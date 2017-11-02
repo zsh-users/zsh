@@ -22,7 +22,7 @@ options+=(
 )
 
 output_modes=( column HTML line list )
-(( $+sqlite3 )) && output_modes+=( csv quote )
+(( $+sqlite3 )) && output_modes+=( ascii csv quote )
 exclusive=( $^dashes-${^output_modes:l} )
 for display_opt in $output_modes ; do
   # finagle the description to match the way SQLite's -help formats them
@@ -45,7 +45,10 @@ options+=(
   $^dashes'-cmd[run specified command before reading stdin]:sqlite meta-command'
   '(-*batch -*interactive)'$^dashes'-batch[force batch I/O]'
   '(-*batch -*interactive)'$^dashes'-interactive[force interactive I/O]'
+  $^dashes'-lookaside[specify size and number of entries for lookaside memory]:size (bytes): :entries'
   $^dashes'-mmap[set default mmap size]:size'
+  $^dashes'-newline[set output row separator]:separator [\n]'
+  $^dashes'-pagecache[specify size and number of slots for page cache memory]:size (bytes): :slots'
   $^dashes'-stats[print memory stats before each finalize]'
   $^dashes'-vfs[use specified default VFS]:vfs:(unix-dotfile unix-excl unix-none unix-namedsem)'
 )

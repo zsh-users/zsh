@@ -1,5 +1,8 @@
 2017-11-13  Oliver Kiddle  <opk@zsh.org>
 
+	* gitlab #1: Completion/Unix/Command/_sqlite: update options
+	for sqlite 3.21.0
+
 	* github #18: Malcolm Ramsay: Completion/Redhat/Command/_dnf:
 	Explicitly use system python so the dnf module can be found
 
