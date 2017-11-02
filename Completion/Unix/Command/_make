@@ -287,14 +287,9 @@ _make() {
       compset -P 1 '*='
       _value "$@" && ret=0
     else
-      _tags targets variables
-      while _tags
-      do
-        _requested targets expl 'make targets' \
-          compadd -Q -- $TARGETS && ret=0
-        _requested variables expl 'make variables' \
-          compadd -S '=' -F keys -- ${(k)VARIABLES} && ret=0
-      done
+      _alternative \
+        'targets:make target:compadd -Q -a TARGETS' \
+        'variables:make variable:compadd -S = -F keys -k VARIABLES' && ret=0
     fi
   esac
 

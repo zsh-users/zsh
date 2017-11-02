@@ -72,6 +72,7 @@ else
       _files -W module_path -g '*.(dll|s[ol]|bundle)(:r)' && ret=0
     _requested aliases expl 'module alias' \
       compadd "$suf[@]" -k 'modules[(R)alias*]' && ret=0
+    (( ret )) || return 0
   done
   return ret
 fi

@@ -1,3 +1,9 @@
+2017-11-02  Oliver Kiddle  <opk@zsh.org>
+
+	* 41971: Completion/Linux/Command/_modutils,
+	Completion/Unix/Command/_make, Completion/Zsh/Command/_zmodload:
+	correctly break out of certain tag loops when there are matches
+
 2017-11-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Martijn: 41866: Src/builtin.c, Src/hashtable.c: no error for

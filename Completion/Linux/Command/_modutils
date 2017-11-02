@@ -119,6 +119,7 @@ _modutils() {
 	    while _tags; do
 		_requested files expl "module file"  _files -g '*.ko(-.)' && ret=0
 		_requested modules expl module compadd -a modules && ret=0
+		(( ret )) || break
 	    done
 	    ;;
 
