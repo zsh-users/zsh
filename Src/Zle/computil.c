@@ -2080,7 +2080,7 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
         remnulargs(line);
         untokenize(line);
 
-	ca_inactive(d, argxor, cur, 0);
+	ca_inactive(d, argxor, cur - 1, 0);
 	if ((d->flags & CDF_SEP) && cur != compcurrent && !strcmp(line, "--")) {
 	    ca_inactive(d, NULL, cur, 1);
 	    continue;

@@ -485,11 +485,17 @@
 >NO:{-c}
 >NO:{-g}
 
- tst_arguments '(-)-h' -a -b -c
+ tst_arguments '(-)-h' -a -b -c --long +p
  comptest $'tst -h -\t'
 0:exclude all other options
 >line: {tst -h -}{}
 >MESSAGE:{no arguments}
+
+ tst_arguments --args -b -c +p '(-)1:normal'
+ comptest $'tst arg -\t'
+0:exclude all options from a normal argument
+>line: {tst arg -}{}
+>MESSAGE:{no more arguments}
 
  tst_arguments -a '(-a)-b'
  comptest $'tst - -b\C-b\C-b\C-b\t'
