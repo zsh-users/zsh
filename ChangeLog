@@ -1,7 +1,10 @@
 2017-11-13  Oliver Kiddle  <opk@zsh.org>
 
-	* github #19: Chris Bracken: Fix minor typo in
-	INC_APPEND_HISTORY documentation
+	* github #18: Malcolm Ramsay: Completion/Redhat/Command/_dnf:
+	Explicitly use system python so the dnf module can be found
+
+	* github #19: Chris Bracken: Doc/Zsh/options.yo: Fix minor typo
+	in INC_APPEND_HISTORY documentation
 
 2017-11-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 

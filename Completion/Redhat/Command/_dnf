@@ -38,9 +38,9 @@ _dnf_local_packages() {
 
 _dnf() {
   if [[ "$(readlink /usr/bin/dnf)" == "dnf-2" ]]; then
-    local python_exec="python2"
+    local python_exec="/usr/bin/python2"
   else
-    local python_exec="python3"
+    local python_exec="/usr/bin/python3"
   fi
   local helper=$(${python_exec} -c "import dnf.cli; print('{}/completion_helper.py'.format(dnf.cli.__path__[0]))")
   local cache_file="/var/cache/dnf/packages.db"
