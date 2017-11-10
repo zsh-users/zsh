@@ -1987,7 +1987,7 @@ and options.  Note that the tt(-H) flag on parameters is respected; no
 value will be shown for these parameters.
 
 tt(-p) may be followed by an optional integer argument.  Currently
-only the value tt(1)) is supported.  In this case arrays and associative
+only the value tt(1) is supported.  In this case arrays and associative
 arrays are printed with newlines between indented elements for
 readability.
 )

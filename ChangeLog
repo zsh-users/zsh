@@ -1,3 +1,7 @@
+2017-11-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Martijn: 42004: Doc/Zsh/builtins.yo: fix parentheses.
+
 2017-11-04  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Completion/Linux/Command/_sshfs: Make the -o option
