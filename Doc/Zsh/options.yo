@@ -1016,7 +1016,7 @@ pindex(INCAPPENDHISTORY)
 pindex(NOINCAPPENDHISTORY)
 cindex(history, incremental appending to a file)
 item(tt(INC_APPEND_HISTORY))(
-This options works like tt(APPEND_HISTORY) except that new history lines
+This option works like tt(APPEND_HISTORY) except that new history lines
 are added to the tt($HISTFILE) incrementally (as soon as they are
 entered), rather than waiting until the shell exits.
 The file will still be periodically re-written to trim it when the
