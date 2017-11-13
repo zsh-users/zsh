@@ -1,5 +1,8 @@
 2017-11-13  Oliver Kiddle  <opk@zsh.org>
 
+	* 42019: Completion/Unix/Command/_git: update options to 2.15
+	and improve format completion for git tag and for-each-ref
+
 	* gitlab #1: Completion/Unix/Command/_sqlite: update options
 	for sqlite 3.21.0
 

@@ -293,9 +293,8 @@ _git-branch () {
 
   l='--color --no-color -r --remotes -a -v --verbose --abbrev --no-abbrev --list --points-at --sort'
   c='-l --create-reflog -f --force -t --track --no-track -u --set-upstream --set-upstream-to --unset-upstream --contains --no-contains --merged --no-merged'
-  m='-m --move -M'
+  m='-c --copy -C -m --move -M --edit-description'
   d='-d --delete -D'
-  e='--edit-description'
 
   declare -a dependent_creation_args
   if (( words[(I)(-r|--remotes)] == 0 )); then
@@ -325,37 +324,39 @@ _git-branch () {
   fi
 
   _arguments -S -s \
-    "($c $m $d $e --no-color :)--color=-[turn on branch coloring]:: :__git_color_whens" \
-    "($c $m $d $e : --color)--no-color[turn off branch coloring]" \
-    "($c $m $d $e --no-column)"'--column=[display tag listing in columns]:column.branch option:((always\:"always show in columns" never\:"never show in columns" auto\:"show in columns if the output is to the terminal" column\:"fill columns before rows (default)" row\:"fill rows before columns" plain\:"show in one column" dense\:"make unequal size columns to utilize more space" nodense\:"make equal size columns"))' \
-    "($c $m $d $e --column)"'--no-column[do not display in columns]' \
-    "($c $m $d $e )*--list[list only branches matching glob]:pattern" \
-    "($c $m    $e  -a)"{-r,--remotes}'[list or delete only remote-tracking branches]' \
-    "($c $m $d $e: -r --remotes)-a[list both remote-tracking branches and local branches]" \
-    "($c $m $d $e : -v -vv --verbose)"{-v,-vv,--verbose}'[show SHA1 and commit subject line for each head]' \
-    "($c $m $d $e :)--abbrev=[set minimum SHA1 display-length]: :__git_guard_number length" \
-    "($c $m $d $e :)--no-abbrev[do not abbreviate sha1s]" \
-    "($l $m $d $e)"{-l,--create-reflog}"[create the branch's reflog]" \
-    "($l $m $d $e -f --force)"{-f,--force}"[force the creation of a new branch]" \
-    "($l $m $d $e -t --track)"{-t,--track}"[set up configuration so that pull merges from the start point]" \
-    "($l $m $d $e)--no-track[override the branch.autosetupmerge configuration variable]" \
-    "($l $m $d $e -u --set-upstream --set-upstream-to --unset-upstream)"{-u+,--set-upstream-to=}"[set up configuration so that pull merges]:remote-branches:__git_remote_branch_names" \
-    "($l $m $d $e -u --set-upstream --set-upstream-to --unset-upstream)--unset-upstream[remove upstream configuration]" \
-    "($l $m $d $e)*--contains=[only list branches that contain the specified commit]: :__git_committishs" \
-    "($l $m $d $e)*--no-contains=[only list branches that don't contain the specified commit]: :__git_committishs" \
-    "($l $m $d $e)--merged=[only list branches that are fully contained by HEAD]: :__git_committishs" \
-    "($l $m $d $e)--no-merged=[don't list branches that are fully contained by HEAD]: :__git_committishs" \
+    "($c $m $d --no-color :)--color=-[turn on branch coloring]:: :__git_color_whens" \
+    "($c $m $d : --color)--no-color[turn off branch coloring]" \
+    "($c $m $d --no-column)"'--column=[display tag listing in columns]:column.branch option:((always\:"always show in columns" never\:"never show in columns" auto\:"show in columns if the output is to the terminal" column\:"fill columns before rows (default)" row\:"fill rows before columns" plain\:"show in one column" dense\:"make unequal size columns to utilize more space" nodense\:"make equal size columns"))' \
+    "($c $m $d --column)--no-column[don't display in columns]" \
+    "($c $m $d )*--list[list only branches matching glob]:pattern" \
+    "($c $m     -a)"{-r,--remotes}'[list or delete only remote-tracking branches]' \
+    "($c $m $d : -r --remotes)-a[list both remote-tracking branches and local branches]" \
+    "($c $m $d : -v -vv --verbose)"{-v,-vv,--verbose}'[show SHA1 and commit subject line for each head]' \
+    "($c $m $d :)--abbrev=[set minimum SHA1 display-length]: :__git_guard_number length" \
+    "($c $m $d :)--no-abbrev[don't abbreviate sha1s]" \
+    "($l $m $d)"{-l,--create-reflog}"[create the branch's reflog]" \
+    "($l $m $d -f --force)"{-f,--force}'[force the creation of a new branch]' \
+    "($l $m $d -t --track)"{-t,--track}'[setup configuration so that pull merges from the start point]' \
+    "($l $m $d)--no-track[override the branch.autosetupmerge configuration variable]" \
+    "($l $m $d -u --set-upstream --set-upstream-to --unset-upstream)"{-u+,--set-upstream-to=}'[set up configuration so that pull merges]:remote-branches:__git_remote_branch_names' \
+    "($l $m $d -u --set-upstream --set-upstream-to --unset-upstream)--unset-upstream[remove upstream configuration]" \
+    "($l $m $d)*--contains=[only list branches that contain the specified commit]: :__git_committishs" \
+    "($l $m $d)*--no-contains=[only list branches that don't contain the specified commit]: :__git_committishs" \
+    "($l $m $d)--merged=[only list branches that are fully contained by HEAD]: :__git_committishs" \
+    "($l $m $d)--no-merged=[don't list branches that are fully contained by HEAD]: :__git_committishs" \
     "($c $l $m $d)--edit-description[edit branch description]" \
     $dependent_creation_args \
-    "($l $c $d $m $e)"{-m,--move}"[rename a branch and the corresponding reflog]" \
-    "($l $c $d $m $e)-M[rename a branch even if the new branch-name already exists]" \
+    "($l $c $d $m)"{-m,--move}"[rename a branch and the corresponding reflog]" \
+    "($l $c $d $m)-M[rename a branch even if the new branch-name already exists]" \
+    "($l $c $d $m)"{-c,--copy}"[copy a branch and the corresponding reflog]" \
+    "($l $c $d $m)-C[copy a branch even if the new branch-name already exists]" \
     $dependent_modification_args \
-    "($l $c $m $d $e)"{-d,--delete}"[delete a fully merged branch]" \
-    "($l $c $m $d $e)-D[delete a branch]" \
+    "($l $c $m $d)"{-d,--delete}"[delete a fully merged branch]" \
+    "($l $c $m $d)-D[delete a branch]" \
     {-q,--quiet}"[be more quiet]" \
     '*--sort=[specify field to sort on]: :__git_ref_sort_keys' \
     '--points-at=[only list tags of the given object]: :__git_commits' \
-    "($c $m $d $e -i --ignore-case)"{-i,--ignore-case}'[sorting and filtering are case-insensitive]' \
+    "($c $m $d -i --ignore-case)"{-i,--ignore-case}'[sorting and filtering are case-insensitive]' \
     $dependent_deletion_args
 }
 
@@ -929,6 +930,7 @@ _git-format-patch () {
     '--no-binary[do not output contents of changes in binary files, only note that they differ]' \
     '--root[treat the revision argument as a range]' \
     '--zero-commit[output all-zero hash in From header]' \
+    '--progress[show progress while generating patches]' \
     ': :->commit-or-commit-range' && ret=0
 
   case $state in
@@ -1126,6 +1128,22 @@ _git-init () {
     ':: :_directories'
 }
 
+(( $+functions[_git-interpret-trailers] )) ||
+_git-interpret-trailers() {
+  _arguments \
+    '--in-place[edit files in place]' \
+    '--trim-empty[trim empty trailers]' \
+    '--where[specify where to place the new trailer]' \
+    '--if-exists[specify action if trailer already exists]' \
+    '--if-missing[specify action if trailer is missing]' \
+    '--only-trailers[output only the trailers]' \
+    "--only-input[don't apply config rules]" \
+    '--unfold[join whitespace-continued values]' \
+    '--parse[set parsing options]' \
+    '--trailer[specify trailer(s) to add]' \
+    '*:file:_files'
+}
+
 (( $+functions[_git-log] )) ||
 _git-log () {
   local curcontext=$curcontext state line ret=1
@@ -1189,6 +1207,8 @@ _git-merge () {
     '--abort[restore the original branch and abort the merge operation]' \
     '--continue[continue the current in-progress merge]' \
     '--progress[force progress reporting]' \
+    '--signoff[add Signed-off-by:]' \
+    '--verify[verify commit-msg hook]' \
     '*: : __git_commits -O expl:git_commit_opts'
 }
 
@@ -1988,10 +2008,9 @@ _git-tag () {
       "*--no-contains=[only list tags that don't contain the specified commit]: :__git_commits" \
       '--merged=-[print only tags that are merged]:: :__git_commits' \
       '--no-merged=-[print only tags that are not merged]:: :__git_commits' \
-      '--sort=[specify how the tags should be sorted]:mode:((refname\:"lexicographic order"
-                                                             version\\\:refname\:"tag names are treated as version numbers"))' \
+      '--sort=[specify how the tags should be sorted]:field:__git_ref_sort_keys' \
       '--points-at=[only list tags of the given object]: :__git_commits' \
-      '--format=[specify format to use for the output]:format' \
+      '--format=[specify format to use for the output]:format:__git_format_ref' \
       '--color=-[respect any colors specified in the format]::when:(always never auto)' \
       '(-i --ignore-case)'{-i,--ignore-case}'[sorting and filtering are case-insensitive]' \
       ':: :_guard "^-*" pattern' \
@@ -2187,6 +2206,7 @@ __git_config_option-or-value () {
     advice.implicitIdentity:'show advice when identity is guessed from system settings::->bool:true'
     advice.detachedHead:'show advice when entering detached-HEAD state::->bool:true'
     advice.amWorkDir:'show the location of the patch file when git-am fails to apply it::->bool:true'
+    advice.rmHints:'show directions in case of failure in the output of git-rm(1)::->bool:true'
     blame.blankboundary:'show blank SHA-1 for boundary commits::->bool:false'
     blame.showroot:'show root commits as normal commits::->bool:false'
     blame.date:'date format to use in output::__git_date_formats:iso'
@@ -3389,6 +3409,7 @@ _git-filter-branch () {
     '--original[namespace where original commits will be stored]:namespace:_directories' \
     '-d[temporary directory used for rewriting]: :_directories' \
     '(-f --force)'{-f,--force}'[force operation]' \
+    '--state-branch[load mapping from old to new objects from specified branch]:branch:__git_branch_names' \
     '*: :__git_commit_ranges'
 }
 
@@ -3503,16 +3524,6 @@ _git-reflog () {
 
     return ret
   fi
-}
-
-(( $+functions[_git-relink] )) ||
-_git-relink () {
-  _arguments \
-    '--safe[stop if two objects with the same hash exist but have different sizes]' \
-    '(-)'{-h,--help}'[display usage information]' \
-    ': :_directories' \
-    ': :_directories' \
-    '*: :_directories'
 }
 
 (( $+functions[_git-remote] )) ||
@@ -3991,7 +4002,7 @@ _git-verify-tag () {
   _arguments -S -s \
     '(-v --verbose)'{-v,--verbose}'[print contents of the tag object before validating it]' \
     '--raw[print raw gpg status output]' \
-    '--format=[specify format to use for the output]:format' \
+    '--format=[specify format to use for the output]:format:__git_format_ref' \
     '*: :__git_tags'
 }
 
@@ -4916,7 +4927,7 @@ _git-for-each-ref () {
   _arguments -S -s \
     '--count=[maximum number of refs to iterate over]: :__git_guard_number "maximum number of refs"' \
     '*--sort=[key to sort refs by]: :__git_ref_sort_keys' \
-    '--format=-[output format of ref information]:format' \
+    '--format=-[output format of ref information]:format:__git_format_ref' \
     '--color=-[respect any colors specified in the format]::when:(always never auto)' \
     '*--points-at=[print only refs which point at the given object]:object:__git_commits' \
     '*--merged=[print only refs that are merged]:object:__git_commits' \
@@ -5642,7 +5653,6 @@ _git_commands () {
     pack-refs:'pack heads and tags for efficient repository access'
     prune:'prune all unreachable objects from the object database'
     reflog:'manage reflog information'
-    relink:'hardlink common objects in local repositories'
     remote:'manage set of tracked repositories'
     repack:'pack unpacked objects in a repository'
     replace:'create, list, delete refs to replace objects')
@@ -5656,6 +5666,7 @@ _git_commands () {
     get-tar-commit-id:'extract commit ID from an archive created using git archive'
     help:'display help information about git'
     instaweb:'instantly browse your working repository in gitweb'
+    interpret-trailers:'add or parse structured information in commit messages'
     merge-tree:'show three-way merge without touching index'
     rerere:'reuse recorded resolution of conflicted merges'
     rev-parse:'pick out and massage parameters for other git commands'
@@ -6028,17 +6039,80 @@ __git_reflog_entries () {
 __git_ref_sort_keys () {
   compset -P '-'
 
-  local -a sort_keys
+  __git_ref_fields "$@"
+}
 
-  # TODO: numparent is undocumented.
-  sort_keys=(
-    'refname:the name of the ref'
+(( $+functions[__git_ref_fields] )) ||
+__git_ref_fields () {
+  # pass -a to complete all fields, otherwise only fields relevant to sorting
+  local match mbegin mend
+  local -a cfields fields append opts all
+
+  zparseopts -D -E -a opts x: X: J: V: a=all
+
+  if compset -P 1 '(#b)(*):'; then
+    case $match[1] in
+      push|upstream)
+	append=(
+	  'trackshort[show terse version: > (ahead) < (behind) = (in sync)]'
+	  'track[print gone whenever unknown upstream ref is encountered]'
+	  'track,nobracket[tracking information without brackets]'
+        )
+      ;&
+      refname|upstream|symref)
+	append+=(
+	  {strip,lstrip}'[strip elements from the left]:elements to strip / -remain'
+	  'rstrip[strip elements from the right]:elements to strip / -remain'
+	  'short[strip to non-ambiguous short name]'
+	)
+      ;;
+      objectname)
+        append=(
+	  'short[strip to non-ambiguous short name]:length'
+	)
+      ;;
+      color)
+	_alternative \
+	  'colors::__git_colors' \
+	  'attributes::__git_color_attributes'
+	return
+      ;;
+      align)
+	append=(
+	  'width[specify width]:width'
+	  'position[specify alignment]:alignment:(left right middle)'
+	)
+      ;;
+      if) append=( {,not}'equals:string' ) ;;
+      contents) append=( subject body signature lines:lines ) ;;
+      tailers) append=( only unfold ) ;;
+      v|version)
+	append=(
+	  'refname[sort by versions]'
+	)
+      ;;
+    esac
+    (( $#append )) || return 1
+    _values 'interpolation modifier' $append
+    return
+  fi
+
+  cfields=(
+    'refname:name of the ref'
+    'objectname:object name (SHA-1)'
+    'upstream:name of a local ref which can be considered “upstream” from the displayed ref'
+    'push:name of a local ref which represents the @{push} location for the displayed ref'
+    'symref:the ref which the given symbolic ref refers to'
+    'contents:complete message'
+    'trailers:structured information in commit messages'
+  )
+  fields=(
     'objecttype:the type of the object'
     'objectsize:the size of the object'
-    'objectname:the object name (SHA-1)'
+    'HEAD:* if HEAD matches ref or space otherwise'
     'tree:the tree header-field'
     'parent:the parent header-field'
-    'numparent:undocumented'
+    'numparent:number of parent objects'
     'object:the object header-field'
     'type:the type header-field'
     'tag:the tag header-field'
@@ -6046,19 +6120,45 @@ __git_ref_sort_keys () {
     'authorname:the name component of the author header-field'
     'authoremail:the email component of the author header-field'
     'authordate:the date component of the author header-field'
+    'committer:the committer header-field'
     'committername:the name component of the committer header-field'
     'committeremail:the email component of the committer header-field'
     'committerdate:the date component of the committer header-field'
+    'tagger:the tagger header-field'
     'taggername:the name component of the tagger header-field'
     'taggeremail:the email component of the tagger header-field'
     'taggerdate:the date component of the tagger header-field'
-    'creatorname:the name component of the creator header-field'
+    'creator:the creator header-field'
     'creatordate:the date component of the creator header-field'
     'subject:the subject of the message'
     'body:the body of the message'
-    'body:the contents of the message (subject and body)')
+    'version\:refname:sort by versions'
+  )
+  if (( $#all )); then
+    cfields+=(
+      'color:change output color'
+      'align:set alignment'
+      'if:conditional'
+    )
+    fields+=(
+      'then:true branch'
+      'else:false branch'
+      'end:end if or align block'
+    )
+  fi
 
-  _describe -t sort-keys 'sort key' sort_keys $*
+  _describe -t fields 'field' cfields -S : -r ':\\) \t\n\-' -- fields "$@"
+}
+
+(( $+functions[__git_format_ref] )) ||
+__git_format_ref() {
+  local expl
+  compset -P '(%\\\([^)]#\\\)|[^%]|%%|%[[:xdigit:]][[:xdigit:]])#'
+  if compset -P '%\\\((\*|)'; then
+    __git_ref_fields -S '\)' -a
+  else
+    _wanted -x formats expl format compadd -S '' '%('
+  fi
 }
 
 (( $+functions[__git_signoff_file] )) ||
@@ -6986,7 +7086,14 @@ __git_setup_diff_stage_options () {
 __git_format_placeholders() {
   local sep
   local -a disp names placeholders expl
-  if compset -P 'format:'; then
+  _describe -t formats format '( oneline:"commit-ids and subject of messages"
+    short:"few headers and only subject of messages"
+    medium:"most parts of messages"
+    full:"all parts of commit messages"
+    fuller:"like full and includes dates"
+    email:"use email headers like From and Subject"
+    raw:"the raw commits" )' -- '( format:"specify own format" )' -S ':' && return
+  compset -P 'format:'
     compset -P '(%[^acgCG]|%?[^%]|[^%])#'
     if compset -P '%C'; then
       _wanted colors expl color compadd reset red green blue
@@ -7005,6 +7112,8 @@ __git_format_placeholders() {
 	gD:'reflog selector'
 	gd:'short reflog selector'
 	gn:'reflog identity'
+	ge:'reflog identity email'
+	gE:'reflog identity email (use .mailmap)'
 	gs:'reflog subject'
       )
       disp=( -l )
@@ -7028,8 +7137,8 @@ __git_format_placeholders() {
 	h:'abbreviated commit hash'
 	T:'tree hash'
 	t:'abbreviated tree hash'
-	P:'parent hash'
-	p:'abbreviated parent hash'
+	P:'parent hashes'
+	p:'abbreviated parent hashes'
 	a:'author details'
 	c:'committer details'
 	d:'ref name in brackets'
@@ -7060,15 +7169,6 @@ __git_format_placeholders() {
     fi
     _wanted placeholders expl placeholder \
         compadd -p % -S '' "$disp[@]" "$@" - "$names[@]"
-  else
-    _describe -t formats format '( oneline:"commit-ids and subject of messages"
-      short:"few headers and only subject of messages"
-      medium:"most parts of messages"
-      full:"all parts of commit messages"
-      fuller:"like full and includes dates"
-      email:"use email headers like From and Subject"
-      raw:"the raw commits" )' -- '( format:"specify own format" )' -S ':'
-  fi
 }
 
 (( $+functions[__git_setup_revision_options] )) ||
