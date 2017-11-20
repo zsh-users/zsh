@@ -1,3 +1,8 @@
+2017-11-20  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Evan Underscore / pws: 42037: Completion/bashcompinit: recent
+	change caused wrong word to be used for COMP_POINT.
+
 2017-11-13  Oliver Kiddle  <opk@zsh.org>
 
 	* 42019: Completion/Unix/Command/_git: update options to 2.15
