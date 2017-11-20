@@ -387,7 +387,7 @@ insert(char *s, int checked)
 	    qn = qn->next;
 	}
     } else if (!checked) {
-	if (statfullpath(s, NULL, 1)) {
+	if (statfullpath(s, &buf, 1)) {
 	    unqueue_signals();
 	    return;
 	}

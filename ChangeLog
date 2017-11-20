@@ -1,5 +1,8 @@
 2017-11-20  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Dima Kogan: 42040: Src/glob.c: buffer for glob qualifiers
+	loses stat information in corner case.
+
 	* Evan Underscore / pws: 42037: Completion/bashcompinit: recent
 	change caused wrong word to be used for COMP_POINT.
 
