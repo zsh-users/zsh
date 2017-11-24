@@ -440,6 +440,26 @@ F:Failures in these cases do not indicate a problem in the shell.
 >  [[ 'a' == 'b' || 'b' = 'c' || 'c' != 'd' ]]
 >}
 
+  (setopt posixbuiltins; [[ -o invalidoption ]]; echo set: $?; echo "line 1: no warning" >&2)
+  (unsetopt posixbuiltins; [[ -o invalidoption ]]; echo unset: $?)
+  [[ -o invalidoption || -n nonempty ]]; echo "in disjunction, true: $?"
+  [[ -o invalidoption || -z nonempty ]]; echo "in disjunction, false: $?"
+  [[ ! -o invalidoption ]]; echo "negated: $?"
+  [[ -o invalidoption && -n nonempty ]] || echo "in conjunction: $?"
+0:-o invalidoption
+>set: 1
+?line 1: no warning
+>unset: 3
+?(eval):2: no such option: invalidoption
+>in disjunction, true: 0
+?(eval):3: no such option: invalidoption
+>in disjunction, false: 1
+?(eval):4: no such option: invalidoption
+>negated: 3
+?(eval):5: no such option: invalidoption
+>in conjunction: 3
+?(eval):6: no such option: invalidoption
+
 %clean
   # This works around a bug in rm -f in some versions of Cygwin
   chmod 644 unmodish

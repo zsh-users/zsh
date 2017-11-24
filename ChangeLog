@@ -1,3 +1,9 @@
+2017-11-24  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 42031 + 42048: Doc/Zsh/cond.yo, Doc/Zsh/options.yo, README,
+	Src/cond.c, Test/C02cond.ztst: Make [[ -o invalidoption ]]
+	a normal(ish) false value, rather than a syntax error.
+
 2017-11-20  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Dima Kogan: 42040: Src/glob.c: buffer for glob qualifiers

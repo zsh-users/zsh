@@ -45,6 +45,10 @@ item(tt(-o) var(option))(
 true if option named var(option) is on.  var(option)
 may be a single character, in which case it is a single letter option name.
 (See noderef(Specifying Options).)
+
+When no option named var(option) exists, and the tt(POSIX_BUILTINS) option
+hasn't been set, return 3 with a warning.  If that option is set, return 1
+with no warning.
 )
 item(tt(-p) var(file))(
 true if var(file) exists and is a FIFO special file (named pipe).

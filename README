@@ -54,6 +54,18 @@ foo=([aeiou]\=vowel)
 This is only required for array values contained within parentheses;
 command line expansion for normal arguments has not changed.
 
+3) The syntax
+
+[[ -o foo ]]
+
+where foo is not the name of a shell option (with optional underscores
+and optional "no" prefix) used to be treated as a syntax error, i.e.,
+the enclosing command line or file were aborted.  It now emits a warning
+and returns a non-zero exit code.  For further details, see the
+documentation of the -o switch in the chapter "Conditional Expressions"
+in the zshmisc(1) manual.
+
+
 Incompatibilities between 5.3.1 and 5.4.2
 -----------------------------------------
 

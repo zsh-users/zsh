@@ -61,7 +61,8 @@ static void cond_subst(char **strp, int glob_ok)
  * of functionality.
  *
  * Return status is the final shell status, i.e. 0 for true,
- * 1 for false and 2 for error.
+ * 1 for false, 2 for syntax error, 3 for "option in tested in
+ * -o does not exist".
  */
 
 /**/
@@ -86,10 +87,10 @@ evalcond(Estate state, char *fromtest)
 	if (tracingcond)
 	    fprintf(xtrerr, " %s", condstr[ctype]);
 	ret = evalcond(state, fromtest);
-	if (ret == 2)
-	    return ret;
-	else
+	if (ret == 0 || ret == 1)
 	    return !ret;
+	else
+	    return ret;
     case COND_AND:
 	if (!(ret = evalcond(state, fromtest))) {
 	    if (tracingcond)
@@ -100,7 +101,8 @@ evalcond(Estate state, char *fromtest)
 	    return ret;
 	}
     case COND_OR:
-	if ((ret = evalcond(state, fromtest)) == 1) {
+	ret = evalcond(state, fromtest);
+	if (ret == 1 || ret == 3) {
 	    if (tracingcond)
 		fprintf(xtrerr, " %s", condstr[ctype]);
 	    goto rec;
@@ -506,8 +508,12 @@ optison(char *name, char *s)
     else
 	i = optlookup(s);
     if (!i) {
-	zwarnnam(name, "no such option: %s", s);
-	return 2;
+	if (isset(POSIXBUILTINS))
+	    return 1;
+	else {
+	    zwarnnam(name, "no such option: %s", s);
+	    return 3;
+	}
     } else if(i < 0)
 	return !unset(-i);
     else
