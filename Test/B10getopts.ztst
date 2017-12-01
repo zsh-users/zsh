@@ -1,0 +1,81 @@
+# Test the getopts builtin.
+
+%prep
+
+  test_getopts() {
+    local OPTARG OPTIND opt
+    local -a res
+    while getopts abc: opt 2>&1; do
+      [[ $opt == [?:] ]] || res+=( $opt )
+    done
+    (( $#res )) && print -r -- $res
+    return $(( $#res ? 0 : 1 ))
+  }
+
+%test
+
+  test_getopts
+1:no arguments
+
+  test_getopts foo
+1:one operand
+
+  test_getopts -a
+0:one option
+>a
+
+  test_getopts -a foo
+0:one option, one operand
+>a
+
+  test_getopts -a foo -b
+0:one option, two operands, leading hyphen
+>a
+
+  test_getopts -ab
+0:two options, single argument
+>a b
+
+  test_getopts -a -b
+0:two options, separate arguments
+>a b
+
+  test_getopts -a -b +a
+0:three options, + variant
+>a b +a
+
+  test_getopts -cx
+0:one option with value, single argument
+>c
+
+  test_getopts +cx
+0:one option with value, single argument, + variant
+>+c
+
+  test_getopts -c x
+0:one option with value, separate arguments
+>c
+
+  test_getopts -acx
+0:two options, one with value, single argument
+>a c
+
+  test_getopts -ac x
+0:two options, one with value, separate arguments
+>a c
+
+  test_getopts -c
+1:one option missing value
+>test_getopts:3: argument expected after -c option
+
+  test_getopts +c
+1:one option missing value, + variant
+>test_getopts:3: argument expected after +c option
+
+  test_getopts -x
+1:one illegal option
+>test_getopts:3: bad option: -x
+
+  test_getopts +x
+1:one illegal option, + variant
+>test_getopts:3: bad option: +x
