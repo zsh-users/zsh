@@ -1,3 +1,8 @@
+2017-12-01  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* dana: 42063: Src/builtin.c: getopts errors now report "+" if
+	appropriate for option.
+
 2017-11-24  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 42031 + 42048: Doc/Zsh/cond.yo, Doc/Zsh/options.yo, README,

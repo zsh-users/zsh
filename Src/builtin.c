@@ -5442,8 +5442,9 @@ bin_getopts(UNUSED(char *name), char **argv, UNUSED(Options ops), UNUSED(int fun
 	if(quiet) {
 	    zoptarg = metafy(optbuf, lenoptbuf, META_DUP);
 	} else {
-	    zwarn(*p == '?' ? "bad option: -%c" :
-		  "argument expected after -%c option", opch);
+	    zwarn(*p == '?' ? "bad option: %c%c" :
+		  "argument expected after %c%c option",
+		  "?-+"[lenoptbuf], opch);
 	    zoptarg=ztrdup("");
 	}
 	return 0;
