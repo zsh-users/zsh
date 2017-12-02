@@ -1,6 +1,6 @@
 2017-12-01  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* data: 42065: Test/B10getopts.ztst: new getopts tests.
+	* dana: 42065: Test/B10getopts.ztst: new getopts tests.
 
 	* dana: 42063: Src/builtin.c: getopts errors now report "+" if
 	appropriate for option.
