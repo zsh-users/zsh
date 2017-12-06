@@ -3251,19 +3251,24 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 
 	    next = nextnode(node);
 	    if (s[0] == Star && !s[1]) {
-		if (!checkrmall(pwd))
-		    uremnode(args, node);
+		if (!checkrmall(pwd)) {
+		    errflag |= ERRFLAG_ERROR;
+		    break;
+		}
 	    } else if (l >= 2 && s[l - 2] == '/' && s[l - 1] == Star) {
 		char t = s[l - 2];
+		int rmall;
 
 		s[l - 2] = 0;
-		if (!checkrmall(*s ? s : "/"))
-		    uremnode(args, node);
+		rmall = checkrmall(s);
 		s[l - 2] = t;
+
+		if (!rmall) {
+		    errflag |= ERRFLAG_ERROR;
+		    break;
+		}
 	    }
 	}
-	if (!nextnode(firstnode(args)))
-	    errflag |= ERRFLAG_ERROR;
     }
 
     if (type == WC_FUNCDEF) {
