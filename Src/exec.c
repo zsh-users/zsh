@@ -2750,7 +2750,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
     char *text;
     int save[10];
     int fil, dfil, is_cursh, do_exec = 0, redir_err = 0, i;
-    int nullexec = 0, magic_assign = 0, forked = 0;
+    int nullexec = 0, magic_assign = 0, forked = 0, old_lastval;
     int is_shfunc = 0, is_builtin = 0, is_exec = 0, use_defpath = 0;
     /* Various flags to the command. */
     int cflags = 0, orig_cflags = 0, checked = 0, oautocont = -1;
@@ -2775,6 +2775,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
      * If assignment but no command get the status from variable
      * assignment.
      */
+    old_lastval = lastval;
     if (!args && varspc)
 	lastval = errflag ? errflag : cmdoutval;
     /*
@@ -3209,8 +3210,11 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 			return;
 		    }
 		    cmdoutval = use_cmdoutval ? lastval : 0;
-		    if (varspc)
+		    if (varspc) {
+			/* Make sure $? is still correct for assignment */
+			lastval = old_lastval;
 			addvars(state, varspc, 0);
+		    }
 		    if (errflag)
 			lastval = 1;
 		    else

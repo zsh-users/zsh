@@ -199,6 +199,41 @@
 >a 1 2 3
 >a 1 2 3
 
+# tests of array assignment using lastval ($?)
+
+  true
+  array=( $? )
+  print $array
+0:Assign $? to array (true)
+>0
+
+  false
+  array=( $? )
+  print $array
+0:Assign $? to array (false)
+>1
+
+  true
+  typeset array=( $? )
+  print $array
+0:Assign $? to array with typeset (true)
+>0
+
+  false
+  typeset array=( $? )
+  print $array
+0:Assign $? to array with typeset (false)
+>1
+
+  array=( )
+  true
+  array+=( $? )
+  false
+  array+=( $? )
+  print $array
+0:Append $? to array (true+false)
+>0 1
+
 # tests of var+=scalar
 
  s+=foo
