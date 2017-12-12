@@ -1,3 +1,8 @@
+2017-12-12  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 42110: Src/parse.c, Test/A04redirect.ztst: fix redirection in
+	between variable assignments at start of line.
+
 2017-12-01  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* dana: 42065: Test/B10getopts.ztst: new getopts tests.

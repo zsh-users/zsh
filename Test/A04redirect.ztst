@@ -622,3 +622,10 @@
 >FOO
 >HERE
 >}
+
+  a=b 2>/dev/null c=d
+  print $a
+  print $c
+0:Redirect in the middle of assignments
+>b
+>d

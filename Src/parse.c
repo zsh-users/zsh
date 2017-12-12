@@ -1848,6 +1848,10 @@ par_simple(int *cmplx, int nr)
 	    incmdpos = oldcmdpos;
 	    isnull = 0;
 	    assignments = 1;
+	} else if (IS_REDIROP(tok)) {
+	    *cmplx = c = 1;
+	    nr += par_redir(&r, NULL);
+	    continue;
 	} else
 	    break;
 	zshlex();
