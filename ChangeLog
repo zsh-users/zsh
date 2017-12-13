@@ -1,3 +1,11 @@
+2017-12-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Matthew Martin: 42113: Completion/BSD/Command/_bsd_pkg,
+	Completion/BSD/Type/_fbsd_architectures,
+	Completion/BSD/Type/_nbsd_architectures,
+	Completion/BSD/Type/_obsd_architectures: Remove FreeBSD use of
+	pkg_* tools and add BSD architecture utilities.
+
 2017-12-12  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 42110: Src/parse.c, Test/A04redirect.ztst: fix redirection in
