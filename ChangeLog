@@ -1,4 +1,9 @@
-2017-01-02  Eric Cook <llua@gmx.com>
+2018-01-03  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* Matthew Martin: 42117: Completion/BSD/Command/_chflags:
+	use anonymous function rather than define one in user namespace
+
+2018-01-02  Eric Cook <llua@gmx.com>
 
 	* 42171: Completion/BSD/Command/_portsnap,
 	Completion/Linux/Command/_ipset,
@@ -112,7 +117,7 @@
 
 2017-12-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* Matthew Martin: 42113: Completion/BSD/Command/_bsd_pkg,
+	* Matthew Martin: 42114: Completion/BSD/Command/_bsd_pkg,
 	Completion/BSD/Type/_fbsd_architectures,
 	Completion/BSD/Type/_nbsd_architectures,
 	Completion/BSD/Type/_obsd_architectures: Remove FreeBSD use of
