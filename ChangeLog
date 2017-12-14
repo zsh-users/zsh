@@ -1,3 +1,9 @@
+2017-12-14  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* dana: 42119: Doc/zsh/params.yo, Src/jobs.c,
+	Test/A01grammar.ztst: add millisecond and microsecond options to
+	TIMEFMT variable.
+
 2017-12-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Matthew Martin: 42113: Completion/BSD/Command/_bsd_pkg,

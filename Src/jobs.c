@@ -728,6 +728,40 @@ printtime(struct timeval *real, child_times_t *ti, char *desc)
 	    case 'S':
 		fprintf(stderr, "%4.2fs", system_time);
 		break;
+	    case 'm':
+		switch (*++s) {
+		case 'E':
+		    fprintf(stderr, "%0.fms", elapsed_time * 1000.0);
+		    break;
+		case 'U':
+		    fprintf(stderr, "%0.fms", user_time * 1000.0);
+		    break;
+		case 'S':
+		    fprintf(stderr, "%0.fms", system_time * 1000.0);
+		    break;
+		default:
+		    fprintf(stderr, "%%m");
+		    s--;
+		    break;
+		}
+		break;
+	    case 'u':
+		switch (*++s) {
+		case 'E':
+		    fprintf(stderr, "%0.fus", elapsed_time * 1000000.0);
+		    break;
+		case 'U':
+		    fprintf(stderr, "%0.fus", user_time * 1000000.0);
+		    break;
+		case 'S':
+		    fprintf(stderr, "%0.fus", system_time * 1000000.0);
+		    break;
+		default:
+		    fprintf(stderr, "%%u");
+		    s--;
+		    break;
+		}
+		break;
 	    case '*':
 		switch (*++s) {
 		case 'E':

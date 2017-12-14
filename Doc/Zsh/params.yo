@@ -1616,10 +1616,12 @@ sitem(tt(%c))(Number of involuntary context switches.)
 sitem(tt(%J))(The name of this job.)
 endsitem()
 
-A star may be inserted between the percent sign and flags printing time.
-This cause the time to be printed in
+A star may be inserted between the percent sign and flags printing time
+(e.g., `tt(%*E)'); this causes the time to be printed in
 `var(hh)tt(:)var(mm)tt(:)var(ss)tt(.)var(ttt)'
 format (hours and minutes are only printed if they are not zero).
+Alternatively, `tt(m)' or `tt(u)' may be used (e.g., `tt(%mE)') to produce
+time output in milliseconds or microseconds, respectively.
 )
 vindex(TMOUT)
 item(tt(TMOUT))(
