@@ -1,3 +1,8 @@
+2017-12-15  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 42123 (tweaked further): Src/exec.c: need to take account of
+	Dash when comparing functions names for autoloading.
+
 2017-12-14  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* dana: 42119: Doc/zsh/params.yo, Src/jobs.c,

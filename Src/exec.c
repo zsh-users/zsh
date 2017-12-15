@@ -5932,6 +5932,7 @@ stripkshdef(Eprog prog, char *name)
 {
     Wordcode pc;
     wordcode code;
+    char *ptr1, *ptr2;
 
     if (!prog)
 	return NULL;
@@ -5942,8 +5943,25 @@ stripkshdef(Eprog prog, char *name)
 	return prog;
     pc++;
     code = *pc++;
-    if (wc_code(code) != WC_FUNCDEF ||
-	*pc != 1 || strcmp(name, ecrawstr(prog, pc + 1, NULL)))
+    if (wc_code(code) != WC_FUNCDEF ||	*pc != 1)
+	return prog;
+
+    /*
+     * See if name of function requested (name) is same as
+     * name of function in word code.  name may still have "-"
+     * tokenised.  The word code shouldn't, as function names should be
+     * untokenised, but reports say it sometimes does.
+     */
+    ptr1 = name;
+    ptr2 = ecrawstr(prog, pc + 1, NULL);
+    while (*ptr1 && *ptr2) {
+	if (*ptr1 != *ptr2 && *ptr1 != Dash && *ptr1 != '-' &&
+	    *ptr2 != Dash && *ptr2 != '-')
+	    break;
+	ptr1++;
+	ptr2++;
+    }
+    if (*ptr1 || *ptr2)
 	return prog;
 
     {

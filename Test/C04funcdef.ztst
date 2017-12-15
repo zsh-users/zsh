@@ -523,6 +523,15 @@
 1:
 ?fn:4: maximum nested function level reached; increase FUNCNEST?
 
+  (
+     fpath=(.)
+     print "foo-bar() { print this should run automatically; }" >foo-bar
+     autoload -Uz foo-bar
+     foo-bar
+  )
+0:autoload containing dash
+>this should run automatically
+
 %clean
 
  rm -f file.in file.out
