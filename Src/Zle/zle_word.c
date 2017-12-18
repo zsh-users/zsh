@@ -86,7 +86,7 @@ viforwardword(char **args)
     if (n < 0) {
 	int ret;
 	zmult = -n;
-	ret = backwardword(args);
+	ret = vibackwardword(args);
 	zmult = n;
 	return ret;
     }
@@ -168,7 +168,7 @@ viforwardblankwordend(char **args)
     if (n < 0) {
 	int ret;
 	zmult = -n;
-	ret = viforwardblankwordend(args);
+	ret = vibackwardblankwordend(args);
 	zmult = n;
 	return ret;
     }
@@ -276,7 +276,7 @@ vibackwardword(char **args)
     if (n < 0) {
 	int ret;
 	zmult = -n;
-	ret = backwardword(args);
+	ret = viforwardword(args);
 	zmult = n;
 	return ret;
     }
@@ -482,7 +482,7 @@ vibackwardkillword(UNUSED(char **args))
 	    cc = wordclass(zleline[pos]);
 	    for (;;) {
 		x = pos;
-		if (x < lim)
+		if (x <= lim)
 		    break;
 		DECPOS(pos);
 		if (wordclass(zleline[pos]) != cc)

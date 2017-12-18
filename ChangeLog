@@ -1,5 +1,11 @@
 2017-12-18  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
+	* 42412: Src/Zle/zle_word.c: fix a bug in 42116. Also fix a few
+	widgets which were calling wrong function when negative numeric
+	argument was given.
+
+2017-12-18  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
 	* 42116: Src/Zle/zle_word.c, Src/Zle/textobjects.c, Src/Zle/zle.h,
 	Test/X02zlevi.ztst: multibyte support for Zle vi-mode word motion
 
