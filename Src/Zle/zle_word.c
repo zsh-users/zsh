@@ -64,7 +64,18 @@ forwardword(char **args)
     return 0;
 }
 
-#define Z_vialnum(X) (ZC_ialnum(X) || (ZWC('_') == X))
+/*
+ * class of character (for vi-mode word motion)
+ * 0: blank,  1: alnum or _,  2: punctuation,  3: the others
+ */
+
+/**/
+int
+wordclass(ZLE_CHAR_T x)
+{
+    return (ZC_iblank(x) ? 0 : ((ZC_ialnum(x) || (ZWC('_') == x)) ? 1 :
+		ZC_ipunct(x) ? 2 : 3));
+}
 
 /**/
 int
@@ -81,13 +92,10 @@ viforwardword(char **args)
     }
     while (n--) {
 	int nl;
-	if (Z_vialnum(zleline[zlecs]))
-	    while (zlecs != zlell && Z_vialnum(zleline[zlecs]))
-		INCCS();
-	else
-	    while (zlecs != zlell && !Z_vialnum(zleline[zlecs]) &&
-		    !ZC_inblank(zleline[zlecs]))
-		INCCS();
+	int cc = wordclass(zleline[zlecs]);
+	while (zlecs != zlell && wordclass(zleline[zlecs]) == cc) {
+	    INCCS();
+	}
 	if (wordflag && !n)
 	    return 0;
 	nl = (zleline[zlecs] == ZWC('\n'));
@@ -208,26 +216,17 @@ viforwardwordend(char **args)
 	    zlecs = pos;
 	}
 	if (zlecs != zlell) {
+	    int cc;
 	    pos = zlecs;
 	    INCPOS(pos);
-	    if (Z_vialnum(zleline[pos])) {
-		for (;;) {
-		    zlecs = pos;
-		    if (zlecs == zlell)
+	    cc = wordclass(zleline[pos]);
+	    for (;;) {
+		zlecs = pos;
+		if (zlecs == zlell)
+		    break;
+		INCPOS(pos);
+		if (wordclass(zleline[pos]) != cc)
 			break;
-		    INCPOS(pos);
-		    if (!Z_vialnum(zleline[pos]))
-			break;
-		}
-	    } else {
-		for (;;) {
-		    zlecs = pos;
-		    if (zlecs == zlell)
-			break;
-		    INCPOS(pos);
-		    if (Z_vialnum(zleline[pos]) || ZC_inblank(zleline[pos]))
-			break;
-		}
 	    }
 	}
     }
@@ -295,24 +294,14 @@ vibackwardword(char **args)
 	}
 	if (zlecs) {
 	    int pos = zlecs;
-	    if (Z_vialnum(zleline[pos])) {
-		for (;;) {
-		    zlecs = pos;
-		    if (zlecs == 0)
-			break;
-		    DECPOS(pos);
-		    if (!Z_vialnum(zleline[pos]))
-			break;
-		}
-	    } else {
-		for (;;) {
-		    zlecs = pos;
-		    if (zlecs == 0)
-			break;
-		    DECPOS(pos);
-		    if (Z_vialnum(zleline[pos]) || ZC_inblank(zleline[pos]))
-			break;
-		}
+	    int cc = wordclass(zleline[pos]);
+	    for (;;) {
+		zlecs = pos;
+		if (zlecs == 0)
+		    break;
+		DECPOS(pos);
+		if (wordclass(zleline[pos]) != cc || ZC_inblank(zleline[pos]))
+		    break;
 	    }
 	}
     }
@@ -368,17 +357,10 @@ vibackwardwordend(char **args)
 	return ret;
     }
     while (n-- && zlecs > 1) {
-	int start = 0;
-	if (Z_vialnum(zleline[zlecs]))
-	    start = 1;
-	else if (!ZC_inblank(zleline[zlecs]))
-	    start = 2;
+	int cc = wordclass(zleline[zlecs]);
 	DECCS();
 	while (zlecs) {
-	    int same = (start != 1) && ZC_iblank(zleline[zlecs]);
-	    if (start)
-		same |= Z_vialnum(zleline[zlecs]);
-	    if (same == (start == 2))
+	    if (wordclass(zleline[zlecs]) != cc || ZC_iblank(zleline[zlecs]))
 		break;
 	    DECCS();
 	}
@@ -494,26 +476,17 @@ vibackwardkillword(UNUSED(char **args))
 	    x = pos;
 	}
 	if (x > lim) {
+	    int cc;
 	    int pos = x;
 	    DECPOS(pos);
-	    if (Z_vialnum(zleline[pos])) {
-		for (;;) {
-		    x = pos;
-		    if (x <= lim)
-			break;
-		    DECPOS(pos);
-		    if (!Z_vialnum(zleline[pos]))
-			break;
-		}
-	    } else {
-		for (;;) {
-		    x = pos;
-		    if (x <= lim)
-			break;
-		    DECPOS(pos);
-		    if (Z_vialnum(zleline[pos]) || ZC_iblank(zleline[pos]))
-			break;
-		}
+	    cc = wordclass(zleline[pos]);
+	    for (;;) {
+		x = pos;
+		if (x < lim)
+		    break;
+		DECPOS(pos);
+		if (wordclass(zleline[pos]) != cc)
+		    break;
 	    }
 	}
     }

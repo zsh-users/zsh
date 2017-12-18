@@ -1,6 +1,16 @@
 # Tests of the vi mode of ZLE
 
 %prep
+  unset -m LC_\*
+  ZSH_TEST_LANG=
+  langs=(en_{US,GB}.{UTF-,utf}8 en.UTF-8
+	 $(locale -a 2>/dev/null | egrep 'utf8|UTF-8'))
+  for LANG in $langs; do
+    if [[ é = ? ]]; then
+      ZSH_TEST_LANG=$LANG 
+      break;
+    fi
+  done
   if [[ $OSTYPE = cygwin ]]; then
     ZTST_unimplemented="the zsh/zpty module does not work on Cygwin"
   elif ( zmodload zsh/zpty 2>/dev/null ); then
@@ -463,12 +473,12 @@
 >  aww
 >CURSOR: 0
 
-  zletest $' --ww  ww--\eo\eoww\eo\eo--\eo\eo  ww\e' gei{a,=,b,c,=,d,e,=,f}$'\e'
+  zletest $' --ww  ww--\eo\eoww\eo\eo--\eo\eo  ww\e' gei{a,=,b,c,d,=,e,f,=,g}$'\e'
 0:backward word end
->BUFFER: f -=-wew  wdw-=-
->c
->wbw
->
+>BUFFER: g -=-wfw  wew-=-
+>d
+>wcw
+>b
 >-=-
 >a
 >  ww
@@ -528,6 +538,15 @@
 >
 >  wwe
 >CURSOR: 29
+
+  if [[ -z $ZSH_TEST_LANG ]]; then
+    ZTST_skip="no UTF-8 locale for Zle vi-mode test"
+  else
+    zletest $'/あいう/えお/かき\ebxgegex0wxex'
+  fi
+0:word motion with multibyte characters
+>BUFFER: /い/え/き
+>CURSOR: 2
 
   zletest $'    ----word    ----    word    word----    ----\e42|daw30|daw22|daw14|daw2|daw'
 0:delete all word on blanks

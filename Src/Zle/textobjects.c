@@ -30,13 +30,6 @@
 #include "zle.mdh"
 #include "textobjects.pro"
 
-/* class of character: 0 is whitespace, 1 is word character, 2 is other */
-static int
-wordclass(ZLE_CHAR_T x)
-{
-    return (ZC_iblank(x) ? 0 : ((ZC_ialnum(x) || (ZWC('_') == x)) ? 1 : 2));
-}
-
 static int
 blankwordclass(ZLE_CHAR_T x)
 {

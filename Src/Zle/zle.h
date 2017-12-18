@@ -67,6 +67,7 @@ typedef wint_t   ZLE_INT_T;
 #define ZC_inblank iswspace
 #define ZC_iupper iswupper
 #define ZC_iword(x) wcsitype((x), IWORD)
+#define ZC_ipunct iswpunct
 
 #define ZC_tolower towlower
 #define ZC_toupper towupper
@@ -153,6 +154,7 @@ static inline int ZS_strncmp(ZLE_STRING_T s1, ZLE_STRING_T s2, size_t l)
 #define ZC_inblank inblank
 #define ZC_iupper isupper
 #define ZC_iword iword
+#define ZC_ipunct ispunct
 
 #define ZC_tolower tulower
 #define ZC_toupper tuupper

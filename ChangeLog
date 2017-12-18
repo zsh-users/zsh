@@ -1,3 +1,8 @@
+2017-12-18  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 42116: Src/Zle/zle_word.c, Src/Zle/textobjects.c, Src/Zle/zle.h,
+	Test/X02zlevi.ztst: multibyte support for Zle vi-mode word motion
+
 2017-12-15  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 42123 (tweaked further): Src/exec.c: need to take account of
