@@ -1,5 +1,8 @@
 2017-12-20  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 42138: Completion/Unix/Command/_git: _git-revert: Complete
+	recent commits first.
+
 	* Stephane (rebased by Mikael): users/13148, workers/42060:
 	Src/exec.c: Abort the command line when replying "[n] No" to
 	the RM_STAR_SILENT prompt.
