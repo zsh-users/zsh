@@ -5,7 +5,8 @@ local expl
 _description files expl 'object file'
 
 __object_file() {
-  [[ -x $REPLY || $REPLY = *.([ao]|so|elf)(.<->)## || $REPLY = (core*|*.core) ]]
+  [[ -x $REPLY || $REPLY = *.(a|o|elf) || $REPLY = *.so(.<->)# ||
+	$REPLY = (core*|*.core) ]]
 }
 
 _files -g '*(-.e,__object_file,)'

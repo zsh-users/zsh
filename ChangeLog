@@ -1,3 +1,8 @@
+2017-12-20  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 42143: Completion/Unix/Type/_object_files: fix a pattern for
+	matching object files
+
 2017-12-18  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 42412: Src/Zle/zle_word.c: fix a bug in 42116. Also fix a few
