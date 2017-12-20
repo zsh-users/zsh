@@ -137,3 +137,14 @@
   thisworks)
 0:NO_ALIAS_FUNC_DEF works if the alias is a complete definition
 >That worked
+
+ type \bar
+ type -w \bar
+ type \\bar
+ type -w \\bar
+0:type -w of alias -g
+>bar is a global alias for echo
+>bar: global alias
+>\bar is an alias for echo
+>\bar: alias
+
