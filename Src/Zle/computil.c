@@ -2493,7 +2493,9 @@ ca_set_data(LinkList descr, LinkList act, LinkList subc,
 	 * the case above right.
 	 */
 	if (arg->type == CAA_NORMAL &&
-	    opt && optdef && optdef->type == CAO_NEXT)
+	    opt && optdef &&
+	    (optdef->type == CAO_NEXT || optdef->type == CAO_ODIRECT ||
+	     optdef->type == CAO_OEQUAL))
 	    return;
 
 	if (single)

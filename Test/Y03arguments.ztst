@@ -237,6 +237,27 @@
 >NO:{-a}
 >NO:{-b}
 
+ tst_arguments '*'{-x+,--xxx=}':optarg:(1)' '*:operand:(a)'
+ comptest $'tst \t'
+ comptest $'tst -x \t'
+ comptest $'tst -x\t'
+ comptest $'tst --xxx=\t'
+ comptest $'tst --xxx \t'
+ comptest $'tst a -x\t'
+ comptest $'tst a -x \t'
+ comptest $'tst a --xxx=\t'
+ comptest $'tst a --xxx \t'
+0:optarg completion following rest operand on line (workers/42141)
+>line: {tst a }{}
+>line: {tst -x 1 }{}
+>line: {tst -x1 }{}
+>line: {tst --xxx=1 }{}
+>line: {tst --xxx 1 }{}
+>line: {tst a -x1 }{}
+>line: {tst a -x 1 }{}
+>line: {tst a --xxx=1 }{}
+>line: {tst a --xxx 1 }{}
+
  tst_arguments '-a' '*::rest:{compadd - -b}'
  comptest $'tst arg -\t'
 0:rest arguments
