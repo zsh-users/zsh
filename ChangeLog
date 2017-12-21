@@ -1,6 +1,9 @@
 2017-12-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* 33395: Src/exec.c, Src/zsh.h: improved line numbering for
+	* danda: 42155: Completion/Unix/Command/_ssh: various
+	improvements for OpenSSH.
+
+	* 42152: Src/exec.c, Src/zsh.h: improved line numbering for
 	functions (in particular anonymous functions) defined inside
 	others, also flag for anonymous functions.
 

@@ -4,7 +4,7 @@
 
 _ssh () {
   local curcontext="$curcontext" state line expl suf ret=1
-  local args common tmp p1 file cmn cmds sdesc
+  local args common common_transfer algopt tmp p1 file cmn cmds sdesc
   typeset -A opt_args
 
   common=(
@@ -20,7 +20,7 @@ _ssh () {
     '*-o+[specify extra options]:option string:->option'
   )
   common_transfer=(
-    '-l[limit used bandwidth]:bandwidth in KiB/s:'
+    '-l+[limit used bandwidth]:bandwidth in Kbit/s:'
     '-P+[specify port on remote host]:port number on remote host'
     '-p[preserve modification times, access times and modes]'
     '-q[disable progress meter and warnings]'
@@ -28,16 +28,17 @@ _ssh () {
     '-S+[specify ssh program]:path to ssh:_command_names -e' \
     '-v[verbose mode]'
   )
+  algopt='-E+[specify hash algorithm for fingerprints]:algorithm:(md5 sha256)'
 
   case "$service" in
   ssh)
     _arguments -C -s \
-      '(-a)-A[enables forwarding of the authentication agent connection]' \
+      '(-a)-A[enable forwarding of the authentication agent connection]' \
       '(-A)-a[disable forwarding of authentication agent connection]' \
       '(-P)-b+[specify interface to transmit on]:bind address:_bind_addresses' \
       '-D+[specify a dynamic port forwarding]:dynamic port forwarding:->dynforward' \
       '-e+[set escape character]:escape character (or `none'\''):' \
-      '-E[append log output to file instead of stderr]:_files' \
+      '-E+[append log output to file instead of stderr]:_files' \
       '(-n)-f[go to background]' \
       '-g[allow remote hosts to connect to local forwarded ports]' \
       '-G[output configuration and exit]' \
@@ -45,26 +46,26 @@ _ssh () {
       '-J+[connect via a jump host]: :->userhost' \
       '-K[enable GSSAPI-based authentication and forwarding]' \
       '-k[disable forwarding of GSSAPI credentials]' \
-      '*-L[specify local port forwarding]:local port forwarding:->forward' \
+      '*-L+[specify local port forwarding]:local port forwarding:->forward' \
       '-l+[specify login name]:login name:_ssh_users' \
       '-M[master mode for connection sharing]' \
       '(-1)-m+[specify mac algorithms]:mac spec:->macs' \
       '(-1)-N[do not execute a remote command (protocol version 2 only)]' \
       '-n[redirect stdin from /dev/null]' \
-      '-O[control an active connection multiplexing master process]:multiplex control command:((check\:"check master process is running" exit\:"request the master to exit" forward\:"request forward without command execution" stop\:"request the master to stop accepting further multiplexing requests" cancel\:"cancel existing forwardings with -L and/or -R" proxy))' \
+      '-O+[control an active connection multiplexing master process]:multiplex control command:((check\:"check master process is running" exit\:"request the master to exit" forward\:"request forward without command execution" stop\:"request the master to stop accepting further multiplexing requests" cancel\:"cancel existing forwardings with -L and/or -R" proxy))' \
       '-P[use non privileged port]' \
       '-p+[specify port on remote host]:port number on remote host' \
       '(-v)*-q[quiet operation]' \
-      '*-R[specify remote port forwarding]:remote port forwarding:->forward' \
+      '*-R+[specify remote port forwarding]:remote port forwarding:->forward' \
       '-S+[specify location of control socket for connection sharing]:path to control socket:_files' \
-      '-Q[query parameters]:parameter type:((cipher\:"supported symmetric ciphers" cipher-auth\:"supported symmetric ciphers that support authenticated encryption" mac\:"supported message integrity codes" kex\:"key exchange algorithms" key\:"key types" protocol-version\:"supported SSH protocol versions"))' \
+      '-Q+[query parameters]:parameter type:((cipher\:"supported symmetric ciphers" cipher-auth\:"supported symmetric ciphers that support authenticated encryption" mac\:"supported message integrity codes" kex\:"key exchange algorithms" key\:"key types" protocol-version\:"supported SSH protocol versions"))' \
       '(-1)-s[invoke subsystem]' \
       '(-1 -t)-T[disable pseudo-tty allocation (protocol version 2 only)]' \
       '(-T)-t[force pseudo-tty allocation]' \
       '-V[show version number]' \
       '(-q)*-v[verbose mode (multiple increase verbosity, up to 3)]' \
-      '-W[forward standard input and output to host]:stdinout forward:->hostport' \
-      '-w[request tunnel device forwarding]:local_tun[\:remote_tun] (integer or "any"):' \
+      '-W+[forward standard input and output to host]:stdinout forward:->hostport' \
+      '-w+[request tunnel device forwarding]:local_tun[\:remote_tun] (integer or "any"):' \
       '(-x -Y)-X[enable (untrusted) X11 forwarding]' \
       '(-X -Y)-x[disable X11 forwarding]' \
       '(-x -X)-Y[enable trusted X11 forwarding]' \
@@ -79,17 +80,21 @@ _ssh () {
       '*:file:->file' "$common[@]" "$common_transfer[@]" && ret=0
     ;;
   ssh-add)
-    _arguments -s \
+    [[ $OSTYPE == darwin* ]] && args=(
+      '-A[add identities from keychain]'
+      '-K[update keychain when adding/removing identities]'
+    )
+    _arguments -s : $args \
       '-c[identity is subject to confirmation via SSH_ASKPASS]' \
       '-D[delete all identities]' \
       '-d[remove identity]' \
-      '-E[specify hash algorithm for fingerprints]:algorithm:(md5 sha256)' \
-      '-e[remove keys provided by the PKCS#11 shared library]:library:_files -g "*.(so|dylib)(|.<->)(-.)"' \
+      $algopt \
+      '-e+[remove keys provided by the PKCS#11 shared library]:library:_files -g "*.(so|dylib)(|.<->)(-.)"' \
       '-k[load plain private keys only and skip certificates]' \
-      '-L[lists public key parameters of all identities in the agent]'\
+      '-L[list public key parameters of all identities in the agent]'\
       '-l[list all identities]' \
-      '-s[add keys provided by the PKCS#11 shared library]:library:_files -g "*.(so|dylib)(|.<->)(-.)"' \
-      '-t[set maximum lifetime for identity]:maximum lifetime (in seconds or time format):' \
+      '-s+[add keys provided by the PKCS#11 shared library]:library:_files -g "*.(so|dylib)(|.<->)(-.)"' \
+      '-t+[set maximum lifetime for identity]:maximum lifetime (in seconds or time format):' \
       '-X[unlock the agent]' \
       '-x[lock the agent with a password]' \
       '*:SSH identity file:_files'
@@ -97,10 +102,13 @@ _ssh () {
     ;;
   ssh-agent)
     _arguments -s \
-      '(-k)-a[UNIX-domain socket to bind agent to]:UNIX-domain socket:_files' \
+      '(-k)-a+[UNIX-domain socket to bind agent to]:UNIX-domain socket:_files' \
       '(-k -s)-c[force csh-style shell]' \
       '(-k)-d[debug mode]' \
+      '(-k)-D[foreground mode]' \
+      "(-k)$algopt" \
       '-k[kill current agent]' \
+      '(-k)-P[specify PKCS#11 shared library whitelist]:PKCS#11 library whitelist pattern' \
       '(-k -c)-s[force sh-style shell]' \
       '-t[set default maximum lifetime for identities]:maximum lifetime (in seconds or time format):' \
       '*::command: _normal'
@@ -125,12 +133,12 @@ _ssh () {
     cmn=( -b -P -N -C -m -v ) # options common to many basic commands (except -f which is common to most)
     cms=( -E -q -t -g -M -S -a -J -j -K -W -I -h -n -O -V -u ) # options specific to one basic command
     _arguments -s $args \
-      "(${${(@)cmds:#-G}} -P -m ${${(@)cms:#-[MS]}})-b[specify number of bits in key]:bits in key" \
-      "$p1(${${(@)cmds:#-[pc]}} -b -C $cms)-P[provide old passphrase]:old passphrase" \
-      "(${${(@)cmds:#-p}} -m -v ${${(@)cms:#-[qt]}})-N[provide new passphrase]:new passphrase" \
-      "(${${(@)cmds:#-c}} -m -v $cms)-C[provide new comment]:new comment" \
-      "(-D -G -M -S -I -h -n -O -V -A)-f[$file file]:$file file:_files" \
-      "$p1(${${(@)cmds:#-[ie]}})-m[specify conversion format]:format:(PEM PKCS7 RFC4716)" \
+      "(${${(@)cmds:#-G}} -P -m ${${(@)cms:#-[MS]}})-b+[specify number of bits in key]:bits in key" \
+      "$p1(${${(@)cmds:#-[pc]}} -b -C $cms)-P+[provide old passphrase]:old passphrase" \
+      "(${${(@)cmds:#-p}} -m -v ${${(@)cms:#-[qt]}})-N+[provide new passphrase]:new passphrase" \
+      "(${${(@)cmds:#-c}} -m -v $cms)-C+[provide new comment]:new comment" \
+      "(-D -G -M -S -I -h -n -O -V -A)-f+[$file file]:$file file:_files" \
+      "$p1(${${(@)cmds:#-[ie]}})-m+[specify conversion format]:format:(PEM PKCS7 RFC4716)" \
       "(${${(@)cmds:#-[lGT]}} ${${(@)cmn:#-[bv]}} -f)*-v[verbose mode]" \
       - '(commands)' \
       "(-b -P -C -v)-p[change passphrase of private key file]" \
@@ -139,39 +147,39 @@ _ssh () {
       "($cmn)-y[get public key from private key]" \
       '(-b -N -m -v)-c[change comment in private and public key files]' \
       "($cmn)-B[show the bubblebabble digest of key]" \
-      "(-)-D[download key stored in smartcard reader]:reader" \
+      "(-)-D+[download key stored in smartcard reader]:reader" \
       "($cmn)-H[hash names in known_hosts file]" \
-      "($cmn)-R[remove host from known_hosts file]:host:_ssh_hosts" \
+      "($cmn)-R+[remove host from known_hosts file]:host:_ssh_hosts" \
       "($cmn)-L[print the contents of a certificate]" \
       "(-)-A[generate host keys for all key types]" \
       "($cmn)-Q[test whether keys have been revoked in a KRL]" \
       - finger \
       "($cmn)-l[show fingerprint of key file]" \
-      "$p1($cmn)-E[specify hash algorithm for displayed fingerprints]:hash algorithim:(md5 sha256)" \
+      "$p1($cmn)$algopt" \
       - create \
       '(-P -m)-q[silence ssh-keygen]' \
-      "(-P -m)-t[specify the type of the key to create]:key type:(rsa dsa ecdsa ed25519)" \
+      "(-P -m)-t+[specify the type of the key to create]:key type:(rsa dsa ecdsa ed25519)" \
       - dns \
       "($cmn)-r[print DNS resource record]:hostname:_hosts" \
       "$p1($cmn)-g[use generic DNS format]" \
       - primes \
       "(-P -N -C -m -f)-G[generate candidates for DH-GEX moduli]" \
-      "$p1(-P -N -C -m -f)-M[specify amount of memory to use for generating DH-GEX moduli]:memory (MB)" \
-      "$p1(-P -N -C -m -f)-S[specify start point]:start point (hex)" \
+      "$p1(-P -N -C -m -f)-M+[specify amount of memory to use for generating DH-GEX moduli]:memory (MB)" \
+      "$p1(-P -N -C -m -f)-S+[specify start point]:start point (hex)" \
       - screen \
-      "(${${(@)cmn:#-v}})-T[screen candidates for DH-GEX moduli]:output file:_files" \
-      "${p1}(${${(@)cmn:#-v}})-a[specify number of rounds]:rounds" \
+      "(${${(@)cmn:#-v}})-T+[screen candidates for DH-GEX moduli]:output file:_files" \
+      "${p1}(${${(@)cmn:#-v}})-a+[specify number of rounds]:rounds" \
       "${p1}(${${(@)cmn:#-v}})-J[exit after screening specified number of lines]" \
-      "${p1}(${${(@)cmn:#-v}})-j[start screening at the specified line number]:line number" \
-      "${p1}(${${(@)cmn:#-v}})-K[write the last line processed to file]:file:_files" \
+      "${p1}(${${(@)cmn:#-v}})-j+[start screening at the specified line number]:line number" \
+      "${p1}(${${(@)cmn:#-v}})-K+[write the last line processed to file]:file:_files" \
       "${p1}(${${(@)cmn:#-v}})-W[specify desired generator]:generator" \
       - certify \
       "($cmn)-s[$sdesc]:CA key:_files" \
-      "$p1($cmn -f -u)-I[specify key identifier to include in certificate]:key id" \
+      "$p1($cmn -f -u)-I+[specify key identifier to include in certificate]:key id" \
       "$p1($cmn -f -u)-h[generate host certificate instead of a user certificate]" \
-      "$p1($cmn -f -u)-n[specify user/host principal names to include in certificate]:principals" \
-      "$p1($cmn -f -u)-O[specify a certificate option]:option" \
-      "$p1($cmn -f -u)-V[specify certificate validity interval]:interval" \
+      "$p1($cmn -f -u)-n+[specify user/host principal names to include in certificate]:principals" \
+      "$p1($cmn -f -u)-O+[specify a certificate option]:option" \
+      "$p1($cmn -f -u)-V+[specify certificate validity interval]:interval" \
       "($cmn -I -h -n -O -V)-k[generate a KRL file]" \
       "$p1($cmn -I -h -n -O -V)-u[update a KRL]"
     return
@@ -181,15 +189,15 @@ _ssh () {
       '-a[attempt to continue interrupted transfers]' \
       '-B+[specify buffer size]:buffer size (bytes) [32768]' \
       '-b+[specify batch file to read]:batch file:_files' \
-      '-D[connect directly to a local sftp server]:sftp server path' \
+      '-D+[connect directly to a local sftp server]:sftp server path' \
       '-f[request that files be flushed immediately after transfer]' \
-      '-R[specify number of outstanding requests]:number of requests [64]' \
-      '-s[SSH2 subsystem or path to sftp server on the remote host]' \
+      '-R+[specify number of outstanding requests]:number of requests [64]' \
+      '-s+[SSH2 subsystem or path to sftp server on the remote host]:subsystem/path' \
       '1:file:->rfile' '*:file:->file' "$common[@]" "$common_transfer[@]" && ret=0
     ;;
   (ssh-copy-id)
     _arguments \
-      '-i:SSH identity file:_files' \
+      '-i+[select identity file]:SSH identity file:_files' \
       ':remote host name:->userhost' \
     ;;
   esac
@@ -446,7 +454,7 @@ _ssh () {
         # old options are after the empty "\"-line
         _wanted values expl 'configure file option' \
             compadd -M 'm:{a-z}={A-Z}' -q -S '=' - \
-	        AddKeysToAgent \
+                AddKeysToAgent \
                 AddressFamily \
                 BatchMode \
                 BindAddress \
@@ -455,7 +463,7 @@ _ssh () {
                 CanonicalizeHostname \
                 CanonicalizeMaxDots \
                 CanonicalizePermittedCNAMEs \
-		CertificateFile \
+                CertificateFile \
                 ChallengeResponseAuthentication \
                 CheckHostIP \
                 Cipher \
@@ -490,7 +498,7 @@ _ssh () {
                 HostKeyAlias \
                 HostName \
                 IdentitiesOnly \
-		IdentityAgent \
+                IdentityAgent \
                 IdentityFile \
                 IgnoreUnknown \
                 IPQoS \
@@ -510,7 +518,7 @@ _ssh () {
                 PreferredAuthentications \
                 Protocol \
                 ProxyCommand \
-		ProxyJump \
+                ProxyJump \
                 ProxyUseFdpass \
                 PubkeyAcceptedKeyTypes \
                 PubkeyAuthentication \
