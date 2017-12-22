@@ -1,3 +1,9 @@
+2017-12-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 33395: Src/exec.c, Src/zsh.h: improved line numbering for
+	functions (in particular anonymous functions) defined inside
+	others, also flag for anonymous functions.
+
 2017-12-20  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* dana: 42145: Src/Zle/computil.c, Test/Y03arguments.ztst: fix

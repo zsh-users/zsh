@@ -5089,7 +5089,11 @@ execfuncdef(Estate state, Eprog redir_prog)
 	shf->node.flags = 0;
 	/* No dircache here, not a directory */
 	shf->filename = ztrdup(scriptfilename);
-	shf->lineno = lineno;
+	shf->lineno =
+	    (funcstack && (funcstack->tp == FS_FUNC ||
+			   funcstack->tp == FS_EVAL)) ?
+	    funcstack->flineno + lineno :
+	    lineno;
 	/*
 	 * redir_prog is permanently allocated --- but if
 	 * this function has multiple names we need an additional
@@ -5109,6 +5113,7 @@ execfuncdef(Estate state, Eprog redir_prog)
 	    LinkList args;
 
 	    anon_func = 1;
+	    shf->node.flags |= PM_ANONYMOUS;
 
 	    state->pc = end;
 	    end += *state->pc++;
