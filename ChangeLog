@@ -1,5 +1,7 @@
 2018-01-04  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Stephane: 42159: Src/params.c: avoid crash copying empty hash table.
+
 	* Sebastian: 42188: Src/Modules/system.c: It is necessary to
 	close the lock descriptor in some failure cases.
 

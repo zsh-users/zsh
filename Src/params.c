@@ -549,10 +549,13 @@ scancopyparams(HashNode hn, UNUSED(int flags))
 HashTable
 copyparamtable(HashTable ht, char *name)
 {
-    HashTable nht = newparamtable(ht->hsize, name);
-    outtable = nht;
-    scanhashtable(ht, 0, 0, 0, scancopyparams, 0);
-    outtable = NULL;
+    HashTable nht = 0;
+    if (ht) {
+	nht = newparamtable(ht->hsize, name);
+	outtable = nht;
+	scanhashtable(ht, 0, 0, 0, scancopyparams, 0);
+	outtable = NULL;
+    }
     return nht;
 }
 
