@@ -5594,7 +5594,8 @@ checkjobs(void)
 
     for (i = 1; i <= maxjob; i++)
 	if (i != thisjob && (jobtab[i].stat & STAT_LOCKED) &&
-	    !(jobtab[i].stat & STAT_NOPRINT))
+	    !(jobtab[i].stat & STAT_NOPRINT) &&
+	    (isset(CHECKRUNNINGJOBS) || jobtab[i].stat & STAT_STOPPED))
 	    break;
     if (i <= maxjob) {
 	if (jobtab[i].stat & STAT_STOPPED) {

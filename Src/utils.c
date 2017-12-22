@@ -1832,7 +1832,7 @@ adjustlines(int signalled)
     else
 	shttyinfo.winsize.ws_row = zterm_lines;
 #endif /* TIOCGWINSZ */
-    if (zterm_lines <= 0) {
+    if (zterm_lines < 0) {
 	DPUTS(signalled, "BUG: Impossible TIOCGWINSZ rows");
 	zterm_lines = tclines > 0 ? tclines : 24;
     }
@@ -1856,7 +1856,7 @@ adjustcolumns(int signalled)
     else
 	shttyinfo.winsize.ws_col = zterm_columns;
 #endif /* TIOCGWINSZ */
-    if (zterm_columns <= 0) {
+    if (zterm_columns < 0) {
 	DPUTS(signalled, "BUG: Impossible TIOCGWINSZ cols");
 	zterm_columns = tccolumns > 0 ? tccolumns : 80;
     }
