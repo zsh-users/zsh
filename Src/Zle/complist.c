@@ -1097,15 +1097,15 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 	    if (*p) {
 		int arg = 0, is_fg;
 
+		if (idigit(*p))
+		    arg = zstrtol(p, &p, 10);
+
 		len = MB_METACHARLENCONV(p, &cchar);
 #ifdef MULTIBYTE_SUPPORT
 		if (cchar == WEOF)
 		    cchar = (wchar_t)(*p == Meta ? p[1] ^ 32 : *p);
 #endif
 		p += len;
-
-		if (idigit(*p))
-		    arg = zstrtol(p, &p, 10);
 
 		m = 0;
 		switch (cchar) {

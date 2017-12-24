@@ -56,6 +56,21 @@
 >FI:{file1}
 >FI:{file2}
 
+  # Temporarily modify format set in comptest
+  comptesteval 'zstyle -s ":completion:*:descriptions" format oldfmt'
+  comptesteval 'zstyle ":completion:*:descriptions" format \
+    ${oldfmt/>*</>%5F123abc%f %B123abc%b<}'
+  comptest $': \t'
+  comptesteval 'zstyle ":completion:*:descriptions" format $oldfmt'
+0:custom description with formatting sequences
+>line: {: }{}
+*>DESCRIPTION:{*123abc*123abc*~*F123*}
+>DI:{dir1}
+>DI:{dir2}
+>FI:{file1}
+>FI:{file2}
+F:regression test workers/42164
+
 # Depends on path assignment in comptestinit
   comptesteval "path=( $ZTST_srcdir:A )"
   comptest $'zt\t'

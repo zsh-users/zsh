@@ -1,5 +1,8 @@
 2018-01-04  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* dana: 42164: Src/Zle/complist.c, Test/Y01completion.ztst:
+	numeric values didn't work in format escapes in completion lists.
+
 	* Stephane: 42159: Src/params.c: avoid crash copying empty hash table.
 
 	* Sebastian: 42188: Src/Modules/system.c: It is necessary to
