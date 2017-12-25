@@ -1,26 +1,84 @@
 #compdef mosh
 
-local curcontext="$curcontext" state line
-local -a _comp_priv_prefix
+_mosh () {
+  local curcontext="$curcontext" state line expl tmp ret=1
+  local -a _comp_priv_prefix
+  typeset -A opt_args
 
-_arguments -C \
-  '(-)--help[display help information]' \
-  '(-)--version[display version information]' \
-  "--no-init[don't set terminal init string]" \
-  '--ssh=[specify ssh command to setup session]:ssh command:_normal' \
-  '--port=[specify server-side port range]:port:_sequence -n 2 -s \: _ports' \
-  '(-a -n)--predict=[control speculative local echo]:mode:(adaptive always never)' \
-  '(--predict -n)-a[synonym for --predict=always]' \
-  '(--predict -a)-n[synonym for --predict=never]' \
-  '--server[specify command to run server helper]:remote file:_files' \
-  '--client[specify command to run client helper]:_command_names -e' \
-  '1:remote host name:->userhost' \
-  '*:::args:_normal' && return
+  _arguments -C \
+    '(-)--help[display help information]' \
+    '(-)--version[display version information]' \
+    "--no-init[don't set terminal init string]" \
+    '--ssh=[specify ssh command to setup session]:ssh command:_normal' \
+    '--port=[specify server-side port range]:port:_sequence -n 2 -s \: _ports' \
+    '(-a -n)--predict=[control speculative local echo]:mode:(adaptive always never)' \
+    '(--predict -n)-a[synonym for --predict=always]' \
+    '(--predict -a)-n[synonym for --predict=never]' \
+    '--server[specify command to run server helper]:remote file:_files' \
+    '--client[specify command to run client helper]:_command_names -e' \
+    '1:remote host name:->userhost' \
+    '*:::args:_normal' && return
 
-case $state in
-  userhost)
-    _hosts || _user_at_host && return
-  ;;
-esac
+  case $state in
+    userhost)
+      if compset -P '*@'; then
+        _wanted hosts expl 'remote host name' _ssh_hosts && ret=0
+      elif compset -S '@*'; then
+        _wanted users expl 'login name' _ssh_users -S '' && ret=0
+      else
+        if (( $+opt_args[-l] )); then
+          tmp=()
+        else
+          tmp=( 'users:login name:_ssh_users -qS@' )
+        fi
+        _alternative \
+            'hosts:remote host name:_ssh_hosts' \
+            "$tmp[@]" && ret=0
+      fi
+      ;;
+  esac
 
-return 1
+  return ret
+}
+
+_ssh_users () {
+  _combination -s '[:@]' my-accounts users-hosts users "$@"
+}
+
+_ssh_hosts () {
+  local -a config_hosts
+  local config
+  integer ind
+
+  # If users-hosts matches, we shouldn't complete anything else.
+  if [[ "$IPREFIX" == *@ ]]; then
+    _combination -s '[:@]' my-accounts users-hosts "users=${IPREFIX/@}" hosts "$@" && return
+  else
+    _combination -s '[:@]' my-accounts users-hosts \
+      ${opt_args[-l]:+"users=${opt_args[-l]:q}"} hosts "$@" && return
+  fi
+  if (( ind = ${words[(I)-F]} )); then
+    config=${~words[ind+1]} 2>/dev/null
+  else
+    config="$HOME/.ssh/config"
+  fi
+  if [[ -r $config ]]; then
+    local key hosts host
+    while IFS=$'=\t ' read -r key hosts; do
+      if [[ "$key" == (#i)host ]]; then
+         for host in ${(z)hosts}; do
+            case $host in
+            (*[*?]*) ;;
+            (*) config_hosts+=("$host") ;;
+            esac
+         done
+      fi
+    done < "$config"
+    if (( ${#config_hosts} )); then
+      _wanted hosts expl 'remote host name' \
+        compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' "$@" $config_hosts
+    fi
+  fi
+}
+
+_mosh "$@"
