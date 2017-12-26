@@ -111,7 +111,7 @@ _regex_arguments _xset_parse \
   \) \#
 
 _xset () {
-  local expl allopts
+  local expl allopts opt
   typeset -A desc no eo
 
   desc=(

@@ -1,7 +1,7 @@
 #compdef tr
 
 local curcontext="$curcontext" state line expl ret=1
-local args variant
+local args variant k
 local -A descr
 descr=(
   -c '[complement characters specified by first string]'

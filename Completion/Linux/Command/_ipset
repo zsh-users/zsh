@@ -1,7 +1,7 @@
 #compdef ipset
 
 local offset=0
-local -a args from_to hash cmds listopts
+local -a args from_to hash cmds listopts addopts
 
 _set_types () {
 	_values -S \  "Set type" \

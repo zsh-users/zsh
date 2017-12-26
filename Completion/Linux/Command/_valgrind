@@ -1,8 +1,8 @@
 #compdef valgrind -value-,VALGRIND_OPTS,-default-
 
 local curcontext="$curcontext" state line
-local -a cmd common common_mem_null \
-  args args_{addrcheck,memcheck,cachegrind,helgrind,lackey,massif,none}
+local -a cmd common common_{mem_null,read_varinfo}
+local -a args args_{addrcheck,memcheck,cachegrind,helgrind,lackey,massif,none}
 
 cmd=(
   '1:command name:_command_names -e'

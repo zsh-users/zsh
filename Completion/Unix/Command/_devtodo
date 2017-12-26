@@ -5,7 +5,7 @@ typeset -a arg_generic arg_add todo_opts \
            priorities
 typeset -A arg_pair arg_desc
 typeset -i i
-typeset expl
+typeset expl arg
 
 for ((i=2; i <= $#words; i++)) {
 	if [[ $words[$i] == '--database' ]]; then

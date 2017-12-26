@@ -2,7 +2,7 @@
 
 local state line expl curcontext="$curcontext" ret=1
 typeset -A opt_args
-local -a cmds args
+local -a cmds args vopt flags
 
 flags=( temp pub )
 cmds=(

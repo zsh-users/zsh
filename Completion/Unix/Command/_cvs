@@ -882,7 +882,7 @@ _cvs_modified_entries() {
 }
 
 (( $+_cvs_ignore_default )) ||
-_cvs_ignore_default=(
+local _cvs_ignore_default=(
   RCS SCCS CVS CVS.adm RCSLOG 'cvslog.*' tags TAGS .make.state .nse_depinfo
   '*\~' '\#*' '.\#*' ',*' '_$*' '*$' '*.old' '*.bak' '*.BAK' '*.orig' '*.rej'
   '.del-*' '*.a' '*.olb' '*.o' '*.obj' '*.so' '*.exe' '*.Z' '*.elc' '*.ln'

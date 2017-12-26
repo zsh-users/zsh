@@ -2,7 +2,7 @@
 
 local curcontext="$curcontext" state line expl desc RUBY ret=1
 typeset -A opt_args
-local -a opts irb all common charsets suf
+local -a opts irb erb all common charsets suf
 
 all=(
   '*-r+[require the library before executing your script]:library name:->library'

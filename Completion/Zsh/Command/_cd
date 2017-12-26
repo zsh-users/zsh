@@ -22,7 +22,7 @@ _cd_options() {
 setopt localoptions nonomatch
 
 local expl ret=1 curarg
-integer argstart=2 noopts
+integer argstart=2 noopts match mbegin mend
 
 if (( CURRENT > 1 )); then
   # if not in command position, may have options.

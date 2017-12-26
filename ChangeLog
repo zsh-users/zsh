@@ -1,3 +1,25 @@
+2017-01-02  Eric Cook <llua@gmx.com>
+
+	* 42171: Completion/BSD/Command/_portsnap,
+	Completion/Linux/Command/_ipset,
+	Completion/Linux/Command/_valgrind,
+	Completion/Redhat/Command/_rpm,
+	Completion/Solaris/Command/_prstat,
+	Completion/Unix/Command/_arp,
+	Completion/Unix/Command/_cvs,
+	Completion/Unix/Command/_devtodo,
+	Completion/Unix/Command/_ffmpeg,
+	Completion/Unix/Command/_git,
+	Completion/Unix/Command/_gpg,
+	Completion/Unix/Command/_ruby,
+	Completion/Unix/Command/_tr,
+	Completion/Unix/Command/_whois,
+	Completion/Unix/Command/_yp,
+	Completion/Unix/Command/_zfs,
+	Completion/X/Command/_xset,
+	Completion/Zsh/Command/_cd: prevent various parmeters
+	from becoming global.
+
 2017-12-31  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 42183: Completion/Unix/Command/_objdump: support LLVM variant

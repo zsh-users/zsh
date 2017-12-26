@@ -2,6 +2,7 @@
 
 _prstat()
 {
+	local d_opt sort_key
 	d_opt=(
 		"u"\:"seconds past the epoch"
 		"d"\:"standard date format"

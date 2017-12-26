@@ -100,7 +100,7 @@ typeset -A _ffmpeg_flags
 
 local -a _ffmpeg_argspecs
 {
-    local lastopt
+    local lastopt REPLY
     local lastopt_description
     local lastopt_takesargs
     local lastopt_type

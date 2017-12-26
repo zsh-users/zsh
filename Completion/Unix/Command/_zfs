@@ -6,7 +6,7 @@ _zfs() {
 	typeset -A opt_args
 	local -a subcmds rw_properties rw_propnames ro_properties create_properties
 	local -a share_nfs_ro_properties share_nfs_rw_properties
-	local -a share_smb_ro_properties share_nfs_rw_properties
+	local -a share_smb_ro_properties share_smb_rw_properties
 	local -a share_ro_properties share_rw_properties
 	local -a difffields delegatable_perms
 

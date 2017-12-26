@@ -7727,7 +7727,7 @@ for file in ${^fpath}/_git-*~(*~|*.zwc)(-.N); do
     continue
   fi
 
-  local desc=
+  local desc= input
   integer i=1
   while read input; do
     if (( i == 2 )); then

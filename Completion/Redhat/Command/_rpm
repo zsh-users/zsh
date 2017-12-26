@@ -45,7 +45,7 @@ _rpm () {
   local curcontext="$curcontext" state lstate line nm="$compstate[nmatches]"
   typeset -A opt_args
   local ret=1
-  local -a tmp expl commonopts selectopts
+  local -a tmp expl commonopts selectopts pathopts
 
   commonopts=(
     '(-v --verbose)--quiet[print as little as possible]'

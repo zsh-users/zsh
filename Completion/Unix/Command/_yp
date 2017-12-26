@@ -1,6 +1,6 @@
 #compdef ypcat ypmatch yppasswd ypwhich ypset ypserv ypbind yppush yppoll ypxfr domainname
 
-local curcontext="$curcontext" line state expl ret=1
+local curcontext="$curcontext" line state expl ret=1 _yp_cache_nicks _yp_args
 typeset -A opt_args
 
 if (( ! $+_yp_cache_maps )); then

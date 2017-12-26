@@ -1,7 +1,7 @@
 #compdef gpg gpgv gpg-zip gpg2=gpg
 
 local curcontext="$curcontext" state line expl ret=1
-local -a args allopts dups
+local -a args allopts dups extra
 typeset -A opt_args
 
 if [[ $service = gpg-zip ]]; then

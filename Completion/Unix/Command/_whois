@@ -1,6 +1,7 @@
 #compdef whois fwhois
 
 _whois () {
+  local _whois_comp
   _whois_setup
   case "$0" in
   fwhois) _whois_fwhois;;
