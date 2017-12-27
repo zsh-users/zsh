@@ -1,3 +1,7 @@
+2017-12-27  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 42176: Completion/Unix/Command/_tar: update long options
+
 2017-12-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* dana: 42156 with tweak as per 42158: Doc/Zsh/options.yo,

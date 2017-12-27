@@ -99,10 +99,16 @@ if [[ "$PREFIX" = --* ]]; then
 
   # ...long options after `--'.
 
-  _arguments -- '--owner*:user:_users' \
+  _arguments --  '--owner=*:user:_users' \
+		 '--group=*:group:_groups' \
+		 '--atime-preserve*::method:(replace system)' \
+		 '--*-script=NAME:script file:_files' \
+		 '--format=*:format:(gnu oldgnu pax posix ustar v7)' \
+		 '--quoting-style=*:quoting style:(literal shell shell-always c c-maybe escape locale clocale)' \
+		 '--totals*=SIGNAL*::signal:(HUP QUIT INT USR1 USR2)' \
                  '*=(PROG|COMMAND)*:program:_command_names -e' \
 		 '*=ARCHIVE*:archive: _tar_archive' \
-		 '*=NAME*:file:_files' \
+		 '*=FILE*:file:_files' \
 		 '*=DIR*:directory:_files -/' \
 		 '*=CONTROL*::version control:(t numbered nil existing never simple)'
 
