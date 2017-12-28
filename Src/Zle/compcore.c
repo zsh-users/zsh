@@ -1901,7 +1901,8 @@ set_comp_sep(void)
 	    p = compwords[i] = (char *) getdata(n);
 	    untokenize(p);
 	}
-	compcurrent = cur + 1;
+	/* The current position shouldn't exceed the new word count */
+	compcurrent = cur + 1 > i ? i : cur + 1;
 	compwords[i] = NULL;
     }
     instring = ois;

@@ -1,5 +1,8 @@
 2018-05-11  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 42180: dana: Src/Zle/compcore.c: safety when removing
+	separators in completion.
+
 	* 42101 (tweaked): dana: Src/exec.c, Test/A06assign.ztst:
 	assigning shell status to array was broken.
 
