@@ -1,6 +1,6 @@
 #autoload +X
 
-local curcontext="${curcontext}" tmp err_fd=-1
+local curcontext="${curcontext}" tmp err_fd=-1 clocale='_comp_locale;'
 local -a prefix
 
 if [[ "$1" = -p ]]; then
@@ -10,6 +10,9 @@ if [[ "$1" = -p ]]; then
     zstyle -t ":completion:${curcontext}:${1}" gain-privileges &&
 	prefix=( $_comp_priv_prefix )
   fi
+elif [[ "$1" = -l ]]; then
+  shift
+  clocale=''
 fi
 
 if (( ${debug_fd:--1} > 2 )) || [[ ! -t 2 ]]
@@ -21,12 +24,12 @@ fi
 
 if zstyle -s ":completion:${curcontext}:${1}" command tmp; then
   if [[ "$tmp" = -* ]]; then
-    eval "$tmp[2,-1]" "$argv[2,-1]"
+    eval $clocale "$tmp[2,-1]" "$argv[2,-1]"
   else
-    eval $prefix "$tmp"
+    eval $clocale $prefix "$tmp"
   fi
 else
-  eval $prefix "$argv[2,-1]"
+  eval $clocale $prefix "$argv[2,-1]"
 fi 2>&$err_fd
 
 } always {

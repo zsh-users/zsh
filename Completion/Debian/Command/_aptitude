@@ -80,7 +80,7 @@ _arguments -C \
 
 case $state in
   cmds)
-    cmds=( ${${(M)${(f)"$(LC_ALL=C _call_program commands aptitude -h 2>/dev/null)"}:# [^- ][^ ]## *}/(#b) ([^ ]##) ##(- )#([^- ]*)/$match[1]:$match[3]:l})
+    cmds=( ${${(M)${(f)"$(_call_program commands aptitude -h 2>/dev/null)"}:# [^- ][^ ]## *}/(#b) ([^ ]##) ##(- )#([^- ]*)/$match[1]:$match[3]:l})
 
     _describe -t commands 'aptitude command' cmds && ret=0
   ;;

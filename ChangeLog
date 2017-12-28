@@ -1,3 +1,13 @@
+2017-12-28  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 42175 + 42177 (+ 24178 by Daniel):
+	Completion/Base/Utility/_arguments,
+	Completion/Base/Utility/_call_program,
+	Completion/Debian/Command/_aptitude, Completion/Unix/Command/_a2ps,
+	Completion/Unix/Command/_subversion, Completion/Unix/Command/_tar,
+	Doc/Zsh/compsys.yo: avoid localized output from external commands
+	for easier analysys by the completion system.
+
 2017-12-27  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 42176: Completion/Unix/Command/_tar: update long options

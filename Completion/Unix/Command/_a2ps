@@ -7,7 +7,7 @@ if [[ "$words[1]" != "$_cache_a2ps_cmd" ]]; then
 
   _cache_a2ps_cmd="$words[1]"
 
-  descr=( "${(@)${(f@)$(_call_program features LC_ALL=C $words[1] --list=features)//
+  descr=( "${(@)${(f@)$(_call_program features $words[1] --list=features)//
  /	}:#}" )
 
   _cache_a2ps_values=(

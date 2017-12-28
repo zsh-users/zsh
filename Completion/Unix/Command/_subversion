@@ -34,7 +34,7 @@ _svn () {
     typeset -gHA _svn_cmds
     if _cache_invalid svn-cmds || ! _retrieve_cache svn-cmds; then
       _svn_cmds=(
-	${=${(f)${${"$(_comp_locale; _call_program commands svn help)"#l#*Available subcommands:}%%Subversion is a tool*}}/(#s)[[:space:]]#(#b)([a-z]##)[[:space:]]#(\([a-z, ?]##\))#/$match[1] :$match[1]${match[2]:+:${${match[2]//[(),]}// /:}}:}
+	${=${(f)${${"$(_call_program commands svn help)"#l#*Available subcommands:}%%Subversion is a tool*}}/(#s)[[:space:]]#(#b)([a-z]##)[[:space:]]#(\([a-z, ?]##\))#/$match[1] :$match[1]${match[2]:+:${${match[2]//[(),]}// /:}}:}
       )
       if (( $? == 0 )); then
         _store_cache svn-cmds _svn_cmds
@@ -60,14 +60,14 @@ _svn () {
 	if _cache_invalid svn-${cmd}-usage || \
 	    ! _retrieve_cache svn-${cmd}-usage;
 	then
-	  usage=${${(M)${(f)"$(_comp_locale; _call_program options svn help $cmd)"}:#usage:*}#usage:*$cmd] }
+	  usage=${${(M)${(f)"$(_call_program options svn help $cmd)"}:#usage:*}#usage:*$cmd] }
 	  _store_cache svn-${cmd}-usage usage
 	fi
 	if _cache_invalid svn-${cmd}-usage || \
 	    ! _retrieve_cache svn-${cmd}-args;
 	then
 	  args=(
-	    ${=${${${(M)${(f)"$(_comp_locale; _call_program options svn help $cmd)"#(*Valid options:|(#e))}:#* :*}%% #:*}/ (arg|ARG)/:arg:}/(#b)(-##)([[:alpha:]]##) \[--([a-z-]##)\](:arg:)#/(--$match[3])$match[1]$match[2]$match[4] ($match[1]$match[2])--$match[3]$match[4]}
+	    ${=${${${(M)${(f)"$(_call_program options svn help $cmd)"#(*Valid options:|(#e))}:#* :*}%% #:*}/ (arg|ARG)/:arg:}/(#b)(-##)([[:alpha:]]##) \[--([a-z-]##)\](:arg:)#/(--$match[3])$match[1]$match[2]$match[4] ($match[1]$match[2])--$match[3]$match[4]}
 	  )
           while (( idx=$args[(I)*--accept:arg:] )); do
             args[(I)*--accept:arg:]=( --accept'=:automatic conflict resolution action:((working\:working base\:base '"`for i j in p postpone mc mine-conflict tc theirs-conflict mf mine-full tf theirs-full e edit l launch; do print -rn $i\\\\:$j $j\\\\:$j ""; done `"'))' )
@@ -227,7 +227,7 @@ _svnadmin () {
   if [[ -n $state ]] && (( ! $+_svnadmin_cmds )); then
     typeset -gHA _svnadmin_cmds
     _svnadmin_cmds=(
-      ${=${(f)${${"$(_comp_locale; _call_program commands svnadmin help)"#l#*Available subcommands:}}}/(#s)[[:space:]]#(#b)([-a-z]##)[[:space:]]#(\([a-z, ?]##\))#/$match[1] :$match[1]${match[2]:+:${${match[2]//[(),]}// /:}}:}
+      ${=${(f)${${"$(_call_program commands svnadmin help)"#l#*Available subcommands:}}}/(#s)[[:space:]]#(#b)([-a-z]##)[[:space:]]#(\([a-z, ?]##\))#/$match[1] :$match[1]${match[2]:+:${${match[2]//[(),]}// /:}}:}
     )
   fi
 
@@ -242,9 +242,9 @@ _svnadmin () {
       if (( $#cmd )); then
         curcontext="${curcontext%:*:*}:svnadmin-${cmd}:"
 
-        usage=${${(M)${(f)"$(_comp_locale; _call_program options svnadmin help $cmd)"}:#$cmd: usage:*}#$cmd: usage: svnadmin $cmd }
+        usage=${${(M)${(f)"$(_call_program options svnadmin help $cmd)"}:#$cmd: usage:*}#$cmd: usage: svnadmin $cmd }
         args=(
-          ${=${${${(M)${(f)"$(_comp_locale; _call_program options svnadmin help $cmd)"#(*Valid options:|(#e))}:#* :*}%% #:*}/ (arg|ARG)/:arg:}/(#b)-([[:alpha:]]) \[--([a-z-]##)\](:arg:)#/(--$match[2])-$match[1]$match[3] (-$match[1])--$match[2]$match[3]}
+          ${=${${${(M)${(f)"$(_call_program options svnadmin help $cmd)"#(*Valid options:|(#e))}:#* :*}%% #:*}/ (arg|ARG)/:arg:}/(#b)-([[:alpha:]]) \[--([a-z-]##)\](:arg:)#/(--$match[2])-$match[1]$match[3] (-$match[1])--$match[2]$match[3]}
         )
         # All options get {-x+,--long-x=}
         args=( ${args/(#b)(--[A-Za-z0-9-]##):arg:/$match[1]=:arg:} )
@@ -429,7 +429,7 @@ _svn_props() {
 _svn_changelists() {
   local cls
 
-  cls=( ${${${(M)${(f)"$(_comp_locale; _call_program changelists svn status 2>/dev/null)"}:#--- Changelist*}%??}##*\'} )
+  cls=( ${${${(M)${(f)"$(_call_program changelists svn status 2>/dev/null)"}:#--- Changelist*}%??}##*\'} )
   compadd "$@" -a cls && return 0
 }
 

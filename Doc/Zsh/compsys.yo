@@ -3596,7 +3596,8 @@ findex(_arguments)
 redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ @ @ @ @ @ ))ifnztexi(           )))
 xitem(tt(_arguments )[ tt(-nswWCRS) ] [ tt(-A) var(pat) ] [ tt(-O) var(name) ] [ tt(-M) var(matchspec) ])
 xitem(SPACES()[ tt(:) ] var(spec) ...)
-item(tt(_arguments) [ var(opt) ... ] tt(-)tt(-) [ tt(-i) var(pats) ] [ tt(-s) var(pair) ] [ var(helpspec) ... ])(
+xitem(tt(_arguments )[ var(opt) ... ] tt(-)tt(-) [ tt(-l) ] [ tt(-i) var(pats) ] [ tt(-s) var(pair) ])
+item(SPACES()[ var(helpspec) ...])(
 This function can be used to give a complete specification for completion
 for a command whose arguments follow standard UNIX option and argument
 conventions.
@@ -4139,6 +4140,12 @@ pattern and the var(action) will be used only directly after the
 `tt(=)', not in the next word.  This is the behaviour of a normal
 specification defined with the form `tt(=-)'.
 
+By default, the command (with the option `tt(--help)') is run after
+resetting all the locale categories (except for tt(LC_CTYPE)) to `tt(C)'.
+If the localized help output is known to work, the option `tt(-l)' can
+be specified after the `tt(_arguments -)tt(-)' so that the command is
+run in the current locale.
+
 The `tt(_arguments -)tt(-)' can be followed by the option `tt(-i)
 var(patterns)' to give patterns for options which are not to be
 completed.  The patterns can be given as the name of an array parameter
@@ -4230,7 +4237,7 @@ The return status of tt(_call_function) itself is zero if the function
 var(name) exists and was called and non-zero otherwise.
 )
 findex(_call_program)
-item(tt(_call_program) [ tt(-p) ] var(tag) var(string) ...)(
+item(tt(_call_program) [ tt(-l) ] [ tt(-p) ] var(tag) var(string) ...)(
 This function provides a mechanism for the user to override the use of an
 external command.  It looks up the tt(command) style with the supplied
 var(tag).  If the style is set, its value is used as the command to
@@ -4238,6 +4245,11 @@ execute.  The var(string)s from the call to tt(_call_program), or from the
 style if set, are concatenated with spaces between them and the resulting
 string is evaluated.  The return status is the return status of the command
 called.
+
+By default, the command is run in an environment where all the locale
+categories (except for tt(LC_CTYPE)) are reset to `tt(C)' by calling the
+utility function tt(_comp_locale) (see below). If the option `tt(-l)' is
+given, the command is run with the current locale.
 
 If the option `tt(-p)' is supplied it indicates that the command
 output is influenced by the permissions it is run with. If the
@@ -4298,6 +4310,18 @@ item(tt(_command_names) [ tt(-e) | tt(-) ])(
 This function completes words that are valid at command position: names of
 aliases, builtins, hashed commands, functions, and so on.  With the tt(-e)
 flag, only hashed commands are completed.  The tt(-) flag is ignored.
+)
+findex(_comp_locale)
+item(tt(_comp_locale))(
+This function resets all the locale categories other than tt(LC_CTYPE) to
+`tt(C)' so that the output from external commands can be easily analyzed by
+the completion system. tt(LC_CTYPE) retains the current value (taking
+tt(LC_ALL) and tt(LANG) into account), ensuring that non-ASCII characters
+in file names are still handled properly.
+
+This function should normally be run only in a subshell, because the new
+locale is exported to the environment. Typical usage would be
+`tt($LPAR()_comp_locale; )var(command) ...tt(RPAR())'.
 )
 findex(_completers)
 item(tt(_completers) [ tt(-p) ])(
