@@ -2,6 +2,8 @@
 ## Written by Frank Terbeck <ft@bewatermyfriend.org>
 ## Distributed under the same BSD-ish license as zsh itself.
 
+# This function sets ${vcs_info_msg_<N>_} from ${msgs}.
+
 setopt localoptions noksharrays NO_shwordsplit unset
 local -i i j
 

@@ -34,7 +34,7 @@ hook_com[subdir_orig]="${hook_com[subdir]}"
 
 VCS_INFO_hook 'post-backend'
 
-## description:
+## description (for backend authors):
 #   action:   a string that signals a certain non-default condition in the
 #             repository (like 'rebase-i' in git). If this in non-empty,
 #             the actionformats will be used, too.
@@ -48,6 +48,11 @@ VCS_INFO_hook 'post-backend'
 # If an argument has no valid value for a given backend, an empty value
 # should be provided. eg:
 #   VCS_INFO_formats '' "${foobranch}" "${foobase}" '' '' '' "${foomisc}"
+
+## description (vcs_info internals):
+# This function is called by the backend with information about the repository,
+# and (after some manipulations) populates the ${msgs} variable in preparation
+# for calling VCS_INFO_set.
 
 if [[ -n ${hook_com[action]} ]] ; then
     zstyle -a ":vcs_info:${vcs}:${usercontext}:${rrn}" actionformats msgs
