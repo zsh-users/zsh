@@ -609,7 +609,7 @@ _apt_releases_update () {
   then
     local -a tmp=("${(f)$(apt-cache policy)}")
     _apt_releases=(
-${${${${(M)tmp:#*release*}#*a=}%%,*}:#now}
+${${${${(M)tmp:#*release*a=*}#*a=}%%,*}:#now}
 ${${${${(M)tmp:#*release*n=*}#*n=}%%,*}:#now}
     )
     typeset -U _apt_releases

@@ -1,5 +1,8 @@
 2017-12-30  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 42186: Completion/Debian/Command/_apt: Fix completion of
+	target_release names, e.g., 'apt install zsh/<TAB>'.
+
 	* unposted: Functions/VCS_Info/VCS_INFO_formats,
 	Functions/VCS_Info/VCS_INFO_set: vcs_info: Add docstrings to
 	the internal functions VCS_INFO_formats and VCS_INFO_set.
