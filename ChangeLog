@@ -1,3 +1,8 @@
+2018-01-04  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Sebastian: 42188: Src/Modules/system.c: It is necessary to
+	close the lock descriptor in some failure cases.
+
 2018-01-04  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* dana: 42214: Completion/BSD/Type/_file_flags,

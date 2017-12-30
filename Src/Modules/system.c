@@ -649,22 +649,30 @@ bin_zsystem_flock(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     if (timeout > 0) {
 	time_t end = time(NULL) + (time_t)timeout;
 	while (fcntl(flock_fd, F_SETLK, &lck) < 0) {
-	    if (errflag)
+	    if (errflag) {
+                zclose(flock_fd);
 		return 1;
+            }
 	    if (errno != EINTR && errno != EACCES && errno != EAGAIN) {
+                zclose(flock_fd);
 		zwarnnam(nam, "failed to lock file %s: %e", args[0], errno);
 		return 1;
 	    }
-	    if (time(NULL) >= end)
+	    if (time(NULL) >= end) {
+                zclose(flock_fd);
 		return 2;
+            }
 	    sleep(1);
 	}
     } else {
 	while (fcntl(flock_fd, timeout == 0 ? F_SETLK : F_SETLKW, &lck) < 0) {
-	    if (errflag)
+	    if (errflag) {
+                zclose(flock_fd);
 		return 1;
+            }
 	    if (errno == EINTR)
 		continue;
+            zclose(flock_fd);
 	    zwarnnam(nam, "failed to lock file %s: %e", args[0], errno);
 	    return 1;
 	}
