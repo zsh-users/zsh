@@ -1,3 +1,7 @@
+2017-12-31  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 42183: Completion/Unix/Command/_objdump: support LLVM variant
+
 2017-12-30  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 42186: Completion/Debian/Command/_apt: Fix completion of
