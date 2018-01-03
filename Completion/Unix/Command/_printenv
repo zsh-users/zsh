@@ -1,4 +1,4 @@
-#compdef printenv
+#compdef printenv gprintenv
 
 local expl
 

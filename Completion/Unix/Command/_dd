@@ -1,4 +1,4 @@
-#compdef dd
+#compdef dd gdd
 
 _values -w 'option' \
   'if[specify input file]:input file:_tilde_files' \

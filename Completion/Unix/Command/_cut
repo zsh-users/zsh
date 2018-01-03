@@ -1,4 +1,4 @@
-#compdef cut
+#compdef cut gcut
 
 typeset -A _cut_args
 

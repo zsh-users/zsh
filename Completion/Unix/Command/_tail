@@ -1,4 +1,4 @@
-#compdef tail
+#compdef tail gtail
 
 local curcontext=$curcontext state state_descr line opts args ret=1
 typeset -A opt_args

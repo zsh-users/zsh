@@ -1,4 +1,4 @@
-#compdef fmt
+#compdef fmt gfmt
 
 local variant
 local -a args

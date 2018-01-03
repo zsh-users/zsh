@@ -1,4 +1,4 @@
-#compdef tr
+#compdef tr gtr
 
 local curcontext="$curcontext" state line expl ret=1
 local args variant k

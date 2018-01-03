@@ -1,4 +1,4 @@
-#compdef cat
+#compdef cat gcat
 
 local -a args
 

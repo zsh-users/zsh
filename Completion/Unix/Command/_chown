@@ -1,4 +1,4 @@
-#compdef chown chgrp zf_chown=chown zf_chgrp=chgrp
+#compdef chown chgrp gchown=chown gchgrp=chgrp zf_chown=chown zf_chgrp=chgrp
 
 local curcontext="$curcontext" state line expl ret=1
 local suf usr grp req deref pattern arg args

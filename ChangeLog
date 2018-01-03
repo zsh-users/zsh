@@ -1,5 +1,15 @@
 2018-01-03  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* dana: 42207: Completion/Unix/Command/_chown,
+	Completion/Unix/Command/_cat, Completion/Unix/Command/_cut,
+	Completion/Unix/Command/_dd, Completion/Unix/Command/_df,
+	Completion/Unix/Command/_env, Completion/Unix/Command/_fmt,
+	Completion/Unix/Command/_head, Completion/Unix/Command/_paste,
+	Completion/Unix/Command/_printenv, Completion/Unix/Command/_stty,
+	Completion/Unix/Command/_stdbuf, Completion/Unix/Command/_tail,
+	Completion/Unix/Command/_tr, Completion/Unix/Command/_uname,
+	Completion/Unix/Type/_directories: add g prefixes for GNU variants
+
 	* Matthew Martin: 42117: Completion/BSD/Command/_chflags:
 	use anonymous function rather than define one in user namespace
 

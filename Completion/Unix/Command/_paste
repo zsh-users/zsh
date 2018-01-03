@@ -1,4 +1,4 @@
-#compdef paste
+#compdef paste gpaste
 
 local -a args
 local dopt='[specify delimiter list]:delimiter list [tab]'

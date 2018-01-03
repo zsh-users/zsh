@@ -1,4 +1,4 @@
-#compdef env
+#compdef env genv
 
 local context state line variant args ret=1
 

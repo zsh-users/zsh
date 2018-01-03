@@ -1,4 +1,4 @@
-#compdef uname
+#compdef uname guname
 
 typeset -A _uname_args
 local -a args

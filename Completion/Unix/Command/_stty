@@ -1,4 +1,4 @@
-#compdef stty
+#compdef stty gstty
 
 local expl
 

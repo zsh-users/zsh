@@ -1,4 +1,4 @@
-#compdef head
+#compdef head ghead
 
 local curcontext=$curcontext state state_descr line expl opts args ret=1
 typeset -A opt_args

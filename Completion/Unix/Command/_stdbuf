@@ -1,4 +1,4 @@
-#compdef stdbuf
+#compdef stdbuf gstdbuf
 
 local -a short long buf args
 local i opt gnu=0

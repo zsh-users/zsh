@@ -1,4 +1,4 @@
-#compdef df
+#compdef df gdf
 
 local curcontext="$curcontext" state state_descr line args spec ret=1
 local -A opt_args
