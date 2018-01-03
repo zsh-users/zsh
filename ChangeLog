@@ -1,5 +1,7 @@
 2018-01-03  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42208: Completion/Unix/Command/_yp: fix use of cache variables
+
 	* dana: 42207: Completion/Unix/Command/_chown,
 	Completion/Unix/Command/_cat, Completion/Unix/Command/_cut,
 	Completion/Unix/Command/_dd, Completion/Unix/Command/_df,

@@ -1,25 +1,27 @@
 #compdef ypcat ypmatch yppasswd ypwhich ypset ypserv ypbind yppush yppoll ypxfr domainname
 
-local curcontext="$curcontext" line state expl ret=1 _yp_cache_nicks _yp_args
+local curcontext="$curcontext" line state expl args ret=1
 typeset -A opt_args
 
-if (( ! $+_yp_cache_maps )); then
-  _yp_cache_maps=( "${(@)${(@f)$(_call_program maps ypwhich -m)}%% *}" )
-  _yp_cache_nicks=( "${(@)${(@)${(@f)$(_call_program names ypwhich -x)}#*\"}%%\"*}" )
-  _yp_args=(
-    '(-x)-d[specify domain]:domain name' \
-    '(-x)-k[display keys]' \
-    '(-x)-t[inhibit nicknames]' \
-    '(: -d -k -t)-x[display nicknames]' \
-  )
+if (( ! $+_cache_yp_maps )); then
+  typeset -ga _cache_yp_maps _cache_yp_nicks
+  _cache_yp_maps=( "${(@)${(@f)$(_call_program maps ypwhich -m)}%% *}" )
+  _cache_yp_nicks=( "${(@)${(@)${(@f)$(_call_program names ypwhich -x)}#*\"}%%\"*}" )
 fi
+
+args=(
+  '(-x)-d[specify domain]:domain name' \
+  '(-x)-k[display keys]' \
+  '(-x)-t[inhibit nicknames]' \
+  '(: -d -k -t)-x[display nicknames]' \
+)
 
 case "$service" in
 ypcat)
-  _arguments -C -s "$_yp_args[@]" ':map name:->map' && ret=0
+  _arguments -C -s $args ':map name:->map' && ret=0
   ;;
 ypmatch)
-  _arguments -C -s "$_yp_args[@]" '::key map:->keymap' ':map name:->map' && 
+  _arguments -C -s $args '::key map:->keymap' ':map name:->map' &&
     ret=0
   ;;
 yppasswd)
@@ -96,9 +98,9 @@ if [[ "$state" = map* ]]; then
     # The `-M ...' allows `pa.n<TAB>' to complete to `passwd.byname'.
     _requested maps expl 'map name' \
         compadd -M 'l:.|by=by l:.|=by r:|.=* r:|=*' -a \
-                _yp_cache_maps && ret=0
+                _cache_yp_maps && ret=0
     _requested nicknames expl nicknames \
-        compadd -a _yp_cache_nicks && ret=0
+        compadd -a _cache_yp_nicks && ret=0
     (( ret )) || return 0
   done
 elif [[ "$state" = servers ]]; then
