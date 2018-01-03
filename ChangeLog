@@ -1,5 +1,11 @@
 2018-01-03  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* dana: 42210: Completion/BSD/Command/_chflags,
+	Completion/BSD/Type/_flags, Completion/Unix/Command/_chmod,
+	Completion/Unix/Command/_find, Completion/Unix/Command/_mkdir,
+	Completion/Unix/Type/_modes: factor out completion of file
+	modes and flags and handle _comp_priv_prefix for chflags
+
 	* dana: 42209: Completion/Unix/Command/_unexpand: take account
 	of numeric options such as -4 instead of -t4
 

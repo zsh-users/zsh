@@ -1,68 +1,8 @@
 #compdef chflags
 
-local args flag_descs flags own='-g *(-u$EUID)'
+local args own='-g *(-u$EUID)'
 
-flag_descs=(
-  uappnd 'user append-only'
-  uchg 'user immutable'
-)
-
-if (( ! EUID )); then
-  flag_descs+=(
-    arch archived
-    nodump nodump
-    sappnd 'system append-only'
-    schg 'system immutable'
-  )
-  unset own
-fi
-
-if [[ $OSTYPE = (darwin|dragonfly|freebsd|netbsd)* ]]; then
-  flag_descs+=(opaque opaque)
-
-  if [[ $OSTYPE = darwin* ]]; then
-    flag_descs+=(hidden hidden)
-  fi
-
-  if [[ $OSTYPE = (dragonfly|freebsd)* ]]; then
-    flag_descs+=(uunlnk 'user undeletable')
-    (( EUID )) || flag_descs+=(sunlnk 'system undeletable')
-  fi
-
-  [[ $OSTYPE = dragonflybsd* ]] && {
-    flag_descs+=(
-      cache XXX
-      nouhistory 'user nohistory'
-    )
-
-    (( EUID )) || flag_descs+=(
-      noscache XXX
-      noshistory 'system nohistory'
-    )
-  }
-
-  [[ $OSTYPE = freebsd* ]] && flag_descs+=(
-    uarch archive
-    uhidden hidden
-    uoffline offline
-    urdonly 'DOS, Windows and CIFS readonly'
-    ureparse 'Windows reparse point'
-    usparse 'sparse file'
-    usystem 'DOS, Windows and CIFS system'
-  )
-fi
-
-() {
-  for 1 2; do
-    if [[ $1 = no* ]]; then
-      flags+=("(${1#no})$1[set the $2 flag]"
-               "($1)${1#no}[unset the $2 flag]")
-    else
-      flags+=("(no$1)$1[set the $2 flag]"
-               "($1)no$1[unset the $2 flag]")
-    fi
-  done
-} $flag_descs
+(( ! EUID || $+_comp_priv_prefix )) && own=
 
 if [[ $OSTYPE = (darwin|dragonfly|freebsd)* ]]; then
   args=(
@@ -72,7 +12,7 @@ if [[ $OSTYPE = (darwin|dragonfly|freebsd)* ]]; then
 fi
 
 _arguments -s -A "-*" : $args \
-  ':file flag:_values -s , "file flags" $flags[@]' \
+  ': :_flags' \
   '*:file:_files "$own"' \
   - opth \
   '-h[act on symlinks]' \

@@ -3,7 +3,7 @@
 local curcontext="$curcontext" state line expl ret=1
 local -a args privs
 
-args=( '*:file:->files' '1:mode:->mode' )
+args=( '*: :->files' '1: :_modes' )
 
 if _pick_variant gnu=Free\ Soft unix --version; then
   args+=(
@@ -45,35 +45,12 @@ else
         '(1)-I[removes all inherited entries from named files ACLs]'
       )
     ;;
-    solaris*) privs=( 'l[mandatory locking]' ) ;;
   esac
 fi
 
 _arguments -C -s "$args[@]" && ret=0
 
 case "$state" in
-  mode)
-    compset -P \*,
-    compset -S ,\*
-    if [[ -prefix [0-7] ]]; then
-      _message -e number 'numeric mode'
-    elif compset -P '[a-z]#[+-=]'; then
-      _values -S '' privilege \
-	'r[read]' 'w[write]' 'x[execute]' \
-	's[set uid/gid]' 't[sticky]' \
-	'X[execute only if directory or executable to another]' \
-	"u[owner's current permissions]" \
-	"g[group's current permissions]" \
-	"o[other's current permissions]" \
-	"$privs[@]" && ret=0
-    else
-      suf=( -S '' )
-      compset -P '*'
-      _alternative -O suf \
-	'who:who:((u\:user g\:group a\:all o\:others))' \
-	'operators:operator:(+ - =)' && ret=0
-    fi
-  ;;
   files)
     if [[ -n $opt_args[--reference] ]]; then
       zmodload -F zsh/stat b:zstat 2>/dev/null
