@@ -1,5 +1,8 @@
 2018-01-03  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* dana: 42209: Completion/Unix/Command/_tr: fix option
+	descriptions for non-GNU variants
+
 	* 42208: Completion/Unix/Command/_yp: fix use of cache variables
 
 	* dana: 42207: Completion/Unix/Command/_chown,

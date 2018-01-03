@@ -28,7 +28,7 @@ case $variant in
   ;|
   *)
     for k in c d s; do
-      args+=( -$k$descr[$k] )
+      args+=( -$k$descr[-$k] )
     done
   ;;
 esac
