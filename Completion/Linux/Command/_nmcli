@@ -3,7 +3,7 @@
 # compatible with nmcli 1.8.4
 
 _nmcli() {
-  local line
+  local curcontext="$curcontext" line
 
   _arguments -C \
     '(-p -pretty -t -terse)-t'{,erse}'[terse output]' \
@@ -45,7 +45,7 @@ _nmcli_general() {
 }
 
 _nmcli_networking() {
-  local line
+  local curcontext="$curcontext" line
 
   _arguments -C \
     "1: :(on off connectivity help)" \
@@ -67,7 +67,7 @@ _nmcli_radio() {
 }
 
 _nmcli_connection() {
-  local line
+  local curcontext="$curcontext" line
 
   _arguments -C \
     "1: :(show up down add modify clone edit delete monitor reload load import export help)" \
@@ -163,7 +163,7 @@ _nmcli_connection_ids() {
 }
 
 _nmcli_device() {
-  local line
+  local curcontext="$curcontext" line
 
   _arguments -C \
     "1: :(status show set connect reapply modify disconnect delete monitor wifi lldp help)" \
@@ -221,7 +221,7 @@ _nmcli_device_monitor() {
 }
 
 _nmcli_device_wifi() {
-  local line
+  local curcontext="$curcontext" line
 
   _arguments -C \
     "1: :(list connect hotspot rescan)" \
@@ -245,7 +245,7 @@ _nmcli_device_wifi_list() {
 }
 
 _nmcli_device_wifi_connect() {
-  local line
+  local curcontext="$curcontext" line
 
   _arguments -C \
     "1: :_nmcli_device_wifi_ssids" \
@@ -258,7 +258,7 @@ _nmcli_device_wifi_connect() {
 
 _nmcli_device_wifi_connect_opts() {
   # TODO: there must be a cleaner way to implement this
-  local line
+  local curcontext="$curcontext" line
 
   _arguments -C \
     "1: :(password wep-key-type ifname bssid name private hidden)" \
@@ -297,7 +297,7 @@ _nmcli_device_wifi_connect_opts() {
 }
 
 _nmcli_device_wifi_hotspot() {
-  local line
+  local curcontext="$curcontext" line
 
   _arguments -C \
     "1: :(ifname con-name ssid band channel password)" \
@@ -369,3 +369,5 @@ _nmcli_device_ifnames() {
 _nmcli_agent() {
   _arguments "1: :(secret polkit all help)"
 }
+
+_nmcli "$@"
