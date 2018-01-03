@@ -40,7 +40,7 @@ _nmcli_fields() {
 }
 
 _nmcli_general() {
-  _arguments "1: :(status hostname permissions logging help)"
+  _arguments "1:command:(status hostname permissions logging help)"
   # TODO: provide completions for logging
 }
 
@@ -48,7 +48,7 @@ _nmcli_networking() {
   local curcontext="$curcontext" line
 
   _arguments -C \
-    "1: :(on off connectivity help)" \
+    "1:command:(on off connectivity help)" \
     "*::arg:->args"
 
   case $line[1] in
@@ -57,20 +57,20 @@ _nmcli_networking() {
 }
 
 _nmcli_networking_connectivity() {
-  _arguments "1: :(check)"
+  _arguments "1:flag:(check)"
 }
 
 _nmcli_radio() {
   _arguments \
-    "1: :(all wifi wwan help)" \
-    "2: :(on off)"
+    "1:type:(all wifi wwan help)" \
+    "2:switch:(on off)"
 }
 
 _nmcli_connection() {
   local curcontext="$curcontext" line
 
   _arguments -C \
-    "1: :(show up down add modify clone edit delete monitor reload load import export help)" \
+    "1:command:(show up down add modify clone edit delete monitor reload load import export help)" \
     "*::arg:->args"
 
   case $line[1] in
@@ -93,43 +93,43 @@ _nmcli_connection_show() {
   # TODO: add support for --order
   _arguments \
     "--active" \
-    "1: :_nmcli_connection_specs"
+    "1:connection:_nmcli_connection_specs"
 }
 
 _nmcli_connection_up() {
   # TODO: add support for ifname, ap and passwd-file parameters
-  _arguments "1: :_nmcli_connection_specs"
+  _arguments "1:connection:_nmcli_connection_specs"
 }
 
 _nmcli_connection_down() {
-  _arguments "1: :_nmcli_connection_specs"
+  _arguments "1:connection:_nmcli_connection_specs"
 }
 
 _nmcli_connection_modify() {
   # TODO: add support for options and properties
   _arguments \
     "--temporary" \
-    "1: :_nmcli_connection_specs"
+    "1:connection:_nmcli_connection_specs"
 }
 
 _nmcli_connection_clone() {
   _arguments \
     "--temporary" \
-    "1: :_nmcli_connection_specs" \
+    "1:connection:_nmcli_connection_specs" \
     "2:new name"
 }
 
 _nmcli_connection_edit() {
   # TODO: add support for adding new connections (type and con-name parameters)
-  _arguments "1: :_nmcli_connection_specs"
+  _arguments "1:connection:_nmcli_connection_specs"
 }
 
 _nmcli_connection_delete() {
-  _arguments "*: :_nmcli_connection_specs"
+  _arguments "*:connection:_nmcli_connection_specs"
 }
 
 _nmcli_connection_monitor() {
-  _arguments "*: :_nmcli_connection_specs"
+  _arguments "*:connection:_nmcli_connection_specs"
 }
 
 _nmcli_connection_load() {
@@ -140,15 +140,15 @@ _nmcli_connection_import() {
   _arguments \
     "--temporary" \
     "1: :(type)" \
-    "2: :(vpnc openvpn pptp openconnect openswan libreswan ssh l2tp iodine)" \
+    "2:type:(vpnc openvpn pptp openconnect openswan libreswan ssh l2tp iodine)" \
     "3: :(file)" \
-    "4: :_files"
+    "4:file:_files"
 }
 
 _nmcli_connection_export() {
   _arguments \
-    "1: :_nmcli_connection_specs" \
-    "2: :_files"
+    "1:connection:_nmcli_connection_specs" \
+    "2:file:_files"
 }
 
 _nmcli_connection_specs() {
@@ -166,7 +166,7 @@ _nmcli_device() {
   local curcontext="$curcontext" line
 
   _arguments -C \
-    "1: :(status show set connect reapply modify disconnect delete monitor wifi lldp help)" \
+    "1:command:(status show set connect reapply modify disconnect delete monitor wifi lldp help)" \
     "*::arg:->args"
 
   case $line[1] in
@@ -184,47 +184,47 @@ _nmcli_device() {
 }
 
 _nmcli_device_show() {
-  _arguments "1: :_nmcli_device_ifnames"
+  _arguments "1:interface:_nmcli_device_ifnames"
 }
 
 _nmcli_device_set() {
   # TODO: allow specifying both options, and in any order
   _arguments \
-    "1: :_nmcli_device_ifnames" \
-    "2: :(autoconnect managed)" \
-    "3: :(yes no)"
+    "1:interface:_nmcli_device_ifnames" \
+    "2:property:(autoconnect managed)" \
+    "3:switch:(yes no)"
 }
 
 _nmcli_device_connect() {
-  _arguments "1: :_nmcli_device_ifnames"
+  _arguments "1:interface:_nmcli_device_ifnames"
 }
 
 _nmcli_device_reapply() {
-  _arguments "1: :_nmcli_device_ifnames"
+  _arguments "1:interface:_nmcli_device_ifnames"
 }
 
 _nmcli_device_modify() {
   # TODO: add support for settings
-  _arguments "1: :_nmcli_device_ifnames"
+  _arguments "1:interface:_nmcli_device_ifnames"
 }
 
 _nmcli_device_disconnect() {
-  _arguments "*: :_nmcli_device_ifnames"
+  _arguments "*:interface:_nmcli_device_ifnames"
 }
 
 _nmcli_device_delete() {
-  _arguments "*: :_nmcli_device_ifnames"
+  _arguments "*:interface:_nmcli_device_ifnames"
 }
 
 _nmcli_device_monitor() {
-  _arguments "*: :_nmcli_device_ifnames"
+  _arguments "*:interface:_nmcli_device_ifnames"
 }
 
 _nmcli_device_wifi() {
   local curcontext="$curcontext" line
 
   _arguments -C \
-    "1: :(list connect hotspot rescan)" \
+    "1:command:(list connect hotspot rescan)" \
     "*::arg:->args"
 
   case $line[1] in
@@ -239,16 +239,16 @@ _nmcli_device_wifi_list() {
   # TODO: support bssid on its own
   _arguments \
     "1: :(ifname)" \
-    "2: :_nmcli_device_ifnames" \
+    "2:interface:_nmcli_device_ifnames" \
     "3: :(bssid)" \
-    "4: :_nmcli_device_wifi_bssids"
+    "4:bssid:_nmcli_device_wifi_bssids"
 }
 
 _nmcli_device_wifi_connect() {
   local curcontext="$curcontext" line
 
   _arguments -C \
-    "1: :_nmcli_device_wifi_ssids" \
+    "1:ssid:_nmcli_device_wifi_ssids" \
     "*::arg:->args"
 
   if [[ -n $line[1] ]]; then
@@ -261,7 +261,7 @@ _nmcli_device_wifi_connect_opts() {
   local curcontext="$curcontext" line
 
   _arguments -C \
-    "1: :(password wep-key-type ifname bssid name private hidden)" \
+    "1:property:(password wep-key-type ifname bssid name private hidden)" \
     "*::arg:->args"
 
   local min_line_len=2
@@ -300,7 +300,7 @@ _nmcli_device_wifi_hotspot() {
   local curcontext="$curcontext" line
 
   _arguments -C \
-    "1: :(ifname con-name ssid band channel password)" \
+    "1:property:(ifname con-name ssid band channel password)" \
     "*::arg:->args"
 
   local min_line_len=2
@@ -336,9 +336,9 @@ _nmcli_device_wifi_rescan() {
   # TODO: support ssid on its own and multiple ssids
   _arguments \
     "1: :(ifname)" \
-    "2: :_nmcli_device_ifnames" \
+    "2:interface:_nmcli_device_ifnames" \
     "3: :(ssid)" \
-    "4: :_nmcli_device_wifi_ssids"
+    "4:ssid:_nmcli_device_wifi_ssids"
 }
 
 _nmcli_device_wifi_bssids() {
@@ -357,7 +357,7 @@ _nmcli_device_lldp() {
   _arguments \
     "1: :(list)" \
     "2: :(ifname)" \
-    "3: :_nmcli_device_ifnames"
+    "3:interface:_nmcli_device_ifnames"
 }
 
 _nmcli_device_ifnames() {
@@ -367,7 +367,7 @@ _nmcli_device_ifnames() {
 }
 
 _nmcli_agent() {
-  _arguments "1: :(secret polkit all help)"
+  _arguments "1:type:(secret polkit all help)"
 }
 
 _nmcli "$@"
