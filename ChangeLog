@@ -1,5 +1,8 @@
 2018-01-03  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* dana: 42209: Completion/Unix/Command/_unexpand: take account
+	of numeric options such as -4 instead of -t4
+
 	* dana: 42209: Completion/Unix/Command/_tr: fix option
 	descriptions for non-GNU variants
 

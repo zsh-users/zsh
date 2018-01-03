@@ -28,6 +28,10 @@ elif [[ $OSTYPE = (*bsd*|dragonfly*|darwin*) ]]; then
 fi
 [[ $service = *un* ]] && args+=(  "(--all --help --version)-a[$all]" )
 
+# Most (un)expand variants, excluding BusyBox, allow e.g. -4 instead of -t4
+[[ $_cmd_variant[$service] == *busybox* ]] ||
+args+=( '!(-0 -1 -2 -3 -4 -5 -6 -7 -8 -9 -t --tabs)-'{0..9} )
+
 _arguments -s -S "$args[@]" \
   "(--tabs --help)-t+${tabs}" \
   '*:file:_files'
