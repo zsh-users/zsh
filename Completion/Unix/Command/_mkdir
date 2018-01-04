@@ -4,7 +4,7 @@ local curcontext="$curcontext" state line expl args variant ret=1
 typeset -A opt_args
 
 args=(
-  '(-m --mode)'{-m,--mode=}'[set permission mode]: :_modes'
+  '(-m --mode)'{-m,--mode=}'[set permission mode]: :_file_modes'
   '(-p --parents)'{-p,--parents}'[make parent directories as needed]'
   '(-)*: :->directories'
 )

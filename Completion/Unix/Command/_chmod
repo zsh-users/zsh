@@ -3,7 +3,7 @@
 local curcontext="$curcontext" state line expl ret=1
 local -a args privs
 
-args=( '*: :->files' '1: :_modes' )
+args=( '*: :->files' '1: :_file_modes' )
 
 if _pick_variant gnu=Free\ Soft unix --version; then
   args+=(

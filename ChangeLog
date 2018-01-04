@@ -1,5 +1,11 @@
 2018-01-04  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* dana: 42214: Completion/BSD/Type/_file_flags,
+	Completion/Unix/Type/_file_modes, Completion/Unix/Command/_find,
+	Completion/Unix/Command/_mkdir, Completion/BSD/Command/_chflags,
+	Completion/Unix/Command/_chmod: use less general names on new
+	functions for completing file flags and modes
+
 	* github #21: Maciek Makowski:
 	Completion/Linux/Command/_networkmanager: update nmcli
 	completions to be compatible with recent version 1.8.4

@@ -139,7 +139,7 @@ _arguments -C $args \
   '*-nogroup' \
   '*-nouser' \
   '*-ok:program: _command_names -e:*\;::program arguments: _normal' \
-  '*-perm: :_modes' \
+  '*-perm: :_file_modes' \
   '*-print' \
   '*-prune' \
   '*-size:file size (blocks)' \

@@ -12,7 +12,7 @@ if [[ $OSTYPE = (darwin|dragonfly|freebsd)* ]]; then
 fi
 
 _arguments -s -A "-*" : $args \
-  ': :_flags' \
+  ': :_file_flags' \
   '*:file:_files "$own"' \
   - opth \
   '-h[act on symlinks]' \
