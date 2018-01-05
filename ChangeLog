@@ -1,3 +1,8 @@
+2018-01-05  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* dana: 42222: Completion/Unix/Type/_object_files: recognize
+	.dylib extension (macOS).
+
 2018-01-04  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* dana: 42164: Src/Zle/complist.c, Test/Y01completion.ztst:
