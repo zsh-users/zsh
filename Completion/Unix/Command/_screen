@@ -56,6 +56,8 @@ scr_cmds=(
 )
 
 _arguments -C \
+  '(-6)-4[resolve hostnames only to IPv4 addresses]' \
+  '(-4)-4[resolve hostnames only to IPv6 addresses]' \
   "-a[force all capabilities into each window's termcap]" \
   '-A[adapt all windows to the new display width & height]' \
   "-c[read configuration file instead of '.screenrc']:config file:_files" \
@@ -75,7 +77,7 @@ _arguments -C \
   '-O[choose optimal output rather than exact vt100 emulation]' \
   '-p[preselect the named window]:window number or name:((\=\:windowlist -\:blank\ window \:window\ number))' \
   '-q[quiet startup, exit with non-zero return code if unsuccessful]' \
-  '-Q[send response to stdout of command qwery process]:screen command:(echo info lastmsg number select time title windows)' \
+  '-Q[send response to stdout of command query process]:screen command:(echo info lastmsg number select time title windows)' \
   '-r[reattach to a detached screen process]: :->detached-sessions' \
   '-Dr: :->any-sessions' \
   '-dr: :->any-sessions' \

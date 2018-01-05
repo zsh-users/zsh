@@ -1,5 +1,7 @@
 2018-01-05  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42230: Completion/Unix/Command/_screen: update to 4.06.01
+
 	* 42229: Completion/Unix/Command/_awk, Completion/Unix/Command/_df,
 	Completion/Unix/Command/_ls, Completion/Unix/Command/_od,
 	Completion/Unix/Command/_tail, Completion/Unix/Command/_timeout:
