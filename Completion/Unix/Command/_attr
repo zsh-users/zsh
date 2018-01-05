@@ -1,4 +1,4 @@
-#compdef attr getfattr setfattr
+#compdef attr getfattr setfattr xattr
 
 case $service in
   attr)
@@ -45,4 +45,23 @@ case $service in
       '*:file:_files'
     return
   ;;
+  # The Python xattr module ships with a utility called xattr which might appear
+  # on some systems; it is not entirely compatible with the Darwin variant, but
+  # does seem inspired by it, to the degree that this is probably close enough
+  xattr)
+    _arguments -s -S -A '-*' : \
+      '(: -)'{-h,--help}'[display help information]' \
+      '(-c -d -w)-l[display in long format]' \
+      '-r[act recursively]' \
+      '-s[act on symbolic links]' \
+      '(-w)-v[always display file name]' \
+      '(-c -d)-x[use hexademical format for value input and output]' \
+      '*: :_files' \
+      + '(op)' \
+      '(-l -x)-c[remove all attributes]' \
+      '(-l -x)-d[remove specified attribute]:attribute name' \
+      '-p[display value of specified attribute]:attribute name' \
+      '(-l -v)-w[set value of specified attribute]:attribute name: :attribute value'
+    return
+    ;;
 esac

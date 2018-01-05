@@ -1,5 +1,23 @@
 2018-01-05  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* dana: 42231: Completion/Darwin/Command/_caffeinate,
+	Completion/Darwin/Command/_mdfind,
+	Completion/Darwin/Command/_mdls,
+	Completion/Darwin/Command/_mdutil,
+	Completion/Darwin/Command/_nvram,
+	Completion/Darwin/Command/_osascript,
+	Completion/Darwin/Command/_pbcopy,
+	Completion/Darwin/Command/_plutil,
+	Completion/Darwin/Command/_say,
+	Completion/Darwin/Command/_scselect,
+	Completion/Darwin/Command/_scutil,
+	Completion/Darwin/Command/_sw_vers,
+	Completion/Linux/Command/_chattr,
+	Completion/Linux/Command/_ldconfig,
+	Completion/Linux/Command/_lsattr,
+	Completion/Unix/Command/_attr: new completion functions for simple
+	utilities belonging to the 'Darwin' and 'Linux' groups.
+
 	* 42230: Completion/Unix/Command/_screen: update to 4.06.01
 
 	* 42229: Completion/Unix/Command/_awk, Completion/Unix/Command/_df,
