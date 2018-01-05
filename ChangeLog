@@ -1,3 +1,8 @@
+2018-01-05  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 42221: Completion/Unix/Command/_enscript:
+	update enscript completion for GNU enscript 1.6.6
+
 2018-01-05  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* dana: 42222: Completion/Unix/Type/_object_files: recognize
@@ -73,7 +78,7 @@
 	Completion/Unix/Command/_yp,
 	Completion/Unix/Command/_zfs,
 	Completion/X/Command/_xset,
-	Completion/Zsh/Command/_cd: prevent various parmeters
+	Completion/Zsh/Command/_cd: prevent various parameters
 	from becoming global.
 
 2017-12-31  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
