@@ -27,7 +27,7 @@ if _pick_variant gnu=GNU unix --version; then
   args+=(
     '--traditional'
     '--endian=[swap input bytes]:endianess:(big little)'
-    {-S+,--strings=-}'[output strings of at least specfied bytes long]:length'
+    {-S+,--strings=-}'[output strings of at least specified bytes long]:length'
     {-w-,--width=-}'[output specified bytes per line]:bytes'
     '(- : *)--help[display help and exit]'
     '(- : *)--version[output version information and exit]'

@@ -53,6 +53,7 @@ case $variant in
       '*'{-l+,--load}'[load dynamic extension]:extension:->extension'
       {-M,--bignum}'[select arbitrary-precision arithmetic on numbers]'
       {-o-,--pretty-print=-}'[pretty-print awk program]::output file:_files'
+      '(-s --no-optimize)'{-s,--no-optimize}'[disable default optimizations upon the internal program representation]'
       {-S,--sandbox}'[disable system(), redirections and dynamic extensions]'
     )
     ;;

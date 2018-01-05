@@ -1,5 +1,10 @@
 2018-01-05  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42229: Completion/Unix/Command/_awk, Completion/Unix/Command/_df,
+	Completion/Unix/Command/_ls, Completion/Unix/Command/_od,
+	Completion/Unix/Command/_tail, Completion/Unix/Command/_timeout:
+	update completion of GNU programs for coreutils 8.29 / gawk 4.2.0
+
 	* dana: 42223 (tweaked): Completion/X/Command/_sublimetext,
 	Completion/Unix/Command/_getopt, Completion/Unix/Command/_install
 	Completion/Unix/Command/_mktemp, Completion/Unix/Command/_fold:

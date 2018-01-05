@@ -11,7 +11,7 @@ if _pick_variant gnu=GNU unix --version; then
     '(-F --follow)-f[same as --follow=descriptor]'
     '(-f --follow --retry)-F[same as --follow=name --retry]'
     '--max-unchanged-stats=[with --follow=name, check file rename after the specified number of iterations]:number of iterations'
-    '(-s --sleep-interval)'{-s+,--sleep-interval=}'[with -f, sleep the specfied seconds between iterations]:seconds'
+    '(-s --sleep-interval)'{-s+,--sleep-interval=}'[with -f, sleep the specified seconds between iterations]:seconds'
     '--pid=[with -f, terminate after the specified process dies]:pid:_pids'
     '(-q --quiet --silent -v --verbose)'{-q,--quiet,--silent}'[never output headers giving file names]'
     '(-q --quiet --silent -v --verbose)'{-v,--verbose}'[always output headers giving file names]'

@@ -5,6 +5,7 @@ local args
 if [[ $service = g* || $OSTYPE != *bsd* ]]; then
   # GNU coreutils as opposed to Free/NetBSD implementation
   args=(
+    '(-v --verbose)'{-v,--verbose}'[indicate when signal is sent upon timeout]'
     '(- *)--help[display usage information]'
     '(- *)--version[display version information]'
   )

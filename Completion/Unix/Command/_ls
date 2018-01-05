@@ -177,7 +177,7 @@ else
     '(-f)--full-time[list both full date and full time]'
 
     '(--block-size --human-readable -h --si --kilobytes -k)'{--kilobytes,-k}'[use block size of 1k]'
-    '(--human-readable -h --si --kilobytes -k)--block-size=[specify block size]:block size (bytes):(1024)'
+    '(--human-readable -h --si --kilobytes -k)--block-size=[specify block size]:block size (bytes):(K M G T P E Z Y KB MB TB PB EB ZB YB)'
 
     '(--numeric-uid-gid -n)'{--numeric-uid-gid,-n}'[numeric uid, gid]'
     '(--tabsize -T)'{--tabsize=,-T+}'[specify tab size]:tab size'
