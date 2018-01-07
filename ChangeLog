@@ -1,3 +1,8 @@
+2018-01-20  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 42243: Src/Modules/pcre.c: Free stuff properly in zsh/pcre
+	module
+
 2018-01-18  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 42294: Completion/compinit: disable REPORTTIME in completion.
