@@ -1,3 +1,8 @@
+2018-01-10  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* Matthew Martin: 42242: Completion/Unix/Command/_ldconfig:
+	add [DFNO]BSD to the mix
+
 2018-01-08  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 42245: Src/hist.c, Src/lex.c, Src/zsh.h: Abort last word on
