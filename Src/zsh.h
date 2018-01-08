@@ -2992,6 +2992,7 @@ struct hist_stack {
     void (*hungetc) _((int));
     void (*hwaddc) _((int));
     void (*hwbegin) _((int));
+    void (*hwabort) _((void));
     void (*hwend) _((void));
     void (*addtoline) _((int));
     unsigned char *cstack;

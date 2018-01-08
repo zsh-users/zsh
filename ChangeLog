@@ -1,3 +1,8 @@
+2018-01-08  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 42245: Src/hist.c, Src/lex.c, Src/zsh.h: Abort last word on
+	interactive comment to avoid it becoming a useless word.
+
 2018-01-05  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* dana: 42231: Completion/Darwin/Command/_caffeinate,

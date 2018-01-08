@@ -677,7 +677,7 @@ gettok(void)
 		(char *)hcalloc(lexbuf.siz = LEX_HEAP_SIZE);
 	    add(c);
 	}
-	hwend();
+	hwabort();
 	while ((c = ingetc()) != '\n' && !lexstop) {
 	    hwaddc(c);
 	    addtoline(c);

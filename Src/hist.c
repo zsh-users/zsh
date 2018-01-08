@@ -46,6 +46,9 @@ void (*hwaddc) _((int));
 void (*hwbegin) _((int));
 
 /**/
+void (*hwabort) _((void));
+
+/**/
 void (*hwend) _((void));
 
 /**/
@@ -250,6 +253,7 @@ hist_context_save(struct hist_stack *hs, int toplevel)
     hs->hungetc = hungetc;
     hs->hwaddc = hwaddc;
     hs->hwbegin = hwbegin;
+    hs->hwabort = hwabort;
     hs->hwend = hwend;
     hs->addtoline = addtoline;
     hs->hlinesz = hlinesz;
@@ -294,6 +298,7 @@ hist_context_restore(const struct hist_stack *hs, int toplevel)
     hungetc = hs->hungetc;
     hwaddc = hs->hwaddc;
     hwbegin = hs->hwbegin;
+    hwabort = hs->hwabort;
     hwend = hs->hwend;
     addtoline = hs->addtoline;
     hlinesz = hs->hlinesz;
@@ -986,6 +991,11 @@ nohw(UNUSED(int c))
 }
 
 static void
+nohwabort(void)
+{
+}
+
+static void
 nohwe(void)
 {
 }
@@ -1057,6 +1067,7 @@ hbegin(int dohist)
 	hungetc = inungetc;
 	hwaddc = nohw;
 	hwbegin = nohw;
+	hwabort = nohwabort;
 	hwend = nohwe;
 	addtoline = nohw;
     } else {
@@ -1066,6 +1077,7 @@ hbegin(int dohist)
 	hungetc = ihungetc;
 	hwaddc = ihwaddc;
 	hwbegin = ihwbegin;
+	hwabort = ihwabort;
 	hwend = ihwend;
 	addtoline = iaddtoline;
 	if (!isset(BANGHIST))
@@ -1569,6 +1581,16 @@ ihwbegin(int offset)
     if (chwordpos%2)
 	chwordpos--;	/* make sure we're on a word start, not end */
     chwords[chwordpos++] = hptr - chline + offset;
+}
+
+/* Abort current history word, not needed */
+
+/**/
+void
+ihwabort(void)
+{
+    if (chwordpos%2)
+	chwordpos--;
 }
 
 /* add a word to the history List */
