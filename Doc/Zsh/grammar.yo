@@ -671,4 +671,5 @@ single quote if it is set.
 
 Inside double quotes (tt("")), parameter and
 command substitution occur, and `tt(\)' quotes the characters
-`tt(\)', `tt(`)', `tt(")', and `tt($)'.
+`tt(\)', `tt(`)', `tt(")', `tt($)', and the first character
+of tt($histchars) (default `tt(!)').
