@@ -84,8 +84,7 @@ vindex(histchars, use of)
 A history expansion begins with the first character of the tt(histchars)
 parameter, which is `tt(!)' by default, and may occur anywhere on the
 command line, including inside double quotes (but not inside single quotes
-tt('...') or C-style quotes tt($'...')).  A literal `tt(!)' may be
-obtained by escaping it with a backslash.  
+tt('...') or C-style quotes tt($'...') nor when escaped with a backslash).  
 
 The first character is followed by an optional event designator
 (ifzman(see )noderef(Event Designators)) and then an optional word
