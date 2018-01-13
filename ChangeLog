@@ -1,6 +1,6 @@
 2018-01-13  Barton E. Schaefer  <schaefer@zsh.org>
 
-	* unposted: Doc/Zsh/expn.yo: Follow-up to previous: Clarify that
+	* 42264: Doc/Zsh/expn.yo: Follow-up to previous: Clarify that
 	${histchars[1]} may be backslash-escaped even when it isn't '!'.
 
 2018-01-13  Daniel Shahaf  <d.s@daniel.shahaf.name>
