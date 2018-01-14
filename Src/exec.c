@@ -1319,7 +1319,9 @@ execlist(Estate state, int dont_change_job, int exiting)
 	    noerrexit = NOERREXIT_EXIT | NOERREXIT_RETURN;
 	    if (ltype & Z_SIMPLE) /* skip the line number */
 		pc2++;
-	    pm = setsparam("ZSH_DEBUG_CMD", getpermtext(state->prog, pc2, 0));
+	    pm = assignsparam("ZSH_DEBUG_CMD",
+			      getpermtext(state->prog, pc2, 0),
+			      0);
 
 	    exiting = donetrap;
 	    ret = lastval;

@@ -1,3 +1,7 @@
+2018-01-14  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 42043: Src/exec.c: ZSH_DEBUG_CMD should not WARN_CREATE_GLOBAL
+
 2018-01-13  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 42264: Doc/Zsh/expn.yo: Follow-up to previous: Clarify that
