@@ -315,7 +315,7 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 		case '/':
 		case 'C':
 		    /* `/' gives 0, `/any' gives 1, etc. */
-		    if (*ss++ == '/' && *ss)
+		    if (*ss && *ss++ == '/' && *ss)
 			arg--;
 		    for (; *ss; ss++)
 			if (*ss == '/')
