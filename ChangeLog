@@ -1,3 +1,7 @@
+2018-01-16  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Warepire: Src/prompt.c: off by one fix in multiline prompts.
+
 2018-01-14  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 42136: Src/prompt.c: empty string check in %~ / %C expansions
