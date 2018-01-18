@@ -1,3 +1,7 @@
+2018-01-18  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 42294: Completion/compinit: disable REPORTTIME in completion.
+
 2018-01-16  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Warepire: Src/prompt.c: off by one fix in multiline prompts.

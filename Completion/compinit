@@ -175,7 +175,9 @@ typeset -gH _comp_setup='local -A _comp_caller_options;
              exec </dev/null;
              trap - ZERR;
              local -a reply;
-             local REPLY'
+             local REPLY;
+             local REPORTTIME;
+             unset REPORTTIME'
 
 # These can hold names of functions that are to be called before/after all
 # matches have been generated.
