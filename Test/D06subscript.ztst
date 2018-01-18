@@ -273,3 +273,19 @@
  print ${string[1,twoarg(1,4)]}
 0:Commas inside parentheses do not confuse subscripts
 >abc
+
+  string='foobarbaz foob?rbaz foob?rbaz'
+  print $string[(i)b?r] $string[(I)b?r]
+  print $string[(r)b?r] $string[(R)b?r]
+  print $string[(r)b?r,(R)b?r]
+  print $string[(ei)b?r] $string[(eI)b?r]
+  print $string[(er)b?r] $string[(eR)b?r]
+  print $string[(er)b?r,(eR)b?r]
+0:Pattern handling with scalars
+F:Regression test for workers/42297
+>4 24
+>b b
+>barbaz foob?rbaz foob?r
+>14 24
+>b b
+>b?rbaz foob?r

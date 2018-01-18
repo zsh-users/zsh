@@ -1,3 +1,11 @@
+2018-05-14  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 42297: dana: Src/params.c, Test/D06subscript.ztst: (e)
+	subscript needs extra work with scalars.
+
+	* 42234: Stephane: Src/signals.c: don't kill a process that's
+	already exited when killing a job.
+
 2018-05-13  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 42488: Src/Modules/mathfunc.c, Src/builtin.c, Src/math.c,

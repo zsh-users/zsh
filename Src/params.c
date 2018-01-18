@@ -1515,7 +1515,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 	    }
 	}
     } else {
-	if (!v->isarr && !word) {
+	if (!v->isarr && !word && !quote_arg) {
 	    l = strlen(s);
 	    if (a2) {
 		if (!l || *s != '*') {
@@ -1534,9 +1534,23 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 	    }
 	}
 	if (!keymatch) {
-	    if (quote_arg)
+	    if (quote_arg) {
 		untokenize(s);
-	    else
+		/* Scalar (e) needs implicit asterisk tokens */
+		if (!v->isarr && !word) {
+		    l = strlen(s);
+		    d = (char *) hcalloc(l + 2);
+		    if (a2) {
+			*d = Star;
+			strcpy(d + 1, s);
+		    } else {
+			strcpy(d, s);
+			d[l] = Star;
+			d[l + 1] = '\0';
+		    }
+		    s = d;
+		}
+	    } else
 		tokenize(s);
 	    remnulargs(s);
 	    pprog = patcompile(s, 0, NULL);
