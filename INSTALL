@@ -47,7 +47,7 @@ Pre-configuration
 If you are using a normal source release, skip this section.
 
 If the `configure' script does not already exist -- e.g., if you've got
-a snapshot of the bare sources just checked out from a CVS repository
+a snapshot of the bare sources just checked out from a git repository
 -- some things need to be built before the configuration can proceed.
 Run the script `./Util/preconfig' to do this.
 

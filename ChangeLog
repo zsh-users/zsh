@@ -1,3 +1,7 @@
+2018-01-22  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Daniel Tamelin: 42305: INSTALL: CVS should be git.
+
 2018-01-20  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 42243: Src/Modules/pcre.c: Free stuff properly in zsh/pcre
