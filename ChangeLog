@@ -1,5 +1,7 @@
 2018-01-19  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* dana: 41924: Doc/Zsh/params.yo: (wi) subscript flag interaction
+
 	* Sebastian Gniazdowski: 41839: Functions/Misc/allopt: force IFS
 	to default for "read"
 
