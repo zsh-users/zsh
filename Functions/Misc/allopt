@@ -8,7 +8,7 @@
 # Written by Sweth Chandramouli with hacks by Bart Schaefer.
 
 listalloptions () {
-   local OPT_NAME OPT_VALUE
+   local OPT_NAME OPT_VALUE IFS=$' \t\n'
    builtin set -o | while read OPT_NAME OPT_VALUE ; do
       if [[ ${OPT_NAME#no} != ${OPT_NAME} ]] ; then
 	 OPT_VALUE=${(L)${${OPT_VALUE:s/on/OFF}:s/off/on}}
