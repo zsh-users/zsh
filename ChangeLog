@@ -1,3 +1,8 @@
+2018-01-19  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Sebastian Gniazdowski: 41839: Functions/Misc/allopt: force IFS
+	to default for "read"
+
 2018-01-18  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 42294: Completion/compinit: disable REPORTTIME in completion.
