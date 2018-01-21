@@ -48,13 +48,13 @@ else
     '-L+[use user/group database files from specified directory]: :_directories'
     '-l[fall back to system files if user/group not found in -L directory]'
   )
-  [[ $OSTYPE == netbsd* ]] && {
-    args+=(
-      '-a+[specify shell command to run on files after install]:shell command'
-      '-r[use temporary files to perform safe copy]'
-      '-S+[specify arguments to pass to strip program]:arguments to strip program'
-    )
-    # NetBSD has no -v for some reason
+  [[ $OSTYPE == netbsd* ]] && args+=(
+    '-a+[specify shell command to run on files after install]:shell command'
+    '-r[use temporary files to perform safe copy]'
+    '-S+[specify arguments to pass to strip program]:arguments to strip program'
+  )
+  [[ $OSTYPE == (net|open)bsd* ]] && {
+    # (Net|Open)BSD has no -v for some reason
     args=( ${args##((#s)|*\))(\*|)-v*} )
   }
   [[ $OSTYPE == openbsd* ]] && args+=(

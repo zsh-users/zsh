@@ -20,6 +20,7 @@ case $OSTYPE in
     args+=(
       '-i+[ignore values provided by leases for specified options]:options'
       '-L+[specify file to write option data too]:file:_files'
+      "-n[don't configure any interfaces]"
     )
   ;;
   *) # ISC implementation, used on Linux and NetBSD

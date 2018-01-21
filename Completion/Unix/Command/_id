@@ -32,7 +32,11 @@ else
       )
     ;;
     openbsd*)
-      args+=( '(-)-R[display the routing table of the current process]' )
+      args+=(
+        '(-)-c[display the login class]'
+        '(-)-p[make the output human readable]'
+        '(-)-R[display the routing table of the current process]'
+      )
     ;;
     darwin*|dragonfly*|freebsd*)
       args+=( '(-)-P[print id in the form of a password file entry]' )
