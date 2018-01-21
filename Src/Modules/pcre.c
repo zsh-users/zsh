@@ -88,10 +88,19 @@ bin_pcre_compile(char *nam, char **args, Options ops, UNUSED(int func))
     if (zpcre_utf8_enabled())
 	pcre_opts |= PCRE_UTF8;
 
-    pcre_hints = NULL;  /* Is this necessary? */
+#ifdef HAVE_PCRE_STUDY
+    if (pcre_hints)
+#ifdef PCRE_CONFIG_JIT
+	pcre_free_study(pcre_hints);
+#else
+	pcre_free(pcre_hints);
+#endif
+    pcre_hints = NULL;
+#endif
 
     if (pcre_pattern)
 	pcre_free(pcre_pattern);
+    pcre_pattern = NULL;
 
     target = ztrdup(*args);
     unmetafy(target, &target_len);
@@ -128,6 +137,14 @@ bin_pcre_study(char *nam, UNUSED(char **args), UNUSED(Options ops), UNUSED(int f
 	return 1;
     }
     
+    if (pcre_hints)
+#ifdef PCRE_CONFIG_JIT
+	pcre_free_study(pcre_hints);
+#else
+	pcre_free(pcre_hints);
+#endif
+    pcre_hints = NULL;
+
     pcre_hints = pcre_study(pcre_pattern, 0, &pcre_error);
     if (pcre_error != NULL)
     {
@@ -528,5 +545,21 @@ cleanup_(Module m)
 int
 finish_(UNUSED(Module m))
 {
+#if defined(HAVE_PCRE_COMPILE) && defined(HAVE_PCRE_EXEC)
+#ifdef HAVE_PCRE_STUDY
+    if (pcre_hints)
+#ifdef PCRE_CONFIG_JIT
+	pcre_free_study(pcre_hints);
+#else
+	pcre_free(pcre_hints);
+#endif
+    pcre_hints = NULL;
+#endif
+
+    if (pcre_pattern)
+	pcre_free(pcre_pattern);
+    pcre_pattern = NULL;
+#endif
+
     return 0;
 }
