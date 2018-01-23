@@ -1,5 +1,7 @@
 2018-01-23  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42299: Completion/Zsh/Command/_typeset: correct optional argument
+
 	* Matthew Martin: 42309: Completion/Unix/Command/_dhclient,
 	Completion/Unix/Command/_id,  Completion/Unix/Command/_install:
 	A few small updates for OpenBSD

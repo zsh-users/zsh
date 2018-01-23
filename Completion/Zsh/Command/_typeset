@@ -30,7 +30,7 @@ allargs=(
   k "($popts -w -z)-+k[mark function for ksh-style autoloading]"
   l "($popts -T)-l[convert the value to lowercase]"
   m '(-A -E -F -T -i)-m[treat arguments as patterns]'
-  p '-p+[output parameters in form of calls to typeset]:option:((1\:multi-line\ output\ of\ arrays))'
+  p '-p+[output parameters in form of calls to typeset]::option:((1\:multi-line\ output\ of\ arrays))'
   r '(-f)-+r[mark parameters as readonly]'
   rf '-r[remember autoload path]'
   Rf '-R[remember autoload path, error if not found]'
