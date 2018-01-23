@@ -1,5 +1,14 @@
 2018-01-23  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42317: Completion/Linux/Command/_cryptsetup,
+	Completion/Linux/Command/_ethtool, Completion/Unix/Command/_wget,
+	Completion/Linux/Command/_tune2fs, Completion/Unix/Command/_cowsay,
+	Completion/Unix/Command/_git, Completion/Unix/Command/_gsettings,
+	Completion/Unix/Command/_gzip, Completion/Unix/Command/_ssh,
+	Completion/Unix/Command/_sudo, Completion/Unix/Command/_tidy,
+	Completion/Unix/Command/_tmux, Completion/Unix/Command/_truss:
+	option updates for commands that have had recent updates
+
 	* 42299: Completion/Zsh/Command/_typeset: correct optional argument
 
 	* Matthew Martin: 42309: Completion/Unix/Command/_dhclient,

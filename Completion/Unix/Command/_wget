@@ -71,6 +71,7 @@ _arguments -C -s \
   '(--adjust-extension -E)'{--adjust-extension,-E}'[save all HTML/CSS documents with proper extensions]' \
   "--ignore-length[ignore \`Content-Length' header field]" \
   '*--header=[send a custom HTTP header]:header:->header' \
+  '--compression=:compression:(auto gzip none)' \
   '--max-redirect=:number' \
   '--proxy-user=:user' \
   '--proxy-password=:password' \
@@ -90,7 +91,7 @@ _arguments -C -s \
   '--content-disposition[honor the Content-Disposition header when choosing local file names]'  \
   '--content-on-error[output received content on server errors]' \
   "--auth-no-challenge[send basic HTTP authentication without first waiting for server's challenge]" \
-  '--secure-protocol=[choose secure protocol]:protocol:(SSLv2 SSLv3 TLSv1)' \
+  '--secure-protocol=[choose secure protocol]:protocol:(SSLv2 SSLv3 TLSv1 TLSv1_1 TLSv1_2 PFS)' \
   --https-only \
   "--no-check-certificate=[don't check the server certificate]" \
   '--certificate=[specify client certificate]:client certificate file:_files' \
@@ -142,6 +143,7 @@ _arguments -C -s \
   '(-np --no-parent)'{-np,--no-parent}"[don't ascend to parent directory]" \
   '--no-verbose' \
   '--no-clobber' \
+  '--no-netrc' \
   '--no-use-server-timestamps[do not set timestamp to server provided value]' \
   '--htmlify=:htmlify:' \
   '--no:no:->noflags' \

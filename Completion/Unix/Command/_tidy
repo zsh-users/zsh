@@ -6,8 +6,8 @@ opts=( ${${${(s.</option>.)"$(_call_program options $words[1] -xml-config)"}##*<
 opts=( ${opts/;Integer*/:number} )
 opts=( ${opts/;Boolean*/:boolean:(yes no)} )
 opts=( ${opts/;AutoBool*/:value:(auto yes no)} )
-opts=( ${opts/;(String|Tag)*/:value} )
-opts=( ${opts/(#b);(enum|Encoding|DocType)*<default>(*)<*<example>([^<]#)<*/:value [${match[2]%% *}]:(${(j. .)${(@s., .)match[3]}%% *})} )
+opts=( ${opts/;(String|Tag|Attributes)*/:value} )
+opts=( ${opts/(#bi);(enum|Encoding|DocType)*<default>(*)<*<example>([^<]#)<*/:value [${match[2]%% *}]:(${(j. .)${(@s., .)match[3]}%% *})} )
 opts=( ${(M)opts:#*:*} )
 
 _arguments -s -A "-*" --$^opts \
@@ -33,7 +33,10 @@ _arguments -s -A "-*" --$^opts \
   '(- *)'{-version,-v}'[show the version of Tidy]' \
   '(- *)'{-help,-h,-\?}'[list the command line options]' \
   '(- *)-help-config[list all configuration options]' \
+  '(- *)-help-env[show details of environment and runtime configuration]' \
   '(- *)-show-config[list the current configuration settings]' \
+  '(- *)-export-config[list the current settings in config file form]' \
+  '(- *)-export-default-config[list the default settings in config file form]' \
   "(*)-help-option[show a description of specified configuration option]:config option:(${(@j. .)opts%%:*})" \
   '(-lang -language)'{-lang,-language}'[set the two-letter language code]:language:_locales' \
   '-xml-help[list the command line options in XML format]' \
@@ -41,6 +44,7 @@ _arguments -s -A "-*" --$^opts \
   "-xml-strings[output all of Tidy's strings in XML format]" \
   '-xml-error-strings[output error constants and strings in XML format]' \
   '-xml-options-strings[output option descriptions in XML format]' \
+  '-options[specify file containing configuration settings]:config file:_files' \
   '*:file:_files' \
   + '(encoding)' \
   '-ascii[use US-ASCII for output, ISO-8859-1 for input]' \

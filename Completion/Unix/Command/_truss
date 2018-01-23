@@ -43,6 +43,9 @@ case $OSTYPE in
       "(-c)-S[don't report signals received by the process]"
       '(*)-p[trace specified existing processes]:pid:_pids'
     )
+  ;|
+  freebsd<10->.*)
+    args+=( '-H[include thread ID in the output of each event]' )
   ;;
 esac
 

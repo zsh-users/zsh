@@ -60,9 +60,10 @@ _git-add () {
     '(-i --interactive : -)'{-i,--interactive}'[add contents interactively to index]' \
     '(-p --patch)'{-p,--patch}'[like -i but go directly into patch mode for specified files]' \
     '(-e --edit)'{-e,--edit}'[open diff against index in editor]' \
-    '(-A --all --no-ignore-removal -u --update --no-all --ignore-removal)'{-A,--all,--no-ignore-removal}'[add, modify, and remove index entries to match the working tree]' \
-    '(-A --all --no-ignore-removal -u --update --no-all --ignore-removal)'{--no-all,--ignore-removal}'[like "--all" but ignore removals]' \
+    '(-A --all --no-ignore-removal -u --update --no-all --ignore-removal --renormalize)'{-A,--all,--no-ignore-removal}'[add, modify, and remove index entries to match the working tree]' \
+    '(-A --all --no-ignore-removal -u --update --no-all --ignore-removal --renormalize)'{--no-all,--ignore-removal}'[like "--all" but ignore removals]' \
     '(-A --all --no-ignore-removal -u --update --no-all --ignore-removal)'{-u,--update}'[update the index just where it already has an entry matching <pathspec>]' \
+    '(-A --all --no-ignore-removal -u --update --no-all --ignore-removal)--renormalize[renormalize EOL of tracked files (implies -u)]' \
     '(-N --intent-to-add)'{-N,--intent-to-add}'[record only that path will be added later]' \
     '--refresh[do not add files, but refresh their stat() info in index]' \
     '--ignore-errors[continue adding if an error occurs]' \
@@ -1207,7 +1208,6 @@ _git-merge () {
     '--abort[restore the original branch and abort the merge operation]' \
     '--continue[continue the current in-progress merge]' \
     '--progress[force progress reporting]' \
-    '--signoff[add Signed-off-by:]' \
     '--verify[verify commit-msg hook]' \
     '*: : __git_commits -O expl:git_commit_opts'
 }
@@ -1751,7 +1751,7 @@ _git-status () {
                                                                                      normal\:"show untracked files and directories" \
                                                                                      all\:"also show untracked files in untracked directories (default)"))' \
     '--ignore-submodules[ignore changes to submodules]:: :__git_ignore_submodules_whens' \
-    '--ignored[show ignored files as well]' \
+    '--ignored=-[show ignored files as well]:mode [traditional]:(traditional matching no)' \
     '(-z --null --column --no-column)'{-z,--null}'[use NUL termination on output]' \
     '(--no-column -z --null)--column=-[display in columns]::column.status option:((always\:"always show in columns" never\:"never show in columns" auto\:"show in columns if the output is to the terminal" column\:"fill columns before rows (default)" row\:"fill rows before columns" plain\:"show in one column" dense\:"make unequal size columns to utilize more space" nodense\:"make equal size columns"))' \
     '(--column)--no-column[do not display in columns]' \
@@ -2126,10 +2126,11 @@ _git-config () {
     '(--global --system         -f --file --blob)--local[use local config file]' \
     '(--global --system --local           --blob)'{-f+,--file=}'[use given config file]:config file:_files' \
     '(--global --system --local -f --file)--blob=[read config from given blob object]:blob:__git_blobs' \
-    '(       --int --bool-or-int --path)--bool[setting is a boolean]' \
-    '(--bool       --bool-or-int --path)--int[setting is an integer]' \
-    '(--bool --int               --path)--bool-or-int[setting is an integer]' \
-    '(--bool --int --bool-or-int       )--path[setting is a path]' \
+    '(       --int --bool-or-int --path --expiry-date)--bool[setting is a boolean]' \
+    '(--bool       --bool-or-int --path --expiry-date)--int[setting is an integer]' \
+    '(--bool --int               --path --expiry-date)--bool-or-int[setting is an integer]' \
+    '(--bool --int --bool-or-int        --expiry-date)--path[setting is a path]' \
+    '(--bool --int --bool-or-int --path              )--expiry-date[setting is an expiry date]' \
     '(-z --null)'{-z,--null}'[end values with NUL and newline between key and value]' \
     '(--get --get-all --get-urlmatch --replace-all --add --unset --unset-all --rename-section --remove-section -e --edit --get-color --get-colorbool)--name-only[show variable names only]' \
     '(--includes)'--no-includes"[don't respect \"include.*\" directives]" \
@@ -4669,6 +4670,8 @@ _git-pack-objects () {
     '--keep-true-parents[pack parents hidden by grafts]' \
     '--use-bitmap-index[use a bitmap index if available to speed up counting objects]' \
     '--write-bitmap-index[write a bitmap index together with the pack index]' \
+    '--filter=[omit certain objects from pack file]:filter:_git_rev-list_filters' \
+    '--missing=[specify how missing objects are handled]:action:(error allow-any print)' \
     ':base-name:_files'
 }
 
@@ -4781,6 +4784,10 @@ _git-update-index () {
     '--untracked-cache[enable/disable untracked cache]' \
     '--test-untracked-cache[test if the filesystem supports untracked cache]' \
     '--force-untracked-cache[enable untracked cache without testing the filesystem]' \
+    '--force-write-index[write out the index even if is not flagged as changed]' \
+    '--fsmonitor[enable or disable file system monitor]' \
+    '--fsmonitor-valid[mark files as fsmonitor valid]' \
+    '--no-fsmonitor-valid[clear fsmonitor valid bit]' \
     $z_opt \
     '*:: :_files'
 }
@@ -4972,7 +4979,8 @@ _git-ls-files () {
     '--exclude-standard[skip files in standard Git exclusion lists]' \
     '--error-unmatch[if any file does not appear in index, treat this as an error]' \
     '(-s --stage -u --unmerged)--with-tree=[treat paths removed since given tree-ish as still present]: :__git_tree_ishs' \
-    '-v[identify each files status (hmrck?)]' \
+    '(-f)-v[indicate status of each file using lowercase for assume changed files]' \
+    '(-v)-f[indicate status of each file using lowercase for fsmonitor clean files]' \
     '--full-name[force paths to be output relative to the project top directory]' \
     '--recurse-submodules[recurse through submodules]' \
     '--abbrev=[set minimum SHA1 display-length]: :__git_guard_number length' \
@@ -5069,7 +5077,14 @@ _git-rev-list () {
 
   _arguments -C -S \
     $revision_options \
-    '(--pretty)--header[display contents of commit in raw-format]' \
+    '--no-filter[turn off any previous --filter argument]' \
+    '--filter-print-omitted[print a list of objects omitted by --filter]' \
+    '--filter=[omit certain objects from pack file]:filter:_git_rev-list_filters' \
+    '--missing=[specify how missing objects are handled]:action:(error allow-any print)' \
+    '(--count --pretty --header --left-right --abbrev-commit --abbrev --parent --children)--quiet[print nothing; exit status indicates if objects are fully connected]' \
+    '--use-bitmap-index[try to speed traversal using pack bitmap index if available]' \
+    '--progress=-[show progress reports as objects are considered]:header' \
+    '(--pretty --quiet)--header[display contents of commit in raw-format]' \
     '--timestamp[print raw commit timestamp]' \
     '(         --bisect-vars --bisect-all)--bisect[show only middlemost commit object]' \
     '(--bisect)--bisect-vars[same as --bisect, displaying shell-evalable code]' \
@@ -5090,6 +5105,15 @@ _git-rev-list () {
   esac
 
   return ret
+}
+
+(( $+functions[_git_rev-list_filters] )) ||
+_git_rev-list_filters() {
+  _values 'filter' \
+    'blob\:none[omit all blobs]' \
+    'blob\:limit[omit blobs larger than specified size]:size' \
+    'sparse\:oid[uses a sparse-checkout specification contained in the blob]:blob-ish' \
+    'sparse\:path[uses a sparse-checkout specification contained in path]:path:_directories'
 }
 
 (( $+functions[_git-show-index] )) ||
@@ -5812,16 +5836,24 @@ __git_extract_aliases () {
 __git_date_formats () {
   declare -a date_formats
 
+  if compset -P 'format:'; then
+    _strftime
+    return
+  fi
+
   date_formats=(
     relative:'show dates relative to the current time'
     local:'show timestamps in local timezone'
-    iso:'show timestamps in ISO 8601 format'
-    rfc:'show timestamps in RFC 2822 format'
+    iso{,8601}:'show timestamps in ISO 8601 format'
+    iso-strict:'show timestamps in strict ISO 8601 format'
+    rfc{,2822}:'show timestamps in RFC 2822 format'
     short:'show only date but not time'
     raw:'show date in internal raw git format (%s %z)'
-    default:'show timestamp in the original timezone')
+    unix:'show date as a Unix epoch timestamp'
+    default:'show timestamp in the original timezone'
+  )
 
-  _describe -t date-formats 'date format' date_formats $*
+  _describe -t date-formats 'date format' date_formats -- '( format\:custom\ format )' -S :
 }
 
 (( $+functions[__git_gpg_secret_keys] )) ||
@@ -6983,6 +7015,8 @@ __git_setup_log_options () {
   # TODO: Need to implement -<n> for limiting the number of commits to show.
   log_options=(
     '(- *)-h[display help]'
+    '--decorate-refs=[only decorate refs that match pattern]:pattern'
+    "--decorate-refs-exclude=[don't decorate refs that match pattern]:pattern"
     '(           --no-decorate)--decorate=-[print out ref names of any commits that are shown]: :__git_log_decorate_formats'
     '(--decorate              )--no-decorate[do not print out ref names of any commits that are shown]'
     '(          --no-follow)--follow[follow renames]'
@@ -7204,16 +7238,19 @@ __git_setup_revision_options () {
     '*--author=[limit commits to those by given author]:author'
     '*--committer=[limit commits to those by given committer]:committer'
     '*--grep=[limit commits to those with log messages matching the given pattern]:pattern'
-    '--all-match[limit commits to ones matching all --grep, --author, and --committer]'
+    '--all-match[limit commits to those matching all --grep, --author, and --committer]'
+    '--invert-grep[limit commits to those not matching --grep, --author and --committer]'
     '(-i --regexp-ignore-case)'{-i,--regexp-ignore-case}'[match regexps ignoring case]'
-    '(-E --extended-regexp)'{-E,--extended-regexp}'[use POSIX extended regexps]'
-    '(-F --fixed-strings)'{-F,--fixed-strings}'[do not interpret patterns as regexps]'
+    '!(-E --extended-regexp -F --fixed-strings -P --perl-regexp)--basic-regexp'
+    '(-E --extended-regexp -F --fixed-strings -P --perl-regexp)'{-E,--extended-regexp}'[use POSIX extended regexps]'
+    '(-E --extended-regexp -F --fixed-strings -P --perl-regexp)'{-F,--fixed-strings}"[don't interpret patterns as regexps]"
+    '(-E --extended-regexp -F --fixed-strings -P --perl-regexp)'{-P,--perl-regexp}'[use perl regular expression]'
     '--remove-empty[stop when given path disappears from tree]'
-    '--merges[display only merge commits]'
-    '--no-merges[do not display commits with more than one parent]'
-    '(--min-parents --no-min-parents)--min-parents=-[show only commits having at least <n> commits]: :__git_guard_number "minimum number of parents"'
-    '(--min-parents --no-min-parents)--no-min-parents[reset limit]'
-    '(--max-parents --no-max-parents)--max-parents=-[show only commits having at most <n> commits]: :__git_guard_number "maximum number of parents"'
+    '(--no-merges --min-parents)--merges[display only merge commits]'
+    "(--merges --max-parents)--no-merges[don't display commits with more than one parent]"
+    '(--min-parents --no-min-parents --merges)--min-parents=-[show only commits with at least specified number of commits]: :__git_guard_number "number of parents"'
+    '(--min-parents --no-min-parents --merges)--no-min-parents[reset limit]'
+    '(--max-parents --no-max-parents --no-merges)--max-parents=-[show only commits with at most specified number of commits]: :__git_guard_number "number of parents"'
     '(--max-parents --no-max-parents)--no-max-parents[reset limit]'
     '--first-parent[follow only first parent from merge commits]'
     '*--not[reverses meaning of ^ prefix for revisions that follow]'
@@ -7242,18 +7279,20 @@ __git_setup_revision_options () {
     '(-g --walk-reflogs)--reverse[display commits in reverse order]'
     '(          --objects-edge)--objects[display object ids of objects referenced by listed commits]'
     '(--objects               )--objects-edge[display object ids of objects referenced by listed and excluded commits]'
-    '(          --do-walk)--no-walk[only display given revs, do not traverse their ancestors]'
+    "(          --do-walk)--no-walk=-[only display given revs, don't traverse their ancestors]::order:(sorted unsorted)"
     '(--no-walk          )--do-walk[only display given revs, traversing their ancestors]'
     '(              --cherry-pick)--cherry-mark[like --cherry-pick but mark equivalent commits instead of omitting them]'
     '(--cherry-pick              )--cherry-pick[omit any commit that introduces the same change as another commit on "the other side" of a symmetric range]'
     '(            --right-only)--left-only[list only commits on the left side of a symmetric range]'
     '(--left-only             )--right-only[list only commits on the right side of a symmetric range]'
-    '(--left-only --right-only --cherry-pick --cherry-mark)--cherry[synonym for --right-only --cherry-mark --no-merges]'
+    '(--left-only --right-only --cherry-pick --cherry-mark --no-merges --merges --max-parents)--cherry[synonym for --right-only --cherry-mark --no-merges]'
     '(-c --cc            )--full-diff[show full commit diffs when using log -p, not only those affecting the given path]'
     '--log-size[print log message size in bytes before the message]'
     '--use-mailmap[use mailmap file to map author and committer names and email]'
 
     '--reflog[show all commits from reflogs]'
+    '--single-worktree[examine the current working tree only]'
+    '--stdin[additionally read commits from standard input]'
     '--default[use argument as default revision]:default revision:__git_revisions'
     # TODO: --early-output is undocumented.
     '--early-output=-[undocumented]::undocumented'
@@ -7278,6 +7317,7 @@ __git_setup_merge_options () {
     '(-n --no-stat)--stat[show a diffstat at the end of the merge]'
     '(--stat -n --no-stat)'{-n,--no-stat}'[do not show diffstat at the end of the merge]'
     '(         --no-squash)--squash[merge, but do not commit]'
+    '--signoff[add Signed-off-by:]'
     '(--squash            )--no-squash[merge and commit]'
     '--ff-only[refuse to merge unless HEAD is up to date or merge can be resolved as a fast-forward]'
     '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=-}'[GPG-sign the commit]::key id'

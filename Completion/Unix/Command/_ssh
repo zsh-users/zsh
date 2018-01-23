@@ -8,19 +8,16 @@ _ssh () {
   typeset -A opt_args
 
   common=(
-    '(-2)-1[forces ssh to try protocol version 1 only]'
-    '(-1)-2[forces ssh to try protocol version 2 only]'
     '(-6)-4[forces ssh to use IPv4 addresses only]'
     '(-4)-6[forces ssh to use IPv6 addresses only]'
     '-C[compress data]'
-    # for protocol version 2, this can be a comma-separated list
-    '-c+[select encryption cipher]:encryption cipher:(idea des 3des blowfish arcfour tss none)'
+    '-c+[select encryption cipher]:encryption cipher:->ciphers'
     '-F+[specify alternate config file]:config file:_files'
     '*-i+[select identity file]:SSH identity file:_files -g "*(-.^AR)"'
     '*-o+[specify extra options]:option string:->option'
   )
   common_transfer=(
-    '-l+[limit used bandwidth]:bandwidth in Kbit/s:'
+    '-l+[limit used bandwidth]:bandwidth (Kbit/s)'
     '-P+[specify port on remote host]:port number on remote host'
     '-p[preserve modification times, access times and modes]'
     '-q[disable progress meter and warnings]'
@@ -49,8 +46,8 @@ _ssh () {
       '*-L+[specify local port forwarding]:local port forwarding:->forward' \
       '-l+[specify login name]:login name:_ssh_users' \
       '-M[master mode for connection sharing]' \
-      '(-1)-m+[specify mac algorithms]:mac spec:->macs' \
-      '(-1)-N[do not execute a remote command (protocol version 2 only)]' \
+      '-m+[specify mac algorithms]: :->macs' \
+      "-N[don't execute a remote command]" \
       '-n[redirect stdin from /dev/null]' \
       '-O+[control an active connection multiplexing master process]:multiplex control command:((check\:"check master process is running" exit\:"request the master to exit" forward\:"request forward without command execution" stop\:"request the master to stop accepting further multiplexing requests" cancel\:"cancel existing forwardings with -L and/or -R" proxy))' \
       '-P[use non privileged port]' \
@@ -59,8 +56,8 @@ _ssh () {
       '*-R+[specify remote port forwarding]:remote port forwarding:->forward' \
       '-S+[specify location of control socket for connection sharing]:path to control socket:_files' \
       '-Q+[query parameters]:parameter type:((cipher\:"supported symmetric ciphers" cipher-auth\:"supported symmetric ciphers that support authenticated encryption" mac\:"supported message integrity codes" kex\:"key exchange algorithms" key\:"key types" protocol-version\:"supported SSH protocol versions"))' \
-      '(-1)-s[invoke subsystem]' \
-      '(-1 -t)-T[disable pseudo-tty allocation (protocol version 2 only)]' \
+      '-s[invoke subsystem]' \
+      '(-t)-T[disable pseudo-tty allocation]' \
       '(-T)-t[force pseudo-tty allocation]' \
       '-V[show version number]' \
       '(-q)*-v[verbose mode (multiple increase verbosity, up to 3)]' \
@@ -95,6 +92,7 @@ _ssh () {
       '-l[list all identities]' \
       '-s+[add keys provided by the PKCS#11 shared library]:library:_files -g "*.(so|dylib)(|.<->)(-.)"' \
       '-t+[set maximum lifetime for identity]:maximum lifetime (in seconds or time format):' \
+      '-q[be quiet after a successful operation]' \
       '-X[unlock the agent]' \
       '-x[lock the agent with a password]' \
       '*:SSH identity file:_files'
@@ -177,8 +175,14 @@ _ssh () {
       "($cmn)-s[$sdesc]:CA key:_files" \
       "$p1($cmn -f -u)-I+[specify key identifier to include in certificate]:key id" \
       "$p1($cmn -f -u)-h[generate host certificate instead of a user certificate]" \
+      "$p1($cmn -f -u -D)-U[indicate that CA key is held by ssh-agent]" \
+      "$p1($cmn -f -u -U)-D+[indicate the CA key is stored in a PKCS#11 token]:PKCS11 shared library:_files -g '*.(so|dylib)(|.<->)(-.)'" \
       "$p1($cmn -f -u)-n+[specify user/host principal names to include in certificate]:principals" \
-      "$p1($cmn -f -u)-O+[specify a certificate option]:option" \
+      "$p1($cmn -f -u)*-O+[specify a certificate option]: : _values 'option'
+        clear critical\:name extension\:name force-command\:command\:_cmdstring
+	no-agent-forwarding no-port-forwarding no-pty no-user-rc no-x11-forwarding
+	permit-agent-forwarding permit-port-forwarding permit-pty permit-user-rc
+	permit-x11-forwarding source-address\:source\ address" \
       "$p1($cmn -f -u)-V+[specify certificate validity interval]:interval" \
       "($cmn -I -h -n -O -V)-k[generate a KRL file]" \
       "$p1($cmn -I -h -n -O -V)-u[update a KRL]"
@@ -217,7 +221,7 @@ _ssh () {
           ;;
         esac
         case "${IPREFIX#-o}" in
-        (#i)(afstokenpassing|batchmode|canonicalizefallbacklocal|challengeresponseauthentication|checkhostip|clearallforwardings|compression|enablesshkeysign|exitonforwardfailure|fallbacktorsh|forward(agent|x11)|forwardx11trusted|gatewayports|gssapiauthentication|gssapidelegatecredentials|gssapitrustdns|hashknownhosts|hostbasedauthentication|identitiesonly|kbdinteractiveauthentication|(tcp|)keepalive|nohostauthenticationforlocalhost|passwordauthentication|permitlocalcommand|proxyusefdpass|pubkeyauthentication|rhosts(|rsa)authentication|rsaauthentication|streamlocalbindunlink|usersh|kerberos(authentication|tgtpassing)|useprivilegedport|visualhostkey)=*)
+        (#i)(afstokenpassing|batchmode|canonicalizefallbacklocal|challengeresponseauthentication|checkhostip|clearallforwardings|compression|enablesshkeysign|exitonforwardfailure|fallbacktorsh|forward(agent|x11)|forwardx11trusted|gatewayports|gssapiauthentication|gssapidelegatecredentials|gssapikeyexchange|gssapirenewalforcesrekey|gssapitrustdns|hashknownhosts|hostbasedauthentication|identitiesonly|kbdinteractiveauthentication|(tcp|)keepalive|nohostauthenticationforlocalhost|passwordauthentication|permitlocalcommand|proxyusefdpass|pubkeyauthentication|rhosts(|rsa)authentication|rsaauthentication|streamlocalbindunlink|usersh|kerberos(authentication|tgtpassing)|useprivilegedport|visualhostkey)=*)
           _wanted values expl 'truth value' compadd yes no && ret=0
           ;;
         (#i)addressfamily=*)
@@ -239,32 +243,7 @@ _ssh () {
           _message -e 'CNAME rule list (source_domain_list:target_domain_list, each pattern list comma separated)' && ret=0
           ;;
         (#i)ciphers=*)
-          _values -s , 'encryption cipher' \
-              '3des-cbc' \
-              'aes128-cbc' \
-              'aes192-cbc' \
-              'aes256-cbc' \
-              'aes128-ctr' \
-              'aes192-ctr' \
-              'aes256-ctr' \
-              'arcfour128' \
-              'arcfour256' \
-              'arcfour' \
-              'blowfish-cbc' \
-              'cast128-cbc' \
-              \
-              'rijndael128-cbc' \
-              'rijndael192-cbc' \
-              'rijndael256-cbc' \
-              'rijndael-cbc@lysator.liu.se' \
-              && ret=0
-          ;;
-        (#i)cipher=*)
-          _wanted values expl 'encryption cipher (protocol version 1)' \
-              compadd blowfish 3des des idea arcfour tss none && ret=0
-          ;;
-        (#i)compressionlevel=*)
-          _values 'compression level' {1..9} && ret=0
+          state=ciphers
           ;;
         (#i)connectionattempts=*)
           _message -e 'connection attempts' && ret=0
@@ -304,21 +283,7 @@ _ssh () {
           _wanted hosts expl 'real host name to log into' _ssh_hosts && ret=0
           ;;
         (#i)(hostbasedkeytypes|hostkeyalgorithms|pubkeyacceptedkeytypes)=*)
-          _values -s , 'key types' \
-              'ecdsa-sha2-nistp256-cert-v01@openssh.com' \
-              'ecdsa-sha2-nistp384-cert-v01@openssh.com' \
-              'ecdsa-sha2-nistp521-cert-v01@openssh.com' \
-              'ssh-ed25519-cert-v01@openssh.com' \
-              'ssh-rsa-cert-v01@openssh.com' \
-              'ssh-dss-cert-v01@openssh.com' \
-              'ssh-rsa-cert-v00@openssh.com' \
-              'ssh-dss-cert-v00@openssh.com' \
-              'ecdsa-sha2-nistp256' \
-              'ecdsa-sha2-nistp384' \
-              'ecdsa-sha2-nistp521' \
-              'ssh-ed25519' \
-              'ssh-rsa' \
-              'ssh-dss' && ret=0
+	  _wanted key-types expl 'key type' _sequence compadd - $(_call_program key-types ssh -Q key) && ret=0
           ;;
         (#i)identityfile=*)
           _description files expl 'SSH identity file'
@@ -350,12 +315,9 @@ _ssh () {
           _values -s , 'keyboard-interactive authentication methods' \
               'bsdauth' 'pam' 'skey' && ret=0
           ;;
-        (#i)kexalgorithms=*)
-          _values -s , 'KEX algorithms' \
-              ecdh-sha2-nistp256 ecdh-sha2-nistp384 ecdh-sha2-nistp521 \
-              diffie-hellman-group-exchange-sha256 \
-              diffie-hellman-group-exchange-sha1 \
-              diffie-hellman-group14-sha1 diffie-hellman-group1-sha1 && ret=0
+        (#i)(kexalgorithms|gssapikexalgorithms)=*)
+          _wanted algorithms expl 'key exchange algorithm' _sequence compadd - \
+              $(_call_program algorithms ssh -Q kex) && ret=0
           ;;
         (#i)localcommand=*)
           _description commands expl 'run command locally after connecting'
@@ -389,7 +351,7 @@ _ssh () {
               '1' \
               '2' && ret=0
           ;;
-        (#i)proxycommand=*)
+        (#i)(proxy|remote)command=*)
           _cmdstring && ret=0
           ;;
         (#i)rekeylimit=*)
@@ -421,7 +383,13 @@ _ssh () {
         (#i)streamlocalbindmask=*)
           _message -e 'octal mask' && ret=0
           ;;
-        (#i)(stricthostkeychecking|verifyhostkeydns|updatehostkeys)=*)
+        (#i)stricthostkeychecking=*)
+          _wanted values expl 'value' compadd yes no ask accept-new off && ret=0
+          ;;
+        (#i)syslogfacility=*)
+          _wanted facilities expl 'facility' compadd -M 'm:{a-z}={A-Z}' DAEMON USER AUTH LOCAL{0,1,2,3,4,5,6,7} && ret=0
+          ;;
+        (#i)(verifyhostkeydns|updatehostkeys)=*)
           _wanted values expl 'truthish value' compadd yes no ask && ret=0
           ;;
         (#i)transport=*)
@@ -466,11 +434,9 @@ _ssh () {
                 CertificateFile \
                 ChallengeResponseAuthentication \
                 CheckHostIP \
-                Cipher \
                 Ciphers \
                 ClearAllForwardings \
                 Compression \
-                CompressionLevel \
                 ConnectionAttempts \
                 ConnectTimeout \
                 ControlMaster \
@@ -488,10 +454,14 @@ _ssh () {
                 GatewayPorts \
                 GlobalKnownHostsFile \
                 GSSAPIAuthentication \
+                GSSAPIClientIdentity \
                 GSSAPIDelegateCredentials \
+                GSSAPIKeyExchange \
+                GSSAPIRenewalForcesRekey \
+                GSSAPIServerIdentity \
                 GSSAPITrustDns \
+                GSSAPIKexAlgorithms \
                 HashKnownHosts \
-                Host \
                 HostbasedAuthentication \
                 HostbasedKeyTypes \
                 HostKeyAlgorithms \
@@ -516,13 +486,13 @@ _ssh () {
                 PKCS11Provider \
                 Port \
                 PreferredAuthentications \
-                Protocol \
                 ProxyCommand \
                 ProxyJump \
                 ProxyUseFdpass \
                 PubkeyAcceptedKeyTypes \
                 PubkeyAuthentication \
                 RekeyLimit \
+                RemoteCommand \
                 RemoteForward \
                 RequestTTY \
                 RevokedHostKeys \
@@ -534,8 +504,8 @@ _ssh () {
                 StreamLocalBindMask \
                 StreamLocalBindUnlink \
                 StrictHostKeyChecking \
+                SyslogFacility \
                 TCPKeepAlive \
-                Transport \
                 Tunnel \
                 TunnelDevice \
                 UpdateHostKeys \
@@ -608,11 +578,18 @@ _ssh () {
       return ret
       ;;
     macs)
-      _values -s , 'MAC algorithms' hmac-md5 hmac-sha1 umac-64@openssh.com \
-          hmac-ripemd160 hmac-sha1-96 hmac-md5-96 hmac-sha2-256 \
-          hmac-sha2-256-96 hmac-sha2-512 hmac-sha2-512-96 && ret=0
+      _wanted macs expl 'MAC algorithm' _sequence compadd - $(_call_program macs ssh -Q mac)
+      return
+      ;;
+    ciphers)
+      _wanted ciphers expl 'encryption cipher' _sequence compadd - $(_call_program ciphers ssh -Q cipher)
+      return
       ;;
     command)
+      if (( $+opt_args[-s] )); then
+	_wanted subsystems expl subsystem compadd sftp
+	return
+      fi
       local -a _comp_priv_prefix
       shift 1 words
       (( CURRENT-- ))

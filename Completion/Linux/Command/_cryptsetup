@@ -25,6 +25,7 @@ _arguments -s \
   '(-i --iter-time)'{-i+,--iter-time=}'[set password processing duration]:duration (milliseconds)' \
   '(-q --batch-mode)'{-q,--batch-mode}"[don't ask for confirmation]" \
   '(-t --timeout)'{-t+,--timeout=}'[set password prompt timeout]:timeout (seconds)' \
+  '--progress-frequency=[specify progress line update interval]:interval (seconds)' \
   '(-T --tries)'{-T+,--tries=}'[set maximum number of retries]:number of retries' \
   '--align-payload=[set payload alignment]:sectors' \
   '--header-backup-file=[specify file with LUKS header and keyslots backup]:file:_files' \
@@ -39,10 +40,30 @@ _arguments -s \
   '--tcrypt-system[device is system TCRYPT drive (with bootloader)]' \
   '--tcrypt-backup[use backup (secondary) TCRYPT header]' \
   '--veracrypt[scan also for VeraCrypt compatible device]' \
+  '--veracrypt-pim=[specify personal iteration multiplier for VeraCrypt compatible device]:multiplier' \
+  '--veracrypt-query-pim[query personal iteration multiplier for VeraCrypt compatible device]' \
   '(-M --type)'{-M+,--type=}'[specify type of device metadata]:type:(luks plain loopaes tcrypt)' \
   '--force-password[disable password quality check (if enabled)]' \
   '--perf-same_cpu_crypt[use dm-crypt same_cpu_crypt performance compatibility option]' \
   '--perf-submit_from_crypt_cpus[use dm-crypt submit_from_crypt_cpus performance compatibility option]' \
+  '--deferred[device removal is deferred until the last user closes it]' \
+  '--pbkdf=[specify PBKDF algorithm for LUKS2]:algorithm:(argon2i argon2id pbkdf2)' \
+  '--pbkdf-memory=[specify PBKDF memory cost limit]:limit (kilobytes)' \
+  '--pbkdf-parallel=[specify PBKDF parallel cost]:threads' \
+  '--pbkdf-force-iterations=[specify PBKDF iterations cost]:cost' \
+  '--priority=[specify keyslot priority]:priority:(ignore normal prefer)' \
+  '--disable-locks[disable locking of on-disk metadata]' \
+  '--disable-keyring[disable loading volume keys via kernel keyring]' \
+  '(-I --integrity)'{-I+,--integrity=}'[specify data integrity algorithm (LUKS2 only)]:algorithm' \
+  '--integrity-no-journal[disable journal for integrity device]' \
+  "--integrity-no-wipe[don't wipe device after format]" \
+  "--token-only[don't ask for passphrase if activation by token fails]" \
+  '--token-id=[specify token number]:number [any]' \
+  '--key-description=[specify key description]:description' \
+  '--sector-size=[specify encryption sector size]:size [512 bytes]' \
+  '--persistent[set activation flags persistent for device]' \
+  '--label=[set label for the LUKS2 device]:label' \
+  '--subsystem=[set subsystem label for the LUKS2 device]:subsystem' \
   '(- : *)--version[show version information]' \
   '(- : *)'{-\?,--help}'[display help information]' \
   '(- : *)--usage[display brief usage]' \
@@ -59,6 +80,8 @@ case $state in
       'benchmark:benchmark cipher'
       'repair:try to repair on-disk metadata'
       'erase:erase all keyslots'
+      'convert:convert LUKS from/to LUKS2 format'
+      'config:set permanent configuration options for LUKS2'
       'luksFormat:initialize a LUKS partition'
       'luksAddKey:add a new key'
       'luksRemoveKey:remove a key'
@@ -86,7 +109,7 @@ case $state in
       benchmark) args=( '--cipher=:cipher' );;
       luksKillSlot) args=( $device ':key slot number' );;
       remove|status|resize|*lose|luksSuspend|luksResume) args=( $mapping );;
-      erase|repair|(luks(AddKey|Erase|RemoveKey|DelKey|UUID|Dump)|isLuks))
+      erase|convert|config|repair|(luks(AddKey|Erase|RemoveKey|DelKey|UUID|Dump)|isLuks))
 	args=( $device )
       ;;
       luks(Format|AddKey|RemoveKey|ChangeKey))

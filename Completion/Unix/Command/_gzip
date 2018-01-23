@@ -13,7 +13,9 @@ unpigz|pigz)
     '(-b --blocksize)'{-b+,--blocksize}'[set compression block size]:size (KiB)'
     '(-p --processes)'{-p,--processes}'[specify number of processes to use]'
     '(-z --zlib)'{-z,--zlib}'[compress to zlib (.zz) format]'
-    '(-T --no-time)'{-T,--no-time}"[don't store/restore modification time in/from header]"
+    '(-m --no-time)'{-m,--no-time}"[don't store/restore modification time in/from header]"
+    '(-M --time)'{-M,--time}"[store/restore modification time in/from header]"
+    '(--synchronous)-Y[force output file write to permanent storage]'
   )
 ;|
 pigz)
@@ -23,7 +25,7 @@ pigz)
     '(--rsyncable)-R[make rsync-friendly archive]'
     "($excl)"{-F,--first}'[do iterations first, before block split]'
     "($excl)"{-I+,--iterations}'[specify number of iterations for optimization]:iterations [15]'
-    "($excl)"{-M+,--maxsplits}'[specify maximum number of split blocks]:split blocks [15]'
+    "($excl)"{-J+,--maxsplits}'[specify maximum number of split blocks]:split blocks [15]'
     "($excl)"{-O,--oneblock}"[don't split into smaller blocks]"
   )
 ;|
@@ -62,6 +64,7 @@ gzip|pigz)
     '(-R)--rsyncable[make rsync-friendly archive]' \
     '(--suffix)-S+[specify suffix for compressed files]:suffix:' \
     '(-S)--suffix=[specify suffix for compressed files]:suffix:' \
+    '(-Y)--synchronous[force output file write to permanent storage]' \
     '(--test)-t[test compressed file integrity]' \
     '(-t)--test[test compressed file integrity]' \
     '(--verbose)-v[verbose mode]' \

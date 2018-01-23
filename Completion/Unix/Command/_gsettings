@@ -3,7 +3,7 @@
 local curcontext="$curcontext" state line expl ret=1
 local subcmds
 
-_arguments \
+_arguments -A "-*" \
   '(- 1 *)--version[show version information]' \
   '--schemadir[specify location of schemata]:directory:_directories' \
   ':command:->subcmds' \
@@ -20,6 +20,9 @@ if [[ $state = subargs ]]; then
       _arguments ':schema:->schemata' ':key:->keys' ':value'
     ;;
     (list|reset)-(keys|recursively|children)) state=schemata ;;
+    list-schemas)
+      _arguments '--print-paths'
+    ;;
     *) _default && ret=0 ;;
   esac
 fi
