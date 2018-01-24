@@ -1,3 +1,8 @@
+2018-01-24  Daniel Hahler  <zsh@thequod.de>
+
+	* 42323: Completion/Unix/Command/_git: _git: move "local" statement
+	out of loop.
+
 2018-01-24  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 42322 (tweaked): Src/hist.c, Src/zsh.h: don't discard a
