@@ -204,6 +204,13 @@ int hlinesz;
  
 static zlong defev;
 
+/*
+ * Flag that we stopped reading line when we got to a comment,
+ * but we want to keep it in the histofy even if there were no words
+ * (i.e. the comment was the entire line).
+ */
+static int hist_keep_comment;
+
 /* Remember the last line in the history file so we can find it again. */
 static struct histfile_stats {
     char *text;
@@ -258,6 +265,7 @@ hist_context_save(struct hist_stack *hs, int toplevel)
     hs->addtoline = addtoline;
     hs->hlinesz = hlinesz;
     hs->defev = defev;
+    hs->hist_keep_comment = hist_keep_comment;
     /*
      * We save and restore the command stack with history
      * as it's visible to the user interactively, so if
@@ -303,6 +311,7 @@ hist_context_restore(const struct hist_stack *hs, int toplevel)
     addtoline = hs->addtoline;
     hlinesz = hs->hlinesz;
     defev = hs->defev;
+    hist_keep_comment = hs->hist_keep_comment;
     if (cmdstack)
 	zfree(cmdstack, CMDSTACKSZ);
     cmdstack = hs->cstack;
@@ -1462,7 +1471,7 @@ hend(Eprog prog)
 	    } else
 		save = 0;
 	}
-	if (chwordpos <= 2)
+	if (chwordpos <= 2 && !hist_keep_comment)
 	    save = 0;
 	else if (should_ignore_line(prog))
 	    save = -1;
@@ -1565,6 +1574,7 @@ hend(Eprog prog)
      */
     while (histsave_stack_pos > stack_pos)
 	pophiststack();
+    hist_keep_comment = 0;
     unqueue_signals();
     return !(flag & HISTFLAG_NOEXEC || errflag);
 }
@@ -1591,6 +1601,7 @@ ihwabort(void)
 {
     if (chwordpos%2)
 	chwordpos--;
+    hist_keep_comment = 1;
 }
 
 /* add a word to the history List */

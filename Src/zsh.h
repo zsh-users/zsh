@@ -2997,6 +2997,7 @@ struct hist_stack {
     void (*addtoline) _((int));
     unsigned char *cstack;
     int csp;
+    int hist_keep_comment;
 };
 
 /*
