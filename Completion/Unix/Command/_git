@@ -7028,14 +7028,15 @@ __git_setup_log_options () {
 
 (( $+functions[__git_setup_diff_options] )) ||
 __git_setup_diff_options () {
-  local diff_types='(-p -u --patch -U --unified --raw --patch-with-raw --stat --numstat --shortstat --dirstat --dirstat-by-file --summary --patch-with-stat --name-only --name-status --cumulative -s --no-patch)'
+  # According to Git: "fatal: --name-only, --name-status, --check and -s are mutually exclusive"
+  local exclusive_diff_options='(--name-only --name-status --check -s --no-patch)'
 
   diff_options=(
-    $diff_types{-p,-u,--patch}'[generate diff in patch format]'
-    $diff_types{-U,--unified=}'[generate diff with given lines of context]: :__git_guard_number lines'
-    $diff_types'--raw[generate default raw diff output]'
-    $diff_types'--patch-with-raw[generate patch but also keep the default raw diff output]'
-    $diff_types{-s,--no-patch}'[suppress diff output]'
+    {-p,-u,--patch}'[generate diff in patch format]'
+    {-U,--unified=}'[generate diff with given lines of context]: :__git_guard_number lines'
+    '--raw[generate default raw diff output]'
+    '--patch-with-raw[generate patch but also keep the default raw diff output]'
+    $exclusive_diff_options{-s,--no-patch}'[suppress diff output]'
     '(--minimal --patience --histogram --diff-algorithm)--minimal[spend extra time to make sure the smallest possible diff is produced]'
     '(--minimal --patience --histogram --diff-algorithm)--patience[generate diffs with patience algorithm]'
     '(--minimal --patience --histogram --diff-algorithm)--histogram[generate diffs with histogram algorithm]'
@@ -7044,16 +7045,16 @@ __git_setup_diff_options () {
                                                                                                                     minimal\:"spend extra time to make sure the smallest possible diff is produced"
                                                                                                                     patience\:"generate diffs with patience algorithm"
                                                                                                                     histogram\:"generate diffs with histogram algorithm"))'
-    $diff_types'--stat=-[generate diffstat instead of patch]:: :__git_guard_diff-stat-width'
-    $diff_types'--numstat[generate more machine-friendly diffstat]'
-    $diff_types'--shortstat[generate summary diffstat]'
-    $diff_types'--dirstat=-[generate dirstat by amount of changes]:: :__git_guard_number limit'
-    $diff_types'--dirstat-by-file=-[generate dirstat by number of files]:: :__git_guard_number limit'
-    $diff_types'--summary[generate condensed summary of extended header information]'
-    $diff_types'--patch-with-stat[generate patch and prepend its diffstat]'
+    '--stat=-[generate diffstat instead of patch]:: :__git_guard_diff-stat-width'
+    '--numstat[generate more machine-friendly diffstat]'
+    '--shortstat[generate summary diffstat]'
+    '--dirstat=-[generate dirstat by amount of changes]:: :__git_guard_number limit'
+    '--dirstat-by-file=-[generate dirstat by number of files]:: :__git_guard_number limit'
+    '--summary[generate condensed summary of extended header information]'
+    '--patch-with-stat[generate patch and prepend its diffstat]'
     '-z[use NUL termination on output]'
-    $diff_types'--name-only[show only names of changed files]'
-    $diff_types'--name-status[show only names and status of changed files]'
+    $exclusive_diff_options'--name-only[show only names of changed files]'
+    $exclusive_diff_options'--name-status[show only names and status of changed files]'
     '--submodule=-[select output format for submodule differences]::format:((short\:"show pairs of commit names"
 									     log\:"list commits like git submodule does"
 									     diff\:"show differences"))'
@@ -7066,7 +7067,7 @@ __git_setup_diff_options () {
     '--word-diff-regex=-[specify what constitutes a word]:word regex'
     '(--color --no-color              )--color-words=-[show colored-word diff]::word regex'
     '--no-renames[turn off rename detection]'
-    '--check[warn if changes introduce trailing whitespace or space/tab indents]'
+    $exclusive_diff_options'--check[warn if changes introduce trailing whitespace or space/tab indents]'
     '--full-index[show full object name of pre- and post-image blob]'
     '(--full-index)--binary[in addition to --full-index, output binary diffs for git-apply]'
     '--abbrev=[set minimum SHA1 display-length]: :__git_guard_number length'

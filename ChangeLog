@@ -1,3 +1,8 @@
+2018-02-12  Daniel Hahler  <zsh@thequod.de>
+
+	* 42324: Completion/Unix/Command/_git: _git: handle mutually exclusive
+	options.
+
 2018-02-11  Daniel Hahler  <zsh@thequod.de>
 
 	* 42327: Completion/Unix/Command/_make: _make: complete _files.
