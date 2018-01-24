@@ -7760,14 +7760,14 @@ _git() {
 declare -gUa _git_third_party_commands
 _git_third_party_commands=()
 
-local file
+local file input
 for file in ${^fpath}/_git-*~(*~|*.zwc)(-.N); do
   local name=${${file:t}#_git-}
   if (( $+_git_third_party_commands[$name] )); then
     continue
   fi
 
-  local desc= input
+  local desc=
   integer i=1
   while read input; do
     if (( i == 2 )); then
