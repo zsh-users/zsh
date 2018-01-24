@@ -1,3 +1,8 @@
+2018-01-23  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Joey Pabalinas: 42313: Src/subst.c: avoid null-pointer deref
+	when using ${(PA)...} on an empty array result
+
 2018-01-23  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 42317: Completion/Linux/Command/_cryptsetup,

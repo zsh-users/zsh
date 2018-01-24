@@ -2430,7 +2430,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		val = aval[0];
 		isarr = 0;
 	    }
-	    s = dyncat(val, s);
+	    s = val ? dyncat(val, s) : dupstring(s);
 	    /* Now behave po-faced as if it was always like that... */
 	    subexp = 0;
 	    /*
