@@ -289,7 +289,8 @@ _make() {
     else
       _alternative \
         'targets:make target:compadd -Q -a TARGETS' \
-        'variables:make variable:compadd -S = -F keys -k VARIABLES' && ret=0
+        'variables:make variable:compadd -S = -F keys -k VARIABLES' \
+        '*:file:_files' && ret=0
     fi
   esac
 
