@@ -1,5 +1,8 @@
 2018-02-07  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* Matthew Martin: 42330: Completion/Unix/Command/_ln:
+	-L and -P are POSIX, but not supported by Darwin or NetBSD
+
 	* wgh@torlan.ru: 42336: Completion/Unix/Command/_adb: force
 	single column output when getting filenames with adb ls command
 

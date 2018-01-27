@@ -3,19 +3,11 @@
 local curcontext="$curcontext" state line ret=1
 local -A opt_args
 
-local -a args bsd
+local -a args opts
 args=(
-  '-f[remove existing destination files]'
+  '(-i)-f[remove existing destination files]'
   '-s[create symbolic links instead of hard links]'
 )
-bsd=(
-  '-F[remove existing destination directories]'
-  {-h,-n}'[do not dereference destination]'
-  '-i[prompt before removing destination files]'
-  '-v[print name of each linked file]'
-)
-
-local -a opts
 
 local variant
 _pick_variant -r variant gnu=gnu unix --help
@@ -50,18 +42,40 @@ elif (( ${+builtins[ln]} )); then
   args+=(
     '-d[attempt to hard link directories]'
     {-h,-n}'[do not dereference destination]'
-    '-i[prompt before removing destination files]')
-elif [[ $OSTYPE == darwin* ]]; then
-  args+=( $bsd )
-elif [[ $OSTYPE == freebsd* ]]; then
-  args+=( $bsd
-    '(-L)-P[create hard links directly to symbolic links]'
-    '(-P)-L[create hard links to symbolic link references]'
-    "-w[warn if source of a symbolic link doesn't currently exist]"
-  )
+    '(-f)-i[prompt before removing destination files]')
+else
+  case $OSTYPE in
+    darwin*|dragonfly*|freebsd*|netbsd*|openbsd*)
+      args+=(
+        {-h,-n}'[do not dereference destination]'
+      )
+    ;|
+    darwin*|dragonfly*|freebsd*|netbsd*)
+      args+=(
+      '(-f)-i[prompt before removing destination files]'
+        '-v[print name of each linked file]'
+      )
+    ;|
+    darwin*|dragonfly*|freebsd*)
+      args+=(
+        '-F[remove existing destination directories]'
+      )
+    ;|
+    dragonfly*|freebsd*|openbsd*)
+      args+=(
+        '(-L)-P[create hard links directly to symbolic links]'
+        '(-P)-L[create hard links to symbolic link references]'
+      )
+    ;|
+    dragonfly*|freebsd*)
+      args+=(
+        "-w[warn if source of a symbolic link doesn't currently exist]"
+      )
+    ;;
+  esac
 fi
 
-_arguments -C -s $opts \
+_arguments -C -s $opts : \
   $args \
   ':link target:_files' \
   '*:: :->files' && ret=0
