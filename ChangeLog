@@ -1,5 +1,9 @@
 2018-02-07  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* Christian Hesse: 42333: Completion/Unix/Command/_git: Starting
+	with version 2.16.0 git no longer accepts an empty string as a
+	pathspec element. Thus we have to replace empty strings with a dot.
+
 	* Matthew Martin: 42330: Completion/Unix/Command/_ln:
 	-L and -P are POSIX, but not supported by Darwin or NetBSD
 
