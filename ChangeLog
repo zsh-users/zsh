@@ -2,7 +2,7 @@
 
 	* 42332: Src/builtin.c, Src/utils.c: special case printf for
 	unsigned integers by looking for constansts, avoiding conversion
-	to unsigned.
+	to signed.
 
 2018-01-24  Daniel Hahler  <zsh@thequod.de>
 
