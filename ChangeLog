@@ -1,3 +1,9 @@
+2018-01-31  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 42332: Src/builtin.c, Src/utils.c: special case printf for
+	unsigned integers by looking for constansts, avoiding conversion
+	to unsigned.
+
 2018-01-24  Daniel Hahler  <zsh@thequod.de>
 
 	* 42323: Completion/Unix/Command/_git: _git: move "local" statement

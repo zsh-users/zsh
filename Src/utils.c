@@ -2455,6 +2455,67 @@ zstrtol_underscore(const char *s, char **t, int base, int underscore)
     return neg ? -(zlong)calc : (zlong)calc;
 }
 
+/*
+ * If s represents a complete unsigned integer (and nothing else)
+ * return 1 and set retval to the value.  Otherwise return 0.
+ *
+ * Underscores are always allowed.
+ *
+ * Sensitive to OCTAL_ZEROES.
+ */
+
+/**/
+mod_export int
+zstrtoul_underscore(const char *s, zulong *retval)
+{
+    zulong calc = 0, newcalc = 0, base;
+
+    if (*s == '+')
+	s++;
+
+    if (*s != '0')
+	base = 10;
+    else if (*++s == 'x' || *s == 'X')
+	base = 16, s++;
+    else if (*s == 'b' || *s == 'B')
+	base = 2, s++;
+    else
+	base = isset(OCTALZEROES) ? 8 : 10;
+    if (base < 2 || base > 36) {
+	return 0;
+    } else if (base <= 10) {
+	for (; (*s >= '0' && *s < ('0' + base)) ||
+		 *s == '_'; s++) {
+	    if (*s == '_')
+		continue;
+	    newcalc = calc * base + *s - '0';
+	    if (newcalc < calc)
+	    {
+		return 0;
+	    }
+	    calc = newcalc;
+	}
+    } else {
+	for (; idigit(*s) || (*s >= 'a' && *s < ('a' + base - 10))
+	     || (*s >= 'A' && *s < ('A' + base - 10))
+	     || *s == '_'; s++) {
+	    if (*s == '_')
+		continue;
+	    newcalc = calc*base + (idigit(*s) ? (*s - '0') : (*s & 0x1f) + 9);
+	    if (newcalc < calc)
+	    {
+		return 0;
+	    }
+	    calc = newcalc;
+	}
+    }
+
+    if (*s)
+	return 0;
+    *retval = calc;
+    return 1;
+}
+
 /**/
 mod_export int
 setblock_fd(int turnonblocking, int fd, long *modep)

@@ -5243,7 +5243,10 @@ bin_print(char *name, char **args, Options ops, int func)
  		    	*d++ = 'l';
 #endif
 		    	*d++ = 'l', *d++ = *c, *d = '\0';
-			zulongval = (curarg) ? mathevali(curarg) : 0;
+			if (!curarg)
+			    zulongval = (zulong)0;
+			else if (!zstrtoul_underscore(curarg, &zulongval))
+			    zulongval = mathevali(curarg);
 			if (errflag) {
 			    zulongval = 0;
 			    errflag &= ~ERRFLAG_ERROR;
