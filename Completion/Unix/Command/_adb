@@ -480,7 +480,7 @@ _adb_remote_folder () {
     pref=${pref%/*}/
   fi
   # yes, this ls is sickening to look at, but android doesn't have printf or find
-  files=(${${(f)"$(adb ${=ADB_DEVICE_SPECIFICATION} shell 'ls -d 2> /dev/null '$pref'*/ '$pref'*')"}%$'\r'})
+  files=(${${(f)"$(adb ${=ADB_DEVICE_SPECIFICATION} shell 'ls -1d 2> /dev/null '$pref'*/ '$pref'*')"}%$'\r'})
   dirs=(${${(M)files:#*/}%/})
   files=(${${files:|dirs}:#*\*(/|)})
   _adb_device_available && \
