@@ -1,4 +1,4 @@
-#compdef svn svnadmin svnadmin-static=svnadmin
+#compdef svn svnlite=svn svnadmin svnadmin-static=svnadmin
 
 _svn () {
   local curcontext="$curcontext" state line expl ret=1
@@ -24,7 +24,7 @@ _svn () {
     zstyle ":completion:*:*:$service:*" cache-policy _svn_caching_policy
   fi
 
-  _arguments -C \
+  _arguments -C -A "-*" \
     '(-)--help[print help information]' \
     '(- *)--version[print client version information]' \
     '1: :->cmds' \
@@ -70,29 +70,32 @@ _svn () {
 	    ${=${${${(M)${(f)"$(_call_program options svn help $cmd)"#(*Valid options:|(#e))}:#* :*}%% #:*}/ (arg|ARG)/:arg:}/(#b)(-##)([[:alpha:]]##) \[--([a-z-]##)\](:arg:)#/(--$match[3])$match[1]$match[2]$match[4] ($match[1]$match[2])--$match[3]$match[4]}
 	  )
           while (( idx=$args[(I)*--accept:arg:] )); do
-            args[(I)*--accept:arg:]=( --accept'=:automatic conflict resolution action:((working\:working base\:base '"`for i j in p postpone mc mine-conflict tc theirs-conflict mf mine-full tf theirs-full e edit l launch; do print -rn $i\\\\:$j $j\\\\:$j ""; done `"'))' )
+            args[idx]=( --accept'=:automatic conflict resolution action:((working\:working base\:base '"`for i j in p postpone mc mine-conflict tc theirs-conflict mf mine-full tf theirs-full e edit l launch; do print -rn $i\\\\:$j $j\\\\:$j ""; done `"'))' )
           done
           while (( idx=$args[(I)*--c(l|hangelist):arg:] )); do
-            args[(I)*--c(l|hangelist):arg:]=( \*{--cl,--changelist}'=:change list:_svn_changelists' )
+            args[idx]=( \*{--cl,--changelist}'=:change list:_svn_changelists' )
           done
           while (( idx=$args[(I)*--config-dir:arg:] )); do
-            args[(I)*--config-dir:arg:]=( --config-dir'=:config dir:_directories' )
+            args[idx]=( --config-dir'=:config dir:_directories' )
           done
+	  while (( idx=$args[(I)*--config-option:arg:] )); do
+	    args[idx]=( '*--config-option=: :_svn_config_options' )
+	  done
           while (( idx=$args[(I)*--depth:arg:] )); do
-            args[(I)*--depth:arg:]=( --depth'=:operation depth (how far to recurse):(empty files immediates infinity)' )
+            args[idx]=( --depth'=:operation depth (how far to recurse):(empty files immediates infinity)' )
           done
           while (( idx=$args[(I)*(-F|--file):arg:] )); do
-            args[(I)*(-F|--file):arg:]=( '(-F --file)'{-F+,--file=}':log message file:_files' )
+            args[idx]=( '(-F --file)'{-F+,--file=}':log message file:_files' )
           done
           while (( idx=$args[(I)*--set-depth:arg:] )); do
-            args[(I)*--set-depth:arg:]=( --set-depth'=[make working copy deeper or shallower]:new depth:(exclude empty files immediates infinity)' )
+            args[idx]=( --set-depth'=[make working copy deeper or shallower]:new depth:(exclude empty files immediates infinity)' )
           done
           while (( idx=$args[(I)*--trust-server-cert-failures:arg:] )); do
-            args[(I)*--trust-server-cert-failures:arg:]=( --trust-server-cert-failures'=:failures:_values -s , "certificate failures to ignore" "unknown-ca[unknown authority]" "cn-mismatch[hostname mismatch]" "expired[certificate expired]" "not-yet-valid[certificate not yet valid]" "other[all other failures]"' )
+            args[idx]=( --trust-server-cert-failures'=:failures:_values -s , "certificate failures to ignore" "unknown-ca[unknown authority]" "cn-mismatch[hostname mismatch]" "expired[certificate expired]" "not-yet-valid[certificate not yet valid]" "other[all other failures]"' )
           done
           while (( idx=$args[(I)*--show-item:arg:] )); do
             # (q) to quote the parentheses in the value
-            args[(I)*--show-item:arg:]=( --show-item'=:item key:(('"`for i j in ${(kv)show_item_keys}; do print -rn - $i\\\\:"${(q)j}" ""; done`"'))' )
+            args[idx]=( --show-item'=:item key:(('"`for i j in ${(kv)show_item_keys}; do print -rn - $i\\\\:"${(q)j}" ""; done`"'))' )
           done
           # All other options get {-x+,--long-x=}
           args=( ${args/(#b)(--[A-Za-z0-9-]##):arg:/$match[1]=:arg:} )
@@ -415,6 +418,27 @@ _svn_commands() {
 (( $+functions[_svnadmin_command] )) ||
 _svnadmin_commands() {
   compadd "$@" -k _svnadmin_cmds || compadd "$@" ${(s.:.)_svnadmin_cmds}
+}
+
+(( $+functions[_svn_config_options] )) ||
+_svn_config_options() {
+  local -a expl suf
+  local cfgfile
+  compset -S ':*' || suf=( -qS : )
+  if compset -P 2 '*:'; then
+    if compset -P '*='; then
+      _message -e values 'value'
+    else
+      _message -e options 'option'
+    fi
+  elif compset -P 1 '*:'; then
+    cfgfile=( ~/.subversion/${(M)${IPREFIX%:}%(config|servers)}(N) /dev/null )
+    _description sections expl 'section'
+    compadd $suf "$expl[@]" ${${${(M)${(f)"$(<${cfgfile[1]})"}:#\[*\]}#\[}%\]}
+  else
+    _description config-files expl 'configuration file'
+    compadd $suf "$expl[@]" config servers
+  fi
 }
 
 (( $+functions[_svn_props] )) ||
