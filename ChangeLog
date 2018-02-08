@@ -1,3 +1,9 @@
+2018-02-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted: Completion/Unix/Command/_subversion: Support
+	subcommands with hyphens in their names, such as 'shelf-list
+	(shelves)' from upstream 1.10 development versions.
+
 2018-02-07  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* Christian Hesse: 42333: Completion/Unix/Command/_git: Starting
