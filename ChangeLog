@@ -1,3 +1,9 @@
+2018-02-12  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Marijn: 42355: Src/exec.c, Test/A04redirect.ztst:
+	Interpreation of backslash on here doc input was inconsistent
+	and confusing.
+
 2018-02-12  Daniel Hahler  <zsh@thequod.de>
 
 	* 42324: Completion/Unix/Command/_git: _git: handle mutually exclusive

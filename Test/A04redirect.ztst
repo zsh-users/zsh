@@ -114,7 +114,7 @@
   heretest() {
     print First line
     cat <<'    HERE'
-    $foo$foo met celeste  'but with extra'  "stuff to test quoting"
+    $foo$foo met celeste  'but with extra'  "stuff to test quoting"\
     HERE
     print Last line
   }
@@ -125,18 +125,56 @@
   heretest
 0:Re-evaluation of function output with here document, quoted
 >First line
->    $foo$foo met celeste  'but with extra'  "stuff to test quoting"
+>    $foo$foo met celeste  'but with extra'  "stuff to test quoting"\
 >Last line
 >First line
->    $foo$foo met celeste  'but with extra'  "stuff to test quoting"
+>    $foo$foo met celeste  'but with extra'  "stuff to test quoting"\
 >Last line
 >First line
->    $foo$foo met celeste  'but with extra'  "stuff to test quoting"
+>    $foo$foo met celeste  'but with extra'  "stuff to test quoting"\
 >Last line
 
   read -r line <<'  HERE'
   HERE
 1:No input, not even newline, from empty here document.
+
+  heretest() {
+    print First line
+    cat <<-HERE
+	$foo\
+	$foo
+	some\
+	stuff
+	to\
+  test
+	tab\stripping
+	HERE
+    print Last line
+  }
+  heretest
+  eval "$(functions heretest)"
+  heretest
+  eval "$(functions heretest)"
+  heretest
+0:Line continuation in here-document with unquoted delimiter
+>First line
+>bar	bar
+>some	stuff
+>to  test
+>tab\stripping
+>Last line
+>First line
+>bar	bar
+>some	stuff
+>to  test
+>tab\stripping
+>Last line
+>First line
+>bar	bar
+>some	stuff
+>to  test
+>tab\stripping
+>Last line
 
   #
   # exec tests: perform these in subshells so if they fail the
