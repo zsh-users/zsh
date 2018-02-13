@@ -1469,7 +1469,7 @@ is specified with no command.  Defaults to tt(more).
 vindex(REPORTMEMORY)
 item(tt(REPORTMEMORY))(
 If nonnegative, commands whose maximum resident set size (roughly
-speaking, main memory usage) in megabytes is greater than this
+speaking, main memory usage) in kilobytes is greater than this
 value have timing statistics reported.  The format used to output
 statistics is the value of the tt(TIMEFMT) parameter, which is the same
 as for the tt(REPORTTIME) variable and the tt(time) builtin; note that
@@ -1604,7 +1604,7 @@ sitem(tt(%D))(The average amount in (unshared) data/stack space used in
 kilobytes.)
 sitem(tt(%K))(The total space used (tt(%X)PLUS()tt(%D)) in kilobytes.)
 sitem(tt(%M))(The  maximum memory the process had in use at any time in
-megabytes.)
+kilobytes.)
 sitem(tt(%F))(The number of major page faults (page needed to be brought
 from disk).)
 sitem(tt(%R))(The number of minor page faults.)
