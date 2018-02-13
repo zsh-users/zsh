@@ -1,11 +1,11 @@
 2018-02-13  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Eitan Adler: Doc/Zsh/params.yo: REPORTMEMORY is in kilobytes,
-	not megabytes:
+	not megabytes.
 
 2018-02-12  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* Marijn: 42355: Src/exec.c, Test/A04redirect.ztst:
+	* Martijn: 42355: Src/exec.c, Test/A04redirect.ztst:
 	Interpreation of backslash on here doc input was inconsistent
 	and confusing.
 
