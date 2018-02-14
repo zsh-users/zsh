@@ -5596,12 +5596,7 @@ __git_describe_commit () {
 # .
 (( $+functions[__git_ignore_line] )) ||
 __git_ignore_line () {
-  declare -a ignored
-  ignored=()
-  ((CURRENT > 1)) &&
-    ignored+=(${(bQ)line[1,CURRENT-1]})
-  ((CURRENT < $#line)) &&
-    ignored+=(${(bQ)line[CURRENT+1,-1]})
+  local -a ignored=(${line:#${words[CURRENT]}})
   $* -F ignored
 }
 

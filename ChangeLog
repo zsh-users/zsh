@@ -1,3 +1,8 @@
+2018-02-22  Daniel Hahler  <zsh@thequod.de>
+
+	* 42364: Completion/Unix/Command/_git: _git: fix __git_ignore_line to
+	ignore the current word.
+
 2018-02-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 42362: Src/jobs.c: protet REPORTTIME logic from bad status.
