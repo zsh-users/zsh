@@ -1,3 +1,8 @@
+2018-03-05  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Martijn: 42365: Src/parse.c: use .zwc file if timestamp
+	identical to source file.
+
 2018-03-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Taylor West: 42411: Src/mem.c: assume any current C compiler

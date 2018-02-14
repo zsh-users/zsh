@@ -3677,15 +3677,15 @@ try_dump_file(char *path, char *name, char *file, int *ksh, int test_only)
      * function. */
     queue_signals();
     if (!rd &&
-	(rc || std.st_mtime > stc.st_mtime) &&
-	(rn || std.st_mtime > stn.st_mtime) &&
+	(rc || std.st_mtime >= stc.st_mtime) &&
+	(rn || std.st_mtime >= stn.st_mtime) &&
 	(prog = check_dump_file(dig, &std, name, ksh, test_only))) {
 	unqueue_signals();
 	return prog;
     }
     /* No digest file. Now look for the per-function compiled file. */
     if (!rc &&
-	(rn || stc.st_mtime > stn.st_mtime) &&
+	(rn || stc.st_mtime >= stn.st_mtime) &&
 	(prog = check_dump_file(wc, &stc, name, ksh, test_only))) {
 	unqueue_signals();
 	return prog;
@@ -3724,7 +3724,7 @@ try_source_file(char *file)
     rn = stat(file, &stn);
 
     queue_signals();
-    if (!rc && (rn || stc.st_mtime > stn.st_mtime) &&
+    if (!rc && (rn || stc.st_mtime >= stn.st_mtime) &&
 	(prog = check_dump_file(wc, &stc, tail, NULL, 0))) {
 	unqueue_signals();
 	return prog;
