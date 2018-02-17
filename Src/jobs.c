@@ -925,6 +925,7 @@ should_report_time(Job j)
     struct value vbuf;
     Value v;
     char *s = "REPORTTIME";
+    int save_errflag = errflag;
     zlong reporttime = -1;
 #ifdef HAVE_GETRUSAGE
     char *sm = "REPORTMEMORY";
@@ -936,12 +937,14 @@ should_report_time(Job j)
 	return 1;
 
     queue_signals();
+    errflag = 0;
     if ((v = getvalue(&vbuf, &s, 0)))
 	reporttime = getintvalue(v);
 #ifdef HAVE_GETRUSAGE
     if ((v = getvalue(&vbuf, &sm, 0)))
 	reportmemory = getintvalue(v);
 #endif
+    errflag = save_errflag;
     unqueue_signals();
     if (reporttime < 0
 #ifdef HAVE_GETRUSAGE

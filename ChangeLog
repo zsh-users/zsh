@@ -1,3 +1,7 @@
+2018-02-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 42362: Src/jobs.c: protet REPORTTIME logic from bad status.
+
 2018-02-13  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Eitan Adler: Doc/Zsh/params.yo: REPORTMEMORY is in kilobytes,
