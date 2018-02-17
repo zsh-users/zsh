@@ -1,5 +1,8 @@
 2018-03-07  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* github #22: Ferenc-: Completion/Unix/Command/_gcc:
+	Add newer C++ standard options to gcc completion
+
 	* github #23: Matthijs Tijink: Completion/X/Command/_kdeconnect:
 	new kdeconnect-cli completion
 
