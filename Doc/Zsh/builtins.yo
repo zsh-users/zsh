@@ -504,6 +504,15 @@ pindex(BSD_ECHO, use of)
 The tt(-E) flag, or the tt(BSD_ECHO) option, can be used to disable
 these escape sequences.  In the latter case, tt(-e) flag can be used to
 enable them.
+
+Note that for standards compliance a double dash does not terminate
+option processing; instead, it is printed directly.  However, a
+single dash does terminate option processing, so the first dash,
+possibly following options, is not printed, but everything following it
+is printed as an argument.  The single dash behaviour is different
+from other shells.  For a more portable way of printing text, see
+tt(printf), and for a more controllable way of printing text within zsh,
+see tt(print).
 )
 module(echotc)(zsh/termcap)
 module(echoti)(zsh/terminfo)
