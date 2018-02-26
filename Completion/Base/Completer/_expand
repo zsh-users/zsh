@@ -43,7 +43,8 @@ zstyle -s ":completion:${curcontext}:" accept-exact tmp ||
 
 if [[ "$tmp" != (yes|true|on|1) ]]; then
   { [[ "$word" = \~(|[-+]) ||
-       ( "$word" = \~[-+][1-9]## && $word[3,-1] -le $#dirstack ) ]] && return 1 }
+	   ( "$word" = \~[-+][1-9]## && $word[3,-1] -le $#dirstack ) ||
+     $word = \~\[*\]/* ]] && return 1 }
   { [[ ( "$word" = \~* && ${#userdirs[(I)${word[2,-1]}*]}+${#nameddirs[(I)${word[2,-1]}*]} -gt 1 ) ||
        ( "$word" = *\$[a-zA-Z0-9_]## && 
          ${#parameters[(I)${word##*\$}*]} -ne 1 ) ]] && continue=1 }

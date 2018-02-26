@@ -1,5 +1,9 @@
 2018-02-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* users/23169: Completion/Base/Completer/_expand: treat ~[...]
+	the same way is other forms of tilde expansion: only expand
+	if accept-exact is set.
+
 	* 42399: Doc/Zsh/builtins.yo: better description of interaction
 	between echo and dashes.
 
