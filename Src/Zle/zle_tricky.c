@@ -456,6 +456,7 @@ checkparams(char *p)
 static int
 cmphaswilds(char *str)
 {
+    char *ptr;
     if ((*str == Inbrack || *str == Outbrack) && !str[1])
 	return 0;
 
@@ -464,6 +465,14 @@ cmphaswilds(char *str)
      * to escape job references such as %?foo.                 */
     if (str[0] == '%' && str[1] ==Quest)
 	str += 2;
+
+    /*
+     * In ~[foo], the square brackets are not wild cards.
+     * This test matches the master one in filesubstr().
+     */
+    if (*str == Tilde && str[1] == Inbrack &&
+	(ptr = strchr(str+2, Outbrack)))
+	str = ptr + 1;
 
     for (; *str;) {
 	if (*str == String || *str == Qstring) {

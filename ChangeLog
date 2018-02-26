@@ -1,5 +1,9 @@
 2018-02-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 23180: Src/Zle/zle_tricky.c: Square brackets in dynamic
+	directory expansion shouldn't force expansion in
+	expand-or-complete.
+
 	* Joey Pabalinas: 42401: Src/mem.c: replace malloc with use of
 	realloc to work around crash with gcc using -foptimize-strlen.
 
