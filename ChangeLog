@@ -1,5 +1,8 @@
 2018-02-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Joey Pabalinas: 42401: Src/mem.c: replace malloc with use of
+	realloc to work around crash with gcc using -foptimize-strlen.
+
 	* users/23169: Completion/Base/Completer/_expand: treat ~[...]
 	the same way is other forms of tilde expansion: only expand
 	if accept-exact is set.

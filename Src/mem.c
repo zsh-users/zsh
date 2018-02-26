@@ -1719,7 +1719,13 @@ calloc(MALLOC_ARG_T n, MALLOC_ARG_T size)
     if (!(l = n * size))
 	return (MALLOC_RET_T) m_high;
 
-    r = malloc(l);
+    /*
+     * use realloc() (with a NULL `p` argument it behaves exactly the same
+     * as malloc() does) to prevent an infinite loop caused by sibling-call
+     * optimizations (the malloc() call would otherwise be replaced by an
+     * unconditional branch back to line 1719 ad infinitum).
+     */
+    r = realloc(NULL, l);
 
     memset(r, 0, l);
 
