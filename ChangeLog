@@ -1,3 +1,8 @@
+2018-03-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Taylor West: 42411: Src/mem.c: assume any current C compiler
+	will handle NULL argument to free.
+
 2018-02-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 23180: Src/Zle/zle_tricky.c: Square brackets in dynamic
