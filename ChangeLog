@@ -1,3 +1,8 @@
+2018-03-12  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 42453: Src/jobs.c: fix race looking up status of just
+	exited background job.
+
 2018-03-07  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* github #22: Ferenc-: Completion/Unix/Command/_gcc:

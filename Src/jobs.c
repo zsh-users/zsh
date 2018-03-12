@@ -2289,8 +2289,11 @@ bin_fg(char *name, char **argv, Options ops, int func)
 		     */
 		    retval = waitforpid(pid, 1);
 		}
-		if (retval == 0)
-		    retval = lastval2;
+		if (retval == 0) {
+		    if ((retval = getbgstatus(pid)) < 0) {
+			retval = lastval2;
+		    }
+		}
 	    } else if ((retval = getbgstatus(pid)) < 0) {
 		zwarnnam(name, "pid %d is not a child of this shell", pid);
 		/* presumably lastval2 doesn't tell us a heck of a lot? */
