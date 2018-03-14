@@ -4507,6 +4507,8 @@ getoutput(char *cmd, int qt)
     if ((s = simple_redir_name(prog, REDIR_READ))) {
 	/* $(< word) */
 	int stream;
+	LinkList retval;
+	int readerror;
 
 	singsub(&s);
 	if (errflag)
@@ -4514,9 +4516,15 @@ getoutput(char *cmd, int qt)
 	untokenize(s);
 	if ((stream = open(unmeta(s), O_RDONLY | O_NOCTTY)) == -1) {
 	    zwarn("%e: %s", errno, s);
+	    lastval = cmdoutval = 1;
 	    return newlinklist();
 	}
-	return readoutput(stream, qt);
+	retval = readoutput(stream, qt, &readerror);
+	if (readerror) {
+	  zwarn("error when reading %s: %e", s, readerror);
+	  lastval = cmdoutval = 1;
+	}
+	return retval;
     }
     if (mpipe(pipes) < 0) {
 	errflag |= ERRFLAG_ERROR;
@@ -4537,7 +4545,7 @@ getoutput(char *cmd, int qt)
 	LinkList retval;
 
 	zclose(pipes[1]);
-	retval = readoutput(pipes[0], qt);
+	retval = readoutput(pipes[0], qt, NULL);
 	fdtable[pipes[0]] = FDT_UNUSED;
 	waitforpid(pid, 0);		/* unblocks */
 	lastval = cmdoutval;
@@ -4562,7 +4570,7 @@ getoutput(char *cmd, int qt)
 
 /**/
 mod_export LinkList
-readoutput(int in, int qt)
+readoutput(int in, int qt, int *readerror)
 {
     LinkList ret;
     char *buf, *ptr;
@@ -4591,6 +4599,8 @@ readoutput(int in, int qt)
 	}
 	*ptr++ = c;
     }
+    if (readerror && ferror(fin))
+	*readerror = errno;
     fclose(fin);
     while (cnt && ptr[-1] == '\n')
 	ptr--, cnt--;

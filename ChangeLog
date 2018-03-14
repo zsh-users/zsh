@@ -1,3 +1,9 @@
+2018-03-15  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Stephane: 42465: Src/exec.c, Src/Modules/mapfile.c: pass error
+	status from readoutput, causing more consistent reporting
+	from $(...) constructs.
+
 2018-03-12  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 42453: Src/jobs.c: fix race looking up status of just
