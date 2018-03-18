@@ -4599,8 +4599,8 @@ readoutput(int in, int qt, int *readerror)
 	}
 	*ptr++ = c;
     }
-    if (readerror && ferror(fin))
-	*readerror = errno;
+    if (readerror)
+	*readerror = ferror(fin) ? errno : 0;
     fclose(fin);
     while (cnt && ptr[-1] == '\n')
 	ptr--, cnt--;

@@ -197,9 +197,8 @@ get_contents(char *fname)
     val = NULL;
     if ((fd = open(fname, O_RDONLY | O_NOCTTY)) >= 0) {
 	LinkList ll;
-	int readerror;
 
-	if ((ll = readoutput(fd, 1, &readerror)))
+	if ((ll = readoutput(fd, 1, 0)))
 	    val = peekfirst(ll);
     }
 #endif /* USE_MMAP */
