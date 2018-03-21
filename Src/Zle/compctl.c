@@ -383,7 +383,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
      * cct is a temporary just to hold flags; it never needs freeing.
      */
     struct compctl cct;
-    char **argv = *av;
+    char **argv = *av, argv_end[2] = "x";
     int ready = 0, hx = 0;
 
     /* Handle `compctl + foo ...' specially:  turn it into
@@ -516,14 +516,14 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		    }
 		    if ((*argv)[1]) {
 			p = (*argv) + 1;
-			*argv = "" - 1;
+			*argv = argv_end;
 		    } else if (!argv[1]) {
 			zwarnnam(name, "retry specification expected after -%c",
 				 **argv);
 			return 1;
 		    } else {
 			p = *++argv;
-			*argv = "" - 1;
+			*argv = argv_end;
 		    }
 		    switch (*p) {
 		    case '+':
@@ -553,25 +553,25 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 	    case 'k':
 		if ((*argv)[1]) {
 		    cct.keyvar = (*argv) + 1;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		} else if (!argv[1]) {
 		    zwarnnam(name, "variable name expected after -%c", **argv);
 		    return 1;
 		} else {
 		    cct.keyvar = *++argv;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		}
 		break;
 	    case 'K':
 		if ((*argv)[1]) {
 		    cct.func = (*argv) + 1;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		} else if (!argv[1]) {
 		    zwarnnam(name, "function name expected after -%c", **argv);
 		    return 1;
 		} else {
 		    cct.func = *++argv;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		}
 		break;
 	    case 'Y':
@@ -582,74 +582,74 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 	    expl:
 		if ((*argv)[1]) {
 		    cct.explain = (*argv) + 1;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		} else if (!argv[1]) {
 		    zwarnnam(name, "string expected after -%c", **argv);
 		    return 1;
 		} else {
 		    cct.explain = *++argv;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		}
 		break;
 	    case 'y':
 		if ((*argv)[1]) {
 		    cct.ylist = (*argv) + 1;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		} else if (!argv[1]) {
 		    zwarnnam(name, "function/variable expected after -%c",
 			     **argv);
 		} else {
 		    cct.ylist = *++argv;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		}
 		break;
 	    case 'P':
 		if ((*argv)[1]) {
 		    cct.prefix = (*argv) + 1;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		} else if (!argv[1]) {
 		    zwarnnam(name, "string expected after -%c", **argv);
 		    return 1;
 		} else {
 		    cct.prefix = *++argv;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		}
 		break;
 	    case 'S':
 		if ((*argv)[1]) {
 		    cct.suffix = (*argv) + 1;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		} else if (!argv[1]) {
 		    zwarnnam(name, "string expected after -%c", **argv);
 		    return 1;
 		} else {
 		    cct.suffix = *++argv;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		}
 		break;
 	    case 'g':
 		if ((*argv)[1]) {
 		    cct.glob = (*argv) + 1;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		} else if (!argv[1]) {
 		    zwarnnam(name, "glob pattern expected after -%c", **argv);
 		    return 1;
 		} else {
 		    cct.glob = *++argv;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		}
 		break;
 	    case 's':
 		if ((*argv)[1]) {
 		    cct.str = (*argv) + 1;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		} else if (!argv[1]) {
 		    zwarnnam(name, "command string expected after -%c",
 			     **argv);
 		    return 1;
 		} else {
 		    cct.str = *++argv;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		}
 		break;
 	    case 'l':
@@ -658,13 +658,13 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		    return 1;
 		} else if ((*argv)[1]) {
 		    cct.subcmd = (*argv) + 1;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		} else if (!argv[1]) {
 		    zwarnnam(name, "command name expected after -%c", **argv);
 		    return 1;
 		} else {
 		    cct.subcmd = *++argv;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		}
 		break;
 	    case 'h':
@@ -673,49 +673,49 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		    return 1;
 		} else if ((*argv)[1]) {
 		    cct.substr = (*argv) + 1;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		} else if (!argv[1]) {
 		    zwarnnam(name, "command name expected after -%c", **argv);
 		    return 1;
 		} else {
 		    cct.substr = *++argv;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		}
 		break;
 	    case 'W':
 		if ((*argv)[1]) {
 		    cct.withd = (*argv) + 1;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		} else if (!argv[1]) {
 		    zwarnnam(name, "path expected after -%c", **argv);
 		    return 1;
 		} else {
 		    cct.withd = *++argv;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		}
 		break;
 	    case 'J':
 		if ((*argv)[1]) {
 		    cct.gname = (*argv) + 1;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		} else if (!argv[1]) {
 		    zwarnnam(name, "group name expected after -%c", **argv);
 		    return 1;
 		} else {
 		    cct.gname = *++argv;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		}
 		break;
 	    case 'V':
 		if ((*argv)[1]) {
 		    cct.gname = (*argv) + 1;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		} else if (!argv[1]) {
 		    zwarnnam(name, "group name expected after -%c", **argv);
 		    return 1;
 		} else {
 		    cct.gname = *++argv;
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		}
 		cct.mask2 |= CC_NOSORT;
 		break;
@@ -738,7 +738,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 			cct.mstr = NULL;
 			return 1;
 		    }
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		} else if (!argv[1]) {
 		    zwarnnam(name, "matching specification expected after -%c",
 			     **argv);
@@ -751,7 +751,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 			cct.mstr = NULL;
 			return 1;
 		    }
-		    *argv = "" - 1;
+		    *argv = argv_end;
 		}
 		break;
 	    case 'H':
@@ -772,7 +772,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		    cct.hnum = 0;
 		if (*cct.hpat == '*' && !cct.hpat[1])
 		    cct.hpat = "";
-		*argv = "" - 1;
+		*argv = argv_end;
 		break;
 	    case 'C':
 		if (cl) {

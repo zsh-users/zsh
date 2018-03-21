@@ -1,3 +1,8 @@
+2018-03-21  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 42487: Src/Zle/compctl.c: remove gcc 7.3.0 warnings and
+	potentially incorrect pointer usage.
+
 2018-03-18  Barton E. Schaefer  <schaefer@brasslantern.com>
 
 	* Stephane: 42469: Src/exec.c, Src/Modules/mapfile.c: fix 42465
