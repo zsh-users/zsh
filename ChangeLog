@@ -1,3 +1,7 @@
+2018-03-22  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 42191: Completion/Darwin/Command/_otool: new completion
+
 2018-03-21  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 42487: Src/Zle/compctl.c: remove gcc 7.3.0 warnings and
