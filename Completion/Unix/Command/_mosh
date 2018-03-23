@@ -1,6 +1,6 @@
 #compdef mosh
 
-local curcontext="$curcontext" state line
+local curcontext="$curcontext" state line expl ret=1
 local -a _comp_priv_prefix
 
 _arguments -C \
@@ -15,12 +15,20 @@ _arguments -C \
   '--server[specify command to run server helper]:remote file:_files' \
   '--client[specify command to run client helper]:_command_names -e' \
   '1:remote host name:->userhost' \
-  '*:::args:_normal' && return
+  '*:::args:_normal' && ret=0
 
 case $state in
   userhost)
-    _hosts || _user_at_host && return
+    if compset -P '*@'; then
+      _wanted hosts expl 'remote host name' _ssh_hosts && ret=0
+    elif compset -S '@*'; then
+      _wanted users expl 'login name' _combination -s '[:@]' my-accounts users-hosts users -S '' && ret=0
+    else
+      _alternative \
+	'hosts:remote host name:_ssh_hosts' \
+	'users:login name:_combination -s "[:@]" my-accounts users-hosts users -qS@' && ret=0
+    fi
   ;;
 esac
 
-return 1
+return ret

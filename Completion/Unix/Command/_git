@@ -6892,10 +6892,6 @@ __git_tree_files () {
 
 (( $+functions[__git_remote_repositories] )) ||
 __git_remote_repositories () {
-  local service
-
-  service= _ssh
-
   if compset -P '*:'; then
     _remote_files -/ -- ssh
   else
