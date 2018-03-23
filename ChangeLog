@@ -1,3 +1,8 @@
+2018-03-23  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 42497 (tweaked c.f. 42498): Completion/Debian/Command/_apt:
+	make completion after apt install work on local .deb files
+
 2018-03-22  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 42191: Completion/Darwin/Command/_otool: new completion

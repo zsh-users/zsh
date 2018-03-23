@@ -408,12 +408,13 @@ _apt-cmd () {
     /$'policy\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'update\0'/ \| \
     \( \
-    /$'install\0'\|$'download\0'\|$'source\0'\|$'build-dep\0'/ \
-      /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \
-       \( \
-       /$'[^\0/]#/'/ /$'[^\0/]#\0'/ ':release name::_apt_releases' \| \
-       /$'[^\0=]#='/ /$'[^\0=]#\0'/ ':package version::_apt_versions_of_binary_package' \
-       \)  \
+      /$'(install|download|source|build-dep)\0'/ -'subcmd=${match%?}' \
+      /$'[^\0]#\0'/ ':packages::_deb_packages -qr "\n\t\- /=" "$expl_packages[@]" avail' \# \
+      \( \
+	// '%(.|)/%' -'[[ $subcmd = install ]]' /'[]'/ ':files:package file:_files -g "*.deb(-.)"' \| \
+	/$'[^\0/=]#\/'/ /'[]'/ ':apt-releases:release name:_apt_releases' \| \
+	/$'[^\0/=]#='/ /'[]'/ ':apt-package-versions:package version:_apt_versions_of_binary_package' \| \
+      \) \
     \) \| \
     /$'remove\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'purge\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
@@ -427,7 +428,7 @@ _apt-cmd () {
     /"[]"/	':argument-1::compadd "$expl_action[@]" list search showsrc show depends rdepends policy update install download source build-dep remove upgrade full-upgrade dist-upgrade edit-sources autoclean changelog autoremove purge'
 
   _apt-cmd () {
-    local expl_action expl_packages
+    local expl_action expl_packages subcmd
     _description actions expl_action 'action'
     _description packages expl_packages 'package'
 
@@ -475,11 +476,11 @@ _apt-get () {
     /$'upgrade\0'/ \| \
     \( \
     /$'install\0'\|$'download\0'\|$'source\0'\|$'build-dep\0'/ \
-      /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \
-       \( \
-       /$'[^\0/]#/'/ /$'[^\0/]#\0'/ ':release name::_apt_releases' \| \
-       /$'[^\0=]#='/ /$'[^\0=]#\0'/ ':package version::_apt_versions_of_binary_package' \
-       \)  \
+      /$'[^\0]#\0'/ ':packages::_deb_packages -qr "\n\t\- /=" "$expl_packages[@]" avail' \# \
+      \( \
+	/$'[^\0/=]#/'/ /'[]'/ ':apt-releases:release name:_apt_releases' \| \
+	/$'[^\0/=]#='/ /'[]'/ ':apt-package-versions:package version:_apt_versions_of_binary_package' \
+      \) \
     \) \| \
     /$'remove\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'purge\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
@@ -662,7 +663,7 @@ _apt_versions_of_binary_package() {
     done
   done
 
-  _describe -t apt-package-versions "package versions" kv "$@"
+  _describe -t apt-package-versions 'package version' kv "$@"
 }
 
 _apt_caching_policy () {
