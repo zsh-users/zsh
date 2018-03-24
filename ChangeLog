@@ -1,5 +1,9 @@
 2018-03-24  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42521 based on 42049 (SATOH Fumiyasu):
+	Completion/Unix/Command/_make: make always includes relative
+	to the current directory rather than relative to the Makefile
+
 	* 42519, CVE-2018-1083: Src/Zle/compctl.c: check bounds on
 	PATH_MAX-sized buffer used for file completion candidates
 

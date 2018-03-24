@@ -69,7 +69,7 @@ _make-expandVars() {
 }
 
 _make-parseMakefile () {
-  local input var val target dep TAB=$'\t' dir=$1 tmp IFS=
+  local input var val target dep TAB=$'\t' tmp IFS=
 
   while read input
   do
@@ -108,14 +108,10 @@ _make-parseMakefile () {
         f=${f%[\">]}
       fi
       f=$(_make-expandVars $f)
-      case $f in
-        (/*) ;;
-        (*) f=$dir/$f ;;
-      esac
 
       if [[ -r $f ]]
       then
-        _make-parseMakefile ${f%%/[^/]##} < $f
+        _make-parseMakefile < $f
       fi
       ;;
     esac
@@ -150,7 +146,7 @@ _make-findBasedir () {
 
 _make() {
 
-  local prev="$words[CURRENT-1]" file expl tmp is_gnu dir incl match
+  local prev="$words[CURRENT-1]" file expl tmp is_gnu incl match
   local context state state_descr line
   local -a option_specs
   local -A VARIABLES VAR_ARGS opt_args
@@ -266,16 +262,16 @@ _make() {
       if [[ $is_gnu == gnu ]] 
       then
         if zstyle -t ":completion:${curcontext}:targets" call-command; then
-          _make-parseMakefile $PWD < <(_call_program targets "$words[1]" -nsp --no-print-directory -f "$file" .PHONY 2> /dev/null)
+          _make-parseMakefile < <(_call_program targets "$words[1]" -nsp --no-print-directory -f "$file" .PHONY 2> /dev/null)
         else
-          _make-parseMakefile $PWD < $file
+          _make-parseMakefile < $file
         fi
       else
         if [[ $OSTYPE == (freebsd|dragonfly|netbsd)* || /$words[1] == */bmake* ]]; then
           TARGETS+=(${=${(f)"$(_call_program targets "$words[1]" -s -f "$file" -V.ALLTARGETS 2> /dev/null)"}})
-          _make-parseMakefile $PWD < <(_call_program targets "$words[1]" -nsdg1Fstdout -f "$file" .PHONY 2> /dev/null)
+          _make-parseMakefile < <(_call_program targets "$words[1]" -nsdg1Fstdout -f "$file" .PHONY 2> /dev/null)
         else
-          _make-parseMakefile $PWD < $file
+          _make-parseMakefile < $file
         fi
       fi
     fi
