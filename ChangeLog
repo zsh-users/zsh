@@ -1,3 +1,8 @@
+2018-03-24  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 42501: Src/Zle/complete.c, Src/Zle/computil.c,
+	Src/Zle/zle_thingy.c: avoid out of bound pointer (as 42487).
+
 2018-03-23  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 42491 based on 42000 (Andrei Shevchuk):

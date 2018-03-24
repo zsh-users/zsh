@@ -1222,7 +1222,7 @@ parse_cadef(char *nam, char **args)
 	    else if (*p == 'A') {
 		if (p[1]) {
 		    nonarg = p + 1;
-		    p = "" - 1;
+		    p += strlen(p+1);
 		} else if (args[1])
 		    nonarg = *++args;
 		else
@@ -1230,7 +1230,7 @@ parse_cadef(char *nam, char **args)
 	    } else if (*p == 'M') {
 		if (p[1]) {
 		    match = p + 1;
-		    p = "" - 1;
+		    p += strlen(p+1);
 		} else if (args[1])
 		    match = *++args;
 		else

@@ -731,6 +731,7 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 	    break;
 	}
 	while (*++(*args)) {
+	    char skip_this_arg[2] = "x";
 	    switch (**args) {
 	    case 'n':
 		num = args[0][1] ? args[0]+1 : args[1];
@@ -741,7 +742,7 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 		    return 1;
 		}
 		if (!args[0][1])
-		    *++args = "" - 1;
+		    *++args = skip_this_arg;
 		saveflag = 1;
 		zmod.mult = atoi(num);
 		zmod.flags |= MOD_MULT;
@@ -760,7 +761,7 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 		    return 1;
 		}
 		if (!args[0][1])
-		    *++args = "" - 1;
+		    *++args = skip_this_arg;
 		keymap_restore = dupstring(curkeymapname);
 		if (selectkeymap(keymap_tmp, 0)) {
 		    if (remetafy)

@@ -715,11 +715,10 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    case 'E':
                 if (p[1]) {
                     dat.dummies = atoi(p + 1);
-                    p = "" - 1;
+		    p += strlen(p+1);
                 } else if (argv[1]) {
                     argv++;
                     dat.dummies = atoi(*argv);
-                    p = "" - 1;
                 } else {
                     zwarnnam(name, "number expected after -%c", *p);
 		    zsfree(mstr);
@@ -744,13 +743,12 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		    /* Pasted argument: -Xfoo. */
 		    if (!*sp)
 			*sp = p + 1;
-		    p = "" - 1;
+		    p += strlen(p+1);
 		} else if (argv[1]) {
 		    /* Argument in a separate word: -X foo. */
 		    argv++;
 		    if (!*sp)
 			*sp = *argv;
-		    p = "" - 1;
 		} else {
 		    /* Missing argument: argv[N] == "-X", argv[N+1] == NULL. */
 		    zwarnnam(name, e, *p);
