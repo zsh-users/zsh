@@ -3,6 +3,9 @@
 	* 42501: Src/Zle/complete.c, Src/Zle/computil.c,
 	Src/Zle/zle_thingy.c: avoid out of bound pointer (as 42487).
 
+	* unposted: Src/Modules/db_gdbm.c: add 'static' to a file-local
+	variable.
+
 2018-03-23  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 42491 based on 42000 (Andrei Shevchuk):

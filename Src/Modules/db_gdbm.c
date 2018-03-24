@@ -98,7 +98,7 @@ static struct builtin bintab[] = {
     { name, PM_ARRAY | PM_READONLY, (void *) var, NULL,  NULL, NULL, NULL }
 
 /* Holds names of all tied parameters */
-char **zgdbm_tied;
+static char **zgdbm_tied;
 
 static struct paramdef patab[] = {
     ROARRPARAMDEF( "zgdbm_tied", &zgdbm_tied ),
