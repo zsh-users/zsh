@@ -1,5 +1,8 @@
 2018-03-24  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42520: Completion/Unix/Command/_netcat: don't use an empty
+	but existing option cache in netcat completion
+
 	* 42521 based on 42049 (SATOH Fumiyasu):
 	Completion/Unix/Command/_make: make always includes relative
 	to the current directory rather than relative to the Makefile

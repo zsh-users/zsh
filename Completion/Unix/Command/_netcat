@@ -6,11 +6,12 @@ if [[ $service = nc ]] && ! _pick_variant netcat=connect nedit -h; then
   return
 fi
 
-if (( ! $+_nc_args )); then
+if (( ! $#_cache_nc_args )); then
+  typeset -ga _cache_nc_args
   local help="$(_call_program options $words[1] -h < /dev/null 2>&1)"
   local -A optionmap
   optionmap=(
-    '*-e prog*' '-e+[program to exec after connect]:prog:_command_names -e'
+    '*-e prog*' '-e+[program to exec after connect]:program:_command_names -e'
      '*-g gateway*' '-g+[source-routing hop point]:gateway:_hosts'
      '*-G num*' '-G[source-routing pointer: 4, 8, 12]'
      '*-i secs*' '-i+[delay interval for lines sent or ports scanned]:delay (secs)'
@@ -28,10 +29,10 @@ if (( ! $+_nc_args )); then
      '*-x*' '-x'
      '*-b*' '-b[allow broadcasts]'
   )
-  _nc_args=($optionmap[(K)"$help"])
+  _cache_nc_args=( $optionmap[(K)"$help"] )
 fi
 
 _arguments -s \
-  "$_nc_args[@]" \
+  "$_cache_nc_args[@]" \
   ':host:_hosts' \
   ':port:_ports'
