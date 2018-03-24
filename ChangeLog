@@ -1,5 +1,8 @@
 2018-03-24  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42519, CVE-2018-1083: Src/Zle/compctl.c: check bounds on
+	PATH_MAX-sized buffer used for file completion candidates
+
 	* 42518, CVE-2018-1071: Src/exec.c, Src/utils.c:
 	check bounds when copying path in hashcmd()
 

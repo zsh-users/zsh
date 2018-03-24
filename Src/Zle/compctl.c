@@ -2176,6 +2176,8 @@ gen_matches_files(int dirs, int execs, int all)
     if (prpre && *prpre) {
 	pathpref = dupstring(prpre);
 	unmetafy(pathpref, &pathpreflen);
+	if (pathpreflen > PATH_MAX)
+	    return;
 	/* system needs NULL termination, not provided by unmetafy */
 	pathpref[pathpreflen] = '\0';
     } else {
@@ -2218,6 +2220,8 @@ gen_matches_files(int dirs, int execs, int all)
 		     * the path buffer by appending the filename.       */
 		    ums = dupstring(n);
 		    unmetafy(ums, &umlen);
+		    if (umlen + pathpreflen + 1 > PATH_MAX)
+			continue;
 		    memcpy(q, ums, umlen);
 		    q[umlen] = '\0';
 		    /* And do the stat. */
@@ -2232,6 +2236,8 @@ gen_matches_files(int dirs, int execs, int all)
 			/* We have to test for a path suffix. */
 			int o = strlen(p), tt;
 
+			if (o + strlen(psuf) > PATH_MAX)
+			    continue;
 			/* Append it to the path buffer. */
 			strcpy(p + o, psuf);
 
