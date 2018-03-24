@@ -2283,10 +2283,10 @@ struncpy(char **s, char *t, int n)
 {
     char *u = *s;
 
-    while (n--)
-	*u++ = *t++;
+    while (n-- && (*u++ = *t++));
     *s = u;
-    *u = '\0';
+    if (n > 0) /* just one null-byte will do, unlike strncpy(3) */
+	*u = '\0';
 }
 
 /* Return the number of elements in an array of pointers. *

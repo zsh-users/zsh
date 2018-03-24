@@ -934,7 +934,7 @@ hashcmd(char *arg0, char **pp)
     for (; *pp; pp++)
 	if (**pp == '/') {
 	    s = buf;
-	    strucpy(&s, *pp);
+	    struncpy(&s, *pp, PATH_MAX);
 	    *s++ = '/';
 	    if ((s - buf) + strlen(arg0) >= PATH_MAX)
 		continue;

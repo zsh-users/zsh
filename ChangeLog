@@ -1,3 +1,8 @@
+2018-03-24  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 42518, CVE-2018-1071: Src/exec.c, Src/utils.c:
+	check bounds when copying path in hashcmd()
+
 2018-03-24  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 42501: Src/Zle/complete.c, Src/Zle/computil.c,
