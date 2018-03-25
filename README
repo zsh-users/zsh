@@ -5,11 +5,12 @@ THE Z SHELL (ZSH)
 Version
 -------
 
-This is version 5.4.2 of the shell.  This is a stable release.  There
-are some significant bug fixes over 5.4.1 and a few visible improvements
-since 5.3.1, the previous widely released version, as well as many
-bug fixes.  Note in particular the changs highlighted under
-"Incompatibilites since 5.3.1" below.  See NEWS for more information.
+This is version 5.5 of the shell.  This is a stable release.  There
+are some significant bug fixes and a few user visible additions since
+5.4.2.  All zsh installations are encouraged to upgrade.
+
+Note in particular the changes highlighted under "Incompatibilities since
+5.4.2" below.  See NEWS for more information.
 
 Installing Zsh
 --------------
