@@ -1,3 +1,9 @@
+2018-03-27  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Martijn: 42538: Src/utils.c, Test/A04redirect.ztst:
+	temporarily set umask (with signals queued) while reading
+	here document.
+
 2018-03-25  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 42480: Src/utils.c: optimize $#var for single-byte character sets

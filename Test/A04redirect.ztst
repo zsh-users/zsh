@@ -667,3 +667,12 @@
 0:Redirect in the middle of assignments
 >b
 >d
+
+  umask 0777
+  cat <<'  HERE'
+  look ma, no permissions
+  HERE
+  cat <<<"it's a miracle"
+0:Here-{string,document}s succeed with restrictive umask
+>  look ma, no permissions
+>it's a miracle
