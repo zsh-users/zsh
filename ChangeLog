@@ -1,3 +1,7 @@
+2018-03-25  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 42480: Src/utils.c: optimize $#var for single-byte character sets
+
 2018-03-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 42505: README. Etc/FAQ.yo: prepare for 5.5 release.

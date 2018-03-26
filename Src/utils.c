@@ -5496,7 +5496,7 @@ mb_metastrlenend(char *ptr, int width, char *eptr)
     wchar_t wc;
     int num, num_in_char, complete;
 
-    if (!isset(MULTIBYTE))
+    if (!isset(MULTIBYTE) || MB_CUR_MAX == 1)
 	return eptr ? (int)(eptr - ptr) : ztrlen(ptr);
 
     laststart = ptr;
