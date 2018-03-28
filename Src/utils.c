@@ -2287,7 +2287,8 @@ struncpy(char **s, char *t, int n)
 {
     char *u = *s;
 
-    while (n-- && (*u++ = *t++));
+    while (n-- && (*u = *t++))
+	u++;
     *s = u;
     if (n > 0) /* just one null-byte will do, unlike strncpy(3) */
 	*u = '\0';
@@ -4424,17 +4425,20 @@ spname(char *oldname)
 	     * odd to the human reader, and we may make use of the total  *
 	     * distance for all corrections at some point in the future.  */
 	    if (bestdist < maxthresh) {
-		strcpy(new, spnameguess);
-		strcat(new, old);
-		return newname;
+		struncpy(&new, spnameguess, sizeof(newname) - (new - newname));
+		struncpy(&new, old, sizeof(newname) - (new - newname));
+		return (new - newname) >= (sizeof(newname)-1) ? NULL : newname;
 	    } else
 	    	return NULL;
 	} else {
 	    maxthresh = bestdist + thresh;
 	    bestdist += thisdist;
 	}
-	for (p = spnamebest; (*new = *p++);)
+	for (p = spnamebest; (*new = *p++);) {
+	    if ((new - newname) >= (sizeof(newname)-1))
+		return NULL;
 	    new++;
+	}
     }
 }
 

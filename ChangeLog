@@ -1,3 +1,8 @@
+2018-03-28  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 42539: Src/utils.c: prevent overflow of PATH_MAX-sized
+	buffer in spelling correction
+
 2018-03-27  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Martijn: 42538: Src/utils.c, Test/A04redirect.ztst:
