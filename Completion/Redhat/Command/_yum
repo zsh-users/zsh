@@ -1,8 +1,13 @@
-#compdef yum
+#compdef yum yumdb
 
 # Main dispatcher
 _yum() {
   local curcontext="$curcontext" state lstate line
+
+  if [[ $service = yumdb ]]; then
+    _yumdb
+    return
+  fi
 
   _arguments -s \
     '(- *)'{-h,--help}'[show the help message]' \
@@ -44,6 +49,53 @@ _yum() {
     '--sec-severity=[include security relevant packages matching specific severity]:severity' \
     {*-x,*--exclude=}'[exclude package(s) by name or glob]:exclude packages' \
     '*::yum command:_yum_command'
+}
+
+_yumdb() {
+  local curcontext="$curcontext" desc ret=1
+  local -a state line
+
+  _arguments -C \
+    '(- 1)--version[display version information]' \
+    '(- 1)'{-h,--help}'[display help information]' \
+    '--noplugins[disable yum plugin support]' \
+    '(-c --config)'{-c,--config=}'[specify config file location]:Yum conf file:_files' \
+    '1:command:((
+      get\:get\ value\ of\ given\ key
+      set\:set\ value\ of\ given\ key
+      del\:delete\ given\ key
+      rename\:rename\ given\ key
+      rename-force\:rename\ given\ key,\ potentially\ removing\ new-key
+      copy\:copy\ given\ key
+      copy-force\:copy\ given\ key,\ potentially\ removing\ new-key
+      search\:search\ packages\ for\ given\ key
+      exist\:list\ packages\ that\ have\ given\ key
+      unset\:list\ packages\ that\ lack\ given\ key
+      info\:display\ data\ in\ the\ yumdb
+      sync\:add\ package\ data\ from\ repositories
+      sync-force\:replace\ package\ data\ from\ repositories
+      undeleted shell
+    ))' \
+    '*:: :->args' && ret=0
+
+  if [[ -n $state ]]; then
+    case $CURRENT:$words[1] in
+      3:set|<3->:search)
+        case $words[2] in
+          reason) _wanted reasons expl reason compadd user dep ;;
+          *) _message -e values value ;;
+        esac
+      ;;
+      3:(copy|rename)*) desc='new key';&
+      2:(^(info|sync)))
+        _wanted -x keys expl "${desc:-key}" compadd \
+          checksum_data checksum_type command_line from_repo from_repo_revision \
+          from_repo_timestamp reason releasever installonly origin_url changed_by && ret=0
+      ;;
+      *) _yum_act_on_installed_pkgs && ret=0 ;;
+    esac
+  fi
+  return ret
 }
 
 (( $+functions[_yum_command] )) || _yum_command()

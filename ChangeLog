@@ -1,5 +1,8 @@
 2018-03-28  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42549: Completion/Redhat/Command/_yum: also handle the yumdb
+	command in yum completion
+
 	* 42550: Completion/Unix/Command/_gem: completion for ruby's gem
 
 	* 42539: Src/utils.c: prevent overflow of PATH_MAX-sized
