@@ -1,5 +1,7 @@
 2018-03-28  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42548: Completion/Unix/Command/_pwgen: new pwgen completion
+
 	* 42549: Completion/Redhat/Command/_yum: also handle the yumdb
 	command in yum completion
 
