@@ -1,3 +1,7 @@
+2018-03-29  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 42564: Completion/Unix/Command/_adb: Various improvements
+
 2018-03-28  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 42548: Completion/Unix/Command/_pwgen: new pwgen completion

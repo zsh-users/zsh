@@ -1,12 +1,11 @@
 #compdef adb -value-,ADB_TRACE,-default- -value-,ANDROID_SERIAL,-default- -value-,ANDROID_LOG_TAGS,-default-
 
-local ADB_DEVICE_SPECIFICATION LOG_REDIRECT
-
 _adb() {
   # rely on localoptions
   setopt nonomatch
 
-  ADB_DEVICE_SPECIFICATION=""
+  local -a ADB_DEVICE_SPECIFICATION
+  local LOG_REDIRECT
 
   if [[ $1 = -l ]]; then
     # Run to load _adb and associated functions but do
@@ -23,7 +22,6 @@ _adb() {
 
       (ANDROID_SERIAL)
       _adb_device_serial
-      ADB_DEVICE_SPECIFICATION="-s ${ANDROID_SERIAL}"
       ;;
 
       (ANDROID_LOG_TAGS)
@@ -80,18 +78,18 @@ _adb() {
 
   (( $+functions[_adb_device_specification] )) && _adb_device_specification
 
-  adb ${=ADB_DEVICE_SPECIFICATION} shell exit 2>/dev/null || {
+  if ! adb ${ADB_DEVICE_SPECIFICATION} shell exit 2>/dev/null; then
       # early bail-out until a single valid device/emulator is specified and up-and-running
-      _message -r "No (started) device specified, completions do not yet work"
+      [[ $words[CURRENT-1] = -s ]] || _message -r "No (started) device specified, completions do not yet work"
       _arguments \
-	'(-d -e   )-s[serial]: :_adb_device_serial' \
-	'(   -e -s)-d[device]' \
-	'(-d    -s)-e[emulator]' \
+	'-s[serial]: :_adb_device_serial' \
+	'(   -e)-d[device]' \
+	'(-d   )-e[emulator]' \
 	'1:options:_adb_options_handler' \
 	'*: : _default'
       
-      return;
-  }
+      return
+  fi
   
   (( $+functions[_adb_check_log_redirect] )) && _adb_check_log_redirect
 
@@ -163,27 +161,13 @@ _adb_sanitize_context () {
 
 (( $+functions[_adb_device_specification] )) ||
 _adb_device_specification () {
-  local integer i=1
-  foreach word ($words)
-  do
-    i=$(( ++i ))
-    case ${words[$i]} in
-      (-d|-e)
-        ADB_DEVICE_SPECIFICATION="${words[$i]}"
-        break
-        ;;
-      (-s)
-        ADB_DEVICE_SPECIFICATION="-s ${words[$i + 1]}"
-        break
-        ;;
-      (-*)
-        continue
-        ;;
-      (*)
-        break
-        ;;
-    esac
-  done
+  local -a word
+  word=($words[(R)-[des]])
+  if [[ $words[(R)-s] == -s ]]; then
+    local i=$words[(I)-s]
+    word=($words[i,i+1])
+  fi
+  ADB_DEVICE_SPECIFICATION=($word)
 }
 
 (( $+functions[_adb_dispatch_shell] )) ||
@@ -230,8 +214,10 @@ _adb_pm_list () {
       ;;
     (features)
       ;;
+    (users)
+      ;;
     (*)
-      _wanted pm_list_argument expl 'pm list argument' compadd packages permission-groups permissions instrumentation features
+      _wanted pm_list_argument expl 'pm list argument' compadd packages permission-groups permissions instrumentation features users
       ;;
   esac
 }
@@ -319,16 +305,10 @@ _adb_package_manager_handler () {
 
 (( $+functions[_adb_dispatch_uninstall] )) ||
 _adb_dispatch_uninstall () {
-  argcount=${#${(M)words#-*}}
-  if [[ $CURRENT -gt (( argcount + 2 )) ]]
-  then
-    _message -r "Notice: you can only uninstall one package at a time" 
-     return
-  fi
-
   _arguments \
 	'-k[keep data and cache]' \
-        '*:installed package:_adb_installed_packages'
+  '--user[uninstall for user id]:user id:_adb_users' \
+        '1:installed package:_adb_installed_packages'
 }
 
 (( $+functions[_adb_dispatch_install] )) ||
@@ -390,7 +370,7 @@ _adb_dispatch_connection_handling () {
 
 (( $+functions[_adb_check_log_redirect] )) ||
 _adb_check_log_redirect () {
-  LOG_REDIRECT=${$(adb ${=ADB_DEVICE_SPECIFICATION} shell getprop log.redirect-stdio 2>/dev/null)//
+  LOG_REDIRECT=${$(adb ${ADB_DEVICE_SPECIFICATION} shell getprop log.redirect-stdio 2>/dev/null)//
 /}
   [[ ${LOG_REDIRECT[1,4]} == "true" ]] &&  _message -r "Notice: stdio log redirection enabled on the device, so some completions will not work"
 }
@@ -414,18 +394,27 @@ _adb_trace_opts() {
 (( $+functions[_adb_device_serial] )) ||
 _adb_device_serial() {
   local expl
-  _wanted dev_serial expl 'available devices' compadd $(command adb devices | sed -n 's/^\([^[:space:]]*\)\t.*$/\1/p') 
+  local -a devices device_desc
+  local device
+  devices=( $(adb devices -l | sed -n 's/^\([^[:space:]]*\)[[:space:]]*.*product:\([^[:space:]]*\).*$/\1:\2/p') )
+  zstyle -a :completion:${curcontext} device-names device_desc
+  for device in $device_desc; do
+    if [[ -n $devices[(r)${device%:*}:*] ]]; then
+      devices[(i)${device%:*}:*]=$device
+    fi
+  done
+  _describe -t dev_serial 'available devices' devices
 }
 
 (( $+functions[_adb_logcat_filter_specification] )) ||
 _adb_logcat_filter_specification() {
   zstyle ":completion:${curcontext}:" cache-policy _adb_cache_policy_single_command
 
-  local cacheid=logcat_filter_cache_${$(adb ${=ADB_DEVICE_SPECIFICATION} get-serialno)}
+  local cacheid=logcat_filter_cache_${$(adb ${ADB_DEVICE_SPECIFICATION} get-serialno)}
   typeset -a logcat_filter_tags
   if _cache_invalid "$cacheid" || ! _retrieve_cache "$cacheid"
   then
-    logcat_filter_tags=( $(command adb ${=ADB_DEVICE_SPECIFICATION} logcat -d | sed -n 's#^[VDIWEF]/\([^[:space:](]*\).*#\1#p' |sort | uniq) )
+    logcat_filter_tags=( $(command adb ${ADB_DEVICE_SPECIFICATION} logcat -d -v brief | sed -n 's#^[VDIWEF]/\([^[:space:](]*\).*#\1#p' |sort | uniq) )
     _store_cache "$cacheid" logcat_filter_tags
   fi
   local expl
@@ -466,7 +455,7 @@ _adb_shell_commands_handler() {
 
 (( $+functions[_adb_device_available] )) ||
 _adb_device_available() {
-  [[ $(adb ${=ADB_DEVICE_SPECIFICATION} get-state 2>&1) == "device" ]] && return 0
+  [[ $(adb ${ADB_DEVICE_SPECIFICATION} get-state 2>&1) == "device" ]] && return 0
   return 1
 }
 
@@ -480,7 +469,7 @@ _adb_remote_folder () {
     pref=${pref%/*}/
   fi
   # yes, this ls is sickening to look at, but android doesn't have printf or find
-  files=(${${(f)"$(adb ${=ADB_DEVICE_SPECIFICATION} shell 'ls -1d 2> /dev/null '$pref'*/ '$pref'*')"}%$'\r'})
+  files=(${${(f)"$(adb ${ADB_DEVICE_SPECIFICATION} shell 'ls -1d 2> /dev/null '$pref'*/ '$pref'*')"}%$'\r'})
   dirs=(${${(M)files:#*/}%/})
   files=(${${files:|dirs}:#*\*(/|)})
   _adb_device_available && \
@@ -495,15 +484,22 @@ _adb_installed_packages() {
     zstyle ":completion:${curcontext}:" cache-policy _adb_cache_policy_single_command
   fi
 
-  local cacheid=package_cache_${$(adb ${=ADB_DEVICE_SPECIFICATION} get-serialno)}
+  local cacheid=package_cache_${$(adb ${ADB_DEVICE_SPECIFICATION} get-serialno)}
   typeset -a installed_packages
   if _cache_invalid "$cacheid" || ! _retrieve_cache "$cacheid"
   then
-    installed_packages=(${$( adb ${=ADB_DEVICE_SPECIFICATION} shell pm list packages )//#package:/})
+    installed_packages=(${$( adb ${ADB_DEVICE_SPECIFICATION} shell pm list packages )//#package:/})
     _store_cache "$cacheid" installed_packages
   fi
  
   _wanted adb_installed_packages expl 'packages that are installed' compadd ${installed_packages}
+}
+
+(( $+functions[_adb_users] )) ||
+_adb_users() {
+  local -a users
+  users=( ${${${(M)${(f)"$(adb shell pm list users)"}:#*UserInfo*}#*UserInfo\{}%:*} )
+  _describe -t users 'users' users
 }
 
 (( $+functions[_adb_cache_policy_single_command] )) ||
