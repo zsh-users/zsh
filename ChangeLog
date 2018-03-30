@@ -1,5 +1,8 @@
 2018-03-30  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42569: Completion/Unix/Command/_lsof: improve completion after
+	-i and -s options
+
 	* 42567: Completion/Unix/Command/_xmlstarlet: new completion
 	for xmlstarlet
 
