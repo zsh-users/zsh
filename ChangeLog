@@ -1,3 +1,7 @@
+2018-03-30  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 42566: Completion/Unix/Command/_strings: new strings completion
+
 2018-03-29  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 42564: Completion/Unix/Command/_adb: Various improvements
