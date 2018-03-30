@@ -1,5 +1,9 @@
 2018-03-30  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42570: Completion/Unix/Command/_drill,
+	Completion/Unix/Command/_dig, Completion/Unix/Type/_dns_types:
+	new completion for drill and factor out DNS type completion
+
 	* 42560: Src/utils.c: silence sign-compare compiler warnings
 
 	* 42566: Completion/Unix/Command/_strings: new strings completion
