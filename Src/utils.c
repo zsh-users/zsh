@@ -4396,7 +4396,7 @@ spname(char *oldname)
      * Rationale for this, if there ever was any, has been forgotten.    */
     for (;;) {
 	while (*old == '/') {
-	    if ((new - newname) >= (sizeof(newname)-1))
+            if (new >= newname + sizeof(newname) - 1)
 		return NULL;
 	    *new++ = *old++;
 	}
@@ -4427,7 +4427,7 @@ spname(char *oldname)
 	    if (bestdist < maxthresh) {
 		struncpy(&new, spnameguess, sizeof(newname) - (new - newname));
 		struncpy(&new, old, sizeof(newname) - (new - newname));
-		return (new - newname) >= (sizeof(newname)-1) ? NULL : newname;
+		return (new >= newname + sizeof(newname) -1) ? NULL : newname;
 	    } else
 	    	return NULL;
 	} else {
@@ -4435,7 +4435,7 @@ spname(char *oldname)
 	    bestdist += thisdist;
 	}
 	for (p = spnamebest; (*new = *p++);) {
-	    if ((new - newname) >= (sizeof(newname)-1))
+	    if (new >= newname + sizeof(newname) - 1)
 		return NULL;
 	    new++;
 	}
