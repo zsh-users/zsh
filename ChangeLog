@@ -1,5 +1,7 @@
 2018-03-30  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42568: Completion/Unix/Command/_shutdown: new completion
+
 	* 42569: Completion/Unix/Command/_lsof: improve completion after
 	-i and -s options
 
