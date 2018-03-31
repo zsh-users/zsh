@@ -1,3 +1,8 @@
+2018-03-31  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 42571: Completion/BSD/Command/_jail,
+	Completion/BSD/Command/_jexec: new completion for FreeBSD jail
+
 2018-03-30  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 42568: Completion/Unix/Command/_shutdown: new completion

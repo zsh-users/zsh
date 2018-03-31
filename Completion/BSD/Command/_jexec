@@ -4,7 +4,7 @@ _jexec_normal() {
   local PATH=$PATH
   local -a _comp_priv_prefix
   # relative paths are relative to the jail's root
-  path=( "$(command jls -j $words[1] path)"/$^path )
+  path=( "$(_call_program paths jls -j $words[1] path)"/$^path )
   shift 1 words; (( CURRENT-- ))
   _normal
 }
