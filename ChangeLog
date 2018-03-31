@@ -1,5 +1,14 @@
 2018-03-31  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42572: Completion/Linux/Command/_ethtool,
+	Completion/Linux/Command/_ss, Completion/Unix/Command/_arping,
+	Completion/Unix/Command/_mosh, Completion/Unix/Command/_notmuch,
+	Completion/Unix/Command/_mpc, Completion/Unix/Command/_objdump,
+	Completion/Unix/Command/_prove, Completion/Unix/Command/_rsync,
+	Completion/Unix/Command/_readelf, Completion/Unix/Command/_ruby,
+	Completion/Unix/Command/_strip, Completion/Unix/Command/_vim,
+	Completion/X/Command/_evince: various completion option updates
+
 	* 42571: Completion/BSD/Command/_jail,
 	Completion/BSD/Command/_jexec: new completion for FreeBSD jail
 

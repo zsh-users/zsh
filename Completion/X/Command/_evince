@@ -5,12 +5,8 @@ _arguments -s -S \
   '--version[display version information]' \
   {-h,--help}'[display help information]' \
   '--help-all[display help on all options]' \
-  '--help-sm-client[display help on session management options]' \
   '--help-gtk[display help on GTK+ options]' \
   - normal \
-  '--sm-client-disable[disable connection to session manager]' \
-  '--sm-client-state-file=[specify file containing saved configuration]:file:_files' \
-  '--sm-client-id=[specify session management ID]:id' \
   '--class=[specify program class as used by the window manager]:class' \
   '--name=[program name as used by the window manager]:name:_x_name' \
   '--gdk-debug=[specify GDK debugging flags to set]:flag' \

@@ -149,6 +149,7 @@ _rsync() {
     '(--devices --specials)-D[same as --devices --specials]' \
     '(-D)--devices[preserve devices]' \
     '--no-devices[turn off --devices]' \
+    '--copy-devices[copy device contents as regular file]' \
     '(-D)--specials[preserve special files]' \
     '--no-specials[turn off --specials]' \
     '--no-D[turn off --devices and --specials]' \
@@ -161,7 +162,8 @@ _rsync() {
     '(-n --dry-run)'{-n,--dry-run}'[show what would have been transferred]' \
     '(-W --whole-file)'{-W,--whole-file}'[copy files whole (without delta-transfer algorithm)]' \
     {--no-W,--no-whole-file}'[turn off --whole-file]' \
-    '(-x --one-file-system)'{-x,--one-file-system}'[do not cross filesystem boundaries]' \
+    '--checksum-choice=[choose the checksum algorithms]:algorithm:_sequence -n 2 compadd - auto md4 md5 none' \
+    '(-x --one-file-system)'{-x,--one-file-system}"[don't cross filesystem boundaries]" \
     '(-B --block-size)'{-B,--block-size=}'[force a fixed checksum block-size]:block size' \
     '(-e --rsh)'{-e+,--rsh=}'[specify the remote shell to use]:remote-shell command:(rsh ssh)' \
     '--rsync-path=[specify path to rsync on the remote machine]:remote command' \
@@ -190,9 +192,9 @@ _rsync() {
     '--numeric-ids[do not map uid/gid values by user/group name]' \
     '--timeout=[set I/O timeout in seconds for lulls in a transfer]:seconds' \
     '--contimeout=[set connect timeout in seconds for daemon connections]:seconds' \
-    '(-I --ignore-times)'{-I,--ignore-times}'[do not skip files that match in size and mod-time]' \
+    '(-I --ignore-times)'{-I,--ignore-times}"[don't skip files that match in size and mod-time]" \
     '--size-only[skip files that match in size]' \
-    '--modify-window=[compare mod-times with reduced accuracy]:seconds' \
+    '(-@ --modify-window)'{-@+,--modify-window=}'[compare mod-times with reduced accuracy]:seconds' \
     '(-y --fuzzy)'{-y,--fuzzy}'[find similar file for basis if no destination file]' \
     '(--copy-dest --link-dest)*--compare-dest=[also compare destination files relative to specified directory]:directory:_directories' \
     '(--compare-dest --link-dest)*--copy-dest=[like --compare-dest, but also includes copies of unchanged files]:directory:_directories' \
@@ -240,6 +242,7 @@ _rsync() {
     '--preallocate[preallocate the full length of new files]' \
     '--iconv=[request charset conversion of filenames]:number' \
     '--checksum-seed=:number' \
+    "--noatime[don't alter atime when opening source files]" \
     '--read-batch=[read a batched update from the specified file]:file:_files'
 }
 

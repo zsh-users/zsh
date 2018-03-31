@@ -29,6 +29,7 @@ _arguments -s -S  -A "-*" \
   '-D[display answers as exclamation marks and missing packets as dots]' \
   '-e[like -a but beep when there is no reply]' \
   "-F[don't try to be smart about the interface name]" \
+  '-g+[specify group to setgid() to]:group [nobody]:_groups' \
   '-m+[specify type of timestamp for incoming packets]:timestamp type' \
   '(:)-B[255.255.255.255]' \
   '-0[source 0.0.0.0]' \
@@ -36,6 +37,7 @@ _arguments -s -S  -A "-*" \
   '-S+[set source IP]:source IP address:_hosts' \
   '-T+[target IP]:target IP address:_hosts' \
   '-p[turn on promiscuous mode]' \
+  '-Q+[specify 802.1p priority to set]:priority [0]' \
   '-s[set source MAC address]:source MAC address' \
   '-t[set target MAC address]:target MAC address' \
   '-c[send this many requests]:count' \
@@ -45,7 +47,8 @@ _arguments -s -S  -A "-*" \
   '-P[send ARP replies instead of requests]' \
   '-u[show index=received/sent instead of just index=received when pinging MACs]' \
   '-U[send unsolicited ARP]' \
-  '-w+[specify time to wait between pings (ms)]:time (ms)' \
+  '-V+[specify VLAN tag to set]:vlan' \
+  '-w+[specify time to wait between pings (microseconds)]:time (microseconds)' \
   '-W+[specify time to wait between pings (seconds)]:time (seconds)' \
   '(-B):address:_hosts'
  

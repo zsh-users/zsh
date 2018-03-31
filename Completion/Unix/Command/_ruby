@@ -1,4 +1,4 @@
-#compdef ruby irb erb -P (ruby|[ei]rb)[0-9.]# -value-,RUBY(LIB|OPT|PATH),-default-
+#compdef ruby irb erb ruby-mri -P (ruby|[ei]rb)[0-9.]# -value-,RUBY(LIB|OPT|PATH),-default-
 
 local curcontext="$curcontext" state line expl desc RUBY ret=1
 typeset -A opt_args
@@ -41,6 +41,7 @@ opts=(
   '(1 * -)--copyright[print the copyright]'
   --{en,dis}'able=[enable or disable features]:feature:(gems did_you_mean rubyopt frozen_string_literal all)'
   \!--{en,dis}able-{gems,rubyopt,all}
+  '--dump=[dump debug information]:information:_sequence compadd - insns yydebug parsetree parsetree_with_comment'
   --{external,internal}'-encoding=:charset:->charsets'
   '!'{-y,--yydebug}
   '!--dump=:target:(version copyright usage yydebug syntax parsetree parsetree_with_comment insns)'

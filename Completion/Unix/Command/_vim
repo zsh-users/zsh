@@ -40,6 +40,7 @@ arguments=(
   '(-A -H   )-F[start in Farsi mode]'
   '-T[set terminal type]:::_terminals'
   '--not-a-term[skip warning for input/output not being a terminal]'
+  '--ttyfail[exit if input or output is not a terminal]'
   '-u[use given vimrc file instead of default .vimrc]::rc file:_files'
   "--noplugin[don't load plugin scripts]"
   '-o-[number of windows to open (default: one for each file)]::window count: '
@@ -70,6 +71,7 @@ arguments=(
   '--startuptime[write startup timing messages to given file]:log file:_files'
   '--socketid[run GVIM in another window]'
   '-i[use specified viminfo file]:viminfo file [~/.viminfo]:_files'
+  '--clean[defaults, no plugins, no viminfo]'
   '(- *)'{-h,--help}'[print help and exit]'
   '(- *)--version[print version information and exit]'
   '(* -q)-t[edit file where tag is defined]:tag:_complete_tag'

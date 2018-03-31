@@ -1,6 +1,6 @@
 #compdef objdump eu-objdump llvm-objdump
 
-local opts args files variant curcontext=$context state state_descr line
+local opts args files variant curcontext=$context state state_descr line ret=1
 typeset -A opt_args
 
 files='*:object file:_object_files'
@@ -148,23 +148,23 @@ case $variant in
   ;;
 esac
 
-_arguments $opts -C : "$args[@]" $files && return 0
+_arguments $opts -C : "$args[@]" $files && ret=0
 
 case "$state" in
   short_dwarf_names)
-    _values -s "" "dwarf section" "l[rawline]" "L[decodedline]" "i[info]" "a[abbrev]" "p[pubnames]" "r[aranges]" "m[macro]" "f[frames]" "F[frames-interp]" "s[str]" "o[loc]" "R[Ranges]" "t[pubtypes]"
+    _values -s "" "dwarf section" "l[rawline]" "L[decodedline]" "i[info]" "a[abbrev]" "p[pubnames]" "r[aranges]" "m[macro]" "f[frames]" "F[frames-interp]" "s[str]" "o[loc]" "R[Ranges]" "t[pubtypes]" "U[trace_info]" "u[trace_abbrev]" "g[gdb_index]" "T[trace_aranges]" "A[addr]" "c[cu_index]" "k[links]" "K[follow-links]" && ret=0
   ;;
   dwarf_names)
-    _values -s , "dwarf section" rawline decodedline info abbrev pubnames aranges macro frames frames-interp str loc Ranges pubtypes gdb_index trace_info trace_abbrev trace_aranges addr cu_index
+    _values -s , "dwarf section" rawline decodedline info abbrev pubnames aranges macro frames frames-interp str loc Ranges pubtypes gdb_index trace_info trace_abbrev trace_aranges addr cu_index links follow-links && ret=0
   ;;
   bfdname)
-    _values "object format" "${(z)${(@M)${(f)$(_call_program targets objdump --help)}##* supported targets:*}##*: }"
+    _values "object format" "${(z)${(@M)${(f)$(_call_program targets objdump --help)}##* supported targets:*}##*: }" && ret=0
   ;;
   machine)
-    _values "machine architecture" "${(@)${(z)${(@M)${(f)$(_call_program targets objdump --help)}##* supported architectures:*}##*: }//:/\\:}"
+    _values "machine architecture" "${(@)${(z)${(@M)${(f)$(_call_program targets objdump --help)}##* supported architectures:*}##*: }//:/\\:}" && ret=0
   ;;
   disassembler_options)
-    _values -s , "disassembler options" "${(@)${(@)${(@M)${(f)${(ps.-M switch.)$(_call_program targets objdump --help)}[2]}:#  [^ ]*}#  }%% *}"
+    _values -s , "disassembler options" "${(@)${(@)${(@M)${(f)${(ps.-M switch.)$(_call_program targets objdump --help)}[2]}:#  [^ ]*}#  }%% *}" && ret=0
   ;;
   llvm_targets)
     _values "target architecture" "${(z)${(@)${(f)$(_call_program targets
@@ -172,4 +172,4 @@ case "$state" in
   ;;
 esac
 
- 
+return ret

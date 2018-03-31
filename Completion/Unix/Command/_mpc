@@ -53,6 +53,7 @@ _mpc_command() {
     play:"start playing"
     playlist:"print the current playlist"
     prev:"play the previous song in the current playlist"
+    prio:"change song priorities in the queue"
     random:"toggle random mode, or specify state"
     repeat:"toggle repeat mode, or specify state"
     single:"toggle single mode, or specify state"

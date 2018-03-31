@@ -6,12 +6,16 @@ _notmuch_commands()
   notmuch_commands=(
     'setup:interactively set up notmuch for first use'
     'new:find and import any new message to the database'
+    'insert:add a new message into the maildir and notmuch database'
     'search:search for messages matching the search terms, display matching threads as results'
+    'address:get addresses from messages matching the given search terms'
     'reply:constructs a reply template for a set of messages'
     'show:show all messages matching the search terms'
     'tag:add or remove tags for all messages matching the search terms'
     'dump:creates a plain-text dump of the tags of each message'
     'restore:restores the tags from the given file'
+    'compact:compact the notmuch database'
+    'reindex:re-index all messages matching the search terms'
     'help:show details on a command'
     'compact:compact the notmuch database'
     'config:access the notmuch configuration file'
@@ -30,7 +34,9 @@ _notmuch_help_topics()
 {
   local -a notmuch_help_topics
   notmuch_help_topics=(
-    'search-terms:show common search-terms syntax'
+    'search-terms:common search-term syntax'
+    'hooks:hooks that will be run before or after certain commands'
+    'properties:message property conventions and documentation'
   )
   _describe -t notmuch-help-topics 'topic' notmuch_help_topics
 }

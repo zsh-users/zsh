@@ -33,10 +33,11 @@ _arguments -C -s \
   "($info -d --dccp)"{-d,--dccp}'[display DCCP sockets]' \
   "($info -w --raw)"{-w,--raw}'[display RAW sockets]' \
   "($info -x --unix)"{-x,--unix}'[display Unix domain sockets]' \
-  "($info -f --family)"{-f,--family}'[display sockets of specified type]:family:(unix inet inet6 link netlink unix)' \
+  "($info)--vsock[display only vsock sockets]' \
+  "($info -f --family)"{-f,--family}'[display sockets of specified type]:family:(unix inet inet6 link netlink unix vsock)' \
   "($info -K --kill)"{-K,--kill}'[forcibly close sockets, display what was closed]' \
   "($info -H --no-header)"{-H,--no-header}'[suppress header line]' \
-  "($info -A --query --socket)"{-A,--query,--socket}'[specify socket tables to show]: :_values -s , socket\ table all inet tcp udp raw unix packet netlink unix_dgram unix_stream unix_seqpacket packet_raw packet_dgram' \
+  "($info -A --query --socket)"{-A,--query,--socket}'[specify socket tables to show]: :_values -s , socket\ table all inet tcp udp raw unix packet netlink unix_dgram unix_stream unix_seqpacket packet_raw packet_dgram vsock_stream vsock_dgram' \
   "($info -D)"{-D,--diag=}'[dump raw info to file]:file:_files' \
   "($info -F)"{-F,--filter=}'[read filter information from a file]:file:_files' \
   "($info)*: :->filter" && ret=0
@@ -78,7 +79,7 @@ if [[ -n $state ]]; then
   state|exclude)
     _wanted states expl state compadd -M 'm:{a-zA-Z_}={A-Za-z-}' \
       ESTABLISHED SYN-SENT SYN-RECV FIN-WAIT-1 FIN-WAIT-2 TIME-WAIT \
-      CLOSED CLOSE-WAIT LAST-ACK LISTEN CLOSING \
+      CLOSED CLOSE-WAIT LAST-ACK LISTENING CLOSING \
       all connected synchronized bucket big && ret=0
   ;;
   *)

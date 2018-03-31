@@ -19,8 +19,8 @@ args=(
   '(-c --archive-index)'{-c,--archive-index}'[show symbol/file index in an archive]'
   \*{-x,--hex-dump=}"[dump contents of specified section as bytes]:section:($sections)"
   \*{-p,--string-dump=}"[dump contents of specified section as strings]:section:($sections)"
-  '-w+[show the contents of DWARF2 debug sections]::debug section:(l L i a p r m f F s o R t)'
-  '--debug-dump=[show the contents of DWARF2 debug sections]::section:(rawline decodedline info abbrev pubnames aranges macro frames frames-interp str loc Ranges pubtypes gdb_index trace_info trace_abbrev trace_aranges)'
+  '-w+[show the contents of DWARF2 debug sections]::debug section:(l L i a p r m f F s o R t U u T g A c k K)'
+  '--debug-dump=[show the contents of DWARF2 debug sections]::section:(rawline decodedline info abbrev pubnames aranges macro frames frames-interp str loc Ranges pubtypes gdb_index trace_info trace_abbrev trace_aranges addr cu_index links follow-links)'
   '(-I --histogram)'{-I,--histogram}'[show histogram of bucket list lengths]'
   '(-W --wide)'{-W,--wide}'[allow output width to exceed 80 characters]'
   '(- *)'{-H,--help}'[display help information]'

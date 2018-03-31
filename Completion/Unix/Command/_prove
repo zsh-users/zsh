@@ -46,6 +46,7 @@ _arguments \
   {-a,--archive}'[store output in archive file]:file:_files' \
   {-j,--jobs}'[run N jobs in parallel]:jobs:' \
   '*--state=[control persistent state]: :_values -s , state last failed passed all hot todo slow fast new old fresh save' \
+  '--statefile=[specify file to use instead of .prove]:state file:_files' \
   '--rc=[custom rcfile]:file:_files' \
   '*--rules=[limit tests run (or not) in parallel]:rules' \
   '*:file or directory:_files'
