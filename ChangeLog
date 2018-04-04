@@ -1,5 +1,7 @@
 2018-04-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: 5.4.2-test-2.
+
 	* 42581(?): Src/hist.c, Src/lex.c, Test/X03zlebindkey.ztst: history
 	expansion within ZLE needs history to be read to conclusion on
 	error.
