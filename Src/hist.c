@@ -465,8 +465,26 @@ herrflush(void)
 {
     inpopalias();
 
-    while (!lexstop && inbufct && !strin)
-	hwaddc(ingetc());
+    if (lexstop)
+	return;
+    /*
+     * The lex_add_raw test is needed if we are parsing a command
+     * substitution when expanding history for ZLE: strin is set but we
+     * need to finish off the input because the string we are reading is
+     * going to be used directly in the line that goes to ZLE.
+     *
+     * Note that this is a side effect --- this is not the usual reason
+     * for testing lex_add_raw which is to add the text to a different
+     * buffer used when we are actually parsing the command substituion
+     * (nothing to do with ZLE).  Sorry.
+     */
+    while (inbufct && (!strin || lex_add_raw)) {
+	int c = ingetc();
+	if (!lexstop) {
+	    hwaddc(c);
+	    addtoline(c);
+	}
+    }
 }
 
 /*

@@ -1,3 +1,9 @@
+2018-04-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 42581(?): Src/hist.c, Src/lex.c, Test/X03zlebindkey.ztst: history
+	expansion within ZLE needs history to be read to conclusion on
+	error.
+
 2018-03-31  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 42572: Completion/Linux/Command/_ethtool,

@@ -126,3 +126,20 @@
 >CURSOR: 1
 >BUFFER: ホ
 >CURSOR: 1
+
+  zpty_run 'bindkey " " magic-space'
+  setopt interactivecomments
+  zletest 'echo $(( x ) x ) y'
+  zletest 'echo $(( ##x ) ##x ) y'
+  unsetopt interactivecomments
+  zletest 'echo $(( x ) x ) y'
+  zletest 'echo $(( ##x ) ##x ) y'
+0:history expansion of failed command substitution using magic-space binding
+>BUFFER: echo $(( x ) x ) y
+>CURSOR: 18
+>BUFFER: echo $(( ##x ) ##x ) y
+>CURSOR: 22
+>BUFFER: echo $(( x ) x ) y
+>CURSOR: 18
+>BUFFER: echo $(( ##x ) ##x ) y
+>CURSOR: 22

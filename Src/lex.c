@@ -158,7 +158,7 @@ mod_export int nocomments;
 /* add raw input characters while parsing command substitution */
 
 /**/
-static int lex_add_raw;
+int lex_add_raw;
 
 /* variables associated with the above */
 
