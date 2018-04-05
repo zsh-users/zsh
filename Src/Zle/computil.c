@@ -2675,7 +2675,7 @@ bin_comparguments(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 
 	    for (; lstate; lstate = lstate->snext) {
 		if (lstate->actopts &&
-		    (lstate->opt || lstate->def ||
+		    (lstate->opt || (ca_doff && lstate->def) ||
 		     (lstate->def && lstate->def->opt &&
 		      (lstate->def->type == CAA_OPT ||
 		       (lstate->def->type >= CAA_RARGS &&

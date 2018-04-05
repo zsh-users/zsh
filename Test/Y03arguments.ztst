@@ -184,6 +184,12 @@
 0:sticky option argument
 >line: {tst -x }{}
 
+ tst_arguments '-x:arg' -y -z
+ comptest $'tst -x -\t'
+0:option argument with prefix that passes option prefix-needed test
+>line: {tst -x -}{}
+>DESCRIPTION:{arg}
+
  tst_arguments '-x[desc]'
  comptest $'tst -x\t'
 0:end of option sequence
@@ -720,6 +726,15 @@ F:shouldn't offer -t in the first case (with stacked options)
 0:partial completion of option with an argument
 >line: {tst --prefix=one }{}
 >line: {tst --prefix=one --prop=}{}
+
+ tst_arguments -s -W -a+:arg -b
+ comptest $'tst -a\t'
+0:with -W options mixed with arguments
+>line: {tst -a}{}
+>DESCRIPTION:{arg}
+>DESCRIPTION:{option}
+>NO:{-b}
+
 
 %clean
 
