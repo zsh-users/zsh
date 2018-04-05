@@ -1,5 +1,9 @@
 2018-04-05  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42582: Completion/BSD/Command/_cu, Completion/Unix/Command/_uniq,
+	Completion/Unix/Command/_dhclient, Completion/Unix/Command/_script:
+	updates to options in completions for OpenBSD 6.3
+
 	* 42575: Src/Zle/computil.c, Test/Y03arguments.ztst: fix to not
 	complete options in the argument to another option
 

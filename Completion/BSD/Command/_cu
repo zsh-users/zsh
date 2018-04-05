@@ -1,7 +1,26 @@
 #compdef cu
 
-_arguments -s -A '-*' \
-  '-d[do not block waiting for a carrier to be detected]' \
+local args
+
+case $OSTYPE in
+  openbsd*)
+    args+=(
+      "-d[don't block waiting for a carrier to be detected]"
+      '-r[start cu in restricted mode - prevent local operations]'
+    )
+  ;;
+  (net|free)bsd*)
+    args+=(
+      '-a[set the acu port]:acu'
+      '(-o)-e[use even parity]'
+      '-h[echo characters locally]'
+      '(-e)-o[use odd parity]'
+      '-t[connect via a hard-wired connection to a host on a dial-up line]'
+    )
+  ;;
+esac
+
+_arguments -s -A '-*' $args \
   '-l[line to use]:line:(/dev/(cuaU#<->|ttyS<->)(N%c))' \
   '-s[line speed]:line speed:_baudrates' \
   '(-*)1:host:'

@@ -42,11 +42,13 @@ case $OSTYPE in
       '(-d -p)-r[record a session with input, output and timing data]'
     )
   ;|
-  netbsd*)
+  netbsd*|openbsd*)
     args+=(
-      '-f[flush output after each write]'
       '-c[run specified command instead of a shell]:command:_cmdstring'
     )
+  ;|
+  netbsd*)
+    args+=( '-f[flush output after each write]' )
   ;|
   freebsd*)
     args+=(
