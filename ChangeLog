@@ -17,6 +17,8 @@
 
 2018-04-05  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
+	* 42590: Completion/Unix/Command/_fmt: fix detection of OSTYPE
+
 	* 42585 (cf. 42574: Eitan Adler): Completion/Unix/Command/_tar,
 	Completion/Unix/Type/_tar_archive: complete all compressed
 	archives when libarchive-based tar is being used without
