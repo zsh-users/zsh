@@ -21,7 +21,7 @@ local _tar_cmd tf tmp tmpb del index
 # from some of the possible long options, and from the second word if
 # that does not start with a hyphen.
 
-if _pick_variant gnu=GNU unix --version; then
+if _pick_variant gnu=GNU libarchive=libarchive unix --version; then
   case "$($service --version)" in
     ("tar (GNU tar) "(#b)([0-9.-]##)*)
     autoload -z is-at-least
