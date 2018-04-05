@@ -2,6 +2,8 @@
 
 	* 42577: Completion/Unix/Command/_strings: fix macOS support
 
+	* 42578: Completion/Unix/Command/_shutdown: add support for macOS
+
 2018-04-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: 5.4.2-test-2.

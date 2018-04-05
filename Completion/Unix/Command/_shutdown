@@ -17,15 +17,19 @@ if [[ -d /etc/systemd ]]; then
 fi
 
 case $OSTYPE in
-  *bsd*|dragonfly*|linux*)
+  *bsd*|dragonfly*|linux*|darwin*)
     args=(
       '-h[halt the system after shutdown]'
-      '-p[turn off power after shutdown]'
       '-r[reboot the system]'
       '-k[kick everybody off]'
       '-n[prevent file system cache from being flushed]'
       '1: :_guard "^-*" "time (now/hh\:mm/+mins)"'
       '*:warning message'
+    )
+  ;|
+  *bsd*|dragonfly*|linux*)
+    args=(
+      '-p[turn off power after shutdown]'
     )
   ;|
   (net|open)bsd*)
@@ -46,6 +50,13 @@ case $OSTYPE in
       '-x[enable debug console messages]'
       '-z[silence some console messages]'
       '-D[prevent shutdown from detaching from the tty]'
+    )
+  ;;
+  darwin*)
+    args+=(
+      '-o[execute halt or reboot instead of sending a signal to launchd]'
+      '-s[put the system to sleep]'
+      '-u[with -h, wait 5 minutes before removing power]'
     )
   ;;
   solaris2.<11->) args=( '(-i)-r[reboot]' ) ;&
