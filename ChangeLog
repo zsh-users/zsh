@@ -1,3 +1,7 @@
+2018-04-05  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 42577: Completion/Unix/Command/_strings: fix macOS support
+
 2018-04-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: 5.4.2-test-2.

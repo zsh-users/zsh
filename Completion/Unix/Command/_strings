@@ -56,9 +56,9 @@ else
     '-a[look everywhere in file, not just initialised data space of object files]'
   )
   case $OSTYPE in
-    darwin)
+    darwin*)
       local -a arch
-      arch=( ${${${"$(_call_program architectures strings -arch \? 2>&1)"}#*flags are: }%%$'\n'*} )
+      arch=( ${(z)${${"$(_call_program architectures strings -arch - 2>&1)"}#*flags are: }%%$'\n'*} all )
       args+=( '-arch[specify the architecture]:architecture:compadd -a arch' )
     ;;
   esac
