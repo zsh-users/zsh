@@ -1,6 +1,6 @@
-#compdef ssh slogin=ssh scp ssh-add ssh-agent ssh-keygen sftp ssh-copy-id
+#compdef ssh slogin=ssh scp ssh-add ssh-agent ssh-copy-id ssh-keygen ssh-keyscan sftp
 
-# TODO: sshd, ssh-keyscan, ssh-keysign
+# TODO: sshd, ssh-keysign
 
 _ssh () {
   local curcontext="$curcontext" state line expl suf ret=1
@@ -187,7 +187,20 @@ _ssh () {
       "($cmn -I -h -n -O -V)-k[generate a KRL file]" \
       "$p1($cmn -I -h -n -O -V)-u[update a KRL]"
     return
-    ;;
+  ;;
+  ssh-keyscan)
+    _arguments \
+      '(-6)-4[forces ssh to use IPv4 addresses only]' \
+      '(-4)-6[forces ssh to use IPv6 addresses only]' \
+      '-c[request certificates from target hosts instead of plain keys]' \
+      '*-f+[read hosts from file, one per line]:file:_files' \
+      '-H[hash all hostnames and addresses in the output]' \
+      '-p+[specify port on remote host]:port number on remote host' \
+      '-T+[specify timeout]:timeout (seconds) [5]' \
+      '-t+[specify key types to fetch from scanned hosts]:key type:_sequence compadd - rsa dsa ecdsa ed25519' \
+      '-v[verbose mode]'
+    return
+  ;;
   sftp)
     _arguments -C -s \
       '-a[attempt to continue interrupted transfers]' \
@@ -199,10 +212,15 @@ _ssh () {
       '-s+[SSH2 subsystem or path to sftp server on the remote host]:subsystem/path' \
       '1:file:->rfile' '*:file:->file' "$common[@]" "$common_transfer[@]" && ret=0
     ;;
-  (ssh-copy-id)
+  ssh-copy-id)
     _arguments \
-      '-i+[select identity file]:SSH identity file:_files' \
-      ':remote host name:->userhost' \
+      '-i+[select identity file]:SSH identity file:_files -g "*(-.^AR)"' \
+      '-f[copy keys without trying to check if they are already installed]' \
+      '-n[dry run - no keys are actually copied]' \
+      '*-o+[specify ssh options]:option string:->option' \
+      '-p+[specify port on remote host]:port number on remote host' \
+      '(- 1)'{-h,-\?}'[display usage information]' \
+      ':remote host name:->userhost' && ret=0
     ;;
   esac
 
