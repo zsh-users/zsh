@@ -1,5 +1,7 @@
 2018-04-05  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42583: Completion/Unix/Command/_column: new column completion
+
 	* 42582: Completion/BSD/Command/_cu, Completion/Unix/Command/_uniq,
 	Completion/Unix/Command/_dhclient, Completion/Unix/Command/_script:
 	updates to options in completions for OpenBSD 6.3
