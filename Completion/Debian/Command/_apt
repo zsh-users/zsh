@@ -411,7 +411,7 @@ _apt-cmd () {
       /$'(install|download|source|build-dep)\0'/ -'subcmd=${match%?}' \
       /$'[^\0]#\0'/ ':packages::_deb_packages -qr "\n\t\- /=" "$expl_packages[@]" avail' \# \
       \( \
-	// '%(.|)/%' -'[[ $subcmd = install ]]' /'[]'/ ':files:package file:_files -g "*.deb(-.)"' \| \
+	// '%(.|)/%' -'[[ $subcmd = install ]]' /'[]'/ ':files:package file:_files -g "*.(changes|deb|dsc)(-.)"' \| \
 	/$'[^\0/=]#\/'/ /'[]'/ ':apt-releases:release name:_apt_releases' \| \
 	/$'[^\0/=]#='/ /'[]'/ ':apt-package-versions:package version:_apt_versions_of_binary_package' \| \
       \) \

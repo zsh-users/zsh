@@ -1,5 +1,8 @@
 2018-04-05  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42591: Completion/Debian/Command/_apt: complete *.changes and
+	*.dsc files alongside *.deb
+
 	* 42584: Completion/Unix/Command/_ssh: complete options for
 	ssh-keyscan and update options for ssh-copy-id
 
