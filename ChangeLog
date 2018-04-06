@@ -7,6 +7,11 @@
 	* github #24: Klas Mellbourn: Completion/X/Command/_code:
 	Add completion script for Visual Studio Code
 
+2018-04-06  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 42602: Completion/Unix/Command/_gcc: Update _gcc as of GCC
+	7.3.0 for generic options and x86
+
 2018-04-05  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 42591: Completion/Debian/Command/_apt: complete *.changes and
