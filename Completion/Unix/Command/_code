@@ -4,7 +4,7 @@ local arguments
 
 arguments=(
   '(-d --diff)'{-d,--diff}'[compare two files with each other]:file to compare:_files:file to compare with:_files'
-  '(-a --add)'\*{-a,--add}'[add specified directory (or directories) to the last active window.]:directory:_directories'
+  \*{-a,--add}'[add specified directory to the last active window.]:directory:_directories'
   '(-g --goto)'{-g,--goto}'[open a file at the path on the specified line and character position]:file\:line[\:character]:_files -r \:'
   '(-n --new-window -r --reuse-window)'{-n,--new-window}'[open a new window]'
   '(-n --new-window -r --reuse-window)'{-r,--reuse-window}'[open a file or directory in the last active window]'
@@ -16,8 +16,8 @@ arguments=(
   '--extensions-dir[specify the root path for extensions]:root path:_directories'
   '--list-extensions[list the installed extensions]'
   '--show-versions[show versions of installed extensions, when using --list-extension]'
-  '--install-extension[specify extension to install]:id or path:_files -g "*.vsix"'
-  '--uninstall-extension[specify extension to uninstall]:id or path:_files -g "*.vsix"'
+  '--install-extension[specify extension to install]:id or path:_files -g "*.vsix(-.)"'
+  '--uninstall-extension[specify extension to uninstall]:id or path:_files -g "*.vsix(-.)"'
   '--enable-proposed-api[enable proposed api features for specified extension]:extension id:'
   '--verbose[print verbose output (implies --wait)]'
   '--log[specify log level to use]:level [info]:(critical error warn info debug trace off)'
