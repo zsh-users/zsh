@@ -158,7 +158,8 @@ setpmmapfiles(Param pm, HashTable ht)
 
 		setpmmapfile(v.pm, ztrdup(getstrvalue(&v)));
 	    }
-    deleteparamtable(ht);
+    if (ht != pm->u.hash)
+	deleteparamtable(ht);
 }
 
 /**/

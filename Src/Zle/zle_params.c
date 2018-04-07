@@ -124,7 +124,7 @@ static const struct gsu_array killring_gsu =
 static const struct gsu_scalar register_gsu =
 { strgetfn, set_register, unset_register };
 static const struct gsu_hash registers_gsu =
-{ hashgetfn, set_registers, zleunsetfn };
+{ hashgetfn, set_registers, unset_registers };
 
 /* implementation is in zle_refresh.c */
 static const struct gsu_array region_highlight_gsu =
@@ -837,7 +837,17 @@ set_registers(UNUSED(Param pm), HashTable ht)
 
 	    set_register(v.pm, getstrvalue(&v));
         }
-    deleteparamtable(ht);
+    if (ht != pm->u.hash)
+	deleteparamtable(ht);
+}
+
+/**/
+static void
+unset_registers(Param pm, int exp)
+{
+    stdunsetfn(pm, exp);
+    deletehashtable(pm->u.hash);
+    pm->u.hash = NULL;
 }
 
 static void

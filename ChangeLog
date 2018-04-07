@@ -1,5 +1,8 @@
 2018-04-07  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42605: Src/Modules/mapfile.c, Src/Zle/complete.c,
+	Src/Zle/zle_params.c: properly free the vi registers hash
+
 	* 42601: Src/builtin.c: tidy up code for set -A/+A to not
 	increment a NULL pointer and to be more efficient
 

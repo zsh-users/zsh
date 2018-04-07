@@ -1325,7 +1325,8 @@ set_compstate(UNUSED(Param pm), HashTable ht)
 
 		    break;
 		}
-    deleteparamtable(ht);
+    if (ht != pm->u.hash)
+	deleteparamtable(ht);
 }
 
 /**/
