@@ -1,0 +1,79 @@
+#compdef vmctl
+
+local context line state state_descr
+local -a subcommands vmctl_status
+local -A opt_args
+
+_vm_name() {
+  compadd "$@" - ${${${(@f)"$(_call_program vmctl_status vmctl status)"}[2,-1]}##* }
+}
+
+_vm_switch() {
+  [[ -r /etc/vm.conf ]] &&
+  compadd "$@" - ${${${(M)${(f)"$(</etc/vm.conf)"}:#switch *}##switch ##\"#}%%\"# *}
+}
+
+subcommands=(
+  console:'connect to the console of the VM'
+  create:'create a VM disk image'
+  load:'load additional configuration'
+  log:'change logging verbosity'
+  pause:'pause a VM'
+  receive:'receive a VM from stdin'
+  reload:'remove stopped VMs and reload config'
+  reset:'reset specified component'
+  send:'send VM to stdout and terminate it'
+  {show,status}:'list VMs running or just the specified id'
+  start:'start a VM'
+  stop:'stop a VM'
+  unpause:'unpause a VM'
+)
+
+if (( CURRENT == 2 )); then
+  _describe subcommand subcommands
+else
+  shift words; (( CURRENT-- ))
+  case $words[1] in
+    console|pause|send|show|status|stop|unpause)
+      _arguments ':id:_vm_name'
+      ;;
+    create)
+      _arguments \
+        ':path:_files' \
+        ': :(-s)' \
+        ':disk size in megabytes: '
+      ;;
+    load)
+      _arguments ':configuration file:_files'
+      ;;
+    log)
+      _arguments ':logging verbosity:(brief verbose)'
+      ;;
+    receive)
+      _arguments ':name: '
+      ;;
+    reset)
+      _arguments ':reset option:((
+        all\:"reset the running state"
+        switches\:"reset the configured switches"
+        vms\:"reset and terminate all VMs"
+      ))'
+      ;;
+    start)
+      if (( CURRENT == 2 )); then
+        _vm_name
+      else
+        shift words; (( CURRENT-- ))
+        _arguments -s \
+          '-b+[boot with the specified kernel or BIOS image]:boot image:_files' \
+          '-c[automatically connect to the VM console]' \
+          '*-d+[disk image file]:disk image:_files' \
+          '-i+[number of network interfaces]:number: ' \
+          '-L[add a local network interface]' \
+          '-m+[memory size in megabytes]:megabytes: ' \
+          '-n+[specify switch to attach]:switch:_vm_switch' \
+	  '-r+[ISO image file for virtual CD-ROM]:ISO image:_files'
+      fi
+      ;;
+  esac
+fi
