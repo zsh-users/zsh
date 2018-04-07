@@ -2486,9 +2486,7 @@ zstrtoul_underscore(const char *s, zulong *retval)
 	base = 2, s++;
     else
 	base = isset(OCTALZEROES) ? 8 : 10;
-    if (base < 2 || base > 36) {
-	return 0;
-    } else if (base <= 10) {
+    if (base <= 10) {
 	for (; (*s >= '0' && *s < ('0' + base)) ||
 		 *s == '_'; s++) {
 	    if (*s == '_')
