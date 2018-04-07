@@ -1,5 +1,8 @@
 2018-04-07  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42601: Src/builtin.c: tidy up code for set -A/+A to not
+	increment a NULL pointer and to be more efficient
+
 	* 42607, CVE-2018-1100: Src/utils.c: check bounds on buffer
 	in mail checking
 

@@ -695,13 +695,11 @@ bin_set(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	char **a = NULL, **y;
 	int len = arrlen(args);
 
-	if (array < 0 && (a = getaparam(arrayname))) {
-	    int al = arrlen(a);
-
-	    if (al > len)
-		len = al;
+	if (array < 0 && (a = getaparam(arrayname)) && arrlen_gt(a, len)) {
+	    a += len;
+	    len += arrlen(a);
 	}
-	for (x = y = zalloc((len + 1) * sizeof(char *)); len--; a++) {
+	for (x = y = zalloc((len + 1) * sizeof(char *)); len--;) {
 	    if (!*args)
 		args = a;
 	    *y++ = ztrdup(*args++);
