@@ -1,5 +1,8 @@
 2018-04-07  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42607, CVE-2018-1100: Src/utils.c: check bounds on buffer
+	in mail checking
+
 	* 42600: Src/Zle/computil.c: error paths for _values leaked
 	the exclusion list array
 

@@ -1653,7 +1653,7 @@ checkmailpath(char **s)
 	    LinkList l;
 	    DIR *lock = opendir(unmeta(*s));
 	    char buf[PATH_MAX * 2 + 1], **arr, **ap;
-	    int ct = 1;
+	    int buflen, ct = 1;
 
 	    if (lock) {
 		char *fn;
@@ -1662,9 +1662,11 @@ checkmailpath(char **s)
 		l = newlinklist();
 		while ((fn = zreaddir(lock, 1)) && !errflag) {
 		    if (u)
-			sprintf(buf, "%s/%s?%s", *s, fn, u);
+			buflen = snprintf(buf, sizeof(buf), "%s/%s?%s", *s, fn, u);
 		    else
-			sprintf(buf, "%s/%s", *s, fn);
+			buflen = snprintf(buf, sizeof(buf), "%s/%s", *s, fn);
+		    if (buflen < 0 || buflen >= (int)sizeof(buf))
+			continue;
 		    addlinknode(l, dupstring(buf));
 		    ct++;
 		}
