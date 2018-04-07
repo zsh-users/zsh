@@ -3216,7 +3216,7 @@ assignaparam(char *s, char **val, int flags)
      * This only applies if the flag ASSPM_KEY_VALUE is passed in,
      * indicating prefork() detected this syntax.
      *
-     * For associative arrays we just junk the Makrer elements.
+     * For associative arrays we just junk the Marker elements.
      */
     if (flags & ASSPM_KEY_VALUE) {
 	char **aptr;
@@ -3243,6 +3243,7 @@ assignaparam(char *s, char **val, int flags)
 			(!isset(KSHARRAYS) && *iptr == 0)) {
 			unqueue_signals();
 			zerr("bad subscript for direct array assignment: %s", *aptr);
+			freearray(val);
 			return NULL;
 		    }
 		    if (!isset(KSHARRAYS))
@@ -3260,6 +3261,7 @@ assignaparam(char *s, char **val, int flags)
 	    fullval = zshcalloc((maxlen+1) * sizeof(char *));
 	    if (!fullval) {
 		zerr("array too large");
+		freearray(val);
 		return NULL;
 	    }
 	    fullval[maxlen] = NULL;

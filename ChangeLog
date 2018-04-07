@@ -1,5 +1,7 @@
 2018-04-07  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42597: Src/params.c: plug memory leak found by coverity
+
 	* 42595: Src/utils.c: remove dead code flagged by coverity
 
 	* Matthew Martin: 42604: Completion/BSD/Command/_signify,
