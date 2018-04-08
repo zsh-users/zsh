@@ -1,3 +1,8 @@
+2018-04-08  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* c.f. 42499: tera torn: Completion/Unix/Command/_twisted:
+	update twisted completion stub for new twist command
+
 2018-04-07  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 42605: Src/Modules/mapfile.c, Src/Zle/complete.c,
