@@ -1540,17 +1540,20 @@ if test -z "$sigfile_list"; then
 /usr/include/bits/signum.h
 /dev/null"
 fi
-for SIGNAL_H in $sigfile_list
+for SIGNAL_TRY_H in $sigfile_list
 do
   dnl Try to make sure it doesn't get confused by files that don't
   dnl have real signal definitions in, but do #define SIG* by counting
   dnl the number of signals.  Maybe we could even check for e.g. SIGHUP?
-  nsigs=`test -f $SIGNAL_H && \
-  grep '#[ 	]*define[ 	][ 	]*SIG[0-9A-Z]*[ 	]*[0-9][0-9]*' $SIGNAL_H | \
+  nsigs=`test -f $SIGNAL_TRY_H && \
+  grep '#[ 	]*define[ 	][ 	]*SIG[0-9A-Z]*[ 	]*[0-9][0-9]*' $SIGNAL_TRY_H | \
   wc -l | sed 's/[ 	]//g'`
-  test "x$nsigs" != x && test "$nsigs" -ge 7 && break
+  if test "x$nsigs" != x && test "$nsigs" -ge 7
+  then
+    SIGNAL_H="$SIGNAL_H $SIGNAL_TRY_H"
+  fi
 done
-if test x$SIGNAL_H = x"/dev/null"; then
+if test x$SIGNAL_H = x; then
   AC_MSG_ERROR(SIGNAL MACROS NOT FOUND:  please report to developers)
 fi
 zsh_cv_path_signal_h=$SIGNAL_H
