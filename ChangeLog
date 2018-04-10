@@ -1,3 +1,7 @@
+2018-04-09  Eric Cook  <llua@gmx.com>
+	* 42613: pda: Completion/Linux/Command/_ss
+	fix quoting typo
+
 2018-04-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: release zsh-5.5.
