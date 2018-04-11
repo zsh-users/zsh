@@ -1553,12 +1553,12 @@ do
     SIGNAL_H="$SIGNAL_H $SIGNAL_TRY_H"
   fi
 done
-if test x$SIGNAL_H = x; then
+if test "x$SIGNAL_H" = x; then
   AC_MSG_ERROR(SIGNAL MACROS NOT FOUND:  please report to developers)
 fi
-zsh_cv_path_signal_h=$SIGNAL_H
+zsh_cv_path_signal_h="$SIGNAL_H"
 ])
-SIGNAL_H=$zsh_cv_path_signal_h
+SIGNAL_H="$zsh_cv_path_signal_h"
 AC_SUBST(SIGNAL_H)dnl
 
 dnl Where are error names located?  Needed as input for errnames1.awk

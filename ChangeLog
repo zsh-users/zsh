@@ -1,3 +1,8 @@
+2018-04-11  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 42623: configure.ac: some extra quotes needed (and some
+	cosmetic) for 42618.
+
 2018-04-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Benedikt Morbach: 42618: configure.ac: support signal names
