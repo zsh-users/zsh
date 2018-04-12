@@ -32,9 +32,7 @@ arguments=('-P[parent process id]:parent process id:->ppid'
      '-x[match exactly]'
      '-z[match only in zones]:zone:_zones')
 
-if [[ $service == 'pkill' ]]; then
-  arguments+=('-'${^signals}'[signal]')
-elif [[ $service == 'pgrep' ]]; then
+if [[ $service == 'pgrep' ]]; then
   arguments+=('-d[output delimiter]:delimiter:compadd ${(s\:\:)IFS}'
         '-l[list name in addition to id]')
 fi
@@ -64,8 +62,12 @@ case "$OSTYPE" in
     optchars="flvxdnoPgsuUGt"
     ;;
 esac
+# Only keep relevant arguments according to $optchars.
 arguments=( ${(M)arguments:#(|\*)(|\(*\))-[$optchars]*}
      '*:process name:->pname')
+if [[ $service == 'pkill' ]]; then
+  arguments+=('-'${^signals}'[signal]')
+fi
 
 _arguments -C -s -w $arguments && ret=0
 

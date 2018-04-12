@@ -1,3 +1,8 @@
+2018-04-13  Daniel Hahler  <zsh@thequod.de>
+
+	* 42631: Completion/Unix/Command/_pgrep: _pgrep: pkill: fix completion
+	of signals.
+
 2018-04-12  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 42624 (plus test): Src/exec.c, Test/C04funcdef.ztst: avoid
