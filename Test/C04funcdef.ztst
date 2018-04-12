@@ -43,6 +43,16 @@
 0:Function definition without braces
 >bar
 
+  a a b() {
+    read word
+    print $0: $word
+  } <<<redirection
+  b
+  a
+0:Multiple function definition with duplicate name and redirection
+>b: redirection
+>a: redirection
+
   functions -M m1
   m1() { (( $# )) }
   print $(( m1() ))

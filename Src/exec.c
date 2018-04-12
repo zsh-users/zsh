@@ -5042,7 +5042,7 @@ execfuncdef(Estate state, Eprog redir_prog)
     Shfunc shf;
     char *s = NULL;
     int signum, nprg, sbeg, nstrs, npats, len, plen, i, htok = 0, ret = 0;
-    int nfunc = 0, anon_func = 0;
+    int anon_func = 0;
     Wordcode beg = state->pc, end;
     Eprog prog;
     Patprog *pp;
@@ -5118,12 +5118,16 @@ execfuncdef(Estate state, Eprog redir_prog)
 	/*
 	 * redir_prog is permanently allocated --- but if
 	 * this function has multiple names we need an additional
-	 * one.
+	 * one. Original redir_prog used with the last name
+	 * because earlier functions are freed in case of duplicate
+	 * names.
 	 */
-	if (nfunc++ && redir_prog)
+	if (names && nonempty(names) && redir_prog)
 	    shf->redir = dupeprog(redir_prog, 0);
-	else
+	else {
 	    shf->redir = redir_prog;
+	    redir_prog = 0;
+	}
 	shfunc_set_sticky(shf);
 
 	if (!names) {
@@ -5203,7 +5207,7 @@ execfuncdef(Estate state, Eprog redir_prog)
     }
     if (!anon_func)
 	setunderscore("");
-    if (!nfunc && redir_prog) {
+    if (redir_prog) {
 	/* For completeness, shouldn't happen */
 	freeeprog(redir_prog);
     }
