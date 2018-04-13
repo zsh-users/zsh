@@ -260,7 +260,7 @@ upline(char **args)
 	else
 	    CCRIGHT();
 #endif
-	    
+
     }
     return n;
 }
@@ -1671,7 +1671,7 @@ doisearch(char **args, int dir, int pattern)
 	    }
 	    set_isrch_spot(top_spot++, hl, pos, pat_hl, pat_pos, end_pos,
 			   zlemetacs, sbptr, dir, nomatch);
-	    if (sbptr >= sibuf - FIRST_SEARCH_CHAR - 2 
+	    if (sbptr >= sibuf - FIRST_SEARCH_CHAR - 2
 #ifdef MULTIBYTE_SUPPORT
 		- 2 * (int)MB_CUR_MAX
 #endif

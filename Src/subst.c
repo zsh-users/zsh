@@ -1789,7 +1789,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
     int aspar = 0;
     /*
      * The (%) flag, c.f. mods again.
-     */	
+     */
     int presc = 0;
     /*
      * The (g) flag.  Process escape sequences with various GETKEY_ flags.
@@ -2322,7 +2322,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		globsubst = 2;
 	} else if (c == '+') {
 	    /*
-	     * Return whether indicated parameter is set. 
+	     * Return whether indicated parameter is set.
 	     * Try to handle this when parameter is named
 	     * by (P) (second part of test).
 	     */
@@ -2340,7 +2340,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	    }
 	} else if (inbrace && inull(*s)) {
 	    /*
-	     * Handles things like ${(f)"$(<file)"} by skipping 
+	     * Handles things like ${(f)"$(<file)"} by skipping
 	     * the double quotes.  We don't need to know what was
 	     * actually there; the presence of a String or Qstring
 	     * is good enough.

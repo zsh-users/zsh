@@ -204,7 +204,7 @@ bin_zselect(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		    int found = 0;
 
 		    convbase(buf, fd, 10);
-		    for (nptr = firstnode(fdlist); nptr; 
+		    for (nptr = firstnode(fdlist); nptr;
 			 nptr = nextnode(nextnode(nptr))) {
 			if (!strcmp((char *)getdata(nptr), buf)) {
 			    /* Already there, add new character. */

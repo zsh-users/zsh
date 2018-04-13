@@ -75,7 +75,7 @@ mod_export char *origline;
 mod_export int origcs, origll;
 
 /* Words on the command line, for use in completion */
- 
+
 /**/
 mod_export int clwsize, clwnum, clwpos;
 /**/
@@ -2296,7 +2296,7 @@ doexpansion(char *s, int lst, int olst, int explincmd)
 	goto end;
     }
     if (lst == COMP_LIST_EXPAND) {
-	/* Only the list of expansions was requested. Restore the 
+	/* Only the list of expansions was requested. Restore the
          * command line. */
         zlemetacs = 0;
         foredel(zlemetall, CUT_RAW);

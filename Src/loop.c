@@ -31,17 +31,17 @@
 #include "loop.pro"
 
 /* # of nested loops we are in */
- 
+
 /**/
 int loops;
- 
+
 /* # of continue levels */
- 
+
 /**/
 mod_export int contflag;
- 
+
 /* # of break levels */
- 
+
 /**/
 mod_export int breaks;
 
@@ -154,7 +154,7 @@ execfor(Estate state, int do_exec)
 		name = (char *)getdata(node);
 		if (!args || !(str = (char *) ugetnode(args)))
 		{
-		    if (count) { 
+		    if (count) {
 			str = "";
 			last = 1;
 		    } else

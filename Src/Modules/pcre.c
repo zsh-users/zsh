@@ -78,13 +78,13 @@ bin_pcre_compile(char *nam, char **args, Options ops, UNUSED(int func))
     int pcre_opts = 0, pcre_errptr, target_len;
     const char *pcre_error;
     char *target;
-    
+
     if(OPT_ISSET(ops,'a')) pcre_opts |= PCRE_ANCHORED;
     if(OPT_ISSET(ops,'i')) pcre_opts |= PCRE_CASELESS;
     if(OPT_ISSET(ops,'m')) pcre_opts |= PCRE_MULTILINE;
     if(OPT_ISSET(ops,'x')) pcre_opts |= PCRE_EXTENDED;
     if(OPT_ISSET(ops,'s')) pcre_opts |= PCRE_DOTALL;
-    
+
     if (zpcre_utf8_enabled())
 	pcre_opts |= PCRE_UTF8;
 
@@ -118,7 +118,7 @@ bin_pcre_compile(char *nam, char **args, Options ops, UNUSED(int func))
 	zwarnnam(nam, "error in regex: %s", pcre_error);
 	return 1;
     }
-    
+
     return 0;
 }
 
@@ -136,7 +136,7 @@ bin_pcre_study(char *nam, UNUSED(char **args), UNUSED(Options ops), UNUSED(int f
 	zwarnnam(nam, "no pattern has been compiled for study");
 	return 1;
     }
-    
+
     if (pcre_hints)
 #ifdef PCRE_CONFIG_JIT
 	pcre_free_study(pcre_hints);
@@ -151,7 +151,7 @@ bin_pcre_study(char *nam, UNUSED(char **args), UNUSED(Options ops), UNUSED(int f
 	zwarnnam(nam, "error while studying regex: %s", pcre_error);
 	return 1;
     }
-    
+
     return 0;
 }
 
@@ -377,7 +377,7 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
     else {
 	zwarnnam(nam, "error in pcre_exec [%d]", ret);
     }
-    
+
     if (ovec)
 	zfree(ovec, ovecsize*sizeof(int));
 

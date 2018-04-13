@@ -655,7 +655,7 @@ scanner(Complist q, int shortcircuit)
 		memcpy((char *)&errsfound, fn, sizeof(int));
 		fn += sizeof(int);
 		/* scan next level */
-		scanner((q->closure) ? q : q->next, shortcircuit); 
+		scanner((q->closure) ? q : q->next, shortcircuit);
 		if (shortcircuit && shortcircuit == matchct)
 		    return;
 		pathbuf[pathpos = oppos] = '\0';
@@ -1772,7 +1772,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 			    qfirst = qn;
 			    for (qlast = qfirst; qlast->next;
 				 qlast = qlast->next)
-				;			    
+				;
 			} else
 			    qfirst = dup_qual_list(qn, &qlast);
 			/* ... link into new `or' chain ... */

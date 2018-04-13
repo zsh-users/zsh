@@ -34,7 +34,7 @@
 
 /**/
 mod_export int emulation;
- 
+
 /* current sticky emulation:  sticky = NULL means none */
 
 /**/

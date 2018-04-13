@@ -153,7 +153,7 @@ gettermcap(UNUSED(HashTable ht), const char *name)
     if ((termflags & TERM_UNKNOWN) && (isset(INTERACTIVE) || !init_term()))
 	return NULL;
 
-    
+
     nameu = dupstring(name);
     unmetafy(nameu, &len);
 

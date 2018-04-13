@@ -832,7 +832,7 @@ bin_zpty(char *nam, char **args, Options ops, UNUSED(int func))
 	    zwarnnam(nam, "pty command name already used: %s", *args);
 	    return 1;
 	}
-	return newptycmd(nam, *args, args + 1, OPT_ISSET(ops,'e'), 
+	return newptycmd(nam, *args, args + 1, OPT_ISSET(ops,'e'),
 			 OPT_ISSET(ops,'b'));
     } else {
 	Ptycmd p;

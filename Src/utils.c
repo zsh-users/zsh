@@ -1124,7 +1124,7 @@ finddir_scan(HashNode hn, UNUSED(int flags))
 
 /*
  * See if a path has a named directory as its prefix.
- * If passed a NULL argument, it will invalidate any 
+ * If passed a NULL argument, it will invalidate any
  * cached information.
  *
  * s here is metafied.
@@ -4122,7 +4122,7 @@ makebangspecial(int yesno)
     /* Name and call signature for congruence with makecommaspecial(),
      * but in this case when yesno is nonzero we defer to the state
      * saved by inittyptab().
-     */ 
+     */
     if (yesno == 0) {
 	typtab[bangchar] &= ~ISPECIAL;
     } else if (typtab_flags & ZTF_BANGCHAR) {

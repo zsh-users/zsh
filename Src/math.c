@@ -35,10 +35,10 @@ struct mathvalue;
 #include <math.h>
 
 /* nonzero means we are not evaluating, just parsing */
- 
+
 /**/
 int noeval;
- 
+
 /* integer zero */
 
 /**/
@@ -56,7 +56,7 @@ mnumber lastmathval;
 
 /**/
 int lastbase;
- 
+
 static char *ptr;
 
 static mnumber yyval;
@@ -226,7 +226,7 @@ static int c_prec[TOKCOUNT] =
  *                    CID (identifier with '#'), FUNC (math function)
  * 1   Opening parenthesis: M_INPAR '('  (for convenience, not an operator)
  * 2   Unary operators: PREPLUS/POSTPLUS '++', PREMINUS/POSTMINUS '--',
- *                      NOT '!', COMP '~', UPLUS '+', UMINUS '-' 
+ *                      NOT '!', COMP '~', UPLUS '+', UMINUS '-'
  * 3   SHLEFT '<<', SHRIGHT '>>'
  * 4   AND '&'
  * 5   XOR '^'
@@ -1383,7 +1383,7 @@ bop(int tk)
 
     if (stack[sp].val.type == MN_UNSET)
 	*spval = getmathparam(stack + sp);
-    tst = (spval->type & MN_FLOAT) ? (zlong)spval->u.d : spval->u.l; 
+    tst = (spval->type & MN_FLOAT) ? (zlong)spval->u.d : spval->u.l;
 
     switch (tk) {
     case DAND:

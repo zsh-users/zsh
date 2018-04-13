@@ -188,7 +188,7 @@ mod_export char *zlenoargs[1] = { NULL };
 static char **raw_lp, **raw_rp;
 
 /*
- * File descriptors we are watching as well as the terminal fd. 
+ * File descriptors we are watching as well as the terminal fd.
  * These are all for reading; we don't watch for writes or exceptions.
  */
 /**/

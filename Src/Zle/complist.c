@@ -45,7 +45,7 @@
  *           horizontally this applies both the screen and the logical array.
  * mline:    The line for the selected completion in the logical array of
  *           all matches, not all of which may be on screen at once.
- * mcols:    Local copy of columns used in sizing arrays. 
+ * mcols:    Local copy of columns used in sizing arrays.
  * mlines:   The number of lines in the logical array of all matches,
  *           initialised from listdat.nlines.
  */
@@ -204,7 +204,7 @@ static char *colnames[] = {
 
 static char *defcols[] = {
     "0", "0", "1;31", "1;36", "33", "1;35", "1;33", "1;33", NULL, NULL,
-    "37;41", "30;43", "30;42", "34;42", "37;44", "1;32", 
+    "37;41", "30;43", "30;42", "34;42", "37;44", "1;32",
     "\033[", "m", NULL, "0", "0", "7", NULL, NULL, "0"
 };
 
@@ -516,7 +516,7 @@ getcols(void)
 	    mcolors.files[i] = filecol("");
 	mcolors.pats = NULL;
 	mcolors.exts = NULL;
-	
+
 	if ((s = tcstr[TCSTANDOUTBEG]) && s[0]) {
 	    mcolors.files[COL_MA] = filecol(s);
 	    mcolors.files[COL_EC] = filecol(tcstr[TCSTANDOUTEND]);
@@ -633,19 +633,19 @@ doiscol(int pos)
 	    zlrputs(curiscols[--curiscol]);
 	}
     }
-    while (((fi = (endpos[curisbeg] < begpos[curisbeg] || 
+    while (((fi = (endpos[curisbeg] < begpos[curisbeg] ||
 		  begpos[curisbeg] == -1)) ||
 	    pos == begpos[curisbeg]) && *patcols) {
 	if (!fi) {
 	    int i, j, e = endpos[curisbeg];
-	    
+
 	    /* insert e in sendpos */
 	    for (i = curissend; sendpos[i] <= e; ++i)
 		;
 	    for (j = MAX_POS - 1; j > i; --j)
 		sendpos[j] = sendpos[j-1];
 	    sendpos[i] = e;
-	    
+
 	    zcputs(NULL, COL_NO);
 	    zlrputs(*patcols);
 	    curiscols[++curiscol] = *patcols;
@@ -2137,7 +2137,7 @@ adjust_mcol(int wish, Cmatch ***tabp, Cmgroup **grp)
 	*grp = *grp + c - mcol;
 
     mcol = c;
-    
+
     return 0;
 }
 
@@ -2414,7 +2414,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	wasmeta = 0;
 	metafy_line();
     }
-    
+
     if ((s = getsparam("MENUSCROLL"))) {
 	if (!(step = mathevali(s)))
 	    step = (zterm_lines - nlnct) >> 1;
@@ -2951,7 +2951,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    do {
 		if (mline == mlines - 1) {
 		    if (wrap & 2) {
-			mline = omline; 
+			mline = omline;
 			p = op;
 			break;
 		    }
@@ -2986,7 +2986,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    do {
 		if (!mline) {
 		    if (wrap & 2) {
-			mline = omline; 
+			mline = omline;
 			p = op;
 			break;
 		    }

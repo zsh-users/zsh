@@ -60,17 +60,17 @@ mod_export int tokfd;
 zlong toklineno;
 
 /* lexical analyzer error flag */
- 
+
 /**/
 mod_export int lexstop;
 
 /* if != 0, this is the first line of the command */
- 
+
 /**/
 mod_export int isfirstln;
- 
+
 /* if != 0, this is the first char of the command (not including white space) */
- 
+
 /**/
 int isfirstch;
 
@@ -85,7 +85,7 @@ int inalmore;
  * set when we detect a lookahead that stops the word from
  * needing correction.
  */
- 
+
 /**/
 int nocorrect;
 
@@ -789,7 +789,7 @@ gettok(void)
 		     */
 		    tokstr = NULL;
 		    return INPAR;
-		    
+
 		case CMD_OR_MATH_ERR:
 		    /*
 		     * LEXFLAGS_ACTIVE means we came from bufferwords(),
@@ -942,7 +942,7 @@ gettokstr(int c, int sub)
 	int act;
 	int e;
 	int inbl = inblank(c);
-	
+
 	if (fdpar && !inbl && c != ')')
 	    fdpar = 0;
 

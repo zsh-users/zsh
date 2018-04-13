@@ -215,7 +215,7 @@ math_func(char *name, int argc, mnumber *argv, int id)
       case BF_POS:
 	  rtst = (argd <= 0.0);
 	  break;
-	  
+
       case BF_NONNEG:
 	  rtst = (argd < 0.0);
 	  break;
@@ -358,7 +358,7 @@ math_func(char *name, int argc, mnumber *argv, int id)
 
   case MF_ILOGB:
       ret.type = MN_INTEGER;
-      ret.u.l = ilogb(argd); 
+      ret.u.l = ilogb(argd);
       break;
 
   case MF_INT:
@@ -399,7 +399,7 @@ math_func(char *name, int argc, mnumber *argv, int id)
       break;
 
   case MF_LOGB:
-      retd = logb(argd); 
+      retd = logb(argd);
       break;
 
   case MF_NEXTAFTER:

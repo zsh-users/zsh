@@ -612,7 +612,7 @@ bin_rm(char *nam, char **args, Options ops, UNUSED(int func))
     rmm.opt_force = OPT_ISSET(ops,'f');
     rmm.opt_interact = OPT_ISSET(ops,'i') && !OPT_ISSET(ops,'f');
     rmm.opt_unlinkdir = OPT_ISSET(ops,'d');
-    err = recursivecmd(nam, OPT_ISSET(ops,'f'), 
+    err = recursivecmd(nam, OPT_ISSET(ops,'f'),
 		       OPT_ISSET(ops,'r') && !OPT_ISSET(ops,'d'),
 		       OPT_ISSET(ops,'s'),
 	args, recurse_donothing, rm_dirpost, rm_leaf, &rmm);

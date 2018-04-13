@@ -187,7 +187,7 @@ scanterminfo(UNUSED(HashTable ht), ScanFunc func, int flags)
 	"da", "db", "mir", "msgr", "nxon", "xsb", "npc", "ndscr", "nrrmc",
 	"os", "mc5i", "xvpa", "sam", "eslok", "hz", "ul", "xon", NULL};
 #endif
-    
+
 #ifndef HAVE_NUMNAMES
     static char *numnames[] = {
 	"cols", "it", "lh", "lw", "lines", "lm", "xmc", "ma", "colors",

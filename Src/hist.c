@@ -55,7 +55,7 @@ void (*hwend) _((void));
 void (*addtoline) _((int));
 
 /* != 0 means history substitution is turned off */
- 
+
 /**/
 mod_export int stophist;
 
@@ -83,7 +83,7 @@ mod_export int excs, exlast;
  * Note curhist is passed to zle on variable length argument list:
  * type must match that retrieved in zle_main_entry.
  */
- 
+
 /**/
 mod_export zlong curhist;
 
@@ -101,25 +101,25 @@ zlong histlinect;
 HashTable histtab;
 /**/
 mod_export Histent hist_ring;
- 
+
 /* capacity of history lists */
- 
+
 /**/
 zlong histsiz;
- 
+
 /* desired history-file size (in lines) */
- 
+
 /**/
 zlong savehistsiz;
- 
+
 /* if = 1, we have performed history substitution on the current line *
  * if = 2, we have used the 'p' modifier                              */
- 
+
 /**/
 int histdone;
- 
+
 /* state of the history mechanism */
- 
+
 /**/
 int histactive;
 
@@ -154,22 +154,22 @@ short *chwords;
 int chwordlen, chwordpos;
 
 /* the last l for s/l/r/ history substitution */
- 
+
 /**/
 char *hsubl;
 
 /* the last r for s/l/r/ history substitution */
- 
+
 /**/
 char *hsubr;
- 
+
 /* pointer into the history line */
- 
+
 /**/
 mod_export char *hptr;
- 
+
 /* the current history line */
- 
+
 /**/
 mod_export char *chline;
 
@@ -194,14 +194,14 @@ mod_export char *zle_chline;
 
 /**/
 int qbang;
- 
+
 /* max size of histline */
- 
+
 /**/
 int hlinesz;
- 
+
 /* default event (usually curhist-1, that is, "!!") */
- 
+
 static zlong defev;
 
 /*
@@ -578,7 +578,7 @@ histsubchar(int c)
      *
      * Include the character we are attempting to substitute.
      */
-    lexraw_mark = zshlex_raw_mark(-1); 
+    lexraw_mark = zshlex_raw_mark(-1);
 
     /* look, no goto's */
     if (isfirstch && c == hatchar) {
@@ -1220,7 +1220,7 @@ addhistnum(zlong hl, int n, int xflags)
 {
     int dir = n < 0? -1 : n > 0? 1 : 0;
     Histent he = gethistent(hl, dir);
-			     
+
     if (!he)
 	return 0;
     if (he->histnum != hl)
@@ -1334,7 +1334,7 @@ putoldhistentryontop(short keep_going)
 Histent
 prepnexthistent(void)
 {
-    Histent he; 
+    Histent he;
     int curline_in_ring = hist_ring == &curline;
 
     if (curline_in_ring)
@@ -1637,7 +1637,7 @@ ihwend(void)
 	    chwords[chwordpos++] = hptr - chline;
 	    if (chwordpos >= chwordlen) {
 		chwords = (short *) realloc(chwords,
-					    (chwordlen += 32) * 
+					    (chwordlen += 32) *
 					    sizeof(short));
 	    }
 	} else {
@@ -3201,7 +3201,7 @@ histfileIsLocked(void)
 }
 
 /*
- * Get the words in the current buffer. Using the lexer. 
+ * Get the words in the current buffer. Using the lexer.
  *
  * As far as I can make out, this is a gross hack based on a gross hack.
  * When analysing lines from within zle, we tweak the metafied line

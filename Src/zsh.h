@@ -135,11 +135,11 @@ struct mathfunc {
 #define STRMATHFUNC(name, func, id) \
     { NULL, name, MFF_STR, NULL, func, NULL, 0, 0, id }
 
-/* Character tokens are sometimes casted to (unsigned char)'s.         * 
- * Unfortunately, some compilers don't correctly cast signed to        * 
- * unsigned promotions; i.e. (int)(unsigned char)((char) -1) evaluates * 
- * to -1, instead of 255 like it should.  We circumvent the troubles   * 
- * of such shameful delinquency by casting to a larger unsigned type   * 
+/* Character tokens are sometimes casted to (unsigned char)'s.         *
+ * Unfortunately, some compilers don't correctly cast signed to        *
+ * unsigned promotions; i.e. (int)(unsigned char)((char) -1) evaluates *
+ * to -1, instead of 255 like it should.  We circumvent the troubles   *
+ * of such shameful delinquency by casting to a larger unsigned type   *
  * then back down to unsigned char.                                    */
 
 #ifdef BROKEN_SIGNED_TO_UNSIGNED_CASTING
@@ -875,7 +875,7 @@ struct eccstr {
 #define WCB_END()           wc_bld(WC_END, 0)
 
 #define WC_LIST_TYPE(C)     wc_data(C)
-#define Z_END               (1<<4) 
+#define Z_END               (1<<4)
 #define Z_SIMPLE            (1<<5)
 #define WC_LIST_FREE        (6)	/* Next bit available in integer */
 #define WC_LIST_SKIP(C)     (wc_data(C) >> WC_LIST_FREE)
@@ -2833,9 +2833,9 @@ struct heap {
 #endif
 
 /* Uncomment the following if the struct needs padding to 64-bit size. */
-/* Make sure sizeof(heap) is a multiple of 8 
+/* Make sure sizeof(heap) is a multiple of 8
 #if defined(PAD_64_BIT) && !defined(__GNUC__)
-    size_t dummy;		
+    size_t dummy;
 #endif
 */
 #define arena(X)	((char *) (X) + sizeof(struct heap))

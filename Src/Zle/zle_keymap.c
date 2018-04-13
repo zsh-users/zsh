@@ -751,7 +751,7 @@ bin_bindkey(char *name, char **argv, Options ops, UNUSED(int func))
 		zwarnnam(name, "incompatible operation selection options");
 		return 1;
 	    }
-    n = OPT_ISSET(ops,'e') + OPT_ISSET(ops,'v') + 
+    n = OPT_ISSET(ops,'e') + OPT_ISSET(ops,'v') +
 	OPT_ISSET(ops,'a') + OPT_ISSET(ops,'M');
     if(!op->selp && n) {
 	zwarnnam(name, "keymap cannot be selected with -%c", op->o);
@@ -1224,7 +1224,7 @@ static char *cursorptr;
 
 /* utility function for termcap output routine to add to string */
 
-static int 
+static int
 add_cursor_char(int c)
 {
     *cursorptr++ = c;
@@ -1272,7 +1272,7 @@ add_cursor_key(Keymap km, int tccode, Thingy thingy, int defchar)
      * This is necessary to make cursor keys work on many xterms with
      * both normal and application modes.
      */
-    if (buf[0] == '\33' && (buf[1] == '[' || buf[1] == 'O') && 
+    if (buf[0] == '\33' && (buf[1] == '[' || buf[1] == 'O') &&
 	buf[2] && !buf[3])
     {
 	buf[1] = (buf[1] == '[') ? 'O' : '[';
@@ -1386,12 +1386,12 @@ default_bindings(void)
     bindkey(amap, "guu", NULL, "gugu");
     bindkey(amap, "gUU", NULL, "gUgU");
 
-    /* emacs mode: arrow keys */ 
+    /* emacs mode: arrow keys */
     add_cursor_key(emap, TCUPCURSOR, t_uplineorhistory, 'A');
     add_cursor_key(emap, TCDOWNCURSOR, t_downlineorhistory, 'B');
     add_cursor_key(emap, TCLEFTCURSOR, t_backwardchar, 'D');
     add_cursor_key(emap, TCRIGHTCURSOR, t_forwardchar, 'C');
-   
+
     /* emacs mode: ^X sequences */
     bindkey(emap, "\30*",   refthingy(t_expandword), NULL);
     bindkey(emap, "\30g",   refthingy(t_listexpand), NULL);

@@ -51,7 +51,7 @@ cut_cline(Cline l)
     /* If no match was added with matching, we don't really know
      * which parts of the unambiguous string are worth keeping,
      * so for now we keep everything (in the hope that this
-     * produces a string containing at least everything that was 
+     * produces a string containing at least everything that was
      * originally on the line). */
 
     if (!hasmatched) {
@@ -156,7 +156,7 @@ cut_cline(Cline l)
 
 /* This builds the unambiguous string. If ins is one, it is immediately
  * inserted into the line. Otherwise csp is used to return the relative
- * cursor position in the string returned and posl contains all 
+ * cursor position in the string returned and posl contains all
  * positions with missing or ambiguous characters. If ins is two, csp
  * and posl contain real command line positions (including braces). */
 
@@ -882,7 +882,7 @@ ztat(char *nam, struct stat *buf, int ls)
 	    else
 		*p++ = *q;
 	*p = '\0';
-	
+
 	ret = ls ? lstat(nam, buf) : stat(nam, buf);
     }
 

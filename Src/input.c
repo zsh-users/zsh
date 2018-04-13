@@ -35,7 +35,7 @@
  * flags marking the end of alias expansion, with minimal copying of
  * strings.  The same stack is used to record the fact that the input
  * is a history or alias expansion and to store the alias while it is in use.
- * 
+ *
  * Input is taken either from zle, if appropriate, or read directly from
  * the input file, or may be supplied by some other part of the shell (such
  * as `eval' or $(...) substitution).  In the last case, it should be
@@ -47,7 +47,7 @@
  * (push supplied alias onto stack) or INP_HIST (ditto, but used to
  * mark history expansion).  `alias' is ignored unless INP_ALIAS or
  * INP_HIST is supplied.  INP_ALIAS is always set if INP_HIST is.
- * 
+ *
  * Note that the input string is itself used as the input buffer: it is not
  * copied, nor is it every written back to, so using a constant string
  * should work.  Consequently, when passing areas of memory from the heap
@@ -86,10 +86,10 @@ int SHIN;
 FILE *bshin;
 
 /* != 0 means we are reading input from a string */
- 
+
 /**/
 int strin;
- 
+
 /* total # of characters waiting to be read. */
 
 /**/
@@ -412,7 +412,7 @@ inputsetline(char *str, int flags)
  * expand an alias or a history reference.
  * In fact, the character is ignored and the previous character is used.
  * (If that's wrong, the bug is in the calling code.  Use the #ifdef DEBUG
- * code to check.) 
+ * code to check.)
  */
 
 /**/

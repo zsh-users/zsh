@@ -70,11 +70,11 @@ int h_errno;
 /**/
 mod_export char const *
 zsh_inet_ntop(int af, void const *cp, char *buf, size_t len)
-{       
+{
     if (af != AF_INET) {
 	errno = EAFNOSUPPORT;
 	return NULL;
-    } 
+    }
     if (len < INET_ADDRSTRLEN) {
 	errno = ENOSPC;
 	return NULL;
@@ -271,11 +271,11 @@ static Tcp_session
 zts_byfd(int fd)
 {
     LinkNode node;
-    
+
     for (node = firstnode(ztcp_sessions); node; incnode(node))
 	if (((Tcp_session)getdata(node))->fd == fd)
 	    return (Tcp_session)getdata(node);
-    
+
     return NULL;
 }
 
@@ -295,9 +295,9 @@ mod_export int
 tcp_close(Tcp_session sess)
 {
     int err;
-    
+
     if (sess)
-    {  
+    {
 	if (sess->fd != -1)
 	{
 	    err = zclose(sess->fd);
@@ -516,21 +516,21 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	    fd_set rfds;
 	    struct timeval tv;
 	    int ret;
-	    
+
 	    FD_ZERO(&rfds);
 	    FD_SET(lfd, &rfds);
 	    tv.tv_sec = 0;
 	    tv.tv_usec = 0;
-	    
+
 	    if ((ret = select(lfd+1, &rfds, NULL, NULL, &tv)) == 0) return 1;
 	    else if (ret == -1)
 	    {
 		zwarnnam(nam, "select error: %e", errno);
 		return 1;
 	    }
-	    
+
 # endif
-	    
+
 #else
 	    zwarnnam(nam, "not currently supported");
 	    return 1;
@@ -626,16 +626,16 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	    else
 		destport = htons(atoi(args[1]));
 	}
-	
+
 	desthost = ztrdup(args[0]);
-	
+
 	zthost = zsh_getipnodebyname(desthost, AF_INET, 0, &herrno);
 	if (!zthost || errflag) {
 	    zwarnnam(nam, "host resolution failure: %s", desthost);
 	    zsfree(desthost);
 	    return 1;
 	}
-	
+
 	sess = tcp_socket(PF_INET, SOCK_STREAM, 0, 0);
 
 	if (!sess) {
@@ -655,7 +655,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	    zts_delete(sess);
 	    return 1;
 	}
-	
+
 	for (addrp = zthost->h_addr_list; err && *addrp; addrp++) {
 	    if (zthost->h_length != 4)
 		zwarnnam(nam, "address length mismatch");
@@ -663,7 +663,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 		err = tcp_connect(sess, *addrp, zthost, destport);
 	    } while (err && errno == EINTR && !errflag);
 	}
-	
+
 	if (err) {
 	    zwarnnam(nam, "connection failed: %e", errno);
 	    tcp_close(sess);
@@ -688,7 +688,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 		printf("%s:%d is now on fd %d\n",
 			desthost, destport, sess->fd);
 	}
-	
+
 	zsfree(desthost);
     }
 
