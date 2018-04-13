@@ -319,14 +319,14 @@ abort_match(void)
 /* This adds a new string in the static char buffer. The arguments are
  * the matcher used (if any), the strings from the line and the word
  * and the length of the string from the word. The last argument is
- * non-zero if we are matching a suffix (where the given string has to 
+ * non-zero if we are matching a suffix (where the given string has to
  * be prepended to the contents of the buffer). */
 
 /**/
 static void
 add_match_str(Cmatcher m, char *l, char *w, int wl, int sfx)
 {
-    /* Get the string and length to insert: either from the line 
+    /* Get the string and length to insert: either from the line
      * or from the match. */
     if (m && (m->flags & CMF_LINE)) {
 	wl = m->llen; w = l;
@@ -365,7 +365,7 @@ add_match_str(Cmatcher m, char *l, char *w, int wl, int sfx)
  * matcher used, pointers to the line and word strings for the anchor,
  * a pointer to the original line string for the whole part, the string
  * before (or after) the anchor that has not yet been added, the length
- * of the line-string for that, and a flag saying if we are matching a 
+ * of the line-string for that, and a flag saying if we are matching a
  * suffix. */
 
 /**/
@@ -607,7 +607,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		     * block.
 		     */
 		    int t;
-		    /* 
+		    /*
 		     * 1 iff the anchor and the word are on the same side of
 		     * the line pattern; that is: if either
 		     * - the anchor is on the left and we are matching
@@ -660,7 +660,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		     * Contact zsh-workers@zsh.org.
 		     */
 		    char *tp;
-		    /* 
+		    /*
 		     * Temporary variable.  Used as temporary storage for a
 		     *
 		     *     {
@@ -779,7 +779,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		    if (!t)
 			continue;
 
-		    /* Yes, add the strings and clines if this is a 
+		    /* Yes, add the strings and clines if this is a
 		     * top-level call. */
 		    if (!test && (!he || (llen + alen))) {
 			char *op, *lp, *map, *wap, *wmp;
@@ -1155,7 +1155,7 @@ comp_match(char *pfx, char *sfx, char *w, Patprog cp, Cline *clp, int qu,
 	    teststr = r;
 	if (!pattry(cp, teststr))
 	    return NULL;
-    
+
 	r = (qu == 2 ? tildequote(r, 0) : multiquote(r, !qu));
 
 	/* We still break it into parts here, trying to build a sensible
@@ -1379,7 +1379,7 @@ pattern_match_equivalence(Cpattern lp, convchar_t wind, int wmtp,
 
 /**/
 static int
-pattern_match_restrict(Cpattern p, Cpattern wp, convchar_t *wsc, int wsclen,  
+pattern_match_restrict(Cpattern p, Cpattern wp, convchar_t *wsc, int wsclen,
 		       Cpattern prestrict, ZLE_STRING_T new_line)
 {
     convchar_t c;
@@ -2180,7 +2180,7 @@ check_cmdata(Cmdata md, int sfx)
     return 0;
 }
 
-/* This puts the not-yet-matched portion back into the last cline and 
+/* This puts the not-yet-matched portion back into the last cline and
  * returns that. */
 
 static Cline

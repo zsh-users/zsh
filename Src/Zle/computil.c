@@ -745,12 +745,12 @@ cd_get(char **params)
 
                 memmove(opts, opts + 1,
                         (arrlen(opts + 1) + 1) * sizeof(char *));
-                
+
             } else
                 opts[0] = ztrdup("-2V-default-");
             csl = "packed";
             break;
-  
+
         case CRT_DUMMY:
             {
                 char buf[20];
@@ -2275,7 +2275,7 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
 		    break;
 
 		state.opt = (cur == state.nargbeg + 1 &&
-			     (!multi || !*line || 
+			     (!multi || !*line ||
 			      *line == '-' || *line == '+'));
 		state.optbeg = state.nargbeg;
 		state.argbeg = cur - 1;
@@ -2351,7 +2351,7 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
 		}
 	    } else {
 		ca_laststate.def = adef;
-		ca_laststate.opt = (!arglast || !multi || !*line || 
+		ca_laststate.opt = (!arglast || !multi || !*line ||
 				    *line == '-' || *line == '+');
 		ca_laststate.ddef = NULL;
 		ca_laststate.dopt = NULL;
@@ -2629,7 +2629,7 @@ bin_comparguments(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
         /* This returns the descriptions, actions and sub-contexts for the
          * things _arguments has to execute at this place on the line (the
          * sub-contexts are used as tags).
-         * The return value is particularly important here, it says if 
+         * The return value is particularly important here, it says if
          * there are arguments to complete at all. */
 	{
 	    LinkList descr, act, subc;
@@ -3642,7 +3642,7 @@ bin_compquote(char *nam, char **args, Options ops, UNUSED(int func))
 	if ((v = getvalue(&vbuf, &name, 0))) {
 	    switch (PM_TYPE(v->pm->node.flags)) {
 	    case PM_SCALAR:
-		setstrvalue(v, ztrdup(comp_quote(getstrvalue(v), 
+		setstrvalue(v, ztrdup(comp_quote(getstrvalue(v),
 						 OPT_ISSET(ops,'p'))));
 		break;
 	    case PM_ARRAY:
@@ -4373,13 +4373,13 @@ cfp_matcher_range(Cmatcher *ms, char *add)
 			} else
 			    len += newlen + 1;
 			break;
-			    
+
 		    case CPAT_CCLASS:
 			/*
 			 * If there is an equivalence only on one
 			 * side it's not equivalent to anything.
 			 * Treat it as an ordinary character class.
-			 */ 
+			 */
 		    case CPAT_EQUIV:
 		    case CPAT_CHAR:
 			if (ret)
@@ -4898,7 +4898,7 @@ cf_remove_other(char **names, char *pre, int *amb)
  * SYNOPSIS:
  *     1. compfiles -p  parnam1 parnam2 skipped matcher sdirs parnam3 varargs [..varargs]
  *     2. compfiles -p- parnam1 parnam2 skipped matcher sdirs parnam3 varargs [..varargs]
- *     3. compfiles -P  parnam1 parnam2 skipped matcher sdirs parnam3 
+ *     3. compfiles -P  parnam1 parnam2 skipped matcher sdirs parnam3
  *
  *     1. Set parnam1 to an array of patterns....
  *        ${(P)parnam1} is an in/out parameter.

@@ -173,7 +173,7 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
 
     tied_param->gsu.h = &gdbm_hash_gsu;
 
-    /* Allocate parameter sub-gsu, fill dbf field. 
+    /* Allocate parameter sub-gsu, fill dbf field.
      * dbf allocation is 1 to 1 accompanied by
      * gsu_scalar_ext allocation. */
 
@@ -534,7 +534,7 @@ gdbmhashsetfn(Param pm, HashTable ht)
             /* Store */
 	    content.dptr = umval;
 	    content.dsize = umlen;
-	    (void)gdbm_store(dbf, key, content, GDBM_REPLACE);	
+	    (void)gdbm_store(dbf, key, content, GDBM_REPLACE);
 
             /* Free - unmetafy_zalloc allocates
              * exact required space + 1 null byte */

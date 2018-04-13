@@ -580,17 +580,17 @@ bin_hashinfo(UNUSED(char *nam), UNUSED(char **args), UNUSED(Options ops), UNUSED
 /********************************/
 
 /* hash table containing external commands */
- 
+
 /**/
 mod_export HashTable cmdnamtab;
- 
+
 /* how far we've hashed the PATH so far */
- 
+
 /**/
 mod_export char **pathchecked;
 
 /* Create a new command hash table */
- 
+
 /**/
 void
 createcmdnamtable(void)
@@ -707,7 +707,7 @@ static void
 fillcmdnamtable(UNUSED(HashTable ht))
 {
     char **pq;
- 
+
     for (pq = pathchecked; *pq; pq++)
 	hashdir(pq);
 
@@ -719,16 +719,16 @@ static void
 freecmdnamnode(HashNode hn)
 {
     Cmdnam cn = (Cmdnam) hn;
- 
+
     zsfree(cn->node.nam);
     if (cn->node.flags & HASHED)
 	zsfree(cn->u.cmd);
- 
+
     zfree(cn, sizeof(struct cmdnam));
 }
 
 /* Print an element of the cmdnamtab hash table (external command) */
- 
+
 /**/
 static void
 printcmdnamnode(HashNode hn, int printflags)
@@ -736,7 +736,7 @@ printcmdnamnode(HashNode hn, int printflags)
     Cmdnam cn = (Cmdnam) hn;
 
     if (printflags & PRINT_WHENCE_WORD) {
-	printf("%s: %s\n", cn->node.nam, (cn->node.flags & HASHED) ? 
+	printf("%s: %s\n", cn->node.nam, (cn->node.flags & HASHED) ?
 	       "hashed" : "command");
 	return;
     }
@@ -903,7 +903,7 @@ freeshfuncnode(HashNode hn)
 }
 
 /* Print a shell function */
- 
+
 /**/
 static void
 printshfuncnode(HashNode hn, int printflags)
@@ -918,7 +918,7 @@ printshfuncnode(HashNode hn, int printflags)
 	putchar('\n');
 	return;
     }
- 
+
     if ((printflags & (PRINT_WHENCE_VERBOSE|PRINT_WHENCE_WORD)) &&
 	!(printflags & PRINT_WHENCE_FUNCDEF)) {
 	nicezputs(f->node.nam, stdout);
@@ -937,7 +937,7 @@ printshfuncnode(HashNode hn, int printflags)
 	putchar('\n');
 	return;
     }
- 
+
     quotedzputs(f->node.nam, stdout);
     if (f->funcdef || f->node.flags & PM_UNDEFINED) {
 	printf(" () {\n");
@@ -1167,15 +1167,15 @@ printreswdnode(HashNode hn, int printflags)
 /********************************/
 
 /* hash table containing the aliases */
- 
+
 /**/
 mod_export HashTable aliastab;
- 
+
 /* has table containing suffix aliases */
 
 /**/
 mod_export HashTable sufaliastab;
- 
+
 /* Create new hash tables for aliases */
 
 /**/
@@ -1238,7 +1238,7 @@ static void
 freealiasnode(HashNode hn)
 {
     Alias al = (Alias) hn;
- 
+
     zsfree(al->node.nam);
     zsfree(al->text);
     zfree(al, sizeof(struct alias));
@@ -1305,7 +1305,7 @@ printaliasnode(HashNode hn, int printflags)
     if (printflags & PRINT_LIST) {
 	/* Fast fail on unrepresentable values. */
 	if (strchr(a->node.nam, '=')) {
-	    zwarn("invalid alias '%s' encountered while printing aliases", 
+	    zwarn("invalid alias '%s' encountered while printing aliases",
 		  a->node.nam);
 	    /* ### TODO: Return an error status to the C caller */
 	    return;

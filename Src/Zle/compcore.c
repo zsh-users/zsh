@@ -125,7 +125,7 @@ mod_export LinkList matches;
 /**/
 LinkList fmatches;
 
-/* This holds the list of matches-groups. lastmatches holds the last list of 
+/* This holds the list of matches-groups. lastmatches holds the last list of
  * permanently allocated matches, pmatches is the same for the list
  * currently built, amatches is the heap allocated stuff during completion
  * (after all matches have been generated it is an alias for pmatches), and
@@ -278,7 +278,7 @@ mod_export int lastend;
 #define inststr(X) inststrlen((X),1,-1)
 
 /*
- * Main completion entry point, called from zle. 
+ * Main completion entry point, called from zle.
  * At this point the line is already metafied.
  */
 
@@ -313,7 +313,7 @@ do_completion(UNUSED(Hookdef dummy), Compldat dat)
     zsfree(compexactstr);
     compexactstr = ztrdup("");
     uselist = (useline ?
-	       ((isset(AUTOLIST) && !isset(BASHAUTOLIST)) ? 
+	       ((isset(AUTOLIST) && !isset(BASHAUTOLIST)) ?
 		(isset(LISTAMBIGUOUS) ? 3 : 2) : 0) : 1);
     zsfree(comppatmatch);
     opm = comppatmatch = ztrdup(useglob ? "*" : "");
@@ -703,7 +703,7 @@ callcompfunc(char *s, char *fn)
 	    compsuffix = ztrdup("");
 	} else {
 	    char *ss, sav;
-	    
+
 	    ss = s + offs;
 
 	    sav = *ss;
@@ -1122,7 +1122,7 @@ check_param(char *s, int set, int test)
      *
      * TODO: passing s as a parameter while we get some mysterious
      * offset "offs" into it via a global sucks badly.
-     */ 
+     */
     for (p = s + offs; ; p--) {
 	if (*p == String || *p == Qstring) {
 	    /*
@@ -1869,7 +1869,7 @@ set_comp_sep(void)
 	    compsuffix = ztrdup("");
 	} else {
 	    char *ss, sav;
-	    
+
 	    ss = ns + soffs;
 
 	    sav = *ss;
@@ -1883,7 +1883,7 @@ set_comp_sep(void)
         if ((i = strlen(compprefix)) > 1 && compprefix[i - 1] == '\\' &&
 	    compprefix[i - 2] != '\\' && compprefix[i - 2] != Meta)
             compprefix[i - 1] = '\0';
-        
+
 	tmp = tricat(compqiprefix, compiprefix, multiquote(qp, 1));
 	zsfree(compqiprefix);
 	compqiprefix = tmp;
@@ -3049,7 +3049,7 @@ begcmgroup(char *n, int flags)
     mgroup->heap_id = last_heap_id;
 #endif
     mgroup->name = dupstring(n);
-    mgroup->lcount = mgroup->llcount = mgroup->mcount = mgroup->ecount = 
+    mgroup->lcount = mgroup->llcount = mgroup->mcount = mgroup->ecount =
 	mgroup->ccount = 0;
     mgroup->flags = flags;
     mgroup->matches = NULL;

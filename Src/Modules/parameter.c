@@ -1930,7 +1930,7 @@ static HashNode
 getpmdissalias(HashTable ht, const char *name)
 {
     return getalias(sufaliastab, ht, name, ALIAS_SUFFIX|DISABLED);
-} 
+}
 
 /**/
 static void
@@ -2201,7 +2201,7 @@ static struct paramdef partab[] = {
 	    &pmdisraliases_gsu, getpmdisralias, scanpmdisraliases),
     SPECIALPMDEF("dis_builtins", PM_READONLY,
 	    NULL, getpmdisbuiltin, scanpmdisbuiltins),
-    SPECIALPMDEF("dis_functions", 0, 
+    SPECIALPMDEF("dis_functions", 0,
 	    &pmdisfunctions_gsu, getpmdisfunction, scanpmdisfunctions),
     SPECIALPMDEF("dis_functions_source", PM_READONLY, NULL,
 		 getpmdisfunction_source, scanpmdisfunction_source),

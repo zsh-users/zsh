@@ -1722,7 +1722,7 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		    zwarnnam(nam, "associative array given more than once");
 		    return 1;
 		}
-		if (o[2]) 
+		if (o[2])
 		    assoc = o + 2;
 		else if (*args)
 		    assoc = *args++;

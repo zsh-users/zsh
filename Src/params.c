@@ -43,12 +43,12 @@
 #endif
 
 /* what level of localness we are at */
- 
+
 /**/
 mod_export int locallevel;
 
 /* Variables holding values of special parameters */
- 
+
 /**/
 mod_export
 char **pparams,		/* $argv        */
@@ -63,7 +63,7 @@ char **pparams,		/* $argv        */
 mod_export
 char **path,		/* $path        */
      **fignore;		/* $fignore     */
- 
+
 /**/
 mod_export
 char *argzero,		/* $0           */
@@ -120,7 +120,7 @@ zlong lineno,		/* $LINENO      */
      shlvl;		/* $SHLVL       */
 
 /* $histchars */
- 
+
 /**/
 mod_export unsigned char bangchar;
 /**/
@@ -128,14 +128,14 @@ unsigned char hatchar, hashchar;
 
 /**/
 unsigned char keyboardhackchar = '\0';
- 
+
 /* $SECONDS = now.tv_sec - shtimer.tv_sec
  *          + (now.tv_usec - shtimer.tv_usec) / 1000000.0
  * (rounded to an integer if the parameter is not set to float) */
- 
+
 /**/
 struct timeval shtimer;
- 
+
 /* 0 if this $TERM setup is usable, otherwise it contains TERM_* flags */
 
 /**/
@@ -474,7 +474,7 @@ static initparam argvparam_pm = IPDEF9F("", &pparams, NULL, \
 static Param argvparam;
 
 /* hash table containing the parameters */
- 
+
 /**/
 mod_export HashTable paramtab, realparamtab;
 
@@ -851,7 +851,7 @@ createparamtable(void)
      * memory so that we can free them if needed               */
     for (
 #ifndef USE_SET_UNSET_ENV
-	envp = 
+	envp =
 #endif
 	    envp2 = environ; *envp2; envp2++) {
 	if (split_env_string(*envp2, &iname, &ivalue)) {
@@ -2278,7 +2278,7 @@ getstrvalue(Value v)
 			t = (char *) hcalloc(fwidth + t0 + 1);
 			/* prefix guaranteed to be single byte chars */
 			preflen = valprefend - s;
-			memset(t + preflen, 
+			memset(t + preflen,
 			       (((v->pm->node.flags & PM_RIGHT_B)
 				 || !zero) ?       ' ' : '0'), fwidth);
 			/*
@@ -2760,7 +2760,7 @@ setarrvalue(Value v, char **val)
 
 	post_assignment_length = v->start + arrlen(val);
 	if (v->end < pre_assignment_length) {
-	    /* 
+	    /*
 	     * Allocate room for array elements between the end of the slice `v'
 	     * and the original array's end.
 	     */
@@ -3037,7 +3037,7 @@ assignsparam(char *s, char *val, int flags)
 	    created = 1;
 	} else if ((((v->pm->node.flags & PM_ARRAY) && !(flags & ASSPM_AUGMENT)) ||
 	    	 (v->pm->node.flags & PM_HASHED)) &&
-		 !(v->pm->node.flags & (PM_SPECIAL|PM_TIED)) && 
+		 !(v->pm->node.flags & (PM_SPECIAL|PM_TIED)) &&
 		 unset(KSHARRAYS)) {
 	    unsetparam(t);
 	    createparam(t, PM_SCALAR);
@@ -4221,7 +4221,7 @@ arrayuniq(char **x, int freeok)
 	}
 	++it;
     }
-    
+
     deletehashtable(ht);
 }
 
@@ -4989,7 +4989,7 @@ arrfixenv(char *s, char **t)
 	cmdnamtab->emptytable(cmdnamtab);
 
     pm = (Param) paramtab->getnode(paramtab, s);
-    
+
     /*
      * Only one level of a parameter can be exported.  Unless
      * ALLEXPORT is set, this must be global.
@@ -5093,13 +5093,13 @@ findenv(char *name, int *pos)
 
     eq = strchr(name, '=');
     nlen = eq ? eq - name : (int)strlen(name);
-    for (ep = environ; *ep; ep++) 
+    for (ep = environ; *ep; ep++)
 	if (!strncmp (*ep, name, nlen) && *((*ep)+nlen) == '=') {
 	    if (pos)
 		*pos = ep - environ;
 	    return 1;
 	}
-    
+
     return 0;
 }
 /**/
@@ -5116,7 +5116,7 @@ zgetenv(char *name)
     return getenv(name);
 #else
     char **ep, *s, *t;
- 
+
     for (ep = environ; *ep; ep++) {
        for (s = *ep, t = name; *s && *s == *t; s++, t++);
        if (*s == '=' && !*t)
@@ -5618,7 +5618,7 @@ void
 freeparamnode(HashNode hn)
 {
     Param pm = (Param) hn;
- 
+
     /* The second argument of unsetfn() is used by modules to
      * differentiate "exp"licit unset from implicit unset, as when
      * a parameter is going out of scope.  It's not clear which

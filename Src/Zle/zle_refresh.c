@@ -650,7 +650,7 @@ zwcwrite(const REFRESH_STRING s, size_t i)
    I've put my fingers into just about every routine in here -
    any queries about updates to mason@primenet.com.au */
 
-static REFRESH_STRING 
+static REFRESH_STRING
     *nbuf = NULL,		/* new video buffer line-by-line array */
     *obuf = NULL;		/* old video buffer line-by-line array */
 static int more_start,		/* more text before start of screen?	    */
@@ -709,7 +709,7 @@ void
 resetvideo(void)
 {
     int ln;
- 
+
     winw = zterm_columns;  /* terminal width */
     if (termflags & TERM_SHORT)
 	winh = 1;
@@ -1146,7 +1146,7 @@ zrefresh(void)
 	txtattrmask = 0;
 
 	if (trashedzle && !clearflag)
-	    reexpandprompt(); 
+	    reexpandprompt();
 	resetvideo();
 	resetneeded = 0;	/* unset */
 	oput_rpmpt = 0;		/* no right-prompt currently on screen */
@@ -1181,7 +1181,7 @@ zrefresh(void)
     } else if (winw != zterm_columns || rwinh != zterm_lines)
 	resetvideo();
 
-/* now winw equals columns and winh equals lines 
+/* now winw equals columns and winh equals lines
    width comparisons can be made with winw, height comparisons with winh */
 
     if (termflags & TERM_SHORT) {
@@ -1192,7 +1192,7 @@ zrefresh(void)
     if (tmpcs < 0) {
 #ifdef DEBUG
 	fprintf(stderr, "BUG: negative cursor position\n");
-	fflush(stderr); 
+	fflush(stderr);
 #endif
 	tmpcs = 0;
     }
@@ -1449,7 +1449,7 @@ zrefresh(void)
 	int outll, outsz, all_atr_on, all_atr_off;
 	char *statusdup = ztrdup(statusline);
 	ZLE_STRING_T outputline =
-	    stringaszleline(statusdup, 0, &outll, &outsz, NULL); 
+	    stringaszleline(statusdup, 0, &outll, &outsz, NULL);
 
 	all_atr_on = special_atr_on;
 	all_atr_off = TXT_ATTR_OFF_FROM_ON(all_atr_on);
@@ -1826,7 +1826,7 @@ refreshline(int ln)
 	&& tccan(TCCLEAREOL)) {
 	moveto(ln, 0);
 	tcoutclear(TCCLEAREOL);
-	return;	
+	return;
     }
 
 /* 1: pad out the new buffer with spaces to contain _all_ of the characters
@@ -2009,11 +2009,11 @@ refreshline(int ln)
 	    }
 
 	    /* inserting & deleting chars: we can if there's no right-prompt */
-	    if ((ln || !put_rpmpt || !oput_rpmpt) 
+	    if ((ln || !put_rpmpt || !oput_rpmpt)
 #ifdef MULTIBYTE_SUPPORT
 		&& ol->chr != WEOF && nl->chr != WEOF
 #endif
-		&& nl[1].chr && ol[1].chr && !ZR_equal(ol[1], nl[1])) { 
+		&& nl[1].chr && ol[1].chr && !ZR_equal(ol[1], nl[1])) {
 
 		/* deleting characters - see if we can find a match series that
 		   makes it cheaper to delete intermediate characters
@@ -2053,7 +2053,7 @@ refreshline(int ln)
 		 * should be annihilated, but we don't do this if we're on the
 		 * last line lest undesired scrolling occurs due to `illegal'
 		 * characters on screen
-		 */ 
+		 */
 		if (tccan(TCINS) && (vln != zterm_lines - 1)) {
 		    /* not on last line */
 		    for (i = 1; nl[i].chr; i++) {
@@ -2284,7 +2284,7 @@ tc_rightcurs(int ct)
 #ifndef MULTIBYTE_SUPPORT
 	if ((int)strlen(lpromptbuf) == lpromptw)
 	    fputs(lpromptbuf + i, shout);
-	else 
+	else
 #endif
 	if (tccan(TCRIGHT) && (tclen[TCRIGHT] * ct <= ztrlen(lpromptbuf)))
 	    /* it is cheaper to send TCRIGHT than reprint the whole prompt */

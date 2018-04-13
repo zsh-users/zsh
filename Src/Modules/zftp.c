@@ -667,7 +667,7 @@ zfgetline(char *ln, int lnsize, int tmout)
 	    }
 	    break;
 	}
-	
+
 	if (zcfinish)
 	    break;
 	if (added < lnsize) {
@@ -698,7 +698,7 @@ zfgetline(char *ln, int lnsize, int tmout)
  */
 
 /**/
-static int 
+static int
 zfgetmsg(void)
 {
     char line[256], *ptr, *verbose;
@@ -1125,7 +1125,7 @@ zfgetdata(char *name, char *rest, char *cmd, int getsize)
 
 	/* accept the connection */
 	len = sizeof(zdsock);
-	newfd = zfmovefd(accept(zfsess->dfd, (struct sockaddr *)&zdsock, 
+	newfd = zfmovefd(accept(zfsess->dfd, (struct sockaddr *)&zdsock,
 				&len));
 	if (newfd < 0)
 	    zwarnnam(name, "unable to accept data: %e", errno);
@@ -1680,7 +1680,7 @@ zfsenddata(char *name, int recv, int progress, off_t startat)
 
 	noholdintr();
     }
-	
+
     if (toasc)
 	zfree(ascbuf, ZF_ASCSIZE);
     zfclosedata();
@@ -1778,14 +1778,14 @@ zftp_open(char *name, char **args, int flags)
 
     /*
      * This sets an alarm for the whole process, getting the host name
-     * as well as connecting.  Arguably you could time them out separately. 
+     * as well as connecting.  Arguably you could time them out separately.
      */
     tmout = getiparam("ZFTP_TMOUT");
     if (setjmp(zfalrmbuf)) {
 	char *hname;
 	alarm(0);
 	queue_signals();
-	if ((hname = getsparam_u("ZFTP_HOST")) && *hname) 
+	if ((hname = getsparam_u("ZFTP_HOST")) && *hname)
 	    zwarnnam(name, "timeout connecting to %s", hname);
 	else
 	    zwarnnam(name, "timeout on host name lookup");
@@ -1812,7 +1812,7 @@ zftp_open(char *name, char **args, int flags)
 	    /* should use herror() here if available, but maybe
 	     * needs configure test. on AIX it's present but not
 	     * in headers.
-	     * 
+	     *
 	     * on the other hand, herror() is obsolete
 	     */
 	    FAILED();
@@ -2381,7 +2381,7 @@ zfgetcwd(void)
     if (*ptr == '"') {
 	ptr++;
 	endc = '"';
-    } else 
+    } else
 	endc = ' ';
     for (eptr = ptr; *eptr && *eptr != endc; eptr++)
 	;
@@ -2453,7 +2453,7 @@ zftp_type(char *name, char **args, int flags)
 	    zwarnnam(name, "transfer type %s not recognised", str);
 	    return 1;
 	}
-	
+
 	if (nt == 'B')		/* binary = image */
 	    nt = 'I';
     }
@@ -2537,7 +2537,7 @@ zftp_local(UNUSED(char *name), char **args, int flags)
  * Get sends all files to stdout, i.e. this is basically cat. It's up to a
  * shell function driver to turn this into standard FTP-like commands.
  *
- * Put/append sends everything from stdin down the drai^H^H^Hata connection. 
+ * Put/append sends everything from stdin down the drai^H^H^Hata connection.
  * Slightly weird with multiple files in that it tries to read
  * a separate complete file from stdin each time, which is
  * only even potentially useful interactively.  But the only
@@ -3070,7 +3070,7 @@ bin_zftp(char *name, char **args, UNUSED(Options ops), UNUSED(int func))
 	    /*
 	     * with ret == 2, we just got dumped out in the test,
 	     * so enough messages already.
-	     */	       
+	     */
 	    zwarnnam(fullname, "not connected.");
 	}
 	return 1;
@@ -3209,7 +3209,7 @@ boot_(UNUSED(Module m))
     zfsetparam("ZFTP_PREFS", ztrdup("PS"), ZFPM_IFUNSET);
     /* default preferences if user deletes variable */
     zfprefs = ZFPF_SNDP|ZFPF_PASV;
-    
+
     zfsessions = znewlinklist();
     newsession("default");
 

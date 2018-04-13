@@ -36,12 +36,12 @@
 static Cmlist cmatcher;
 
 /* Default completion infos */
- 
+
 /**/
 struct compctl cc_compos, cc_default, cc_first, cc_dummy;
- 
+
 /* Hash table for completion info for commands */
- 
+
 /**/
 HashTable compctltab;
 
@@ -379,7 +379,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
     /* Parse the basic flags for completion:
      * first is a flag that we are not in extended completion,
      * while hx indicates or (+) completion (need to know for
-     * default and command completion as the initial compctl is special). 
+     * default and command completion as the initial compctl is special).
      * cct is a temporary just to hold flags; it never needs freeing.
      */
     struct compctl cct;
@@ -1802,7 +1802,7 @@ ccmakehookfn(UNUSED(Hookdef dummy), struct ccmakedat *dat)
 	    mstack = &ms;
 
 	    /* Store the matchers used in the bmatchers list which is used
-	     * when building new parts for the string to insert into the 
+	     * when building new parts for the string to insert into the
 	     * line. */
 	    add_bmatchers(m->matcher);
 	} else
@@ -2041,9 +2041,9 @@ addmatch(char *s, char *t)
     }
     if (!ms)
 	return;
-    add_match_data(isalt, ms, s, lc, ipre, ripre, isuf, 
+    add_match_data(isalt, ms, s, lc, ipre, ripre, isuf,
 		   (incompfunc ? dupstring(curcc->prefix) : curcc->prefix),
-		   prpre, 
+		   prpre,
 		   (isfile ? lppre : NULL), NULL,
 		   (isfile ? lpsuf : NULL), NULL,
 		   (incompfunc ? dupstring(curcc->suffix) : curcc->suffix),
@@ -2709,7 +2709,7 @@ makecomplistext(Compctl occ, char *os, int incmd)
 				compadd = a, t = 1;
 			}
 			break;
-			
+
 		    case CCT_CURPAT:
 		    case CCT_CURSTR:
 			tt = clwpos;
@@ -2723,7 +2723,7 @@ makecomplistext(Compctl occ, char *os, int incmd)
 			s = ztrdup((a < 0 || a >= clwnum) ? "" :
 				   clwords[a]);
 			untokenize(s);
-			
+
 			if (cc->type == CCT_CURPAT ||
 			    cc->type == CCT_WORDPAT) {
 			    tokenize(ss = dupstring(cc->u.s.s[i]));
@@ -3065,7 +3065,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
     usemenu = um;
     patcomp = filecomp = NULL;
     rpre = rsuf = lpre = lsuf = ppre = psuf = lppre = lpsuf =
-	fpre = fsuf = ipre = ripre = prpre = 
+	fpre = fsuf = ipre = ripre = prpre =
 	qfpre = qfsuf = qrpre = qrsuf = qlpre = qlsuf = NULL;
 
     curcc = cc;
@@ -3669,15 +3669,15 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	Shfunc shfunc;
 	char **r;
 	int lv = lastval;
-	    
+
 	/* Get the function. */
 	if ((shfunc = getshfunc(cc->func))) {
 	    /* We have it, so build a argument list. */
 	    LinkList args = newlinklist();
 	    int osc = sfcontext;
-		
+
 	    addlinknode(args, cc->func);
-		
+
 	    if (delit) {
 		p = dupstrpfx(os, ooffs);
 		untokenize(p);
@@ -3689,7 +3689,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 		addlinknode(args, lpre);
 		addlinknode(args, lsuf);
 	    }
-		
+
 	    /* This flag allows us to use read -l and -c. */
 	    if (incompfunc != 1)
 		incompctlfunc = 1;
@@ -3912,9 +3912,9 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	char **ow = clwords, *os = cmdstr, *ops = NULL;
 	int oldn = clwnum, oldp = clwpos, br;
 	unsigned long occ = ccont;
-	
+
 	ccont = CC_CCCONT;
-	
+
 	/* So we restrict the words-array. */
 	if (brange >= clwnum)
 	    brange = clwnum - 1;

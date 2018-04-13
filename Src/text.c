@@ -938,7 +938,7 @@ gettext2(Estate state)
 				ctype == COND_STRNEQ)
 				state->pc++;
 			} else {
-			    /* Unary test: `-f foo' etc. */ 
+			    /* Unary test: `-f foo' etc. */
 			    char c2[4];
 
 			    c2[0] = '-';

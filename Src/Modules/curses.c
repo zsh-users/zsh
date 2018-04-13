@@ -349,7 +349,7 @@ zcurses_colorget(const char *nam, char *colorpair)
 	    return NULL;
 	}
 
-	*bg = '\0';        
+	*bg = '\0';
 
         // cp/bg can be {number}/{number} or {name}/{name}
 
@@ -383,7 +383,7 @@ zcurses_colorget(const char *nam, char *colorpair)
 	}
 
 	cpn = (Colorpairnode)zshcalloc(sizeof(struct colorpairnode));
-	
+
 	if (!cpn) {
 	    zsfree(cp);
 	    return NULL;

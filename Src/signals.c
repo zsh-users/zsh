@@ -29,7 +29,7 @@
 
 #include "zsh.mdh"
 #include "signals.pro"
- 
+
 /* Array describing the state of each signal: an element contains *
  * 0 for the default action or some ZSIG_* flags ored together.   */
 
@@ -107,7 +107,7 @@ static sigset_t blocked_set;
 # define signal_setjmp(b)     setjmp(b)
 # define signal_longjmp(b,n)  longjmp((b),(n))
 #endif
- 
+
 #ifdef NO_SIGNAL_BLOCKING
 # define signal_process(sig)  signal_ignore(sig)
 # define signal_reset(sig)    install_handler(sig)
@@ -126,7 +126,7 @@ install_handler(int sig)
 {
 #ifdef POSIX_SIGNALS
     struct sigaction act;
- 
+
     act.sa_handler = (SIGNAL_HANDTYPE) zhandler;
     sigemptyset(&act.sa_mask);        /* only block sig while in handler */
     act.sa_flags = 0;
@@ -138,7 +138,7 @@ install_handler(int sig)
 #else
 # ifdef BSD_SIGNALS
     struct sigvec vec;
- 
+
     vec.sv_handler = (SIGNAL_HANDTYPE) zhandler;
     vec.sv_mask = sigmask(sig);    /* mask out this signal while in handler    */
 #  ifdef SV_INTERRUPT
@@ -159,7 +159,7 @@ install_handler(int sig)
 }
 
 /* enable ^C interrupts */
- 
+
 /**/
 mod_export void
 intr(void)
@@ -169,7 +169,7 @@ intr(void)
 }
 
 /* disable ^C interrupts */
- 
+
 #if 0 /**/
 void
 nointr(void)
@@ -178,9 +178,9 @@ nointr(void)
         signal_ignore(SIGINT);
 }
 #endif
- 
+
 /* temporarily block ^C interrupts */
- 
+
 /**/
 mod_export void
 holdintr(void)
@@ -190,7 +190,7 @@ holdintr(void)
 }
 
 /* release ^C interrupts */
- 
+
 /**/
 mod_export void
 noholdintr(void)
@@ -198,16 +198,16 @@ noholdintr(void)
     if (interact)
         signal_unblock(signal_mask(SIGINT));
 }
- 
+
 /* create a signal mask containing *
  * only the given signal           */
- 
+
 /**/
 mod_export sigset_t
 signal_mask(int sig)
 {
     sigset_t set;
- 
+
     sigemptyset(&set);
     if (sig)
         sigaddset(&set, sig);
@@ -225,14 +225,14 @@ mod_export sigset_t
 signal_block(sigset_t set)
 {
     sigset_t oset;
- 
+
 #ifdef POSIX_SIGNALS
     sigprocmask(SIG_BLOCK, &set, &oset);
 
 #else
 # ifdef SYSV_SIGNALS
     int i;
- 
+
     oset = blocked_set;
     for (i = 1; i <= NSIG; ++i) {
         if (sigismember(&set, i) && !sigismember(&blocked_set, i)) {
@@ -254,7 +254,7 @@ signal_block(sigset_t set)
    }
 # endif /* SYSV_SIGNALS */
 #endif /* POSIX_SIGNALS */
- 
+
     return oset;
 }
 
@@ -280,7 +280,7 @@ signal_unblock(sigset_t set)
 # else
 #  ifdef SYSV_SIGNALS
     int i;
- 
+
     oset = blocked_set;
     for (i = 1; i <= NSIG; ++i) {
         if (sigismember(&set, i) && sigismember(&blocked_set, i)) {
@@ -303,7 +303,7 @@ signal_unblock(sigset_t set)
 #  endif /* SYSV_SIGNALS  */
 # endif  /* BSD_SIGNALS   */
 #endif   /* POSIX_SIGNALS */
- 
+
     return oset;
 }
 
@@ -315,7 +315,7 @@ mod_export sigset_t
 signal_setmask(sigset_t set)
 {
     sigset_t oset;
- 
+
 #ifdef POSIX_SIGNALS
     sigprocmask(SIG_SETMASK, &set, &oset);
 #else
@@ -324,7 +324,7 @@ signal_setmask(sigset_t set)
 # else
 #  ifdef SYSV_SIGNALS
     int i;
- 
+
     oset = blocked_set;
     for (i = 1; i <= NSIG; ++i) {
         if (sigismember(&set, i) && !sigismember(&blocked_set, i)) {
@@ -351,7 +351,7 @@ signal_setmask(sigset_t set)
 #  endif /* SYSV_SIGNALS  */
 # endif  /* BSD_SIGNALS   */
 #endif   /* POSIX_SIGNALS */
- 
+
     return oset;
 }
 
@@ -571,7 +571,7 @@ wait_for_processes(void)
 }
 
 /* the signal handler */
- 
+
 /**/
 mod_export RETSIGTYPE
 zhandler(int sig)
@@ -582,14 +582,14 @@ zhandler(int sig)
     int do_jump;
     signal_jmp_buf jump_to;
 #endif
- 
+
     last_signal = sig;
     signal_process(sig);
- 
+
     sigfillset(&newmask);
     /* Block all signals temporarily           */
     oldmask = signal_block(newmask);
- 
+
 #if defined(NO_SIGNAL_BLOCKING)
     /* do we need to longjmp to signal_suspend */
     do_jump = suspend_longjmp;
@@ -622,15 +622,15 @@ zhandler(int sig)
         signal_reset(sig);
         return;
     }
- 
+
     /* Reset signal mask, signal traps ok now */
     signal_setmask(oldmask);
- 
+
     switch (sig) {
     case SIGCHLD:
 	wait_for_processes();
         break;
- 
+
     case SIGPIPE:
 	if (!handletrap(SIGPIPE)) {
 	    if (!interact)
@@ -648,7 +648,7 @@ zhandler(int sig)
             zexit(SIGHUP, 1);
         }
         break;
- 
+
     case SIGINT:
         if (!handletrap(SIGINT)) {
 	    if ((isset(PRIVILEGED) || isset(RESTRICTED)) &&
@@ -690,12 +690,12 @@ zhandler(int sig)
 	    }
         }
         break;
- 
+
     default:
         (void) handletrap(sig);
         break;
     }   /* end of switch(sig) */
- 
+
     signal_reset(sig);
 
 /* This is used to make signal_suspend() race-free */
@@ -706,15 +706,15 @@ zhandler(int sig)
 
 } /* handler */
 
- 
+
 /* SIGHUP any jobs left running */
- 
+
 /**/
 void
 killrunjobs(int from_signal)
 {
     int i, killed = 0;
- 
+
     if (unset(HUP))
         return;
     for (i = 1; i <= maxjob; i++)
@@ -731,7 +731,7 @@ killrunjobs(int from_signal)
 
 
 /* send a signal to a job (simply involves kill if monitoring is on) */
- 
+
 /**/
 int
 killjb(Job jn, int sig)

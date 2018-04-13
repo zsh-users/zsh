@@ -24,7 +24,7 @@
  * The softwareprovided hereunder is on an "as is" basis, and Peter
  * Stephenson, Sven Wischnowsky and the Zsh Development Group have no
  * obligation to provide maintenance, support, updates, enhancements, or
- * modifications. 
+ * modifications.
  *
  */
 

@@ -83,7 +83,7 @@ char *compiprefix,
 /**/
 Param *comprpms;
 
-/* 
+/*
  * An array of Param structures for elemens of $compstate; see
  * 'compkparams' below.
  *
@@ -227,7 +227,7 @@ cpcpattern(Cpattern o)
     return r;
 }
 
-/* 
+/*
  * Parse a string for matcher control, containing multiple matchers.
  *
  * 's' is the string to be parsed.
@@ -403,7 +403,7 @@ parse_cmatcher(char *name, char *s)
 }
 
 /*
- * Parse a pattern for matcher control. 
+ * Parse a pattern for matcher control.
  * name is the name of the builtin from which this is called, for errors.
  * *sp is the input string and will be updated to the end of the parsed
  *   pattern.
@@ -572,7 +572,7 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	return 1;
     }
     dat.ipre = dat.isuf = dat.ppre = dat.psuf = dat.prpre = dat.mesg =
-	dat.pre = dat.suf = dat.group = dat.rems = dat.remf = dat.disp = 
+	dat.pre = dat.suf = dat.group = dat.rems = dat.remf = dat.disp =
 	dat.ign = dat.exp = dat.apar = dat.opar = dat.dpar = NULL;
     dat.match = NULL;
     dat.flags = 0;
@@ -1497,7 +1497,7 @@ comp_wrapper(Eprog prog, FuncWrap w, char *name)
 	unsigned int runset = 0, kunset = 0, m, sm;
 	Param *pp;
 
-	m = CP_WORDS | CP_REDIRS | CP_CURRENT | CP_PREFIX | CP_SUFFIX | 
+	m = CP_WORDS | CP_REDIRS | CP_CURRENT | CP_PREFIX | CP_SUFFIX |
 	    CP_IPREFIX | CP_ISUFFIX | CP_QIPREFIX | CP_QISUFFIX;
 	for (pp = comprpms, sm = 1; m; pp++, m >>= 1, sm <<= 1) {
 	    if ((m & 1) && ((*pp)->node.flags & PM_UNSET))
@@ -1656,7 +1656,7 @@ setup_(UNUSED(Module m))
 
     comprpms = compkpms = NULL;
     compwords = compredirs = NULL;
-    compprefix = compsuffix = compiprefix = compisuffix = 
+    compprefix = compsuffix = compiprefix = compisuffix =
 	compqiprefix = compqisuffix =
 	compcontext = compparameter = compredirect = compquote =
 	compquoting = comprestore = complist = compinsert =

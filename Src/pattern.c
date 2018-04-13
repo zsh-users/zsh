@@ -1117,7 +1117,7 @@ patgetglobflags(char **strp, long *assertp, int *ignore)
 
 
 static const char *colon_stuffs[]  = {
-    "alpha", "alnum", "ascii", "blank", "cntrl", "digit", "graph", 
+    "alpha", "alnum", "ascii", "blank", "cntrl", "digit", "graph",
     "lower", "print", "punct", "space", "upper", "xdigit", "IDENT",
     "IFS", "IFSSPACE", "WORD", "INCOMPLETE", "INVALID", NULL
 };
@@ -3766,7 +3766,7 @@ mb_patmatchindex(char *range, wint_t ind, wint_t *chr, int *mtp)
 	    case PP_RANGE:
 		r1 = metacharinc(&range);
 		r2 = metacharinc(&range);
-		rdiff = (wint_t)r2 - (wint_t)r1; 
+		rdiff = (wint_t)r2 - (wint_t)r1;
 		if (rdiff >= ind) {
 		    *chr = (wint_t)r1 + ind;
 		    return 1;
@@ -3999,7 +3999,7 @@ patmatchindex(char *range, int ind, int *chr, int *mtp)
 		r2 = STOUC(UNMETA(range));
 		if (*range == Meta)
 		    range++;
-		rdiff = r2 - r1; 
+		rdiff = r2 - r1;
 		if (rdiff >= ind) {
 		    *chr = r1 + ind;
 		    return 1;

@@ -35,7 +35,7 @@
 	to call zalloc/zshcalloc, which call malloc/calloc directly.  It
 	is legal to call realloc() or free() on memory allocated this way.
 	The second way is to call zhalloc/hcalloc, which allocates memory
-	from one of the memory pools on the heap stack.  Such memory pools 
+	from one of the memory pools on the heap stack.  Such memory pools
 	will automatically created when the heap allocation routines are
 	called.  To be sure that they are freed at appropriate times
 	one should call pushheap() before one starts using heaps and
@@ -1209,7 +1209,7 @@ malloc(MALLOC_ARG_T size)
 
     /* some systems want malloc to return the highest valid address plus one
        if it is called with an argument of zero.
-    
+
        TODO: really?  Suppose we allocate more memory, so
        that this is now in bounds, then a more rational application
        that thinks it can free() anything it malloc'ed, even
@@ -1264,7 +1264,7 @@ malloc(MALLOC_ARG_T size)
 	    m->free = sh->next;
 	    m->used++;
 
-	    /* if all small blocks in this block are allocated, the block is 
+	    /* if all small blocks in this block are allocated, the block is
 	       put at the end of the list blocks with small blocks of this
 	       size (i.e., we try to keep blocks with free blocks at the
 	       beginning of the list, to make the search faster) */

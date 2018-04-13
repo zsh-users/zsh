@@ -1432,7 +1432,7 @@ static int
 del_automathfunc(UNUSED(const char *modnam), const char *fnam, int flags)
 {
     MathFunc f = getmathfunc(fnam, 0);
-    
+
     if (!f) {
 	if (!(flags & FEAT_IGNORE))
 	    return 2;
@@ -2435,7 +2435,7 @@ autoloadscan(HashNode hn, int printflags)
 int
 bin_zmodload(char *nam, char **args, Options ops, UNUSED(int func))
 {
-    int ops_bcpf = OPT_ISSET(ops,'b') || OPT_ISSET(ops,'c') || 
+    int ops_bcpf = OPT_ISSET(ops,'b') || OPT_ISSET(ops,'c') ||
 	OPT_ISSET(ops,'p') || OPT_ISSET(ops,'f');
     int ops_au = OPT_ISSET(ops,'a') || OPT_ISSET(ops,'u');
     int ret = 1, autoopts;
@@ -2451,7 +2451,7 @@ bin_zmodload(char *nam, char **args, Options ops, UNUSED(int func))
 	return 1;
     }
     if (OPT_ISSET(ops,'A') || OPT_ISSET(ops,'R')) {
-	if (ops_bcpf || ops_au || OPT_ISSET(ops,'d') || 
+	if (ops_bcpf || ops_au || OPT_ISSET(ops,'d') ||
 	    (OPT_ISSET(ops,'R') && OPT_ISSET(ops,'e'))) {
 	    zwarnnam(nam, "illegal flags combined with -A or -R");
 	    return 1;
@@ -2467,7 +2467,7 @@ bin_zmodload(char *nam, char **args, Options ops, UNUSED(int func))
 	zwarnnam(nam, "what do you want to unload?");
 	return 1;
     }
-    if (OPT_ISSET(ops,'e') && (OPT_ISSET(ops,'I') || OPT_ISSET(ops,'L') || 
+    if (OPT_ISSET(ops,'e') && (OPT_ISSET(ops,'I') || OPT_ISSET(ops,'L') ||
 			       (OPT_ISSET(ops,'a') && !OPT_ISSET(ops,'F'))
 			       || OPT_ISSET(ops,'d') ||
 			       OPT_ISSET(ops,'i') || OPT_ISSET(ops,'u'))) {

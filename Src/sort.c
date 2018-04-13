@@ -91,7 +91,7 @@ eltpcmp(const void *a, const void *b)
 		if (be->len != -1) {
 		    /*
 		     * if a is shorter it's earlier, so return -1 and
-		     * vice versa 
+		     * vice versa
 		     */
 		    return (ae->len - be->len) * sortdir;
 		} else {

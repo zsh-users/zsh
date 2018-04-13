@@ -1038,7 +1038,7 @@ cd_do_chdir(char *cnam, char *dest, int hard)
 	    if (!(*pp)[0] || ((*pp)[0] == '.' && (*pp)[1] == '\0'))
 		hasdot = 1;
     /*
-     * If 
+     * If
      * (- there is no . in cdpath
      *  - or cdpath is not being used)
      *  - and the POSIXCD option is not set

@@ -174,21 +174,21 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	    fd_set rfds;
 	    struct timeval tv;
 	    int ret;
-	    
+
 	    FD_ZERO(&rfds);
 	    FD_SET(lfd, &rfds);
 	    tv.tv_sec = 0;
 	    tv.tv_usec = 0;
-	    
+
 	    if ((ret = select(lfd+1, &rfds, NULL, NULL, &tv)) == 0) return 1;
 	    else if (ret == -1)
 	    {
 		zwarnnam(nam, "select error: %e", errno);
 		return 1;
 	    }
-	    
+
 # endif
-	    
+
 #else
 	    zwarnnam(nam, "not currently supported");
 	    return 1;
@@ -241,7 +241,7 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 
 	soun.sun_family = AF_UNIX;
 	strncpy(soun.sun_path, args[0], sizeof(soun.sun_path)-1);
-	
+
 	if ((err = connect(sfd, (struct sockaddr *)&soun, sizeof(struct sockaddr_un)))) {
 	    zwarnnam(nam, "connection failed: %e", errno);
 	    close(sfd);
@@ -266,7 +266,7 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	    if (verbose)
 		printf("%s is now on fd %d\n", soun.sun_path, sfd);
 	}
-	
+
     }
 
     return 0;

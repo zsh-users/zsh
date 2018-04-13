@@ -626,7 +626,7 @@ cleanup_(Module m)
     *(Builtin)hn = save_local;
 
     removehashnode(reswdtab, "private");
-    
+
     realparamtab->getnode = getparamnode;
     realparamtab->getnode2 = save_getnode2;
     realparamtab->printnode = save_printnode;

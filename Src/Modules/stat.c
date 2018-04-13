@@ -348,7 +348,7 @@ statprint(struct stat *sbuf, char *outbuf, char *fname, int iwhich, int flags)
  *  +type selects just element type of stat buffer (-l gives list):
  *        type can be shortened to unambiguous string.  only one type is
  *        allowed.  The extra type, +link, reads the target of a symbolic
- *        link; it is empty if the stat was not an lstat or if 
+ *        link; it is empty if the stat was not an lstat or if
  *        a file descriptor was stat'd, if the stat'd file is
  *        not a symbolic link, or if symbolic links are not
  *        supported.  If +link is explicitly requested, the -L (lstat)

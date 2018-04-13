@@ -40,24 +40,24 @@ mod_export pid_t origpgrp;
 
 /**/
 mod_export pid_t mypgrp;
- 
+
 /* the job we are working on */
- 
+
 /**/
 mod_export int thisjob;
 
 /* the current job (+) */
- 
+
 /**/
 mod_export int curjob;
- 
+
 /* the previous job (-) */
- 
+
 /**/
 mod_export int prevjob;
- 
+
 /* the job table */
- 
+
 /**/
 mod_export struct job *jobtab;
 
@@ -78,7 +78,7 @@ static struct job *oldjobtab;
 static int oldmaxjob;
 
 /* shell timings */
- 
+
 /**/
 #ifdef HAVE_GETRUSAGE
 /**/
@@ -89,9 +89,9 @@ static struct rusage child_usage;
 static struct tms shtms;
 /**/
 #endif
- 
+
 /* 1 if ttyctl -f has been executed */
- 
+
 /**/
 mod_export int ttyfrozen;
 
@@ -130,7 +130,7 @@ makerunning(Job jn)
     jn->stat &= ~STAT_STOPPED;
     for (pn = jn->procs; pn; pn = pn->next) {
 #if 0
-	if (WIFSTOPPED(pn->status) && 
+	if (WIFSTOPPED(pn->status) &&
 	    (!(jn->stat & STAT_SUPERJOB) || pn->next))
 	    pn->status = SP_RUNNING;
 #endif
@@ -186,7 +186,7 @@ findproc(pid_t pid, Job *jptr, Process *pptr, int aux)
 	    if (pn->pid == pid) {
 		*pptr = pn;
 		*jptr = jobtab + i;
-		if (pn->status == SP_RUNNING) 
+		if (pn->status == SP_RUNNING)
 		    return 1;
 	    }
 	}
@@ -302,7 +302,7 @@ handle_sub(int job, int fg)
 /* Get the latest usage information */
 
 /**/
-void 
+void
 get_usage(void)
 {
 #ifdef HAVE_GETRUSAGE
@@ -347,7 +347,7 @@ update_process(Process pn, int status)
 /*
  * Called when the current shell is behaving as if it received
  * a interactively generated signal (sig).
- * 
+ *
  * As we got the signal or are pretending we did, we need to pretend
  * anything attached to a CURSH process got it, too.
  */
@@ -484,7 +484,7 @@ update_job(Job jn)
 
     if (shout && shout != stderr && !ttyfrozen && !jn->stty_in_env &&
 	!zleactive && job == thisjob && !somestopped &&
-	!(jn->stat & STAT_NOSTTY)) 
+	!(jn->stat & STAT_NOSTTY))
 	gettyinfo(&shttyinfo);
 
     if (isset(MONITOR)) {
@@ -789,7 +789,7 @@ printtime(struct timeval *real, child_times_t *ti, char *desc)
 #endif
 #ifdef HAVE_STRUCT_RUSAGE_RU_IXRSS
 	    case 'X':
-		fprintf(stderr, "%ld", 
+		fprintf(stderr, "%ld",
 			total_time ?
 			(long)(ti->ru_ixrss / total_time) :
 			(long)0);
@@ -798,7 +798,7 @@ printtime(struct timeval *real, child_times_t *ti, char *desc)
 #ifdef HAVE_STRUCT_RUSAGE_RU_IDRSS
 	    case 'D':
 		fprintf(stderr, "%ld",
-			total_time ? 
+			total_time ?
 			(long) ((ti->ru_idrss
 #ifdef HAVE_STRUCT_RUSAGE_RU_ISRSS
 				 + ti->ru_isrss
@@ -1755,13 +1755,13 @@ shelltime(void)
 }
 
 /* see if jobs need printing */
- 
+
 /**/
 void
 scanjobs(void)
 {
     int i;
- 
+
     for (i = 1; i <= maxjob; i++)
         if (jobtab[i].stat & STAT_CHANGED)
             printjob(jobtab + i, !!isset(LONGLISTJOBS), 1);
@@ -2245,7 +2245,7 @@ bin_fg(char *name, char **argv, Options ops, int func)
 		if (job != ignorejob && jobptr->stat) {
 		    if ((!OPT_ISSET(ops,'r') && !OPT_ISSET(ops,'s')) ||
 			(OPT_ISSET(ops,'r') && OPT_ISSET(ops,'s')) ||
-			(OPT_ISSET(ops,'r') && 
+			(OPT_ISSET(ops,'r') &&
 			 !(jobptr->stat & STAT_STOPPED)) ||
 			(OPT_ISSET(ops,'s') && jobptr->stat & STAT_STOPPED))
 			printjob(jobptr, lng, 2);
@@ -2667,7 +2667,7 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    if (kill(pid, sig) == -1) {
 		zwarnnam("kill", "kill %s failed: %e", *argv, errno);
 		returnval++;
-	    } 
+	    }
 #ifndef WIFCONTINUED
 	    else if (sig == SIGCONT) {
 		Job jn;

@@ -889,7 +889,7 @@ bin_zle_fd(char *name, char **args, Options ops, UNUSED(char func))
 	    /* zrealloc handles NULL pointers, so OK for first time through */
 	    int newnwatch = nwatch+1;
 	    Watch_fd new_fd;
-	    watch_fds = (Watch_fd)zrealloc(watch_fds, 
+	    watch_fds = (Watch_fd)zrealloc(watch_fds,
 					   newnwatch * sizeof(struct watch_fd));
 	    new_fd = watch_fds + nwatch;
 	    new_fd->fd = fd;

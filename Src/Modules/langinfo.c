@@ -445,7 +445,7 @@ scanlanginfo(UNUSED(HashTable ht), ScanFunc func, int flags)
 	    func(&pm->node, flags);
 	}
     }
-    
+
 }
 
 static struct paramdef partab[] = {
