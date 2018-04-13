@@ -537,6 +537,19 @@ wait_for_processes(void)
 #else
 		update_process(pn, status);
 #endif
+		if (pn->pid == jn->gleader) {
+		    jn->gleader = 0;
+		    if (!(jn->stat & STAT_NOSTTY)) {
+			/*
+			 * This PID was in control of the terminal;
+			 * reclaim terminal now it has exited.
+			 * It's still possible some future forked
+			 * process of this job will become group
+			 * leader, however.
+			 */
+			attachtty(mypgrp);
+		    }
+		}
 	    }
 	    update_job(jn);
 	} else if (findproc(pid, &jn, &pn, 1)) {

@@ -4576,10 +4576,20 @@ readoutput(int in, int qt, int *readerror)
     char *buf, *ptr;
     int bsiz, c, cnt = 0;
     FILE *fin;
+    int q = queue_signal_level();
 
     fin = fdopen(in, "r");
     ret = newlinklist();
     ptr = buf = (char *) hcalloc(bsiz = 64);
+    /*
+     * We need to be sensitive to SIGCHLD else we can be
+     * stuck forever with important processes unreaped.
+     * The case that triggered this was where the exiting
+     * process is group leader of the foreground process and we need
+     * to reclaim the terminal else ^C doesn't work.
+     */
+    dont_queue_signals();
+    child_unblock();
     while ((c = fgetc(fin)) != EOF || errno == EINTR) {
 	if (c == EOF) {
 	    errno = 0;
@@ -4592,13 +4602,18 @@ readoutput(int in, int qt, int *readerror)
 	    cnt++;
 	}
 	if (++cnt >= bsiz) {
-	    char *pp = (char *) hcalloc(bsiz *= 2);
+	    char *pp;
+	    queue_signals();
+	    pp = (char *) hcalloc(bsiz *= 2);
+	    dont_queue_signals();
 
 	    memcpy(pp, buf, cnt - 1);
 	    ptr = (buf = pp) + cnt - 1;
 	}
 	*ptr++ = c;
     }
+    child_block();
+    restore_queue_signals(q);
     if (readerror)
 	*readerror = ferror(fin) ? errno : 0;
     fclose(fin);
