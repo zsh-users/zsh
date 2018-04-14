@@ -1,0 +1,67 @@
+#compdef cksum sum=cksum md2 md4 md5 rmd160 sha1 sha256 sha384 sha512 sha512t256
+
+if [[ $OSTYPE == (dragonfly|freebsd)* && service == cksum ]]; then
+  _arguments -s -S -A '-*' \
+    '-o[use specified historic algorithm]:historic algorithm:(1 2 3)' \
+    '*:_files'
+
+else
+  local -a args
+
+  case $OSTYPE in
+    dragonfly*|freebsd*|netbsd*)
+      args+=(
+        '-t[run built-in time trial]'
+      )
+      ;|
+    dragonfly*|freebsd*|openbsd*)
+      args+=(
+        '-r[reverse the output format]'
+      )
+      ;|
+    dragonfly*)
+      args+=(
+        '-b+[begin at specified offset]:begin offset: '
+        '-e+[end at specified offset]:end offset: '
+      )
+      ;;
+    freebsd*)
+      args+=(
+        '-c+[compare digest against specified string]:digest string: '
+      )
+      ;;
+    netbsd*)
+      args+=(
+        '(*)-c+[compare checksums against specifed sumfile]:sumfile:_files'
+        '-n[reverse the output format]'
+        '-w[warn on malformed checksum files]'
+      )
+      if [[ $service == cksum ]]; then
+        args=(
+          '(-o)-a+[use the specfied algorithm(s)]:algorithm:(crc md2 md4 md5 old1 old2 rmd160 sha1 sha256 sha384 sha512)'
+          '(-a)-o+[use the specfied historic algorithm]:historic algorithm:(1 2)'
+        )
+      fi
+      ;;
+    openbsd*)
+      args+=(
+        '-b[output in base 64]'
+        '-C+[compare checksums against specifed checklist]:checklist:_files'
+        '-c[file arguments are checklists]'
+        '-h+[output to specified hashfile]:hashfile:_files'
+        '*-t[run built-in time trial]'
+      )
+      if [[ $service == cksum ]]; then
+        args+=('*-a+[use the specfied algorithm(s)]:algorithm:_values -s , algotithm cksum md5 rmd160 sha1 sha224 sha256 sha384 sha512/256 sha512')
+      fi
+      ;;
+  esac
+
+  _arguments -s -S -A '-*' \
+    $args \
+    '-p[echo stdin to stdout]' \
+    '-q[quiet mode]' \
+    '-s+[checksum specified string]:string: ' \
+    '-x[run built-in test]' \
+    '*:_files'
+fi

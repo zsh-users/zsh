@@ -1,3 +1,12 @@
+2018-04-16  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* Matthew Martin: 42643, 42644: Completion/BSD/Command/_cksum:
+	new cksum completion
+
+	* Matthew Martin: 42642 (tweaked for Solaris):
+	Completion/Unix/Command/_chown:
+	OpenBSD chown does not support -f and dragonfly has -x
+
 2018-04-15  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 42650: Src/utils.c: fix 42156 for zero-sized terminals
