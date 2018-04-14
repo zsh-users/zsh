@@ -23,7 +23,6 @@ if _pick_variant gnu=Free\ Soft unix --version; then
       args+=( '--from=[restrict changes to files by current ownership]: :->owner' )
 else
   args=(
-    "-f[don't report errors]"
     "-h[operate on symlinks them self]"
     '-R[change files and directories recursively]'
     '(-H -L -P)-L[follow all symlinks]'
@@ -31,7 +30,8 @@ else
     '(-H -L -P)-P[do not follow symlinks (default)]'
   )
   for pattern arg in \
-    'freebsd*' "-x[don't traverse file systems]" \
+    '(dragonfly|freebsd)*' "-x[don't traverse file systems]" \
+    '(darwin|dragonfly|(free|net)bsd|solaris)*' "-f[don't report errors]" \
     '(darwin|dragonfly|(free|net)bsd)*' '-v[output info for every file processed]' \
     'solaris2.<11->' '-s[owner and/or group are Windows SID strings]'
   do
