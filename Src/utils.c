@@ -1834,8 +1834,9 @@ adjustlines(int signalled)
     else
 	shttyinfo.winsize.ws_row = zterm_lines;
 #endif /* TIOCGWINSZ */
-    if (zterm_lines < 0) {
-	DPUTS(signalled, "BUG: Impossible TIOCGWINSZ rows");
+    if (zterm_lines <= 0) {
+	DPUTS(signalled && zterm_lines < 0,
+	      "BUG: Impossible TIOCGWINSZ rows");
 	zterm_lines = tclines > 0 ? tclines : 24;
     }
 
@@ -1858,8 +1859,9 @@ adjustcolumns(int signalled)
     else
 	shttyinfo.winsize.ws_col = zterm_columns;
 #endif /* TIOCGWINSZ */
-    if (zterm_columns < 0) {
-	DPUTS(signalled, "BUG: Impossible TIOCGWINSZ cols");
+    if (zterm_columns <= 0) {
+	DPUTS(signalled && zterm_columns < 0,
+	      "BUG: Impossible TIOCGWINSZ cols");
 	zterm_columns = tccolumns > 0 ? tccolumns : 80;
     }
 
@@ -2777,7 +2779,7 @@ checkrmall(char *s)
 	int ignoredots = !isset(GLOBDOTS);
 	char *fname;
 
-	while (fname = zreaddir(rmd, 1)) {
+	while ((fname = zreaddir(rmd, 1))) {
 	    if (ignoredots && *fname == '.')
 		continue;
 	    count++;

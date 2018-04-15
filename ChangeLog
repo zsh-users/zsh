@@ -1,5 +1,7 @@
 2018-04-15  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 42650: Src/utils.c: fix 42156 for zero-sized terminals
+
 	* 42636: Src/utils.c: fix GLOB_DOTS for !(RM_STAR_SILENT)
 
 2018-04-13  Daniel Hahler  <zsh@thequod.de>
