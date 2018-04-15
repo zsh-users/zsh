@@ -1,3 +1,7 @@
+2018-04-15  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 42636: Src/utils.c: fix GLOB_DOTS for !(RM_STAR_SILENT)
+
 2018-04-13  Daniel Hahler  <zsh@thequod.de>
 
 	* 42631: Completion/Unix/Command/_pgrep: _pgrep: pkill: fix completion
@@ -206,7 +210,7 @@
 	* 42487: Src/Zle/compctl.c: remove gcc 7.3.0 warnings and
 	potentially incorrect pointer usage.
 
-2018-03-18  Barton E. Schaefer  <schaefer@brasslantern.com>
+2018-03-18  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Stephane: 42469: Src/exec.c, Src/Modules/mapfile.c: fix 42465
 
