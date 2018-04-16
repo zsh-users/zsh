@@ -116,6 +116,8 @@ _git-am () {
     '(-u --utf8 --no-utf8)--no-utf8[pass -n to git mailinfo]' \
     '(-3 --3way)'{-3,--3way}'[use 3-way merge if patch does not apply cleanly]' \
     $apply_options \
+    '--quit[abort the patching operation but keep HEAD where it is]' \
+    '--show-current-patch[show the patch being applied]' \
     '(-i --interactive)'{-i,--interactive}'[apply patches interactively]' \
     '--committer-date-is-author-date[use author date as committer date]' \
     '--ignore-date[use committer date as author date]' \
@@ -637,6 +639,7 @@ _git-clone () {
     '--separate-git-dir[place .git dir outside worktree]:path to .git dir:_path_files -/' \
     '(-4 --ipv4 -6 --ipv6)'{-4,--ipv4}'[use IPv4 addresses only]' \
     '(-4 --ipv4 -6 --ipv6)'{-6,--ipv6}'[use IPv6 addresses only]' \
+    '--filter=[object filtering]:filter:_git_rev-list_filters' \
     ': :->repository' \
     ': :_directories' && ret=0
 
@@ -685,6 +688,8 @@ _git-commit () {
     $reset_author_opt \
     '(        --porcelain --dry-run)--short[dry run with short output format]' \
     '--branch[show branch information]' \
+    '!(--no-ahead-behind)--ahead-behind' \
+    "--no-ahead-behind[don't display detailed ahead/behind counts relative to upstream branch]" \
     '(--short             --dry-run)--porcelain[dry run with machine-readable output format]' \
     '(--short --porcelain --dry-run -z --null)'{-z,--null}'[dry run with NULL-separated output format]' \
     {-p,--patch}'[use the interactive patch selection interface to chose which changes to commit]' \
@@ -865,6 +870,8 @@ _git-fetch () {
     '--deepen[deepen history of shallow clone]:number of commits' \
     '(-n --no-tags -t --tags)'{-n,--no-tags}'[disable automatic tag following]' \
     '(--all -m --multiple)'{-m,--multiple}'[fetch from multiple remotes]' \
+    '(-P --prune-tags)'{-P,--prune-tags}'[prune local tags no longer on remote and clobber changed tags]' \
+    '--filter=[object filtering]:filter:_git_rev-list_filters' \
     '*:: :->repository-or-group-or-refspec' && ret=0
 
   case $state in
@@ -1431,6 +1438,7 @@ _git-rebase () {
     '(-)--edit-todo[edit interactive instruction sheet in an editor]' \
     '(-)--skip[skip the current patch]' \
     '(-)--quit[abort but keep HEAD where it is]' \
+    '(-)--show-current-patch[show the patch file being applied or merged]' \
     - options \
     '(-m --merge)'{-m,--merge}'[use merging strategies to rebase]' \
     '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=-}'[GPG-sign the commit]::key id' \
@@ -1450,6 +1458,7 @@ _git-rebase () {
     '(-p --preserve-merges --interactive)'{-p,--preserve-merges}'[try to recreate merges instead of ignoring them]' \
     {-x+,--exec=}'[with -i\: append "exec <cmd>" after each line]:command:_command_names -e' \
     '(-k --keep-empty)'{-k,--keep-empty}'[keep empty commits in the result]' \
+    '--allow-empty-message[allow rebasing commits with empty messages]' \
     '(1)--root[rebase all reachable commits]' \
     $autosquash_opts \
     '(--autostash --no-autostash)--autostash[stash uncommitted changes before rebasing and apply them afterwards]' \
@@ -1747,6 +1756,8 @@ _git-status () {
     $branch_opts \
     '(-s --short)--porcelain=-[produce machine-readable output]:version:(v1)' \
     '(-s --short)--show-stash[show stash information]' \
+    '!(--no-ahead-behind)--ahead-behind' \
+    "--no-ahead-behind[don't display detailed ahead/behind counts relative to upstream branch]" \
     '(-u --untracked-files)'{-u-,--untracked-files=-}'[show untracked files]::mode:((no\:"show no untracked files" \
                                                                                      normal\:"show untracked files and directories" \
                                                                                      all\:"also show untracked files in untracked directories (default)"))' \
@@ -1988,6 +1999,7 @@ _git-tag () {
   _arguments \
     - creation \
       '(-a --annotate -s --sign -u --local-user)'{-a,--annotate}'[create an unsigned, annotated tag]' \
+      '(-e --edit)'{-e,--edit}'[force edit of tag message]' \
       '(-a --annotate -s --sign -u --local-user)'{-s,--sign}'[create a signed and annotated tag]' \
       '(-a --annotate -s --sign)'{-u+,--local-user=}'[create a tag, annotated and signed with the given key]: :__git_gpg_secret_keys' \
       '(-f --force)'{-f,--force}'[replace existing tag]' \
@@ -2037,6 +2049,8 @@ _git-worktree() {
         prune:'prune working tree information'
         list:'list details of each worktree'
 	lock:'prevent a working tree from being pruned'
+	move:'move a working tree to a new location'
+	remove:'remove a working tree'
 	unlock:'allow working tree to be pruned, moved or deleted'
       )
 
@@ -2051,32 +2065,44 @@ _git-worktree() {
 	  else
 	    args=( ':commit:__git_commits' )
 	  fi
-          _arguments \
+          _arguments -S \
 	    '(-f --force)'{-f,--force}'[checkout branch even if already checked out in another worktree]' \
 	    '(-B --detach)-b+[create a new branch]: :__git_branch_names' \
 	    '(-b --detach)-B+[create or reset a branch]: :__git_branch_names' \
 	    '(-b -B)--detach[detach HEAD at named commit]' \
 	    '--no-checkout[suppress file checkout in new worktree]' \
-	    ':path:_files' $args && ret=0
+	    '--lock[keep working tree locked after creation]' \
+	    ':path:_directories' $args && ret=0
 	;;
         (prune)
-          _arguments \
+          _arguments -S \
 	    '(-n --dry-run)'{-n,--dry-run}"[don't remove, show only]" \
 	    '(-v --verbose)'{-v,--verbose}'[report pruned objects]' \
 	    '--expire[expire objects older than specified time]:time' && ret=0
 	;;
         (list)
-	  _arguments '--porcelain[machine-readable output]' && ret=0
+	  _arguments -S '--porcelain[machine-readable output]' && ret=0
 	;;
 	(lock)
-	  _arguments -C '--reason=[specify reason for locking]:reason' ': :->worktrees' && ret=0
-	  [[ -z $state ]] && return ret
-	;&
+	  _arguments -C -S '--reason=[specify reason for locking]:reason' ': :->worktrees' && ret=0
+	;;
+	(move)
+	  _arguments -C \
+            ': :->worktrees' \
+            ':location:_directories' && ret=0
+	;;
+	(remove)
+	  _arguments -C -S '--force[remove working trees that are not clean or that have submodules]' \
+            ': :->worktrees' && ret=0
+	;;
 	(unlock)
-	  _wanted directories expl 'working tree' compadd -S ' ' -f -M 'r:|/=* r:|=*' \
-	      ${${(M)${(f)"$(_call_program directories git worktree list --porcelain)"}:#worktree*}#* }
+	  state=worktrees
 	;;
       esac
+      if [[ $state = worktrees ]]; then
+        _wanted directories expl 'working tree' compadd -S ' ' -f -M 'r:|/=* r:|=*' \
+            ${${(M)${(f)"$(_call_program directories git worktree list --porcelain)"}:#worktree*}#* } && ret=0
+      fi
     ;;
   esac
   return ret
@@ -3442,6 +3468,7 @@ _git-prune () {
     '(-v --verbose)'{-v,--verbose}'[report all removed objects]' \
     '--progress[show progress]' \
     '--expire=[only expire loose objects older than specified date]: :__git_datetimes' \
+    '--exclude-promisor-objects[limit traversal to objects outside promisor packfiles]' \
     '*:: :__git_heads'
 }
 
@@ -4133,11 +4160,14 @@ _git-send-email () {
     '--cc-cover[copy the Cc: list from the first file to the rest]' \
     '--compose[edit introductory message for patch series]' \
     '--from=[specify sender]:email address:_email_addresses' \
+    '--reply-to=[specify Reply-To address]:email address:_email_addresses' \
     '--in-reply-to=[specify contents of first In-Reply-To header]:message-id' \
     '--subject=[specify the initial subject of the email thread]:subject' \
     '--to=[specify the primary recipient of the emails]: :_email_addresses' \
+    "--no-xmailer[don't add X-Mailer header]" \
     '--8bit-encoding=[encoding to use for non-ASCII messages]: :__git_encodings' \
     '--compose-encoding=[encoding to use for compose messages]: :__git_encodings' \
+    '--transfer-encoding=[specify transfer encoding to use]:transfer encoding:(quoted-printable 8bit base64)' \
     '--envelope-sender[specify the envelope sender used to send the emails]: :_email_addresses' \
     '--smtp-encryption=[specify encryption method to use]: :__git_sendemail_smtpencryption_values' \
     '--smtp-domain=[specify FQDN used in HELO/EHLO]: :_domains' \
@@ -4147,7 +4177,10 @@ _git-send-email () {
     '--smtp-server-option=[specify the outgoing SMTP server option to use]:SMPT server option' \
     '--smtp-ssl-cert-path=[path to ca-certificates (directory or file)]:ca certificates path:_files' \
     '--smtp-user=[specify user to use for SMTP-AUTH]:smtp user:_users' \
+    '--smtp-auth=[specify allowed AUTH mechanisms]:space-separated list of mechanisms' \
     '--smtp-debug=[enable or disable debug output]:smtp debug:((0\:"disable" 1\:"enable"))' \
+    '--batch-size=[specify maximum number of messages per connection]:number' \
+    '--relogin-delay=[specify delay between successive logins]:delay (seconds)' \
     '--cc-cmd=[specify command to generate Cc\: header with]:Cc\: command:_cmdstring' \
     '--to-cmd=[specify command to generate To\: header with]:To\: command:_cmdstring' \
     '(                 --no-chain-reply-to)--chain-reply-to[send each email as a reply to previous one]' \
@@ -4168,6 +4201,7 @@ _git-send-email () {
     '(           --no-validate)--validate[perform sanity checks on patches]' \
     '(--validate              )--no-validate[do not perform sanity checks on patches]' \
     '--force[send emails even if safety checks would prevent it]' \
+    '(- *)--dump-aliases[dump configured aliases and exit]' \
     '*: : _alternative -O expl
       "files:file:_files"
       "commits:recent commit object name:__git_commit_objects_prefer_recent"'
@@ -4671,7 +4705,8 @@ _git-pack-objects () {
     '--use-bitmap-index[use a bitmap index if available to speed up counting objects]' \
     '--write-bitmap-index[write a bitmap index together with the pack index]' \
     '--filter=[omit certain objects from pack file]:filter:_git_rev-list_filters' \
-    '--missing=[specify how missing objects are handled]:action:(error allow-any print)' \
+    '--missing=[specify how missing objects are handled]:action:(error allow-any allow-promisor print)' \
+    "--exclude-promisor-objects[don't pack objects in promisor packfiles]" \
     ':base-name:_files'
 }
 
@@ -5080,7 +5115,7 @@ _git-rev-list () {
     '--no-filter[turn off any previous --filter argument]' \
     '--filter-print-omitted[print a list of objects omitted by --filter]' \
     '--filter=[omit certain objects from pack file]:filter:_git_rev-list_filters' \
-    '--missing=[specify how missing objects are handled]:action:(error allow-any print)' \
+    '--missing=[specify how missing objects are handled]:action:(error allow-any allow-promisor print)' \
     '(--count --pretty --header --left-right --abbrev-commit --abbrev --parent --children)--quiet[print nothing; exit status indicates if objects are fully connected]' \
     '--use-bitmap-index[try to speed traversal using pack bitmap index if available]' \
     '--progress=-[show progress reports as objects are considered]:header' \
@@ -5197,6 +5232,7 @@ _git-daemon () {
     '--forbid-override[forbid overriding site-wide service]: :__git_daemon_service' \
     '(--no-informative-errors)--informative-errors[report more verbose errors to the client]' \
     '(--informative-errors)--no-informative-errors[report all errors as "access denied" to the client]' \
+    '--log-destination=[send log messages to the specified destination]:destination:(stderr syslog none)' \
     '*:repository:_directories'
 }
 
@@ -7071,6 +7107,7 @@ __git_setup_diff_options () {
     '--diff-filter=-[select certain kinds of files for diff]: :_guard "[AaCcDdMmRrTtUuXxBb*]#" kinds'
     '-S-[look for differences that add or remove the given string]:string'
     '-G-[look for differences whose added or removed line matches the given regex]:pattern'
+    '--find-object=[look for differences that change the number of occurrences of the specified object]:object:__git_blobs'
     '--pickaxe-all[when -S finds a change, show all changes in that changeset]'
     '--pickaxe-regex[treat argument of -S as regular expression]'
     '-O-[output patch in the order of glob-pattern lines in given file]: :_files'

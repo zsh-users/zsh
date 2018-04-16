@@ -1,5 +1,10 @@
 2018-04-16  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42659: Completion/Unix/Command/_git, Completion/Unix/Command/_sed,
+	Completion/Linux/Command/_ethtool, Completion/Linux/Command/_htop,
+	Completion/Linux/Command/_pidof, Completion/Unix/Command/_sqlite,
+	Completion/Unix/Command/_ssh: various completion option updates
+
 	* 42658: Completion/Unix/Command/_diffstat: allow compact form of
 	option arguments to diffstat
 

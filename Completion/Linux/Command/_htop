@@ -1,10 +1,11 @@
 #compdef htop
 
 _arguments -S : \
-  '(-d --delay)'{-d+,--delay=}'[update frequency]:duration' \
+  '(-d --delay)'{-d+,--delay=}'[update frequency]:duration (tenths of seconds)' \
   '(-C --no-color --no-colour)'{-C,--no-colo{,u}r}'[monochrome mode]' \
-  '(-h --help)'{-h,--help}'[display help]' \
-  '(-p --pid)'{-p+,--pid=}'[show given pids]: : _sequence -n ${$(</proc/sys/kernel/pid_max)\:-32768} _pids' \
-  '(-s --sort-key)'{-s+,--sort-key=}'[sort by key]:key:( ${(f)"$($service --sort-key help)"} )' \
+  '(-)'{-h,--help}'[display usage information]' \
+  \*{-p+,--pid=}'[show given pids]: : _sequence -n ${$(</proc/sys/kernel/pid_max)\:-32768} _pids' \
+  '(-s --sort-key)'{-s+,--sort-key=}'[sort by key]:key:( ${(f)"$(_call_program sort-keys $words[1] --sort-key help)"} )' \
+  '(-t --tree)'{-t,--tree}'[show tree view of processes]' \
   '(-u --user)'{-u+,--user=}'[show processes of user]: : _users' \
-  '(-v --version)'{-v,--version}'[print version information]'
+  '(-)'{-v,--version}'[display version information]'

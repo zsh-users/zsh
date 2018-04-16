@@ -10,7 +10,8 @@ _arguments -C -s -w \
   "(-s --single-shot $exargs)"{-s,--single-shot}'[return one PID only]' \
   "(-c --check-root $exargs)"{-c,--check-root}'[omit processes with different root]' \
   "(-x $exargs)"-x'[include shells running named scripts]' \
-  "($exargs)"\*{-o+,--omit-pid}'[omit processes with PIDs]:pids:_sequence -s , _pids' \
+  "($exargs)"\*{-o+,--omit-pid=}'[omit processes with PIDs]:pids:_sequence -s , _pids' \
+  '(-S --separator)'{-S+,--separator=}'[specify separator put between PIDs]:separator' \
   '*:process:->procnames' \
   && return 0
 

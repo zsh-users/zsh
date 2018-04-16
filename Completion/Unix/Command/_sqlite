@@ -41,6 +41,7 @@ options+=(
 )
 
 (( $+sqlite3 )) && options+=(
+  $^dashes'-append[append the database to the end of the file]'
   $^dashes'-bail[stop after hitting an error]'
   $^dashes'-cmd[run specified command before reading stdin]:sqlite meta-command'
   '(-*batch -*interactive)'$^dashes'-batch[force batch I/O]'
@@ -49,6 +50,7 @@ options+=(
   $^dashes'-mmap[set default mmap size]:size'
   $^dashes'-newline[set output row separator]:separator [\n]'
   $^dashes'-pagecache[specify size and number of slots for page cache memory]:size (bytes): :slots'
+  $^dashes'-readonly[open the database read-only]'
   $^dashes'-stats[print memory stats before each finalize]'
   $^dashes'-vfs[use specified default VFS]:vfs:(unix-dotfile unix-excl unix-none unix-namedsem)'
 )

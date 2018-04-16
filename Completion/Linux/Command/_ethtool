@@ -69,7 +69,7 @@ if [[ -n $state ]]; then
   rx-frames-low|tx-usecs-low|tx-frames-low|pkt-rate-high|rx-usecs-high) ;&
   rx-frames-high|tx-usecs-high|tx-frames-high|sample-interval|dmac|rx-mini) ;&
   rx-jumbo|offset|length|magic|value|phyad|proto|tos|tclass|l4proto|src-port) ;&
-  dst-port|spi|l4data|vlan-etype|vlan|user-def|action|vf|queue|loc|delete) ;&
+  dst-port|spi|l4data|vlan-etype|vlan|user-def|action|vf|queue|loc) ;&
   other|combined|tx-timer|count)
     _message -e numbers 'number'
   ;;
@@ -130,16 +130,19 @@ if [[ -n $state ]]; then
     _message -e masks mask
   ;;
   hkey)
-    _message -e keys expl 'hash key'
+    _message -e keys 'hash key'
   ;;
   hfunc)
-    _message -e functions expl 'hash function'
+    _message -e functions 'hash function'
   ;;
   flags)
-    _message -e masks expl mask
+    _message -e masks mask
   ;;
   encoding)
     _wanted encodings expl encoding compadd auto off rs baser
+  ;;
+  context)
+    _message -e contexts 'RSS context'
   ;;
   *)
     case $words[2] in
@@ -218,7 +221,7 @@ if [[ -n $state ]]; then
       fi
           ;;
     -n|-u|--show-nfc|--show-ntuple)
-      _wanted options expl option compadd -F line - rx-flow-hash rule
+      _wanted options expl option compadd -F line - rx-flow-hash context rule
     ;;
     -N|-U|--config-nfc|--config-ntuple)
       if [[ $words[CURRENT-2] = rx-flow-hash ]]; then
@@ -231,19 +234,25 @@ if [[ -n $state ]]; then
           'f[bytes 0 and 1 of the Layer 4 header]' \
           'n[bytes 2 and 3 of the Layer 4 header]' \
           'r[discard all packets of this flow type]'
+      elif [[ $words[CURRENT-1] = delete ]]; then
+        _message -e numbers 'number'
       else
-        _wanted options expl option compadd -F line - rx-flow-hash flow-type \
+        _wanted options expl option compadd -F line - rx-flow-hash context flow-type \
             delete src dst proto src-ip dst-ip tos m tclass l4proto src-port \
             dst-port spi l4data vlan-etype vlan user-def dst-mac action vf \
-            queue loc
+            queue context loc
       fi
+    ;;
+    -x|--show-rxfh-indir|--show-rxfh)
+      _wanted options expl option compadd -F line - context
     ;;
     -X|--set-rxfh-indir|--rxfh)
       _values -S ' ' -w 'option' \
+        context \
         '(weight default)equal' \
         '(equal default)weight' \
         '(equal weight)default' \
-        hkey hfunc
+        hkey hfunc delete
     ;;
     -f|--flash)
       if (( CURRENT = 4 )); then

@@ -32,6 +32,7 @@ _ssh () {
     _arguments -C -s \
       '(-a)-A[enable forwarding of the authentication agent connection]' \
       '(-A)-a[disable forwarding of authentication agent connection]' \
+      '-B+[bind to specified interface before attempting to connect]:interface:_net_interfaces' \
       '(-P)-b+[specify interface to transmit on]:bind address:_bind_addresses' \
       '-D+[specify a dynamic port forwarding]:dynamic port forwarding:->dynforward' \
       '-e+[set escape character]:escape character (or `none'\''):' \
@@ -90,6 +91,8 @@ _ssh () {
       '-k[load plain private keys only and skip certificates]' \
       '-L[list public key parameters of all identities in the agent]'\
       '-l[list all identities]' \
+      '-m+[specify minimum remaining signatures before maximum is changed]:number' \
+      '-M+[specify maximum number of signatures]:number' \
       '-s+[add keys provided by the PKCS#11 shared library]:library:_files -g "*.(so|dylib)(|.<->)(-.)"' \
       '-t+[set maximum lifetime for identity]:maximum lifetime (in seconds or time format):' \
       '-q[be quiet after a successful operation]' \
