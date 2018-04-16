@@ -1,3 +1,8 @@
+2018-04-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: NEWS, README, Config/version.mk, Etc/FAQ.yo: update
+	to release 5.5.1.
+
 2018-04-16  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 42659: Completion/Unix/Command/_git, Completion/Unix/Command/_sed,
