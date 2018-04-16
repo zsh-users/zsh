@@ -1,5 +1,8 @@
 2018-04-16  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42658: Completion/Unix/Command/_diffstat: allow compact form of
+	option arguments to diffstat
+
 	* Matthew Martin: 42643, 42644: Completion/BSD/Command/_cksum:
 	new cksum completion
 
