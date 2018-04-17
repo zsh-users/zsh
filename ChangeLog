@@ -1,3 +1,7 @@
+2018-04-17  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* unposted: Config/version.mk: update to 5.5.1-dev-0.
+
 2018-04-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: NEWS, README, Config/version.mk, Etc/FAQ.yo: update
