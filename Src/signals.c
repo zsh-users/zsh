@@ -537,7 +537,8 @@ wait_for_processes(void)
 #else
 		update_process(pn, status);
 #endif
-		if (pn->pid == jn->gleader) {
+		if (WIFEXITED(status) &&
+		    pn->pid == jn->gleader) {
 		    jn->gleader = 0;
 		    if (!(jn->stat & STAT_NOSTTY)) {
 			/*
