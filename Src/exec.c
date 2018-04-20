@@ -2942,8 +2942,11 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		is_builtin = 1;
 
 		/* autoload the builtin if necessary */
-		if (!(hn = resolvebuiltin(cmdarg, hn)))
+		if (!(hn = resolvebuiltin(cmdarg, hn))) {
+		    if (forked)
+			_exit(lastval);
 		    return;
+		}
 		if (type != WC_TYPESET)
 		    magic_assign = (hn->flags & BINF_MAGICEQUALS);
 		break;
@@ -3121,6 +3124,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 			    zerr("unknown exec flag -%c", *cmdopt);
 			    lastval = 1;
 			    errflag |= ERRFLAG_ERROR;
+			    if (forked)
+				_exit(lastval);
 			    return;
 			}
 		    }
@@ -3214,6 +3219,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 			zerr("redirection with no command");
 			lastval = 1;
 			errflag |= ERRFLAG_ERROR;
+			if (forked)
+			    _exit(lastval);
 			return;
 		    } else if (!nullcmd || !*nullcmd || opts[SHNULLCMD]) {
 			if (!args)
@@ -3232,6 +3239,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		    }
 		} else if ((cflags & BINF_PREFIX) && (cflags & BINF_COMMAND)) {
 		    lastval = 0;
+		    if (forked)
+			_exit(lastval);
 		    return;
 		} else {
 		    /*
@@ -3242,6 +3251,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		    if (badcshglob == 1) {
 			zerr("no match");
 			lastval = 1;
+			if (forked)
+			    _exit(lastval);
 			return;
 		    }
 		    cmdoutval = use_cmdoutval ? lastval : 0;
@@ -3255,12 +3266,16 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 			fputc('\n', xtrerr);
 			fflush(xtrerr);
 		    }
+		    if (forked)
+			_exit(lastval);
 		    return;
 		}
 	    } else if (isset(RESTRICTED) && (cflags & BINF_EXEC) && do_exec) {
 		zerrnam("exec", "%s: restricted",
 			(char *) getdata(firstnode(args)));
 		lastval = 1;
+		if (forked)
+		    _exit(lastval);
 		return;
 	    }
 
@@ -3295,6 +3310,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		    lastval = 1;
 		    if (oautocont >= 0)
 			opts[AUTOCONTINUE] = oautocont;
+		    if (forked)
+			_exit(lastval);
 		    return;
 		}
 		break;
@@ -3303,8 +3320,11 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		is_builtin = 1;
 
 		/* autoload the builtin if necessary */
-		if (!(hn = resolvebuiltin(cmdarg, hn)))
+		if (!(hn = resolvebuiltin(cmdarg, hn))) {
+		    if (forked)
+			_exit(lastval);
 		    return;
+		}
 		break;
 	    }
 	    cflags &= ~BINF_BUILTIN & ~BINF_COMMAND;
@@ -3319,6 +3339,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 	    lastval = 1;
 	if (oautocont >= 0)
 	    opts[AUTOCONTINUE] = oautocont;
+	if (forked)
+	    _exit(lastval);
 	return;
     }
 
@@ -3396,6 +3418,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		lastval = 1;
 		if (oautocont >= 0)
 		    opts[AUTOCONTINUE] = oautocont;
+		if (forked)
+		    _exit(lastval);
 		return;
 	    }
 	}
@@ -3424,6 +3448,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 	lastval = 1;
 	if (oautocont >= 0)
 	    opts[AUTOCONTINUE] = oautocont;
+	if (forked)
+	    _exit(lastval);
 	return;
     }
 
