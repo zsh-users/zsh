@@ -1878,8 +1878,6 @@ static void
 execpline2(Estate state, wordcode pcode,
 	   int how, int input, int output, int last1)
 {
-    pid_t pid;
-    int pipes[2];
     struct execcmd_params eparams;
 
     if (breaks || retflag)
@@ -1900,65 +1898,21 @@ execpline2(Estate state, wordcode pcode,
     }
     if (WC_PIPE_TYPE(pcode) == WC_PIPE_END) {
 	execcmd_analyse(state, &eparams);
-	execcmd_exec(state, &eparams, input, output, how, last1 ? 1 : 2);
+	execcmd_exec(state, &eparams, input, output, how, last1 ? 1 : 2, -1);
     } else {
+	int pipes[2];
 	int old_list_pipe = list_pipe;
-	int subsh_close = -1;
-	Wordcode next = state->pc + (*state->pc), start_pc;
+	Wordcode next = state->pc + (*state->pc);
 
-	start_pc = ++state->pc;
+	++state->pc;
 	execcmd_analyse(state, &eparams);
 
 	if (mpipe(pipes) < 0) {
 	    /* FIXME */
 	}
 
-	/* if we are doing "foo | bar" where foo is a current *
-	 * shell command, do foo in a subshell and do the     *
-	 * rest of the pipeline in the current shell.         */
-	if ((eparams.type >= WC_CURSH || !eparams.args)
-	    && (how & Z_SYNC)) {
-	    int synch[2];
-	    struct timeval bgtime;
-
-	    if (pipe(synch) < 0) {
-		zerr("pipe failed: %e", errno);
-		lastval = 1;
-		errflag |= ERRFLAG_ERROR;
-		return;
-	    } else if ((pid = zfork(&bgtime)) == -1) {
-		close(synch[0]);
-		close(synch[1]);
-		lastval = 1;
-		errflag |= ERRFLAG_ERROR;
-		return;
-	    } else if (pid) {
-		char dummy, *text;
-
-		text = getjobtext(state->prog, start_pc);
-		addproc(pid, text, 0, &bgtime);
-		close(synch[1]);
-		read_loop(synch[0], &dummy, 1);
-		close(synch[0]);
-	    } else {
-		zclose(pipes[0]);
-		close(synch[0]);
-		entersubsh(((how & Z_ASYNC) ? ESUB_ASYNC : 0)
-			   | ESUB_PGRP | ESUB_KEEPTRAP);
-		close(synch[1]);
-		if (sigtrapped[SIGEXIT])
-		{
-		    unsettrap(SIGEXIT);
-		}
-		execcmd_exec(state, &eparams, input, pipes[1], how, 1);
-		_exit(lastval);
-	    }
-	} else {
-	    /* otherwise just do the pipeline normally. */
-	    addfilelist(NULL, pipes[0]);
-	    subsh_close = pipes[0];
-	    execcmd_exec(state, &eparams, input, pipes[1], how, 0);
-	}
+	addfilelist(NULL, pipes[0]);
+	execcmd_exec(state, &eparams, input, pipes[1], how, 0, pipes[0]);
 	zclose(pipes[1]);
 	state->pc = next;
 
@@ -1969,8 +1923,6 @@ execpline2(Estate state, wordcode pcode,
 	execpline2(state, *state->pc++, how, pipes[0], output, last1);
 	list_pipe = old_list_pipe;
 	cmdpop();
-	if (subsh_close != pipes[0])
-	    zclose(pipes[0]);
     }
 }
 
@@ -2710,7 +2662,8 @@ static void execcmd_getargs(LinkList preargs, LinkList args, int expand)
 /**/
 static int
 execcmd_fork(Estate state, int how, int type, Wordcode varspc,
-	     LinkList *filelistp, char *text, int oautocont)
+	     LinkList *filelistp, char *text, int oautocont,
+	     int close_if_forked)
 {
     pid_t pid;
     int synch[2], flags;
@@ -2766,6 +2719,7 @@ execcmd_fork(Estate state, int how, int type, Wordcode varspc,
     *filelistp = jobtab[thisjob].filelist;
     entersubsh(flags);
     close(synch[1]);
+    zclose(close_if_forked);
 
     if (sigtrapped[SIGINT] & ZSIG_IGNORED)
 	holdintr();
@@ -2786,7 +2740,7 @@ execcmd_fork(Estate state, int how, int type, Wordcode varspc,
 /**/
 static void
 execcmd_exec(Estate state, Execcmd_params eparams,
-	     int input, int output, int how, int last1)
+	     int input, int output, int how, int last1, int close_if_forked)
 {
     HashNode hn = NULL;
     LinkList filelist = NULL;
@@ -2863,19 +2817,18 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 	    pushnode(args, dupstring("fg"));
     }
 
-    if ((how & Z_ASYNC) || (output && !last1)) {
+    if ((how & Z_ASYNC) || output) {
 	/*
 	 * If running in the background, or not the last command in a
-	 * pipeline and not already forked, we don't need any of
-	 * the rest of this function to affect the state in the
-	 * main shell, so fork immediately.
+	 * pipeline, we don't need any of the rest of this function to
+	 * affect the state in the main shell, so fork immediately.
 	 *
 	 * In other cases we may need to process the command line
 	 * a bit further before we make the decision.
 	 */
 	text = getjobtext(state->prog, eparams->beg);
 	switch (execcmd_fork(state, how, type, varspc, &filelist,
-			     text, oautocont)) {
+			     text, oautocont, close_if_forked)) {
 	case -1:
 	    goto fatal;
 	case 0:
@@ -2883,7 +2836,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 	default:
 	    return;
 	}
-	forked = 1;
+	last1 = forked = 1;
     } else
 	text = NULL;
 
@@ -3525,7 +3478,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 	     (!is_cursh && (last1 != 1 || nsigtrapped || havefiles() ||
 			    fdtable_flocks)))) {
 	    switch (execcmd_fork(state, how, type, varspc, &filelist,
-				 text, oautocont)) {
+				 text, oautocont, close_if_forked)) {
 	    case -1:
 		goto fatal;
 	    case 0:
