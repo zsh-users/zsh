@@ -2707,6 +2707,78 @@ static void execcmd_getargs(LinkList preargs, LinkList args, int expand)
     }
 }
 
+/**/
+static int
+execcmd_fork(Estate state, int how, int type, Wordcode varspc,
+	     LinkList *filelistp, char *text, int oautocont)
+{
+    pid_t pid;
+    int synch[2], flags;
+    char dummy;
+    struct timeval bgtime;
+
+    child_block();
+
+    if (pipe(synch) < 0) {
+	zerr("pipe failed: %e", errno);
+	return -1;
+    } else if ((pid = zfork(&bgtime)) == -1) {
+	close(synch[0]);
+	close(synch[1]);
+	lastval = 1;
+	errflag |= ERRFLAG_ERROR;
+	return -1;
+    }
+    if (pid) {
+	close(synch[1]);
+	read_loop(synch[0], &dummy, 1);
+	close(synch[0]);
+	if (how & Z_ASYNC) {
+	    lastpid = (zlong) pid;
+	} else if (!jobtab[thisjob].stty_in_env && varspc) {
+	    /* search for STTY=... */
+	    Wordcode p = varspc;
+	    wordcode ac;
+
+	    while (wc_code(ac = *p) == WC_ASSIGN) {
+		if (!strcmp(ecrawstr(state->prog, p + 1, NULL), "STTY")) {
+		    jobtab[thisjob].stty_in_env = 1;
+		    break;
+		}
+		p += (WC_ASSIGN_TYPE(ac) == WC_ASSIGN_SCALAR ?
+		      3 : WC_ASSIGN_NUM(ac) + 2);
+	    }
+	}
+	addproc(pid, text, 0, &bgtime);
+	if (oautocont >= 0)
+	    opts[AUTOCONTINUE] = oautocont;
+	pipecleanfilelist(jobtab[thisjob].filelist, 1);
+	return pid;
+    }
+
+    /* pid == 0 */
+    close(synch[0]);
+    flags = ((how & Z_ASYNC) ? ESUB_ASYNC : 0) | ESUB_PGRP;
+    if ((type != WC_SUBSH) && !(how & Z_ASYNC))
+	flags |= ESUB_KEEPTRAP;
+    if (type == WC_SUBSH && !(how & Z_ASYNC))
+	flags |= ESUB_JOB_CONTROL;
+    *filelistp = jobtab[thisjob].filelist;
+    entersubsh(flags);
+    close(synch[1]);
+
+    if (sigtrapped[SIGINT] & ZSIG_IGNORED)
+	holdintr();
+#ifdef HAVE_NICE
+    /* Check if we should run background jobs at a lower priority. */
+    if ((how & Z_ASYNC) && isset(BGNICE))
+	if (nice(5) < 0)
+	    zwarn("nice(5) failed: %e", errno);
+#endif /* HAVE_NICE */
+
+    return 0;
+}
+
 /*
  * Execute a command at the lowest level of the hierarchy.
  */
@@ -3074,6 +3146,29 @@ execcmd_exec(Estate state, Execcmd_params eparams,
     esprefork = (magic_assign ||
 		 (isset(MAGICEQUALSUBST) && type != WC_TYPESET)) ?
 		 PREFORK_TYPESET : 0;
+    if (how & Z_ASYNC) {
+	/*
+	 * If running in the background, we don't need any of
+	 * the rest of this functino to affect the state in the
+	 * main shell, so fork immediately.
+	 *
+	 * In other cases we may need to process the command line
+	 * a bit further before we make the decision.
+	 */
+	text = getjobtext(state->prog, eparams->beg);
+	switch (execcmd_fork(state, how, type, varspc, &filelist,
+			     text, oautocont)) {
+	case -1:
+	    goto fatal;
+	case 0:
+	    break;
+	default:
+	    return;
+	}
+	forked = 1;
+    } else
+	text = NULL;
+
     if (args) {
 	if (eparams->htok)
 	    prefork(args, esprefork, NULL);
@@ -3226,11 +3321,9 @@ execcmd_exec(Estate state, Execcmd_params eparams,
     }
 
     /* Get the text associated with this command. */
-    if ((how & Z_ASYNC) ||
+    if (!text &&
 	(!sfcontext && (jobbing || (how & Z_TIMED))))
 	text = getjobtext(state->prog, eparams->beg);
-    else
-	text = NULL;
 
     /*
      * Set up special parameter $_
@@ -3378,7 +3471,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 
     /**************************************************************************
      * Do we need to fork?  We need to fork if:                               *
-     * 1) The command is supposed to run in the background. (or)              *
+     * 1) The command is supposed to run in the background.  This             *
+     *    case is now handled above (forked = 1 here). (or)                   *
      * 2) There is no `exec' flag, and either:                                *
      *    a) This is a builtin or shell function with output piped somewhere. *
      *    b) This is an external command and we can't do a `fake exec'.       *
@@ -3397,99 +3491,45 @@ execcmd_exec(Estate state, Execcmd_params eparams,
      * current shell.                                                         *
      **************************************************************************/
 
-    if ((how & Z_ASYNC) ||
-	(!do_exec &&
-	 (((is_builtin || is_shfunc) && output) ||
-	  (!is_cursh && (last1 != 1 || nsigtrapped || havefiles() ||
-			 fdtable_flocks))))) {
-
-	pid_t pid;
-	int synch[2], flags;
-	char dummy;
-	struct timeval bgtime;
-
-	child_block();
-
-	if (pipe(synch) < 0) {
-	    zerr("pipe failed: %e", errno);
-	    goto fatal;
-	} else if ((pid = zfork(&bgtime)) == -1) {
-	    close(synch[0]);
-	    close(synch[1]);
-	    lastval = 1;
-	    errflag |= ERRFLAG_ERROR;
-	    goto fatal;
-	}
-	if (pid) {
-
-	    close(synch[1]);
-	    read_loop(synch[0], &dummy, 1);
-	    close(synch[0]);
-	    if (how & Z_ASYNC) {
-		lastpid = (zlong) pid;
-	    } else if (!jobtab[thisjob].stty_in_env && varspc) {
-		/* search for STTY=... */
-		Wordcode p = varspc;
-		wordcode ac;
-
-		while (wc_code(ac = *p) == WC_ASSIGN) {
-		    if (!strcmp(ecrawstr(state->prog, p + 1, NULL), "STTY")) {
-			jobtab[thisjob].stty_in_env = 1;
-			break;
-		    }
-		    p += (WC_ASSIGN_TYPE(ac) == WC_ASSIGN_SCALAR ?
-			  3 : WC_ASSIGN_NUM(ac) + 2);
-		}
+    if (!forked) {
+	if (!do_exec &&
+	    (((is_builtin || is_shfunc) && output) ||
+	     (!is_cursh && (last1 != 1 || nsigtrapped || havefiles() ||
+			    fdtable_flocks)))) {
+	    switch (execcmd_fork(state, how, type, varspc, &filelist,
+				 text, oautocont)) {
+	    case -1:
+		goto fatal;
+	    case 0:
+		break;
+	    default:
+		return;
 	    }
-	    addproc(pid, text, 0, &bgtime);
-	    if (oautocont >= 0)
-		opts[AUTOCONTINUE] = oautocont;
-	    pipecleanfilelist(jobtab[thisjob].filelist, 1);
-	    return;
-	}
-	/* pid == 0 */
-	close(synch[0]);
-	flags = ((how & Z_ASYNC) ? ESUB_ASYNC : 0) | ESUB_PGRP;
-	if ((type != WC_SUBSH) && !(how & Z_ASYNC))
-	    flags |= ESUB_KEEPTRAP;
-	if (type == WC_SUBSH && !(how & Z_ASYNC))
-	    flags |= ESUB_JOB_CONTROL;
-	filelist = jobtab[thisjob].filelist;
-	entersubsh(flags);
-	close(synch[1]);
-	forked = 1;
-	if (sigtrapped[SIGINT] & ZSIG_IGNORED)
-	    holdintr();
-#ifdef HAVE_NICE
-	/* Check if we should run background jobs at a lower priority. */
-	if ((how & Z_ASYNC) && isset(BGNICE))
-	    if (nice(5) < 0)
-		zwarn("nice(5) failed: %e", errno);
-#endif /* HAVE_NICE */
-
-    } else if (is_cursh) {
-	/* This is a current shell procedure that didn't need to fork.    *
-	 * This includes current shell procedures that are being exec'ed, *
-	 * as well as null execs.                                         */
-	jobtab[thisjob].stat |= STAT_CURSH;
-	if (!jobtab[thisjob].procs)
-	    jobtab[thisjob].stat |= STAT_NOPRINT;
-	if (is_builtin)
-	  jobtab[thisjob].stat |= STAT_BUILTIN;
-    } else {
-	/* This is an exec (real or fake) for an external command.    *
-	 * Note that any form of exec means that the subshell is fake *
-	 * (but we may be in a subshell already).                     */
-	is_exec = 1;
-	/*
-	 * If we are in a subshell environment anyway, say we're forked,
-	 * even if we're actually not forked because we know the
-	 * subshell is exiting.  This ensures SHLVL reflects the current
-	 * shell, and also optimises out any save/restore we'd need to
-	 * do if we were returning to the main shell.
-	 */
-	if (type == WC_SUBSH)
 	    forked = 1;
+	} else if (is_cursh) {
+	    /* This is a current shell procedure that didn't need to fork.    *
+	     * This includes current shell procedures that are being exec'ed, *
+	     * as well as null execs.                                         */
+	    jobtab[thisjob].stat |= STAT_CURSH;
+	    if (!jobtab[thisjob].procs)
+		jobtab[thisjob].stat |= STAT_NOPRINT;
+	    if (is_builtin)
+		jobtab[thisjob].stat |= STAT_BUILTIN;
+	} else {
+	    /* This is an exec (real or fake) for an external command.    *
+	     * Note that any form of exec means that the subshell is fake *
+	     * (but we may be in a subshell already).                     */
+	    is_exec = 1;
+	    /*
+	     * If we are in a subshell environment anyway, say we're forked,
+	     * even if we're actually not forked because we know the
+	     * subshell is exiting.  This ensures SHLVL reflects the current
+	     * shell, and also optimises out any save/restore we'd need to
+	     * do if we were returning to the main shell.
+	     */
+	    if (type == WC_SUBSH)
+		forked = 1;
+	}
     }
 
     if ((esglob = !(cflags & BINF_NOGLOB)) && args && eparams->htok) {
