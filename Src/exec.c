@@ -2863,6 +2863,30 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 	    pushnode(args, dupstring("fg"));
     }
 
+    if ((how & Z_ASYNC) || (output && !last1)) {
+	/*
+	 * If running in the background, or not the last command in a
+	 * pipeline and not already forked, we don't need any of
+	 * the rest of this function to affect the state in the
+	 * main shell, so fork immediately.
+	 *
+	 * In other cases we may need to process the command line
+	 * a bit further before we make the decision.
+	 */
+	text = getjobtext(state->prog, eparams->beg);
+	switch (execcmd_fork(state, how, type, varspc, &filelist,
+			     text, oautocont)) {
+	case -1:
+	    goto fatal;
+	case 0:
+	    break;
+	default:
+	    return;
+	}
+	forked = 1;
+    } else
+	text = NULL;
+
     /* Check if it's a builtin needing automatic MAGIC_EQUALS_SUBST      *
      * handling.  Things like typeset need this.  We can't detect the    *
      * command if it contains some tokens (e.g. x=ex; ${x}port), so this *
@@ -2871,7 +2895,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
     if ((type == WC_SIMPLE || type == WC_TYPESET) && args) {
 	/*
 	 * preargs contains args that have been expanded by prefork.
-	 * Running execcmd_getargs() causes the any argument available
+	 * Running execcmd_getargs() causes any argument available
 	 * in args to be exanded where necessary and transferred to
 	 * preargs.  We call execcmd_getargs() every time we need to
 	 * analyse an argument not available in preargs, though there is
@@ -3146,29 +3170,6 @@ execcmd_exec(Estate state, Execcmd_params eparams,
     esprefork = (magic_assign ||
 		 (isset(MAGICEQUALSUBST) && type != WC_TYPESET)) ?
 		 PREFORK_TYPESET : 0;
-    if ((how & Z_ASYNC) || (output && !last1)) {
-	/*
-	 * If running in the background, or not the last command in a
-	 * pipeline and not already forked, we don't need any of
-	 * the rest of this function to affect the state in the
-	 * main shell, so fork immediately.
-	 *
-	 * In other cases we may need to process the command line
-	 * a bit further before we make the decision.
-	 */
-	text = getjobtext(state->prog, eparams->beg);
-	switch (execcmd_fork(state, how, type, varspc, &filelist,
-			     text, oautocont)) {
-	case -1:
-	    goto fatal;
-	case 0:
-	    break;
-	default:
-	    return;
-	}
-	forked = 1;
-    } else
-	text = NULL;
 
     if (args) {
 	if (eparams->htok)
