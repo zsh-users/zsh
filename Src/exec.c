@@ -3146,10 +3146,11 @@ execcmd_exec(Estate state, Execcmd_params eparams,
     esprefork = (magic_assign ||
 		 (isset(MAGICEQUALSUBST) && type != WC_TYPESET)) ?
 		 PREFORK_TYPESET : 0;
-    if (how & Z_ASYNC) {
+    if ((how & Z_ASYNC) || (output && !last1)) {
 	/*
-	 * If running in the background, we don't need any of
-	 * the rest of this functino to affect the state in the
+	 * If running in the background, or not the last command in a
+	 * pipeline and not already forked, we don't need any of
+	 * the rest of this function to affect the state in the
 	 * main shell, so fork immediately.
 	 *
 	 * In other cases we may need to process the command line
