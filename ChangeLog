@@ -1,3 +1,11 @@
+2018-05-01  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* from branch fork_early, c.f. 42702: Src/exec.c: Various changes
+	to make forking for a command work better.  Move the fork even
+	earlier; add case of non-final pipeline elements; _exit when
+	forked; remove previous early fork in caller; replace fix for
+	leaked file descriptor in pipeline handling.
+
 2018-04-29  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* Matthew Martin: 42730: Completion/Unix/Command/_rmdir,
