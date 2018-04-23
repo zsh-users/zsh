@@ -538,7 +538,8 @@ wait_for_processes(void)
 		update_process(pn, status);
 #endif
 		if (WIFEXITED(status) &&
-		    pn->pid == jn->gleader) {
+		    pn->pid == jn->gleader &&
+		    killpg(pn->pid, 0) == -1) {
 		    jn->gleader = 0;
 		    if (!(jn->stat & STAT_NOSTTY)) {
 			/*
