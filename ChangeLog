@@ -1,3 +1,7 @@
+2018-04-23  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 23362: Src/parse.c: Allow short loops with "while".
+
 2018-04-20  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 42684 (with extra comments): Src/exec.c: Fork earlier

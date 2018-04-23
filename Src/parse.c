@@ -1510,8 +1510,10 @@ par_while(int *cmplx)
 	if (tok != ZEND)
 	    YYERRORV(oecused);
 	zshlex();
-    } else
+    } else if (unset(SHORTLOOPS)) {
 	YYERRORV(oecused);
+    } else
+	par_save_list1(cmplx);
 
     ecbuf[p] = WCB_WHILE(type, ecused - 1 - p);
 }
