@@ -1,3 +1,10 @@
+2018-04-24  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 42708: Src/exec.c, Src/Modules/clone.c, Src/Modules/zpty.c,
+	Test/D03procsubst.ztst: don't close file descriptors for
+	process substitution on closem() tidy up unless we are exiting
+	as they need to be visible to external processes.
+
 2018-04-23  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 42705: Src/signals.c: another fix for 42630 --- also check

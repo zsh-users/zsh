@@ -400,7 +400,7 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 	dup2(slave, 1);
 	dup2(slave, 2);
 
-	closem(0);
+	closem(FDT_UNUSED, 0);
 	close(slave);
 	close(master);
 	close(coprocin);

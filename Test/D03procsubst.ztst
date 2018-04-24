@@ -149,3 +149,10 @@
   fi
 0:proc subst fd in forked subshell closed in parent (external command)
 >1	1
+
+  procfunc() {
+    cat <(cat "$@")
+  }
+  procfunc <(echo argument)
+0:With /proc/self file descriptors must not be tidied up too early
+>argument

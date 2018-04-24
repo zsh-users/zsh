@@ -698,7 +698,7 @@ execute(LinkList args, int flags, int defpath)
      * Note that we don't close fd's attached to process substitution
      * here, which should be visible to external processes.
      */
-    closem(FDT_XTRACE);
+    closem(FDT_XTRACE, 0);
 #ifndef FD_CLOEXEC
     if (SHTTY != -1) {
 	close(SHTTY);
@@ -3943,7 +3943,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		LinkList assigns = (LinkList)0;
 		int postassigns = eparams->postassigns;
 		if (forked)
-		    closem(FDT_INTERNAL);
+		    closem(FDT_INTERNAL, 0);
 		if (postassigns) {
 		    Wordcode opc = state->pc;
 		    state->pc = eparams->assignspc;
@@ -4129,7 +4129,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		    if (errflag)
 			_exit(1);
 		}
-		closem(FDT_INTERNAL);
+		closem(FDT_INTERNAL, 0);
 		if (coprocin != -1) {
 		    zclose(coprocin);
 		    coprocin = -1;
@@ -4191,7 +4191,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 	for (i = 0; i < 10; i++)
 	    if (fdtable[i] != FDT_UNUSED)
 		close(i);
-	closem(FDT_UNUSED);
+	closem(FDT_UNUSED, 1);
 	if (thisjob != -1)
 	    waitjobs();
 	_exit(lastval);
@@ -4367,16 +4367,24 @@ fixfds(int *save)
  *
  * Close any that are marked as used if "how" is FDT_UNUSED, else
  * close any with the value "how".
+ *
+ * If "all" is zero, we'll skip cases where we need the file
+ * descriptor to be visible externally.
  */
 
 /**/
 mod_export void
-closem(int how)
+closem(int how, int all)
 {
     int i;
 
     for (i = 10; i <= max_zsh_fd; i++)
 	if (fdtable[i] != FDT_UNUSED &&
+	    /*
+	     * Process substitution needs to be visible to user;
+	     * fd's are explicitly cleaned up by filelist handling.
+	     */
+	    (all || fdtable[i] != FDT_PROC_SUBST) &&
 	    (how == FDT_UNUSED || (fdtable[i] & FDT_TYPE_MASK) == how)) {
 	    if (i == SHTTY)
 		SHTTY = -1;
@@ -4859,7 +4867,7 @@ getproc(char *cmd, char **eptr)
 	    addproc(pid, NULL, 1, &bgtime);
 	return pnam;
     }
-    closem(FDT_UNUSED);
+    closem(FDT_UNUSED, 0);
     fd = open(pnam, out ? O_WRONLY | O_NOCTTY : O_RDONLY | O_NOCTTY);
     if (fd == -1) {
 	zerr("can't open %s: %e", pnam, errno);
@@ -4898,7 +4906,7 @@ getproc(char *cmd, char **eptr)
     }
     entersubsh(ESUB_ASYNC|ESUB_PGRP);
     redup(pipes[out], out);
-    closem(FDT_UNUSED);   /* this closes pipes[!out] as well */
+    closem(FDT_UNUSED, 0);   /* this closes pipes[!out] as well */
 #endif /* PATH_DEV_FD */
 
     cmdpush(CS_CMDSUBST);
@@ -4948,7 +4956,7 @@ getpipe(char *cmd, int nullexec)
     }
     entersubsh(ESUB_PGRP);
     redup(pipes[out], out);
-    closem(FDT_UNUSED);	/* this closes pipes[!out] as well */
+    closem(FDT_UNUSED, 0);	/* this closes pipes[!out] as well */
     cmdpush(CS_CMDSUBST);
     execode(prog, 0, 1, out ? "outsubst" : "insubst");
     cmdpop();
