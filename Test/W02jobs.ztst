@@ -192,52 +192,46 @@
 *>\[1]  ? kill*sleep*
 
   zpty_start
-  zpty_input $'ed 2>/dev/null\n=\n'
+  zpty_input $'dc 2>/dev/null\n1\np\n'
   zpty_line
-  zpty_input $'a\nstuff1\n.\nw tmpfile\nq\n'
+  zpty_input $'1\n+\np\nq\n'
   zpty_stop
-  cat tmpfile
-  rm -f tmpfile
 0:Sanity check of "ed" as foreground process
-*>0
-*>stuff1
-F:This test checks we can run the simple editor "ed" as a way of testing
+*>1
+*>2
+F:This test checks we can run the simple calculator dc as a way of testing
 F:user interaction for later job control tests .  The test itself is
 F:trivial; its failure may simply indicate our test methodology does not
 F:work on this system.
 
   zpty_start
-  zpty_input $'ed 2>/dev/null\n=\n'
+  zpty_input $'dc 2>/dev/null\n1\np\n'
   zpty_line
   zpty_input $'\C-z'
   zpty_input 'fg'
-  zpty_input $'a\nstuff2\n.\nw tmpfile\nq\n'
+  zpty_input $'1\n+\np\nq\n'
   zpty_stop
-  cat tmpfile
-  rm -f tmpfile
 0:Basic fg with subsequent user interaction
-*>0
-*>zsh:*(stopped|suspended)*ed*
-*>*continued*ed*
-*>stuff2
+*>1
+*>zsh:*(stopped|suspended)*dc*
+*>*continued*dc*
+*>2
 
   zpty_start
-  zpty_input $'ed 2>/dev/null\n=\n'
+  zpty_input $'dc 2>/dev/null\n1\np\n'
   zpty_line
   zpty_input $'\C-z'
   zpty_input 'bg'
   zpty_input 'fg'
-  zpty_input $'a\nstuff3\n.\nw tmpfile\nq\n'
+  zpty_input $'1\n+\np\nq\n'
   zpty_stop
-  cat tmpfile
-  rm -f tmpfile
 0:bg and fg with user input
-*>0
-*>zsh:*(stopped|suspended)*ed*
-*>*continued*ed*
-*>*(stopped|suspended)*ed*
-*>*continued*ed*
-*>stuff3
+*>1
+*>zsh:*(stopped|suspended)*dc*
+*>*continued*dc*
+*>*(stopped|suspended)*dc*
+*>*continued*dc*
+*>2
 
 %clean
 

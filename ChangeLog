@@ -5,6 +5,9 @@
 
 2018-04-25  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 42722: Test/ztst.zsh, Test/W02jobs.ztst: replace ed with
+	dc and hope for better times.
+
 	* 42714: Test/W02jobs.ztst, Test/ztst.zsh: add basic fg and bg
 	tests using ed.  Improve output on pattern difference failure in
 	tests.
