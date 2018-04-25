@@ -4882,7 +4882,7 @@ getproc(char *cmd, char **eptr)
 	zerr("process substitution %s cannot be used here", cmd);
 	return NULL;
     }
-    pnam = hcalloc(strlen(PATH_DEV_FD) + 6);
+    pnam = zhalloc(strlen(PATH_DEV_FD) + 1 + DIGBUFSIZE);
     if (!(prog = parsecmd(cmd, eptr)))
 	return NULL;
     if (mpipe(pipes) < 0)
