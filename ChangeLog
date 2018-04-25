@@ -1,3 +1,9 @@
+2018-04-25  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 42714: Test/W02jobs.ztst, Test/ztst.zsh: add basic fg and bg
+	tests using ed.  Improve output on pattern difference failure in
+	tests.
+
 2018-04-24  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 42708: Src/exec.c, Src/Modules/clone.c, Src/Modules/zpty.c,

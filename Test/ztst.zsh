@@ -315,7 +315,8 @@ ZTST_diff() {
       
   if (( diff_pat )); then
     local -a diff_lines1 diff_lines2
-    integer failed i
+    integer failed i l n
+    local p
 
     diff_lines1=("${(f)$(<$argv[-2])}")
     diff_lines2=("${(f)$(<$argv[-1])}")
@@ -330,7 +331,25 @@ ZTST_diff() {
       done
     fi
     if (( failed )); then
-      print -rl "Pattern match failed:" \<${^diff_lines1} \>${^diff_lines2}
+      print -r "Pattern match failed, line $i:"
+      n=${#diff_lines1}
+      (( ${#diff_lines2} > $n )) && n=${#diff_lines2}
+      for (( l = 1; l <= n; ++l )); do
+	if (( l == i )); then
+	  p="-"
+	else
+	  p=" "
+	fi
+	print -r -- "$p<${diff_lines1[l]}"
+      done
+      for (( l = 1; l <= n; ++l )); do
+	if (( l == i )); then
+	  p="+"
+	else
+	  p=" "
+	fi
+	print -r -- "$p>${diff_lines2[l]}"
+      done
       diff_ret=1
     fi
   else

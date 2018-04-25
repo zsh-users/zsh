@@ -13,6 +13,14 @@
     zpty_input() {
       zpty -w zsh "${(F)@}" $'\n'
     }
+    zpty_line() {
+      local REPLY
+      integer i
+      for (( i = 0; i < ${1:-1}; ++i )); do
+        zpty -r zsh REPLY
+        print -r -- ${REPLY%%($'\r\n'|$'\n')}
+      done
+    }
     zpty_stop() {
       # exit twice in case of check_jobs
       zpty -w zsh $'exit\nexit\n'
@@ -161,15 +169,17 @@
 
   zpty_start
   zpty_input 'sleep 10 & sleep 9 & sleep 8 & sleep 7 &'
-  sleep 0.1
+  zpty_line 4
   zpty_input 'kill %4'
+  # Dunno why we need this when checking input...
   sleep 0.1
+  zpty_line
   zpty_input 'kill -HUP %3'
-  sleep 0.1
+  zpty_line
   zpty_input 'kill -INT %2'
-  sleep 0.1
+  zpty_line
   zpty_input 'kill -KILL %1'
-  sleep 0.1
+  zpty_line
   zpty_stop
 0:various `kill` signals with multiple running jobs
 *>\[1] [0-9]##
@@ -180,6 +190,54 @@
 *>\[3]  ? hangup*sleep*
 *>\[2]  ? interrupt*sleep*
 *>\[1]  ? kill*sleep*
+
+  zpty_start
+  zpty_input $'ed 2>/dev/null\n=\n'
+  zpty_line
+  zpty_input $'a\nstuff1\n.\nw tmpfile\nq\n'
+  zpty_stop
+  cat tmpfile
+  rm -f tmpfile
+0:Sanity check of "ed" as foreground process
+*>0
+*>stuff1
+F:This test checks we can run the simple editor "ed" as a way of testing
+F:user interaction for later job control tests .  The test itself is
+F:trivial; its failure may simply indicate our test methodology does not
+F:work on this system.
+
+  zpty_start
+  zpty_input $'ed 2>/dev/null\n=\n'
+  zpty_line
+  zpty_input $'\C-z'
+  zpty_input 'fg'
+  zpty_input $'a\nstuff2\n.\nw tmpfile\nq\n'
+  zpty_stop
+  cat tmpfile
+  rm -f tmpfile
+0:Basic fg with subsequent user interaction
+*>0
+*>zsh:*(stopped|suspended)*ed*
+*>*continued*ed*
+*>stuff2
+
+  zpty_start
+  zpty_input $'ed 2>/dev/null\n=\n'
+  zpty_line
+  zpty_input $'\C-z'
+  zpty_input 'bg'
+  zpty_input 'fg'
+  zpty_input $'a\nstuff3\n.\nw tmpfile\nq\n'
+  zpty_stop
+  cat tmpfile
+  rm -f tmpfile
+0:bg and fg with user input
+*>0
+*>zsh:*(stopped|suspended)*ed*
+*>*continued*ed*
+*>*(stopped|suspended)*ed*
+*>*continued*ed*
+*>stuff3
 
 %clean
 
