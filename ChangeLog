@@ -1,3 +1,8 @@
+2018-04-26  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* c.f. 42726: Test/W02jobs.ztst: Back off fg and bg tests as they
+	are currently too hard to make robust.
+
 2018-04-25  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Src/exec.c: Correct process substitution buffer

@@ -191,48 +191,6 @@
 *>\[2]  ? interrupt*sleep*
 *>\[1]  ? kill*sleep*
 
-  zpty_start
-  zpty_input $'dc 2>/dev/null\n1\np\n'
-  zpty_line
-  zpty_input $'1\n+\np\nq\n'
-  zpty_stop
-0:Sanity check of "ed" as foreground process
-*>1
-*>2
-F:This test checks we can run the simple calculator dc as a way of testing
-F:user interaction for later job control tests .  The test itself is
-F:trivial; its failure may simply indicate our test methodology does not
-F:work on this system.
-
-  zpty_start
-  zpty_input $'dc 2>/dev/null\n1\np\n'
-  zpty_line
-  zpty_input $'\C-z'
-  zpty_input 'fg'
-  zpty_input $'1\n+\np\nq\n'
-  zpty_stop
-0:Basic fg with subsequent user interaction
-*>1
-*>zsh:*(stopped|suspended)*dc*
-*>*continued*dc*
-*>2
-
-  zpty_start
-  zpty_input $'dc 2>/dev/null\n1\np\n'
-  zpty_line
-  zpty_input $'\C-z'
-  zpty_input 'bg'
-  zpty_input 'fg'
-  zpty_input $'1\n+\np\nq\n'
-  zpty_stop
-0:bg and fg with user input
-*>1
-*>zsh:*(stopped|suspended)*dc*
-*>*continued*dc*
-*>*(stopped|suspended)*dc*
-*>*continued*dc*
-*>2
-
 %clean
 
   zmodload -ui zsh/zpty
