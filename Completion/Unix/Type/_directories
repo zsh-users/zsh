@@ -1,4 +1,4 @@
-#compdef rmdir grmdir zf_rmdir dircmp -P -value-,*path,-default-
+#compdef zf_rmdir dircmp -P -value-,*path,-default-
 
 local expl
 

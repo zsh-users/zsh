@@ -1,0 +1,23 @@
+#compdef rmdir grmdir
+
+local -a args
+
+args=(
+  '(-p --parents)'{-p,--parents}'[remove each component of the specified paths]'
+)
+
+if _pick_variant gnu=GNU unix --version; then
+  args+=(
+    '--ignore-fail-on-non-empty[ignore failure if directory is non-empty]'
+    '(-v --verbose)'{-v,--verbose}'[be verbose]'
+  )
+else
+  args=(${args:#*\)--*})
+  if [[ $OSTYPE == (dragonfly|freebsd)* ]]; then
+    args+=('-v[be verbose]')
+  fi
+fi
+
+_arguments -s -S -A '-*' \
+  $args \
+  '*:directories:_directories'
