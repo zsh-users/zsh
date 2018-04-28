@@ -28,32 +28,63 @@ if _pick_variant gnu=GNU unix --version; then
     {-H,--si}'[human readable format, but use powers of 1000 not 1024]'
     {-i,--inodes}'[list inode information instead of block usage]'
   )
-elif [[ "$OSTYPE" == (darwin|freebsd|dragonfly)* ]]; then
+elif [[ "$OSTYPE" == (darwin|dragonfly|freebsd|netbsd*|openbsd)* ]]; then
   args=(
-    '(-b -g -H -h -k -m)-b[use 512-byte blocks (default)]'
-    '(-b -g -H -h -k -m)-g[use 1024^3-byte blocks]'
-    '(-b -g -H -h -k -m)-H[human-readable output (base 10)]'
-    '(-b -g -H -h -k -m)-h[human-readable output (base 2)]'
-    '(-b -g -H -h -k -m)-k[use 1024-byte blocks]'
-    '(-b -g -H -h -k -m)-m[use 1024*1024-byte blocks]'
-    '-P[POSIX compliant output]'
-    '-a[show all mount points]'
-    '-c[display a grand total]'
-    '-i[include inode usage statistics (default)]'
+    '(-b -g -H -h -k -m --si)-h[human-readable output (base 2)]'
+    '(-b -g -H -h -k -m --si)-k[use 1024-byte blocks]'
+    '(-G -i -P)-P[POSIX compliant output]'
+    '(-G -i -P)-i[include inode usage statistics (default)]'
     '-l[only display locally-mounted file systems]'
     '-n[use previously obtained statistics]'
     '*:files:_umountable'
   )
   spec='[only display file systems of specified types]:file system type:->fslist'
   case "$OSTYPE" in
+    (darwin*|dragonfly*|freebsd*|netbsd*)
+      args+=(
+        '-a[show all mount points]'
+        '(-b -g -H -h -k -m --si)-g[use 1024^3-byte blocks]'
+        '(-b -g -H -h -k -m --si)-m[use 1024*1024-byte blocks]'
+      )
+      ;|
+    (darwin*|dragonfly*|freebsd*)
+      args+=(
+        '(-b -g -H -h -k -m --si)-b[use 512-byte blocks (default)]'
+        '(-b -g -H -h -k -m --si)-H[human-readable output (base 10)]'
+      )
+      ;|
+    (darwin*|freebsd*)
+      args+=(
+        '-c[display a grand total]'
+      )
+      ;|
     (darwin*)
       args+=(
         "-T+$spec"
         "!-t+$spec" # obsolete
       )
       ;;
-    (freebsd*|dragonfly*)
-      args+=( "-t+$spec" '-T[include file system type]' )
+    (dragonfly*|freebsd*|netbsd*|openbsd*)
+      args+=(
+        "-t+$spec"
+      )
+      ;|
+    (dragonfly*|freebsd*)
+      args+=(
+        '-T[include file system type]'
+      )
+      ;|
+    (freebsd*)
+      args+=(
+        '--libxo[generate output via libxo]'
+        '(-b -g -H -h -k -m --si)--si[human-readable output (base 10)]'
+        '-,[separate thousands]'
+      )
+      ;;
+    (netbsd*)
+      args+=(
+        '(-G -i -P)-G[display all fields in statvfs]'
+      )
       ;;
   esac
 else
