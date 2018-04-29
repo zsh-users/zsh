@@ -4435,16 +4435,16 @@ gethere(char **strp, int typ)
 		bptr = buf + bsiz;
 		bsiz *= 2;
 	    }
-	    if (lexstop)
+	    if (lexstop || c == '\n')
 		break;
-	    if (c == '\n') {
-		if (!qt && bptr > t && *(bptr - 1) == '\\') {
-		    /* line continuation */
+	    if (!qt && c == '\\') {
+		*bptr++ = c;
+		c = hgetc();
+		if (c == '\n') {
 		    bptr--;
 		    c = hgetc();
 		    continue;
-		} else
-		    break;
+		}
 	    }
 	    *bptr++ = c;
 	    c = hgetc();

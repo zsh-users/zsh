@@ -176,6 +176,30 @@
 >tab\stripping
 >Last line
 
+  heretest() {
+    print First line
+    cat <<-HERE
+	$foo\\
+	$foo
+	some\\ \
+	stuff
+	to\
+  test \\
+	more backslash craziness\\\\\\\\\
+	wild
+	HERE
+    print Last line
+  }
+  heretest
+0:No line continuation in here-document on escaped backslash
+>First line
+>bar\
+>bar
+>some\ 	stuff
+>to  test \
+>more backslash craziness\\\\	wild
+>Last line
+
   #
   # exec tests: perform these in subshells so if they fail the
   # shell won't exit.

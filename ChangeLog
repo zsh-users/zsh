@@ -1,3 +1,7 @@
+2018-04-29  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Ricardo Giorni: 47201: fix 42355 for multiple backslashes
+
 2018-04-26  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* c.f. 42726: Test/W02jobs.ztst: Back off fg and bg tests as they
