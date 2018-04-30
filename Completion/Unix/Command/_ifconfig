@@ -25,11 +25,16 @@ case $OSTYPE in
       '(-l -C)-m[list supported media]'
       '(-l -C)-L[show address lifetime as time offset]'
     )
-    opts=( $alias $debug
+    listopts=(
+        active caps chan countries mac mesh regdomain roam txparam txpower
+        scan sta wme
+    )
+    opts=( $alias $debug $listopts
       anycast lladdr media {,-}mediaopt {,delete}tunnel create destroy
       {,un}plumb vlan {,-}vlandev metric prefixlen range phase ssid muid
       stationname channel authmode {,-}powersave powersavesleep wepmode
-      {,-}wep {,-}nwkey add delete ether {,-}link{0,1,2}
+      {,-}wep {,-}nwkey add delete ether {,-}link{0,1,2} list wme wmm
+      roam roam:rssi roam:rate roaming
     )
   ;;
   irix5*) opts=( $debug ) ;;

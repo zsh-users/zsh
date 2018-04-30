@@ -1,5 +1,8 @@
 2018-05-02  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* Eitan Adler: 42732: Completion/Unix/Command/_ifconfig:
+	Add several more entries to ifconfig
+
 	* 42743: Completion/Unix/Command/_vorbis: update vorbis-tools
 	completion and include vorbiscomment with the rest
 
