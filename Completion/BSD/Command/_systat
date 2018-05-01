@@ -16,6 +16,7 @@ case $OSTYPE in
       'vmstat:virtual memory statistics'
       'netstat:network connection statistics'
       'ifstat:network traffic statistics'
+      'zarc:display arc cache usage'
     )
   ;;
   openbsd*)

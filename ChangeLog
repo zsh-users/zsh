@@ -1,5 +1,8 @@
 2018-05-02  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* Eitan Adler: 42740: Completion/BSD/Command/_systat:
+	Teach _systat about the 'zarc' screen
+
 	* Eitan Adler: 42732: Completion/Unix/Command/_ifconfig:
 	Add several more entries to ifconfig
 
