@@ -1,3 +1,8 @@
+2018-05-02  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 42743: Completion/Unix/Command/_vorbis: update vorbis-tools
+	completion and include vorbiscomment with the rest
+
 2018-05-01  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* from branch fork_early, c.f. 42702: Src/exec.c: Various changes
