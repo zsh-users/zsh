@@ -1,3 +1,8 @@
+2018-06-27  Daniel Hahler  <zsh@thequod.de>
+
+	* 42746: Completion/Unix/Command/_vim: _vim: handle special values for
+	-u/-U.
+
 2018-06-27  Eric Cook  <llua@gmx.com>
 
 	* 43096: Eitan: Completion/Unix/Command/_vim, remove duplicate flag

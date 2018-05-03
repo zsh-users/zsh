@@ -41,7 +41,7 @@ arguments=(
   '-T[set terminal type]:::_terminals'
   '--not-a-term[skip warning for input/output not being a terminal]'
   '--ttyfail[exit if input or output is not a terminal]'
-  '-u[use given vimrc file instead of default .vimrc]::rc file:_files'
+  '-u[use given vimrc file instead of default .vimrc]:config:->config'
   "--noplugin[don't load plugin scripts]"
   '-o-[number of windows to open (default: one for each file)]::window count: '
   '-O-[number of windows to vertically split open (default is one for each file)]::window count: '
@@ -89,7 +89,7 @@ arguments=(
   '--role[set unique role to identify main window]:role'
   '--socketid[open vim inside another GTK widget]:xid'
   '--echo-wid[echo window ID on stdout]'
-  '-U[use given gvimrc file instead of default .gvimrc]::rc file:_files'
+  '-U[use given gvimrc file instead of default .gvimrc]:gui config:->configgui'
 )
 
 _arguments -C -S $arguments && ret=0
@@ -115,6 +115,23 @@ elif [[ $state = verbosity ]]; then
     )" && ret=0
     if _requested files expl 'file for verbose output'; then
       compset -P '[0-9]#'
+      _files "$expl[@]" && ret=0
+    fi
+    (( ret )) || break
+  done
+elif [[ "$state" = config* ]]; then
+  _tags special files
+  local names=(
+      "NONE:'skip initialization from files and environment variables'"
+      "NORC:'same as NONE, but load plugins'"
+  )
+  # gvim only supports -U NONE to skip GUI initialization.
+  [[ $state != configgui || $service != *g* ]] && names+=(
+      "DEFAULTS:'same as NONE, but loads defaults.vim'"
+  )
+  while _tags; do
+    _requested special && _describe -V 'special' "(${(F)names})" && ret=0
+    if _requested files expl 'rc file'; then
       _files "$expl[@]" && ret=0
     fi
     (( ret )) || break
