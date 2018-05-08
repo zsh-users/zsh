@@ -1,5 +1,8 @@
 2018-05-08  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 42752: Completion/Unx/Command/_git: better completion
+	handling for git aliases expanding to external command.
+
 	* 42751: Src/Zle/zle_main.c: Protect shell status around
 	time function execution in line editor.
 

@@ -7758,7 +7758,10 @@ _git() {
         curcontext=${curcontext%:*:*}:git-$words[1]:
 	(( $+opt_args[--git-dir] )) && local -x GIT_DIR=$opt_args[--git-dir]
 	if ! _call_function ret _git-$words[1]; then
-	  if zstyle -T :completion:$curcontext: use-fallback; then
+	  if [[ $words[1] = \!* ]]; then
+	    words[1]=${words[1]##\!}
+	    _normal && ret=0
+	  elif zstyle -T :completion:$curcontext: use-fallback; then
 	    _default && ret=0
 	  else
 	    _message "unknown sub-command: $words[1]"
