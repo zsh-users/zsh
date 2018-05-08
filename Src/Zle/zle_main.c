@@ -631,6 +631,8 @@ raw_getbyte(long do_keytmout, char *cptr)
 		continue;
 	    }
 	    if (selret == 0) {
+		zlong save_lastval;
+
 		/*
 		 * Nothing ready and no error, so we timed out.
 		 */
@@ -648,6 +650,7 @@ raw_getbyte(long do_keytmout, char *cptr)
 		    break;
 
 		case ZTM_FUNC:
+		    save_lastval = lastval;
 		    while (firstnode(timedfns)) {
 			Timedfn tfdat = (Timedfn)getdata(firstnode(timedfns));
 			/*
@@ -661,6 +664,7 @@ raw_getbyte(long do_keytmout, char *cptr)
 			    break;
 			tfdat->func();
 		    }
+		    lastval = save_lastval;
 		    /* Function may have messed up the display */
 		    if (resetneeded)
 			zrefresh();

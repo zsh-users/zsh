@@ -1,3 +1,8 @@
+2018-05-08  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 42751: Src/Zle/zle_main.c: Protect shell status around
+	time function execution in line editor.
+
 2018-05-02  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* Eitan Adler: 42740: Completion/BSD/Command/_systat:
