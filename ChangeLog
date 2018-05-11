@@ -6,8 +6,6 @@
 	* 42101 (tweaked): dana: Src/exec.c, Test/A06assign.ztst:
 	assigning shell status to array was broken.
 
-	* Src/exec.c (execcmd_exec): 
-
 2018-05-08  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 42752: Completion/Unx/Command/_git: better completion
