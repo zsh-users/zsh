@@ -5234,8 +5234,14 @@ bin_print(char *name, char **args, Options ops, int func)
 			    errflag &= ~ERRFLAG_ERROR;
 			    ret = 1;
 			}
-			print_val(doubleval)
-			    break;
+			/* force consistent form for Inf/NaN output */
+			if (isnan(doubleval))
+			    count += fputs("nan", fout);
+			else if (isinf(doubleval))
+			    count += fputs((doubleval < 0.0) ? "-inf" : "inf", fout);
+		        else
+			    print_val(doubleval)
+			break;
 		    case 3:
 #ifdef ZSH_64_BIT_UTYPE
  		    	*d++ = 'l';

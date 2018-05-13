@@ -302,6 +302,40 @@
 ?(eval):1: bad math expression: operator expected at `2 '
 # ` for emacs shell mode
 
+  in=1 info=2 Infinity=3 Inf=4
+  print $(( in )) $(( info )) $(( Infinity )) $(( $Inf )) $(( inf )) $(( INF )) $(( Inf )) $(( iNF ))
+0:Infinity parsing
+>1 2 3 4 Inf Inf Inf Inf
+
+  integer Inf
+  print $(( Inf[0] ))
+1:Refer to Inf with an array subscript
+?(eval):2: bad base syntax
+
+  (( NaN = 1 ))
+2:Assign to NaN
+?(eval):1: bad math expression: lvalue required
+
+  a='Inf'
+  (( b = 1e500 ))
+  print $((1e500)) $(($((1e500)))) $(( a )) $b $(( b )) $(( 3.0 / 0 ))
+0:Overflow to infinity
+>Inf Inf Inf Inf Inf Inf
+
+  print $((1e500))
+  print $(( $((1e500)) ))
+0:Reinput infinity value into math context
+>Inf
+>Inf
+
+  print $((1e500/1e500)) $((-1e500/1e500)) $(( 24. % 0 ))
+0:NaN results
+>NaN NaN NaN
+
+  (( 3 / 0 ))
+2:Integer division by zero
+?(eval):1: division by zero
+
   integer varassi
   print $(( varassi = 5.5 / 2.0 ))
   print $varassi

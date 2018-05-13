@@ -1,5 +1,9 @@
 2018-05-13  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42488: Src/Modules/mathfunc.c, Src/builtin.c, Src/math.c,
+	Test/B03print.ztst, Test/C01arith.ztst, Test/V03mathfunc.ztst:
+	test cases for 42369 and address some issues in the code
+
 	* Nelson H. F. Beebe: 19597 (rebased 42369): Src/math.c,
 	Src/params.c. Src/Modules/mathfunc.c, configure.ac:
 	return Inf, NaN etc from floating point operations instead

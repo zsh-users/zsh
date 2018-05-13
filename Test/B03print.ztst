@@ -86,6 +86,17 @@
 >123.45 678
 >90.1 0
 
+ nan=0 inf=1 Infinity=2
+ printf '%.1f\n' -inf Infinity Inf nan NaN -Inf -0.0
+0:infinity constants
+>-inf
+>inf
+>inf
+>nan
+>nan
+>-inf
+>-0.0
+
  print -f 'arg: %b\n' -C2 '\x41' '\x42' '\x43'
 0:override -C when -f was given
 >arg: A

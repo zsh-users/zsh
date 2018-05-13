@@ -100,8 +100,8 @@ F:This test fails if your math library doesn't have erand48().
 >1.50000
 
    print $(( sqrt(-1) ))
-1:Non-negative argument checking for square roots.
-?(eval):1: math: argument to sqrt out of range
+0:Non-negative argument checking for square roots.
+>NaN
 
 # Simple test that the pseudorandom number generators are producing
 # something that could conceivably be pseudorandom numbers in a

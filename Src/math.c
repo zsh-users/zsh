@@ -593,7 +593,6 @@ isinf(double x)
 #endif
 
 #if !defined(HAVE_ISNAN)
-/**/
 static double
 store(double *x)
 {
@@ -816,27 +815,11 @@ zzlex(void)
 		ptr++;
 		break;
 	    }
-	case ' ':
+	case ' ': /* Fall through! */
 	case '\t':
 	case '\n':
 	    break;
-	/* Fall through! */
 	default:
-	    if (strcmp(ptr-1, "NaN") == 0) {
-		yyval.type = MN_FLOAT;
-		yyval.u.d = 0.0;
-		yyval.u.d /= yyval.u.d;
-		ptr += 2;
-		return NUM;
-	    }
-	    else if (strcmp(ptr-1, "Inf") == 0) {
-		yyval.type = MN_FLOAT;
-		yyval.u.d = 0.0;
-		yyval.u.d = 1.0 / yyval.u.d;
-		ptr += 2;
-		return NUM;
-	    }
-
 	    if (idigit(*--ptr) || *ptr == '.')
 		return lexconstant();
 	    if (*ptr == '#') {
@@ -860,6 +843,20 @@ zzlex(void)
 
 		p = ptr;
 		ptr = ie;
+		if (ie - p == 3) {
+		    if (strncasecmp(p, "NaN", 3) == 0) {
+			yyval.type = MN_FLOAT;
+			yyval.u.d = 0.0;
+			yyval.u.d /= yyval.u.d;
+			return NUM;
+		    }
+		    else if (strncasecmp(p, "Inf", 3) == 0) {
+			yyval.type = MN_FLOAT;
+			yyval.u.d = 0.0;
+			yyval.u.d = 1.0 / yyval.u.d;
+			return NUM;
+		    }
+		}
 		if (*ptr == '[' || (!cct && *ptr == '(')) {
 		    char op = *ptr, cp = ((*ptr == '[') ? ']' : ')');
 		    int l;
@@ -1114,6 +1111,10 @@ callmathfunc(char *o)
 static int
 notzero(mnumber a)
 {
+    if ((a.type & MN_INTEGER) && a.u.l == 0) {
+        zerr("division by zero");
+        return 0;
+    }
     return 1;
 }
 
