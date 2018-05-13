@@ -208,49 +208,6 @@ math_func(char *name, int argc, mnumber *argv, int id)
   if (errflag)
     return ret;
 
-  if (id & 0xff00) {
-      int rtst = 0;
-
-      switch ((id >> 8) & 0xff) {
-      case BF_POS:
-	  rtst = (argd <= 0.0);
-	  break;
-	  
-      case BF_NONNEG:
-	  rtst = (argd < 0.0);
-	  break;
-
-      case BF_FRAC:
-	  rtst = (fabs(argd) > 1.0);
-	  break;
-
-      case BF_GE1:
-	  rtst = (argd < 1.0);
-	  break;
-
-      case BF_FRACO:
-	  rtst = (fabs(argd) >= 1.0);
-	  break;
-
-      case BF_INTPOS:
-	  rtst = (argd <= 0 && (double)(zlong)argd == argd);
-	  break;
-
-      case BF_GTRM1:
-	  rtst = (argd <= -1);
-	  break;
-
-      case BF_POS2:
-	  rtst = (argd2 <= 0.0);
-	  break;
-      }
-
-      if (rtst) {
-	  zerr("math: argument to %s out of range", name);
-	  return ret;
-      }
-  }
-
   switch (id & 0xff) {
   case MF_ABS:
       ret.type = argv->type;

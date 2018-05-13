@@ -1317,6 +1317,7 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       erand48 open_memstream \
 	       posix_openpt \
 	       wctomb iconv \
+	       isinf isnan \
 	       grantpt unlockpt ptsname \
 	       htons ntohs \
 	       regcomp regexec regerror regfree \

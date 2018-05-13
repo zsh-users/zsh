@@ -1,5 +1,10 @@
 2018-05-13  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* Nelson H. F. Beebe: 19597 (rebased 42369): Src/math.c,
+	Src/params.c. Src/Modules/mathfunc.c, configure.ac:
+	return Inf, NaN etc from floating point operations instead
+	of errors to allow non-stop IEEE 754 arithmetic
+
 	* 42760: Src/Zle/zle_thingy.c: move stack variable outside
 	while loop scope as it is accessed in the while condition
 

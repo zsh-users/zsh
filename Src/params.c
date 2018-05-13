@@ -36,6 +36,8 @@
 #else
 #include "patchlevel.h"
 
+#include <math.h>
+
 /* If removed from the ChangeLog for some reason */
 #ifndef ZSH_PATCHLEVEL
 #define ZSH_PATCHLEVEL "unknown"
@@ -5431,10 +5433,16 @@ convfloat(double dval, int digits, int flags, FILE *fout)
 	ret = NULL;
     } else {
 	VARARR(char, buf, 512 + digits);
-	sprintf(buf, fmt, digits, dval);
-	if (!strchr(buf, 'e') && !strchr(buf, '.'))
-	    strcat(buf, ".");
-	ret = dupstring(buf);
+	if (isinf(dval))
+	    ret = dupstring((dval < 0.0) ? "-Inf" : "Inf");
+	else if (isnan(dval))
+	    ret = dupstring("NaN");
+	else {
+	    sprintf(buf, fmt, digits, dval);
+	    if (!strchr(buf, 'e') && !strchr(buf, '.'))
+		strcat(buf, ".");
+	    ret = dupstring(buf);
+	}
     }
 #ifdef USE_LOCALE
     if (prev_locale) setlocale(LC_NUMERIC, prev_locale);
