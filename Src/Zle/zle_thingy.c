@@ -725,13 +725,13 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 	remetafy = 0;
 
     while (*args && **args == '-') {
+	char skip_this_arg[2] = "x";
 	char *num;
 	if (!args[0][1] || args[0][1] == '-') {
 	    args++;
 	    break;
 	}
 	while (*++(*args)) {
-	    char skip_this_arg[2] = "x";
 	    switch (**args) {
 	    case 'n':
 		num = args[0][1] ? args[0]+1 : args[1];

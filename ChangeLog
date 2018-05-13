@@ -1,3 +1,8 @@
+2018-05-13  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 42760: Src/Zle/zle_thingy.c: move stack variable outside
+	while loop scope as it is accessed in the while condition
+
 2018-05-11  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 42180: dana: Src/Zle/compcore.c: safety when removing
