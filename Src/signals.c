@@ -793,9 +793,21 @@ killjb(Job jn, int sig)
         else
 	    return killpg(jn->gleader, sig);
     }
-    for (pn = jn->procs; pn; pn = pn->next)
-        if ((err = kill(pn->pid, sig)) == -1 && errno != ESRCH && sig != 0)
-            return -1;
+    for (pn = jn->procs; pn; pn = pn->next) {
+	/*
+	 * Do not kill this job's process if it's already dead as its
+	 * pid could have been reused by the system.
+	 * As the PID doesn't exist don't return an error.
+	 */
+	if (pn->status == SP_RUNNING || WIFSTOPPED(pn->status)) {
+	    /*
+	     * kill -0 on a job is pointless. We still call kill() for each process
+	     * in case the user cares about it but we ignore its outcome.
+	     */
+	    if ((err = kill(pn->pid, sig)) == -1 && errno != ESRCH && sig != 0)
+		return -1;
+	}
+    }
     return err;
 }
 
