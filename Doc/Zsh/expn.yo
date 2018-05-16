@@ -2004,7 +2004,7 @@ The character is 7-bit, i.e. is a single-byte character without
 the top bit set.
 )
 item(tt([:blank:]))(
-The character is either space or tab
+The character is a blank character
 )
 item(tt([:cntrl:]))(
 The character is a control character

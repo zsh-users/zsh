@@ -1,5 +1,8 @@
 2018-05-17  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* Stephane: 42790: Doc/Zsh/expn.yo, NEWS, Src/pattern.c,
+	configure.ac: make [[:blank:]] match non-ASCII blanks
+
 	* 42784: Completion/Zsh/Command/_typeset: complete -s and -x
 	options to the functions builtin
 

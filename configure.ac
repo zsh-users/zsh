@@ -1304,6 +1304,7 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       memcpy memmove strstr strerror strtoul \
 	       getrlimit getrusage \
 	       setlocale \
+	       isblank iswblank \
 	       uname \
 	       signgam tgamma \
 	       scalbn \
@@ -2564,6 +2565,12 @@ AC_HELP_STRING([--enable-multibyte], [support multibyte characters]),
 [AC_CACHE_VAL(zsh_cv_c_unicode_support,
   AC_MSG_NOTICE([checking for functions supporting multibyte characters])
   [zfuncs_absent=
+dnl
+dnl Note that iswblank is not included and checked separately.
+dnl As iswblank() was added to C long after the others, we still
+dnl want to enabled unicode support even if iswblank is not available
+dnl (we then just do the SPC+TAB approximation)
+dnl
    for zfunc in iswalnum iswcntrl iswdigit iswgraph iswlower iswprint \
 iswpunct iswspace iswupper iswxdigit mbrlen mbrtowc towupper towlower \
 wcschr wcscpy wcslen wcsncmp wcsncpy wcrtomb wcwidth wmemchr wmemcmp \

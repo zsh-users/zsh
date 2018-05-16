@@ -4,7 +4,14 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
-Changes from %.5 to 5.5.1
+Changes from 5.5.1 to FIXME
+---------------------------
+
+In shell patterns, [[:blank:]] now honours the locale instead of
+matching exclusively on space and tab, like for the other POSIX
+character classes or for extended regular expressions.
+
+Changes from 5.5 to 5.5.1
 -------------------------
 
 Apart from a fix for a configuration problem finding singal names from
