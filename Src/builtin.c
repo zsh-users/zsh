@@ -3199,7 +3199,7 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	pflags |= PRINT_NAMEONLY;
 
     if (OPT_MINUS(ops,'M') || OPT_PLUS(ops,'M')) {
-	MathFunc p, q;
+	MathFunc p, q, prev;
 	/*
 	 * Add/remove/list function as mathematical.
 	 */
@@ -3331,15 +3331,10 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	    p->maxargs = maxargs;
 
 	    queue_signals();
-	    for (q = mathfuncs; q; q = q->next) {
+	    for (q = mathfuncs, prev = NULL; q; prev = q, q = q->next) {
 		if (!strcmp(q->name, funcname)) {
-		    unqueue_signals();
-		    zwarnnam(name, "-M %s: function already exists",
-			     funcname);
-		    zsfree(p->name);
-		    zsfree(p->module);
-		    zfree(p, sizeof(struct mathfunc));
-		    return 1;
+		    removemathfunc(prev, q);
+		    break;
 		}
 	    }
 

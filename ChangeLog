@@ -1,3 +1,8 @@
+2018-05-17  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 42785: Src/builtins.c: redefining a user math function should
+	silently work as with redefining other shell objects.
+
 2018-05-14  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 42297: dana: Src/params.c, Test/D06subscript.ztst: (e)
