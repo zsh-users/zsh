@@ -454,15 +454,14 @@ enum {
  * so the shell can still exec the last process.
  */
 #define FDT_FLOCK_EXEC		6
-#ifdef PATH_DEV_FD
 /*
  * Entry used by a process substition.
  * This marker is not tested internally as we associated the file
  * descriptor with a job for closing.
+ *
+ * This is not used unless PATH_DEV_FD is defined.
  */
 #define FDT_PROC_SUBST		7
-#endif
-
 /*
  * Mask to get the basic FDT type.
  */

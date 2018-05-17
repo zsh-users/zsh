@@ -1,5 +1,8 @@
 2018-05-17  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 42793: Src/jobs.c, Src/zsh.h: Always define FDT_PROC_SUBST to
+	avoid proliferating #ifdef's.
+
 	* 42785: Src/builtins.c: redefining a user math function should
 	silently work as with redefining other shell objects.
 
