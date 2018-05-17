@@ -1,3 +1,8 @@
+2018-05-17  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 42784: Completion/Zsh/Command/_typeset: complete -s and -x
+	options to the functions builtin
+
 2018-05-17  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 42793: Src/jobs.c, Src/zsh.h: Always define FDT_PROC_SUBST to

@@ -55,9 +55,13 @@ case ${service} in
   ;;
   float) use="EFHghlprtux";;
   functions)
-    use="UkmTtuzMW"
+    use="UkmTtuzW"
     func=f
-    allargs[M]='(-k -t -T -u -U -z -M +M +k +t +z)-+M[define mathematical function]'
+    args=(
+      '(-k -t -T -u -U -W -x -z -M +M +k +t +W +z)-+M[define mathematical function]'
+      '(-k -m -t -T -u -U -W -x -z +M +k +t +W +z)-s[define mathematical function that takes a string argument]'
+      '(-M)-x+[specify spaces to use for indentation]:spaces'
+    )
   ;;
   integer)
     use="Hghilprtux"
@@ -89,8 +93,10 @@ if [[ "$state" = vars_eq ]]; then
       _wanted functions expl 'math function' compadd -F line - \
           ${${${(f)"$(functions -M)"}##*-M }%% *}
     elif (( $+opt_args[-M] )); then
-      _arguments ':new math function:_functions' ':minimum arguments' \
-      ':maximum arguments' ':shell function:_functions'
+      _arguments ':new math function:_functions' \
+	":minimum arguments${(k)opt_args[-s]:+:(1)}" \
+	":maximum arguments${(k)opt_args[-s]:+:(1)}" \
+	':shell function:_functions'
     elif (( $+opt_args[-w] )); then
       _wanted files expl 'zwc file' _files -g '*.zwc(-.)'
     elif [[ $service = autoload || -n $opt_args[(i)-[uU]] ]]; then
