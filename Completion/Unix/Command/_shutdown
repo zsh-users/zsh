@@ -27,8 +27,8 @@ case $OSTYPE in
       '*:warning message'
     )
   ;|
-  *bsd*|dragonfly*|linux*)
-    args=(
+  *bsd*|dragonfly*)
+    args+=(
       '-p[turn off power after shutdown]'
     )
   ;|
