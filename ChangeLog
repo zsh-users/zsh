@@ -1,3 +1,8 @@
+2018-08-31  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 42810: pseyfert: Completion/Unix/Command/_git:
+	git remote set-url completion
+
 2018-08-30  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 43349: Completion/X/Command/_eog: new completion for eog
@@ -5,6 +10,9 @@
 	* 43350: Completion/Unix/Command/_zsh: support --emulate
 
 2018-08-29  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 43351: Completion/Unix/Type/_diff_options: handle the new
+	diff implementation in the pre-release version of FreeBSD 12
 
 	* 43346: Completion/Linux/Command/_cryptsetup,
 	Completion/Linux/Command/_networkmanager,
