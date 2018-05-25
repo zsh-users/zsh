@@ -1,3 +1,7 @@
+2018-05-25  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 42809: Src/Zle/compcore.c: slightly improve 'compset -q'
+
 2018-05-19  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 42806: Completion/Unix/Command/_shutdown: fix where options

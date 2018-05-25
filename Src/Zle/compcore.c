@@ -1638,7 +1638,7 @@ set_comp_sep(void)
 		    p[-1] = '\0';
 	    }
 	}
-	if (tok == ENDINPUT || tok == LEXERR)
+	if (tok == ENDINPUT)
 	    break;
 	if (tokstr && *tokstr) {
             for (p = tokstr; dq && *p; p++) {
@@ -1667,7 +1667,7 @@ set_comp_sep(void)
 	if (!got && !lexflags) {
 	    DPUTS(!p, "no current word in substr");
 	    got = 1;
-	    cur = i;
+	    cur = countlinknodes(foo) - 1;  /* cur is 0 offset */
 	    swb = wb - 1 - dq - sq - dolq;
 	    swe = we - 1 - dq - sq - dolq;
             sqq = lsq;
@@ -1902,7 +1902,10 @@ set_comp_sep(void)
 	    untokenize(p);
 	}
 	/* The current position shouldn't exceed the new word count */
-	compcurrent = cur + 1 > i ? i : cur + 1;
+	if ((compcurrent = cur + 1) > i) {
+	    DPUTS2(1, "compcurrent=%d > number_of_words=%d", compcurrent, i);
+	    compcurrent = i;
+	}
 	compwords[i] = NULL;
     }
     instring = ois;
