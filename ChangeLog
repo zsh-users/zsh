@@ -1,3 +1,8 @@
+2018-05-29  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Eitan Adler: 42863: configure.ac: autoconf update to latest
+	conventions.
+
 2018-05-25  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 42809: Src/Zle/compcore.c: slightly improve 'compset -q'
