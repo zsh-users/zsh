@@ -537,7 +537,6 @@ AC_SUBST(EXELDFLAGS)dnl
 AC_SUBST(LIBLDFLAGS)dnl
 
 AC_PROG_CPP                 dnl Figure out how to run C preprocessor.
-AC_PROG_GCC_TRADITIONAL     dnl Do we need -traditional flag for gcc.
 AC_C_CONST                  dnl Does compiler support `const'.
 
 dnl Default preprocessing on Mac OS X produces warnings

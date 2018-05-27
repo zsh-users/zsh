@@ -1,5 +1,8 @@
 2018-05-29  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Eitan Adler: 42862: configure.ac: AC_PROG_TRADITIONAL is no
+	longer needed.
+
 	* Eitan Adler: 42863: configure.ac: autoconf update to latest
 	conventions.
 
