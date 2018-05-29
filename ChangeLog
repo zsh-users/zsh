@@ -1,5 +1,8 @@
 2018-05-29  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* c.f. 42865: config.guess, config.sub: update from GNU
+	distribution.
+
 	* Eitan Adler: 42862: configure.ac: AC_PROG_TRADITIONAL is no
 	longer needed.
 
