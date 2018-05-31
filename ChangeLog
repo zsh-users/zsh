@@ -1,3 +1,7 @@
+2018-05-31  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 42870: Src/Zle/compcore.c: another improvement of 'compset -q'
+
 2018-05-29  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* c.f. 42865: config.guess, config.sub: update from GNU

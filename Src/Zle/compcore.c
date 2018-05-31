@@ -1610,9 +1610,11 @@ set_comp_sep(void)
     inpush(dupstrspace(tmp), 0, NULL);
     zlemetaline = tmp;
     /*
-     * Length of temporary string, calculated above.
+     * tl is the length of temporary string, calculated above.
+     * It seems zlemetall need not include the 'x' added at the cursor.
+     * addedx is taken care of in function gotword() (lex.c).
      */
-    zlemetall = tl;
+    zlemetall = tl - addedx;
     strinbeg(0);
     noaliases = 1;
     do {
@@ -1668,8 +1670,8 @@ set_comp_sep(void)
 	    DPUTS(!p, "no current word in substr");
 	    got = 1;
 	    cur = countlinknodes(foo) - 1;  /* cur is 0 offset */
-	    swb = wb - 1 - dq - sq - dolq;
-	    swe = we - 1 - dq - sq - dolq;
+	    swb = wb - dq - sq - dolq;
+	    swe = we - dq - sq - dolq;
             sqq = lsq;
 	    soffs = zlemetacs - swb - css;
 	    DPUTS2(p[soffs] != 'x', "expecting 'x' at offset %d of \"%s\"",
