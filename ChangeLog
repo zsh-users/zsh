@@ -1,3 +1,8 @@
+2018-06-01  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 42888: MACHINES: remove outdated issues and update general
+	description.
+
 2018-05-31  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 42870: Src/Zle/compcore.c: another improvement of 'compset -q'
