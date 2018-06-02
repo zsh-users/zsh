@@ -1,5 +1,7 @@
 2018-06-09  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42918: dana: Completion/Unix/Command/_jq: fix file completion
+
 	* 42918: dana: Completion/Unix/Command/_ldd: adapt detection of
 	GNU variant to work on Ubuntu
 

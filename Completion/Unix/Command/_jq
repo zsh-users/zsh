@@ -31,4 +31,4 @@ _arguments -S -s : \
   '*--argjson[pre-set a variable to an object]: :_guard "|[A-Za-z][A-Za-z0-9]#" "variable name":value (JSON): ' \
   '*--slurpfile[pre-set a variable to contents of a file]: :_guard "|[A-Za-z][A-Za-z0-9]#" "variable name":value (filename of file containing JSON):_files' \
   "1: :_guard '|[^-]' filter" \
-  "*:_files"
+  "*: :_files"
