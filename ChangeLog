@@ -1,3 +1,8 @@
+2018-06-09  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 42918: dana: Completion/Unix/Command/_ldd: adapt detection of
+	GNU variant to work on Ubuntu
+
 2018-06-07  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 42947: Doron Behar: Completion/Unix/Command/_luarocks:

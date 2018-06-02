@@ -1,6 +1,6 @@
 #compdef ldd
 
-if _pick_variant gnu='(GNU|EGLIBC|Gentoo)' unix --version; then
+if _pick_variant gnu='(Free Soft|GNU|EGLIBC|Gentoo)' unix --version; then
   args=(
     '(- *)--version[display version information]'
     '(- *)--help[display help information]'
