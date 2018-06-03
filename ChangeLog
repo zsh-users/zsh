@@ -1,5 +1,8 @@
 2018-06-03  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42881: Completion/Unix/Command/_ghostscript: update options in
+	ghostscript completion and query more matches directly from it
+
 	* 42920: Completion/Linux/Command/_dkms: new dkms completion
 
 2018-06-01  Peter Stephenson  <p.stephenson@samsung.com>
