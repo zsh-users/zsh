@@ -1,5 +1,7 @@
 2018-06-03  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42922: dana: Completion/Unix/Command/_tac: new tac completion
+
 	* 42881: Completion/Unix/Command/_ghostscript: update options in
 	ghostscript completion and query more matches directly from it
 
