@@ -6,6 +6,8 @@ _arguments -s \
     "-a[mode to use while on AC power]:mode:($powerd_mode)" \
     "-b[mode to use while on battery power]:mode:($powerd_mode)" \
     '-i[CPU idle percent level when begin to degrade performance]:percent:' \
+    '-m[minimum frequency to throttle down to]:frequency (MHz)' \
+    '-M[maximum frequency to throttle up to]:frequency (MHz)' \
     "-n[mode to use normally when the AC line state is unknown]:mode:($powerd_mode)" \
     '-p[polling interval (in milliseconds) for AC line state and system idle levels]:interval:' \
     '-P[alternative pidfile]:pidfile:_files' \
