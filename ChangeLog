@@ -1,5 +1,8 @@
 2018-06-07  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42935: Eitan Adler: Completion/Unix/Command/_arp:
+	FreeBSD does not support -v for arp
+
 	* 42937: Eitan Adler: Completion/BSD/Command/_powerd: add -M/-m
 
 	* 43943: Completion/Unix/Command/_samba: update with long options

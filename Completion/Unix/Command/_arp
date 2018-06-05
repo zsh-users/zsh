@@ -37,7 +37,7 @@ case $OSTYPE in
     flags+=( netmask )
   ;;
   darwin*|freebsd*|dragonfly*)
-    cmds+=( '(-n -v -i)-S[create an arp entry, replacing any existing entry]' )
+    cmds+=( '(-n -i)-S[create an arp entry, replacing any existing entry]' )
   ;|
   darwin*|freebsd*)
     args+=( '(-s -Q -f)-i+[select an interface]:interface:_net_interfaces' )
@@ -58,7 +58,6 @@ case $OSTYPE in
     args+=( $vopt )
   ;;
   freebsd*)
-    args+=( $vopt )
     flags+=( blackhole reject )
   ;;
   openbsd*)
