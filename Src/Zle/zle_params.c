@@ -819,7 +819,7 @@ get_registers(UNUSED(HashTable ht), const char *name)
 
 /**/
 static void
-set_registers(UNUSED(Param pm), HashTable ht)
+set_registers(Param pm, HashTable ht)
 {
     int i;
     HashNode hn;

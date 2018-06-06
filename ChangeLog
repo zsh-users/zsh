@@ -1,3 +1,8 @@
+2018-06-06  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Eitan: 42939: Src/Zle/zle_params.c: pm argument to
+	set_registers is not unused.
+
 2018-06-05  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Sebastian: 42929 (twaked): Functions/Misc/zed: additional
