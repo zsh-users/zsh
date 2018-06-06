@@ -1,5 +1,8 @@
 2018-06-06  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Eitan: 42938: Src/Modules/mathfunc.c: name argument to
+	math_func is not unused.
+
 	* Eitan: 42939: Src/Zle/zle_params.c: pm argument to
 	set_registers is not unused.
 

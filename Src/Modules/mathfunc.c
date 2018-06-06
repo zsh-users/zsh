@@ -164,7 +164,7 @@ static struct mathfunc mftab[] = {
 
 /**/
 static mnumber
-math_func(char *name, int argc, mnumber *argv, int id)
+math_func(UNUSED(char *name), int argc, mnumber *argv, int id)
 {
   mnumber ret;
   double argd = 0, argd2 = 0, retd = 0;
