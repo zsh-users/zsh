@@ -1,3 +1,7 @@
+2018-06-07  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 43943: Completion/Unix/Command/_samba: update with long options
+
 2018-06-06  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Eitan: 42938: Src/Modules/mathfunc.c: name argument to
