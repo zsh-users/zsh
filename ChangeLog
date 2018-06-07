@@ -1,5 +1,8 @@
 2018-06-07  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* users/23434: Functions/Misc/zed: initialise UNDO_LIMIT_NO so
+	that an initial undo doesn't clear the whole edit buffer
+
 	* 42935: Eitan Adler: Completion/Unix/Command/_arp:
 	FreeBSD does not support -v for arp
 

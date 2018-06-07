@@ -72,6 +72,12 @@ if (( bind )) || ! bindkey -M zed >&/dev/null; then
   # zed we may want to set this temporally.
   bindkey -A main zed-normal-keymap
 
+  # Define a widget to use at startup, undo shouldn't clear initial buffer
+  __zed_init() {
+    UNDO_LIMIT_NO=$UNDO_CHANGE_NO
+  }
+  zle -N __zed_init
+
   # Assign some default keys.
   # Depending on your stty's, you may be able to use ^J as accept-line, else:
 
@@ -126,11 +132,11 @@ if ((fun)) then
     var="${(q-)1} () {
 }"
   fi
-  vared -M zed -m zed-vicmd var && eval function "$var"
+  vared -M zed -m zed-vicmd -i __zed_init var && eval function "$var"
 else
   zed_file_name=$1
   [[ -f $1 ]] && var="$(<$1)"
-  while vared -M zed -m zed-vicmd var
+  while vared -M zed -m zed-vicmd -i __zed_init var
   do
     {
       print -r -- "$var" >| $zed_file_name
