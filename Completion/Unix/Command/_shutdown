@@ -42,6 +42,11 @@ case $OSTYPE in
     args+=(
       '-o[execute halt or reboot instead of sending a signal to init]'
     )
+  ;|
+  freebsd<12->.*)
+    args+=(
+      '-c[power cycle the system instead of halting if possible]'
+    )
   ;;
   netbsd*)
     args+=(

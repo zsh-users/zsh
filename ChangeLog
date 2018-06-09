@@ -1,5 +1,8 @@
 2018-06-09  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42968: Eitan Adler: Completion/Unix/Command/_shutdown:
+	add "-c" for _shutdown completion on FreeBSD 12-current
+
 	* 42965: dana: Completion/Unix/Command/_bash,
 	Completion/Unix/Command/_sh: add full completion for bash
 
