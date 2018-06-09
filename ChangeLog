@@ -1,5 +1,8 @@
 2018-06-09  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42965: dana: Completion/Unix/Command/_bash,
+	Completion/Unix/Command/_sh: add full completion for bash
+
 	* 42964: Eitan Adler: Completion/BSD/Type/_fbsd_architectures:
 	Update list of fbsd architectures
 

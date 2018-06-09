@@ -1,4 +1,4 @@
-#compdef sh ksh bash csh tcsh rc
+#compdef sh ash csh dash ksh ksh88 ksh93 mksh oksh pdksh rc tcsh yash
 
 if (( CURRENT == ${words[(i)-c]} + 1 )); then
   _cmdstring
