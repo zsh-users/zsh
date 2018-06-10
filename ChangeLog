@@ -1,3 +1,8 @@
+2018-06-10  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 42977: dana: Completion/Unix/Command/_man: Complete options to
+	major man variants, otherwise improve especially section matching
+
 2018-06-09  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 42968: Eitan Adler: Completion/Unix/Command/_shutdown:
