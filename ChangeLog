@@ -1,5 +1,7 @@
 2018-06-10  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 42978: dana: Completion/Darwin/Command/_pbcopy: fix small bug
+
 	* 42977: dana: Completion/Unix/Command/_man: Complete options to
 	major man variants, otherwise improve especially section matching
 

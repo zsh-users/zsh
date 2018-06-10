@@ -8,7 +8,7 @@ args=(
   '(-)-help[display help information]'
   '-pboard[specify pasteboard to copy to or paste from]: :->pboards'
 )
-[[ $service == pbpaste ]] & args+=(
+[[ $service == pbpaste ]] && args+=(
   '-Prefer[specify type of data to prefer when pasting]: :->dtypes'
 )
 
