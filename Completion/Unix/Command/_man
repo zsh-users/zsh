@@ -109,7 +109,7 @@ _man() {
       '--warnings=[enable specified groff warnings]:groff warnings'
       '(-a --all --regex)--wildcard[treat page name as shell glob]'
       # @todo Could enumerate these
-      '(-X --gxditview)'{-X-,--gxditview=-}'[display output in gxditview using specified DPI (default: 75)]::DPI'
+      '(-X --gxditview)'{-X-,--gxditview=-}'[display output in gxditview using specified DPI]::resolution (DPI) [75]'
       # @todo Post-process how?
       '(-t --troff -Z --ditroff)'{-Z,--ditroff}'[post-process output for chosen device]'
     )
@@ -232,7 +232,7 @@ _man() {
 
   if [[ $sect = (<->*|[lnopx]) || $sect = *\|* ]]; then
     sects=( ${(s.|.)sect} )
-    dirs=( $^_manpath/(sman|man|cat)${^sects}/ )
+    dirs=( $^_manpath/(sman|man|cat)${^sects}(|.*)/ )
     sect=${(j<|>)sects}
     [[ $sect == *'|'* ]] && sect="($sect)"
     awk="\$2 == \"$sect\" {print \$1}"
@@ -247,7 +247,7 @@ _man() {
 
   # Solaris 11 and on have a man-index directory that doesn't contain manpages
   dirs=( ${dirs:#*/man-index/} )
-  sects=( ${(o)${dirs##*(man|cat)}%/} )
+  sects=( ${(o)${${dirs##*(man|cat)}%.*}%/} )
 
   # If we've got this far, we can build our look-up table for descriptions of
   # the more common sections. Unless otherwise labelled, the more specific ones
@@ -297,6 +297,11 @@ _man() {
     # Add OS-specific stuff that's too risky for or overrides the general list
     [[ $OSTYPE == darwin*  ]] && sect_descs+=( n 'Tcl/Tk features' )
     [[ $OSTYPE == openbsd* ]] && sect_descs+=( 3p 'Perl features' )
+    # @todo Oracle Solaris 11.4 adopts the BSD/Linux structure, making many of
+    # these inaccurate — this should be handled accordingly in the future. If
+    # OSTYPE isn't helpful (since other Solaris descendants may not follow
+    # suit), we could perhaps use the presence of SysV-style sections under
+    # _manpath as the determinant
     [[ $OSTYPE == solaris* ]] && sect_descs+=(
       1t  'Tcl/Tk features'
       3m  'mathematical library functions'
@@ -320,21 +325,22 @@ _man() {
     local -a specs
 
     (( $#sects )) || {
-      _message 'manual section'
+      _message -e sections 'manual section'
       return 1
     }
 
     # Build specs from descriptions
     for s in $sects; do
-      specs+=( "${s}[${(b)sect_descs[$s]}]" )
+      specs+=( "${s}:${(b)sect_descs[$s]}" )
     done
+    specs=( ${specs%:} )
 
     if [[ $variant == (darwin|dragonfly|freebsd|linux)* ]]; then
-      _values -s : 'manual section' $specs
+      _sequence -s : _describe -t sections 'manual section' specs
     elif [[ $variant == solaris* ]]; then
-      _values -s , 'manual section' $specs
+      _sequence -s , _describe -t sections 'manual section' specs
     else
-      _values 'manual section' $specs
+      _describe -t sections 'manual section' specs
     fi
     return
   }

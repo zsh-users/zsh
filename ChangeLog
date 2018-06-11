@@ -1,7 +1,9 @@
 2018-06-11  dana  <dana@dana.is>
 
+	* 42983: dana: Completion/Unix/Command/_man: Address misc. feedback
+
 	* 42984: dana: Completion/Unix/Type/_files,
-	Completion/Unix/Type/_object_files: fix argument pass-through to compadd
+	Completion/Unix/Type/_object_files: Fix argument pass-through to compadd
 
 2018-06-10  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
