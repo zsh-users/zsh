@@ -9,4 +9,4 @@ __object_file() {
 	$REPLY = (core*|*.core) ]]
 }
 
-_files -g '*(-.e,__object_file,)'
+_files -g '*(-.e,__object_file,)' "$@" "${(@)expl}"
