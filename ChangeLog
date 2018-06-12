@@ -1,3 +1,8 @@
+2019-02-09  Doron Behar <doron.behar@gmail.com>
+
+	* gitlab !5: Completion/Unix/Command/_abcde:
+	New abcde completion.
+
 2019-02-09  Hiroki Noda <kubo39@gmail.com>
 
 	* github #31: Completion/Unix/Command/_nm,
