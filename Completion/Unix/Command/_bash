@@ -71,12 +71,12 @@ case $state in
     fi
     ;;
   set-options)
-    tmp=( ${(f)"$( _call_program set-options ${(q-)cmd} -c '"shopt -o"' )"} )
+    tmp=( ${(f)"$( _call_program set-options $cmd -c '"shopt -o"' )"} )
     tmp=( ${tmp%%[[:space:]]*} )
     _values -w '`set` option' $tmp && ret=0
     ;;
   shopt-options)
-    tmp=( ${(f)"$( _call_program shopt-options ${(q-)cmd} -c shopt )"} )
+    tmp=( ${(f)"$( _call_program shopt-options $cmd -c shopt )"} )
     tmp=( ${tmp%%[[:space:]]*} )
     _values -w '`shopt` option' $tmp && ret=0
     ;;
