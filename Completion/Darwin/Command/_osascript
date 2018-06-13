@@ -18,7 +18,7 @@ case $state in
     # but adding the output of osalang makes this future-proof
     _values 'script language' \
       AppleScript JavaScript 'Generic Scripting System' \
-      ${(f)"$( command osalang 2> /dev/null )"} \
+      ${(f)"$( _call_program languages command osalang )"} \
     && ret=0
     ;;
   modifiers)

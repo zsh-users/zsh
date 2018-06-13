@@ -28,9 +28,9 @@ case $state in
     # also, not every file format supports bit-rate values
     (( $+opt_args[--file-format] )) && {
       tmp=( ${(f)"$(
-        command $service \
+        _call_program bit-rates $words[1] \
           --file-format=${opt_args[--file-format]##*:} \
-          --bit-rate='?' 2> /dev/null
+          --bit-rate='\?'
       )"} )
       tmp=( ${tmp//[[:space:]]##/} )
     }
@@ -46,9 +46,9 @@ case $state in
       _message 'data format' && ret=0
     else
       tmp=( ${(f)"$(
-        command $service \
+        _call_program data-formats $words[1] \
           --file-format=${opt_args[--file-format]##*:} \
-          --data-format='?' 2> /dev/null
+          --data-format='\?'
       )"} )
       tmp=( ${tmp//:/\\:} )
       tmp=( ${^tmp/[[:space:]]##/[}\] )
@@ -56,13 +56,13 @@ case $state in
     fi
     ;;
   devices)
-    tmp=( ${(f)"$( command $service -a '?' 2> /dev/null )"} )
+    tmp=( ${(f)"$( _call_program devices $words[1] -a '\?' )"} )
     tmp=( ${tmp##[[:space:]]#[0-9]##[[:space:]]##} )
     tmp=( ${tmp//:/\\:} )
     _values 'audio device name or ID' $tmp && ret=0
     ;;
   file-formats)
-    tmp=( ${(f)"$( command $service --file-format='?' 2> /dev/null )"} )
+    tmp=( ${(f)"$( _call_program file-formats $words[1] --file-format='\?' )"} )
     tmp=( ${tmp%%[[:space:]]##\(.*} )
     tmp=( ${tmp//:/\\:} )
     tmp=( ${^tmp/[[:space:]]##/[}\] )
@@ -76,7 +76,7 @@ case $state in
     && ret=0
     ;;
   voices)
-    tmp=( ${(f)"$( command $service -v '?' 2> /dev/null )"} )
+    tmp=( ${(f)"$( _call_program voices $words[1] -v '\?' )"} )
     tmp=( ${tmp%%[[:space:]](#c2,)*} )
     _values voice $tmp && ret=0
     ;;

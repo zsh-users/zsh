@@ -1,3 +1,10 @@
+2018-06-13  dana  <dana@dana.is>
+
+	* 42992: Completion/Darwin/Command/_nvram,
+	Completion/Darwin/Command/_osascript, Completion/Darwin/Command/_say,
+	Completion/Darwin/Command/_scselect: Use _call_program to fetch argument
+	possibilities
+
 2018-06-12  dana  <dana@dana.is>
 
 	* unposted: Completion/Darwin/Type/_mac_applications: Change 'Mac OS X' to
