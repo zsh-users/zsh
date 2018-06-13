@@ -1694,6 +1694,9 @@ _git-stash () {
 	    '(-m --message)'{-m,--message}'[specify stash description]' \
             ':: :__git_modified_files' && ret=0
           ;;
+        (--)
+            __git_modified_files
+          ;;
         (list)
           local -a log_options revision_options
           __git_setup_log_options

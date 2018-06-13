@@ -1,5 +1,8 @@
 2018-06-18  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 43006: Tim Smith: Completion/Unix/Command/_git: complete
+	modified files after `git stash --`
+
 	* users/23484: Completion/Unix/Command/_git: be consistent on
 	matcher specs for branches to fix issue with partial matching
 
