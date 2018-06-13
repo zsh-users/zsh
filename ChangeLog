@@ -1,9 +1,14 @@
+2018-06-12  dana  <dana@dana.is>
+
+	* unposted: Completion/Darwin/Type/_mac_applications: Change 'Mac OS X' to
+	'macOS'
+
 2018-06-11  dana  <dana@dana.is>
 
-	* 42983: dana: Completion/Unix/Command/_man: Address misc. feedback
+	* 42983: Completion/Unix/Command/_man: Address misc. feedback
 
-	* 42984: dana: Completion/Unix/Type/_files,
-	Completion/Unix/Type/_object_files: Fix argument pass-through to compadd
+	* 42984: Completion/Unix/Type/_files, Completion/Unix/Type/_object_files:
+	Fix argument pass-through to compadd
 
 2018-06-10  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
