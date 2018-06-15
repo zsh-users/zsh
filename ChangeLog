@@ -1,3 +1,7 @@
+2018-06-15  Matthew Martin  <phy1729@gmail.com>
+
+	* 42981: Completion/Unix/Command/_ed: Add ed completer
+
 2018-06-15  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* users/23472: 	Doc/Zsh/mod_system.yo, Src/Modules/system.c,
