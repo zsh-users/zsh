@@ -1095,6 +1095,7 @@ struct execstack {
     pid_t cmdoutpid;
     int cmdoutval;
     int use_cmdoutval;
+    pid_t procsubstpid;
     int trap_return;
     int trap_state;
     int trapisfunc;

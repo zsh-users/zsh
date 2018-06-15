@@ -772,6 +772,8 @@ fillpmsysparams(Param pm, const char *name)
 	num = (int)getpid();
     } else if (!strcmp(name, "ppid")) {
 	num = (int)getppid();
+    } else if (!strcmp(name, "procsubstpid")) {
+	num = (int)procsubstpid;
     } else {
 	pm->u.str = dupstring("");
 	pm->node.flags |= PM_UNSET;
@@ -804,6 +806,8 @@ scanpmsysparams(UNUSED(HashTable ht), ScanFunc func, int flags)
     fillpmsysparams(&spm, "pid");
     func(&spm.node, flags);
     fillpmsysparams(&spm, "ppid");
+    func(&spm.node, flags);
+    fillpmsysparams(&spm, "procsubstpid");
     func(&spm.node, flags);
 }
 

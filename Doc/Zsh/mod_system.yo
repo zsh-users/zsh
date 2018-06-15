@@ -255,6 +255,11 @@ Returns the process ID of the parent of the current process, even in
 subshells.  Compare tt($PPID), which returns the process ID of the parent
 of the main shell process.
 )
+item(tt(procsubstpid))(
+Returns the process ID of the last process started for process
+substitution, i.e. the tt(<LPAR())var(...)tt(RPAR()) and
+tt(>LPAR())var(...)tt(RPAR()) expansions.
+)
 enditem()
 )
 enditem()

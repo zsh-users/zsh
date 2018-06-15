@@ -174,6 +174,11 @@ mod_export int zleactive;
 /**/
 pid_t cmdoutpid;
 
+/* pid of last process started by <(...),  >(...) */
+
+/**/
+mod_export pid_t procsubstpid;
+
 /* exit status of process undergoing 'process substitution' */
 
 /**/
@@ -4850,6 +4855,7 @@ getproc(char *cmd, char **eptr)
 	    return NULL;
 	if (!out)
 	    addproc(pid, NULL, 1, &bgtime);
+	procsubstpid = pid;
 	return pnam;
     }
     closem(FDT_UNUSED, 0);
@@ -4887,6 +4893,7 @@ getproc(char *cmd, char **eptr)
 	{
 	    addproc(pid, NULL, 1, &bgtime);
 	}
+	procsubstpid = pid;
 	return pnam;
     }
     entersubsh(ESUB_ASYNC|ESUB_PGRP);
@@ -4937,6 +4944,7 @@ getpipe(char *cmd, int nullexec)
 	}
 	if (!nullexec)
 	    addproc(pid, NULL, 1, &bgtime);
+	procsubstpid = pid;
 	return pipes[!out];
     }
     entersubsh(ESUB_PGRP);
@@ -6172,6 +6180,7 @@ execsave(void)
     es->cmdoutpid = cmdoutpid;
     es->cmdoutval = cmdoutval;
     es->use_cmdoutval = use_cmdoutval;
+    es->procsubstpid = procsubstpid;
     es->trap_return = trap_return;
     es->trap_state = trap_state;
     es->trapisfunc = trapisfunc;
@@ -6207,6 +6216,7 @@ execrestore(void)
     cmdoutpid = en->cmdoutpid;
     cmdoutval = en->cmdoutval;
     use_cmdoutval = en->use_cmdoutval;
+    procsubstpid = en->procsubstpid;
     trap_return = en->trap_return;
     trap_state = en->trap_state;
     trapisfunc = en->trapisfunc;

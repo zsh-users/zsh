@@ -1,5 +1,8 @@
 2018-06-15  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* users/23472: 	Doc/Zsh/mod_system.yo, Src/Modules/system.c,
+	Src/exec.c, Src/zsh.h: Add $sysparams[procsubstpid].
+
 	* 43008: Src/otpions.c: combine suggestion from Sebastain to
 	silence warnings for double setgid/setuid with suggestion
 	from Eitan to put setgid first.
