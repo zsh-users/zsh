@@ -1,3 +1,9 @@
+2018-06-15  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 43008: Src/otpions.c: combine suggestion from Sebastain to
+	silence warnings for double setgid/setuid with suggestion
+	from Eitan to put setgid first.
+
 2018-06-13  dana  <dana@dana.is>
 
 	* 42992: Completion/Unix/Command/_bash: Fix minor escaping bug
