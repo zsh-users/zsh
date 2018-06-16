@@ -4,6 +4,11 @@
 # - Solaris is seemingly the only OS that doesn't allow the `man n page` syntax;
 #   you must use `man -s n page`
 # - We assume that Linux distributions are using either man-db or mandoc
+# - @todo Would be nice to support completing the initial operand as a section
+#   name (on non-Solaris systems)
+# - @todo We don't support the man-db syntax <name>.<section> (e.g., `ls.1`)
+# - @todo We don't support the man-db feature of 'sub-pages' — that is, treating
+#   pairs of operands like `git diff` as `git-diff`
 # - @todo Option exclusivity isn't super accurate
 # - @todo Solaris man accepts a single hyphen as the first option to disable
 #   paging (like AIX's -c); we don't support that
@@ -220,7 +225,15 @@ _man() {
   elif [[ $variant == (dragonfly|freebsd)* ]] && (( $+opt_args[-S] )); then
     noinsert=1
     sect=${opt_args[-S]//:/|}
-  elif (( CURRENT > 1 )) && [[ $variant != solaris* ]]; then
+  # It's only a small help, but, per man-db, we can avoid treating an initial
+  # operand like `8139too` as a section name by ensuring that only the first
+  # character is a digit. This doesn't do much for stuff like `2to3`, but we can
+  # at least special-case a few common patterns for now
+  elif
+    (( CURRENT > 1 )) &&
+    [[ $variant != solaris* ]] &&
+    [[ ${${(Q)words[1]}##(2to3|7z)*} == ([0-9](|[^0-9[:punct:]]*)|[lnopx]) ]]
+  then
     noinsert=1
     sect=$words[1]
   elif [[ -n ${sect:=$MANSECT} ]]; then
@@ -232,7 +245,25 @@ _man() {
 
   if [[ $sect = (<->*|[lnopx]) || $sect = *\|* ]]; then
     sects=( ${(s.|.)sect} )
-    dirs=( $^_manpath/(sman|man|cat)${^sects}(|.*)/ )
+
+    # Most man implementations support partial matching of a page's
+    # (sub-)section name — e.g., `3per` for `3perl`. The (sub-)section name may
+    # or may not correspond to the directory name (most systems combine
+    # sub-sections), but we'll assume that if it starts with a number and we're
+    # not on Solaris (which doesn't support this feature at all) that we can do
+    # a match against the leading number. This is irritating if you DO want the
+    # exact sub-section specified, but unfortunately there's no way to determine
+    # this programmatically — i guess we could add a style to control it
+    () {
+      for 1; do
+        if [[ $OSTYPE == solaris* || $1 != <->* ]]; then
+          dirs+=( $^_manpath/(sman|man|cat)$1(|.*)/ )
+        else
+          dirs+=( $^_manpath/(sman|man|cat)${1%%[^0-9]#}*/ )
+        fi
+      done
+    } $sects
+
     sect=${(j<|>)sects}
     [[ $sect == *'|'* ]] && sect="($sect)"
     awk="\$2 == \"$sect\" {print \$1}"
@@ -281,7 +312,7 @@ _man() {
       8        'maintenance commands and procedures'
       9        'kernel features'
       9lua     'Lua kernel bindings' # NetBSD
-      l        'local documentation' # AIX, etc.
+      l        'local documentation' # AIX, etc. — TCL on some systems?
       n        'new documentation' # AIX, etc.
       o        'old documentation' # AIX, etc.
       p        'public documentation' # AIX, etc.
@@ -380,14 +411,14 @@ _man_pages() {
   local pages sopt
 
   # What files corresponding to manual pages can end in.
-  local suf='.((?|<->*|ntcl)(|.gz|.bz2|.Z|.lzma))'
+  local suf='.((?|<->*|ntcl)(|.gz|.bz2|.z|.Z|.lzma))'
 
   if [[ $PREFIX$SUFFIX = */* ]]; then
     # Easy way to test for versions of man that allow file names.
     # This can't be a normal man page reference.
     # Try to complete by glob first.
     if [[ -n $sect_dirname ]]; then
-      _path_files -g "*.*$sect_dirname*(|.gz|.bz2|.Z|.lzma)" "$expl[@]"
+      _path_files -g "*.*$sect_dirname*(|.gz|.bz2|.z|.Z|.lzma)" "$expl[@]"
     else
       _path_files -g "*$suf" "$expl[@]" && return
       _path_files "$expl[@]"
@@ -396,7 +427,7 @@ _man_pages() {
   fi
 
   pages=( ${(M)dirs:#*$sect_dirname/} )
-  pages=( ${^pages}/"*$sect${sect:+"*"}" );
+  pages=( ${^pages}/"*${sect:+.$sect"*"}" )
   pages=( ${^~pages}(N:t) )
 
   (($#mrd)) && pages[$#pages+1]=($(awk $awk $mrd))

@@ -1,3 +1,7 @@
+2018-06-15  dana  <dana@dana.is>
+
+	* 43024: Completion/Unix/Command/_man: Improve section-name matching
+
 2018-06-15  Matthew Martin  <phy1729@gmail.com>
 
 	* 42981: Completion/Unix/Command/_ed: Add ed completer
