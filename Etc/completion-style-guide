@@ -20,6 +20,26 @@ Coding style:
 * Please try not to use lines longer than 79 characters. Don't worry
   about breaking long `_arguments' or `_values' specs though.
 
+* Never use alternative, unusual, or optional syntax in completion
+  functions (or any other shell code distributed with zsh). In other
+  words, do NOT use the following:
+
+    # Short loops
+    for x in $y; myfunc $x
+
+    # Alternative forms
+    if { [[ $x == $y ]] } {
+      myfunc $x
+    }
+    foreach x in $y {
+      myfunc $x
+    }
+
+    # Weird tricks
+    () for 1 {
+      myfunc $1
+    } $x
+
 Descriptions:
 
 Descriptions should not have a trailing full stop and initial capital
