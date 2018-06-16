@@ -5,7 +5,7 @@
 setopt localoptions extendedglob NO_shwordsplit
 local tlabase tlabranch
 
-tlabase="$(VCS_INFO_realpath ${vcs_comm[basedir]})"
+tlabase=${vcs_comm[basedir]:P}
 rrn=${tlabase:t}
 # tree-id gives us something like 'foo@example.com/demo--1.0--patch-4', so:
 tlabranch=${${"$( ${vcs_comm[cmd]} tree-id )"}/*\//}

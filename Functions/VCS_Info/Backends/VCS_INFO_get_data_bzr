@@ -81,7 +81,7 @@ else
             bzrbase=${bzr_info[branch_root]} ;;
     esac
 
-    bzrbase="$(VCS_INFO_realpath ${bzrbase})"
+    bzrbase=${bzrbase:P}
 
     if [ -n "${bzr_info[checkout_of_branch]}" ] && \
        zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" "use-server"

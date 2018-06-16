@@ -46,7 +46,7 @@ else
   done
 fi
 
-svnbase="$(VCS_INFO_realpath ${svnbase})"
+svnbase=${svnbase:P}
 
 rrn=${svnbase:t}
 zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" branchformat svnbranch || svnbranch="%b:%r"

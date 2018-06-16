@@ -1,7 +1,0 @@
-## vim:ft=zsh
-## Written by Frank Terbeck <ft@bewatermyfriend.org>
-## Distributed under the same BSD-ish license as zsh itself.
-
-setopt localoptions NO_shwordsplit chaselinks
-# -q to avoid chpwd() invocations
-( builtin cd -q $1 2>/dev/null && pwd; )

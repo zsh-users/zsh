@@ -9,7 +9,7 @@ cvsbase="."
 while [[ -d "${cvsbase}/../CVS" ]]; do
     cvsbase="${cvsbase}/.."
 done
-cvsbase="$(VCS_INFO_realpath ${cvsbase})"
+cvsbase=${cvsbase:P}
 cvsbranch=$(< ./CVS/Repository)
 rrn=${cvsbase:t}
 cvsbranch=${cvsbranch##${rrn}/}

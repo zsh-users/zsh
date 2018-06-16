@@ -1,5 +1,13 @@
 2018-06-16  dana  <dana@dana.is>
 
+	* 43030: Functions/VCS_Info/Backends/VCS_INFO_get_data_bzr,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_cvs,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_svn,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_tla,
+	Functions/VCS_Info/VCS_INFO_bydir_detect,
+	Functions/VCS_Info/VCS_INFO_realpath,
+	Functions/VCS_Info/vcs_info: Replace VCS_INFO_realpath() by :P
+
 	* 43031: Etc/completion-style-guide: Add note about quoting/escaping
 	(cf. 42992)
 
