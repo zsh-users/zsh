@@ -1,3 +1,9 @@
+2018-06-18  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Eitan: 43029: Src/Modules/zftp.c, Src/signals.c, Src/signals.h,
+	configure.ac: remove test for signal handler return type as no
+	longer needed.
+
 2018-06-18  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 43006: Tim Smith: Completion/Unix/Command/_git: complete

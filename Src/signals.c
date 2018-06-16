@@ -588,7 +588,7 @@ wait_for_processes(void)
 /* the signal handler */
  
 /**/
-mod_export RETSIGTYPE
+mod_export void
 zhandler(int sig)
 {
     sigset_t newmask, oldmask;

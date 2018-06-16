@@ -362,7 +362,7 @@ static jmp_buf zfalrmbuf;
 /* The signal handler itself */
 
 /**/
-static RETSIGTYPE
+static void
 zfhandler(int sig)
 {
     if (sig == SIGALRM) {
