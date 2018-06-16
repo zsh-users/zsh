@@ -513,3 +513,20 @@ Misc. remarks
     completion function would contain the code for the default way to
     generate the matches.
     See the `_email_addresses', `_rpm' and `_nslookup' files for examples.
+9)  Be mindful of quoting/escaping edge cases. Notably:
+    * Elements of the `$words' array are derived verbatim from the user's
+      command-line input -- if they type an argument in quotes or escaped
+      by backslashes, that is how it appears in the array.
+    * Option-arguments are stored in `$opt_args` the same way. Further,
+      since multiple arguments to the same option are represented in a
+      colon-delimited fashion, backslashes and colons passed by the user
+      are escaped. For instance, the option-arguments parsed from
+      `-afoo -a "bar" -a 1:2:3' appear in `$opt_args[-a]` as
+      `foo:"bar":1\:2\:3'.
+    * The `_call_program` helper used by many completion functions is
+      implemented using `eval', so arguments to it must be quoted
+      accordingly. As mentioned above, most of the user's own input comes
+      pre-escaped, but you may run into problems passing file names or
+      data derived from another command's output to the helper. Consider
+      using some variation of the `q` expansion flag to deal with this:
+      `_call_program vals $words[1] ${(q-)myfile}'
