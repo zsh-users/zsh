@@ -1,11 +1,12 @@
 #compdef sed gsed psed s2p
 
-local args inplace extended
+local inplace extended
+local -a args aopts=( -A '-*' )
 
 args=(
   '(-n --quiet --silent)'{-n,--quiet,--silent}'[suppress automatic printing of pattern space]'
-  '(1)*'{-e,--expression=-}'[specify sed commands to run]:sed script'
-  '(1)*'{-f,--file=-}'[add contents of file to commands to run]:file:_files'
+  '(1)*'{-e+,--expression=}'[specify sed commands to run]:sed script'
+  '(1)*'{-f+,--file=}'[add contents of file to commands to run]: :_files'
   '(-e)1: :_guard "^-*" sed script'
   '*:input file:_files'
 )
@@ -18,11 +19,12 @@ if [[ $service = (psed|s2p) ]]; then
     '-a[delay opening files listed with w function]'
   )
 elif _pick_variant gnu=GNU unix --version; then
+  aopts=( )
   args+=(
     '--follow-symlinks[follow symlinks when processing in place]'
-    '(-i --in-place)'{-i-,--in-place=-}$inplace
+    '(-i --in-place)'{-i+,--in-place=}$inplace
     '(-c --copy)'{-c,--copy}'[copy instead of rename when shuffling files in in-place mode]'
-    '(-l --line-length)'{-l,--line-length=-}'[specify line-wrap length for the l command]'
+    '(-l --line-length)'{-l+,--line-length=}'[specify line-wrap length for the l command]'
     '(-r)--posix[disable GNU extensions]'
     '(-E -r --regexp-extended)'{-E,-r,--regexp-extended}$extended
     '(-s --separate)'{-s,--separate}'[consider files separately instead of as a combined stream]'
@@ -37,20 +39,21 @@ else
   case $OSTYPE in
     openbsd*|freebsd*|netbsd*|darwin*|dragonfly*)
       args+=(
-	'(-r -E)'{-r,-E}$extended
+	'(-r -E)'-E$extended
 	'-a[delay opening files listed with w function]'
       )
     ;|
-    darwin*|freebsd*|netbsd*|openbsd*)  args+=( '-i'$inplace ) ;|
+    openbsd*|freebsd*|netbsd*|dragonfly*) args+=( '(-r -E)'-r$extended ) ;|
+    darwin*|freebsd*|netbsd*|openbsd*) args+=( '-i+'$inplace ) ;|
     darwin*|freebsd*|netbsd*) args+=( '-l[make output line buffered]' ) ;|
     freebsd*) args+=( '-u[disable data buffering]' ) ;|
     freebsd*|netbsd*)
       args+=(
-        '-I[edit files in-place, treating all files as a single input stream]::suffix for backup'
+        '-I+[edit files in-place, treating all files as a single input stream]::suffix for backup'
       )
     ;;
     openbsd*) args+=( '-u[make output line buffered]' ) ;;
   esac
 fi
 
-_arguments -s "$args[@]"
+_arguments -s -S $aopts : "$args[@]"

@@ -1,6 +1,6 @@
 #compdef comm gcomm
 
-local -a args
+local -a args aopts=( -A '-*' )
 
 args=(
   '-1[suppress lines unique to first file]'
@@ -11,10 +11,13 @@ args=(
 )
 
 if _pick_variant gnu=GNU unix --version; then
+  aopts=( )
   args+=(
     '(--nocheck-order)--check-order[check input is correctly sorted]'
     "(--check-order)--nocheck-order[don't check input is correctly sorted]"
-    '--output-delimiter=:delimiter'
+    '--output-delimiter=[specify column delimiter]:delimiter'
+    '--total[display summary]'
+    '(-z --zero-terminated)'{-z,--zero-terminated}'[use NUL as line delimiter]'
     '(- : *)--version[display version information]'
     '(- : *)--help[display help information]'
   )
@@ -24,4 +27,4 @@ elif [[ $OSTYPE = (openbsd|netbsd)* ]]; then
   args+=( '-f[case insensitive comparison of lines]' )
 fi
 
-_arguments -s $args
+_arguments -s -S $aopts : $args
