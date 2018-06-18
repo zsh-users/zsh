@@ -1,3 +1,7 @@
+2018-06-18  dana  <dana@dana.is>
+
+	* 43047: Completion/Unix/Type/_bind_addresses: Always return local IPs
+
 2018-06-18  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: Test/V01zmodload.ztst: updated for 43039.

@@ -1,15 +1,17 @@
 #autoload
 
-local expl
+# @todo In the future it might be useful to have this function take a glob or
+# similar to filter out loop-back addresses, only return IPv4/6, etc.
 
-case $OSTYPE in
-  aix*) _hosts "$@" ;;
-  darwin*|freebsd*|dragonfly*) _hosts "$@" ;;
-  irix*) _hosts "$@" ;;
-  # Couldn't find anything special for linux except for /proc/net/dev
-  # Is there any proc file which gives the formatted ip?
-  linux*) ;&
-  *)
-    _wanted bind-addresses expl 'bind address' compadd "$@" - \
-      ${${${(M)${(f)"$(ifconfig -a)"}:#*addr:*}##*addr:( |)}%%(/| )*}
-esac
+local -a expl tmp cmd=( ifconfig -a )
+
+# A lot of Linux systems have ifconfig, but this is probably safer (and it's
+# parsed the same way)
+[[ $OSTYPE == linux* ]] && (( $+commands[ip] )) && cmd=( ip addr show )
+
+tmp=( ${(f)"$( _call_program bind-addresses $cmd )"} )
+tmp=( ${(@M)tmp##(|[[:space:]]##)inet(|6)(|:)[[:space:]]*} )
+tmp=( ${(@)tmp#*inet(|6)(|:)[[:space:]]##} )
+tmp=( ${(@)tmp%%[^0-9A-Fa-f:.]*} )
+
+_wanted bind-addresses expl 'bind address' compadd -a "$@" - tmp
