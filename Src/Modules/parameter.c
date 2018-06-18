@@ -2190,6 +2190,7 @@ static const struct gsu_array dirs_gsu =
 static const struct gsu_array historywords_gsu =
 { histwgetfn, arrsetfn, stdunsetfn };
 
+/* Make sure to update autofeatures in parameter.mdd if necessary */
 static struct paramdef partab[] = {
     SPECIALPMDEF("aliases", 0,
 	    &pmraliases_gsu, getpmralias, scanpmraliases),

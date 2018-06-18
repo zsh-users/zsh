@@ -1,3 +1,8 @@
+2018-06-17  dana  <dana@dana.is>
+
+	* 43039: Src/Modules/parameter.mdd: Mark functions_source (et al.)
+	for auto-loading
+
 2018-06-16  dana  <dana@dana.is>
 
 	* 43030: Functions/VCS_Info/Backends/VCS_INFO_get_data_bzr,
