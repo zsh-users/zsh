@@ -1,3 +1,8 @@
+2018-07-01  Doron Behar  <doron.behar@gmail.com>
+
+	* 43059: Completion/Unix/Command/_gpg: Use explicit UIDs for
+	state = public keys.
+
 2018-07-01  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 43107: Completion/Unix/Type/_ttys, Completion/Unix/Command/_ps,

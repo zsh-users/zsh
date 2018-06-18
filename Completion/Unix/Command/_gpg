@@ -206,20 +206,68 @@ fi
 
 case "$state" in
   public-keys)
-    _wanted public-keys expl 'public key' \
-	compadd ${${(Mo)$(_call_program public-keys $words[1] $needed --list-public-keys --list-options no-show-photos):%<*>}//(<|>)/} && return
+    local public_keys_lines=(${(f)"$(_call_program public-keys ${(q)words[1]} ${(q)needed} --list-public-keys --list-options no-show-photos --with-colons)"})
+    local -a uids emails
+    local i j parts current_uid
+    for (( i = 1; i < ${#public_keys_lines[@]}; ++i )); do
+      parts=("${(@s.:.)public_keys_lines[$i]}")
+      if [[ ${parts[1]} == "fpr" ]]; then
+        current_uid="${parts[10]}"
+        i=$((i + 1))
+        parts=("${(@s.:.)public_keys_lines[$i]}")
+        while [[ ${parts[1]} == "uid" ]]; do
+          uids+=("${current_uid}")
+          emails+=("${parts[10]}")
+          i=$((i + 1))
+          parts=("${(@s.:.)public_keys_lines[$i]}")
+        done
+      fi
+    done
+    _describe -t public-keys 'public key' emails uids
   ;;
   secret-keys)
-    _wanted secret-keys expl 'secret key' compadd \
-	${${(Mo)$(_call_program secret-keys $words[1] $needed --list-secret-keys --list-options no-show-photos):%<*>}//(<|>)/} && return
+    local secret_keys_lines=(${(f)"$(_call_program secret-keys ${(q)words[1]} ${(q)needed} --list-secret-keys --list-options no-show-photos --with-colons)"})
+    local -a uids emails
+    local i j parts current_uid
+    for (( i = 1; i < ${#secret_keys_lines[@]}; ++i )); do
+      parts=("${(@s.:.)secret_keys_lines[$i]}")
+      if [[ ${parts[1]} == "fpr" ]]; then
+        current_uid="${parts[10]}"
+        i=$((i + 1))
+        parts=("${(@s.:.)secret_keys_lines[$i]}")
+        while [[ ${parts[1]} == "uid" ]]; do
+          uids+=("${current_uid}")
+          emails+=("${parts[10]}")
+          i=$((i + 1))
+          parts=("${(@s.:.)secret_keys_lines[$i]}")
+        done
+      fi
+    done
+    _describe -t secret-keys 'secret key' emails uids
   ;;
   ciphers)
     _wanted ciphers expl cipher compadd \
-        ${${(s.,.)${(M)${(f)${"$(_call_program ciphers $words[1] $needed --version)"}//,$'\n' #/, }:#Cipher*}#*:}# } && return
+        ${${(s.,.)${(M)${(f)${"$(_call_program ciphers ${(q)words[1]} ${(q)needed} --version)"}//,$'\n' #/, }:#Cipher*}#*:}# } && return
   ;;
   (public-keyids)
-    _wanted public-keys expl 'public keyid' \
-      compadd ${(M)${${(f)"$(_call_program public-keyids $words[1] $needed --list-public-keys --list-options no-show-photos)"}## #}:#[0-9A-F](#c40)} && return
+    local public_keys_lines=(${(f)"$(_call_program public-keyids ${(q)words[1]} ${(q)needed} --list-public-keys --list-options no-show-photos --with-colons)"})
+    local -a uids emails
+    local i j parts current_uid
+    for (( i = 1; i < ${#public_keys_lines[@]}; ++i )); do
+      parts=("${(@s.:.)public_keys_lines[$i]}")
+      if [[ ${parts[1]} == "fpr" ]]; then
+        current_uid="${parts[10]}"
+        i=$((i + 1))
+        parts=("${(@s.:.)public_keys_lines[$i]}")
+        while [[ ${parts[1]} == "uid" ]]; do
+          uids+=("${current_uid}")
+          emails+=("${parts[10]}")
+          i=$((i + 1))
+          parts=("${(@s.:.)public_keys_lines[$i]}")
+        done
+      fi
+    done
+    _describe -t public-keyids 'public key' emails uids
   ;;
   (option-list)
     _sequence _wanted options expl option \
