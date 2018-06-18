@@ -1,3 +1,8 @@
+2018-06-18  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 43048: Eitan: Completion/Unix/Command/_gcc: add sanitizers,
+	standards aliases and fix -flto
+
 2018-06-17  dana  <dana@dana.is>
 
 	* 43043: Completion/Unix/Command/_comm,

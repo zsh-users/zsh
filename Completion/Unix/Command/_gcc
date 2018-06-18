@@ -338,15 +338,30 @@ h8/300)
   ;;
 esac
 
+local -a sanitizers
 if [[ "$service" = clang* ]]; then
     args=(
         $args
-        -flto -emit-llvm
+        "-flto=-[generate output files suitable for link time optimization]::style:(full thin)"
+        -emit-llvm
         "-Qunused-arguments[don't emit warning for unused driver arguments]"
         --analyze
         -fshow-column -fshow-source-location -fcaret-diagnostics -fdiagnostics-fixit-info
         -fdiagnostics-parseable-fixits -fdiagnostics-print-source-range-info
         -fprint-source-range-info -fdiagnostics-show-option -fmessage-length
+    )
+    sanitizers=(
+        address alignment bool bounds enum float-cast-overflow float-divide-by-zero
+        integer-divide-by-zero memory nonnull-attribute null nullability-arg nullability-assign
+        nullability-return object-size pointer-overflow return unsigned-integer-overflow
+        returns-nonnull-attribute shift signed-integer-overflow unreachable vla-bound vptr
+    )
+else
+    args=(
+      '-flto=-[Enable link-time optimization]::jobs:'
+    )
+    sanitizers=(
+        address memory
     )
 fi
 
@@ -399,7 +414,7 @@ args+=(
   '-print-file-name=-[Display the full path to library <library>]:library:->library'
   '-print-prog-name=-[Display the full path to compiler component <program>]:program:'
   '*-specs=-[Override built-in specs with the contents of <file>]:file:_files'
-  '-std=-[assume that the input sources are for specified standard]:standard:(c90 c89 c99 c11 gnu90 gnu89 gnu99 gnu11 c++98 c++03 gnu++98 gnu++03 c++11 gnu++11 c++1y gnu++1y c++14 gnu++14 c++1z gnu++1z c++17 gnu++17 c++2a gnu++2a)'
+  '-std=-[assume that the input sources are for specified standard]:standard:(c90 c89 iso9899:1990 iso9899:199409 c99 iso9899:1999 c11 iso9899:2011 gnu90 gnu89 gnu99 gnu11 c++98 c++03 gnu++98 gnu++03 c++11 gnu++11 c++1y gnu++1y c++14 gnu++14 c++1z gnu++1z c++17 iso9899:2017 gnu++17 c++2a gnu++2a)'
   '*-include:include file:_files -g \*.h\(-.\)'
   '*-imacros:macro input file:_files -g \*.h\(-.\)'
   '*-idirafter:second include path directory:_files -/'
@@ -1034,7 +1049,6 @@ args+=(
   '-flto-odr-type-merging[Merge C++ types using One Definition Rule]'
   '-flto-partition=-[Partition symbols and vars at linktime based on object files they originate from]:partitioning algorithm:(1to1 balanced max one none)'
   '-flto-report[Report various link-time optimization statistics]'
-  '-flto=-[Enable link-time optimization]::jobs:'
   '-fmax-errors=-[Maximum number of errors to report]:errors: '
   '-fmem-report-wpa[Report on permanent memory allocation in WPA only]'
   '-fmem-report[Report on permanent memory allocation]'
@@ -1061,7 +1075,7 @@ args+=(
   '-freciprocal-math[Same as -fassociative-math for expressions which include division]'
   '-frecord-gcc-switches[Record gcc command line switches in the object file]'
   '-free[Turn on Redundant Extensions Elimination pass]'
-  '-fsanitize=-[Enable AddressSanitizer, a memory error detector]:style:(address thread)'
+  "-fsanitize=-[Enable AddressSanitizer, a memory error detector]:style:($sanitizers)"
   '-fsched-stalled-insns-dep=-[Set dependence distance checking in premature scheduling of queued insns]:instructions: '
   '-fsched-stalled-insns=-[Set number of queued insns that can be prematurely scheduled]:instructions: '
   '-fsched-verbose=-[Set the verbosity level of the scheduler]:verbosity: '
