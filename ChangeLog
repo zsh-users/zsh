@@ -1,5 +1,7 @@
 2018-06-18  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unposted: Test/V01zmodload.ztst: updated for 43039.
+
 	* Eitan: 43029: Src/Modules/zftp.c, Src/signals.c, Src/signals.h,
 	configure.ac: remove test for signal handler return type as no
 	longer needed.

@@ -182,6 +182,7 @@
 >p:dis_aliases
 >p:dis_builtins
 >p:dis_functions
+>p:dis_functions_source
 >p:dis_galiases
 >p:dis_patchars
 >p:dis_reswords
@@ -190,6 +191,7 @@
 >p:funcsourcetrace
 >p:funcstack
 >p:functions
+>p:functions_source
 >p:functrace
 >p:galiases
 >p:history
@@ -205,6 +207,7 @@
 >p:reswords
 >p:saliases
 >p:userdirs
+>p:usergroups
 
  if [[ $mods[(r)zsh/example] == zsh/example ]]; then
    zmodload -u zsh/example
