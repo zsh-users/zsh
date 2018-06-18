@@ -1,5 +1,8 @@
 2018-06-18  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* users/23484: Completion/Unix/Command/_git: be consistent on
+	matcher specs for branches to fix issue with partial matching
+
 	* 43048: Eitan: Completion/Unix/Command/_gcc: add sanitizers,
 	standards aliases and fix -flto
 
