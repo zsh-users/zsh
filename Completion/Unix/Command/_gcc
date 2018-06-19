@@ -338,7 +338,6 @@ h8/300)
   ;;
 esac
 
-local -a sanitizers
 if [[ "$service" = clang* ]]; then
     args=(
         $args
@@ -349,21 +348,23 @@ if [[ "$service" = clang* ]]; then
         -fshow-column -fshow-source-location -fcaret-diagnostics -fdiagnostics-fixit-info
         -fdiagnostics-parseable-fixits -fdiagnostics-print-source-range-info
         -fprint-source-range-info -fdiagnostics-show-option -fmessage-length
+        "-nostdinc[Do not search standard system directories or compiler builtin directories for include files]"
+        "-nostdlibinc[Do not search standard system directories for include files]"
+        "-nobuiltininc[Do not search builtin directory for include files]"
     )
+else
+    args=(
+      '-flto=-[Enable link-time optimization]::jobs:'
+    )
+fi
+
+local -a sanitizers
     sanitizers=(
         address alignment bool bounds enum float-cast-overflow float-divide-by-zero
         integer-divide-by-zero memory nonnull-attribute null nullability-arg nullability-assign
         nullability-return object-size pointer-overflow return unsigned-integer-overflow
         returns-nonnull-attribute shift signed-integer-overflow unreachable vla-bound vptr
     )
-else
-    args=(
-      '-flto=-[Enable link-time optimization]::jobs:'
-    )
-    sanitizers=(
-        address memory
-    )
-fi
 
 local -a languages
 languages=(
@@ -965,7 +966,7 @@ args+=(
 args+=(
   '-nostartfiles[Do not use the standard system startup files when linking]'
   '-nodefaultlibs[Do not use the standard system libraries when linking]'
-  '-nostdlib[Do not use the standard system startup files or libraries when linking]'
+  '-nostdlib[Do not use standard system startup files or libraries when linking]'
   '-rdynamic[Pass the flag -export-dynamic to the ELF linker, on targets that support it]'
   '-s[Remove all symbol table and relocation information from the executable]'
   '-static[On systems that support dynamic linking, this prevents linking with the shared libraries]'

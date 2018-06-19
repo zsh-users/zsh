@@ -1,5 +1,8 @@
 2018-06-18  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 43074: Eitan: Completion/Unix/Command/_gcc: Completion for
+	additional linker options for clang and sanitizers for gcc
+
 	* 43078: Completion/Unix/Command/_sed: add completion for the
 	sed expression
 
