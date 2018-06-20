@@ -108,6 +108,14 @@
   if (( $date2[7,8] != $date3[1,2] )); then
     print "Years do not agree in $date2, $date3"
   fi
+  # These are somewhat questionable, but...
+  ns=( ${="$(print -P '%D{%9.} %D{%N}')"} )
+  if [[ $ns[1] != [0-9](#c9) ]] || [[ $ns[2] != [0-9](#c9) ]]; then
+    print "Nanosecond lengths/formats are not as expected in $ns[1], $ns[2]"
+  fi
+  if (( ($ns2[2] - $ns[1]) > 5000000 )); then
+    print "Nanoseconds differ too much in $ns[1], $ns[2]"
+  fi
 0:Dates produced by prompt escapes
 
   mkdir foo

@@ -1113,6 +1113,14 @@ zsh_TYPE_EXISTS([
 #endif
 ], struct timezone)
 
+dnl Check for struct timespec since POSIX only gained it in 2008
+zsh_TYPE_EXISTS([
+#define _GNU_SOURCE 1
+#ifdef HAVE_SYS_TIME_H
+# include <sys/time.h>
+#endif
+], struct timespec)
+
 dnl Check for utmp structures, for watch
 zsh_TYPE_EXISTS([
 #ifdef HAVE_SYS_TYPES_H

@@ -3224,7 +3224,7 @@ ztrftimebuf(int *bufsizeptr, int decr)
 
 /**/
 mod_export int
-ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm, long usec)
+ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm, long nsec)
 {
     int hr12;
 #ifdef HAVE_STRFTIME
@@ -3299,15 +3299,15 @@ morefmt:
 	    case '.':
 		if (ztrftimebuf(&bufsize, digs))
 		    return -1;
-		if (digs > 6)
-		    digs = 6;
-		if (digs < 6) {
+		if (digs > 9)
+		    digs = 9;
+		if (digs < 9) {
 		    int trunc;
-		    for (trunc = 5 - digs; trunc; trunc--)
-			usec /= 10;
-		    usec  = (usec + 5) / 10;
+		    for (trunc = 8 - digs; trunc; trunc--)
+			nsec /= 10;
+		    nsec = (nsec + 8) / 10;
 		}
-		sprintf(buf, "%0*ld", digs, usec);
+		sprintf(buf, "%0*ld", digs, nsec);
 		buf += digs;
 		break;
 	    case '\0':
@@ -3368,6 +3368,12 @@ morefmt:
 		if (tm->tm_min > 9 || !strip)
 		    *buf++ = '0' + tm->tm_min / 10;
 		*buf++ = '0' + tm->tm_min % 10;
+		break;
+	    case 'N':
+		if (ztrftimebuf(&bufsize, 9))
+		    return -1;
+		sprintf(buf, "%09ld", nsec);
+		buf += 9;
 		break;
 	    case 'S':
 		if (tm->tm_sec > 9 || !strip)

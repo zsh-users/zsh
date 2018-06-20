@@ -188,7 +188,7 @@ static char *timefmt;
 
 /**/
 static void
-stattimeprint(time_t tim, char *outbuf, int flags)
+stattimeprint(time_t tim, long nsecs, char *outbuf, int flags)
 {
     if (flags & STF_RAW) {
 	sprintf(outbuf, "%ld", (unsigned long)tim);
@@ -199,7 +199,7 @@ stattimeprint(time_t tim, char *outbuf, int flags)
 	char *oend = outbuf + strlen(outbuf);
 	/* Where the heck does "40" come from? */
 	int len = ztrftime(oend, 40, timefmt, (flags & STF_GMT) ? gmtime(&tim) :
-			   localtime(&tim), 0L);
+			   localtime(&tim), nsecs);
 	if (len > 0)
 	    metafy(oend, len, META_NOALLOC);
 	if (flags & STF_RAW)
@@ -291,15 +291,27 @@ statprint(struct stat *sbuf, char *outbuf, char *fname, int iwhich, int flags)
 	break;
 
     case ST_ATIM:
-	stattimeprint(sbuf->st_atime, optr, flags);
+#ifdef GET_ST_ATIME_NSEC
+	stattimeprint(sbuf->st_atime, GET_ST_ATIME_NSEC(*sbuf), optr, flags);
+#else
+	stattimeprint(sbuf->st_atime, 0L, optr, flags);
+#endif
 	break;
 
     case ST_MTIM:
-	stattimeprint(sbuf->st_mtime, optr, flags);
+#ifdef GET_ST_MTIME_NSEC
+	stattimeprint(sbuf->st_mtime, GET_ST_MTIME_NSEC(*sbuf), optr, flags);
+#else
+	stattimeprint(sbuf->st_mtime, 0L, optr, flags);
+#endif
 	break;
 
     case ST_CTIM:
-	stattimeprint(sbuf->st_ctime, optr, flags);
+#ifdef GET_ST_CTIME_NSEC
+	stattimeprint(sbuf->st_ctime, GET_ST_CTIME_NSEC(*sbuf), optr, flags);
+#else
+	stattimeprint(sbuf->st_ctime, 0L, optr, flags);
+#endif
 	break;
 
     case ST_BLKSIZE:

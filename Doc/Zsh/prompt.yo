@@ -198,11 +198,15 @@ endsitem()
 In addition, if the system supports the POSIX tt(gettimeofday) system
 call, tt(%.) provides decimal fractions of a second since the epoch with
 leading zeroes.  By default three decimal places are provided, but a
-number of digits up to 6 may be given following the tt(%); hence tt(%6.)
-outputs microseconds.  A typical example of this is the format
-`tt(%D{%H:%M:%S.%.})'.
+number of digits up to 9 may be given following the tt(%); hence tt(%6.)
+outputs microseconds, and tt(%9.) outputs nanoseconds.  (The latter
+requires a nanosecond-precision tt(clock_gettime); systems lacking this
+will return a value multiplied by the appropriate power of 10.)  A typical
+example of this is the format `tt(%D{%H:%M:%S.%.})'.
 
-The GNU extension that a `tt(-)' between the tt(%) and the
+The GNU extension tt(%N) is handled as a synonym for tt(%9.).
+
+Additionally, the GNU extension that a `tt(-)' between the tt(%) and the
 format character causes a leading zero or space to be stripped
 is handled directly by the shell for the format characters tt(d), tt(f),
 tt(H), tt(k), tt(l), tt(m), tt(M), tt(S) and tt(y); any other format

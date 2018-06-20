@@ -273,8 +273,7 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
     char *ss, *hostnam;
     int t0, arg, test, sep, j, numjobs, len;
     struct tm *tm;
-    struct timezone dummy_tz;
-    struct timeval tv;
+    struct timespec ts;
     time_t timet;
     Nameddir nd;
 
@@ -664,8 +663,8 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 			tmfmt = "%l:%M%p";
 			break;
 		    }
-		    gettimeofday(&tv, &dummy_tz);
-		    tm = localtime(&tv.tv_sec);
+		    zgettime(&ts);
+		    tm = localtime(&ts.tv_sec);
 		    /*
 		     * Hack because strftime won't say how
 		     * much space it actually needs.  Try to add it
@@ -675,7 +674,7 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 		     */
 		    for(j = 0, t0 = strlen(tmfmt)*8; j < 3; j++, t0*=2) {
 			addbufspc(t0);
-			if ((len = ztrftime(bv->bp, t0, tmfmt, tm, tv.tv_usec))
+			if ((len = ztrftime(bv->bp, t0, tmfmt, tm, ts.tv_nsec))
 			    >= 0)
 			    break;
 		    }

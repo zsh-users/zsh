@@ -180,66 +180,30 @@ getcurrentsecs(UNUSED(Param pm))
 }
 
 static double
-getcurrentrealtime(Param pm)
+getcurrentrealtime(UNUSED(Param pm))
 {
-#ifdef HAVE_CLOCK_GETTIME
     struct timespec now;
-
-    if (clock_gettime(CLOCK_REALTIME, &now) < 0) {
-	zwarn("%s: unable to retrieve time: %e", pm->node.nam, errno);
-	return (double)0.0;
-    }
-
+    zgettime(&now);
     return (double)now.tv_sec + (double)now.tv_nsec * 1e-9;
-#else
-    struct timeval now;
-    struct timezone dummy_tz;
-
-    (void)pm;
-    gettimeofday(&now, &dummy_tz);
-
-    return (double)now.tv_sec + (double)now.tv_usec * 1e-6;
-#endif
 }
 
 static char **
-getcurrenttime(Param pm)
+getcurrenttime(UNUSED(Param pm))
 {
     char **arr;
     char buf[DIGBUFSIZE];
-
-#ifdef HAVE_CLOCK_GETTIME
     struct timespec now;
 
-    if (clock_gettime(CLOCK_REALTIME, &now) < 0) {
-	zwarn("%s: unable to retrieve time: %e", pm->node.nam, errno);
-	return NULL;
-    }
+    zgettime(&now);
 
     arr = (char **)zhalloc(3 * sizeof(*arr));
     sprintf(buf, "%ld", (long)now.tv_sec);
     arr[0] = dupstring(buf);
-    sprintf(buf, "%ld", now.tv_nsec);
+    sprintf(buf, "%ld", (long)now.tv_nsec);
     arr[1] = dupstring(buf);
     arr[2] = NULL;
 
     return arr;
-#else
-    struct timeval now;
-    struct timezone dummy_tz;
-
-    (void)pm;
-    gettimeofday(&now, &dummy_tz);
-
-    arr = (char **)zhalloc(3 * sizeof(*arr));
-    sprintf(buf, "%ld", (long)now.tv_sec);
-    arr[0] = dupstring(buf);
-    sprintf(buf, "%ld", (long)now.tv_usec * 1000);
-    arr[1] = dupstring(buf);
-    arr[2] = NULL;
-
-    return arr;
-#endif
 }
 
 static struct builtin bintab[] = {

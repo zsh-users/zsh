@@ -5,6 +5,12 @@
 
 2018-06-20  dana  <dana@dana.is>
 
+	* 43075 (based on 24059): Doc/Zsh/mod_stat.yo, Doc/Zsh/prompt.yo,
+	Src/Modules/datetime.c,	Src/Modules/stat.c, Src/compat.c,
+	Src/prompt.c, Src/utils.c, Src/zsh_system.h, Test/D01prompt.ztst,
+	configure.ac: Support nanosecond precision in zsh/stat file times
+	and time formats generally (%9./%N)
+
 	* 43061: Completion/Darwin/Command/_open,
 	Completion/Unix/Command/_webbrowser: Improve open completion, adjust
 	_webbrowser wording
