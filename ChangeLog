@@ -1,3 +1,8 @@
+2018-06-20  dana  <dana@dana.is>
+
+	* 43060: Completion/Unix/Command/_stat,
+	Completion/Zsh/Command/_stat: Expand stat completion
+
 2018-06-18  dana  <dana@dana.is>
 
 	* 43047: Completion/Unix/Command/_hostname: Add hostname completion
