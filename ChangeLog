@@ -1,5 +1,9 @@
 2018-06-20  dana  <dana@dana.is>
 
+	* 43061: Completion/Darwin/Command/_open,
+	Completion/Unix/Command/_webbrowser: Improve open completion, adjust
+	_webbrowser wording
+
 	* 43060: Completion/Unix/Command/_stat,
 	Completion/Zsh/Command/_stat: Expand stat completion
 
