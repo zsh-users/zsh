@@ -1,3 +1,8 @@
+2018-06-20  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 43077: Src/builtin.c: failure of math evaluation didn't
+	propagate to status of shift builtin.
+
 2018-06-20  dana  <dana@dana.is>
 
 	* 43061: Completion/Darwin/Command/_open,
