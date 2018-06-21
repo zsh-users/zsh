@@ -1,5 +1,8 @@
 2018-06-18  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 43078: Completion/Unix/Command/_sed: add completion for the
+	sed expression
+
 	* 43073: Completion/Linux/Command/_cryptsetup,
 	Completion/Linux/Command/_sysstat, Completion/Linux/Command/_ss,
 	Completion/Linux/Command/_kpartx, Completion/Linux/Command/_tune2fs,
