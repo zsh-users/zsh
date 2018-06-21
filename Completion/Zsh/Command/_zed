@@ -5,5 +5,6 @@ case $service in
 (zed) _arguments -S : \
 	'(- 2):file:_files' \
 	'(1):shell function:_functions' \
+	'(1)-x+[specify spaces to use for indentation in function expansion]:spaces' \
 	'(1)-f[edit function]';;
 esac

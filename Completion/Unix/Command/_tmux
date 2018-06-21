@@ -235,6 +235,7 @@ _tmux-choose-client() {
 _tmux-choose-tree() {
   [[ -n ${tmux_describe} ]] && print "put a window into tree choice mode" && return
   _arguments -s \
+    '-G[include all sessions in any session groups in the tree rather than only the first]' \
     '-N[start without the preview]' \
     '-F+[specify format for each list item]:format:__tmux-formats' \
     '-f+[filter items]:filter format:__tmux-formats' \
@@ -562,6 +563,8 @@ _tmux-paste-buffer() {
 _tmux-pipe-pane() {
   [[ -n ${tmux_describe} ]] && print "pipe output from a pane to a shell command" && return
   _arguments -s -A "-*" -S \
+    '-I[write stdout from command to the pane as if it were typed]' \
+    '-O[pipe output from the pane to the command (default unless -I used)]' \
     '-o[only open a pipe if none is currently opened]' \
     '-t+[specify target pane]:pane:__tmux-panes' \
     ':shell command:_cmdstring'
@@ -658,12 +661,13 @@ _tmux-save-buffer() {
 }
 
 _tmux-select-layout() {
-  [[ -n ${tmux_describe} ]] && print "choose a layout for a window" && return
+  [[ -n ${tmux_describe} ]] && print "choose a layout for a pane" && return
   _arguments -s -A "-*" -S \
+    '-E[spread the current pane and any panes next to it out evenly]' \
     '-n[behave like next-layout]' \
     '-o[revert to previous layout]' \
     '-p[behave like previous-layout]' \
-    '-t+[specify a target window]:target window:__tmux-windows' \
+    '-t+[specify a target pane]:target pane:__tmux-panes' \
     ':layout:(even-horizontal even-vertical main-horizontal main-vertical tiled)'
 }
 

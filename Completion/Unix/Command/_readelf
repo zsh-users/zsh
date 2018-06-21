@@ -7,6 +7,7 @@ _pick_variant -r variant elftoolchain=elftoolchain elfutils=elfutils binutils --
 
 args=(
   '(-a --all)'{-a,--all}'[show all tables]'
+  '(-g --section-groups)'{-g,--section-groups}'[show section groups]'
   '(-h --file-header)'{-h,--file-header}'[show file header]'
   '(-l --program-headers --segments)'{-l,--program-headers,--segments}'[show program headers]'
   '(-S --section-headers --sections)'{-S,--section-headers,--sections}'[show sections header]'
@@ -31,7 +32,6 @@ args=(
 case $variant in
   elftoolchain|binutils)
     args+=(
-      '(-g --section-groups)'{-g,--section-groups}'[show section groups]'
       '(-t --section-details)'{-t,--section-details}'[show section details]'
       '(-e --headers)'{-e,--headers}'[show file, program and sections headers]'
       '(-s --syms --symbols)'{-s,--syms,--symbols}'[show symbol table]'
@@ -49,6 +49,7 @@ case $variant in
   ;;
   elfutils)
     args+=(
+      '--dwarf-skeleton=[find skeleton compile units (with -w)]:file:_files'
       '--elf-section[used specified section as ELF input data]::section'
       '(-e --exception)'{-e,--exception}'[show sections for exception handling]'
       '(-N --numeric-addresses)'{-N,--numeric-addresses}"[don't find symbol names for addresses in DWARF data]"

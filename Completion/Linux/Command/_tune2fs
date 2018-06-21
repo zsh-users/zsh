@@ -24,7 +24,7 @@ _arguments -s -S \
   '-m+[set the percentage of reserved filesystem blocks]:percentage' \
   '-M+[set the last-mounted directory for the filesystem]:directory:_files -/' \
   '-o+[mount options]:options:_values -s , debug bsdgroups user_xattr acl uid16 journal_data journal_data_ordered journal_data_writeback nobarrier block_validity discard nodelalloc' \
-  '-O+[set or clear filesystem features]: :_values -s , feature dir_index dir_nlink encrypt extentextent extra_isize filetype flex_bg has_journalhuge_file large_file metadata_csum mmp project quota read-only resize_inode sparse_super uninit_bg' \
+  '-O+[set or clear filesystem features]: :_values -s , feature 64bit dir_index dir_nlink ea_inode encrypt extent extra_isize filetype flex_bg has_journal large_dir huge_file large_file metadata_csum metadata_csum_seed mmp project quota read-only resize_inode sparse_super uninit_bg' \
   '-r+[set the number of reserved filesystem blocks]:number' \
   '-Q+[set quota feature on the superblock]: :_values -s , "quota option" usrquota grpquota prjquota' \
   '-s+[set sparse super feature]:state:((0\:off 1\:on))' \

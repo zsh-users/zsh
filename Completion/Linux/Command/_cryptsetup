@@ -33,7 +33,7 @@ _arguments -s \
   '(--use-random)--use-urandom[use /dev/urandom to generate volume key]' \
   '--shared[share device with another non-overlapping crypt segment]' \
   '--uuid=[set device UUID]:uuid' \
-  '--allow-discards[allow discards (aka TRIM) requests for device]' \
+  '--allow-discards[allow discard (aka TRIM) requests for device]' \
   '--header=[device or file with separated LUKS header]:file:_files' \
   '--test-passphrase[do not activate device, just check passphrase]' \
   '--tcrypt-hidden[use hidden header (hidden TCRYPT device)]' \
@@ -64,6 +64,7 @@ _arguments -s \
   '--persistent[set activation flags persistent for device]' \
   '--label=[set label for the LUKS2 device]:label' \
   '--subsystem=[set subsystem label for the LUKS2 device]:subsystem' \
+  '--unbound[create unbound (no assigned data segment) LUKS2 keyslot]' \
   '(- : *)--version[show version information]' \
   '(- : *)'{-\?,--help}'[display help information]' \
   '(- : *)--usage[display brief usage]' \
@@ -86,6 +87,7 @@ case $state in
       'luksAddKey:add a new key'
       'luksRemoveKey:remove a key'
       'luksChangeKey:change a key'
+      'luksConvertKey:convert a key to new pbkdf parameters'
       'luksKillSlot:wipe key from slot'
       'luksUUID:print/change device UUID'
       'isLuks:check if device is a LUKS partition'
@@ -112,7 +114,7 @@ case $state in
       erase|convert|config|repair|(luks(AddKey|Erase|RemoveKey|DelKey|UUID|Dump)|isLuks))
 	args=( $device )
       ;;
-      luks(Format|AddKey|RemoveKey|ChangeKey))
+      luks(Format|AddKey|RemoveKey|ChangeKey|ConvertKey))
 	args=( $device ':key file:_files' )
       ;;
       luksHeader*) args=( $device '--header-backup-file:file:_files' );;

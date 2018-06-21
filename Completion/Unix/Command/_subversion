@@ -26,7 +26,7 @@ _svn () {
 
   _arguments -C -A "-*" \
     '(-)--help[print help information]' \
-    '(- *)--version[print client version information]' \
+    '(*)--version[print client version information]' \
     '1: :->cmds' \
     '*:: :->args' && ret=0
 
@@ -169,6 +169,9 @@ _svn () {
               '*:file:_files -g "(.svn|*)(/e:_svn_deletedfiles:,e:_svn_status:)"'
             )
           ;;
+	  (unshelve)
+	    args+=( '1:shelf name:compadd - ${${(f)"$(_call_program shelves svn unshelve -q --list)"}%%      *}' )
+	  ;;
           (*)
             case $usage in
               *(SRC|DST|TARGET|URL*PATH)*)

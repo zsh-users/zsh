@@ -18,6 +18,7 @@ _arguments -C -s \
   "($info -m --memory)"{-m,--memory}'[show socket memory usage]' \
   "($info -p --processes)"{-p,--processes}'[show process using each socket]' \
   "($info -i --info)"{-i,--info}'[show internal TCP information]' \
+  "($info)--tipcinfo[show internal tipc socket information]" \
   "($info -s --summary)"{-s,--summary}'[print summary statistics]' \
   "($info -b --bpf)"{-b,--bpf}'[show bpf filter socket information]' \
   "($info -E --events)"{-E,--events}'[continually display sockets as they are destroyed]' \
@@ -33,13 +34,14 @@ _arguments -C -s \
   "($info -d --dccp)"{-d,--dccp}'[display DCCP sockets]' \
   "($info -w --raw)"{-w,--raw}'[display RAW sockets]' \
   "($info -x --unix)"{-x,--unix}'[display Unix domain sockets]' \
+  "($info)--tipc[display only TIPC sockets]" \
   "($info)--vsock[display only vsock sockets]" \
-  "($info -f --family)"{-f,--family}'[display sockets of specified type]:family:(unix inet inet6 link netlink unix vsock)' \
+  "($info -f --family)"{-f+,--family=}'[display sockets of specified type]:family:(unix inet inet6 link netlink unix vsock tipc)' \
   "($info -K --kill)"{-K,--kill}'[forcibly close sockets, display what was closed]' \
   "($info -H --no-header)"{-H,--no-header}'[suppress header line]' \
-  "($info -A --query --socket)"{-A,--query,--socket}'[specify socket tables to show]: :_values -s , socket\ table all inet tcp udp raw unix packet netlink unix_dgram unix_stream unix_seqpacket packet_raw packet_dgram vsock_stream vsock_dgram' \
-  "($info -D)"{-D,--diag=}'[dump raw info to file]:file:_files' \
-  "($info -F)"{-F,--filter=}'[read filter information from a file]:file:_files' \
+  "($info -A --query --socket)"{-A+,--query=,--socket=}'[specify socket tables to show]: :_values -s , socket\ table all inet tcp udp raw unix packet netlink unix_dgram unix_stream unix_seqpacket packet_raw packet_dgram vsock_stream vsock_dgram tipc' \
+  "($info -D)"{-D+,--diag=}'[dump raw info to file]:file:_files' \
+  "($info -F)"{-F+,--filter=}'[read filter information from a file]:file:_files' \
   "($info)*: :->filter" && ret=0
 
 if [[ -n $state ]]; then

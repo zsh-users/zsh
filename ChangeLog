@@ -1,3 +1,17 @@
+2018-06-18  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 43073: Completion/Linux/Command/_cryptsetup,
+	Completion/Linux/Command/_sysstat, Completion/Linux/Command/_ss,
+	Completion/Linux/Command/_kpartx, Completion/Linux/Command/_tune2fs,
+	Completion/Unix/Command/_ansible, Completion/Unix/Command/_git,
+	Completion/Unix/Command/_lynx, Completion/Unix/Command/_mpc,
+	Completion/Unix/Command/_readelf, Completion/Unix/Command/_sqlite,
+	Completion/Unix/Command/_subversion, Completion/Unix/Command/_tmux,
+	Completion/Unix/Command/_user_admin, Completion/Unix/Command/_wget,
+	Completion/Unix/Command/_xxd, Completion/X/Command/_qiv,
+	Completion/Zsh/Command/_which, Completion/Zsh/Command/_zed:
+	various completion option updates
+
 2018-06-20  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 43077: Src/builtin.c: failure of math evaluation didn't

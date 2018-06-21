@@ -37,6 +37,7 @@ _mpc_command() {
     disable:"disable an output"
     enable:"enable an output"
     toggleoutput:"toggle an output"
+    outputset:"set output attributes"
     idle:"wait until an event occurs"
     idleloop:"loop waiting for events"
     insert:"insert a song after the currently playing song in the playlist"
@@ -73,6 +74,7 @@ _mpc_command() {
     stop:"stop the currently playing playlists"
     toggle:"toggles Play/Pause, plays if stopped"
     update:"scan music directory for updates"
+    rescan:"rescan music directory (including unchanged files)"
     version:"report version of MPD"
     volume:"set volume"
     status:"display MPD status"
@@ -222,6 +224,16 @@ _mpc_toggleoutput() {
   _mpc_helper_outputs
 }
 
+_mpc_outputset() {
+  if (( CURRENT == 2 )); then
+    _mpc_helper_outputs
+  else
+    _values -w -S = attribute \
+      'dop:setting:(1 0)' \
+      'allowed_formats:formats'
+  fi
+}
+
 _mpc_move() {
   if (( $#words <= 3 )); then
     _mpc_helper_songnumbers
@@ -318,6 +330,10 @@ _mpc_update() {
   _mpc_helper_files
 }
 
+_mpc_rescan() {
+  _mpc_helper_files
+}
+
 if [[ $service = *MPD_HOST* ]]; then
   _hosts
   return
@@ -339,7 +355,7 @@ if [[ $state = formats ]]; then
   compset -P '([^%]|%[^%]#%)#'
   _wanted metadata expl 'metadata delimiter' compadd -p % -S % \
     artist album albumartist comment composer date disc genre performer title \
-    track time file position mtime mdate && ret=0
+    track time file position id prio mtime mdate && ret=0
 fi
 
 return ret
