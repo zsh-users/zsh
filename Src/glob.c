@@ -1455,13 +1455,15 @@ zglob(LinkList list, LinkNode np, int nountok)
 			    if ((pw = getpwnam(s + arglen)))
 				data = pw->pw_uid;
 			    else {
-				zerr("unknown user");
+				zerr("unknown username '%s'", s + arglen);
 				data = 0;
 			    }
 			    *tt = sav;
 #else /* !USE_GETPWNAM */
 			    sav = *tt;
-			    zerr("unknown user");
+			    *tt = '\0';
+			    zerr("unable to resolve non-numeric username '%s'", s + arglen);
+			    *tt = sav;
 			    data = 0;
 #endif /* !USE_GETPWNAM */
 			    if (sav)
