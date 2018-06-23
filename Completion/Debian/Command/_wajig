@@ -14,7 +14,8 @@ _arguments -C -s \
 
 case $state in
   cmds)
-    cmds=( ${${(M)${(f)"$(wajig commands 2>/dev/null)"}:# [^-]*}/(#b) ([^ ]#) #(*)/$match[1]:$match[2]:l} )
+    cmds=( ${(f)"$( _call_program commands $words[1] commands )"} )
+    cmds=( ${(@)cmds/(#b)([^ ]##) ##(?)(*)/$match[1]:${match[2]:l}${match[3]//:/\\:}} )
 
     _describe -t commands 'wajig command' cmds && ret=0
   ;;

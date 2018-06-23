@@ -1,3 +1,7 @@
+2018-06-23  dana  <dana@dana.is>
+
+	* 43088: Completion/Debian/Command/_wajig: Fix sub-command completion
+
 2018-06-18  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 43074: Eitan: Completion/Unix/Command/_gcc: Completion for
