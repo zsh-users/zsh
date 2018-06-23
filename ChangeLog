@@ -1,5 +1,8 @@
 2018-06-23  dana  <dana@dana.is>
 
+	* 43081: Completion/Darwin/Command/_networksetup: Add networksetup
+	completion
+
 	* 43088: Completion/Debian/Command/_wajig: Fix sub-command completion
 
 2018-06-18  Oliver Kiddle  <okiddle@yahoo.co.uk>
