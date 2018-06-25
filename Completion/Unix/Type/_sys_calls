@@ -12,7 +12,7 @@ local -au syscalls
 zparseopts -D -K -E a=all n=none
 
 [[ $OSTYPE = linux* ]] && ifile=/usr/include/bits/syscall.h
-syscalls=( ${${${(M)${(f)"$(<$ifile)"}:#?define[[:blank:]]##SYS_*}#*[[:blank:]]SYS_}%%[[:blank:]]*} ) 2>/dev/null
+syscalls=( ${${${(M)${(f)"$(<$ifile)"}:#\#[[:blank:]]#define[[:blank:]]##SYS_*}#*[[:blank:]]SYS_}%%[[:blank:]]*} ) 2>/dev/null
 [[ -n $all ]] && syscalls+=( all )
 [[ -n $none ]] && syscalls+=( none )
 

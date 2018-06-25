@@ -5,6 +5,9 @@
 	Completion/Darwin/Command/_sc_usage: new utility to complete names
 	of running processes, and three new completion functions which use it.
 
+	* 43080: Completion/Unix/Type/_sys_calls: analyze recent syscall.h
+	properly
+
 2018-06-24  dana  <dana@dana.is>
 
 	* unposted: Completion/Linux/Command/_opkg: Fix mistyped variable
