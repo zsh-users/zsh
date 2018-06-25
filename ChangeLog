@@ -1,3 +1,10 @@
+2018-06-25  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 43079, 43086: Completion/Unix/Type/_process_names,
+	Completion/Unix/Command/_dtruss, Completion/Darwin/Command/_fs_usage,
+	Completion/Darwin/Command/_sc_usage: new utility to complete names
+	of running processes, and three new completion functions which use it.
+
 2018-06-24  dana  <dana@dana.is>
 
 	* unposted: Completion/Linux/Command/_opkg: Fix mistyped variable
