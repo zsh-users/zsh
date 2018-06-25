@@ -1,3 +1,9 @@
+2018-06-25  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 43084: Doc/Zsh/zle.yo, Functions/Chpwd/zsh_directory_name_cdr,
+	Src/Zle/zle_main.c: vared -g suppresses variable creation and
+	override warnings; also suppress in function.
+
 2018-06-25  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 43079, 43086: Completion/Unix/Type/_process_names,

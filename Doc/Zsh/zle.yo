@@ -342,7 +342,7 @@ findex(vared)
 cindex(parameters, editing)
 cindex(editing parameters)
 redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ ))ifnztexi(      )))
-xitem(tt(vared )[ tt(-Aache) ] [ tt(-p) var(prompt) ] [ tt(-r) var(rprompt) ])
+xitem(tt(vared )[ tt(-Aacghe) ] [ tt(-p) var(prompt) ] [ tt(-r) var(rprompt) ])
 xitem(SPACES()[ tt(-M) var(main-keymap) ] [ tt(-m) var(vicmd-keymap) ])
 xitem(SPACES()[ tt(-i) var(init-widget) ] [ tt(-f) var(finish-widget) ])
 item(SPACES()[ tt(-t) var(tty) ] var(name))(
@@ -353,7 +353,9 @@ When the tt(-c) flag is given, the parameter is created if it doesn't
 already exist.  The tt(-a) flag may be given with tt(-c) to create
 an array parameter, or the tt(-A) flag to create an associative array.
 If the type of an existing parameter does not match the type to be
-created, the parameter is unset and recreated.
+created, the parameter is unset and recreated.  The tt(-g) flag may
+be given to suppress warnings from the tt(WARN_CREATE_GLOBAL)
+and tt(WARN_NESTED_VAR) options.
 
 If an array or array slice is being edited, separator characters as defined
 in tt($IFS) will be shown quoted with a backslash, as will backslashes

@@ -1,14 +1,13 @@
 if [[ $1 = n ]]; then
   if [[ $2 = <-> ]]; then
     # Recent directory
-    typeset -ga reply
     autoload -Uz cdr
     cdr -r
     if [[ -n ${reply[$2]} ]]; then
-      reply=(${reply[$2]})
+      typeset -ga reply=(${reply[$2]})
       return 0
     else
-      reply=()
+      typeset -ga reply=()
       return 1
     fi
   fi

@@ -1652,6 +1652,7 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
     Param pm = 0;
     int ifl;
     int type = PM_SCALAR, obreaks = breaks, haso = 0, oSHTTY = 0;
+    int warn_flags;
     char *p1, *p2, *main_keymapname, *vicmd_keymapname, *init, *finish;
     Keymap main_keymapsave = NULL, vicmd_keymapsave = NULL;
     FILE *oshout = NULL;
@@ -1665,6 +1666,7 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
 	return 1;
     }
 
+    warn_flags = OPT_ISSET(ops, 'g') ? 0 : ASSPM_WARN;
     if (OPT_ISSET(ops,'A'))
     {
 	if (OPT_ISSET(ops, 'a'))
@@ -1845,11 +1847,11 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
 	a = spacesplit(t, 1, 0, 1);
 	zsfree(t);
 	if (PM_TYPE(pm->node.flags) == PM_ARRAY)
-	    setaparam(args[0], a);
+	    assignaparam(args[0], a, warn_flags);
 	else
 	    sethparam(args[0], a);
     } else
-	setsparam(args[0], t);
+	assignsparam(args[0], t, warn_flags);
     unqueue_signals();
     return 0;
 }
@@ -2148,7 +2150,7 @@ zle_main_entry(int cmd, va_list ap)
 
 static struct builtin bintab[] = {
     BUILTIN("bindkey", 0, bin_bindkey, 0, -1, 0, "evaM:ldDANmrsLRp", NULL),
-    BUILTIN("vared",   0, bin_vared,   1,  1, 0, "aAcef:hi:M:m:p:r:t:", NULL),
+    BUILTIN("vared",   0, bin_vared,   1,  1, 0, "aAcef:ghi:M:m:p:r:t:", NULL),
     BUILTIN("zle",     0, bin_zle,     0, -1, 0, "aAcCDfFgGIKlLmMNrRTUw", NULL),
 };
 
