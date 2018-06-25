@@ -279,7 +279,7 @@ _opkg() {
 
   if
     zstyle -t ":completion:*:*:$service:*" cache-persists &&
-    (( ! $+opkg_cache_pkg_all ))
+    (( ! $+_opkg_cache_pkg_all ))
   then
     typeset -gaU _opkg_cache_pkg_all
     typeset -gaU _opkg_cache_pkg_inst

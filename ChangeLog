@@ -1,3 +1,8 @@
+2018-06-24  dana  <dana@dana.is>
+
+	* unposted: Completion/Linux/Command/_opkg: Fix mistyped variable
+	name
+
 2018-06-23  dana  <dana@dana.is>
 
 	* 43081: Completion/Darwin/Command/_networksetup: Add networksetup
