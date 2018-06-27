@@ -71,7 +71,6 @@ arguments=(
   '--startuptime[write startup timing messages to given file]:log file:_files'
   '--socketid[run GVIM in another window]'
   '-i[use specified viminfo file]:viminfo file [~/.viminfo]:_files'
-  '--clean[defaults, no plugins, no viminfo]'
   '(- *)'{-h,--help}'[print help and exit]'
   '(- *)--version[print version information and exit]'
   '(* -q)-t[edit file where tag is defined]:tag:_complete_tag'
