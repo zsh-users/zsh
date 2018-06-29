@@ -75,9 +75,9 @@ if zstyle -T ":completion:${curcontext}:files" remote-access; then
     remdispf=( ${(M)remdispf:#${~glob[2]}} )
   fi
 
-  _tags files
+  _tags remote-files
   while _tags; do
-    while _next_label files expl ${suf:-remote directory}; do
+    while _next_label remote-files expl ${suf:-remote directory}; do
       [[ -n $suf ]] &&
           compadd "$args[@]" "$expl[@]" -d remdispf -- ${(q)remdispf%[*=|]} && ret=0
       compadd ${suf:+-S/} -r "/ \t\n\-" "$args[@]" "$expl[@]" -d remdispd \

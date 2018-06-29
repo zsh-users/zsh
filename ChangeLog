@@ -1,3 +1,8 @@
+2018-06-29  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* users/23519: README, Completion/Unix/Type/_remote_files: Use tag
+	remote-files instead of files for remote files.
+
 2018-06-27  Daniel Hahler  <zsh@thequod.de>
 
 	* 42746: Completion/Unix/Command/_vim: _vim: handle special values for
