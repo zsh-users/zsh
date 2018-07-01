@@ -10,4 +10,4 @@ _arguments -w -S -s : \
   "-o[reconnect on overflow]" \
   "-t[print date and time at start]" \
   "-W[allow write access to observed tty]" \
-  ":tty device:_ttys -D"
+  "(-): : _ttys -Do"
