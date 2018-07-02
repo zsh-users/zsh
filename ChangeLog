@@ -1,3 +1,8 @@
+2018-07-02  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 43108, 43121: Completion/Unix/Command/_killall: complete
+	various options
+
 2018-07-01  Doron Behar  <doron.behar@gmail.com>
 
 	* 43059: Completion/Unix/Command/_gpg: Use explicit UIDs for
