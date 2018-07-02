@@ -1,3 +1,8 @@
+2018-07-03  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* dana: 43134: Completion/Unix/Type/_signals: don't complete SIG
+	in front of numeric signals.
+
 2018-07-02  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 43108, 43121: Completion/Unix/Command/_killall: complete

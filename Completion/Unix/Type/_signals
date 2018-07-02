@@ -36,7 +36,7 @@ if [[ -z "$minus" ]] ||
   fi
 
   if [[ -n "$pre" && $PREFIX = ${minus}S* ]]; then
-    sigs=( "${minus}SIG${(@)^signals[first,last]}" )
+    sigs=( "${minus}SIG${(@)^${(@)signals[first,last]:#<->}}" )
     (( $#disp )) && tmp=( "$tmp[@]" "${(@)signals[first,last]}" )
   else
     sigs=()
