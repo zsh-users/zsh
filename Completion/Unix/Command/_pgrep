@@ -1,75 +1,134 @@
 #compdef pgrep pkill
 
-local curcontext="$curcontext" state line ret=1 expl
+# Notes:
+# - We assume that Linux systems use procps-ng — specifically, procps-ng >=3.3.4
+#   (which changed the behaviour of -f and added -a)
+# - We don't really need to keep pgopts and pkopts separate, but it seems like
+#   it should make things a bit easier to follow
+# - @todo We could complete log-in classes given to -c
+# - @todo We could complete routing tables given to -T
+
+local curcontext="$curcontext" state line ret=1 expl pgopts pkopts no
 typeset -A opt_args
-typeset -a arguments
+typeset -a arguments sig_arguments aopts
 
-arguments=('-P[parent process id]:parent process id:->ppid'
-     '-F[match only in process in pidfile]:files:_files'
-     '-g[match only in process group ids]:group:->pgid'
-     '-G[match only real group id]:group:_groups'
-     '-j[match only in processes inside jails]:jail id:_sequence _jails -0 -o jid'
-     '-J[match only in project ids]:project id:->projid'
-     '-M[extract the name list from the specified core]:files:_files'
-     '-N[extract the name list from the specified system]:files:_files'
-     '-s[match only session id]:session id:->sid'
-     '-t[match only controlled by terminal]:terminal device:_sequence _ttys -d'
-     '-T[match only in processes specified routing table in rtable]'
-     '-u[match only effective user id]:user:_users'
-     '-U[match only real user id]:user:_users'
-     '(-n)-o[oldest process]'
-     '(-o)-n[newest process]'
-     '-a[include process ancestors in the match list]'
-     '-c[print a count of matching processes]'
-     '-f[match against full command line]'
-     '-i[ignore case distinctions]'
-     '-I[confirmation before attempting to single each process]'
-     '-L[given pidfile must be locked]'
-     '-q[do not write anything to standard output]'
-     '-S[search also in system processes]'
-     '-v[negate matching]'
-     '-w[show thread ids instead of pids]'
-     '-x[match exactly]'
-     '-z[match only in zones]:zone:_zones')
+# These arguments (a) are common to all variants (like -x), (b) are the most
+# common amongst all variants (like -a), or (c) have a single unambiguous
+# meaning amongst all variants (like --help). Many of them are filtered out or
+# overridden below
+arguments=(
+  '-a[include process ancestors in match list]'
+  '-c+[match only on specified login class]:login class'
+  '(-F --pidfile)'{-F+,--pidfile=}'[match only processes in specified PID file]:PID file:_files'
+  '(-f --full)'{-f,--full}'[match against full command line]'
+  '(-G --group)'{-G+,--group=}'[match only on specified real group IDs]: :_sequence _groups'
+  '(-g --pgroup)'{-g+,--pgroup=}'[match only on specified process group IDs]: :->pgid'
+  '(: * -)'{-h,--help}'[display help information]'
+  '-I[request confirmation before signalling each process]'
+  '-i[ignore case distinctions]'
+  '-J+[match only on specified project IDs]: :->projid'
+  '-j+[match only on specified jail IDs]:jail:_sequence _jails -0 -o jid'
+  '(-L --logpidfile)'{-L,--logpidfile}'[fail if PID file not locked (with -F)]'
+  '(-N)-M+[extract name list from specified core]:core file:_files'
+  '(-M)-N+[extract name list from specified system]:system file:_files'
+  '(-o -n --oldest --newest)'{-n,--newest}'[match newest process]'
+  '(-o -n --oldest --newest)'{-o,--oldest}'[match oldest process]'
+  '(-P --parent)'{-P+,--parent=}'[match only on specified parent process IDs]: :->ppid'
+  '(-l)-q[suppress normal output]'
+  '-S[search also in system processes (kernel threads)]'
+  '(-s --session)'{-s+,--session=}'[match only on specified process session IDs]: :->sid'
+  # _signals is OK here — we do it differently below
+  '(ss)--signal=[specify signal to send to process]: :_signals -s'
+  '-T+[match only on specified routing table]:routing table'
+  '(-t --terminal)'{-t+,--terminal=}'[match only on specified controlling terminals]:terminal device:_sequence _ttys -d'
+  '(-U --uid)'{-U+,--uid=}'[match only on specified real user IDs]: :_sequence _users'
+  '(-u --euid)'{-u+,--euid=}'[match only on specified effective user IDs]: :_sequence _users'
+  '(-v --inverse)'{-v,--inverse}'[negate matching]'
+  '(-x --exact)'{-x,--exact}'[match process name or command line (with -f) exactly]'
+  '--ns=[match only on same namespaces as specified PID]: :_pids'
+  '--nslist=[match only on specified namespaces (with --ns)]:namespace:(ipc mnt net pid user uts)'
+  '(: * -)'{-V,--version}'[display version information]'
+  '-z+[match only on specified zone IDs]:zone:_sequence _zones'
+)
+[[ $service == pgrep ]] && arguments+=(
+  '(-d --delimiter)'{-d+,--delimiter=}'[specify output delimiter]:delimiter:compadd ${(s<>)IFS}'
+  '(-q)-l[display process name (and arguments with -f)]'
+  '(-w --lightweight)'{-w,--lightweight}'[show all thread IDs instead of PID]'
+)
+[[ $service == pkill ]] && arguments+=(
+  '(-e --echo)'{-e,--echo}'[display signalled process]'
+  '-l[display kill command]'
+)
 
-if [[ $service == 'pgrep' ]]; then
-  arguments+=('-d[output delimiter]:delimiter:compadd ${(s\:\:)IFS}'
-        '-l[list name in addition to id]')
-fi
-
-local optchars
-case "$OSTYPE" in
+case $OSTYPE in
   linux*)
-    optchars="cflvxdnoPgsuUGtw"
+    # Note: We deliberately exclude -v but not --inverse from pkill
+    pgopts=acdFfGghLlnoPstUuVvwx-
+    pkopts=ceFfGghLnoPstUuVx-
+    arguments=(
+      ${arguments:#((#s)|*\))(\*|)-[acl]*}
+      '(-c --count)'{-c,--count}'[display count of matching processes]'
+    )
+    [[ $service == pgrep ]] && arguments+=(
+      '(-a -l --list-full --list-name)'{-a,--list-full}'[display full command line]'
+      '(-a -l --list-full --list-name)'{-l,--list-name}'[display process name]'
+    )
     ;;
-  freebsd*)
-    optchars="LSafilnoqvxFGMNPUdgjstu"
+  dragonfly*|freebsd*)
+    pgopts=acdFfGgijLlMNnoPqSstUuvx
+    pkopts=acFfGgIijLlMNnoPstUuvx
     ;;
   openbsd*)
-    optchars="flnoqvxdGgPsTtUu"
+    pgopts=dfGglnoPqsTtUuvx
+    pkopts=fGgIlnoPqsTtUuvx
     ;;
   darwin*)
-    optchars="LafilnoqvxFGPUdgtu"
+    pgopts=adFfGgiLlnoPqtUuvx
+    pkopts=aFfGgIiLlnoPtUuvx
     ;;
   solaris*)
-    optchars="flvxdnoPgsuUGJtTcz"
-    arguments=( ${arguments##-T*} )
-    arguments=( ${arguments##-c*} )
-    arguments+=( '-T[match only processes in task ids]:taskid:->task' )
-    arguments+=( '-c[match only processes in contract ids]:taskid:->contract' )
+    pgopts=cdfGgJlnoPsTtUuvxz
+    pkopts=cfGgJnoPsTtUuvxz
+    arguments=(
+      ${arguments:#((#s)|*\))(\*|)-[cT]*}
+      '-c+[match only on specified contract IDs]: :->contract'
+      '-T+[match only on specified task IDs]: :->task'
+    )
     ;;
   *)
-    optchars="flvxdnoPgsuUGt"
+    pgopts=dfGgilnPstUuvx
+    pkopts=fGgilnPstUuvx
     ;;
 esac
-# Only keep relevant arguments according to $optchars.
-arguments=( ${(M)arguments:#(|\*)(|\(*\))-[$optchars]*}
-     '*:process name:->pname')
-if [[ $service == 'pkill' ]]; then
-  arguments+=('-'${^signals}'[signal]')
+
+if [[ $service == pgrep ]]; then
+  arguments=( ${(M)arguments:#((#s)|*\))(\*|)-[$pgopts]*} )
+else
+  arguments=( ${(M)arguments:#((#s)|*\))(\*|)-[$pkopts]*} )
+
+  # Signals on non-Linux systems can only be completed as the first argument
+  (( CURRENT != 2 )) && [[ $OSTYPE != linux* ]] && no='!'
+
+  # This is used for exclusion with --signal
+  sig_arguments=( + '(ss)' )
+
+  # This is very similar to _signals, but i've avoided it here because it
+  # doesn't behave the way i want it to
+  sig_arguments+=( $no'(--signal)-'${^signals[2,-3]} )
+  sig_arguments+=( '!(--signal)-'{0..$(( $#signals - 3 ))} )
+
+  # Complete the -SIG* variant if it's requested
+  if [[ $PREFIX$SUFFIX == -S* ]]; then
+    sig_arguments+=( '(--signal)-SIG'${^${(@)signals[2,-3]:#<->}} )
+  else
+    sig_arguments+=( '!(--signal)-SIG'${^${(@)signals[2,-3]:#<->}} )
+  fi
 fi
 
-_arguments -C -s -w $arguments && ret=0
+arguments+=( $sig_arguments + o '*: :->pname' )
+
+[[ $OSTYPE == linux* ]] || aopts+=( -A '*-' )
+_arguments -C -s -S $aopts : $arguments && ret=0
 
 case $state in
   (sid)
@@ -87,7 +146,7 @@ case $state in
       sid=(${(uon)$(ps -A -o sid=)})
     fi
 
-    _wanted sid expl 'session id' compadd -S ',' -q -F used $sid
+    _wanted sid expl 'session ID' compadd -S ',' -q -F used $sid
     ;;
 
   (ppid)
@@ -101,7 +160,7 @@ case $state in
       ppid=(${(uon)$(ps -A -o ppid=)})
     fi
 
-    _wanted ppid expl 'parent process id' compadd -S ',' -q -F used $ppid
+    _wanted ppid expl 'parent process ID' compadd -S ',' -q -F used $ppid
     ;;
 
   (pgid)
@@ -115,7 +174,7 @@ case $state in
       pgid=(${(uon)$(ps -A -o pgid=)})
     fi
 
-    _wanted pgid expl 'process group id' compadd -S ',' -q -F used $pgid
+    _wanted pgid expl 'process group ID' compadd -S ',' -q -F used $pgid
     ;;
 
   (projid)
@@ -125,7 +184,7 @@ case $state in
     used=(${(s:,:)IPREFIX})
     projid=(${(uon)$(ps -A -o project=)})
 
-    _wanted projid expl 'project id' compadd -S ',' -q -F used $projid
+    _wanted projid expl 'project ID' compadd -S ',' -q -F used $projid
     ;;
 
   (contract)
@@ -135,7 +194,7 @@ case $state in
     used=(${(s:,:)IPREFIX})
     ctid=(${(uon)$(ps -A -o ctid=)})
 
-    _wanted ctid expl 'contract id' compadd -S ',' -q -F used $ctid
+    _wanted ctid expl 'contract ID' compadd -S ',' -q -F used $ctid
     ;;
 
   (task)
@@ -145,7 +204,7 @@ case $state in
     used=(${(s:,:)IPREFIX})
     taskid=(${(uon)$(ps -A -o project=)})
 
-    _wanted taskid expl 'task id' compadd -S ',' -q -F used $taskid
+    _wanted taskid expl 'task ID' compadd -S ',' -q -F used $taskid
     ;;
 
   (pname)

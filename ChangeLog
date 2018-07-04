@@ -1,3 +1,8 @@
+2018-07-03  dana  <dana@dana.is>
+
+	* 43105 (tweaked): Completion/Unix/Command/_pgrep: Add full procps
+	support, other improvements
+
 2018-07-03  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* dana: 43134: Completion/Unix/Type/_signals: don't complete SIG
