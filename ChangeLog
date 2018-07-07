@@ -1,3 +1,7 @@
+2018-07-07  Matthew Martin  <phy1729@gmail.com>
+
+	* 43106: Completion/BSD/Command/_ldap: Add ldap completer.
+
 2018-07-03  dana  <dana@dana.is>
 
 	* 43105 (tweaked): Completion/Unix/Command/_pgrep: Add full procps
