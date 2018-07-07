@@ -102,7 +102,7 @@ _nm_connection_up() {
 }
 
 _nm_connection_down() {
-  _arguments "1:connection:_nm_connection_specs"
+  _arguments "1:connection:_nm_connection_active"
 }
 
 _nm_connection_modify() {
@@ -159,6 +159,12 @@ _nm_connection_specs() {
 _nm_connection_ids() {
   local -a con_ids
   con_ids=(${(f)"$(_call_program nmcli nmcli -t -f name connection)"})
+  _describe 'select connection' con_ids
+}
+
+_nm_connection_active() {
+  local -a con_ids
+  con_ids=(${(f)"$(_call_program nmcli nmcli -t -f name connection show --active)"})
   _describe 'select connection' con_ids
 }
 

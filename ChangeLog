@@ -5,6 +5,9 @@
 	* 43046: Completion/Unix/Type/_pdf, Completion/X/Command/_mupdf:
 	Add mupdf completer.
 
+	* 42995: David Klann: Completion/Linux/Command/_networkmanager:
+	Only complete active connections for nmcli connection down.
+
 2018-07-03  dana  <dana@dana.is>
 
 	* 43105 (tweaked): Completion/Unix/Command/_pgrep: Add full procps
