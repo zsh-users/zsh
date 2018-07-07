@@ -1,4 +1,4 @@
-#compdef pdf2dsc pdf2ps pdfimages pdfinfo pdftopbm pdftops pdftotext pdfopt pdffonts kpdf apvlv epdfview mupdf
+#compdef pdf2dsc pdf2ps pdfimages pdfinfo pdftopbm pdftops pdftotext pdfopt pdffonts kpdf apvlv epdfview
 
 local expl ext=''
 
