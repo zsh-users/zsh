@@ -1,3 +1,10 @@
+2018-07-09  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* users/23531: Src/exec.c, Test/C03traps.ztst: Fix error
+	exit/return from within shell construct inside nested function,
+	and in left hand side of pipe (regression due to broken tests);
+	stop tests from exiting too early and add new test for first fix.
+
 2018-07-07  Matthew Martin  <phy1729@gmail.com>
 
 	* 43106: Completion/BSD/Command/_ldap: Add ldap completer.

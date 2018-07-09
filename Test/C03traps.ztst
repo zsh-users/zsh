@@ -680,6 +680,22 @@ F:Must be tested with a top-level script rather than source or function
 >Better
 >In .zshenv
 
+  unsetopt errreturn
+  fn2() {
+    if true; then
+      false
+    fi
+  }
+  fn1() {
+    setopt localoptions errreturn
+    fn2
+    print $?
+  }
+  fn1
+  print fn1 done
+0:ERR_RETURN caused by function returning false from within shell construct
+>fn1 done
+
   fn2() {
     if false; then
       print Bad
@@ -741,6 +757,7 @@ F:Must be tested with a top-level script rather than source or function
 0:ERR_EXIT not triggered by status 1 at end of { }
 >OK
 
+  unsetopt err_exit err_return
   (setopt err_exit
   for x in y; do
     false

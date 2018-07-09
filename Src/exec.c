@@ -2728,6 +2728,11 @@ execcmd_fork(Estate state, int how, int type, Wordcode varspc,
 
     if (sigtrapped[SIGINT] & ZSIG_IGNORED)
 	holdintr();
+    /*
+     * EXIT traps shouldn't be called even if we forked to run
+     * shell code as this isn't the main shell.
+     */
+    sigtrapped[SIGEXIT] = 0;
 #ifdef HAVE_NICE
     /* Check if we should run background jobs at a lower priority. */
     if ((how & Z_ASYNC) && isset(BGNICE))
@@ -5792,7 +5797,19 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
     undoshfunc:
 	--funcdepth;
 	if (retflag) {
+	    /*
+	     * This function is forced to return.
+	     */
 	    retflag = 0;
+	    /*
+	     * The calling function isn't necessarily forced to return,
+	     * but it should be made sensitive to ERR_EXIT and
+	     * ERR_RETURN as the assumptions we made at the end of
+	     * constructs within this function no longer apply.  If
+	     * there are cases where this is not true, they need adding
+	     * to C03traps.ztst.
+	     */
+	    this_noerrexit = 0;
 	    breaks = funcsave->breaks;
 	}
 	freearray(pparams);
