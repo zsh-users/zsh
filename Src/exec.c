@@ -4418,7 +4418,9 @@ gethere(char **strp, int typ)
 	while ((c = hgetc()) == '\t' && strip)
 	    ;
 	for (;;) {
-	    if (bptr == buf + bsiz) {
+	    if (bptr >= buf + bsiz - 2) {
+		ptrdiff_t toff = t - buf;
+		ptrdiff_t bptroff = bptr - buf;
 		char *newbuf = realloc(buf, 2 * bsiz);
 		if (!newbuf) {
 		    /* out of memory */
@@ -4426,8 +4428,8 @@ gethere(char **strp, int typ)
 		    return NULL;
 		}
 		buf = newbuf;
-		t = buf + bsiz - (bptr - t);
-		bptr = buf + bsiz;
+		t = buf + toff;
+		bptr = buf + bptroff;
 		bsiz *= 2;
 	    }
 	    if (lexstop || c == '\n')

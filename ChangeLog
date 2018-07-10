@@ -1,3 +1,8 @@
+2018-07-10  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 43156, 43157: Src/exec.c: need to allow for possible
+	update of pointer by two in gethere().
+
 2018-07-09  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* users/23531: Src/exec.c, Test/C03traps.ztst: Fix error
