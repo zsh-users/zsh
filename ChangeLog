@@ -1,3 +1,7 @@
+2018-07-10  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 43155: Completion/Unix/Command/_gcc: escape : in action for -std
+
 2018-07-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 43156, 43157: Src/exec.c: need to allow for possible
