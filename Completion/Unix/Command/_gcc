@@ -339,8 +339,7 @@ h8/300)
 esac
 
 if [[ "$service" = clang* ]]; then
-    args=(
-        $args
+    args+=(
         "-flto=-[generate output files suitable for link time optimization]::style:(full thin)"
         -emit-llvm
         "-Qunused-arguments[don't emit warning for unused driver arguments]"
@@ -353,7 +352,7 @@ if [[ "$service" = clang* ]]; then
         "-nobuiltininc[Do not search builtin directory for include files]"
     )
 else
-    args=(
+    args+=(
       '-flto=-[Enable link-time optimization]::jobs:'
     )
 fi
@@ -383,7 +382,6 @@ languages=(
 
 # generic options (from --help)
 args+=(
-  -a -C -H -P -s
   '-###[print commands to run this compilation]'
   '-o:output file:_files -g "^*.(c|h|cc|C|cxx)(-.)"'
   '-x[Specify the language of the following input files]:input file language:('"$languages"')'
@@ -395,6 +393,10 @@ args+=(
   '*-A-:define assertion:'
   '*-D-:define macro:'
   '*-U-:undefine macro:'
+  '-C[do not discard comments during preprocess]'
+  '-CC[do not discard comments, including macro expansion]'
+  '-P[inhibit generation of linkemakers during preprocess]'
+  '-H[print name of each header file used]'
   '-E[Preprocess only; do not compile, assemble or link]'
   '-S[Compile only; do not assemble or link]'
   '-c[Compile and assemble, but do not link]'
