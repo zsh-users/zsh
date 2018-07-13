@@ -1,3 +1,8 @@
+2018-07-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Doron Behar: 43166: Completion/Unix/Type/_pspdf,
+	Completion/X/Command/_zathura: new zathura completion.
+
 2018-07-18  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 43177: Completion/Unix/Command/_grep: support bzgrep, and add

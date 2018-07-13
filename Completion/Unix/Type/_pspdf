@@ -1,4 +1,4 @@
-#compdef gsbj gsdj gsdj500 gslj gslp gsnd ps2ascii ghostview mgv pstoedit pstotgif zathura
+#compdef gsbj gsdj gsdj500 gslj gslp gsnd ps2ascii ghostview mgv pstoedit pstotgif
 
 local expl ext
 
