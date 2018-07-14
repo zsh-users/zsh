@@ -1,3 +1,8 @@
+2018-07-16  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Tim Smith: 43172: Doc/Zsh/mod_zutil.yo: document escaping of
+	colon in zformat -a.
+
 2018-07-11  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 43164: Completion/Unix/Command/_gcc: fix 'args=' to 'args+=',

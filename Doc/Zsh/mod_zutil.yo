@@ -172,6 +172,7 @@ printed below each other.  All strings without a colon are left
 unchanged and all strings with an empty var(right) string have the
 trailing colon removed.  In both cases the lengths of the strings
 are not used to determine how the other strings are to be aligned.
+A colon in the var(left) string can be escaped with a backslash.
 The resulting strings are stored in the var(array).
 )
 findex(zregexparse)
