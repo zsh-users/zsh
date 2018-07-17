@@ -1,3 +1,8 @@
+2018-07-18  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 43177: Completion/Unix/Command/_grep: support bzgrep, and add
+	a few options for macOS.
+
 2018-07-17  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: Doc/Makefile.in: remove ftp_sites.yo.

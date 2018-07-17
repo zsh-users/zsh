@@ -1,4 +1,4 @@
-#compdef grep egrep fgrep bsdgrep zgrep zegrep zfgrep ggrep gegrep gfgrep gzgrep gzegrep gzfgrep -value-,GREP_OPTIONS,-default-
+#compdef grep egrep fgrep bsdgrep zgrep zegrep zfgrep ggrep gegrep gfgrep gzgrep gzegrep gzfgrep bzgrep bzegrep bzfgrep -value-,GREP_OPTIONS,-default-
 
 local arguments matchers command variant
 
@@ -11,13 +11,15 @@ else
   arguments=( '(-e --regexp -f --file)1: :_guard "^-*" pattern' )
   if [[ $service = z* ]]; then
     arguments+=( '*:files:_files -g "*.gz(-.)"' )
+  elif [[ $service = bz* ]]; then
+    arguments+=( '*:files:_files -g "*.bz2(-.)"' )
   else
     arguments+=( '*:files:_files' )
   fi
   command="$words[1]"
 fi
 
-if [[ $service != (|g)(|z)[ef]grep ]]; then
+if [[ $service != (|g|z|gz|bz)[ef]grep ]]; then
   matchers='(--extended-regexp --fixed-strings --basic-regexp --perl-regexp -E -F -G -P)'
   arguments+=(
     $matchers{--extended-regexp,-E}'[use extended regular expression]'
@@ -66,7 +68,7 @@ arguments+=(
 _pick_variant -r variant -c "$command" gnu=gnu gpl2=2.5.1 unix --version
 case $variant:$OSTYPE in
   (gnu:*|gpl2:freebsd*))
-    [[ $service != (|g)(|z)[ef]grep ]] && arguments+=(
+    [[ $service != (|g|z|gz|bz)[ef]grep ]] && arguments+=(
       $matchers{--perl-regexp,-P}'[use perl regular expression]'
     )
   ;|
@@ -76,15 +78,19 @@ case $variant:$OSTYPE in
       '(-z --null-data)'{-z,--null-data}'[input data separated by 0 byte, not newline]'
     )
   ;|
-  gpl2:freebsd*)
-    arguments+=(
-      '(--null --no-filename -h)--null[print 0 byte after each filename]'
-    )
-  ;|
   gpl2:(freebsd|darwin)*)
     arguments+=(
+      '(--null --no-filename -h)--null[print 0 byte after each filename]'
       '(-Z --decompress -J --bz2decompress)'{-J,--bz2decompress}"[decompress bzip2'ed input before searching]"
       '(-Z --decompress -J --bz2decompress)'{-Z,--decompress}"[decompress gzip'ed input before searching]"
+    )
+  ;|
+  gpl2:darwin*)
+    arguments+=(
+      '(-p -S)-O[follow symlinks on the command line]'
+      '(-O -S)-p[do not follow symlinks]'
+      '(-O -p)-S[follow all symlinks]'
+      '*--include-dir=[only search directories matching specified pattern]:directory pattern'
     )
   ;|
   (gnu:*|gpl2:netbsd*))
