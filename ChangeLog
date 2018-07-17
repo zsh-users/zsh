@@ -1,5 +1,9 @@
 2018-07-17  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Matthew Martin: 43179: Doc/Zsh/contrib.yo,
+	Doc/Zsh/ftp_sites.yo, Doc/Zsh/metafaq.yo: update distro docs to
+	remove dead links.
+
 	* 43176: Doc/Zsh/intro.yo: note right at start of manual that
 	default mode is not POSIX.
 

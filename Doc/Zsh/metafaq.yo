@@ -18,17 +18,17 @@ can be contacted at tt(<coordinator@zsh.org>), but matters relating to
 the code should generally go to the mailing list.
 texinode(Availability)(Mailing Lists)(Author)(Introduction)
 sect(Availability)
-Zsh is available from the following anonymous FTP sites.  These mirror
-sites are kept frequently up to date.  The sites marked with em((H)) may be
-mirroring tt(ftp.cs.elte.hu) instead of the primary site.
+Zsh is available from the following HTTP and anonymous FTP site.
 
 cindex(FTP sites for zsh)
 cindex(acquiring zsh by FTP)
 cindex(availability of zsh)
-INCLUDEFILE(Zsh/ftp_sites.yo)\
+nofill(uref(ftp://ftp.zsh.org/pub/)
+uref(https://www.zsh.org/pub/))
+)
 
 The up-to-date source code is available via Git from Sourceforge.  See
-uref(http://sourceforge.net/projects/zsh/) for details.  A summary of
+uref(https://sourceforge.net/projects/zsh/) for details.  A summary of
 instructions for the archive can be found at
 uref(http://zsh.sourceforge.net/).
 
@@ -75,7 +75,7 @@ maintained by Karsten Thygesen tt(<karthy@kom.auc.dk>).
 The mailing lists are archived; the archives can be accessed via the
 administrative addresses listed above.  There is also a hypertext
 archive, maintained by Geoff Wing tt(<gcw@zsh.org>), available at
-uref(http://www.zsh.org/mla/).
+uref(https://www.zsh.org/mla/).
 texinode(The Zsh FAQ)(The Zsh Web Page)(Mailing Lists)(Introduction)
 sect(The Zsh FAQ)
 Zsh has a list of Frequently Asked Questions (FAQ), maintained by
@@ -86,7 +86,7 @@ uref(http://www.zsh.org/FAQ/).  The contact address for FAQ-related matters
 is tt(<faqmaster@zsh.org>).
 texinode(The Zsh Web Page)(The Zsh Userguide)(The Zsh FAQ)(Introduction)
 sect(The Zsh Web Page)
-Zsh has a web page which is located at uref(http://www.zsh.org/).  This is
+Zsh has a web page which is located at uref(https://www.zsh.org/).  This is
 maintained by Karsten Thygesen tt(<karthy@zsh.org>), of SunSITE Denmark.
 The contact address for web-related matters is tt(<webmaster@zsh.org>).
 texinode(The Zsh Userguide)(See Also)(The Zsh Web Page)(Introduction)
@@ -98,7 +98,3 @@ cabbalistic, hierographic, or downright mystifying (for example, the word
 uref(http://zsh.sourceforge.net/Guide/).  At the time of writing, chapters
 dealing with startup files and their contents and the new completion system
 were essentially complete.
-sect(The Zsh Wiki)
-A `wiki' website for zsh has been created at uref(http://www.zshwiki.org/).
-This is a site which can be added to and modified directly by users without
-any special permission.  You can add your own zsh tips and configurations.
