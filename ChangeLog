@@ -1,5 +1,7 @@
 2018-07-17  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unposted: Doc/Makefile.in: remove ftp_sites.yo.
+
 	* Matthew Martin: 43179: Doc/Zsh/contrib.yo,
 	Doc/Zsh/ftp_sites.yo, Doc/Zsh/metafaq.yo: update distro docs to
 	remove dead links.

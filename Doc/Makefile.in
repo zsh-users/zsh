@@ -76,7 +76,7 @@ YODLSRC = zmacros.yo zman.yo ztexi.yo Zsh/arith.yo Zsh/builtins.yo \
 Zsh/calsys.yo \
 Zsh/compat.yo Zsh/compctl.yo Zsh/compsys.yo Zsh/compwid.yo Zsh/cond.yo \
 Zsh/contrib.yo Zsh/exec.yo Zsh/expn.yo \
-Zsh/filelist.yo Zsh/files.yo Zsh/ftp_sites.yo \
+Zsh/filelist.yo Zsh/files.yo \
 Zsh/func.yo Zsh/grammar.yo Zsh/manual.yo \
 Zsh/index.yo Zsh/intro.yo Zsh/invoke.yo Zsh/jobs.yo Zsh/metafaq.yo \
 Zsh/modules.yo Zsh/modlist.yo Zsh/modmenu.yo Zsh/manmodmenu.yo $(MODDOCSRC) \
@@ -185,7 +185,7 @@ zshall.1: zsh.yo
 	    $(YODL) -I$(sdir) -DZSHALL -w zman.yo version.yo zsh.yo | sed -e '1s/\\-/-/g' -e '/^\.'\''/d' > $$target \
 	;; esac; \
 
-../META-FAQ: META-FAQ.yo Zsh/metafaq.yo Zsh/ftp_sites.yo
+../META-FAQ: META-FAQ.yo Zsh/metafaq.yo
 	case '$(YODL)' in :*) touch $(sdir_top)/META-FAQ ;; *) \
 	    $(YODL) -I$(sdir) META-FAQ.yo | sed -e '/NEXTLINE/N' -e '/DELLINE/d' -e '/^SECTHEAD$$/{N;s/^SECTHEAD.//;h;s/./-/g;H;g;}' -e 's/  *$$//' -e '/comment(.*)/d' > $(sdir_top)/META-FAQ \
 	;; esac
@@ -211,7 +211,7 @@ $(MAN): zmacros.yo zman.yo
 
 zsh.1 zshall.1: Zsh/intro.yo Zsh/metafaq.yo Zsh/invoke.yo Zsh/files.yo \
                 Zsh/filelist.yo Zsh/filelist.yo Zsh/seealso.yo \
-                Zsh/ftp_sites.yo Zsh/compat.yo Zsh/restricted.yo
+                Zsh/compat.yo Zsh/restricted.yo
 
 zshbuiltins.1: Zsh/builtins.yo
 
