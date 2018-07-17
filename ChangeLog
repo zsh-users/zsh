@@ -1,3 +1,8 @@
+2018-07-17  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 43176: Doc/Zsh/intro.yo: note right at start of manual that
+	default mode is not POSIX.
+
 2018-07-16  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Tim Smith: 43172: Doc/Zsh/mod_zutil.yo: document escaping of
