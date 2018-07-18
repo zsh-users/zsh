@@ -8,6 +8,9 @@
 	* 43177: Completion/Unix/Command/_grep: support bzgrep, and add
 	a few options for macOS.
 
+	* 43182: Completion/Unix/Command/_lldb: complete process name
+	after option -n/--attach-name
+
 2018-07-17  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: Doc/Makefile.in: remove ftp_sites.yo.

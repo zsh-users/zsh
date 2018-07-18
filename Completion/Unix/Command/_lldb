@@ -2,7 +2,8 @@
 
 local curcontext=$curcontext state state_descr line expl ret=1
 typeset -A opt_args
-local -a args
+typeset -a opts args
+[[ $EUID = 0 || $_comp_priv_prefix[1] = sudo ]] && opts=( -a )
 
 args=(
   '*'{-o+,--one-line=}'[run one-line lldb command after loading executable]:lldb command: '
@@ -29,7 +30,7 @@ args=(
     '(-c --core)'{-c+,--core=}'[specify core file to open]:core file:_files -g "*core*(-.)"'
     '*::executable and arguments:->exe_args'
   - name
-    '(-n --attach-name)'{-n+,--attach-name=}'[attach to the named process]:process name'
+    '(-n --attach-name)'{-n+,--attach-name=}"[attach to the named process]: :_process_names $opts"
     '(-w --wait-for)'{-w,--wait-for}'[wait for the specified process to launch]'
   - pid
     '(-p --attach-pid)'{-p+,--attach-pid=}'[attach to the specified process]:pid:_pids'
