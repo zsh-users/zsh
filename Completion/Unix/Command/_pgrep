@@ -40,7 +40,7 @@ arguments=(
   # _signals is OK here — we do it differently below
   '(ss)--signal=[specify signal to send to process]: :_signals -s'
   '-T+[match only on specified routing table]:routing table'
-  '(-t --terminal)'{-t+,--terminal=}'[match only on specified controlling terminals]:terminal device:_sequence _ttys -d'
+  '(-t --terminal)'{-t+,--terminal=}'[match only on specified controlling terminals]: :_sequence _ttys -do'
   '(-U --uid)'{-U+,--uid=}'[match only on specified real user IDs]: :_sequence _users'
   '(-u --euid)'{-u+,--euid=}'[match only on specified effective user IDs]: :_sequence _users'
   '(-v --inverse)'{-v,--inverse}'[negate matching]'

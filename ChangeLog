@@ -3,6 +3,10 @@
 	* 43189: Completion/Unix/Command/_install: similar fix as 43187
 	for option -f (_flags was renamed to _file_flags)
 
+	* 43183: Completion/Unix/Type/_ttys, Completion/Unix/Command/_gdb,
+	Completion/Unix/Command/_pgrep: fix '_ttys -o' on Linux, and use
+	it in _gdb and _pgrep.
+
 2018-07-19  Yasuhiro KIMURA  <yasu@utahime.org>
 
 	* 43187: Completion/Unix/Command/_install: Fix completion error
