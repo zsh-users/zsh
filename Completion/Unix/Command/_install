@@ -11,7 +11,7 @@ common_args=(
   '(-C -c --compare)-c[copy files (default)]'
   '(-d --directory)'{-d,--directory}'[create directories]'
   '(-g --group)'{-g+,--group=}'[specify destination file group]: :_groups'
-  '(-m --mode)'{-m+,--mode=}'[specify destination file mode]: :_modes'
+  '(-m --mode)'{-m+,--mode=}'[specify destination file mode]: :_file_modes'
   '(-o --owner)'{-o+,--owner=}'[specify destination file owner]: :_users'
   '(-p --preserve-timestamps)'{-p,--preserve-timestamps}'[preserve modification times]'
   '(-s --strip)'{-s,--strip}'[strip binaries]'

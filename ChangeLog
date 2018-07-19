@@ -1,3 +1,8 @@
+2018-07-19  Yasuhiro KIMURA  <yasu@utahime.org>
+
+	* 43187: Completion/Unix/Command/_install: Fix completion error
+	about 'm' option of 'install' command
+
 2018-07-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Doron Behar: 43166: Completion/Unix/Type/_pspdf,
