@@ -1,7 +1,7 @@
 #compdef pgrep pkill
 
 # Notes:
-# - We assume that Linux systems use procps-ng — specifically, procps-ng >=3.3.4
+# - We assume that Linux systems use procps-ng - specifically, procps-ng >=3.3.4
 #   (which changed the behaviour of -f and added -a)
 # - We don't really need to keep pgopts and pkopts separate, but it seems like
 #   it should make things a bit easier to follow
@@ -26,7 +26,6 @@ arguments=(
   '(: * -)'{-h,--help}'[display help information]'
   '-I[request confirmation before signalling each process]'
   '-i[ignore case distinctions]'
-  '-J+[match only on specified project IDs]: :->projid'
   '-j+[match only on specified jail IDs]:jail:_sequence _jails -0 -o jid'
   '(-L --logpidfile)'{-L,--logpidfile}'[fail if PID file not locked (with -F)]'
   '(-N)-M+[extract name list from specified core]:core file:_files'
@@ -37,7 +36,7 @@ arguments=(
   '(-l)-q[suppress normal output]'
   '-S[search also in system processes (kernel threads)]'
   '(-s --session)'{-s+,--session=}'[match only on specified process session IDs]: :->sid'
-  # _signals is OK here — we do it differently below
+  # _signals is OK here - we do it differently below
   '(ss)--signal=[specify signal to send to process]: :_signals -s'
   '-T+[match only on specified routing table]:routing table'
   '(-t --terminal)'{-t+,--terminal=}'[match only on specified controlling terminals]: :_sequence _ttys -do'
@@ -87,11 +86,12 @@ case $OSTYPE in
     pkopts=aFfGgIiLlnoPtUuvx
     ;;
   solaris*)
-    pgopts=cdfGgJlnoPsTtUuvxz
-    pkopts=cfGgJnoPsTtUuvxz
+    pgopts=cdfGglnoPsTtUuvxz
+    pkopts=cfGgnoPsTtUuvxz
     arguments=(
       ${arguments:#((#s)|*\))(\*|)-[cT]*}
       '-c+[match only on specified contract IDs]: :->contract'
+      '-J+[match only on specified project IDs]: :->projid'
       '-T+[match only on specified task IDs]: :->task'
     )
     ;;
@@ -130,115 +130,48 @@ arguments+=( $sig_arguments + o '*: :->pname' )
 [[ $OSTYPE == linux* ]] || aopts+=( -A '*-' )
 _arguments -C -s -S $aopts : $arguments && ret=0
 
+# complete comma-separated list of various IDs
+# $1: tag, $2: description, $3: keyword for 'ps -o'
+_pgrep_sequence () {
+    _sequence _wanted $1 expl "$2" \
+	      compadd - ${(un)$(_call_program $1 ps -A -o $3=)}
+}
+
 case $state in
   (sid)
     if [[ $OSTYPE == openbsd* ]]; then
-      break
-    fi
-
-    compset -P '*,'
-
-    local -a used sid
-    used=(${(s:,:)IPREFIX})
-    if [[ $OSTYPE == freebsd* ]]; then
-      sid=(${(uon)$(ps -ax -o sid=)})
+      _message 'session ID'
     else
-      sid=(${(uon)$(ps -A -o sid=)})
+      _pgrep_sequence session-ids 'session ID' sid
     fi
-
-    _wanted sid expl 'session ID' compadd -S ',' -q -F used $sid
     ;;
-
   (ppid)
-    compset -P '*,'
-
-    local -a used ppid
-    used=(${(s:,:)IPREFIX})
-    if [[ $OSTYPE == (freebsd|openbsd|darwin)* ]]; then
-      ppid=(${(uon)$(ps -ax -o ppid=)})
-    else
-      ppid=(${(uon)$(ps -A -o ppid=)})
-    fi
-
-    _wanted ppid expl 'parent process ID' compadd -S ',' -q -F used $ppid
+    _pgrep_sequence ppids 'parent process ID' ppid
     ;;
-
   (pgid)
-    compset -P '*,'
-
-    local -a used pgid
-    used=(${(s:,:)IPREFIX})
-    if [[ $OSTYPE == (freebsd|openbsd|darwin)* ]]; then
-      pgid=(${(uon)$(ps -ax -o pgid=)})
-    else
-      pgid=(${(uon)$(ps -A -o pgid=)})
-    fi
-
-    _wanted pgid expl 'process group ID' compadd -S ',' -q -F used $pgid
+    _pgrep_sequence pgids 'process group ID' pgid
     ;;
-
   (projid)
-    compset -P '*,'
-
-    local -a used projid
-    used=(${(s:,:)IPREFIX})
-    projid=(${(uon)$(ps -A -o project=)})
-
-    _wanted projid expl 'project ID' compadd -S ',' -q -F used $projid
+    _pgrep_sequence project-ids 'project ID' project
     ;;
-
   (contract)
-    compset -P '*,'
-
-    local -a used ctid
-    used=(${(s:,:)IPREFIX})
-    ctid=(${(uon)$(ps -A -o ctid=)})
-
-    _wanted ctid expl 'contract ID' compadd -S ',' -q -F used $ctid
+    _pgrep_sequence contract-ids 'contract ID' ctid
     ;;
-
   (task)
-    compset -P '*,'
-
-    local -a used taskid
-    used=(${(s:,:)IPREFIX})
-    taskid=(${(uon)$(ps -A -o project=)})
-
-    _wanted taskid expl 'task ID' compadd -S ',' -q -F used $taskid
+    _pgrep_sequence task-ids 'task ID' taskid
     ;;
-
   (pname)
     local ispat="pattern matching "
     if (( ${+opt_args[-x]} )); then
       ispat=""
     fi
-
-    local command
     if (( ${+opt_args[-f]} )); then
-      if [[ "$OSTYPE" == freebsd* ]] && (( ${+opt_args[-S]} )); then
-        command="$(ps -axH -o command=)"
-      elif [[ "$OSTYPE" == (freebsd|openbsd|darwin)* ]]; then
-        command="$(ps -ax -o command=)"
-      elif [[ "$OSTYPE" == solaris* ]]; then
-        command="$(ps -A -o args=)"
-      else
-        command="$(ps -A o cmd=)"
-      fi
-      _wanted pname expl $ispat'process command line' compadd ${(u)${(f)${command}}}
+      _wanted process-args expl $ispat'process command line' \
+	compadd ${${(f)"$(_call_program process-args ps -A -o args=)"}% *}
     else
-      if [[ "$OSTYPE" == freebsd* ]] && (( ${+opt_args[-S]} )); then
-        command="$(ps -axcH -o command=)"
-      elif [[ "$OSTYPE" == (freebsd|openbsd|darwin)* ]]; then
-        command="$(ps -axc -o command=)"
-      elif [[ "$OSTYPE" == solaris* ]]; then
-        command="$(ps -A -o comm=)"
-      else
-        command="$(ps -A co cmd=)"
-      fi
-      _wanted pname expl $ispat'process name' compadd ${(u)${(f)${command}}}
+      _wanted processes-names expl $ispat'process name' _process_names -a -t
     fi
     ;;
-
 esac && ret=0
 
 return ret
