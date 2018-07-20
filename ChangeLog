@@ -1,3 +1,8 @@
+2018-07-19  dana  <dana@dana.is>
+
+	* 43186 (tweaked): Completion/Unix/Command/_crontab: Add completion
+	for cronie/dcron/Vixie crontab
+
 2018-07-19  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 43189: Completion/Unix/Command/_install: similar fix as 43187
