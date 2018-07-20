@@ -1,3 +1,7 @@
+2018-07-20  dana  <dana@dana.is>
+
+	* 43196: Completion/Unix/Command/_nginx: Add completion for nginx
+
 2018-07-20  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 43192: Completion/Unix/Command/_pgrep: simplify the completions
