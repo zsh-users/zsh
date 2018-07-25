@@ -1,16 +1,16 @@
-#compdef iptables iptables-save iptables-restore
+#compdef iptables iptables-save iptables-restore ip6tables ip6tables-save ip6tables-restore
 
 local curcontext="$curcontext" state line expl i ret=1
 local -a cmds rcmds ropts rules states prev args
 
 case $service in
-  iptables-save)
+  iptables-save | ip6tables-save)
     _arguments -s \
       {-c,--counters}'[include values of packet and byte counters in output]' \
       {-t,--table}'[specify table]:table:(filter nat mangle)'
     return
   ;;
-  iptables-restore)
+  iptables-restore | ip6tables-restore)
     _arguments -s \
       {-c,--counters}'[restore the values of all packet and byte counters]' \
       {-n,--noflush}"[don't flush the previous contents of the table]"

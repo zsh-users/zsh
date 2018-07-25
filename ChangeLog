@@ -1,3 +1,8 @@
+2018-07-25  dana  <dana@dana.is>
+
+	* Simon Ruderich: 43200: Completion/Linux/Command/_iptables: Add
+	completion for ip6tables*
+
 2018-07-20  dana  <dana@dana.is>
 
 	* 43196: Completion/Unix/Command/_nginx: Add completion for nginx
