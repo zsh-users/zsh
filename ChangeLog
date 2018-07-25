@@ -1,5 +1,7 @@
 2018-07-25  dana  <dana@dana.is>
 
+	* 43203: Completion/Unix/Command/_lua: Add completion for lua
+
 	* Simon Ruderich: 43200: Completion/Linux/Command/_iptables: Add
 	completion for ip6tables*
 
