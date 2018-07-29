@@ -3,6 +3,8 @@
 	* 43185: Completion/Zsh/Type/_command_names: Use [ suffix for
 	associative arrays. Add + to remove-chars from Oliver.
 
+	* 43184: Etc/FAQ.yo: Remove reference to ftp_sites.yo.
+
 2018-07-25  dana  <dana@dana.is>
 
 	* 43203: Completion/Unix/Command/_lua: Add completion for lua

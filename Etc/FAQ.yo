@@ -331,15 +331,11 @@ label(16)
 
   The coordinator of development is currently me; the alias
   email(coordinator@zsh.org) can be used to contact whoever is in the hot
-  seat.  The following are known mirrors (kept frequently up to date); the
-  first is the official archive site, currently in Australia.  All are
-  available by anonymous FTP.  The major sites keep test versions in the
+  seat.  url(https://www.zsh.org/)(https://www.zsh.org/ is the official
+  archive site, currently in Australia.  Test versions are kept in the
   `testing' subdirectory: such up-to-the-minute development versions should
   only be retrieved if you actually plan to help test the latest version of
-  the shell.  The following list also appears on the WWW at
-  url(http://www.zsh.org/)(http://www.zsh.org/) .
-
-includefile(../Doc/Zsh/ftp_sites.yo)
+  the shell.
 
   A Windows port was created by Amol Deshpandem based on 3.0.5 (which
   is now rather old).  This has now been restored and can be found at
