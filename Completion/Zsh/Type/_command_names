@@ -31,7 +31,8 @@ else
     'suffix-aliases:suffix alias:_suffix_alias_files'
     'reserved-words:reserved word:compadd -Qk reswords'
     'jobs:: _jobs -t'
-    'parameters:: _parameters -g "^*readonly*" -qS= -r "\n\t\- =["'
+    'parameters:: _parameters -g "^*(readonly|association)*" -qS= -r "\n\t\- =[+"'
+    'parameters:: _parameters -g "*association*~*readonly*" -qS\[ -r "\n\t\- =[+"'
   )
 fi
 

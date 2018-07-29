@@ -1,3 +1,8 @@
+2018-07-29  Matthew Martin  <phy1729@gmail.com>
+
+	* 43185: Completion/Zsh/Type/_command_names: Use [ suffix for
+	associative arrays. Add + to remove-chars from Oliver.
+
 2018-07-25  dana  <dana@dana.is>
 
 	* 43203: Completion/Unix/Command/_lua: Add completion for lua
