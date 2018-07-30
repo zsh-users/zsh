@@ -804,6 +804,8 @@ raw_getbyte(long do_keytmout, char *cptr)
 		}
 # endif
 	    }
+	    /* If looping, need to recalculate timeout */
+	    calc_timeout(&tmout, do_keytmout);
 	}
 # ifdef HAVE_POLL
 	zfree(fds, sizeof(struct pollfd) * nfds);

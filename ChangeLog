@@ -1,3 +1,8 @@
+2018-07-30  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 43225: Src/Zle/zle_main.c: recalculate timeout after calling
+	handler within ZLE raw read.
+
 2018-07-29  Matthew Martin  <phy1729@gmail.com>
 
 	* 43185: Completion/Zsh/Type/_command_names: Use [ suffix for
