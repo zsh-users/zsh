@@ -459,7 +459,8 @@ parseopts(char *nam, char ***argvp, char *new_opts, char **cmdp,
 		/* -c command */
 		*cmdp = *argv;
 		new_opts[INTERACTIVE] &= 1;
-		scriptname = scriptfilename = ztrdup("zsh");
+		if (toplevel)
+		    scriptname = scriptfilename = ztrdup("zsh");
 	    } else if (**argv == 'o') {
 		if (!*++*argv)
 		    argv++;

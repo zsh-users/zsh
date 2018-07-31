@@ -3169,7 +3169,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		    zip = hmkarray(sval);
 	    }
 	    if (!isarr) {
-		aval = mkarray(val);
+		aval = hmkarray(val);
 		isarr = 1;
 	    }
 	    if (zip) {

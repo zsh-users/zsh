@@ -359,7 +359,7 @@ gdbmsetfn(Param pm, char *val)
     }
 
     if (val) {
-        pm->u.str = ztrdup(val);
+        pm->u.str = val;
         pm->node.flags |= PM_UPTODATE;
     }
 
@@ -731,6 +731,9 @@ static int remove_tied_name( const char *name ) {
         }
         p++;
     }
+
+    if (*p)
+	zsfree(*p);
 
     /* Copy x+1 to x */
     while (*p) {

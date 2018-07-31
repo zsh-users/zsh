@@ -3556,6 +3556,8 @@ freematches(Cmgroup g, int cm)
 	    }
 	    free(g->expls);
 	}
+	if (g->widths)
+	    free(g->widths);
 	zsfree(g->name);
 	free(g);
 

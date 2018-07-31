@@ -535,7 +535,7 @@ lexconstant(void)
 	for (ptr2 = ptr; ptr2 < nptr; ptr2++) {
 	    if (*ptr2 == '_') {
 		int len = nptr - ptr;
-		ptr = ztrdup(ptr);
+		ptr = dupstring(ptr);
 		for (ptr2 = ptr; len; len--) {
 		    if (*ptr2 == '_')
 			chuck(ptr2);

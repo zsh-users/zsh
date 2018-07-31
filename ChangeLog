@@ -1,3 +1,9 @@
+2018-07-31  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 43219 (except term{cap,info}.c): Src/Modules/db_gdbm.c,
+	Src/Modules/pcre.c, Src/Zle/compcore.c, Src/init.c, Src/math.c,
+	Src/subst.c: fix several memory leaks
+
 2018-07-30  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 43225: Src/Zle/zle_main.c: recalculate timeout after calling

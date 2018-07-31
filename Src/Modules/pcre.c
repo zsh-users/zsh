@@ -380,6 +380,7 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
     
     if (ovec)
 	zfree(ovec, ovecsize*sizeof(int));
+    zsfree(plaintext);
 
     return return_value;
 }
