@@ -1,3 +1,9 @@
+2018-07-31  dana  <dana@dana.is>
+
+	* 43207 (tweaked): Completion/Unix/Type/_bind_addresses,
+	Completion/Unix/Command/_php: Add options to control _bind_addresses
+	behaviour, improve PHP completion
+
 2018-07-31  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 43219 (except term{cap,info}.c): Src/Modules/db_gdbm.c,
