@@ -375,6 +375,43 @@ zerrmsg(FILE *file, const char *fmt, va_list ap)
     fflush(file);
 }
 
+/*
+ * Wrapper for setupterm() and del_curterm().
+ * These are called from terminfo.c and termcap.c.
+ */
+static int term_count;	/* reference count of cur_term */
+
+/**/
+mod_export void
+zsetupterm(void)
+{
+#ifdef HAVE_SETUPTERM
+    int errret;
+
+    DPUTS(term_count < 0 || (term_count > 0 && !cur_term),
+	    "inconsistent term_count and/or cur_term");
+    /*
+     * Just because we can't set up the terminal doesn't
+     * mean the modules hasn't booted---TERM may change,
+     * and it should be handled dynamically---so ignore errors here.
+     */
+    if (term_count++ == 0)
+	(void)setupterm((char *)0, 1, &errret);
+#endif
+}
+
+/**/
+mod_export void
+zdeleteterm(void)
+{
+#ifdef HAVE_SETUPTERM
+    DPUTS(term_count < 1 || !cur_term,
+	    "inconsistent term_count and/or cur_term");
+    if (--term_count == 0)
+	del_curterm(cur_term);
+#endif
+}
+
 /* Output a single character, for the termcap routines.     *
  * This is used instead of putchar since it can be a macro. */
 

@@ -345,16 +345,7 @@ int
 boot_(UNUSED(Module m))
 {
 #ifdef HAVE_TGETENT
-# ifdef HAVE_SETUPTERM
-    int errret;
-
-    /*
-     * Just because we can't set up the terminal doesn't
-     * mean the modules hasn't booted---TERM may change,
-     * and it should be handled dynamically---so ignore errors here.
-     */
-    (void)setupterm((char *)0, 1, &errret);
-# endif
+    zsetupterm();
 #endif
     return  0;
 }
@@ -363,6 +354,9 @@ boot_(UNUSED(Module m))
 int
 cleanup_(Module m)
 {
+#ifdef HAVE_TGETENT
+    zdeleteterm();
+#endif
     return setfeatureenables(m, &module_features, NULL);
 }
 

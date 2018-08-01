@@ -1,3 +1,8 @@
+2018-08-01  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 43227: Src/Modules/termcap.c, Src/Modules/terminfo.c,
+	Src/utils.c: fix memory leaks not fixed in 43219
+
 2018-07-31  dana  <dana@dana.is>
 
 	* 43207 (tweaked): Completion/Unix/Type/_bind_addresses,
