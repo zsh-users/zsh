@@ -523,24 +523,28 @@ _hg_cmd_copy() {
 }
 
 _hg_cmd_diff() {
+  local context state state_descr line ret=1
   typeset -A opt_args
+
   _arguments -s : $_hg_global_opts $_hg_pat_opts $_hg_diff_opts \
   '*'{-r+,--rev=}'[revision]:revision:_hg_revrange' \
   '(--show-function -p)'{-p,--show-function}'[show which function each change is in]' \
   '(--ignore-all-space -w)'{-w,--ignore-all-space}'[ignore white space when comparing lines]' \
   '(--ignore-space-change -b)'{-b,--ignore-space-change}'[ignore changes in the amount of white space]' \
   '(--ignore-blank-lines -B)'{-B,--ignore-blank-lines}'[ignore changes whose lines are all blank]' \
-  '*:file:->diff_files'
+  '*:file:->diff_files' && ret=0
 
   if [[ $state == 'diff_files' ]]
   then
     if [[ -n $opt_args[-r] ]]
     then
-      _hg_files
+      _hg_files && ret=0
     else
-      _hg_modified
+      _hg_modified && ret=0
     fi
   fi
+
+  return ret
 }
 
 _hg_cmd_export() {
@@ -698,43 +702,47 @@ _hg_cmd_rename() {
 }
 
 _hg_cmd_resolve() {
-  local context state line
+  local context state state_descr line ret=1
   typeset -A opt_args
 
   _arguments -s : $_hg_global_opts \
   '(--list -l --mark -m --unmark -u)'{-l,--list}'[list state of files needing merge]:*:merged files:->resolve_files' \
   '(--mark -m --list -l --unmark -u)'{-m,--mark}'[mark files as resolved]:*:unresolved files:_hg_unresolved' \
   '(--unmark -u --list -l --mark -m)'{-u,--unmark}'[unmark files as resolved]:*:resolved files:_hg_resolved' \
-  '*:file:_hg_unresolved'
+  '*:file:_hg_unresolved' && ret=0
 
   if [[ $state == 'resolve_files' ]]
   then
     _alternative 'files:resolved files:_hg_resolved' \
-      'files:unresolved files:_hg_unresolved'
+      'files:unresolved files:_hg_unresolved' && ret=0
   fi
+
+  return ret
 }
 
 _hg_cmd_revert() {
-  local context state line
+  local context state state_descr line ret=1
   typeset -A opt_args
 
   _arguments -s : $_hg_global_opts $_hg_pat_opts $_hg_dryrun_opts \
   '(--all -a :)'{-a,--all}'[revert all changes when no arguments given]' \
   '(--rev -r)'{-r+,--rev=}'[revision to revert to]:revision:_hg_tags' \
   '--no-backup[do not save backup copies of files]' \
-  '*:file:->diff_files'
+  '*:file:->diff_files' && ret=0
 
   if [[ $state == 'diff_files' ]]
   then
     if [[ -n $opt_args[-r] ]]
     then
-      _hg_files
+      _hg_files && ret=0
     else
       typeset -a status_files
       _hg_status mard
-      _wanted files expl 'modified, added, removed or deleted file' _multi_parts / status_files
+      _wanted files expl 'modified, added, removed or deleted file' _multi_parts / status_files && ret=0
     fi
   fi
+
+  return ret
 }
 
 _hg_cmd_serve() {

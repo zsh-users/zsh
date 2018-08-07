@@ -1,5 +1,8 @@
 2018-08-07  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Anton Shestakov: 43251: Completion/Unix/Command/_hg: fix
+	return value of some hg completion functions.
+
 	* Anton Shestakov: 43253: Completion/Unix/Command/_hg: hg
 	--style is deprecated, use --template.
 
