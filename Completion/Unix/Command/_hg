@@ -554,6 +554,11 @@ _hg_cmd_export() {
   '*:revision:_hg_tags'
 }
 
+_hg_cmd_forget() {
+  _arguments -s : $_hg_global_opts $_hg_pat_opts \
+  '*:file:_hg_files'
+}
+
 _hg_cmd_grep() {
   _arguments -s : $_hg_global_opts $_hg_pat_opts \
   '(--print0 -0)'{-0,--print0}'[end filenames with NUL]' \
@@ -668,6 +673,16 @@ _hg_cmd_paths() {
   ':path:_hg_paths'
 }
 
+_hg_cmd_phase() {
+  _arguments -s : $_hg_global_opts \
+  '(--public -p --draft -d --secret -s)'{-p,--public}'[set changeset phase to public]' \
+  '(--public -p --draft -d --secret -s)'{-d,--draft}'[set changeset phase to draft]' \
+  '(--public -p --draft -d --secret -s)'{-s,--secret}'[set changeset phase to secret]' \
+  '(--force -f)'{-f,--force}'[allow to move boundary backward]' \
+  '*'{-r+,--rev=}'[target revision]:revision:_hg_tags' \
+  '*:revision:_hg_tags'
+}
+
 _hg_cmd_pull() {
   _arguments -s : $_hg_global_opts $_hg_remote_opts \
   '(--force -f)'{-f,--force}'[run even when the remote repository is unrelated]' \
@@ -780,6 +795,11 @@ _hg_cmd_status() {
   '(--print0 -0)'{-0,--print0}'[end filenames with NUL, for use with xargs]' \
   '--rev[show difference from revision]:revision:_hg_tags' \
   '*:files:_files'
+}
+
+_hg_cmd_summary() {
+  _arguments -s : $_hg_global_opts \
+  '--remote[check for push and pull]'
 }
 
 _hg_cmd_tag() {
