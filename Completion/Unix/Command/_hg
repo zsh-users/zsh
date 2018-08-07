@@ -389,9 +389,9 @@ _hg_diff_opts=(
 _hg_dryrun_opts=(
   '(--dry-run -n)'{-n,--dry-run}'[do not perform actions, just print output]')
 
-_hg_style_opts=(
-  '--style[display using template map file]:'
-  '--template[display with template]:')
+_hg_template_opts=(
+  '--template[display with template]:template'
+)
 
 _hg_commit_opts=(
   '(-m --message -l --logfile --edit -e)'{-e,--edit}'[edit commit message]'
@@ -565,7 +565,7 @@ _hg_cmd_grep() {
 }
 
 _hg_cmd_heads() {
-  _arguments -s : $_hg_global_opts $_hg_style_opts \
+  _arguments -s : $_hg_global_opts $_hg_template_opts \
   '(--rev -r)'{-r+,--rev=}'[show only heads which are descendants of rev]:revision:_hg_tags'
 }
 
@@ -592,7 +592,7 @@ _hg_cmd_import() {
 }
 
 _hg_cmd_incoming() {
-  _arguments -s : $_hg_global_opts $_hg_remote_opts $_hg_style_opts \
+  _arguments -s : $_hg_global_opts $_hg_remote_opts $_hg_template_opts \
   '(--no-merges -M)'{-M,--no-merges}'[do not show merge revisions]' \
   '(--force -f)'{-f,--force}'[run even when the remote repository is unrelated]' \
   '(--patch -p)'{-p,--patch}'[show patch]' \
@@ -616,7 +616,7 @@ _hg_cmd_locate() {
 }
 
 _hg_cmd_log() {
-  _arguments -s : $_hg_global_opts $_hg_pat_opts $_hg_style_opts \
+  _arguments -s : $_hg_global_opts $_hg_pat_opts $_hg_template_opts \
   '(--follow --follow-first -f)'{-f,--follow}'[follow changeset or history]' \
   '(-f --follow)--follow-first[only follow the first parent of merge changesets]' \
   '(--copies -C)'{-C,--copies}'[show copied files]' \
@@ -644,7 +644,7 @@ _hg_cmd_merge() {
 }
 
 _hg_cmd_outgoing() {
-  _arguments -s : $_hg_global_opts $_hg_remote_opts $_hg_style_opts \
+  _arguments -s : $_hg_global_opts $_hg_remote_opts $_hg_template_opts \
   '(--no-merges -M)'{-M,--no-merges}'[do not show merge revisions]' \
   '(--force -f)'{-f,--force}'[run even when the remote repository is unrelated]' \
   '(--patch -p)'{-p,--patch}'[show patch]' \
@@ -654,7 +654,7 @@ _hg_cmd_outgoing() {
 }
 
 _hg_cmd_parents() {
-  _arguments -s : $_hg_global_opts $_hg_style_opts \
+  _arguments -s : $_hg_global_opts $_hg_template_opts \
   '(--rev -r)'{-r+,--rev=}'[show parents of the specified rev]:revision:_hg_tags' \
   ':last modified file:_hg_files'
 }
@@ -785,7 +785,7 @@ _hg_cmd_tag() {
 }
 
 _hg_cmd_tip() {
-  _arguments -s : $_hg_global_opts $_hg_style_opts \
+  _arguments -s : $_hg_global_opts $_hg_template_opts \
   '(--patch -p)'{-p,--patch}'[show patch]'
 }
 
