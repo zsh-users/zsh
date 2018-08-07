@@ -1,5 +1,8 @@
 2018-08-07  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Anton Shestakov: 43252: Completion/Unix/Command/_hg: fix up
+	various hg options for completion.
+
 	* Anton Shestakov: 43250: Completion/Unix/Command/_hg: Add hg
 	forget, phase, summary completions.
 
