@@ -1,3 +1,8 @@
+2018-08-08  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 43261: Src/math.c, Test/C01arith.ztst: Apply unary minus to
+	entire lexical constant, so base doesn't get treated as negative.
+
 2018-08-07  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Anton Shestakov: 43254: Completion/Unix/Command/_hg: Remove hg

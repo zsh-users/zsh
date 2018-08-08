@@ -640,8 +640,19 @@ zzlex(void)
 	    }
 	    if (unary) {
 		if (idigit(*ptr) || *ptr == '.') {
-		    ptr--;
-		    return lexconstant();
+		    int ctype = lexconstant();
+		    if (ctype == NUM)
+		    {
+			if (yyval.type == MN_FLOAT)
+			{
+			    yyval.u.d = -yyval.u.d;
+			}
+			else
+			{
+			    yyval.u.l = -yyval.u.l;
+			}
+		    }
+		    return ctype;
 		} else
 		    return UMINUS;
 	    } else

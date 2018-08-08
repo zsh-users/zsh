@@ -467,3 +467,7 @@
 >6
 >4
 ?(eval):6: bad math expression: lvalue required
+
+  print $(( -2#101-16#f ))
+0: Unary minus doesn't apply to base but to number as a whole.
+>-20
