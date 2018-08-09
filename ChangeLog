@@ -1,3 +1,8 @@
+2018-08-09  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 43264: Src/params.c, Test/D04parameter.ztst:
+	${+assoc[nonexistent]} returned 1 with KSH_ARRAYS.
+
 2018-08-08  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 43261: Src/math.c, Test/C01arith.ztst: Apply unary minus to

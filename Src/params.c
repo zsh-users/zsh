@@ -1427,7 +1427,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 	    HashTable ht = v->pm->gsu.h->getfn(v->pm);
 	    if (!ht) {
 		if (flags & SCANPM_CHECKING)
-		    return isset(KSHARRAYS) ? 1 : 0;
+		    return 0;
 		ht = newparamtable(17, v->pm->node.nam);
 		v->pm->gsu.h->setfn(v->pm, ht);
 	    }

@@ -2422,3 +2422,11 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 >: #
 >: ` backtick
 >: word
+
+  (
+    setopt KSH_ARRAYS
+    typeset -A ksh_assoc
+    print ${+assoc[unset]}
+  )
+0:Use of parameter subst + to test element of hash with KSH_ARRAYS.
+>0
