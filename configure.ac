@@ -1266,6 +1266,7 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       isblank iswblank \
 	       uname \
 	       signgam tgamma \
+	       log2 \
 	       scalbn \
 	       putenv getenv setenv unsetenv xw\
 	       brk sbrk \

@@ -1,3 +1,8 @@
+2018-08-13  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* dana: 43275: Doc/Zsh/mod_mathfunc.yo, Src/Modules/mathfunc.c,
+	Test/V03mathfunc.ztst, configure.ac: Add log2 to mathfunc.
+
 2018-08-12  Marc Cornellà  <marc.cornella@live.com>
 
 	* unposted (PR #26): Completion/Unix/Command/_git: __git_files:

@@ -65,6 +65,7 @@ MF_LGAMMA,
 MF_LOG,
 MF_LOG10,
 MF_LOG1P,
+MF_LOG2,
 MF_LOGB,
 MF_NEXTAFTER,
 MF_RINT,
@@ -142,6 +143,7 @@ static struct mathfunc mftab[] = {
   NUMMATHFUNC("log", math_func, 1, 1, MF_LOG),
   NUMMATHFUNC("log10", math_func, 1, 1, MF_LOG10),
   NUMMATHFUNC("log1p", math_func, 1, 1, MF_LOG1P),
+  NUMMATHFUNC("log2", math_func, 1, 1, MF_LOG2),
   NUMMATHFUNC("logb", math_func, 1, 1, MF_LOGB),
   NUMMATHFUNC("nextafter", math_func, 2, 2, MF_NEXTAFTER),
 #ifdef HAVE_ERAND48
@@ -336,6 +338,14 @@ math_func(UNUSED(char *name), int argc, mnumber *argv, int id)
 
   case MF_LOG1P:
       retd = log1p(argd);
+      break;
+
+  case MF_LOG2:
+#ifdef HAVE_LOG2
+      retd = log2(argd);
+#else
+      retd = log(argd) / log(2);
+#endif
       break;
 
   case MF_LOGB:

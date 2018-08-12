@@ -139,3 +139,9 @@ F:This test fails if your math library doesn't have erand48().
   print $g, $l
 0:Test Gamma function gamma and lgamma
 >1.00000, 0.00000
+
+  float -F 5 a b c
+  (( a = log2(0.5), b = log2(1.5), c = log2(99) ))
+  print -r - "$a, $b, $c"
+0:log2
+>-1.00000, 0.58496, 6.62936
