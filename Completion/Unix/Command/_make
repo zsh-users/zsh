@@ -177,7 +177,7 @@ _make() {
       '(- *)'{-h,--help}'[print help message and exit]'
       '(-i --ignore-errors)'{-i,--ignore-errors}'[ignore errors from recipes]'
       '*'{-I,--include-dir=}'[search DIRECTORY for included makefiles]:search path for included makefile:->dir'
-      '(-j --jobs)'{-j,--jobs=}'[allow N jobs at once; infinite jobs with no arg]:number of jobs'
+      '(-j --jobs)'{-j+,--jobs=}'[allow N jobs at once; infinite jobs with no arg]:number of jobs'
       '(-k --keep-going)'{-k,--keep-going}"[keep going when some targets can't be made]"
       '(-l --load-average --max-load)'{-l,--load-average=,--max-load}"[don't start multiple jobs unless load is below N]:load"
       '(-L --check-symlink-times)'{-L,--check-symlink-times}'[use the latest mtime between symlinks and target]'
