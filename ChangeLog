@@ -1,5 +1,8 @@
 2018-08-23  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* github #27: Klas Mellbourn: Completion/X/Command/_code:
+	add --folder-uri to completion for Visual Studio Code
+
 	* 43301 (based on work by Julien Nicoulaud):
 	Completion/Debian/Command/_debuild, Completion/Unix/Command/_ack,
 	Completion/Unix/Command/_scons, Completion/Unix/Command/_vpnc,
