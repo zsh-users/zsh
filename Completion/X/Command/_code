@@ -24,6 +24,7 @@ arguments=(
   '(-s --status)'{-s,--status}'[print process usage and diagnostics information]'
   '(-p --performance)'{-p,--performance}'[start with the "Developer: Startup Performance" command enabled]'
   '--prof-startup[run CPU profiler during startup]'
+  '--disable-extension[disable specified installed extension]'
   '--disable-extensions[disable all installed extensions]'
   '--inspect-extensions[allow debugging and profiling of extensions]'
   '--inspect-brk-extensions[allow debugging and profiling of extensions with the extension host being paused after start]'
