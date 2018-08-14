@@ -30,6 +30,7 @@ arguments=(
   '--disable-gpu[disable GPU hardware acceleration]'
   '--upload-logs[uploads logs from current session to a secure endpoint]:confirm:(iConfirmLogsUpload)'
   '--max-memory=[specify max memory size for a window]:size (Mbytes)'
+  '--folder-uri[open an URI as a folder, if there is an extension contributing a FileSystemProvider for that URI]'
   '*:filename:_files'
 )
 
