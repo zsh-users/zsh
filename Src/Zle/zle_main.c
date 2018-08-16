@@ -58,6 +58,11 @@ mod_export int incompctlfunc;
 /**/
 mod_export int hascompmod;
 
+/* Increment for each nested recursive-edit */
+
+/**/
+mod_export int zle_recursive;
+
 /* ZLRF_* flags passed to zleread() */
 
 /**/
@@ -1941,6 +1946,8 @@ recursiveedit(UNUSED(char **args))
     int locerror;
     int q = queue_signal_level();
 
+    ++zle_recursive;
+
     /* zlecore() expects to be entered with signal queue disabled */
     dont_queue_signals();
 
@@ -1949,6 +1956,8 @@ recursiveedit(UNUSED(char **args))
     zlecore();
 
     restore_queue_signals(q);
+
+    --zle_recursive;
 
     locerror = errflag ? 1 : 0;
     errflag = done = eofsent = 0;

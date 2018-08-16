@@ -1085,6 +1085,13 @@ wrappers of tt(bracketed-paste).  See also tt(zle -f).
 
 tt(YANK_ACTIVE) is read-only.
 )
+vindex(ZLE_RECURSIVE)
+item(tt(ZLE_RECURSIVE) (integer))(
+Usually zero, but incremented inside any instance of
+tt(recursive-edit).  Hence indicates the current recursion level.
+
+tt(ZLE_RECURSIVE) is read-only.
+)
 vindex(ZLE_STATE)
 item(tt(ZLE_STATE) (scalar))(
 Contains a set of space-separated words that describe the current tt(zle)

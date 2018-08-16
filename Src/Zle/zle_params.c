@@ -93,6 +93,8 @@ static const struct gsu_integer numeric_gsu =
 { get_numeric, set_numeric, unset_numeric };
 static const struct gsu_integer pending_gsu =
 { get_pending, NULL, zleunsetfn };
+static const struct gsu_integer recursive_gsu =
+{ get_recursive, NULL, zleunsetfn };
 static const struct gsu_integer region_active_gsu =
 { get_region_active, set_region_active, zleunsetfn };
 static const struct gsu_integer undo_change_no_gsu =
@@ -180,6 +182,7 @@ static struct zleparam {
     { "SUFFIX_START", PM_INTEGER, GSU(suffixstart_gsu), NULL },
     { "SUFFIX_END", PM_INTEGER, GSU(suffixend_gsu), NULL },
     { "SUFFIX_ACTIVE", PM_INTEGER | PM_READONLY, GSU(suffixactive_gsu), NULL },
+    { "ZLE_RECURSIVE", PM_INTEGER | PM_READONLY, GSU(recursive_gsu), NULL },
     { "ZLE_STATE", PM_SCALAR | PM_READONLY, GSU(zle_state_gsu), NULL },
     { NULL, 0, NULL, NULL }
 };
@@ -524,6 +527,13 @@ static zlong
 get_pending(UNUSED(Param pm))
 {
     return noquery(0);
+}
+
+/**/
+static zlong
+get_recursive(UNUSED(Param pm))
+{
+    return zle_recursive;
 }
 
 /**/
