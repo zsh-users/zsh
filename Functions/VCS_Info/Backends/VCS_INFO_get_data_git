@@ -104,16 +104,11 @@ VCS_INFO_git_getbranch () {
     elif [[ -d "${gitdir}/.dotest-merge" ]] ; then
         gitbranch="$(< ${gitdir}/.dotest-merge/head-name)"
 
+    elif gitbranch="$(${(z)gitsymref} 2> /dev/null)" ; then
+    elif gitbranch="refs/tags/$(${vcs_comm[cmd]} describe --all --exact-match HEAD 2>/dev/null)" ; then
+    elif gitbranch="${${"$(< $gitdir/HEAD)"}[1,7]}..." ; then
     else
-        gitbranch="$(${(z)gitsymref} 2> /dev/null)"
-
-        if [[ $? -ne 0 ]] ; then
-            gitbranch="refs/tags/$(${vcs_comm[cmd]} describe --all --exact-match HEAD 2>/dev/null)"
-
-            if [[ $? -ne 0 ]] ; then
-                gitbranch="${${"$(< $gitdir/HEAD)"}[1,7]}..."
-            fi
-        fi
+        # Can't happen
     fi
 
     return 0
