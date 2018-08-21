@@ -1,3 +1,8 @@
+2018-08-21  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted: Doc/Zsh/compsys.yo: docs: Fix duplicated words
+	in _combination.
+
 2018-08-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 43294: Doc/Zsh/zle.yo, Src/Zle/zle_main.c,

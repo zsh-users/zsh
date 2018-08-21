@@ -4279,8 +4279,8 @@ var(field)s for which the value is known).
 
 The matches generated will be taken from the value of the style.  These
 should contain the possible values for the combinations in the appropriate
-order (users, hosts, ports in the example above).  The different fields
-the values for the different fields are separated by colons.  This
+order (users, hosts, ports in the example above).
+The values for the different fields are separated by colons.  This
 can be altered with the option tt(-s) to tt(_combination) which specifies a
 pattern.  Typically this is a character class, as for example
 `tt(-s "[:@]")' in the case of the tt(users-hosts) style.    Each
