@@ -1,5 +1,8 @@
 2018-08-23  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 43325: Anton Shestakov: Completion/Unix/Command/_hg:
+	suggest merge tools for -t/--tool
+
 	* 43326: Anton Shestakov: Completion/Unix/Command/_hg:
 	add completion of -S/--subrepos to many commands
 

@@ -282,6 +282,18 @@ _hg_config() {
     (( $#items )) && _describe -t config 'config item' items
 }
 
+_hg_internal_merge_tools=(
+  \\:dump \\:fail \\:local \\:merge \\:merge-local \\:merge-other \\:merge3
+  \\:other \\:prompt \\:tagmerge \\:union
+)
+
+_hg_merge_tools() {
+  typeset -a external_tools
+  _describe -t internal_tools 'internal merge tools' _hg_internal_merge_tools
+  external_tools=(${(f)"$(_hg_cmd showconfig merge-tools | cut -d . -f 2)"})
+  (( $#external_tools )) && _describe -t external_tools 'external merge tools' external_tools
+}
+
 _hg_addremove() {
   _alternative 'files:unknown files:_hg_unknown' \
     'files:missing files:_hg_missing'
@@ -387,6 +399,10 @@ _hg_diff_opts=(
   '--nodates[omit dates from diff headers]'
 )
 
+_hg_mergetool_opts=(
+  '(--tool -t)'{-t+,--tool=}'[specify merge tool]:merge tool:_hg_merge_tools'
+)
+
 _hg_dryrun_opts=(
   '(--dry-run -n)'{-n,--dry-run}'[do not perform actions, just print output]')
 
@@ -449,7 +465,7 @@ _hg_cmd_archive() {
 }
 
 _hg_cmd_backout() {
-  _arguments -s -S : $_hg_global_opts $_hg_pat_opts \
+  _arguments -s -S : $_hg_global_opts $_hg_mergetool_opts $_hg_pat_opts \
     '--merge[merge with old dirstate parent after backout]' \
     '(--date -d)'{-d+,--date=}'[record the specified date as commit date]:date' \
     '--parent[parent to choose when backing out merge]' \
@@ -679,7 +695,7 @@ _hg_cmd_manifest() {
 }
 
 _hg_cmd_merge() {
-  _arguments -s -S : $_hg_global_opts \
+  _arguments -s -S : $_hg_global_opts $_hg_mergetool_opts \
   '(--force -f)'{-f,--force}'[force a merge with outstanding changes]' \
   '(--rev -r 1)'{-r+,--rev=}'[revision to merge]:revision:_hg_mergerevs' \
   '(--preview -P)'{-P,--preview}'[review revisions to merge (no merge is performed)]' \
@@ -753,7 +769,7 @@ _hg_cmd_resolve() {
   local context state state_descr line ret=1
   typeset -A opt_args
 
-  _arguments -s -S : $_hg_global_opts \
+  _arguments -s -S : $_hg_global_opts $_hg_mergetool_opts \
   '(--all -a)'{-a,--all}'[select all unresolved files]' \
   '(--no-status -n)'{-n,--no-status}'[hide status prefix]' \
   '(--list -l --mark -m --unmark -u)'{-l,--list}'[list state of files needing merge]:*:merged files:->resolve_files' \
@@ -871,7 +887,7 @@ _hg_cmd_unbundle() {
 }
 
 _hg_cmd_update() {
-  _arguments -s -S : $_hg_global_opts \
+  _arguments -s -S : $_hg_global_opts $_hg_mergetool_opts \
   '(--clean -C)'{-C,--clean}'[discard uncommitted changes (no backup)]' \
   '(--check -c)'{-c,--check}'[require clean working directory]' \
   '(--date -d)'{-d+,--date=}'[tipmost revision matching date]:date' \
