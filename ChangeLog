@@ -1,3 +1,10 @@
+2018-08-23  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 43301 (based on work by Julien Nicoulaud):
+	Completion/Debian/Command/_debuild, Completion/Unix/Command/_ack,
+	Completion/Unix/Command/_scons, Completion/Unix/Command/_vpnc,
+	Completion/X/Command/_geany: functions from zsh-completions project
+
 2018-08-21  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Doc/Zsh/compsys.yo: docs: Fix duplicated words
