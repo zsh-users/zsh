@@ -1,5 +1,8 @@
 2018-08-23  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 43326: Anton Shestakov: Completion/Unix/Command/_hg:
+	add completion of -S/--subrepos to many commands
+
 	* github #27: Klas Mellbourn: Completion/X/Command/_code:
 	add --folder-uri to completion for Visual Studio Code
 

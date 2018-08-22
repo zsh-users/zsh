@@ -405,18 +405,22 @@ _hg_remote_opts=(
   '--insecure[do not verify server certificate (ignoring web.cacerts config)]'
 )
 
+_hg_subrepos_opts=(
+  '(--subrepos -S)'{-S,--subrepos}'[recurse into subrepositories]'
+)
+
 _hg_cmd() {
   _call_program hg hg --config ui.verbose=0 --config defaults."$1"= \
     "$_hg_cmd_globals[@]" "$@" 2> /dev/null
 }
 
 _hg_cmd_add() {
-  _arguments -s -S : $_hg_global_opts $_hg_pat_opts $_hg_dryrun_opts \
+  _arguments -s -S : $_hg_global_opts $_hg_pat_opts $_hg_dryrun_opts $_hg_subrepos_opts \
   '*:unknown files:_hg_unknown'
 }
 
 _hg_cmd_addremove() {
-  _arguments -s -S : $_hg_global_opts $_hg_pat_opts $_hg_dryrun_opts \
+  _arguments -s -S : $_hg_global_opts $_hg_pat_opts $_hg_dryrun_opts $_hg_subrepos_opts \
   '(--similarity -s)'{-s+,--similarity=}'[guess renamed files by similarity (0<=s<=100)]:similarity' \
   '*:unknown or missing files:_hg_addremove'
 }
@@ -436,7 +440,7 @@ _hg_cmd_annotate() {
 }
 
 _hg_cmd_archive() {
-  _arguments -s -S : $_hg_global_opts $_hg_pat_opts \
+  _arguments -s -S : $_hg_global_opts $_hg_pat_opts $_hg_subrepos_opts \
   '--no-decode[do not pass files through decoders]' \
   '(--prefix -p)'{-p+,--prefix=}'[directory prefix for files in archive]:prefix' \
   '(--rev -r)'{-r+,--rev=}'[revision to distribute]:revision:_hg_tags' \
@@ -517,7 +521,7 @@ _hg_cmd_clone() {
 }
 
 _hg_cmd_commit() {
-  _arguments -s -S : $_hg_global_opts $_hg_pat_opts \
+  _arguments -s -S : $_hg_global_opts $_hg_pat_opts $_hg_subrepos_opts \
   '(--addremove -A)'{-A,--addremove}'[mark new/missing files as added/removed before committing]' \
   '(--message -m)'{-m+,--message=}'[specify commit message]:text' \
   '(--logfile -l)'{-l+,--logfile=}'[read commit message from specified file]:log file:_files' \
@@ -541,7 +545,7 @@ _hg_cmd_diff() {
   local context state state_descr line ret=1
   typeset -A opt_args
 
-  _arguments -s -S : $_hg_global_opts $_hg_pat_opts $_hg_diff_opts \
+  _arguments -s -S : $_hg_global_opts $_hg_pat_opts $_hg_diff_opts $_hg_subrepos_opts \
   '*'{-r+,--rev=}'[revision]:revision:_hg_revrange' \
   '(--show-function -p)'{-p,--show-function}'[show which function each change is in]' \
   '(--ignore-all-space -w)'{-w,--ignore-all-space}'[ignore white space when comparing lines]' \
@@ -630,7 +634,7 @@ _hg_cmd_import() {
 }
 
 _hg_cmd_incoming() {
-  _arguments -s -S : $_hg_global_opts $_hg_remote_opts $_hg_template_opts \
+  _arguments -s -S : $_hg_global_opts $_hg_remote_opts $_hg_template_opts $_hg_subrepos_opts \
   '(--no-merges -M)'{-M,--no-merges}'[do not show merge revisions]' \
   '(--force -f)'{-f,--force}'[run even when the remote repository is unrelated]' \
   '(--patch -p)'{-p,--patch}'[show patch]' \
@@ -683,7 +687,7 @@ _hg_cmd_merge() {
 }
 
 _hg_cmd_outgoing() {
-  _arguments -s -S : $_hg_global_opts $_hg_remote_opts $_hg_template_opts \
+  _arguments -s -S : $_hg_global_opts $_hg_remote_opts $_hg_template_opts $_hg_subrepos_opts \
   '(--no-merges -M)'{-M,--no-merges}'[do not show merge revisions]' \
   '(--force -f)'{-f,--force}'[run even when the remote repository is unrelated]' \
   '(--patch -p)'{-p,--patch}'[show patch]' \
@@ -732,7 +736,7 @@ _hg_cmd_push() {
 }
 
 _hg_cmd_remove() {
-  _arguments -s -S : $_hg_global_opts $_hg_pat_opts \
+  _arguments -s -S : $_hg_global_opts $_hg_pat_opts $_hg_subrepos_opts \
   '(--after -A)'{-A,--after}'[record delete for missing files]' \
   '(--force -f)'{-f,--force}'[forget added files, delete modified files]' \
   '*:file:_hg_files'
@@ -793,7 +797,7 @@ _hg_cmd_revert() {
 }
 
 _hg_cmd_serve() {
-  _arguments -s -S : $_hg_global_opts \
+  _arguments -s -S : $_hg_global_opts $_hg_subrepos_opts \
   '(--accesslog -A)'{-A+,--accesslog=}'[name of access log file to write to]:log file:_files' \
   '(--errorlog -E)'{-E+,--errorlog=}'[name of error log file to write to]:log file:_files' \
   '(--daemon -d)'{-d,--daemon}'[run server in background]' \
@@ -821,7 +825,7 @@ _hg_cmd_showconfig() {
 }
 
 _hg_cmd_status() {
-  _arguments -s -S : $_hg_global_opts $_hg_pat_opts \
+  _arguments -s -S : $_hg_global_opts $_hg_pat_opts $_hg_subrepos_opts \
   '(--all -A)'{-A,--all}'[show status of all files]' \
   '(--modified -m)'{-m,--modified}'[show only modified files]' \
   '(--added -a)'{-a,--added}'[show only added files]' \
