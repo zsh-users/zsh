@@ -85,7 +85,7 @@ _man() {
     )
     [[ $variant == linux* ]] && args+=(
       '(: -)'{-\?,--help}'[display help information]'
-      '(-7 -t -H -T -Z --ascii --html --troff --troff-device --ditroff)'{-7,--asci}'[translate man pages for 7-bit terminal]'
+      '(-7 -t -H -T -Z --ascii --html --troff --troff-device --ditroff)'{-7,--ascii}'[translate man pages for 7-bit terminal]'
       '(-D --default)'{-D,--default}'[reset man to default options]'
       # @todo Could enumerate these
       '(-E --encoding)'{-E+,--encoding=}'[specify output encoding]:encoding'

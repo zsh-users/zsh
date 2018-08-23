@@ -1,3 +1,7 @@
+2018-08-23  dana  <dana@dana.is>
+
+	* unposted: Completion/Unix/Command/_man: Fix --ascii typo
+
 2018-08-23  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 43325: Anton Shestakov: Completion/Unix/Command/_hg:
