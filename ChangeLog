@@ -1,3 +1,7 @@
+2018-08-24  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 43328: Completion/X/Command/_zeal: new completion
+
 2018-08-23  dana  <dana@dana.is>
 
 	* unposted: Completion/Unix/Command/_man: Fix --ascii typo
