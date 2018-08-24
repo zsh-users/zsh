@@ -1,6 +1,8 @@
 2018-08-24  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
-	* x: Completion/Unix/Command/_diff3: new diff3 completion
+	* 43330: Completion/BSD/Command/_cu: complete more options
+
+	* 43329: Completion/Unix/Command/_diff3: new diff3 completion
 
 	* 43328: Completion/X/Command/_zeal: new completion
 
