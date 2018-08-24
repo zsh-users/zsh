@@ -1,3 +1,8 @@
+2018-08-25  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 43331: Completion/Unix/Command/_diff3: Enhance positional
+	argument descriptions (thanks, Oliver).
+
 2018-08-24  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 43313 (log message tweaked):

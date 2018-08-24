@@ -39,8 +39,8 @@ else
 fi
 
 _arguments -s -S $args \
-  '1:updated file:_files' \
-  '2:original file:_files' \
-  '3:updated file:_files' \
+  '1: : _wanted files expl "first updated file (${${(As.:.)opt_args[-L]}[1]:-mine})" _files' \
+  '2: : _wanted files expl "original file (${${(As.:.)opt_args[-L]}[2]:-old})" _files' \
+  '3: : _wanted files expl "second updated file (${${(As.:.)opt_args[-L]}[3]:-their})" _files' \
   + '(ed)' $ed
 
