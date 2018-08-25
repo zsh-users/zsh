@@ -4,7 +4,7 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
-Changes from 5.5.1 to 5.5.1-test-1
+Changes from 5.5.1 to 5.5.1-test-2
 ----------------------------------
 
 In shell patterns, [[:blank:]] now honours the locale instead of
