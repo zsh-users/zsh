@@ -1,5 +1,8 @@
 2018-08-25  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Config/version.mk, NEWS, README: Test release:
+	5.5.1-test-1.
+
 	* 43331: Completion/Unix/Command/_diff3: Enhance positional
 	argument descriptions (thanks, Oliver).
 
