@@ -331,7 +331,7 @@ label(16)
 
   The coordinator of development is currently me; the alias
   email(coordinator@zsh.org) can be used to contact whoever is in the hot
-  seat.  url(https://www.zsh.org/)(https://www.zsh.org/ is the official
+  seat.  url(https://www.zsh.org/)(https://www.zsh.org/) is the official
   archive site, currently in Australia.  Test versions are kept in the
   `testing' subdirectory: such up-to-the-minute development versions should
   only be retrieved if you actually plan to help test the latest version of
