@@ -40,13 +40,13 @@ INSTALL         = @INSTALL@
 
 # ========== DEPENDENCIES FOR BUILDING ==========
 
-all: FAQ
+all: FAQ FAQ.html
 
-FAQ: FAQ.yo
-	cd $(sdir) && $(YODL2TXT) FAQ.yo && mv -f FAQ.txt FAQ
+FAQ: $(sdir)/FAQ.yo
+	$(YODL2TXT) -o FAQ.txt $< && mv FAQ.txt $@
 
-FAQ.html: FAQ.yo
-	$(YODL2HTML) $(sdir)/FAQ.yo
+FAQ.html: $(sdir)/FAQ.yo
+	$(YODL2HTML) -o $@ $<
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 
