@@ -1,5 +1,8 @@
 2018-08-28  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* unposted: Completion/Linux/Command/_dkms: correct
+	completion argument order
+
 	* unposted: Completion/Unix/Command/_strings: completion for
 	argument to -s was missing
 
