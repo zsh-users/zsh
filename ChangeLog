@@ -1,5 +1,8 @@
 2018-08-28  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* unposted: Completion/Unix/Command/_strings: completion for
+	argument to -s was missing
+
 	* unposted: Completion/Unix/Command/_tar: complete also for bsdtar
 
 	* unposted: Completion/Solaris/Command/_svccfg: fix typo in

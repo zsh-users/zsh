@@ -39,7 +39,7 @@ if _pick_variant -r variant binutils=GNU elftoolchain=elftoolchain elfutils=elfu
 	'(-a --all -d --data)'{-d,--data}'[only print strings from file data sections]'
 	'(-w --include-all-whitespace)'{-w,--include-all-whitespace}'[include all whitespace as valid string characters]'
 	'(-T --target)'{-T+,--target=}'[specify binary file format]:format:compadd - ${(z)${(M)${(f)"$(_call_program targets strings --help)"}##* supported targets*}##*\: }'
-	'(-s --output-separator)'{-s+,--output-separator=}'[specify string used to separate strings in output]'
+	'(-s --output-separator)'{-s+,--output-separator=}'[specify string used to separate strings in output]:separator'
       )
     ;;
     elfutils)
