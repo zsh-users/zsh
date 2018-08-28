@@ -1,5 +1,8 @@
 2018-08-28  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 43345: Completion/Unix/Command/_mount,
+	Completion/Unix/Type/_umountable: don't modify global variable
+
 	* unposted: Completion/Linux/Command/_dkms: correct
 	completion argument order
 

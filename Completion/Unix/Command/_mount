@@ -931,7 +931,7 @@ devordir)
   esac
   ;;
 udevordir)
-  _umountable
+  _umountable && ret=0
   ;;
 labels)
   _wanted labels expl 'disk label' compadd /dev/disk/by-label/*(:t) && ret=0
