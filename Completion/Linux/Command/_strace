@@ -54,7 +54,9 @@ case $state in
       'signal[trace only the specified subset of signals]:signal:_sequence _signals -s -M "B\:!="' \
       'read[perform a full hex and ASCII dump of all the data read from listed file descriptors]:file descriptor:_sequence _file_descriptors' \
       'write[perform a full hex and ASCII dump of all the data written to listed file descriptors]:file descriptor:_sequence _file_descriptors' \
-      'fault[perform syscall fault injection]:system call:_sys_calls -a -n' && ret=0
+      'fault[perform syscall fault injection]:system call:_sys_calls -a -n' \
+      'inject[perform syscall tampering]:system call:_sys_calls -a -n' \
+      'kvm[print the exit reason of kvm vcpu]: :(vcpu)' && ret=0
     if [[ $words[CURRENT] != *=* || $state = syscalls ]]; then
       local dedup sets suf="-qS,"
       compset -P '!'

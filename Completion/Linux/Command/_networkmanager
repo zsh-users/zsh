@@ -6,6 +6,7 @@ _networkmanager() {
   local curcontext="$curcontext" state line
 
   _arguments -C \
+    '(-o -overview)-o'{,verview}'[overview mode (hide default values)]' \
     '(-p -pretty -t -terse)-t'{,erse}'[terse output]' \
     '(-p -pretty -t -terse)-p'{,retty}'[pretty output]' \
     '(-m -mode)-m'{,ode}'[output mode]:mode:(tabular multiline)' \

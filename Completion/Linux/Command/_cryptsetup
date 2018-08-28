@@ -1,8 +1,9 @@
 #compdef cryptsetup
 
-local curcontext="$curcontext" ret=1
+local curcontext="$curcontext" ign ret=1
 local -a actions state line expl
 
+(( $#words > 2 )) && ign='!'
 _arguments -s \
   '(-v --verbose)'{-v,--verbose}'[enable verbose mode]' \
   '--debug[enable debug mode]' \
@@ -65,9 +66,10 @@ _arguments -s \
   '--label=[set label for the LUKS2 device]:label' \
   '--subsystem=[set subsystem label for the LUKS2 device]:subsystem' \
   '--unbound[create unbound (no assigned data segment) LUKS2 keyslot]' \
-  '(- : *)--version[show version information]' \
-  '(- : *)'{-\?,--help}'[display help information]' \
-  '(- : *)--usage[display brief usage]' \
+  '--json-file=[read or write token to json file]:json file:_files -g "*.json(-.)"' \
+  "${ign}(- : *)--version[show version information]" \
+  "${ign}(- : *)"{-\?,--help}'[display help information]' \
+  "${ign}(- : *)--usage[display brief usage]" \
   ':action:->actions' \
   '*::arguments:->action-arguments' && ret=0
 
@@ -97,6 +99,7 @@ case $state in
       'luksResume:resume suspended LUKS device'
       'luksHeaderBackup:store binary backup of headers'
       'luksHeaderRestore:restore header backup'
+      'token:manipulate auto-activation token of the device'
     )
     _describe action actions && ret=0
   ;;
@@ -118,6 +121,17 @@ case $state in
 	args=( $device ':key file:_files' )
       ;;
       luksHeader*) args=( $device '--header-backup-file:file:_files' );;
+      token)
+	args=(
+	  ':action:((
+	    add\:create\ a\ new\ keyring
+	    remove\:remove\ any\ token\ from\ slot
+	    import\:store\ arbitrary\ valid\ token\ json\ in\ LUKS2\ header
+	    export\:write\ requested\ token\ json\ to\ a\ file
+	  ))'
+	  $device
+	)
+      ;;
       *)
         _default && ret=0
       ;;

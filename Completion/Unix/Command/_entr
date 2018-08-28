@@ -6,6 +6,7 @@ typeset -A opt_args
 _arguments -s -S \
   '-c[execute clear before invoking utility]' \
   '-d[track directories and exit if a new file is added]' \
+  "-n[non-interactive mode; don't access TTY]" \
   '-p[postpone first execution of the utility]' \
   '-r[reload a persistent child process]' \
   '(*)-s[evaluate the first argument using interpreter specified by $SHELL]' \

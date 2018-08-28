@@ -54,6 +54,7 @@ case $OSTYPE in
       '(--no-pid)-pf[pid file]:pid file:_files'
       '(-pf)--no-pid[disable writing pid files]'
       '-cf[config file]:config file:_files'
+      '-df[duid file]:duid file:_files'
       '-sf[script file]:script file:_files'
       '-4o6[DHCPv4  over DHCPv6 protocol]:port'
       "-nc[don't drop capabilities]"

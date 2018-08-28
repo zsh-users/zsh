@@ -81,7 +81,7 @@ case $OSTYPE in
       '-llinfo:validly translate proto addr to link addr'
     )
   ;|
-  (open|free)bsd*|darwin*|dragonfly*)
+  (net|open|free)bsd*|darwin*|dragonfly*)
     args+=(
       "-d[debug-only mode: don't update routing table]"
       '-t[test-only mode: /dev/null used instead of a socket]'
@@ -89,7 +89,7 @@ case $OSTYPE in
   ;|
   netbsd*|solaris*)
     args+=( '-f[remove all routes first]' )
-  ;;
+  ;|
   (netbsd|darwin|dragonfly)*)
     modifiers+=( '-proxy:make entry a link level proxy' )
   ;|
@@ -121,8 +121,10 @@ case $OSTYPE in
   netbsd*)
     subcmds+=( flushall 'remove all routes including the default gateway' )
     args+=(
+      "-L[don't show link layer entries in routing table]"
       '-S[print a space when a flag is missing to align flags]'
       '-s[suppress all output from get except for the gateway]'
+      '-T[show tags in the route display]'
     )
     modifiers+=(
       '-tag'

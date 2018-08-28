@@ -26,6 +26,7 @@ local -a alts args
   '*+noedns[clear EDNS options to be sent]'
   '*+'{no,}'expire[send an EDNS Expire option]'
   '*+'{no,}'header-only[send query without a question section]'
+  '*+'{no,}'idnin[set processing of IDN domain names on input]'
   '*+'{no,}'idnout[set conversion of IDN puny code on output]'
   '*+'{no,}'keepopen[keep TCP socket open between queries]'
   '*+'{no,}'mapped[allow mapped IPv4 over IPv6 to be used]'

@@ -52,16 +52,12 @@ else
     ;|
     darwin*|dragonfly*|freebsd*|netbsd*)
       args+=(
-      '(-f)-i[prompt before removing destination files]'
+        '-F[remove existing destination directories]'
+        '(-f)-i[prompt before removing destination files]'
         '-v[print name of each linked file]'
       )
     ;|
-    darwin*|dragonfly*|freebsd*)
-      args+=(
-        '-F[remove existing destination directories]'
-      )
-    ;|
-    dragonfly*|freebsd*|openbsd*)
+    dragonfly*|freebsd*|netbsd*|openbsd*)
       args+=(
         '(-L)-P[create hard links directly to symbolic links]'
         '(-P)-L[create hard links to symbolic link references]'

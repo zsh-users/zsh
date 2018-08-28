@@ -4,8 +4,8 @@ local args variant
 local ordering='(-d --dictionary-order -g --general-numeric-sort -M --month-sort -h --human-numeric-sort -n --numeric-sort --sort -V --version-sort --help --version)'
 
 args=(
-  "(-c --check -C)-c[check whether input is sorted; don't sort]"
-  '(-m --merge)'{-m,--merge}"[merge already sorted files; don't sort]"
+  "(-c --check -C -m --merge -s --stable)-c[check whether input is sorted; don't sort]"
+  '(-c --check -C -m --merge)'{-m,--merge}"[merge already sorted files; don't sort]"
   '(-o --output)'{-o+,--output=}'[write result to file instead of standard output]:output file:_files'
   \*{-T+,--temporary-directory=}'[specify directory for temporary files]:directory:_directories'
   '(-u --unique)'{-u,--unique}'[with -c, check for strict ordering; without -c, output only the first of an equal run]'
@@ -26,7 +26,7 @@ case $variant in
       '(-s --stable)'{-s,--stable}'[preserve original order of lines with the same key]'
     )
   ;|
-  openbsd*|freebsd*|gnu|solaris2.<11->)
+  netbsd*|openbsd*|freebsd*|gnu|solaris2.<11->)
     args+=(
       "(-c --check -C)-C[check whether input is sorted silently; don't sort]"
     )

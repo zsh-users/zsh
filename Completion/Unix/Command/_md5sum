@@ -7,7 +7,7 @@
 #
 # @todo Support BusyBox?
 
-local type
+local type ign
 local -a args
 
 case $service in
@@ -17,16 +17,18 @@ case $service in
 esac
 
 # General options
-args+=(
+(( $#words > 2 )) && ign='!'
+args=(
   '(: -)--help[display help information]'
   '(: -)--version[display version information]'
 )
 # Summing options
-args+=(
+args=( ${ign}${^args}
   + sum
   '(chk)--tag[create BSD-style checksums]'
   '(chk -b -t --binary --text)'{-b,--binary}'[read in binary mode]'
   '(chk -b -t --binary --text)'{-t,--text}'[read in text mode]'
+  '(chk -z --zero)'{-z,--zero}'[end each output line with NUL and disable filename escaping]'
 )
 # This is the only option that differs amongst all of these tools
 [[ $service == *b2* ]] && args+=(

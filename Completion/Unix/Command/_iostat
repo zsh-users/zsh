@@ -38,6 +38,7 @@ case $OSTYPE:l in
     args+=(
       '-D[display alternate disk statistics]'
       '-x[show extended disk statistics]'
+      '-y[report data on waiting and active requests]'
       '*:drives:( $(sysctl -n hw.disknames) )'
     )
     ;;
@@ -114,6 +115,7 @@ case $OSTYPE:l in
     args=(
       '-c[display CPU utilization report]'
       '-d[display device utilization report]'
+      '--dec=-[specify the number of decimal places to use]:decimal places [2]:(0 1 2)'
       '*-g[display statistics for a group of devices]:group name'
       '-H[only display global statistics for group]'
       '(--human)-h[human readable device utilization report]'

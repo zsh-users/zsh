@@ -42,12 +42,12 @@ case $variant in
   (free|net)bsd*)
     args+=( '(-b -l -p)-n+[generate specified number of output files]:output files' )
   ;|
-  freebsd*)
+  darwin*|freebsd*)
     args+=(
-      '-d[use numeric suffixes]'
       '(-b -l -n)-p+[split the file whenever a line matches specified pattern]:pattern'
     )
-  ;;
+  ;|
+  freebsd*) args+=( '-d[use numeric suffixes]' ) ;;
 esac
 
 _arguments -s -S $args && ret=0

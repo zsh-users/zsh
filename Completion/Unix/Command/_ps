@@ -110,9 +110,15 @@ case $OSTYPE in
     bsdarg+=( '*G[select processes by real group]' )
   ;|
   freebsd*|dragonfly*)
-    bsd+=( 'f[show command and environment for swapped out processes]' ) ;|
+    bsd+=( 'f[show command and environment for swapped out processes]' )
+  ;|
   netbsd*|openbsd*)
     bsdarg+=( 'W[extract swap information from specified file]' )
+  ;|
+  freebsd*|netbsd*)
+    bsd+=(
+      'd[show process hierarchy]'
+    )
   ;|
   darwin*)
     bsd+=(
@@ -140,7 +146,6 @@ case $OSTYPE in
   ;;
   freebsd*)
     bsd+=(
-      'd[show process hierarchy]'
       '*J[select processes by jail ID]'
       'Z[show mac label]'
     )

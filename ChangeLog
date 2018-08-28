@@ -1,5 +1,18 @@
 2018-08-29  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 43346: Completion/Linux/Command/_cryptsetup,
+	Completion/Linux/Command/_networkmanager,
+	Completion/Linux/Command/_strace, Completion/Unix/Command/_attr,
+	Completion/Linux/Command/_sysstat, Completion/Unix/Command/_cmp,
+	Completion/Unix/Command/_dhclient, Completion/Unix/Command/_dig,
+	Completion/Unix/Command/_entr, Completion/Unix/Command/_gnutls,
+	Completion/Unix/Command/_env, Completion/Unix/Command/_iostat,
+	Completion/Unix/Command/_ln, Completion/Unix/Command/_md5sum,
+	Completion/Unix/Command/_ps, Completion/Unix/Command/_route,
+	Completion/Unix/Command/_service, Completion/Unix/Command/_sort,
+	Completion/Unix/Command/_split, Completion/Unix/Command/_top:
+	various completion option updates
+
 	* 43348: Anton Shestakov: Completion/Unix/Command/_hg:
 	check for both -r and --rev
 

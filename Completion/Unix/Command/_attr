@@ -39,6 +39,7 @@ case $service in
       '(-v --value)'{-v+,--value=}'[specify value for the attribute]' \
       '(-x --remove)'{-x+,--remove=}'[remove specified extended attribute]' \
       '(-n --name -v --value)--restore[restore extended attributes from dump file]:dump file:_files' \
+      '--raw[attribute value is not encoded]' \
       '(-h --no-dereference)'{-h,--no-dereference}"[don't follow symbolic links]" \
       '(* -)--version[display version information]' \
       '(* -)--help[display help information]' \

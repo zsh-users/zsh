@@ -15,6 +15,7 @@ case $variant in
       '(- *)--help[display help information]'
     )
   ;;
+  netbsd*) args+=( "-c[don't use mmap]" ) ;|
   freebsd*|openbsd*)
     args=(
       "-h[don't follow symbolic links]"

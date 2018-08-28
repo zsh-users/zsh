@@ -72,7 +72,8 @@ case $OSTYPE in
       '-m+[specify statistic type]:type:(( cpu\:default io ))'
       '-P[per-cpu CPU usage statistics]'
       '(1 -)-v[write version number and exit]'
-      '-z[do not display system idle process]'
+      '-w[display approximate swap usage]'
+      "-z[don't display system idle process]"
       '-J+[show processes owned by the specified jail]:jail:_jails -0'
       '-U+[show processes owned by the specified username]: :_users'
     );;

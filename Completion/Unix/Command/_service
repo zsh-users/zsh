@@ -5,24 +5,28 @@
 # _sub_command happy
 
 # we are interested in init service only
-local args ctx="${curcontext}argument-1:"
+local args actions ctx="${curcontext}argument-1:"
 zstyle -T  ":completion:${ctx}" tag-order && \
   zstyle ":completion:${ctx}" tag-order init
 
 case $OSTYPE in
+  freebsd<11->.*)
+    args=( '-j+[perform actions in specified jail]:jail:_jails' )
+  ;&
   freebsd*|dragonfly*)
-    args=(
-      '(-)-r[show the results of boot time rcorder]'
-      '(-)-R[restart all enabled local services]'
+    actions=(
+      '(*)-r[show the results of boot time rcorder]'
+      '(*)-R[restart all enabled local services]'
     )
   ;&
   netbsd*)
     _arguments -s $args \
-      '(-)-e[show services that are enabled]' \
-      '(-)-l[list all scripts in /etc/rc.d and the local startup directory]' \
       '(-e -R)-v[verbose]' \
-      ':service name:_services' \
-      '*::service argument:_init_d'
+      '*::service argument:_init_d' \
+      + '(actions)' $actions \
+      '(*)-e[show services that are enabled]' \
+      '(*)-l[list all scripts in /etc/rc.d and the local startup directory]' \
+      ':service name:_services'
   ;;
   *)
     _arguments -s \
