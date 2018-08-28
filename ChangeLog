@@ -1,3 +1,8 @@
+2018-08-28  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* unposted: Completion/Solaris/Command/_svccfg: fix typo in
+	function call
+
 2018-08-25  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Etc/FAQ.yo: Fix FAQ build, broken by 43184.

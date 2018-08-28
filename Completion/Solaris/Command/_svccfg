@@ -62,7 +62,7 @@ _svccfg() {
 		;;
 
 	(validate)
-		_alternative 'files:file:_files' 'fmris:fmri:_svc_fmri -c'
+		_alternative 'files:file:_files' 'fmris:fmri:_svcs_fmri -c'
 		;;
 
 	(export)
