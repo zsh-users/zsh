@@ -1,4 +1,4 @@
-#compdef tar gtar star
+#compdef tar gtar star bsdtar
 
 # Tar completion.  Features:
 #  - Tries to collect tar commands from second position, single letter
