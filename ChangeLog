@@ -1,3 +1,7 @@
+2018-08-30  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 43349: Completion/X/Command/_eog: new completion for eog
+
 2018-08-29  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 43346: Completion/Linux/Command/_cryptsetup,
