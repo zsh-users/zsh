@@ -567,7 +567,7 @@ _hg_cmd_diff() {
 
   if [[ $state == 'diff_files' ]]
   then
-    if [[ -n $opt_args[-r] ]]
+    if [[ -n ${opt_args[(I)-r|--rev]} ]]
     then
       _hg_files && ret=0
     else
@@ -795,7 +795,7 @@ _hg_cmd_revert() {
 
   if [[ $state == 'diff_files' ]]
   then
-    if [[ -n $opt_args[-r] ]]
+    if [[ -n ${opt_args[(I)-r|--rev]} ]]
     then
       _hg_files && ret=0
     else

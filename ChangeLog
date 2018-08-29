@@ -1,5 +1,8 @@
 2018-08-29  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 43348: Anton Shestakov: Completion/Unix/Command/_hg:
+	check for both -r and --rev
+
 	* 43347: Anton Shestakov: Completion/Unix/Command/_hg:
 	use revsets for suggestions for hg merge
 
