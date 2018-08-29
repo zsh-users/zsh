@@ -1,9 +1,12 @@
 #compdef zsh
 
-local curcontext=$curcontext state state_descr line expl
+local curcontext=$curcontext state state_descr line expl not='!'
 typeset -A opt_args
 
+[[ $CURRENT = 2 ]] && not=''
+
 _arguments -S -s : \
+  ${not}'--emulate[specify emulation mode]:mode:(zsh sh ksh csh)' \
   '*-o+[set named option]:option:_options' \
   '*+o+[unset named option]:option:_options' \
   '(1 -s --shinstdin)'{-s,--shinstdin}'[read commands from standard input]' \

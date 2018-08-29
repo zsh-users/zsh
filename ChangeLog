@@ -2,6 +2,8 @@
 
 	* 43349: Completion/X/Command/_eog: new completion for eog
 
+	* 43350: Completion/Unix/Command/_zsh: support --emulate
+
 2018-08-29  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 43346: Completion/Linux/Command/_cryptsetup,
