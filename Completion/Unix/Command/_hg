@@ -192,13 +192,9 @@ _hg_tags() {
 # likely merge candidates
 _hg_mergerevs() {
   typeset -a heads
-  local myrev
+  local revset='sort(head() and not ., -rev)'
 
-  heads=(${(f)"$(_hg_cmd heads --template '{rev}\\n')"})
-  # exclude own revision
-  myrev=$(_hg_cmd log -r . --template '{rev}\\n')
-  heads=(${heads:#$myrev})
-
+  heads=(${(f)"$(_hg_cmd log -r '$revset' --template '{rev}\\n')"})
   (( $#heads )) && _describe -t heads 'heads' heads
 }
 
