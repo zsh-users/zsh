@@ -53,8 +53,8 @@ patchlevel.h: FORCE
 	@if [ -f $(sdir)/$@.release ]; then \
 	  cp -f $(sdir)/$@.release $@; \
 	else \
-	  echo '#define ZSH_PATCHLEVEL "'`cd $(sdir) && git describe --tags --long`'"' > $@.tmp; \
-	  cmp $@ $@.tmp >/dev/null 2>&1 && rm -f $@.tmp || mv $@.tmp $@; \
+	  echo '#define ZSH_PATCHLEVEL "'`cd $(sdir) && git describe --tags --long --abbrev=7`'"' > $@.tmp; \
+	  cmp $@ $@.tmp >/dev/null 2>&1 && rm -f $@.tmp || mv -f $@.tmp $@; \
 	fi
 FORCE:
 

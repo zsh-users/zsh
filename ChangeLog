@@ -1,5 +1,7 @@
 2018-08-31  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 43358: Src/zsh.mdd: enforce consistent patchlevel form
+
 	* 43357: configure.ac: isinf/isnan can be macros rather
 	than functions so need a custom configure test
 
