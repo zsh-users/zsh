@@ -1,5 +1,8 @@
 2018-08-31  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* unposted: Completion/Unix/Command/_git: git describe's
+	--long and --abbrev options are not mutually exclusive
+
 	* 43359: Completion/Unix/Command/_git:
 	further review of git remote set-url completion
 

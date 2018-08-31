@@ -738,11 +738,11 @@ _git-describe () {
     '--all[use any ref found in "$GIT_DIR/refs/"]' \
     '--tags[use any ref found in "$GIT_DIR/refs/tags"]' \
     '(--tags)--contains[find the tag after the commit instead of before]' \
-    '(--long)--abbrev=[set minimum SHA1 display-length]: :__git_guard_number length' \
+    '--abbrev=[set minimum SHA1 display-length]: :__git_guard_number length' \
     '(             --exact-match)--candidates=[consider up to given number of candidates]: :__git_guard_number "number of candidates"' \
     '(--candidates              )--exact-match[only output exact matches, same as --candidates=0]' \
     '--debug[display information about the searching strategy]' \
-    '(--abbrev)--long[always show full format, even for exact matches]' \
+    '--long[always show full format, even for exact matches]' \
     '*--match=[only consider tags matching glob pattern]:pattern' \
     "*--exclude=[don't consider tags matching glob pattern]:pattern" \
     '--always[show uniquely abbreviated commit object as fallback]' \
