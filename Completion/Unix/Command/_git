@@ -3607,12 +3607,7 @@ _git-remote () {
             '(-m --master)'{-m,--master=}'[set HEAD of remote to point to given master branch]: :__git_branch_names' \
 	    '--mirror[do not use separate remotes]::mirror type:(fetch pull)' \
             ':name:__git_remotes' \
-            ':repository:->repository' && ret=0
-	  case $state in
-	    (repository)
-            __git_repositories_or_url && ret=0
-	    ;;
-	  esac
+            ':repository:__git_repositories_or_urls' && ret=0
           ;;
         (get-url)
           _arguments -S -s \
@@ -3641,17 +3636,13 @@ _git-remote () {
             '*: :__git_branch_names' && ret=0
           ;;
         (set-url)
-          # TODO: Old URL does not get completed if --push, --add, or --delete are present
-          # TODO: assumes $line[1] is always the remote name
-          _message "the line is: $line"
-          _arguments -S -s \
-            '(3)--push[manipulate push URLs instead of fetch URLs]' \
-            '--add[add URL to those already defined]' \
-            '(3)--delete[delete all matching URLs]' \
-            ': :__git_remotes' \
-            ':new url:__git_repositories_or_url' \
-            ':old url:__git_current_remote_url $line[1]' \
-                      && ret=0
+          _arguments -S \
+            '--push[manipulate push URLs instead of fetch URLs]' \
+            '(3)--add[add URL to those already defined]' \
+            '(2)--delete[delete all matching URLs]' \
+            '1: :__git_remotes' \
+            '2:new url:__git_repositories_or_urls' \
+            '3:old url: __git_current_remote_urls ${(k)opt_args[--push]} $line[1]' && ret=0
           ;;
         (show)
           _arguments -S \
@@ -6971,19 +6962,19 @@ __git_local_repositories () {
   _wanted local-repositories expl 'local repositories' _directories
 }
 
-(( $+functions[__git_repositories_or_url] )) ||
-__git_repositories_or_url () {
+(( $+functions[__git_repositories_or_urls] )) ||
+__git_repositories_or_urls () {
   _alternative \
     'repositories::__git_repositories' \
-    'url::_urls'
+    'urls::_urls'
 }
 
-(( $+functions[__git_current_remote_url] )) ||
-__git_current_remote_url () {
-    # TODO: is ${(@)*[1,4]} a proper replacement for $* and passing extra arguments?
-    # TODO: add --push to the `git remote get-url` command in case `git remote set-url --push origin <new url> <TAB>` is completed
-  _wanted remote-urls expl 'current urls' \
-      compadd ${(@)*[1,4]} - ${${(0)"$(_call_program remote-urls git remote get-url $5)"}%%$'\n'*}
+(( $+functions[__git_current_remote_urls] )) ||
+__git_current_remote_urls () {
+  local expl
+  _description remote-urls expl 'current url'
+  compadd "$expl[@]" -M 'r:|/=* r:|=*' - ${(f)"$(_call_program remote-urls
+      git remote get-url "$@" --all)"}
 }
 
 (( $+functions[__git_any_repositories] )) ||

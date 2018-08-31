@@ -1,5 +1,8 @@
 2018-08-31  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 43359: Completion/Unix/Command/_git:
+	further review of git remote set-url completion
+
 	* 42810: pseyfert: Completion/Unix/Command/_git:
 	git remote set-url completion
 
