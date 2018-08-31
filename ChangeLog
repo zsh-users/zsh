@@ -1,5 +1,8 @@
 2018-08-31  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 43357: configure.ac: isinf/isnan can be macros rather
+	than functions so need a custom configure test
+
 	* unposted: Completion/Unix/Command/_git: git describe's
 	--long and --abbrev options are not mutually exclusive
 

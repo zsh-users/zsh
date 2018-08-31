@@ -1278,7 +1278,6 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       erand48 open_memstream \
 	       posix_openpt \
 	       wctomb iconv \
-	       isinf isnan \
 	       grantpt unlockpt ptsname \
 	       htons ntohs \
 	       regcomp regexec regerror regfree \
@@ -1290,6 +1289,27 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       srand_deterministic \
 	       setutxent getutxent endutxent getutent)
 AC_FUNC_STRCOLL
+
+# isinf() and isnan() can exist as either functions or macros.
+AH_TEMPLATE([HAVE_ISINF],
+  [Define to 1 if you have the `isinf' macro or function.])
+AC_MSG_CHECKING([for isinf])
+AC_LINK_IFELSE([AC_LANG_SOURCE(
+[[#include <math.h>
+int main () { return (isinf(1.0) != 0); }]])],
+  [AC_MSG_RESULT([yes])
+   AC_DEFINE([HAVE_ISINF])],
+  [AC_MSG_RESULT([no])])
+
+AH_TEMPLATE([HAVE_ISNAN],
+  [Define to 1 if you have the `isnan' macro or function.])
+AC_MSG_CHECKING([for isnan])
+AC_LINK_IFELSE([AC_LANG_SOURCE([[
+#include <math.h>
+int main () { return (isnan(1.0) != 0); }]])],
+  [AC_MSG_RESULT([yes])
+   AC_DEFINE([HAVE_ISNAN])],
+  [AC_MSG_RESULT([no])])
 
 AH_TEMPLATE([REALPATH_ACCEPTS_NULL],
 [Define if realpath() accepts NULL as its second argument.])
