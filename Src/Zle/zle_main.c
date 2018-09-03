@@ -452,7 +452,7 @@ struct ztmout {
  */
 
 static void
-calc_timeout(struct ztmout *tmoutp, long do_keytmout)
+calc_timeout(struct ztmout *tmoutp, long do_keytmout, int full)
 {
     if (do_keytmout && (keytimeout > 0 || do_keytmout < 0)) {
 	if (do_keytmout < 0)
@@ -465,7 +465,7 @@ calc_timeout(struct ztmout *tmoutp, long do_keytmout)
     } else
 	tmoutp->tp = ZTM_NONE;
 
-    if (timedfns) {
+    if (full && timedfns) {
 	for (;;) {
 	    LinkNode tfnode = firstnode(timedfns);
 	    Timedfn tfdat;
@@ -504,7 +504,7 @@ calc_timeout(struct ztmout *tmoutp, long do_keytmout)
 /* see calc_timeout for use of do_keytmout */
 
 static int
-raw_getbyte(long do_keytmout, char *cptr)
+raw_getbyte(long do_keytmout, char *cptr, int full)
 {
     int ret;
     struct ztmout tmout;
@@ -519,7 +519,7 @@ raw_getbyte(long do_keytmout, char *cptr)
 # endif
 #endif
 
-    calc_timeout(&tmout, do_keytmout);
+    calc_timeout(&tmout, do_keytmout, full);
 
     /*
      * Handle timeouts and watched fd's.  If a watched fd or a function
@@ -684,7 +684,7 @@ raw_getbyte(long do_keytmout, char *cptr)
 		     * reconsider the key timeout from scratch.
 		     * The effect of this is microscopic.
 		     */
-		    calc_timeout(&tmout, do_keytmout);
+		    calc_timeout(&tmout, do_keytmout, full);
 		    break;
 		}
 		/*
@@ -810,7 +810,7 @@ raw_getbyte(long do_keytmout, char *cptr)
 # endif
 	    }
 	    /* If looping, need to recalculate timeout */
-	    calc_timeout(&tmout, do_keytmout);
+	    calc_timeout(&tmout, do_keytmout, full);
 	}
 # ifdef HAVE_POLL
 	zfree(fds, sizeof(struct pollfd) * nfds);
@@ -852,7 +852,7 @@ raw_getbyte(long do_keytmout, char *cptr)
 
 /**/
 mod_export int
-getbyte(long do_keytmout, int *timeout)
+getbyte(long do_keytmout, int *timeout, int full)
 {
     char cc;
     unsigned int ret;
@@ -877,7 +877,7 @@ getbyte(long do_keytmout, int *timeout)
 	for (;;) {
 	    int q = queue_signal_level();
 	    dont_queue_signals();
-	    r = raw_getbyte(do_keytmout, &cc);
+	    r = raw_getbyte(do_keytmout, &cc, full);
 	    restore_queue_signals(q);
 	    if (r == -2) {
 		/* timeout */
@@ -956,7 +956,7 @@ getbyte(long do_keytmout, int *timeout)
 mod_export ZLE_INT_T
 getfullchar(int do_keytmout)
 {
-    int inchar = getbyte((long)do_keytmout, NULL);
+    int inchar = getbyte((long)do_keytmout, NULL, 1);
 
 #ifdef MULTIBYTE_SUPPORT
     return getrestchar(inchar, NULL, NULL);
@@ -1021,7 +1021,7 @@ getrestchar(int inchar, char *outstr, int *outcount)
 	 * arrive together.  If we don't do this the input can
 	 * get stuck if an invalid byte sequence arrives.
 	 */
-	inchar = getbyte(1L, &timeout);
+	inchar = getbyte(1L, &timeout, 1);
 	/* getbyte deliberately resets lastchar_wide_valid */
 	lastchar_wide_valid = 1;
 	if (inchar == EOF) {
@@ -2139,7 +2139,7 @@ zle_main_entry(int cmd, va_list ap)
 	do_keytmout = va_arg(ap, long);
 	timeout = va_arg(ap, int *);
 	chrp = va_arg(ap, int *);
-	*chrp = getbyte(do_keytmout, timeout);
+	*chrp = getbyte(do_keytmout, timeout, 0);
 	break;
     }
 

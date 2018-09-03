@@ -1518,7 +1518,7 @@ getrestchar_keybuf(void)
 	     * arrive together.  If we don't do this the input can
 	     * get stuck if an invalid byte sequence arrives.
 	     */
-	    inchar = getbyte(1L, &timeout);
+	    inchar = getbyte(1L, &timeout, 1);
 	    /* getbyte deliberately resets lastchar_wide_valid */
 	    lastchar_wide_valid = 1;
 	    if (inchar == EOF) {
@@ -1673,7 +1673,7 @@ addkeybuf(int c)
 static int
 getkeybuf(int w)
 {
-    int c = getbyte((long)w, NULL);
+    int c = getbyte((long)w, NULL, 1);
 
     if(c < 0)
 	return EOF;

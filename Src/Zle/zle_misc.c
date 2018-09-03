@@ -756,7 +756,7 @@ bracketedstring(void)
     while (endesc[endpos]) {
 	if (current + 1 >= psize)
 	    pbuf = zrealloc(pbuf, psize *= 2);
-	if ((next = getbyte(1L, &timeout)) == EOF)
+	if ((next = getbyte(1L, &timeout, 1)) == EOF)
 	    break;
 	if (!endpos || next != endesc[endpos++])
 	    endpos = (next == *endesc);
@@ -970,7 +970,7 @@ universalargument(char **args)
      *
      * Hence for now this remains byte-by-byte.
      */
-    while ((gotk = getbyte(0L, NULL)) != EOF) {
+    while ((gotk = getbyte(0L, NULL, 1)) != EOF) {
 	if (gotk == '-' && !digcnt) {
 	    minus = -1;
 	    digcnt++;

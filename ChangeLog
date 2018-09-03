@@ -1,3 +1,9 @@
+2018-09-03  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 43365: Src/Zle/zle_keymap.c, Src/Zle/zle_main.c,
+	Src/Zle/zle_misc.c, Src/Zle/zle_vi.c: Don't handle ZLE timed
+	functions if just reading a single key.
+
 2018-08-31  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 43358: Src/zsh.mdd: enforce consistent patchlevel form
