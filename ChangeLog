@@ -1,3 +1,8 @@
+2018-09-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 43367: Makefile.in: Add maintainer targets 'tarxz-src' and
+	'targz-src'.
+
 2018-09-03  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* unposted: NEWS: mention Inf/NaN floating point changes

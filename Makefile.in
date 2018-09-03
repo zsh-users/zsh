@@ -175,3 +175,12 @@ $(DISTNAME)-doc.tar.gz: FORCE
 	rm -rf $(DISTNAME)
 
 FORCE:
+
+tarxz-src: $(DISTNAME).tar.xz
+$(DISTNAME).tar.xz: $(DISTNAME).tar.gz
+	< $< zcat | xz -9 > $@
+
+tarxz-doc: $(DISTNAME)-doc.tar.xz
+$(DISTNAME)-doc.tar.xz: $(DISTNAME)-doc.tar.gz
+	< $< zcat | xz -9 > $@
+
