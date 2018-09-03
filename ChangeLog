@@ -1,3 +1,8 @@
+2018-09-03  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* unposted: Makefile.in: further to 43358 use same patchlevel
+	form for the release file
+
 2018-09-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 43333: Etc/Makefile.in: Generate FAQ.html in the builddir,
