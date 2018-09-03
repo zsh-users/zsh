@@ -1,6 +1,6 @@
 #compdef compdef
 
-local state line expl list disp curcontext="$curcontext" pat normal ret=1
+local state line expl disp curcontext="$curcontext" pat normal ret=1
 local args1 args2
 typeset -A opt_args
 
@@ -57,7 +57,8 @@ case $state in
     _wanted commands expl 'completed command' compadd -k _comps && ret=0
   ;;
   cfun)
-    list=( ${^fpath:/.}/_(|*[^~])(:t) )
+    typeset -aU list=( ${(v)_comps} ${(k)functions[(I)_*]} )
+    (( ${+list[1]} )) || list+=( ${^fpath:/.}/_(|*[^~])(:t) )
     if zstyle -T ":completion:${curcontext}:functions" prefix-hidden; then
       disp=( ${list[@]#_} )
       _wanted functions expl 'completion function' \
