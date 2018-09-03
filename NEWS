@@ -7,9 +7,16 @@ Note also the list of incompatibilities in the README file.
 Changes from 5.5.1 to 5.5.1-test-2
 ----------------------------------
 
+Non-stop IEEE 754 arithmetic support - Inf and NaN are now returned
+from floating point operations where errors were printed before.
+Inf and NaN are also recognised in arithmetic expressions.
+
 In shell patterns, [[:blank:]] now honours the locale instead of
 matching exclusively on space and tab, like for the other POSIX
 character classes or for extended regular expressions.
+
+Nanosecond precision on file times is supported in the module
+zsh/stat.
 
 Changes from 5.5 to 5.5.1
 -------------------------

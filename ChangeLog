@@ -1,5 +1,7 @@
 2018-09-03  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* unposted: NEWS: mention Inf/NaN floating point changes
+
 	* unposted: Makefile.in: further to 43358 use same patchlevel
 	form for the release file
 
