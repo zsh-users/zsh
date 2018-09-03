@@ -4,6 +4,27 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
+Changes from 5.5.1-test-2 to 5.6
+--------------------------------
+
+CVE-2018-0502: Data from the second line of a #! script file might be passed to
+execve().  For example, in the following situation -
+.
+    printf '#!foo\nbar' > baz
+    ./baz
+.
+the shell might take "bar" rather than "foo" for the argv[0] to be passed to
+execve().  [ Reported by Anthony Sottile and Buck Evan. ]
+
+CVE-2018-13259: A shebang line longer than 64 characters would be truncated.
+For example, in the following situation:
+.
+    ( printf '#!'; repeat 64 printf 'x'; printf 'y' ) > foo
+    ./foo
+.
+the shell might execute x...x (64 repetitions) rather than x...xy (64 x's,
+one y).  [ Reported by Daniel Shahaf. ]
+
 Changes from 5.5.1 to 5.5.1-test-2
 ----------------------------------
 

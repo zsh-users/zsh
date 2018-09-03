@@ -458,7 +458,7 @@ execcursh(Estate state, int do_exec)
 
 /* execve after handling $_ and #! */
 
-#define POUNDBANGLIMIT 64
+#define POUNDBANGLIMIT 128
 
 /**/
 static int
@@ -499,18 +499,20 @@ zexecve(char *pth, char **argv, char **newenvp)
 	if ((fd = open(pth, O_RDONLY|O_NOCTTY)) >= 0) {
 	    argv0 = *argv;
 	    *argv = pth;
-	    execvebuf[0] = '\0';
+	    memset(execvebuf, '\0', POUNDBANGLIMIT + 1);
 	    ct = read(fd, execvebuf, POUNDBANGLIMIT);
 	    close(fd);
 	    if (ct >= 0) {
-		if (execvebuf[0] == '#') {
-		    if (execvebuf[1] == '!') {
-			for (t0 = 0; t0 != ct; t0++)
-			    if (execvebuf[t0] == '\n')
-				break;
+		if (ct >= 2 && execvebuf[0] == '#' && execvebuf[1] == '!') {
+		    for (t0 = 0; t0 != ct; t0++)
+			if (execvebuf[t0] == '\n')
+			    break;
+		    if (t0 == ct)
+			zerr("%s: bad interpreter: %s: %e", pth,
+			     execvebuf + 2, eno);
+		    else {
 			while (inblank(execvebuf[t0]))
 			    execvebuf[t0--] = '\0';
-			execvebuf[POUNDBANGLIMIT] = '\0';
 			for (ptr = execvebuf + 2; *ptr && *ptr == ' '; ptr++);
 			for (ptr2 = ptr; *ptr && *ptr != ' '; ptr++);
 			if (eno == ENOENT) {
@@ -519,10 +521,16 @@ zexecve(char *pth, char **argv, char **newenvp)
 				*ptr = '\0';
 			    if (*ptr2 != '/' &&
 				(pprog = pathprog(ptr2, NULL))) {
-				argv[-2] = ptr2;
-				argv[-1] = ptr + 1;
-				winch_unblock();
-				execve(pprog, argv - 2, newenvp);
+				if (ptr == execvebuf + t0 + 1) {
+				    argv[-1] = ptr2;
+				    winch_unblock();
+				    execve(pprog, argv - 1, newenvp);
+				} else {
+				    argv[-2] = ptr2;
+				    argv[-1] = ptr + 1;
+				    winch_unblock();
+				    execve(pprog, argv - 2, newenvp);
+				}
 			    }
 			    zerr("%s: bad interpreter: %s: %e", pth, ptr2,
 				 eno);
@@ -537,10 +545,6 @@ zexecve(char *pth, char **argv, char **newenvp)
 			    winch_unblock();
 			    execve(ptr2, argv - 1, newenvp);
 			}
-		    } else if (eno == ENOEXEC) {
-			argv[-1] = "sh";
-			winch_unblock();
-			execve("/bin/sh", argv - 1, newenvp);
 		    }
 		} else if (eno == ENOEXEC) {
 		    for (t0 = 0; t0 != ct; t0++)

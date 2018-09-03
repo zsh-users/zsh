@@ -5,9 +5,9 @@ THE Z SHELL (ZSH)
 Version
 -------
 
-This is version 5.5.1-test-2 of the shell.  This is a test release.  There
-are some significant bug fixes and a few user visible additions since
-5.5.1.  All zsh installations are encouraged to upgrade.
+This is version 5.6 of the shell.  This is a security and feature release.
+There are some significant bug fixes and a few user visible additions since
+5.5.1.  All zsh installations are encouraged to upgrade as soon as possible.
 
 Note in particular the changes highlighted under "Incompatibilities since
 5.5.1" below.  See NEWS for more information.

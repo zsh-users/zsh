@@ -12,7 +12,14 @@
 
   print '#!/bin/sh\necho This is dir2' >dir2/tstcmd
 
+  print -n '#!sh\necho This is slashless' >tstcmd-slashless
+  print -n '#!echo foo\necho This is arg' >tstcmd-arg
+  print '#!xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxnyyy' >tstcmd-interp-too-long
+  print '#!/bin/sh\necho should not execute; exit 1' >xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxn
+
   chmod 755 tstcmd dir1/tstcmd dir2/tstcmd
+  chmod 755 tstcmd-slashless tstcmd-arg tstcmd-interp-too-long
+  chmod 755 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxn
 
 %test
   ./tstcmd
@@ -32,6 +39,21 @@
   path=($storepath)
 0:path (2)
 >This is top
+
+  PATH=/bin:${ZTST_testdir}/command.tmp/ tstcmd-slashless
+0:path (3)
+>This is slashless
+
+  PATH=/bin:${ZTST_testdir}/command.tmp tstcmd-arg
+0:path (4)
+*>foo */command.tmp/tstcmd-arg
+
+  path=(/bin ${ZTST_testdir}/command.tmp/)
+  tstcmd-interp-too-long 2>&1; echo "status $?"
+  path=($storepath)
+0:path (5)
+*>*tstcmd-interp-too-long: bad interpreter: x*xn: no such file or directory
+>status 127
 
   functst() { print $# arguments:; print -l $*; }
   functst "Eines Morgens" "als Gregor Samsa"
