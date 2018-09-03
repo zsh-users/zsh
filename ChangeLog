@@ -1,5 +1,7 @@
 2018-09-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Config/version.mk: Post-release version bump.
+
 	* unposted: Config/version.mk: Release 5.6.
 
 2018-09-03  Anthony Sottile  <asottile@umich.edu>
