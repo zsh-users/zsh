@@ -1,5 +1,8 @@
 2018-09-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 43370: Etc/creating-a-release.txt: New maintainer-facing
+	documentation.
+
 	* unposted: Config/version.mk: Post-release version bump.
 
 	* unposted: Config/version.mk: Release 5.6.

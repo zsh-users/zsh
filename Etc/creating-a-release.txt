@@ -1,0 +1,60 @@
+To create a zsh release:
+
+- Be satisfied that 'master' is releaseable.
+  (No recent destabilizing changes, `make check` passes, etc)
+
+- Bump or update:
+
+	Config/version.mk to today's date
+	Config/version.mk version number (sequence: 5.4.2, 5.4.2-dev-$((i++)), 5.4.2-test-$((++j)), 5.5)
+	Etc/FAQ.yo
+	README
+	NEWS
+
+- Commit those changes with an "unposted" ChangeLog entry.
+
+	git commit -am "Test release: 5.5.1-test-1." && 
+		zshdev-add-nnnnn-and-changelog unposted
+	# (Everyone has a different way of getting the "unposted" magic string
+	# into ChangeLog and the log message.  This script is how I do it; YMMV;
+	# see Etc/zsh-development-guide for alternative scripts.)
+
+- Create signed git tag named "zsh-5.5.1-..." (not "5.5.1-...")
+
+	git tag --sign -m "Tag version zsh-5.5.1-test-1." zsh-5.5.1-test-1
+
+- If the tagged release is a stable release (as opposed to a test release):
+
+	vi Config/version.mk # bump to 5.6-dev-0 and tomorrow's date
+	git commit -am "Post-release version bump." &&
+		zshdev-add-nnnnn-and-changelog unposted
+		# or local equivalent (see above)
+
+- Create tarball:
+
+	git checkout zsh-5.5.1-test-1
+	make -C Etc
+	make -C Doc everything
+	make tarxz-doc tarxz-src
+	for i in zsh*.tar.?z ; do gpg -ab -- $i ; done
+
+	# The tarxz-* targets create both *.tar.gz and *.tar.xz.
+
+- [one time step] Add your key to http://zsh.sf.net/Arc/source.html; see README in the 'web' repository for how to do this.  Its URL is:
+
+	git clone git://git.code.sf.net/p/zsh/web
+	git clone ssh://git.code.sf.net/p/zsh/web
+
+- Upload to sf.net
+
+	Test releases go to the "zsh-test" directory.
+	Stable releases to zsh/ and zsh-doc/.
+
+- Upload to zsh.org
+
+- Post to -workers@
+
+- After a day or so post to:
+
+	-users@, if test release;
+	-announce@, if stable release.
