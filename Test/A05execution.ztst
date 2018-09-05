@@ -6,16 +6,20 @@
 
   cd command.tmp
 
-  print '#!/bin/sh\necho This is top' >tstcmd
+  shcmd="$(which sh)"
+  shpath=${shcmd:h}
+  echocmd="$(which -p echo)"
+  echopath=${echocmd:h}
+  print "#!${shcmd}\necho This is top" >tstcmd
 
-  print '#!/bin/sh\necho This is dir1' >dir1/tstcmd
+  print "#!${shcmd}\necho This is dir1" >dir1/tstcmd
 
-  print '#!/bin/sh\necho This is dir2' >dir2/tstcmd
+  print "#!${shcmd}\necho This is dir2" >dir2/tstcmd
 
   print -n '#!sh\necho This is slashless' >tstcmd-slashless
   print -n '#!echo foo\necho This is arg' >tstcmd-arg
   print '#!xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxnyyy' >tstcmd-interp-too-long
-  print '#!/bin/sh\necho should not execute; exit 1' >xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxn
+  print "#!${sh}\necho should not execute; exit 1" >xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxn
 
   chmod 755 tstcmd dir1/tstcmd dir2/tstcmd
   chmod 755 tstcmd-slashless tstcmd-arg tstcmd-interp-too-long
@@ -40,15 +44,15 @@
 0:path (2)
 >This is top
 
-  PATH=/bin:${ZTST_testdir}/command.tmp/ tstcmd-slashless
+  PATH=${shpath}:${ZTST_testdir}/command.tmp/ tstcmd-slashless
 0:path (3)
 >This is slashless
 
-  PATH=/bin:${ZTST_testdir}/command.tmp tstcmd-arg
+  PATH=${echopath}:${ZTST_testdir}/command.tmp tstcmd-arg
 0:path (4)
 *>foo */command.tmp/tstcmd-arg
 
-  path=(/bin ${ZTST_testdir}/command.tmp/)
+  path=($shpath $echopath ${ZTST_testdir}/command.tmp/)
   tstcmd-interp-too-long 2>&1; echo "status $?"
   path=($storepath)
 0:path (5)
