@@ -201,11 +201,10 @@ runhelp: help.txt
 .PHONY: runhelp
 
 help.txt: zshbuiltins.1
-	@-rm -f $(sdir)/help.txt $(sdir)/help/*
+	@-rm -f $@ help/*
 	perl $(sdir_top)/Util/helpfiles \
-	    $(sdir)/zshbuiltins.1 $(sdir)/help $(sdir)/help.txt \
-	    || rm -f $(sdir)/help.txt $(sdir)/help/*
-	touch $(sdir)/$@
+	    $(sdir)/zshbuiltins.1 help help.txt \
+	    || rm -f help.txt help/*
 
 $(MAN): zmacros.yo zman.yo
 

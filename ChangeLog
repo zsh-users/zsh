@@ -1,5 +1,9 @@
 2018-09-06  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 43392: Doc/Makefile.in, Etc/creating-a-release.txt: dist:
+	Generate doc/help/* and doc/help.txt in builddir rather than
+	srcdir.
+
 	* 43366: Completion/Zsh/Command/_compdef: Change and add sources
 	for completed completion function names.
 
