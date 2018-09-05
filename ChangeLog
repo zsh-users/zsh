@@ -1,3 +1,8 @@
+2018-09-05  dana  <dana@dana.is>
+
+	* 43372: Completion/Linux/Command/_e2label: Add completion for
+	e2label
+
 2018-09-05  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 43375 with fix from 43390: Test/A05execution.ztst: don't
