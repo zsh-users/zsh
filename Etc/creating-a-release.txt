@@ -33,12 +33,19 @@ To create a zsh release:
 - Create tarball:
 
 	git checkout zsh-5.5.1-test-1
+	git diff HEAD # ensure no local mods
+	Util/preconfig && ./configure ...
+	make
 	make -C Etc
 	make -C Doc everything
 	make tarxz-doc tarxz-src
 	for i in zsh*.tar.?z ; do gpg -ab -- $i ; done
 
 	# The tarxz-* targets create both *.tar.gz and *.tar.xz.
+	# 
+	# They must be run in an in-tree build (where the generated 'configure'
+	# and the generated 'Makefile' are in the same directory), for now, since
+	# Doc/help/* need to be included in the src tarball.  See workers/43373.
 
 - [one time step] Add your key to http://zsh.sf.net/Arc/source.html; see README in the 'web' repository for how to do this.  Its URL is:
 
