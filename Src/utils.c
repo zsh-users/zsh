@@ -2952,7 +2952,7 @@ getquery(char *valid_chars, int purge)
     int isem = !strcmp(term, "emacs");
     struct ttyinfo ti;
 
-    attachtty(mypgrp);
+    ATTACHTTY(mypgrp, 15);
 
     gettyinfo(&ti);
 #ifdef HAS_TIO
@@ -4639,13 +4639,21 @@ setcbreak(void)
 
 /* give the tty to some process */
 
-/**/
+/* note: deliberately not automatically prototyped */
 mod_export void
-attachtty(pid_t pgrp)
+attachtty(pid_t pgrp
+#ifdef DEBUG_JOB_CONTROL
+	  , int index
+#endif
+    )
 {
     static int ep = 0;
 
     if (jobbing && interact) {
+#ifdef DEBUG_JOB_CONTROL
+	fprintf(stderr, "attachtty(%d): pgrp = %d, mypgrp = %d\n",
+		index, pgrp, mypgrp);
+#endif
 #ifdef HAVE_TCSETPGRP
 	if (SHTTY != -1 && tcsetpgrp(SHTTY, pgrp) == -1 && !ep)
 #else
@@ -4658,8 +4666,11 @@ attachtty(pid_t pgrp)
 # endif
 #endif
 	{
+#ifdef DEBUG_JOB_CONTROL
+	    fprintf(stderr, "attachtty failed\n");
+#endif
 	    if (pgrp != mypgrp && kill(-pgrp, 0) == -1)
-		attachtty(mypgrp);
+		ATTACHTTY(mypgrp, 16);
 	    else {
 		if (errno != ENOTTY)
 		{
@@ -4672,6 +4683,26 @@ attachtty(pid_t pgrp)
 	}
     }
 }
+
+/**/
+#ifdef DEBUG_JOB_CONTROL
+
+void set_gleader(int job, int pid, int index)
+{
+    jobtab[job].gleader = pid;
+    fprintf(stderr, "set_gleader(%d): %d = %d\n", index, job, pid);
+}
+
+int setpgrp_debug(int pid, int pgid, int index)
+{
+    int ret = setpgrp(pid, pgid);
+    fprintf(stderr, "setpgrp(%d): pid %d, pgid %d, current pid %d, ret %d\n",
+	    index, pid, pgid, getpid(), ret);
+    return ret;
+}
+
+/**/
+#endif /* DEBUG_JOB_CONTROL */
 
 /* get the process group associated with the tty */
 

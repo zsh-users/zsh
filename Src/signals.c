@@ -540,7 +540,7 @@ wait_for_processes(void)
 		if (WIFEXITED(status) &&
 		    pn->pid == jn->gleader &&
 		    killpg(pn->pid, 0) == -1) {
-		    jn->gleader = 0;
+		    SET_GLEADER(jn-jobtab, 0, 11);
 		    if (!(jn->stat & STAT_NOSTTY)) {
 			/*
 			 * This PID was in control of the terminal;
@@ -549,7 +549,7 @@ wait_for_processes(void)
 			 * process of this job will become group
 			 * leader, however.
 			 */
-			attachtty(mypgrp);
+			ATTACHTTY(mypgrp, 14);
 		    }
 		}
 	    }

@@ -6129,7 +6129,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 	    if (unset(INTERACTIVE))
 		gettyinfo(&shttyinfo);
 	    /* attach to the tty */
-	    attachtty(mypgrp);
+	    ATTACHTTY(mypgrp, 1);
 	    if (!isem)
 		setcbreak();
 	    readfd = SHTTY;

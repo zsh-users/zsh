@@ -260,7 +260,7 @@ handle_sub(int job, int fg)
 		       killpg(jn->gleader, 0) == -1))) {
 		Process p;
 		for (p = jn->procs; p->next; p = p->next);
-		jn->gleader = p->pid;
+		SET_GLEADER(jn-jobtab, p->pid, 7);
 	    }
 	    /* This deleted the job too early if the parent
 	       shell waited for a command in a list that will
@@ -275,7 +275,7 @@ handle_sub(int job, int fg)
 	       now. */
 	    if ((fg || thisjob == job) &&
 		(!jn->procs->next || cp || jn->procs->pid != jn->gleader))
-		attachtty(jn->gleader);
+		ATTACHTTY(jn->gleader, 5);
 	    kill(sj->other, SIGCONT);
 	    if (jn->stat & STAT_DISOWN)
 	    {
@@ -495,7 +495,7 @@ update_job(Job jn)
 	    (jn->gleader == pgrp || (pgrp > 1 && kill(-pgrp, 0) == -1))) {
 	    if (list_pipe) {
 		if (somestopped || (pgrp > 1 && kill(-pgrp, 0) == -1)) {
-		    attachtty(mypgrp);
+		    ATTACHTTY(mypgrp, 6);
 		    /* check window size and adjust if necessary */
 		    adjustwinsize(0);
 		} else {
@@ -522,7 +522,7 @@ update_job(Job jn)
 		    inerrflush();
 		}
 	    } else {
-		attachtty(mypgrp);
+		ATTACHTTY(mypgrp, 7);
 		/* check window size and adjust if necessary */
 		adjustwinsize(0);
 	    }
@@ -1326,7 +1326,8 @@ freejob(Job jn, int deleting)
 	    freejob(jobtab + jn->other, 0);
 	jn = jobtab + job;
     }
-    jn->gleader = jn->other = 0;
+    SET_GLEADER(jn-jobtab, 0, 8);
+    jn->other = 0;
     jn->stat = jn->stty_in_env = 0;
     jn->filelist = NULL;
     jn->ty = NULL;
@@ -1353,7 +1354,7 @@ deletejob(Job jn, int disowning)
 {
     deletefilelist(jn->filelist, disowning);
     if (jn->stat & STAT_ATTACH) {
-	attachtty(mypgrp);
+	ATTACHTTY(mypgrp, 8);
 	adjustwinsize(0);
     }
     if (jn->stat & STAT_SUPERJOB) {
@@ -1395,7 +1396,7 @@ addproc(pid_t pid, char *text, int aux, struct timeval *bgtime)
 	/* if this is the first process we are adding to *
 	 * the job, then it's the group leader.          */
 	if (!jobtab[thisjob].gleader)
-	    jobtab[thisjob].gleader = pid;
+	    SET_GLEADER(thisjob, pid, 9);
 	/* attach this process to end of process list of current job */
 	pnlist = &jobtab[thisjob].procs;
     }
@@ -1643,7 +1644,7 @@ static int initnewjob(int i)
 	zsfree(jobtab[i].pwd);
 	jobtab[i].pwd = NULL;
     }
-    jobtab[i].gleader = 0;
+    SET_GLEADER(i, 0, 10);
 
     if (i > maxjob)
 	maxjob = i;
@@ -2384,9 +2385,9 @@ bin_fg(char *name, char **argv, Options ops, int func)
 			  (jobtab[job].stat & STAT_SUBLEADER) ||
 			  killpg(jobtab[job].gleader, 0) == -1)) &&
 			jobtab[jobtab[job].other].gleader)
-			attachtty(jobtab[jobtab[job].other].gleader);
+			ATTACHTTY(jobtab[jobtab[job].other].gleader, 9);
 		    else
-			attachtty(jobtab[job].gleader);
+			ATTACHTTY(jobtab[job].gleader, 10);
 		}
 	    }
 	    if (stopped) {
@@ -2848,11 +2849,15 @@ acquire_pgrp(void)
 	oldset = signal_block(blockset);
 	while ((ttpgrp = gettygrp()) != -1 && ttpgrp != mypgrp) {
 	    mypgrp = GETPGRP();
+#ifdef DEBUG_JOB_CONTROL
+	    fprintf(stderr, "mypgrp(1) %ld -> %d, pid %d, mypid %ld\n",
+		    lastpgrp, mypgrp, getpid(), mypid);
+#endif
 	    if (mypgrp == mypid) {
 		if (!interact)
 		    break; /* attachtty() will be a no-op, give up */
 		signal_setmask(oldset);
-		attachtty(mypgrp); /* Might generate SIGT* */
+		ATTACHTTY(mypgrp, 11); /* Might generate SIGT* */
 		signal_block(blockset);
 	    }
 	    if (mypgrp == gettygrp())
@@ -2861,14 +2866,22 @@ acquire_pgrp(void)
 	    if (read(0, NULL, 0) != 0) {} /* Might generate SIGT* */
 	    signal_block(blockset);
 	    mypgrp = GETPGRP();
+#ifdef DEBUG_JOB_CONTROL
+	    fprintf(stderr, "mypgrp(2) %ld -> %d, pid %d, mypid %ld\n",
+		    lastpgrp, mypgrp, getpid(), mypid);
+#endif
 	    if (mypgrp == lastpgrp && !interact)
 		break; /* Unlikely that pgrp will ever change */
 	    lastpgrp = mypgrp;
 	}
 	if (mypgrp != mypid) {
-	    if (setpgrp(0, 0) == 0) {
+	    if (SETPGRP(0, 0, 6) == 0) {
 		mypgrp = mypid;
-		attachtty(mypgrp);
+#ifdef DEBUG_JOB_CONTROL
+		fprintf(stderr, "mypgrp(3) %ld -> %d, pid %d, mypid %ld\n",
+			lastpgrp, mypgrp, getpid(), mypid);
+#endif
+		ATTACHTTY(mypgrp, 12);
 	    } else
 		opts[MONITOR] = 0;
 	}
@@ -2886,9 +2899,13 @@ release_pgrp(void)
     if (origpgrp != mypgrp) {
 	/* in linux pid namespaces, origpgrp may never have been set */
 	if (origpgrp) {
-	    attachtty(origpgrp);
-	    setpgrp(0, origpgrp);
+	    ATTACHTTY(origpgrp, 13);
+	    SETPGRP(0, origpgrp, 7);
 	}
+#ifdef DEBUG_JOB_CONTROL
+	fprintf(stderr, "mypgrp(4) %d -> %d, pid %d, mypid %ld\n",
+		mypgrp, origpgrp, getpid(), mypid);
+#endif
 	mypgrp = origpgrp;
     }
 }

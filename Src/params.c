@@ -2586,7 +2586,7 @@ assignstrvalue(Value v, char *val, int flags)
 		Param pm = v->pm;
                 /* Size doesn't change, can limit actions to only
                  * overwriting bytes in already allocated string */
-                strncpy(z + v->start, val, vlen);
+                memcpy(z + v->start, val, vlen);
 		/* Implement remainder of strsetfn */
 		if (!(pm->node.flags & PM_HASHELEM) &&
 		    ((pm->node.flags & PM_NAMEDDIR) ||

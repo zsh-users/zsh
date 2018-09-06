@@ -356,7 +356,7 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 	if (get_pty(0, &slave))
 	    exit(1);
 	SHTTY = slave;
-	attachtty(mypid);
+	ATTACHTTY(mypid, 17);
 #ifdef TIOCGWINSZ
 	/* Set the window size before associating with the terminal *
 	 * so that we don't get hit with a SIGWINCH.  I'm paranoid. */

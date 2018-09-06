@@ -233,7 +233,7 @@ zsetterm(void)
     shttyinfo.lmodes &= ~LFLUSHO;
 #endif
 
-    attachtty(mypgrp);
+    ATTACHTTY(mypgrp, 18);
     ti = shttyinfo;
 #ifdef HAS_TIO
     if (unset(FLOWCONTROL))
@@ -917,7 +917,7 @@ getbyte(long do_keytmout, int *timeout, int full)
 	    } else if (errno == EIO && !die) {
 		ret = opts[MONITOR];
 		opts[MONITOR] = 1;
-		attachtty(mypgrp);
+		ATTACHTTY(mypgrp, 19);
 		zrefresh();	/* kludge! */
 		opts[MONITOR] = ret;
 		die = 1;
