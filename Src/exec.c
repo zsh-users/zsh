@@ -1028,13 +1028,14 @@ entersubsh(int flags, struct entersubsh_ret *retp)
 	}
     } else if (thisjob != -1 && (flags & ESUB_PGRP)) {
 	if (jobtab[list_pipe_job].gleader && (list_pipe || list_pipe_child)) {
-	    if (setpgrp(0L, jobtab[list_pipe_job].gleader) == -1 ||
+	    if (SETPGRP(0L, jobtab[list_pipe_job].gleader, 1) == -1 ||
 		killpg(jobtab[list_pipe_job].gleader, 0) == -1) {
-		jobtab[list_pipe_job].gleader =
-		    jobtab[thisjob].gleader = (list_pipe_child ? mypgrp : getpid());
-		setpgrp(0L, jobtab[list_pipe_job].gleader);
+		SET_GLEADER(list_pipe_job,
+			    (list_pipe_child ? mypgrp : getpid()), 1);
+		SET_GLEADER(thisjob, jobtab[list_pipe_job].gleader, 2);
+		SETPGRP(0L, jobtab[list_pipe_job].gleader, 2);
 		if (!(flags & ESUB_ASYNC))
-		    attachtty(jobtab[thisjob].gleader);
+		    ATTACHTTY(jobtab[thisjob].gleader, 2);
 	    }
 	    if (retp) {
 		retp->gleader = jobtab[list_pipe_job].gleader;
@@ -1042,7 +1043,7 @@ entersubsh(int flags, struct entersubsh_ret *retp)
 	    }
 	}
 	else if (!jobtab[thisjob].gleader ||
-		 setpgrp(0L, jobtab[thisjob].gleader) == -1) {
+		 SETPGRP(0L, jobtab[thisjob].gleader, 3) == -1) {
 	    /*
 	     * This is the standard point at which a newly started
 	     * process gets put into the foreground by taking over
@@ -1053,13 +1054,13 @@ entersubsh(int flags, struct entersubsh_ret *retp)
 	     * the operation is allowed to work (in addition to not
 	     * causing the shell to be suspended).
 	     */
-	    jobtab[thisjob].gleader = getpid();
+	    SET_GLEADER(thisjob, getpid(), 3);
 	    if (list_pipe_job != thisjob &&
 		!jobtab[list_pipe_job].gleader)
-		jobtab[list_pipe_job].gleader = jobtab[thisjob].gleader;
-	    setpgrp(0L, jobtab[thisjob].gleader);
+		SET_GLEADER(list_pipe_job, jobtab[thisjob].gleader, 4);
+	    SETPGRP(0L, jobtab[thisjob].gleader, 4);
 	    if (!(flags & ESUB_ASYNC))
-		attachtty(jobtab[thisjob].gleader);
+		ATTACHTTY(jobtab[thisjob].gleader, 3);
 	    if (retp) {
 		retp->gleader = jobtab[thisjob].gleader;
 		if (list_pipe_job != thisjob)
@@ -1702,7 +1703,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		    /* If the super-job contains only the sub-shell, the
 		       sub-shell is the group leader. */
 		    if (!jn->procs->next || lpforked == 2) {
-			jn->gleader = list_pipe_pid;
+			SET_GLEADER(jn->gleader, list_pipe_pid, 5);
 			jn->stat |= STAT_SUBLEADER;
 			/*
 			 * Pick up any subjob that's still lying around
@@ -1825,7 +1826,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 			    jn->stat |= STAT_SUBJOB | STAT_NOPRINT;
 			    jn->other = list_pipe_pid;	/* see zsh.h */
 			    if (hasprocs(list_pipe_job))
-				jn->gleader = jobtab[list_pipe_job].gleader;
+				SET_GLEADER(jn-jobtab, jobtab[list_pipe_job].gleader, 6);
 			}
 			if ((list_pipe || last1) && hasprocs(list_pipe_job))
 			    killpg(jobtab[list_pipe_job].gleader, SIGSTOP);
@@ -1848,7 +1849,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 			 * do anything other than the following, but no
 			 * doubt we'll find out...
 			 */
-			setpgrp(0L, mypgrp = getpid());
+			SETPGRP(0L, mypgrp = getpid(), 5);
 			close(synch[1]);
 			kill(getpid(), SIGSTOP);
 			list_pipe = 0;

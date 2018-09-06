@@ -3300,7 +3300,7 @@ typedef int convchar_t;
 #define MB_METASTRLEN2(str, widthp)	ztrlen(str)
 #define MB_METASTRLEN2END(str, widthp, eptr)	ztrlenend(str, eptr)
 
-#define MB_CHARINIT()
+#define MBT_CHARINIT()
 #define MB_CHARLENCONV(str, len, cp) charlenconv((str), (len), (cp))
 #define MB_CHARLEN(str, len) ((len) ? 1 : 0)
 
@@ -3311,3 +3311,26 @@ typedef int convchar_t;
 #define ZWS(s)	s
 
 #endif /* MULTIBYTE_SUPPORT */
+
+
+/* Uncomment to debug problems with job control */
+/*#define DEBUG_JOB_CONTROL*/
+
+#ifdef DEBUG_JOB_CONTROL
+#define ATTACHTTY(pgrp, index) attachtty(pgrp, index)
+void attachtty(pid_t pgrp, int index);
+
+#define SET_GLEADER(job, pid, index) set_gleader(job, pid, index)
+void set_gleader(int job, int pid, int index);
+
+#define SETPGRP(pid, pgid, index) setpgrp_debug(pid, pgid, index)
+int setpgrp_debug(int pid, int pgid, int index);
+#else
+
+#define ATTACHTTY(pgrp, index) attachtty(pgrp)
+
+#define SET_GLEADER(job, pid, index) (jobtab[(job)].gleader = (pid))
+void attachtty(pid_t pgrp);
+
+#define SETPGRP(pid, pgid, index) setpgrp(pid, pgid)
+#endif

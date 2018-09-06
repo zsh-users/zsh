@@ -1116,7 +1116,7 @@ hbegin(int dohist)
 	hist_ring->ftim = time(NULL);
     if ((dohist == 2 || (interact && isset(SHINSTDIN))) && !strin) {
 	histactive = HA_ACTIVE;
-	attachtty(mypgrp);
+	ATTACHTTY(mypgrp, 4);
 	linkcurline();
 	defev = addhistnum(curhist, -1, HIST_FOREIGN);
     } else
