@@ -337,11 +337,11 @@ install.man: man
 install.runhelp: $(runhelp)
 	if test x"$(runhelpdir)" != x""; then \
 	    ${SHELL} $(sdir_top)/mkinstalldirs $(DESTDIR)$(runhelpdir); \
-	    $(INSTALL_DATA) $(sdir)/help/* $(DESTDIR)$(runhelpdir); \
+	    $(INSTALL_DATA) help/* $(DESTDIR)$(runhelpdir); \
 	    while read from to; do \
 	        rm -f $(DESTDIR)$(runhelpdir)/$$to || : ; \
 	        $(LN_S) $$from $(DESTDIR)$(runhelpdir)/$$to; \
-	    done < $(sdir)/help.txt; \
+	    done < help.txt; \
 	fi
 .PHONY: install.runhelp
 
@@ -418,7 +418,7 @@ distclean-here: clean-here
 realclean-here: distclean-here
 	cd $(sdir) && rm -f Zsh/modlist.yo Zsh/modmenu.yo Zsh/manmodmenu.yo
 	cd $(sdir) && rm -f version.yo ../META-FAQ zsh.texi $(MAN)
-	cd $(sdir) && rm -f help.txt help/*
+	rm -f help.txt help/*
 .PHONY: realclean-here
 
 @CLEAN_MK@
