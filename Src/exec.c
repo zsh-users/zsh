@@ -423,6 +423,17 @@ static int nowait, pline_level = 0;
 static int list_pipe_child = 0, list_pipe_job;
 static char list_pipe_text[JOBTEXTSIZE];
 
+#ifdef DEBUG_JOB_CONTROL
+int setpgrp_debug(int pid, int pgid, int index)
+{
+    int ret = setpgrp(pid, pgid);
+    fprintf(stderr, "setpgrp(%d): pid %d, pgid %d, current pid %d, lpj = %d, gleader = %d, ret %d\n",
+	    index, pid, pgid, getpid(), list_pipe_job, jobtab[list_pipe_job].gleader, ret);
+    fflush(stderr);
+    return ret;
+}
+#endif
+
 /* execute a current shell command */
 
 /**/
@@ -999,6 +1010,9 @@ static void
 entersubsh(int flags)
 {
     int i, sig, monitor, job_control_ok;
+#ifdef DEBUG_JOB_CONTROL
+    int check_later = 0;
+#endif
 
     if (!(flags & ESUB_KEEPTRAP))
 	for (sig = 0; sig < SIGCOUNT; sig++)
@@ -1030,6 +1044,19 @@ entersubsh(int flags)
 		SETPGRP(0L, jobtab[list_pipe_job].gleader, 2);
 		if (!(flags & ESUB_ASYNC))
 		    ATTACHTTY(jobtab[thisjob].gleader, 2);
+	    } else if (gettygrp() == GETPGRP()) {
+		/*
+		 * There are races where if the process is attached
+		 * to the terminal blocking SIGTTOU causes errors.
+		 * So just leave signals alone.
+		 */
+		/* job_control_ok = 1;*/ /* Probably not a * fix */
+#ifdef DEBUG_JOB_CONTROL
+		fprintf(stderr, "pid = %d, gleader = %d, pgrp = %d, list_pipe_child = %d, mypgrp = %d\n",
+			getpid(), jobtab[list_pipe_job].gleader,
+			getpgrp(), list_pipe_child, mypgrp);
+		check_later = 1;
+#endif
 	    }
 	}
 	else if (!jobtab[thisjob].gleader ||
@@ -1068,6 +1095,7 @@ entersubsh(int flags)
     if (flags & ESUB_NOMONITOR) {
 #ifdef DEBUG_JOB_CONTROL
 	fprintf(stderr, "subsh with no monitor, blocking signals\n");
+	fflush(stderr);
 #endif
 	/*
 	 * Allowing any form of interactive signalling here is
@@ -1080,6 +1108,7 @@ entersubsh(int flags)
     } else if (!job_control_ok) {
 #ifdef DEBUG_JOB_CONTROL
 	fprintf(stderr, "subsh with no job control, blocking signals\n");
+	fflush(stderr);
 #endif
 	/*
 	 * If this process is not going to be doing job control,
@@ -1090,6 +1119,20 @@ entersubsh(int flags)
 	signal_default(SIGTTOU);
 	signal_default(SIGTTIN);
 	signal_default(SIGTSTP);
+#ifdef DEBUG_JOB_CONTROL
+	if (check_later)
+	{
+	    if (SETPGRP(0L, jobtab[list_pipe_job].gleader, 101) == -1 ||
+		kill(jobtab[list_pipe_job].gleader, 0) == -1) {
+		SET_GLEADER(list_pipe_job,
+			    (list_pipe_child ? mypgrp : getpid()), 101);
+		SET_GLEADER(thisjob, jobtab[list_pipe_job].gleader, 102);
+		SETPGRP(0L, jobtab[list_pipe_job].gleader, 102);
+		if (!(flags & ESUB_ASYNC))
+		    ATTACHTTY(jobtab[thisjob].gleader, 102);
+	    }
+	}
+#endif
     }
     if (interact) {
 	signal_default(SIGTERM);

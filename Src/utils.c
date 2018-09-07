@@ -4651,8 +4651,9 @@ attachtty(pid_t pgrp
 
     if (jobbing && interact) {
 #ifdef DEBUG_JOB_CONTROL
-	fprintf(stderr, "attachtty(%d): pgrp = %d, mypgrp = %d\n",
-		index, pgrp, mypgrp);
+	fprintf(stderr, "attachtty(%d): pgrp = %d, mypgrp = %d, curpid = %d\n",
+		index, pgrp, mypgrp, getpid());
+	fflush(stderr);
 #endif
 #ifdef HAVE_TCSETPGRP
 	if (SHTTY != -1 && tcsetpgrp(SHTTY, pgrp) == -1 && !ep)
@@ -4668,6 +4669,7 @@ attachtty(pid_t pgrp
 	{
 #ifdef DEBUG_JOB_CONTROL
 	    fprintf(stderr, "attachtty failed\n");
+	    fflush(stderr);
 #endif
 	    if (pgrp != mypgrp && kill(-pgrp, 0) == -1)
 		ATTACHTTY(mypgrp, 16);
@@ -4690,15 +4692,9 @@ attachtty(pid_t pgrp
 void set_gleader(int job, int pid, int index)
 {
     jobtab[job].gleader = pid;
-    fprintf(stderr, "set_gleader(%d): %d = %d\n", index, job, pid);
-}
-
-int setpgrp_debug(int pid, int pgid, int index)
-{
-    int ret = setpgrp(pid, pgid);
-    fprintf(stderr, "setpgrp(%d): pid %d, pgid %d, current pid %d, ret %d\n",
-	    index, pid, pgid, getpid(), ret);
-    return ret;
+    fprintf(stderr, "set_gleader(%d): %d = %d, curpid = %d\n", index, job, pid,
+	getpid());
+    fflush(stderr);
 }
 
 /**/
