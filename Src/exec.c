@@ -1066,6 +1066,9 @@ entersubsh(int flags)
 	release_pgrp();
     shout = NULL;
     if (flags & ESUB_NOMONITOR) {
+#ifdef DEBUG_JOB_CONTROL
+	fprintf(stderr, "subsh with no monitor, blocking signals\n");
+#endif
 	/*
 	 * Allowing any form of interactive signalling here is
 	 * actively harmful as we are in a context where there is no
@@ -1075,6 +1078,9 @@ entersubsh(int flags)
 	signal_ignore(SIGTTIN);
 	signal_ignore(SIGTSTP);
     } else if (!job_control_ok) {
+#ifdef DEBUG_JOB_CONTROL
+	fprintf(stderr, "subsh with no job control, blocking signals\n");
+#endif
 	/*
 	 * If this process is not going to be doing job control,
 	 * we don't want to do special things with the corresponding
