@@ -540,6 +540,11 @@ wait_for_processes(void)
 		if (WIFEXITED(status) &&
 		    pn->pid == jn->gleader &&
 		    killpg(pn->pid, 0) == -1) {
+#ifdef DEBUG_JOB_CONTROL
+		    fprintf(stderr, "pid %d exited in control of TTY\n",
+			    pn->pid);
+		    fflush(stderr);
+#endif
 		    SET_GLEADER(jn-jobtab, 0, 11);
 		    if (!(jn->stat & STAT_NOSTTY)) {
 			/*
