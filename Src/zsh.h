@@ -3314,7 +3314,7 @@ typedef int convchar_t;
 
 
 /* Uncomment to debug problems with job control */
-/*#define DEBUG_JOB_CONTROL*/
+#define DEBUG_JOB_CONTROL
 
 #ifdef DEBUG_JOB_CONTROL
 #define ATTACHTTY(pgrp, index) attachtty(pgrp, index)
