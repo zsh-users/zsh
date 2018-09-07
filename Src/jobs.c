@@ -1375,7 +1375,7 @@ deletejob(Job jn, int disowning)
 
 /**/
 void
-addproc(pid_t pid, char *text, int aux, struct timeval *bgtime)
+addproc(pid_t pid, char *text, int aux, struct timeval *bgtime, int gleader)
 {
     Process pn, *pnlist;
 
@@ -1392,10 +1392,15 @@ addproc(pid_t pid, char *text, int aux, struct timeval *bgtime)
     if (!aux)
     {
 	pn->bgtime = *bgtime;
-	/* if this is the first process we are adding to *
-	 * the job, then it's the group leader.          */
+	/*
+	 * if this is the first process we are adding to
+	 * the job, then it's the group leader.
+	 *
+	 * Exception: if the forked subshell reported its own group
+	 * leader, set that.
+	 */
 	if (!jobtab[thisjob].gleader)
-	    jobtab[thisjob].gleader = pid;
+	    jobtab[thisjob].gleader = (gleader != -1) ? gleader : pid;
 	/* attach this process to end of process list of current job */
 	pnlist = &jobtab[thisjob].procs;
     }
