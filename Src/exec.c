@@ -1044,13 +1044,7 @@ entersubsh(int flags)
 		SETPGRP(0L, jobtab[list_pipe_job].gleader, 2);
 		if (!(flags & ESUB_ASYNC))
 		    ATTACHTTY(jobtab[thisjob].gleader, 2);
-	    } else if (gettygrp() == GETPGRP()) {
-		/*
-		 * There are races where if the process is attached
-		 * to the terminal blocking SIGTTOU causes errors.
-		 * So just leave signals alone.
-		 */
-		/* job_control_ok = 1;*/ /* Probably not a * fix */
+	    } else {
 #ifdef DEBUG_JOB_CONTROL
 		fprintf(stderr, "pid = %d, gleader = %d, pgrp = %d, list_pipe_child = %d, mypgrp = %d\n",
 			getpid(), jobtab[list_pipe_job].gleader,
