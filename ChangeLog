@@ -1,3 +1,8 @@
+2018-09-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted: Config/version.mk, Etc/FAQ.yo, NEWS, README: Patch
+	release: 5.6.1
+
 2018-09-07  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 43409: Src/exec.c, Src/jobs.c: ensure main shell and newly
