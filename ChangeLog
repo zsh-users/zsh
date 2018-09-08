@@ -1,5 +1,7 @@
 2018-09-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Etc/creating-a-release.txt: Add another step.
+
 	* unposted: Config/version.mk: Post-release version bump.
 
 	* unposted: Config/version.mk, Etc/FAQ.yo, NEWS, README: Patch
