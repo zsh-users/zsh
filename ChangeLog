@@ -1,5 +1,7 @@
 2018-09-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Config/version.mk: Post-release version bump.
+
 	* unposted: Config/version.mk, Etc/FAQ.yo, NEWS, README: Patch
 	release: 5.6.1
 
