@@ -33,6 +33,8 @@
 #include "zsh.mdh"
 #include "builtin.pro"
 
+#include <math.h>
+
 /* Builtins in the main executable */
 
 static struct builtin builtins[] =
