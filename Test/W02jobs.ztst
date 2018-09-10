@@ -85,27 +85,29 @@
 *>zsh:*running jobs*
 *>zsh:*SIGHUPed*
 
-  zpty_start
-  zpty_input 'setopt check_jobs no_check_running_jobs'
-  zpty_input 'sleep 3'
-  sleep 0.1
-  zpty_input $'\C-z'
-  zpty_stop
-0:suspended job with check_jobs + no_check_running_jobs
-*>zsh:*(stopped|suspended)*sleep*
-*>zsh:*(stopped|suspended) jobs*
-# no 'SIGHUPed' message for suspended jobs
-
-  zpty_start
-  zpty_input 'setopt check_jobs check_running_jobs'
-  zpty_input 'sleep 3'
-  sleep 0.1
-  zpty_input $'\C-z'
-  zpty_stop
-0:suspended job with check_jobs + check_running_jobs
-*>zsh:*(stopped|suspended)*sleep*
-*>zsh:*(stopped|suspended) jobs*
-# no 'SIGHUPed' message for suspended jobs
+#### Races presumed to be associated with zpty mean that
+#### tests involving suspending jobs are not safe.
+##   zpty_start
+##   zpty_input 'setopt check_jobs no_check_running_jobs'
+##   zpty_input 'sleep 3'
+##   sleep 0.1
+##   zpty_input $'\C-z'
+##   zpty_stop
+## 0:suspended job with check_jobs + no_check_running_jobs
+## *>zsh:*(stopped|suspended)*sleep*
+## *>zsh:*(stopped|suspended) jobs*
+## # no 'SIGHUPed' message for suspended jobs
+## 
+##   zpty_start
+##   zpty_input 'setopt check_jobs check_running_jobs'
+##   zpty_input 'sleep 3'
+##   sleep 0.1
+##   zpty_input $'\C-z'
+##   zpty_stop
+## 0:suspended job with check_jobs + check_running_jobs
+## *>zsh:*(stopped|suspended)*sleep*
+## *>zsh:*(stopped|suspended) jobs*
+## # no 'SIGHUPed' message for suspended jobs
 
   zpty_start
   zpty_input 'sleep 5 & sleep 4 & sleep 3 &'
@@ -153,19 +155,19 @@
 *>-
 *>zsh:*SIGHUPed*
 
-  zpty_start
-  zpty_input 'sleep 5'
-  sleep 0.1
-  zpty_input $'\C-z'
-  zpty_input 'jobs -r'
-  zpty_input 'print -- -'
-  zpty_input 'jobs -s'
-  zpty_stop
-0:`jobs -r` and `jobs -s` with suspended job
-*>zsh:*(stopped|suspended)*sleep*
-*>-
-*>\[1]  + (stopped|suspended)*sleep*
-# no 'SIGHUPed' message for suspended jobs
+##   zpty_start
+##   zpty_input 'sleep 5'
+##   sleep 0.1
+##   zpty_input $'\C-z'
+##   zpty_input 'jobs -r'
+##   zpty_input 'print -- -'
+##   zpty_input 'jobs -s'
+##   zpty_stop
+## 0:`jobs -r` and `jobs -s` with suspended job
+## *>zsh:*(stopped|suspended)*sleep*
+## *>-
+## *>\[1]  + (stopped|suspended)*sleep*
+## # no 'SIGHUPed' message for suspended jobs
 
   zpty_start
   zpty_input 'sleep 10 & sleep 9 & sleep 8 & sleep 7 &'

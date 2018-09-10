@@ -1,3 +1,8 @@
+2018-09-10  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 43426: Test/W02jobs.ztst: disable tests involving suspending
+	jobs as these are provoking races in particular on OpenSUSE.
+
 2018-09-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Etc/creating-a-release.txt: Add another step.
