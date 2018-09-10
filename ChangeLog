@@ -1,3 +1,8 @@
+2018-09-10  Jörg Thalheim  <joerg@thalheim.io>
+
+	* GitHub #28: Src/builtin.c: Add missing math.h include for
+	builtins
+
 2018-09-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 43426: Test/W02jobs.ztst: disable tests involving suspending
