@@ -40,8 +40,6 @@ To create a zsh release:
 	make tarxz-doc tarxz-src
 	for i in zsh*.tar.?z ; do gpg -ab -- $i ; done
 
-	# The tarxz-* targets create both *.tar.gz and *.tar.xz.
-
 - [one time step] Add your key to http://zsh.sf.net/Arc/source.html; see README in the 'web' repository for how to do this.  Its URL is:
 
 	git clone git://git.code.sf.net/p/zsh/web

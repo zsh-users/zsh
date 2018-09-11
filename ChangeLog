@@ -1,5 +1,8 @@
 2018-09-12  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 43447: Etc/creating-a-release.txt, Makefile.in: Generate
+	tar.xz artifacts only.
+
 	* 43443: Completion/Unix/Command/_git: When completing worktrees,
 	show the ref and hash of each worktree.
 

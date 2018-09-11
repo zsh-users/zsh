@@ -159,28 +159,19 @@ $(sdir)/stamp-h.in: $(sdir)/configure
 
 DISTNAME = zsh-$(VERSION)
 
-targz-src: $(DISTNAME).tar.gz
-$(DISTNAME).tar.gz: FORCE
+tarxz-src: $(DISTNAME).tar.xz
+$(DISTNAME).tar.xz: FORCE
 	@$(sdir_top)/Util/mkdisttree.sh $(DISTNAME) $(sdir_top) $(dir_top) SRC \
 	    $(MAKE) $(MAKEDEFS)
 	echo '#define ZSH_PATCHLEVEL "'`cd $(sdir_top) && git describe --tags --long --abbrev=7`'"' >$(DISTNAME)/Src/patchlevel.h.release
-	tar cf - $(DISTNAME) | gzip -9 > $@
+	tar cf - $(DISTNAME) | xz -9 > $@
 	rm -rf $(DISTNAME)
 
-targz-doc: $(DISTNAME)-doc.tar.gz
-$(DISTNAME)-doc.tar.gz: FORCE
+tarxz-doc: $(DISTNAME)-doc.tar.xz
+$(DISTNAME)-doc.tar.xz: FORCE
 	@$(sdir_top)/Util/mkdisttree.sh $(DISTNAME) $(sdir_top) $(dir_top) DOC \
 	    $(MAKE) $(MAKEDEFS)
-	tar cf - $(DISTNAME) | gzip -9 > $@
+	tar cf - $(DISTNAME) | xz -9 > $@
 	rm -rf $(DISTNAME)
 
 FORCE:
-
-tarxz-src: $(DISTNAME).tar.xz
-$(DISTNAME).tar.xz: $(DISTNAME).tar.gz
-	< $< zcat | xz -9 > $@
-
-tarxz-doc: $(DISTNAME)-doc.tar.xz
-$(DISTNAME)-doc.tar.xz: $(DISTNAME)-doc.tar.gz
-	< $< zcat | xz -9 > $@
-
