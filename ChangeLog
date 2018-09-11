@@ -1,5 +1,8 @@
 2018-09-12  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 43443: Completion/Unix/Command/_git: When completing worktrees,
+	show the ref and hash of each worktree.
+
 	* 43442: Completion/Unix/Command/_git: Break out a helper
 	function.
 
