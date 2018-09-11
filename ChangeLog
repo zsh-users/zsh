@@ -1,3 +1,8 @@
+2018-09-12  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 43442: Completion/Unix/Command/_git: Break out a helper
+	function.
+
 2018-09-12  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 43450: Src/signals.c: fix window size if reattaching shell

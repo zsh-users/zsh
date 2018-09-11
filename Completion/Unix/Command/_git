@@ -2108,8 +2108,7 @@ _git-worktree() {
 	;;
       esac
       if [[ $state = worktrees ]]; then
-        _wanted directories expl 'working tree' compadd -S ' ' -f -M 'r:|/=* r:|=*' \
-            ${${(M)${(f)"$(_call_program directories git worktree list --porcelain)"}:#worktree*}#* } && ret=0
+        __git_worktrees && ret=0
       fi
     ;;
   esac
@@ -7559,6 +7558,11 @@ __git_browsers () {
   _alternative \
     'user-browsers:user-defined browser:compadd -a - userbrowsers' \
     'builtin-browsers:builtin browser:compadd -a - builtinbrowsers'
+}
+
+__git_worktrees () {
+  _wanted directories expl 'working tree' compadd -S ' ' -f -M 'r:|/=* r:|=*' \
+    ${${(M)${(f)"$(_call_program directories git worktree list --porcelain)"}:#worktree*}#* }
 }
 
 (( $+functions[__git_difftools] )) ||
