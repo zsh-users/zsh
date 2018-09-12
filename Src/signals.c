@@ -550,6 +550,7 @@ wait_for_processes(void)
 			 * leader, however.
 			 */
 			attachtty(mypgrp);
+			adjustwinsize(0);
 		    }
 		}
 	    }

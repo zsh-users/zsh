@@ -1,5 +1,8 @@
 2018-09-12  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 43450: Src/signals.c: fix window size if reattaching shell
+	to terminal on exit of process.
+
 	* 43446: Src/exec.c, Src/jobs.c, Src/zsh.h: enhance 43409 to
 	pass back list_pipe_job as well, fixing additional races.
 
