@@ -4,6 +4,17 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
+Changes from 5.6.1 to 5.6.2
+---------------------------
+
+Fix another SIGTTOU case.
+
+Fix SIGWINCH being ignored when zsh is not in the foreground.
+
+The release tarballs are now compressed using xz(1), whereas previously
+both xz(1) and gzip(1) versions were available.  If this gets in your way,
+give us a shout.
+
 Changes from 5.6 to 5.6.1
 -------------------------
 

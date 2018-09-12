@@ -1,3 +1,8 @@
+2018-09-14  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 43457: Config/version.mk, Etc/FAQ.yo, NEWS, README: Release
+	5.6.2
+
 2018-09-14  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 43466: Test/A05execution.ztst: path(5) test is too specific as
