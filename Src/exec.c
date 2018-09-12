@@ -1002,7 +1002,7 @@ enum {
 
 /**/
 static void
-entersubsh(int flags, int *gleaderp)
+entersubsh(int flags, struct entersubsh_ret *retp)
 {
     int i, sig, monitor, job_control_ok;
 
@@ -1036,8 +1036,10 @@ entersubsh(int flags, int *gleaderp)
 		if (!(flags & ESUB_ASYNC))
 		    attachtty(jobtab[thisjob].gleader);
 	    }
-	    if (gleaderp)
-		*gleaderp = jobtab[list_pipe_job].gleader;
+	    if (retp) {
+		retp->gleader = jobtab[list_pipe_job].gleader;
+		retp->list_pipe_job = list_pipe_job;
+	    }
 	}
 	else if (!jobtab[thisjob].gleader ||
 		 setpgrp(0L, jobtab[thisjob].gleader) == -1) {
@@ -1058,8 +1060,11 @@ entersubsh(int flags, int *gleaderp)
 	    setpgrp(0L, jobtab[thisjob].gleader);
 	    if (!(flags & ESUB_ASYNC))
 		attachtty(jobtab[thisjob].gleader);
-	    if (gleaderp)
-		*gleaderp = jobtab[thisjob].gleader;
+	    if (retp) {
+		retp->gleader = jobtab[thisjob].gleader;
+		if (list_pipe_job != thisjob)
+		    retp->list_pipe_job = list_pipe_job;
+	    }
 	}
     }
     if (!(flags & ESUB_FAKE))
@@ -1692,7 +1697,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		    curjob = newjob;
 		    DPUTS(!list_pipe_pid, "invalid list_pipe_pid");
 		    addproc(list_pipe_pid, list_pipe_text, 0,
-			    &list_pipe_start, -1);
+			    &list_pipe_start, -1, -1);
 
 		    /* If the super-job contains only the sub-shell, the
 		       sub-shell is the group leader. */
@@ -2185,7 +2190,7 @@ closemn(struct multio **mfds, int fd, int type)
 	    }
 	    mn->ct = 1;
 	    mn->fds[0] = fd;
-	    addproc(pid, NULL, 1, &bgtime, -1);
+	    addproc(pid, NULL, 1, &bgtime, -1, -1);
 	    child_unblock();
 	    return;
 	}
@@ -2686,10 +2691,12 @@ execcmd_fork(Estate state, int how, int type, Wordcode varspc,
 {
     pid_t pid;
     int synch[2], flags;
-    int gleader = -1;
+    struct entersubsh_ret esret;
     struct timeval bgtime;
 
     child_block();
+    esret.gleader = -1;
+    esret.list_pipe_job = -1;
 
     if (pipe(synch) < 0) {
 	zerr("pipe failed: %e", errno);
@@ -2703,7 +2710,7 @@ execcmd_fork(Estate state, int how, int type, Wordcode varspc,
     }
     if (pid) {
 	close(synch[1]);
-	read_loop(synch[0], (char *)&gleader, sizeof(gleader));
+	read_loop(synch[0], (char *)&esret, sizeof(esret));
 	close(synch[0]);
 	if (how & Z_ASYNC) {
 	    lastpid = (zlong) pid;
@@ -2721,7 +2728,7 @@ execcmd_fork(Estate state, int how, int type, Wordcode varspc,
 		      3 : WC_ASSIGN_NUM(ac) + 2);
 	    }
 	}
-	addproc(pid, text, 0, &bgtime, gleader);
+	addproc(pid, text, 0, &bgtime, esret.gleader, esret.list_pipe_job);
 	if (oautocont >= 0)
 	    opts[AUTOCONTINUE] = oautocont;
 	pipecleanfilelist(jobtab[thisjob].filelist, 1);
@@ -2736,8 +2743,8 @@ execcmd_fork(Estate state, int how, int type, Wordcode varspc,
     if (type == WC_SUBSH && !(how & Z_ASYNC))
 	flags |= ESUB_JOB_CONTROL;
     *filelistp = jobtab[thisjob].filelist;
-    entersubsh(flags, &gleader);
-    write(synch[1], &gleader, sizeof(gleader));
+    entersubsh(flags, &esret);
+    write(synch[1], &esret, sizeof(esret));
     close(synch[1]);
     zclose(close_if_forked);
 
@@ -4876,7 +4883,7 @@ getproc(char *cmd, char **eptr)
 	if (pid == -1)
 	    return NULL;
 	if (!out)
-	    addproc(pid, NULL, 1, &bgtime, -1);
+	    addproc(pid, NULL, 1, &bgtime, -1, -1);
 	procsubstpid = pid;
 	return pnam;
     }
@@ -4913,7 +4920,7 @@ getproc(char *cmd, char **eptr)
 	addfilelist(NULL, fd);
 	if (!out)
 	{
-	    addproc(pid, NULL, 1, &bgtime, -1);
+	    addproc(pid, NULL, 1, &bgtime, -1, -1);
 	}
 	procsubstpid = pid;
 	return pnam;
@@ -4965,7 +4972,7 @@ getpipe(char *cmd, int nullexec)
 	    return -1;
 	}
 	if (!nullexec)
-	    addproc(pid, NULL, 1, &bgtime, -1);
+	    addproc(pid, NULL, 1, &bgtime, -1, -1);
 	procsubstpid = pid;
 	return pipes[!out];
     }

@@ -1,3 +1,8 @@
+2018-09-12  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 43446: Src/exec.c, Src/jobs.c, Src/zsh.h: enhance 43409 to
+	pass back list_pipe_job as well, fixing additional races.
+
 2018-09-10  Jörg Thalheim  <joerg@thalheim.io>
 
 	* GitHub #28: Src/builtin.c: Add missing math.h include for

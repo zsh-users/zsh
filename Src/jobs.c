@@ -1375,7 +1375,8 @@ deletejob(Job jn, int disowning)
 
 /**/
 void
-addproc(pid_t pid, char *text, int aux, struct timeval *bgtime, int gleader)
+addproc(pid_t pid, char *text, int aux, struct timeval *bgtime,
+	int gleader, int list_pipe_job_used)
 {
     Process pn, *pnlist;
 
@@ -1397,10 +1398,15 @@ addproc(pid_t pid, char *text, int aux, struct timeval *bgtime, int gleader)
 	 * the job, then it's the group leader.
 	 *
 	 * Exception: if the forked subshell reported its own group
-	 * leader, set that.
+	 * leader, set that.  If it reported the use of list_pipe_job,
+	 * set it for that, too.
 	 */
-	if (!jobtab[thisjob].gleader)
-	    jobtab[thisjob].gleader = (gleader != -1) ? gleader : pid;
+	if (gleader != -1) {
+	    jobtab[thisjob].gleader = gleader;
+	    if (list_pipe_job_used != -1)
+		jobtab[list_pipe_job_used].gleader = gleader;
+	} else if (!jobtab[thisjob].gleader)
+		jobtab[thisjob].gleader = pid;
 	/* attach this process to end of process list of current job */
 	pnlist = &jobtab[thisjob].procs;
     }

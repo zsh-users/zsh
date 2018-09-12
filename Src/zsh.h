@@ -505,6 +505,14 @@ enum {
     ZCONTEXT_PARSE      = (1<<2)
 };
 
+/* Report from entersubsh() to pass subshell info to addproc */
+struct entersubsh_ret {
+    /* Process group leader chosen by subshell, else -1 */
+    int gleader;
+    /* list_pipe_job setting used by subshell, else -1 */
+    int list_pipe_job;
+};
+
 /**************************/
 /* Abstract types for zsh */
 /**************************/
