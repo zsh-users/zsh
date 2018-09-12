@@ -1,5 +1,8 @@
 2018-09-12  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Completion/Unix/Command/_subversion: _svn: Complete
+	--accept=recommended, new in 1.10.0.
+
 	* 43447: Etc/creating-a-release.txt, Makefile.in: Generate
 	tar.xz artifacts only.
 
