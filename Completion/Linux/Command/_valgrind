@@ -2,10 +2,10 @@
 
 local curcontext="$curcontext" state line
 local -a cmd common common_{mem_null,read_varinfo}
-local -a args args_{addrcheck,memcheck,cachegrind,helgrind,lackey,massif,none}
+local -a args args_{addrcheck,drd,memcheck,cachegrind,helgrind,lackey,massif,none}
 
 cmd=(
-  '1:command name:_command_names -e'
+  '1: : _command_names -e'
   '*::args :_normal'
 )
 
@@ -40,6 +40,31 @@ args_addrcheck=(
   '--workaround-gcc296-bugs=-:enable:(yes no)'
 )
 
+args_drd=(
+  '--check-stack-var=-[detect data races on stack variables]:enable [no]:(yes no)'
+  '--exclusive-threshold=-[print an error if any mutex or writer lock is held longer than specified time]:time (ms)'
+  '--first-race-only=-[report only the first detected data race]:enable [no]:(yes no)'
+  '--free-is-write=-[report races between accessing memory and freeing memory]:enable [no]:(yes no)'
+  '--join-list-vol=-[specify how many joined threads to retain memory access information for]:number of threads [10]'
+  '--report-signal-unlocked=-[report calls to pthread_cond_signal etc where the mutex is not locked]:enable [yes]:(yes no)'
+  '--segment-merging=-[control segment merging]:enable [yes]:(yes no)'
+  '--segment-merging-interval=-[perform segment merging only after the specified number of new segments have been created]:number of segments [10]'
+  '--shared-threshold=-[print an error if a reader lock is held longer than the specified time]:time (ms)'
+  '--show-confl-seg=-[show conflicting segments in race reports]:enable [yes]:(yes no)'
+  '--show-stack-usage=-[print stack usage at thread exit time]:enable [no]:(yes no)'
+  '--ignore-thread-creation=-[control whether all activities during thread creation should be ignored]:enable [no]:(yes no)'
+  '*--ptrace-addr=-[trace all load and store activity for specified address even after free]:address'
+  '*--trace-addr=-[trace all load and store activity for specified address]:address'
+  '--trace-alloc=-[trace all memory allocations and deallocations]:enable [no]:(yes no)'
+  '--trace-barrier=-[trace all barrier activity]:enable [no]:(yes no)'
+  '--trace-cond=-[trace all condition variable activity]:enable [no]:(yes no)'
+  '--trace-fork-join=-[trace all thread creation and all thread termination events]:enable [no]:(yes no)'
+  '--trace-hb=-[trace execution of the ANNOTATE_HAPPENS_BEFORE(), ANNOTATE_HAPPENS_AFTER() and ANNOTATE_HAPPENS_DONE() client requests]:enable [no]:(yes no)'
+  '--trace-mutex=-[trace all mutex activity]:enable [no]:(yes no)'
+  '--trace-rwlock=-[trace all reader-writer lock activity]:enable [no]:(yes no)'
+  '--trace-semaphore=-[trace all semaphore activity]:enable [no]:(yes no)'
+)
+
 args_memcheck=(
   $args_addrcheck
   $common_read_varinfo
@@ -54,8 +79,16 @@ args_cachegrind=(
 args_helgrind=(
   $common
   $common_read_varinfo
-  '--private-stacks=-[assume thread stacks are used privately]:enable:(yes no)'
-  '--show-last-access=-[show location of last word access on error]:locations:(no some all)'
+  '--free-is-write=-[treat heap frees as writes]:enable [no]:(yes no)'
+  '--track-lockorders=-[show lock ordering errors]:enable [yes]:(no yes)'
+  '--history-level=-[specify amount of history to show for data races]:level [full]:((
+    full\:show\ both\ stack\ traces\ for\ a\ data\ race\ \(slow\)
+    approx\:full\ trace\ for\ one\ thread,\ approx\ for\ the\ other\ \(faster\)
+    none\:only\ show\ trace\ for\ one\ thread\ in\ a\ race\ \(fastest\)
+  ))'
+  '--conflict-cache-size=-[specify size of full history cache]:size [2000000]'
+  '--check-stack-refs=-[race-check reads and writes on the main stack and thread stacks]:enable [yes]:(no yes)'
+  '--ignore-thread-creation=-[ignore activities during thread creation]:enable [no]:(yes no)'
 )
 
 args_lackey=(
@@ -80,10 +113,10 @@ args_none=(
 args="args_${${words[(r)--tool=*]#*=}:-memcheck}"
 
 _arguments -C ${(P)args} $cmd \
-  '--tool=-[specify valgrind tool]:valgrind tool:->tools' \
+  '(--version)--tool=-[specify valgrind tool]:valgrind tool:->tools' \
   '(-h --help)'{-h,--help}'[show help information]' \
   '--help-debug[show help info including debugging options]' \
-  '--version[show version]' \
+  '(-)--version[show version]' \
   '(-q --quiet)'{-q,--quiet}'[run silently; only print error msgs]' \
   '(-v --verbose)'{-v,--verbose}'[be more verbose]' \
   '--trace-children=-[valgrind-ise child processes]:enable:(yes no)' \
@@ -105,7 +138,7 @@ _arguments -C ${(P)args} $cmd \
   '--suppressions=-[suppress errors described in specified file]:file:_files' \
   '--gen-suppressions=-[print suppressions for errors detected]:enable:(yes no)' \
   '--db-attach=-[start debugger when errors detected]:enable:(yes no)' \
-  '--db-command=-[specify command to start debugger]:command:_command_names -e' \
+  '--db-command=-[specify command to start debugger]: : _command_names -e' \
   '--input-fd=-[specify file descriptor for input]:file descriptor:_file_descriptors' \
   '--max-stackframe=-[assume stack switch for SP changes larger than specified number of bytes]:bytes' \
   && return

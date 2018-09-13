@@ -1,3 +1,8 @@
+2018-09-18  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 43464: Completion/Linux/Command/_valgrind: complete options
+	for the drd tool and update them for helgrind
+
 2018-09-17  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: ChangeLog: Fix typo, s/43464/43474/.
