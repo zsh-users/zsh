@@ -52,12 +52,17 @@
 0:path (4)
 *>foo */command.tmp/tstcmd-arg
 
-  path=($shpath $echopath ${ZTST_testdir}/command.tmp/)
-  tstcmd-interp-too-long 2>&1; echo "status $?"
-  path=($storepath)
-0:path (5)
-*>*tstcmd-interp-too-long: bad interpreter: x*xn: no such file or directory
->status 127
+  # Just check this exits with non-zero status,
+  # as output and status code can differ.
+  (
+    path=($shpath $echopath ${ZTST_testdir}/command.tmp/)
+    if tstcmd-interp-too-long >/dev/null 2>&1; then
+      exit 0
+    else
+      exit 1
+    fi
+  )
+1:path (5)
 
   functst() { print $# arguments:; print -l $*; }
   functst "Eines Morgens" "als Gregor Samsa"
