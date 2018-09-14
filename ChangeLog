@@ -1,5 +1,8 @@
 2018-09-14  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Completion/Unix/Command/_subversion: _svn: Allow
+	hyphens in command name aliases.
+
 	* unposted: Config/version.mk: Post-release version bump.
 
 	* 43457: Config/version.mk, Etc/FAQ.yo, NEWS, README: Release
