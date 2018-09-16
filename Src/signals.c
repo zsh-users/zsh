@@ -540,8 +540,8 @@ wait_for_processes(void)
 		if (WIFEXITED(status) &&
 		    pn->pid == jn->gleader &&
 		    killpg(pn->pid, 0) == -1) {
-		    jn->gleader = 0;
-		    if (!(jn->stat & STAT_NOSTTY)) {
+		    if (last_attached_pgrp == jn->gleader &&
+			!(jn->stat & STAT_NOSTTY)) {
 			/*
 			 * This PID was in control of the terminal;
 			 * reclaim terminal now it has exited.
@@ -552,6 +552,7 @@ wait_for_processes(void)
 			attachtty(mypgrp);
 			adjustwinsize(0);
 		    }
+		    jn->gleader = 0;
 		}
 	    }
 	    update_job(jn);

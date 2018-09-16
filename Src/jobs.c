@@ -40,6 +40,11 @@ mod_export pid_t origpgrp;
 
 /**/
 mod_export pid_t mypgrp;
+
+/* the last process group to attach to the terminal */
+
+/**/
+pid_t last_attached_pgrp;
  
 /* the job we are working on */
  
@@ -1405,6 +1410,11 @@ addproc(pid_t pid, char *text, int aux, struct timeval *bgtime,
 	    jobtab[thisjob].gleader = gleader;
 	    if (list_pipe_job_used != -1)
 		jobtab[list_pipe_job_used].gleader = gleader;
+	    /*
+	     * Record here this is the latest process group to grab the
+	     * terminal as attachtty() was run in the subshell.
+	     */
+	    last_attached_pgrp = gleader;
 	} else if (!jobtab[thisjob].gleader)
 		jobtab[thisjob].gleader = pid;
 	/* attach this process to end of process list of current job */

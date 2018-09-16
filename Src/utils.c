@@ -4670,6 +4670,10 @@ attachtty(pid_t pgrp)
 		ep = 1;
 	    }
 	}
+	else
+	{
+	    last_attached_pgrp = pgrp;
+	}
     }
 }
 

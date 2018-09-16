@@ -1036,7 +1036,7 @@ entersubsh(int flags, struct entersubsh_ret *retp)
 		if (!(flags & ESUB_ASYNC))
 		    attachtty(jobtab[thisjob].gleader);
 	    }
-	    if (retp) {
+	    if (retp && !(flags & ESUB_ASYNC)) {
 		retp->gleader = jobtab[list_pipe_job].gleader;
 		retp->list_pipe_job = list_pipe_job;
 	    }
@@ -1058,12 +1058,13 @@ entersubsh(int flags, struct entersubsh_ret *retp)
 		!jobtab[list_pipe_job].gleader)
 		jobtab[list_pipe_job].gleader = jobtab[thisjob].gleader;
 	    setpgrp(0L, jobtab[thisjob].gleader);
-	    if (!(flags & ESUB_ASYNC))
+	    if (!(flags & ESUB_ASYNC)) {
 		attachtty(jobtab[thisjob].gleader);
-	    if (retp) {
-		retp->gleader = jobtab[thisjob].gleader;
-		if (list_pipe_job != thisjob)
-		    retp->list_pipe_job = list_pipe_job;
+		if (retp) {
+		    retp->gleader = jobtab[thisjob].gleader;
+		    if (list_pipe_job != thisjob)
+			retp->list_pipe_job = list_pipe_job;
+		}
 	    }
 	}
     }
