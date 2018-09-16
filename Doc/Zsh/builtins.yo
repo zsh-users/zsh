@@ -1332,7 +1332,7 @@ If any of `tt(-m)', `tt(-o)' or `tt(-O)' are used in combination with
 case of `tt(-m)') then nothing is printed.
 )
 findex(printf)
-item(tt(printf) [ -v var(name) ] var(format) [ var(arg) ... ])(
+item(tt(printf) [ tt(-v) var(name) ] var(format) [ var(arg) ... ])(
 Print the arguments according to the format specification. Formatting
 rules are the same as used in C. The same escape sequences as for tt(echo)
 are recognised in the format. All C conversion specifications ending in

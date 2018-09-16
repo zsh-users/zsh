@@ -1,3 +1,7 @@
+2018-09-16  dana  <dana@dana.is>
+
+	* unposted: Doc/Zsh/builtins.yo: Fix trivial formatting error
+
 2018-09-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 43464: Src/exec.c, Src/jobs.c, Src/signals.c, Src/utils.c:
