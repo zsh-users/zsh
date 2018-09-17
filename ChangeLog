@@ -1,3 +1,8 @@
+2018-09-24  dana  <dana@dana.is>
+
+	* Takeshi Banse: users/23642: Completion/Unix/Type/_files: Revert
+	change from workers/42984
+
 2018-09-24  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 43535: Src/jobs.c, Src/signals.c: fixes for bg / fg handling

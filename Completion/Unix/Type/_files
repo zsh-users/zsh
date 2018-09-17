@@ -121,7 +121,7 @@ for def in "$pats[@]"; do
 	    done
 	  fi
         else
-          _path_files -g "$pat" "$opts[@]" "$expl[@]" && ret=0
+          _path_files "$expl[@]" -g "$pat" "$opts[@]" && ret=0
         fi
       done
       (( ret )) || break
