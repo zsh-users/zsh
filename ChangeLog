@@ -1,10 +1,14 @@
+2018-09-17  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted: ChangeLog: Fix typo, s/43464/43474/.
+
 2018-09-16  dana  <dana@dana.is>
 
 	* unposted: Doc/Zsh/builtins.yo: Fix trivial formatting error
 
 2018-09-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* 43464: Src/exec.c, Src/jobs.c, Src/signals.c, Src/utils.c:
+	* 43474: Src/exec.c, Src/jobs.c, Src/signals.c, Src/utils.c:
 	Remember the last process group to attach to the terminal, not
 	just the set of running processes which did.  Don't
 	record process groups for ESUB_ASYNC subshells.
