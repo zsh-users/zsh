@@ -2745,7 +2745,10 @@ execcmd_fork(Estate state, int how, int type, Wordcode varspc,
 	flags |= ESUB_JOB_CONTROL;
     *filelistp = jobtab[thisjob].filelist;
     entersubsh(flags, &esret);
-    write(synch[1], &esret, sizeof(esret));
+    if (write_loop(synch[1], (const void *) &esret, sizeof(esret)) != sizeof(esret)) {
+	zerr("Failed to send entersubsh_ret report: %e", errno);
+	return -1;
+    }
     close(synch[1]);
     zclose(close_if_forked);
 
