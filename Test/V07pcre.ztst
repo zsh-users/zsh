@@ -1,11 +1,10 @@
 %prep
 
-  if ! zmodload -F zsh/pcre C:pcre-match 2>/dev/null
+  if grep '^name=zsh/pcre .* link=no ' $ZTST_testdir/../config.modules >/dev/null
   then
-    ZTST_unimplemented="the zsh/pcre module is not available"
+    ZTST_unimplemented="the zsh/pcre module was disabled by configure (see config.modules)"
     return 0
   fi
-# Load the rest of the builtins
   zmodload zsh/pcre
   setopt rematch_pcre
 # Find a UTF-8 locale.

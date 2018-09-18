@@ -1,3 +1,8 @@
+2018-09-24  Daniel Shahaf  <danielsh@apache.org>
+
+	* 43493: Test/V07pcre.ztst: Have V07pcre fail if PCRE was enabled
+	by configure (config.modules) but failed to load for any reason.
+
 2018-09-24  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 43527, tweaked: Etc/FAQ.yo: describe "which" output
