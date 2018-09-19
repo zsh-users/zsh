@@ -9,10 +9,12 @@ _setxkbmap() {
     setopt extendedglob
 
     # xkb files may be in different places depending on system
-    local dir sourcedir
-    for dir in /usr/lib/X11/xkb /usr/share/X11/xkb; do
-        if [ -d $dir ] ; then
-           sourcedir=$dir
+    local dir sourcedir fullname
+    local -a searchdirs=(${XDG_DATA_HOME:-~/.local/share} ${(s.:.)XDG_DATA_DIRS:-/usr/lib:/usr/share:/usr/local/lib:/usr/local/share})
+    for dir in $searchdirs; do
+        fullname="$dir/X11/xkb"
+        if [ -d $fullname ] ; then
+           sourcedir=$fullname
            break
         fi
     done
