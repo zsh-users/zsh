@@ -555,6 +555,7 @@ inpush(char *str, int flags, Alias inalias)
 	if ((instacktop->alias = inalias))
 	    inalias->inuse = 1;
     } else {
+	instacktop->alias = NULL;
 	/* If we are continuing an alias expansion, record the alias
 	 * expansion in new set of flags (do we need this?)
 	 */
@@ -691,6 +692,7 @@ char *input_hasalias(void)
     {
 	if (!(flags & INP_CONT))
 	    break;
+	DPUTS(instackptr == instack, "BUG: continuation at bottom of instack");
 	instackptr--;
 	if (instackptr->alias)
 	    return instackptr->alias->node.nam;

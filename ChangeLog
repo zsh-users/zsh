@@ -1,3 +1,8 @@
+2018-09-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 43511: Src/input.c: alias entry on input stack wasn't
+	initialised if not expanding alias or using history.
+
 2018-09-19  Maximilian Bosch  <maximilian@mbosch.me>
 
 	* 43502: Completion/X/Command/_setxkbmap: Search XDG_DATA_DIRS
