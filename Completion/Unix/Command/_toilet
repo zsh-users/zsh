@@ -6,7 +6,7 @@ typeset -A opt_args
 fontdir=$(_call_program path toilet -I2 2>/dev/null)
 
 _arguments \
-  '(-f --font)'{-f,--font}'[specify font]:font:_files -W ${~opt_args[-d]\:-$fontdir} -g \*tlf\*\(-.\:r\)' \
+  '(-f --font)'{-f,--font}'[specify font]:font:_files -W ${~opt_args[-d]\:-$fontdir} -g \*\[ft\]lf\*\(-.\:r\)' \
   '(-d --directory)'{-d,--directory}'[specify font directory]:font directory:_files -/' \
   '(-t --termwidth -w --width)'{-w,--width}'[set output width]:width:' \
   '(-t --termwidth -w --width)'{-t,--termwidth}'[adapt to terminal width]' \
