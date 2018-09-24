@@ -2373,6 +2373,12 @@ item(tt(whence) [ tt(-vcwfpamsS) ] [ tt(-x) var(num) ] var(name) ...)(
 For each var(name), indicate how it would be interpreted if used as a
 command name.
 
+If var(name) is not an alias, built-in command, external command, shell
+function, hashed command, or a reserved word, the exit status shall be
+non-zero, and DASH()- if tt(-v), tt(-c), or tt(-w) was passed DASH()- a message
+will be written to standard output.  (This is different from other shells that
+write that message to standard error.)
+
 tt(whence) is most useful when var(name) is only the last path component
 of a command, i.e. does not include a `tt(/)'; in particular, pattern
 matching only succeeds if just the non-directory component of the command is

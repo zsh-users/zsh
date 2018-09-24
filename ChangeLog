@@ -1,3 +1,8 @@
+2018-09-25  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 43528: Doc/Zsh/builtins.yo: zshbuiltins(1): Document 'which''s
+	"not found is not an error" behaviour.
+
 2018-09-25  Oliver Freyermuth  <o.freyermuth@xxxxxxxxxxxxxx>
 
 	* 43554 (tweaked): Completion/X/Command/_zathura: Fix zathura
