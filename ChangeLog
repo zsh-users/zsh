@@ -1,3 +1,8 @@
+2018-09-24  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 43527, tweaked: Etc/FAQ.yo: describe "which" output
+	behaviour.
+
 2018-09-23  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* gitlab !2: Noam Barnea: Completion/Unix/Command/_toilet:

@@ -127,6 +127,7 @@ Chapter 3:  How to get various things to work
 3.26. Why is my output duplicated with `tt(foo 2>&1 >foo.out | bar)'?
 3.27. What are these `^' and `~' pattern characters, anyway?
 3.28. How do I edit the input buffer in $EDITOR?
+3.29. Why does `which' output for missing commands go to stdout?
 
 Chapter 4:  The mysteries of completion
 4.1. What is completion?
@@ -1962,6 +1963,34 @@ label(328)
   in your tt(~/.zshrc), typing mytt(^F c) will open the entered-so-far
   command-line for editing.  The command will not be automatically executed;
   quitting the editor will only return to zsh's command-line editing mode.
+
+
+sect(Why does `which' output for missing commands go to stdout?)
+
+  The issue is that if you run:
+  verb(
+    which non-existent-command
+  )
+  the error message goes, unusually, to standard output rather than
+  to standard error.  Other shells send this message to standard error,
+  as they would if the command was about to be executed but could not be
+  found.
+
+  The original reason for this is that this behaviour is inherited
+  from the C shell (csh), where `tt(which)' itself originated.  So
+  it has been in zsh a very long time, and it is now a feature.
+  (It would be possible to change this in emulation modes; however.
+  so far this possibility has been seen has more of an additional
+  confusion than a help.)
+
+  If you want some further rationalisation, which may be what the C
+  shell designers had in mind, you might note that `tt(which)' is
+  designed as a way of outputting information about a command.  So
+  `this command can be found in ...' and `this command can't be found'
+  are both bits of information here, unlike the case where the command
+  is to be executed.  So although it differs from other Bourne-style
+  shells it is in fact self-consistent.  Note that the exit status does
+  reflect the fact the command can't be found.
 
 
 chapter(The mysteries of completion)
