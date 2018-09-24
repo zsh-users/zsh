@@ -1,3 +1,9 @@
+2018-09-30  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 43531: Src/Zle/compcore.c: Completion: Fix some false
+	positives in the logic for "are these two candidates completions
+	equivalent".
+
 2018-09-28  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 43570: Src/jobs.c: Start documenting jobs.c, in particular

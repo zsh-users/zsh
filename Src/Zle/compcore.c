@@ -3160,9 +3160,7 @@ matcheq(Cmatch a, Cmatch b)
 	matchstreq(a->ppre, b->ppre) &&
 	matchstreq(a->psuf, b->psuf) &&
 	matchstreq(a->suf, b->suf) &&
-	((!a->disp && !b->disp && matchstreq(a->str, b->str)) ||
-	 (a->disp && b->disp && !strcmp(a->disp, b->disp) &&
-	  matchstreq(a->str, b->str)));
+	  matchstreq(a->str, b->str);
 }
 
 /* Make an array from a linked list. The second argument says whether *
