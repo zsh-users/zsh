@@ -1569,10 +1569,8 @@ zwaitjob(int job, int wait_cmd)
 
            errflag = 0; */
 
-	    if (subsh) {
+	    if (subsh)
 		killjb(jn, SIGCONT);
-		jn->stat &= ~STAT_STOPPED;
-	    }
 	    if (jn->stat & STAT_SUPERJOB)
 		if (handle_sub(jn - jobtab, 1))
 		    break;
@@ -1590,6 +1588,17 @@ zwaitjob(int job, int wait_cmd)
     return 0;
 }
 
+static void waitonejob(Job jn)
+{
+    if (jn->procs || jn->auxprocs)
+	zwaitjob(jn - jobtab, 0);
+    else {
+	deletejob(jn, 0);
+	pipestats[0] = lastval;
+	numpipestats = 1;
+    }
+}
+
 /* wait for running job to finish */
 
 /**/
@@ -1599,13 +1608,10 @@ waitjobs(void)
     Job jn = jobtab + thisjob;
     DPUTS(thisjob == -1, "No valid job in waitjobs.");
 
-    if (jn->procs || jn->auxprocs)
-	zwaitjob(thisjob, 0);
-    else {
-	deletejob(jn, 0);
-	pipestats[0] = lastval;
-	numpipestats = 1;
-    }
+    waitonejob(jn);
+    if (jn->stat & STAT_SUPERJOB)
+	waitonejob(jobtab + jn->other);
+	
     thisjob = -1;
 }
 
@@ -2294,11 +2300,8 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	    Process p;
 
 	    if (findproc(pid, &j, &p, 0)) {
-		if (j->stat & STAT_STOPPED) {
+		if (j->stat & STAT_STOPPED)
 		    retval = (killjb(j, SIGCONT) != 0);
-		    if (retval == 0)
-			makerunning(j);
-		}
 		if (retval == 0) {
 		    /*
 		     * returns 0 for normal exit, else signal+128
@@ -2404,9 +2407,17 @@ bin_fg(char *name, char **argv, Options ops, int func)
 			((!jobtab[job].procs->next ||
 			  (jobtab[job].stat & STAT_SUBLEADER) ||
 			  killpg(jobtab[job].gleader, 0) == -1)) &&
-			jobtab[jobtab[job].other].gleader)
+			jobtab[jobtab[job].other].gleader) {
 			attachtty(jobtab[jobtab[job].other].gleader);
-		    else
+			/*
+			 * In case stopped by putting in background.
+			 * Usually that's visible to the user, who
+			 * can restart, but with a superjob this is done
+			 * behind the scenes, so do it here.  Should
+			 * be harmless if not needed.
+			 */
+			stopped = 1;
+		    } else
 			attachtty(jobtab[job].gleader);
 		}
 	    }

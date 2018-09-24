@@ -1,3 +1,11 @@
+2018-09-24  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 43535: Src/jobs.c, Src/signals.c: fixes for bg / fg handling
+	of superjobs.  Be more consistent about marking jobs running;
+	always send SIGCONT when putting superjob / subjob combination
+	into foreground; wait for both superjob and subjob when waiting
+	for superjob.
+
 2018-09-24  Daniel Shahaf  <danielsh@apache.org>
 
 	* 43493: Test/V07pcre.ztst: Have V07pcre fail if PCRE was enabled
