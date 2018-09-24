@@ -1,3 +1,8 @@
+2018-09-25  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Stephane: 43546: "typeset -p" should show presence of -U
+	option.
+
 2018-09-24  dana  <dana@dana.is>
 
 	* Takeshi Banse: users/23642: Completion/Unix/Type/_files: Revert

@@ -5861,6 +5861,13 @@ printparamnode(HashNode hn, int printflags)
 		}
 	    }
 	}
+	if (p->node.flags & PM_UNIQUE) {
+	    if (!doneminus) {
+	      putchar('-');
+	      doneminus = 1;
+	    }
+	    putchar('U');
+	}
 	if (doneminus)
 	    putchar(' ');
     }
