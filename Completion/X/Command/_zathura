@@ -25,7 +25,7 @@ _zathura_files(){
     elif [[ $pf =~ "poppler" ]]; then
       supported_filetypes+="pdf"
     else
-      supported_filetypes+="${${pf%.so}#${plugins_dir}/lib}"
+      supported_filetypes+="${pf:t:r}"
     fi
   done
   _files -g "*.(${(j.|.)supported_filetypes})(-.)"
