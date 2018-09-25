@@ -819,3 +819,8 @@
 >  [one]=two
 >  [three]=''
 >)
+
+ (typeset -a -U foo=(bar bar)
+ typeset -p foo)
+0:typeset -p of typeset -U
+>typeset -aU foo=( bar )
