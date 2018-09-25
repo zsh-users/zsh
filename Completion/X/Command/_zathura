@@ -8,8 +8,7 @@ _zathura_files(){
     ${(Qv)opt_args[(i)-p|--plugins-dir]}(#qN) \
     {/usr/local,/usr,}/lib/zathura(#qN)
   do
-    plugins_files=( $plugins_dir/*.so )
-    (( $#plugins_files )) && break
+    plugins_files+=( $plugins_dir/*.so(N) )
   done
   if [[ -z "${plugins_files}" ]]; then
     _files -g "*.pdf(-.)"
@@ -28,7 +27,7 @@ _zathura_files(){
       supported_filetypes+="${pf:t:r}"
     fi
   done
-  _files -g "*.(${(j.|.)supported_filetypes})(-.)"
+  _files -g "*.(${(j.|.)${(@u)supported_filetypes}})(-.)"
 }
 
 _arguments -s -S \

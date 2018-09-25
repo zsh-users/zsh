@@ -1,3 +1,8 @@
+2018-09-25  Oliver Freyermuth  <o.freyermuth@xxxxxxxxxxxxxx>
+
+	* 43554 (tweaked): Completion/X/Command/_zathura: Fix zathura
+	completion ignoring multiple plugin directories.
+
 2018-09-25  Oliver Freyermuth  <o.freyermuth@googlemail.com>
 
 	* 43544: Completion/X/Command/_zathura: Fix zathura filename
