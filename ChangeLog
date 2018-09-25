@@ -1,10 +1,16 @@
+2018-09-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 43543: Src/jobs.c: Improvements to 43535: attempt to keep
+	STAT_STOPPED correct for superjob, also wait for subjob before
+	superjob.
+
 2018-09-25  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
-	* unposted: Test/B02typeset.ztst: Add a test for 43546.
+	* unposted: Test/B02typeset.ztst: Add a test for 43536.
 
 2018-09-25  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* Stephane: 43546: "typeset -p" should show presence of -U
+	* Stephane: 43536: "typeset -p" should show presence of -U
 	option.
 
 2018-09-24  dana  <dana@dana.is>

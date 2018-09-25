@@ -459,19 +459,29 @@ update_job(Job jn)
 	    jn->ty = (struct ttyinfo *) zalloc(sizeof(struct ttyinfo));
 	    gettyinfo(jn->ty);
 	}
-	if (jn->stat & STAT_STOPPED) {
-	    if (jn->stat & STAT_SUBJOB) {
-		/* If we have `cat foo|while read a; grep $a bar;done'
-		 * and have hit ^Z, the sub-job is stopped, but the
-		 * super-job may still be running, waiting to be stopped
-		 * or to exit. So we have to send it a SIGTSTP. */
-		int i;
+	if (jn->stat & STAT_SUBJOB) {
+	    /* If we have `cat foo|while read a; grep $a bar;done'
+	     * and have hit ^Z, the sub-job is stopped, but the
+	     * super-job may still be running, waiting to be stopped
+	     * or to exit. So we have to send it a SIGTSTP. */
+	    int i;
 
-		if ((i = super_job(job)))
-		    killpg(jobtab[i].gleader, SIGTSTP);
+	    if ((i = super_job(job))) {
+		killpg(jobtab[i].gleader, SIGTSTP);
+		/*
+		 * Job may already be stopped if it consists of only the
+		 * forked shell waiting for the subjob -- so mark as
+		 * stopped immediately.  This ensures we send it (and,
+		 * crucially, the subjob, as the visible job used with
+		 * fg/bg is the superjob) a SIGCONT if we need it.
+		 */
+		jobtab[i].stat |= STAT_CHANGED | STAT_STOPPED;
 	    }
+	    jn->stat |= STAT_CHANGED | STAT_STOPPED;
 	    return;
 	}
+	if (jn->stat & STAT_STOPPED)
+	    return;
     }
     {                   /* job is done or stopped, remember return value */
 	lastval2 = val;
@@ -1608,10 +1618,11 @@ waitjobs(void)
     Job jn = jobtab + thisjob;
     DPUTS(thisjob == -1, "No valid job in waitjobs.");
 
-    waitonejob(jn);
+    /* If there's a subjob, it should finish first. */
     if (jn->stat & STAT_SUPERJOB)
 	waitonejob(jobtab + jn->other);
-	
+    waitonejob(jn);
+
     thisjob = -1;
 }
 
@@ -2407,17 +2418,9 @@ bin_fg(char *name, char **argv, Options ops, int func)
 			((!jobtab[job].procs->next ||
 			  (jobtab[job].stat & STAT_SUBLEADER) ||
 			  killpg(jobtab[job].gleader, 0) == -1)) &&
-			jobtab[jobtab[job].other].gleader) {
+			jobtab[jobtab[job].other].gleader)
 			attachtty(jobtab[jobtab[job].other].gleader);
-			/*
-			 * In case stopped by putting in background.
-			 * Usually that's visible to the user, who
-			 * can restart, but with a superjob this is done
-			 * behind the scenes, so do it here.  Should
-			 * be harmless if not needed.
-			 */
-			stopped = 1;
-		    } else
+		    else
 			attachtty(jobtab[job].gleader);
 		}
 	    }
