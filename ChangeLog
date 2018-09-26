@@ -1,5 +1,7 @@
 2018-09-26  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 43564: Better output concerning stopped subjob.
+
 	* 43542 (tweaked): Etc/FAQ.yo: further update about which output.
 
 2018-09-25  Daniel Shahaf  <d.s@daniel.shahaf.name>

@@ -466,8 +466,10 @@ update_job(Job jn)
 	     * or to exit. So we have to send it a SIGTSTP. */
 	    int i;
 
+	    jn->stat |= STAT_CHANGED | STAT_STOPPED;
 	    if ((i = super_job(job))) {
-		killpg(jobtab[i].gleader, SIGTSTP);
+		Job sjn = &jobtab[i];
+		killpg(sjn->gleader, SIGTSTP);
 		/*
 		 * Job may already be stopped if it consists of only the
 		 * forked shell waiting for the subjob -- so mark as
@@ -475,9 +477,20 @@ update_job(Job jn)
 		 * crucially, the subjob, as the visible job used with
 		 * fg/bg is the superjob) a SIGCONT if we need it.
 		 */
-		jobtab[i].stat |= STAT_CHANGED | STAT_STOPPED;
+		sjn->stat |= STAT_CHANGED | STAT_STOPPED;
+		if (isset(NOTIFY) && (sjn->stat & STAT_LOCKED) &&
+		    !(sjn->stat & STAT_NOPRINT)) {
+		    /*
+		     * Print the subjob state, which we don't usually
+		     * do, so the user knows something has stopped.
+		     * So as not to be confusing, we actually output
+		     * the user-visible superjob.
+		     */
+		    if (printjob(sjn, !!isset(LONGLISTJOBS), 0) &&
+			zleactive)
+			zleentry(ZLE_CMD_REFRESH);
+		}
 	    }
-	    jn->stat |= STAT_CHANGED | STAT_STOPPED;
 	    return;
 	}
 	if (jn->stat & STAT_STOPPED)
@@ -1035,13 +1048,32 @@ printjob(Job jn, int lng, int synch)
 	   "bogus job number, jn = %L, jobtab = %L, oldjobtab = %L",
 	   (long)jn, (long)jobtab, (long)oldjobtab);
 
-    if (jn->stat & STAT_NOPRINT) {
+    if (jn->stat & STAT_NOPRINT)
 	skip_print = 1;
-    }
 
     if (lng < 0) {
 	conted = 1;
 	lng = !!isset(LONGLISTJOBS);
+    }
+
+    if (jn->stat & STAT_SUPERJOB &&
+	jn->other)
+    {
+	Job sjn = &jobtab[jn->other];
+	if (sjn->stat & STAT_STOPPED)
+	{
+	    /*
+	     * A subjob is stopped, which will prevent further excution
+	     * of the superjob, which the user wants to know about.  So
+	     * report the status of the subjob as if it were the
+	     * user-visible superjob.
+	     *
+	     * TBD: there may be other times we want to do this
+	     * which would, for example, remove the need for the
+	     * hack at the top of the loop over processes just below.
+	     */
+	    jn = sjn;
+	}
     }
 
 /* find length of longest signame, check to see */
