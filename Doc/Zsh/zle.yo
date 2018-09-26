@@ -47,11 +47,11 @@ by default be entered in emacs mode by holding the alt key and typing
 a number, or pressing escape before each digit, and in vi command mode
 by typing the number before entering a command.  Generally the numeric
 argument causes the next command entered to be repeated the specified
-number of times, unless otherwise noted below. See also
+number of times, unless otherwise noted below; this is implemented
+by the tt(digit-argument) widget. See also
 ifzman(the em(Arguments) subsection of the em(Widgets) section )\
 ifnzman(noderef(Arguments) )\
-for some other ways the numeric argument can be modified. The default
-bindings mentioned here use the tt(digit-argument) widget.
+for some other ways the numeric argument can be modified.
 
 startmenu()
 menu(Keymaps)
