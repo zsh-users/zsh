@@ -1976,21 +1976,23 @@ sect(Why does `which' output for missing commands go to stdout?)
   as they would if the command was about to be executed but could not be
   found.
 
-  The original reason for this is that this behaviour is inherited
-  from the C shell (csh), where `tt(which)' itself originated.  So
-  it has been in zsh a very long time, and it is now a feature.
-  (It would be possible to change this in emulation modes; however.
-  so far this possibility has been seen has more of an additional
-  confusion than a help.)
+  The original reason for this is that this behaviour is inherited from
+  previous versions of `tt(which)', a builtin in later versions of csh,
+  the C shell, as well as tcsh, an adaptation of the C Shell with better
+  editing, and is also available as a separate script sometimes still
+  found in certain distributions.  Other shells had equivalent commands,
+  `tt(whence)' and `tt(type), that zsh has also adopted.  So in fact
+  this has always been a feature of `tt(which)'.  (It would be possible
+  to change this in emulation modes; however.  So far this possibility
+  has been seen has more of an additional confusion than a help.)
 
-  If you want some further rationalisation, which may be what the C
-  shell designers had in mind, you might note that `tt(which)' is
-  designed as a way of outputting information about a command.  So
-  `this command can be found in ...' and `this command can't be found'
-  are both bits of information here, unlike the case where the command
-  is to be executed.  So although it differs from other Bourne-style
-  shells it is in fact self-consistent.  Note that the exit status does
-  reflect the fact the command can't be found.
+  If you want some further rationalisation, you might note that
+  `tt(which)' is designed as a way of outputting information about a
+  command.  So `this command can be found in ...' and `this command
+  can't be found' are both bits of information here, unlike the case
+  where the command is to be executed.  So although it differs from
+  other Bourne-style shells it is in fact self-consistent.  Note that
+  the exit status does reflect the fact the command can't be found.
 
 
 chapter(The mysteries of completion)
