@@ -30,6 +30,27 @@
 #include "zsh.mdh"
 #include "jobs.pro"
 
+/*
+ * Job control in zsh
+ * ==================
+ *
+ * A 'job' represents a pipeline; see the section JOBS in zshmisc(1)) for an
+ * introduction.  The 'struct job's are allocated in the array 'jobtab' which
+ * has 'jobtabsize' elements.  The job whose processes we are currently
+ * preparing to execute is identified by the global variable 'thisjob'.
+ *
+ * A 'superjob' is a job that represents a complex shell construct that has been
+ * backgrounded.  For example, if one runs '() { vi; echo }', a job is created
+ * for the pipeline 'vi'.  If one then backgrounds vi (with ^Z / SIGTSTP), 
+ * the shell forks; the parent shell returns to the interactive prompt and
+ * the child shell becomes a new job in the parent shell.  The job representing
+ * the child shell to the parent shell is a superjob (STAT_SUPERJOB); the 'vi'
+ * job is marked as a subjob (STAT_SUBJOB) in the parent shell.  When the child
+ * shell is resumed (with fg / SIGCONT), it forwards the signal to vi and,
+ * after vi exits, continues executing the remainder of the function.
+ * (See workers/43565.)
+ */
+
 /* the process group of the shell at startup (equal to mypgprp, except
    when we started without being process group leader */
 
@@ -46,17 +67,17 @@ mod_export pid_t mypgrp;
 /**/
 pid_t last_attached_pgrp;
  
-/* the job we are working on */
+/* the job we are working on, or -1 if none */
  
 /**/
 mod_export int thisjob;
 
-/* the current job (+) */
+/* the current job (%+) */
  
 /**/
 mod_export int curjob;
  
-/* the previous job (-) */
+/* the previous job (%-) */
  
 /**/
 mod_export int prevjob;

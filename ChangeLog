@@ -1,3 +1,8 @@
+2018-09-28  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 43570: Src/jobs.c: Start documenting jobs.c, in particular
+	superjobs.
+
 2018-09-27  Daniel Shahaf  <d.s@xxxxxxxxxxxxxxxxxx>
 
 	* 43563: Doc/Zsh/zle.yo: zshzle: Clarify sentence in
