@@ -203,6 +203,11 @@ elif [[ -d "${gitdir}/rebase-merge" ]]; then
                 # "$hash $subject", but I hope this counts as making an effort.
                 p=${p/x /exec }
                 ;;
+            (*)
+                # Forward compatibility with not-yet-existing 'git rebase -i' verbs.
+                if [[ $p != *\ * ]]; then
+                    p+=" ?"
+                fi
         esac
         git_patches_applied+=("$p")
     done
