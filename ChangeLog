@@ -1,5 +1,9 @@
 2018-10-07  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 43586: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	vcs_info git: Reformat to minimise next diff. No functional
+	change.
+
 	* 43585: Functions/VCS_Info/Backends/VCS_INFO_get_data_svn:
 	vcs_info svn: Recognize working copies in need of an upgrade.
 
