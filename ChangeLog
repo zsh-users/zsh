@@ -1,5 +1,10 @@
 2018-10-07  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 43587: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	vcs_info git: In 'git rebase -i', when computing subjects
+	of applied-patches, handle an edge case where the subject is
+	not available.
+
 	* 43588: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
 	vcs_info git: Make sure applied-patches is of the form "$hash
 	$subject" --- that is, has a space and a non-empty second

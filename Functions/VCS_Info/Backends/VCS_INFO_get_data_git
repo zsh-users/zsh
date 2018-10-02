@@ -196,6 +196,24 @@ elif [[ -d "${gitdir}/rebase-merge" ]]; then
                 # The line is of the form "pick $hash $subject".
                 # Just strip the verb and we're good to go.
                 p=${p#* }
+                # Special case: in an interactive rebase, if the user wrote "p $shorthash\n"
+                # in the editor (without a description after the hash), then the .../done
+                # file will contain "p $longhash $shorthash\n" (git 2.11.0) or "pick $longhash\n"
+                # (git 2.19.0).
+                if [[ $p != *\ * ]]; then
+                        # The line is of the form "pick $longhash\n"
+                        #
+                        # Mark the log message subject as unknown.
+                        # TODO: Can we performantly obtain the subject?
+                        p+=" ?"
+                elif (( ${#${p//[^ ]}} == 1 )) && [[ ${p%% *} == ${p#* }* ]]; then
+                        # The line is of the form "p $longhash $shorthash\n"
+                        #
+                        # The shorthash is superfluous, so discard it, and mark
+                        # the log message subject as unknown.
+                        # TODO: Can we performantly obtain the subject?
+                        p="${p%% *} ?"
+                fi
                 ;;
             (x *)
                 # The line is of the form 'exec foo bar baz' where 'foo bar
@@ -212,6 +230,7 @@ elif [[ -d "${gitdir}/rebase-merge" ]]; then
         git_patches_applied+=("$p")
     done
     if [[ -f "${patchdir}/git-rebase-todo" ]] ; then
+        # TODO: Process ${patchdir}/git-rebase-todo lines like ${patchdir}/done lines are
         git_patches_unapplied=( ${${(f)${"$(<"${patchdir}/git-rebase-todo")"}}:#[#]*} )
     fi
     VCS_INFO_git_handle_patches
