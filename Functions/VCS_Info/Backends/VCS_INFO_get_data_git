@@ -183,6 +183,7 @@ then
     git_patches_unapplied=(${(f)"$(< "${patchdir}/unapplied")"})
     VCS_INFO_git_handle_patches
 elif [[ -d "${gitdir}/rebase-merge" ]]; then
+    # 'git rebase -i'
     patchdir="${gitdir}/rebase-merge"
     local p
     [[ -f "${patchdir}/done" ]] &&
@@ -199,12 +200,13 @@ elif [[ -d "${gitdir}/rebase-merge" ]]; then
     fi
     VCS_INFO_git_handle_patches
 elif [[ -d "${gitdir}/rebase-apply" ]]; then
-    # Fake patch names for all but current patch
+    # 'git rebase' without -i
     patchdir="${gitdir}/rebase-apply"
     local next="${patchdir}/next"
     if [[ -f $next ]]; then
         local cur=$(< $next)
         local p subject
+        # Fake patch names for all but current patch
         for ((p = 1; p < cur; p++)); do
             printf -v "git_patches_applied[$p]"  "%04d ?" "$p"
         done
