@@ -1983,8 +1983,8 @@ sect(Why does `which' output for missing commands go to stdout?)
   found in certain distributions.  Other shells had equivalent commands,
   `tt(whence)' and `tt(type), that zsh has also adopted.  So in fact
   this has always been a feature of `tt(which)'.  (It would be possible
-  to change this in emulation modes; however.  So far this possibility
-  has been seen has more of an additional confusion than a help.)
+  to change this in emulation modes; however, so far this possibility
+  has been seen as more of an additional confusion than a help.)
 
   If you want some further rationalisation, you might note that
   `tt(which)' is designed as a way of outputting information about a

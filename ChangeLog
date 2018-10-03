@@ -1,5 +1,7 @@
 2018-10-03  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unposted: Etc/FAQ.yo: minor typos.
+
 	* 43589: Src/jobs.c: Show subjob status instead of superjob any
 	time it still has processes.
 
