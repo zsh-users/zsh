@@ -1081,17 +1081,13 @@ printjob(Job jn, int lng, int synch)
 	jn->other)
     {
 	Job sjn = &jobtab[jn->other];
-	if (sjn->stat & STAT_STOPPED)
+	if (sjn->procs || sjn->auxprocs)
 	{
 	    /*
-	     * A subjob is stopped, which will prevent further excution
-	     * of the superjob, which the user wants to know about.  So
-	     * report the status of the subjob as if it were the
-	     * user-visible superjob.
-	     *
-	     * TBD: there may be other times we want to do this
-	     * which would, for example, remove the need for the
-	     * hack at the top of the loop over processes just below.
+	     * A subjob still has process, which must finish before
+	     * further excution of the superjob, which the user wants to
+	     * know about.  So report the status of the subjob as if it
+	     * were the user-visible superjob.
 	     */
 	    jn = sjn;
 	}
