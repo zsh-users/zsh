@@ -2347,7 +2347,15 @@ __git_config_option-or-value () {
     color.diff.frag:'color of hunk headers::->color'
     color.diff.func:'color of function in hunk header::->color'
     color.diff.old:'color of removed lines::->color'
+    color.diff.oldMoved:'color of lines removed by a move::->color'
+    color.diff.oldMovedAlternative:'alternative color of lines removed by a move::->color'
+    color.diff.oldMovedAlternativeDimmed:'dimmed alternative color of lines removed by a move::->color'
+    color.diff.oldMovedDimmed:'dimmed color of lines removed by a move::->color'
     color.diff.new:'color of added lines::->color'
+    color.diff.newMoved:'color of lines added by a move::->color'
+    color.diff.newMovedAlternative:'alternative color of lines added by a move::->color'
+    color.diff.newMovedAlternativeDimmed:'dimmed alternative color of lines added by a move::->color'
+    color.diff.newMovedDimmed:'dimmed color of lines added by a move::->color'
     color.diff.commit:'color of commit headers::->color'
     color.diff.whitespace:'color of whitespace errors::->color'
     color.decorate.branch:'color of branches::->color'
@@ -7147,16 +7155,22 @@ __git_setup_diff_options () {
     $exclusive_diff_options'--name-only[show only names of changed files]'
     $exclusive_diff_options'--name-status[show only names and status of changed files]'
     '--submodule=-[select output format for submodule differences]::format:((short\:"show pairs of commit names"
-									     log\:"list commits like git submodule does"
-									     diff\:"show differences"))'
-    '(        --no-color --color-words)--color=-[show colored diff]:: :__git_color_whens'
-    '(--color            --color-words)--no-color[turn off colored diff]'
+                                                                             log\:"list commits like git submodule does"
+                                                                             diff\:"show differences"))'
+    '(        --no-color --color-words --color-moved)--color=-[show colored diff]:: :__git_color_whens'
+    '(--color            --color-words --color-moved)--no-color[turn off colored diff]'
     '--word-diff=-[show word diff]::mode:((color\:"highlight changed words using color"
                                           plain\:"wrap deletions and insertions with markers"
                                           porcelain\:"use special line-based format for scripts"
                                           none\:"disable word diff"))'
     '--word-diff-regex=-[specify what constitutes a word]:word regex'
-    '(--color --no-color              )--color-words=-[show colored-word diff]::word regex'
+    '(--color --no-color                            )--color-words=-[show colored-word diff]::word regex'
+    '(--color --no-color                            )--color-moved=-[color moved lines differently]::mode:((no\:"do not highlith moved lines"
+                                                                                                           default\:"like zebra"
+                                                                                                           plain\:"highlight moved lines with color"
+                                                                                                           blocks\:"greedily detect blocks of moved text of at least 20 characters"
+                                                                                                           zebra\:"like blocks, with alternating colors between different blocks"
+                                                                                                           dimmed-zebra\:"like zebra, uninteresting parts are dimmed"))'
     '--no-renames[turn off rename detection]'
     $exclusive_diff_options'--check[warn if changes introduce trailing whitespace or space/tab indents]'
     '--full-index[show full object name of pre- and post-image blob]'

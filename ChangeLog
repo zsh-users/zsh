@@ -1,3 +1,9 @@
+2018-11-02  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* github #29: Wieland Hoffmann: Completion/Unix/Command/_git:
+	Add completion support for Gits --color-moved option and
+	color settings
+
 2018-10-31  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 43746: Completion/Unix/Command/_ping: update for BSD and
