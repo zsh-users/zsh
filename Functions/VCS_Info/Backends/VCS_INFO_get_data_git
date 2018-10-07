@@ -260,18 +260,11 @@ elif [[ -d "${gitdir}/rebase-apply" ]]; then
               subject=$REPLY
             }
         fi
+        subject=${subject:-'?'}
         if [[ -f "${patchdir}/original-commit" ]]; then
-            if [[ -n $subject ]]; then
-                git_patches_applied+=("$(< ${patchdir}/original-commit) $subject")
-            else
-                git_patches_applied+=("$(< ${patchdir}/original-commit)")
-            fi
+            git_patches_applied+=("$(< ${patchdir}/original-commit) $subject")
         else
-            if [[ -n $subject ]]; then
-                git_patches_applied+=("? $subject")
-            else
-                git_patches_applied+=("?")
-            fi
+            git_patches_applied+=("? $subject")
         fi
         local last="$(< "${patchdir}/last")"
         if (( cur+1 <= last )); then
