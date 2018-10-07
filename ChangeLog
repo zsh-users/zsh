@@ -1,5 +1,9 @@
 2018-10-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 43617: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	vcs_info git: During a non-interactive rebase of a detached head,
+	computer the %b expando correctly.
+
 	* 43619: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
 	vcs_info git: In non-interactive rebases, always set
 	$hook_com[git_patches_applied] to a string of the form 'foo bar',

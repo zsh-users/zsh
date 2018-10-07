@@ -90,7 +90,7 @@ VCS_INFO_git_getbranch () {
         [[ -z ${gitbranch} ]] && [[ -r ${actiondir}/head-name ]] \
             && gitbranch="$(< ${actiondir}/head-name)"
         [[ -z ${gitbranch} || ${gitbranch} == 'detached HEAD' ]] \
-            && gitbranch="$(< ${gitdir}/ORIG_HEAD)"
+            && gitbranch="$(< ${actiondir}/onto)"
 
     elif [[ -f "${gitdir}/MERGE_HEAD" ]] ; then
         gitbranch="$(${(z)gitsymref} 2> /dev/null)"
