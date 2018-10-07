@@ -123,8 +123,9 @@ VCS_INFO_git_getbranch () {
 (( ${+functions[VCS_INFO_git_handle_patches]} )) ||
 VCS_INFO_git_handle_patches () {
     local git_applied_s git_unapplied_s gitmsg
+    # All callers populate $git_patches_applied and $git_patches_unapplied in
+    # order, but the hook requires us to reverse $git_patches_applied.
     git_patches_applied=(${(Oa)git_patches_applied})
-    git_patches_unapplied=(${(Oa)git_patches_unapplied})
 
     VCS_INFO_set-patch-format 'git_patches_applied' 'git_applied_s' \
                               'git_patches_unapplied' 'git_unapplied_s' \

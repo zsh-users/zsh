@@ -10,7 +10,7 @@ This is version 5.6.2 of the shell.  This is a bugfix release, following
 release.
 
 Note in particular the changes highlighted under "Incompatibilities since
-5.5.1" below.  See NEWS for more information.
+5.6.2" below.  See NEWS for more information.
 
 Installing Zsh
 --------------
@@ -30,6 +30,20 @@ Features
 Zsh is a shell with lots of features.  For a list of some of these, see the
 file FEATURES, and for the latest changes see NEWS.  For more
 details, see the documentation.
+
+Incompatibilities since 5.6.2
+-----------------------------
+
+1) vcs_info git: The gen-unapplied-string hook receives the patches in order (next
+to be applied first).  This is consistent with the hg backend and with one of
+two contradictory claims in the documentation (the other one has been corrected).
+In zsh through 5.6.2, the patches were passed in reverse order, next to be
+applied being last in the array.
+
+The gen-applied-string hook is unaffected; it still receives the patches in
+reverse order, from last applied to first applied.
+
+2) 
 
 Incompatibilities since 5.5.1
 -----------------------------

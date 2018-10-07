@@ -1668,7 +1668,7 @@ tt(mq)) backend and in tt(quilt) support when the tt(unapplied-string) is
 generated; the tt(get-unapplied) style must be true.
 
 This hook gets the names of all unapplied patches which tt(vcs_info)
-collected so far in the opposite order, which means that the first argument is
+collected so far in order, which means that the first argument is
 the patch next-in-line to be applied and so forth.
 
 When setting tt(ret) to non-zero, the string in

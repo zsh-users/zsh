@@ -3,8 +3,10 @@
 #
 # Parameters:
 # $1 - name of an array parameter to be the argument to gen-applied-string
+#      (patches in reverse order)
 # $2 - name of a parameter to store the applied-string in
 # $3 - name of an array parameter to be the argument to gen-unapplied-string
+#      (patches in order)
 # $4 - name of a parameter to store the unapplied-string in
 # $5 - context argument for use in zstyle getters
 # $6 - name of a parameter to store a patch-format format string in
