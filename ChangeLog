@@ -1,3 +1,12 @@
+2018-10-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 43618: Functions/VCS_Info/Backends/VCS_INFO_detect_p4,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_bzr,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_git,
+	Functions/VCS_Info/VCS_INFO_quilt: vcs_info: Don't redefine
+	helper functions on every execution of the autoloadable outer
+	function.
+
 2018-10-08  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: tweak to Doc/Zsh/builtins.yo to put close

@@ -16,6 +16,7 @@
 # of having such files in all client root directories and nowhere above.
 
 
+(( ${+functions[VCS_INFO_p4_get_server]} )) ||
 VCS_INFO_p4_get_server() {
   emulate -L zsh
   setopt extendedglob
@@ -43,6 +44,7 @@ VCS_INFO_p4_get_server() {
 }
 
 
+(( ${+functions[VCS_INFO_detect_p4]} )) ||
 VCS_INFO_detect_p4() {
   local serverport p4where
 

@@ -1,5 +1,6 @@
 ## vim:ft=zsh:foldmethod=marker
 
+(( ${+functions[VCS_INFO_quilt-match]} )) ||
 function VCS_INFO_quilt-match() {
     emulate -L zsh
     setopt extendedglob
@@ -20,6 +21,7 @@ function VCS_INFO_quilt-match() {
     return 1
 }
 
+(( ${+functions[VCS_INFO_quilt-standalone-detect]} )) ||
 function VCS_INFO_quilt-standalone-detect() {
     emulate -L zsh
     setopt extendedglob
@@ -58,6 +60,7 @@ function VCS_INFO_quilt-standalone-detect() {
     return 1
 }
 
+(( ${+functions[VCS_INFO_quilt-dirfind]} )) ||
 function VCS_INFO_quilt-dirfind() {
     # This is a wrapper around VCS_INFO_bydir_detect(). It makes sure
     # that $vcs_comm[] is unchanged. Currently, changing anything in it
@@ -80,11 +83,12 @@ function VCS_INFO_quilt-dirfind() {
     return ${ret}
 }
 
+(( ${+functions[VCS_INFO_quilt-patch2subject]} )) ||
 function VCS_INFO_quilt-patch2subject() {
     VCS_INFO_patch2subject "$@"
 }
 
-function VCS_INFO_quilt() {
+{
     emulate -L zsh
     setopt extendedglob
     local mode="$1"
@@ -192,4 +196,3 @@ function VCS_INFO_quilt() {
 
     VCS_INFO_hook 'post-quilt' ${mode} ${patches} ${pc:-\\-nopc-}
 }
-VCS_INFO_quilt "$@"

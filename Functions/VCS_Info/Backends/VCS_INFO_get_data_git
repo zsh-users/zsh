@@ -8,6 +8,7 @@ local -i querystaged queryunstaged
 local -a git_patches_applied git_patches_unapplied
 local -A hook_com
 
+(( ${+functions[VCS_INFO_git_getaction]} )) ||
 VCS_INFO_git_getaction () {
     local gitdir=$1
     local tmp
@@ -70,6 +71,7 @@ VCS_INFO_git_getaction () {
     return 1
 }
 
+(( ${+functions[VCS_INFO_git_getbranch]} )) ||
 VCS_INFO_git_getbranch () {
     local gitdir=$1 tmp actiondir
     local gitsymref="${vcs_comm[cmd]} symbolic-ref HEAD"
@@ -118,6 +120,7 @@ VCS_INFO_git_getbranch () {
     return 0
 }
 
+(( ${+functions[VCS_INFO_git_handle_patches]} )) ||
 VCS_INFO_git_handle_patches () {
     local git_applied_s git_unapplied_s gitmsg
     git_patches_applied=(${(Oa)git_patches_applied})

@@ -8,6 +8,7 @@ local bzrbase bzrbr bzr_changes bzr_type
 local -a bzrinfo
 local -A hook_com bzr_info
 
+(( ${+functions[VCS_INFO_bzr_get_info]} )) ||
 VCS_INFO_bzr_get_info() {
     bzrinfo=( ${(s.:.)$( ${vcs_comm[cmd]} version-info --custom \
         --template="{revno}:{branch_nick}:{clean}")} )
@@ -20,6 +21,7 @@ VCS_INFO_bzr_get_info() {
     fi
 }
 
+(( ${+functions[VCS_INFO_bzr_get_info_restricted]} )) ||
 VCS_INFO_bzr_get_info_restricted() {
     # we are forbidden from fetching info on bound branch from remote repository
     bzrinfo=( $(${vcs_comm[cmd]} revno) ${bzrbase:t} )
@@ -30,6 +32,7 @@ VCS_INFO_bzr_get_info_restricted() {
     fi
 }
 
+(( ${+functions[VCS_INFO_bzr_get_changes]} )) ||
 VCS_INFO_bzr_get_changes() {
     local -A counts
     local line flag
