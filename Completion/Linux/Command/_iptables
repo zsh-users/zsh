@@ -7,7 +7,7 @@ case $service in
   iptables-save | ip6tables-save)
     _arguments -s \
       {-c,--counters}'[include values of packet and byte counters in output]' \
-      {-t,--table}'[specify table]:table:(filter nat mangle)'
+      {-t,--table}'[specify table]:table:(filter nat mangle raw security)'
     return
   ;;
   iptables-restore | ip6tables-restore)
@@ -89,7 +89,7 @@ esac
 local i=1
 typeset -U args
 while
-  (( i=words[(ib.i.)-m|--match]+1 )) 
+  (( i=words[(ib.i.)-m|--match]+1 ))
 (( i<CURRENT )); do
   case ${words[i]}; in
     ah) args+=( '--ahspi[match SPIs in AH header]:*^!:spi' ) ;;
@@ -158,7 +158,7 @@ done
 _arguments -C -s \
   '(-)'{-h,--help}'[print program information]' \
   '(-)'{-V,--version}'[print version information]' \
-  '(-h --help -V --version)'{-t,--table}'[specify table]:table:(filter nat mangle)' \
+  '(-h --help -V --version)'{-t,--table}'[specify table]:table:(filter nat mangle raw security)' \
   "($rcmds $cmds)"{-A,--append}'[append rules to end of specified chain]:chain:->chains' \
   "($rcmds $cmds -c --set-counters)"{-D,--delete}'[delete rules from specified chain]:chain:->chains::rule number:->rulenums' \
   "($rcmds $cmds)"{-I,--insert}'[insert rules before specified rule number]:chain:->chains::rule number:->rulenums' \

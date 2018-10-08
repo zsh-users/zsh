@@ -1,3 +1,8 @@
+2018-10-08  a-wing  <1@233.email>
+
+	* 43623: Completion/Linux/Command/_iptables: Fix Completion
+	iptables -t raw security
+
 2018-10-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 43620 (tweaked): Doc/Zsh/contrib.yo,
