@@ -1,5 +1,8 @@
 2018-10-08  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unposted: tweak to Doc/Zsh/builtins.yo to put close
+	parenthesis on new line for help files script.
+
 	* Stephane: 43616: Doc/Zsh/builtins.yo, Src/Modules/db_gdbm.c,
 	Src/Modules/parameter.c, Src/builtin.c, Src/hashtable.h,
 	Src/params.c, Src/subst.c, Src/zsh.h, Test/B02typeset.ztst:

@@ -2187,7 +2187,8 @@ Note that in zsh (like in pdksh but unlike most other shells) it is
 still possible to create a local variable of the same name as this is
 considered a different variable (though this variable, too, can be marked
 readonly). Special variables that have been made readonly retain their value
-and readonly attribute when made local.)
+and readonly attribute when made local.
+)
 item(tt(-t))(
 Tags the named parameters.  Tags have no special meaning to the shell.
 This flag has a different meaning when used with tt(-f); see above.
