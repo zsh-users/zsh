@@ -1,3 +1,11 @@
+2018-10-08  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Stephane: 43616: Doc/Zsh/builtins.yo, Src/Modules/db_gdbm.c,
+	Src/Modules/parameter.c, Src/builtin.c, Src/hashtable.h,
+	Src/params.c, Src/subst.c, Src/zsh.h, Test/B02typeset.ztst:
+	Fixes and improvements to tied variables and interaction
+	with typeset -p.
+
 2018-10-07  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 43587: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:

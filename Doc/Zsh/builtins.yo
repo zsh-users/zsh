@@ -2029,6 +2029,9 @@ scalar version causes a split on all separators (which cannot be quoted).
 It is possible to apply tt(-T) to two previously tied variables but with a
 different separator character, in which case the variables remain joined
 as before but the separator is changed.
+
+When an existing scalar is tied to a new array, the value of the scalar
+is preserved but no attribute other than export will be preserved.
 )
 enditem()
 
@@ -2076,12 +2079,12 @@ flag.
 )
 item(tt(-U))(
 For arrays (but not for associative arrays), keep only the first
-occurrence of each duplicated value.  This may also be set for
-colon-separated special parameters like tt(PATH) or tt(FIGNORE), etc.
-Note the flag takes effect on assignment, and the type of the
-variable being assigned to is determinative; for variables with
-shared values it is therefore recommended to set the flag for
-all interfaces, e.g. `tt(typeset -U PATH path)'.
+occurrence of each duplicated value.  This may also be set for tied
+parameters (see tt(-T)) or colon-separated special parameters like
+tt(PATH) or tt(FIGNORE), etc.  Note the flag takes effect on assignment,
+and the type of the variable being assigned to is determinative; for
+variables with shared values it is therefore recommended to set the flag
+for all interfaces, e.g. `tt(typeset -U PATH path)'.
 
 This flag has a different meaning when used with tt(-f); see below.
 )
@@ -2174,10 +2177,17 @@ be turned off.
 If the tt(POSIX_BUILTINS) option is set, the readonly attribute is
 more restrictive: unset variables can be marked readonly and cannot then
 be set; furthermore, the readonly attribute cannot be removed from any
-variable.  Note that in zsh (unlike other shells) it is still possible
-to create a local variable of the same name as this is considered a
-different variable (though this variable, too, can be marked readonly).
-)
+variable.
+
+It is still possible to change other attributes of the variable though,
+some of which like tt(-U) or tt(-Z) would affect the value. More generally,
+the readonly attribute should not be relied on as a security mechanism.
+
+Note that in zsh (like in pdksh but unlike most other shells) it is
+still possible to create a local variable of the same name as this is
+considered a different variable (though this variable, too, can be marked
+readonly). Special variables that have been made readonly retain their value
+and readonly attribute when made local.)
 item(tt(-t))(
 Tags the named parameters.  Tags have no special meaning to the shell.
 This flag has a different meaning when used with tt(-f); see above.

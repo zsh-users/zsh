@@ -809,7 +809,7 @@ myfreeparamnode(HashNode hn)
 
     zsfree(pm->node.nam);
     /* If this variable was tied by the user, ename was ztrdup'd */
-    if (pm->node.flags & PM_TIED && pm->ename) {
+    if (!(pm->node.flags & PM_SPECIAL) && pm->ename) {
         zsfree(pm->ename);
         pm->ename = NULL;
     }

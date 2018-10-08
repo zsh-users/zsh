@@ -1886,18 +1886,21 @@ struct tieddata {
 #define PM_ANONYMOUS    (1<<20) /* (function) anonymous function            */
 #define PM_LOCAL	(1<<21) /* this parameter will be made local        */
 #define PM_SPECIAL	(1<<22) /* special builtin parameter                */
-#define PM_DONTIMPORT	(1<<23)	/* do not import this variable              */
-#define PM_RESTRICTED	(1<<24) /* cannot be changed in restricted mode     */
-#define PM_UNSET	(1<<25)	/* has null value                           */
-#define PM_REMOVABLE	(1<<26)	/* special can be removed from paramtab     */
-#define PM_AUTOLOAD	(1<<27) /* autoloaded from module                   */
-#define PM_NORESTORE	(1<<28)	/* do not restore value of local special    */
-#define PM_AUTOALL	(1<<28) /* autoload all features in module
+#define PM_RO_BY_DESIGN (1<<23) /* to distinguish from specials that can be
+				   made read-only by the user               */
+#define PM_READONLY_SPECIAL (PM_SPECIAL|PM_READONLY|PM_RO_BY_DESIGN)
+#define PM_DONTIMPORT	(1<<24)	/* do not import this variable              */
+#define PM_RESTRICTED	(1<<25) /* cannot be changed in restricted mode     */
+#define PM_UNSET	(1<<26)	/* has null value                           */
+#define PM_REMOVABLE	(1<<27)	/* special can be removed from paramtab     */
+#define PM_AUTOLOAD	(1<<28) /* autoloaded from module                   */
+#define PM_NORESTORE	(1<<29)	/* do not restore value of local special    */
+#define PM_AUTOALL	(1<<29) /* autoload all features in module
 				 * when loading: valid only if PM_AUTOLOAD
 				 * is also present.
 				 */
-#define PM_HASHELEM     (1<<29) /* is a hash-element */
-#define PM_NAMEDDIR     (1<<30) /* has a corresponding nameddirtab entry    */
+#define PM_HASHELEM     (1<<30) /* is a hash-element */
+#define PM_NAMEDDIR     (1<<31) /* has a corresponding nameddirtab entry    */
 
 /* The option string corresponds to the first of the variables above */
 #define TYPESET_OPTSTR "aiEFALRZlurtxUhHTkz"
@@ -2138,6 +2141,8 @@ typedef groupset *Groupset;
 #define PRINT_INCLUDEVALUE	(1<<4)
 #define PRINT_TYPESET		(1<<5)
 #define PRINT_LINE	        (1<<6)
+#define PRINT_POSIX_EXPORT	(1<<7)
+#define PRINT_POSIX_READONLY	(1<<8)
 
 /* flags for printing for the whence builtin */
 #define PRINT_WHENCE_CSH	(1<<7)

@@ -290,7 +290,7 @@ static initparam special_params[] ={
 #define GSU(X) BR((GsuScalar)(void *)(&(X)))
 #define NULL_GSU BR((GsuScalar)(void *)NULL)
 #define IPDEF1(A,B,C) {{NULL,A,PM_INTEGER|PM_SPECIAL|C},BR(NULL),GSU(B),10,0,NULL,NULL,NULL,0}
-IPDEF1("#", pound_gsu, PM_READONLY),
+IPDEF1("#", pound_gsu, PM_READONLY_SPECIAL),
 IPDEF1("ERRNO", errno_gsu, PM_UNSET),
 IPDEF1("GID", gid_gsu, PM_DONTIMPORT | PM_RESTRICTED),
 IPDEF1("EGID", egid_gsu, PM_DONTIMPORT | PM_RESTRICTED),
@@ -300,11 +300,11 @@ IPDEF1("SAVEHIST", savehist_gsu, PM_RESTRICTED),
 IPDEF1("SECONDS", intseconds_gsu, 0),
 IPDEF1("UID", uid_gsu, PM_DONTIMPORT | PM_RESTRICTED),
 IPDEF1("EUID", euid_gsu, PM_DONTIMPORT | PM_RESTRICTED),
-IPDEF1("TTYIDLE", ttyidle_gsu, PM_READONLY),
+IPDEF1("TTYIDLE", ttyidle_gsu, PM_READONLY_SPECIAL),
 
 #define IPDEF2(A,B,C) {{NULL,A,PM_SCALAR|PM_SPECIAL|C},BR(NULL),GSU(B),0,0,NULL,NULL,NULL,0}
 IPDEF2("USERNAME", username_gsu, PM_DONTIMPORT|PM_RESTRICTED),
-IPDEF2("-", dash_gsu, PM_READONLY),
+IPDEF2("-", dash_gsu, PM_READONLY_SPECIAL),
 IPDEF2("histchars", histchars_gsu, PM_DONTIMPORT),
 IPDEF2("HOME", home_gsu, PM_UNSET),
 IPDEF2("TERM", term_gsu, PM_UNSET),
@@ -337,7 +337,7 @@ LCIPDEF("LC_TIME"),
 # endif
 #endif /* USE_LOCALE */
 
-#define IPDEF4(A,B) {{NULL,A,PM_INTEGER|PM_READONLY|PM_SPECIAL},BR((void *)B),GSU(varint_readonly_gsu),10,0,NULL,NULL,NULL,0}
+#define IPDEF4(A,B) {{NULL,A,PM_INTEGER|PM_READONLY_SPECIAL},BR((void *)B),GSU(varint_readonly_gsu),10,0,NULL,NULL,NULL,0}
 IPDEF4("!", &lastpid),
 IPDEF4("$", &mypid),
 IPDEF4("?", &lastval),
@@ -377,10 +377,9 @@ IPDEF7("PS3", &prompt3),
 IPDEF7R("PS4", &prompt4),
 IPDEF7("SPROMPT", &sprompt),
 
-#define IPDEF9F(A,B,C,D) {{NULL,A,D|PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT},BR((void *)B),GSU(vararray_gsu),0,0,NULL,C,NULL,0}
-#define IPDEF9(A,B,C) IPDEF9F(A,B,C,0)
-IPDEF9F("*", &pparams, NULL, PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT|PM_READONLY),
-IPDEF9F("@", &pparams, NULL, PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT|PM_READONLY),
+#define IPDEF9(A,B,C,D) {{NULL,A,D|PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT},BR((void *)B),GSU(vararray_gsu),0,0,NULL,C,NULL,0}
+IPDEF9("*", &pparams, NULL, PM_ARRAY|PM_READONLY_SPECIAL|PM_DONTIMPORT),
+IPDEF9("@", &pparams, NULL, PM_ARRAY|PM_READONLY_SPECIAL|PM_DONTIMPORT),
 
 /*
  * This empty row indicates the end of parameters available in
@@ -389,17 +388,17 @@ IPDEF9F("@", &pparams, NULL, PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT|PM_READONLY),
 {{NULL,NULL,0},BR(NULL),NULL_GSU,0,0,NULL,NULL,NULL,0},
 
 #define IPDEF8(A,B,C,D) {{NULL,A,D|PM_SCALAR|PM_SPECIAL},BR((void *)B),GSU(colonarr_gsu),0,0,NULL,C,NULL,0}
-IPDEF8("CDPATH", &cdpath, "cdpath", 0),
-IPDEF8("FIGNORE", &fignore, "fignore", 0),
-IPDEF8("FPATH", &fpath, "fpath", 0),
-IPDEF8("MAILPATH", &mailpath, "mailpath", 0),
-IPDEF8("WATCH", &watch, "watch", 0),
-IPDEF8("PATH", &path, "path", PM_RESTRICTED),
-IPDEF8("PSVAR", &psvar, "psvar", 0),
-IPDEF8("ZSH_EVAL_CONTEXT", &zsh_eval_context, "zsh_eval_context", PM_READONLY),
+IPDEF8("CDPATH", &cdpath, "cdpath", PM_TIED),
+IPDEF8("FIGNORE", &fignore, "fignore", PM_TIED),
+IPDEF8("FPATH", &fpath, "fpath", PM_TIED),
+IPDEF8("MAILPATH", &mailpath, "mailpath", PM_TIED),
+IPDEF8("WATCH", &watch, "watch", PM_TIED),
+IPDEF8("PATH", &path, "path", PM_RESTRICTED|PM_TIED),
+IPDEF8("PSVAR", &psvar, "psvar", PM_TIED),
+IPDEF8("ZSH_EVAL_CONTEXT", &zsh_eval_context, "zsh_eval_context", PM_READONLY_SPECIAL|PM_TIED),
 
 /* MODULE_PATH is not imported for security reasons */
-IPDEF8("MODULE_PATH", &module_path, "module_path", PM_DONTIMPORT|PM_RESTRICTED),
+IPDEF8("MODULE_PATH", &module_path, "module_path", PM_DONTIMPORT|PM_RESTRICTED|PM_TIED),
 
 #define IPDEF10(A,B) {{NULL,A,PM_ARRAY|PM_SPECIAL},BR(NULL),GSU(B),10,0,NULL,NULL,NULL,0}
 
@@ -409,7 +408,7 @@ IPDEF8("MODULE_PATH", &module_path, "module_path", PM_DONTIMPORT|PM_RESTRICTED),
  */
 
 /* All of these have sh compatible equivalents.                */
-IPDEF1("ARGC", argc_gsu, PM_READONLY),
+IPDEF1("ARGC", argc_gsu, PM_READONLY_SPECIAL),
 IPDEF2("HISTCHARS", histchars_gsu, PM_DONTIMPORT),
 IPDEF4("status", &lastval),
 IPDEF7("prompt", &prompt),
@@ -417,20 +416,20 @@ IPDEF7("PROMPT", &prompt),
 IPDEF7("PROMPT2", &prompt2),
 IPDEF7("PROMPT3", &prompt3),
 IPDEF7("PROMPT4", &prompt4),
-IPDEF8("MANPATH", &manpath, "manpath", 0),
-IPDEF9("argv", &pparams, NULL),
-IPDEF9("fignore", &fignore, "FIGNORE"),
-IPDEF9("cdpath", &cdpath, "CDPATH"),
-IPDEF9("fpath", &fpath, "FPATH"),
-IPDEF9("mailpath", &mailpath, "MAILPATH"),
-IPDEF9("manpath", &manpath, "MANPATH"),
-IPDEF9("psvar", &psvar, "PSVAR"),
-IPDEF9("watch", &watch, "WATCH"),
+IPDEF8("MANPATH", &manpath, "manpath", PM_TIED),
+IPDEF9("argv", &pparams, NULL, 0),
+IPDEF9("fignore", &fignore, "FIGNORE", PM_TIED),
+IPDEF9("cdpath", &cdpath, "CDPATH", PM_TIED),
+IPDEF9("fpath", &fpath, "FPATH", PM_TIED),
+IPDEF9("mailpath", &mailpath, "MAILPATH", PM_TIED),
+IPDEF9("manpath", &manpath, "MANPATH", PM_TIED),
+IPDEF9("psvar", &psvar, "PSVAR", PM_TIED),
+IPDEF9("watch", &watch, "WATCH", PM_TIED),
 
-IPDEF9F("zsh_eval_context", &zsh_eval_context, "ZSH_EVAL_CONTEXT", PM_READONLY),
+IPDEF9("zsh_eval_context", &zsh_eval_context, "ZSH_EVAL_CONTEXT", PM_TIED|PM_READONLY_SPECIAL),
 
-IPDEF9F("module_path", &module_path, "MODULE_PATH", PM_RESTRICTED),
-IPDEF9F("path", &path, "PATH", PM_RESTRICTED),
+IPDEF9("module_path", &module_path, "MODULE_PATH", PM_TIED|PM_RESTRICTED),
+IPDEF9("path", &path, "PATH", PM_TIED|PM_RESTRICTED),
 
 /* These are known to zsh alone. */
 
@@ -451,7 +450,7 @@ IPDEF8("MAILPATH", &mailpath, NULL, 0),
 IPDEF8("WATCH", &watch, NULL, 0),
 IPDEF8("PATH", &path, NULL, PM_RESTRICTED),
 IPDEF8("PSVAR", &psvar, NULL, 0),
-IPDEF8("ZSH_EVAL_CONTEXT", &zsh_eval_context, NULL, PM_READONLY),
+IPDEF8("ZSH_EVAL_CONTEXT", &zsh_eval_context, NULL, PM_READONLY_SPECIAL),
 
 /* MODULE_PATH is not imported for security reasons */
 IPDEF8("MODULE_PATH", &module_path, NULL, PM_DONTIMPORT|PM_RESTRICTED),
@@ -464,7 +463,7 @@ IPDEF8("MODULE_PATH", &module_path, NULL, PM_DONTIMPORT|PM_RESTRICTED),
  * and $@, this is not readonly.  This parameter is not directly
  * visible in user space.
  */
-static initparam argvparam_pm = IPDEF9F("", &pparams, NULL, \
+static initparam argvparam_pm = IPDEF9("", &pparams, NULL, \
 				 PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT);
 
 #undef BR
@@ -5024,10 +5023,10 @@ arrfixenv(char *s, char **t)
     if (!(pm->node.flags & PM_EXPORTED))
 	return;
 
-    if (pm->node.flags & PM_TIED)
-	joinchar = STOUC(((struct tieddata *)pm->u.data)->joinchar);
-    else
+    if (pm->node.flags & PM_SPECIAL)
 	joinchar = ':';
+    else
+	joinchar = STOUC(((struct tieddata *)pm->u.data)->joinchar);
 
     addenv(pm, t ? zjoin(t, joinchar, 1) : "");
 }
@@ -5650,7 +5649,7 @@ freeparamnode(HashNode hn)
 	pm->gsu.s->unsetfn(pm, 1);
     zsfree(pm->node.nam);
     /* If this variable was tied by the user, ename was ztrdup'd */
-    if (pm->node.flags & PM_TIED)
+    if (!(pm->node.flags & PM_SPECIAL))
 	zsfree(pm->ename);
     zfree(pm, sizeof(struct param));
 }
@@ -5685,7 +5684,9 @@ static const struct paramtypes pmtypes[] = {
     { PM_UPPER, "uppercase", 'u', 0},
     { PM_READONLY, "readonly", 'r', 0},
     { PM_TAGGED, "tagged", 't', 0},
-    { PM_EXPORTED, "exported", 'x', 0}
+    { PM_EXPORTED, "exported", 'x', 0},
+    { PM_UNIQUE, "unique", 'U', 0},
+    { PM_TIED, "tied", 'T', 0}
 };
 
 #define PMTYPES_SIZE ((int)(sizeof(pmtypes)/sizeof(struct paramtypes)))
@@ -5774,10 +5775,6 @@ printparamvalue(Param p, int printflags)
 	}
 	break;
     }
-    if ((printflags & (PRINT_KV_PAIR|PRINT_LINE)) == PRINT_KV_PAIR)
-	putchar(' ');
-    else if (!(printflags & PRINT_KV_PAIR))
-	putchar('\n');
 }
 
 /**/
@@ -5785,36 +5782,41 @@ mod_export void
 printparamnode(HashNode hn, int printflags)
 {
     Param p = (Param) hn;
+    Param peer = NULL;
 
     if (p->node.flags & PM_UNSET) {
-	if (isset(POSIXBUILTINS) && (p->node.flags & PM_READONLY) &&
-	    (printflags & PRINT_TYPESET))
-	{
+	if (printflags & (PRINT_POSIX_READONLY|PRINT_POSIX_EXPORT) &&
+	    p->node.flags & (PM_READONLY|PM_EXPORTED)) {
 	    /*
-	     * Special POSIX rules: show the parameter as readonly
+	     * Special POSIX rules: show the parameter as readonly/exported
 	     * even though it's unset, but with no value.
 	     */
 	    printflags |= PRINT_NAMEONLY;
 	}
-	else if (p->node.flags & PM_EXPORTED)
-	    printflags |= PRINT_NAMEONLY;
 	else
 	    return;
     }
     if (p->node.flags & PM_AUTOLOAD)
 	printflags |= PRINT_NAMEONLY;
 
-    if (printflags & PRINT_TYPESET) {
-	if ((p->node.flags & (PM_READONLY|PM_SPECIAL)) ==
-	    (PM_READONLY|PM_SPECIAL) ||
-	    (p->node.flags & PM_AUTOLOAD)) {
+    if (printflags & (PRINT_TYPESET|PRINT_POSIX_READONLY|PRINT_POSIX_EXPORT)) {
+	if (p->node.flags & (PM_RO_BY_DESIGN|PM_AUTOLOAD)) {
 	    /*
 	     * It's not possible to restore the state of
 	     * these, so don't output.
 	     */
 	    return;
 	}
-	if (locallevel && p->level >= locallevel) {
+	/*
+	 * The zsh variants of export -p/readonly -p also report other
+	 * flags to indicate other attributes or scope. The POSIX variants
+	 * don't.
+	 */
+	if (printflags & PRINT_POSIX_EXPORT) {
+	    printf("export ");
+	} else if (printflags & PRINT_POSIX_READONLY) {
+	    printf("readonly ");
+	} else if (locallevel && p->level >= locallevel) {
 	    printf("typeset ");	    /* printf("local "); */
 	} else if ((p->node.flags & PM_EXPORTED) &&
 		   !(p->node.flags & (PM_ARRAY|PM_HASHED))) {
@@ -5861,22 +5863,48 @@ printparamnode(HashNode hn, int printflags)
 		}
 	    }
 	}
-	if (p->node.flags & PM_UNIQUE) {
-	    if (!doneminus) {
-	      putchar('-');
-	      doneminus = 1;
-	    }
-	    putchar('U');
-	}
 	if (doneminus)
 	    putchar(' ');
+
+	if (p->node.flags & PM_TIED) {
+	    /*
+	     * For scalars tied to arrays,s
+	     *   * typeset +m outputs
+	     *      array tied SCALAR array
+	     *      tied array SCALAR
+	     *   * typeset -p outputs:
+	     *      typeset -T SCALAR array  (for hidden values)
+	     *      typeset -T SCALAR array=(values)
+	     *      for both scalar and array (flags may be different)
+	     *
+	     * We choose to print the value for the array instead of the scalar
+	     * as scalars can't disambiguate between
+	     * typeset -T SCALAR array=()
+	     * and
+	     * typeset -T SCALAR array=('')
+	     * (same for (a b:c)...)
+	     */
+	    Param tmp = (Param) paramtab->getnode(paramtab, p->ename);
+
+	    /*
+	     * Swap param and tied peer for typeset -p output
+	     */
+	    if (!(printflags & PRINT_TYPESET) || (p->node.flags & PM_ARRAY))
+		peer = tmp;
+	    else {
+		peer = p;
+		p = tmp;
+	    }
+
+	    quotedzputs(peer->node.nam, stdout);
+	    putchar(' ');
+	}
     }
 
     if ((printflags & PRINT_NAMEONLY) ||
-	((p->node.flags & PM_HIDEVAL) && !(printflags & PRINT_INCLUDEVALUE))) {
-	zputs(p->node.nam, stdout);
-	putchar('\n');
-    } else {
+	((p->node.flags & PM_HIDEVAL) && !(printflags & PRINT_INCLUDEVALUE)))
+	quotedzputs(p->node.nam, stdout);
+    else {
 	if (printflags & PRINT_KV_PAIR) {
 	    if (printflags & PRINT_LINE)
 		printf("\n  ");
@@ -5888,4 +5916,22 @@ printparamnode(HashNode hn, int printflags)
 
 	printparamvalue(p, printflags);
     }
+    if (peer && (printflags & PRINT_TYPESET) && !(p->node.flags & PM_SPECIAL)) {
+	/*
+	 * append the join char for tied parameters if different from colon
+	 * for typeset -p output.
+	 */
+	unsigned char joinchar = STOUC(((struct tieddata *)peer->u.data)->joinchar);
+	if (joinchar != ':') {
+	    char buf[2];
+	    buf[0] = joinchar;
+	    buf[1] = '\0';
+	    putchar(' ');
+	    quotedzputs(buf, stdout);
+	}
+    }
+    if ((printflags & (PRINT_KV_PAIR|PRINT_LINE)) == PRINT_KV_PAIR)
+	putchar(' ');
+    else if (!(printflags & PRINT_KV_PAIR))
+	putchar('\n');
 }
