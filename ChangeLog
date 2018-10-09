@@ -1,5 +1,8 @@
 2018-10-09  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 43656: Src/builtin.c: special tied parameters don't have
+	tieddata.
+
 	* unposted: Test/C03traps.ztst: addition to previous test
 	suggested by Mikael.
 

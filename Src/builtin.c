@@ -2258,7 +2258,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	    } else if (pm->env && !(pm->node.flags & PM_HASHELEM))
 		delenv(pm);
 	    DPUTS(ASG_ARRAYP(asg), "BUG: typeset got array value where scalar expected");
-	    if (altpm) {
+	    if (altpm && !(pm->node.flags & PM_SPECIAL)) {
 		struct tieddata* tdp = (struct tieddata *) pm->u.data;
 		if (tdp) {
 		    if (tdp->joinchar != joinchar && !asg->value.scalar) {
