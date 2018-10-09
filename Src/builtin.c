@@ -5709,7 +5709,13 @@ int shell_exiting;
 mod_export void
 zexit(int val, int from_where)
 {
-    /* Don't do anything recursively:  see below */
+    static int exit_val;
+    /*
+     * Don't do anything recursively:  see below.
+     * Do, however, update exit status --- there's no nesting,
+     * a later value always overrides an earlier.
+     */
+    exit_val = val;
     if (shell_exiting == -1)
 	return;
 
@@ -5757,7 +5763,7 @@ zexit(int val, int from_where)
 #endif
 	}
     }
-    lastval = val;
+    lastval = exit_val;
     /*
      * Now we are committed to exiting any previous state
      * is irrelevant.  Ensure trap can run.
@@ -5771,9 +5777,9 @@ zexit(int val, int from_where)
        release_pgrp();
     }
     if (mypid != getpid())
-	_exit(val);
+	_exit(exit_val);
     else
-	exit(val);
+	exit(exit_val);
 }
 
 /* . (dot), source */

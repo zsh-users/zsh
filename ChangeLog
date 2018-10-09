@@ -1,3 +1,8 @@
+2018-10-09  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 43653: Src/builtin.c, Test/C03traps.ztst: explicit exit from
+	EXIT trap overrides previous status.
+
 2018-10-08  a-wing  <1@233.email>
 
 	* 43623: Completion/Linux/Command/_iptables: Fix Completion
