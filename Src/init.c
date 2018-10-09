@@ -157,7 +157,7 @@ loop(int toplevel, int justonce)
 		 * Handle that now.
 		 */
 		stopmsg = 1;
-		zexit(exit_pending >> 1, 0);
+		zexit(exit_val, 0);
 	    }
 	    if (tok == LEXERR && !lastval)
 		lastval = 1;
@@ -215,14 +215,14 @@ loop(int toplevel, int justonce)
 	    clearerr(stderr);
 	}
 	if (subsh)		/* how'd we get this far in a subshell? */
-	    exit(lastval);
+	    realexit();
 	if (((!interact || sourcelevel) && errflag) || retflag)
 	    break;
 	if (isset(SINGLECOMMAND) && toplevel) {
 	    dont_queue_signals();
 	    if (sigtrapped[SIGEXIT])
 		dotrap(SIGEXIT);
-	    exit(lastval);
+	    realexit();
 	}
 	if (justonce)
 	    break;
@@ -1358,7 +1358,7 @@ init_misc(char *cmd, char *zsh_name)
 	bshin = fdopen(SHIN, "r");
 	execstring(cmd, 0, 1, "cmdarg");
 	stopmsg = 1;
-	zexit(lastval, 0);
+	zexit(exit_val ? exit_val : lastval, 0);
     }
 
     if (interact && isset(RCS))

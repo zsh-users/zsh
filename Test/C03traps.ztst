@@ -869,6 +869,10 @@ F:Must be tested with a top-level script rather than source or function
   $ZTST_testdir/../Src/zsh -fc 'fn() { exit $?+8; }; trap fn EXIT; exit 7'
 15:Progated exit status through exit trap
 
+  $ZTST_testdir/../Src/zsh -fc 'fn() { exit 13; }; trap fn EXIT'
+13:Explicit exit in exit trap overrides implicit exit status
+
 %clean
 
   rm -f TRAPEXIT
+

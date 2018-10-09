@@ -5647,8 +5647,9 @@ bin_break(char *name, char **argv, UNUSED(Options ops), int func)
 	    if (stopmsg || (zexit(0,2), !stopmsg)) {
 		retflag = 1;
 		breaks = loops;
-		exit_pending = (num << 1) | 1;
+		exit_pending = 1;
 		exit_level = locallevel;
+		exit_val = num;
 	    }
 	} else
 	    zexit(num, 0);
@@ -5698,6 +5699,42 @@ checkjobs(void)
 /**/
 int shell_exiting;
 
+/*
+ * Exit status if explicitly set by an exit command.
+ * This is complicated by the fact the exit command may be within
+ * a function whose state we need to unwind (exit_pending set
+ * and the exit will happen up the stack), or we may need to execute
+ * additional code such as a trap after we are committed to exiting
+ * (shell_exiting and the exit will happen down the stack).
+ *
+ * It's lucky this is all so obvious there is no possibility of any
+ * bugs.  (C.f. the entire rest of the shell.)
+ */
+/**/
+int exit_val;
+
+/*
+ * Actually exit the shell, working out the status locally.
+ * This is exit_val if "exit" has explicitly been called in the shell,
+ * else lastval.
+ */
+
+/**/
+void
+realexit(void)
+{
+    exit(exit_val ? exit_val : lastval);
+}
+
+/* As realexit(), but call _exit instead */
+
+/**/
+void
+_realexit(void)
+{
+    _exit(exit_val ? exit_val : lastval);
+}
+
 /* exit the shell.  val is the return value of the shell.  *
  * from_where is
  *   1   if zexit is called because of a signal
@@ -5709,7 +5746,6 @@ int shell_exiting;
 mod_export void
 zexit(int val, int from_where)
 {
-    static int exit_val;
     /*
      * Don't do anything recursively:  see below.
      * Do, however, update exit status --- there's no nesting,
