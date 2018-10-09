@@ -1,5 +1,9 @@
 2018-10-09  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 43660: Src/builtin.c, Src/exec.c, Src/init.c,
+	Test/C03traps.ztst: extend 43653 for implicit exit and combine
+	logic with pending exit status from exits within functions.
+
 	* 43656: Src/builtin.c: special tied parameters don't have
 	tieddata.
 
