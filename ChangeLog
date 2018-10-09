@@ -1,5 +1,8 @@
 2018-10-09  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unposted: Test/C03traps.ztst: addition to previous test
+	suggested by Mikael.
+
 	* 43653: Src/builtin.c, Test/C03traps.ztst: explicit exit from
 	EXIT trap overrides previous status.
 
