@@ -875,6 +875,12 @@ F:Must be tested with a top-level script rather than source or function
   $ZTST_testdir/../Src/zsh -fc 'fn() { exit 0; }; trap fn EXIT; false'
 0:Explicit exit status 0 in exit trap overrides implicit non-zero status
 
+  $ZTST_testdir/../Src/zsh -f <<<'fn() { exit 13; }; trap fn EXIT; false'
+13:Exit status from exit trap, script-like path
+
+  $ZTST_testdir/../Src/zsh -f <<<'fn() { exit 0; }; trap fn EXIT; false'
+0:Explicit exit status overrides implicit: script-like code path
+
 %clean
 
   rm -f TRAPEXIT
