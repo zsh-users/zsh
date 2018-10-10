@@ -5723,7 +5723,7 @@ int exit_val;
 void
 realexit(void)
 {
-    exit(exit_val ? exit_val : lastval);
+    exit((shell_exiting || exit_pending) ? exit_val : lastval);
 }
 
 /* As realexit(), but call _exit instead */
@@ -5732,7 +5732,7 @@ realexit(void)
 void
 _realexit(void)
 {
-    _exit(exit_val ? exit_val : lastval);
+    _exit((shell_exiting || exit_pending) ? exit_val : lastval);
 }
 
 /* exit the shell.  val is the return value of the shell.  *

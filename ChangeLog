@@ -1,3 +1,8 @@
+2018-10-10  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 43669: Src/builtin.c, Src/init.c, Test/C03traps.ztst: ensure
+	explicit exit status is used rather than implicit.
+
 2018-10-09  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 43660: Src/builtin.c, Src/exec.c, Src/init.c,

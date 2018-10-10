@@ -1358,7 +1358,7 @@ init_misc(char *cmd, char *zsh_name)
 	bshin = fdopen(SHIN, "r");
 	execstring(cmd, 0, 1, "cmdarg");
 	stopmsg = 1;
-	zexit(exit_val ? exit_val : lastval, 0);
+	zexit((exit_pending || shell_exiting) ? exit_val : lastval, 0);
     }
 
     if (interact && isset(RCS))
