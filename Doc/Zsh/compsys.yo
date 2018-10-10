@@ -489,7 +489,11 @@ The parameter tt($_compskip) may be set by any function defined for a
 pattern context.  If it is set to a value containing the substring
 `tt(patterns)' none of the pattern-functions will be called; if it is
 set to a value containing the substring `tt(all)', no other function
-will be called.
+will be called.  Setting tt($_compskip) in this manner is of particular
+utility when using the tt(-p) option, as otherwise the dispatcher will
+move on to additional functions (likely the default one) after calling
+the pattern-context one, which can mangle the display of completion
+possibilities if not handled properly.
 
 The form with tt(-k) defines a widget with the same name as the var(function)
 that will be called for each of the var(key-sequence)s; this is like the
