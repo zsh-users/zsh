@@ -1867,7 +1867,7 @@ struct tieddata {
 /* The following are the same since they *
  * both represent -U option to typeset   */
 #define PM_UNIQUE	(1<<13)	/* remove duplicates                        */
-#define PM_UNALIASED	(1<<13)	/* do not expand aliases when autoloading   */
+#define PM_UNALIASED	(1<<13)	/* (function) do not expand aliases when autoloading   */
 
 #define PM_HIDE		(1<<14)	/* Special behaviour hidden by local        */
 #define PM_CUR_FPATH    (1<<14) /* (function): can use $fpath with filename */
@@ -1876,31 +1876,30 @@ struct tieddata {
 #define PM_TIED 	(1<<16)	/* array tied to colon-path or v.v.         */
 #define PM_TAGGED_LOCAL (1<<16) /* (function): non-recursive PM_TAGGED      */
 
-#define PM_KSHSTORED	(1<<17) /* function stored in ksh form              */
-#define PM_ZSHSTORED	(1<<18) /* function stored in zsh form              */
-
 /* Remaining flags do not correspond directly to command line arguments */
-#define PM_DONTIMPORT_SUID (1<<19) /* do not import if running setuid */
-#define PM_LOADDIR      (1<<19) /* (function) filename gives load directory */
-#define PM_SINGLE       (1<<20) /* special can only have a single instance  */
-#define PM_ANONYMOUS    (1<<20) /* (function) anonymous function            */
-#define PM_LOCAL	(1<<21) /* this parameter will be made local        */
-#define PM_SPECIAL	(1<<22) /* special builtin parameter                */
-#define PM_RO_BY_DESIGN (1<<23) /* to distinguish from specials that can be
+#define PM_DONTIMPORT_SUID (1<<17) /* do not import if running setuid */
+#define PM_LOADDIR      (1<<17) /* (function) filename gives load directory */
+#define PM_SINGLE       (1<<18) /* special can only have a single instance  */
+#define PM_ANONYMOUS    (1<<18) /* (function) anonymous function            */
+#define PM_LOCAL	(1<<19) /* this parameter will be made local        */
+#define PM_KSHSTORED	(1<<19) /* (function) stored in ksh form              */
+#define PM_SPECIAL	(1<<20) /* special builtin parameter                */
+#define PM_ZSHSTORED	(1<<20) /* (function) stored in zsh form              */
+#define PM_RO_BY_DESIGN (1<<21) /* to distinguish from specials that can be
 				   made read-only by the user               */
 #define PM_READONLY_SPECIAL (PM_SPECIAL|PM_READONLY|PM_RO_BY_DESIGN)
-#define PM_DONTIMPORT	(1<<24)	/* do not import this variable              */
-#define PM_RESTRICTED	(1<<25) /* cannot be changed in restricted mode     */
-#define PM_UNSET	(1<<26)	/* has null value                           */
-#define PM_REMOVABLE	(1<<27)	/* special can be removed from paramtab     */
-#define PM_AUTOLOAD	(1<<28) /* autoloaded from module                   */
-#define PM_NORESTORE	(1<<29)	/* do not restore value of local special    */
-#define PM_AUTOALL	(1<<29) /* autoload all features in module
+#define PM_DONTIMPORT	(1<<22)	/* do not import this variable              */
+#define PM_RESTRICTED	(1<<23) /* cannot be changed in restricted mode     */
+#define PM_UNSET	(1<<24)	/* has null value                           */
+#define PM_REMOVABLE	(1<<25)	/* special can be removed from paramtab     */
+#define PM_AUTOLOAD	(1<<26) /* autoloaded from module                   */
+#define PM_NORESTORE	(1<<27)	/* do not restore value of local special    */
+#define PM_AUTOALL	(1<<27) /* autoload all features in module
 				 * when loading: valid only if PM_AUTOLOAD
 				 * is also present.
 				 */
-#define PM_HASHELEM     (1<<30) /* is a hash-element */
-#define PM_NAMEDDIR     (1<<31) /* has a corresponding nameddirtab entry    */
+#define PM_HASHELEM     (1<<28) /* is a hash-element */
+#define PM_NAMEDDIR     (1<<29) /* has a corresponding nameddirtab entry    */
 
 /* The option string corresponds to the first of the variables above */
 #define TYPESET_OPTSTR "aiEFALRZlurtxUhHTkz"
