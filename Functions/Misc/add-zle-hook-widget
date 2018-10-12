@@ -129,7 +129,7 @@ function add-zle-hook-widget {
     else
 	# Check whether attempting to add a widget named for the hook
 	if [[ "$fn" = "$hook" ]]; then
-	    if [[ -n "${widgets[$fn]}" ]]; then
+	    if (( ${+widgets[$fn]} )); then
 		print -u2 "$funcstack[1]: Cannot hook $fn to itself"
 		return 1
 	    fi
@@ -141,8 +141,8 @@ function add-zle-hook-widget {
 	integer i=${#options[ksharrays]}-2
 	zstyle -g extant_hooks "$hook" widgets
         # Check for an existing widget, add it as the first hook
-	if [[ ${widgets[$hook]} != "user:azhw:$hook" ]]; then
-	    if [[ -n ${widgets[$hook]} ]]; then
+	if [[ ${widgets[$hook]:-} != "user:azhw:$hook" ]]; then
+	    if [[ -n ${widgets[$hook]:-} ]]; then
 		zle -A "$hook" "${widgets[$hook]}"
 		extant_hooks=(0:"${widgets[$hook]}" "${extant_hooks[@]}")
 	    fi
@@ -152,17 +152,17 @@ function add-zle-hook-widget {
 	if [[ -z ${(M)extant_hooks[@]:#(<->:|)$fn} ]]; then
        	    # no index and not already hooked
             # assign largest existing index plus 1
-	    i=${${(On@)${(@M)extant_hooks[@]#<->:}%:}[i]}+1
+	    i=${${(On@)${(@M)extant_hooks[@]#<->:}%:}[i]:-0}+1
 	else
 	    return 0
 	fi
 	extant_hooks+=("${i}:${fn}")
 	zstyle -- "$hook" widgets "${extant_hooks[@]}"
-	if [[ -z "${widgets[$fn]}" ]]; then
+	if (( ! ${+widgets[$fn]} )); then
 	    autoload "${autoopts[@]}" -- "$fn"
 	    zle -N -- "$fn"
 	fi
-	if [[ -z "${widgets[$hook]}" ]]; then
+	if (( ! ${+widgets[$hook]} )); then
 	    zle -N "$hook" azhw:"$hook"
 	fi
     fi
