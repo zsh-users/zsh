@@ -3820,6 +3820,14 @@ wordcount(char *s, char *sep, int mul)
     return r;
 }
 
+/*
+ * 's' is a NULL-terminated array of strings.
+ * 'sep' is a string.
+ *
+ * Return a string consisting of the elements of 's' joined by 'sep',
+ * allocated on the heap iff 'heap'.
+ */
+
 /**/
 mod_export char *
 sepjoin(char **s, char *sep, int heap)
