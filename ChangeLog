@@ -1,3 +1,8 @@
+2018-10-16  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 43692: Doc/Makefile.in: Generate man pages in the build dir,
+	rather than the source dir.
+
 2018-10-15  dana  <dana@dana.is>
 
 	* 43672: Doc/Zsh/redirect.yo: Document result of redirecting

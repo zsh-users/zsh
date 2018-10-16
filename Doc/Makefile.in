@@ -142,7 +142,7 @@ zsh.info: $(sdir)/zsh.texi
 .yo.1:
 	@case $@ in \
 	  */*) target=$@ ;; \
-	  *) target=$(sdir)/$@ ;; \
+	  *) target=$@ ;; \
 	esac; \
 	case '$(YODL)' in :*) touch $$target ;; *) \
 	    echo $(YODL) -o $$target -I$(sdir):. -w zman.yo version.yo $< ; \
@@ -176,9 +176,9 @@ zsh_toc.html: $(sdir)/zsh.texi texi2html.conf
 	             --init-file texi2html.conf $(sdir)/zsh.texi
 
 zshall.1: zsh.yo
-	@case $@ in \
+	case $@ in \
 	  */*) target=$@ ;; \
-	  *) target=$(sdir)/$@ ;; \
+	  *) target=$@ ;; \
 	esac; \
 	case '$(YODL)' in :*) touch $$target ;; *) \
 	    echo $(YODL) -o $$target -I$(sdir) -DZSHALL -w zman.yo version.yo zsh.yo; \
@@ -203,7 +203,7 @@ runhelp: help.txt
 help.txt: zshbuiltins.1
 	@-rm -f $@ help/*
 	perl $(sdir_top)/Util/helpfiles \
-	    $(sdir)/zshbuiltins.1 help help.txt \
+	    zshbuiltins.1 help help.txt \
 	    || rm -f help.txt help/*
 
 $(MAN): zmacros.yo zman.yo
@@ -328,8 +328,8 @@ uninstall: uninstall.man uninstall.runhelp
 install.man: man
 	${SHELL} $(sdir_top)/mkinstalldirs $(DESTDIR)$(mandir)/man1
 	for file in $(MAN); do \
-	    test -s $(sdir)/$$file || exit 1; \
-	    $(INSTALL_DATA) $(sdir)/$$file $(DESTDIR)$(mandir)/man1/`echo $$file | sed 's|zsh|$(tzsh)|'` || exit 1; \
+	    test -s $$file || exit 1; \
+	    $(INSTALL_DATA) $$file $(DESTDIR)$(mandir)/man1/`echo $$file | sed 's|zsh|$(tzsh)|'` || exit 1; \
 	done
 .PHONY: install.man
 
