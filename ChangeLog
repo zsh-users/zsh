@@ -1,3 +1,8 @@
+2018-10-15  dana  <dana@dana.is>
+
+	* 43672: Doc/Zsh/redirect.yo: Document result of redirecting
+	from a non-existent file
+
 2018-10-14  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Src/utils.c: internals: Document sepjoin().

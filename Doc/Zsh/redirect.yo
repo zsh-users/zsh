@@ -26,6 +26,7 @@ separate filename in turn.
 startitem()
 item(tt(<) var(word))(
 Open file var(word) for reading as standard input.
+It is an error to open a file in this fashion if it does not exist.
 )
 item(tt(<>) var(word))(
 Open file var(word) for reading and writing as standard input.
