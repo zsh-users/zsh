@@ -1,3 +1,8 @@
+2018-10-23  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Sebastian: 43695: Src/lex.c: minor but simple optimisation
+	to reuse existing string lengths.
+
 2018-10-22  dana  <dana@dana.is>
 
 	* 43713: Completion/Unix/Command/_init_d: Improve completion of
