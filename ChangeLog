@@ -1,5 +1,8 @@
 2018-10-17  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 43697: Completion/X/Command/_zathura: match uppercase
+	filename extensions
+
 	* 43698: Completion/Unix/Command/_git: update options for 2.19
 
 2018-10-16  Daniel Shahaf  <d.s@daniel.shahaf.name>
