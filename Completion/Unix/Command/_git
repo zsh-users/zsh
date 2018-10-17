@@ -295,7 +295,7 @@ _git-branch () {
   declare l c m d e
 
   l='--color --no-color -r --remotes -a -v --verbose --abbrev --no-abbrev --list --points-at --sort'
-  c='-l --create-reflog -f --force -t --track --no-track -u --set-upstream --set-upstream-to --unset-upstream --contains --no-contains --merged --no-merged'
+  c='--create-reflog -f --force -t --track --no-track -u --set-upstream --set-upstream-to --unset-upstream --contains --no-contains --merged --no-merged'
   m='-c --copy -C -m --move -M --edit-description'
   d='-d --delete -D'
 
@@ -337,7 +337,7 @@ _git-branch () {
     "($c $m $d : -v -vv --verbose)"{-v,-vv,--verbose}'[show SHA1 and commit subject line for each head]' \
     "($c $m $d :)--abbrev=[set minimum SHA1 display-length]: :__git_guard_number length" \
     "($c $m $d :)--no-abbrev[don't abbreviate sha1s]" \
-    "($l $m $d)"{-l,--create-reflog}"[create the branch's reflog]" \
+    "($l $m $d)--create-reflog[create the branch's reflog]" \
     "($l $m $d -f --force)"{-f,--force}'[force the creation of a new branch]' \
     "($l $m $d -t --track)"{-t,--track}'[setup configuration so that pull merges from the start point]' \
     "($l $m $d)--no-track[override the branch.autosetupmerge configuration variable]" \
@@ -872,6 +872,7 @@ _git-fetch () {
     '(--all -m --multiple)'{-m,--multiple}'[fetch from multiple remotes]' \
     '(-P --prune-tags)'{-P,--prune-tags}'[prune local tags no longer on remote and clobber changed tags]' \
     \*{-o+,--server-option=}'[send specified string to the server when using protocol version 2]:option' \
+    '--negotiation-tip=[only report refs reachable from specified object to the server]:commit:__git_commits' \
     '--filter=[object filtering]:filter:_git_rev-list_filters' \
     '*:: :->repository-or-group-or-refspec' && ret=0
 
@@ -992,35 +993,37 @@ _git-grep () {
     '--untracked[search also in untracked files]' \
     '(-a --text)'{-a,--text}'[process binary files as if they were text]' \
     '(--textconv --no-textconv)--textconv[honor textconv filter settings]' \
-    '(--textconv --no-textconv)--no-textconv[do not honor textconv filter settings]' \
+    "(--textconv --no-textconv)--no-textconv[don't honor textconv filter settings]" \
     '(-i --ignore-case)'{-i,--ignore-case}'[ignore case when matching]' \
-    '-I[do not match pattern in binary files]' \
+    "-I[don't match pattern in binary files]" \
     '--max-depth=[descend at most given levels of directories]: :__git_guard_number depth' \
     '(-w --word-regexp)'{-w,--word-regexp}'[match only whole words]' \
     '(-v --invert-match)'{-v,--invert-match}'[select non-matching lines]' \
-    '(   -H)-h[supress output of filenames]' \
-    '(-h   )-H[show filenames]' \
+    '(-H)-h[suppress output of filenames]' \
+    '(-h -c --count)-H[show filenames]' \
     '--full-name[output paths relative to the project top directory]' \
-    '(-E --extended-regexp -G --basic-regexp -P --perl-regexp -F --fixed-strings)'{-E,--extended-regexp}'[use POSIX extended regexes]' \
-    '(-E --extended-regexp -G --basic-regexp -P --perl-regexp -F --fixed-strings)'{-G,--basic-regexp}'[use POSIX basic regexes]' \
+    '(-E --extended-regexp -G --basic-regexp -P --perl-regexp -F --fixed-strings)'{-E,--extended-regexp}'[use extended regular expressions]' \
+    '(-E --extended-regexp -G --basic-regexp -P --perl-regexp -F --fixed-strings)'{-G,--basic-regexp}'[use basic regular expressions]' \
     '(-E --extended-regexp -G --basic-regexp -P --perl-regexp -F --fixed-strings)'{-P,--perl-regexp}'[use perl-compatible regexes]' \
-    '(-E --extended-regexp -G --basic-regexp -P --perl-regexp -F --fixed-strings)'{-F,--fixed-strings}'[do not interpret pattern as a regex]' \
+    '(-E --extended-regexp -G --basic-regexp -P --perl-regexp -F --fixed-strings)'{-F,--fixed-strings}'[use literal strings]' \
     '(-n --line-number)'{-n,--line-number}'[prefix the line number to matching lines]' \
-    '(-l --files-with-matches -L --files-without-match --name-only)'{-l,--files-with-matches,--name-only}'[show only names of matching files]' \
-    '(-l --files-with-matches -L --files-without-match)'{-L,--files-without-match}'[show only names of non-matching files]' \
-    '(--cached -O --open-files-in-pager)'{-O+,--open-files-in-pager=}'-[open matching files in pager]:pager:_cmdstring' \
+    '(-c --count)--column[show column number of first match]' \
+    '(-c --count -l --files-with-matches --name-only -L --files-without-match -o --only-matching)'{-l,--files-with-matches,--name-only}'[show only names of matching files]' \
+    '(-c --count -l --files-with-matches --name-only -L --files-without-match -o --only-matching)'{-L,--files-without-match}'[show only names of non-matching files]' \
+    '(-c --count -o --only-matching -n --line-number --color --no-color --cached --heading -O --open-files-in-pager)'{-O,--open-files-in-pager=}'-[open matching files in pager]::pager:_cmdstring' \
     '(-z --null)'{-z,--null}'[output \0 after filenames]' \
-    '(-c --count)'{-c,--count}'[show number of matching lines in files]' \
-    '(        --no-color)--color=-[color matches]:: :__git_color_whens' \
-    '(--color           )--no-color[do not color matches]' \
-    '--break[prefix the line number to matching lines]' \
-    '--heading[show the filename above the matches]' \
-    '(-A --after-context)'{-A+,--after-context=}'[show <num> trailing lines, and separate groups of matches]: :__git_guard_number lines' \
-    '(-B --before-context)'{-B+,--before-context=}'[show <num> leading lines, and separate groups of matches]: :__git_guard_number lines' \
-    '(-A --after-context -B --before-context -C --context)'{-C+,--context=}'[show <num> leading and trailing lines, and separate groups of matches]: :__git_guard_number lines' \
+    '(-c --count -l --files-with-matches --name-only -L --files-without-match -o --only-matching)'{--only-matching,-o}'[show only matching part of line]' \
+    '(-h -c --count -l --files-with-matches --name-only -L --files-without-match -o --only-matching --color --break --heading -p --show-function -W --function-context)'{-c,--count}'[show number of matching lines in files]' \
+    '(--no-color -O --open-files-in-pager)--color=-[color matches]:: :__git_color_whens' \
+    "(--color -O --open-files-in-pager)--no-color[don't color matches]" \
+    '(-c --count -O --open-files-in-pager)--break[print an empty line between matches from different files]' \
+    '(-c --count -O --open-files-in-pager)--heading[show the filename above the matches]' \
+    '(-A --after-context)'{-A+,--after-context=}'[specify lines of trailing context]: :__git_guard_number lines' \
+    '(-B --before-context)'{-B+,--before-context=}'[specify lines of leading context]: :__git_guard_number lines' \
+    '(-A --after-context -B --before-context -C --context)'{-C+,--context=}'[specify lines of context]: :__git_guard_number lines' \
     '--threads=[use specified number of threads]:number of threads' \
-    '(-p --show-function)'{-p,--show-function}'[show preceding line containing function name of match]' \
-    '(-W --function-context)'{-W,--function-context}'[show whole function where a match was found]' \
+    '(-c --count -p --show-function)'{-p,--show-function}'[show preceding line containing function name of match]' \
+    '(-c --count -W --function-context)'{-W,--function-context}'[show whole function where a match was found]' \
     '(1)*-f+[read patterns from given file]:pattern file:_files' \
     '(1)*-e+[use the given pattern for matching]:pattern' \
     $pattern_operators \
@@ -1210,7 +1213,8 @@ _git-merge () {
 
   _arguments -S -s \
     $merge_options \
-    '-m+[set the commit message to be used for the merge commit]:merge message' \
+    \*{-m+,--message=}'[set the commit message to be used for the merge commit]:merge message' \
+    \*{-F+,--file=}'[read commit message from a file]:file' \
     '(--edit --no-edit)-e[open an editor to change the commit message]' \
     '(                    --no-rerere-autoupdate)--rerere-autoupdate[allow the rerere mechanism to update the index]' \
     '(--rerere-autoupdate                       )--no-rerere-autoupdate[do not allow the rerere mechanism to update the index]' \
@@ -1348,10 +1352,13 @@ _git-pull () {
 
   _arguments \
     $merge_options \
-    '(-r --rebase --no-rebase)'{-r=-,--rebase=-}'[perform a rebase after fetching]::rebase after fetching:((true\:"rebase after fetching"
-                                                                                                        false\:"merge after fetching"
-                                                                                                        preserve\:"rebase and preserve merges"
-													interactive\:"allow list of commits to be edited"))' \
+    '(-r --rebase --no-rebase)'{-r=-,--rebase=-}'[perform a rebase after fetching]::rebase after fetching:((
+      true\:"rebase after fetching"
+      false\:"merge after fetching"
+      merges\:"try to rebase merges instead of skipping them"
+      preserve\:"rebase and preserve merges"
+      interactive\:"allow list of commits to be edited"
+    ))' \
     '(-r --rebase            )--no-rebase[do not perform a rebase after fetching]' \
     '--autostash[automatically stash/stash pop before and after rebase]' \
     $fetch_options \
@@ -1423,6 +1430,20 @@ _git-push () {
   return ret
 }
 
+(( $+functions[_git-range-diff] )) ||
+_git-range-diff () {
+  local -a diff_options
+  __git_setup_diff_options
+
+  _arguments -s \
+    '--creation-factor=[specify weighting for creation]:weighting (percent)' \
+    '--no-dual-color[use simple diff colors]' \
+    $diff_options \
+    '1:range 1:__git_commit_ranges' \
+    '2:range 2:__git_commit_ranges' \
+    '3:revision 2:__git_commits'
+}
+
 (( $+functions[_git-rebase] )) ||
 _git-rebase () {
   local -a autosquash_opts
@@ -1457,6 +1478,7 @@ _git-rebase () {
     '(-i --interactive)--whitespace=-[detect a new or modified line that has whitespace errors]: :__git_apply_whitespace_strategies' \
     '(-i --interactive)--committer-date-is-author-date[use author date as committer date]' \
     '(-i --interactive --ignore-whitespace --whitespace --committer-date-is-author-date)'{-i,--interactive}'[make a list of commits to be rebased and open in $EDITOR]' \
+    '(-r --rebase-merges)'{-r-,--rebase-merges=-}'[try to rebase merges instead of skipping them]::option:(rebase-cousins no-rebase-cousins)' \
     '(-p --preserve-merges --interactive)'{-p,--preserve-merges}'[try to recreate merges instead of ignoring them]' \
     {-x+,--exec=}'[with -i\: append "exec <cmd>" after each line]:command:_command_names -e' \
     '(-k --keep-empty)'{-k,--keep-empty}'[keep empty commits in the result]' \
@@ -2589,9 +2611,13 @@ __git_config_option-or-value () {
     pull.rebase:'rebase branches on top of the fetched branch, instead of merging::->pull.rebase:false'
     pull.twohead:'default merge strategy to use when pulling a single branch::__git_merge_strategies'
     push.default:'action git push should take if no refspec is given::->push.default:simple'
+    push.followTags:'enable --follow-tags option by default::->bool:false'
+    push.gpgSign:'GPG-sign pushes::->bool:false'
+    push.recurseSubmodules:'ensure all submodule commits are available on a remote-tracking branch'
     rebase.stat:'show a diffstat of what changed upstream since last rebase::->bool:false'
-    rebase.autosquash:'autosquash by default::->bool:false'
-    rebase.autostash:'autostash by default::->bool:false'
+    rebase.autoSquash:'autosquash by default::->bool:false'
+    rebase.autoStash:'autostash by default::->bool:false'
+    rebase.missingCommitsCheck:'print a warning if some commits are removed'
     receive.autogc:'run git gc --auto after receiving data::->bool:true'
     receive.fsckObjects:'check all received objects::->bool:true'
     receive.hiderefs:'string(s) receive-pack uses to decide which refs to omit from its initial advertisement:hidden refs:->string'
@@ -2718,8 +2744,12 @@ __git_config_option-or-value () {
     'url.*.pushInsteadOf:string to start URLs to push to with:prefix:->string'
     user.email:'email address used for commits::_email_addresses -c'
     user.name:'full name used for commits:name:->string'
+    user.useConfigOnly:'avoid guessing defaults for user.email and user.name:->bool:true'
     user.signingkey:'default GPG key to use when creating signed tags::__git_gpg_secret_keys'
-    web.browser:'web browser to use::__git_browsers')
+    versionsort.suffix:'specify sort order of suffixes applied to tags:suffix'
+    web.browser:'web browser to use::__git_browsers'
+    worktree.guessRemote:'with add, if branch matches remote track it::->bool:true'
+  )
 
   declare -a git_present_options # 'present' is an adjective
   git_present_options=(
@@ -2962,8 +2992,11 @@ __git_config_option-or-value () {
           url:'URL prefixes'
           user:'options controlling user identity'
           web:'web options'
+          versionsort:'tag sorting options'
+          worktree:'git worktree options'
           svn:'git svn options'
-          svn-remote:'git svn remotes')
+          svn-remote:'git svn remotes'
+        )
         () {
           local i
           for i in ${(u)git_present_options%%.*}; do
@@ -3689,7 +3722,8 @@ _git-repack () {
     '--depth=[maximum delta depth]:maximum delta depth' \
     '--threads=[limit maximum number of threads]:threads' \
     '--max-pack-size=-[maximum size of each output packfile]: : __git_guard_bytes "maximum pack size"' \
-    '--pack-kept-objects[repack objects in packs marked with .keep]'
+    '--pack-kept-objects[repack objects in packs marked with .keep]' \
+    '--keep-pack=[ignore named pack]:pack'
 }
 
 (( $+functions[_git-replace] )) ||
@@ -3835,11 +3869,12 @@ _git-get-tar-commit-id () {
 (( $+functions[_git-help] )) ||
 _git-help () {
   _arguments -S -s \
-    '(         -g --guides -i --info -m --man -w --web)'{-a,--all}'[show all available commands]' \
-    '(-a --all -g --guides           -m --man -w --web)'{-i,--info}'[display manual for the command in info format]' \
-    '(-a --all -g --guides -i --info          -w --web)'{-m,--man}'[display manual for the command in man format]' \
-    '(-a --all -g --guides -i --info -m --man         )'{-w,--web}'[display manual for the command in HTML format]' \
-    '(-g --guides)'{-g,--guides}'[prints a list of useful guides on the standard output]' \
+    '(-c --config -i --info -m --man -w --web)'{-a,--all}'[show all available commands]' \
+    '(-)'{-c,--config}'[print all configuration variable names]' \
+    '(-a --all -g --guides -c --config -m --man -w --web)'{-i,--info}'[display manual for the command in info format]' \
+    '(-a --all -g --guides -c --config -i --info -w --web)'{-m,--man}'[display manual for the command in man format]' \
+    '(-a --all -g --guides -c --config -i --info -m --man)'{-w,--web}'[display manual for the command in HTML format]' \
+    '(-g --guides -c --config -i --info -m --man -w --web)'{-g,--guides}'[prints a list of useful guides on the standard output]' \
     '(-v --verbose)'{-v,--verbose}'[print command descriptions]' \
     ': : _alternative commands:command:_git_commands "guides:git guides:(attributes glossary ignore modules revisions tutorial workflows)"'
 }
@@ -4886,6 +4921,7 @@ _git-cat-file () {
     '(--batch)--batch-check=-[print SHA1, type and size (or in specified format)]::format' \
     '--follow-symlinks[follow in-tree symlinks (used with --batch or --batch-check)]' \
     '--batch-all-objects[show all objects with --batch or --batch-check]' \
+    "--unordered[don't order --batch-all-objects output]" \
     '--buffer[disable flushing of output after each object]'
 }
 
@@ -5698,6 +5734,7 @@ _git_commands () {
     notes:'add or inspect object notes'
     pull:'fetch from and merge with another repository or local branch'
     push:'update remote refs along with associated objects'
+    range-diff:'compare two commit ranges'
     rebase:'forward-port local commits to the updated upstream head'
     reset:'reset current HEAD to specified state'
     revert:'revert existing commits'
