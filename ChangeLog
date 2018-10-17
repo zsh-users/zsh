@@ -1,3 +1,8 @@
+2018-10-17  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 43694: Doc/Zsh/redirect.yo: More detail on how multio file
+	opening differs from cat.
+
 2018-10-17  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 43697: Completion/X/Command/_zathura: match uppercase

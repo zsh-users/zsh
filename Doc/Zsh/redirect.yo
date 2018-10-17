@@ -235,6 +235,9 @@ example(date >foo | cat)
 
 writes the date to the file `tt(foo)', and also pipes it to cat.
 
+Note that the shell opens all the files to be used in the multio process
+immediately, not at the point they are about to be written.
+
 Note also that redirections are always expanded in order.  This happens
 regardless of the setting of the tt(MULTIOS) option, but with the option
 in effect there are additional consequences. For example,
@@ -269,9 +272,13 @@ example(echo exit 0 >> *.sh)
 
 If the user tries to open a file descriptor for reading more than once,
 the shell opens the file descriptor as a pipe to a process that copies
-all the specified inputs to its output in the order
-specified, similar to bf(cat),
-provided the tt(MULTIOS) option is set.  Thus
+all the specified inputs to its output in the order specified, provided
+the tt(MULTIOS) option is set.  It should be noted that each file is
+opened immediately, not at the point where it is about to be read:
+this behaviour differs from tt(cat), so if strictly standard behaviour
+is needed, tt(cat) should be used instead.
+
+Thus
 
 example(sort <foo <fubar)
 
