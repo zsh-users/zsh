@@ -1,5 +1,8 @@
 2018-10-23  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Marcin Mielniczuk: 43714: Completion/Unix/Command/_lp: lp
+	fit-to-page option.
+
 	* Sebastian: 43695: Src/lex.c: minor but simple optimisation
 	to reuse existing string lengths.
 

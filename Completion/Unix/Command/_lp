@@ -30,7 +30,7 @@ _lp_job_options()
   lopts_with_args=( media orientation-requested sides number-up scaling cpi lpi
     page-{bottom,left,right,top} page-ranges )
 
-  lopts_no_args=(fitplot landscape)
+  lopts_no_args=(fitplot fit-to-page landscape)
 
   if [[ $service == 'lpadmin' ]]; then
     # Extra options from lpadmin man page.
