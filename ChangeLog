@@ -1,3 +1,8 @@
+2018-10-22  dana  <dana@dana.is>
+
+	* 43713: Completion/Unix/Command/_init_d: Improve completion of
+	service commands
+
 2018-10-17  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 43694: Doc/Zsh/redirect.yo: More detail on how multio file

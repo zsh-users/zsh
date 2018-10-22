@@ -80,15 +80,29 @@ else
   (( $+functions[_init_d_get_cmds] )) ||
   _init_d_get_cmds() {
     local what magic cmds
-
-    # If the file starts with `#!' we hope that this is a shell script
-    # and get lines looking like <space>foo|bar) with the words in $what.
-
-    what='(st(art|op|atus)|(force-|)re(start|load)|debug_(up|down)|dump(|_stats)|add|delete|clean|list)'
+    local -a tmp
 
     [[ -x $script ]] || return 1
-    read -u0 -k2 magic < $script && [[ $magic = '#!' ]] &&
-    cmds=( ${${(j:|:s:|:)${(M)${(f)"$(< $script)"}:#[[:blank:]]#(\'|)${~what}([[:blank:]]#\|[[:blank:]]#${~what})#(\'|)\)}}//[^-a-z_]} )
+
+    # If the file starts with `#!' we hope that this is a shell script
+    # and get lines looking like <space>foo|bar) with the words in $what. Note
+    # that we'll fail to match if any of the alternate patterns in the case
+    # clause are not enumerated (e.g., `start|stop|custom)` won't match)
+    tmp=(
+      status add delete clean list
+      load save show check {config,}test
+      standalone master graceful
+      debug debug{_,-}{up,down} dump{,{_,-}stats}
+      {force-,graceful-,try-,}{start,stop,restart,reload}
+      {start,stop}-htcacheclean
+    )
+    what="((['\"]|)(${(j<|>)tmp})(['\"]|))"
+
+    read -u0 -k2 magic < $script && [[ $magic = '#!' ]] && {
+      cmds=( ${(f)"$(< $script)"} )
+      cmds=( ${(M)cmds:#[[:blank:]]#${~what}([[:blank:]]#\|[[:blank:]]#${~what})#[[:blank:]]#\)} )
+      cmds=( ${${(j:|:s:|:)cmds}//[^-a-z_]} )
+    }
 
     # This would be the pattern to use every line of the form <space>foo).
     # Some people say this might match too many lines...
