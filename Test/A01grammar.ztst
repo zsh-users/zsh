@@ -873,3 +873,13 @@
 0:Assignment-only current shell commands in LHS of pipelin
 >1
 >1
+
+ echo pipe | ; sed s/pipe/PIPE/
+ true && ; echo and true
+ false && ; echo and false
+ true || ; echo or true
+ false || ; echo or false
+0:semicolon is equivalent to newline
+>PIPE
+>and true
+>or false

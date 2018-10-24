@@ -1,3 +1,8 @@
+2018-10-24  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 43726: Test/A01grammar.ztst: Add tests for semicolon in the
+	middle of a sublist not terminating it.
+
 2018-10-24  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 43723: Completion/Unix/Command/_mkdir: fix for builtin
