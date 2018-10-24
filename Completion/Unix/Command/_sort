@@ -16,27 +16,27 @@ args=(
   '(-r --reverse)'{-r,--reverse}'[reverse the result of comparisons]'
   '(-b --ignore-leading-blanks)'{-b,--ignore-leading-blanks}'[ignore leading blanks]'
   '(-t --field-separator)'{-t+,--field-separator=}'[specify field separator instead of non-blank to blank transition]:separator'
-  '(-k --key)'{-k+,--key=}'[specified start and end fields for key]:key field'
+  \*{-k+,--key=}'[specified start and end fields for key]:key field'
 )
 
 _pick_variant -r variant gnu=GNU $OSTYPE --version
 case $variant in
-  dragonfly*|netbsd*|openbsd*|freebsd*|gnu)
+  dragonfly*|netbsd*|openbsd*|freebsd*|darwin*|gnu)
     args+=(
       '(-s --stable)'{-s,--stable}'[preserve original order of lines with the same key]'
     )
   ;|
-  netbsd*|openbsd*|freebsd*|gnu|solaris2.<11->)
+  netbsd*|openbsd*|freebsd*|darwin*|gnu|solaris2.<11->)
     args+=(
       "(-c --check -C)-C[check whether input is sorted silently; don't sort]"
     )
   ;|
-  openbsd*|freebsd*|gnu)
+  openbsd*|freebsd*|darwin*|gnu)
     args+=(
       '(-z --zero-terminated)'{-z,--zero-terminated}'[end lines with 0 byte, not newline]'
     )
   ;|
-  freebsd*|gnu)
+  freebsd*|darwin*|gnu)
     args+=(
       "(-c --check -C)--check=-[check whether input is sorted; don't sort]::bad line handling:(diagnose-first silent quiet)"
       "$ordering"{-g,--general-numeric-sort}'[compare according to general numeric value]'
@@ -49,7 +49,7 @@ case $variant in
       '--random-source=[get random bytes from file]:file:_files'
       '--batch-size=[maximum inputs to merge]:number'
       '--compress-program=[specify program to compress temporary files with]:program:(gzip bzip2 lzop xz)'
-      '--debug[annotate the of the line used to sort]'
+      '--debug[annotate the part of the line used to sort]'
       '(*)--files0-from=[read input files from file]:file:_files'
       '(-S --buffer-size)'{-S+,--buffer-size=}'[specify size for main memory buffer]:size'
       '(- *)--help[display help and exit]'
@@ -71,7 +71,7 @@ case $variant in
   gnu)
     args+=( '--parallel=[set number of sorts run concurrently]:number' )
   ;;
-  freebsd*)
+  freebsd*|darwin*)
     args+=( --radixsort  --mergesort --qsort --heapsort --mmap )
   ;;
   *) args=( "${(@)args:#(|\(*\))(|\*)--*}" ) ;;

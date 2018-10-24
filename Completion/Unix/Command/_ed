@@ -19,7 +19,7 @@ if _pick_variant gnu=GNU unix --version; then
 else
   args=(-A '-*' ${args:#*\)--*})
   case $OSTYPE in
-    dragonfly*|freebsd*|netbsd*|solaris*)
+    dragonfly*|freebsd*|darwin*|netbsd*|solaris*)
       args+=(
         '-x[prompt for an encryption key]'
       )

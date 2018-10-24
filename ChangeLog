@@ -1,5 +1,9 @@
 2018-10-24  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
+	* 43722: Completion/Unix/Command/_ed,
+	Completion/Unix/Command/_env, Completion/Unix/Command/_sort:
+	use the same completions as freebsd for darwin.
+
 	* 43721: Completion/Unix/Command/_diff3: detect GNU variant
 	correctly
 

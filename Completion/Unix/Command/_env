@@ -16,11 +16,11 @@ case $variant in
       "${ign}(- *)--version[display version information]"
     )
   ;;
-  freebsd*)
+  freebsd*|darwin*)
     args=(
-      '(-i)*-u[remove variable from the environment]:env var to remove:_parameters -g "*export*"'
-      '-P[specify alternate executable search PATH]:path:_dir_list'
-      '-S[perform word splitting]'
+      '(-i)*-u+[remove variable from the environment]:env var to remove:_parameters -g "*export*"'
+      '-P+[specify alternate executable search PATH]:path:_dir_list'
+      '-S+[perform word splitting]:string to split'
       '*-v[verbose output]'
     )
   ;&
