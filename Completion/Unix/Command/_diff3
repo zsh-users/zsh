@@ -3,7 +3,7 @@
 local -a args ed
 local ign
 
-if _pick_variant gnu=GNU unix; then
+if _pick_variant gnu=GNU unix --version; then
   ed=(
     '(-m --merge -A --show-all)'{-e,--ed}'[output ed script for incorporating changes]'
     '(-m --merge -A --show-all)'{-E,--show-overlap}'[like -e, but bracket conflicts]'
@@ -21,8 +21,8 @@ if _pick_variant gnu=GNU unix; then
     '(-T --initial-tab)'{-T,--initial-tab}'[make tabs line up by prepending a tab]'
     '--diff-program=[specify program to compare files]: : _command_names -e'
     \*{-L+,--label=}'[use specified label instead of file name]:label'
-    "$ign(-)--help[display usage information]"
-    "$ign(-)"{-v,--version}'[display version information]'
+    "$ign(- :)--help[display usage information]"
+    "$ign(- :)"{-v,--version}'[display version information]'
   )
 else
   args=( -A "-*" )

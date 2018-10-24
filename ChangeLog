@@ -1,3 +1,8 @@
+2018-10-24  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 43721: Completion/Unix/Command/_diff3: detect GNU variant
+	correctly
+
 2018-10-24  dana  <dana@dana.is>
 
 	* 43718: Completion/BSD/Command/_fstat,
