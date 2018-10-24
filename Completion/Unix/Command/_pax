@@ -44,4 +44,4 @@ _arguments -s \
   '-X[do not descend into directories that have a different device ID]' \
   '-Y[ignore older files by ctime after file name mods]' \
   '-Z[ignore older files after file name mods]' \
-  '*:files:_files'
+  '*: :_files'

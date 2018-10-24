@@ -41,7 +41,7 @@ arguments=(
   {-o+,-offset}'[add specified offset to displayed file position]:offset'
   {-s,-skip,-seek}'[specify file offset to dump from]: :_guard "[0-9]#" "file offset to dump from (absolute or relative)"'
 
-  ':files:_files'
+  ': :_files'
 )
 
 _arguments -S $arguments

@@ -19,7 +19,7 @@ if _pick_variant gnu=GNU unix --version; then
     '!-v'
     '(- : *)--help[display help and exit]'
     '(- : *)--version[output version information and exit]'
-    '*:files:_umountable'
+    '*: :_umountable'
     - '(format)'
     {-B+,--block-size=}'[specify block size]:size (bytes)'
     '-k[like --block-size=1K]'
@@ -36,7 +36,7 @@ elif [[ "$OSTYPE" == (darwin|dragonfly|freebsd|netbsd*|openbsd)* ]]; then
     '(-G -i -P)-i[include inode usage statistics (default)]'
     '-l[only display locally-mounted file systems]'
     '-n[use previously obtained statistics]'
-    '*:files:_umountable'
+    '*: :_umountable'
   )
   spec='[only display file systems of specified types]:file system type:->fslist'
   case "$OSTYPE" in
@@ -93,7 +93,7 @@ else
     '-k[use 1024-byte blocks]'
     '-P[POSIX compliant output]'
     '-t[include total allocated-space figures in the output]'
-    '*:files:_umountable'
+    '*: :_umountable'
   )
 fi
 

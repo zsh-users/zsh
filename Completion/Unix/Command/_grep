@@ -10,11 +10,11 @@ if [[ $service = *GREP_OPT* ]]; then
 else
   arguments=( '(-e --regexp -f --file)1: :_guard "^-*" pattern' )
   if [[ $service = z* ]]; then
-    arguments+=( '*:files:_files -g "*.gz(-.)"' )
+    arguments+=( '*: :_files -g "*.gz(-.)"' )
   elif [[ $service = bz* ]]; then
-    arguments+=( '*:files:_files -g "*.bz2(-.)"' )
+    arguments+=( '*: :_files -g "*.bz2(-.)"' )
   else
-    arguments+=( '*:files:_files' )
+    arguments+=( '*: :_files' )
   fi
   command="$words[1]"
 fi

@@ -58,7 +58,7 @@ case $service in
 	'-n+:file to include:_files' \
 	'-n@+:file of files to include:_files' \
         "$common[@]" \
-        '*:RAR files:_files -g \*.rar\(-.\)'
+        '*:RAR file:_files -g \*.rar\(-.\)'
     fi
   ;;
   rar)
@@ -126,7 +126,7 @@ case $service in
 	'-w+[assign work directory]:work directory:_files -/' \
 	"$common[@]" \
 	'-z+[read archive comment from file]:comment file:_files' \
-	'*:files:_files'
+	'*: :_files'
     fi
   ;;
 esac

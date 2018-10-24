@@ -9,4 +9,4 @@ _arguments -s \
 '-p+[report all files open by the specified process]:process id:_pids' \
 '-u+[report all files open by the specified user]:user:_users' \
 '-v[verbose mode]' \
-'*:files:_files'
+'*: :_files'

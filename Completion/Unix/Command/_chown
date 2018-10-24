@@ -40,7 +40,7 @@ else
 fi
 
 (( $+words[(r)--reference*] )) || args+=( '(--reference)1: :->owner' )
-_arguments -C -s "$args[@]" '*:files:->files' && ret=0
+_arguments -C -s "$args[@]" '*: :->files' && ret=0
 
 case $state in
   owner)

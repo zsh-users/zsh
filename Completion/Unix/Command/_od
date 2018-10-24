@@ -61,7 +61,7 @@ else
   esac
 fi
 
-_arguments -C -s -S : "$args[@]" '*:files:_files' && return 0
+_arguments -C -s -S : "$args[@]" '*: :_files' && return 0
 
 case "$state" in
   (format)

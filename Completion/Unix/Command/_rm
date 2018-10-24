@@ -5,7 +5,7 @@ args=(
   '(-f --force)'{-f,--force}'[ignore nonexistent files, never prompt]'
   '(-I --interactive)-i[prompt before every removal]'
   '(-r -R --recursive)'{-r,-R,--recursive}'[remove directories and their contents recursively]'
-  '*::files:->file'
+  '*:: :->file'
 )
 if _pick_variant gnu=gnu unix --help; then
   opts+=(-S)

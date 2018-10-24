@@ -37,7 +37,7 @@ if ! _pick_variant gnu=gnu unix --help; then
 
     '(-B -b -w -q)-q[hide control chars]'
 
-    '*:files:_files'
+    '*: :_files'
   )
   if [[ "$OSTYPE" = (netbsd*|dragonfly*|freebsd*|openbsd*|darwin*) ]]; then
     arguments+=(

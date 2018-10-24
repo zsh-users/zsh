@@ -16,7 +16,7 @@ if _pick_variant gnu=GNU unix --version; then
     '(-v --show-nonprinting)'{-v,--show-nonprinting}'[use ^ and M- notation, except for LFD and TAB]'
     '(- : *)--help[display help and exit]'
     '(- : *)--version[output version information and exit]'
-    '*:files:_files'
+    '*: :_files'
   )
 
 elif [[ "$OSTYPE" == (*bsd|dragonfly|darwin)* ]]; then
@@ -29,7 +29,7 @@ elif [[ "$OSTYPE" == (*bsd|dragonfly|darwin)* ]]; then
     '(-v)-t[display tab as ^I (implies -v)]'
     '-u[do not buffer output]'
     '-v[display non-printing chars as ^X or M-a]'
-    '*:files:_files'
+    '*: :_files'
   )
   [[ $OSTYPE = (free|net)bsd* ]] && args+=(
     '-l[set a lock on the stdout file descriptor]'
@@ -48,14 +48,14 @@ elif [[ $OSTYPE = solaris* ]]; then
     '-v[display non-printing chars as ^X or M-a]'
     '-e[display $ at the end of each line (requires -v)]'
     '-t[display tab as ^I and formfeeds and ^L (requires -v)]'
-    '*:files:_files'
+    '*: :_files'
   )
 else
   # POSIX reqires '-u', and most OSes may support '-n'
   args=(
     '-n[number all output lines]'
     '-u[do not buffer output]'
-    '*:files:_files'
+    '*: :_files'
   )
 fi
 

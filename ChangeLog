@@ -1,3 +1,13 @@
+2018-10-24  dana  <dana@dana.is>
+
+	* 43718: Completion/BSD/Command/_fstat,
+	Completion/Unix/Command/_awk, Completion/Unix/Command/_cat,
+	Completion/Unix/Command/_chown, Completion/Unix/Command/_df,
+	Completion/Unix/Command/_grep, Completion/Unix/Command/_ls,
+	Completion/Unix/Command/_od, Completion/Unix/Command/_pax,
+	Completion/Unix/Command/_rar, Completion/Unix/Command/_rm,
+	Completion/Unix/Command/_xxd: Use singular group descriptions
+
 2018-10-23  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Marcin Mielniczuk: 43714: Completion/Unix/Command/_lp: lp

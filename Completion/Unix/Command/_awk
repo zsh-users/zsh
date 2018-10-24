@@ -21,7 +21,7 @@ args=(
   '*'{-v+,--assign}'[assign values to variables]:assignment:'
   '(1)*'{-f+,--file}'[read program file]:program file:->script'
   '1: :_guard "^-*" "program text"'
-  '*:input files:_files'
+  '*:input file:_files'
 )
 
 case $variant in
