@@ -26,7 +26,7 @@ fi
 # Now $variant is set.
 
 case $variant in
-  gnu|freebsd*|dragonfly*)
+  gnu|freebsd*|dragonfly*|darwin*)
     args+=(
       '(-v --verbose)'{-v,--verbose}'[print message for each created directory]'
     )
@@ -41,8 +41,6 @@ case $variant in
       '(- :)--help[display help information]'
       '(- :)--version[display version information]'
     )
-  ;;
-  zsh) # remove all options
   ;;
   *) # non-GNU: remove long options
     args=( ${${${args:#(|*\))--*}//--[^ )]#/}/\( #\)/} )

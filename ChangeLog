@@ -1,5 +1,8 @@
 2018-10-24  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
+	* 43723: Completion/Unix/Command/_mkdir: fix for builtin
+	mkdir, and add support for darwin
+
 	* 43722: Completion/Unix/Command/_ed,
 	Completion/Unix/Command/_env, Completion/Unix/Command/_sort:
 	use the same completions as freebsd for darwin.
