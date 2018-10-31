@@ -37,7 +37,7 @@ case ${variant}:${${service#ping}:-4} in
   iputils:*|((free|net)bsd|darwin|dragonfly)*:4)
     args+=( '-a[audible bell for each packet]' )
   ;|
-  iputils:*|(net|open)bsd*:4)
+  iputils:*|netbsd*:4|openbsd*)
     args+=( '-w+[specify timeout after which ping exits]:deadline (seconds)' )
   ;|
   iputils:*|openbsd*:4|solaris*)
@@ -58,10 +58,7 @@ case ${variant}:${${service#ping}:-4} in
     args+=( "-D[set the don't fragment bit]" )
   ;|
   ((free|net)bsd|darwin|dragonfly)*:4)
-    args+=(
-      '-Q[somewhat quiet]'
-      '-T+[set IP Time to Live for outgoing packets]:ttl'
-    )
+    args+=( '-Q[somewhat quiet]')
   ;|
   freebsd*:6|darwin*:6|solaris*|netbsd*)
     args+=(
@@ -84,7 +81,7 @@ case ${variant}:${${service#ping}:-4} in
   (*bsd|darwin)*:6)
     args+=( '*-m[suppress fragmenting of packets into the minimum IPv6 MTU]' )
   ;|
-  freebsd*|darwin*|dragonfly*|netbsd*:6)
+  freebsd*|darwin*|netbsd*:6)
     args+=( '-P+[specify IPsec policy to be used for the probe]:policy' )
   ;|
   solaris2.<11->)
@@ -101,17 +98,19 @@ case ${variant}:${${service#ping}:-4} in
       '-h+[specify size increment for ICMP payload for sweeping pings]:size [1]'
       '-M+[use ICMP_MASKREQ or ICMP_TSTAMP instead of ICMP_ECHO]:ICMP:(mask time)'
       '-m+[set IP Time to Live for outgoing packets]:ttl'
+      '-T+[set IP Time to Live for multicasted packets]:ttl'
       '-t+[specify timeout after which ping exits]:deadline (seconds)'
       '-W+[specify time to wait for a response]:wait time (ms)'
       '-z+[specify type of service]:type of service'
     )
-  ;;
+  ;|
   (freebsd|darwin)*:6)
     args+=(
+      '-D[disable IPv6 fragmentation]'
       '-R[audible bell for no packet]'
       '-r[audible bell for each packet]'
     )
-  ;;
+  ;|
   freebsd*:6)
     args+=(
       '-x+[specify time to wait for a response]:wait time (ms)'
@@ -124,24 +123,30 @@ case ${variant}:${${service#ping}:-4} in
       '-E+[specify IPsec policy to be used for the probe]:policy'
       '-h+[specify target host]:host:_hosts'
       '-P+[use a pseudo-random sequence for the data]'
+      '-T+[set IP Time to Live for outgoing packets]:ttl'
       '-t+[specify type of service]:type of service'
     )
   ;;
   (dragonfly|netbsd)*:6)
     args+=( '-R[inject reachability confirmation hint for target host/first hop]' )
-  ;|
+  ;;
   darwin*:4)
-    args+=( '-b+[bind the socket to specified interface for sending]:interface:_net_interfaces' )
+    args+=( '-b+[bind the socket to specified interface for sending]:interface:_net_interfaces')
   ;|
   darwin*:6)
     args+=(
       '-B+[bind the socket to specified interface for sending]:interface:_net_interfaces'
-      '-C[prohibit socket from using cellular network interface]'
+      '-G+[specify max,min,increment size for ICMP payload for sweeping pings]:max,min,incr (defalt min=0 incr=1)'
+      '-z+[specify traffic class]:traffic class'
     )
   ;|
   darwin*)
     args+=(
+      '-C[prohibit socket from using cellular network interface]'
+      '-K+[specify network service type for sending ICMP packets]:serviece type:(BK_SYS BK BE RV AV RD OAM VI SIG VO)'
       '-k+[specify traffic class to use for sending ICMP packets]:traffic class [CTL]:(BK_SYS BK BE RD OAM AV RV VI VO CTL)'
+      '--apple-connect[connects the socket to the destination address]'
+      '--apple-time[prints the time a packet was received]'
     )
   ;;
   openbsd*:4)

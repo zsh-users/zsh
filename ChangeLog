@@ -1,5 +1,8 @@
 2018-10-31  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
+	* 43746: Completion/Unix/Command/_ping: update for BSD and
+	Darwin
+
 	* 43744: Completion/Unix/Command/_sysctl: add support for
 	procps-ng (Linux) and NetBSD, with several other updates
 
