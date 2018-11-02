@@ -21,17 +21,18 @@ zstyle -s ":completion:${curcontext}:" cache-policy update_policy
 
 typeset -ga _ack_raw_types
 if _cache_invalid ack-types || ! _retrieve_cache ack-types; then
-  (( ${+commands[${words[1]}]} )) && _ack_raw_types=(
-      ${(S)${(S)${(f)${${"$(_call_program file-types $words[1] --help=types)"}#*--\[no\]}}%; first line matches \/*\/}#*no\]} )
+  _ack_raw_types=(
+      ${(S)${(S)${(f)${${"$(_call_program file-types $words[1] --help-types)"}#*--\[no\]}}%; ?irst line matches \/*\/}#*no\]} )
   [[ $#_ack_raw_types -gt 0 ]] && _store_cache ack-types _ack_raw_types
 fi
 
 (( $#words > 2 )) && ign='!'
 
 _arguments -C -s -S \
-  '(-i --ignore-case --smart-case --no-smart-case --nosmart-case --lines)'{-i,--ignore-case}'[match case-insensitively]' \
-  '(-i --ignore-case --no-smart-case --nosmart-case --lines)--smart-case[case-insensitive match unless pattern includes uppercase]' \
-  '(-i --ignore-case --smart-case --no-smart-case --nosmart-case --lines)'{--no-smart-case,--nosmart-case}'[disable --smart-case option]' \
+  '(-i --ignore-case -I -S --smart-case --no-smart-case --nosmart-case --lines)'{-i,--ignore-case}'[match case-insensitively]' \
+  '(-i --ignore-case -I -S --no-smart-case --nosmart-case --lines)'{-S,--smart-case}'[case-insensitive match unless pattern includes uppercase]' \
+  '(-i --ignore-case -I -S --smart-case --no-smart-case --nosmart-case --lines)'{--no-smart-case,--nosmart-case}'[disable --smart-case option]' \
+  '(-i --ignore-case -S --smart-case --no-smart-case --nosmart-case --lines)-I[turn on case-sensitivity in pattern]' \
   '(-v --invert-match)'{-v,--invert-match}'[select non-matching lines]' \
   '(-w --word-regexp)'{-w,--word-regexp}'[force pattern to match only whole words]' \
   '(-Q --literal)'{-Q,--literal}'[use literal strings]' \
@@ -59,10 +60,12 @@ _arguments -C -s -S \
   '(--nobreak --break)'{--nobreak,--break}'[print a break between results from different files, default on]' \
   '(--nogroup)--group[group matches by file name]' \
   "(--group)--nogroup[don't group matches by file name]" \
+  '--proximate=[separate match output with blank lines unless they are adjacent]::proximity (lines)' \
   '(--nocolor --nocolour)--colo'{,u}'r[enable color highlighting of output]' \
-  '(--color --colour --color-filename --color-match --color-lineno)--nocolo'{,u}'r[suppress the color]' \
+  '(--color --colour --color-filename --color-match --color-colno --color-lineno)--nocolo'{,u}'r[suppress the color]' \
   '(--nocolor --nocolour --color --colour)--color-filename=[sets the color to be used for filenames]:color:->colors' \
   '(--nocolor --nocolour --color --colour)--color-match=[sets the color to be used for matches]:color:->colors' \
+  '(--nocolor --nocolour --color --colour)--color-colno=[specify color for column numbers]:color:->colors' \
   '(--nocolor --nocolour --color --colour)--color-lineno=[specify color for line numbers]:color:->colors' \
   '--flush[flush output on every line]' \
   '(1)-f[only print the files that would be searched, without actually doing any searching]' \
@@ -92,6 +95,8 @@ _arguments -C -s -S \
   '(--filter --nofilter)--filter[treat standard input as pipe]' \
   '(--filter --nofilter)--nofilter[treat standard input as tty]' \
   "${ign}(- 1 *)--man[display the manual page]" \
+  "${ign}(- 1 *)--faq[display the frequently asked questions]" \
+  "${ign}(- 1 *)--cookbook[display a list of tips and tricks for using ack]" \
   "${ign}(- 1 *)--version[display version and copyright information]" \
   "${ign}(- 1 *)--bar[consult Admiral Ackbar]" \
   "${ign}(- 1 *)--thpppt[bill the cat]" \

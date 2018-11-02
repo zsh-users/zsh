@@ -1,5 +1,7 @@
 2018-11-02  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 43748: Completion/Unix/Command/_ack: fix for ack 3beta
+
 	* github #29: Wieland Hoffmann: Completion/Unix/Command/_git:
 	Add completion support for Gits --color-moved option and
 	color settings
