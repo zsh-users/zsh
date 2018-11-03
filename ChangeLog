@@ -1,3 +1,8 @@
+2018-11-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 43752: Completion/Base/Completer/_expand: Fix quoting if
+	globbing failed / was not tried for expression on command line.
+
 2018-11-02  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 43748: Completion/Unix/Command/_ack: fix for ack 3beta
