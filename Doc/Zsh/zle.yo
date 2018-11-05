@@ -2703,8 +2703,9 @@ this to appear with other types of highlighting; it is used to override
 a default.
 )
 item(tt(fg=)var(colour))(
-The foreground colour should be set to var(colour), a decimal integer
-or the name of one of the eight most widely-supported colours.
+The foreground colour should be set to var(colour), a decimal integer,
+the name of one of the eight most widely-supported colours or as a
+`tt(#)' followed by an RGB triplet in hexadecimal format.
 
 Not all terminals support this and, of those that do, not all provide
 facilities to test the support, hence the user should decide based on the
@@ -2720,6 +2721,15 @@ number of colours supported may be tested by the command `tt(echotc
 Co)'; if this succeeds, it indicates a limit on the number of colours which
 will be enforced by the line editor.  The number of colours is in any case
 limited to 256 (i.e. the range 0 to 255).
+
+Some modern terminal emulators have support for 24-bit true colour (16
+million colours). In this case, the hex triplet format can be used. This
+consists of either a three or six digit hexadecimal number describing
+the red, green and blue components of the colour. Hex triplets can also
+be used with 88 and 256 colour terminals via the tt(zsh/nearcolor)
+module (see ifzman(zmanref(zshmodules))\
+ifnzman(noderef(The zsh/nearcolor Module))\
+).
 
 Colour is also known as color.
 )

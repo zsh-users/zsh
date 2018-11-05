@@ -4,6 +4,15 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
+Changes since 5.6.2
+-------------------
+
+Support for 24-bit true color terminals has been added. Hex triplets
+can be used when specifying colours for prompts and line editor
+highlighting. On 88 and 256 colour terminals, a new zsh/nearcolor module
+allows colours specified with hex triplets to be matched against the
+nearest available colour.
+
 Changes from 5.6.1 to 5.6.2
 ---------------------------
 
