@@ -94,6 +94,7 @@ mod_export struct hookdef zshhooks[] = {
     HOOKDEF("exit", NULL, HOOKF_ALL),
     HOOKDEF("before_trap", NULL, HOOKF_ALL),
     HOOKDEF("after_trap", NULL, HOOKF_ALL),
+    HOOKDEF("get_color_attr", NULL, HOOKF_ALL),
 };
 
 /* keep executing lists until EOF found */

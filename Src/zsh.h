@@ -2707,6 +2707,12 @@ struct ttyinfo {
 #define COL_SEQ_BG	(1)
 #define COL_SEQ_COUNT	(2)
 
+struct color_rgb {
+    unsigned int red, green, blue;
+};
+
+typedef struct color_rgb *Color_rgb;
+
 /*
  * Flags to testcap() and set_colour_attribute (which currently only
  * handles TSC_PROMPT).
@@ -3203,6 +3209,7 @@ enum {
 #define EXITHOOK       (zshhooks + 0)
 #define BEFORETRAPHOOK (zshhooks + 1)
 #define AFTERTRAPHOOK  (zshhooks + 2)
+#define GETCOLORATTR   (zshhooks + 3)
 
 #ifdef MULTIBYTE_SUPPORT
 /* Final argument to mb_niceformat() */

@@ -1621,7 +1621,24 @@ match_colour(const char **teststrp, int is_fg, int colour)
     int shft, on, named = 0, tc;
 
     if (teststrp) {
-	if ((named = ialpha(**teststrp))) {
+	if (**teststrp == '#' && isxdigit((*teststrp)[1])) {
+	    struct color_rgb color;
+	    char *end;
+	    zlong col = zstrtol(*teststrp+1, &end, 16);
+            if (end - *teststrp == 4) {
+		color.red = col >> 8 | ((col >> 8) << 4);
+		color.green = (col & 0xf0) >> 4;
+		color.green |= color.green << 4;
+		color.blue = col & 0xf;
+		color.blue |= color.blue << 4;
+	    } else if (end - *teststrp == 7) {
+		color.red = col >> 16;
+		color.green = (col & 0xff00) >> 8;
+		color.blue = col & 0xff;
+	    }
+	    *teststrp = end;
+	    colour = runhookdef(GETCOLORATTR, &color);
+	} else if ((named = ialpha(**teststrp))) {
 	    colour = match_named_colour(teststrp);
 	    if (colour == 8) {
 		/* default */
