@@ -149,7 +149,7 @@ char *lpromptbuf, *rpromptbuf;
 /* Text attributes after displaying prompts */
 
 /**/
-unsigned pmpt_attr, rpmpt_attr;
+zattr pmpt_attr, rpmpt_attr;
 
 /* number of lines displayed */
 
@@ -208,7 +208,7 @@ int predisplaylen, postdisplaylen;
  * displayed on screen.
  */
 
-static int default_atr_on, special_atr_on;
+static zattr default_atr_on, special_atr_on;
 
 /*
  * Array of region highlights, no special termination.
@@ -521,7 +521,7 @@ unset_region_highlight(Param pm, int exp)
 
 
 /* The last attributes that were on. */
-static int lastatr;
+static zattr lastatr;
 
 /*
  * Clear the last attributes that we set:  used when we're going
@@ -560,7 +560,7 @@ tcoutclear(int cap)
 
 /**/
 void
-zwcputc(const REFRESH_ELEMENT *c, int *curatrp)
+zwcputc(const REFRESH_ELEMENT *c, zattr *curatrp)
 {
     /*
      * Safety: turn attributes off if last heard of turned on.
@@ -638,7 +638,7 @@ static int
 zwcwrite(const REFRESH_STRING s, size_t i)
 {
     size_t j;
-    int curatr = 0;
+    zattr curatr = 0;
 
     for (j = 0; j < i; j++)
 	zwcputc(s + j, &curatr);
@@ -891,7 +891,7 @@ snextline(Rparams rpms)
 
 /**/
 static void
-settextattributes(int atr)
+settextattributes(zattr atr)
 {
     if (txtchangeisset(atr, TXTNOBOLDFACE))
 	tsetcap(TCALLATTRSOFF, 0);
@@ -992,7 +992,7 @@ zrefresh(void)
     int tmppos;			/* t - tmpline				     */
     int tmpalloced;		/* flag to free tmpline when finished	     */
     int remetafy;		/* flag that zle line is metafied	     */
-    int txtchange;		/* attributes set after prompts              */
+    zattr txtchange;		/* attributes set after prompts              */
     int rprompt_off = 1;	/* Offset of rprompt from right of screen    */
     struct rparams rpms;
 #ifdef MULTIBYTE_SUPPORT
@@ -1212,8 +1212,9 @@ zrefresh(void)
     rpms.s = nbuf[rpms.ln = 0] + lpromptw;
     rpms.sen = *nbuf + winw;
     for (t = tmpline, tmppos = 0; tmppos < tmpll; t++, tmppos++) {
-	int base_atr_on = default_atr_on, base_atr_off = 0, ireg;
-	int all_atr_on, all_atr_off;
+	unsigned ireg;
+	zattr base_atr_on = default_atr_on, base_atr_off = 0;
+	zattr all_atr_on, all_atr_off;
 	struct region_highlight *rhp;
 	/*
 	 * Calculate attribute based on region.
@@ -1446,7 +1447,8 @@ zrefresh(void)
 	more_end = 1;
 
     if (statusline) {
-	int outll, outsz, all_atr_on, all_atr_off;
+	int outll, outsz;
+	zattr all_atr_on, all_atr_off;
 	char *statusdup = ztrdup(statusline);
 	ZLE_STRING_T outputline =
 	    stringaszleline(statusdup, 0, &outll, &outsz, NULL); 
@@ -1672,7 +1674,7 @@ zrefresh(void)
 
     /* output the right-prompt if appropriate */
 	if (put_rpmpt && !iln && !oput_rpmpt) {
-	    int attrchange;
+	    zattr attrchange;
 
 	    moveto(0, winw - rprompt_off - rpromptw);
 	    zputs(rpromptbuf, shout);
@@ -1926,7 +1928,7 @@ refreshline(int ln)
 /* 3: main display loop - write out the buffer using whatever tricks we can */
 
     for (;;) {
-	int now_off;
+	zattr now_off;
 
 #ifdef MULTIBYTE_SUPPORT
 	if ((!nl->chr || nl->chr != WEOF) && (!ol->chr || ol->chr != WEOF)) {
@@ -2506,8 +2508,9 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
     *vp = zr_zr;
 
     for (t0 = 0; t0 < tmpll; t0++) {
-	int base_atr_on = 0, base_atr_off = 0, ireg;
-	int all_atr_on, all_atr_off;
+	unsigned ireg;
+	zattr base_atr_on = 0, base_atr_off = 0;
+	zattr all_atr_on, all_atr_off;
 	struct region_highlight *rhp;
 	/*
 	 * Calculate attribute based on region.

@@ -137,6 +137,10 @@ char *alloca _((size_t));
 #include <stddef.h>
 #endif
 
+#ifdef HAVE_STDINT_H
+# include <stdint.h>
+#endif
+
 #include <stdio.h>
 #include <ctype.h>
 #include <sys/stat.h>

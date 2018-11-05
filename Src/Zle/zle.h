@@ -430,7 +430,7 @@ enum {
  */
 struct region_highlight {
     /* Attributes turned on in the region */
-    int atr;
+    zattr atr;
     /* Start of the region */
     int start;
     /* Start of the region in metafied ZLE line */
@@ -488,7 +488,7 @@ typedef struct {
      * need the effect; 'off' attributes are only present for the
      * last character in the sequence.
      */
-    int atr;
+    zattr atr;
 } REFRESH_ELEMENT;
 
 /* A string of screen cells */

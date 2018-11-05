@@ -1,5 +1,10 @@
 2018-11-05  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 43759: Src/Modules/nearcolor.c, Src/Zle/complist.c,
+	Src/Zle/zle.h, Src/Zle/zle_refresh.c, Src/Zle/zle_tricky.c,
+	Src/prompt.c, Src/zsh.h, Src/zsh_system.h: add support for
+	true colour terminals
+
 	* 43747: Src/Modules/nearcolor.c, Src/Modules/nearcolor.mdd,
 	Src/init.c, Src/prompt.c, Src/zsh.h: new module to map
 	colours from hex triplets to the nearest matching colour

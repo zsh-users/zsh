@@ -2431,6 +2431,7 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 	/* Handle the `%' stuff (%% == %, %n == <number of matches>). */
 	if (doesc && *p == '%') {
 	    int arg = 0, is_fg;
+	    zattr atr;
 	    if (idigit(*++p))
 		arg = zstrtol(p, &p, 10);
 	    if (*p) {
@@ -2482,13 +2483,13 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 		    is_fg = (*p == 'F');
 		    if (p[1] == '{') {
 			p += 2;
-			arg = match_colour((const char **)&p, is_fg, 0);
+			atr = match_colour((const char **)&p, is_fg, 0);
 			if (*p != '}')
 			    p--;
 		    } else
-			arg = match_colour(NULL, is_fg, arg);
-		    if (arg >= 0)
-			set_colour_attribute(arg, is_fg ? COL_SEQ_FG :
+			atr = match_colour(NULL, is_fg, arg);
+		    if (atr != TXT_ERROR)
+			set_colour_attribute(atr, is_fg ? COL_SEQ_FG :
 					     COL_SEQ_BG, 0);
 		    break;
 		case 'f':

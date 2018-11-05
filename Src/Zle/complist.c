@@ -1096,6 +1096,7 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 	    p += len;
 	    if (*p) {
 		int arg = 0, is_fg;
+		zattr atr;
 
 		if (idigit(*p))
 		    arg = zstrtol(p, &p, 10);
@@ -1159,13 +1160,13 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		    /* colours must be ASCII */
 		    if (*p == '{') {
 			p++;
-			arg = match_colour((const char **)&p, is_fg, 0);
+			atr = match_colour((const char **)&p, is_fg, 0);
 			if (*p == '}')
 			    p++;
 		    } else
-			arg = match_colour(NULL, is_fg, arg);
-		    if (arg >= 0 && dopr)
-			set_colour_attribute(arg, is_fg ? COL_SEQ_FG :
+			atr = match_colour(NULL, is_fg, arg);
+		    if (atr != TXT_ERROR && dopr)
+			set_colour_attribute(atr, is_fg ? COL_SEQ_FG :
 					     COL_SEQ_BG, 0);
 		    break;
 		case ZWC('f'):

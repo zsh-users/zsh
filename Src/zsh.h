@@ -2633,6 +2633,12 @@ struct ttyinfo {
  * Text attributes for displaying in ZLE
  */
 
+#ifdef HAVE_STDINT_H
+  typedef uint64_t zattr;
+#else
+  typedef zulong zattr;
+#endif
+
 #define TXTBOLDFACE   0x0001
 #define TXTSTANDOUT   0x0002
 #define TXTUNDERLINE  0x0004
@@ -2664,32 +2670,41 @@ struct ttyinfo {
  */
 #define TXT_MULTIWORD_MASK  0x0400
 
+/* used when, e.g an invalid colour is specified */
+#define TXT_ERROR 0x0800
+
 /* Mask for colour to use in foreground */
-#define TXT_ATTR_FG_COL_MASK     0x000FF000
+#define TXT_ATTR_FG_COL_MASK     0x000000FFFFFF0000
 /* Bits to shift the foreground colour */
-#define TXT_ATTR_FG_COL_SHIFT    (12)
+#define TXT_ATTR_FG_COL_SHIFT    (16)
 /* Mask for colour to use in background */
-#define TXT_ATTR_BG_COL_MASK     0x0FF00000
+#define TXT_ATTR_BG_COL_MASK     0xFFFFFF0000000000
 /* Bits to shift the background colour */
-#define TXT_ATTR_BG_COL_SHIFT    (20)
+#define TXT_ATTR_BG_COL_SHIFT    (40)
 
 /* Flag to use termcap AF sequence to set colour, if available */
-#define TXT_ATTR_FG_TERMCAP      0x10000000
+#define TXT_ATTR_FG_TERMCAP      0x1000
 /* Flag to use termcap AB sequence to set colour, if available */
-#define TXT_ATTR_BG_TERMCAP      0x20000000
+#define TXT_ATTR_BG_TERMCAP      0x2000
+
+/* Flag to indicate that foreground is a 24-bit colour */
+#define TXT_ATTR_FG_24BIT        0x4000
+/* Flag to indicate that background is a 24-bit colour */
+#define TXT_ATTR_BG_24BIT        0x8000
 
 /* Things to turn on, including values for the colour elements */
 #define TXT_ATTR_ON_VALUES_MASK	\
     (TXT_ATTR_ON_MASK|TXT_ATTR_FG_COL_MASK|TXT_ATTR_BG_COL_MASK|\
-     TXT_ATTR_FG_TERMCAP|TXT_ATTR_BG_TERMCAP)
+     TXT_ATTR_FG_TERMCAP|TXT_ATTR_BG_TERMCAP|\
+     TXT_ATTR_FG_24BIT|TXT_ATTR_BG_24BIT)
 
 /* Mask out everything to do with setting a foreground colour */
 #define TXT_ATTR_FG_ON_MASK \
-    (TXTFGCOLOUR|TXT_ATTR_FG_COL_MASK|TXT_ATTR_FG_TERMCAP)
+    (TXTFGCOLOUR|TXT_ATTR_FG_COL_MASK|TXT_ATTR_FG_TERMCAP|TXT_ATTR_FG_24BIT)
 
 /* Mask out everything to do with setting a background colour */
 #define TXT_ATTR_BG_ON_MASK \
-    (TXTBGCOLOUR|TXT_ATTR_BG_COL_MASK|TXT_ATTR_BG_TERMCAP)
+    (TXTBGCOLOUR|TXT_ATTR_BG_COL_MASK|TXT_ATTR_BG_TERMCAP|TXT_ATTR_BG_24BIT)
 
 /* Mask out everything to do with activating colours */
 #define TXT_ATTR_COLOUR_ON_MASK			\
