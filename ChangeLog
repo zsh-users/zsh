@@ -1,5 +1,8 @@
 2018-11-08  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 43779 (tweaked): Joey Pabalinas: Functions/Zle/select-bracketed: 
+	add parentheses to fix expression with cprecedences option set
+
 	* 43805: Src/Modules/nearcolor.c, Src/prompt.c: make nearcolor
 	module use the default colour rather than black as a fallback
 

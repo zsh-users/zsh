@@ -17,8 +17,8 @@ setopt localoptions noksharrays
 local style=${${1:-$KEYS}[1]} matching="(){}[]<>bbBB"
 local -i find=${NUMERIC:-1} idx=${matching[(I)[${${1:-$KEYS}[2]}]]}%9
 (( idx )) || return 1 # no corresponding closing bracket
-local lmatch=${matching[1 + (idx-1) & ~1]}
-local rmatch=${matching[1 + (idx-1) | 1]}
+local lmatch=${matching[1 + ((idx-1) & ~1)]}
+local rmatch=${matching[1 + ((idx-1) | 1)]}
 local -i start=CURSOR+1 end=CURSOR+1 rfind=find
 
 [[ $BUFFER[start] = "$rmatch" ]] && (( start--, end-- ))
