@@ -1,3 +1,10 @@
+2018-11-07  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 43761: Completion/BSD/Type/_file_flags,
+	Completion/Unix/Command/_mktemp, Completion/Unix/Command/_script,
+	Completion/Unix/Command/_strip, Completion/Unix/Type/_file_systems:
+	add or update support for darwin
+
 2018-11-05  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 43760: Doc/Makefile.in, Doc/Zsh/mod_nearcolor.yo,

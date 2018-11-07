@@ -7,6 +7,7 @@ local -a context line state state_descr copts=( "${@}" ) flags flag_descs
 local -A val_args
 
 flag_descs+=(
+  nodump nodump
   uappnd 'user append-only'
   uchg 'user immutable'
 )
@@ -14,7 +15,6 @@ flag_descs+=(
 if (( su )); then
   flag_descs+=(
     arch archived
-    nodump nodump
     sappnd 'system append-only'
     schg 'system immutable'
   )
@@ -36,12 +36,12 @@ if [[ $OSTYPE = (darwin|dragonfly|freebsd|netbsd)* ]]; then
 
   if [[ $OSTYPE = dragonfly* ]]; then
     flag_descs+=(
-      cache XXX
+      cache cache
       nouhistory 'user nohistory'
     )
 
     (( su )) && flag_descs+=(
-      noscache XXX
+      noscache noscache
       noshistory 'system nohistory'
     )
   fi

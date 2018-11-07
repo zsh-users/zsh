@@ -42,10 +42,39 @@ if _pick_variant gnu=GNU solaris --version; then
     '(-)'{-V,--version}'[display version information and exit]'
     '(-v --verbose)'{-v,--verbose}'[list all object files modified or members of archives]')
 else
-  args=(
-    '-l[strip line information only]'
-    '-V[display version information on stderr and exit]'
-    '-x[do not strip the symbol table]')
+  case $OSTYPE in
+    solaris*)
+      args=(
+	'-l[strip line information only]'
+	'-V[display version information on stderr and exit]'
+	'-x[do not strip the symbol table]')
+      ;;
+    darwin*)
+      local -a arch
+      arch=( ${(z)${${"$(_call_program architectures
+			strings -arch - 2>&1)"}#*flags are: }%%$'\n'*} all )
+      args=(
+	'-u[save all undefined symbols]'
+	'-r[save all symbols referenced dynamically]'
+	'-s[save global symbols listed in the specified file]:file:_files'
+	'-R[remove global symbols listed in the specified file]:file:_files'
+	'-i[ignore symbols listed in -s/-R file but are not in the object files]'
+	'-d[save debug symbols in files listed in the specified file]:file:_file'
+	'-A[save all global absolute symbols and Objective-C class symbols]'
+	'-n[save all N_SECT global symbols]'
+	'-S[remove debug symbols]'
+	'-X[remove local symbols whose names begin with L]'
+	'-T[remove Swift symbols]'
+	'-N[remove all nlist symbols and string tables from binaries used by dyld]'
+	'-x[remove all local symbols]'
+	'-c[remove section contents of dynamic library to create stub library]'
+	'-o[write the result to specified file]:output file:_files'
+	'-no_uuid[remove only LC_UUID load command]'
+	'-no_split_info[remove LC_SEGMENT_SPLIT_INFO load command]'
+	'-no_code_signature_warning[not warn when code signature would be invalid in the output]'
+	'-arch[specify the architecture]:architecture:( $arch )' )
+      ;;
+  esac
 fi
 
 _arguments \
