@@ -7459,19 +7459,28 @@ mailstat(char *path, struct stat *st)
 
        /* See if cur/ is present */
        dir = appstr(ztrdup(path), "/cur");
-       if (stat(dir, &st_tmp) || !S_ISDIR(st_tmp.st_mode)) return 0;
+       if (stat(dir, &st_tmp) || !S_ISDIR(st_tmp.st_mode)) {
+	   zsfree(dir);
+	   return 0;
+       }
        st_ret.st_atime = st_tmp.st_atime;
 
        /* See if tmp/ is present */
        dir[plen] = 0;
        dir = appstr(dir, "/tmp");
-       if (stat(dir, &st_tmp) || !S_ISDIR(st_tmp.st_mode)) return 0;
+       if (stat(dir, &st_tmp) || !S_ISDIR(st_tmp.st_mode)) {
+	   zsfree(dir);
+	   return 0;
+       }
        st_ret.st_mtime = st_tmp.st_mtime;
 
        /* And new/ */
        dir[plen] = 0;
        dir = appstr(dir, "/new");
-       if (stat(dir, &st_tmp) || !S_ISDIR(st_tmp.st_mode)) return 0;
+       if (stat(dir, &st_tmp) || !S_ISDIR(st_tmp.st_mode)) {
+	   zsfree(dir);
+	   return 0;
+       }
        st_ret.st_mtime = st_tmp.st_mtime;
 
 #if THERE_IS_EXACTLY_ONE_MAILDIR_IN_MAILPATH
@@ -7483,6 +7492,7 @@ mailstat(char *path, struct stat *st)
            st_tmp.st_atime == st_new_last.st_atime &&
            st_tmp.st_mtime == st_new_last.st_mtime) {
 	   *st = st_ret_last;
+	   zsfree(dir);
 	   return 0;
        }
        st_new_last = st_tmp;
