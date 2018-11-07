@@ -41,7 +41,8 @@ em(not) given, a newline is added at the end.
 
 If no var(string) is provided, the standard input is copied to the
 pseudo-terminal; this may stop before copying the full input if the
-pseudo-terminal is non-blocking.
+pseudo-terminal is non-blocking.  The exact input is always copied:
+the tt(-n) option is not applied.
 
 Note that the command under the pseudo-terminal sees this input as if it
 were typed, so beware when sending special tty driver characters such as

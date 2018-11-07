@@ -1,3 +1,8 @@
+2018-11-07  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 43788: Doc/Zsh/mod_zpty.yo: make it clear -n option to
+	zpty -w is irrelevant if no string argument.
+
 2018-11-07  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 43761: Completion/BSD/Type/_file_flags,
