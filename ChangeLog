@@ -1,3 +1,7 @@
+2018-11-09  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 43791: Kamil: Src/Modules/clone.c: file descriptor was closed twice.
+
 2018-11-08  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 43779 (tweaked): Joey Pabalinas: Functions/Zle/select-bracketed: 

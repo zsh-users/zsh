@@ -96,7 +96,8 @@ bin_clone(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	init_io(NULL);
 	setsparam("TTY", ztrdup(ttystrname));
     }
-    close(ttyfd);
+    else
+	close(ttyfd);
     if (pid < 0) {
 	zerrnam(nam, "fork failed: %e", errno);
 	return 1;
