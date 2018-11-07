@@ -1,5 +1,7 @@
 2018-11-09  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 43793: Kamil: Src/Zle/computil.c: could overrun buffer by 1 byte.
+
 	* 43791: Kamil: Src/Modules/clone.c: file descriptor was closed twice.
 
 2018-11-08  Oliver Kiddle  <okiddle@yahoo.co.uk>

@@ -561,9 +561,9 @@ cd_init(char *nam, char *hide, char *mlen, char *sep,
                 if (str->str == str->match)
                     str->str = ztrdup(str->str);
                 if (hide[1] && str->str[0] == '-' && str->str[1] == '-')
-                    strcpy(str->str, str->str + 2);
+                    memmove(str->str, str->str + 2, strlen(str->str) - 1);
                 else if (str->str[0] == '-' || str->str[0] == '+')
-                    strcpy(str->str, str->str + 1);
+                    memmove(str->str, str->str + 1, strlen(str->str));
             }
         }
 	for (ap = args; *args &&
