@@ -4805,7 +4805,8 @@ getoutputfile(char *cmd, char **eptr)
     }
 
     if ((cmdoutpid = pid = zfork(NULL)) == -1) {
-	/* fork or open error */
+	/* fork error */
+	close(fd);
 	child_unblock();
 	return nam;
     } else if (pid) {

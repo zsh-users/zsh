@@ -1,5 +1,7 @@
 2018-11-09  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 43792: Kamil: Src/exec.c: file descriptor could leak on fork error.
+
 	* 43793: Kamil: Src/Zle/computil.c: could overrun buffer by 1 byte.
 
 	* 43791: Kamil: Src/Modules/clone.c: file descriptor was closed twice.
