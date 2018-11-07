@@ -1390,8 +1390,6 @@ setmathfuncs(char const *nam, MathFunc f, int size, int *e)
 	    if (deletemathfunc(f)) {
 		zwarnnam(nam, "math function `%s' already deleted", f->name);
 		ret = 1;
-	    } else {
-		f->flags &= ~MFF_ADDED;
 	    }
 	}
 	f++;
