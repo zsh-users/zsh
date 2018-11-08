@@ -1,5 +1,8 @@
 2018-11-08  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 43804: Src/prompt.c: also need to be able to turn colour
+	attributes back into hex triples for region_highlight variable
+
 	* unposted: Src/Modules/nearcolor.c: add usual copyright header
 
 	* 43784: Completion/Zsh/Command/_compadd: clarify descriptions on

@@ -1646,7 +1646,8 @@ match_colour(const char **teststrp, int is_fg, int colour)
 		color.red = col >> 16;
 		color.green = (col & 0xff00) >> 8;
 		color.blue = col & 0xff;
-	    }
+	    } else
+		return TXT_ERROR;
 	    *teststrp = end;
 	    colour = runhookdef(GETCOLORATTR, &color) - 1;
 	    if (colour < 0) { /* no hook function added, try true color (24-bit) */
@@ -1744,11 +1745,12 @@ match_highlight(const char *teststr, zattr *on_var)
 
 /*
  * Count or output a string for colour information: used
- * by output_highlight().
+ * by output_highlight(). count when buf is NULL.
+ * returned count excludes the terminating null byte.
  */
 
 static int
-output_colour(int colour, int fg_bg, int use_tc, char *buf)
+output_colour(int colour, int fg_bg, int use_tc, int truecol, char *buf)
 {
     int atrlen = 3, len;
     char *ptr = buf;
@@ -1756,8 +1758,12 @@ output_colour(int colour, int fg_bg, int use_tc, char *buf)
 	strcpy(ptr, fg_bg == COL_SEQ_FG ? "fg=" : "bg=");
 	ptr += 3;
     }
+    if (truecol) {
+	/* length of hex triplet always 7, don't need sprintf to count */
+	atrlen += buf ? sprintf(ptr, "#%02x%02x%02x", colour >> 16,
+		(colour >> 8) & 0xff, colour & 0xff) : 7;
     /* colour should only be > 7 if using termcap but let's be safe */
-    if (use_tc || colour > 7) {
+    } else if (use_tc || colour > 7) {
 	char digbuf[DIGBUFSIZE];
 	sprintf(digbuf, "%d", colour);
 	len = strlen(digbuf);
@@ -1795,6 +1801,7 @@ output_highlight(zattr atr, char *buf)
 	len = output_colour(txtchangeget(atr, TXT_ATTR_FG_COL),
 			    COL_SEQ_FG,
 			    (atr & TXT_ATTR_FG_TERMCAP),
+			    (atr & TXT_ATTR_FG_24BIT),
 			    ptr);
 	atrlen += len;
 	if (buf)
@@ -1811,6 +1818,7 @@ output_highlight(zattr atr, char *buf)
 	len = output_colour(txtchangeget(atr, TXT_ATTR_BG_COL),
 			    COL_SEQ_BG,
 			    (atr & TXT_ATTR_BG_TERMCAP),
+			    (atr & TXT_ATTR_BG_24BIT),
 			    ptr);
 	atrlen += len;
 	if (buf)
