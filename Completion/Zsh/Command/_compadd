@@ -14,9 +14,9 @@ _arguments -C -s -S -A "-*" \
   '(-a)-k[matches are keys of specified associative arrays]' \
   '-d+[specify display strings]:array:_parameters -g "*array*"' \
   '-l[list display strings one per line, not in columns]' \
-  '-o[order matches by display string not by match string]' \
-  '(-1 -E)-J+[specify match group]:group' \
-  '-V+[specify unsorted match group]:group' \
+  '-o[order matches by match string not by display string]' \
+  '(-1 -E)-J+[specify match group which will be sorted]:group' \
+  '-V+[specify pre-ordered match group]:group' \
   '(-J -E)-1[remove only consecutive duplicates from group]' \
   '-2[preserve all duplicates]' \
   '(-x)-X[specify explanation]:explanation' \
