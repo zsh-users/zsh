@@ -146,13 +146,14 @@ mapRGBto256(int red, int green, int blue)
 static int
 getnearestcolor(UNUSED(Hookdef dummy), Color_rgb col)
 {
+    /* we add 1 to the colours so that colour 0 (black) is
+     * distinguished from runhookdef() indicating that no
+     * hook function is registered */
     if (tccolours == 256)
 	return mapRGBto256(col->red, col->green, col->blue) + 1;
     if (tccolours == 88)
 	return mapRGBto88(col->red, col->green, col->blue) + 1;
-    /* returning 1 indicates black rather than failure (0) so this
-     * module still serves to prevent fallback on true color */
-    return 1;
+    return -1;
 }
 
 static struct features module_features = {

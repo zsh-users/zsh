@@ -1,5 +1,8 @@
 2018-11-08  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 43805: Src/Modules/nearcolor.c, Src/prompt.c: make nearcolor
+	module use the default colour rather than black as a fallback
+
 	* 43804: Src/prompt.c: also need to be able to turn colour
 	attributes back into hex triples for region_highlight variable
 

@@ -1650,10 +1650,12 @@ match_colour(const char **teststrp, int is_fg, int colour)
 		return TXT_ERROR;
 	    *teststrp = end;
 	    colour = runhookdef(GETCOLORATTR, &color) - 1;
-	    if (colour < 0) { /* no hook function added, try true color (24-bit) */
+	    if (colour == -1) { /* no hook function added, try true color (24-bit) */
 		colour = (((color.red << 8) + color.green) << 8) + color.blue;
 		return on | (is_fg ? TXT_ATTR_FG_24BIT : TXT_ATTR_BG_24BIT) |
 			(zattr)colour << shft;
+	    } else if (colour <= -2) {
+		return TXT_ERROR;
 	    }
 	} else if ((named = ialpha(**teststrp))) {
 	    colour = match_named_colour(teststrp);
