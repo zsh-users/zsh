@@ -1,5 +1,7 @@
 2018-11-08  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* unposted: Src/Modules/nearcolor.c: add usual copyright header
+
 	* 43784: Completion/Zsh/Command/_compadd: clarify descriptions on
 	options related to match sorting
 
