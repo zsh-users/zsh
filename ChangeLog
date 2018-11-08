@@ -1,3 +1,9 @@
+2018-11-08  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* unposted (c.f. Bart: 43739):
+	Completion/Zsh/Context/_brace_parameter: use a correct
+	description for the @ parameter expansion flag
+
 2018-11-07  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 43788: Doc/Zsh/mod_zpty.yo: make it clear -n option to
