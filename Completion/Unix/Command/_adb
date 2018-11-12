@@ -112,6 +112,9 @@ _adb_dispatch_command () {
     (*:adb-shell:)
       (( $+functions[_adb_dispatch_shell] )) && _adb_dispatch_shell
       ;;
+    (*:adb-backup:)
+      (( $+functions[_adb_dispatch_backup] )) && _adb_dispatch_backup
+      ;;
     (*:adb-connect:|*:adb-disconnect:)
       (( $+functions[_adb_dispatch_connection_handling] )) && _adb_dispatch_connection_handling
       ;;
@@ -189,6 +192,18 @@ _adb_dispatch_shell () {
       _arguments '*: :_adb_remote_folder'
       ;;
   esac
+}
+
+(( $+functions[_adb_dispatch_backup] )) ||
+_adb_dispatch_backup() {
+  _arguments \
+    '-f[specify backup file]:backup file:_files' \
+    '-apk[backup .apk files]' '!(-apk)-noapk' \
+    '-obb[backup .obb files]' '!(-obb)-noobb' \
+    '-shared[backup shared storage]' '!(-shared)-noshared' \
+    '-all[backup all installed apps]' \
+    '-nosystem[include system apps when backing up all apps]' '!(-nosystem)-system' \
+    '*:package name:_adb_installed_packages'
 }
 
 (( $+functions[_adb_pm_list] )) ||
@@ -298,7 +313,7 @@ _adb_package_manager_handler () {
     (getInstallLocation)
       ;;
     (*)
-      _wanted pm_argument expl 'pm argument' compadd list path install unistall enable disable setInstallLocation getInstallLocation
+      _wanted pm_argument expl 'pm argument' compadd list path install uninstall enable disable setInstallLocation getInstallLocation
       ;;
   esac
 }

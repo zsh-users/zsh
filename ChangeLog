@@ -1,5 +1,8 @@
 2018-11-12  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 43819: Completion/Unix/Command/_adb: expand adb completion to
+	also cover options to adb backup
+
 	* 43818: Completion/Zsh/Type/_module_math_func: complete math
 	functions for other modules besides zsh/mathfunc
 
