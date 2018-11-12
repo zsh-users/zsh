@@ -646,7 +646,7 @@ args+=(
   '-Wstrict-selector-match[Warn if type signatures of candidate methods do not match exactly]'
   '-Wstringop-overflow[Warn about buffer overflow in string manipulation functions like memcpy and strcpy.  Same as  -Wstringop-overflow=]'
   '-Wsubobject-linkage[Warn if a class type has a base or a field whose type uses the anonymous namespace or depends on a type with no linkage]'
-  '-Wsuggest-attribute=-[Warn about functions which might be candidates for __attribute__((const))]:const:(pure const noreturn format)'
+  '*-Wsuggest-attribute=-[warn about functions that might be candidates for attributes]:attribute:(pure const noreturn format)'
   '-Wsuggest-final-methods[Warn about C++ virtual methods where adding final keyword would improve code quality]'
   '-Wsuggest-final-types[Warn about C++ polymorphic types where adding final keyword would improve code quality]'
   '-Wsuggest-override[Suggest that the override keyword be used when the declaration of a virtual function overrides another]'
