@@ -1,9 +1,12 @@
 #autoload
 
-local expl
-local -a funcs
+local mod
+local -a funcs alts
+local -a modules=( example mathfunc system )
 
-funcs=(${${${(f)"$(zmodload -Fl zsh/mathfunc 2>/dev/null)"}:#^+f:*}##+f:})
+for mod in $modules; do
+  funcs=( ${${${(f)"$(zmodload -Fl zsh/$mod 2>/dev/null)"}:#^+f:*}##+f:} )
+  alts+=( "module-math-functions.${mod}:math function from zsh/${mod}:compadd -S '(' $funcs" )
+done
 
-_wanted module-math-functions expl 'math function from zsh/mathfunc' \
-    compadd -S '(' -q "$@" -a funcs
+_alternative $alts

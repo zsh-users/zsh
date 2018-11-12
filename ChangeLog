@@ -1,5 +1,8 @@
 2018-11-12  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 43818: Completion/Zsh/Type/_module_math_func: complete math
+	functions for other modules besides zsh/mathfunc
+
 	* 43816: Completion/Linux/Command/_valgrind,
 	Completion/BSD/Command/_vmctl, Completion/Linux/Command/_ethtool,
 	Completion/Linux/Command/_losetup, Completion/Linux/Command/_lsblk,
