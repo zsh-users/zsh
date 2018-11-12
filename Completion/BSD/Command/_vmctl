@@ -1,16 +1,18 @@
 #compdef vmctl
 
-local context line state state_descr
-local -a subcommands vmctl_status
-local -A opt_args
+local -a subcommands alts
 
-_vm_name() {
-  compadd "$@" - ${${${(@f)"$(_call_program vmctl_status vmctl status)"}[2,-1]}##* }
+_vm_names() {
+  local expl
+  _description virtual-machines expl 'virtual machine'
+  compadd "$@" "$expl[@]" - ${${${(@f)"$(_call_program virtual-machines vmctl status)"}[2,-1]}##* }
 }
 
-_vm_switch() {
+_vm_switches() {
+  local expl
+  _description virtual-switches expl 'virtual switch'
   [[ -r /etc/vm.conf ]] &&
-  compadd "$@" - ${${${(M)${(f)"$(</etc/vm.conf)"}:#switch *}##switch ##\"#}%%\"# *}
+  compadd "$@" "$expl[@]" - ${${${(M)${(f)"$(</etc/vm.conf)"}:#switch *}##switch ##\"#}%%\"# *}
 }
 
 subcommands=(
@@ -26,22 +28,30 @@ subcommands=(
   {show,status}:'list VMs running or just the specified id'
   start:'start a VM'
   stop:'stop a VM'
-  unpause:'unpause a VM'
+  unpause:'resume a VM'
 )
 
 if (( CURRENT == 2 )); then
   _describe subcommand subcommands
 else
+  local curcontext="${curcontext%:*}-${words[2]}:"
   shift words; (( CURRENT-- ))
   case $words[1] in
-    console|pause|send|show|status|stop|unpause)
-      _arguments ':id:_vm_name'
+    console|pause|send|show|status|unpause)
+      _vm_names
       ;;
     create)
-      _arguments \
-        ':path:_files' \
-        ': :(-s)' \
-        ':disk size in megabytes: '
+      if (( CURRENT == 2 )); then
+	compset -P '(raw|qcow2):' || alts=(
+	  'prefixes:prefix:compadd -S: raw qcow2'
+	)
+	_alternative 'files:path:_files' $alts
+      else
+	shift words; (( CURRENT-- ))
+	_arguments \
+	  '-s+[specify size]:size' \
+	  '-b+[specify base disk]:base image:_files'
+      fi
       ;;
     load)
       _arguments ':configuration file:_files'
@@ -61,7 +71,7 @@ else
       ;;
     start)
       if (( CURRENT == 2 )); then
-        _vm_name
+        _vm_names
       else
         shift words; (( CURRENT-- ))
         _arguments -s \
@@ -71,9 +81,22 @@ else
           '-i+[number of network interfaces]:number: ' \
           '-L[add a local network interface]' \
           '-m+[memory size in megabytes]:megabytes: ' \
-          '-n+[specify switch to attach]:switch:_vm_switch' \
-	  '-r+[ISO image file for virtual CD-ROM]:ISO image:_files'
+          '-n+[specify switch to attach]: :_vm_switches' \
+	  '-r+[ISO image file for virtual CD-ROM]:ISO image:_files' \
+	  '-t+[use existing VM as a template]: :_vm_names'
       fi
-      ;;
+    ;;
+    stop)
+      if (( CURRENT == 2 )); then
+	_alternative \
+	  'all:all:(-a)' \
+	  'virtual-machines: :_vm_names'
+      else
+	shift words; (( CURRENT-- ))
+	_arguments \
+	  '-f[forcefully stop without attempting a graceful shutdown]' \
+	  '-w[wait until the VM has been terminated]'
+      fi
+    ;;
   esac
 fi

@@ -55,6 +55,7 @@ case $service in
       '(-t --timeout)'{-t+,--timeout=}'[change the per-operation timeout]:timeout (seconds)'
       '(2 -p --port)'{-p+,--port=}'[specify tcp port]:tcp port'
       '(-g --grepable)'{-g,--grepable}'[produce grepable output]'
+      '(-q --quiet)'{-q,--quiet}'[suppress help message]'
       '(-B --browse)'{-B,--browse}'[browse SMB servers using DNS]'
       '(2 -d --debuglevel)'{-d+,--debuglevel=}'[specify debug level]:debug level:(0 1 2 3 4 5 6 7 8 9 10)'
       '(2 -O --socket-options)'{-O+,--socket-options=}'[specify socket options]:socket options'

@@ -9,6 +9,7 @@ case $OSTYPE in
   linux-gnu)
     args=(
       '(info json -c --output-width)'{-c+,--output-width=}'[format output to fit display of specified width]:width'
+      '(info)'{-L,--table-empty-lines}"[don't ignore empty lines]"
       + fill
       '(info table text json -x --fillrows)'{-x,--fillrows}'[fill rows before filling columns]'
       + table

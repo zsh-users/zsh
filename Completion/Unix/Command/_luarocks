@@ -9,6 +9,7 @@ __luarocks_command(){
     doc:'show documentation for an installed rock'
     download:'download a specific rock file from a rocks server'
     help:'help on commands'
+    init:'initialize a directory for a Lua project using LuaRocks'
     install:'install a rock'
     lint:'check syntax of a rockspec'
     list:'list currently installed rocks'
@@ -20,13 +21,27 @@ __luarocks_command(){
     remove:'uninstall a rock'
     search:'query the LuaRocks servers'
     show:'show information about an installed rock'
+    test:'run the test suite in the current directory'
     unpack:'unpack the contents of a rock'
     upload:'upload a rockspec to the public rocks repository'
+    which:'indicate which file corresponds to a given module name'
     write_rockspec:'write a template for a rockspec file'
   )
   _describe -t commands 'command' commands "$@"
 }
+
 local option_deps_modes='--deps-mode=[specify how to handle dependencies]:mode:__luarocks_deps_modes'
+
+local rockspec_options=(
+  '--license=[specify a license string]:license (e.g. "MIT/X11" or "GNU GPL v3")'
+  '--summary=[a short one-line description summary]:summary:{_message -e "short summary of the rock"}'
+  '--detailed=[a longer description string]:detailed_text:{_message -e "detailed description of the rock"}'
+  '--homepage=[project homepage]:URL:_urls'
+  '--lua-versions=[specify supported Lua versions]:lua version:_sequence compadd - 5.{1,2,3,4}'
+  '--rockspec-format=[rockspec format version, such as "1.0" or "1.1"]:VER: '
+  '--lib=[comma separated list of C library files to link to]:library files'
+)
+
 (( $+functions[__luarocks_deps_modes] )) ||
 __luarocks_deps_modes(){
   local modes=(
@@ -78,10 +93,7 @@ __luarocks_rock_version(){
     i=$(( i + 1 ))
   done
 }
-(( $+functions[__luarocks_lua_versions] )) ||
-__luarocks_lua_versions(){
-  _values -s , 5.3 5.2 5.1
-}
+
 (( $+functions[___luarocks_manually_store_cache_configs_paths] )) ||
 ___luarocks_manually_store_cache_configs_paths(){
   user_config_path="$(_call_program user_config_path luarocks config --user-config)"
@@ -397,6 +409,15 @@ _luarocks_download(){
 _luarocks_help(){
   _arguments '1: :__luarocks_command'
 }
+
+(( $+functions[_luarocks_init] )) ||
+_luarocks_init(){
+  _arguments $rockspec_options \
+    '--reset[regenerate files if they already exist]' \
+    '1: :_guard "^-*" "name"'\
+    '2: :_guard "^-*" "version"'
+}
+
 # arguments:
 # - must: .rockspec file / external rock
 # - optional: version
@@ -453,11 +474,11 @@ _luarocks_pack(){
 # arguments:
 # NOTE: receives only options
 local path_command_options=(
-  '--bin[adds the system path to the output]'
-  '--append[appends the paths to the existing paths]'
-  '--lr-path[exports the Lua path (not formatted as shell command)]'
-  '--lr-cpath[exports the Lua cpath (not formatted as shell command)]'
-  '--lr-bin[exports the system path (not formatted as shell command)]'
+  "--no-bin[don't export the PATH variable]"
+  '--append[append the paths to the existing paths]'
+  '--lr-path[export the Lua path (not formatted as shell command)]'
+  '--lr-cpath[export the Lua cpath (not formatted as shell command)]'
+  '--lr-bin[export the system path (not formatted as shell command)]'
 )
 (( $+functions[_luarocks_path] )) ||
 _luarocks_path(){
@@ -495,13 +516,14 @@ _luarocks_remove(){
 local search_command_options=(
   '--source[return only rockspecs and source rocks]'
   '--binary[return only pure Lua and binary rocks (rocks that can be used with the "install" command without requiring a C toolchain)]'
-  '--all[list all contents of the server that are suitable to this platform, do not filter by name]'
+  "--all[list all contents of the server that are suitable for this platform, don't filter by name]"
+  '--porcelain[produce machine readable output]'
 )
 (( $+functions[_luarocks_search] )) ||
 _luarocks_search(){
   _arguments \
     "${search_command_options[@]}" \
-    '*:SEARCH QUERY:'
+    '*: :_guard "^--*" "search query"'
 }
 # arguments:
 # - must: installed rock
@@ -509,6 +531,8 @@ local show_command_options=(
   '--home[home page of project]'
   '--modules[all modules provided by this package as used by require()]'
   '--deps[packages this package depends on]'
+  '--build-deps[show build-only dependencies for package]'
+  '--test-deps[show dependencies for testing package]'
   '--rockspec[the full path of the rockspec file]'
   '--mversion[the package version]'
   '--rock-tree[local tree where rock is installed]'
@@ -520,6 +544,16 @@ _luarocks_show(){
     "${show_command_options[@]}" \
     "1: :{__luarocks_rock 'installed' "${opt_args[--tree]}"}"
 }
+
+(( $+functions[_luarocks_test] )) ||
+_luarocks_test(){
+  _arguments $option_deps_modes \
+    '--test-type=[specify the test suite type manually]:test suite type' \
+    '--reset[regenerate files if they already exist]' \
+    '1:rockspec:__luarocks_rock' \
+    '*:arg'
+}
+
 # arguments:
 # - must: rockpack file / external rock
 # - optional: version (only when chossing external rock)
@@ -535,8 +569,9 @@ _luarocks_unpack(){
 # arguments:
 # - must: rockspec file
 local upload_command_options=(
-  '--skip-pack[do not pack and send source rock]'
-  '--api-key=[give it an API key]:KEY:{_message "api key"}'
+  "--skip-pack[don't pack and send source rock]"
+  '(--temp-key)--api-key=[use and save specified API key]:api key'
+  '(--api-key)--temp-key=[use specified temporary API key in this invocation only]:api key'
   '--force[replace existing rockspec if the same revision of a module already exists]'
 )
 (( $+functions[_luarocks_upload] )) ||
@@ -545,26 +580,18 @@ _luarocks_upload(){
     "${upload_command_options[@]}" \
     '1: :{__luarocks_rock "rockspec"}'
 }
-# arguments:
-# - optional: name
-# - optional: version
-# - optional: URL / PATH
-# receives as an argument a name and a version with optionally a URL/PATH
-local write_rockspec_command_options=(
-  '--output=[write the rockspec with the given filename]:FILE:_files'
-  '--license=[specify a license string]:license (e.g. "MIT/X11" or "GNU GPL v3")'
-  '--summary=[a short one-line description summary]:summary:{_message -e "short summary of the rock"}'
-  '--detailed=[a longer description string]:detailed_text:{_message -e "detailed description of the rock"}'
-  '--homepage=[project homepage]:URL:_urls'
-  '--lua-version=[supported Lua versions]:LUA_VER:__luarocks_lua_versions'
-  '--rockspec-format=[rockspec format version, such as "1.0" or "1.1"]:VER: '
-  '--tag=[tag to use. Will attempt to extract version number from it]:tag:__git_tag'
-  '--lib=[comma separated list of C library files to link to]:library files'
-)
+
+(( $+functions[_luarocks_which] )) ||
+_luarocks_which(){
+  _message -e modules 'module name'
+}
+
 (( $+functions[_luarocks_write_rockspec] )) ||
 _luarocks_write_rockspec(){
   _arguments -A "-*" \
-    "${write_rockspec_command_options[@]}" \
+    "${rockspec_options[@]}" \
+    '--output=[write the rockspec with the given file]:file:_files' \
+    '--tag=[specify tag to use. Will attempt to extract version number from it]:tag:__git_tag' \
     '1:: :{_message "new rock name"}' \
     '2:: :{__luarocks_rock_version "new_rock"}' \
     '3:: :_urls'
@@ -572,13 +599,15 @@ _luarocks_write_rockspec(){
 
 # The real thing
 _arguments -C \
-  '(--server --only-server)--server=[fetch rocks/rockspecs from this server]:HOST:_hosts' \
-  '(--server --only-server)--only-server=[fetch rocks/rockspecs from this server only]:HOST:_hosts' \
+  '--dev[enable the sub-repositories in rocks servers]' \
+  '(--server --only-server)--server=[fetch rocks/rockspecs from specified server]:host:_hosts' \
+  '(--server --only-server)--only-server=[fetch rocks/rockspecs from specified server only]:host:_hosts' \
   '--only-sources=[restrict downloads to paths matching the given URL]:URL:_urls' \
-  '--tree=[which tree to operate on]:TREE:{_files -/}' \
+  '--lua-dir=[specify location of lua installation]:path:_directories' \
+  '--tree=[specify which tree to operate on]:tree:_directories' \
   '--local[use the tree in the user'"'"'s home directory]' \
   '--verbose[display verbose output of commands executed]' \
-  '--timeout=[timeout on network operations]:SECONDS:{_message "timeout (seconds)"}' \
+  '--timeout=[specify timeout for network operations]:timeout (seconds)' \
   '1: :__luarocks_command' \
   '*::arg:->args'
 

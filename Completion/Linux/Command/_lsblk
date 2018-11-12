@@ -15,6 +15,7 @@ _arguments -C -s -S \
   '(H -p --paths)'{-p,--paths}'[print complete device path]' \
   '(H -s --inverse)'{-s,--inverse}'[reverse dependency order]' \
   '(H -x --sort)'{-x+,--sort=}'[sort output by specified column]:column:->columns' \
+  '(H)--sysroot=[use specified directory as system root]:directory:_directories' \
   '*:device:_files -g "*(-%b)" -P / -W /' \
   + fields \
   '(H -D --discard -o --output -O --output-all)'{-D,--discard}'[output discard capabilities]' \

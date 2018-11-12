@@ -55,6 +55,7 @@ _mpc_command() {
     playlist:"print the current playlist"
     prev:"play the previous song in the current playlist"
     prio:"change song priorities in the queue"
+    queued:"show the next queued song"
     random:"toggle random mode, or specify state"
     repeat:"toggle repeat mode, or specify state"
     single:"toggle single mode, or specify state"
@@ -69,6 +70,7 @@ _mpc_command() {
     findadd:"find songs and add them to the current playlist"
     list:"list all tags of given type"
     seek:"seek to the position specified in percent"
+    seekthrough:"seek by an amount of time within the song and playlist"
     shuffle:"shuffle the current playlist"
     stats:"display statistics about MPD"
     stop:"stop the currently playing playlists"
@@ -82,6 +84,8 @@ _mpc_command() {
     waitmessage:"wait for at least one message on the specified channel"
     subscribe:"subscribe to the specified channel and continuously receive messages"
     sticker:"sticker management"
+    mount:"list mounts or add a new mount"
+    unmount:"remove a mount"
   )
 
   if (( CURRENT == 1 )); then
@@ -209,7 +213,11 @@ _mpc_play() {
 }
 
 _mpc_seek() {
-  _message "floating point percent value"
+  _message -e position 'position ([+-][HH:MM:SS]|<0-100>%%)'
+}
+
+_mpc_seekthrough() {
+  _message -e position 'position ([+-][HH:MM:SS])'
 }
 
 _mpc_enable() {
@@ -349,6 +357,7 @@ _arguments -C \
   '(-p --port)'{-p,--port=}'[connect to server port]:port' \
   '(-f --format)'{-f,--format=}'[specify the format of song display]:format string:->formats' \
   '(-w --wait)'{-w,--wait}'[wait for operation to finish (e.g. database update)]' \
+  '(-r --range)'{-r,--range=}'[operate on a range (e.g. when loading a playlist)]:<start>\:<end>' \
   '*::mpc command:_mpc_command' && ret=0
 
 if [[ $state = formats ]]; then

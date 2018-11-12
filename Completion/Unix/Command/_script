@@ -24,6 +24,7 @@ case $OSTYPE in
       "(-e --return $hlp)"{-e,--return}'[return exit status of the child process]'
       "(-f --flush $hlp)"{-f,--flush}'[flush output after each write]'
       "($hlp)--force[use output file even when it is a link]"
+      '(-o --output-limit)'{-o+,--output-limit=}'[terminate if output files exceed specified size]:size (bytes)'
       "(-q --quiet $hlp)"{-q,--quiet}'[be quiet]'
       "(-t --timing $hlp)"{-t-,--timing=-}'[output timing data]::timing file:_files'
       '(- 1)'{-h,--help}'[display help information]'

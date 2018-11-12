@@ -106,6 +106,7 @@ if [[ -n $state ]]; then
       '(d)a[wake on ARP]' \
       '(d)g[wake on MagicPacket(tm)]' \
       '(d)s[enable SecureOn(tm) password for MagicPacket(tm)]' \
+      '(d)f[wake on filter(s)]' \
       '(p u m b a g s)d[disable (wake on nothing)]'
   ;;
   sopass)
@@ -137,9 +138,6 @@ if [[ -n $state ]]; then
   ;;
   flags)
     _message -e masks mask
-  ;;
-  encoding)
-    _wanted encodings expl encoding compadd auto off rs baser
   ;;
   context)
     _message -e contexts 'RSS context'
@@ -255,7 +253,7 @@ if [[ -n $state ]]; then
         hkey hfunc delete
     ;;
     -f|--flash)
-      if (( CURRENT = 4 )); then
+      if (( CURRENT == 4 )); then
         _files
       else
         _message -e regions region
@@ -291,7 +289,11 @@ if [[ -n $state ]]; then
           {mgmt,irq,dma,filter,offload,mac,phy,ram,ap}{,-shared}
     ;;
     --set-fec)
-      _wanted options expl tunable compadd -F line - encoding
+      if (( CURRENT == 4 )); then
+        _wanted options expl tunable compadd - encoding
+      else
+        _wanted encodings expl encoding compadd -F line auto off rs baser
+      fi
     ;;
     esac
   ;;

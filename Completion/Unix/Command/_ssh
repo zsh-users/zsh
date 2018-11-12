@@ -56,7 +56,7 @@ _ssh () {
       '(-v)*-q[quiet operation]' \
       '*-R+[specify remote port forwarding]:remote port forwarding:->forward' \
       '-S+[specify location of control socket for connection sharing]:path to control socket:_files' \
-      '-Q+[query parameters]:parameter type:((cipher\:"supported symmetric ciphers" cipher-auth\:"supported symmetric ciphers that support authenticated encryption" mac\:"supported message integrity codes" kex\:"key exchange algorithms" key\:"key types" protocol-version\:"supported SSH protocol versions"))' \
+      '-Q+[query parameters]:query option:((cipher\:"supported symmetric ciphers" cipher-auth\:"supported symmetric ciphers that support authenticated encryption" mac\:"supported message integrity codes" kex\:"key exchange algorithms" key\:"key types" key-cert\:"certificate key types" key-plain\:"non-certificate key types" protocol-version\:"supported SSH protocol versions" sig\:"supported signature algorithms" help\:"show supported queries"))' \
       '-s[invoke subsystem]' \
       '(-t)-T[disable pseudo-tty allocation]' \
       '(-T)-t[force pseudo-tty allocation]' \
@@ -452,6 +452,7 @@ _ssh () {
                 CanonicalizeHostname \
                 CanonicalizeMaxDots \
                 CanonicalizePermittedCNAMEs \
+                CASignatureAlgorithms \
                 CertificateFile \
                 ChallengeResponseAuthentication \
                 CheckHostIP \

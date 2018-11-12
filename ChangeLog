@@ -1,5 +1,16 @@
 2018-11-12  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 43816: Completion/Linux/Command/_valgrind,
+	Completion/BSD/Command/_vmctl, Completion/Linux/Command/_ethtool,
+	Completion/Linux/Command/_losetup, Completion/Linux/Command/_lsblk,
+	Completion/Unix/Command/_ansible, Completion/Unix/Command/_column,
+	Completion/Unix/Command/_dhclient, Completion/Unix/Command/_links,
+	Completion/Unix/Command/_dmidecode, Completion/Unix/Command/_jq,
+	Completion/Unix/Command/_luarocks, Completion/Unix/Command/_mpc,
+	Completion/Unix/Command/_samba, Completion/Unix/Command/_script,
+	Completion/Unix/Command/_ssh, Completion/Unix/Command/_tmux:
+	various completion option updates
+
 	* 43817: Completion/Linux/Command/_btrfs: update options in
 	completion through to btrfs 4.17.1
 

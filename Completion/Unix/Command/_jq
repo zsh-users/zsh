@@ -27,8 +27,11 @@ _arguments -S -s : \
   '(-f --from-file)'{-f,--from-file}'[read filter from file]:_files' \
   '-L+[prepend a directory to the module search path]:_directories' \
   '(-e --exit-status)'{-e,--exit-status}'[report "false" and "null" results via exit code]' \
-  '*--arg[pre-set a variable to a string]: :_guard "|[A-Za-z][A-Za-z0-9]#" "variable name":value (string): ' \
-  '*--argjson[pre-set a variable to an object]: :_guard "|[A-Za-z][A-Za-z0-9]#" "variable name":value (JSON): ' \
-  '*--slurpfile[pre-set a variable to contents of a file]: :_guard "|[A-Za-z][A-Za-z0-9]#" "variable name":value (filename of file containing JSON):_files' \
+  '*--arg[pre-set a variable to a string]:variable name: :value (string)' \
+  '*--argjson[pre-set a variable to an object]:variable name: :value (JSON)' \
+  '*--slurpfile[pre-set a variable to an array of JSON texts read from a file]:variable name: :file:_files' \
+  '*--rawfile[pre-set a variable to the contents of a file]:variable name: :file:_files' \
+  '--args[remaining arguments are string arguments, not files]' \
+  '--jsonargs[remaining arguments are JSON arguments, not files]' \
   "1: :_guard '|[^-]' filter" \
   "*: :_files"

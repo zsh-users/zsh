@@ -304,7 +304,7 @@ _tmux-display-message() {
   _arguments -s -S \
     '-c+[specify target client]:client:__tmux-clients' \
     '-p[print message to stdout]' \
-    '-t+[specify target client]:client:__tmux-clients' \
+    '-t+[specify target pane]:pane:__tmux-panes' \
     '-F+[specify output format]:format:__tmux-formats' \
     ':message'
 }
@@ -809,8 +809,9 @@ _tmux-set-window-option() {
 _tmux-set-hook() {
   [[ -n ${tmux_describe} ]] && print "set a hook to a command" && return
   _arguments -s \
-    '-g[add hook to global list]' \
-    '-u[unset a hook]' \
+    '(-R)-g[add hook to global list]' \
+    '(-g -u)-R[run hook immediately]' \
+    '(-R)-u[unset a hook]' \
     '-t+[specify target session]:session:__tmux-sessions' \
     ':hook name:_tmux_hooks' \
     '*:::command:= _tmux'

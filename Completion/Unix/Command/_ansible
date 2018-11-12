@@ -1,6 +1,6 @@
 #compdef ansible ansible-config ansible-console ansible-doc ansible-galaxy ansible-inventory ansible-playbook ansible-pull ansible-vault
 
-local curcontext="$curcontext" plug plugvar ret=1
+local curcontext="$curcontext" plug plugvar ign ret=1
 local -a args state line
 local -A opt_args
 
@@ -30,7 +30,7 @@ case $service in
       '(-D --diff)'{-D,--diff}'[show differences when changing small files and templates]'
       '(-b --become)'{-b,--become}'[escalate privileges on remote system]'
       '(-f --forks)'{-f+,--forks=}'[specify number of parallel processes to use]:processes [5]'
-      '--become-method=[specify privilege escalation method to use]:method [sudo]:(sesu sudo su pbrun pfexec doas dzdo ksu runas pmrun enable)'
+      '--become-method=[specify privilege escalation method to use]:method [sudo]:(sudo su pbrun pfexec doas dzdo ksu runas pmrun enable machinectl)'
       '--become-user=[specify remote user for running operations]:user:_users'
       "--syntax-check[perform a syntax check on the playbook, but don't execute it]"
       '!(-R --su-user -U --sudo-user)'{-R,-U,--su-user,--sudo-user}':user [root]:_users'
@@ -102,6 +102,7 @@ case $service in
   ;;
   ansible-doc)
     args+=(
+      '!(-l --list -F --list_files -s --snippet)'{-j,--json} # "internal testing only"
       '(-l --list -F --list_files -s --snippet)'{-l,--list}'[list available plugins]'
       '(-l --list -F --list_files -s --snippet)'{-F,--list_files}'[show plugin names and their source files without summaries]'
       '(-l --list -F --list_files -s --snippet)'{-s,--snippet}'[show playbook snippet for specified plugins]'
@@ -143,6 +144,7 @@ case $service in
   ansible-pull)
     args+=(
       "--check[don't make any changes]"
+      '--diff[show the differences in changed files]'
       '(-d --directory)'{-d+,--directory=}'[specify directory to checkout repository to]:directory:_directories'
       '--full[do a full instead of a shallow clone]'
       '(-m --module-name)'{-m+,--module-name=}'[specify repository module used for checking out repository]:module:(git subversion hg bzr)'
@@ -167,9 +169,10 @@ case $service in
   ;;
 esac
 
+(( $#words > 2 )) && ign='!'
 _arguments -s -S -C $args \
-  '(- :)--version[display version information]' \
-  '(- :)'{-h,--help}'[display usage information]' \
+  "${ign}(- :)--version[display version information]" \
+  "${ign}(- :)"{-h,--help}'[display usage information]' \
   \*{-v,--verbose}"[verbose mode (repeat to increase)]" && ret=0
 
 plug=${(v)opt_args[(i)-(t|-type)]:-module}
@@ -220,11 +223,18 @@ case $state in
     fi
   ;;
   galaxy)
+    ign=''
     curcontext="${curcontext%:*}-${line[1]}:"
-    args=()
+    (( $#words > 2 )) && ign='!'
+    args=(
+      "${ign}(-)"{-h,--help}'[display usage information]'
+      '(-c --ignore-certs)'{-c,--ignore-certs}'[ignore SSL certificate validation errors]'
+      '(-s --server)'{-s+,--server=}'[specify API server destination]:server:_hosts'
+      {-v,--verbose}'[verbose mode]'
+    )
     case $line[1] in
       info|search|list|remove|install)
-	args=( '(-p --roles-path)'{-p,--roles-path}'[specify location of roles]:path:_directories' )
+	args+=( '(-p --roles-path)'{-p,--roles-path}'[specify location of roles]:path:_directories' )
       ;|
       info|init)
 	args+=( "--offline[don't query the galaxy API]" )
@@ -241,22 +251,23 @@ case $state in
 	)
       ;;
       setup)
-	args=(
+	args+=(
 	  '--list[list integrations]'
 	  '--remove=[remove integration]:integration id'
 	)
       ;;
       init)
 	args+=(
-	  '--container-enabled[initialize the skeleton role with default contents for a Container Enabled role]'
           '--init-path=[specify path in which the skeleton role will be created]:path:_directories'
           '--role-skeleton=[specify path to a role skeleton that the new role should be based upon]'
+	  '--type=[initialize using an alternate role type]:role type:(container apb network)'
 	)
       ;;
       install)
 	args+=(
 	  '(-n --no-deps)'{-n,--no-deps}"[don’t download roles listed as dependencies]"
 	  '(-i --ignore-errors)'{-i,--ignore-errors}'[ignore errors and continue with the next specified role]'
+	  '(-g --keep-scm-meta)'{-g,--keep-scm-meta}'[use tar instead of the scm archive option when packaging the role]'
 	  '(-r --role-file)'{-r+,--role-file=}'[specify file containing a list of roles to be imported]:file:_files'
         )
       ;;
