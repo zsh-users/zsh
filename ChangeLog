@@ -1,5 +1,8 @@
 2018-11-12  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 43817: Completion/Linux/Command/_btrfs: update options in
+	completion through to btrfs 4.17.1
+
 	* 43813: Completion/BSD/Command/_powerd: add units, default
 	values and allow option arguments in the same word as the option
 
