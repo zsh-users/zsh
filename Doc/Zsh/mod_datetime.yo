@@ -6,9 +6,13 @@ The tt(zsh/datetime) module makes available one builtin command:
 startitem()
 findex(strftime)
 cindex(date string, printing)
-xitem(tt(strftime) [ tt(-s) var(scalar) ] var(format) var(epochtime) )
+xitem(tt(strftime) [ tt(-s) var(scalar) ] var(format) [ var(epochtime) [ var(nanoseconds) ] ] )
 item(tt(strftime) tt(-r) [ tt(-q) ] [ tt(-s) var(scalar) ] var(format) var(timestring) )(
-Output the date denoted by var(epochtime) in the var(format) specified.
+Output the date in the var(format) specified.  With no var(epochtime), the
+current system date/time is used; optionally, var(epochtime) may be used to
+specify the number of seconds since the epoch, and var(nanoseconds) may
+additionally be used to specify the number of nanoseconds past the second
+(otherwise that number is assumed to be 0).
 See manref(strftime)(3) for details.  The zsh extensions described in
 ifzman(the section EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
 ifnzman(noderef(Prompt Expansion)) are also available.

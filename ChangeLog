@@ -1,3 +1,8 @@
+2018-11-13  dana  <dana@dana.is>
+
+	* 43800: Doc/Zsh/mod_datetime.yo, Src/Modules/datetime.c,
+	Test/V09datetime.ztst: Add nanosecond support to strftime built-in
+
 2018-11-12  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 43819: Completion/Unix/Command/_adb: expand adb completion to

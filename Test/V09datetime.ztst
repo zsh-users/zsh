@@ -82,3 +82,32 @@
 # The result can be '%@' (Linux), '@' (BSDs) or an error (Cygwin).
   [[ $(strftime '%@' 0 2> /dev/null) == (%|)@ || $? != 0 ]]
 0:bad format specifier
+
+# This test may fail at 23:59:59.xxx on New Year's Eve :/
+  [[ "$( strftime '%Y' )" == "$( strftime '%Y' "$EPOCHSECONDS" )" ]]
+0:epochtime optional
+
+  strftime '%Y-%m-%d %H:%M:%S.%3.' 1012615322
+  strftime '%Y-%m-%d %H:%M:%S.%3.' 1012615322 0
+  strftime '%Y-%m-%d %H:%M:%S.%3.' 1012615322 2
+  strftime '%Y-%m-%d %H:%M:%S.%3.' 1012615322 $(( 222 * (10 ** 9) ))
+0:optional nanoseconds
+>2002-02-02 02:02:02.000
+>2002-02-02 02:02:02.000
+>2002-02-02 02:02:02.000
+>2002-02-02 02:02:02.222
+
+  strftime '%Y' '' 2> /dev/null
+1:empty epochtime not allowed
+
+  strftime '%Y' 1012615322 '' 2> /dev/null
+1:empty nanoseconds not allowed
+
+  strftime '%N' 1012615322 ${(l<64><9>):-} 2> /dev/null
+1:overflowed nanoseconds not allowed
+
+  strftime '%N' 1012615322 -1 2> /dev/null
+1:negative nanoseconds not allowed
+
+  strftime -r '%Y' 2> /dev/null
+1:-r timestring not optional
