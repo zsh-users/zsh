@@ -1,5 +1,8 @@
 2018-11-13  dana  <dana@dana.is>
 
+	* 43809: Completion/Unix/Command/_npm: Suppress npm update checks
+	during completion
+
 	* unposted (cf. 43800): Completion/Zsh/Command/_strftime: Update
 	strftime completion for nanoseconds change
 
