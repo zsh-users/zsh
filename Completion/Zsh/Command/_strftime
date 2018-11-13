@@ -4,9 +4,11 @@ local ret=1 expl
 
 _arguments -S -A '-*' -s \
   '-q[run quietly]' \
-  '-r[reverse lookup using strptime]' \
+  '(3)-r[reverse lookup using strptime]' \
   '-s+[assign result to parameter]:param:_parameters' \
   '1:format: _date_formats zsh' \
-  '2:epoch time (or date string with -r)' && ret=0
+  '2:epoch time (or date string with -r)' \
+  '3:nanoseconds' \
+&& ret=0
 
 return ret

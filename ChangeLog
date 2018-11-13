@@ -1,5 +1,8 @@
 2018-11-13  dana  <dana@dana.is>
 
+	* unposted (cf. 43800): Completion/Zsh/Command/_strftime: Update
+	strftime completion for nanoseconds change
+
 	* 43800: Doc/Zsh/mod_datetime.yo, Src/Modules/datetime.c,
 	Test/V09datetime.ztst: Add nanosecond support to strftime built-in
 
