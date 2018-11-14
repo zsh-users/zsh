@@ -1,3 +1,8 @@
+2018-11-14  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 43620: Doc/Zsh/expn.yo: more care documenting command
+	substituion including $(<...).
+
 2018-11-13  dana  <dana@dana.is>
 
 	* 43809: Completion/Unix/Command/_npm: Suppress npm update checks

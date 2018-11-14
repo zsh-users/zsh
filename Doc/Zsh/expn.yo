@@ -1683,10 +1683,17 @@ any trailing newlines deleted.
 If the substitution is not enclosed in double quotes, the
 output is broken into words using the tt(IFS) parameter.
 vindex(IFS, use of)
+
 The substitution `tt($LPAR()cat) var(foo)tt(RPAR())' may be replaced
-by the equivalent but faster `tt($LPAR()<)var(foo)tt(RPAR())'.
-In either case, if the option tt(GLOB_SUBST) is set,
-the output is eligible for filename generation.
+by the faster `tt($LPAR()<)var(foo)tt(RPAR())'.  In this case var(foo)
+undergoes single word shell expansions (em(parameter expansion),
+em(command substitution) and em(arithmetic expansion)), but not
+filename generation.
+
+If the option tt(GLOB_SUBST) is set, the result of any unquoted command
+substitution, including the special form just mentioned, is eligible for
+filename generation.
+
 texinode(Arithmetic Expansion)(Brace Expansion)(Command Substitution)(Expansion)
 sect(Arithmetic Expansion)
 cindex(arithmetic expansion)
