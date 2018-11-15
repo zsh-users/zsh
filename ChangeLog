@@ -1,5 +1,7 @@
 2018-11-15  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* unposted: Completion/Unix/Command/_zcat: support macOS
+
 	* Ivan Tkachenko: 43823: Src/Modules/stat.c: remove unnecessary
 	metafy() in stattimeprint()
 
