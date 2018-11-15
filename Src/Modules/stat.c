@@ -198,10 +198,8 @@ stattimeprint(time_t tim, long nsecs, char *outbuf, int flags)
     if (flags & STF_STRING) {
 	char *oend = outbuf + strlen(outbuf);
 	/* Where the heck does "40" come from? */
-	int len = ztrftime(oend, 40, timefmt, (flags & STF_GMT) ? gmtime(&tim) :
+	ztrftime(oend, 40, timefmt, (flags & STF_GMT) ? gmtime(&tim) :
 			   localtime(&tim), nsecs);
-	if (len > 0)
-	    metafy(oend, len, META_NOALLOC);
 	if (flags & STF_RAW)
 	    strcat(oend, ")");
     }
