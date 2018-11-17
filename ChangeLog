@@ -1,3 +1,8 @@
+2018-11-16  dana  <dana@dana.is>
+
+	* Daniel O'Connor: 43830: Completion/BSD/Command/_cu: Complete
+	/dev/cu.* (used by macOS)
+
 2018-11-15  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* unposted: Completion/Unix/Command/_zcat: support macOS

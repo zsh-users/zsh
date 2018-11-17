@@ -32,7 +32,7 @@ case $variant in
       '(-E --escape)'{-E+,--escape=}'[specify escape character]:escape character [~]'
       '(-a -p --port)'{-a+,-p+,--port=}'[specify the port]:port'
       '(-c --phone -n --prompt)'{-c+,--phone=}'[specify phone number to call]:phone number'
-      '(1 -l -z --system)--line=[specify line to use]:line:(/dev/(cuaU#<->|ttyS<->|tty.*)(N%c))'
+      '(1 -l -z --system)--line=[specify line to use]:line:(/dev/(cuaU#<->|ttyS<->|tty.*|cu.*)(N%c))'
     )
   ;|
   taylor)
@@ -63,5 +63,5 @@ esac
 
 _arguments -s $args \
   '(--speed)-s+[set line speed for the connection]:line speed [9600]:_baudrates' \
-  '(1 --line -z --system)-l+[specify line to use]:line:(/dev/(cuaU#<->|ttyS<->|tty.*)(N%c))' \
+  '(1 --line -z --system)-l+[specify line to use]:line:(/dev/(cuaU#<->|ttyS<->|tty.*|cu.*)(N%c))' \
   '1: :_guard "^-*" system'
