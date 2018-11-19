@@ -33,37 +33,37 @@
 #include <math.h>
 
 struct cielab {
-    float L, a, b;
+    double L, a, b;
 };
 typedef struct cielab *Cielab;
 
-static float
+static double
 deltae(Cielab lab1, Cielab lab2)
 {
     /* taking square root unnecessary as we're just comparing values */
-    return powf(lab1->L - lab2->L, 2) +
-	powf(lab1->a - lab2->a, 2) +
-	powf(lab1->b - lab2->b, 2);
+    return pow(lab1->L - lab2->L, 2) +
+	pow(lab1->a - lab2->a, 2) +
+	pow(lab1->b - lab2->b, 2);
 }
 
 static void
 RGBtoLAB(int red, int green, int blue, Cielab lab)
 {
-    float R = (float)red / 255.0;
-    float G = (float)green / 255.0;
-    float B = (float)blue / 255.0;
-    R = 100.0 * (R > 0.04045 ? powf((R + 0.055) / 1.055, 2.4) : R / 12.92);
-    G = 100.0 * (G > 0.04045 ? powf((G + 0.055) / 1.055, 2.4) : G / 12.92);
-    B = 100.0 * (B > 0.04045 ? powf((B + 0.055) / 1.055, 2.4) : B / 12.92);
+    double R = red / 255.0;
+    double G = green / 255.0;
+    double B = blue / 255.0;
+    R = 100.0 * (R > 0.04045 ? pow((R + 0.055) / 1.055, 2.4) : R / 12.92);
+    G = 100.0 * (G > 0.04045 ? pow((G + 0.055) / 1.055, 2.4) : G / 12.92);
+    B = 100.0 * (B > 0.04045 ? pow((B + 0.055) / 1.055, 2.4) : B / 12.92);
 
     /* Observer. = 2 degrees, Illuminant = D65 */
-    float X = (R * 0.4124 + G * 0.3576 + B * 0.1805) / 95.047;
-    float Y = (R * 0.2126 + G * 0.7152 + B * 0.0722) / 100.0;
-    float Z = (R * 0.0193 + G * 0.1192 + B * 0.9505) / 108.883;
+    double X = (R * 0.4124 + G * 0.3576 + B * 0.1805) / 95.047;
+    double Y = (R * 0.2126 + G * 0.7152 + B * 0.0722) / 100.0;
+    double Z = (R * 0.0193 + G * 0.1192 + B * 0.9505) / 108.883;
 
-    X = (X > 0.008856) ? powf(X, 1.0/3.0) : (7.787 * X) + (16.0 / 116.0);
-    Y = (Y > 0.008856) ? powf(Y, 1.0/3.0) : (7.787 * Y) + (16.0 / 116.0);
-    Z = (Z > 0.008856) ? powf(Z, 1.0/3.0) : (7.787 * Z) + (16.0 / 116.0);
+    X = (X > 0.008856) ? pow(X, 1.0/3.0) : (7.787 * X) + (16.0 / 116.0);
+    Y = (Y > 0.008856) ? pow(Y, 1.0/3.0) : (7.787 * Y) + (16.0 / 116.0);
+    Z = (Z > 0.008856) ? pow(Z, 1.0/3.0) : (7.787 * Z) + (16.0 / 116.0);
 
     lab->L = (116.0 * Y) - 16.0;
     lab->a = 500.0 * (X - Y);
@@ -75,7 +75,7 @@ mapRGBto88(int red, int green, int blue)
 {
     int component[] = { 0, 0x8b, 0xcd, 0xff, 0x2e, 0x5c, 0x8b, 0xa2, 0xb9, 0xd0, 0xe7 };
     struct cielab orig, next;
-    float nextl, bestl = -1;
+    double nextl, bestl = -1;
     int r, g, b;
     int comp_r = 0, comp_g = 0, comp_b = 0;
 
@@ -116,7 +116,7 @@ mapRGBto256(int red, int green, int blue)
 	0xa8, 0xb2, 0xbc, 0xc6, 0xd0, 0xda, 0xe4, 0xee
     };
     struct cielab orig, next;
-    float nextl, bestl = -1;
+    double nextl, bestl = -1;
     int r, g, b;
     int comp_r = 0, comp_g = 0, comp_b = 0;
 

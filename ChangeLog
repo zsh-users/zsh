@@ -1,3 +1,7 @@
+2018-11-19  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 43829: Src/Modules/nearcolor.c: use double instead of float
+
 2018-11-16  dana  <dana@dana.is>
 
 	* Daniel O'Connor: 43830: Completion/BSD/Command/_cu: Complete
