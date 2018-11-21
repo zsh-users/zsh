@@ -1,3 +1,9 @@
+2018-11-21  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 43837 (test from Daniel): Src/subst.c, Test/D04parameter.ztst:
+	Nested substitution didn't remove Nularg from empty string,
+	giving bogus character.
+
 2018-11-19  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 43829: Src/Modules/nearcolor.c: use double instead of float

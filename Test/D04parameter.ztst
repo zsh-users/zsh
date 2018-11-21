@@ -2430,3 +2430,10 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
   )
 0:Use of parameter subst + to test element of hash with KSH_ARRAYS.
 >0
+
+ for baz in "" "inga"; do
+   echo ${#${baz}} "${#${baz}}" ${#baz} "${#baz}"
+ done
+0:double-quoted nested evaluation of empty string
+>0 0 0 0
+>4 4 4 4

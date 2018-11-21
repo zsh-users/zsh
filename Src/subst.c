@@ -2405,6 +2405,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	    aspar = 0;
 	} else if (aspar)
 	    idbeg = val;
+	if (*val == Nularg)
+	    ++val;
 	*s = sav;
 	/*
 	 * This tests for the second double quote in an expression
