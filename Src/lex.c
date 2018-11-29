@@ -1613,6 +1613,7 @@ parsestr(char **s)
 		zerr("parse error near `%c'", err);
 	    else
 		zerr("parse error");
+	    tok = LEXERR;
 	}
     }
     return err;
