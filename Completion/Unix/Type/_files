@@ -17,6 +17,10 @@ if _have_glob_qual $PREFIX; then
     _globquals && ret=0
   fi
   return ret
+elif [[ $_comp_caller_options[extendedglob] == on ]] && compset -P '\(\#'; then
+  # Globbing flags can start at beginning of word, even though
+  # glob qualifiers can't.
+  _globflags && return
 fi
 
 local opts tmp glob pat pats expl tag i def descr end ign tried
