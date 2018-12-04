@@ -1,7 +1,7 @@
 2018-12-04  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* 43860: Completion/Unix/Type/_files: complete globbing flags at
-	start of word.
+	* 43860, 43861: Completion/Unix/Type/_files: complete globbing
+	flags at start of word.
 
 2018-11-29  Peter Stephenson  <p.stephenson@samsung.com>
 
