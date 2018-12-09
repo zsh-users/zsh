@@ -89,7 +89,7 @@ VCS_INFO_git_getbranch () {
         gitbranch="$(${(z)gitsymref} 2> /dev/null)"
         [[ -z ${gitbranch} ]] && [[ -r ${actiondir}/head-name ]] \
             && gitbranch="$(< ${actiondir}/head-name)"
-        [[ -z ${gitbranch} || ${gitbranch} == 'detached HEAD' ]] \
+        [[ -z ${gitbranch} || ${gitbranch} == 'detached HEAD' ]] && [[ -r ${actiondir}/onto ]] \
             && gitbranch="$(< ${actiondir}/onto)"
 
     elif [[ -f "${gitdir}/MERGE_HEAD" ]] ; then
@@ -112,9 +112,11 @@ VCS_INFO_git_getbranch () {
     ## Commented out because we don't know of a case in which 'describe --contains' fails and 'name-rev --tags' succeeds.
     #elif gitbranch="$(${vcs_comm[cmd]} name-rev --name-only --no-undefined --tags HEAD 2>/dev/null)" ; then
     elif gitbranch="$(${vcs_comm[cmd]} name-rev --name-only --no-undefined --always HEAD 2>/dev/null)" ; then
-    elif gitbranch="${${"$(< $gitdir/HEAD)"}[1,7]}..." ; then
-    else
-        # Can't happen
+    fi
+
+    if [[ -z ${gitbranch} ]]
+    then
+	gitbranch="${${"$(< $gitdir/HEAD)"}[1,7]}..."
     fi
 
     return 0
