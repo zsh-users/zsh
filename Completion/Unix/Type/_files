@@ -46,6 +46,8 @@ if (( tmp )); then
   ignvars=($=opts[tmp+1])
   if [[ $ignvars = _comp_ignore ]]; then
     ign=( $_comp_ignore )
+  elif [[ $ignvars = \(* ]]; then
+    ign=( ${=ignvars[2,-2]} )
   else
     ign=()
     for ignvar in $ignvars; do

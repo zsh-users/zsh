@@ -1,3 +1,8 @@
+2018-12-09  dana  <dana@dana.is>
+
+	* 43871: Completion/Unix/Type/_files: Support `-F '(pat ...)'` as
+	with _path_files
+
 2018-12-04  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 43860, 43861: Completion/Unix/Type/_files: complete globbing
