@@ -1,3 +1,8 @@
+2018-12-14  dana  <dana@dana.is>
+
+	* unposted: Completion/Unix/Command/_dig: Fix _arguments syntax
+	error
+
 2018-12-13  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 43879: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
