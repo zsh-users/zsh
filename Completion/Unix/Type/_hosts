@@ -1,4 +1,4 @@
-#compdef ftp rwho rup xping traceroute host aaaa zone mx ns soa txt
+#compdef ftp rwho rup xping traceroute aaaa zone mx ns soa txt
 
 # avoid calling variable "hosts", it's an obvious candidate for use in
 #  zstyle -e '*' hosts 'reply=($hosts)'

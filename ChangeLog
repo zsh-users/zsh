@@ -1,5 +1,14 @@
 2018-12-17  dana  <dana@dana.is>
 
+	* 43897: Completion/Darwin/Command/_xcode-select,
+	Completion/Unix/Command/_asciidoctor,
+	Completion/Unix/Command/_asciinema,
+	Completion/Unix/Command/_host, Completion/Unix/Command/_mkfifo,
+	Completion/Unix/Command/_mknod, Completion/Unix/Command/_shred,
+	Completion/Unix/Command/_tail, Completion/Unix/Command/_tty,
+	Completion/Unix/Command/_visudo, Completion/Unix/Type/_hosts:
+	Add/update various completion functions
+
 	* 43895: Completion/Unix/Command/_watch: Complete for
 	procps/-ng watch
 

@@ -38,10 +38,13 @@ else
       )
       ;|
     (freebsd*|darwin*|dragonfly*|netbsd*)
-      args+=( '(-f -r)-F[implies -f, but also detect file rename]' )
+      args+=(
+	'(-f -r)-F[implies -f, but also detect file rename]'
+	'(-v)-q[never output headers giving file names]'
+      )
       ;|
-    (freebsd*|darwin*|dragonfly*)
-      args+=( '-q[suppress the headers when displaying multiple files]' )
+    (netbsd*)
+      args+=( '(-q)-v[always output headers giving file names]' )
       ;;
   esac
 fi
