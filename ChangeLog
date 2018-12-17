@@ -1,3 +1,8 @@
+2018-12-17  dana  <dana@dana.is>
+
+	* 43895: Completion/Unix/Command/_watch: Complete for
+	procps/-ng watch
+
 2018-12-17  Joey Pabalinas  <joeypabalinas@gmail.com>
 
 	* 43904 (plus tweak): Doc/Zsh/grammar.yo: zshmisc(1): document
