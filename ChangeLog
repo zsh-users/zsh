@@ -1,3 +1,8 @@
+2018-12-17  Joey Pabalinas  <joeypabalinas@gmail.com>
+
+	* 43904 (plus tweak): Doc/Zsh/grammar.yo: zshmisc(1): document
+	term being optional if `in word' is omitted
+
 2018-12-14  dana  <dana@dana.is>
 
 	* unposted: Completion/Unix/Command/_dig: Fix _arguments syntax

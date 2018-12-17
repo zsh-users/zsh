@@ -183,11 +183,14 @@ findex(for)
 cindex(for loops)
 cindex(loops, for)
 item(tt(for) var(name) ... [ tt(in) var(word) ... ] var(term) tt(do) var(list) tt(done))(
-where var(term) is at least one newline or tt(;).
 Expand the list of var(word)s, and set the parameter
-var(name) to each of them in turn, executing
-var(list) each time.  If the tt(in) var(word) is omitted,
+var(name) to each of them in turn, executing var(list)
+each time.  If the `tt(in) var(word)' is omitted,
 use the positional parameters instead of the var(word)s.
+
+The var(term) consists of one or more newline or tt(;)
+which terminate the var(word)s, and are optional when the
+`tt(in) var(word)' is omitted.
 
 More than one parameter var(name) can appear before the list of
 var(word)s.  If var(N) var(name)s are given, then on each execution of the
