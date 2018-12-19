@@ -1,3 +1,8 @@
+2018-12-19  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* unposted c.f. 43913: Functions/Zle/edit-command-line: emulate
+	-L zsh to avoid bad effects with globsubst.
+
 2018-12-17  dana  <dana@dana.is>
 
 	* 43897: Completion/Darwin/Command/_xcode-select,

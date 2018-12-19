@@ -6,6 +6,8 @@
 # will give ksh-like behaviour for that key,
 # except that it will handle multi-line buffers properly.
 
+emulate -L zsh
+
 () {
   exec </dev/tty
 
