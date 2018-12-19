@@ -5,9 +5,7 @@ THE Z SHELL (ZSH)
 Version
 -------
 
-This is version 5.6.2 of the shell.  This is a bugfix release, following
-5.6 which was a security and feature release and 5.6.1 which was a bugfix
-release.
+This is version 5.7 of the shell.
 
 Note in particular the changes highlighted under "Incompatibilities since
 5.6.2" below.  See NEWS for more information.
@@ -34,19 +32,18 @@ details, see the documentation.
 Incompatibilities since 5.6.2
 -----------------------------
 
-1) vcs_info git: The gen-unapplied-string hook receives the patches in order (next
-to be applied first).  This is consistent with the hg backend and with one of
-two contradictory claims in the documentation (the other one has been corrected).
-In zsh through 5.6.2, the patches were passed in reverse order, next to be
-applied being last in the array.
+1) vcs_info git: The gen-unapplied-string hook receives the patches in
+order (next to be applied first).  This is consistent with the hg
+backend and with one of two contradictory claims in the documentation
+(the other one has been corrected).  In zsh through 5.6.2, the patches
+were passed in reverse order, next to be applied being last in the
+array.
 
 The gen-applied-string hook is unaffected; it still receives the patches in
 reverse order, from last applied to first applied.
 
-2) 
-
-Incompatibilities since 5.5.1
------------------------------
+Incompatibilities between 5.5.1 and 5.6.2
+------------------------------------------
 
 The completion helper _remote_files, typically used after a hostname
 with scp-style completion, now uses remote-files instead of files as a
