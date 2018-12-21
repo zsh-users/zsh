@@ -2338,7 +2338,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		zerr("bad substitution");
 		return NULL;
 	    }
-	} else if (inbrace && inull(*s)) {
+	} else if (inbrace && inull(*s) && *s != Bnull) {
 	    /*
 	     * Handles things like ${(f)"$(<file)"} by skipping 
 	     * the double quotes.  We don't need to know what was
