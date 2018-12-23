@@ -1,3 +1,8 @@
+2018-12-17  dana  <dana@dana.is>
+
+	* 43928: Completion/Base/Utility/_alternative: Evaluate (...)
+	action syntax as with _arguments
+
 2018-12-21  Bart Schaefer  <schaefer@zsh.org>
 
 	* 43921: ${\var} should be an error

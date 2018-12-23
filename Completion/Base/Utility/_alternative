@@ -43,8 +43,10 @@ while _tags; do
 
         # Anything inside `(...)' is added directly.
 
+        eval ws\=\( "${action[2,-2]}" \)
+
         _all_labels "${def%%:*}" expl "$descr" \
-            compadd "$subopts[@]" - ${=action[2,-2]}
+            compadd "$subopts[@]" -a - ws
       elif [[ "$action" = \{*\} ]]; then
 
         # A string in braces is evaluated.
