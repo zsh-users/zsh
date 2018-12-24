@@ -90,7 +90,7 @@
   strftime '%Y-%m-%d %H:%M:%S.%3.' 1012615322
   strftime '%Y-%m-%d %H:%M:%S.%3.' 1012615322 0
   strftime '%Y-%m-%d %H:%M:%S.%3.' 1012615322 2
-  strftime '%Y-%m-%d %H:%M:%S.%3.' 1012615322 $(( 222 * (10 ** 9) ))
+  strftime '%Y-%m-%d %H:%M:%S.%3.' 1012615322 $(( 222 * (10 ** 6) ))
 0:optional nanoseconds
 >2002-02-02 02:02:02.000
 >2002-02-02 02:02:02.000
@@ -102,6 +102,9 @@
 
   strftime '%Y' 1012615322 '' 2> /dev/null
 1:empty nanoseconds not allowed
+
+  strftime '%N' 1012615322 $(( 10 ** 9 )) 2> /dev/null
+1:too-large nanoseconds not allowed
 
   strftime '%N' 1012615322 ${(l<64><9>):-} 2> /dev/null
 1:overflowed nanoseconds not allowed

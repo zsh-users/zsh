@@ -1,4 +1,10 @@
-2018-12-17  dana  <dana@dana.is>
+2018-12-24  dana  <dana@dana.is>
+
+	* 43935 (tweaked): Src/Modules/datetime.c, Test/V09datetime.ztst:
+	Fix test error on 32-bit machines, reject too-large nanosecond
+	values given to strftime
+
+2018-12-23  dana  <dana@dana.is>
 
 	* 43928: Completion/Base/Utility/_alternative: Evaluate (...)
 	action syntax as with _arguments

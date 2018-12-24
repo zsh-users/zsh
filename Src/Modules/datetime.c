@@ -148,7 +148,7 @@ output_strftime(char *nam, char **argv, Options ops, UNUSED(int func))
 	    } else if (*argv[2] == '\0' || *endptr != '\0') {
 		zwarnnam(nam, "%s: invalid decimal number", argv[2]);
 		return 1;
-	    } else if (ts.tv_nsec < 0) {
+	    } else if (ts.tv_nsec < 0 || ts.tv_nsec > 999999999) {
 		zwarnnam(nam, "%s: invalid nanosecond value", argv[2]);
 		return 1;
 	    }
