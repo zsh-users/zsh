@@ -1910,7 +1910,7 @@ getjob(const char *s, const char *prog)
     /* "%%", "%+" and "%" all represent the current job */
     if (*s == '%' || *s == '+' || !*s) {
 	if (curjob == -1) {
-	    if (prog)
+	    if (prog && !isset(POSIXBUILTINS))
 		zwarnnam(prog, "no current job");
 	    returnval = -1;
 	    goto done;
@@ -1921,7 +1921,7 @@ getjob(const char *s, const char *prog)
     /* "%-" represents the previous job */
     if (*s == '-') {
 	if (prevjob == -1) {
-	    if (prog)
+	    if (prog && !isset(POSIXBUILTINS))
 		zwarnnam(prog, "no previous job");
 	    returnval = -1;
 	    goto done;
@@ -1944,7 +1944,7 @@ getjob(const char *s, const char *prog)
 	    returnval = jobnum;
 	    goto done;
 	}
-	if (prog)
+	if (prog && !isset(POSIXBUILTINS))
 	    zwarnnam(prog, "%%%s: no such job", s);
 	returnval = -1;
 	goto done;
@@ -1962,7 +1962,7 @@ getjob(const char *s, const char *prog)
 			returnval = jobnum;
 			goto done;
 		    }
-	if (prog)
+	if (prog && !isset(POSIXBUILTINS))
 	    zwarnnam(prog, "job not found: %s", s);
 	returnval = -1;
 	goto done;
@@ -1976,7 +1976,8 @@ getjob(const char *s, const char *prog)
     }
     /* if we get here, it is because none of the above succeeded and went
     to done */
-    zwarnnam(prog, "job not found: %s", s);
+    if (!isset(POSIXBUILTINS))
+	zwarnnam(prog, "job not found: %s", s);
     returnval = -1;
   done:
     return returnval;
@@ -2375,9 +2376,10 @@ bin_fg(char *name, char **argv, Options ops, int func)
 		    }
 		}
 	    } else if ((retval = getbgstatus(pid)) < 0) {
-		zwarnnam(name, "pid %d is not a child of this shell", pid);
+		if (!isset(POSIXBUILTINS))
+		    zwarnnam(name, "pid %d is not a child of this shell", pid);
 		/* presumably lastval2 doesn't tell us a heck of a lot? */
-		retval = 1;
+		retval = 127;
 	    }
 	    thisjob = ocj;
 	    continue;
@@ -2391,15 +2393,16 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	job = (*argv) ? getjob(*argv, name) : firstjob;
 	firstjob = -1;
 	if (job == -1) {
-	    retval = 1;
+	    retval = 127;
 	    break;
 	}
 	jstat = oldjobtab ? oldjobtab[job].stat : jobtab[job].stat;
 	if (!(jstat & STAT_INUSE) ||
 	    (jstat & STAT_NOPRINT)) {
-	    zwarnnam(name, "%s: no such job", *argv);
+	    if (!isset(POSIXBUILTINS))
+		zwarnnam(name, "%s: no such job", *argv);
 	    unqueue_signals();
-	    return 1;
+	    return 127;
 	}
         /* If AUTO_CONTINUE is set (automatically make stopped jobs running
          * on disown), we actually do a bg and then delete the job table entry. */

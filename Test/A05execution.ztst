@@ -341,3 +341,56 @@ F:anonymous function, and a descriptor leak when backgrounding a pipeline
 >17
 >19
 
+# Test 'wait' for unknown job/process ID.
+  wait 1
+  echo $?
+  wait %%
+  echo $?
+  wait %+
+  echo $?
+  wait %-
+  echo $?
+  wait %1
+  echo $?
+  wait %foo
+  echo $?
+  wait %\?bar
+127:'wait' exit status and warning for unknown ID
+>127
+>127
+>127
+>127
+>127
+>127
+?(eval):wait:1: pid 1 is not a child of this shell
+?(eval):wait:3: %%: no such job
+?(eval):wait:5: %+: no such job
+?(eval):wait:7: %-: no such job
+?(eval):wait:9: %1: no such job
+?(eval):wait:11: job not found: foo
+?(eval):wait:13: job not found: ?bar
+
+# Test 'wait' for unknown job/process ID (POSIX mode).
+  (setopt POSIX_BUILTINS
+  wait 1
+  echo $?
+  wait %%
+  echo $?
+  wait %+
+  echo $?
+  wait %-
+  echo $?
+  wait %1
+  echo $?
+  wait %foo
+  echo $?
+  wait %\?bar)
+127:'wait' exit status for unknown ID (POSIX mode)
+>127
+>0
+>127
+>127
+>127
+>127
+# TBD: the 0 above is believed to be bogus and should also be turned
+# into 127 when the ccorresponding bug is fixed in the main shell.
