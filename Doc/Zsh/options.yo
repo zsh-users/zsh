@@ -753,7 +753,9 @@ pindex(NOUNSET)
 cindex(parameters, substituting unset)
 cindex(unset parameters, substituting)
 item(tt(UNSET) (tt(PLUS()u), ksh: tt(PLUS()u)) <K> <S> <Z>)(
-Treat unset parameters as if they were empty when substituting.
+Treat unset parameters as if they were empty when substituting, and as if
+they were zero when reading their values in arithmetic expansion and
+arithmetic commands.
 Otherwise they are treated as an error.
 )
 pindex(WARN_CREATE_GLOBAL)

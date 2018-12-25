@@ -42,6 +42,10 @@ array.
 The gen-applied-string hook is unaffected; it still receives the patches in
 reverse order, from last applied to first applied.
 
+2) The option NO_UNSET now also applies when reading values from
+variables without a preceding '$' sign in shell arithmetic expansion
+and in the double-parentheses and 'let' arithmetic commands.
+
 Incompatibilities between 5.5.1 and 5.6.2
 ------------------------------------------
 

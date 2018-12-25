@@ -342,6 +342,8 @@ getmathparam(struct mathvalue *mptr)
 	mptr->pval = (Value)zhalloc(sizeof(struct value));
 	if (!getvalue(mptr->pval, &s, 1))
 	{
+	    if (unset(UNSET))
+		zerr("%s: parameter not set", mptr->lval);
 	    mptr->pval = NULL;
 	    if (isset(FORCEFLOAT)) {
 		result.type = MN_FLOAT;

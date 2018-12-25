@@ -1,3 +1,10 @@
+2018-12-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 43944: Martijn: Doc/Zsh/options.yo, README, Src/math.c,
+	Test/C01arith.ztst: apply NO_UNSET consistently to arithmetic.
+
+	* unposted: Test/D04parameter.ztst: test for 43938.
+
 2018-12-30  dana  <dana@dana.is>
 
 	* 43914 (tweaked): Completion/Unix/Command/_composer: Add

@@ -471,3 +471,19 @@
   print $(( -2#101-16#f ))
 0: Unary minus doesn't apply to base but to number as a whole.
 >-20
+
+  ( set -o nounset
+  true $(( noexist + 1 ))
+  echo 'should never get here' )
+1:Arithmetic, NO_UNSET part 1
+?(eval):2: noexist: parameter not set
+
+  ( setopt nounset
+  (( noexist++ )) )
+2:Arithmetic, NO_UNSET part 2
+?(eval):2: noexist: parameter not set
+
+  ( unsetopt unset
+  let noexist==0 )
+1:Arithmetic, NO_UNSET part 3
+?(eval):2: noexist: parameter not set
