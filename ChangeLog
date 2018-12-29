@@ -1,3 +1,8 @@
+2018-12-29  dana  <dana@dana.is>
+
+	* 43953 (tweaked per 43954): Src/utils.c, Test/V09datetime.ztst:
+	Fix rounding/truncation error in %. time-format specifier
+
 2018-12-24  dana  <dana@dana.is>
 
 	* 43935 (tweaked): Src/Modules/datetime.c, Test/V09datetime.ztst:

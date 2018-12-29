@@ -3334,19 +3334,28 @@ morefmt:
 #endif
 	    switch (*fmt++) {
 	    case '.':
-		if (ztrftimebuf(&bufsize, digs))
-		    return -1;
+	    {
+		long fnsec = nsec;
 		if (digs > 9)
 		    digs = 9;
+		if (ztrftimebuf(&bufsize, digs))
+		    return -1;
 		if (digs < 9) {
 		    int trunc;
-		    for (trunc = 8 - digs; trunc; trunc--)
-			nsec /= 10;
-		    nsec = (nsec + 8) / 10;
+		    long max = 100000000;
+		    for (trunc = 8 - digs; trunc; trunc--) {
+			max /= 10;
+			fnsec /= 10;
+		    }
+		    max -= 1;
+		    fnsec = (fnsec + 5) / 10;
+		    if (fnsec > max)
+			fnsec = max;
 		}
-		sprintf(buf, "%0*ld", digs, nsec);
+		sprintf(buf, "%0*ld", digs, fnsec);
 		buf += digs;
 		break;
+	    }
 	    case '\0':
 		/* Guard against premature end of string */
 		*buf++ = '%';
