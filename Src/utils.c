@@ -3846,7 +3846,7 @@ sepjoin(char **s, char *sep, int heap)
     char sepbuf[2];
 
     if (!*s)
-	return heap ? "" : ztrdup("");
+	return heap ? dupstring("") : ztrdup("");
     if (!sep) {
 	/* optimise common case that ifs[0] is space */
 	if (ifs && *ifs != ' ') {

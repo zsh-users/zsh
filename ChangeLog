@@ -1,3 +1,8 @@
+2018-12-30  dana  <dana@dana.is>
+
+	* unposted (per 43938): Src/utils.c: Avoid segfault when
+	unmetafying empty string
+
 2018-12-29  dana  <dana@dana.is>
 
 	* 43953 (tweaked per 43954): Src/utils.c, Test/V09datetime.ztst:
