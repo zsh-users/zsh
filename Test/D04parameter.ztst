@@ -2423,6 +2423,8 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 >: ` backtick
 >: word
 
+#' (to deconfuse emacs shell script mode)
+
   (
     setopt KSH_ARRAYS
     typeset -A ksh_assoc
@@ -2437,3 +2439,9 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 0:double-quoted nested evaluation of empty string
 >0 0 0 0
 >4 4 4 4
+
+  () {
+    local -a x
+    : <<< ${(F)x/y}
+  }
+0:Separation / join logic regresssion test
