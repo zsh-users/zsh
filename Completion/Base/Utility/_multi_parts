@@ -127,8 +127,7 @@ while true; do
 	return
       fi
     elif (( $#tmp1 )); then
-      local ret=1 tt
-      local -a mm
+      local ret=1
 
       # More than one match. First we get all strings that match the
       # rest from the line.
@@ -145,11 +144,14 @@ while true; do
 	SUFFIX="$suf"
       fi
 
-      for tt in $tmp1
-      do
-        mm+=( "${(@M)matches:#$tt*}" )
-      done
-      matches=( $mm )
+      # The purpose of this check (or one purpose, anyway) seems to be to ensure
+      # that the suffix for the current segment on the command line doesn't
+      # match across segments. For example, we want $matches for a<TAB>c to
+      # include abc/d, but not abd/c. If we don't have anything on the command
+      # line for this segment, though, we can skip it. (The difference is only
+      # noticeable when there are a huge number of possibilities)
+      [[ -n $pre$suf ]] &&
+      matches=( ${(@M)matches:#(${(j<|>)~${(@b)tmp1}})*} )
 
       if ! zstyle -t ":completion:${curcontext}:" expand suffix ||
          [[ -n "$menu" || -z "$compstate[insert]" ]]; then

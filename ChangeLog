@@ -1,5 +1,7 @@
 2018-12-30  dana  <dana@dana.is>
 
+	* 43930: Completion/Base/Utility/_multi_parts: Improve performance
+
 	* unposted (per 43938): Src/utils.c: Avoid segfault when
 	unmetafying empty string
 
