@@ -1764,7 +1764,12 @@ output_colour(int colour, int fg_bg, int use_tc, int truecol, char *buf)
 	/* length of hex triplet always 7, don't need sprintf to count */
 	atrlen += buf ? sprintf(ptr, "#%02x%02x%02x", colour >> 16,
 		(colour >> 8) & 0xff, colour & 0xff) : 7;
-    /* colour should only be > 7 if using termcap but let's be safe */
+    /* colour should only be > 7 if using termcap but let's be safe. Update:
+     * currently other places in code don't always imply that colour > 7 =>
+     * using-termcap - if zle_highlight will be non-default, then it will be
+     * used instead of termcap even for colour > 7. Here this just emits the
+     * color number, so it works fine for both zle_highlight and tercap cases
+     */
     } else if (use_tc || colour > 7) {
 	char digbuf[DIGBUFSIZE];
 	sprintf(digbuf, "%d", colour);
@@ -1995,6 +2000,7 @@ set_colour_attribute(zattr atr, int fg_bg, int flags)
     char *ptr;
     int do_free, is_prompt = (flags & TSC_PROMPT) ? 1 : 0;
     int colour, tc, def, use_termcap, use_truecolor;
+    int is_default_zle_highlight = 1;
 
     if (fg_bg == COL_SEQ_FG) {
 	colour = txtchangeget(atr, TXT_ATTR_FG_COL);
@@ -2010,6 +2016,15 @@ set_colour_attribute(zattr atr, int fg_bg, int flags)
 	use_termcap = txtchangeisset(atr, TXT_ATTR_BG_TERMCAP);
     }
 
+    /* Test if current zle_highlight settings are customized, or
+     * the typical "standard" codes */
+    if (0 != strcmp(fg_bg_sequences[fg_bg].start, fg_bg == COL_SEQ_FG ? "\e[3" : "\e[4") ||
+            0 != strcmp(fg_bg_sequences[fg_bg].def, "9") || /* the same in-fix for both FG and BG */
+            0 != strcmp(fg_bg_sequences[fg_bg].end, "m") /* the same suffix for both FG and BG */
+   ) {
+            is_default_zle_highlight = 0;
+    }
+
     /*
      * If we're not restoring the default, and either have a
      * colour value that is too large for ANSI, or have been told
@@ -2020,7 +2035,7 @@ set_colour_attribute(zattr atr, int fg_bg, int flags)
      * highlighting variables, so much of this shouldn't be
      * necessary at this point, but we might as well be safe.
      */
-    if (!def && !use_truecolor && (colour > 7 || use_termcap)) {
+    if (!def && !use_truecolor && (is_default_zle_highlight && (colour > 7 || use_termcap))) {
 	/*
 	 * We can if it's available, and either we couldn't get
 	 * the maximum number of colours, or the colour is in range.
@@ -2046,9 +2061,10 @@ set_colour_attribute(zattr atr, int fg_bg, int flags)
 	}
 	/*
 	 * Nope, that didn't work.
-	 * If 0 to 7, assume standard ANSI works, otherwise it won't.
+	 * If 0 to 7, assume standard ANSI works, if 8 to 255, assume
+         * typical 256-color escapes works, otherwise it won't.
 	 */
-	if (colour > 7)
+	if (colour > 255)
 	    return;
     }
 
@@ -2057,6 +2073,10 @@ set_colour_attribute(zattr atr, int fg_bg, int flags)
 	allocate_colour_buffer();
     }
 
+    /* Build the reset-code: .start + .def + . end
+     * or the typical true-color code: .start + 8;2;%d;%d;%d + .end
+     * or the typical 256-color code: .start + 8;5;%d + .end
+     */
     strcpy(colseq_buf, fg_bg_sequences[fg_bg].start);
 
     ptr = colseq_buf + strlen(colseq_buf);
@@ -2067,6 +2087,8 @@ set_colour_attribute(zattr atr, int fg_bg, int flags)
     } else if (use_truecolor) {
 	ptr += sprintf(ptr, "8;2;%d;%d;%d", colour >> 16,
 		(colour >> 8) & 0xff, colour & 0xff);
+    } else if (colour > 7 && colour <= 255) {
+        ptr += sprintf(ptr, "8;5;%d", colour);
     } else
 	*ptr++ = colour + '0';
     strcpy(ptr, fg_bg_sequences[fg_bg].end);

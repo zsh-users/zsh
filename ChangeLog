@@ -1,5 +1,9 @@
 2018-12-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Sebastian: users/23809: Src/prompt.c,
+	Test/X04zlehighlight.ztst: Add ZLE_HIGHLITHT extensions to
+	termcap for colours > 7, add tests.
+
 	* 43944: Martijn: Doc/Zsh/options.yo, README, Src/math.c,
 	Test/C01arith.ztst: apply NO_UNSET consistently to arithmetic.
 
