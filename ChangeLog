@@ -1,3 +1,7 @@
+2018-12-31  dana  <dana@dana.is>
+
+	* 43962: Test/X04zlehighlight.ztst: Fix module_path
+
 2018-12-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Sebastian: users/23809: Src/prompt.c,
