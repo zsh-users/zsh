@@ -1,5 +1,9 @@
 2018-01-01  dana  <dana@dana.is>
 
+	* 43960: Completion/Linux/Command/_setsid,
+	Completion/Zsh/Command/_exec, Completion/Zsh/Command/_precommand:
+	Add full completion for exec and setsid
+
 	* 43959: Completion/Unix/Command/_ipsec,
 	Completion/Unix/Command/_swanctl, Completion/Unix/Type/_urls: Add
 	completion for strongSwan, &al.; complete unix:// URIs
