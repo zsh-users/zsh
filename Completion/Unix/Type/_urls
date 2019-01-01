@@ -81,7 +81,7 @@ case "$scheme" in
       return
     fi
   ;;
-  file)
+  file|unix)
     [[ -prefix //(127.0.0.1|localhost)/ ]] && compset -P '//(127.0.0.1|localhost)'
     [[ -prefix /// ]] && compset -P //
     if ! compset -P //; then
