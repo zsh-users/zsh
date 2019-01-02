@@ -7015,6 +7015,12 @@
 	Test/B02typeset.ztst, Test/V10private.ztst: typeset -p
 	can now output arrays on one line.
 
+	* 37303: Test/E01options.ztst: test WARN_CREATE_GLOBAL negative
+	cases.
+
+	* 37302: Src/exec.c, Src/params.c: suppress WARN_CREATE_GLOBAL
+	warnings after a fork
+
 	* unposted: Src/exec.c, Src/init.c: fix up init_io() calls
 	in previous change.
 
