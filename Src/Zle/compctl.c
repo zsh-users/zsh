@@ -3256,6 +3256,15 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	rpl = strlen(rpre);
 	rsl = strlen(rsuf);
     }
+    else
+    {
+	for (p = rpre; *p; ++p)
+	    if (*p == Dash)
+		*p = '-';
+	for (p = rsuf; *p; ++p)
+	    if (*p == Dash)
+		*p = '-';
+    }
     untokenize(lpre);
     untokenize(lsuf);
 
