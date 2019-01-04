@@ -11,6 +11,10 @@ To create a zsh release:
 	README
 	NEWS
 
+  README should document compatibility-breaking changes. Generally, NEWS should
+  document new features and major bug fixes (but not routine fixes or changes to
+  completion/contrib functions).
+
 - Commit those changes with an "unposted" ChangeLog entry.
 
 	git commit -am "Test release: 5.5.1-test-1." && 

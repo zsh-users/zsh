@@ -63,13 +63,23 @@ In shell patterns, [[:blank:]] now honours the locale instead of
 matching exclusively on space and tab, like for the other POSIX
 character classes or for extended regular expressions.
 
-Nanosecond precision on file times is supported in the module
+The zsh/system module now provides the PID of the last process
+substitution via $sysparams[procsubstpid].
+
+Time formatting via the %D prompt escape now offers nanosecond
+precision with the %. and %N format specifiers. Additionally,
+nanosecond precision on file times is supported in the module
 zsh/stat.
+
+The zsh/mathfunc module now includes a log2() function.
+
+The parameter ZLE_RECURSIVE has been added to indicate the
+current ZLE recursion level.
 
 Changes from 5.5 to 5.5.1
 -------------------------
 
-Apart from a fix for a configuration problem finding singal names from
+Apart from a fix for a configuration problem finding signal names from
 (some) recent versions of glibc, there are only minor changes.
 
 Changes from 5.4.2 to 5.5
@@ -89,8 +99,18 @@ typeset -A assoc=([key1]=val1 [key2]=val2)
 is allowed for compatibility with other shells.  In the case of normal
 arrays the new syntax can be mixed with the old.
 
+The %E, %S, and %U TIMEFMT specifiers now support m and u prefixes
+(e.g., %mE) to output times in milliseconds and microseconds,
+respectively.
+
+The option CHECK_RUNNING_JOBS was added to control whether zsh should
+check for running jobs in addition to suspended ones with CHECK_JOBS.
+It is enabled by default.
+
 Changes from 5.3.1 to 5.4.2
 ---------------------------
+
+There are only minor changes between 5.4 and 5.4.2.
 
 The 'exec' and 'command' precommand modifiers, and options to them, are
 now parsed after parameter expansion.  Previously, both the modifier and
@@ -111,6 +131,13 @@ turned on for an individual function with "functions -W".
 zmodload now has an option -s to be silent on a failure to find a module
 but still print other errors.
 
+The autoload builtin gained several new features to load functions from a
+file path determined at the time of definition rather than at the time of
+loading.
+
+The zsh/parameter module now exposes the file paths associated with
+shell functions via the parameters functions_source and
+dis_functions_source.
 
 Changes from 5.2 to 5.3.1
 -------------------------

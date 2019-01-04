@@ -1,3 +1,9 @@
+2018-01-04  dana  <dana@dana.is>
+
+	* 43970, 43971: Etc/creating-a-release.txt, NEWS: Document some
+	changes in 5.{4,5,6} not previously mentioned, clarify that
+	process in release instructions
+
 2019-01-03  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 43969: Src/Zle/compctl.c: untokenize Dash for compctl with
