@@ -2017,15 +2017,6 @@ _git-subtree () {
 
 (( $+functions[_git-tag] )) ||
 _git-tag () {
-  local -a message_opts
-
-  if (( words[(I)-[asu]] )); then
-    message_opts=(
-      '(-m --message -F --file)'{-m+,--message=}'[specify tag message]:message'
-      '(-m --message -F --file)'{-F+,--file=}'[read tag message from given file]:message file:_files'
-    )
-  fi
-
   _arguments \
     - creation \
       '(-a --annotate -s --sign -u --local-user)'{-a,--annotate}'[create an unsigned, annotated tag]' \
@@ -2035,7 +2026,8 @@ _git-tag () {
       '(-f --force)'{-f,--force}'[replace existing tag]' \
       '--create-reflog[create a reflog]' \
       '--cleanup=[cleanup message]:mode:((verbatim\:"no cleanup" whitespace\:"remove leading and trailing whitespace" strip\:"remove leading and trailing whitespace and comments"))' \
-      $message_opts \
+      '(-m --message -F --file)'{-F+,--file=}'[read tag message from given file]:message file:_files' \
+      '(-m --message -F --file)'{-m+,--message=}'[specify tag message]:message' \
       ': :__git_tags' \
       ':: :__git_commits' \
     - deletion \
