@@ -2,6 +2,11 @@
 
 local -a match mbegin mend
 
+local splitchars
+if zstyle -s ":completion:${curcontext}:" file-split-chars splitchars; then
+  compset -P "*[${(q)splitchars}]"
+fi
+
 # Look for glob qualifiers.  Do this first:  if we're really
 # in a glob qualifier, we don't actually want to expand
 # the earlier part of the path.  We can't expand inside

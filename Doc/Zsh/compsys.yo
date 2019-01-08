@@ -1568,6 +1568,16 @@ contains the string `tt(follow)', timestamps are associated with the
 targets of symbolic links; the default is to use the timestamps
 of the links themselves.
 )
+kindex(file-split-chars, completion style)
+item(tt(file-split-chars))(
+A set of characters that will cause em(all) file completions for
+the given context to be split at the point where any of the characters
+occurs.  A typical use is to set the style to tt(:); then everything
+up to and including the last tt(:) in the string so far is ignored when
+completing files.  As this is quite heavy-handed, it is usually
+preferable to update completion functions for contexts where this
+behaviour is useful.
+)
 kindex(filter, completion style)
 item(tt(filter))(
 The tt(ldap) plugin of email address completion (see tt(_email_addresses)) uses

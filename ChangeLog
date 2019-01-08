@@ -1,3 +1,8 @@
+2019-01-08  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* users/23829: Completion/Unix/Type/_path_files,
+	Doc/Zsh/compsys.yo: Add and document file-split-chars style.
+
 2018-01-05  dana  <dana@dana.is>
 
 	* unposted: Config/version.mk, NEWS: Update for 5.6.2-test-3
