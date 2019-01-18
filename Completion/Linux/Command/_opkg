@@ -35,6 +35,10 @@
 # % zstyle ':completion:*:opkg:*' conf-paths <pattern> ...
 #   Set to one or more paths or glob patterns to override the defaults used when
 #   searching opkg configuration data.
+#
+# Elevated privileges may be necessary to complete package names, etc.; consider
+# setting the gain-privileges style as follows:
+# zstyle ':completion:*:(ipkg|opkg)/*' gain-privileges yes
 
 ##
 # Check cache validity.
@@ -105,7 +109,7 @@ _opkg_arch_prio() {
   }
 
   # Already configured arches
-  tmp=( ${(f)"$( _call_program architectures $svc print-architecture )"} )
+  tmp=( ${(f)"$( _call_program -p architectures $svc print-architecture )"} )
   tmp=( ${${tmp##arch[ ]##}%% *} )
 
   tmp+=(
@@ -182,7 +186,9 @@ _opkg_pkg_all() {
 
   { (( ! $#_opkg_cache_pkg_all )) || _cache_invalid opkg-pkg-all } &&
   ! _retrieve_cache opkg-pkg-all && {
-    _opkg_cache_pkg_all=( ${(f)"$( _call_program pkg-all ${svc:-opkg} list )"} )
+    _opkg_cache_pkg_all=( ${(f)"$(
+      _call_program -p pkg-all ${svc:-opkg} list )"}
+    )
     _opkg_cache_pkg_all=( ${(@)_opkg_cache_pkg_all##[[:space:]]*} )
     _opkg_cache_pkg_all=( ${(@)_opkg_cache_pkg_all%%[[:space:]]*} )
     _store_cache opkg-pkg-all _opkg_cache_pkg_all
@@ -207,7 +213,7 @@ _opkg_pkg_inst() {
   { (( ! $#_opkg_cache_pkg_inst )) || _cache_invalid opkg-pkg-inst } &&
   ! _retrieve_cache opkg-pkg-inst && {
     _opkg_cache_pkg_inst=( ${(f)"$(
-      _call_program pkg-inst ${svc:-opkg} list-installed
+      _call_program -p pkg-inst ${svc:-opkg} list-installed
     )"} )
     _opkg_cache_pkg_inst=( ${(@)_opkg_cache_pkg_inst##[[:space:]]*} )
     _opkg_cache_pkg_inst=( ${(@)_opkg_cache_pkg_inst%%[[:space:]]*} )
@@ -257,7 +263,7 @@ _opkg_pkg_upgr() {
   { (( ! $#_opkg_cache_pkg_upgr )) || _cache_invalid opkg-pkg-upgr } &&
   ! _retrieve_cache opkg-pkg-upgr && {
     _opkg_cache_pkg_upgr=( ${(f)"$(
-      _call_program pkg-upgr ${svc:-opkg} list-upgradable
+      _call_program -p pkg-upgr ${svc:-opkg} list-upgradable
     )"} )
     _opkg_cache_pkg_upgr=( ${(@)_opkg_cache_pkg_upgr##[[:space:]]*} )
     _opkg_cache_pkg_upgr=( ${(@)_opkg_cache_pkg_upgr%%[[:space:]]*} )

@@ -1,3 +1,7 @@
+2018-01-18  dana  <dana@dana.is>
+
+	* 43990: Completion/Linux/Command/_opkg: Support gain-privileges
+
 2019-01-08  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* users/23829: Completion/Unix/Type/_path_files,
