@@ -119,6 +119,7 @@ if [[ $PREFIX = *'${('[^\)]# ]]; then
     flags+=(
       "q:quote with single quotes"
       "-:quote minimally for readability"
+      "+:quote like q-, plus \$'...' for unprintable characters"
     )
     ;;
 

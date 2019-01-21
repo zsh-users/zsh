@@ -1,3 +1,7 @@
+2018-01-21  dana  <dana@dana.is>
+
+	* 44001: Completion/Zsh/Context/_brace_parameter: Complete (q+)
+
 2018-01-18  dana  <dana@dana.is>
 
 	* 43990: Completion/Linux/Command/_opkg: Support gain-privileges
