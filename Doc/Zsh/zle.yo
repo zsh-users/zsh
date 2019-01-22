@@ -2671,7 +2671,9 @@ cindex(escape sequences, terminal, for highlighting)
 cindex(terminal escape sequences for highlighting)
 item(tt(fg_start_code) (tt(\e[3)))(
 The start of the escape sequence for the foreground colour.
-This is followed by an ASCII digit representing the colour.
+This is followed by one to three ASCII digits representing the colour.
+Only used for palette colors, i.e. not 24-bit colors specified via a
+color triplet.
 )
 item(tt(fg_default_code) (tt(9)))(
 The number to use instead of the colour to reset the default foreground
@@ -2682,7 +2684,7 @@ The end of the escape sequence for the foreground colour.
 )
 item(tt(bg_start_code) (tt(\e[4)))(
 The start of the escape sequence for the background colour.
-This is followed by an ASCII digit representing the colour.
+See tt(fg_start_code) above.
 )
 item(tt(bg_default_code) (tt(9)))(
 The number to use instead of the colour to reset the default

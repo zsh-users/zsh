@@ -2018,11 +2018,13 @@ set_colour_attribute(zattr atr, int fg_bg, int flags)
 
     /* Test if current zle_highlight settings are customized, or
      * the typical "standard" codes */
-    if (0 != strcmp(fg_bg_sequences[fg_bg].start, fg_bg == COL_SEQ_FG ? "\e[3" : "\e[4") ||
-            0 != strcmp(fg_bg_sequences[fg_bg].def, "9") || /* the same in-fix for both FG and BG */
-            0 != strcmp(fg_bg_sequences[fg_bg].end, "m") /* the same suffix for both FG and BG */
-   ) {
-            is_default_zle_highlight = 0;
+    if (0 != strcmp(fg_bg_sequences[fg_bg].start, fg_bg == COL_SEQ_FG ? TC_COL_FG_START : TC_COL_BG_START) ||
+	/* the same in-fix for both FG and BG */
+	0 != strcmp(fg_bg_sequences[fg_bg].def, TC_COL_FG_DEFAULT) ||
+	/* the same suffix for both FG and BG */
+	0 != strcmp(fg_bg_sequences[fg_bg].end, TC_COL_FG_END))
+    {
+	is_default_zle_highlight = 0;
     }
 
     /*
@@ -2035,7 +2037,9 @@ set_colour_attribute(zattr atr, int fg_bg, int flags)
      * highlighting variables, so much of this shouldn't be
      * necessary at this point, but we might as well be safe.
      */
-    if (!def && !use_truecolor && (is_default_zle_highlight && (colour > 7 || use_termcap))) {
+    if (!def && !use_truecolor &&
+	(is_default_zle_highlight && (colour > 7 || use_termcap)))
+    {
 	/*
 	 * We can if it's available, and either we couldn't get
 	 * the maximum number of colours, or the colour is in range.
@@ -2077,21 +2081,30 @@ set_colour_attribute(zattr atr, int fg_bg, int flags)
      * or the typical true-color code: .start + 8;2;%d;%d;%d + .end
      * or the typical 256-color code: .start + 8;5;%d + .end
      */
-    strcpy(colseq_buf, fg_bg_sequences[fg_bg].start);
+    if (use_truecolor)
+	strcpy(colseq_buf, fg_bg == COL_SEQ_FG ? TC_COL_FG_START : TC_COL_BG_START);
+    else
+	strcpy(colseq_buf, fg_bg_sequences[fg_bg].start);
 
     ptr = colseq_buf + strlen(colseq_buf);
     if (def) {
-	strcpy(ptr, fg_bg_sequences[fg_bg].def);
+	if (use_truecolor)
+	    strcpy(ptr, fg_bg == COL_SEQ_FG ? TC_COL_FG_DEFAULT : TC_COL_BG_DEFAULT);
+	else
+	    strcpy(ptr, fg_bg_sequences[fg_bg].def);
 	while (*ptr)
 	    ptr++;
     } else if (use_truecolor) {
 	ptr += sprintf(ptr, "8;2;%d;%d;%d", colour >> 16,
 		(colour >> 8) & 0xff, colour & 0xff);
     } else if (colour > 7 && colour <= 255) {
-        ptr += sprintf(ptr, "8;5;%d", colour);
+	ptr += sprintf(ptr, "%d", colour);
     } else
 	*ptr++ = colour + '0';
-    strcpy(ptr, fg_bg_sequences[fg_bg].end);
+    if (use_truecolor)
+	strcpy(ptr, fg_bg == COL_SEQ_FG ? TC_COL_FG_END : TC_COL_BG_END);
+    else
+	strcpy(ptr, fg_bg_sequences[fg_bg].end);
 
     if (is_prompt) {
 	if (!bv->dontcount) {

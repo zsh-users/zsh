@@ -96,7 +96,7 @@
   zpty_line 1 p       # the line of interest, preserving escapes ("p")
   zpty_stop
 0:basic region_highlight with true-color (hex-triplets)
->0m27m24mCDE|38;2;4;8;16|trueCDE|39|
+>0m27m24m38;2;4;8;16mtrueCDE|39|
 
   zpty_start
   zpty_input 'zmodload zsh/nearcolor'
@@ -108,7 +108,7 @@
   zpty_line 1 p       # the line of interest, preserving escapes ("p")
   zpty_stop
 0:basic region_highlight with near-color (hex-triplets at input)
->0m27m24mCDE|38;5;232|trueCDE|39|
+>0m27m24mCDE|3232|trueCDE|39|
 
   zpty_start
   zpty_input 'rh_widget() { BUFFER="true"; region_highlight+=( "0 4 fg=green" ); rh2; }'
@@ -132,7 +132,7 @@
   zpty_line 1 p       # the line of interest, preserving escapes ("p")
   zpty_stop
 0:overlapping region_highlight with true-color
->0m27m24mCDE|38;2;0;204;0|tCDE|38;2;204;0;0|rCDE|39|CDE|38;2;0;204;0|ueCDE|39|
+>0m27m24m38;2;0;204;0mt38;2;204;0;0mrCDE|39|38;2;0;204;0mueCDE|39|
 
   zpty_start
   zpty_input 'zmodload zsh/nearcolor'
@@ -145,7 +145,7 @@
   zpty_line 1 p       # the line of interest, preserving escapes ("p")
   zpty_stop
 0:overlapping region_highlight with near-color (hex-triplets at input)
->0m27m24mCDE|38;5;40|tCDE|38;5;160|rCDE|39|CDE|38;5;40|ueCDE|39|
+>0m27m24mCDE|340|tCDE|3160|rCDE|39|CDE|340|ueCDE|39|
 
 %clean
 

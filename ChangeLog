@@ -1,3 +1,8 @@
+2019-01-23  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 44011: Doc/Zsh/zle.yo, Src/prompt.c, Test/X04zlehighlight.ztst:
+	Only use fg_start_code for non-truecolor
+
 2018-01-21  dana  <dana@dana.is>
 
 	* 44001: Completion/Zsh/Context/_brace_parameter: Complete (q+)
