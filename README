@@ -5,7 +5,8 @@ THE Z SHELL (ZSH)
 Version
 -------
 
-This is version 5.7 of the shell.
+This is version 5.7 of the shell.  This is a stable release.  There are
+a few visible improvements since 5.6 as well as many bugfixes.
 
 Note in particular the changes highlighted under "Incompatibilities since
 5.6.2" below.  See NEWS for more information.
