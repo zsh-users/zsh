@@ -29,6 +29,8 @@
       integer i
       for (( i = 0; i < ${1:-1}; ++i )); do
         zpty -r zsh REPLY
+        # Normalise me/sgr0 to \e[0m. We also need to strip \e(B in zpty_stop()
+        REPLY=${REPLY//${termcap[me]}/$'\x1b[0m'}
         # P is for "preserve", and induces keeping some
         # expected color codes to test region_highlight,
         # etc. - the color codes are made a regular text.
@@ -54,7 +56,12 @@
       # zpty gives no output when piped without these braces (?)
       # The while loop with // substitution is to convert `e^Mexit'
       # into `exit' (see zpty_line). The sed commands remove escapes
-      { zpty -r zsh } | sed -e $'/[^\t\r ]/!d' -e $'s/\r$//' -e $'s/\x1b\\[[0-9;]*m//g' | while read REPLY; do REPLY=${REPLY//(#b)((?(#c0,1))$cm(?(#c0,1)))/${${${(M)match[2]:#${match[3]}}:+${match[2]}}:-${${match[1]##[[:space:]]##}%%[[:space:]]##}}}; print -rn -- "$REPLY"; done
+      { zpty -r zsh } |
+      sed -e $'/[^\t\r ]/!d' -e $'s/\r$//' -e $'s/\x1b\\[[0-9;]*m//g' -e $'s/\x1b([A-Z]//g' |
+      while read REPLY; do
+        REPLY=${REPLY//(#b)((?(#c0,1))$cm(?(#c0,1)))/${${${(M)match[2]:#${match[3]}}:+${match[2]}}:-${${match[1]##[[:space:]]##}%%[[:space:]]##}}}
+        print -rn -- "$REPLY"
+      done
       zpty -d
       :
     }

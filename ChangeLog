@@ -1,3 +1,8 @@
+2018-01-23  dana  <dana@dana.is>
+
+	* 44012: Test/X04zlehighlight.ztst: Fix spurious test failures
+	on OpenBSD
+
 2019-01-23  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 44011: Doc/Zsh/zle.yo, Src/prompt.c, Test/X04zlehighlight.ztst:
