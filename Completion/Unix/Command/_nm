@@ -60,7 +60,7 @@ if _pick_variant -r variant binutils=GNU elftoolchain=elftoolchain elfutils=elfu
       compset -P '@' && files='*:options file:_files'
       args+=(
 	'(-f --format -P)-f+[specify output format]:format:(bsd sysv posix)'
-	'(-C --no-demangle)--demangle=-[decode symbol names]::style:(auto gnu lucid arm hp edg gnu-v3 java gnat)'
+	'(-C --no-demangle)--demangle=-[decode symbol names]::style:(auto gnu lucid arm hp edg gnu-v3 java gnat rust dlang)'
 	'--plugin[load specified plugin]:plugin'
 	'--special-syms[include special symbols in the output]'
 	'--synthetic[display synthetic symbols as well]'
