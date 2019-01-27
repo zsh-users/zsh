@@ -1,3 +1,8 @@
+2018-01-27  dana  <dana@dana.is>
+
+	* 44020: Functions/VCS_Info/Backends/VCS_INFO_detect_p4: Fix
+	infinite recursion
+
 2018-01-24  dana  <dana@dana.is>
 
 	* unposted: Config/version.mk: Post-release version bump

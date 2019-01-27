@@ -44,7 +44,6 @@ VCS_INFO_p4_get_server() {
 }
 
 
-(( ${+functions[VCS_INFO_detect_p4]} )) ||
 VCS_INFO_detect_p4() {
   local serverport p4where
 
