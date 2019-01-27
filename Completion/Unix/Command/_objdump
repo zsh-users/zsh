@@ -54,7 +54,7 @@ case $variant in
     "(-l --line-numbers)"{-l,--line-numbers}"[Include line numbers and filenames in output]"
     "(-F --file-offsets)"{-F,--file-offsets}"[Include file offsets when displaying information]"
     "(-C --demangle)-C[Decode mangled/processed symbol names]"
-    "(-C --demangle)--demangle=-[Decode mangled/processed symbol names]::style:(auto gnu lucid arm hp edg gnu-v3 java gnat)"
+    "(-C --demangle)--demangle=-[decode mangled/processed symbol names]::style:(auto gnu lucid arm hp edg gnu-v3 java gnat rust dlang)"
     "(-w --wide)"{-w,--wide}"[Format output for more than 80 columns]"
     "(-z --disassemble-zeroes)"{-z,--disassemble-zeroes}"[Do not skip blocks of zeroes when disassembling]"
 
