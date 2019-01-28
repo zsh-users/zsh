@@ -2049,7 +2049,7 @@ _git-tag () {
       '(-i --ignore-case)'{-i,--ignore-case}'[sorting and filtering are case-insensitive]' \
       ':: :_guard "^-*" pattern' \
     - verification \
-      '(-v --verify)'{-v,--verify}'[verify gpg signutare of tags]' \
+      '(-v --verify)'{-v,--verify}'[verify gpg signature of tags]' \
       '*:: :__git_ignore_line_inside_arguments __git_tags'
 }
 
