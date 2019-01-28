@@ -1,5 +1,8 @@
 2018-01-27  dana  <dana@dana.is>
 
+	* unposted: Etc/creating-a-release.txt: Document additional
+	release steps
+
 	* 44020: Functions/VCS_Info/Backends/VCS_INFO_detect_p4: Fix
 	infinite recursion
 
