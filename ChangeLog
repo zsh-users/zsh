@@ -1,5 +1,8 @@
 2019-02-03  dana  <dana@dana.is>
 
+	* unposted: Config/version.mk, Etc/FAQ.yo, README: Update for
+	5.7.1
+
 	* 44034: Completion/Unix/Type/_date_formats: Complete %9./%N,
 	adjust some wording
 
