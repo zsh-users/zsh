@@ -1,5 +1,8 @@
 2019-02-03  dana  <dana@dana.is>
 
+	* 44033: Completion/Unix/Command/_dos2unix: Add completion for
+	dos2unix/unix2dos
+
 	* 44030: Src/prompt.c, Test/D01prompt.ztst: Return error for
 	unrecognised colour name
 
