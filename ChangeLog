@@ -1,3 +1,8 @@
+2019-02-03  dana  <dana@dana.is>
+
+	* 44030: Src/prompt.c, Test/D01prompt.ztst: Return error for
+	unrecognised colour name
+
 2019-01-28  Fredric Silberberg  <fred@silberberg.xyz>
 
 	* github #32: Completion/Unix/Command/_git: Fix a typo in the

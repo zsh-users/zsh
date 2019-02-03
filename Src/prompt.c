@@ -1663,6 +1663,8 @@ match_colour(const char **teststrp, int is_fg, int colour)
 		/* default */
 		return is_fg ? TXTNOFGCOLOUR : TXTNOBGCOLOUR;
 	    }
+	    if (colour < 0)
+		return TXT_ERROR;
 	}
 	else {
 	    colour = (int)zstrtol(*teststrp, (char **)teststrp, 10);

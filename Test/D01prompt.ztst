@@ -221,3 +221,11 @@
   print ${(%U)Y-%(v}
 0:Regression test for test on empty psvar
 >
+
+# Unrecognised colour strings should produce the default sequence
+  f=${(%):-'%f'} # Recognised
+  Fdefault=${(%):-'%F{default}'} # Recognised
+  Freset=${(%):-'%F{reset}'} # Unrecognised
+  Ffoo=${(%):-'%F{foo}'} # Unrecognised
+  [[ $f == $Fdefault && $Fdefault == $Freset && $Freset == $Ffoo ]]
+0:Regression test for workers/44029
