@@ -24,7 +24,7 @@ specs=(
   'c:preferred locale date and time'
   'C:2-digit century'
   'd:day of month (01-31)'
-  'D:american format month/day/year (%m/%d/%y)'
+  'D:American format month/day/year (%m/%d/%y)'
   'e:day of month ( 1-31)'
   'F:ISO 8601 year-month-date (%Y-%m-%d)'
   'G:4-digit ISO 8601 week-based year'
@@ -44,21 +44,25 @@ specs=(
   'S:seconds (00-60)'
   't:tab'
   'T:24-hour notation with seconds (%H:%M:%S)'
-  'u:day of week (1-7, 1=monday)'
-  'U:week number of current year, sunday based (00-53)'
+  'u:day of week (1-7, 1=Monday)'
+  'U:week number of current year, Sunday based (00-53)'
   'V:ISO 8601 week number of current year, week 1 has 4 days in current year (01-53)'
-  'w:day of week (0-6, 0=sunday)'
-  'W:week number of current year, monday based (00-53)'
+  'w:day of week (0-6, 0=Sunday)'
+  'W:week number of current year, Monday based (00-53)'
   'x:locale dependent date representation without time'
   'X:locale dependent time representation without date'
   'y:2-digit year (00-99)'
   'Y:full year'
   'z:UTC offset'
   'Z:timezone name'
-  '%:A %'
+  '%:literal %'
 )
 
 case $OSTYPE in
+  linux-gnu)
+    [[ $1 == zsh ]] || # %N is handled below in this case
+    specs+=( 'N:fractional part of seconds since epoch, in nanoseconds' )
+  ;|
   freebsd*|dragonfly*|darwin*|linux-gnu|solaris2.<11->)
     specs+=(
       'E:alternate representation'
@@ -91,6 +95,7 @@ if [[ $1 == zsh ]]; then
     'f:day of month (1-31)'
     'K:hour (0-23)'
     'L:hour (0-12)'
+    'N:fractional part of seconds since epoch, in nanoseconds (%9.)'
     '.:fractional part of seconds since epoch'
     "-:don't pad numeric values"
   )
@@ -102,4 +107,4 @@ done
 
 _describe -t date-format-specifier 'date format specifier' specs \
     -p "${(Q)PREFIX:-%}" -S ''
-[[ $1 == zsh ]] && _message -e date-format-precision 'precision for %%. (1-6)'
+[[ $1 == zsh ]] && _message -e date-format-precision 'precision for %%. (1-9)'
