@@ -24,13 +24,14 @@ _lp_get_printer()
 _lp_job_options()
 {
   local expl printer
-  local -a lopts_with_args lopts_no_args
+  local -a lopts_with_args lopts_no_args desc_opts
 
   # Generic options (from lp manual page)
-  lopts_with_args=( media orientation-requested sides number-up scaling cpi lpi
-    page-{bottom,left,right,top} page-ranges )
+  lopts_with_args=(collate job-{hold-until,priority,sheets} media
+    number-up{,-layout} orientation-requested outputorder page-border
+    page-ranges sides)
 
-  lopts_no_args=(fitplot fit-to-page landscape)
+  lopts_no_args=(fit-to-page mirror)
 
   if [[ $service == 'lpadmin' ]]; then
     # Extra options from lpadmin man page.
@@ -51,7 +52,11 @@ _lp_job_options()
 	compadd "$@" a4 letter legal
 	;;
       (orientation-requested)
-	compadd "$@" 4
+	desc_opts=(
+	  '4:rotated 90 degrees counter-clockwise'
+	  '5:rotated 90 degrees clockwise'
+	  '6:rotated 180 degrees')
+	_describe "orientation requested" desc_opts
 	;;
       (sides)
 	compadd "$@" one-sided two-sided-{long,short}-edge
@@ -60,8 +65,9 @@ _lp_job_options()
 	_description -V option-o-1 expl "pages per sheet"
 	compadd "$expl[@]" 2 4 6 9 16
 	;;
-      (scaling|cpi|lpi|page-(bottom|left|right|top))
-	return 0; # Don't complete anything
+      (number-up-layout)
+	_description -V option-o-1 expl "layout"
+	compadd "$expl[@]" btlr btrl lrbt lrtb rlbt rltb tblr tbrl
 	;;
       (cupsIPPSupplies|cupsSNMPSupplies|printer-is-shared)
 	compadd "$@" true false
@@ -69,6 +75,14 @@ _lp_job_options()
       (printer-error-policy)
 	compadd "$@" abort-job retry-job retry-current-job stop-printer
 	;;
+      (Duplex|BRDuplex)
+	desc_opts=(
+	  "DuplexTumble:flip short side"
+	  "DuplexNoTumble:flip long side"
+	  "None")
+	_describe "duplex options" desc_opts
+	;;
+
       (*)
 	compadd "$@" \
 	  $(_call_program list-printer-options lpoptions $printer -l | \

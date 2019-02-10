@@ -22,7 +22,6 @@ _arguments \
   '(--watch)--nowatch' \
   '(--noresize)--resize' \
   '(--resize)--noresize' \
-  '(--grayscale --color)--monochrome' \
   '(--monochrome --color)--grayscale' \
   '(--grayscale --color)--monochrome' \
   '(--landscape --seascape --upsidedown)--portrait' \
