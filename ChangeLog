@@ -1,5 +1,8 @@
 2019-05-06  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* Doron Behar: gitlab !3: Completion/Unix/Command/_transmission:
+	Transmission remote completion
+
 	* Aurélien Olivier: github #33: Completion/Unix/Command/_myrepos:
 	Add completion file for myrepos (mr)
 
