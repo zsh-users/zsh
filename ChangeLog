@@ -1,3 +1,9 @@
+2019-02-14  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* see 44062: back off change to ZLE per-line initiialisation,
+	causing problems after failed reads and apparently not needed
+	for the intended fix of interrupt handling (40305 / 34656ec2).
+
 2019-02-09  Doron Behar <doron.behar@gmail.com>
 
 	* gitlab !5: Completion/Unix/Command/_abcde:
