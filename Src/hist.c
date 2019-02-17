@@ -216,6 +216,7 @@ static struct histfile_stats {
     char *text;
     time_t stim, mtim;
     off_t fpos, fsiz;
+    int interrupted;
     zlong next_write_ev;
 } lasthist;
 
@@ -2544,11 +2545,13 @@ readhistfile(char *fn, int err, int readflags)
 	sb.st_size == 0)
 	return;
     if (readflags & HFILE_FAST) {
-	if ((lasthist.fsiz == sb.st_size && lasthist.mtim == sb.st_mtime)
-	    || lockhistfile(fn, 0))
+	if (!lasthist.interrupted &&
+	    ((lasthist.fsiz == sb.st_size && lasthist.mtim == sb.st_mtime)
+	     || lockhistfile(fn, 0)))
 	    return;
 	lasthist.fsiz = sb.st_size;
 	lasthist.mtim = sb.st_mtime;
+	lasthist.interrupted = 0;
     } else if ((ret = lockhistfile(fn, 1))) {
 	if (ret == 2) {
 	    zwarn("locking failed for %s: %e: reading anyway", fn, errno);
@@ -2694,8 +2697,11 @@ readhistfile(char *fn, int err, int readflags)
 	     */
 	    if (uselex || remeta)
 		freeheap();
-	    if (errflag & ERRFLAG_INT)
+	    if (errflag & ERRFLAG_INT) {
+		/* Can't assume fast read next time if interrupted. */
+		lasthist.interrupted = 1;
 		break;
+	    }
 	}
 	if (start && readflags & HFILE_USE_OPTIONS) {
 	    zsfree(lasthist.text);
