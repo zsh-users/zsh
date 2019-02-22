@@ -3,7 +3,7 @@
 local curcontext="$curcontext" state state_descr line expl ret=1
 typeset -A opt_args; local -a specs aopts
 
-if _pick_variant gnu='(GNU|EGLIBC)' unix --version; then
+if _pick_variant gnu='(Free Soft|GNU|GLIBC)' unix --version; then
 
   local exargs="-? --help --usage -V --version"
 

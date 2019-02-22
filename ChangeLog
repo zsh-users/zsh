@@ -1,5 +1,11 @@
 2019-02-22  dana  <dana@dana.is>
 
+	* 44077: Completion/Unix/Command/_getent,
+	Completion/Unix/Command/_iconv, Completion/Unix/Command/_ldd,
+	Completion/Unix/Command/_locale,
+	Completion/Unix/Command/_localedef: Fix outdated _pick_variant
+	patterns, partially fix `getent -s`
+
 	* 44076 (tweaked): Completion/Unix/Command/_column: Support
 	Debian column, add missing util-linux options, adjust wording
 
