@@ -1,3 +1,8 @@
+2019-02-22  dana  <dana@dana.is>
+
+	* 44076 (tweaked): Completion/Unix/Command/_column: Support
+	Debian column, add missing util-linux options, adjust wording
+
 2019-02-18  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Yutian Li: 44067: Src/hist.c: If history read was interrupted,
