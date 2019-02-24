@@ -41,7 +41,7 @@ _arguments -S -s -A "[-+]*"  \
   '(-d --dumb)'{-d,--dumb}'[suppress error message if terminal is dumb]' \
   '(-e -E --quit-at-eof --QUIT-AT-EOF)'{-e,--quit-at-eof}'[exit the second time end-of-file is reached]' \
   '(-e -E --quit-at-eof --QUIT-AT-EOF)'{-E,--QUIT-AT-EOF}'[exit when end-of-file is reached]' \
-  '(-f --force)'{-f,--force}'[force opening of non-reqular files]' \
+  '(-f --force)'{-f,--force}'[force opening of non-regular files]' \
   '(-F --quit-if-one-screen)'{-F,--quit-if-one-screen}'[exit if entire file fits on first screen]' \
   '(-G --HILITE-SEARCH -g --hilite-search)'{-g,--hilite-search}'[highlight only one match for searches]' \
   '(-g --hilite-search -G --HILITE-SEARCH)'{-G,--HILITE-SEARCH}'[disable highlighting of search matches]' \
