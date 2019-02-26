@@ -50,7 +50,7 @@ case $OSTYPE in
         args+=(
 	  '(-)'{-u,--usage}'[display short usage message]'
 	  '(-)--help[display help information]'
-	  '(-D --binddn)'{-D+,--binddn=}'[specify LDAP disingushed name to bind]:binddn'
+	  '(-D --binddn)'{-D+,--binddn=}'[specify LDAP distinguished name to bind]:binddn'
 	  '(-P --path)'{-P+,--path=}'[specify path to search for passwd and shadow files]:path:_directories'
 	  '(-q --quiet)'{-q,--quiet}"[don't be verbose]"
 	  '--service=[use specified name service]:service:(files nis nisplus ldap)'

@@ -215,7 +215,7 @@ _bsd_pkg() {
         '-N[show which packages each package was built with]'
         '-n[show which packages each package needs]'
         '-p[show installation prefixes]'
-        '-Q[show the definition of the speficied variable from the build information]:variable:'
+        '-Q[show the definition of the specified variable from the build information]:variable:'
         '-r[show list of installed requiring packages recursively]'
         '-S[show total size occupied by each package and its dependents]'
         '-u[show information for all user-installed packages]'
@@ -227,7 +227,7 @@ _bsd_pkg() {
       flags+=(
         '(:)-A[show all installed packages, including internal packages]'
         '-C[show certificate information]'
-        '-E[show the package that contains the speficied file]:file:_files'
+        '-E[show the package that contains the specified file]:file:_files'
         # XXX only with -L
         '-K[prefix filenames with category keywords]'
         '-M[show the install-message file]'

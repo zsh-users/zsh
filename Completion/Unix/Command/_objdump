@@ -92,7 +92,7 @@ case $variant in
       '-bind[display Mach-O binding info]'
       '-color[use colored syntax highlighting]'
       '-data-in-code[w -macho: print data in code table]'
-      "-dis-symname=[w -macho: disassemble just the specfied symbol's instructions]"
+      "-dis-symname=[w -macho: disassemble just the specified symbol's instructions]"
       '(-disassemble -d)'{-disassemble,-d}'[display assembler mnemonics for machine instructions]'
       '(-disassemble-all -D)'{-disassemble-all,-D}'[disassemble all instruction sections]'
       '-dsym=[w -macho -g: use the specified .dSYM file for debug info]:dsym file:_files'

@@ -85,7 +85,7 @@ case $OSTYPE in
       '(-A -a -M)-q[silently ignore nonexistent variables]' \
       '(-M -x)-r[binary output]' \
       '(-a -A -d -e -f -M -r)-w[write mode]' \
-      '(-d -M -r)*-x[hex output. -xx for hexdupm-like output]' \
+      '(-d -M -r)*-x[hex output. -xx for hexdump-like output]' \
       '*:sysctl variable:_multi_parts ${words[(r)-w]:+-S=} -i . sysctlvars'
   ;;
   *)

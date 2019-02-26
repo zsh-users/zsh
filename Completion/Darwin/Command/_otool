@@ -20,7 +20,7 @@ _arguments \
   '-I[display the indirect symbol table]' \
   '-T[display the table of contents for a dynamic shared library]' \
   '-R[display the reference table of a dynamic shared library]' \
-  '-M[display the module table of dymamic shared library]' \
+  '-M[display the module table of dynamic shared library]' \
   '-H[display the two-level namespace hints table]' \
   '-G[display the data in code table]' \
   '-C[display the linker optimization hints]' \
@@ -35,7 +35,7 @@ _arguments \
   '-j[with disassembly, print opcode bytes]' \
   "-Q[use otool's disassembler]" \
   '-arch[select the specified architecture from a universal file]:arch:(i386 x86_64)' \
-  '-m[object file names are not assuemd to be in archive(member) syntax]' \
+  '-m[object file names are not assumed to be in archive(member) syntax]' \
   '(- *)--version[print version of otool]' \
   '*:file:_object_files' && return 0
 

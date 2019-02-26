@@ -241,7 +241,7 @@ while (( $#state )); do
         qgroup:(assign|remove)) args+=( '1:source path:_files -/'
           '2:destination path:_files -/' '3:path:_files -/' );|
         qgroup:assign) args+=( \!--rescan
-          "--no-rescan[don't do a rescan, even if the assignment will make the quotas inconsitent]" )
+          "--no-rescan[don't do a rescan, even if the assignment will make the quotas inconsistent]" )
         ;;
         qgroup:(create|destroy)) args+=( '1:qgroupid:' '2:path:_files -/' );;
         qgroup:show)
@@ -337,7 +337,7 @@ while (( $#state )); do
             '--init-csum-tree[create a new CRC tree]'
             '--init-extent-tree[create a new extent tree]'
             '--clear-space-cache[clear space cache for v1 or v2]:version:(v1 v2)'
-            '--check-data-csum[verify checkums of data blocks]'
+            '--check-data-csum[verify checksums of data blocks]'
             '(-Q --qgroup-report)'{-Q,--qgroup-report}'[verify qgroup accounting and compare against filesystem accounting]'
             '(-E --subvol-extents)'{-E,--subvol-extents}'[show extent state for the given subvolume]:subvolume id'
             '(-p --progress)'{-p,--progress}'[indicate progress at various checking phases]'

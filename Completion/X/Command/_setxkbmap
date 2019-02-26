@@ -23,7 +23,7 @@ _setxkbmap() {
     local -a arguments
 
     arguments=(
-        '-compat[compability map]:compability:_setxkbmap_compat'
+        '-compat[compatibility map]:compatibility:_setxkbmap_compat'
         '-config[configuration file]:configuration:_files'
         '-display[display]:display:_x_display'
         '-geometry[geometry component]:geometry:_setxkbmap_geometry'

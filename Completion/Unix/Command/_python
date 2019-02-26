@@ -16,7 +16,7 @@ if _pick_variant python3=Python\ 3 python2 --version; then
   )
 else
   args=(
-    '-R[use a pseudo-random salt to make hash values unpredeictable]'
+    '-R[use a pseudo-random salt to make hash values unpredictable]'
     '-Q+[division options]:division option:(old warn warnall new)'
     '(-tt)-t[issue warnings about inconsistent tab usage]'
     '(-t)-tt[issue errors about inconsistent tab usage]'

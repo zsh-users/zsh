@@ -53,7 +53,7 @@ case $service in
       '--catalogs[use SGML catalogs]' \
       '--xinclude[do XInclude processing on document input]' \
       '--xincludestyle[do XInclude processing on stylesheets]' \
-      '--load-trace[print trace of all external entites loaded]' \
+      '--load-trace[print trace of all external entities loaded]' \
       {--profile,--norman}'[dump profiling information]' \
       '1:stylesheet:_files -g "*.xslt#(-.)"' \
       ':file:_files -g "*.xml(-.)"' && return
@@ -71,7 +71,7 @@ case $service in
       '--noenc[ignore any encoding specified inside the document]' \
       "(--output -o)--noout[don't output the result tree]" \
       '--path[provide a set of paths for resources]:paths:_files -/' \
-      '--load-trace[print trace of all external entites loaded]' \
+      '--load-trace[print trace of all external entities loaded]' \
       '--nonet[refuse to fetch DTDs or entities over network]' \
       '--nocompact[do not generate compact text nodes]' \
       '--htmlout[output results as HTML]' \

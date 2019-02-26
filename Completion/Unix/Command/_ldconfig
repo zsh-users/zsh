@@ -62,7 +62,7 @@ case $OSTYPE in
     );|
   openbsd*)
     args+=(
-      '(-m)-U[unconfigure specified directories or inaccessable directories if none specified]'
+      '(-m)-U[unconfigure specified directories or inaccessible directories if none specified]'
     );|
 esac
 

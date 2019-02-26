@@ -176,7 +176,7 @@ _urpmi() {
 	"($help : -)"{--help,-h}"[print usage information]" \
 	"($help)--allow-force[allow asking user to install packages without dependencies checking and integrity]" \
 	"($help)--allow-nodeps[allow asking user to install packages without dependencies checking]" \
-	"($help)--auto-select[utomatically select packages to upgrade the system]" \
+	"($help)--auto-select[automatically select packages to upgrade the system]" \
 	"($help --env)--bug[output a bug report in given directory]:directory for bug report:_files -/" \
 	"($help -X)--best-output[automatically select text or X interface]" \
 	"($help --noclean)--clean[remove rpm from cache before anything else]" \

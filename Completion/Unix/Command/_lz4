@@ -44,7 +44,7 @@ args=(
   + b # Benchmark-mode options
   "(C c d t)-b-[benchmark file using specified compression level]::compression level:(${(j< >)levels//-/})"
   "(C c d t)-e-[specify upper compression level limit (with -b)]:compression level:(${(j< >)levels//-/})"
-  '(C c d t)-i-[specifiy minimum evaluation time (with -b)]:evaluation time (seconds)'
+  '(C c d t)-i-[specify minimum evaluation time (with -b)]:evaluation time (seconds)'
   + c # Compress-mode options
   "(b d t ${(j< >)levels} -c0 -c1 -c2 -hc)"${^levels}
   '(B b d t -m -r --multiple)-l[compress using legacy (Linux kernel) format]'

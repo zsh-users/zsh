@@ -33,7 +33,7 @@ case $service in
 	'-ls[limit stack space to N Kb]:int:' \
 	'-nolock[disable the locking mechanism]' \
 	'-logo[enable logo in screen saver]' \
-	'-nolisten[dont listen on protocol]:protocol:(tcp)' \
+	"-nolisten[don't listen on protocol]:protocol:(tcp)" \
 	'-p[screen-saver pattern duration (minutes)]:time (minutes):' \
 	'-pn[accept failure to listen on all ports]' \
 	'-nopn[reject failure to listen on all ports]' \
@@ -61,7 +61,7 @@ case $service in
 	'-udpinputport[UDP port for keyboard/pointer data]:port:' \
 	'-rfbport[TCP port for RFB protocol]:port:' \
 	'-rfbwait[max time in ms to wait for RFB client]:time:' \
-	'-nocursor[dont put up a cursor]' \
+	"-nocursor[don't put up a cursor]" \
 	'-rfbauth[use authentication on RFB protocol]:passwd-file:_files' \
 	'-httpd[serve files via HTTP from here]:dir:_files -/' \
 	'-httpport[port for HTTP]:port:' \
@@ -71,7 +71,7 @@ case $service in
 	'-desktop[VNC desktop name (default x11)]:name:' \
 	'-alwaysshared[always treat new clients as shared]' \
 	'-nevershared[never treat new clients as shared]' \
-	'-dontdisconnect[dont disconnect existing clients for new non-shared connections]' \
+	"-dontdisconnect[don't disconnect existing clients for new non-shared connections]" \
 	'-viewonly[let clients only to view the desktop]' \
 	'-localhost[only allow connections from localhost]' \
 	'-interface[only bind to specified interface address]:ipaddr:' \

@@ -56,7 +56,7 @@ _arguments -C \
   '(-F --display-format)'{-F,--display-format}'[specify output format for search command]:format:_aptitude_format_strings' \
   '(-O --sort)'{-O,--sort}'[specify sort order]:sort order:()' \
   '(-w --width)'{-w,--width}'[specify output width]:width' \
-  '-f[aggressivley try to fix dependencies of broken packages]' \
+  '-f[aggressively try to fix dependencies of broken packages]' \
   '(-V --show-versions)'{-V,--show-versions}'[show which versions of packages will be installed]' \
   '(-D --show-deps)'{-D,--show-deps}'[show brief explanations of automatic installations and removals]' \
   '-Z[show disk space changes for each package]' \

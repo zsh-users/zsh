@@ -34,7 +34,7 @@ _arguments \
     '-backups[keep backup copies of all files]' \
     '-backupsuffix[a suffix to be added to names of backup files]:suffix:' \
     '-confirmbigdel[ask about whole-replica (or path) deletes (default true)]' \
-    '-confirmmerge[ask for confirmation before commiting results of a merge]' \
+    '-confirmmerge[ask for confirmation before committing results of a merge]' \
     '-contactquietly[suppress the "contacting server" message during startup]' \
     '-copyprog[external program for copying large files]:program:_files -g "*(-x)"' \
     '-copyprogrest[variant of copyprog for resuming partial transfers]:program:_files -g "*(-x)"' \
@@ -61,7 +61,7 @@ _arguments \
     '-maxthreads[maximum number of simultaneous file transfers]:number:' \
     '-merge[add a pattern to the merge list]:pattern:' \
     '-mountpoint[abort if this path does not exist]:mountpoint:_files -/' \
-    '-numericids[dont map uid/gid values by user/group names]' \
+    "-numericids[don't map uid/gid values by user/group names]" \
     '-preferpartial[add a pattern to the preferpartial list]:pattern:' \
     '-pretendwin[use creation times for detecting updates]' \
     '-repeat[synchronize repeatedly (text interface only)]:repeat:' \

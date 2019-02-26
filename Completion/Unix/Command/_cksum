@@ -91,7 +91,7 @@ case $OSTYPE in
   openbsd*)
     args+=(
       '-b[output in base64]'
-      '(-h)-C+[verify input files against checksums in specifed file]:checksum file:_files'
+      '(-h)-C+[verify input files against checksums in specified file]:checksum file:_files'
       '(-C)-h+[output checksums to specified file]:checksum file:_files'
       '(-n -r)-q[output checksum only, or suppress check success messages]'
     )

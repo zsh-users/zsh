@@ -54,7 +54,7 @@ case $state in
       cddb)
         _arguments $args \
           '-artists[search artists]' \
-          '-albums[search albulms]' \
+          '-albums[search albums]' \
           '-songs[search songs]' \
           '-all[search all artists, albums and songs]' && ret=0
       ;;

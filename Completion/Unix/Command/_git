@@ -714,7 +714,7 @@ _git-commit () {
                                                                                                   all\:"show individual files in untracked directories"))' \
     '(-q --quiet -v --verbose)'{-v,--verbose}'[show unified diff of all file changes]' \
     '(-q --quiet -v --verbose)'{-q,--quiet}'[suppress commit summary message]' \
-    '--dry-run[only show list of paths that are to be commited or not, and any untracked]' \
+    '--dry-run[only show list of paths that are to be committed or not, and any untracked]' \
     '(         --no-status)--status[include the output of git status in the commit message template]' \
     '(--status            )--no-status[do not include the output of git status in the commit message template]' \
     '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=}'[GPG-sign the commit]::key id' \
@@ -3473,7 +3473,7 @@ _git-filter-branch () {
     '--msg-filter[filter for rewriting commit messages]: :_cmdstring' \
     '--commit-filter[filter for rewriting commit]: :_cmdstring' \
     '--tag-name-filter[filter for rewriting tag names]: :_cmdstring' \
-    '--subdirectory-filter[only look at histor that touches given directory]: :_directories' \
+    '--subdirectory-filter[only look at history that touches given directory]: :_directories' \
     '--prune-empty[ignore empty generated commits]' \
     '--original[namespace where original commits will be stored]:namespace:_directories' \
     '-d[temporary directory used for rewriting]: :_directories' \
@@ -4970,7 +4970,7 @@ _git-diff-tree () {
   _arguments -C -S -s \
     $revision_options \
     '-r[recurse into subdirectories]' \
-    '(-r   )-t[disply tree objects in diff output]' \
+    '(-r   )-t[display tree objects in diff output]' \
     '--root[display root diff]' \
     '-m[do not ignore merges]' \
     '-s[do not show differences]' \

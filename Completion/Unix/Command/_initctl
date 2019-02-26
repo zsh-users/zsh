@@ -18,7 +18,7 @@ _initctl_fillarray_events_args ()
         _initctl_events_list+=($match[1])
         # this is a bit tricky, we take the string right of the matched event
         # and parse for \sUPPERCASE=\S (in perl-re syntax) substrings until there are no more matches
-        # since we can't do multiple matches, we concatenated the remaing strings and try again
+        # since we can't do multiple matches, we concatenated the remaining strings and try again
         local stml="$match[2]"
         while [[ "$stml" == (#b)(*)\ ([[:upper:]_]##\=)[^[:space:]](#b)(*) ]]; do
           _initctl_eventargs_list+=($match[2])

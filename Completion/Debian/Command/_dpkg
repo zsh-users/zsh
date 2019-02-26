@@ -30,7 +30,7 @@ _dpkg_deb_actions=(
 _dpkg_common_actions=(
   '--help[show help]'
   '--version[show version]'
-  '(--license --licence)'{--license,--licence}'[show licencing]'
+  '(--license --licence)'{--license,--licence}'[show licensing]'
 )
 
 _dpkg_actions=(

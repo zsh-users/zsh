@@ -23,7 +23,7 @@ _arguments -s -S \
   '(-N --netrc)'{-N+,--netrc=}'[use file instead of ~/.netrc to look up login names and pass- words for FTP sites]' \
   '(-n --no-mtime)'{-n,--no-mtime}"[don't preserve the modification time]" \
   '--no-passive[force FTP code to use active mode]' \
-  '--no-proxy=[hosts on which to disable proxoes]:host:_sequence _hosts' \
+  '--no-proxy=[hosts on which to disable proxies]:host:_sequence _hosts' \
   '--no-sslv3' '--no-tlsv1' --no-verify-hostname --no-verify-peer \
   '(-o --output)'{-o+,--output=}'[set the output file name]:file:_files' \
   '-P' \

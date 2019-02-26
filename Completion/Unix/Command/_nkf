@@ -33,7 +33,7 @@ _arguments -s \
   '($inputs)-W16l[Input assumption is UTF-16 (Little Endian; BOM)]' \
   '(-M)-m-[MIME decode]:mime decode:((B\:base64 Q\:quoted S\:strict N\:non-strict 0\:no-decode))' \
   '(-m)-M-[MIME encode]:mime encode:((\:header B\:base64 Q\:quoted))' \
-  '-h-[hirakana<->katakana]:hirakata:((1\:hirakana-\>katakana 2\:katakana-\>hirakana 3\:both))' \
+  '-h-[hiragana<->katakana]:hirakata:((1\:hiragana-\>katakana 2\:katakana-\>hiragana 3\:both))' \
   '-L-[line mode]:line mode:((u\:LF w\:CRLF m\:CR))' \
   '-I[convert non ISO-2022-JP character to GETA]' \
   '(--cap-input --url-input)'{--cap-input,--url-input}'[Convert hex after \: or \%]' \

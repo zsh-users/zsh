@@ -102,7 +102,7 @@ while
 	'--ctreplsrc[match reply source address]:*^!:network:_hosts'
 	'--ctrepldst[match reply destination address]:*^!:network:_hosts'
 	'--ctstatus[match internal conntrack states]:state:(NONE EXPECTED SEEN_REPLY ASSURED)'
-	'--ctexpire[match remaing lifetime]:time'
+	'--ctexpire[match remaining lifetime]:time'
       )
     ;;
     dscp)

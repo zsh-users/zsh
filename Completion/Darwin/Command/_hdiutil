@@ -220,7 +220,7 @@ _hdiutil(){
         "-uid[uid of root directory]:uid in number" \
         "-gid[gid of root directory]:gid in number" \
         "-mode[mode of root directory]:mode" \
-        "-nouuid[suppress addiing a UUID]" \
+        "-nouuid[suppress adding a UUID]" \
         "(-noautostretch)-autostretch" \
         "(-autostretch)-noautostretch" \
         "-stretch[max_stretch]: :_hdiutil_imagesize" \

@@ -4,7 +4,7 @@ local context state state_descr line
 
 _arguments -s -S \
   '(H -i --info)'{-i,--info}'[show identity information for device]' \
-  '(H)--identify=-[show words and bits from indentification data]: : _values -S "" "words and bits"
+  '(H)--identify=-[show words and bits from identification data]: : _values -S "" "words and bits"
     "(n v)b[print all bits]"
     "w[print all words]"
     "(b v)n[suppress printing bits]"

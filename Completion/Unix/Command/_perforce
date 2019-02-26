@@ -2426,7 +2426,7 @@ _perforce_cmd_key() {
   _arguments -s : \
     '(-i -m)-d[delete key]' \
     '(-d -m)-i[increment key value by 1]' \
-    '(-d -i)-m[allow mulitple operations]' \
+    '(-d -i)-m[allow multiple operations]' \
     $keyargs
 }
 

@@ -230,7 +230,7 @@ _lp()
 	'-n[Copies]:copies (1--100):' \
 	'*-o:print job options:_lp_job_options' \
 	'-q[Job priority -- 1 (lowest) to 100 (highest)]:priority:' \
-	'-s[Dont report resulting job IDs]' \
+	"-s[Don't report resulting job IDs]" \
 	'-t[Sets the job name]:job name:' \
 	'-u[Job submission username]:username:_users' \
 	'-H[Time to print]:print time (or enter hh\:mm):(hold immediate restart resume)' \

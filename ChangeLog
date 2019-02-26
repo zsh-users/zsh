@@ -1,3 +1,27 @@
+2019-02-26  dana  <dana@dana.is>
+
+	* 44080: Completion/BSD/Command/_bsd_pkg,
+	Completion/BSD/Command/_fetch, Completion/Darwin/Command/_hdiutil,
+	Completion/Darwin/Command/_otool,
+	Completion/Darwin/Command/_sc_usage,
+	Completion/Debian/Command/_aptitude,
+	Completion/Debian/Command/_dpkg,
+	Completion/Debian/Command/_vim-addons,
+	Completion/Linux/Command/_btrfs, Completion/Linux/Command/_cpupower,
+	Completion/Linux/Command/_iptables,
+	Completion/Mandriva/Command/_urpmi, Completion/Unix/Command/_chsh,
+	Completion/Unix/Command/_cksum, Completion/Unix/Command/_git,
+	Completion/Unix/Command/_gnutls, Completion/Unix/Command/_initctl,
+	Completion/Unix/Command/_java, Completion/Unix/Command/_ldconfig,
+	Completion/Unix/Command/_lp, Completion/Unix/Command/_lz4,
+	Completion/Unix/Command/_nkf, Completion/Unix/Command/_objdump,
+	Completion/Unix/Command/_perforce, Completion/Unix/Command/_python,
+	Completion/Unix/Command/_smartmontools,
+	Completion/Unix/Command/_surfraw, Completion/Unix/Command/_sysctl,
+	Completion/Unix/Command/_unison, Completion/Unix/Command/_xmlsoft,
+	Completion/X/Command/_setxkbmap, Completion/X/Command/_vnc: Fix
+	several option-description typos
+
 2019-02-24  dana  <dana@dana.is>
 
 	* unposted: Completion/Unix/Command/_less: Fix typo

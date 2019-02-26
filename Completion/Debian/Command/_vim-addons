@@ -12,7 +12,7 @@ _arguments \
   '(y --system-dir)'{-y,--system-dir}'[set system-wide target directory]' \
   '(-)'{-h,--help}'[show help information]' \
   '(-w --system-wide -t --target-dir)'{-w,--system-wide}'[use system-wide target directory]' \
-  '(-z --silent -v --verbose)'{-z,--silent}'[supress most output]' \
+  '(-z --silent -v --verbose)'{-z,--silent}'[suppress most output]' \
   '1:commands:((
     install\:install\ specified\ addons
     remove\:remove\ specified\ addons

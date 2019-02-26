@@ -111,7 +111,7 @@ javadoc)
     '-bottom[specify bottom text]:bottom text:' \
     '-link[generate a link to external reference classes]:document URL:' \
     '-linkoffline[generate a link for external reference class names]:document URL::package list URL:' \
-    '-group[generate tables for each groupes]:group heading::package patterns:' \
+    '-group[generate tables for each group]:group heading::package patterns:' \
     '-nodeprecated[do not document deprecated API]' \
     '-nodeprecatedlist[do not generate deprecated API list]' \
     '-notree[do not generate class and interface hierarchy]' \
