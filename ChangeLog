@@ -1,5 +1,8 @@
 2019-02-26  dana  <dana@dana.is>
 
+	* 44085: Completion/Unix/Type/_remote_files: Prevent ls/alias
+	settings from mangling file listings
+
 	* 44080: Completion/BSD/Command/_bsd_pkg,
 	Completion/BSD/Command/_fetch, Completion/Darwin/Command/_hdiutil,
 	Completion/Darwin/Command/_otool,

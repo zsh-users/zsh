@@ -59,7 +59,10 @@ if zstyle -T ":completion:${curcontext}:files" remote-access; then
   fi
 
   # remote filenames
-  remfiles=(${(M)${(f)"$(_call_program files $cmd $cmd_args $host ls -d1FL -- "$rempat" 2>/dev/null)"}%%[^/]#(|/)})
+  remfiles=(${(M)${(f)"$(
+    _call_program files $cmd $cmd_args $host \
+      QUOTING_STYLE=literal command ls -d1FL -- "$rempat" 2>/dev/null
+  )"}%%[^/]#(|/)})
 
   compset -P '*/'
   compset -S '/*' || (( ${args[(I)-/]} )) || suf='remote file'
