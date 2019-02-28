@@ -1,5 +1,8 @@
 2019-02-27  dana  <dana@dana.is>
 
+	* 44087: Completion/Unix/Command/_getconf: Complete options,
+	complete config variables on more systems
+
 	* 44090 (re: 44085): Completion/Unix/Type/_remote_files: Don't
 	set QUOTING_STYLE -- syntax incompatible with some shells
 
