@@ -1,3 +1,8 @@
+2019-02-27  dana  <dana@dana.is>
+
+	* 44090 (re: 44085): Completion/Unix/Type/_remote_files: Don't
+	set QUOTING_STYLE -- syntax incompatible with some shells
+
 2019-02-26  dana  <dana@dana.is>
 
 	* 44085: Completion/Unix/Type/_remote_files: Prevent ls/alias
