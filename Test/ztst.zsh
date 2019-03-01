@@ -322,7 +322,7 @@ ZTST_diff() {
     diff_lines2=("${(f@)$(<$argv[-1])}")
     if (( ${#diff_lines1} != ${#diff_lines2} )); then
       failed=1
-      print -r "Pattern match filead, line mismatch (${#diff_lines1}/${#diff_lines2}):"
+      print -r "Pattern match failed, line mismatch (${#diff_lines1}/${#diff_lines2}):"
     else
       for (( i = 1; i <= ${#diff_lines1}; i++ )); do
 	if [[ ${diff_lines2[i]} != ${~diff_lines1[i]} ]]; then

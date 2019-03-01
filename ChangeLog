@@ -1,3 +1,7 @@
+2019-03-01  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* unposted: Test/ztst.zsh: fix a typo
+
 2019-02-27  dana  <dana@dana.is>
 
 	* 44087: Completion/Unix/Command/_getconf: Complete options,
