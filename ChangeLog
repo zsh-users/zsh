@@ -1,7 +1,10 @@
-2019-05-06  Laurent Arnoud  <laurent@spkdev.net>
+2019-05-06  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
-	* github #35 (tweaked): Completion/Unix/Command/_gem: fix
-	_arguments spec for gem push completion
+	* Aurélien Olivier: github #33: Completion/Unix/Command/_myrepos:
+	Add completion file for myrepos (mr)
+
+	* Laurent Arnoud: github #35: Completion/Unix/Command/_gem:
+	fix _arguments spec for gem push completion (tweaked)
 
 2019-05-03  dana  <dana@dana.is>
 
