@@ -1,3 +1,8 @@
+2019-03-06  dana  <dana@dana.is>
+
+	* 44099: Completion/Darwin/Command/_trash: Add completion for
+	macOS trash utility
+
 2019-03-01  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* unposted: Test/ztst.zsh: fix a typo
