@@ -1,4 +1,4 @@
-#compdef -p zf*
+#compdef -P zf*
 
 # Completion for zftp builtin and zf* functions.  The functions
 # zfcd_match and zfget_match (also used for old-style completion)

@@ -1,5 +1,8 @@
 2019-03-06  dana  <dana@dana.is>
 
+	* unposted: Completion/Zsh/Command/_zftp: Use 'post' pattern
+	matching to avoid clobbering other functions
+
 	* 44099: Completion/Darwin/Command/_trash: Add completion for
 	macOS trash utility
 
