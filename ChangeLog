@@ -1,3 +1,7 @@
+2019-03-08  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 44101: Completion/Unix/Command/_vim: better support for nvim
+
 2019-03-06  dana  <dana@dana.is>
 
 	* unposted: Completion/Zsh/Command/_zftp: Use 'post' pattern
