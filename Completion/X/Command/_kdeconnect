@@ -1,7 +1,9 @@
 #compdef kdeconnect-cli
 
 _kdeconnect_device-ids() {
-  compadd $(kdeconnect-cli --list-available --id-only)
+  #Use kdeconnect-cli's built-in autocomplete list, if available (newer versions)
+  #Otherwise, fall back to an older method (without descriptions)
+  _values "KDE Connect device id" "${(f)$(kdeconnect-cli --shell-device-autocompletion=zsh 2>/dev/null || kdeconnect-cli --list-available --id-only 2>/dev/null)}"
 }
 
 _arguments \
@@ -25,7 +27,8 @@ _arguments \
   '--list-commands[list remote commands and their ids]' \
   '--execute-command[execute a remote command]:command id' \
   '(-k --send-keys)'{-k,--send-keys}'[send keys to the specified device]' \
-  "--my-id[display this device's id and exit]" \
+  "--my-id[display this device's id]" \
+  "--photo[open the connected device's camera and transfer the photo]" \
   '(-)'{-h,--help}'[display usage information]' \
   '(-)'{-v,--version}'[display version information]' \
   '(-)--author[show author information and exit]' \
