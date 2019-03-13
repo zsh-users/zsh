@@ -1644,7 +1644,7 @@ static int
 bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     char *o, *p, *n, **pp, **aval, **ap, *assoc = NULL, **cp, **np;
-    int del = 0, flags = 0, extract = 0, keep = 0;
+    int del = 0, flags = 0, extract = 0, fail = 0, keep = 0;
     Zoptdesc sopts[256], d;
     Zoptarr a, defarr = NULL;
     Zoptval v;
@@ -1680,6 +1680,14 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		    break;
 		}
 		extract = 1;
+		break;
+	    case 'F':
+		if (o[2]) {
+		    args--;
+		    o = NULL;
+		    break;
+		}
+		fail = 1;
 		break;
 	    case 'K':
 		if (o[2]) {
@@ -1843,6 +1851,10 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	if (!(d = lookup_opt(o + 1))) {
 	    while (*++o) {
 		if (!(d = sopts[STOUC(*o)])) {
+		    if (fail) {
+			zwarnnam(nam, "bad option: %c", *o);
+			return 1;
+		    }
 		    o = NULL;
 		    break;
 		}

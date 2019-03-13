@@ -180,7 +180,7 @@ item(tt(zregexparse))(
 This implements some internals of the tt(_regex_arguments) function.
 )
 findex(zparseopts)
-item(tt(zparseopts) [ tt(-D) tt(-K) tt(-M) tt(-E) ] [ tt(-a) var(array) ] [ tt(-A) var(assoc) ] [ tt(-) ] var(spec) ...)(
+item(tt(zparseopts) [ tt(-D) tt(-E) tt(-F) tt(-K) tt(-M) ] [ tt(-a) var(array) ] [ tt(-A) var(assoc) ] [ tt(-) ] var(spec) ...)(
 This builtin simplifies the parsing of options in positional parameters,
 i.e. the set of arguments given by tt($*).  Each var(spec) describes one
 option and must be of the form `var(opt)[tt(=)var(array)]'.  If an option
@@ -195,7 +195,7 @@ Note that it is an error to give any var(spec) without an
 Unless the tt(-E) option is given, parsing stops at the first string
 that isn't described by one of the var(spec)s.  Even with tt(-E),
 parsing always stops at a positional parameter equal to `tt(-)' or
-`tt(-)tt(-)'.
+`tt(-)tt(-)'. See also tt(-F).
 
 The var(opt) description must be one of the following.  Any of the special
 characters can appear in the option name provided it is preceded by a
@@ -234,9 +234,23 @@ first colon.
 )
 enditem()
 
+In all cases, option-arguments must appear either immediately following the
+option in the same positional parameter or in the next one. Even an optional
+argument may appear in the next parameter, unless it begins with a `tt(-)'.
+There is no special handling of `tt(=)' as with GNU-style argument parsers;
+given the var(spec) `tt(-foo:)', the positional parameter `tt(-)tt(-foo=bar)'
+is parsed as `tt(-)tt(-foo)' with an argument of `tt(=bar)'.
+
+When the names of two options that take no arguments overlap, the longest one
+wins, so that parsing for the var(spec)s `tt(-foo -foobar)' (for example) is
+unambiguous. However, due to the aforementioned handling of option-arguments,
+ambiguities may arise when at least one overlapping var(spec) takes an
+argument, as in `tt(-foo: -foobar)'. In that case, the last matching
+var(spec) wins.
+
 The options of tt(zparseopts) itself cannot be stacked because, for
 example, the stack `tt(-DEK)' is indistinguishable from a var(spec) for
-the GNU-style long option `tt(--DEK)'.  The options of tt(zparseopts)
+the GNU-style long option `tt(-)tt(-DEK)'.  The options of tt(zparseopts)
 itself are:
 
 startitem()
@@ -252,8 +266,29 @@ as the values.
 item(tt(-D))(
 If this option is given, all options found are removed from the positional
 parameters of the calling shell or shell function, up to but not including
-any not described by the var(spec)s.  This is similar to using the tt(shift)
-builtin.
+any not described by the var(spec)s.  If the first such parameter is `tt(-)'
+or `tt(-)tt(-)', it is removed as well.  This is similar to using the
+tt(shift) builtin.
+)
+item(tt(-E))(
+This changes the parsing rules to em(not) stop at the first string
+that isn't described by one of the var(spec)s.  It can be used to test
+for or (if used together with tt(-D)) extract options and their
+arguments, ignoring all other options and arguments that may be in the
+positional parameters.  As indicated above, parsing still stops at the
+first `tt(-)' or `tt(-)tt(-)' not described by a var(spec), but it is not
+removed when used with tt(-D).
+)
+item(tt(-F))(
+If this option is given, tt(zparseopts) immediately stops at the first
+option-like parameter not described by one of the var(spec)s, prints an
+error message, and returns status 1.  Removal (tt(-D)) and extraction
+(tt(-E)) are not performed, and option arrays are not updated.  This
+provides basic validation for the given options.
+
+Note that the appearance in the positional parameters of an option without
+its required argument always aborts parsing and returns an error as described
+above regardless of whether this option is used.
 )
 item(tt(-K))(
 With this option, the arrays specified with the tt(-a) option and with the
@@ -271,13 +306,6 @@ which is used to choose where to store the values.  If no other var(spec)
 is found, the values are stored as usual.  This changes only the way the
 values are stored, not the way tt($*) is parsed, so results may be
 unpredictable if the `var(name)tt(+)' specifier is used inconsistently.
-)
-item(tt(-E))(
-This changes the parsing rules to em(not) stop at the first string
-that isn't described by one of the var(spec)s.  It can be used to test
-for or (if used together with tt(-D)) extract options and their
-arguments, ignoring all other options and arguments that may be in the
-positional parameters.
 )
 enditem()
 

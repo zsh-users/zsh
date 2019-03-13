@@ -1,3 +1,9 @@
+2019-03-12  dana  <dana@dana.is>
+
+	* 44100: Completion/Zsh/Command/_zparseopts, Doc/Zsh/mod_zutil.yo,
+	Src/Modules/zutil.c, Test/V12zparseopts.ztst: Add `zparseopts -F`,
+	completion, tests, documentation
+
 2019-03-08  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 44101: Completion/Unix/Command/_vim: better support for nvim
