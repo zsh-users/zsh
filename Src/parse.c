@@ -414,10 +414,10 @@ ecstrcode(char *s)
 	return c;
     } else {
 	Eccstr p, *pp;
-	int cmp;
+	long cmp;
 
 	for (pp = &ecstrs; (p = *pp); ) {
-	    if (!(cmp = p->nfunc - ecnfunc) && !(cmp = (((signed)p->hashval) - ((signed)val))) && !(cmp = strcmp(p->str, s))) {
+	    if (!(cmp = p->nfunc - ecnfunc) && !(cmp = (((long)p->hashval) - ((long)val))) && !(cmp = strcmp(p->str, s))) {
 		return p->offs;
             }
 	    pp = (cmp < 0 ? &(p->left) : &(p->right));

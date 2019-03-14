@@ -1,3 +1,8 @@
+2019-03-14  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Kamil: 44122: Src/parse.c: turn an int into a long to avoid
+	overflow.
+
 2019-03-12  dana  <dana@dana.is>
 
 	* 44100: Completion/Zsh/Command/_zparseopts, Doc/Zsh/mod_zutil.yo,
