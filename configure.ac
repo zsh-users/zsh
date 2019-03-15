@@ -2087,6 +2087,10 @@ AC_CACHE_CHECK(for NIS, zsh_cv_sys_nis,
 zsh_cv_sys_nis=yes || zsh_cv_sys_nis=no])
 if test x$zsh_cv_sys_nis = xyes; then
   AC_DEFINE(HAVE_NIS)
+dnl RPC is removed from glibc-2.26 and replaced by libtirpc
+  AC_CHECK_HEADER(rpc/rpc.h, [],
+  [test -f /usr/include/tirpc/rpc/rpc.h && \
+   CPPFLAGS="$CPPFLAGS -I/usr/include/tirpc"])
 dnl Some systems (Solaris 2.x, Linux Redhat 5.x) require
 dnl libnsl (Network Services Library) to find yp_all
   AC_SEARCH_LIBS(yp_all, nsl)
