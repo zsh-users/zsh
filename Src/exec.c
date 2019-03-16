@@ -940,6 +940,8 @@ hashcmd(char *arg0, char **pp)
     char *s, buf[PATH_MAX+1];
     char **pq;
 
+    if (*arg0 == '/')
+        return NULL;
     for (; *pp; pp++)
 	if (**pp == '/') {
 	    s = buf;

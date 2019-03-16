@@ -988,6 +988,10 @@ The choice of hash table to work on is determined by the tt(-d) option;
 without the option the command hash table is used, and with the option the
 named directory hash table is used.
 
+Command paths starting with a tt(/) are never hashed, whether by explicit
+use of the tt(hash) command or otherwise, but are always found
+by direct look up in the file system.
+
 Given no arguments, and neither the tt(-r) or tt(-f) options,
 the selected hash table will be listed in full.
 

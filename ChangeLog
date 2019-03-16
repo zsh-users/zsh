@@ -1,5 +1,8 @@
 2019-03-19  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Charles Blake: 44132: Src/exec.c, Doc/Zsh/builtins.yo: don't
+	hash commands beginning with a '/'.
+
 	* 44142: Src/hist.c: fix bug stripping spaces on line with only
 	comment.
 
