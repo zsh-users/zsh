@@ -1,52 +1,58 @@
 #compdef chmod gchmod
 
-local curcontext="$curcontext" state line expl ret=1
+local curcontext="$curcontext" state line expl ret=1 variant
 local -a args privs
 
 args=( '*: :->files' '1: :_file_modes' )
 
-if _pick_variant gnu=Free\ Soft unix --version; then
-  args+=(
-    '(-v --verbose -c --changes)'{-c,--changes}'[report changes made]'
-    '(-v --verbose -c --changes)'{-v,--verbose}'[output a diagnostic for every file processed]'
-    '(-f --silent --quiet)'{-f,--silent,--quiet}'[suppress most error messages]'
-    '(--no-preserve-root)--preserve-root[fail to operate recursively on /]'
-    "(--preserve-root)--no-preserve-root[don't treat / specially (default)]"
-    '(1)--reference=[copy permissions of specified file]:file:_files'
-    '(-R --recursive)'{-R,--recursive}'[change files and directories recursively]'
-    '(- : *)--help[display help information]'
-    '(- : *)--version[display version information]'
-  )
-else
-  args+=(
-    '-f[suppress most error messages]'
-    '-R[change files and directories recursively]'
-  )
-  case $OSTYPE in
-    freebsd*|dragonfly*|darwin*)
-      args+=( '-v[output a diagnostic for every file processed]')
-    ;|
-    freebsd*|netbsd*|darwin*|dragonfly*)
-      args+=( "-h[operate on symlinks them self]" )
-    ;|
-    freebsd*|openbsd*|netbsd*|darwin*|dragonfly*)
-      args+=(
-	'(-H -L -P)-L[follow all symlinks]'
-	'(-H -L -P)-H[follow symlinks on the command line]'
-	'(-H -L -P)-P[do not follow symlinks (default)]'
-      )
-    ;|
-    darwin*)
-      args+=(
-        '(1)-C[returns false if any of the named files have ACLs]'
-	'(1)-N[remove ACLs from specified files]'
-	'(1)-E[read ACL info from stdin as a sequential list of ACEs]'
-	'(1)-i[removes inherited bit from all entries in named files ACLs]'
-        '(1)-I[removes all inherited entries from named files ACLs]'
-      )
+_pick_variant -r variant gnu=Free\ Soft $OSTYPE --version
+case "$variant" in
+  gnu)
+    args+=(
+      '(-v --verbose -c --changes)'{-c,--changes}'[report changes made]'
+      '(-v --verbose -c --changes)'{-v,--verbose}'[output a diagnostic for every file processed]'
+      '(-f --silent --quiet)'{-f,--silent,--quiet}'[suppress most error messages]'
+      '(--no-preserve-root)--preserve-root[fail to operate recursively on /]'
+      "(--preserve-root)--no-preserve-root[don't treat / specially (default)]"
+      '(1)--reference=[copy permissions of specified file]:file:_files'
+      '(-R --recursive)'{-R,--recursive}'[change files and directories recursively]'
+      '(- : *)--help[display help information]'
+      '(- : *)--version[display version information]'
+    )
     ;;
-  esac
-fi
+  *)
+    args+=(
+      '-f[suppress most error messages]'
+      '-R[change files and directories recursively]'
+    )
+    ;|
+  freebsd*|dragonfly*|darwin*)
+    args+=(
+      '-v[output a diagnostic for every file processed]'
+    )
+    ;|
+  freebsd*|netbsd*|darwin*|dragonfly*)
+    args+=(
+      '-h[operate on symlinks them self]'
+    )
+    ;|
+  freebsd*|openbsd*|netbsd*|darwin*|dragonfly*)
+    args+=(
+      '(-H -L -P)-L[follow all symlinks]'
+      '(-H -L -P)-H[follow symlinks on the command line]'
+      '(-H -L -P)-P[do not follow symlinks (default)]'
+    )
+    ;|
+  darwin*)
+    args+=(
+      '(1)-C[returns false if any of the named files have ACLs]'
+      '(1)-N[remove ACLs from specified files]'
+      '(1)-E[read ACL info from stdin as a sequential list of ACEs]'
+      '(1)-i[removes inherited bit from all entries in named files ACLs]'
+      '(1)-I[removes all inherited entries from named files ACLs]'
+    )
+    ;;
+esac
 
 _arguments -C -s "$args[@]" && ret=0
 
@@ -62,12 +68,12 @@ case "$state" in
       local spec who op priv
       local -a specs
       for spec in ${(s:,:)line[1]}; do
-	if [[ ${spec#*[+-=]} != [rwxst]## ]]; then
-	  _files && ret=0
-	  return ret
-	fi
+        if [[ ${spec#*[+-=]} != [rwxst]## ]]; then
+          _files && ret=0
+          return ret
+        fi
 
-	specs+=( ${${(M)spec##[+-=]*}:+a}$spec )
+        specs+=( ${${(M)spec##[+-=]*}:+a}$spec )
       done
       _wanted files expl file _files -g "*(-.^f:${(j.,.)specs}:)" && ret=0
     fi
