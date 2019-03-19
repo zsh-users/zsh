@@ -1,3 +1,8 @@
+2019-03-18  Matthew Martin  <phy1729@gmail.com>
+
+	* 44135: Completion/Unix/Command/_chmod, Doc/Zsh/mod_files.yo,
+	Src/Modules/files.c: Add chmod builtin.
+
 2019-03-15  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 44118: configure.ac: use /usr/include/tirpc/ if headers for
