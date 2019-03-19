@@ -1198,8 +1198,9 @@ histreduceblanks(void)
 	chline[pos] = '\0';
     } else {
 	ptr = chline + pos;
-	while ((*ptr++ = *lastptr++))
-	    ;
+	if (ptr < lastptr)
+	    while ((*ptr++ = *lastptr++))
+		;
     }
 }
 
