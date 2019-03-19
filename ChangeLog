@@ -1,5 +1,7 @@
 2019-03-19  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unposted: Make the doc change in the foregoing clearer.
+
 	* Charles Blake: 44132: Src/exec.c, Doc/Zsh/builtins.yo: don't
 	hash commands beginning with a '/'.
 
