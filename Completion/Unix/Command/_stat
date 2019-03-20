@@ -6,20 +6,14 @@
 #   Dragonfly by parsing the output of `lsof -N`, but it's not available by
 #   default — is there another way?
 
-local expl variant precmd ret=1
+local expl variant ret=1
 local -a context line state state_descr args aopts=( -A '-*' )
 local -A opt_args
 
-if [[ $service == zstat ]] || [[ $precommands[-1] == builtin ]]; then
-  variant=zsh
-else
-  [[ $precommands[-1] == command ]] && precmd=command
-  _pick_variant -c "${precmd:+$precmd }${words[1]}" -r variant \
-    gnu='Free Soft' zsh='no files given' unix --version
-fi
+_pick_variant -r variant -b zsh gnu='Free Soft' $OSTYPE --version
 
-case $OSTYPE-$variant in
-  *-zsh)
+case $variant in
+  zsh)
     args=(
       "(-H)-A[assign the results to array, don't print]:array variable:_parameters -g '*array*'"
       - set1
@@ -43,7 +37,7 @@ case $OSTYPE-$variant in
       '-l[list stat types]'
     )
     ;;
-  *-gnu)
+  gnu)
     aopts=( )
     args=(
       '*: :_files'
