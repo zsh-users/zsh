@@ -1,3 +1,8 @@
+2019-03-21  dana  <dana@dana.is>
+
+	* 44111: Completion/Unix/Command/_git: Use `git rev-list` for log
+	messages
+
 2019-03-19  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: Make the doc change in the foregoing clearer.

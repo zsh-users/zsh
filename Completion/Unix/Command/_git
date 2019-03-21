@@ -5652,7 +5652,7 @@ __git_describe_branch () {
     local __c
     local -a __commits
     for __c in ${(P)__commits_in}; do
-      __commits+=("${__c}:${$(_call_program describe git log -1 --oneline $__c)//:/\\:}")
+      __commits+=("${__c}:${$(_call_program describe git rev-list -1 --oneline $__c)//:/\\:}")
     done
     _describe -t $__tag $__desc __commits "$@"
   else
@@ -6493,8 +6493,9 @@ __git_commit_objects () {
 
   # Note: the after-the-colon part must be unique across the entire array;
   # see workers/34768
-  commits=(${(f)"$(_call_program commits git --no-pager log -1000 --all --reflog --format='%h:\[%h\]\ %s\ \(%cr\)')"})
+  commits=(${(f)"$(_call_program commits git --no-pager rev-list -1000 --all --reflog --format='%h:\[%h\]\ %s\ \(%cr\)' HEAD)"})
   __git_command_successful $pipestatus || return 1
+  commits=(${commits:#commit [[:xdigit:]](#c40,)})
 
   _describe -Vx -t commits 'commit object name' commits
 }
@@ -6503,7 +6504,7 @@ __git_commit_objects () {
 __git_recent_commits () {
   local gitdir expl start
   declare -a descr tags heads commits argument_array_names commit_opts
-  local i j k ret
+  local h i j k ret
   integer distance_from_head
   local label
   local parents
@@ -6517,10 +6518,11 @@ __git_recent_commits () {
 
   # Careful: most %d will expand to the empty string.  Quote properly!
   # NOTE: we could use %D directly, but it's not available in git 1.9.1 at least.
-  commits=("${(f)"$(_call_program commits git --no-pager log ${(q)commit_opts} -20 --format='%h%n%d%n%s\ \(%cr\)%n%p')"}")
+  commits=("${(f)"$(_call_program commits git --no-pager rev-list ${(q)commit_opts} -20 --format='%h%n%d%n%s\ \(%cr\)%n%p' HEAD)"}")
   __git_command_successful $pipestatus || return 1
 
-  for i j k parents in "$commits[@]" ; do
+  # h => hard-coded 'commit abcdef1234567890...' -- just discarded
+  for h i j k parents in "$commits[@]" ; do
     # Note: the after-the-colon part must be unique across the entire array;
     # see workers/34768
     if (( $#commit_opts )); then
