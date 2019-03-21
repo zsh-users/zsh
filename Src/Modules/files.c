@@ -613,7 +613,8 @@ bin_rm(char *nam, char **args, Options ops, UNUSED(int func))
     rmm.opt_interact = OPT_ISSET(ops,'i') && !OPT_ISSET(ops,'f');
     rmm.opt_unlinkdir = OPT_ISSET(ops,'d');
     err = recursivecmd(nam, OPT_ISSET(ops,'f'), 
-		       OPT_ISSET(ops,'r') && !OPT_ISSET(ops,'d'),
+		       !OPT_ISSET(ops,'d') && (OPT_ISSET(ops,'R') ||
+		                               OPT_ISSET(ops,'r')),
 		       OPT_ISSET(ops,'s'),
 	args, recurse_donothing, rm_dirpost, rm_leaf, &rmm);
     return OPT_ISSET(ops,'f') ? 0 : err;
@@ -798,7 +799,7 @@ static struct builtin bintab[] = {
     BUILTIN("ln",    0, bin_ln,    1, -1, BIN_LN,    LN_OPTS, NULL),
     BUILTIN("mkdir", 0, bin_mkdir, 1, -1, 0,         "pm:",   NULL),
     BUILTIN("mv",    0, bin_ln,    2, -1, BIN_MV,    "fi",    NULL),
-    BUILTIN("rm",    0, bin_rm,    1, -1, 0,         "dfirs", NULL),
+    BUILTIN("rm",    0, bin_rm,    1, -1, 0,         "dfiRrs", NULL),
     BUILTIN("rmdir", 0, bin_rmdir, 1, -1, 0,         NULL,    NULL),
     BUILTIN("sync",  0, bin_sync,  0,  0, 0,         NULL,    NULL),
     /* The "safe" zsh-only names */
@@ -808,7 +809,7 @@ static struct builtin bintab[] = {
     BUILTIN("zf_ln",    0, bin_ln,    1, -1, BIN_LN,    LN_OPTS, NULL),
     BUILTIN("zf_mkdir", 0, bin_mkdir, 1, -1, 0,         "pm:",   NULL),
     BUILTIN("zf_mv",    0, bin_ln,    2, -1, BIN_MV,    "fi",    NULL),
-    BUILTIN("zf_rm",    0, bin_rm,    1, -1, 0,         "dfirs", NULL),
+    BUILTIN("zf_rm",    0, bin_rm,    1, -1, 0,         "dfiRrs", NULL),
     BUILTIN("zf_rmdir", 0, bin_rmdir, 1, -1, 0,         NULL,    NULL),
     BUILTIN("zf_sync",  0, bin_sync,  0,  0, 0,         NULL,    NULL),
 

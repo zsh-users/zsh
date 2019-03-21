@@ -7,6 +7,9 @@
 
 2019-03-21  Matthew Martin  <phy1729@gmail.com>
 
+	* 44153: Doc/Zsh/mod_files.yo, Src/Modules/files.c: rm: Accept
+	-R as equivalent to -r.
+
 	* 44149: Completion/Unix/Command/_mkdir,
 	Completion/Unix/Command/_stat: Use _pick_variant -b.
 

@@ -144,15 +144,15 @@ fall back on copying and removing files; if this behaviour is desired,
 use tt(cp) and tt(rm) manually.  This may change in a future version.
 )
 findex(rm)
-item(tt(rm) [ tt(-dfirs) ] var(filename) ...)(
+item(tt(rm) [ tt(-dfiRrs) ] var(filename) ...)(
 Removes files and directories specified.
 
-Normally, tt(rm) will not remove directories (except with the tt(-r)
-option).  The tt(-d) option causes tt(rm) to try removing directories
+Normally, tt(rm) will not remove directories (except with the tt(-R) or tt(-r)
+options).  The tt(-d) option causes tt(rm) to try removing directories
 with tt(unlink) (see manref(unlink)(2)), the same method used for files.
 Typically only the super-user can actually succeed in unlinking
 directories in this way.
-tt(-d) takes precedence over tt(-r).
+tt(-d) takes precedence over tt(-R) and tt(-r).
 
 By default, the user will be queried before removing any file
 that the user cannot write to, but writable files will be silently
@@ -162,9 +162,9 @@ any files.  The tt(-f) option causes files to be
 silently deleted, without querying, and suppresses all error indications.
 tt(-f) takes precedence.
 
-The tt(-r) option causes tt(rm) to recursively descend into directories,
-deleting all files in the directory before removing the directory with
-the tt(rmdir) system call (see manref(rmdir)(2)).
+The tt(-R) and tt(-r) options cause tt(rm) to recursively descend into
+directories, deleting all files in the directory before removing the directory
+with the tt(rmdir) system call (see manref(rmdir)(2)).
 
 The tt(-s) option is a zsh extension to tt(rm) functionality.  It enables
 paranoid behaviour, intended to avoid common security problems involving
