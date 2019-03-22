@@ -8,6 +8,7 @@ opts=( -s -w -C )
 
 case $OSTYPE in
   *linux*)
+    # based on procps-ng-3.3.15
     fields=(
       '%CPU:CPU usage' '%MEM:memory usage (res)' 'CGROUPS:control groups'
       'CODE:code size' 'COMMAND:Command name/line' 'DATA:data + stack size'
@@ -26,25 +27,33 @@ case $OSTYPE in
       'nTH:number of threads' 'nsIPC:IPC namespace' 'nsMNT:MNT namespace'
       'nsNET:NET namespace' 'nsPID:PID namespace' 'nsUSER:USER namespace'
       'nsUTS:UTS namespace' 'vMj:major page fault count delta'
-      'vMn:minor page fault count delta'
+      'vMn:minor page fault count delta' 'LXC:lxc container name'
+      'OOMa:out of memory adjustment factor' 'OOMs:out of memory source'
+      'Rsan:resident anonymous memory size'
+      'RSfd:resident file-backed memory size' 'RSlk:resident locked memory size'
+      'RSsh:resident shared memory size' 'CGNAME:control group name'
+      'NU:last known NUMA node'
     )
     order=( '+:descending (default)' '-:ascending' )
+    local -a units=( 'k:KiB' 'm:MiB' 'g:GiB' 't:TiB' 'p:PiB' 'e:EiB' )
     specs=(
       '(-)-'{h,v}'[show version and usage]'
       '-b[batch mode]'
       '-c[command line/program name toggle]'
       '-d+[delay time interval]:interval'
+      '-E+[specify the memory scaling unit]: : _describe -V -t units unit units'
       '-H[threads mode operation]'
       '-i[idle process toggle]'
       '-n+[number of iterations]:number of iterations'
       '-o+[override sort field]:fieldname:->sortkey'
       '-O[output field names]'
-      '*-p+[monitor pids]: :_sequence -s , _pids'
+      '(-u -U)*-p+[monitor pids]: :_sequence -s , _pids'
       '-s[secure mode operation]'
       '-S[cumulative time toggle]'
-      '(-U)-u+[effective user filter mode]: :_users'
-      '(-u)-U+[user filter mode]: :_users'
+      '(-U -p)-u+[effective user filter mode]: :_users'
+      '(-u -p)-U+[user filter mode]: :_users'
       '-w+[output width override]::number'
+      '-1[single/separate cpu states toggle]'
     );;
   freebsd*|openbsd*)
     fields=( cpu size res time pri pid )
@@ -63,7 +72,7 @@ case $OSTYPE in
       '1: :_guard "^-*" "number of processes to display"'
     );|
   freebsd*)
-    fields+=( threads total read write fault vcsw ivcsw jid )
+    fields+=( threads total read write fault vcsw ivcsw jid swap )
     specs+=(
       '-C[CPU display mode]'
       '-a[display command names via argv]'
@@ -127,6 +136,8 @@ case $OSTYPE in
       'sysmach:total Mach syscalls'
       'pageins:total pageins'
       'boosts:number of boosts held by the process'
+      'instrs:number of instructions retired by the process'
+      'cycles:number of cycles spent in the process'
     )
     order=( '-:descending (default)' '+:ascending' )
     specs=(
