@@ -7,6 +7,9 @@
 
 2019-03-21  Matthew Martin  <phy1729@gmail.com>
 
+	* 44144: Completion/Zsh/Command/_builtin: Append "builtin" to
+	precommands.
+
 	* 44155: Completion/Base/Utility/_pick_variant: Update builtin
 	check.
 

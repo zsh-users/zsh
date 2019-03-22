@@ -1,5 +1,7 @@
 #compdef builtin
 
+precommands+=(builtin)
+
 if (( $CURRENT > 2 )); then
   shift words
   (( CURRENT -- ))
