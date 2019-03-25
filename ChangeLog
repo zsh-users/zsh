@@ -1,3 +1,7 @@
+2019-03-24  dana  <dana@dana.is>
+
+	* unposted: Completion/Unix/Command/_chmod: Adjust _guard pattern
+
 2019-03-22  dana  <dana@dana.is>
 
 	* unposted: Completion/Unix/Command/_chmod: Use _guard for mode

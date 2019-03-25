@@ -12,7 +12,7 @@ case "$variant" in
     args=(
       '-R[change files and directories recursively]'
       '-s[enable paranoid behavior]'
-      '1: :_guard "^-*" "octal mode"'
+      '1: :_guard "[0-7]#" "octal mode"'
       '*: :->files'
     )
     ;;
