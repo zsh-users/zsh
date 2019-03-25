@@ -1,5 +1,8 @@
 2019-05-06  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* Doron Behar: gitlab !8: Completion/Unix/Command/_luarocks:
+	Support completion of installed lua rocks' versions
+
 	* Doron Behar: gitlab !4: Completion/Unix/Command/_pandoc:
 	Add pandoc completion
 

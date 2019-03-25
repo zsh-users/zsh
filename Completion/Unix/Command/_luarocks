@@ -67,15 +67,8 @@ __luarocks_rock_version(){
           fi
           ;;
         "installed")
-          # TODO: actually complete versions of installed rocks using the cache
-          # How does luarocks handles multiple versions of the same package?
-          # If anybody knows, please write something beautiful here
           tree="$2"
-          if [[ -z "${tree}" ]]; then
-            _message -e "version for installed rock ${words[$i]}"
-          else
-            _message -e "version for installed rock ${words[$i]} on tree ${tree}"
-          fi
+          __luarocks_installed_rocks "${tree}" "${words[$i]}"
           return
           ;;
         "new_version")
@@ -202,7 +195,11 @@ __luarocks_installed_rocks(){
   # rocks which will be completed by this function will not use the cache which
   # is valid only for installed rocks on default trees like /usr/lib/luarocks
   # and ~/.luarocks
+  #
+  # The second argument (optional as well) is meant for telling the function to
+  # complete a version of a installed rock and not the rock itself from the list
   local tree="$1"
+  local complete_version_for_rock="$2"
   if [[ -z ${tree} ]]; then
     local update_policy
     zstyle -s ":completion:${curcontext}:" cache-policy update_policy
@@ -240,7 +237,7 @@ __luarocks_installed_rocks(){
     if _cache_invalid luarocks_installed_descriptions; then
       rocks_descriptions=()
       for i in {1.."${#rocks_names[@]}"}; do
-        name_version_description="$(luarocks show ${rocks_names[$i]} 2>/dev/null | head -2 | tail -1)"
+        name_version_description="$(luarocks show ${rocks_names[$i]} ${rocks_versions[$i]} 2>/dev/null | head -2 | tail -1)"
         total_length=${#name_version_description}
         garbage_length="$((${#rocks_names[$i]} + ${#rocks_versions[$i]} + 5))"
         description="${name_version_description[${garbage_length},${total_length}]}"
@@ -253,7 +250,7 @@ __luarocks_installed_rocks(){
     if _cache_invalid luarocks_installed_names_and_descriptions; then
       rocks_names_and_descriptions=()
       for i in {1.."${#rocks_names[@]}"}; do
-        name_and_description=${rocks_names[$i]}:${rocks_descriptions[$i]}
+        name_and_description=${rocks_names[$i]}:"${rocks_versions[$i]} "${rocks_descriptions[$i]}
         rocks_names_and_descriptions+=(${name_and_description})
       done
     else
@@ -275,7 +272,7 @@ __luarocks_installed_rocks(){
     done
     rocks_descriptions=()
     for i in {1.."${#rocks_names[@]}"}; do
-      name_version_description="$(luarocks show ${rocks_names[$i]} 2> /dev/null | head -2 | tail -1)"
+      name_version_description="$(luarocks show ${rocks_names[$i]} ${rocks_versions[$i]} 2> /dev/null | head -2 | tail -1)"
       total_length=${#name_version_description}
       garbage_length="$((${#rocks_names[$i]} + ${#rocks_versions[$i]} + 5))"
       description="${name_version_description[${garbage_length},${total_length}]}"
@@ -283,11 +280,30 @@ __luarocks_installed_rocks(){
     done
     rocks_names_and_descriptions=()
     for i in {1.."${#rocks_names[@]}"}; do
-      name_and_description=${rocks_names[$i]}:${rocks_descriptions[$i]}
+      name_and_description=${rocks_names[$i]}:"${rocks_versions[$i]} "${rocks_descriptions[$i]}
       rocks_names_and_descriptions+=(${name_and_description})
     done
   fi
-  _describe 'installed rocks' rocks_names_and_descriptions
+  if [[ -z "$complete_version_for_rock" ]]; then
+    _describe 'installed rock' rocks_names_and_descriptions
+  else
+    if [[ ! -z "${rocks_names[(r)${complete_version_for_rock}]}" ]]; then  # checks if the requested rock exists in the list of rocks_names
+      local rock="${complete_version_for_rock}"
+      local first_match_index=${rocks_names[(i)${rock}]}
+      local last_match_index=${rocks_names[(I)${rock}]}
+      local versions=()
+      for i in {${first_match_index}..${last_match_index}}; do
+        versions+=("${rocks_versions[$i]}")
+      done
+      _values "rock's version" $versions
+    else
+      if [[ -z "${tree}" ]]; then
+        _message -r "no such rock installed"
+      else
+        _message -r "no such rock installed in tree ${tree}"
+      fi
+    fi
+  fi
 }
 # Used to complete one or more of the followings:
 # - .rockspec file
@@ -542,7 +558,8 @@ local show_command_options=(
 _luarocks_show(){
   _arguments \
     "${show_command_options[@]}" \
-    "1: :{__luarocks_rock 'installed' "${opt_args[--tree]}"}"
+    "1: :{__luarocks_rock 'installed' "${opt_args[--tree]}"}" \
+    '2:: :{__luarocks_rock_version "installed" '"${opt_args[--tree]}"'}'
 }
 
 (( $+functions[_luarocks_test] )) ||
