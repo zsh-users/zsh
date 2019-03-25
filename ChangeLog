@@ -1,5 +1,7 @@
 2019-03-25  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* 44176: Src/Modules/zftp.c: warn only if off_t is longer than long
+
 	* Wesley Schwengle: 44162 (tweaked): Src/Modules/zftp.c: Avoid
 	format-overflow warning by using ztrftime()
 

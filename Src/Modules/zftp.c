@@ -2512,7 +2512,8 @@ zftp_local(UNUSED(char *name), char **args, int flags)
 #ifdef OFF_T_IS_64_BIT
 	printf("%s %s\n", output64(sz), mt);
 #else
-	DPUTS(sizeof(sz) > 4, "Shell compiled with wrong off_t size");
+	DPUTS(sizeof(sz) > sizeof(long),
+		"Shell compiled with wrong off_t size");
 	printf("%ld %s\n", (long)sz, mt);
 #endif
 	zsfree(mt);
