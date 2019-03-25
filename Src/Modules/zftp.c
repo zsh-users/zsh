@@ -1257,14 +1257,8 @@ zfstats(char *fnam, int remote, off_t *retsize, char **retmdtm, int fd)
 	if (retmdtm) {
 	    /* use gmtime() rather than localtime() for consistency */
 	    tm = gmtime(&statbuf.st_mtime);
-	    /*
-	     * FTP format for data is YYYYMMDDHHMMSS
-	     * Using tm directly is easier than worrying about
-	     * incompatible strftime()'s.
-	     */
-	    sprintf(tmbuf, "%04d%02d%02d%02d%02d%02d",
-		    tm->tm_year + 1900, tm->tm_mon+1, tm->tm_mday,
-		    tm->tm_hour, tm->tm_min, tm->tm_sec);
+	    /* FTP format for date is YYYYMMDDHHMMSS */
+	    ztrftime(tmbuf, sizeof(tmbuf), "%Y%m%d%H%M%S", tm, 0L);
 	    mt = ztrdup(tmbuf);
 	}
     }

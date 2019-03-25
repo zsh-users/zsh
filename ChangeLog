@@ -1,5 +1,8 @@
 2019-03-25  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* Wesley Schwengle: 44162 (tweaked): Src/Modules/zftp.c: Avoid
+	format-overflow warning by using ztrftime()
+
 	* Wesley Schwengle: 44164: Src/params.c: Avoid stringop-truncation
 	warning by replacing strncpy() by memcpy()
 
