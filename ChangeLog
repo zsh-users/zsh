@@ -1,3 +1,14 @@
+2019-03-25  dana  <dana@dana.is>
+
+	* 44160 (tweaked): Completion/Debian/Command/_apt,
+	Completion/Debian/Command/_apt-file,
+	Completion/Debian/Command/_debdiff,
+	Completion/Debian/Command/_dpkg,
+	Completion/Debian/Command/_lintian,
+	Completion/Debian/Command/_piuparts,
+	Completion/Debian/Type/_deb_files: Add _deb_files helper with
+	support for *.ddeb, use it where applicable
+
 2019-03-25  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 44176: Src/Modules/zftp.c: warn only if off_t is longer than long

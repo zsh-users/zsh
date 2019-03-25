@@ -36,7 +36,7 @@ case $state in
     case $line[1] in
       search|find)
 	if (( $#opt_args[(I)(-D|--from-deb)] )); then
-	  _wanted files expl 'debian package' _files -g '*.deb(-.)'
+	  _deb_files
 	elif (( $#opt_args[(I)(-f|--from-file)] )); then
           _files
 	else

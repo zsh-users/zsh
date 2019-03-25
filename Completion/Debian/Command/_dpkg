@@ -18,13 +18,13 @@ _dpkg_deb_only_actions=(
 
 _dpkg_deb_actions=(
   '(--build -b)'{--build,-b}'[build archive]:directory:_files -/'
-  '(--contents -c)'{--contents,-c}'[list contents]:Debian package:_files -g "*.u#deb(-.)"'
-  '(--info -I)'{--info,-I}'[show info]:Debian package:_files -g "*.u#deb(-.)"'
-  '(--field -f)'{--field,-f}'[show fields]:Debian package:_files -g "*.u#deb(-.)"'
-  '(--control -e)'{--control,-e}'[extract control]:Debian package:_files -g "*.u#deb(-.)"'
-  '(--extract -x)'{--extract,-x}'[extract files]:Debian package:_files -g "*.u#deb(-.)"'
-  '(--vextract -X)'{--vextract,-X}'[extract and list files]:Debian package:_files -g "*.u#deb(-.)"'
-  '--fsys-tarfile[output fs tarfile]:Debian package:_files -g "*.u#deb(-.)"'
+  '(--contents -c)'{--contents,-c}'[list contents]: :_deb_files'
+  '(--info -I)'{--info,-I}'[show info]: :_deb_files'
+  '(--field -f)'{--field,-f}'[show fields]: :_deb_files'
+  '(--control -e)'{--control,-e}'[extract control]: :_deb_files'
+  '(--extract -x)'{--extract,-x}'[extract files]: :_deb_files'
+  '(--vextract -X)'{--vextract,-X}'[extract and list files]: :_deb_files'
+  '--fsys-tarfile[output fs tarfile]: :_deb_files'
 )
 
 _dpkg_common_actions=(
@@ -35,7 +35,7 @@ _dpkg_common_actions=(
 
 _dpkg_actions=(
   '(--install -i)'{--install,-i}'[install packages]:*:Debian packages:->install'
-  '--unpack[unpack package]:Debian package:_files -g "*.deb(-.)"'
+  '--unpack[unpack package]: :_deb_files'
   '--configure[reconfigure specified packages]:*:package:->configure'
   '(--remove -r)'{--remove,-r}'[remove package]:*:package:->remove'
   '(--purge -P)'{--purge,-P}'[purge package]:*:package:->purge'
@@ -76,7 +76,7 @@ _dpkg_options=(
 _dpkg_options_recursive=( '(--recursive -R)'{--recursive,-R}'[recursive]' )
 
 _dpkg_deb_and_query_only_actions=(
-    '(--show -W)'{--show,-W}'[show package info]:Debian package:_files -g \*.u\#deb\(-.\)'
+    '(--show -W)'{--show,-W}'[show package info]: :_deb_files'
 )
 
 _dpkg_deb_and_query_only_options=(
@@ -147,7 +147,7 @@ case "$state" in
 	"$_dpkg_options_recursive[@]" \
 	'*:directory:_path_files -/' \
       - nonrecur \
-	'*:Debian package:_path_files -g "*.deb(-.)"'
+	'*: :_deb_files'
   ;;
   remove|status|listfiles)
     _call_function ret _dpkg_$state && return ret
