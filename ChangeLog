@@ -43,6 +43,12 @@
 	* 44158 (tweaked): Completion/Unix/Command/_postgresql: Add
 	completion for PostgreSQL
 
+2019-03-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 44168 (tweaked to remove modification to errflag):
+	Src/Zle/zle_main.c: Ignore bad return if errno EINTR as this is
+	recoverable.
+g
 2019-03-25  dana  <dana@dana.is>
 
 	* 44160 (tweaked): Completion/Debian/Command/_apt,

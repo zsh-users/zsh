@@ -632,7 +632,11 @@ raw_getbyte(long do_keytmout, char *cptr, int full)
 	     * with all fds, then try unsetting the special ones.
 	     */
 	    if (selret < 0 && !errtry) {
-		errtry = 1;
+		/* Continue after irrelevant interrupt */
+		if (errno != EINTR) {
+		    /* Don't trust special FDs */
+		    errtry = 1;
+		}
 		continue;
 	    }
 	    if (selret == 0) {
