@@ -1,3 +1,8 @@
+2019-04-01  dana  <dana@dana.is>
+
+	* 44158 (tweaked): Completion/Unix/Command/_postgresql: Add
+	completion for PostgreSQL
+
 2019-03-25  dana  <dana@dana.is>
 
 	* 44160 (tweaked): Completion/Debian/Command/_apt,
