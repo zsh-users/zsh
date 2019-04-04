@@ -45,6 +45,12 @@ unset _comp_priv_prefix
 # _precommand sets this to indicate we are following a precommand modifier
 local -a precommands
 
+# Precommands which allow their wrapped command to be a builtin.
+# All of these are necessarily builtins or reserved words themselves,
+# but not all builtin precommands are listed here:
+# for one, the 'command' builtin is excluded.
+local -ar builtin_precommands=(- builtin eval exec nocorrect noglob time)
+
 typeset -U _lastdescr _comp_ignore _comp_colors
 
 {

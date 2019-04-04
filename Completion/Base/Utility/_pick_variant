@@ -4,12 +4,6 @@ local output cmd pat pre
 local -a var
 local -A opts
 
-# Precommands which allow their wrapped command to be a builtin.
-# All of these are necessarily builtins or reserved words themselves,
-# but not all builtin precommands are listed here:
-# for one, the 'command' builtin is excluded.
-local -ar builtin_precommands=(- builtin eval exec nocorrect noglob time)
-
 (( $+_cmd_variant )) || typeset -gA _cmd_variant
 
 zparseopts -D -A opts b: c: r:

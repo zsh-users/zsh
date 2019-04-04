@@ -21,6 +21,8 @@ defs=(
 
 if [[ "$1" = -e ]]; then
   shift
+elif (( ${#precommands:|builtin_precommands} )); then
+  # precommand excludes internal options below
 else
   [[ "$1" = - ]] && shift
 

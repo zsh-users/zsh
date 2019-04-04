@@ -1,5 +1,12 @@
 2019-04-04  Matthew Martin  <phy1729@gmail.com>
 
+	* 44201: Completion/Base/Core/_main_complete,
+	Completion/Base/Utility/_pick_variant,
+	Completion/Linux/Command/_setsid,
+	Completion/Zsh/Command/_command,
+	Completion/Zsh/Type/_command_names: Check for external forcing
+	precommand.
+
 	* 44200 (tweaked): Completion/Base/Core/_normal,
 	Completion/Linux/Command/_setsid,
 	Completion/Zsh/Command/_builtin,
