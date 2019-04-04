@@ -1,5 +1,8 @@
 2019-04-04  Matthew Martin  <phy1729@gmail.com>
 
+	* 44202 (tweaked): Completion/Base/Core/_normal,
+	Doc/Zsh/compsys.yo: Add -P to reset precommands.
+
 	* 44201: Completion/Base/Core/_main_complete,
 	Completion/Base/Utility/_pick_variant,
 	Completion/Linux/Command/_setsid,

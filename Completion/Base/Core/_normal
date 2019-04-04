@@ -3,8 +3,9 @@
 local _comp_command1 _comp_command2 _comp_command precommand
 local -A opts
 
-zparseopts -A opts -D - p+:-=precommand s
+zparseopts -A opts -D - P p+:-=precommand s
 (( $+opts[-s] )) || _compskip=
+(( $+opts[-P] )) && precommands=()
 (( $#precommand )) && precommands+=(${precommand#-p})
 
 # Check for a history reference to complete modifiers.
