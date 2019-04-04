@@ -1,5 +1,12 @@
 2019-04-04  Matthew Martin  <phy1729@gmail.com>
 
+	* 44200 (tweaked): Completion/Base/Core/_normal,
+	Completion/Linux/Command/_setsid,
+	Completion/Zsh/Command/_builtin,
+	Completion/Zsh/Command/_command, Completion/Zsh/Command/_exec,
+	Completion/Zsh/Command/_precommand, Doc/Zsh/compsys.yo: Append
+	to precommands in _normal.
+
 	* 44199: Completion/Base/Core/_normal: Use zparseopts.
 
 2019-04-01  dana  <dana@dana.is>

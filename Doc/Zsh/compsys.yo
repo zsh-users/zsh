@@ -4658,7 +4658,7 @@ fi
 return ret)
 )
 findex(_normal)
-item(tt(_normal))(
+item(tt(_normal) [ tt(-p) var(precommand) ])(
 This is the standard function called to handle completion outside
 any special tt(-)var(context)tt(-).  It is called both to complete the command
 word and also the arguments for a command.  In the second case,
@@ -4668,10 +4668,17 @@ there is none it uses the completion for the tt(-default-) context.
 A second use is to reexamine the command line specified by the tt($words)
 array and the tt($CURRENT) parameter after those have been modified.
 For example, the function tt(_precommand), which
-completes after pre-command specifiers such as tt(nohup), removes the
+completes after precommand specifiers such as tt(nohup), removes the
 first word from the tt(words) array, decrements the tt(CURRENT) parameter,
-then calls tt(_normal) again.  The effect is that `tt(nohup) var(cmd ...)'
-is treated in the same way as `var(cmd ...)'.
+then calls `tt(_normal -p $service)'.  The effect is that
+`tt(nohup) var(cmd ...)' is treated in the same way as `var(cmd ...)'.
+
+startitem()
+item(tt(-p) var(precommand))(
+Append var(precommand) to the list of precommands. This option should be
+used in nearly all cases.
+)
+enditem()
 
 If the command name matches one of the patterns given by one of the
 options tt(-p) or tt(-P) to tt(compdef), the corresponding completion

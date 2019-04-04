@@ -1,9 +1,6 @@
 #compdef - nohup eval time rusage noglob nocorrect catchsegv aoss hilite eatmydata
 
-# precommands is made local in _main_complete
-precommands+=($words[1])
-
 shift words
 (( CURRENT-- ))
 
-_normal
+_normal -p $service

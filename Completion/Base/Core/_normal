@@ -1,10 +1,11 @@
 #compdef -command-line-
 
-local _comp_command1 _comp_command2 _comp_command
+local _comp_command1 _comp_command2 _comp_command precommand
 local -A opts
 
-zparseopts -A opts -D - s
+zparseopts -A opts -D - p+:-=precommand s
 (( $+opts[-s] )) || _compskip=
+(( $#precommand )) && precommands+=(${precommand#-p})
 
 # Check for a history reference to complete modifiers.
 # $PREFIX has a quoted form of the !, so we can't test that

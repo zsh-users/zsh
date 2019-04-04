@@ -1,11 +1,9 @@
 #compdef builtin
 
-precommands+=(builtin)
-
 if (( $CURRENT > 2 )); then
   shift words
   (( CURRENT -- ))
-  _normal
+  _normal -p $service
 else
   local expl
 

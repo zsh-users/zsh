@@ -1,7 +1,5 @@
 #compdef setsid
 
-[[ $service == setsid ]] && precommands+=( setsid )
-
 _arguments -s -S -A '-*' : \
   '(: * -)'{-h,--help}'[display help information]' \
   '(: * -)'{-V,--version}'[display version information]' \
@@ -9,4 +7,4 @@ _arguments -s -S -A '-*' : \
   '(-f --fork)'{-f,--fork}'[always fork]' \
   '(-w --wait)'{-w,--wait}'[wait for program to exit, and use same return code]' \
   '1: :_path_commands' \
-  '*:: : _normal'
+  '*:: : _normal -p $service'
