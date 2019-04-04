@@ -1,3 +1,7 @@
+2019-04-04  Matthew Martin  <phy1729@gmail.com>
+
+	* 44199: Completion/Base/Core/_normal: Use zparseopts.
+
 2019-04-01  dana  <dana@dana.is>
 
 	* 44158 (tweaked): Completion/Unix/Command/_postgresql: Add

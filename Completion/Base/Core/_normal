@@ -1,13 +1,10 @@
 #compdef -command-line-
 
-local _comp_command1 _comp_command2 _comp_command skip
+local _comp_command1 _comp_command2 _comp_command
+local -A opts
 
-if [[ "$1" = -s ]]; then
-  skip=(-s)
-else
-  skip=()
-  _compskip=''
-fi
+zparseopts -A opts -D - s
+(( $+opts[-s] )) || _compskip=
 
 # Check for a history reference to complete modifiers.
 # $PREFIX has a quoted form of the !, so we can't test that
@@ -37,5 +34,5 @@ fi
 
 _set_command
 
-_dispatch "$skip[@]" "$_comp_command" \
+_dispatch ${(k)opts[-s]} "$_comp_command" \
           "$_comp_command1" "$_comp_command2" -default-
