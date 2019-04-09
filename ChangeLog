@@ -1,5 +1,8 @@
 2019-04-10  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Eric Freese: 44214: Src/exec.c: <(...) substitutions shouldn't
+	grab the terminal.
+
 	* Roman Perepelitsa: 44215: Doc/Zsh/zle.yo,
 	Src/Zle/iwidgets.list, Src/Zle/zle.h, Src/Zle/zle_main.c,
 	Src/Zle/zle_thingy.c, Src/Zle/zle_utils.c, Src/Zle/zle_vi.c:

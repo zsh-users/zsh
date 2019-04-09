@@ -4984,7 +4984,7 @@ getpipe(char *cmd, int nullexec)
 	procsubstpid = pid;
 	return pipes[!out];
     }
-    entersubsh(ESUB_PGRP, NULL);
+    entersubsh(ESUB_ASYNC|ESUB_PGRP, NULL);
     redup(pipes[out], out);
     closem(FDT_UNUSED, 0);	/* this closes pipes[!out] as well */
     cmdpush(CS_CMDSUBST);
