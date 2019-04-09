@@ -1,5 +1,11 @@
 2019-04-10  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Roman Perepelitsa: 44215: Doc/Zsh/zle.yo,
+	Src/Zle/iwidgets.list, Src/Zle/zle.h, Src/Zle/zle_main.c,
+	Src/Zle/zle_thingy.c, Src/Zle/zle_utils.c, Src/Zle/zle_vi.c:
+	Maintain LASTWIDGET across reset-prompt, avoiding side effects
+	of asynchronous notifications.
+
 	* 44202: Src/Zle/compctl.c: Rewrite to use memmove()
 	for possibly overlapping copy.
 

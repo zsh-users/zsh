@@ -216,7 +216,7 @@ getvirange(int wf)
 	     * a number of lines is used.  If the function used
 	     * returns 1, we fail.
 	     */
-	    if ((k2 == bindk) ? dovilinerange() : execzlefunc(k2, zlenoargs, 1))
+	    if ((k2 == bindk) ? dovilinerange() : execzlefunc(k2, zlenoargs, 1, 0))
 		ret = -1;
 	    if (viinrepeat)
 		zmult = mult1;

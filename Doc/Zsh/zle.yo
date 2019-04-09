@@ -2415,9 +2415,12 @@ directory, or changes to the value of variables referred to by the
 prompt).
 
 Otherwise, the prompt is only expanded each time zle starts, and
-when the display as been interrupted by output from another part of the
+when the display has been interrupted by output from another part of the
 shell (such as a job notification) which causes the command line to be
 reprinted.
+
+tt(reset-prompt) doesn't alter the special parameter tt(LASTWIDGET).
+
 )
 tindex(send-break)
 item(tt(send-break) (tt(^G ESC-^G)) (unbound) (unbound))(

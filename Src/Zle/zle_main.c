@@ -1073,7 +1073,7 @@ redrawhook(void)
 	 * temporarily reset state for special variable handling etc.
 	 */
 	incompfunc = 0;
-	execzlefunc(initthingy, args, 1);
+	execzlefunc(initthingy, args, 1, 0);
 	incompfunc = old_incompfunc;
 
 	/* Restore errflag and retflag as zlecallhook() does */
@@ -1136,7 +1136,7 @@ zlecore(void)
 		eofsent = 1;
 		break;
 	    }
-	    if (execzlefunc(bindk, zlenoargs, 0)) {
+	    if (execzlefunc(bindk, zlenoargs, 0, 0)) {
 		handlefeep(zlenoargs);
 		if (eofsent)
 		    break;
@@ -1386,7 +1386,7 @@ execimmortal(Thingy func, char **args)
 {
     Thingy immortal = rthingy_nocreate(dyncat(".", func->nam));
     if (immortal)
-	return execzlefunc(immortal, args, 0);
+	return execzlefunc(immortal, args, 0, 0);
     return 1;
 }
 
@@ -1398,13 +1398,14 @@ execimmortal(Thingy func, char **args)
 
 /**/
 int
-execzlefunc(Thingy func, char **args, int set_bindk)
+execzlefunc(Thingy func, char **args, int set_bindk, int set_lbindk)
 {
     int r = 0, ret = 0, remetafy = 0;
     int nestedvichg = vichgflag;
     int isrepeat = (viinrepeat == 3);
     Widget w;
     Thingy save_bindk = bindk;
+    Thingy save_lbindk = lbindk;
 
     if (set_bindk)
 	bindk = func;
@@ -1412,6 +1413,8 @@ execzlefunc(Thingy func, char **args, int set_bindk)
 	unmetafy_line();
 	remetafy = 1;
     }
+    if (set_lbindk)
+	refthingy(save_lbindk);
     if (isrepeat)
 	viinrepeat = 2;
 
@@ -1535,7 +1538,10 @@ execzlefunc(Thingy func, char **args, int set_bindk)
 	    redup(osi, 0);
 	}
     }
-    if (r) {
+    if (set_lbindk) {
+	unrefthingy(lbindk);
+	lbindk = save_lbindk;
+    } else if (r) {
 	unrefthingy(lbindk);
 	refthingy(func);
 	lbindk = func;

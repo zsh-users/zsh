@@ -99,7 +99,7 @@
 "recursive-edit", recursiveedit, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
 "redisplay", redisplay, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
 "redo", redo, ZLE_KEEPSUFFIX
-"reset-prompt", resetprompt, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
+"reset-prompt", resetprompt, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL | ZLE_NOTCOMMAND | ZLE_NOLAST
 "reverse-menu-complete", reversemenucomplete, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_ISCOMP
 "run-help", processcmd, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
 "select-a-word", selectword, ZLE_KEEPSUFFIX

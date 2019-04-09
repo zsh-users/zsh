@@ -1733,7 +1733,7 @@ zlecallhook(char *name, char *arg)
 
     args[0] = arg;
     args[1] = NULL;
-    execzlefunc(thingy, args, 1);
+    execzlefunc(thingy, args, 1, 0);
     unrefthingy(thingy);
 
     /* Retain any user interrupt error status */

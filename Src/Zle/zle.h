@@ -217,6 +217,7 @@ struct widget {
 #define ZLE_ISCOMP      (1<<11)	/* usable for new style completion */
 #define WIDGET_INUSE    (1<<12) /* widget is in use */
 #define WIDGET_FREE     (1<<13) /* request to free when no longer in use */
+#define ZLE_NOLAST	(1<<14)	/* widget should not alter lbindk */
 
 /* thingies */
 

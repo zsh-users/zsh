@@ -703,7 +703,7 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 {
     Thingy t;
     struct modifier modsave = zmod;
-    int ret, saveflag = 0, setbindk = 0, remetafy;
+    int ret, saveflag = 0, setbindk = 0, setlbindk, remetafy;
     char *wname = *args++, *keymap_restore = NULL, *keymap_tmp;
 
     if (!wname)
@@ -787,7 +787,8 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
      * a vi range to detect a repeated key */
     setbindk = setbindk ||
 	(t->widget && (t->widget->flags & (WIDGET_INT | ZLE_VIOPER)) == WIDGET_INT);
-    ret = execzlefunc(t, args, setbindk);
+    setlbindk = t->widget && (t->widget->flags & ZLE_NOLAST) == ZLE_NOLAST;
+    ret = execzlefunc(t, args, setbindk, setlbindk);
     unrefthingy(t);
     if (saveflag)
 	zmod = modsave;
