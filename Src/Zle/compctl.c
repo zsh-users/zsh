@@ -3331,13 +3331,11 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    zlemetaline[end] = save;
 	    if (brend) {
 		Brinfo bp;
-		char *p;
-		int bl;
 
 		for (bp = brend; bp; bp = bp->next) {
-		    p = lpsuf + (we - zlemetacs) - bp->qpos -
-			(bl = strlen(bp->str));
-		    strcpy(p, p + bl);
+		    char *p2 = lpsuf + (we - zlemetacs) - bp->qpos;
+		    char *p1 = p2 - strlen(bp->str);
+		    memmove(p1, p2, strlen(p2) + 1);
 		}
 	    }
 	    if (!(lpsuf = strchr(lpsuf, '/')) && sf2)

@@ -1,3 +1,8 @@
+2019-04-10  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 44202: Src/Zle/compctl.c: Rewrite to use memmove()
+	for possibly overlapping copy.
+
 2019-04-10  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 44210: Completion/Linux/Command/_findmnt,
