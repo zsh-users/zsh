@@ -38,6 +38,10 @@ _arguments -C -s -S \
   '(* -)'{-V,--version}'[display version information]' && ret=0
 
 case $state in
+  columnlist)
+    compset -P '+' || _describe -t list-prefixes prefix \
+		      '( +:"not replace but extend the list" )' -S '' && ret=0
+  ;|
   *list)
     dedup=( ${(Ms.,.)PREFIX##*,} ${(Ms.,.)SUFFIX%%,*} )
     compset -S ',*' && suf=()
@@ -45,7 +49,7 @@ case $state in
   ;|
   column*)
     values=(
-      ${${${${(f)"$(_call_program columns lsblk -h)"}[(r)Available*,-3]## #}[2,-1]//:/\\:}/  /:}
+      ${${${${(f)"$(_call_program columns lsblk -h)"}[(r)Available*,-2]## #}[2,-1]//:/\\:}/  /:}
     )
     _describe -t fields column values -M 'm:{a-z}={A-Z}' $suf -F dedup && ret=0
   ;;

@@ -1,3 +1,8 @@
+2019-04-10  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 44210: Completion/Linux/Command/_findmnt,
+	Completion/Linux/Command/_lsblk: Add _findmnt and update _lsblk.
+
 2019-04-04  Matthew Martin  <phy1729@gmail.com>
 
 	* 44202 (tweaked): Completion/Base/Core/_normal,
