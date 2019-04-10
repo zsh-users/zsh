@@ -74,7 +74,7 @@ static struct builtin builtins[] =
     BUILTIN("fc", 0, bin_fc, 0, -1, BIN_FC, "aAdDe:EfiIlLmnpPrRt:W", NULL),
     BUILTIN("fg", 0, bin_fg, 0, -1, BIN_FG, NULL, NULL),
     BUILTIN("float", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "E:%F:%HL:%R:%Z:%ghlp:%rtux", "E"),
-    BUILTIN("functions", BINF_PLUSOPTS, bin_functions, 0, -1, 0, "kmMstTuUWx:z", NULL),
+    BUILTIN("functions", BINF_PLUSOPTS, bin_functions, 0, -1, 0, "ckmMstTuUWx:z", NULL),
     BUILTIN("getln", 0, bin_read, 0, -1, 0, "ecnAlE", "zr"),
     BUILTIN("getopts", 0, bin_getopts, 2, -1, 0, NULL, NULL),
     BUILTIN("hash", BINF_MAGICEQUALS, bin_hash, 0, -1, 0, "Ldfmrv", NULL),
@@ -3248,9 +3248,48 @@ bin_functions(char *name, char **argv, Options ops, int func)
 
     if ((off & PM_UNDEFINED) || (OPT_ISSET(ops,'k') && OPT_ISSET(ops,'z')) ||
 	(OPT_ISSET(ops,'x') && !OPT_HASARG(ops,'x')) ||
-	(OPT_MINUS(ops,'X') && (OPT_ISSET(ops,'m') || !scriptname))) {
+	(OPT_MINUS(ops,'X') && (OPT_ISSET(ops,'m') || !scriptname)) ||
+	(OPT_ISSET(ops,'c') && (OPT_ISSET(ops,'x') || OPT_ISSET(ops,'X') ||
+				OPT_ISSET(ops,'m')))) {
 	zwarnnam(name, "invalid option(s)");
 	return 1;
+    }
+
+    if (OPT_ISSET(ops,'c')) {
+	Shfunc newsh;
+	if (!*argv || !argv[1] || argv[2]) {
+	    zwarnnam(name, "-c: requires two arguments");
+	    return 1;
+	}
+	shf = (Shfunc) shfunctab->getnode(shfunctab, *argv);
+	if (!shf) {
+	    zwarnnam(name, "no such funciton: %s", *argv);
+	    return 1;
+	}
+	if (shf->node.flags & PM_UNDEFINED) {
+	    if (shf->funcdef) {
+		freeeprog(shf->funcdef);
+		shf->funcdef = &dummy_eprog;
+	    }
+	    shf = loadautofn(shf, 1, 0, 0);
+	    if (!shf)
+		return 1;
+	}
+	newsh = zalloc(sizeof(*newsh));
+	memcpy(newsh, shf, sizeof(*newsh));
+	if (newsh->node.flags & PM_LOADDIR) {
+	    /* Expand original location of autoloaded file */
+	    newsh->node.flags &= ~PM_LOADDIR;
+	    newsh->filename = tricat(shf->filename, "/", shf->node.nam);
+	} else
+	    newsh->filename = ztrdup(shf->filename);
+	newsh->funcdef->nref++;
+	if (newsh->redir)
+	    newsh->redir->nref++;
+	if (shf->sticky)
+	    newsh->sticky = sticky_emulation_dup(sticky, 0);
+	shfunctab->addnode(shfunctab, ztrdup(argv[1]), &newsh->node);
+	return 0;
     }
 
     if (OPT_ISSET(ops,'x')) {

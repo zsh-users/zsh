@@ -503,7 +503,7 @@
   not_trashed() { print This function was not trashed; }
   autoload -Uz /foo/bar/not_trashed
   not_trashed
-0:autoload with absolute path doesn't trash loaded function
+0:autoload with absolute path does not trash loaded function
 >This function was not trashed
 
   # keep spec from getting loaded in parent shell for simplicity
@@ -541,6 +541,73 @@
   )
 0:autoload containing dash
 >this should run automatically
+
+  tbc() {
+     print This function is called $0.
+  }
+  tbc
+  functions -c tbc newcopy
+  newcopy
+  unfunction tbc
+  newcopy
+0:functions -c
+>This function is called tbc.
+>This function is called newcopy.
+>This function is called newcopy.
+
+  (
+    fpath=(.)
+    print >tbc_auto 'print This autoloaded function is called $0.'
+    autoload -Uz tbc_auto
+    functions -c tbc_auto newcopy_auto
+    newcopy_auto
+    tbc_auto
+  )
+0:functions -c with autoload
+>This autoloaded function is called newcopy_auto.
+>This autoloaded function is called tbc_auto.
+
+  (
+    fpath=(.)
+    print >tbc_redef "print This is the core of the old function."
+    autoload -Uz tbc_redef
+    functions -c tbc_redef tbc_original
+    tbc_redef() {
+	print About to call the original.
+	tbc_original
+	print Stopped calling the original because once is enough.
+    }
+    tbc_redef
+  )
+0:function -c with redefinition
+>About to call the original.
+>This is the core of the old function.
+>Stopped calling the original because once is enough.
+
+  (
+    fpath=(.)
+    print >line_info '\nprint -P "%1x:%I is where we are."'
+    autoload -Uz line_info
+    functions -c line_info preserve_file
+    preserve_file
+  )
+0:functions -c preserves file information
+>line_info:2 is where we are.
+
+  (
+    fpath=(.)
+    print >func_info '\nprint -P "%N:%i is where we are."'
+    autoload -Uz func_info
+    functions -c func_info change_output
+    change_output
+  )
+0:functions -c updates non-file function information
+>change_output:2 is where we are.
+
+  autoload -Uz cant_autoload_for_copying
+  functions -c cant_autoload_for_copying not_copied
+1:functions -c gracefully rejects failed autoload
+?(eval):2: cant_autoload_for_copying: function definition file not found
 
 %clean
 

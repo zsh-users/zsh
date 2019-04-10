@@ -858,10 +858,11 @@ point numbers are not permitted.
 )
 findex(functions)
 xitem(tt(functions) [ {tt(PLUS())|tt(-)}tt(UkmtTuWz) ] [ tt(-x) var(num) ] [ var(name) ... ])
+xitem(tt(functions -c) var(oldfn) var(newfn))
 xitem(tt(functions -M) [tt(-s)] var(mathfn) [ var(min) [ var(max) [ var(shellfn) ] ] ])
 xitem(tt(functions -M) [ tt(-m) var(pattern) ... ])
 item(tt(functions +M) [ tt(-m) ] var(mathfn) ... )(
-Equivalent to tt(typeset -f), with the exception of the tt(-x),
+Equivalent to tt(typeset -f), with the exception of the tt(-c), tt(-x),
 tt(-M) and tt(-W) options.  For tt(functions -u) and tt(functions -U),
 see tt(autoload), which provides additional options.
 
@@ -874,6 +875,14 @@ The tt(-W) option turns on the option tt(WARN_NESTED_VAR) for the named
 function or functions only.  The option is turned off at the start of
 nested functions (apart from anonoymous functions) unless the called
 function also has the tt(-W) attribute.
+
+The tt(-c) option causes var(oldfn) to be copied to var(newfn).  The
+copy is efficiently handled internally by reference counting.  If
+var(oldfn) was marked for autoload it is first loaded and if this
+fails the copy fails.  Either function may subsequently be redefined
+without affecting the other.  A typical idiom is that var(oldfn) is the
+name of a library shell function which is then redefined to call
+tt(newfn), thereby installing a modified version of the function.
 
 Use of the tt(-M) option may not be combined with any of the options
 handled by tt(typeset -f).
