@@ -88,6 +88,21 @@ tt(AUTO_CD) option set) is not a directory, and does not begin with a
 slash, try to expand the expression as if it were preceded by a `tt(~)' (see
 noderef(Filename Expansion)).
 )
+pindex(CD_SILENT)
+pindex(NO_CD_SILENT)
+pindex(CDSILENT)
+pindex(NOCDSILENT)
+cindex(cd, silencing)
+cindex(autocd, silencing)
+item(tt(CD_SILENT))(
+Never print the working directory after a tt(cd) (whether explicit or
+implied with the tt(AUTO_CD) option set). tt(cd) normally prints the
+working directory when the argument given to it was tt(-), a stack entry, or
+the name of a directory found under tt(CDPATH). Note that this is distinct
+from tt(pushd)'s stack-printing behaviour, which is controlled by
+tt(PUSHD_SILENT). This option overrides the printing-related effects of
+tt(POSIX_CD).
+)
 pindex(CHASE_DOTS)
 pindex(NO_CHASE_DOTS)
 pindex(CHASEDOTS)

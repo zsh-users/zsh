@@ -720,7 +720,7 @@ bin_set(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 /**** directory-handling builtins ****/
 
 /**/
-int doprintdir = 0;		/* set in exec.c (for autocd) */
+int doprintdir = 0;		/* set in exec.c (for autocd, cdpath, etc.) */
 
 /* pwd: display the name of the current directory */
 
@@ -1251,7 +1251,7 @@ cd_new_pwd(int func, LinkNode dir, int quiet)
 	if (func != BIN_CD && isset(INTERACTIVE)) {
             if (unset(PUSHDSILENT) && !quiet)
 	        printdirstack();
-        } else if (doprintdir) {
+	} else if (unset(CDSILENT) && doprintdir) {
 	    fprintdir(pwd, stdout);
 	    putchar('\n');
 	}
