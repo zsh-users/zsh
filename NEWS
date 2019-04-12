@@ -4,8 +4,27 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
-Changes since 5.6.2
+Changes since 5.7.1
 -------------------
+
+The zsh/zutil module's zparseopts builtin learnt an -F option to abort
+parsing when an unrecognised option-like parameter is encountered.
+
+The zsh/files module gained a chmod builtin.
+
+Several changes have been made to the way completion functions track
+'precommands' (such as `command` and `env`) and determine whether the
+command being completed for is a shell builtin. Developers of completion
+functions may wish to familiarise themselves with `_normal -p` and
+`_pick_variant -b`.
+
+The option CD_SILENT was added to suppress all output from cd (whether
+explicit or implicit with AUTO_CD). It is disabled by default.
+
+Changes from 5.6.2 to 5.7.1
+---------------------------
+
+There are only minor changes between 5.7 and 5.7.1.
 
 Support for 24-bit true color terminals has been added. Hex triplets
 can be used when specifying colours for prompts and line editor

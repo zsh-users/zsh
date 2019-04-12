@@ -1,5 +1,7 @@
 2019-04-12  dana  <dana@dana.is>
 
+	* unposted: NEWS: Document recent feature additions
+
 	* 44198: Doc/Zsh/options.yo, Src/builtin.c, Src/options.c,
 	Src/zsh.h: Add cd_silent option to suppress all cd output
 
