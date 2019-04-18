@@ -1075,10 +1075,10 @@ putstr(int d)
 mod_export void
 countprompt(char *str, int *wp, int *hp, int overf)
 {
-    int w = 0, h = 1;
+    int w = 0, h = 1, multi = 0;
     int s = 1;
 #ifdef MULTIBYTE_SUPPORT
-    int wcw, multi = 0;
+    int wcw;
     char inchar;
     mbstate_t mbs;
     wchar_t wc;
@@ -1087,7 +1087,12 @@ countprompt(char *str, int *wp, int *hp, int overf)
 #endif
 
     for (; *str; str++) {
-	if (w > zterm_columns && overf >= 0) {
+	/*
+	 * Avoid double-incrementing the height when there's a newline in the
+	 * prompt and the line it terminates takes up exactly the width of the
+	 * terminal
+	 */
+	if (w >= zterm_columns && overf >= 0 && !multi && *str != '\n') {
 	    w = 0;
 	    h++;
 	}

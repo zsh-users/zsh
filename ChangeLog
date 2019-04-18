@@ -1,3 +1,7 @@
+2019-04-18  Mikael Magnusson  <mikachu@gmail.com>
+
+	* dana: 43288: Src/prompt.c: fix line-broken prompts
+
 2019-04-12  dana  <dana@dana.is>
 
 	* unposted: NEWS: Document recent feature additions
