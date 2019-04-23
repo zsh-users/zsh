@@ -17,7 +17,7 @@ done
 if (( ${#precommands:|builtin_precommands} )); then
   pre=command
 elif (( $+opts[-b] && ( $precommands[(I)builtin] || $+builtins[$opts[-c]] ) )); then
-  (( $+opts[-r] )) && eval "${opts[-r]}=$opts[-b]"
+  (( $+opts[-r] )) && : ${(P)opts[-r]::=$opts[-b]}
   return 0
 elif (( $precommands[(I)builtin] )); then
   pre=builtin
@@ -28,7 +28,7 @@ else
 fi
 
 if [[ $pre != builtin ]] && (( $+_cmd_variant[$opts[-c]] )); then
-  (( $+opts[-r] )) && eval "${opts[-r]}=${_cmd_variant[$opts[-c]]}"
+  (( $+opts[-r] )) && : ${(P)opts[-r]::=${_cmd_variant[$opts[-c]]}}
   [[ $_cmd_variant[$opts[-c]] = "$1" ]] && return 1
   return 0
 fi
@@ -37,13 +37,13 @@ output="$(_call_program variant $pre $opts[-c] "${@[2,-1]}" </dev/null 2>&1)"
 
 for cmd pat in "$var[@]"; do
   if [[ $output = *$~pat* ]]; then
-    (( $+opts[-r] )) && eval "${opts[-r]}=$cmd"
+    (( $+opts[-r] )) && : ${(P)opts[-r]::=$cmd}
     _cmd_variant[$opts[-c]]="$cmd"
     return 0
   fi
 done
 
-(( $+opts[-r] )) && eval "${opts[-r]}=$1"
+(( $+opts[-r] )) && : ${(P)opts[-r]::=$1}
 [[ $pre != builtin ]] && _cmd_variant[$opts[-c]]="$1"
 
 return 1

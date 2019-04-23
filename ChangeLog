@@ -1,5 +1,8 @@
 2019-04-22  Matthew Martin  <phy1729@gmail.com>
 
+	* unposted: Completion/Base/Utility/_pick_variant: Use
+	${(P) ::= rather than eval.
+
 	* 44242: Completion/Unix/Command/_chown,
 	Completion/Unix/Command/_ln, Completion/Unix/Command/_mv,
 	Completion/Unix/Command/_rm, Completion/Unix/Command/_rmdir:
