@@ -1,3 +1,8 @@
+2019-04-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 44248: Src/init.c: Mark SIGQUIT as ignored if ignored at
+	shell start, so we don't enable it after a fork.
+
 2019-04-25  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 44254: Src/compat.c: make quite sure we've reached "/"

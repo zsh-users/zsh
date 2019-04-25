@@ -1234,6 +1234,15 @@ init_signals(void)
 
     intr();
 
+#ifdef POSIX_SIGNALS
+    {
+	struct sigaction act;
+	if (!sigaction(SIGQUIT, NULL, &act) &&
+	    act.sa_handler == SIG_IGN)
+	    sigtrapped[SIGQUIT] = ZSIG_IGNORED;
+    }
+#endif
+
 #ifndef QDEBUG
     signal_ignore(SIGQUIT);
 #endif
