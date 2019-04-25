@@ -361,8 +361,18 @@ zgetdir(struct dirsav *d)
 	pino = sbuf.st_ino;
 	pdev = sbuf.st_dev;
 
-	/* If they're the same, we've reached the root directory. */
+	/* If they're the same, we've reached the root directory... */
 	if (ino == pino && dev == pdev) {
+	    /*
+	     * ...well, probably.  If this was an orphaned . after
+	     * an unmount, or something such, we could be in trouble...
+	     */
+	    if (stat("/", &sbuf) < 0 ||
+		sbuf.st_ino != ino ||
+		sbuf.st_dev != dev) {
+		zerr("Failed to get current directory: path invalid");
+		return NULL;
+	    }
 	    if (!buf[pos])
 		buf[--pos] = '/';
 	    if (d) {
