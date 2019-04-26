@@ -1,4 +1,4 @@
-#compdef rmdir grmdir
+#compdef rmdir grmdir zf_rmdir
 
 local variant
 local -a args

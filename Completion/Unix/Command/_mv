@@ -1,4 +1,4 @@
-#compdef mv gmv
+#compdef mv gmv zf_mv
 
 local args variant
 

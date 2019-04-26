@@ -2,6 +2,11 @@
 
 	* 44234: Completion/Unix/Command/_ssh: Update for OpenSSH 8.0
 
+	* 44249: Completion/Unix/Command/_mv,
+	Completion/Unix/Command/_rmdir,
+	Completion/Unix/Type/_directories: Handle zsh/files built-ins
+	in _mv and _rmdir
+
 2019-04-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 44248: Src/init.c: Mark SIGQUIT as ignored if ignored at
