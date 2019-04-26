@@ -8,8 +8,8 @@ _ssh () {
   typeset -A opt_args
 
   common=(
-    '(-6)-4[forces ssh to use IPv4 addresses only]'
-    '(-4)-6[forces ssh to use IPv6 addresses only]'
+    '(-6)-4[force ssh to use IPv4 addresses only]'
+    '(-4)-6[force ssh to use IPv6 addresses only]'
     '-C[compress data]'
     '-c+[select encryption cipher]:encryption cipher:->ciphers'
     '-F+[specify alternate config file]:config file:_files'
@@ -17,6 +17,7 @@ _ssh () {
     '*-o+[specify extra options]:option string:->option'
   )
   common_transfer=(
+    '-J+[connect via a jump host]: :->userhost'
     '-l+[limit used bandwidth]:bandwidth (Kbit/s)'
     '-P+[specify port on remote host]:port number on remote host'
     '-p[preserve modification times, access times and modes]'
@@ -75,6 +76,7 @@ _ssh () {
     _arguments -C -s \
       '-3[copy through local host, not directly between the remote hosts]' \
       '-B[batch mode (don'\''t ask for passphrases)]' \
+      '-T[disable strict filename checking]' \
       '*:file:->file' "$common[@]" "$common_transfer[@]" && ret=0
     ;;
   ssh-add)
@@ -95,6 +97,8 @@ _ssh () {
       '-M+[specify maximum number of signatures]:number' \
       '-s+[add keys provided by the PKCS#11 shared library]:library:_files -g "*.(so|dylib)(|.<->)(-.)"' \
       '-t+[set maximum lifetime for identity]:maximum lifetime (in seconds or time format):' \
+      "-T[test usability of identity files' private keys]" \
+      '-v[verbose mode]' \
       '-q[be quiet after a successful operation]' \
       '-X[unlock the agent]' \
       '-x[lock the agent with a password]' \
@@ -103,7 +107,7 @@ _ssh () {
     ;;
   ssh-agent)
     _arguments -s \
-      '(-k)-a+[UNIX-domain socket to bind agent to]:UNIX-domain socket:_files' \
+      '(-k)-a+[specify UNIX-domain socket to bind agent to]:UNIX-domain socket:_files' \
       '(-k -s)-c[force csh-style shell]' \
       '(-k)-d[debug mode]' \
       '(-k)-D[foreground mode]' \
@@ -112,6 +116,7 @@ _ssh () {
       '(-k)-P[specify PKCS#11 shared library whitelist]:PKCS#11 library whitelist pattern' \
       '(-k -c)-s[force sh-style shell]' \
       '-t[set default maximum lifetime for identities]:maximum lifetime (in seconds or time format):' \
+      '-v[verbose mode]' \
       '*::command: _normal'
     return
     ;;
@@ -193,8 +198,8 @@ _ssh () {
   ;;
   ssh-keyscan)
     _arguments \
-      '(-6)-4[forces ssh to use IPv4 addresses only]' \
-      '(-4)-6[forces ssh to use IPv6 addresses only]' \
+      '(-6)-4[force ssh to use IPv4 addresses only]' \
+      '(-4)-6[force ssh to use IPv6 addresses only]' \
       '-c[request certificates from target hosts instead of plain keys]' \
       '*-f+[read hosts from file, one per line]:file:_files' \
       '-H[hash all hostnames and addresses in the output]' \
@@ -212,7 +217,7 @@ _ssh () {
       '-D+[connect directly to a local sftp server]:sftp server path' \
       '-f[request that files be flushed immediately after transfer]' \
       '-R+[specify number of outstanding requests]:number of requests [64]' \
-      '-s+[SSH2 subsystem or path to sftp server on the remote host]:subsystem/path' \
+      '-s+[specify SSH2 subsystem or path to sftp server on the remote host]:subsystem/path' \
       '1:file:->rfile' '*:file:->file' "$common[@]" "$common_transfer[@]" && ret=0
     ;;
   ssh-copy-id)
