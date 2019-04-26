@@ -29,4 +29,4 @@ esac
 
 _arguments -s -S $aopts \
   $args \
-  '*:directories:_directories'
+  '*: :_directories'

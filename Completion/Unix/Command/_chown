@@ -27,7 +27,7 @@ case "$variant" in
     ;;
   *)
     args=(
-      '-h[operate on symlinks them self]'
+      '-h[operate on symlinks themselves]'
       '-R[change files and directories recursively]'
     )
     ;|

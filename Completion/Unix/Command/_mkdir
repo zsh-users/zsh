@@ -40,7 +40,7 @@ _arguments -C -s -S $aopts $args && ret=0
 case "$state" in
   directories)
     _wanted directories expl \
-      'parent directory (alternatively specify name of directory)' \
+      'parent directory or name of directory to create' \
       _path_files -/ && ret=0
   ;;
 esac

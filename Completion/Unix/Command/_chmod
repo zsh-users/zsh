@@ -43,7 +43,7 @@ case "$variant" in
     ;|
   freebsd*|netbsd*|darwin*|dragonfly*)
     args+=(
-      '-h[operate on symlinks them self]'
+      '-h[operate on symlinks themselves]'
     )
     ;|
   freebsd*|openbsd*|netbsd*|darwin*|dragonfly*)
@@ -55,11 +55,11 @@ case "$variant" in
     ;|
   darwin*)
     args+=(
-      '(1)-C[returns false if any of the named files have ACLs]'
+      '(1)-C[return false if any specified files have ACLs]'
       '(1)-N[remove ACLs from specified files]'
-      '(1)-E[read ACL info from stdin as a sequential list of ACEs]'
-      '(1)-i[removes inherited bit from all entries in named files ACLs]'
-      '(1)-I[removes all inherited entries from named files ACLs]'
+      '(1)-E[read ACL info from stdin as sequential list of ACEs]'
+      "(1)-i[remove inherited bit from all entries in specified files' ACLs]"
+      "(1)-I[remove all inherited entries from specified files' ACLs]"
     )
     ;;
 esac

@@ -52,4 +52,4 @@ case $variant; in
 esac
 
 _arguments -s -S $aopts $args \
-  '*:file:_files'
+  '*: :_files'
