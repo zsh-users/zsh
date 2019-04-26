@@ -3,7 +3,7 @@
 local curcontext="$curcontext" state line ret=1 variant
 local -A opt_args
 
-local -a args opts
+local -a args opts=( -A '-*' )
 args=(
   '(-i)-f[remove existing destination files]'
   '-s[create symbolic links instead of hard links]'
@@ -12,7 +12,7 @@ args=(
 _pick_variant -r variant -b zsh gnu=gnu $OSTYPE --help
 case $variant; in
   gnu)
-    opts=(-S)
+    opts=()
     args=(
       '(-b --backup)-b[create a backup of each existing destination file]' \
       '(-b --backup)--backup=[create a backup of each existing destination file]::method:((
@@ -70,7 +70,7 @@ case $variant; in
     ;;
 esac
 
-_arguments -C -s $opts : \
+_arguments -C -s -S $opts : \
   $args \
   ':link target:_files' \
   '*:: :->files' && ret=0

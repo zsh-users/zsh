@@ -1,11 +1,12 @@
 #compdef chown chgrp gchown=chown gchgrp=chgrp zf_chown=chown zf_chgrp=chgrp
 
 local curcontext="$curcontext" state line expl ret=1 variant
-local suf usr grp req deref pattern arg args
+local suf usr grp req deref pattern arg args aopts=( -A '-*' )
 
 _pick_variant -r variant -b zsh gnu=Free\ Soft $OSTYPE --version
 case "$variant" in
   gnu)
+    aopts=()
     args=(
       '(-c --changes -v --verbose)'{-c,--changes}'[report each change made]'
       '(-c --changes -v --verbose)'{-v,--verbose}'[output info for every file processed]'
@@ -65,7 +66,7 @@ case "$variant" in
 esac
 
 (( $+words[(r)--reference*] )) || args+=( '(--reference)1: :->owner' )
-_arguments -C -s "$args[@]" '*: :->files' && ret=0
+_arguments -C -s -S $aopts "$args[@]" '*: :->files' && ret=0
 
 case $state in
   owner)

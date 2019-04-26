@@ -1,10 +1,11 @@
 #compdef mv gmv zf_mv
 
-local args variant
+local args variant aopts=( -A '-*' )
 
 _pick_variant -r variant -b zsh gnu=GNU $OSTYPE --version
 case $variant; in
   gnu)
+    aopts=()
     args=(
       '(-b --backup -n --no-clobber)--backup=[make a backup of each existing destination file]: : _values "backup type"
         {none,off}"[never make backups]"
@@ -50,5 +51,5 @@ case $variant; in
     ;;
 esac
 
-_arguments -s -S $args \
+_arguments -s -S $aopts $args \
   '*:file:_files'

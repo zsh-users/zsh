@@ -1,12 +1,13 @@
 #compdef mkdir gmkdir zf_mkdir
 
-local curcontext="$curcontext" state line expl args variant ret=1
+local curcontext="$curcontext" variant ret=1
+local -a state line expl args aopts=( -A '-*' )
 typeset -A opt_args
 
 args=(
   '(-m --mode)'{-m,--mode=}'[set permission mode]: :_file_modes'
   '(-p --parents)'{-p,--parents}'[make parent directories as needed]'
-  '(-)*: :->directories'
+  '*: :->directories'
 )
 
 _pick_variant -r variant -b zsh gnu=gnu $OSTYPE --help
@@ -18,6 +19,7 @@ case $variant in
     )
   ;|
   gnu)
+    aopts=()
     if [[ $OSTYPE == linux* ]]; then
       args+=(
         '(-Z --context)'{-Z,--context=}'[set SELinux context]:SELinux context'
@@ -33,7 +35,7 @@ case $variant in
   ;;
 esac
 
-_arguments -C -s $args && ret=0
+_arguments -C -s -S $aopts $args && ret=0
 
 case "$state" in
   directories)

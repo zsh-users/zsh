@@ -1,7 +1,7 @@
 #compdef chmod gchmod zf_chmod
 
 local curcontext="$curcontext" state line expl ret=1 variant
-local -a args privs
+local -a args privs aopts=( -A '-*' )
 
 args=( '*: :->files' '1: :_file_modes' )
 
@@ -17,6 +17,7 @@ case "$variant" in
     )
     ;;
   gnu)
+    aopts=()
     args+=(
       '(-v --verbose -c --changes)'{-c,--changes}'[report changes made]'
       '(-v --verbose -c --changes)'{-v,--verbose}'[output a diagnostic for every file processed]'
@@ -63,7 +64,7 @@ case "$variant" in
     ;;
 esac
 
-_arguments -C -s "$args[@]" && ret=0
+_arguments -C -s -S $aopts "$args[@]" && ret=0
 
 case "$state" in
   files)

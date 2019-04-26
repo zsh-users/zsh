@@ -1,7 +1,7 @@
 #compdef rm grm zf_rm
 
 local variant
-declare -a opts args
+declare -a args opts=( -A '-*' )
 args=(
   '(-f --force)'{-f,--force}'[ignore nonexistent files, never prompt]'
   '(-I --interactive)-i[prompt before every removal]'
@@ -11,7 +11,7 @@ args=(
 _pick_variant -r variant -b zsh gnu=gnu $OSTYPE --help
 case $variant; in
   gnu)
-    opts+=(-S)
+    opts=()
     args+=(
       '(-i --interactive)-I[prompt when removing many files]'
       '(-i -I)--interactive=-[prompt under given condition (defaulting to always)]::when:((once\:"prompt when removing many files"
@@ -64,7 +64,7 @@ esac
 local curcontext=$curcontext state line ret=1
 declare -A opt_args
 
-_arguments -C -s $opts \
+_arguments -C -s -S $opts \
   $args && ret=0
 
 case $state in
