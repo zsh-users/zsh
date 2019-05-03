@@ -425,7 +425,7 @@ execwhile(Estate state, UNUSED(int do_exec))
         breaks--;
 
         simple_pline = old_simple_pline;
-    } else
+    } else {
         for (;;) {
             state->pc = loop;
             noerrexit = NOERREXIT_EXIT | NOERREXIT_RETURN;
@@ -445,8 +445,11 @@ execwhile(Estate state, UNUSED(int do_exec))
 		    lastval = oldval;
                 break;
             }
-            if (retflag)
+            if (retflag) {
+		if (breaks)
+		    breaks--;
                 break;
+	    }
 
 	    /* In case the loop body is also a functional no-op,
 	     * make sure signal handlers recognize ^C as above. */
@@ -470,6 +473,7 @@ execwhile(Estate state, UNUSED(int do_exec))
             freeheap();
             oldval = lastval;
         }
+    }
     cmdpop();
     popheap();
     loops--;

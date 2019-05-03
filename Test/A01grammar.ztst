@@ -640,6 +640,16 @@
 >1
 >0
 
+  echo 'echo dot
+  until return 42; do
+    :
+  done' >until_dot
+  . ./until_dot
+  echo After dot
+0:return in positive until test in dot file does not cause excess breaks
+>dot
+>After dot
+
   echo 'echo $?' >dot_status
   false
   . ./dot_status
