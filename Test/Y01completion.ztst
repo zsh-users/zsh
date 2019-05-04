@@ -99,6 +99,7 @@ F:regression test workers/31611
     comptesteval 'cd "A(B)/C"'
     comptest $'cd ../\t'
   } always {
+    comptesteval 'cd -' # Reset CWD
     rmdir 'A(B)/C' 'A(B)'
   }
 0:directory name is not a glob qualifier
@@ -115,6 +116,27 @@ F:regression test workers/31611
   comptest $'tst \t'
 0:allow for suffixes when moving cursor to end of match (without ignored suffix)
 >line: {tst word:/}{}
+
+# Test for regression introduced by workers/41242, raised in workers/43842
+  {
+    mkdir sortnobslash
+    touch sortnobslash/{'!foo','#foo','\foo','|foo','~foo',Afoo,bfoo}
+    comptesteval 'old_LC_ALL=$LC_ALL; LC_ALL=C'
+    comptest $': sortnobslash/\t'
+  } always {
+    comptesteval 'LC_ALL=$old_LC_ALL'
+    rm -rf sortnobslash
+  }
+0:ignore backslashes when sorting completion matches
+>line: {: sortnobslash/}{}
+>DESCRIPTION:{file}
+>FI:{\!foo}
+>FI:{\#foo}
+>FI:{Afoo}
+>FI:{\\foo}
+>FI:{bfoo}
+>FI:{\|foo}
+>FI:{\~foo}
 
 %clean
 

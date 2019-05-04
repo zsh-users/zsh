@@ -33,6 +33,9 @@
 /* Flag for direction of sort: 1 forwards, -1 reverse */
 static int sortdir;
 
+/* Flag that sort ignores backslashes */
+static int sortnobslash;
+
 /* Flag that sort is numeric */
 static int sortnumeric;
 
@@ -113,9 +116,24 @@ eltpcmp(const void *a, const void *b)
 	bs += (laststarta - as);
 	as += (laststarta - as);
     }
+
+   if (sortnobslash) {
+	while (*as && *bs) {
+	    if (*as == '\\')
+		as++;
+	    if (*bs == '\\')
+		bs++;
+	    if (*as != *bs || !*as)
+		break;
+	    as++;
+	    bs++;
+	}
+    }
+
 #ifdef HAVE_STRCOLL
     cmp = strcoll(as, bs);
 #endif
+
     if (sortnumeric) {
 	for (; *as == *bs && *as; as++, bs++);
 #ifndef HAVE_STRCOLL
@@ -162,7 +180,10 @@ mod_export int
 zstrcmp(const char *as, const char *bs, int sortflags)
 {
     struct sortelt ae, be, *aeptr, *beptr;
-    int oldsortdir = sortdir, oldsortnumeric = sortnumeric, ret;
+    int oldsortdir = sortdir;
+    int oldsortnobslash = sortnobslash;
+    int oldsortnumeric = sortnumeric;
+    int ret;
 
     ae.cmp = as;
     be.cmp = bs;
@@ -173,11 +194,13 @@ zstrcmp(const char *as, const char *bs, int sortflags)
     beptr = &be;
 
     sortdir = 1;
+    sortnobslash = (sortflags & SORTIT_IGNORING_BACKSLASHES) ? 1 : 0;
     sortnumeric = (sortflags & SORTIT_NUMERICALLY) ? 1 : 0;
 
     ret = eltpcmp(&aeptr, &beptr);
 
     /* Paranoia: I don't think we ever need to restore these. */
+    sortnobslash = oldsortnobslash;
     sortnumeric = oldsortnumeric;
     sortdir = oldsortdir;
 
