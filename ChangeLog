@@ -1,3 +1,8 @@
+2019-05-06  Laurent Arnoud  <laurent@spkdev.net>
+
+	* github #35 (tweaked): Completion/Unix/Command/_gem: fix
+	_arguments spec for gem push completion
+
 2019-05-03  dana  <dana@dana.is>
 
 	* 44267: Src/sort.c, Test/Y01completion.ztst: Restore option to

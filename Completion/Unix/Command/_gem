@@ -56,7 +56,7 @@ if [[ $state = command ]]; then
     check|cleanup|contents|dependency|list|open|pristine|rdoc|uninstall|unpack|update)
       args+=( '(--all --skip)*:installed gem:->gems-local' )
     ;|
-    fetch|install|lock|owner|push|search|yank)
+    fetch|install|lock|owner|search|yank)
       args+=( '*:gem:->gems-remote' )
     ;|
     cleanup|uninstall)
@@ -214,7 +214,7 @@ if [[ $state = command ]]; then
       )
     ;;
     push)
-      args+=( '*:gem:_files -g "*.gem(-.)"' )
+      args+=( '1:gem file:_files -g "*.gem(-.)"' )
     ;;
     query)
       args+=(
