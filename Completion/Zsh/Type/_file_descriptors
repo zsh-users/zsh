@@ -56,4 +56,4 @@ fi
 fds=( 0 1 2 $fds )
 
 _description -V file-descriptors expl 'file descriptor'
-compadd $disp "${@/-J/-V}" "$expl[@]" -a fds
+compadd $disp -o nosort "$@" "$expl[@]" -a fds

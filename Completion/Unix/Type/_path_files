@@ -59,7 +59,7 @@ exppaths=()
 zparseopts -a mopts \
     'P:=pfx' 'S:=pfxsfx' 'q=pfxsfx' 'r:=pfxsfx' 'R:=pfxsfx' \
     'W:=prepaths' 'F:=ignore' 'M+:=matcher' \
-    J+: V+: X+: 1 2 n 'f=tmp1' '/=tmp1' 'g+:-=tmp1'
+    J+: V+: x+: X+: 1 2 o+: n 'f=tmp1' '/=tmp1' 'g+:-=tmp1'
 
 sopt="-${(@j::M)${(@)tmp1#-}#?}"
 (( $tmp1[(I)-[/g]*] )) && haspats=yes
@@ -168,7 +168,7 @@ if zstyle -s ":completion:${curcontext}:" file-sort tmp1; then
   if [[ "$sort" = on ]]; then
     sort=
   else
-    mopts=( "${(@)mopts/#-J/-V}" )
+    mopts=( -o nosort "${mopts[@]}" )
 
     tmp2=()
     for tmp1 in "$pats[@]"; do

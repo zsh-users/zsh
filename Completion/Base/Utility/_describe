@@ -108,10 +108,10 @@ while _tags; do
         fi
     
         if [[ -n $_mats ]]; then
-          compadd "$_opts[@]" "${(@)_expl:/-J/-2V}" -D $_strs -O $_mats - \
+          compadd "$_opts[@]" -2 -o nosort "${_expl[@]}" -D $_strs -O $_mats - \
                   "${(@)${(@M)${(@P)_mats}##([^:\\]|\\?)##}//\\(#b)(?)/$match[1]}"
         else
-          compadd "$_opts[@]" "${(@)_expl:/-J/-2V}" -D $_strs - \
+          compadd "$_opts[@]" -2 -o nosort "${_expl[@]}" -D $_strs - \
                   "${(@)${(@M)${(@P)_strs}##([^:\\]|\\?)##}//\\(#b)(?)/$match[1]}"
         fi
       done

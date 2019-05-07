@@ -446,12 +446,13 @@ startitem()
 findex(compadd)
 cindex(completion widgets, adding specified matches)
 redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ @ @ ))ifnztexi(        )))
-xitem(tt(compadd )[ tt(-akqQfenUlo12C) ] [ tt(-F) var(array) ])
+xitem(tt(compadd )[ tt(-akqQfenUl12C) ] [ tt(-F) var(array) ])
 xitem(SPACES()[tt(-P) var(prefix) ] [ tt(-S) var(suffix) ])
 xitem(SPACES()[tt(-p) var(hidden-prefix) ] [ tt(-s) var(hidden-suffix) ])
 xitem(SPACES()[tt(-i) var(ignored-prefix) ] [ tt(-I) var(ignored-suffix) ])
 xitem(SPACES()[tt(-W) var(file-prefix) ] [ tt(-d) var(array) ])
-xitem(SPACES()[tt(-J) var(name) ] [ tt(-V) var(name) ] [ tt(-X) var(explanation) ] [ tt(-x) var(message) ])
+xitem(SPACES()[tt(-J) var(group-name) ] [ tt(-X) var(explanation) ] [ tt(-x) var(message) ])
+xitem(SPACES()[tt(-V) var(group-name) ] [ tt(-o) [ var(order) ] ])
 xitem(SPACES()[tt(-r) var(remove-chars) ] [ tt(-R) var(remove-func) ])
 xitem(SPACES()[tt(-D) var(array) ] [ tt(-O) var(array) ] [ tt(-A) var(array) ])
 xitem(SPACES()[tt(-E) var(number) ])
@@ -540,18 +541,40 @@ This option only has an effect if used together with the tt(-d)
 option. If it is given, the display strings are listed one per line,
 not arrayed in columns.
 )
-item(tt(-o))(
-This option only has an effect if used together with the tt(-d)
-option.  If it is given, the order of the output is determined by the
-match strings;  otherwise it is determined by the display strings
-(i.e. the strings given by the tt(-d) option).
+item(tt(-o) [ var(order) ])(
+This controls the order in which matches are sorted. var(order) is a
+comma-separated list comprising the following possible values.  These values
+can be abbreviated to their initial two or three characters.  Note that the
+order forms part of the group name space so matches with different orderings
+will not be in the same group.
+
+startitem()
+item(tt(match))(
+If given, the order of the output is determined by the match strings;
+otherwise it is determined by the display strings (i.e. the strings given
+by the tt(-d) option). This is the default if `tt(-o)' is specified but
+the var(order) argument is omitted.
 )
-item(tt(-J) var(name))(
+item(tt(nosort))(
+This specifies that the matches are pre-sorted and their order should be
+preserved.  This value only makes sense alone and cannot be combined with any
+others.
+)
+item(tt(numeric))(
+If the matches include numbers, sort them numerically rather than
+lexicographically.
+)
+item(tt(reverse))(
+Arrange the matches backwards by reversing the sort ordering.
+)
+enditem()
+)
+item(tt(-J) var(group-name))(
 Gives the name of the group of matches the words should be stored in.
 )
-item(tt(-V) var(name))(
-Like tt(-J) but naming an unsorted group. These are in a different name
-space than groups created with the tt(-J) flag.
+item(tt(-V) var(group-name))(
+Like tt(-J) but naming an unsorted group. This option is identical to
+the combination of tt(-J) and tt(-o nosort).
 )
 item(tt(-1))(
 If given together with the tt(-V) option, makes

@@ -558,12 +558,53 @@ parse_class(Cpattern p, char *iptr)
     return iptr;
 }
 
+static struct { char *name; int abbrev; int oflag; } orderopts[] = {
+    { "nosort", 2, CAF_NOSORT },
+    { "match", 3, CAF_MATSORT },
+    { "numeric", 3, CAF_NUMSORT },
+    { "reverse", 3, CAF_REVSORT }
+};
+
+/* Parse the option to compadd -o, if flags is non-NULL set it
+ * returns -1 if the argument isn't a valid ordering, 0 otherwise */
+
+/**/
+static int
+parse_ordering(const char *arg, int *flags)
+{
+    int o, fl = 0;
+    const char *next, *opt = arg;
+    do {
+	int found = 0;
+	next = strchr(opt, ',');
+	if (!next)
+	    next = opt + strlen(opt);
+
+	for (o = sizeof(orderopts)/sizeof(*orderopts) - 1; o >= 0 &&
+		!found; --o)
+	{
+	    if ((found = next - opt >= orderopts[o].abbrev &&
+	            !strncmp(orderopts[o].name, opt, next - opt)))
+		fl |= orderopts[o].oflag;
+	}
+	if (!found) {
+	    if (flags) /* default to "match" */
+		*flags = CAF_MATSORT;
+	    return -1;
+	}
+    } while (*next && ((opt = next + 1)));
+    if (flags)
+	*flags |= fl;
+    return 0;
+}
+
 /**/
 static int
 bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 {
     struct cadata dat;
     char *mstr = NULL; /* argument of -M options, accumulated */
+    char *oarg = NULL; /* argument of -o option */
     int added; /* return value */
     Cmatcher match = NULL;
 
@@ -572,7 +613,7 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	return 1;
     }
     dat.ipre = dat.isuf = dat.ppre = dat.psuf = dat.prpre = dat.mesg =
-	dat.pre = dat.suf = dat.group = dat.rems = dat.remf = dat.disp = 
+	dat.pre = dat.suf = dat.group = dat.rems = dat.remf = dat.disp =
 	dat.ign = dat.exp = dat.apar = dat.opar = dat.dpar = NULL;
     dat.match = NULL;
     dat.flags = 0;
@@ -587,6 +628,7 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	}
 	for (p = *argv + 1; *p; p++) {
 	    char *m = NULL; /* argument of -M option (this one only) */
+	    int order = 0;  /* if -o found (argument to which is optional) */
 	    char **sp = NULL; /* the argument to an option should be copied
 				 to *sp. */
 	    const char *e; /* error message */
@@ -710,7 +752,11 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		dat.flags |= CMF_DISPLINE;
 		break;
 	    case 'o':
-		dat.flags |= CMF_MORDER;
+		/* we honour just the first -o option but need to skip
+		 * over a valid argument to subsequent -o options */
+		order = oarg ? -1 : 1;
+		sp = &oarg;
+		/* no error string because argument is optional */
 		break;
 	    case 'E':
                 if (p[1]) {
@@ -741,15 +787,18 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    if (sp) {
 		if (p[1]) {
 		    /* Pasted argument: -Xfoo. */
-		    if (!*sp)
+		    if (!*sp) /* take first option only */
 			*sp = p + 1;
-		    p += strlen(p+1);
+		    if (!order || !parse_ordering(oarg, order == 1 ? &dat.aflags : NULL))
+			p += strlen(p+1);
 		} else if (argv[1]) {
 		    /* Argument in a separate word: -X foo. */
 		    argv++;
 		    if (!*sp)
 			*sp = *argv;
-		} else {
+		    if (order && parse_ordering(oarg, order == 1 ? &dat.aflags : NULL))
+			--argv;
+		} else if (!order) {
 		    /* Missing argument: argv[N] == "-X", argv[N+1] == NULL. */
 		    zwarnnam(name, e, *p);
 		    zsfree(mstr);

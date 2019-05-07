@@ -1,5 +1,21 @@
 2019-05-07  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 44274: Completion/Base/Core/_description,
+	Completion/Base/Utility/_describe, Completion/Base/Utility/_guard,
+	Completion/Base/Utility/_multi_parts,
+	Completion/Base/Utility/_sep_parts,
+	Completion/Base/Utility/_sequence, Completion/Zsh/Command/_compadd,
+	Completion/Darwin/Type/_mac_files_for_application,
+	Completion/Redhat/Command/_yum, Completion/Unix/Command/_git,
+	Completion/Unix/Type/_canonical_paths,
+	Completion/Unix/Type/_baudrates, Completion/Unix/Type/_files,
+	Completion/Unix/Type/_list_files, Completion/Unix/Type/_path_files,
+	Completion/Zsh/Type/_file_descriptors,
+	Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo, NEWS,
+	Src/Zle/comp.h, Src/Zle/compcore.c, Src/Zle/complete.c:
+	allow finer control of completion match soring with
+	arguments to compadd's -o option
+
 	* Gautam Iyer: gitlab !6: Completion/Unix/Command/_rclone:
 	Rudimentary rclone completion
 

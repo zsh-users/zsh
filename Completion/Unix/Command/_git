@@ -5688,7 +5688,7 @@ __git_ignore_line () {
 __git_ignore_line_inside_arguments () {
   declare -a compadd_opts
 
-  zparseopts -D -E -a compadd_opts V: J: 1 2 n f X: M: P: S: r: R: q F:
+  zparseopts -D -E -a compadd_opts V+: J+: 1 2 o+: n f x+: X+: M+: P: S: r: R: q F:
 
   __git_ignore_line $* $compadd_opts
 }
@@ -6160,7 +6160,7 @@ __git_ref_fields () {
   local match mbegin mend
   local -a cfields fields append opts all
 
-  zparseopts -D -E -a opts x: X: J: V: a=all
+  zparseopts -D -E -a opts M+: x+: X+: J+: V+: o+: 1 2 a=all
 
   if compset -P 1 '(#b)(*):'; then
     case $match[1] in
@@ -6731,7 +6731,7 @@ __git_tags_of_type () {
   tags=(${${(M)${(f)"$(_call_program ${(q)type}-tag-refs "git for-each-ref --format='%(*objecttype)%(objecttype) %(refname)' refs/tags 2>/dev/null")"}:#$type(tag|) *}#$type(tag|) refs/tags/})
   __git_command_successful $pipestatus || return 1
 
-  _wanted $type-tags expl "$type tag" compadd -M 'r:|/=* r:|=*' "$@" -a - tags
+  _wanted $type-tags expl "$type tag" compadd -M 'r:|/=* r:|=*' "$@" -o numeric -a - tags
 }
 
 # Reference Argument Types
@@ -6826,7 +6826,7 @@ __git_files_relative () {
 __git_files () {
   local compadd_opts opts tag description gitcdup gitprefix files expl
 
-  zparseopts -D -E -a compadd_opts V: J: 1 2 n f X: M: P: S: r: R: q F:
+  zparseopts -D -E -a compadd_opts V+: J+: 1 2 o+: n f x+: X+: M+: P: S: r: R: q F:
   zparseopts -D -E -a opts -- -cached -deleted -modified -others -ignored -unmerged -killed x+: --exclude+:
   tag=$1 description=$2; shift 2
 
@@ -6957,7 +6957,7 @@ __git_tree_files () {
     shift
   fi
 
-  zparseopts -D -E -a compadd_opts V: J: 1 2 n f X: M: P: S: r: R: q F:
+  zparseopts -D -E -a compadd_opts V+: J+: 1 2 o+: n f x+: X+: M+: P: S: r: R: q F:
 
   [[ "$1" == */ ]] && Path="$1" || Path="${1:h}/"
   shift
@@ -7037,7 +7037,7 @@ __git_any_repositories_or_references () {
 __git_guard () {
   declare -A opts
 
-  zparseopts -K -D -A opts M: J: V: 1 2 n F: X:
+  zparseopts -K -D -A opts M+: J+: V+: 1 2 o+: n F: x+: X+:
 
   [[ "$PREFIX$SUFFIX" != $~1 ]] && return 1
 
@@ -7075,7 +7075,7 @@ __git_guard_diff-stat-width () {
 __git_guard_number () {
   declare -A opts
 
-  zparseopts -K -D -A opts M: J: V: 1 2 n F: X:
+  zparseopts -K -D -A opts M+: J+: V+: 1 2 o+: n F: x+: X+:
 
   _guard '[[:digit:]]#' ${1:-number}
 }

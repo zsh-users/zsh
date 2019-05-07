@@ -14,9 +14,13 @@ _arguments -C -s -S -A "-*" \
   '(-a)-k[matches are keys of specified associative arrays]' \
   '-d+[specify display strings]:array:_parameters -g "*array*"' \
   '-l[list display strings one per line, not in columns]' \
-  '-o[order matches by match string not by display string]' \
-  '(-1 -E)-J+[specify match group which will be sorted]:group' \
-  '-V+[specify pre-ordered match group]:group' \
+  '-o[specify order for matches by match string not by display string]:: : _values -s , order
+    "match[order by match not by display string]"
+    "nosort[matches are pre-ordered]"
+    "numeric[order numerically]"
+    "reverse[order backwards]"' \
+  '(-1 -E)-J+[specify match group]:group' \
+  '!-V+:group' \
   '(-J -E)-1[remove only consecutive duplicates from group]' \
   '-2[preserve all duplicates]' \
   '(-x)-X[specify explanation]:explanation' \
@@ -45,7 +49,7 @@ if [[ -n $state ]]; then
   elif (( $+opt_args[-k] )); then
     _parameters -g "*assoc*" && ret=0
   else
-    _message -e candidate candidates
+    _message -e candidates candidate
   fi
 fi
 

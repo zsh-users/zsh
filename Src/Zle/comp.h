@@ -90,6 +90,9 @@ struct cmgroup {
 #define CGF_PACKED  32		/* LIST_PACKED for this group */
 #define CGF_ROWS    64		/* LIST_ROWS_FIRST for this group */
 #define CGF_FILES   128		/* contains file names */
+#define CGF_MATSORT 256		/* sort by match rather than by display string */
+#define CGF_NUMSORT 512		/* sort numerically */
+#define CGF_REVSORT 1024	/* sort in reverse */
 
 /* This is the struct used to hold matches. */
 
@@ -300,6 +303,9 @@ struct menuinfo {
 #define CAF_ARRAYS  32    /* compadd -a or -k: array/assoc parameter names */
 #define CAF_KEYS    64    /* compadd -k: assoc parameter names */
 #define CAF_ALL    128    /* compadd -C: _all_matches */
+#define CAF_MATSORT 256   /* compadd -o match: sort by match rather than by display string */
+#define CAF_NUMSORT 512   /* compadd -o numeric: sort numerically */
+#define CAF_REVSORT 1024  /* compadd -o numeric: sort in reverse */
 
 /* Data for compadd and addmatches() */
 

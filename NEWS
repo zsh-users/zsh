@@ -21,6 +21,11 @@ functions may wish to familiarise themselves with `_normal -p` and
 The option CD_SILENT was added to suppress all output from cd (whether
 explicit or implicit with AUTO_CD). It is disabled by default.
 
+The compadd builtin's -o option now takes an optional argument to
+specify the order of completion matches. This affects the display
+of candidate matches and the order in which they are selected when
+cycling between them using menu completion.
+
 Changes from 5.6.2 to 5.7.1
 ---------------------------
 

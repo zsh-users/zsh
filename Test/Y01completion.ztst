@@ -138,6 +138,46 @@ F:regression test workers/31611
 >FI:{\|foo}
 >FI:{\~foo}
 
+  comptesteval "_tst() { compadd -onum,rev -J versions r1.10 r1.1 r1.2 r2.3 r2.34 }"
+  comptest $'tst r\t'
+0:reverse numeric sorting of matches
+>line: {tst r}{}
+>NO:{r2.34}
+>NO:{r2.3}
+>NO:{r1.10}
+>NO:{r1.2}
+>NO:{r1.1}
+
+  comptesteval "_tst() { local expl; _wanted times expl time compadd -o match r1.10 r1.2 r2.3 r2.34 }"
+  comptesteval "zstyle ':completion:*:tst:*' sort reverse numeric"
+  comptest $'tst r\t'
+0:reverse numeric sorting of matches via a style
+>line: {tst r}{}
+>DESCRIPTION:{time}
+>NO:{r2.34}
+>NO:{r2.3}
+>NO:{r1.10}
+>NO:{r1.2}
+
+  comptesteval "_tst() { local disp=(a b c); compadd -o -J letters -d disp 3 2 1 }"
+  comptest $'tst \t'
+0:sort in match rather than display name order
+>line: {tst }{}
+>NO:{c}
+>NO:{b}
+>NO:{a}
+
+  comptesteval "_tst() { local expl; _wanted times expl time compadd 3am 12pm 3pm 10pm }"
+  comptesteval "zstyle ':completion:*:tst:*' sort false"
+  comptest $'tst \t'
+0:sorting disabled via the sort style
+>line: {tst }{}
+>DESCRIPTION:{time}
+>NO:{3am}
+>NO:{12pm}
+>NO:{3pm}
+>NO:{10pm}
+
 %clean
 
   zmodload -ui zsh/zpty

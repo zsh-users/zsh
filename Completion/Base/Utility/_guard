@@ -2,7 +2,7 @@
 
 local garbage
 
-zparseopts -K -D -a garbage M: J: V: 1 2 n F: X:
+zparseopts -K -D -a garbage M+: J+: V+: 1 2 o+: n F: X+:
 
 [[ "$PREFIX$SUFFIX" != $~1 ]] && return 1
 

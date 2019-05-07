@@ -35,7 +35,7 @@ _mac_parse_info_plist() {
 # Try to complete files for the specified application.
 _mac_files_for_application() {
   local -a opts
-  zparseopts -D -a opts q n 1 2 P: S: r: R: W: X+: M+: F: J+: V+:
+  zparseopts -D -a opts q n 1 2 o+: P: S: r: R: W: x+: X+: M+: F: J+: V+:
 
   local app_path
   _retrieve_mac_apps

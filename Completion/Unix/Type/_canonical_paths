@@ -5,13 +5,14 @@
 # (relative path when an absolute path is given, and vice versa; when ..'s are
 # present in the word to be completed, and some paths got from symlinks).
 
-# Usage: _canonical_paths [-A var] [-N] [-MJV12nfX] tag desc [paths...]
+# Usage: _canonical_paths [-A var] [-N] [-MJV12onfX] tag desc [paths...]
 
 # -A, if specified, takes the paths from the array variable specified. Paths
 # can also be specified on the command line as shown above. -N, if specified,
 # prevents canonicalizing the paths given before using them for completion, in
 # case they are already so. `tag' and `desc' arguments are well, obvious :) In
-# addition, the options -M, -J, -V, -1, -2, -n, -F, -X are passed to compadd.
+# addition, the options -M, -J, -V, -1, -2, -o, -n, -F, -x, -X are passed to
+# compadd.
 
 _canonical_paths_add_paths () {
   # origpref = original prefix
@@ -59,7 +60,7 @@ _canonical_paths() {
   local __index
   typeset -a __gopts __opts
 
-  zparseopts -D -a __gopts M: J: V: 1 2 n F: X: A:=__opts N=__opts
+  zparseopts -D -a __gopts M+: J+: V+: o+: 1 2 n F: x+: X+: A:=__opts N=__opts
 
   : ${1:=canonical-paths} ${2:=path}
 

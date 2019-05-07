@@ -64,6 +64,6 @@ for f in ${(PQ)1}; do
  ${(r:8:)stat[gid]} ${(l:8:)stat[size]} $stat[mtime] $f")
 done
 
-(( ${#listfiles} )) && listopts=(-d listfiles -l -o)
+(( ${#listfiles} )) && listopts=(-d listfiles -l -o match)
 
 return 0

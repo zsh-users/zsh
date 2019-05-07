@@ -2080,6 +2080,9 @@ addmatches(Cadata dat, char **argv)
 
         /* Select the group in which to store the matches. */
         gflags = (((dat->aflags & CAF_NOSORT ) ? CGF_NOSORT  : 0) |
+                  ((dat->aflags & CAF_MATSORT) ? CGF_MATSORT : 0) |
+                  ((dat->aflags & CAF_NUMSORT) ? CGF_NUMSORT : 0) |
+                  ((dat->aflags & CAF_REVSORT) ? CGF_REVSORT : 0) |
                   ((dat->aflags & CAF_UNIQALL) ? CGF_UNIQALL : 0) |
                   ((dat->aflags & CAF_UNIQCON) ? CGF_UNIQCON : 0));
         if (dat->group) {
@@ -3034,8 +3037,9 @@ begcmgroup(char *n, int flags)
 		HEAP_ERROR(p->heap_id);
 	    }
 #endif
-	    if (p->name &&
-		flags == (p->flags & (CGF_NOSORT|CGF_UNIQALL|CGF_UNIQCON)) &&
+	    if (p->name && flags ==
+		(p->flags & (CGF_NOSORT|CGF_UNIQALL|CGF_UNIQCON|
+			     CGF_MATSORT|CGF_NUMSORT|CGF_REVSORT)) &&
 		!strcmp(n, p->name)) {
 		mgroup = p;
 
@@ -3118,32 +3122,35 @@ addexpl(int always)
 
 /* The comparison function for matches (used for sorting). */
 
+static int matchorder;
+
 /**/
 static int
 matchcmp(Cmatch *a, Cmatch *b)
 {
-    if ((*a)->disp && !((*a)->flags & CMF_MORDER)) {
-	if ((*b)->disp) {
-	    if ((*a)->flags & CMF_DISPLINE) {
-		if ((*b)->flags & CMF_DISPLINE)
-		    return strcmp((*a)->disp, (*b)->disp);
-		else
-		    return -1;
-	    } else {
-		if ((*b)->flags & CMF_DISPLINE)
-		    return 1;
-		else
-		    return strcmp((*a)->disp, (*b)->disp);
-	    }
-	}
-	return -1;
-    }
-    if ((*b)->disp && !((*b)->flags & CMF_MORDER))
-	return 1;
+    const char *as, *bs;
+    int cmp = !!(*b)->disp - !!(*a)->disp;
+    int sortdir = (matchorder & CGF_REVSORT) ? -1 : 1;
 
-    return zstrcmp((*a)->str, (*b)->str, (SORTIT_IGNORING_BACKSLASHES|
-					  (isset(NUMERICGLOBSORT) ?
-					   SORTIT_NUMERICALLY : 0)));
+    /* if match sorting selected or we have no display strings */
+    if ((matchorder & CGF_MATSORT) || (!cmp && !(*a)->disp)) {
+	as = (*a)->str;
+	bs = (*b)->str;
+    } else {
+        if (cmp) /* matches with display strings come first */
+	    return cmp;
+
+	cmp = ((*b)->flags & CMF_DISPLINE) - ((*a)->flags & CMF_DISPLINE);
+        if (cmp) /* sort one-per-line display strings first */
+	    return cmp;
+
+	as = (*a)->disp;
+	bs = (*b)->disp;
+    }
+
+    return sortdir * zstrcmp(as, bs, SORTIT_IGNORING_BACKSLASHES|
+	    ((isset(NUMERICGLOBSORT) ||
+	    matchorder & CGF_NUMSORT) ? SORTIT_NUMERICALLY : 0));
 }
 
 /* This tests whether two matches are equal (would produce the same
@@ -3205,6 +3212,7 @@ makearray(LinkList l, int type, int flags, int *np, int *nlp, int *llp)
     } else {
 	if (!(flags & CGF_NOSORT)) {
 	    /* Now sort the array (it contains matches). */
+	    matchorder = flags;
 	    qsort((void *) rp, n, sizeof(Cmatch),
 		  (int (*) _((const void *, const void *)))matchcmp);
 

@@ -2534,20 +2534,20 @@ is started, making it easy to select either of them.
 )
 kindex(sort, completion style)
 item(tt(sort))(
-Many completion widgets call tt(_description) at some point which
-decides whether the matches are added sorted or unsorted (often
-indirectly via tt(_wanted) or tt(_requested)).  This style can be set
-explicitly to one of the usual `true' or `false' values as an override.
-If it is not set for the context, the standard behaviour of the
-calling widget is used.
+This allows the standard ordering of matches to be overridden.
+
+If its value is `tt(true)' or `tt(false)', sorting is enabled or disabled.
+Additionally the values associated with the `tt(-o)' option to tt(compadd) can
+also be listed: tt(match), tt(nosort), tt(numeric), tt(reverse).  If it is not
+set for the context, the standard behaviour of the calling widget is used.
 
 The style is tested first against the full context including the tag, and
 if that fails to produce a value against the context without the tag.
 
-If the calling widget explicitly requests unsorted matches, this is usually
-honoured.  However, the default (unsorted) behaviour of completion
-for the command history may be overridden by setting the style to
-`true'.
+In many cases where a calling widget explicitly selects a particular ordering
+in lieu of the default, a value of `tt(true)' is not honoured.  An example of
+where this is not the case is for command history where the default of sorting
+matches chronologically may be overridden by setting the style to `true'.
 
 In the tt(_expand) completer, if it is set to
 `true', the expansions generated will always be sorted.  If it is set
@@ -4404,11 +4404,11 @@ convention is not enforced).  The description for the corresponding set
 of matches is passed to the function in var(descr).
 
 The styles tested are: tt(format), tt(hidden), tt(matcher),
-tt(ignored-patterns) and tt(group-name).  The tt(format) style is first
-tested for the given var(tag) and then for the tt(descriptions) tag if
-no value was found, while the remainder are only tested for the tag
-given as the first argument.  The function also calls tt(_setup)
-which tests some more styles.
+tt(ignore-line), tt(ignored-patterns), tt(group-name) and tt(sort).
+The tt(format) style is first tested for the given var(tag) and then for
+the tt(descriptions) tag if no value was found, while the remainder are
+only tested for the tag given as the first argument.  The function also
+calls tt(_setup) which tests some more styles.
 
 The string returned by the tt(format) style (if any) will be modified so
 that the sequence `tt(%d)' is replaced by the var(descr) given as the third

@@ -14,8 +14,8 @@ typeset -U tmp1 matches
 # Get the options.
 
 zparseopts -D -a sopts \
-    'J+:=group' 'V+:=group' 'X+:=expl' 'P:=opts' 'F:=opts' \
-    S: r: R: q 1 2 n f 'M+:=matcher' 'i=imm'
+    'J+:=group' 'V+:=group' 'x+:=expl' 'X+:=expl' 'P:=opts' 'F:=opts' \
+    S: r: R: q 1 2 o+: n f 'M+:=matcher' 'i=imm'
 
 sopts=( "$sopts[@]" "$opts[@]" )
 if (( $#matcher )); then

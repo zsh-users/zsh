@@ -27,7 +27,7 @@ local opts tmp glob pat pats expl tag i def descr end ign tried
 local type sdef ignvars ignvar prepath oprefix rfiles rfile
 
 zparseopts -a opts \
-    '/=tmp' 'f=tmp' 'g+:-=tmp' q n 1 2 P: S: r: R: W: X+: M+: F: J+: V+:
+    '/=tmp' 'f=tmp' 'g+:-=tmp' q n 1 2 P: S: r: R: W: x+: X+: M+: F: J+: V+: o+:
 
 type="${(@j::M)${(@)tmp#-}#?}"
 if (( $tmp[(I)-g*] )); then
