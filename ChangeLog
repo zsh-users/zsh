@@ -1,5 +1,8 @@
 2019-09-26  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* Gautam Iyer: gitlab !9: Completion/Unix/Command/_seafile:
+	Rudimentary seafile client completion
+
 	* Doron Behar: gitlab !11: Completion/Unix/Command/_luarocks:
 	Fix/improve logic of cache validation
 
