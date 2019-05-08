@@ -6,7 +6,7 @@
   langs=(en_{US,GB}.{UTF-,utf}8 en.UTF-8
          $(locale -a 2>/dev/null | egrep 'utf8|UTF-8'))
   for LANG in $langs; do
-    if [[ ?? = ? ]]; then
+    if [[ é = ? ]]; then
       ZSH_TEST_LANG=$LANG
       break;
     fi
@@ -139,11 +139,11 @@ F:regression test workers/31611
     ZTST_skip="no UTF-8 locale for multibyte completion test"
   else
     comptesteval '_tst() { compset -p 1; _message "${(qq)IPREFIX} ${(qq)PREFIX}" }'
-    comptest $'tst ???100\t'
+    comptest $'tst €100\t'
   fi
 0:remove multibyte character from a prefix
->line: {tst ???100}{}
->MESSAGE:{'???' '100'}
+>line: {tst €100}{}
+>MESSAGE:{'€' '100'}
 
   comptesteval "_tst() { compadd -U -s : -S / -I . word; compstate[to_end]= }"
   comptest $'tst .\C-b\t'

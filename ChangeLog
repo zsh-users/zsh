@@ -14,6 +14,8 @@
 
 2019-05-08  dana  <dana@dana.is>
 
+	* unposted: Test/Y01completion.ztst: Fix bad encoding
+
 	* Oliver Kiddle: unposted: Test/Y01completion.ztst: Add compset tests
 	related to workers/44275
 
