@@ -1,6 +1,16 @@
 # Tests for completion system.
 
 %prep
+  unset -m LC_\*
+  ZSH_TEST_LANG=
+  langs=(en_{US,GB}.{UTF-,utf}8 en.UTF-8
+         $(locale -a 2>/dev/null | egrep 'utf8|UTF-8'))
+  for LANG in $langs; do
+    if [[ ?? = ? ]]; then
+      ZSH_TEST_LANG=$LANG
+      break;
+    fi
+  done
   if [[ $OSTYPE = cygwin ]]; then
     ZTST_unimplemented="the zsh/zpty module does not work on Cygwin"
   elif ( zmodload zsh/zpty 2>/dev/null ); then
@@ -106,6 +116,34 @@ F:regression test workers/31611
 >line: {cd "A(B)/}{}
 >line: {cd "A(B)/C/}{}
 >line: {cd ../C/}{}
+
+  comptesteval '_tst() { compset -p 1; _message "${(qq)IPREFIX} ${(qq)PREFIX}" }'
+  comptest $'tst .\t'
+0:remove exact number of characters from a prefix
+>line: {tst .}{}
+>MESSAGE:{'.' ''}
+
+  comptesteval '_tst() { compset -s 3; _message "${(qq)SUFFIX} ${(qq)ISUFFIX}" }'
+  comptest $'tst 123\eb\t'
+0:remove exact number of characters from a suffix
+>line: {tst }{123}
+>MESSAGE:{'' '123'}
+
+  comptesteval '_tst() { compset -p 2; compset -p 3;compset -s 2;compset -s 3; _message "${(qq)PREFIX} ${(qq)SUFFIX}" }'
+  comptest $'tst 12345678\e4\C-b\t'
+0:try to remove excess characters from prefix and suffix
+>line: {tst 1234}{5678}
+>MESSAGE:{'34' '56'}
+
+  if [[ -z $ZSH_TEST_LANG ]]; then
+    ZTST_skip="no UTF-8 locale for multibyte completion test"
+  else
+    comptesteval '_tst() { compset -p 1; _message "${(qq)IPREFIX} ${(qq)PREFIX}" }'
+    comptest $'tst ???100\t'
+  fi
+0:remove multibyte character from a prefix
+>line: {tst ???100}{}
+>MESSAGE:{'???' '100'}
 
   comptesteval "_tst() { compadd -U -s : -S / -I . word; compstate[to_end]= }"
   comptest $'tst .\C-b\t'

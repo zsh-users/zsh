@@ -1,5 +1,8 @@
 2019-05-08  dana  <dana@dana.is>
 
+	* Oliver Kiddle: unposted: Test/Y01completion.ztst: Add compset tests
+	related to workers/44275
+
 	* 44275: Doc/Zsh/compwid.yo, Src/Zle/complete.c: Fix compset -p/-s
 	multibyte inconsistency and documentation
 
