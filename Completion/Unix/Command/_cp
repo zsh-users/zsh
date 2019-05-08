@@ -53,7 +53,7 @@ else
     'solaris2.<11->*' '-/[preserve extended attributes and extended system attributes]' \
     '(darwin|dragonfly|freebsd)*' "(-f -i)-n[don't overwrite existing file]" \
     'netbsd*' "-N[don't copy file flags]" \
-    '(darwin|dragonfly|freebsd|netbsd)*' '-a[archive mode, same as -RpP]' \
+    '(darwin|dragonfly|freebsd|netbsd|openbsd)*' '-a[archive mode, same as -RpP]' \
     '(dragonfly|freebsd)*' '-l[link files instead of copying]' \
     '(darwin|dragonfly|*bsd)*' '-v[show file names as they are copied]' \
     'darwin*' "-X[don't copy extended attributes or resource forks]" \

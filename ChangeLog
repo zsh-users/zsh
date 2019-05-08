@@ -1,3 +1,17 @@
+2019-05-08  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 44279: Completion/BSD/Command/_cu, Completion/BSD/Command/_gstat,
+	Completion/BSD/Command/_procstat, Completion/BSD/Command/_signify,
+	Completion/BSD/Command/_sockstat, Completion/BSD/Command/_vmctl,
+	Completion/Unix/Command/_arp, Completion/Unix/Command/_arping,
+	Completion/Unix/Command/_cp, Completion/Unix/Command/_date,
+	Completion/Unix/Command/_gcore, Completion/Unix/Command/_install,
+	Completion/Unix/Command/_ls, Completion/Unix/Command/_netstat,
+	Completion/Unix/Command/_ping, Completion/Unix/Command/_script,
+	Completion/Unix/Command/_tcpdump, Completion/Unix/Command/_top,
+	Completion/Unix/Command/_vmstat, Completion/Unix/Command/_zpool:
+	completion updates for Dragonfly 5.4, FreeBSD 12 and OpenBSD 6.5
+
 2019-05-08  dana  <dana@dana.is>
 
 	* Oliver Kiddle: unposted: Test/Y01completion.ztst: Add compset tests
@@ -21,7 +35,7 @@
 	Completion/Zsh/Type/_file_descriptors,
 	Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo, NEWS,
 	Src/Zle/comp.h, Src/Zle/compcore.c, Src/Zle/complete.c:
-	allow finer control of completion match soring with
+	allow finer control of completion match sorting with
 	arguments to compadd's -o option
 
 	* Gautam Iyer: gitlab !6: Completion/Unix/Command/_rclone:

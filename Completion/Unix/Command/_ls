@@ -81,10 +81,14 @@ if ! _pick_variant gnu=gnu unix --help; then
   if [[ $OSTYPE = (dragonfly*|freebsd*) ]]; then
     arguments+=(
       '(-A)-I[prevent -A from being automatically set for the super-user]'
+      '(-1 -C -m -x)-D+[specify format for date]:format: _date_formats'
     )
   fi
   if [[ $OSTYPE = dragonfly* ]]; then
-    arguments+=( '-y[display FSMID in long listing]' )
+    arguments+=(
+      '-_[use GMT based date and time output with nanotime timestamp]'
+      '-y[display FSMID in long listing]'
+    )
   fi
   if [[ $OSTYPE = (freebsd*|darwin*) ]]; then
     arguments+=( '(-c -u)-U[file creation time]' )
@@ -92,9 +96,9 @@ if ! _pick_variant gnu=gnu unix --help; then
   if [[ $OSTYPE = freebsd* ]]; then
     arguments+=(
       '-,[print file sizes grouped and separated by thousands]'
-      '-D+[specify format for date]:format: _date_formats'
       '-y[with -t, sort filenames in the same order as the time]'
       '-Z[display MAC label]'
+      '--color=-[control use of color]:color:(never always auto)'
     )
   fi
   if [[ $OSTYPE = darwin* ]]; then

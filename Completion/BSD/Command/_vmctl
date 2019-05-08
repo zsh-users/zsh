@@ -29,6 +29,7 @@ subcommands=(
   start:'start a VM'
   stop:'stop a VM'
   unpause:'resume a VM'
+  wait:'wait until specified VM has stopped'
 )
 
 if (( CURRENT == 2 )); then
@@ -37,7 +38,7 @@ else
   local curcontext="${curcontext%:*}-${words[2]}:"
   shift words; (( CURRENT-- ))
   case $words[1] in
-    console|pause|send|show|status|unpause)
+    console|pause|send|show|status|unpause|wait)
       _vm_names
       ;;
     create)
@@ -50,7 +51,8 @@ else
 	shift words; (( CURRENT-- ))
 	_arguments \
 	  '-s+[specify size]:size' \
-	  '-b+[specify base disk]:base image:_files'
+          '(-i)-b+[specify base disk]:base image:_files'
+          '(-b)-i+[copy and convert input disk]:disk image:_files'
       fi
       ;;
     load)
@@ -75,14 +77,15 @@ else
       else
         shift words; (( CURRENT-- ))
         _arguments -s \
+          '-B+[force system to boot from specified device for this boot]:device:(cdrom disk net)' \
           '-b+[boot with the specified kernel or BIOS image]:boot image:_files' \
           '-c[automatically connect to the VM console]' \
           '*-d+[disk image file]:disk image:_files' \
           '-i+[number of network interfaces]:number: ' \
           '-L[add a local network interface]' \
-          '-m+[memory size in megabytes]:megabytes: ' \
+          '-m+[specify memory size]:memory size (megabytes) [512]' \
           '-n+[specify switch to attach]: :_vm_switches' \
-	  '-r+[ISO image file for virtual CD-ROM]:ISO image:_files' \
+          '-r+[specify ISO image file for virtual CD-ROM]:ISO image:_files -g "*.iso(-.)"' \
 	  '-t+[use existing VM as a template]: :_vm_names'
       fi
     ;;
@@ -97,6 +100,9 @@ else
 	  '-f[forcefully stop without attempting a graceful shutdown]' \
 	  '-w[wait until the VM has been terminated]'
       fi
+    ;;
+    *)
+      _default
     ;;
   esac
 fi

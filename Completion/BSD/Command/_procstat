@@ -6,8 +6,10 @@ _arguments -s -A "-*" -S \
   '-e[show environment variables]' \
   '-f[show file descriptor information]' \
   '-i[show signal pending and disposition]' \
+  '-j[show signal pending and blocked information for process threads]' \
   '-k[show stacks of kernel threads]' \
   '-l[show resource limits]' \
+  "-L[show LWP info for the process pertaining to it's signal driven exit]" \
   '-r[show resource usage]' \
   '-s[show security credential information]' \
   '-S[show cpuset information]' \

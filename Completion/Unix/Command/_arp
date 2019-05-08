@@ -38,8 +38,6 @@ case $OSTYPE in
   ;;
   darwin*|freebsd*|dragonfly*)
     cmds+=( '(-n -i)-S[create an arp entry, replacing any existing entry]' )
-  ;|
-  darwin*|freebsd*)
     args+=( '(-s -Q -f)-i+[select an interface]:interface:_net_interfaces' )
   ;|
   darwin*)

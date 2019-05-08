@@ -14,7 +14,7 @@ _zpool() {
 	)
 
 	if [[ $implementation = openzfs ]] && [[ $OSTYPE != solaris* ]]; then
-		subcmds+=(labelclear)
+		subcmds+=( labelclear initialize )
 	fi
 
 	versions=(
@@ -156,6 +156,14 @@ _zpool() {
 			'-T[timestamp]:value:(u d)' \
 			'-o[Fields to list]:field:_values -s , "field" $fields' \
 			'::pool name:_zfs_pool'
+		;;
+
+	(initialize)
+		_arguments -A "-*" \
+			'(-c --cancel)'{-c,--cancel}'[cancel initializing on specified devices]' \
+			'(-s --suspend)'{-s,--suspend}'[suspend initializing on specified devices]' \
+			':pool name:_zfs_pool' \
+			'*:device:_files'
 		;;
 
 	(iostat)

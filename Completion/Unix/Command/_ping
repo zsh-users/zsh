@@ -11,6 +11,7 @@ case ${variant}:${${service#ping}:-4} in
     args+=(
       '-d[set SO_DEBUG on the socket]'
       '-n[show network addresses as numbers]'
+      '-M+[define mtu discovery]:mtu discovery:(do dont want)'
       '-v[verbose output]'
     )
   ;|
@@ -104,9 +105,11 @@ case ${variant}:${${service#ping}:-4} in
       '-z+[specify type of service]:type of service'
     )
   ;|
+  (freebsd|openbsd|darwin)*:6)
+    args+=( '-D[disable IPv6 fragmentation]' )
+  ;|
   (freebsd|darwin)*:6)
     args+=(
-      '-D[disable IPv6 fragmentation]'
       '-R[audible bell for no packet]'
       '-r[audible bell for each packet]'
     )
@@ -149,16 +152,12 @@ case ${variant}:${${service#ping}:-4} in
       '--apple-time[prints the time a packet was received]'
     )
   ;;
-  openbsd*:4)
-    args+=(
-      '-T+[change TOS value]:TOS value:(critical inetcontrol lowdelay netcontrol throughput reliability ef af cs)'
-    )
-  ;|
   openbsd*)
     args+=(
       '-H[try reverse-lookups of addresses]'
       '-E[audible bell for no packet]'
       '-e[audible bell for each packet]'
+      '-T+[change TOS value]:TOS value:(critical inetcontrol lowdelay netcontrol throughput reliability ef af cs)'
       '-V+[specify routing table to be used]:routing table'
     )
   ;;

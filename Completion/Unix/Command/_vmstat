@@ -21,10 +21,9 @@ case $OSTYPE in
       '(- :)'{-D,--disk-sum}'[summarize disk statistics]'
     )
   ;;
-  *bsd*)
+  *bsd*|dragonfly*)
     specs=(
       '-c+[specify number of times to refresh the display]:count'
-      '-f[report on the number fork syscalls since boot and pages of virtual memory for each]'
       '-i[report the number of interrupts taken by devices since boot]'
       '-M+[specify core file to extract values associated with the name list from]:core:_files'
       '-N+[specify file to extract the name list from]:system:_files'
@@ -32,18 +31,27 @@ case $OSTYPE in
       '*:disk:_files'
     )
   ;|
+  *bsd*)
+    specs=(
+      '-f[report on the number fork syscalls since boot and pages of virtual memory for each]'
+    )
+  ;|
+  freebsd*|dragonfly*)
+    specs+=(
+      '-m[report on the usage of kernel dynamic memory allocated using malloc(9) by type]'
+      '-n+[change the maximum number of disks to display]:number of disks to display [2]'
+      '*-p+[specify which types of devices to display]: :->devices'
+      '-s[display the contents of the SUM structure]'
+      '-z[report on memory used by the kernel zone allocator, uma(9), by zone]'
+    )
+  ;|
   freebsd*)
     specs+=(
       '-a[include statistics about all interrupts]'
       '-h[human readable memory columns output]'
       '-H[scriptable memory columns output]'
-      '-m[report on the usage of kernel dynamic memory allocated using malloc(9) by type]'
-      '-n+[change the maximum number of disks to display]:number of disks to display'
       '-o[list virtual memory objects]'
       '-P[report per-cpu system/user/idle cpu statistics]'
-      '-p+[specify which types of devices to display]: :->devices'
-      '-s[display the contents of the SUM structure]'
-      '-z[report on memory used by the kernel zone allocator, uma(9), by zone]'
     )
   ;|
   (net|open)bsd*)
@@ -71,6 +79,14 @@ case $OSTYPE in
       '-U[dump all UVM histories]'
       '-u+[dump specified UVM history]:uvm'
       '-W[print more information about kernel memory pools]'
+    )
+  ;;
+  dragonfly*)
+    specs+=(
+      '-b[use brief format for formatted numbers]'
+      '-o[report usage of kernel object cache]'
+      '-u[output unformatted numeric values]'
+      '-v[include IRQ numbers and IRQ target CPU numbers before device names (with -i)]'
     )
   ;;
   freebsd*|solaris*)

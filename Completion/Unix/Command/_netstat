@@ -269,6 +269,7 @@ case $OSTYPE in
     )
     interfaces+=(
       '-c+[show specified number of updates, then exit]:count'
+      '-e[show only the number of errors on the interface]'
       '-q[only show interfaces that have seen packets]'
       '-t[show current value of the watchdog timer function]'
     )

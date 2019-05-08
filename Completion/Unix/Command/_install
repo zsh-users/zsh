@@ -64,14 +64,16 @@ else
   [[ $OSTYPE == (darwin|dragonfly)* ]] && args+=(
     '-M[disable use of mmap(2)]'
   )
+  [[ $OSTYPE == (dragonfly|freebsd|netbsd)* ]] && args+=(
+    '(-C -c --compare)-l+[link files (rather than copy) using specified method]: :->linkflags'
+    '+N+[use user/group database files from specified directory]: :_directories'
+    '-U[indicate that install is unprivileged]'
+  )
   [[ $OSTYPE == (freebsd|netbsd)* ]] && args+=(
     '-D+[specify destination directory used for metadata log]: :_directories'
     '-h+[store digest in metadata log using specified method]: :->digests'
-    '(-C -c --compare)-l+[link files (rather than copy) using specified method]: :->linkflags'
     '-M+[log mtree(8) metadata for installed files to specified file]:metadata log file:_files'
-    '+N+[use user/group database files from specified directory]: :_directories'
     '-T+[specify mtree(8) tags to store in metadata log]:mtree(8) tags'
-    '-U[indicate that install is unprivileged]'
   )
   [[ $OSTYPE == netbsd* ]] || args+=(
     '-S[use temporary files to perform safe copy]'

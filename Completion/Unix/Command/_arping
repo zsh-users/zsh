@@ -12,6 +12,7 @@ _arguments -s \
   '-V[print version and exit]' \
   '-c[how many packets to send]:count' \
   '-w[how long to wait for a reply]:timeout' \
+  '-i[specify interval between packets]:interval (seconds)' \
   '-I[interface]:ethernet interface:_net_interfaces' \
   '-s[source ip address]:source IP address:_hosts' \
   ':destination:_hosts'

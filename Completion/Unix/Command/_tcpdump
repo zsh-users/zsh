@@ -134,6 +134,7 @@ if [[ $OSTYPE = openbsd* ]]; then
     - capture
     ${(R)args:#(|\*)(|\(*\))--*} # removes any long-options
     '(-n)-a[attempt to convert network and broadcast addresses to names]'
+    '-B+[specify drop action to be used when filter expression matches a packet]:drop action:(pass capture drop)'
     '-D[select packet flowing in specified direction]:direction:(in out)'
     '-I[print the interface on each dump line]'
     '-o[print a guess of the possible operating system(s)]'

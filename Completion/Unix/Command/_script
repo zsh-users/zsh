@@ -34,10 +34,6 @@ case $OSTYPE in
   darwin*|dragonfly*|netbsd*|freebsd*)
     args=(
       '-q[be quiet: suppress display of starting and ending lines]'
-    )
-  ;|
-  darwin*|netbsd*|freebsd*)
-    args+=(
       '(-a -r -k)-d[suppress sleeps when playing back a session]'
       '(-a -r -k -t)-p[play back a recorded session]'
       '(-d -p)-r[record a session with input, output and timing data]'
@@ -58,13 +54,13 @@ case $OSTYPE in
   ;|
   darwin*|dragonfly*|freebsd*)
     args+=(
+      '-F[send output to specified named pipe]:fifo:_files -g "*(p)"'
       '-t+[specify interval of data flushing]:interval (seconds)'
       '-k[log keys sent to the program as well as output]'
       '*:::arguments: _normal'
     )
   ;|
   darwin*|freebsd*)
-    args+=( '-F[send output to specified named pipe]:fifo:_files -g "*(p)"' )
   ;|
   *)
     args+=(

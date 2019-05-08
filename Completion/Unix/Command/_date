@@ -31,7 +31,7 @@ else
     freebsd*|dragonfly*|darwin*|netbsd*|openbsd*)
       opts+=( -A '-*' )
       args+=(
-	'-j[do not try to set date]'
+	"-j[don't try to set date]"
 	'2:format or date:->fmt_date'
       )
     ;|
@@ -41,6 +41,7 @@ else
     freebsd*|dragonfly*|darwin*|openbsd*)
       args+=(
 	'-d+:daylight saving time value'
+	'-f+[use specified format for input]:parsing format:_date_formats:new date'
 	'-t+:minutes west of GMT'
       )
     ;|
@@ -57,13 +58,11 @@ else
       )
       args+=(
 	'-r+[reference time: file modification or literal time]:reference: _alternative $alts'
+	'(-R)-I-[display in ISO 8601 format]::precision:(date hours minutes seconds)'
       )
     ;|
     freebsd*|dragonfly*|darwin*)
-      args+=(
-	'-f+[use specified format for input]:parsing format:_date_formats:new date:'
-	'*-v+[adjust and print (but not set) date]:[+-]value[ymwdHMS]:'
-      )
+      args+=( "*-v+[adjust and print (but don't set) date]:[+-]value[ymwdHMS]" )
     ;;
     freebsd*|dragonfly*)
       args+=( '-R[display in RFC2822 format]' )

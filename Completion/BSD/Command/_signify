@@ -3,29 +3,30 @@
 _arguments -s -S -A "-*" : \
   - checksum \
   '-C[verify a signed checksum list and the checksum for each file]' \
-  '-p[public key]:public key:_files' \
+  '-p+[public key]:public key:_files' \
   '-q[quiet mode]' \
-  '-x[signature file]:signature file:_files' \
+  '-x+[specify signature file]:signature file:_files' \
   '*:file:_files' \
   - generate \
   '-G[generate a new key pair]' \
-  '-c[specify comment]:comment:' \
-  '-n[do not ask for passphrase]' \
-  '-p[public key]:public key:_files' \
-  '-s[secret key]:secret key:_files' \
+  '-c+[specify comment]:comment' \
+  "-n[don't ask for passphrase]" \
+  '-p+[specify public key file]:public key:_files' \
+  '-s+[specify secret key file]:secret key:_files' \
   - sign \
   '-S[sign a message and create a signature]' \
   '-e[embed the message after the signature]' \
-  '-m[file containing message]:message file:_files' \
-  '-s[secret key]:secret key:_files' \
-  '-x[signature file]:signature file:_files' \
+  '-n[store a zero time stamp in the gzip(1) header (with -z)]' \
+  '-m+[specify file containing message to sign]:message file:_files' \
+  '-s+[specify secret key file]:secret key:_files' \
+  '-x+[specify signature file]:signature file:_files' \
   '-z[embed signature in gzip header]' \
   - verify \
   '-V[verify the message and signature match]' \
   '-e[extract the message from the signature]' \
-  '-m[file containing message to verify or destination to extract]:message file:_files' \
-  '-p[public key]:public key:_files' \
+  '-m+[specify file containing message to verify or destination to extract]:message file:_files' \
+  '-p+[specify public key file]:public key:_files' \
   '-q[quiet mode]' \
-  '-t[restrict verification to specified key type]:key type:((base\:"base sets" fw\:firmware pkg\:packages syspatch\:syspatches))' \
-  '-x[signature file]:signature file:_files' \
+  '-t+[restrict verification to specified key type]:key type:((base\:"base sets" fw\:firmware pkg\:packages syspatch\:syspatches))' \
+  '-x+[specify signature file]:signature file:_files' \
   '-z[verify signature in gzip header]'

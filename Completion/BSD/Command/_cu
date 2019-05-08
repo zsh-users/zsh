@@ -10,6 +10,7 @@ case $variant in
     args+=(
       "-d[don't block waiting for a carrier to be detected]"
       '-r[start cu in restricted mode - prevent local operations]'
+      '-E+[specify escape character]:escape character [~]'
     )
   ;;
   taylor|(net|free)bsd*)
@@ -18,7 +19,7 @@ case $variant in
       '(-e -P --parity)-o[use odd parity]'
     )
   ;|
-  (net|free)bsd*)
+  dragonfly*|(net|free)bsd*)
     args+=( '-t[connect via a hard-wired connection to a host on a dial-up line]' )
   ;|
   taylor|netbsd*)
@@ -53,12 +54,8 @@ case $variant in
       '(-e -o --parity)-P+[set parity]:parity [none]:(even odd none)'
     )
   ;;
-  freebsd*)
-    args=( -A "-*" $args
-      '-a[set the acu port]:acu'
-      '-h[echo characters locally]'
-    )
-  ;;
+  dragonfly*|freebsd*) args+=( '-a[set the acu port]:acu' ) ;|
+  freebsd*) args=( -A "-*" $args '-h[echo characters locally]' ) ;;
 esac
 
 _arguments -s $args \

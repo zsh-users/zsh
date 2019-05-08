@@ -5,6 +5,7 @@ _arguments -s : \
   '(-B)-b[batch mode]' \
   '(-b)-B[endless batch mode]' \
   '-c[enable the display geom(4) consumers]' \
+  '(-b -B)-C[CSV output mode]' \
   '-d[enable the display delete operations]' \
   '-f+[filter by regex]:regex' \
   '-o[enable the display for other operations]' \

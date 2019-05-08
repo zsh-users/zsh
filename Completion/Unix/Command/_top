@@ -65,6 +65,7 @@ case $OSTYPE in
       '-i[interactive mode]'
       '-n[non-interactive mode (identical to batch mode)]'
       '-o+[sort process display by the specified field]:field:( $fields )'
+      '-p+[filter by the specified pid]: :_pids'
       '-q[renice top to -20]'
       '-S[show system processes]'
       '-s+[specify delay interval]:seconds:'
@@ -92,7 +93,6 @@ case $OSTYPE in
       '-1[combine CPU statistic into one line]'
       '-C[show command arguments as well as process name]'
       '-g+[filter processes by the specified string]:string'
-      '-p+[filter by the specified pid]: :_pids'
       '-U+[filter processes by the specified user]: :_users -M "L\:|-="'
     );;
   darwin*)

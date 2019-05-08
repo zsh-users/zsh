@@ -13,6 +13,14 @@ case $OSTYPE in
       '-u[show AF_LOCAL (UNIX) sockets]'
     )
   ;|
+  freebsd<12->.*)
+    args+=(
+      '-S[display the protocol stack if applicable]'
+      '-U[display the remote UDP encapsulation port number if applicable]'
+      '-v[verbose mode]'
+      '-w[use wider field size for displaying addresses]'
+    )
+  ;|
   freebsd*)
     for proto in ${${(M)${(f)"$(</etc/protocols)"}##[a-z0-9]*}}; do
       case $proto in
