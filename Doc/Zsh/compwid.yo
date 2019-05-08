@@ -751,8 +751,8 @@ The options are:
 
 startitem()
 item(tt(-p) var(number))(
-If the contents of the tt(PREFIX) parameter is longer than var(number)
-characters, the first var(number) characters are removed from it and
+If the value of the tt(PREFIX) parameter is at least var(number)
+characters long, the first var(number) characters are removed from it and
 appended to the contents of the tt(IPREFIX) parameter.
 )
 item(tt(-P) [ var(number) ] var(pattern))(

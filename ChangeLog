@@ -1,3 +1,8 @@
+2019-05-08  dana  <dana@dana.is>
+
+	* 44275: Doc/Zsh/compwid.yo, Src/Zle/complete.c: Fix compset -p/-s
+	multibyte inconsistency and documentation
+
 2019-05-07  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 44274: Completion/Base/Core/_description,

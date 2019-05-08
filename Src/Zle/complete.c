@@ -1011,7 +1011,7 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 		}
 	    } else
 #endif
-	    if ((int)strlen(test == CVT_PRENUM ? compprefix : compsuffix) >= na)
+	    if ((int)strlen(test == CVT_PRENUM ? compprefix : compsuffix) < na)
 		return 0;
 	    if (test == CVT_PRENUM)
 		ignore_prefix(na);
