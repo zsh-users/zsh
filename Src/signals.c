@@ -1011,10 +1011,6 @@ removetrap(int sig)
 	(!trapped || locallevel > (sigtrapped[sig] >> ZSIG_SHIFT)))
 	dosavetrap(sig, locallevel);
 
-    if (!trapped) {
-	unqueue_signals();
-        return NULL;
-    }
     if (sigtrapped[sig] & ZSIG_TRAPPED)
 	nsigtrapped--;
     sigtrapped[sig] = 0;
