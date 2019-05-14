@@ -1,5 +1,8 @@
 2019-05-14  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 44290: Src/jobs.c: job number exceeding int range and wrapping
+	to a negative number crashed the shell.
+
 	* 44291: Src/builtin.c: printf with argument specifier out of
 	range for an int crashed the shell.
 

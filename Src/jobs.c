@@ -1932,7 +1932,7 @@ getjob(const char *s, const char *prog)
     /* a digit here means we have a job number */
     if (idigit(*s)) {
 	jobnum = atoi(s);
-	if (jobnum && jobnum <= mymaxjob && myjobtab[jobnum].stat &&
+	if (jobnum > 0 && jobnum <= mymaxjob && myjobtab[jobnum].stat &&
 	    !(myjobtab[jobnum].stat & STAT_SUBJOB) &&
 	    /*
 	     * If running jobs in a subshell, we are allowed to
