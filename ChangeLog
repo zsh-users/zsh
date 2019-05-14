@@ -1,3 +1,8 @@
+2019-05-14  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 44291: Src/builtin.c: printf with argument specifier out of
+	range for an int crashed the shell.
+
 2019-05-14  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 44296: Src/parse.c, Test/B02typeset.ztst: "typeset Q= {X}"

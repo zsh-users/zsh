@@ -4993,8 +4993,7 @@ bin_print(char *name, char **args, Options ops, int func)
 	    	narg = strtoul(c, &endptr, 0);
 		if (*endptr == '$') {
 		    c = endptr + 1;
-		    DPUTS(narg <= 0, "specified zero or negative arg");
-		    if (narg > argc) {
+		    if (narg <= 0 || narg > argc) {
 		    	zwarnnam(name, "%d: argument specifier out of range",
 				 narg);
 			if (fout != stdout)
