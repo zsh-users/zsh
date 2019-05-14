@@ -1101,3 +1101,10 @@
 >export zsh_exported_readonly_scalar=1
 >readonly zsh_exported_readonly_array=( 2 )
 >readonly zsh_exported_readonly_scalar=1
+
+  # The second case was buggy as it needs special handling in postassigns
+  (typeset {X})
+  (typeset Q= {X})
+1:Regression test for {...} parsing in typeset
+?(eval):typeset:2: not valid in this context: {X}
+?(eval):typeset:3: not valid in this context: {X}

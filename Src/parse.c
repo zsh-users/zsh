@@ -1899,6 +1899,14 @@ par_simple(int *cmplx, int nr)
 			    p += nrediradd;
 			    sr += nrediradd;
 			}
+			else if (postassigns)
+			{
+			    /* C.f. normal case below */
+			    postassigns++;
+			    ecadd(WCB_ASSIGN(WC_ASSIGN_SCALAR, WC_ASSIGN_INC, 0));
+			    ecstr(toksave);
+			    ecstr("");	/* TBD can possibly optimise out */
+			}
 			else
 			{
 			    ecstr(toksave);

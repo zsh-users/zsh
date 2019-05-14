@@ -1,3 +1,8 @@
+2019-05-14  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 44296: Src/parse.c, Test/B02typeset.ztst: "typeset Q= {X}"
+	crashed the shell.
+
 2019-05-13  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 44259: Src/signals.c: Ensure we can set signal to default
