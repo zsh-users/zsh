@@ -1,5 +1,8 @@
 2019-05-14  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 44284: Src/builtin.c: combination of -T and -p to typeset
+	crashed the shell.
+
 	* 44290: Src/jobs.c: job number exceeding int range and wrapping
 	to a negative number crashed the shell.
 
