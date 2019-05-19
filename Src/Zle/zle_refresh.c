@@ -1678,7 +1678,12 @@ zrefresh(void)
 
 	    moveto(0, winw - rprompt_off - rpromptw);
 	    zputs(rpromptbuf, shout);
-	    vcs = winw - rprompt_off;
+	    if (rprompt_off) {
+		vcs = winw - rprompt_off;
+	    } else {
+		zputc(&zr_cr);
+		vcs = 0;
+	    }
 	/* reset character attributes to that set by the main prompt */
 	    txtchange = pmpt_attr;
 	    /*
@@ -2159,25 +2164,20 @@ moveto(int ln, int cl)
     const REFRESH_ELEMENT *rep;
 
     if (vcs == winw) {
-	if (rprompt_indent == 0 && tccan(TCLEFT)) {
-	  tc_leftcurs(1);
-	  vcs--;
-	} else {
-	    vln++, vcs = 0;
-	    if (!hasam) {
-		zputc(&zr_cr);
-		zputc(&zr_nl);
-	    } else {
-		if ((vln < nlnct) && nbuf[vln] && nbuf[vln]->chr)
-		    rep = nbuf[vln];
-		else
-		    rep = &zr_sp;
-		zputc(rep);
-		zputc(&zr_cr);
-		if ((vln < olnct) && obuf[vln] && obuf[vln]->chr)
-		    *obuf[vln] = *rep;
-	    }
-	}
+    vln++, vcs = 0;
+    if (!hasam) {
+	zputc(&zr_cr);
+	zputc(&zr_nl);
+    } else {
+	if ((vln < nlnct) && nbuf[vln] && nbuf[vln]->chr)
+	    rep = nbuf[vln];
+	else
+	    rep = &zr_sp;
+	zputc(rep);
+	zputc(&zr_cr);
+	if ((vln < olnct) && obuf[vln] && obuf[vln]->chr)
+	    *obuf[vln] = *rep;
+    }
     }
 
     if (ln == vln && cl == vcs)
