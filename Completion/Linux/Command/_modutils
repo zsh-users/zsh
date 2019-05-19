@@ -10,138 +10,146 @@ _modules_caching_policy()
 }
 
 _modutils() {
-    local curcontext="$curcontext" expl state line modules ign args ret=1
-    local -r modules_dir=/lib/modules
+  local curcontext="$curcontext" expl state line modules modaliases ign args ret=1
+  local -A opt_args
+  local -r modules_dir=/lib/modules
 
-    local update_policy
-    zstyle -s ":completion:*:*:$service:*" cache-policy update_policy
-    if [[ -z "$update_policy" ]]; then
-	zstyle ":completion:*:*:$service:*" cache-policy _modules_caching_policy
-    fi
+  local update_policy
+  zstyle -s ":completion:*:*:$service:*" cache-policy update_policy
+  if [[ -z "$update_policy" ]]; then
+    zstyle ":completion:*:*:$service:*" cache-policy _modules_caching_policy
+  fi
 
-    args=(
-	'(-)'{-V,--version}'[print version]'
-	'(-)'{-h,--help}'[print help text]'
-    )
+  args=(
+    '(-)'{-V,--version}'[display version information]'
+    '(-)'{-h,--help}'[display usage information]'
+  )
 
-    case "$service" in
-	lsmod) _arguments -s "$args[@]" && return ;;
+  case "$service" in
+    lsmod) _arguments -s "$args[@]" && return ;;
 
-	modinfo)
-	    _arguments -s -C "$args[@]" \
-		'(-)'{-a,--author}"[display the module's author]" \
-		'(-)'{-d,--description}"[display the module's description]" \
-		'(-)'{-l,--license}"[display the module's license]" \
-		'(-)'{-n,--filename}"[display the module's filename]" \
-		'(-)'{-p,--parameters}'[display the typed parameters that a module may support]' \
-		'(-)'{-F,--field}"[display only selected module's information]:module_field:(alias author depends description filename license parm)" \
-		'(-)-k[use modules from a different kernel version]:kernel_version:($(echo $modules_dir/*(/\:t)))' \
-		'1:module file:->all_modules' && ret=0
-	    ;;
+    modinfo)
+      _arguments -s -C "$args[@]" \
+	'(-)'{-k+,--set-version=}'[use modules from a different kernel version]:kernel_version:($(echo $modules_dir/*(/\:t)))' \
+	{-b+,--basedir=}'[use specified directory as filesystem root]:path:_directories' \
+	'1:module file:->all-modules' \
+	+ '(field)' \
+	{-a,--author}"[display the module's author]" \
+	{-d,--description}"[display the module's description]" \
+	{-l,--license}"[display the module's license]" \
+	{-n,--filename}"[display the module's filename]" \
+	{-p,--parameters}'[display the typed parameters that a module may support]' \
+	{-F+,--field}"[display only selected module's information]:module_field:(alias author depends description filename intree license name parm sig_hashalgo sig_key signat signer srcversion vermagic)" \
+	{-0,--null}'[use a null instead of newline in output]' && ret=0
+    ;;
 
-	modprobe)
-	    ign='-h --help -V --version -c --showconfig'
-	    _arguments -s -C "$args[@]" \
-		"(-a --all $ign)"{-a,--all}'[load all matching modules]' \
-		'(-)'{-c,--showconfig}'[show current configuration]' \
-		"(-d --debug $ign)"{-d,--debug}'[print debug info]' \
-		"(-k --autoclean $ign)"{-k,--autoclean}'[set autoclean]' \
-		"(-n --show $ign)"{-n,--show}"[don't actually perform action]" \
-		"(-q --quiet $ign)"{-q,--quiet}"[don't complain about insmod failures]" \
-		"(-s --syslog $ign)"{-s,--syslog}'[report via syslog instead of stderr]' \
-		"(* -t --type $ign)"{-t,--type}'[module type]:module type' \
-		"(-v --verbose $ign)"{-v,--verbose}'[print all commands as executed]' \
-		'(-C --config)'{-C,--config}'[specify config file]:config file:_files' \
-		"(-r --remove -l --list -t --type -a --all $ign)"{-r,--remove}'[remove module (stacks)]' \
-		"(-l --list -t --type -a --all $ign)"{'-i[ignore install/remove commands in config file]','--ignore-install[ignore install commands in config file]','--ignore-remove[ignore remove commands in config file]'} \
-		"(* -l --list -r --remove $ign)"{-l,--list}'[list matching modules]' \
-		"(-c $ign)1:modules:->loadable_modules" \
-		"(-c -l --list -t --type $ign)*:params:->params" && ret=0
+    modprobe)
+      ign='-h --help -V --version -c --showconfig --show-config'
+      _arguments -s -C "$args[@]" \
+	"(-a --all $ign)"{-a,--all}'[load all matching modules]' \
+	"(-n --show $ign)"{-n,--show}"[don't actually perform action]" \
+	"(-q --quiet $ign)"{-q,--quiet}"[don't complain about insmod failures]" \
+	"(-s --syslog $ign)"{-s,--syslog}'[report via syslog instead of stderr]' \
+	"(-v --verbose $ign)"{-v,--verbose}'[print all commands as executed]' \
+	'(-C --config)'{-C+,--config=}'[specify config file]:config file:_files' \
+	"(-r --remove -a --all $ign)"{-r,--remove}'[remove module (stacks)]' \
+	'--remove-dependencies[also remove modules depending on it]' \
+	'(* -R --resolve-alias)'{-R,--resolve-alias}'[only lookup and print alias and exit]' \
+	'--first-time[fail if module already inserted or removed]' \
+	"(-a --all $ign)"{'-i[ignore install/remove commands in config file]','--ignore-install[ignore install commands in config file]','--ignore-remove[ignore remove commands in config file]'} \
+	'(-b --use-blacklist)'{-b,--use-blacklist}'[apply blacklist to resolved alias]' \
+	'(-f --force --force-modversions --force-vermagic)'{-f,--force}'[force module insertion or removal]' \
+	"(-f --force)--force-modversion[ignore module's version]" \
+	"(-f --force)--force-vermagic[ignore module's version magic]" \
+	'(-D --show-depends)'{-D,--show-depends}'[only print module dependencies and exit]' \
+	'(-)'{-c,--showconfig,--show-config}'[show current configuration]' \
+	--{show,dump}'-modversions[dump module symbol version and exit]' \
+	{-d+,--dirname=}'[use specified directory as filesystem root]:path:_directories' \
+	{-S+,--set-version=}'[use modules from a different kernel version]:kernel_version:($(echo $modules_dir/*(/\:t)))' \
+	'--show-exports[only print module exported symbol versions and exit]' \
+	'(-n --dry-run --show)'{-n,--dry-run,--show}"[don't execute operations, just print]" \
+	"(-c $ign)1:modules:->loadable-modules" \
+	"(-c $ign)*:params:->params" && ret=0
 
-	    [[ -n $state ]] && (( $+opt_args[-r] )) && state=loaded_modules
-	    ;;
+      [[ -n $state && -n ${opt_args[(i)(-r|--remove)]} ]] && state=loaded-modules
+    ;;
 
-	rmmod)
-	    _arguments -s -C "$args[@]" \
-		'(-a --all)'{-a,--all}'[remove all unused autocleanable modules]' \
-		'(-e --persist)'{-e,--persist}'[save persistent data]' \
-		'(-r --stacks)'{-r,--stacks}'[remove a module stack]' \
-		'(-s --syslog)'{-s,--syslog}'[output to syslog]' \
-		'(-v --verbose)'{-v,--verbose}'[be verbose]' \
-		'*:loaded module:->loaded_modules' && ret=0
-	    ;;
+    rmmod)
+      _arguments -s -C "$args[@]" \
+	'(-f --force)'{-f,--force}'[allow modules that are in use to be removed]' \
+	'(-s --syslog)'{-s,--syslog}'[send errors to syslog]' \
+	'(-v --verbose)'{-v,--verbose}'[be verbose]' \
+	'*:loaded module:->loaded-modules' && ret=0
+      ;;
 
-	insmod)
-	    _arguments \
-		'1:module file:_files' \
-		'*:module parameters:' && ret=0
-	    ;;
-    esac 
+    insmod)
+      _arguments "$args[@]" \
+	  '1:module file:_files' \
+	  '*:module parameters' && ret=0
+    ;;
+  esac
 
-    case "$state" in
-	loaded_modules|loadable_modules)
-	    if [[ -r /proc/modules ]]; then
-		loaded_modules=(${${(f)"$(</proc/modules)"}%% *})
-	    elif [[ -x /sbin/lsmod ]]; then
-		loaded_modules=(${${(f)"$(/sbin/lsmod)"}[2,-1]%% *})
-	    else
-		return 1
-	    fi
+  case "$state" in
+    loaded-modules|loadable-modules)
+      if [[ -r /proc/modules ]]; then
+	loaded_modules=(${${(f)"$(</proc/modules)"}%% *})
+      elif [[ -x /sbin/lsmod ]]; then
+	loaded_modules=(${${(f)"$(/sbin/lsmod)"}[2,-1]%% *})
+      else
+	return 1
+      fi
 
-	    if [[ $state = loaded_modules ]]; then
-		_wanted modules expl 'loaded module' compadd -a loaded_modules \
-		    && return
-		return ret
-	    fi
-	    ;&
+      if [[ $state = loaded-modules ]]; then
+	_wanted modules expl 'loaded module' compadd -a loaded_modules && ret=0
+	return ret
+      fi
+    ;&
 
-	all_modules)
-	    local kver
-	    integer kver_idx
-	    if (( kver_idx=${words[(I)-k]} )); then
-		kver=${words[kver_idx+1]}
-	    else
-		kver=$(uname -r)
-	    fi
+    all-modules)
+      local kver=${opt_args[(i)(-S|-k|--set-version)]:-$(uname -r)}
 
-	    if _cache_invalid modules-$kver || ! _retrieve_cache modules-$kver;
-	    then 
-		# 2011-01-02 gi1242: Do we need .o files? Or is .ko enough?
-		modules=( $modules_dir/$kver/(*~(source|build))/**/*.(o|ko|ko.gz|ko.xz)(.:t:r:r) )
-		_store_cache modules-$kver modules
-	    fi
+      if _cache_invalid modules-$kver || ! _retrieve_cache modules-$kver;
+      then
+	modules=( $modules_dir/$kver/(*~(source|build))/**/*.(o|ko|ko.gz|ko.xz)(.:t:r:r) )
+	modaliases=( ${${${(M)${(f)"$(<$modules_dir/$kver/modules.alias)"}:#alias*}#alias }%% *} )
+	_store_cache modules-$kver modules modaliases
+      fi
 
-	    if [[ $state = loadable_modules ]]; then
-		modules=( ${modules:#(${(j:|:)~${=loaded_modules//_/-}})} )
-	    fi
+      if (( ${+opt_args[(k)(-R|--resolve-alias)]} )); then
+	_tags module-aliases
+      else
+	_tags files modules module-aliases
+      fi
+      if [[ $state = loadable-modules ]]; then
+	modules=( ${modules:#(${(j:|:)~${=loaded_modules//_/-}})} )
+      fi
 
-	    _tags files modules
-	    while _tags; do
-		_requested files expl "module file"  _files -g '*.ko(-.)' && ret=0
-		_requested modules expl module compadd -a modules && ret=0
-		(( ret )) || break
-	    done
-	    ;;
+      while _tags; do
+	_requested modules expl module compadd -a modules && ret=0
+	_requested module-aliases expl 'module alias' compadd -a modaliases && ret=0
+	_requested files expl "module file"  _files -g '*.ko(-.)' && ret=0
+	(( ret )) || break
+      done
+    ;;
 
-	params)
-	    if compset -P 1 '*='; then
-		_message -e value 'parameter value'
-	    else
-		local params
-		params=( ${${(M)${(f)"$(_call_program module_parameter /sbin/modinfo "$words[2]" 2>/dev/null)"}:#parm:*}##parm:[[:space:]]##} )
-		if [[ $#params -eq 0 ]]; then
-		    _message -e parameter "This modules doesn't have parameters"
-		else
-		    typeset -A val_args
+    params)
+      if compset -P 1 '*='; then
+	_message -e value 'parameter value'
+      else
+	local params
+	params=( ${${(M)${(f)"$(_call_program module-parameters /sbin/modinfo "$words[2]" 2>/dev/null)"}:#parm:*}##parm:[[:space:]]##} )
+	compset -S '=*'
+	if (( $#params )); then
+	  _values -S = -w 'module parameter' \
+	      ${${${(M)params:#*(:bool|\(bool\))}/:/[}/(bool| \(bool\))/]} ${^${params:#*(:bool|\(bool\))}/:/[}"]:auto added argument: " && ret=0
+	else
+	  _message -e parameter "module doesn't take parameters"
+	fi
+      fi
+    ;;
+  esac
 
-		    _values -S = -C -w 'module parameter' \
-			${${${(M)params:#*(:bool|\(bool\))}/:/[}/(bool| \(bool\))/]} ${^${params:#*(:bool|\(bool\))}/:/[}"]:auto added argument: " && ret=0
-		fi
-	    fi
-	    ;;
-    esac
-
-    return ret
+  return ret
 }
 
 _modutils "$@"
