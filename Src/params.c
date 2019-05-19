@@ -2201,10 +2201,10 @@ getstrvalue(Value v)
 
     if (v->flags & VALFLAG_SUBST) {
 	if (v->pm->node.flags & (PM_LEFT|PM_RIGHT_B|PM_RIGHT_Z)) {
-	    unsigned int fwidth = v->pm->width ? v->pm->width : MB_METASTRLEN(s);
+	    size_t fwidth = v->pm->width ? (unsigned int)v->pm->width : MB_METASTRLEN(s);
 	    switch (v->pm->node.flags & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) {
 		char *t, *tend;
-		unsigned int t0;
+		size_t t0;
 
 	    case PM_LEFT:
 	    case PM_LEFT | PM_RIGHT_Z:
@@ -5858,7 +5858,7 @@ printparamnode(HashNode hn, int printflags)
 		    doneminus = 0;
 		}
 		if ((pmptr->flags & PMTF_USE_WIDTH) && p->width) {
-		    printf("%d ", p->width);
+		    printf("%u ", p->width);
 		    doneminus = 0;
 		}
 	    }

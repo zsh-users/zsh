@@ -45,7 +45,10 @@ int noexitct = 0;
 char *zunderscore;
 
 /**/
-int underscorelen, underscoreused;
+size_t underscorelen;
+
+/**/
+int underscoreused;
 
 /* what level of sourcing we are at */
  

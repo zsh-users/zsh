@@ -2535,7 +2535,7 @@ setunderscore(char *str)
 {
     queue_signals();
     if (str && *str) {
-	int l = strlen(str) + 1, nl = (l + 31) & ~31;
+	size_t l = strlen(str) + 1, nl = (l + 31) & ~31;
 
 	if (nl > underscorelen || (underscorelen - nl) > 64) {
 	    zfree(zunderscore, underscorelen);

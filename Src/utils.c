@@ -3336,7 +3336,7 @@ morefmt:
 	    case '.':
 	    {
 		long fnsec = nsec;
-		if (digs > 9)
+		if (digs < 0 || digs > 9)
 		    digs = 9;
 		if (ztrftimebuf(&bufsize, digs))
 		    return -1;

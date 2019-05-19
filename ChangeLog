@@ -1,5 +1,8 @@
 2019-05-20  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 44307: Src/exec.c, Src/init.c, Src/params.c, Src/utils.c:
+	allow for atoi() returning a negative number
+
 	* 44308: Completion/Linux/Command/_modutils: update Linux
 	modutils completion
 
