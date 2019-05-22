@@ -1,3 +1,8 @@
+2019-05-23  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 44345: Src/text.c, Test/A01grammar.ztst: fix wordcode traversal
+	where ! without a following command could result in a crash
+
 2019-05-20  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 44307: Src/exec.c, Src/init.c, Src/params.c, Src/utils.c:

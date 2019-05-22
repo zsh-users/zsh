@@ -76,6 +76,39 @@
 0:Basic current shell list with error
 >false
 
+  fn() { : && ! ; : }
+  functions -x3 fn
+  fn
+0:End of sublist containing ! with no command
+>fn () {
+>   : && !
+>   :
+>}
+
+  if [[ m -eq y ]]; then
+    : && !
+    :
+  fi
+0:! followed by no further commands
+
+  fn() { ! {!} && ! (!) || ! {!} }
+  functions -x2 fn
+  fn
+0:exclamation marks without following commands
+>fn () {
+>  ! {
+>    !
+>  } && ! (
+>    !
+>  ) || ! {
+>    !
+>  }
+>}
+
+  ! | true
+1:! followed by no command but by a pipe
+?(eval):1: parse error near `|'
+
 #
 # Tests for `Precommand Modifiers'
 #
