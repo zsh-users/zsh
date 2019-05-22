@@ -1,5 +1,8 @@
 2019-05-23  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* unposted: Completion/Linux/Command/_iptables: remove spurious
+	reference to nonexistent completion function
+
 	* 44349: Completion/Linux/Command/_cryptsetup,
 	Completion/X/Command/_x_utils, Completion/Linux/Command/_lsblk,
 	Completion/Linux/Command/_ss, Completion/Linux/Command/_valgrind,
