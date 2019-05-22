@@ -1,11 +1,12 @@
 #compdef lsblk
 
 local sep ret=1
-local -a values dedup suf=( -qS , )
+local -a values dedup suf
 local curcontext="$curcontext" state line expl
 typeset -A opt_args
 
 _arguments -C -s -S \
+  '(H -E --dedup)'{-E+,--dedup=}'[de-duplicate output by specified column]:column:->columns' \
   '(H -a --all)'{-a,--all}'[print all devices]' \
   '(H -b --bytes)'{-b,--bytes}'[print size in bytes rather than in human readable format]' \
   '(H -d --nodeps)'{-d,--nodeps}"[don't print slaves or holders]" \
@@ -30,7 +31,7 @@ _arguments -C -s -S \
   '(H)'{-i,--ascii}'[output ascii characters only]' \
   '(H)'{-J,--json}'[use JSON output format]' \
   '(H)'{-l,--list}'[use list format output]' \
-  '(H)'{-t,--tree}'[use tree format output]' \
+  '(H)'{-T+,--tree=}'[use tree format output]:column:->columns' \
   '(H)'{-P,--pairs}'[use key="value" output format]' \
   '(H)'{-r,--raw}'[use raw output format]' \
   + 'H' \
@@ -44,6 +45,7 @@ case $state in
   ;|
   *list)
     dedup=( ${(Ms.,.)PREFIX##*,} ${(Ms.,.)SUFFIX%%,*} )
+    suf=( -qS , )
     compset -S ',*' && suf=()
     compset -P '*,'
   ;|

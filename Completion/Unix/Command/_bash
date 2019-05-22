@@ -22,6 +22,7 @@ args=(
   '--noprofile[do not load /etc/profile, ~/.bash_profile, etc.]'
   '--norc[do not load ~/.bashrc]'
   '--posix[enable POSIX mode]'
+  '--pretty-print[format a shell script]'
   '(-r --restricted)--restricted[act as restricted shell]'
   '(: -)--version[display version information]'
   # This is ugly, but this way the + variants have accurate descriptions. Note

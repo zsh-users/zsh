@@ -45,7 +45,7 @@ case $OSTYPE in
       '-g[force giaddr field]:relay:_hosts'
       '-i[use a DUID with DHCPv4 clients]'
       '-I[use the standard DDNS scheme]'
-      '--version[display version number]'
+      '(-)--version[display version number]'
       '(-4)-S[use Information-request to get only stateless configuration]'
       '(-4)*-T[ask for IPv6 temporary addresses]'
       '(-4)-P[enable IPv6 prefix delegation]'
@@ -67,6 +67,10 @@ case $OSTYPE in
       '--request-options[specify list of options the client is to request from the server]:options'
       '--timeout[specify time after which dhclient will decide that no DHCP servers can be contacted]:timeout'
       '--dad-wait-time[specify maximum time to wait for duplicate address detection]:time (seconds)'
+      '--prefix-len-hint[specify length to request when requesting new prefixes]:length'
+      '--decline-wait-time[specify time an IPv4 client should wait between declining an address and issuing a discover]:time (seconds)'
+      '--address-prefix-len[specify length of the prefix for IPv6 addresses]:length'
+      '(-)'{--help,-h}'[display usage information]'
     )
   ;;
 esac

@@ -78,6 +78,7 @@ _arguments -s -C $args \
   '*-6[use IPv6 only]' \
   '*-t+[specify type]:type:_dns_types' \
   '*-q+[specify host name to query]:host:_hosts' \
+  "-r[don't read ~/.digrc]" \
   '*-x+[reverse lookup]:IP address' \
   '*-k+[specify TSIG key file]:file:_files' \
   '*-y+[specify TSIG key]:hmac\:name\:key' \

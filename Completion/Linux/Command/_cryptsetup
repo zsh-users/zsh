@@ -6,7 +6,8 @@ local -a actions state line expl
 (( $#words > 2 )) && ign='!'
 _arguments -s \
   '(-v --verbose)'{-v,--verbose}'[enable verbose mode]' \
-  '--debug[enable debug mode]' \
+  '--debug[show debug messages]' \
+  '--debug-json[show debug messages including JSON metadata]' \
   '(-c --cipher)'{-c+,--cipher=}'[set cipher]:cipher specification' \
   '(-h --hash)'{-h+,--hash=}'[hash algorithm]:hash algorithm' \
   '(-y --verify-passphrase)'{-y,--verify-passphrase}'[query for password twice]' \
@@ -48,6 +49,7 @@ _arguments -s \
   '--perf-same_cpu_crypt[use dm-crypt same_cpu_crypt performance compatibility option]' \
   '--perf-submit_from_crypt_cpus[use dm-crypt submit_from_crypt_cpus performance compatibility option]' \
   '--deferred[device removal is deferred until the last user closes it]' \
+  '--serialize-memory-hard-pbkdf[use global lock to serialize memory]' \
   '--pbkdf=[specify PBKDF algorithm for LUKS2]:algorithm:(argon2i argon2id pbkdf2)' \
   '--pbkdf-memory=[specify PBKDF memory cost limit]:limit (kilobytes)' \
   '--pbkdf-parallel=[specify PBKDF parallel cost]:threads' \
@@ -67,6 +69,19 @@ _arguments -s \
   '--subsystem=[set subsystem label for the LUKS2 device]:subsystem' \
   '--unbound[create unbound (no assigned data segment) LUKS2 keyslot]' \
   '--json-file=[read or write token to json file]:json file:_files -g "*.json(-.)"' \
+  '--luks2-metadata-size=[specify LUKS2 header metadata area size]:size (bytes)' \
+  '--luks2-keyslots-size=[specify LUKS2 header keyslots area size]:size (bytes)' \
+  '--refresh[refresh (reactivate) device with new parameters]' \
+  '--keyslot-key-size=[specify size of the encryption key]:size (bits)' \
+  '--keyslot-cipher=[specify cipher used for LUKS2 keyslot encryption]:cipher' \
+  '--encrypt[Encrypt LUKS2 device (in-place encryption)]' \
+  '--decrypt[decrypt LUKS2 device (remove encryption)]' \
+  '--init-only[initialize LUKS2 reencryption in metadata only]' \
+  '--reduce-device-size=[reduce data device size (move data offset)]:size (bytes)' \
+  '--hotzone-size=[specify maximal reencryption hotzone size]:size (bytes)' \
+  '--resilience=[specify reencryption hotzone resilience type]:resilience type:(checksum journal none)' \
+  '--resilience-hash=[specify reencryption hotzone checksums hash]:string' \
+  '--active-name=[override device autodetection of dm device to be reencrypted]:string' \
   "${ign}(- : *)--version[show version information]" \
   "${ign}(- : *)"{-\?,--help}'[display help information]' \
   "${ign}(- : *)--usage[display brief usage]" \
@@ -82,6 +97,7 @@ case $state in
       'resize:resize an active mapping'
       'benchmark:benchmark cipher'
       'repair:try to repair on-disk metadata'
+      'reencrypt:reencrypt LUKS2 device'
       'erase:erase all keyslots'
       'convert:convert LUKS from/to LUKS2 format'
       'config:set permanent configuration options for LUKS2'
@@ -114,7 +130,7 @@ case $state in
       benchmark) args=( '--cipher=:cipher' );;
       luksKillSlot) args=( $device ':key slot number' );;
       remove|status|resize|*lose|luksSuspend|luksResume) args=( $mapping );;
-      erase|convert|config|repair|(luks(AddKey|Erase|RemoveKey|DelKey|UUID|Dump)|isLuks))
+      erase|convert|config|repair|reencrypt|(luks(AddKey|Erase|RemoveKey|DelKey|UUID|Dump)|isLuks))
 	args=( $device )
       ;;
       luks(Format|AddKey|RemoveKey|ChangeKey|ConvertKey))

@@ -1,5 +1,19 @@
 2019-05-23  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 44349: Completion/Linux/Command/_cryptsetup,
+	Completion/X/Command/_x_utils, Completion/Linux/Command/_lsblk,
+	Completion/Linux/Command/_ss, Completion/Linux/Command/_valgrind,
+	Completion/Linux/Command/_strace, Completion/Unix/Command/_bash,
+	Completion/Unix/Command/_dhclient, Completion/Unix/Command/_dig,
+	Completion/Unix/Command/_entr, Completion/Unix/Command/_env,
+	Completion/Unix/Command/_gem, Completion/Unix/Command/_gnutls,
+	Completion/Unix/Command/_links, Completion/Unix/Command/_nm,
+	Completion/Unix/Command/_objdump, Completion/Unix/Command/_ruby,
+	Completion/Unix/Command/_sed, Completion/Unix/Command/_sqlite,
+	Completion/Unix/Command/_ssh, Completion/Unix/Command/_tiff,
+	Completion/Unix/Command/_tree, Completion/Unix/Command/_wget,
+	Completion/Linux/Command/_ethtool: completion option updates
+
 	* 44345: Src/text.c, Test/A01grammar.ztst: fix wordcode traversal
 	where ! without a following command could result in a crash
 

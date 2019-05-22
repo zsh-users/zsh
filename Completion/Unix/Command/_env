@@ -11,6 +11,10 @@ case $variant in
       '(--ignore-environment -i --help --version)*'{-u+,--unset=}'[remove variable from the environment]:env var to remove:_parameters -g "*export*"'
       '(-C --chdir)'{-C+,--chdir=}'[change working directory]:directory:_directories'
       '(-S --split-string)'{-S+,--split-string=}'[perform word splitting]:string to split'
+      '--block-signal=[block delivery of signals to command]:signal:_sequence _signals'
+      '--default-signal=[reset handling of signals to the default]:signal:_sequence _signals'
+      '--ignore-signal=[set handling of signals to do nothing]:signal:_sequence _signals'
+      '--list-signal-handling[list non default signal handling to stderr]'
       '(-v --debug)'{-v,--debug}'[print verbose information for each processing step]'
       "${ign}(- *)--help[display help information]"
       "${ign}(- *)--version[display version information]"

@@ -48,7 +48,8 @@ _arguments -C \
   '--get-phy-tunable[get PHY tunable]' \
   '--reset[reset hardware components]' \
   '--show-fec[query device for forward error correction support]' \
-  '--set-fec[configure forward error correction for device]' && return
+  '--set-fec[configure forward error correction for device]' \
+  {-Q,--per-queue}'[apply per-queue command]' && return
 
 if [[ -n $state ]]; then
   case $words[CURRENT-1] in
@@ -61,7 +62,7 @@ if [[ -n $state ]]; then
       _wanted onoff expl 'enabled' compadd off on
     fi
   ;;
-  autoneg|adaptive-[rt]x|raw|hex|sg|tso|ufo|gso|lro|eee|tx-lpi|downshift)
+  autoneg|adaptive-[rt]x|raw|hex|sg|tso|ufo|gso|lro|eee|tx-lpi|downshift|fast-link-down)
     _wanted onoff expl 'enabled' compadd off on
   ;;
   rx-usecs|rx-frames|rx-usecs-irq|rx-frames-irq|tx-usecs|tx-frames) ;&
@@ -70,7 +71,7 @@ if [[ -n $state ]]; then
   rx-frames-high|tx-usecs-high|tx-frames-high|sample-interval|dmac|rx-mini) ;&
   rx-jumbo|offset|length|magic|value|phyad|proto|tos|tclass|l4proto|src-port) ;&
   dst-port|spi|l4data|vlan-etype|vlan|user-def|action|vf|queue|loc) ;&
-  other|combined|tx-timer|count)
+  other|combined|tx-timer|count|msecs)
     _message -e numbers 'number'
   ;;
   speed)
@@ -279,10 +280,10 @@ if [[ -n $state ]]; then
       _wanted behaviours expl behaviour compadd -F line - eee advertise tx-lpi tx-timer
     ;;
     --set-phy-tunable)
-      _wanted options expl tunable compadd -F line - downshift count
+      _wanted options expl tunable compadd -F line - downshift count fast-link-down msecs
     ;;
     --get-phy-tunable)
-      _wanted options expl tunable compadd downshift
+      _wanted options expl tunable compadd downshift fast-link-down
     ;;
     --reset)
       _wanted components expl component compadd flags dedicated all \
@@ -293,6 +294,13 @@ if [[ -n $state ]]; then
         _wanted options expl tunable compadd - encoding
       else
         _wanted encodings expl encoding compadd -F line auto off rs baser
+      fi
+    ;;
+    -Q|--pre-queue)
+      if (( CURRENT == 4 )); then
+        _wanted options expl option compadd - queue_mask
+      elif (( CURRENT == 6)); then
+        _wanted options expl option compadd -c --show-coalescing -C --coalesce
       fi
     ;;
     esac

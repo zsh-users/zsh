@@ -36,15 +36,24 @@ opts=(
   '-s[enable some switch parsing for switches after script name]'
   '-S[look for the script using PATH environment variable]'
   '-T-[turn on tainting checks]::taint level [1]:((0\:strings\ from\ streams/environment/ARGV\ are\ tainted 1\:no\ dangerous\ operation\ by\ tainted\ value 2\:process/file\ operations\ prohibited 3\:all\ generated\ objects\ are\ tainted 4\:no\ global\ \(non-tainted\)\ variable\ modification/no\ direct\ output))'
-  '(-v --verbose)'{-v,--verbose}'[print version number, then turn on verbose mode]'
+  '(--verbose)-v[print version number, then turn on verbose mode]'
+  '(-v)--verbose[turn on verbose mode and disable script from stdin]'
   '-x-[strip off text before #!ruby line and perhaps cd to directory]:directory:_files -/'
   '(1 * -)--copyright[print the copyright]'
-  --{en,dis}'able=[enable or disable features]:feature:(gems did_you_mean rubyopt frozen_string_literal all)'
+  --{en,dis}'able=[enable or disable features]:feature:(gems did_you_mean rubyopt frozen_string_literal jit all)'
   \!--{en,dis}able-{gems,rubyopt,all}
   '--dump=[dump debug information]:information:_sequence compadd - insns yydebug parsetree parsetree_with_comment'
   --{external,internal}'-encoding=:charset:->charsets'
   '!'{-y,--yydebug}
   '!--dump=:target:(version copyright usage yydebug syntax parsetree parsetree_with_comment insns)'
+  '--jit[enable jit with default options]'
+  '--jit-warnings[enable printing JIT warnings]'
+  '--jit-debug[enable JIT debugging (very slow)]'
+  '--jit-wait[wait until JIT compilation is finished everytime (for testing)]'
+  '--jit-save-temps[save JIT temporary files]'
+  '--jit-verbose=-[print JIT logs of level num or less to stderr]:maximum log level [0]'
+  '--jit-max-cache=-[specify max number of methods to be JIT-ed in a cache]:number [1000]'
+  '--jit-min-calls=-[specify number of calls to trigger JIT]:calls [5]'
 )
 
 irb=(
@@ -70,7 +79,6 @@ irb=(
 
 erb=(
   "-P[don't evaluate lines which start with %]"
-  '-S[specify safe level for running script]:level:(1 2 3 4)'
   '-T[specify trim mode]:mode [0]:((0\:EOL\ remains 1\:EOL\ removed\ if\ line\ ends\ with\ %\> 2\:EOL\ removed\ if\ line\ starts\ with\ \<%\ and\ ends\ with\ %\> -\:EOL\ is\ removed\ if\ line\ ends\ with\ -%\>,\ leading\ whitespace\ removed\ after\ \<%-))'
   '(-d --debug)'{-d,--debug}'[set debugging flags (set $DEBUG to true)]'
   '-n[used with -x, prepends line number to output]'

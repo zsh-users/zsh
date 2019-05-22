@@ -49,6 +49,7 @@ _arguments -s -S \
   '(-n -C -X)-H[turn on HTML output]:base HREF' \
   '(-n -C -X)-T[title for HTML output]:title' \
   '(-n -C -X)--nolinks[turn off hyperlinks in HTML output]' \
+  '--fromfile[read paths from specified files]' \
   '(-)--version[version of tree]' \
   '(-)--help[verbose usage listing]' \
   '*:directory:_files -/'

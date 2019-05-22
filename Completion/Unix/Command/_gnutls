@@ -60,6 +60,7 @@ case "$service" in
       '--no-ca-verification[disable CA certificate verification]' '!--ca-verification'
       '--ocsp[enable OCSP certificate verification]' '!--no-oscp'
       '(-r --resume)'{-r,--resume}'[establish a session and resume]'
+      '--earlydata=[send early data on resumption from the specified file]:file:_files'
       '(-e --rehandshake)'{-e,--rehandshake}'[connect, establish a session and rehandshake immediately]'
       "--verify-hostname-str=[specify server's hostname to use for validation]:hostname"
       '(-s --starttls)'{-s,--starttls}'[start TLS on EOF or SIGALRM]'
@@ -89,6 +90,7 @@ case "$service" in
       '--inline-commands[inline commands of the form ^<cmd>^]'
       '--inline-commands-prefix=[change delimiter used for inline commands]:delimiter [^]'
       '--fips140-mode[report status of FIPS140-2 mode in gnutls library]'
+      '--logfile=[redirect informational messages to a specific file]:file:_files'
     )
   ;;
 
@@ -97,6 +99,8 @@ case "$service" in
       '--sni-hostname-fatal[send fatal alert on sni-hostname mismatch]'
       '*--alpn=[specify ALPN protocol to be enabled by the server]:protocol'
       '--alpn-fatal[send fatal alert on non-matching ALPN name]'
+      '--earlydata[accept early data]'
+      '--maxearlydata=[specify maximum early data size to accept]:size'
       "--nocookie[don't require cookie on DTLS sessions]"
       '(-g --generate)'{-g,--generate}'[generate Diffie-Hellman parameters]'
       '(-q --quiet)'{-q,--quiet}'[suppress some messages]'
@@ -189,6 +193,8 @@ case "$service" in
       '--stdout-info[print information to stdout instead of stderr]'
       '--ask-pass[enable interaction for entering password when in batch mode]'
       '--pkcs-cipher=[specify cipher to use for pkcs operations]:cipher:(3des 3des-pkcs12 aes-128 aes-192 aes-256 rc2-40 arcfour)'
+      '!(--no-text)--text'
+      "--no-text[don't output textual information before PEM-encoded certificates, private keys, etc]"
     )
   ;;
 

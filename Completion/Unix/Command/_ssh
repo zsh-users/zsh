@@ -97,7 +97,7 @@ _ssh () {
       '-M+[specify maximum number of signatures]:number' \
       '-s+[add keys provided by the PKCS#11 shared library]:library:_files -g "*.(so|dylib)(|.<->)(-.)"' \
       '-t+[set maximum lifetime for identity]:maximum lifetime (in seconds or time format):' \
-      "-T[test usability of identity files' private keys]" \
+      "-T[test usability of identity files' private keys]:*:public key file:_files -g '*.pub(-.)'" \
       '-v[verbose mode]' \
       '-q[be quiet after a successful operation]' \
       '-X[unlock the agent]' \

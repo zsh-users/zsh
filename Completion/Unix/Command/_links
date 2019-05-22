@@ -108,10 +108,10 @@ _arguments -C \
   '-html-target-in-new-window[allow opening new windows from html]' \
   '-html-margin[specify margin]:margin (spaces)' \
   '-html-user-font-size[specify font size in graphics mode]:size' \
-  '-html-t-text-color[specify text color in text mode]:color (0..15)' \
-  '-html-t-link-color[specify link color in text mode]:color (0..15)' \
-  '-html-t-background-color[specify background color in text mode]:color (0..15)' \
-  '-html-t-ignore-document-color[ignore colors from HTML in text mode]:ignore:(0 1)' \
+  '-html-text-color[specify text color in text mode]:color (0..15)' \
+  '-html-link-color[specify link color in text mode]:color (0..15)' \
+  '-html-background-color[specify background color in text mode]:color (0..15)' \
+  '-html-ignore-document-color[ignore colors from HTML in text mode]:ignore:(0 1)' \
   '-html-g-text-color[specify text color in graphics mode]:color (0xRRGGBB)' \
   '-html-g-link-color[specify link color in graphics mode]:color (0xRRGGBB)' \
   '-html-g-background-color[specify background color in graphics mode]:color (0xRRGGBB)' \

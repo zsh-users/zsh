@@ -66,6 +66,7 @@ elif _pick_variant -r variant gnu=GNU unix --version; then
   aopts=( )
   (( $#words > 2 )) && ign='!'
   args+=(
+    '--debug[annotate program execution]'
     '--follow-symlinks[follow symlinks when processing in place]'
     '(-i --in-place -s --separate)'{-i-,--in-place=-}$inplace
     '(-c --copy)'{-c,--copy}'[copy instead of rename when shuffling files in in-place mode]'

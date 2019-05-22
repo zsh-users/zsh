@@ -59,6 +59,8 @@ if _pick_variant -r variant binutils=GNU elftoolchain=elftoolchain elfutils=elfu
     binutils)
       compset -P '@' && files='*:options file:_files'
       args+=(
+        '!(--no-recurse-limit)--recurse-limit'
+        '--no-recurse-limit[disable demangling recursion limit]'
 	'(-f --format -P)-f+[specify output format]:format:(bsd sysv posix)'
 	'(-C --no-demangle)--demangle=-[decode symbol names]::style:(auto gnu lucid arm hp edg gnu-v3 java gnat rust dlang)'
 	'--plugin[load specified plugin]:plugin'

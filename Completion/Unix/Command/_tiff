@@ -249,7 +249,7 @@ if [[ -n "$state" ]]; then
       _message -e values "compression quality (0-100), or \`r' (output RGB)"
       ret=0
       ;;
-    lzw|lzma|zip)
+    lzw|lzma|zip|zstd|webp)
       _values 'LZW and deflate option' \
         '1[without differencing]' \
         '2[with differencing]' && ret=0
@@ -260,7 +260,7 @@ if [[ -n "$state" ]]; then
     while _tags; do
       while _next_label values expl 'compression scheme'; do
         compadd "$expl[@]" - none jbig g4 packbits sgilog && ret=0
-        compadd "$expl[@]" -qS: - lzw zip lzma jpeg g3 && ret=0
+        compadd "$expl[@]" -qS: - lzw zip lzma zstd webp jpeg g3 && ret=0
       done
       (( ret )) || return 0
     done

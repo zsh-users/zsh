@@ -39,6 +39,8 @@ common_report_errors=(
   '--exit-on-first-error=-[exit on the first error]:enable:(yes no)' \
   '--error-exitcode=-[exit code to return if errors found]:exit code' \
   '--error-markers=-[add lines with begin/end markers before/after]:markers (begin,end)' \
+  '(--show-error-list)-s[show detected errors list and suppression counts at exit]' \
+  '--show-error-list=-[show detected errors list and suppression counts at exit]:enable [no]:(yes no)'
   '--keep-debuginfo=-[keep symbols etc for unloaded code]:enable:(yes no)' \
   '--show-below-main=-[continue stack traces below main()]:enable [no]:(yes no)' \
   '--default-suppression=-[load default suppressions]:enable [yes]:(yes no)' \
@@ -84,6 +86,7 @@ args_addrcheck=(
 args_drd=(
   $common_own_malloc
   $common_read_varinfo
+  $common_report_errors
   '--check-stack-var=-[detect data races on stack variables]:enable [no]:(yes no)'
   '--exclusive-threshold=-[print an error if any mutex or writer lock is held longer than specified time]:time (ms)'
   '--first-race-only=-[report only the first detected data race]:enable [no]:(yes no)'
@@ -111,6 +114,7 @@ args_drd=(
 args_memcheck=(
   $args_addrcheck
   $common_read_varinfo
+  $common_report_errors
 )
 
 args_cachegrind=(
@@ -125,6 +129,7 @@ args_cachegrind=(
 args_helgrind=(
   $common_own_malloc
   $common_read_varinfo
+  $common_report_errors
   '--free-is-write=-[treat heap frees as writes]:enable [no]:(yes no)'
   '--track-lockorders=-[show lock ordering errors]:enable [yes]:(no yes)'
   '--history-level=-[specify amount of history to show for data races]:level [full]:((
@@ -186,6 +191,7 @@ args_exp_dhat=(
 
 args_exp_sgcheck=(
   $common_partial
+  $common_report_errors
   '--enable-sg-checks=-[enable stack & global array checking]:enable [yes]:(yes no)'
 )
 

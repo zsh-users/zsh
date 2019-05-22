@@ -16,6 +16,7 @@ _arguments -C -s \
   '*-n+[turn off flags]:flags:->noflags' \
   '--report-speed=:type:(bits)' \
   '(--input-file -i)'{--input-file=,-i+}'[specify input file]:file containing URLs:_files' \
+  '--input-metalink=[download files covered in local Metalink file]:file:_files' \
   '(--force-html -F)'{--force-html,-F}'[treat input file as html]' \
   '(--base -B)'{--base=,-B+}'[prepend URL to relative links]:base URL:_urls' \
   '--config=[specify config file]:config file:_files' \
@@ -57,7 +58,11 @@ _arguments -C -s \
   '--local-encoding=[specify local encoding for IRIs]:encoding' \
   '--remote-encoding=[specify default remote encoding]:encoding' \
   '--unlink[remove file before clobber]' \
-  '--no-xattr[turn off storage of metadata in extended file attributes]' \
+  '--keep-badhash[Keep files with checksum mismatch (append .badhash)]' \
+  '--metalink-index=[metalink application/metalink4+xml metaurl ordinal]:number' \
+  '--metalink-over-http[use Metalink metadata from HTTP response headers]' \
+  '--preferred-location[preferred location for Metalink resources]' \
+  '--xattr[turn on storage of metadata in extended file attributes]' \
   '(-nd --no-directories)'{-nd,--no-directories}"[don't create directories]" \
   '(--force-directories -x)'{--force-directories,-x}'[force creation of directories]' \
   '(-nH --no-host-directories)'{-nH,--no-host-directories}"[don't create host directories]" \
@@ -102,7 +107,7 @@ _arguments -C -s \
   "--ca-directory=[specify dir where hash list of CA's are stored]:directory:_directories" \
   '--crl-file=[specify file with bundle of CRLs]:file:_files' \
   '--pinnedpubkey=:file:_files' \
-  '--random-file[specify file with random data for seeding generator]:file:_files' \
+  '!--random-file=:file:_files' \
   '--egd-file=[specify filename of EGD socket]:file:_files' \
   '--ciphers=[set the priority string (GnuTLS) or cipher list string (OpenSSL) directly]:string' \
   '--no-hsts[disable HSTS]' \

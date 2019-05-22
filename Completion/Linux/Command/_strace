@@ -19,6 +19,7 @@ _arguments -C -s \
   '(-c)-T[show the time spent in system calls]' \
   '(-xx)-x[print all non-ASCII strings in hexadecimal string format]' \
   '(-x)-xx[print all strings in hexadecimal string format]' \
+  '-X+[set the format for printing of named constants and flags]:format:(raw abbrev verbose)' \
   '(-c -yy)-y[print paths associated with file descriptor arguments]' \
   '(-c -y)-yy[print protocol specific information associated with socket file descriptors]' \
   '(-C -i -k -r -ff -t -tt -ttt -T -y -yy)-c[count time, calls, and errors for each system call and report a summary]' \

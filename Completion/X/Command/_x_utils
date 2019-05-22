@@ -150,9 +150,10 @@ xon)
   ;;
 xsetroot)
   _x_arguments \
-    -{help,def,gray,grey,rv} \
+    -{help,version,def,default,gray,grey,rv,reverse} \
     '-cursor:cursor file:_files -g \*.\(\#i\)\(xbm\|curs\(\|or\)\):mask file:_files -g \*.\(\#i\)\(xbm\|curs\(\|or\)\|mask\)\(-.\)' \
     '-cursor_name:cursor name:_x_cursor' \
+    '-xcf:cursor file:_files:size' \
     '-bitmap:bitmap file:_files -g \*.\(\#i\)xbm\(-.\)' \
     '-mod:x grid distance (1-16): :y grid distance (1-16)' \
     '-fg:foreground color:_x_color' \

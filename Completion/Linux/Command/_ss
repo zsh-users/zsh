@@ -20,6 +20,7 @@ _arguments -C -s \
   "($info -i --info)"{-i,--info}'[show internal TCP information]' \
   "($info)--tipcinfo[show internal tipc socket information]" \
   "($info -s --summary)"{-s,--summary}'[print summary statistics]' \
+  "($info)--tos[show tos and priority information]" \
   "($info -b --bpf)"{-b,--bpf}'[show bpf filter socket information]' \
   "($info -E --events)"{-E,--events}'[continually display sockets as they are destroyed]' \
   "($info -Z --context)"{-Z,--context}'[display process SELinux security contexts]' \

@@ -28,12 +28,12 @@ if [[ $state = command ]]; then
   else
     cmds=(
       build cert check cleanup contents dependency environment fetch
-      generate_index help install list lock mirror open outdated owner
+      generate_index help install info list lock mirror open outdated owner
       pristine push query rdoc search server signin signout sources
       specification stale uninstall unpack update which yank
     )
     cmds=( ${(M)cmds:#${words[1]}*} )
-    if (( ${#cmds} == 1 )); then
+    if (( ${#cmds} == 1 )) || [[ $cmds[1] = install ]]; then
       cmd="$cmds[1]"
       curcontext="${curcontext%:*:*}:gem-${cmd}:"
     fi
@@ -65,15 +65,19 @@ if [[ $state = command ]]; then
     contents|pristine|rdoc)
       args+=( '(*)--all[apply to all installed gems]' )
     ;|
-    list|query) def[local]='!' ;|
+    info|list|query) def[local]='!' ;|
     search) def[remote]='!' ;|
-    list|query|search)
+    info|list|query|search)
       args+=( ${(e)lropts}
         '(-a --all)'{-a,--all}'[display all gem versions]'
         '(-e --exact)'{-e,--exact}'[use exact string matching instead of regex]'
         '(-I --no-installed -i --installed)'{-i,--installed}'[check if gem is installed]'
         '(-I --no-installed -i --installed)'{-I,--no-installed}'[check if gem is not installed]'
         '--no-versions[display only gem names]'
+      )
+    ;|
+    list|query|search)
+      args+=(
         '(-d --details)'{-d,--details}'[display detailed gem information]'
         '!(-d --details)--no-details'
       )
@@ -114,11 +118,15 @@ if [[ $state = command ]]; then
         '--suggestions[suggest alternates when gems are not found]'
       )
     ;|
+    (un|)install|pristine|update)
+      args+=(
+        '(-n --bindir)'{-n,--bindir=}'[specify directory where binary files are located]:directory:_directories'
+      )
+    ;|
     (un|)install|update)
       args+=(
         '--ignore-dependencies[ignore dependency requirements]'
         '(-i --install-dir)'{-i,--install-dir=}'[specify gem repository directory to get installed gems]:directory:_directories'
-        '(-n --bindir)'{-n,--bindir=}'[specify directory where binary files are located]:directory:_directories'
       )
     ;|
     owner|push)
@@ -130,13 +138,18 @@ if [[ $state = command ]]; then
     owner|push|signin|yank)
       args+=( '--host=[use another gemcutter-compatible host]:host:_urls' )
     ;|
+    owner|push|signin)
+      args+=( '--otp=[specify digit code for multifactor authentication]:code' )
+    ;|
     install|pristine|update)
       args+=( '(-E --env-shebang)'{-E,--env-shebang}'[rewrite executables with a shebang of /usr/bin/env]' )
     ;|
-
     build)
       args+=(
-        '--force[skip validation of the spec]'
+        '(--strict)--force[skip validation of the spec]'
+        '(--force)--strict[consider warnings as errors when validating the spec]'
+        '(-o --output)'{-o+,--output=}'[output gem with the given filename]:file:_files'
+        '-C+[run as if specified directory was the current directory]:directory:_directories'
         '1:gemspec file:_files -g "*.gemspec(-.)"'
       )
     ;;
@@ -150,6 +163,7 @@ if [[ $state = command ]]; then
         '(-K --private-key)'{-K,--private-key=}'[specify key for --sign or --build]:key'
         '(-s --sign)'{-s,--sign=}'[sign specified certificate with the key from -K and the certificate from -C]:certificate'
         '(-d --days)'{-d,--days=}'[specify days before certificate expires]:days'
+        '(-R --re-sign)'{-R,--re-sign}'[re-sign the certificate]'
       )
     ;;
     check)
@@ -161,7 +175,10 @@ if [[ $state = command ]]; then
       )
     ;;
     cleanup)
-      args+=( '(-n -d --dryrun)'{-n,-d,--dryrun}"[don't uninstall gems]" )
+      args+=(
+        '(-n -d --dryrun)'{-n,-d,--dryrun}"[don't uninstall gems]"
+        "--user-install[cleanup in user's home directory instead of GEM_HOME]"
+      )
     ;;
     contents)
       args+=(

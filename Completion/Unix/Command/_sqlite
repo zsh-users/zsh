@@ -49,6 +49,7 @@ options+=(
   '(-*batch -*interactive)'$^dashes'-batch[force batch I/O]'
   '(-*batch -*interactive)'$^dashes'-interactive[force interactive I/O]'
   $^dashes'-lookaside[specify size and number of entries for lookaside memory]:size (bytes): :entries'
+  $^dashes'-memtrace[trace all memory allocations and deallocations'
   $^dashes'-mmap[set default mmap size]:size'
   $^dashes'-newline[set output row separator]:separator [\n]'
   $^dashes'-pagecache[specify size and number of slots for page cache memory]:size (bytes): :slots'
@@ -69,6 +70,7 @@ if [[ -n $words[(r)-A*] ]]; then
     + '(commands)' \
     '(-c --create)'{-c,--create}'[create a new archive]'
     '(-u --update)'{-u,--update}'[update or add files to an existing archive]'
+    '(-i --insert)'{-i,--insert}'[like -u but always add even if mtime unchanged]'
     '(-t --list)'{-t,--list}'[list contents of archive]'
     '(-x --extract)'{-x,--extract}'[extract files from archive]'
   )

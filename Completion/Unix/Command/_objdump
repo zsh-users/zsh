@@ -24,6 +24,7 @@ case $variant in
     "*"{-P,--private=}"[Display object format specific contents]:option"
     "(-h --section-headers --headers)"{-h,--section-headers,--headers}"[Display the contents of the section headers]"
     "(-x --all-headers)"{-x,--all-headers}"[Display the contents of all headers]"
+    '--disassemble=[display assembler contents for specified symbol]:symbol'
     "(-D --disassemble-all)"{-D,--disassemble-all}"[Display assembler contents of all sections]"
     "(-S --source)"{-S,--source}"[Intermix source code with disassembly]"
     "(-g --debugging)"{-g,--debugging}"[Display debug information in object file]"
@@ -55,6 +56,8 @@ case $variant in
     "(-F --file-offsets)"{-F,--file-offsets}"[Include file offsets when displaying information]"
     "(-C --demangle)-C[Decode mangled/processed symbol names]"
     "(-C --demangle)--demangle=-[decode mangled/processed symbol names]::style:(auto gnu lucid arm hp edg gnu-v3 java gnat rust dlang)"
+    '!(--no-recurse-limit)--recurse-limit'
+    '--no-recurse-limit[disable demangling recursion limit]'
     "(-w --wide)"{-w,--wide}"[Format output for more than 80 columns]"
     "(-z --disassemble-zeroes)"{-z,--disassemble-zeroes}"[Do not skip blocks of zeroes when disassembling]"
 
