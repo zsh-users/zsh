@@ -1,3 +1,8 @@
+2026-08-05  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 55055: Src/builtin.c, Test/A07control.ztst: break: more
+	completely enumerate loop types we are not in
+
 2026-07-25  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 54994: Src/Modules/db_gdbm.c, configure.ac: use gdbm_fd_open

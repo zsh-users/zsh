@@ -5822,13 +5822,13 @@ bin_break(char *name, char **argv, UNUSED(Options ops), int func)
     switch (func) {
     case BIN_CONTINUE:
 	if (!loops) {   /* continue is only permitted in loops */
-	    zerrnam(name, "not in while, until, select, or repeat loop");
+	    zerrnam(name, "not in for, while, until, select, or repeat loop");
 	    return 1;
 	}
 	contflag = 1; /* FALLTHROUGH */
     case BIN_BREAK:
 	if (!loops) {   /* break is only permitted in loops */
-	    zerrnam(name, "not in while, until, select, or repeat loop");
+	    zerrnam(name, "not in for, while, until, select, or repeat loop");
 	    return 1;
 	}
 	breaks = nump ? minimum(num,loops) : 1;
