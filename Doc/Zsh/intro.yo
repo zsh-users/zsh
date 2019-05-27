@@ -15,6 +15,9 @@ startlist()
 ifzshone(\
 list(em(zsh)          Zsh overview (this section))
 )\
+ifzshall(\
+list(em(zsh)          Zsh overview)
+)\
 list(em(zshroadmap)   Informal introduction to the manual)
 list(em(zshmisc)      Anything not fitting into the other sections)
 list(em(zshexpn)      Zsh command and parameter expansion)

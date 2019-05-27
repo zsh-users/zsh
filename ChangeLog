@@ -1,3 +1,8 @@
+2019-05-28  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Jim Murphy: 44364: Doc/Zsh/intro.yo: refer to main zsh page in
+	zshall doc.
+
 2019-05-23  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* unposted: Completion/Linux/Command/_iptables: remove spurious
