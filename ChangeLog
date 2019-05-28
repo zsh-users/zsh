@@ -1,3 +1,8 @@
+2019-05-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 44361: Src/pattern.c: Ensure variables used recursively are
+	initialised in pattern matching.
+
 2019-05-28  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Jim Murphy: 44364: Doc/Zsh/intro.yo: refer to main zsh page in

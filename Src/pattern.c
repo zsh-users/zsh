@@ -2030,6 +2030,16 @@ int errsfound;				/* Total error count so far */
 /**/
 int forceerrs;				/* Forced maximum error count */
 
+/*
+ * exactpos is used to remember how far down an exact string we have
+ * matched, if we are doing approximation and can therefore redo from
+ * the same point; we never need to otherwise.
+ *
+ * exactend is a pointer to the end of the string, which isn't
+ * null-terminated.
+ */
+static char *exactpos, *exactend;
+
 /**/
 void
 pattrystart(void)
@@ -2463,6 +2473,8 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalenin,
 
 	patinput = patinstart;
 
+	exactpos = exactend = NULL;
+	/* The only external call to patmatch --- all others are recursive */
 	if (patmatch((Upat)progstr)) {
 	    /*
 	     * we were lazy and didn't save the globflags if an exclusion
@@ -2651,16 +2663,6 @@ patmatchlen(void)
  */
 #define CHARMATCH_EXPR(expr, chpa) \
 	(charmatch_cache = (expr), CHARMATCH(charmatch_cache, chpa))
-
-/*
- * exactpos is used to remember how far down an exact string we have
- * matched, if we are doing approximation and can therefore redo from
- * the same point; we never need to otherwise.
- *
- * exactend is a pointer to the end of the string, which isn't
- * null-terminated.
- */
-static char *exactpos, *exactend;
 
 /*
  * Main matching routine.
