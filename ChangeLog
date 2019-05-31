@@ -1,3 +1,8 @@
+2019-06-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Stephane (44387, edited): Doc/Zsh/restricted.yo: Describe some
+	problems with restricted mode.
+
 2019-06-03  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 44389: Completion/BSD/Type/_bsd_disks,
