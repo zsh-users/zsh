@@ -4,42 +4,53 @@ local -a args parser
 parser=( -s -S -A '-*' )
 
 case $OSTYPE:l in
-  *bsd*)
+  *bsd*|dragonfly*)
     args+=(
-      '-c[repeat the display N times]:count'
+      '-c+[repeat the display N times]:count'
       '-C[display CPU statistics]'
       '-d[display only device statistics]'
       '-I[display total statistics for a given period, rather than average]'
-      '-M[extract values of the name list from specified file]:core:_files'
-      '-N[extract the name list from the specified file]:system:_files'
       '-T[display TTY statistics]'
-      '-w[specify the duration of pauses between each display]:duration'
+      '-w+[specify the duration of pauses between each display]:duration'
+      '*: :_bsd_disks'
+    )
+    ;|
+  freebsd*|openbsd*|dragonfly*)
+    args+=(
+      '-M+[extract values of the name list from specified file]:core:_files'
+      '-N+[extract the name list from the specified file]:system:_files'
+    )
+    ;|
+  freebsd*|dragonfly*)
+    args+=(
+      '-h[top mode]'
+      '-K[display block count in kilobytes, not block size]'
+      '-n+[display up to the specified number fo devices]:number of disks'
+      '-o[display old-style iostat device statistics]'
+      '*-t+[specify which type of device to display]: :_fbsd_device_types'
     )
     ;|
   freebsd*)
     args+=(
-      '-h[top mode]'
-      '-K[display block count in kilobytes, not block size]'
-      '-o[display old-style iostat device statistics]'
-      '-t[specify which type of device to display]: :->devicetype'
       '-x[show extended disk statistics]'
       '-z[omit lines for devices with no activity]'
-      '-?[display a usage statement and exit]'
-      '*:drives:( ${${(M)${(f)"$(geom disk list)"}\:#Geom name\:*}#*\: } )'
+      '(* -)-?[display a usage statement and exit]'
     )
     ;;
-  openbsd*)
+  dragonfly*)
+    args+=(
+      '-D[display more details]'
+    )
+    ;;
+  openbsd*|netbsd*)
     args+=(
       '-D[display alternate disk statistics]'
-      '*:drives:( ${${(s.,.)"$(sysctl -n hw.disknames)"}%\:*} )'
     )
-    ;;
+    ;|
   netbsd*)
     args+=(
-      '-D[display alternate disk statistics]'
       '-x[show extended disk statistics]'
       '-y[report data on waiting and active requests]'
-      '*:drives:( $(sysctl -n hw.disknames) )'
     )
     ;;
   aix*)
@@ -97,16 +108,17 @@ case $OSTYPE:l in
     ;;
   darwin*)
     args=(
+      '(- *)-?[display usage statement and exit]'
       '-C[display CPU statistics]'
-      '-c[number of times to display statistics]'
+      '-c+[number of times to display statistics]:count'
       '-d[display only device statistics]'
-      '-l[total statistics for a given time period]'
+      '-I[display total statistics for a given period, rather than average]'
       '-K[display block count in kilobytes]'
-      '-n[limit the number of disks included in the report]:number of disks'
+      '-n+[limit the number of disks included in the report]:number of disks'
       '-o[display old-style iostat device statistics]'
       '-T[display TTY statistics]'
       '-U[display system load averages]'
-      '-w[specify the duration of pauses between each display]:duration'
+      '-w+[specify the duration of pauses between each display]:duration'
       '*::device:_files -W /dev -g "disk*"'
     )
     ;;

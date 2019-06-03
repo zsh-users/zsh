@@ -28,11 +28,11 @@ case $OSTYPE in
       '-M+[specify core file to extract values associated with the name list from]:core:_files'
       '-N+[specify file to extract the name list from]:system:_files'
       '-w+[specify delay between each display]:delay (seconds)'
-      '*:disk:_files'
+      '*: :_bsd_disks'
     )
   ;|
   *bsd*)
-    specs=(
+    specs+=(
       '-f[report on the number fork syscalls since boot and pages of virtual memory for each]'
     )
   ;|
@@ -89,12 +89,6 @@ case $OSTYPE in
       '-v[include IRQ numbers and IRQ target CPU numbers before device names (with -i)]'
     )
   ;;
-  freebsd*|solaris*)
-    specs+=(
-      '::disk:_files -W /dev -g "*(-%b)"'
-      ': :_guard "[0-9]#" "interval (seconds)"' ':count'
-    )
-  ;|
   solaris2.<11->)
     specs+=( '(-i -s)-T+[specify time format]:time format:((u\:seconds\ since\ epoch d\:standard\ date\ format))' )
   ;&
@@ -106,30 +100,20 @@ case $OSTYPE in
       '-p[report paging activity]'
       '(-T)-s[display the total number of system events since boot]'
       '-S[report on swapping rather than paging activity]'
+      '::disk:_files -W /dev -g "*(-%b)"'
+      ': :_guard "[0-9]#" "interval (seconds)"' '::count'
     )
   ;;
 esac
 
 if (( $#specs )); then
   local curcontext=$curcontext state state_descr line ret=1
-  typeset -A {opt,val}_args
+  typeset -A opt_args
 
   _arguments -C -s -w -A '-*' : "$specs[@]" && ret=0
 
   if [[ $state == devices ]]; then
-    local -a types
-    types=(
-      'da[direct access devices]' 'sa[sequential access devices]'
-      'printer[printers]' 'proc[processor devices]'
-      'worm[write once read multiple devices]' 'cd[CD devices]'
-      'scanner[scanner devices]' 'optical[optical memory devices]'
-      'changer[medium changer devices]' 'comm[communication devices]'
-      'array[storage array devices]' 'enclosure[enclosure services devices]'
-      'floppy[floppy devices]' 'IDE[Integrated Drive Electronics devices]'
-      'SCSI[Small Computer System Interface devices]'
-      'other[any other device interface]' 'pass[passthrough devices]'
-    )
-    _values -s , 'device type' "$types[@]" && ret=0
+    _fbsd_device_types && ret=0
   elif [[ $state == hashes ]]; then
    local -a tables
    tables=( ${${${(f)"$(_call_program hashes $words[1] -L)"}[2,-1]#?}/ ##/:} )

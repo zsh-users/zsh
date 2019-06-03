@@ -1,3 +1,10 @@
+2019-06-03  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 44389: Completion/BSD/Type/_bsd_disks,
+	Completion/BSD/Type/_fbsd_device_types,
+	Completion/Unix/Command/_iostat, Completion/Unix/Command/_vmstat:
+	update _iostat and _vmstat for BSD
+
 2019-05-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 44361: Src/pattern.c: Ensure variables used recursively are
