@@ -1,3 +1,9 @@
+2019-06-19  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Roman Perepelitsa: 44430: Src/prompt.c: various problems with
+	countprompt() including wide characters, split tabs and trailing
+	Meta characters.
+
 2019-06-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Eitan Adler: 44409: config.guess, config.sub: update to
