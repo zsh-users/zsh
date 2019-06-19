@@ -1,3 +1,8 @@
+2019-06-10  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Eitan Adler: 44409: config.guess, config.sub: update to
+	2019-05-28.
+
 2019-06-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Stephane (44387, edited): Doc/Zsh/restricted.yo: Describe some
