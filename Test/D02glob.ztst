@@ -700,3 +700,31 @@
  print ${value//[${foo}b-z]/x}
 0:handling of - range in complicated pattern context
 >xx
+
+ pathtotest=glob.tmp/my/test/dir/that/does/not/exist
+ mkdir -p $pathtotest
+ print $pathtotest(:h)
+ print $pathtotest(:h0)
+ print $pathtotest(:h10)
+ print $pathtotest(:h3)
+ print $pathtotest(:h2)
+ print $pathtotest(:h1)
+ print $pathtotest(:t)
+ print $pathtotest(:t0)
+ print $pathtotest(:t10)
+ print $pathtotest(:t3)
+ print $pathtotest(:t2)
+ print $pathtotest(:t1)
+0:modifiers :h and :t with numbers (main test is in D04parameter.ztst)
+>glob.tmp/my/test/dir/that/does/not
+>glob.tmp/my/test/dir/that/does/not
+>glob.tmp/my/test/dir/that/does/not/exist
+>glob.tmp/my/test
+>glob.tmp/my
+>glob.tmp
+>exist
+>exist
+>glob.tmp/my/test/dir/that/does/not/exist
+>does/not/exist
+>not/exist
+>exist

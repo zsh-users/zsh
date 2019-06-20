@@ -2511,7 +2511,7 @@ makecomplistcmd(char *os, int incmd, int flags)
     else if (!(cmdstr &&
 	  (((ccp = (Compctlp) compctltab->getnode(compctltab, cmdstr)) &&
 	    (cc = ccp->cc)) ||
-	   ((s = dupstring(cmdstr)) && remlpaths(&s) &&
+	   ((s = dupstring(cmdstr)) && remlpaths(&s, 1) &&
 	    (ccp = (Compctlp) compctltab->getnode(compctltab, s)) &&
 	    (cc = ccp->cc))))) {
 	if (flags & CFN_DEFAULT)

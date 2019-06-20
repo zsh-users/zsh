@@ -3438,7 +3438,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	    s--;
 	    if (unset(KSHARRAYS) || inbrace) {
 		if (!isarr)
-		    modify(&val, &s);
+		    modify(&val, &s, inbrace);
 		else {
 		    char *ss;
 		    char **ap = aval;
@@ -3447,12 +3447,12 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 
 		    while ((*pp = *ap++)) {
 			ss = s;
-			modify(pp++, &ss);
+			modify(pp++, &ss, inbrace);
 		    }
 		    if (pp == aval) {
 			char *t = "";
 			ss = s;
-			modify(&t, &ss);
+			modify(&t, &ss, inbrace);
 		    }
 		    s = ss;
 		}
@@ -4182,6 +4182,12 @@ arithsubst(char *a, char **bptr, char *rest)
  * PTR is an in/out parameter.  On entry it contains the string of colon
  * modifiers.  On return it points past the last recognised modifier.
  *
+ * INBRACE is non-zero if we are in some form of a bracketed or
+ * parenthesised expression; it is zero for modifiers ocurring
+ * in an an unbracketed variable substitution.  This means that
+ * $foo:t222 is treated ias ${foo:t}222 rather than ${foo:t222}
+ * for backward compatibility.
+ *
  * Example:
  *     ENTRY:   *str is "."   *ptr is ":AN"
  *     RETURN:  *str is "/home/foobar" (equal to $PWD)   *ptr points to the "N"
@@ -4189,7 +4195,7 @@ arithsubst(char *a, char **bptr, char *rest)
 
 /**/
 void
-modify(char **str, char **ptr)
+modify(char **str, char **ptr, int inbrace)
 {
     char *ptr1, *ptr2, *ptr3, *lptr, c, *test, *sep, *t, *tt, tc, *e;
     char *copy, *all, *tmp, sav, sav1, *ptr1end;
@@ -4202,6 +4208,8 @@ modify(char **str, char **ptr)
 	*str = dupstring(*str);
 
     while (**ptr == ':') {
+	int count = 0;
+
 	lptr = *ptr;
 	(*ptr)++;
 	wall = gbal = 0;
@@ -4214,16 +4222,25 @@ modify(char **str, char **ptr)
             case 'a':
             case 'A':
 	    case 'c':
-	    case 'h':
 	    case 'r':
 	    case 'e':
-	    case 't':
 	    case 'l':
 	    case 'u':
 	    case 'q':
 	    case 'Q':
 	    case 'P':
 		c = **ptr;
+		break;
+
+	    case 'h':
+	    case 't':
+		c = **ptr;
+		if (inbrace && idigit((*ptr)[1])) {
+		    do {
+			count = 10 * count + ((*ptr)[1] - '0');
+			++(*ptr);
+		    } while (idigit((*ptr)[1]));
+		}
 		break;
 
 	    case 's':
@@ -4392,7 +4409,7 @@ modify(char **str, char **ptr)
 			break;
 		    }
 		    case 'h':
-			remtpath(&copy);
+			remtpath(&copy, count);
 			break;
 		    case 'r':
 			remtext(&copy);
@@ -4401,7 +4418,7 @@ modify(char **str, char **ptr)
 			rembutext(&copy);
 			break;
 		    case 't':
-			remlpaths(&copy);
+			remlpaths(&copy, count);
 			break;
 		    case 'l':
 			copy = casemodify(tt, CASMOD_LOWER);
@@ -4478,7 +4495,7 @@ modify(char **str, char **ptr)
 		    break;
 		}
 		case 'h':
-		    remtpath(str);
+		    remtpath(str, count);
 		    break;
 		case 'r':
 		    remtext(str);
@@ -4487,7 +4504,7 @@ modify(char **str, char **ptr)
 		    rembutext(str);
 		    break;
 		case 't':
-		    remlpaths(str);
+		    remlpaths(str, count);
 		    break;
 		case 'l':
 		    *str = casemodify(*str, CASMOD_LOWER);

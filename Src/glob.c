@@ -400,7 +400,7 @@ insert(char *s, int checked)
 	if (colonmod) {
 	    /* Handle the remainder of the qualifier:  e.g. (:r:s/foo/bar/). */
 	    char *mod = colonmod;
-	    modify(&news, &mod);
+	    modify(&news, &mod, 1);
 	}
 	if (!statted && (gf_sorts & GS_NORMAL)) {
 	    statfullpath(s, &buf, 1);

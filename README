@@ -30,8 +30,27 @@ Zsh is a shell with lots of features.  For a list of some of these, see the
 file FEATURES, and for the latest changes see NEWS.  For more
 details, see the documentation.
 
-Incompatibilities since 5.6.2
+Incompatibilities since 5.7.1
 -----------------------------
+
+The history expansion !:1:t2 used to be interpreted such that the 2
+was a separate character added after the history expansion.  Now
+it is an argument to the :t modifier.
+
+For example
+
+% echo /my/interesting/path
+% echo !:1:t2
+
+used to echo "path2", but now echoes "interesting/path".
+
+The behaviour of :h has similarly changed.
+
+The behaviour has also changed in forms such as ${foo:t2) and *(:t2),
+but in those cases the previous behaviour was not meaningful.
+
+Incompatibilities between 5.6.2 and 5.7.1
+-----------------------------------------
 
 1) vcs_info git: The gen-unapplied-string hook receives the patches in
 order (next to be applied first).  This is consistent with the hg

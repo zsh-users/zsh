@@ -260,9 +260,23 @@ see the definition of the filename extension in the description of the
 tt(r) modifier below.  Note that according to that definition the result
 will be empty if the string ends with a `tt(.)'.
 )
-item(tt(h))(
-Remove a trailing pathname component, leaving the head.  This works
-like `tt(dirname)'.
+item(tt(h) [ var(digits) ])(
+Remove a trailing pathname component, shortening the path by one
+directory level: this is the `head' of the pathname.  This works like
+`tt(dirname)'.  If the tt(h) is followed immediately (with no spaces or
+other separator) by any number of decimal digits, and the value of the
+resulting number is non-zero, that number of leading components is
+preserved instead of the final component being removed.  In an
+absolute path the leading `tt(/)' is the first component, so,
+for example, if tt(var=/my/path/to/something), then tt(${var:h3})
+substitutes tt(/my/path).  Consecutive `/'s are treated the same as
+a single `/'.  In parameter substitution, digits may only be
+used if the expression is in braces, so for example the short form
+substitution tt($var:h2) is treated as tt(${var:h}2), not as
+tt(${var:h2}).  No restriction applies to the use of digits in history
+substitution or globbing qualifiers.  If more components are requested
+than are present, the entire path is substituted (so this does not
+trigger a `failed modifier' error in history expansion).
 )
 item(tt(l))(
 Convert the words to all lowercase.
@@ -316,9 +330,12 @@ immediately by a tt(g).  In parameter expansion the tt(&) must appear
 inside braces, and in filename generation it must be quoted with a
 backslash.
 )
-item(tt(t))(
-Remove all leading pathname components, leaving the tail.  This works
-like `tt(basename)'.
+item(tt(t) [ var(digits) ])(
+Remove all leading pathname components, leaving the final component (tail).
+This works like `tt(basename)'.  Any trailing slashes are first removed.
+Decimal digits are handled as described above for (h), but in this
+case that number of trailing components is preserved instead of
+the default 1; 0 is treated the same as 1.
 )
 item(tt(u))(
 Convert the words to all uppercase.

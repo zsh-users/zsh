@@ -2445,3 +2445,80 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
     : <<< ${(F)x/y}
   }
 0:Separation / join logic regresssion test
+
+  testpath=/one/two/three/four
+  for (( i = 0; i <= 6; ++i )); do
+    eval "print \$testpath:t$i"
+    eval "print \${testpath:t$i}"
+  done
+0:t with trailing digits
+>four0
+>four
+>four1
+>four
+>four2
+>three/four
+>four3
+>two/three/four
+>four4
+>one/two/three/four
+>four5
+>/one/two/three/four
+>four6
+>/one/two/three/four
+
+  testpath=/one/two/three/four
+  for (( i = 0; i <= 6; ++i )); do
+    eval "print \$testpath:h$i"
+    eval "print \${testpath:h$i}"
+  done
+0:h with trailing digits
+>/one/two/three0
+>/one/two/three
+>/one/two/three1
+>/
+>/one/two/three2
+>/one
+>/one/two/three3
+>/one/two
+>/one/two/three4
+>/one/two/three
+>/one/two/three5
+>/one/two/three/four
+>/one/two/three6
+>/one/two/three/four
+
+  testpath=/a/quite/long/path/to/do/messy/stuff/with
+  print $testpath:h2:t3:h5:t16:h2n2
+  print ${testpath:t5:h2}
+  print ${testpath:t5:h2:t}
+  print ${testpath:h6:t4:h3:t2:h}
+  print ${testpath:h10:t10:t6:h3}
+  print ${testpath:t9:h}
+  print ${testpath:t9:h:t}
+0:Combinations of :h and :t with and without trailing digits
+>/a/quite/long/path/to/do/messy/stuff2:t3:h5:t16:h2n2
+>to/do
+>do
+>long
+>path/to/do
+>a/quite/long/path/to/do/messy/stuff
+>stuff
+
+ testpath=///this//has////lots//and////lots//of////slashes
+ print ${testpath:h3}
+ print ${testpath:t4}
+0:Multiple slashes are treated as one in :h and :t but are not removed
+>///this//has
+>and////lots//of////slashes
+
+ testpath=trailing/slashes/are/removed///
+ print ${testpath:h}
+ print ${testpath:h2}
+ print ${testpath:t}
+ print ${testpath:t2}
+0:Modifiers :h and :t remove trailing slashes before examining path
+>trailing/slashes/are
+>trailing/slashes
+>removed
+>are/removed

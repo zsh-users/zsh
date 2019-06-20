@@ -1,3 +1,10 @@
+2019-06-20  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 44435: Doc/Zsh/expn.yo, NEWS, README, Src/Zle/compctl.c,
+	Src/glob.c, Src/hist.c, Src/subst.c, Test/D02glob.ztst,
+	Test/D04parameter.ztst, Test/W01history.ztst: Handle
+	trailing digit arguments of :t and :h modifiers.
+
 2019-06-19  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Roman Perepelitsa: 44430: Src/prompt.c: various problems with

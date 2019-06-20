@@ -555,6 +555,27 @@ substfailed(void)
     return -1;
 }
 
+/*
+ * Return a count given by decimal digits after a modifier.
+ */
+static int
+digitcount(void)
+{
+    int c = ingetc(), count;
+
+    if (idigit(c)) {
+	count = 0;
+	do {
+	    count = 10 * count + (c - '0');
+	    c = ingetc();
+	} while (idigit(c));
+    }
+    else
+	count = 0;
+    inungetc(c);
+    return count;
+}
+
 /* Perform history substitution, returning the next character afterwards. */
 
 /**/
@@ -835,7 +856,7 @@ histsubchar(int c)
 		}
 		break;
 	    case 'h':
-		if (!remtpath(&sline)) {
+		if (!remtpath(&sline, digitcount())) {
 		    herrflush();
 		    zerr("modifier failed: h");
 		    return -1;
@@ -856,7 +877,7 @@ histsubchar(int c)
 		}
 		break;
 	    case 't':
-		if (!remlpaths(&sline)) {
+		if (!remlpaths(&sline, digitcount())) {
 		    herrflush();
 		    zerr("modifier failed: t");
 		    return -1;
@@ -1974,16 +1995,18 @@ chrealpath(char **junkptr)
 
 /**/
 int
-remtpath(char **junkptr)
+remtpath(char **junkptr, int count)
 {
     char *str = strend(*junkptr);
 
     /* ignore trailing slashes */
     while (str >= *junkptr && IS_DIRSEP(*str))
 	--str;
-    /* skip filename */
-    while (str >= *junkptr && !IS_DIRSEP(*str))
-	--str;
+    if (!count) {
+	/* skip filename */
+	while (str >= *junkptr && !IS_DIRSEP(*str))
+	    --str;
+    }
     if (str < *junkptr) {
 	if (IS_DIRSEP(**junkptr))
 	    *junkptr = dupstring ("/");
@@ -1992,6 +2015,34 @@ remtpath(char **junkptr)
 
 	return 0;
     }
+
+    if (count)
+    {
+	/*
+	 * Return this many components, so start from the front.
+	 * Leading slash counts as one component, consistent with
+	 * behaviour of repeated applications of :h.
+	 */
+	char *strp = *junkptr;
+	while (strp < str) {
+	    if (IS_DIRSEP(*strp)) {
+		if (--count <= 0) {
+		    if (strp == *junkptr)
+			++strp;
+		    *strp = '\0';
+		    return 1;
+		}
+		/* Count consecutive separators as one */
+		while (IS_DIRSEP(strp[1]))
+		    ++strp;
+	    }
+	    ++strp;
+	}
+
+	/* Full string needed */
+	return 1;
+    }
+
     /* repeated slashes are considered like a single slash */
     while (str > *junkptr && IS_DIRSEP(str[-1]))
 	--str;
@@ -2040,7 +2091,7 @@ rembutext(char **junkptr)
 
 /**/
 mod_export int
-remlpaths(char **junkptr)
+remlpaths(char **junkptr, int count)
 {
     char *str = strend(*junkptr);
 
@@ -2050,12 +2101,29 @@ remlpaths(char **junkptr)
 	    --str;
 	str[1] = '\0';
     }
-    for (; str >= *junkptr; --str)
-	if (IS_DIRSEP(*str)) {
-	    *str = '\0';
-	    *junkptr = dupstring(str + 1);
-	    return 1;
+    for (;;) {
+	for (; str >= *junkptr; --str) {
+	    if (IS_DIRSEP(*str)) {
+		if (--count > 0) {
+		    if (str > *junkptr) {
+			--str;
+			break;
+		    } else {
+			/* Whole string needed */
+			return 1;
+		    }
+		}
+		*str = '\0';
+		*junkptr = dupstring(str + 1);
+		return 1;
+	    }
 	}
+	/* Count consecutive separators as 1 */
+	while (str >= *junkptr && IS_DIRSEP(*str))
+	    --str;
+	if (str <= *junkptr)
+	    break;
+    }
     return 0;
 }
 
