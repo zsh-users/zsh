@@ -1,3 +1,8 @@
+2019-06-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Martijn: 44443: Src/builtin.c: POSIX allows exporting readonly
+	variables.
+
 2019-06-20  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 44435: Doc/Zsh/expn.yo, NEWS, README, Src/Zle/compctl.c,
