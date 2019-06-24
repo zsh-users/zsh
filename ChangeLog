@@ -1,5 +1,7 @@
 2019-12-16  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* github #36: Aurélien Olivier: Add completion file for GNU Stow
+
 	* 45035: Doc/Zsh/zle.yo: be explicit about the need for
 	a # in colours specified as hex triplets
 
