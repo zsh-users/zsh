@@ -1,3 +1,8 @@
+2019-06-24  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 44446: Src/parse.c, Test/A04redirect.ztst: fix here document
+	with file descriptor declarator.
+
 2019-06-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Martijn: 44443: Src/builtin.c: POSIX allows exporting readonly

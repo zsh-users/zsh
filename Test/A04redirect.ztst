@@ -692,11 +692,19 @@
 >b
 >d
 
-  umask 0777
+  (umask 0777
   cat <<'  HERE'
   look ma, no permissions
   HERE
   cat <<<"it's a miracle"
+  )
 0:Here-{string,document}s succeed with restrictive umask
 >  look ma, no permissions
 >it's a miracle
+
+  exec {testfd}<<'  HERE'
+  This is, in some sense, a here document.
+  HERE
+  cat <&$testfd
+0:Regression test for here document with fd declarator
+>  This is, in some sense, a here document.
