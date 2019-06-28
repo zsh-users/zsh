@@ -79,3 +79,20 @@
   test_getopts +x
 1:one illegal option, + variant
 >test_getopts:3: bad option: +x
+
+  set -- -x
+  OPTIND=1
+  while getopts x: opt; do
+    echo "$opt,${OPTARG:-Empty}"
+  done
+0:missing option-argument (error message mode)
+>?,Empty
+?(eval):3: argument expected after -x option
+
+  set -- -x
+  OPTIND=1
+  while getopts :x: opt; do
+    echo "$opt,${OPTARG:-Empty}"
+  done
+0:missing option-argument (quiet mode)
+>:,x

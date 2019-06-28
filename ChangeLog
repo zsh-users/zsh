@@ -1,3 +1,8 @@
+2019-07-01  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Martijn: 44469: Src/builtin.c, Test/B10getopts.ztst: correct
+	error on missing option argument.
+
 2019-06-24  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 44446: Src/parse.c, Test/A04redirect.ztst: fix here document

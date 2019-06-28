@@ -5511,14 +5511,12 @@ bin_getopts(UNUSED(char *name), char **argv, UNUSED(Options ops), UNUSED(int fun
     /* check for legality */
     if(opch == ':' || !(p = memchr(optstr, opch, lenoptstr))) {
 	p = "?";
-    err:
 	zsfree(zoptarg);
 	setsparam(var, ztrdup(p));
 	if(quiet) {
 	    zoptarg = metafy(optbuf, lenoptbuf, META_DUP);
 	} else {
-	    zwarn(*p == '?' ? "bad option: %c%c" :
-		  "argument expected after %c%c option",
+	    zwarn("bad option: %c%c",
 		  "?-+"[lenoptbuf], opch);
 	    zoptarg=ztrdup("");
 	}
@@ -5529,8 +5527,17 @@ bin_getopts(UNUSED(char *name), char **argv, UNUSED(Options ops), UNUSED(int fun
     if(p[1] == ':') {
 	if(optcind == lenstr) {
 	    if(!args[zoptind]) {
-		p = ":";
-		goto err;
+		zsfree(zoptarg);
+		if(quiet) {
+		    setsparam(var, ztrdup(":"));
+		    zoptarg = metafy(optbuf, lenoptbuf, META_DUP);
+		} else {
+		    setsparam(var, ztrdup("?"));
+		    zoptarg = ztrdup("");
+		    zwarn("argument expected after %c%c option",
+			  "?-+"[lenoptbuf], opch);
+		}
+		return 0;
 	    }
 	    p = ztrdup(args[zoptind++]);
 	} else
