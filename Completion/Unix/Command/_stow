@@ -37,7 +37,7 @@ _stow(){
 
   if (( ${+commands[stow]} )) ; then
     if [[ "$( _call_program version stow --version 2>/dev/null )" =~ "stow\ \(GNU\ Stow\)\ version\ ([0-9]+\.[0-9]+\.[0-9]+)" ]]; then
-      autoload -z is-at-least
+      autoload -Uz is-at-least
       if is-at-least 2.3.0 "$match[1]" ; then
         arguments+=( '--dotfiles[enable special handling for dotfiles]' )
       fi
