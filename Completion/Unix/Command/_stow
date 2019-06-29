@@ -5,9 +5,12 @@
 #
 
 __stow_complete_packages() {
-  local IFS=$'\n'
-  local basedir="${1/\~/$HOME}"
-  _values -C "packages from $basedir" ${$( find -L "$basedir" -mindepth 1 -maxdepth 1 \( -name .git -o -name .svn \) -prune -o -type d -print 2>/dev/null | sed "s#^${basedir}/##" | sort -u ):-""}
+  local stow_pkg_list=( $1/*(-/N:t) )
+  if [[ ${#stow_pkg_list} -gt 0 ]]; then
+    _values -C "packages from $1" ${stow_pkg_list[@]}
+  else
+    _message "no packages found in $1"
+  fi
 }
 
 _stow(){
