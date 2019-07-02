@@ -43,7 +43,8 @@ startitem()
 item(tt(zsocket) tt(-l) [ tt(-v) ] [ tt(-d) var(fd) ] var(filename))(
 tt(zsocket -l) will open a socket listening on var(filename).
 The shell parameter tt(REPLY) will be set to the file descriptor
-associated with that listener.
+associated with that listener.  The file descriptor remains open in subshells
+and forked external executables.
 
 If tt(-d) is specified, its argument
 will be taken as the target file descriptor for
@@ -56,7 +57,8 @@ tt(zsocket -a) will accept an incoming connection
 to the socket associated with var(listenfd).
 The shell parameter tt(REPLY) will
 be set to the file descriptor associated with
-the inbound connection.
+the inbound connection.  The file descriptor remains open in subshells
+and forked external executables.
 
 If tt(-d) is specified, its argument
 will be taken as the target file descriptor for the

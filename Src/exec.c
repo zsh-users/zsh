@@ -4407,8 +4407,10 @@ closem(int how, int all)
 	    /*
 	     * Process substitution needs to be visible to user;
 	     * fd's are explicitly cleaned up by filelist handling.
+	     * External FDs are managed directly by the user.
 	     */
-	    (all || fdtable[i] != FDT_PROC_SUBST) &&
+	    (all || (fdtable[i] != FDT_PROC_SUBST &&
+		     fdtable[i] != FDT_EXTERNAL)) &&
 	    (how == FDT_UNUSED || (fdtable[i] & FDT_TYPE_MASK) == how)) {
 	    if (i == SHTTY)
 		SHTTY = -1;
@@ -4823,6 +4825,7 @@ getoutputfile(char *cmd, char **eptr)
     }
 
     /* pid == 0 */
+    closem(FDT_UNUSED, 0);
     redup(fd, 1);
     entersubsh(ESUB_PGRP|ESUB_NOMONITOR, NULL);
     cmdpush(CS_CMDSUBST);

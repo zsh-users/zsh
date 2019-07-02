@@ -182,7 +182,8 @@ indent(... tt({myfd}>&1))
 This opens a new file descriptor that is a duplicate of file descriptor
 1 and sets the parameter tt(myfd) to the number of the file descriptor,
 which will be at least 10.  The new file descriptor can be written to using
-the syntax tt(>&$myfd).
+the syntax tt(>&$myfd).  The file descriptor remains open in subshells
+and forked external executables.
 
 The syntax tt({)var(varid)tt(}>&-), for example tt({myfd}>&-), may be used
 to close a file descriptor opened in this fashion.  Note that the

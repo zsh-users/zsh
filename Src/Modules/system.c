@@ -316,7 +316,7 @@ bin_sysopen(char *nam, char **args, Options ops, UNUSED(int func))
     int o, fd, moved_fd, explicit = -1;
     mode_t perms = 0666;
 #if defined(FD_CLOEXEC) && !defined(O_CLOEXEC)
-    int fdflags;
+    int fdflags = 0;
 #endif
 
     if (!OPT_ISSET(ops, 'u')) {
@@ -396,8 +396,8 @@ bin_sysopen(char *nam, char **args, Options ops, UNUSED(int func))
 #endif /* O_CLOEXEC */
 	fcntl(moved_fd, F_SETFD, FD_CLOEXEC);
 #endif /* FD_CLOEXEC */
+    fdtable[moved_fd] = FDT_EXTERNAL;
     if (explicit == -1) {
-	fdtable[moved_fd] = FDT_EXTERNAL;
 	setiparam(fdvar, moved_fd);
 	/* if setting the variable failed, close moved_fd to avoid leak */
 	if (errflag)

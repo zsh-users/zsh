@@ -45,7 +45,9 @@ specified as a comma-separated list. The following is a list of possible
 options. Note that, depending on the system, some may not be available.
 startitem()
 item(tt(cloexec))(
-mark file to be closed when other programs are executed
+mark file to be closed when other programs are executed (else
+the file descriptor remains open in subshells and forked external
+executables)
 )
 xitem(tt(create))
 item(tt(creat))(

@@ -1,3 +1,11 @@
+2019-07-02  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 44480: Doc/Zsh/mod_socket.yo, Doc/Zsh/mod_system.yo,
+	Doc/Zsh/redirect.yo, Src/Modules/system.c, Src/exec.c:
+	Don't automatically close FDT_EXTERNAL file descriptors.
+	All sysopen-created fd's become FDT_EXTERNAL.  =(...)
+	calls closem() consistent with other substitutions.
+
 2019-07-01  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Martijn: 44469: Src/builtin.c, Test/B10getopts.ztst: correct
