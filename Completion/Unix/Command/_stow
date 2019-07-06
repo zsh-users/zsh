@@ -55,7 +55,7 @@ _stow(){
         stow_dir="$opt_args[-d]"
       elif (( $+opt_args[--dir] )) ; then
         stow_dir="$opt_args[--dir]"
-      elif (( $+STOW_DIR )) ; then
+      elif [[ ${(t)STOW_DIR} == *export* ]]; then
         # if not provided from the command line, for the stow command, the stow
         # directory is assumed to be the value of the "STOW_DIR" environment
         # variable...
