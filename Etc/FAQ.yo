@@ -128,6 +128,7 @@ Chapter 3:  How to get various things to work
 3.27. What are these `^' and `~' pattern characters, anyway?
 3.28. How do I edit the input buffer in $EDITOR?
 3.29. Why does `which' output for missing commands go to stdout?
+3.30. Why doesn't the expansion mytt(*.{tex,aux,pdf}) do what I expect?
 
 Chapter 4:  The mysteries of completion
 4.1. What is completion?
@@ -1993,6 +1994,44 @@ sect(Why does `which' output for missing commands go to stdout?)
   where the command is to be executed.  So although it differs from
   other Bourne-style shells it is in fact self-consistent.  Note that
   the exit status does reflect the fact the command can't be found.
+
+
+sect(Why doesn't the expansion mytt(*.{tex,aux,pdf}) do what I expect?)
+
+  Based on the behaviour of some other shells, you might guess that the
+  following expression:
+  verb(
+    echo *.{tex,aux,pdf}
+  )
+  would be the way to echo any files ending in mytt(.tex), mytt(.aux) or
+  mytt(.pdf) in the current directory.  Depending on your settings for
+  matching (see link(2.1)(21), in particular tt(NO_NOMATCH)), you may
+  see something else, in particular an error about (say) mytt(*.aux) if
+  there were no files ending mytt(.aux).
+
+  The reason for this is that the brace expansion isn't actually
+  a form of pattern matching.  Instead, the line above is equivalent to
+  verb(
+    echo *.tex *.aux *.pdf
+  )
+  giving you three separate patterns.  With the default mytt(NOMATCH)
+  behaviour in effect, any pattern that fails to match is an error.
+
+  However, there em(is) a way of doing exactly what you want, using
+  parentheses instead of braces:
+  verb(
+    echo *.(tex|aux|pdf)
+  )
+  This is now a pattern matching expression, so is considered as a
+  single pattern.  Now any file that exists will supress the
+  mytt(NOMATCH) behaviour, but you'll still get all the files that do
+  match.
+
+  This use of parentheses is special to zsh.  Modern Bourne-like shells
+  have a syntax like this, too, but with an mytt(@) in front of the
+  parentheses: again, see link(2.1)(21), and search for mytt(@+LPAR()).
+  This is harder for the user to remember but easier for the shell to
+  parse!
 
 
 chapter(The mysteries of completion)
