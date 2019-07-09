@@ -3029,7 +3029,7 @@ eval_autoload(Shfunc shf, char *name, Options ops, int func)
     }
     if (OPT_MINUS(ops,'X')) {
 	char *fargv[3];
-	fargv[0] = name;
+	fargv[0] = quotestring(name, QT_SINGLE_OPTIONAL);
 	fargv[1] = "\"$@\"";
 	fargv[2] = 0;
 	shf->funcdef = mkautofn(shf);
