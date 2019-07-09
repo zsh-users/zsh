@@ -2023,7 +2023,7 @@ sect(Why doesn't the expansion mytt(*.{tex,aux,pdf}) do what I expect?)
     echo *.(tex|aux|pdf)
   )
   This is now a pattern matching expression, so is considered as a
-  single pattern.  Now any file that exists will supress the
+  single pattern.  Now any file that exists will suppress the
   mytt(NOMATCH) behaviour, but you'll still get all the files that do
   match.
 
@@ -2263,22 +2263,21 @@ sect(How does zsh handle multibyte input and output?)
   cause all sorts of odd effects.  (It was possible to edit in zsh using
   single-byte extensions of ASCII such as the ISO 8859 family, however.)
 
-  From version 4.3.4, multibyte input is handled in the line editor if zsh
-  has been compiled with the appropriate definitions, and is automatically
-  activated.  This is indicated by the option tt(MULTIBYTE), which is
-  set by default on shells that support multibyte mode.  Hence you
-  can test this with a standard option test:  `tt([[ -o multibyte ]])'.
+  From version 4.3.4 (stable versions starting from 5.0), multibyte
+  input is handled in the line editor if zsh has been compiled with the
+  appropriate definitions, and is automatically activated.  This is
+  indicated by the option tt(MULTIBYTE), which is set by default on
+  shells that support multibyte mode.  Hence you can test this with a
+  standard option test: `tt([[ -o multibyte ]])'.
 
   The tt(MULTIBYTE) option affects the entire shell: parameter expansion,
   pattern matching, etc. count valid multibyte character strings as a
   single character.  You can unset the option locally in a function to
   revert to single-byte operation.
 
-  Note that if the shell is emulating a Bourne shell the tt(MULTIBYTE)
-  option is unset by default.  This allows various POSIX modes to
-  work normally (POSIX does not deal with multibyte characters).  If
-  you use a "sh" or "ksh" emulation interactively you should probably
-  set the tt(MULTIBYTE) option.
+  As multibyte characters are nowadays standard across most utilities,
+  since 5.1 the tt(MULTBYTE) option has been turned on when emulating
+  other shells.
 
   The other option that affects multibyte support is tt(COMBINING_CHARS),
   new in version 4.3.9.  When this is set, any zero-length punctuation
@@ -2311,17 +2310,19 @@ sect(How do I ensure multibyte input and output work on my system?)
 
   itemization(
    it() The locale.  This describes a whole series of features specific
-      to countries or regions of which the character set is one.  Usually
-      it is controlled by the environment variable tt(LANG) (there are
-      others but this is the one to start with).  You need to find a
-      locale whose name contains mytt(UTF-8).  This will be a variant on
-      your usual locale, which typically indicates the language and
-      country; for example, mine is mytt(en_GB.UTF-8).  Luckily, zsh can
-      complete locale names, so if you have the new completion system
-      loaded you can type mytt(export LANG=) and attempt to complete a
-      suitable locale.  It's the locale that tells the shell to expect the
-      right form of multibyte input.  (However, there's no guarantee that
-      the shell is actually going to get this input: for example, if you
+      to countries or regions of which the character set is one.
+      Usually it is controlled by the environment variable tt(LANG)
+      (there are others but this is the one to start with).  If you have
+      a recent operating system, very likely it is already set
+      appropriately.  Otherwise, you need to find a locale whose name
+      contains mytt(UTF-8).  This will be a variant on your usual
+      locale, which typically indicates the language and country; for
+      example, mine is mytt(en_GB.UTF-8).  Luckily, zsh can complete
+      locale names, so if you have the new completion system loaded you
+      can type mytt(export LANG=) and attempt to complete a suitable
+      locale.  It's the locale that tells the shell to expect the right
+      form of multibyte input.  (However, there's no guarantee that the
+      shell is actually going to get this input: for example, if you
       edit file names that have been created using a different character
       set it won't work properly.)
    it() The terminal emulator.  Those that are supplied with a recent

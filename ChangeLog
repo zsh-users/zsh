@@ -1,3 +1,8 @@
+2019-07-09  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* unposted: Etc/FAQ.yo: typo. also updates to outdated notes on
+	multibyte support.
+
 2019-07-08  Bart Schaefer  <schaefer@brasslantern.com>
 
 	* 43755: Functions/Zle/smart-insert-last-word: (Belated commit)
