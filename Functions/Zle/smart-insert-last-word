@@ -48,13 +48,14 @@ zle auto-suffix-retain
 
 # Not strictly necessary:
 # (($+_ilw_hist)) || integer -g _ilw_hist _ilw_count _ilw_cursor _ilw_lcursor _ilw_changeno
+# (($+_ilw_result)) || typeset -g _ilw_result
 
 integer cursor=$CURSOR lcursor=$CURSOR
 local lastcmd pattern numeric=$NUMERIC
 
 # Save state for repeated calls
 if (( HISTNO == _ilw_hist && cursor == _ilw_cursor &&
-      UNDO_CHANGE_NO == _ilw_changeno ))
+      UNDO_CHANGE_NO == _ilw_changeno )) && [[ $BUFFER == $_ilw_result ]]
 then
     NUMERIC=$[_ilw_count+1]
     lcursor=$_ilw_lcursor
@@ -119,7 +120,7 @@ fi
 (( NUMERIC > $#lastcmd )) && return 1
 
 LBUFFER[lcursor+1,cursor+1]=$lastcmd[-NUMERIC]
-typeset -g _ilw_cursor=$CURSOR
+typeset -g _ilw_cursor=$CURSOR _ilw_result=$BUFFER
 
 # This is necessary to update UNDO_CHANGE_NO immediately
 zle split-undo && typeset -g _ilw_changeno=$UNDO_CHANGE_NO

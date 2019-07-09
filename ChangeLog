@@ -1,5 +1,9 @@
 2019-07-08  Bart Schaefer  <schaefer@brasslantern.com>
 
+	* 43755: Functions/Zle/smart-insert-last-word: (Belated commit)
+	Fix state management for repeat uses to avoid clobbering command
+	line when NOT a repeat
+
 	* 44502: Src/builtin.c: Quote function name for "autoload -X"
 
 	* 44495: Doc/Zsh/params.yo: Mention coproc under $!
