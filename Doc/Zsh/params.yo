@@ -629,7 +629,7 @@ startitem()
 vindex(!)
 item(tt(!) <S>)(
 The process ID of the last command started in the background with tt(&),
-or put into the background with the tt(bg) builtin.
+put into the background with the tt(bg) builtin, or spawned with tt(coproc).
 )
 vindex(#)
 item(tt(#) <S>)(

@@ -1,3 +1,7 @@
+2019-07-08  Bart Schaefer  <schaefer@brasslantern.com>
+
+	* 44495: Doc/Zsh/params.yo: Mention coproc under $!
+
 2019-07-08  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* users/24030: Etc/FAQ.yo: Note that *.{bla,hbl,ahb} is an
