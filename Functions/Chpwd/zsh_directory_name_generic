@@ -69,25 +69,32 @@ elif [[ $1 = d ]]; then
   local _zdn_rest=$_zdn_dir
   local -a _zdn_cpts
   local _zdn_pref _zdn_pref_raw _zdn_matched _zdn_cpt _zdn_name
+  local _zdn_pref_matched _zdn_rest_matched
+  integer _zdn_matchlen _zdn_len1
 
   while [[ -n $_zdn_var && -n $_zdn_rest ]]; do
+    _zdn_matchlen=0
     _zdn_assoc=(${(Pkv)_zdn_var})
-    # Sorting in descending order will ensure prefixes
-    # come after longer strings with that perfix, so
-    # we match more specific directory names preferentially.
     _zdn_cpts=(${(Ov)_zdn_assoc})
     _zdn_cpt=''
     for _zdn_pref_raw in $_zdn_cpts; do
       _zdn_pref=${_zdn_pref_raw%/:*}
       [[ -z $_zdn_pref ]] && continue
       if [[ $_zdn_rest = $_zdn_pref(#b)(/|)(*) ]]; then
-	_zdn_cpt=${(k)_zdn_assoc[(r)$_zdn_pref_raw]}
-	# if we matched a /, too, add it...
-	_zdn_matched+=$_zdn_pref$match[1]
-	_zdn_rest=$match[2]
-	break
+        _zdn_len1=${#_zdn_pref}
+	if (( _zdn_len1 > _zdn_matchlen )); then
+	  _zdn_matchlen=$_zdn_len1
+	  _zdn_cpt=${(k)_zdn_assoc[(r)$_zdn_pref_raw]}
+	  # if we matched a /, too, add it...
+	  _zdn_pref_matched=$_zdn_pref$match[1]
+	  _zdn_rest_matched=$match[2]
+	fi
       fi
     done
+    if (( _zdn_matchlen )); then
+      _zdn_matched+=$_zdn_pref_matched
+      _zdn_rest=$_zdn_rest_matched
+    fi
     if [[ -n $_zdn_cpt ]]; then
       _zdn_name+=${_zdn_name:+${_zdh_name}:}$_zdn_cpt
       if [[ ${_zdn_assoc[$_zdn_cpt]} = (#b)*/:([[:IDENT:]]##) ]]; then
