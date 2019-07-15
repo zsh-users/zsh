@@ -1,6 +1,11 @@
+2019-07-15  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 44509: Src/params.c: Prevent crash with modified PATH / path
+	combination in function.
+
 2019-07-10  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* 44305: Functions/Chpwd/zsh_directory_name_generic: Longest
+	* 44505: Functions/Chpwd/zsh_directory_name_generic: Longest
 	prefix matching was broken if there were suffixes indicating
 	further handling.
 

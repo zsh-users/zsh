@@ -3617,10 +3617,18 @@ unsetparam_pm(Param pm, int altflag, int exp)
 	altpm = (Param) paramtab->getnode(paramtab, altremove);
 	/* tied parameters are at the same local level as each other */
 	oldpm = NULL;
-	while (altpm && altpm->level > pm->level) {
-	    /* param under alternate name hidden by a local */
-	    oldpm = altpm;
-	    altpm = altpm->old;
+	/*
+	 * Look for param under alternate name hidden by a local.
+	 * If this parameter is special, however, the visible
+	 * parameter is the special and the hidden one is keeping
+	 * an old value --- we just mark the visible one as unset.
+	 */
+	if (altpm && !(altpm->node.flags & PM_SPECIAL))
+	{
+	    while (altpm && altpm->level > pm->level) {
+		oldpm = altpm;
+		altpm = altpm->old;
+	    }
 	}
 	if (altpm) {
 	    if (oldpm && !altpm->level) {
