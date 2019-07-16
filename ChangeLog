@@ -1,3 +1,8 @@
+2019-07-16  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 44523: Test/Makefile.in: allow ZTST_handler to be something
+	other than runtests.zsh to accommodate alternative test modes.
+
 2019-07-15  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 44509: Src/params.c: Prevent crash with modified PATH / path
