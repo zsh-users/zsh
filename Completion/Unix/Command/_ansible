@@ -1,10 +1,14 @@
-#compdef ansible ansible-config ansible-console ansible-doc ansible-galaxy ansible-inventory ansible-playbook ansible-pull ansible-vault
+#compdef ansible ansible-config ansible-console ansible-doc ansible-galaxy ansible-inventory ansible-playbook ansible-pull ansible-vault -value-,ANSIBLE_STDOUT_CALLBACK,-default-
 
 local curcontext="$curcontext" plug plugvar ign ret=1
 local -a args state line
 local -A opt_args
 
 case $service in
+  *,ANSIBLE_STDOUT_CALLBACK,*)
+    plug=callback
+    state=plugins
+  ;;
   ansible|ansible-console|ansible-doc|ansible-playbook)
     args=(
       \*{-M+,--module-path=}'[specify path to modules]:module path:_dir_list'
@@ -30,7 +34,7 @@ case $service in
       '(-D --diff)'{-D,--diff}'[show differences when changing small files and templates]'
       '(-b --become)'{-b,--become}'[escalate privileges on remote system]'
       '(-f --forks)'{-f+,--forks=}'[specify number of parallel processes to use]:processes [5]'
-      '--become-method=[specify privilege escalation method to use]:method [sudo]:(sudo su pbrun pfexec doas dzdo ksu runas pmrun enable machinectl)'
+      '--become-method=[specify privilege escalation method to use]:method [sudo]:(sesu sudo su pbrun pfexec doas dzdo ksu runas pmrun enable machinectl)'
       '--become-user=[specify remote user for running operations]:user:_users'
       "--syntax-check[perform a syntax check on the playbook, but don't execute it]"
       '!(-R --su-user -U --sudo-user)'{-R,-U,--su-user,--sudo-user}':user [root]:_users'
@@ -170,12 +174,15 @@ case $service in
 esac
 
 (( $#words > 2 )) && ign='!'
-_arguments -s -S -C $args \
-  "${ign}(- :)--version[display version information]" \
-  "${ign}(- :)"{-h,--help}'[display usage information]' \
-  \*{-v,--verbose}"[verbose mode (repeat to increase)]" && ret=0
+if (( $#args )); then
+  _arguments -s -S -C $args \
+    "${ign}(- :)--version[display version information]" \
+    "${ign}(- :)"{-h,--help}'[display usage information]' \
+    \*{-v,--verbose}"[verbose mode (repeat to increase)]" && ret=0
 
-plug=${(v)opt_args[(i)-(t|-type)]:-module}
+  plug=${(v)opt_args[(i)-(t|-type)]:-module}
+fi
+
 case $state in
   args)
     case ${(v)opt_args[(I)-(m|module)]} in

@@ -1,5 +1,8 @@
 2019-07-19  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 44356: Completion/Unix/Command/_ansible: complete ansible
+	callback plugins for the relevant environment variable's value
+
 	* 44551: Completion/Unix/Command/_git: update for new git changes
 
 2019-07-16  Peter Stephenson  <p.stephenson@samsung.com>
