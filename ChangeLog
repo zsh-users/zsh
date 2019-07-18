@@ -1,3 +1,7 @@
+2019-07-19  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 44551: Completion/Unix/Command/_git: update for new git changes
+
 2019-07-16  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 44523: Test/Makefile.in: allow ZTST_handler to be something
