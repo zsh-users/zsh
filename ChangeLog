@@ -1,3 +1,8 @@
+2019-07-24  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Kamil: 44566: Src/Zle/zle_utils.c: make failed searches of
+	history in Zle robust.
+
 2019-07-19  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 44356: Completion/Unix/Command/_ansible: complete ansible
