@@ -173,16 +173,16 @@ ___luarocks_installed_rocks_cache_policy(){
 
   local user_manifest_file="${configured_user_tree}/lib/luarocks/rocks-${configured_lua_version}/manifest"
   local system_manifest_file="${configured_system_tree}/lib/luarocks/rocks-${configured_lua_version}/manifest"
-  local cache_status=1
+  local cache_status=0
   if [[ -f ${cache_file} ]]; then
     if [[ -f ${user_manifest_file} ]]; then
-      if [[ ${user_manifest_file} -nt ${cache_file} ]]; then
-        cache_status=0
+      if [[ ${cache_file} -nt ${user_manifest_file} ]]; then
+        cache_status=1
       fi
     fi
     if [[ -f ${system_manifest_file} ]]; then
-      if [[ ${system_manifest_file} -nt ${cache_file} ]]; then
-        cache_status=0
+      if [[ ${cache_file} -nt ${system_manifest_file} ]]; then
+        cache_status=1
       fi
     fi
   fi
@@ -402,7 +402,7 @@ local doc_command_options=(
 _luarocks_doc(){
   _arguments \
     "${doc_command_options[@]}" \
-    '1: :{__luarocks_rock "installed" '"${opt_args[--tree]}"'}'
+    "1: :{__luarocks_rock installed ${opt_args[--tree]}}"
 }
 # arguments:
 # - must: external only rockspec
@@ -524,8 +524,8 @@ local remove_command_options=(
 _luarocks_remove(){
   _arguments -A "-*" \
     "${remove_command_options[@]}" \
-    '1: :{__luarocks_rock "installed" '"${opt_args[--tree]}"'}' \
-    '2:: :{__luarocks_rock_version "installed" '"${opt_args[--tree]}"'}'
+    "1: :{__luarocks_rock installed ${opt_args[--tree]}}" \
+    "2:: :{__luarocks_rock_version installed ${opt_args[--tree]}}"
 }
 # arguments:
 # - must: string as a search query
@@ -558,8 +558,8 @@ local show_command_options=(
 _luarocks_show(){
   _arguments \
     "${show_command_options[@]}" \
-    "1: :{__luarocks_rock 'installed' "${opt_args[--tree]}"}" \
-    '2:: :{__luarocks_rock_version "installed" '"${opt_args[--tree]}"'}'
+    "1: :{__luarocks_rock installed "${opt_args[--tree]}"}" \
+    "2:: :{__luarocks_rock_version installed ${opt_args[--tree]}}"
 }
 
 (( $+functions[_luarocks_test] )) ||

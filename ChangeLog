@@ -1,5 +1,8 @@
 2019-09-26  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* Doron Behar: gitlab !11: Completion/Unix/Command/_luarocks:
+	Fix/improve logic of cache validation
+
 	* 44781: Completion/Linux/Type/_selinux_contexts,
 	Completion/Linux/Type/_selinux_roles,
 	Completion/Linux/Type/_selinux_types,
