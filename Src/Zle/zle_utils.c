@@ -1608,10 +1608,9 @@ unapplychange(struct change *ch)
 {
     if(ch->hist != histline) {
 	Histent he = quietgethist(ch->hist);
-	if(!he) {
-	    dputs(ERRMSG("quietgethist(ch->hist) returned NULL"));
+	DPUTS(he == NULL, "quietgethist(ch->hist) returned NULL");
+	if(he == NULL)
 	    return 1;
-	}
 	zle_setline(he);
 	zlecs = ch->new_cs;
 	return 0;
@@ -1653,10 +1652,9 @@ applychange(struct change *ch)
 {
     if(ch->hist != histline) {
 	Histent he = quietgethist(ch->hist);
-	if(!he) {
-	    dputs(ERRMSG("quietgethist(ch->hist) returned NULL"));
+	DPUTS(he == NULL, "quietgethist(ch->hist) returned NULL");
+	if(he == NULL)
 	    return 1;
-	}
 	zle_setline(he);
 	zlecs = ch->old_cs;
 	return 0;

@@ -1,3 +1,8 @@
+2019-07-26  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Kamil: 44582: Src/Zle/zle_utils.c: update to foregoing to
+	use DPUTS() properly.
+
 2019-07-24  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Kamil: 44566: Src/Zle/zle_utils.c: make failed searches of
