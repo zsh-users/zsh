@@ -103,10 +103,10 @@ case ${service%???}:${(M)service%???}:$OSTYPE in
   user:mod:linux*)
     args+=(
       '(-a --append)'{-a,--append}'[add user to supplementary groups without removing from other groups]'
-      \*{-v,--add-sub-uids}'[add a range of subordinate uids]:uids (first-last)'
-      \*{-V,--del-sub-uids}'[remove a range of subordinate uids]:uids (first-last)'
-      \*{-w,--add-sub-gids}'[add a range of subordinate gids]:gids (first-last)'
-      \*{-W,--del-sub-gids}'[remove a range of subordinate gids]:gids (first-last)'
+      \*{-v,--add-subuids}'[add a range of subordinate uids]:uids (first-last)'
+      \*{-V,--del-subuids}'[remove a range of subordinate uids]:uids (first-last)'
+      \*{-w,--add-subgids}'[add a range of subordinate gids]:gids (first-last)'
+      \*{-W,--del-subgids}'[remove a range of subordinate gids]:gids (first-last)'
     )
   ;|
   user:mod:*)
