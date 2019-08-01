@@ -1,5 +1,8 @@
 2019-08-19  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* Lajos Koszti: 44633: Completion/Unix/Command/_ansible:
+	complete ansible-vault actions like create, edit, etc.
+
 	* 44587: Completion/Linux/Command/_btrfs,
 	Completion/Linux/Command/_networkmanager,
 	Completion/Linux/Command/_ss, Completion/Linux/Command/_sshfs,

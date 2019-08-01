@@ -168,6 +168,7 @@ case $service in
   ;;
   ansible-vault)
     args=( -A "-*" $args
+      '::action:(create decrypt edit encrypt encrypt_string rekey view)'
       '--new-vault-id=[specify new vault identity to use for rekey]:vault id'
       '--new-vault-password-file=[specify new vault password file to use for rekey]:file:_files'
       '*::args:->vault'
@@ -313,6 +314,9 @@ case $state in
 	  '(-n --name)'{-n+,--name=}'[specify the variable name]:variable'
 	  '--stdin-name=[specify the variable name for stdin]:variable'
 	)
+      ;|
+      create|edit|rekey|view) args+=( ':file:_files' ) ;|
+      (en|de)crypt) args+=( '::file:_files' )
       ;;
     esac
     _arguments -s -S $args && ret=0
