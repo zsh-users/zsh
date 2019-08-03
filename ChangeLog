@@ -1,3 +1,8 @@
+2019-08-03  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 44637: Shlomi Fish: Src/makepro.awk: "=" doesn't need quoting
+	in awk regexp and can cause warnings.
+
 2019-07-30  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Eric Cook: 24102: Completion/Unix/Command/_user_admin: subuids

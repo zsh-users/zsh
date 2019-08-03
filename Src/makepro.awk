@@ -121,7 +121,7 @@ BEGIN {
 		# initialiser.
 		dcltor = substr(line, 1, RLENGTH-1)
 		line = substr(line, RLENGTH+1)
-		sub(/\=.*$/, "", dcltor)
+		sub(/=.*$/, "", dcltor)
 		match(dcltor, /^([^_0-9A-Za-z]| const )*/)
 		dcltor = substr(dcltor, 1, RLENGTH) "@+" substr(dcltor, RLENGTH+1)
 		match(dcltor, /^.*@\+[_0-9A-Za-z]+/)
