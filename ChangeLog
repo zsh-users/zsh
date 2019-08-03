@@ -1,3 +1,8 @@
+2019-08-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 44635: Src/exec.c: don't apply STAT_NOPRINT to backgrounded
+	jobs.
+
 2019-08-03  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 44637: Shlomi Fish: Src/makepro.awk: "=" doesn't need quoting

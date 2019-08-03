@@ -1690,7 +1690,8 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 
 	    lastwj = thisjob = newjob;
 
-	    if (list_pipe || (pline_level && !(how & Z_TIMED)))
+	    if (list_pipe || (pline_level && !(how & Z_TIMED) &&
+			      !(jn->stat & STAT_NOSTTY)))
 		jn->stat |= STAT_NOPRINT;
 
 	    if (nowait) {
