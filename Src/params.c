@@ -1124,8 +1124,10 @@ copyparam(Param tpm, Param pm, int fakecopy)
     tpm->base = pm->base;
     tpm->width = pm->width;
     tpm->level = pm->level;
-    if (!fakecopy)
+    if (!fakecopy) {
+	tpm->old = pm->old;
 	tpm->node.flags &= ~PM_SPECIAL;
+    }
     switch (PM_TYPE(pm->node.flags)) {
     case PM_SCALAR:
 	tpm->u.str = ztrdup(pm->gsu.s->getfn(pm));

@@ -2522,3 +2522,15 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 >trailing/slashes
 >removed
 >are/removed
+
+ foo=global-value
+ fn() {
+    local foo=function-value
+    foo=export-value true
+    print $foo
+ }
+ fn
+ print $foo
+0:Global variables are not trashed by "foo=bar builtin" (regression test)
+>function-value
+>global-value

@@ -1,3 +1,9 @@
+2019-08-14  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 44664: Src/params.c, Test/D04parameter.ztst: Ensure
+	temporary assignment around builtin in function doesn't
+	trash global variable.
+
 2019-08-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 44635: Src/exec.c: don't apply STAT_NOPRINT to backgrounded
