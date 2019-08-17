@@ -1,5 +1,7 @@
 2019-08-17  dana  <dana@dana.is>
 
+	* 44675: Completion/Unix/Command/_find: Fix return status
+
 	* unposted: NEWS: Mention `functions -c`
 
 2019-08-14  Peter Stephenson  <p.stephenson@samsung.com>

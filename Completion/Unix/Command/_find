@@ -1,6 +1,6 @@
 #compdef find gfind
 
-local curcontext="$curcontext" state_descr variant default
+local curcontext="$curcontext" state_descr variant default ret=1
 local -a state line args alts disp smatch
 
 _pick_variant -r variant gnu=GNU $OSTYPE -version
@@ -147,7 +147,8 @@ _arguments -C $args \
   '*-user:user:_users' \
   '*-xdev' \
   '*-a' '*-o' \
-  '(-D -E -H -L -O -P -f -s -x --help --version)*:directory:_files -/'
+  '(-D -E -H -L -O -P -f -s -x --help --version)*:directory:_files -/' \
+&& ret=0
 
 if [[ $state = times ]]; then
   if ! compset -P '[+-]' || [[ -prefix '[0-9]' ]]; then
@@ -164,5 +165,7 @@ if [[ $state = times ]]; then
     alts=( "senses:sense${default}:compadd -V times -S '' -d disp -a smatch" )
   fi
   alts+=( "times:${state_descr}:_dates -f d" )
-  _alternative $alts
+  _alternative $alts && ret=0
 fi
+
+return ret
