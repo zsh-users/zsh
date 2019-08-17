@@ -32,6 +32,8 @@ arguments in order to keep that many leading or trailing path components
 instead of the defaults of all but one (:h) and one (:t).  In an absolute
 path the leading '/' counts as one component.
 
+The functions builtin gained a -c option to efficiently copy functions.
+
 Changes from 5.6.2 to 5.7.1
 ---------------------------
 

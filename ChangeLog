@@ -1,3 +1,7 @@
+2019-08-17  dana  <dana@dana.is>
+
+	* unposted: NEWS: Mention `functions -c`
+
 2019-08-14  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 44664: Src/params.c, Test/D04parameter.ztst: Ensure
