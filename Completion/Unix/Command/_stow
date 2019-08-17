@@ -5,11 +5,16 @@
 #
 
 __stow_complete_packages() {
-  local stow_pkg_list=( $1/*(-/N:t) )
+  local stow_dir
+  local -a stow_pkg_list
+
+  eval set -A stow_dir $1
+  [[ -n $stow_dir ]] && stow_pkg_list=( $stow_dir/*(-/N:t) )
+
   if [[ ${#stow_pkg_list} -gt 0 ]]; then
-    _values -C "packages from $1" ${stow_pkg_list[@]}
+    _values -C "packages from $stow_dir" ${stow_pkg_list[@]}
   else
-    _message "no packages found in $1"
+    _message "no packages found in $stow_dir"
   fi
 }
 
