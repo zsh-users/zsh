@@ -38,6 +38,8 @@ case "$service" in
       '*--x509keyfile=[specify X.509 key file to use]:file:_files'
       '*--x509certfile=[specify X.509 certificate file to use]:file:_files'
       '(-l --list -p --port)'{-l,--list}'[print list of the supported algorithms/modes]'
+      '--keymatexport=[specify label used for exporting keying material]:label'
+      '--keymatexportsize=[specify size of the exported keying material]:size'
     )
   ;|
   gnutls-cli|gnutls-serv|certtool)

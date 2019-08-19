@@ -29,6 +29,8 @@ _arguments -C -s \
   '-w[summarise syscall latency]' \
   '*-e+[select events to trace or how to trace]:system call:->expressions' \
   '*-P+[trace only system calls accessing given path]:path:_files' \
+  '(-Z)-z[trace only system calls that return success]' \
+  '(-z)-Z[trace only system calls that return an error]' \
   '-b+[detach from process on specified syscall]:syscall:(execve)' \
   '-f[trace child processes as they are created by currently traced processes]' \
   '(-c -C)-ff[write each process trace to <filename>.<pid> (when using -o <filename>]' \
@@ -57,25 +59,44 @@ case $state in
       'write[perform a full hex and ASCII dump of all the data written to listed file descriptors]:file descriptor:_sequence _file_descriptors' \
       'fault[perform syscall fault injection]:system call:_sys_calls -a -n' \
       'inject[perform syscall tampering]:system call:_sys_calls -a -n' \
+      'status[trace system calls with given return status]:status:->status' \
       'kvm[print the exit reason of kvm vcpu]: :(vcpu)' && ret=0
-    if [[ $words[CURRENT] != *=* || $state = syscalls ]]; then
+    if [[ $state = status ]]; then
+      _values -s , 'return status [all]' \
+        all successful failed \
+        "unfinished[system calls that don't return]" \
+        'unavailable[system calls that return but strace fails to fetch the error]' \
+        'detached[system calls where strace detaches before the return]' && ret=0
+    elif [[ $words[CURRENT] != *=* || $state = syscalls ]]; then
       local dedup sets suf="-qS,"
       compset -P '!'
       dedup=( ${(Ms.,.)PREFIX##*,} ${(Ms.,.)SUFFIX%%,*} )
       compset -S ',*' || suf=""
       compset -P '*,'
-      sets=(
-	'file:trace all system calls which take a file name as an argument'
-	'process:trace all system calls which involve process management'
-	'network:trace all the network related system calls'
-	'signal:trace all signal related system calls'
-	'ipc:trace all IPC related system calls'
-	'desc:trace all file descriptor related system calls'
-	'memory:trace all memory mapping related system calls'
-      )
-      _alternative \
-	"related system call:sets: _describe -t traces 'related system call' sets -F dedup $suf" \
-	"system call:syscalls:_sys_calls -a -n $suf -F dedup" && ret=0
+      if compset -P /; then
+        _wanted syscalls expl "system call (regex)" _sys_calls -a -n $suf -F dedup && ret=0
+      else
+        sets=(
+          {%,}'file:trace all system calls which take a file name as an argument'
+          {%,}'process:trace all system calls which involve process management'
+          {%net,{%,}network}':trace all the network related system calls'
+          {%,}'signal:trace all signal related system calls'
+          {%,}'ipc:trace all IPC related system calls'
+          {%,}'desc:trace all file descriptor related system calls'
+          {%,}'memory:trace all memory mapping related system calls'
+          '%stat:trace variants of stat'
+          '%lstat:trace variants of lstat'
+          '%fstat:trace variants of fstat and fstatat'
+          '%%stat:trace variants of all syscalls used for requesting file status'
+          '%statfs:trace variants of statfs'
+          '%fstatfs:trace variants of fstatfs'
+          '%%statfs:trace variants of all syscalls used for file system statistics'
+          '%pure:trace syscalls that always succeed and have no arguments'
+        )
+        _alternative \
+          "sets:related system call: _describe -t traces 'related system call' sets -F dedup $suf" \
+          "syscalls:system call:_sys_calls -a -n $suf -F dedup" && ret=0
+      fi
     fi
   ;;
   file-pipe)

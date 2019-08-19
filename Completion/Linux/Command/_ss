@@ -36,8 +36,9 @@ _arguments -C -s \
   "($info -w --raw)"{-w,--raw}'[display RAW sockets]' \
   "($info -x --unix)"{-x,--unix}'[display Unix domain sockets]' \
   "($info)--tipc[display only TIPC sockets]" \
+  "($info)--xdp[display only XDP sockets]" \
   "($info)--vsock[display only vsock sockets]" \
-  "($info -f --family)"{-f+,--family=}'[display sockets of specified type]:family:(unix inet inet6 link netlink unix vsock tipc)' \
+  "($info -f --family)"{-f+,--family=}'[display sockets of specified type]:family:(inet inet6 link unix netlink vsock tipc xdp help)' \
   "($info -K --kill)"{-K,--kill}'[forcibly close sockets, display what was closed]' \
   "($info -H --no-header)"{-H,--no-header}'[suppress header line]' \
   "($info -A --query --socket)"{-A+,--query=,--socket=}'[specify socket tables to show]: :_values -s , socket\ table all inet tcp udp raw unix packet netlink unix_dgram unix_stream unix_seqpacket packet_raw packet_dgram vsock_stream vsock_dgram tipc' \

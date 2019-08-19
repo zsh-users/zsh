@@ -33,6 +33,15 @@ case $OSTYPE in
       '-c+[write core file to specified file]:file:_files' \
       '*:pid:_pids'
     ;;
+  dragonfly*)
+    _arguments -s \
+      '-c+[write core file to specified file]:file:_files' \
+      '-l+[skip map segments larger than the specified limit]:limit (bytes)' \
+      '-s[stop the process while gathering the core image]' \
+      '-v[Verbosely print out the map segments being dumped]' \
+      '::executable:' \
+      ':pid:_pids'
+  ;;
   freebsd*)
     _arguments -s \
       '-c+[write core file to specified file]:file:_files' \

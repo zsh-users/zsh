@@ -172,11 +172,17 @@ while (( $#state )); do
             )
           [[ ${${(P)group}[cmd]} == add ]] &&
             args+=(
-              {-K,--nodiscard}"[don't perform discard]"
+              {-K,--nodiscard}"[don't perform whole device TRIM]"
               {-f,--force}'[force overwrite of existing filesystem]'
             )
         ;;
-        device:scan) args+=( '(1 -)'{-d,--all-devices}'[scan all devices in /dev]' '1:device:_files -g "*(-%)"' );;
+        device:scan)
+          args+=(
+            '(-)'{-u,--forget}'[unregister all stale devices or a given device]'
+            '(1 -)'{-d,--all-devices}'[enumerate and register all devices]'
+            '1:device:_files -g "*(-%)"'
+          )
+        ;;
         device:stats)
           args+=(
             '(-c --check)'{-c,--check}'[return non-zero if any stat counter is not zero]'
@@ -214,7 +220,7 @@ while (( $#state )); do
             '(-d -s)-m+[act on metadata chunks]:filter:->filters'
             '(-d -m)-s+[act on system chunks (only under -f)]:filters:->filters'
             '-v[verbose mode]'
-            '-f[force reducing of metadata integrity]'
+            '-f[force a reduction of metadata integrity]'
             "--full-balance[don't print warning and don't delay start]"
             '(--background --bg)'{--background,--bg}'[run balance operation asynchronously in the background]'
             '1:path:_files -/'
@@ -286,7 +292,7 @@ while (( $#state )); do
             '(-r --roots)'{-r,--roots}'[print only short root node info]'
             '(-R --backups)'{-R,--backups}'[same as --roots plus print backup root info]'
             '(-u --uuid)'{-u,--uuid}'[print only the uuid tree]'
-            '(-b --block)'{-b,--block}'[print info from the specified block only]:block'
+            \*{-b,--block}'[print info from the specified block only]:block number'
             '(-t --tree)'{-t,--tree}'[print only tree with the given id (string or number)]:tree id'
             '--follow[use with -b, to show all children tree blocks of the block]'
           )
@@ -366,6 +372,9 @@ while (( $#state )); do
             '2:path:_files -/'
           )
         ;;
+        send|receive)
+          args+=( '(-q --quiet)'{-q,--quiet}'[suppress all messages except errors]' )
+        ;|
         send)
           args+=(
             '*-v[verbose mode]'
@@ -375,7 +384,6 @@ while (( $#state )); do
             '-f[specify output file]:file:_files'
             '--no-data[send in NO_FILE_DATA mode]'
             '(-v --verbose)'{-v,--verbose}'[enable verbose output]'
-            '(-q --quiet)'{-q,--quiet}'[suppress all messages except errors]'
             '1:subvolume:_files -/'
           )
         ;;

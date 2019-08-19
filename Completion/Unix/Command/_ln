@@ -63,7 +63,7 @@ case $variant; in
       '(-P)-L[create hard links to symbolic link references]'
     )
     ;|
-  dragonfly*|freebsd*)
+  dragonfly*|freebsd*|netbsd*)
     args+=(
       "-w[warn if source of a symbolic link doesn't currently exist]"
     )

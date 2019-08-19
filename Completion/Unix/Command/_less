@@ -84,7 +84,12 @@ _arguments -S -s -A "[-+]*"  \
   '(-~ --tilde)'{-~,--tilde}"[don't display tildes after end of file]" \
   '(-\# --shift)'{-\#+,--shift=}"[specify amount to move when scrolling horizontally]:number" \
   '--follow-name[the F command changes file if the input file is renamed]' \
+  '--mouse[enable mouse input]' \
+  '--no-histdups[remove duplicates from command history]' \
+  '--rscroll=[set the character used to mark truncated lines]:character [>]' \
+  '--save-marks[retain marks across invocations of less]' \
   '--use-backslash[subsequent options use backslash as escape char]' \
+  '--wheel-lines=[specify lines to move for each click of the mouse wheel]:lines' \
   "$files[@]" && ret=0
 
 

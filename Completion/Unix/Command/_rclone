@@ -77,7 +77,7 @@ _arguments -C \
   '(-n --dry-run)'{-n,--dry-run}'[do a trial run with no permanent changes]' \
   '--dump[list of items to dump from]:string:_sequence compadd - headers bodies requests responses auth filters goroutines openfiles' \
   '--dump-bodies[dump HTTP headers and bodies - may contain sensitive info]' \
-  '--dump-headers[dump HTTP bodies - may contain sensitive info]' \
+  '--dump-headers[dump HTTP headers - may contain sensitive info]' \
   '--exclude[exclude files matching pattern]:stringArray' \
   '--exclude-from[read exclude patterns from file]:files:_files' \
   '--exclude-if-present[exclude directories if filename is present]:string' \
@@ -86,6 +86,7 @@ _arguments -C \
   {-f,--filter}'[add a file-filtering rule]:stringArray' \
   '--filter-from[read filtering patterns from a file]:file:_files' \
   '--ignore-case[ignore case in filters (case insensitive)]' \
+  '--ignore-case-sync[ignore case when synchronizing]' \
   '--ignore-checksum[skip post copy check of checksums]' \
   '--ignore-errors[delete even if there are I/O errors]' \
   '--ignore-existing[skip all files that exist on destination]' \
@@ -108,6 +109,8 @@ _arguments -C \
   '--min-age[only transfer files older than this in s or suffix ms|s|m|h|d|w|M|y]:duration [default off]' \
   '--min-size[only transfer files bigger than this in k or suffix b|k|M|G]:int [default off]' \
   '--modify-window[specify max time delta to be considered the same]:duration [1ns]' \
+  '--multi-thread-cutoff[use multi-threaded downloads for files above specified size]:size (250M)' \
+  '--multi-thread-streams[specify max number of streams to use for multi-threaded downloads]:number (4)' \
   "--no-check-certificate[don't verify the server SSL certificate (insecure)]" \
   "--no-gzip-encoding[don't set Accept-Encoding: gzip]" \
   '!--no-traverse' \
@@ -120,6 +123,8 @@ _arguments -C \
   '--rc-client-ca[client certificate authority to verify clients with]:string' \
   '--rc-files[path to local files to serve on the HTTP server]:directory:_path_files -/' \
   '--rc-htpasswd[htpasswd file - if not provided no authentication is done]:file:_files' \
+  '--rc-job-expire-duration[expire finished async jobs older than specified duration]:duration (1m0s)' \
+  '--rc-job-expire-interval[specify interval to check for expired async jobs]:interval (10s)' \
   '--rc-key[SSL PEM Private key]:string' \
   '--rc-max-header-bytes[maximum size of request header]:int [4096]' \
   "--rc-no-auth[don't require auth for certain methods]" \
@@ -136,6 +141,8 @@ _arguments -C \
   '--stats-file-name-length[max file name length in stats. 0 for no limit]:int [40]' \
   '--stats-log-level[log level to show --stats output]:string [INFO]:(DEBUG INFO NOTICE ERROR)' \
   '--stats-one-line[make the stats fit on one line]' \
+  '--stats-one-line-date[enable --stats-one-line and add current date/time prefix]' \
+  '--stats-one-line-date-format[enable --stats-one-line-date and use custom formatted date]:date format' \
   '--stats-unit[specify units for data rate in stats]:unit [bytes]:(bits bytes)' \
   '--streaming-upload-cutoff[specify size cutoff for switching to chunked upload]:size [100k]' \
   '--suffix[specify suffix for use with --backup-dir]:string' \
@@ -219,9 +226,11 @@ _arguments -C \
   '--drive-list-chunk[size of listing chunk 100-1000. 0 to disable]:int [1000]' \
   '--drive-root-folder-id[specify ID of the root folder]:string' \
   '--drive-scope[scope that rclone should use when requesting access from drive]:scope' \
+  '--drive-server-side-across-configs[allow server side operations (eg copy) to work across different drive configs]' \
   '--drive-service-account-credentials[specify service account credentials JSON blob]:string' \
   '--drive-service-account-file[specify service account credentials JSON file path]:file:_files' \
   '--drive-shared-with-me[only show files that are shared with me]' \
+  '--drive-size-as-quota[show storage quota usage for file size]' \
   '--drive-skip-gdocs[skip google documents in all listings]' \
   '--drive-team-drive[specify ID of the team drive]:ID' \
   '--drive-trashed-only[only show files that are in the trash]' \
@@ -234,9 +243,11 @@ _arguments -C \
   '--dropbox-client-secret[specify Dropbox app client secret]:secret' \
   '--dropbox-impersonate[impersonate specified user]:user' \
   '--ftp-host[specify FTP host to connect to]:host:_hosts' \
+  "--ftp-no-check-certificate[don't verify the TLS certificate of the server]" \
   '--ftp-pass[specify FTP password]:password' \
   '--ftp-port[specify FTP port]:port [21]:_ports' \
-  '--ftp-user[specify FTP username]:username' \
+  '--ftp-tls[use FTP over TLS (implicit)]' \
+  '--ftp-user[specify FTP username]::username' \
   '--gcs-bucket-acl[access control list for new buckets]:string' \
   '--gcs-client-id[Google application client id]:client id' \
   '--gcs-client-secret[Google application client secret]:secret' \
@@ -251,7 +262,6 @@ _arguments -C \
   '--hubic-client-secret[Hubic client secret]:secret' \
   '--jottacloud-hard-delete[delete files permanently rather than putting them into the trash]' \
   '--jottacloud-md5-memory-limit[files bigger than this will be cached on disk to calculate the MD5 if required]:size [10M]' \
-  '--jottacloud-mountpoint[the mountpoint to use]:string' \
   '--jottacloud-pass[password]:string' \
   '--jottacloud-unlink[remove existing public link to file/folder with link command rather than creating]' \
   '--jottacloud-user[user name]:string' \
@@ -286,6 +296,7 @@ _arguments -C \
   '--s3-storage-class[the storage class to use when storing new objects in S3]:string' \
   '--s3-upload-concurrency[concurrency for multipart uploads]:int [2]' \
   '--s3-v2-auth[if true use v2 authentication]' \
+  '--s3-use-accelerate-endpoint[use the AWS S3 accelerated endpoint]' \
   '--sftp-ask-password[allow asking for SFTP password when needed]' \
   '--sftp-disable-hashcheck[disable the execution of SSH commands to determine if remote file hashing is available]' \
   '--sftp-host[SSH host to connect to]:string' \

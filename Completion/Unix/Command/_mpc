@@ -69,6 +69,7 @@ _mpc_command() {
     find:"search for a song, exact match"
     findadd:"find songs and add them to the current playlist"
     list:"list all tags of given type"
+    listneighbors:"list neighbors"
     seek:"seek to the position specified in percent"
     seekthrough:"seek by an amount of time within the song and playlist"
     shuffle:"shuffle the current playlist"

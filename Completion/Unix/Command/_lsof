@@ -1,9 +1,16 @@
 #compdef lsof
 
-local curcontext="$curcontext" state line expl fields args alts suf hsuf pref ret=1
+local curcontext="$curcontext" ret=1
+local -a state line expl args vals fields alts suf hsuf pref
 
 case $OSTYPE in
-  linux*) args=( '-X[skip reporting of info on network connections]' ) ;;
+  linux*)
+    args=(
+      '-E[display endpoint info for pipes, sockets and pseudoterminal files but not files of the endpoints]'
+      '+E[display endpoint info for pipes, sockets and pseudoterminal files including files of the endpoints]'
+      '-X[skip reporting of info on network connections]'
+    )
+  ;;
   solaris*)
     args=(
       '-X[include deleted files]'
@@ -24,8 +31,8 @@ _arguments -C -s -S $args \
   '+D[recursively search from specified dir]:search directory:_files -/' \
   '-D[direct use of device cache file]:function:((\?\:report\ device\ cache\ file\ paths b\:build\ the\ device\ cache\ file i\:ignore\ the\ device\ cache\ file r\:read\ the\ device\ cache\ file u\:read\ and\ update\ the\ device\ cache\ file))' \
   '*-+e[exempt filesystem from blocking kernel calls]:file system:_directories' \
-  '-f[inhibit listing of kernel file structure info]::info type or path:(c f g G n)' \
-  '+f[enable listing of kernel file structure info]::info type:(c f g G n)' \
+  '-f[inhibit listing of kernel file structure info]::info type:->file-structures' \
+  '+f[enable listing of kernel file structure info]::info type:->file-structures' \
   '-F[select output fields]:fields:->fields' \
   '-g[select by process group id]::process group id' \
   '(*)*-i[select internet files]::address:->addresses' \
@@ -92,6 +99,18 @@ case $state in
   filedes)
     _sequence -s , _wanted -x file-descriptors expl "file descriptor" compadd - \
         cwd err jld ltz mem mmap pd rtd tr txt v86 && ret=0
+  ;;
+  file-structures)
+    vals=(
+      'g[file flag abbreviations]'
+      'G[file flags in hexadecimal]'
+    )
+    [[ $OSTYPE != linux* ]] && vals+=(
+      'c[file structure use count]'
+      'f[file structure address]'
+      'n[file structure node address]'
+    )
+    _values 'kernel file structures' $vals && ret=0
   ;;
   states)
     if compset -P 1 '*:'; then

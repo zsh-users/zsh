@@ -12,7 +12,7 @@ _arguments -C -S : \
   '-C[enable compression]' \
   '-F[specify ssh config file]:file:_files' \
   '*-o[specify mount options]:options:->options' \
-  '(-f)-d[enable debug output]' \
+  '(-d --debug -f)'{-d,--debug}'[enable debug output]' \
   '-f[foreground]' \
   '-s[disable multithreaded operation]' \
   ':remote directory:_user_at_host -S:' \
@@ -20,14 +20,14 @@ _arguments -C -S : \
 
 if [[ $state == options ]]; then
   _values -s , "sshfs or fuse or mount options" \
-    debug reconnect delay_connect sshfs_sync no_readahead sync_readdir sshfs_debug \
-    'cache:cache setting:(yes no)' \
-    'cache_max_size:size [10000]' \
-    'cache_timeout:timeout (seconds) [20]' \
-    cache_{stat,dir,link}_timeout:'timeout (seconds)' \
-    'cache_clean_interval:interval [60]' \
-    'cache_min_clean_interval:interval [5]' \
-    'workaround:workaround:(none all rename delaysrv truncate nobuflimit)' \
+    reconnect delay_connect sshfs_sync no_readahead sync_readdir \
+    'dir_cache:cache setting:(yes no)' \
+    'dcache_max_size:size [10000]' \
+    'dcache_timeout:timeout (seconds) [20]' \
+    dcache_{stat,dir,link}_timeout:'timeout (seconds)' \
+    'dcache_clean_interval:interval [60]' \
+    'dcache_min_clean_interval:interval [5]' \
+    'workaround:workaround:(none all rename renamexdev delaysrv truncate nobuflimit fstat createmode)' \
     'idmap:user/group mapping:(none user file)' \
     uidfile:file:_files \
     gidfile:file:_files \

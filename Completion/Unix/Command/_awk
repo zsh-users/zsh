@@ -33,7 +33,7 @@ case $variant in
       {-e,--source}'[pass program text in arg]:program text:'
       '(1)'{-E+,--exec}'[like -f, but safer for CGI]:program file:->script'
       '(- : *)'{-h,--help}'[print usage message and exit]'
-      {-L-,--lint=-}'[warn about dubious or non-portable constructs]::flag:((fatal\:"treat warnings as fatal error" invalid\:"warn only about things that are actually invalid"))'
+      {-L-,--lint=-}'[warn about dubious or non-portable constructs]::flag:((fatal\:"treat warnings as fatal error" invalid\:"warn only about things that are actually invalid" no-ext\:"disable warnings about gawk extensions"))'
       {-n,--non-decimal-data}'[auto-detect octal/hexadecimal values in input]'
       {-N,--use-lc-numeric}"[force use of locale's decimal point character]"
       {-O,--optimize}'[enable optimization]'

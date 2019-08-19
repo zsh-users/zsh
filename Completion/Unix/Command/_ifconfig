@@ -36,6 +36,9 @@ case $OSTYPE in
       {,-}wep {,-}nwkey add delete ether {,-}link{0,1,2} list wme wmm
       roam roam:rssi roam:rate roaming
     )
+  ;|
+  dragonfly*)
+    args+=( '-n[disable auto-loading of kernel network interface driver]' )
   ;;
   irix5*) opts=( $debug ) ;;
   irix6*)

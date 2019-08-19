@@ -1,3 +1,16 @@
+2019-08-19  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 44587: Completion/Linux/Command/_btrfs,
+	Completion/Linux/Command/_networkmanager,
+	Completion/Linux/Command/_ss, Completion/Linux/Command/_sshfs,
+	Completion/Linux/Command/_strace, Completion/Unix/Command/_ansible,
+	Completion/Unix/Command/_awk, Completion/Unix/Command/_gcore,
+	Completion/Unix/Command/_gnutls, Completion/Unix/Command/_ifconfig,
+	Completion/Unix/Command/_less, Completion/Unix/Command/_ln,
+	Completion/Unix/Command/_lsof, Completion/Unix/Command/_mpc,
+	Completion/Unix/Command/_rclone, Completion/Unix/Command/_sqlite,
+	Completion/Unix/Command/_tmux: completion option updates
+
 2019-08-17  dana  <dana@dana.is>
 
 	* 44675: Completion/Unix/Command/_find: Fix return status

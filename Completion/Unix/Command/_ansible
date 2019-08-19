@@ -110,7 +110,7 @@ case $service in
       '(-l --list -F --list_files -s --snippet)'{-l,--list}'[list available plugins]'
       '(-l --list -F --list_files -s --snippet)'{-F,--list_files}'[show plugin names and their source files without summaries]'
       '(-l --list -F --list_files -s --snippet)'{-s,--snippet}'[show playbook snippet for specified plugins]'
-      '(-t --type)'{-t+,--type=}'[choose plugin type]:plugin type [module]:(cache callback connection inventory lookup module strategy vars)'
+      '(-t --type)'{-t+,--type=}'[choose plugin type]:plugin type [module]:(become cache callback cliconf connection httpapi inventory lookup shell module strategy vars)'
       '*:plugin:->plugins'
     )
   ;;
@@ -119,9 +119,11 @@ case $service in
       '--export[when doing an --list, represent in a way that is optimized for export]'
       '(-y --yaml)--graph[output inventory graph]'
       '--host[output specific host information]'
+      '--output=[with --list, specify output file]:file:_files'
       '--list[output all hosts information]'
+      '(-y --yaml --vars --graph)--toml[use TOML format instead of JSON]'
       '(-y --yaml)--vars[add variables to the graph display]'
-      '(-y --yaml --vars --graph)'{-y,--yaml}'[use YAML format instead of JSON]'
+      '(-y --yaml --toml --vars --graph)'{-y,--yaml}'[use YAML format instead of JSON]'
     )
   ;;
   ansible-galaxy)
@@ -176,7 +178,7 @@ esac
 (( $#words > 2 )) && ign='!'
 if (( $#args )); then
   _arguments -s -S -C $args \
-    "${ign}(- :)--version[display version information]" \
+    "${ign}(- :)--version[display version information, config and module locations]" \
     "${ign}(- :)"{-h,--help}'[display usage information]' \
     \*{-v,--verbose}"[verbose mode (repeat to increase)]" && ret=0
 
@@ -272,6 +274,7 @@ case $state in
       ;;
       install)
 	args+=(
+	  "--force-with-deps[force overwriting an existing role and it's dependencies]"
 	  '(-n --no-deps)'{-n,--no-deps}"[don’t download roles listed as dependencies]"
 	  '(-i --ignore-errors)'{-i,--ignore-errors}'[ignore errors and continue with the next specified role]'
 	  '(-g --keep-scm-meta)'{-g,--keep-scm-meta}'[use tar instead of the scm archive option when packaging the role]'

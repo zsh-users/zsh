@@ -96,6 +96,7 @@ _tmux_aliasmap=(
     prevl       previous-layout
     renamew     rename-window
     resizep     resize-pane
+    resizew     resize-window
     respawnp    respawn-pane
     respawnw    respawn-window
     rotatew     rotate-window
@@ -301,17 +302,20 @@ _tmux-detach-client() {
 
 _tmux-display-message() {
   [[ -n ${tmux_describe} ]] && print "display a message in the status line" && return
-  _arguments -s -S \
+  _arguments -s -S -A "-*" \
+    '(-p -F :)-a[list the format variables and their values]' \
     '-c+[specify target client]:client:__tmux-clients' \
-    '-p[print message to stdout]' \
+    '(-a)-p[print message to stdout]' \
     '-t+[specify target pane]:pane:__tmux-panes' \
-    '-F+[specify output format]:format:__tmux-formats' \
+    '(-a)-F+[specify output format]:format:__tmux-formats' \
+    '(-a)-v[prints verbose logging as the format is parsed]' \
     ':message'
 }
 
 _tmux-display-panes() {
   [[ -n ${tmux_describe} ]] && print "display an indicator for each visible pane" && return
   _arguments -S \
+    "-b[don't block other commands until indicator is closed]" \
     '-d+[time to show indicator for]:duration (ms)' \
     '-t+[specify target client]:client:__tmux-clients' \
     '*:::command:= _tmux'
@@ -324,6 +328,7 @@ _tmux-find-window() {
     '-N[match window name]' \
     '-T[match window title]' \
     '-t+[specify target window]:window:__tmux-windows' \
+    '-Z[zoom the pane]' \
     ':window search pattern'
 }
 
@@ -584,10 +589,17 @@ _tmux-previous-window() {
 
 _tmux-refresh-client() {
   [[ -n ${tmux_describe} ]] && print "refresh a client" && return
-  _arguments -s \
+  _arguments -s -S -A "-*" \
+    '-C+[set the width and height of a control client]:width,height' \
+    '-c[reset so that the position follows the cursor]' \
+    '-D[move visible portion of window down]' \
+    '-L[move visible portion of window left]' \
+    '-l[request clipboard from the client and store it in a new paste buf using xterm(1) escape sequence]' \
     "-S[only update the client's status bar]" \
     '-t+[specify target client]:client:__tmux-clients' \
-    '-C+:size'
+    '-R[move visible portion of window right]' \
+    '-U[move visible portion of window up]' \
+    ': :_guard "[0-9]#" "adjustment"'
 }
 
 _tmux-rename-session() {
@@ -616,7 +628,22 @@ _tmux-resize-pane() {
     '-x+[specify width]:width' \
     '-y+[specify height]:height' \
     '-Z[toggle zoom of pane]' \
-    ':adjustment'
+    ': :_guard "[0-9]#" "adjustment"'
+}
+
+_tmux-resize-window() {
+  [[ -n ${tmux_describe} ]] && print "resize a window" && return
+  _arguments -s -A "-*" -S : \
+    '-A[set size of largest session containing the window]' \
+    '-a[set size of smallest session containing the window]' \
+    '-D[resize downward]' \
+    '-L[resize to the left]' \
+    '-R[resize to the right]' \
+    '-U[resize upward]' \
+    '-t+[specify target pane]:pane:__tmux-windows' \
+    '-x+[specify width]:width' \
+    '-y+[specify height]:height' \
+    ': :_guard "[0-9]#" "adjustment"'
 }
 
 _tmux-respawn-pane() {
@@ -1071,7 +1098,7 @@ function __tmux-environment-variables() {
             if _describe -t parameters $msg descriptions; then
                 :
             elif [[ -n $hint ]]; then
-                _message $msg
+                _message -e $msg
             fi
             ;;
         (value)
@@ -1079,10 +1106,10 @@ function __tmux-environment-variables() {
             # TODO: this if/else is because '_description -x' prints the "No matches" error in addition to the message.
             if [[ -n $var_and_val ]]; then
                 local -a expl
-                _description -x parameter-values expl "Value for ${words[-2]}"
+                _description -x parameter-values expl "value for ${words[-2]}"
                 compadd "$expl[@]" - ${var_and_val#*=}
             else
-                _message "Value for ${words[-2]}"
+                _message -e "value for ${words[-2]}"
             fi
             ;;
         (*)
@@ -1128,7 +1155,7 @@ function __tmux-get-optarg() {
 }
 
 __tmux-nothing-else() {
-  _message "no further arguments"
+  _message -e "no further arguments"
 }
 
 function __tmux-option-guard() {
@@ -1140,12 +1167,13 @@ function __tmux-option-guard() {
     int_guard='_guard "[0-9]#" "'${opt}': numeric value"'
     if [[ ${mode} == 'session' ]]; then
         options=(
+            'activity-action:DESC:any none current other'
             'assume-paste-time:'${int_guard}
             'base-index:'${int_guard}
             'bell-action:DESC:any none current other'
-            'bell-on-alert:DESC:on off'
             'default-command:MSG:command string'
             'default-shell:MSG:shell executable'
+            'default-size:MSG:XxY'
             'destroy-unattached:DESC:on off'
             'detach-on-destroy:DESC:on off'
             'display-panes-colour:__tmux-colours'
@@ -1164,7 +1192,9 @@ function __tmux-option-guard() {
             'repeat-time:'${int_guard}
             'set-titles:DESC:on off'
             'set-titles-string:MSG:title format string'
+            'silence-action:DESC:any none current other'
             'status:DESC:on off'
+            'status-format:MSG:format string'
             'status-interval:'${int_guard}
             'status-justify:DESC:left centre right'
             'status-keys:DESC:vi emacs'
@@ -1177,6 +1207,7 @@ function __tmux-option-guard() {
             'status-right-style:__tmux-style'
             'status-style:__tmux-style'
             'update-environment:MSG:string listing env. variables'
+            'user-keys:MSG:key'
             'visual-activity:DESC:on off'
             'visual-bell:DESC:on off'
             'visual-silence:DESC:on off'
@@ -1185,13 +1216,14 @@ function __tmux-option-guard() {
     elif [[ ${mode} == 'server' ]]; then
         options=(
             'buffer-limit:'${int_guard}
+            'command-alias:MSG:alias'
             'default-terminal:MSG:terminal string'
             'escape-time:'${int_guard}
+            'exit-empty:DESC:on off'
             'exit-unattached:DESC:on off'
             'focus-events:DESC:on off'
             'history-file:_path-files -g "*(-.)"'
             'message-limit:'${int_guard}
-            'quiet:DESC:on off'
             'set-clipboard:DESC:on off'
             'terminal-overrides:MSG:overrides string'
         )
@@ -1204,13 +1236,12 @@ function __tmux-option-guard() {
             'automatic-rename-format:DESC:__tmux-format'
             'clock-mode-colour:__tmux-colours'
             'clock-mode-style:DESC:12 24'
-            'force-height:'${int_guard}
-            'force-width:'${int_guard}
             'main-pane-height:'${int_guard}
             'main-pane-width:'${int_guard}
             'mode-keys:DESC:vi emacs'
             'mode-style:__tmux-style'
             'monitor-activity:DESC:on off'
+            'monitor-bell:DESC:on off'
             'monitor-silence:DESC:on off'
             'other-pane-height:'${int_guard}
             'other-pane-width:'${int_guard}
@@ -1230,6 +1261,7 @@ function __tmux-option-guard() {
             'window-status-last-style:__tmux-style'
             'window-status-separator:MSG:separator string'
             'window-status-style:__tmux-style'
+            'window-size:MSG:XxY'
             'window-style:__tmux-style'
             'wrap-search:DESC:on off'
             'xterm-keys:DESC:on off'
@@ -1241,12 +1273,11 @@ function __tmux-option-guard() {
         _message "unknown ${mode} option: ${opt}"
         return
     fi
-    _message "${mode} option value"
     guard=${guard#*:}
     case ${guard} in
         ('') ;;
         (MSG:*)
-            _message ${guard#*:}
+            _message -e ${guard#*:}
             ;;
         (DESC:*)
             eval "desc=( ${guard#*:} )"
@@ -1261,12 +1292,13 @@ function __tmux-option-guard() {
 function __tmux-session-options() {
     local -a tmux_session_options
     tmux_session_options=(
+        'activity-action:set action on window activity when monitor-activity is on'
         'assume-paste-time:assume keys are pasted instead of typed if this fast'
         'base-index:define where to start numbering'
         'bell-action:set action on window bell'
-        'bell-on-alert:ring the terminal bell when an alert occurs'
         'default-command:default command for new windows'
         'default-shell:default shell executable'
+        'default-size:set the default size of windows when the size is not set'
         'destroy-unattached:destroy session if no client is attached'
         'detach-on-destroy:detach client if attached session is destroyed'
         'display-panes-colour:colour used for display-panes'
@@ -1286,7 +1318,9 @@ function __tmux-session-options() {
         'repeat-time:time for multiple commands without prefix-key presses'
         'set-titles:try to set xterm window titles'
         'set-titles-string:format used by set-titles'
+        'silence-action:set action on window silence when monitor-silence is on'
         'status:show or hide the status bar'
+        'status-format:specify the format to be used for each line of the status line'
         'status-interval:interval (in seconds) for status bar updates'
         'status-justify:position of the window list in status bar'
         'status-keys:mode to use in status bar modes (vi/emacs)'
@@ -1299,6 +1333,7 @@ function __tmux-session-options() {
         'status-right-style:style of right part of status line'
         'status-style:style status line'
         "update-environment:list of variables to be copied to a session's environment"
+        'user-keys:set list of user-defined key escape sequences'
         'visual-activity:display status line messages upon activity'
         'visual-bell:use visual bell instead of audible'
         'visual-silence:print a message if monitor-silence is on'
@@ -1352,13 +1387,14 @@ function __tmux-server-options() {
     local -a tmux_server_options
     tmux_server_options=(
         'buffer-limit:number of buffers kept per session'
+        'command-alias:custom command aliases'
         'default-terminal:default terminal definition string'
         'escape-time:set timeout to detect single escape characters (in msecs)'
         'exit-unattached:make server exit if it has no attached clients'
+        'exit-empty:exit when there are no active sessions'
         'focus-events:request focus events from terminal'
         'history-file:tmux command history file name'
         'message-limit:set size of message log per client'
-        'quiet:enable/disable the display of various informational messages'
         'set-clipboard:use esc sequences to set terminal clipboard'
         'terminal-overrides:override terminal descriptions'
     )
@@ -1420,13 +1456,12 @@ function __tmux-window-options() {
         'automatic-rename-format:format for automatic renames'
         'clock-mode-colour:set clock colour'
         'clock-mode-style:set clock hour format (12/24)'
-        'force-height:force a windows to a certain height'
-        'force-width:force a windows to a certain width'
         'main-pane-height:set height for main-* layouts'
         'main-pane-width:set width for main-* layouts'
         'mode-keys:mode to use in copy and choice modes (vi/emacs)'
         'mode-style:set window modes style'
         'monitor-activity:monitor window activity'
+        'monitor-bell:monitor for a bell in the window'
         'monitor-silence:monitor window for inactivity'
         'other-pane-height:height of other panes'
         'other-pane-width:width of other panes'
@@ -1446,6 +1481,7 @@ function __tmux-window-options() {
         'window-status-last-style:style of last window in status bar'
         'window-status-separator:separator drawn between windows in status line'
         'window-status-style:general status bar style'
+        'window-size:indicate how to automatically size windows'
         'window-style:style of window'
         'wrap-search:search wrap around at the end of a pane'
         'xterm-keys:generate xterm-style function key sequences'
