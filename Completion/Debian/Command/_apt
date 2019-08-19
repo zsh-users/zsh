@@ -399,7 +399,13 @@ _apt-cmd () {
     -o,--option:arbitem \
     -t,--target-release:release \
     -- \
-    /$'list\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
+    /$'list\0'/ \( \
+      \( \
+        /$'--installed\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# /'[]'/ \| \
+        // %-% /$'--[^\0]#\0'/ ':options:option:(--installed --upgradable --all-versions)' \
+      \| \) \
+      /$'[^-\0][^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \
+    \) \| \
     /$'search\0'/ /$'[^\0]#\0'/ ':strings:pattern:' \| \
     /$'showsrc\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'show\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
@@ -409,15 +415,14 @@ _apt-cmd () {
     /$'update\0'/ \| \
     \( \
       /$'(install|download|source|build-dep)\0'/ -'subcmd=${match%?}' \
-      /$'[^\0]#\0'/ ':packages::_deb_packages -qr "\n\t\- /=" "$expl_packages[@]" avail' \# \
+      /$'[^\0]#\0'/ ':packages::_deb_packages -qr "\n\t\- /=+-" "$expl_packages[@]" avail' \# \
       \( \
 	// '%(.|)/%' -'[[ $subcmd = install ]]' /'[]'/ ':files: :_deb_files -c' \| \
 	/$'[^\0/=]#\/'/ /'[]'/ ':apt-releases:release name:_apt_releases' \| \
 	/$'[^\0/=]#='/ /'[]'/ ':apt-package-versions:package version:_apt_versions_of_binary_package' \| \
       \) \
     \) \| \
-    /$'remove\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
-    /$'purge\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
+    /$'(remove|reinstall|purge)\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'upgrade\0'/ \| \
     /$'autoclean\0'/ \| \
     /$'changelog\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
@@ -425,7 +430,7 @@ _apt-cmd () {
     /$'full-upgrade\0'/ \| \
     /$'dist-upgrade\0'/ \| \
     /$'edit-sources\0'/ \| \
-    /"[]"/	':argument-1::compadd "$expl_action[@]" list search showsrc show depends rdepends policy update install download source build-dep remove upgrade full-upgrade dist-upgrade edit-sources autoclean changelog autoremove purge'
+    /"[]"/ ':argument-1::compadd "$expl_action[@]" list search showsrc show depends rdepends policy update install reinstall download source build-dep remove upgrade full-upgrade dist-upgrade edit-sources autoclean changelog autoremove purge'
 
   _apt-cmd () {
     local expl_action expl_packages subcmd

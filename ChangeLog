@@ -1,5 +1,7 @@
 2019-08-19  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 44614: Completion/Debian/Command/_apt: apt list option completion
+
 	* Lajos Koszti: 44633: Completion/Unix/Command/_ansible:
 	complete ansible-vault actions like create, edit, etc.
 
