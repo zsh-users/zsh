@@ -774,7 +774,7 @@ AS_HELP_STRING([--with-term-lib=LIBS],[search space-separated LIBS for terminal 
   termcap_curses_order="$withval"
   AC_SEARCH_LIBS(tigetstr, [$termcap_curses_order])
 else
-  termcap_curses_order="$ncursesw_test tinfo termcap $ncurses_test curses"
+  termcap_curses_order="$ncursesw_test $ncurses_test tinfo termcap curses"
 fi],
 [case "$host_os" in
   solaris*)
@@ -783,7 +783,7 @@ fi],
    DL_EXT="${DL_EXT=sl}"
    termcap_curses_order="Hcurses $ncursesw_test $ncurses_test curses termcap" ;;
   *)
-   termcap_curses_order="$ncursesw_test tinfo termcap $ncurses_test curses" ;;
+   termcap_curses_order="$ncursesw_test $ncurses_test tinfo termcap curses" ;;
 esac])dnl
 
 AH_TEMPLATE([ZSH_NO_XOPEN],
