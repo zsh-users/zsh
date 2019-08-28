@@ -1,5 +1,8 @@
 2019-08-28  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* 44710: Src/Builtins/rlimits.awk, Src/Builtins/rlimits.c,
+	configure.ac: support RLIMIT_UMTXP on FreeBSD
+
 	* 44709: Src/zsh_system.h: incluce sys/capability.h only if
 	HAVE_CAP_GET_PROC is defined
 

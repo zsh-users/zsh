@@ -413,6 +413,12 @@ printulimit(char *nam, int lim, int hard, int head)
 	    printf("-k: kqueues                         ");
 	break;
 # endif /* HAVE_RLIMIT_KQUEUES */
+# ifdef HAVE_RLIMIT_UMTXP
+    case RLIMIT_UMTXP:
+	if (head)
+	    printf("-o: umtx shared locks               ");
+	break;
+# endif /* HAVE_RLIMIT_UMTXP */
     default:
 	if (head)
 	    printf("-N %2d:                              ", lim);
@@ -893,6 +899,11 @@ bin_ulimit(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 # ifdef HAVE_RLIMIT_PTHREAD
 		case 'T':
 		    res = RLIMIT_PTHREAD;
+		    break;
+# endif
+# ifdef HAVE_RLIMIT_UMTXP
+		case 'o':
+		    res = RLIMIT_UMTXP;
 		    break;
 # endif
 		default:

@@ -59,6 +59,7 @@ BEGIN {limidx = 0}
 	    if (limnam == "NPTS")    { msg[limnum] = "Npseudoterminals" }
 	    if (limnam == "SWAP")    { msg[limnum] = "Mswapsize" }
 	    if (limnam == "KQUEUES") { msg[limnum] = "Nkqueues" }
+	    if (limnam == "UMTXP")   { msg[limnum] = "Numtxp" }
         }
     }
 }
