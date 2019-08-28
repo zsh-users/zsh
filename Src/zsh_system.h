@@ -522,7 +522,7 @@ struct timespec {
 # define RLIMIT_VMEM RLIMIT_AS
 #endif
 
-#ifdef HAVE_SYS_CAPABILITY_H
+#if defined(HAVE_SYS_CAPABILITY_H) && defined(HAVE_CAP_GET_PROC)
 # include <sys/capability.h>
 #endif
 

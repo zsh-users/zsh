@@ -1,3 +1,8 @@
+2019-08-28  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 44709: Src/zsh_system.h: incluce sys/capability.h only if
+	HAVE_CAP_GET_PROC is defined
+
 2019-08-27  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Sebastian: 44712: configure.ac: prefer any form of ncurses to
