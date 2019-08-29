@@ -3159,6 +3159,8 @@ spckword(char **s, int hist, int cmd, int ask)
 	    scanhashtable(cmdnamtab, 1, 0, 0, spscan, 0);
 	    if (autocd) {
 		char **pp;
+		if (cd_able_vars(unmeta(guess)))
+		    return;
 		for (pp = cdpath; *pp; pp++) {
 		    char bestcd[PATH_MAX + 1];
 		    int thisdist;

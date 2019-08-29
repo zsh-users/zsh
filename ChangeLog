@@ -1,3 +1,8 @@
+2019-08-29  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 44714 (tweaked): Src/utils.c: Take account of CDABLE_VARS
+	while checking spelling
+
 2019-08-28  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 44710: Src/Builtins/rlimits.awk, Src/Builtins/rlimits.c,
