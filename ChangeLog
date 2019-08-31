@@ -1,3 +1,8 @@
+2019-09-04  Ned Batchelder  <ned@nedbatchelder.com>
+
+	* github #37: Doc/Zsh/builtins.yo: Make it easier to understand
+	what "fc -e" does.
+
 2019-08-29  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 44714 (tweaked): Src/utils.c: Take account of CDABLE_VARS
