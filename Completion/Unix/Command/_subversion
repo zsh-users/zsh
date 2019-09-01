@@ -30,11 +30,24 @@ _svn () {
     '1: :->cmds' \
     '*:: :->args' && ret=0
 
+  local _svn_help_takes_verbose
+  if _cache_invalid svn-help-takes-verbose || ! _retrieve_cache svn-help-takes-verbose; then
+    if [[ $(_call_program svn-help-v svn help help) == *--verbose* ]]
+    _svn_help_takes_verbose=$(( ! $? ))
+    _store_cache svn-help-takes-verbose _svn_help_takes_verbose
+  fi
+  if (( _svn_help_takes_verbose )); then
+    readonly dash_v="-v"
+  else
+    readonly dash_v
+  fi
+  unset _svn_help_takes_verbose
+
   if [[ -n $state ]] && (( ! $+_svn_cmds )); then
     typeset -gHA _svn_cmds
     if _cache_invalid svn-cmds || ! _retrieve_cache svn-cmds; then
       _svn_cmds=(
-	${=${(f)${${"$(_call_program commands svn help)"#l#*Available subcommands:}%%Subversion is a tool*}}/(#s)[[:space:]]#(#b)([a-z-]##)[[:space:]]#(\([a-z, ?-]##\))#/$match[1] :$match[1]${match[2]:+:${${match[2]//[(),]}// /:}}:}
+	${=${(f)${${"$(_call_program commands svn help $dash_v)"#l#*Available subcommands:}%%Subversion is a tool*}}/(#s)[[:space:]]#(#b)([a-z-]##)[[:space:]]#(\([a-z, ?-]##\))#/$match[1] :$match[1]${match[2]:+:${${match[2]//[(),]}// /:}}:}
       )
       if (( $? == 0 )); then
         _store_cache svn-cmds _svn_cmds
@@ -60,14 +73,14 @@ _svn () {
 	if _cache_invalid svn-${cmd}-usage || \
 	    ! _retrieve_cache svn-${cmd}-usage;
 	then
-	  usage=${${(M)${(f)"$(_call_program options svn help $cmd)"}:#usage:*}#usage:*$cmd] }
+	  usage=${${(M)${(f)"$(_call_program options svn help $dash_v -- $cmd)"}:#usage:*}#usage:*$cmd] }
 	  _store_cache svn-${cmd}-usage usage
 	fi
 	if _cache_invalid svn-${cmd}-usage || \
 	    ! _retrieve_cache svn-${cmd}-args;
 	then
 	  args=(
-	    ${=${${${(M)${(f)"$(_call_program options svn help $cmd)"#(*Valid options:|(#e))}:#* :*}%% #:*}/ (arg|ARG)/:arg:}/(#b)(-##)([[:alpha:]]##) \[--([a-z-]##)\](:arg:)#/(--$match[3])$match[1]$match[2]$match[4] ($match[1]$match[2])--$match[3]$match[4]}
+	    ${=${${${(M)${(f)"$(_call_program options svn help $dash_v -- $cmd)"#(*Valid options:|(#e))}:#* :*}%% #:*}/ (arg|ARG)/:arg:}/(#b)(-##)([[:alpha:]]##) \[--([a-z-]##)\](:arg:)#/(--$match[3])$match[1]$match[2]$match[4] ($match[1]$match[2])--$match[3]$match[4]}
 	  )
           while (( idx=$args[(I)*--accept:arg:] )); do
             args[idx]=( --accept'=:automatic conflict resolution action:((working\:working base\:base recommended\:recommended '"`for i j in p postpone mc mine-conflict tc theirs-conflict mf mine-full tf theirs-full e edit l launch; do print -rn $i\\\\:$j $j\\\\:$j ""; done `"'))' )

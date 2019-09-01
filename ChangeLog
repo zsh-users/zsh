@@ -1,3 +1,10 @@
+2019-09-04  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 44726/0001: Completion/Unix/Command/_subversion: Use
+	'svn help -v' to show global options, experimental options,
+	and experimental subcommands (upstream issue SVN-4828, to be
+	released in Subversion 1.13.0)
+
 2019-09-04  Ned Batchelder  <ned@nedbatchelder.com>
 
 	* github #37: Doc/Zsh/builtins.yo: Make it easier to understand
