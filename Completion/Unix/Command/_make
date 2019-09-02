@@ -262,7 +262,7 @@ _make() {
       if [[ $is_gnu == gnu ]] 
       then
         if zstyle -t ":completion:${curcontext}:targets" call-command; then
-          _make-parseMakefile < <(_call_program targets "$words[1]" -nsp --no-print-directory -f "$file" .PHONY 2> /dev/null)
+          _make-parseMakefile < <(_call_program targets "$words[1]" -nsp --no-print-directory -f "$file" --always-make 2> /dev/null)
         else
           _make-parseMakefile < $file
         fi
