@@ -11,11 +11,14 @@ _svn () {
      relative-url          "the repository-relative URL"
      repos-root-url        "the repository root URL"
      repos-uuid            "the repository UUID"
+     repos-size            "the size of TARGET in the repository (for files only)"
      revision              "the revision of TARGET"
      last-changed-revision "the most recent revision in which TARGET was changed"
      last-changed-date     "the date of the last-changed revision"
      last-changed-author   "the author of the last-changed revision"
      wc-root               "the working copy root path"
+     schedule              "'normal', 'add', 'delete', 'replace'"
+     depth                 "'infinity', 'immediates', 'files', 'empty', 'exclude'"
   )
 
   local update_policy

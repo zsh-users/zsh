@@ -1,5 +1,8 @@
 2019-09-04  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 44726/0002: Completion/Unix/Command/_subversion: Update
+	--show-item= completion to 1.12.0.
+
 	* 44726/0001: Completion/Unix/Command/_subversion: Use
 	'svn help -v' to show global options, experimental options,
 	and experimental subcommands (upstream issue SVN-4828, to be
