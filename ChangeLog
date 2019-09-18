@@ -1,3 +1,8 @@
+2019-09-18  Tobias Schulte  <tobias.schulte@gliderpilot.de>
+
+	* github #38: Completion/Unix/Command/_git: fix completion text
+	for git update-index --chmod
+
 2019-09-06  Daniel Hahler  <zsh@thequod.de>
 
 	* 44722: Completion/Unix/Command/_make: use --always-make

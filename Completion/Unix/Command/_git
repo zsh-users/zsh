@@ -4896,7 +4896,7 @@ _git-update-index () {
     '--ignore-missing[ignore missing files when refreshing the index]' \
     '*--cacheinfo[insert information directly into the cache]: :_guard "[0-7]#" "octal file mode": :_guard "[[\:xdigit\:]]#" "object id": :_files' \
     '(: -)--index-info[read index information from stdin]' \
-    '--chmod=-[set execute permissions on updated files]:permission:((-x\:executable +x\:"not executable"))' \
+    '--chmod=-[set execute permissions on updated files]:permission:((+x\:executable -x\:"not executable"))' \
     '(                   --no-assume-unchanged)--assume-unchanged[set "assume unchanged" bit for given paths]' \
     '(--assume-unchanged                      )--no-assume-unchanged[unset "assume unchanged" bit for given paths]' \
     '(-q --unmerged --ignore-missing --refresh)--really-refresh[refresh index, unconditionally checking stat information]' \
