@@ -99,7 +99,7 @@ if [[ "$PREFIX" = --* ]]; then
 
   # ...long options after `--'.
 
-  _arguments -- -l '--owner=*:user:_users' \
+  _arguments '-f+:' '-C+:' '*: : true' -- -l '--owner=*:user:_users' \
 		 '--group=*:group:_groups' \
 		 '--atime-preserve*::method:(replace system)' \
 		 '--*-script=NAME:script file:_files' \
