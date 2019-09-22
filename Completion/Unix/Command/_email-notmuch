@@ -1,0 +1,9 @@
+#autoload
+
+local expl
+local -a notmuch_addr
+
+notmuch_addr=( ${(f)"$(notmuch address --deduplicate=address --output=address -- from:/$PREFIX/)"} )
+
+_description notmuch-addr expl 'email address (notmuch)'
+compadd "$expl[@]" -a notmuch_addr

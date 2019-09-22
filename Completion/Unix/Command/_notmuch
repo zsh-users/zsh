@@ -1,80 +1,292 @@
-#compdef notmuch
+#compdef notmuch -p notmuch-*
 
-_notmuch_commands()
-{
+# ZSH completion for `notmuch`
+# Copyright © 2018 Vincent Breitmoser <look@my.amazin.horse>
+
+_notmuch_command() {
   local -a notmuch_commands
   notmuch_commands=(
-    'setup:interactively set up notmuch for first use'
-    'new:find and import any new message to the database'
-    'insert:add a new message into the maildir and notmuch database'
-    'search:search for messages matching the search terms, display matching threads as results'
-    'address:get addresses from messages matching the given search terms'
-    'reply:constructs a reply template for a set of messages'
-    'show:show all messages matching the search terms'
-    'tag:add or remove tags for all messages matching the search terms'
-    'dump:creates a plain-text dump of the tags of each message'
-    'restore:restores the tags from the given file'
+    'help:display documentation for a subcommand'
+    'setup:interactively configure notmuch'
+
+    'address:output addresses from matching messages'
     'compact:compact the notmuch database'
-    'reindex:re-index all messages matching the search terms'
-    'help:show details on a command'
-    'compact:compact the notmuch database'
-    'config:access the notmuch configuration file'
+    'config:access notmuch configuration file'
     'count:count messages matching the given search terms'
+    'dump:creates a plain-text dump of the tags of each message'
+    'insert:add a message to the maildir and notmuch database'
+    'new:incorporate new mail into the notmuch database'
+    'reindex:re-index a set of messages'
+    'reply:constructs a reply template for a set of messages'
+    'restore:restores the tags from the given file (see notmuch dump)'
+    'search:search for messages matching the given search terms'
+    'show:show messages matching the given search terms'
+    'tag:add/remove tags for all messages matching the search terms'
   )
 
-  _describe -t command 'command' notmuch_commands
+  if ((CURRENT == 1)); then
+    _describe -t commands 'notmuch command' notmuch_commands
+  else
+      local curcontext="$curcontext"
+      cmd=$words[1]
+      if (( $+functions[_notmuch_$cmd] )); then
+        _notmuch_$cmd
+      else
+        _message -e "unknown command $cmd"
+      fi
+  fi
 }
 
-_notmuch_dump()
-{
-  _files
+_notmuch_term_tag _notmuch_term_is () {
+  local ret=1 expl
+  local -a notmuch_tags
+
+  notmuch_tags=( ${(f)"$(notmuch search --output=tags '*')"} )
+
+  _description notmuch-tag expl 'tag'
+  compadd "$expl[@]" -a notmuch_tags && ret=0
+  return $ret
 }
 
-_notmuch_help_topics()
-{
-  local -a notmuch_help_topics
-  notmuch_help_topics=(
-    'search-terms:common search-term syntax'
-    'hooks:hooks that will be run before or after certain commands'
-    'properties:message property conventions and documentation'
+_notmuch_term_to _notmuch_term_from() {
+  _email_addresses -c
+}
+
+_notmuch_term_mimetype() {
+  local ret=1 expl
+  local -a commontypes
+  commontypes=(
+    'text/plain'
+    'text/html'
+    'application/pdf'
   )
-  _describe -t notmuch-help-topics 'topic' notmuch_help_topics
+  _description typical-mimetypes expl 'common types'
+  compadd "$expl[@]" -a commontypes && ret=0
+
+  _mime_types && ret=0
+  return $ret
 }
 
-_notmuch_help()
-{
-  _alternative \
-    _notmuch_commands \
-    _notmuch_help_topics
+_notmuch_term_path() {
+  local ret=1 expl
+  local maildir="$(notmuch config get database.path)"
+  [[ -d $maildir ]] || { _message -e "database.path not found" ; return $ret }
+
+  _description notmuch-folder expl 'maildir folder'
+  _files "$expl[@]" -W $maildir -/ && ret=0
+  return $ret
 }
 
-_notmuch_restore()
-{
-  _files
+_notmuch_term_folder() {
+  local ret=1 expl
+  local maildir="$(notmuch config get database.path)"
+  [[ -d $maildir ]] || { _message -e "database.path not found" ; return $ret }
+
+  _description notmuch-folder expl 'maildir folder'
+  local ignoredfolders=( '*/(cur|new|tmp)' )
+  _files "$expl[@]" -W $maildir -F ignoredfolders -/ && ret=0
+  return $ret
 }
 
-_notmuch_search()
-{
-  _arguments -s : \
+_notmuch_term_query() {
+  local ret=1
+  local line query_name
+  local -a query_names query_content
+  for line in ${(f)"$(notmuch config list | grep '^query.')"}; do
+    query_name=${${line%%=*}#query.}
+    query_names+=( $query_name )
+    query_content+=( "$query_name = ${line#*=}" )
+  done
+
+  _description notmuch-named-query expl 'named query'
+  compadd "$expl[@]" -d query_content -a query_names && ret=0
+  return $ret
+}
+
+_notmuch_search_term() {
+  local ret=1 expl match
+  setopt localoptions extendedglob
+
+  typeset -a notmuch_search_terms
+  notmuch_search_terms=(
+    'from' 'to' 'subject' 'attachment' 'mimetype' 'tag' 'id' 'thread' 'path' 'folder' 'date' 'lastmod' 'query' 'property'
+  )
+
+  if compset -P '(#b)([^:]#):'; then
+    if (( $+functions[_notmuch_term_$match[1]] )); then
+      _notmuch_term_$match[1] && ret=0
+      return $ret
+    elif (( $+notmuch_search_terms[(r)$match[1]] )); then
+      _message "search term '$match[1]'" && ret=0
+      return $ret
+    else
+      _message -e "unknown search term '$match[1]'"
+      return $ret
+    fi
+  fi
+
+  _description notmuch-term expl 'search term'
+  compadd "$expl[@]" -S ':' -a notmuch_search_terms && ret=0
+
+  if [[ $CURRENT -gt 1 && $words[CURRENT-1] != '--' ]]; then
+    _description notmuch-op expl 'boolean operator'
+    compadd "$expl[@]" -- and or not xor && ret=0
+  fi
+
+  return $ret
+}
+
+_notmuch_tagging_or_search() {
+  setopt localoptions extendedglob
+  local ret=1 expl
+  local -a notmuch_tags
+
+  # first arg that is a search term, or $#words+1
+  integer searchtermarg=$(( $words[(I)--] != 0 ? $words[(i)--] : $words[(i)^(-|+)*] ))
+
+  if (( CURRENT > 1 )); then
+    () {
+      local -a words=( $argv )
+      local CURRENT=$(( CURRENT - searchtermarg + 1 ))
+      _notmuch_search_term && ret=0
+    } $words[searchtermarg,$]
+  fi
+
+  # only complete +/- tags if we're before the first search term
+  if (( searchtermarg >= CURRENT )); then
+    if compset -P '+'; then
+      notmuch_tags=( ${(f)"$(notmuch search --output=tags '*')"} )
+      _description notmuch-tag expl 'add tag'
+      compadd "$expl[@]" -a notmuch_tags
+      return 0
+    elif compset -P '-'; then
+      notmuch_tags=( ${(f)"$(notmuch search --output=tags '*')"} )
+      _description notmuch-tag expl 'remove tag'
+      compadd "$expl[@]" -a notmuch_tags
+      return 0
+    else
+      _description notmuch-tag expl 'add or remove tags'
+      compadd "$expl[@]" -S '' -- '+' '-' && ret=0
+    fi
+  fi
+
+  return $ret
+}
+
+_notmuch_address() {
+  _arguments -S \
+    '--format=[set output format]:output format:(json sexp text text0)' \
+    '--format-version=[set output format version]:format version: ' \
+    '--sort=[sort results]:sorting:((newest-first\:"reverse chronological order" oldest-first\:"chronological order"))' \
+    '--output=[select output format]:output format:(sender recipients count address)' \
+    '--deduplicate=[deduplicate results]:deduplication mode:(no mailbox address)' \
+    '--exclude=[respect excluded tags setting]:exclude tags:(true false)' \
+    '*::search term:_notmuch_search_term'
+}
+
+_notmuch_compact() {
+  _arguments \
+    '--backup=[save a backup before compacting]:backup directory:_files -/' \
+    '--quiet[do not print progress or results]'
+}
+
+_notmuch_count() {
+  _arguments \
+     - normal \
+        '--lastmod[append lastmod and uuid to output]' \
+        '--exclude=[respect excluded tags setting]:exclude tags:(true false)' \
+        '--output=[select what to count]:output format:(messages threads files)' \
+        '*::search term:_notmuch_search_term' \
+    - batch \
+      '--batch[operate in batch mode]' \
+      '(--batch)--input=[read batch operations from file]:batch file:_files'
+}
+
+_notmuch_dump() {
+  _arguments -S \
+    '--gzip[compress output with gzip]' \
+    '--format=[specify output format]:output format:(batch-tag sup)' \
+    '*--include=[configure metadata to output (default all)]:metadata type:(config properties tags)' \
+    '--output=[write output to file]:output file:_files' \
+    '*::search term:_notmuch_search_term'
+}
+
+_notmuch_new() {
+  _arguments \
+    '--no-hooks[prevent hooks from being run]' \
+    '--quiet[do not print progress or results]' \
+    '--full-scan[don''t rely on directory modification times for scan]' \
+    '--decrypt=[decrypt messages]:decryption setting:((false\:"never decrypt" auto\:"decrypt if session key is known (default)" true\:"decrypt using secret keys" stash\:"decrypt, and store session keys"))'
+}
+
+_notmuch_reindex() {
+  _arguments \
+    '--decrypt=[decrypt messages]:decryption setting:((false\:"never decrypt" auto\:"decrypt if session key is known (default)" true\:"decrypt using secret keys" stash\:"decrypt, and store session keys"))' \
+    '*::search term:_notmuch_search_term'
+}
+
+_notmuch_search() {
+  _arguments -S \
     '--max-threads=[display only the first x threads from the search results]:number of threads to show: ' \
     '--first=[omit the first x threads from the search results]:number of threads to omit: ' \
-    '--sort=[sort results]:sorting:((newest-first\:"reverse chronological order" oldest-first\:"chronological order"))'
+    '--sort=[sort results]:sorting:((newest-first\:"reverse chronological order" oldest-first\:"chronological order"))' \
+    '--output=[select what to output]:output:(summary threads messages files tags)' \
+    '*::search term:_notmuch_search_term'
 }
 
-_notmuch()
-{
-  local ret=1
-  if (( CURRENT > 2 )) ; then
-    local cmd=${words[2]}
-    curcontext="${curcontext%:*:*}:notmuch-$cmd"
-    (( CURRENT-- ))
-    shift words
-    if ! _call_function ret _notmuch_$cmd; then
-      _default && ret=0
-    fi
-    return ret
+_notmuch_show() {
+  _arguments -S \
+    '--entire-thread=[output entire threads]:show thread:(true false)' \
+    '--format=[set output format]:output format:(text json sexp mbox raw)' \
+    '--format-version=[set output format version]:format version: ' \
+    '--part=[output a single decoded mime part]:part number: ' \
+    '--verify[verify signed MIME parts]' \
+    '--decrypt=[decrypt messages]:decryption setting:((false\:"never decrypt" auto\:"decrypt if session key is known (default)" true\:"decrypt using secret keys" stash\:"decrypt, and store session keys"))' \
+    '--exclude=[respect excluded tags setting]:exclude tags:(true false)' \
+    '--body=[output body]:output body content:(true false)' \
+    '--include-html[include text/html parts in the output]' \
+    '*::search term:_notmuch_search_term'
+}
+
+_notmuch_reply() {
+  _arguments \
+    '--format=[set output format]:output format:(default json sexp headers-only)' \
+    '--format-version=[set output format version]:output format version: ' \
+    '--reply-to=[specify recipient types]:recipient types:(all sender)' \
+    '--decrypt=[decrypt messages]:decryption setting:((false\:"never decrypt" auto\:"decrypt if session key is known (default)" true\:"decrypt using secret keys"))' \
+    '*::search term:_notmuch_search_term'
+}
+
+_notmuch_restore() {
+  _arguments \
+    '--acumulate[add data to db instead of replacing]' \
+    '--format=[specify input format]:input format:(auto batch-tag sup)' \
+    '*--include=[configure metadata to import (default all)]:metadata type:(config properties tags)' \
+    '--input=[read from file]:notmuch dump file:_files'
+}
+
+_notmuch_tag() {
+  _arguments \
+    - normal \
+      '--remove-all[remove all tags from matching messages]:*:search term:_notmuch_search_term' \
+      '*::tag or search:_notmuch_tagging_or_search' \
+    - batch \
+      '--batch[operate in batch mode]' \
+      '(--batch)--input=[read batch operations from file]:batch file:_files'
+}
+
+_notmuch() {
+  if [[ $service == notmuch-* ]]; then
+    local compfunc=_${service//-/_}
+    (( $+functions[$compfunc] )) || return 1
+    $compfunc "$@"
   else
-    _notmuch_commands
+    _arguments \
+      '(* -)--help[show help]' \
+      '(* -)--version[show version]' \
+      '--config=-[specify config file]:config file:_files' \
+      '--uuid=-[check against database uuid or exit]:uuid: ' \
+      '*::notmuch commands:_notmuch_command'
   fi
 }
 
