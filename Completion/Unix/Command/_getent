@@ -50,6 +50,13 @@ case $state in
       aliases|passwd|shadow|group)
         _wanted keys expl key compadd ${keys%%:*} && ret=0
       ;;
+      utmpx)
+	if (( CURRENT > 3 )); then
+	  _files && ret=0
+	else
+	  _wanted keys expl key compadd active lastlogin log && ret=0
+	fi
+      ;;
       *) _message -e keys key;;
     esac
   ;;

@@ -1,5 +1,8 @@
 2019-09-26  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 44780: Completion/Unix/Command/_getent: add completion to
+	getent for the utmpx key on FreeBSD.
+
 	* 44779: Completion/Unix/Command/_git: completion for new
 	git switch and git restore commands
 
