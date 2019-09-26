@@ -1,5 +1,8 @@
 2019-09-26  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 44782: Completion/BSD/Command/_pkgin,
+	Completion/Unix/Command/_avahi: new completions
+
 	* Gautam Iyer: gitlab !9: Completion/Unix/Command/_seafile:
 	Rudimentary seafile client completion
 
