@@ -1,5 +1,15 @@
 2019-09-26  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 44781: Completion/Linux/Type/_selinux_contexts,
+	Completion/Linux/Type/_selinux_roles,
+	Completion/Linux/Type/_selinux_types,
+	Completion/Linux/Type/_selinux_users,
+	Completion/Linux/Command/_chcon, Completion/Unix/Command/_cp,
+	Completion/Unix/Command/_find, Completion/Unix/Command/_install,
+	Completion/Unix/Command/_mkdir, Completion/Unix/Command/_mkfifo,
+	Completion/Unix/Command/_mknod, Completion/Unix/Command/_sudo:
+	add completion of SELinux contexts
+
 	* 44780: Completion/Unix/Command/_getent: add completion to
 	getent for the utmpx key on FreeBSD.
 

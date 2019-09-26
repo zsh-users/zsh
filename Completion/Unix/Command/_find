@@ -98,7 +98,7 @@ case $variant in
     args+=(
       '(- *)-help' '(-)--help'
       '(- *)-version' '(-)--version'
-      '-D[print diagnostics]:debug option:(help tree search stat rates opt exec)'
+      '-D[print diagnostics]:debug option:(exec opt rates search stat time tree all help)'
       '-O+[enable query optimisation]:level:(1 2 3)'
       '*-daystart'
       '-regextype:regexp syntax:(help findutils-default awk egrep ed emacs gnu-awk grep posix-awk posix-basic posix-egrep posix-extended posix-minimal-basic sed)'
@@ -116,7 +116,7 @@ case $variant in
       '*-fprintf:output file:_files:output format'
       '*-printf:output format'
     )
-    [[ $OSTYPE = linux-gnu ]] && args+=( '*-context:SELinux context' )
+    [[ $OSTYPE = linux-gnu ]] && args+=( '*-context:SELinux context (glob pattern):_selinux_contexts' )
   ;;
 esac
 

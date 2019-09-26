@@ -10,7 +10,7 @@ if _pick_variant gnu='Free Soft' unix --version; then
   )
   [[ $OSTYPE == linux* ]] && args+=(
     '(--context)-Z[set SELinux security context to default]'
-    '(-Z)--context=-[like -Z, or specify SELinux security context]:SELinux security context'
+    '(-Z)--context=-[like -Z, or specify SELinux security context]::SELinux security context:_selinux_contexts'
   )
 else
   aopts=( -A '-*' )

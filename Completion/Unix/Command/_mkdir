@@ -22,7 +22,8 @@ case $variant in
     aopts=()
     if [[ $OSTYPE == linux* ]]; then
       args+=(
-        '(-Z --context)'{-Z,--context=}'[set SELinux context]:SELinux context'
+        '(--context)-Z[set SELinux context]'
+        '(-Z)--context=-[set SELinux context]::SELinux context:_selinux_contexts'
       )
     fi
     args+=(
