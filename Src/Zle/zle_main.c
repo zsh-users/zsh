@@ -708,7 +708,7 @@ raw_getbyte(long do_keytmout, char *cptr, int full)
 	     */
 	    if (
 # ifdef HAVE_POLL
-		 (fds[0].revents & POLLIN)
+		 (fds[0].revents & (POLLIN|POLLERR|POLLHUP|POLLNVAL))
 # else
 		 FD_ISSET(SHTTY, &foofd)
 # endif
