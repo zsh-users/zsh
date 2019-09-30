@@ -10,10 +10,10 @@ _arguments -s -C -S \
   '(-M --show-machine-names)'{-M,--show-machine-names}'[prepend the host name on output]' \
   '(-i --duplicate-input)'{-i,--duplicate-input}'[duplicate input given to dsh]' \
   '(-b --bufsize)'{-b,--bufsize}'[change buffer size used in input duplication]:buffer size for -i (bytes)' \
-  '(-m --machine)'{-m,--machine}'[execute on machine]:machine:{_hosts || _user_at_host}' \
+  \*{-m,--machine}'[execute on machine]:machine:{_hosts || _user_at_host}' \
   '(-n --num-topology)'{-n,--num-topology}'[how to divide the machines]:number' \
   '(-a --all)'{-a,--all}'[execute on all machines]' \
-  '(-g --group)'{-g,--group}'[execute on group member]:groupname:->groups' \
+  \*{-g,--group}'[execute on group member]:groupname:->groups' \
   '(-f --file)'{-f,--file}'[use the file as list of machines]:file:_files' \
   '(-r --remoteshell)'{-r,--remoteshell}'[execute using shell]:remote shell:(rsh ssh)' \
   '(-o --remoteshellopt)'{-o,--remoteshellopt}'[option to give to remote shell ]:option' \

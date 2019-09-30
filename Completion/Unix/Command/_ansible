@@ -49,7 +49,7 @@ case $service in
   ;|
   ansible|ansible-console|ansible-inventory|ansible-playbook|ansible-pull)
     args+=(
-      '(-i --inventory)'{-i+,--inventory=}'[specify inventory host file or host list]: : _alternative "files\:inventory file\:_files"
+      \*{-i+,--inventory=}'[specify inventory host file or host list]: : _alternative "files\:inventory file\:_files"
 	"hosts\:host\: _sequence _hosts"'
       '!(-i --inventory)--inventory-file=:inventory file:_files'
     )

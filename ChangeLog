@@ -1,5 +1,10 @@
 2019-09-30  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 44783, 44791: Completion/Solaris/Command/_dladm,
+	Completion/Unix/Command/_dsh, Completion/Unix/Command/_ssh,
+	Completion/Unix/Command/_ansible: mark some repeatable
+	options with * in the _arguments specs
+
 	* 44788: Completion/Redhat/Command/_rpm: handle newer rpm
 	commands like rpmkeys, rpmsign and update options
 

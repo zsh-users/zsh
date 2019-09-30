@@ -4,7 +4,7 @@
 
 _ssh () {
   local curcontext="$curcontext" state line expl suf ret=1
-  local args common common_transfer algopt tmp p1 file cmn cmds sdesc
+  local args common common_transfer algopt tmp p1 file cmn cmds sdesc tdesc
   typeset -A opt_args
 
   common=(
@@ -30,6 +30,7 @@ _ssh () {
 
   case "$service" in
   ssh)
+    (( $+words[(r)-[^-]#t*] )) && tdesc=' even if there is no controlling tty'
     _arguments -C -s \
       '(-a)-A[enable forwarding of the authentication agent connection]' \
       '(-A)-a[disable forwarding of authentication agent connection]' \
@@ -60,7 +61,7 @@ _ssh () {
       '-Q+[query parameters]:query option:((cipher\:"supported symmetric ciphers" cipher-auth\:"supported symmetric ciphers that support authenticated encryption" mac\:"supported message integrity codes" kex\:"key exchange algorithms" key\:"key types" key-cert\:"certificate key types" key-plain\:"non-certificate key types" protocol-version\:"supported SSH protocol versions" sig\:"supported signature algorithms" help\:"show supported queries"))' \
       '-s[invoke subsystem]' \
       '(-t)-T[disable pseudo-tty allocation]' \
-      '(-T)-t[force pseudo-tty allocation]' \
+      "(-T)*-t[force pseudo-tty allocation${tdesc}]" \
       '-V[show version number]' \
       '(-q)*-v[verbose mode (multiple increase verbosity, up to 3)]' \
       '-W+[forward standard input and output to host]:stdinout forward:->hostport' \

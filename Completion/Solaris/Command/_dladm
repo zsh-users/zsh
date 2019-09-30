@@ -288,7 +288,7 @@ _dladm() {
     _arguments -A "-*" \
       '(-t --temporary)'{-t,--temporary}'[aggregation should be temporary]' \
       '(-R --root)'{-R,--root}'[root directory]:directory:_path_files -/' \
-      '(-l --link)'{-l,--link}'[component link]:link:_dladm_links' \
+      \*{-l,--link}'[component link]:link:_dladm_links' \
       '(-m --mode)'{-m,--mode}'[aggregation mode]:mode:(dlmp trunk)' \
       '(-P --policy)'{-P,--policy}'[port selection policy]:policy:_values -s , "policy" L2 L3 L4' \
       '(-L --lacp-mode)'{-L,--lacp-mode}'[LACP mode]:lacp mode:(off active passive)' \
