@@ -1,3 +1,8 @@
+2019-10-02  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 44797: Completion/Unix/Command/_git: _git-config: Complete
+	unknown options from 'git help -c'.
+
 2019-10-01  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 44799: Completion/Unix/Command/_pv: new pv completion

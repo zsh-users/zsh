@@ -2886,9 +2886,16 @@ __git_config_option-or-value () {
   declare -a git_present_options # 'present' is an adjective
   git_present_options=(
     ${${${(0)"$(_call_program gettable-options git config -z --list)"}%%$'\n'*}//:/\\:}
+
+    # Remove the "'git help config' for more information" line.
+    #
+    # Change literal 'foo.<bar>.baz' to 'foo.*.baz'. With that, completing
+    # at  foo.lorem.<TAB>  will offer foo.lorem.baz.
+    ${${${(f)"$(_call_program all-known-options "git help -c")"}:#* *}/<*>/*}
   )
 
-  # Add to $git_options options from the config file that aren't already in $git_options.
+  # Add to $git_options options from the config file, and from 'git help -c',
+  # that aren't already in $git_options.
   () {
     local -a -U sections_that_permit_arbitrary_subsection_names=(
       alias
