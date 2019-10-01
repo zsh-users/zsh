@@ -1,5 +1,7 @@
 2019-10-01  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 44799: Completion/Unix/Command/_pv: new pv completion
+
 	* 44798: Completion/Unix/Command/_netstat,
 	Completion/Linux/Command/_strace, Completion/X/Command/_xterm
 	Completion/Linux/Command/_kpartx, Completion/Linux/Command/_ss,
