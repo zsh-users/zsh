@@ -43,7 +43,6 @@
 #
 # TODO:
 #
-#   - Implement __tmux-format
 #   - Implement __tmux-style (possibly using existing helpers like
 #     __tmux-attributes and __tmux-colours)
 #   - in _tmux-list-panes, use __tmux-windows or __tmux-sessions
@@ -188,7 +187,7 @@ _tmux-break-pane() {
   [[ -n ${tmux_describe} ]] && print "break a pane from an existing into a new window" && return
   _arguments -s \
     "-d[don't make the new window become the active one]" \
-    '-F+[specify output format]:format:__tmux-format' \
+    '-F+[specify output format]:format:__tmux-formats' \
     '-P[print information of new window after it has been created]' \
     '-n+[specify window name]:name' \
     '-s+[specify source pane]:pane:__tmux-panes' \
@@ -1119,7 +1118,180 @@ function __tmux-environment-variables() {
 }
 
 __tmux-formats() {
-  _message 'not implemented yet'
+  local hash='#' open='{' close='}' paren='(' quest='?'
+  local tmux_variables expl
+  compquote hash open close paren quest
+  compset -p ${#PREFIX%$hash*}
+  if compset -P "${(q)hash}${open}"; then
+    if compset -P "${(q)quest}"; then
+      close=,
+    elif ! compset -P "([bdt]|s/[^/]#/[^/]#/|=(-|)<->):"; then
+      _describe -t operators operator '(
+	\?:conditional
+	\=:length\ limit
+      )' -S '' -- '(
+	m:fnmatch\ comparison
+	t:convert\ time\ to\ string
+	b:basename
+	c:search\ for\ fnmatch\ pattern\ in\ pane\ content
+	d:dirname
+	\==:comparison
+	\!=:comparison
+      )' -S : -- '(
+	s:substitution
+      )' -S / -- '(
+	\|\|:either\ of\ two\ conditions
+	\&\&:both\ of\ two\ conditions
+      )' -S ,
+    fi
+    tmux_variables=(
+      'alternate_on:if pane is in alternate screen'
+      'alternate_saved_x:saved cursor X in alternate screen'
+      'alternate_saved_y:saved cursor Y in alternate screen'
+      'buffer_created:time buffer created'
+      'buffer_name:name of buffer'
+      'buffer_sample:sample of start of buffer'
+      'buffer_size:size of the specified buffer in bytes'
+      'client_activity:time client last had activity'
+      'client_created:time client created'
+      'client_control_mode:1 if client is in control mode'
+      'client_discarded:bytes discarded when client behind'
+      'client_height:height of client'
+      'client_key_table:current key table'
+      "client_last_session:name of the client's last session"
+      'client_name:name of client'
+      'client_pid:PID of client process'
+      'client_prefix:1 if prefix key has been pressed'
+      'client_readonly:1 if client is readonly'
+      "client_session:name of the client's session"
+      'client_termname:terminal name of client'
+      'client_termtype:terminal type of client'
+      'client_tty:pseudo terminal of client'
+      'client_utf8:1 if client supports utf8'
+      'client_width:width of client'
+      'client_written:bytes written to client'
+      'command:name of command in use, if any'
+      'command_list_name:command name if listing commands'
+      'command_list_alias:command alias if listing commands'
+      'command_list_usage:command usage if listing commands'
+      'cursor_flag:pane cursor flag'
+      'cursor_character:character at cursor in pane'
+      'cursor_x:cursor X position in pane'
+      'cursor_y:cursor Y position in pane'
+      'history_bytes:number of bytes in window history'
+      'history_limit:maximum window history lines'
+      'history_size:size of history in lines'
+      'hook:name of running hook, if any'
+      'hook_pane:ID of pane where hook was run, if any'
+      'hook_session:ID of session where hook was run, if any'
+      'hook_session_name:name of session where hook was run, if any'
+      'hook_window:ID of window where hook was run, if any'
+      'hook_window_name:name of window where hook was run, if any'
+      'host:hostname of local host'
+      'host_short:hostname of local host (no domain name)'
+      'insert_flag:pane insert flag'
+      'keypad_cursor_flag:pane keypad cursor flag'
+      'keypad_flag:pane keypad flag'
+      'line:line number in the list'
+      'mouse_any_flag:pane mouse any flag'
+      'mouse_button_flag:pane mouse button flag'
+      'mouse_standard_flag:pane mouse standard flag'
+      'mouse_all_flag:pane mouse all flag'
+      'pane_active:1 if active pane'
+      'pane_at_bottom:1 if pane is at the bottom of window'
+      'pane_at_left:1 if pane is at the left of window'
+      'pane_at_right:1 if pane is at the right of window'
+      'pane_at_top:1 if pane is at the top of window'
+      'pane_bottom:bottom of pane'
+      'pane_current_command:current command if available'
+      'pane_dead:1 if pane is dead'
+      'pane_dead_status:exit status of process in dead pane'
+      'pane_format:1 if format is for a pane (not assuming the current)'
+      'pane_height:height of pane'
+      'pane_id:unique pane ID'
+      'pane_in_mode:if pane is in a mode'
+      'pane_input_off:if input to pane is disabled'
+      'pane_index:index of pane'
+      'pane_left:left of pane'
+      'pane_mode:name of pane mode, if any.'
+      'pane_pid:PID of first process in pane'
+      'pane_pipe:1 if pane is being piped'
+      'pane_right:right of pane'
+      'pane_search_string:last search string in copy mode'
+      'pane_start_command:command pane started with'
+      'pane_synchronized:if pane is synchronized'
+      'pane_tabs:pane tab positions'
+      'pane_title:title of pane'
+      'pane_top:top of pane'
+      'pane_tty:pseudo terminal of pane'
+      'pane_width:width of pane'
+      'pid:server PID'
+      'rectangle_toggle:1 if rectangle selection is activated'
+      'scroll_region_lower:bottom of scroll region in pane'
+      'scroll_region_upper:top of scroll region in pane'
+      'scroll_position:scroll position in copy mode'
+      'selection_present:1 if selection started in copy mode'
+      'session_alerts:list of window indexes with alerts'
+      'session_attached:number of clients session is attached to'
+      'session_activity:time of session last activity'
+      'session_created:time session created'
+      'session_format:1 if format is for a session (not assuming the current)'
+      'session_last_attached:time session last attached'
+      'session_group:name of session group'
+      'session_group_size:size of session group'
+      'session_group_list:list of sessions in group'
+      'session_grouped:1 if session in a group'
+      'session_id:unique session ID'
+      'session_many_attached:1 if multiple clients attached'
+      'session_name:name of session'
+      'session_stack:window indexes in most recent order'
+      'session_width:width of session'
+      'session_windows:number of windows in session'
+      'socket_path:server socket path'
+      'start_time:server start time'
+      'version:server version'
+      'window_activity:time of window last activity'
+      'window_activity_flag:1 if window has activity'
+      'window_active:1 if window active'
+      'window_bell_flag:1 if window has bell'
+      'window_flags:window flags'
+      'window_format:1 if format is for a window (not assuming the current)'
+      'window_height:height of window'
+      'window_id:unique window ID'
+      'window_index:index of window'
+      'window_last_flag:1 if window is the last used'
+      'window_layout:window layout description, ignoring zoomed window panes'
+      'window_linked:1 if window is linked across sessions'
+      'window_name:name of window'
+      'window_offset_x:X offset into window if larger than client'
+      'window_offset_y:Y offset into window if larger than client'
+      'window_panes:number of panes in window'
+      'window_silence_flag:1 if window has silence alert'
+      'window_stack_index:index in session most recent stack'
+      'window_visible_layout:window layout description, respecting zoomed window panes'
+      'window_width:width of window'
+      'window_zoomed_flag:1 if window is zoomed'
+      'wrap_flag:pane wrap flag'
+    )
+    _describe -t variables variable tmux_variables -S "$close"
+  elif compset -P "${(q)hash}${(q)paren}"; then
+    compset -S '(\\|)\)*'
+    _cmdstring
+  elif [[ $PREFIX = ${hash}* ]]; then
+    _describe -t variables variable '(
+      \#H:local\ hostname
+      \#h:short\ local\ hostname
+      \#D:pane\ id
+      \#P:pane\ index
+      \#T:pane\ title
+      \#S:session\ name
+      \#F:window\ flags
+      \#I:window\ index
+      \#W:window\ name
+    )' -S ''
+  else
+    _wanted format-specifiers expl 'format specifier' compadd -S '' \#
+  fi
 }
 
 function __tmux-colours() {
