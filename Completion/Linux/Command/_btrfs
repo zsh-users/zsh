@@ -109,16 +109,16 @@ while (( $#state )); do
             '(-u --uuid)'{-u,--uuid}'[uuid of the subvolume]'
             '1:subvolume path:_directories'
           )
-        ;;
+        ;|
         subvolume:sync) args+=( '-s[sleep between checks]:delay (seconds) [1]' );;
         subvolume:find-new) args+=( '1:subvol:_files -/' '2:lastgen: _message "last gen"' );;
-        (device|filesystem|qgroup):(df|du|show|usage))
+        (device|filesystem|qgroup|subvolume):(df|du|show|usage))
           args+=(
             '--iec[use 1024 as a base]'
             '--si[use 1000 as a base]'
           )
         ;|
-        (device|filesystem):(df|usage))
+        (device|filesystem):(df|usage)|subvolume:show)
           args+=(
             '(-b --raw)'{-b,--raw}'[output raw numbers in bytes]'
             '(-h --human-readable -H)'{-h,--human-readable}'[output human friendly numbers, base 1024]'
@@ -233,7 +233,7 @@ while (( $#state )); do
         property:list)
           args+=(
             '-t[specify object type]:object type:(subvol filesystem inode device)'
-            '1:object'
+            '1: : _guard "^-*" object'
           )
         ;;
         quota:(enable|disable)) args+=( '1:path:_files -/' );;
@@ -295,6 +295,7 @@ while (( $#state )); do
             \*{-b,--block}'[print info from the specified block only]:block number'
             '(-t --tree)'{-t,--tree}'[print only tree with the given id (string or number)]:tree id'
             '--follow[use with -b, to show all children tree blocks of the block]'
+            "--noscan[don't scan devices from the filesystem, use only the listed ones]"
           )
         ;;
         inspect*:dump-super)
@@ -399,7 +400,11 @@ while (( $#state )); do
             '1:mount:->mounts'
           )
         ;;
-        h(|e(|l(|p)))) args+=( '--full[display detailed help]' );;
+        h(|e(|l(|p)))) args+=(
+            '--full[display detailed help on every command]'
+            '--box[show list of built-in tools (busybox style)]'
+          )
+        ;;
         *) args+=( '*: :_default' );; # fallback for unknown subcommands
       esac
       if ! (( shift )); then

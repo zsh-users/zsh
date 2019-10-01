@@ -41,6 +41,7 @@ _arguments -C -s \
   "($info -f --family)"{-f+,--family=}'[display sockets of specified type]:family:(inet inet6 link unix netlink vsock tipc xdp help)' \
   "($info -K --kill)"{-K,--kill}'[forcibly close sockets, display what was closed]' \
   "($info -H --no-header)"{-H,--no-header}'[suppress header line]' \
+  "($info -O --oneline)"{-O,--oneline}"[print socket's data on a single line]" \
   "($info -A --query --socket)"{-A+,--query=,--socket=}'[specify socket tables to show]: :_values -s , socket\ table all inet tcp udp raw unix packet netlink unix_dgram unix_stream unix_seqpacket packet_raw packet_dgram vsock_stream vsock_dgram tipc' \
   "($info -D)"{-D+,--diag=}'[dump raw info to file]:file:_files' \
   "($info -F)"{-F+,--filter=}'[read filter information from a file]:file:_files' \

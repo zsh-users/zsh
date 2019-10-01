@@ -174,8 +174,15 @@ case $OSTYPE in
   ;|
 
   solaris2.<11->)
+    sets+=( dcache '-[^-]#d*' )
+    sel_dcache=( '-d[display the destination cache entry table]' )
+    dcache=( $families )
     args=( '-T+[specify time format]:time format:((u\:seconds\ since\ epoch d\:standard\ date\ format))' )
-    sockets=( '-u[list user, pid and program that created network endpoint]' )
+    sockets+=(
+      '-u[list user, pid and program that created network endpoint]'
+      '-k[show only sockets with kernel data path bypass enabled]'
+      '-L[only show state of sockets using SO_REUSEPORT load balancing]'
+    )
   ;&
   solaris*)
     args=( -A '-*' $args )

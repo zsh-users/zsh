@@ -1,3 +1,13 @@
+2019-10-01  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 44798: Completion/Unix/Command/_netstat,
+	Completion/Linux/Command/_strace, Completion/X/Command/_xterm
+	Completion/Linux/Command/_kpartx, Completion/Linux/Command/_ss,
+	Completion/Linux/Command/_btrfs, Completion/X/Command/_xrandr,
+	Completion/Unix/Command/_gnutls, Completion/Unix/Command/_make,
+	Completion/Unix/Command/_xargs, Completion/Unix/Type/_ld_debug:
+	completion option update
+
 2019-09-30  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 44783, 44791: Completion/Solaris/Command/_dladm,

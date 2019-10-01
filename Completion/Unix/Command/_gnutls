@@ -85,7 +85,7 @@ case "$service" in
       '--benchmark-tls-ciphers[benchmark TLS ciphers]'
       '--priority-list[print list of the supported priority strings]'
       '*--alpn=[enable application layer protocol]:string'
-      '--recordsize=[specify maximum record size to advertise]:record size'
+      '--recordsize=[specify maximum record size to advertise]:record size (0-4096)'
       "--disable-sni[don't send a Server Name]"
       '--single-key-share[send a single key share under TLS1.3]'
       '--post-handshake-auth[enable post-handshake authentication under TLS1.3]'
@@ -119,6 +119,8 @@ case "$service" in
       '--pskhint=[specify PSK identity hint to use]:string'
       '*--ocsp-response=[specify OCSP response to send to client]:string:_files'
       '--ignore-ocsp-response-errors[ignore any errors when setting the OCSP response]'
+      '--recordsize=[specify maximum record size to advertise]:record size (0-16384)'
+      '--httpdata=[specify data to use as HTTP response]:file:_files'
     )
   ;;
 

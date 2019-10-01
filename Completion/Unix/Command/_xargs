@@ -47,6 +47,7 @@ case $variant in
       '(-0 --null -d --delimiter)'{-0,--null}'[expect NUL characters as input separators]'
       '(-d --delimiter -0 --null)'{-d+,--delimiter=}'[specify delimiter of input items]:delimiter'
       '(-l -L --max-lines -n --max-args -s --max-chars)--max-lines=-[call program for every number of lines]::number of input lines'
+      '(-o --open-tty)'{-o,--open-tty}'[reopen stdin as /dev/tty in the child process before executing the command]'
       '--process-slot-var=[set environment variable to unique value in child processes]:variable:_parameters -g "*export*"'
       '(-r --no-run-if-empty)'{-r,--no-run-if-empty}"[don't run command in absence of input]"
       '(- *)--help[show help information]'

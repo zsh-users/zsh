@@ -46,6 +46,13 @@ _arguments -C \
   '*--rmmode:Mode name:' \
   "*--addmode:output:->outputs:name" \
   "*--delmode:output:->outputs:name" \
+  '--listproviders' \
+  '--setprovideroutputsource:provider: :source' \
+  '--setprovideroffloadsink:provider: :sink' \
+  '--listmonitors' \
+  '--listactivemonitors' \
+  '--setmonitor:name' \
+  '--delmonitor:name' \
   && return 0
 
 case $state in

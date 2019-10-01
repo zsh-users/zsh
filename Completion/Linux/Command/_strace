@@ -25,7 +25,7 @@ _arguments -C -s \
   '(-C -i -k -r -ff -t -tt -ttt -T -y -yy)-c[count time, calls, and errors for each system call and report a summary]' \
   '(-c)-C[count time, calls, and errors for each system call and report a summary in addition to regular output]' \
   '-O+[overhead for tracing system calls]:overhead (microseconds)' \
-  '-S+[sort the output of the histogram (-c option) by the specified criterion]:sort criterion:(time calls name nothing)' \
+  '-S+[sort the output of the histogram (-c option) by the specified criterion]:sort criterion [time]:(time calls errors name nothing)' \
   '-w[summarise syscall latency]' \
   '*-e+[select events to trace or how to trace]:system call:->expressions' \
   '*-P+[trace only system calls accessing given path]:path:_files' \
@@ -39,6 +39,7 @@ _arguments -C -s \
   '*-E+[set or remove exported environment variable]:variable:->envars' \
   "${root}-u+[run as specified user]:user:_users" \
   '(:)*-p+[attach to the process with specified process ID and begin tracing]:process ID:_pids' \
+  '--seccomp-bpf[enable seccomp-bpf filtering]' \
   '-d[show debug output of strace itself on standard error]' \
   '-v[print unabbreviated versions of environment, stat, termios, etc. calls]' \
   '(- 1 *)-h[display help information]' \
