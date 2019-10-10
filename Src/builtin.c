@@ -3263,7 +3263,7 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	}
 	shf = (Shfunc) shfunctab->getnode(shfunctab, *argv);
 	if (!shf) {
-	    zwarnnam(name, "no such funciton: %s", *argv);
+	    zwarnnam(name, "no such function: %s", *argv);
 	    return 1;
 	}
 	if (shf->node.flags & PM_UNDEFINED) {
