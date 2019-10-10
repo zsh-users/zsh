@@ -35,7 +35,7 @@ _svn () {
 
   local _svn_help_takes_verbose
   if _cache_invalid svn-help-takes-verbose || ! _retrieve_cache svn-help-takes-verbose; then
-    if [[ $(_call_program svn-help-v svn help help) == *--verbose* ]]
+    [[ $(_call_program svn-help-v svn help help) == *--verbose* ]]
     _svn_help_takes_verbose=$(( ! $? ))
     _store_cache svn-help-takes-verbose _svn_help_takes_verbose
   fi
