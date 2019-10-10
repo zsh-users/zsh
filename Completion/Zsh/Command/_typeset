@@ -61,6 +61,7 @@ case ${service} in
       '(-k -t -T -u -U -W -x -z -M +M +k +t +W +z)-+M[define mathematical function]'
       '(-k -m -t -T -u -U -W -x -z +M +k +t +W +z)-s[define mathematical function that takes a string argument]'
       '(-M)-x+[specify spaces to use for indentation]:spaces'
+      '(-* +*)-c[copy shell function to another name]:old name:_functions:new name:_functions'
     )
   ;;
   integer)
