@@ -1,13 +1,13 @@
 #autoload
 
 local name nopt xopt format gname hidden hide match opts tag
-local -a gropt sort
+local -a ign gropt sort
 
 opts=()
 
 xopt=(-X)
 nopt=()
-zparseopts -K -D -a nopt 1 2 V=gropt J x=xopt
+zparseopts -K -D -a nopt 1 2 V=gropt J=ign x=xopt
 
 3="${${3##[[:blank:]]#}%%[[:blank:]]#}"
 [[ -n "$3" ]] && _lastdescr=( "$_lastdescr[@]" "$3" )

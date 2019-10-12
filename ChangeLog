@@ -1,5 +1,7 @@
 2019-10-12  dana  <dana@dana.is>
 
+	* 44767: Completion/Base/Core/_description: Ignore -J
+
 	* 44681 (tweaked): Completion/Unix/Command/_composer: Eliminate
 	questionable eval, fix quoting issue
 
