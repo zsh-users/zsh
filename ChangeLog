@@ -9,6 +9,11 @@
 
 	* unposted: Src/builtin.c: functions -c: Fix typo
 
+2019-10-04  Roman Perepelitsa  <roman.perepelitsa@gmail.com>
+
+	* 44784: Src/Zle/zle_main.c: Fix infinite loop when TTY
+	disappears
+
 2019-10-02  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 44797: Completion/Unix/Command/_git: _git-config: Complete
