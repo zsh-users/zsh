@@ -40,7 +40,7 @@ __composer_call() {
 
   __composer_update_work_dir
 
-  cmd=( ${_composer_cmd:-composer} -d${_composer_work_dir:-${(q)PWD}} )
+  cmd=( ${_composer_cmd:-composer} -d${(q)${_composer_work_dir:-$PWD}} )
   (( _composer_is_global )) && cmd+=( global )
 
   _call_program $1 $cmd "${@[2,-1]}"
@@ -115,7 +115,7 @@ __composer_prune_global_opts() {
 (( $+functions[__composer_update_work_dir] )) ||
 __composer_update_work_dir() {
   if [[ -n ${(v)opt_args[(i)(-d|--working-dir)]} ]]; then
-    eval _composer_work_dir=${(v)opt_args[(i)(-d|--working-dir)]}
+    _composer_work_dir=${(Q)${(v)opt_args[(i)(-d|--working-dir)]}}
   elif [[ -z $_composer_work_dir ]]; then
     _composer_work_dir=$PWD
   fi
