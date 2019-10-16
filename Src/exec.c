@@ -2765,9 +2765,12 @@ execcmd_fork(Estate state, int how, int type, Wordcode varspc,
     sigtrapped[SIGEXIT] = 0;
 #ifdef HAVE_NICE
     /* Check if we should run background jobs at a lower priority. */
-    if ((how & Z_ASYNC) && isset(BGNICE))
-	if (nice(5) < 0)
+    if ((how & Z_ASYNC) && isset(BGNICE)) {
+	errno = 0;
+	nice(5);
+	if (errno)
 	    zwarn("nice(5) failed: %e", errno);
+    }
 #endif /* HAVE_NICE */
 
     return 0;

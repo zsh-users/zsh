@@ -1,3 +1,8 @@
+2019-10-16  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* _RuRo_ (Андрей Стоцкий): 44841: Src/exec.c: Better error
+	checking of nice, since return value can be negative.
+
 2019-10-14  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 44812: Completion/Unix/Command/_subversion: Fix syntax error
