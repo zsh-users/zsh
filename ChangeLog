@@ -1,5 +1,9 @@
 2019-10-18  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* c.f. 44831: Completion/Unix/Command/_notmuch,
+	Completion/Unix/Command/_hg, Completion/X/Command/_zathura:
+	remove completion functions included in upstream projects
+
 	* 44849: Completion/Unix/Command/_dhclient,
 	Completion/Unix/Command/_date, Completion/Unix/Command/_grep,
 	Completion/Unix/Command/_ssh, Completion/BSD/Command/_vmctl:
