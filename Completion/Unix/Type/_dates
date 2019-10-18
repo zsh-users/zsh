@@ -73,7 +73,7 @@ for ((;rows;rows--)); do
   (( spacing = COLUMNS - 32 * columns + 2 ))
   disp[-1]="${(l.spacing.)}"
   (( spacing < 2 )) && spacer=0 disp[-1]=()
-  expl[1+expl[(i)-V]]=dates-$rows
+  expl[1+expl[(i)-J]]=dates-$rows
   compadd -x "$mlabels" "$expl[@]" -d disp -E $(( $#disp ))
 
   for ((line=0;line<6;line++)); do

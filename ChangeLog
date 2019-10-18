@@ -1,3 +1,8 @@
+2019-10-18  dana  <dana@dana.is>
+
+	* 44846: Completion/Unix/Type/_dates: Fix regression caused by
+	workers/44274
+
 2019-10-18  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* c.f. 44831: Completion/Linux/Command/_tpconfig,
