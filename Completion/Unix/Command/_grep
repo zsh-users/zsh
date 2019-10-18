@@ -109,7 +109,7 @@ case $variant:$OSTYPE in
   gpl2:*) arguments=( ${${arguments:#*\)-r}/\)-r/\)-R} ) ;;
   *:openbsd*)
     arguments=(
-      ${(M)arguments:#((#s)|*\))--(context|binary-files|line-buffered)*}
+      ${(M)arguments:#((#s)|*\))--(context|binary-files|line-buffered|label|max-count)*}
       ${${arguments:#((#s)|*\))(\*|)-[d-]*}/\)-r/\)-R}
       "-U[search binary files but don't print them]"
       '-Z[behave as zgrep]'

@@ -6,12 +6,12 @@ case $OSTYPE in
   (open|free)bsd*)
     args+=(
       '-c+[specify configuration file]:file:_files'
-      '-l+[specify leases file]:file:_files'
     )
   ;|
   freebsd*)
     args+=(
       '(-d)-b[immediately move to the background]'
+      '-l+[specify leases file]:file:_files'
       '-p+[specify PID file]:file:_files'
       '-u[reject leases with unknown options]'
       '-q[quiet]'

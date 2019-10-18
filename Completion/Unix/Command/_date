@@ -40,9 +40,7 @@ else
     ;|
     freebsd*|dragonfly*|darwin*|openbsd*)
       args+=(
-	'-d+:daylight saving time value'
 	'-f+[use specified format for input]:parsing format:_date_formats:new date'
-	'-t+:minutes west of GMT'
       )
     ;|
     dragonfly*|darwin*|netbsd*|openbsd*)
@@ -62,8 +60,12 @@ else
       )
     ;|
     freebsd*|dragonfly*|darwin*)
-      args+=( "*-v+[adjust and print (but don't set) date]:[+-]value[ymwdHMS]" )
-    ;;
+      args+=(
+	'-d+:daylight saving time value'
+	'-t+:minutes west of GMT'
+	"*-v+[adjust and print (but don't set) date]:[+-]value[ymwdHMS]"
+      )
+    ;|
     freebsd*|dragonfly*)
       args+=( '-R[display in RFC2822 format]' )
     ;|

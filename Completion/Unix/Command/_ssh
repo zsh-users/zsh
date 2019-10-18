@@ -3,8 +3,8 @@
 # TODO: sshd, ssh-keysign
 
 _ssh () {
-  local curcontext="$curcontext" state line expl suf ret=1
-  local args common common_transfer algopt tmp p1 file cmn cmds sdesc tdesc
+  local curcontext="$curcontext" state line expl suf arg ret=1
+  local args sigargs common common_transfer algopt tmp p1 file cmn cmds sdesc tdesc
   typeset -A opt_args
 
   common=(
@@ -126,53 +126,71 @@ _ssh () {
     (( CURRENT == 2 )) && p1='!'
     args=( '!-z:number' )
     sdesc='certify keys with CA key'
-    (( $+words[(r)-s] )) && args=( '-z[specify serial number]:serial number' )
+    (( $+words[(r)-I] )) && args=( '-z[specify serial number]:serial number' )
     (( $+words[(r)-[ku]] )) && args=( '-z[specify version number]:version number' ) &&
         sdesc='specify CA public key file'
     file=key
-    (( $+words[(r)-[HR]] )) && file=known_hosts
+    (( $+words[(r)-[FHR]] )) && file=known_hosts
     (( $+words[(r)-T] )) && file=input
-    if (( $+words[(r)-[kQ]] )); then
+    (( $+words[(r)-A] )) && file='prefix for host key'
+    if (( $+words[(r)-[kIQ]] )); then
       file=krl
       args+=( '*:file:_files' )
     fi
-    cmds=( -p -i -e -y -c -l -B -D -H -R -r -G -T -s -L -A -k -Q ) # basic commands
-    cmn=( -b -P -N -C -m -v ) # options common to many basic commands (except -f which is common to most)
-    cms=( -E -q -t -g -M -S -a -J -j -K -W -I -h -n -O -V -u ) # options specific to one basic command
+    if (( arg = $words[(I)-Y*] )); then
+      [[ $words[arg] = -Y?* ]] || (( arg++ ))
+      case $words[arg] in
+	check*|verify)
+	  sigargs+=( "$p1-s+[specify signature file]:signature file:-files" )
+	;|
+	sign) sigargs+=( '*:file:_files' ) ;;
+	verify)
+	  args=()
+	  sigargs+=(
+	    '-I+[specify signer identity]:identity'
+	    '-r+[specify revocation file]:revocation file:_files'
+	  )
+	;;
+      esac
+    fi
+    cmds=( -p -i -e -y -c -l -B -D -F -H -R -r -G -T -s -L -A -k -Q -Y ) # basic commands
+    cmn=( -b -P -N -C -l -m -v ) # options common to many basic commands (except -f which is common to most)
+    cms=( -E -q -t -g -M -S -a -J -j -K -W -I -h -n -O -V -u -U ) # options specific to one basic command
     _arguments -s $args \
-      "(${${(@)cmds:#-G}} -P -m ${${(@)cms:#-[MS]}})-b+[specify number of bits in key]:bits in key" \
-      "$p1(${${(@)cmds:#-[pc]}} -b -C $cms)-P+[provide old passphrase]:old passphrase" \
-      "(${${(@)cmds:#-p}} -m -v ${${(@)cms:#-[qt]}})-N+[provide new passphrase]:new passphrase" \
-      "(${${(@)cmds:#-c}} -m -v $cms)-C+[provide new comment]:new comment" \
+      "(${${(@)cmds:#-G}} -P ${${(@)cms:#-[MS]}})-b+[specify number of bits in key]:bits in key" \
+      "$p1(${${(@)cmds:#-[pc]}} -b $cms)-P+[provide old passphrase]:old passphrase" \
+      "(${${(@)cmds:#-p}} -v ${${(@)cms:#-[qt]}})-N+[provide new passphrase]:new passphrase" \
+      "(${${(@)cmds:#-c}} -v $cms)-C+[provide new comment]:new comment" \
       "(-D -G -M -S -I -h -n -O -V -A)-f+[$file file]:$file file:_files" \
-      "$p1(${${(@)cmds:#-[ie]}})-m+[specify conversion format]:format:(PEM PKCS7 RFC4716)" \
+      "$p1(${${(@)cmds:#-[FE]}} ${${(@)cmn:#-v}} ${${(@)cms:#-E}})-l[show fingerprint of key file]" \
+      "$p1(${${(@)cmds:#-[iep]}} $cms)-m+[specify conversion format]:format [RFC4716]:(PEM PKCS8 RFC4716)" \
       "(${${(@)cmds:#-[lGT]}} ${${(@)cmn:#-[bv]}} -f)*-v[verbose mode]" \
       - '(commands)' \
-      "(-b -P -C -v)-p[change passphrase of private key file]" \
-      '(-b -P -N -C -v)-i[import key to OpenSSH format]' \
-      '(-b -P -N -C -v)-e[export key to SECSH file format]' \
+      "(-b -l -C -v)-p[change passphrase of private key file]" \
+      '(-b -l -P -N -C -v)-i[import key to OpenSSH format]' \
+      '(-b -l -P -N -C -v)-e[export key to SECSH file format]' \
       "($cmn)-y[get public key from private key]" \
-      '(-b -N -m -v)-c[change comment in private and public key files]' \
+      '(-b -l -N -m -v)-c[change comment in private and public key files]' \
       "($cmn)-B[show the bubblebabble digest of key]" \
       "(-)-D+[download key stored in smartcard reader]:reader" \
+      "(${${(@)cmn:#-[lv]}})-F+[search for host in known_hosts file]:host:_ssh_hosts" \
       "($cmn)-H[hash names in known_hosts file]" \
       "($cmn)-R+[remove host from known_hosts file]:host:_ssh_hosts" \
       "($cmn)-L[print the contents of a certificate]" \
-      "(-)-A[generate host keys for all key types]" \
+      "($cmn -l)-A[generate host keys for all key types]" \
       "($cmn)-Q[test whether keys have been revoked in a KRL]" \
       - finger \
-      "($cmn)-l[show fingerprint of key file]" \
       "$p1($cmn)$algopt" \
       - create \
-      '(-P -m)-q[silence ssh-keygen]' \
-      "(-P -m)-t+[specify the type of the key to create]:key type:(rsa dsa ecdsa ed25519)" \
+      '(-P -l)-q[silence ssh-keygen]' \
+      "(-P -l)-t+[specify the type of the key to create]:key type:(rsa dsa ecdsa ed25519)" \
       - dns \
       "($cmn)-r[print DNS resource record]:hostname:_hosts" \
       "$p1($cmn)-g[use generic DNS format]" \
       - primes \
-      "(-P -N -C -m -f)-G[generate candidates for DH-GEX moduli]" \
-      "$p1(-P -N -C -m -f)-M+[specify amount of memory to use for generating DH-GEX moduli]:memory (MB)" \
-      "$p1(-P -N -C -m -f)-S+[specify start point]:start point (hex)" \
+      "(-P -N -C -l -m -f)-G+[generate candidates for DH-GEX moduli]:output file:_files" \
+      "$p1(-P -N -C -l -m -f)-M+[specify amount of memory to use for generating DH-GEX moduli]:memory (MB)" \
+      "$p1(-P -N -C -l -m -f)-S+[specify start point]:start point (hex)" \
       - screen \
       "(${${(@)cmn:#-v}})-T+[screen candidates for DH-GEX moduli]:output file:_files" \
       "${p1}(${${(@)cmn:#-v}})-a+[specify number of rounds]:rounds" \
@@ -182,19 +200,27 @@ _ssh () {
       "${p1}(${${(@)cmn:#-v}})-W[specify desired generator]:generator" \
       - certify \
       "($cmn)-s[$sdesc]:CA key:_files" \
-      "$p1($cmn -f -u)-I+[specify key identifier to include in certificate]:key id" \
-      "$p1($cmn -f -u)-h[generate host certificate instead of a user certificate]" \
-      "$p1($cmn -f -u -D)-U[indicate that CA key is held by ssh-agent]" \
-      "$p1($cmn -f -u -U)-D+[indicate the CA key is stored in a PKCS#11 token]:PKCS11 shared library:_files -g '*.(so|dylib)(|.<->)(-.)'" \
-      "$p1($cmn -f -u)-n+[specify user/host principal names to include in certificate]:principals" \
-      "$p1($cmn -f -u)*-O+[specify a certificate option]: : _values 'option'
+      "$p1($cmn -f -k -u)-I+[specify key identifier to include in certificate]:key id" \
+      "$p1($cmn -f -k -u)-h[generate host certificate instead of a user certificate]" \
+      "$p1($cmn -f -k -u -D)-U[indicate that CA key is held by ssh-agent]" \
+      "$p1($cmn -f -k -u -U)-D+[indicate the CA key is stored in a PKCS#11 token]:PKCS11 shared library:_files -g '*.(so|dylib)(|.<->)(-.)'" \
+      "$p1($cmn -f -k -u)-n+[specify user/host principal names to include in certificate]:principals" \
+      "$p1($cmn -f -k -u)*-O+[specify a certificate option]: : _values 'option'
         clear critical\:name extension\:name force-command\:command\:_cmdstring
 	no-agent-forwarding no-port-forwarding no-pty no-user-rc no-x11-forwarding
 	permit-agent-forwarding permit-port-forwarding permit-pty permit-user-rc
 	permit-x11-forwarding source-address\:source\ address" \
       "$p1($cmn -f -u)-V+[specify certificate validity interval]:interval" \
-      "($cmn -I -h -n -O -V)-k[generate a KRL file]" \
-      "$p1($cmn -I -h -n -O -V)-u[update a KRL]"
+      "($cmn -I -h -n -D -O -U -V)-k[generate a KRL file]" \
+      "$p1($cmn -I -h -n -D -O -U -V)-u[update a KRL]" \
+      - signature \
+      "($cmn)-Y+[signature action]:action:((
+	sign\:sign\ a\ file\ using\ SSH\ key
+	verify\:verify\ a\ signature\ generated\ using\ the\ sign\ option
+	check-novalidate\:check\ signature\ structure
+      ))" \
+      "$p1-n+[specify namespace]:namespace" \
+      $sigargs
     return
   ;;
   ssh-keyscan)
@@ -202,6 +228,7 @@ _ssh () {
       '(-6)-4[force ssh to use IPv4 addresses only]' \
       '(-4)-6[force ssh to use IPv6 addresses only]' \
       '-c[request certificates from target hosts instead of plain keys]' \
+      '-D[print keys found as SSHFP DNS records]' \
       '*-f+[read hosts from file, one per line]:file:_files' \
       '-H[hash all hostnames and addresses in the output]' \
       '-p+[specify port on remote host]:port number on remote host' \
@@ -529,6 +556,7 @@ _ssh () {
                 SendEnv \
                 ServerAliveCountMax \
                 ServerAliveInterval \
+                SetEnv \
                 StreamLocalBindMask \
                 StreamLocalBindUnlink \
                 StrictHostKeyChecking \

@@ -1,3 +1,10 @@
+2019-10-18  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 44849: Completion/Unix/Command/_dhclient,
+	Completion/Unix/Command/_date, Completion/Unix/Command/_grep,
+	Completion/Unix/Command/_ssh, Completion/BSD/Command/_vmctl:
+	completion updates for changes in OpenBSD 6.6
+
 2019-10-16  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* _RuRo_ (Андрей Стоцкий): 44841: Src/exec.c: Better error
@@ -32,6 +39,8 @@
 	unknown options from 'git help -c'.
 
 2019-10-01  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 44800: Completion/Unix/Command/_tmux: complete tmux formats
 
 	* 44799: Completion/Unix/Command/_pv: new pv completion
 

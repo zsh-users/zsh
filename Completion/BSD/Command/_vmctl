@@ -42,18 +42,14 @@ else
       _vm_names
       ;;
     create)
-      if (( CURRENT == 2 )); then
-	compset -P '(raw|qcow2):' || alts=(
-	  'prefixes:prefix:compadd -S: raw qcow2'
-	)
-	_alternative 'files:path:_files' $alts
-      else
-	shift words; (( CURRENT-- ))
-	_arguments \
-	  '-s+[specify size]:size' \
-          '(-i)-b+[specify base disk]:base image:_files'
-          '(-b)-i+[copy and convert input disk]:disk image:_files'
-      fi
+      compset -P '(raw|qcow2):' || alts=(
+        'prefixes:prefix:compadd -S: raw qcow2'
+      )
+      _arguments \
+        '-s+[specify size]:size' \
+        '(-i)-b+[specify base disk]:base image:_files' \
+        '(-b)-i+[copy and convert input disk]:disk image:_files' \
+        '1:disk: _alternative "files:path:_files" $alts'
       ;;
     load)
       _arguments ':configuration file:_files'
@@ -72,34 +68,25 @@ else
       ))'
       ;;
     start)
-      if (( CURRENT == 2 )); then
-        _vm_names
-      else
-        shift words; (( CURRENT-- ))
-        _arguments -s \
-          '-B+[force system to boot from specified device for this boot]:device:(cdrom disk net)' \
-          '-b+[boot with the specified kernel or BIOS image]:boot image:_files' \
-          '-c[automatically connect to the VM console]' \
-          '*-d+[disk image file]:disk image:_files' \
-          '-i+[number of network interfaces]:number: ' \
-          '-L[add a local network interface]' \
-          '-m+[specify memory size]:memory size (megabytes) [512]' \
-          '-n+[specify switch to attach]: :_vm_switches' \
-          '-r+[specify ISO image file for virtual CD-ROM]:ISO image:_files -g "*.iso(-.)"' \
-	  '-t+[use existing VM as a template]: :_vm_names'
-      fi
+      _arguments -s \
+        '-B+[force system to boot from specified device for this boot]:device:(cdrom disk net)' \
+        '-b+[boot with the specified kernel or BIOS image]:boot image:_files' \
+        '-c[automatically connect to the VM console]' \
+        '*-d+[disk image file]:disk image:_files' \
+        '-i+[number of network interfaces]:number: ' \
+        '-L[add a local network interface]' \
+        '-m+[specify memory size]:memory size (megabytes) [512]' \
+        '-n+[specify switch to attach]: :_vm_switches' \
+        '-r+[specify ISO image file for virtual CD-ROM]:ISO image:_files -g "*.iso(-.)"' \
+        '-t+[use existing VM as a template]: :_vm_names' \
+        '1: :_vm_names'
     ;;
     stop)
-      if (( CURRENT == 2 )); then
-	_alternative \
-	  'all:all:(-a)' \
-	  'virtual-machines: :_vm_names'
-      else
-	shift words; (( CURRENT-- ))
-	_arguments \
-	  '-f[forcefully stop without attempting a graceful shutdown]' \
-	  '-w[wait until the VM has been terminated]'
-      fi
+      _arguments \
+        '(1)-a[stop all running VMs]' \
+        '-f[forcefully stop without attempting a graceful shutdown]' \
+        '-w[wait until the VM has been terminated]' \
+        '(-a)1: :_vm_names'
     ;;
     *)
       _default
