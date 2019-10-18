@@ -1,5 +1,12 @@
 2019-10-18  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* c.f. 44831: Completion/Linux/Command/_tpconfig,
+	Completion/Unix/Command/_elm, Completion/Unix/Command/_flasher,
+	Completion/Unix/Command/_prcs, Completion/Unix/Command/_raggle,
+	Completion/Unix/Command/_uzbl, Completion/Unix/Command/_vux,
+	Completion/Unix/Command/_sablotron: remove completion functions
+	for long dead projects
+
 	* c.f. 44831: Completion/Unix/Command/_notmuch,
 	Completion/Unix/Command/_hg, Completion/X/Command/_zathura:
 	remove completion functions included in upstream projects
