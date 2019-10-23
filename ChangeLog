@@ -1,3 +1,8 @@
+2019-10-28  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Sebastian: 44865: configure.ac: Try harder to link in curses
+	even if not needed for termcap variables.
+
 2019-10-18  dana  <dana@dana.is>
 
 	* 44846: Completion/Unix/Type/_dates: Fix regression caused by

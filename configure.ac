@@ -774,7 +774,7 @@ AS_HELP_STRING([--with-term-lib=LIBS],[search space-separated LIBS for terminal 
   termcap_curses_order="$withval"
   AC_SEARCH_LIBS(tigetstr, [$termcap_curses_order])
 else
-  termcap_curses_order="$ncursesw_test $ncurses_test tinfo termcap curses"
+  termcap_curses_order="$ncursesw_test $ncurses_test tinfow tinfo termcap curses"
 fi],
 [case "$host_os" in
   solaris*)
@@ -783,7 +783,7 @@ fi],
    DL_EXT="${DL_EXT=sl}"
    termcap_curses_order="Hcurses $ncursesw_test $ncurses_test curses termcap" ;;
   *)
-   termcap_curses_order="$ncursesw_test $ncurses_test tinfo termcap curses" ;;
+   termcap_curses_order="$ncursesw_test $ncurses_test tinfow tinfo termcap curses" ;;
 esac])dnl
 
 AH_TEMPLATE([ZSH_NO_XOPEN],
@@ -807,6 +807,8 @@ dnl That's so that on systems where termcap and [n]curses are
 dnl both available and both contain termcap functions, while
 dnl only [n]curses contains terminfo functions, we only link against
 dnl [n]curses.
+LIBS_save_pre_term="$LIBS"
+AC_SEARCH_LIBS(tigetstr, [$termcap_curses_order])
 AC_SEARCH_LIBS(tigetflag, [$termcap_curses_order])
 AC_SEARCH_LIBS(tgetent, [$termcap_curses_order],
   true,
@@ -831,7 +833,56 @@ AC_CACHE_CHECK(if we need to ignore ncurses, zsh_cv_ignore_ncurses,
   zsh_cv_ignore_ncurses=no
   ;;
   *)
-  zsh_cv_ignore_ncurses=yes
+    dnl The lack of -lncurses in the $LIBS might be the result of passing
+    dnl --with-term-lib=^ncurses option. To address this, a test for the tgetent
+    dnl and other functions is ran here, possibly for the second time, just to
+    dnl ensure that the ncurses library doesn't have them.
+    LIBS_save="$LIBS"
+    dnl Remember (the values are used later, around line 3005) and remove the cache
+    ac_cv_search_tigetstr_SAVE="$ac_cv_search_tigetstr"
+    ac_cv_search_tigetnum_SAVE="$ac_cv_search_tigetnum"
+    ac_cv_search_tigetflag_SAVE="$ac_cv_search_tigetflag"
+    ac_cv_search_tgetent_SAVE="$ac_cv_search_tgetent"
+    unset ac_cv_search_tigetstr ac_cv_search_tigetnum ac_cv_search_tigetflag ac_cv_search_tgetent
+    LIBS="$LIBS_save_pre_term"
+
+    dnl Run the checks for all four used terminal functions
+    AC_SEARCH_LIBS(tigetstr, [ncursesw ncurses curses])
+    AC_SEARCH_LIBS(tigetnum, [ncursesw ncurses curses])
+    AC_SEARCH_LIBS(tigetflag, [ncursesw ncurses curses])
+    AC_SEARCH_LIBS(tgetent, [ncursesw ncurses curses])
+    LIBS_result="$LIBS"
+
+    LIBS="$LIBS_save"
+    dnl Restore the cache
+    ac_cv_search_tigetstr="$ac_cv_search_tigetstr_SAVE"
+    ac_cv_search_tigetnum="$ac_cv_search_tigetnum_SAVE"
+    ac_cv_search_tigetflag="$ac_cv_search_tigetflag_SAVE"
+    ac_cv_search_tgetent="$ac_cv_search_tgetent_SAVE"
+
+    case $LIBS_result in
+      *-lncurses*|*-lcurses*)
+        dnl Yes we need to ignore ncurses, its tgetent or tigetflag might
+        dnl conflict with the one from the selected terminal library
+        zsh_cv_ignore_ncurses=yes
+        ;;
+      *)
+        dnl If the tgetent nor tigetflag weren't found in the libncurses*.so, then
+        dnl there will be no conflict with the other terminal library selected (e.g.
+        dnl libtinfo) and it's possible to link ncurses provided that it is working
+        dnl - it is here verified that it has initscr() function to check that
+        AC_SEARCH_LIBS(initscr, [ncursesw ncurses curses])
+        case $LIBS in
+          *-lncurses*|*-lcurses*)
+            dnl No need to ignore curses - it is working and it doesn't
+            dnl have tgetent nor tigetflag
+            zsh_cv_ignore_ncurses=no
+          ;;
+          *)
+            zsh_cv_ignore_ncurses=yes
+          ;;
+        esac
+    esac
   ;;
 esac])
 
