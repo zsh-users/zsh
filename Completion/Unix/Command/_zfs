@@ -145,7 +145,6 @@ _zfs() {
 	# set the sorting for *size properties to false by default?
 	rw_properties=(
 		"aclinherit:value:(discard noallow restricted passthrough passthrough-x)"
-		"aclmode:value:(discard mask passthrough)"
 		"atime:value:(on off)"
 		"canmount:value:(on off noauto)"
 		"checksum:value:(on off fletcher2 fletcher4 sha256 sha256+mac)"
@@ -184,6 +183,15 @@ _zfs() {
 		"zoned:value:(on off)"
 		$share_rw_properties
 	)
+
+		if [[ "$OSTYPE" == "linux-gnu" ]]; then
+			rw_properties+=("acltype:value:(off noacl posixacl)")
+		elif [[ "$OSTYPE" == "solaris*" ]]; then
+			rw_properties+=("aclmode:value:(discard mask passthrough)")
+		else
+			rw_properties+=("aclmode:value:(discard groupmask passthrough restricted)")
+		fi
+
 
 	create_properties=(
 		$rw_properties
