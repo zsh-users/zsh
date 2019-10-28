@@ -1,5 +1,9 @@
 2019-10-28  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 44864: Src/jobs.c: Avoid infinite loop in interactive mode
+	when trying to grab terminal.  Fail after 100 goes (arbitrary
+	choice).
+
 	* Sebastian: 44865: configure.ac: Try harder to link in curses
 	even if not needed for termcap variables.
 
