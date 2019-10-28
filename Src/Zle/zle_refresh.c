@@ -834,7 +834,7 @@ nextline(Rparams rpms, int wrapped)
 	    if (rpms->nvln != -1 && rpms->nvln != winh - 1
 		&& (numscrolls != onumscrolls - 1
 		    || rpms->nvln <= winh / 2))
-	        return 1;
+		return 1;
 	    numscrolls++;
 	    rpms->canscroll = winh / 2;
 	}
@@ -1151,20 +1151,20 @@ zrefresh(void)
 	resetneeded = 0;	/* unset */
 	oput_rpmpt = 0;		/* no right-prompt currently on screen */
 
-        if (!clearflag) {
-            if (tccan(TCCLEAREOD))
-                tcoutclear(TCCLEAREOD);
-            else
-                cleareol = 1;   /* request: clear to end of line */
+	if (!clearflag) {
+	    if (tccan(TCCLEAREOD))
+		tcoutclear(TCCLEAREOD);
+	    else
+		cleareol = 1;   /* request: clear to end of line */
 	    if (listshown > 0)
 		listshown = 0;
 	}
-        if (t0 > -1)
-            olnct = (t0 < winh) ? t0 : winh;
-        if (termflags & TERM_SHORT)
-            vcs = 0;
+	if (t0 > -1)
+	    olnct = (t0 < winh) ? t0 : winh;
+	if (termflags & TERM_SHORT)
+	    vcs = 0;
 	else if (!clearflag && lpromptbuf[0]) {
-            zputs(lpromptbuf, shout);
+	    zputs(lpromptbuf, shout);
 	    if (lpromptwof == winw)
 		zputs("\n", shout);	/* works with both hasam and !hasam */
 	} else {
@@ -1890,7 +1890,7 @@ refreshline(int ln)
     if (hasam && vcs == winw) {
 	if (nbuf[vln] && nbuf[vln][vcs + 1].chr == ZWC('\n')) {
 	    vln++, vcs = 1;
-            if (nbuf[vln]  && nbuf[vln]->chr) {
+	    if (nbuf[vln]  && nbuf[vln]->chr) {
 		zputc(nbuf[vln]);
 	    } else
 		zputc(&zr_sp);  /* I don't think this should happen */
@@ -1959,11 +1959,11 @@ refreshline(int ln)
 	    if (!nl->chr) {
 		if (ccs == winw && hasam && char_ins > 0 && ins_last
 		    && vcs != winw) {
-		    nl--;           /* we can assume we can go back here */
+		    nl--;	   /* we can assume we can go back here */
 		    moveto(ln, winw - 1);
 		    zputc(nl);
 		    vcs++;
-		    return;         /* write last character in line */
+		    return;	 /* write last character in line */
 		}
 		if ((char_ins <= 0) || (ccs >= winw))    /* written everything */
 		    return;
@@ -2164,20 +2164,20 @@ moveto(int ln, int cl)
     const REFRESH_ELEMENT *rep;
 
     if (vcs == winw) {
-    vln++, vcs = 0;
-    if (!hasam) {
-	zputc(&zr_cr);
-	zputc(&zr_nl);
-    } else {
-	if ((vln < nlnct) && nbuf[vln] && nbuf[vln]->chr)
-	    rep = nbuf[vln];
-	else
-	    rep = &zr_sp;
-	zputc(rep);
-	zputc(&zr_cr);
-	if ((vln < olnct) && obuf[vln] && obuf[vln]->chr)
-	    *obuf[vln] = *rep;
-    }
+	vln++, vcs = 0;
+	if (!hasam) {
+	    zputc(&zr_cr);
+	    zputc(&zr_nl);
+	} else {
+	    if ((vln < nlnct) && nbuf[vln] && nbuf[vln]->chr)
+		rep = nbuf[vln];
+	    else
+		rep = &zr_sp;
+	    zputc(rep);
+	    zputc(&zr_cr);
+	    if ((vln < olnct) && obuf[vln] && obuf[vln]->chr)
+		*obuf[vln] = *rep;
+	}
     }
 
     if (ln == vln && cl == vcs)
@@ -2212,7 +2212,7 @@ moveto(int ln, int cl)
     }
 
     if (cl != vcs)
-        singmoveto(cl);
+	singmoveto(cl);
 }
 
 /**/
@@ -2292,7 +2292,7 @@ tc_rightcurs(int ct)
 	    /* it is cheaper to send TCRIGHT than reprint the whole prompt */
 	    for (ct = lpromptw - i; ct--; )
 		tcout(TCRIGHT);
-        else {
+	else {
 	    if (i != 0)
 		zputc(&zr_cr);
 	    tc_upcurs(lprompth - 1);
