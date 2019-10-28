@@ -1703,7 +1703,7 @@ zrefresh(void)
 		zfree(obuf[iln], (winw + 2) * sizeof(**obuf));
 		for (t0 = iln; t0 != olnct; t0++)
 		    obuf[t0] = obuf[t0 + 1];
-		obuf[--olnct] = NULL;
+		obuf[olnct--] = NULL;
 	    }
 	/* don't try to insert a line if olnct = vmaxln (vmaxln is the number
 	   of lines that have been displayed by this routine) so that we don't
@@ -1713,6 +1713,7 @@ zrefresh(void)
 		     obuf[iln] && !ZR_strncmp(obuf[iln], nbuf[iln + 1], 16)) {
 		moveto(iln, 0);
 		tcout(TCINSLINE);
+		zfree(obuf[olnct], (winw + 2) * sizeof(**obuf));
 		for (t0 = olnct; t0 != iln; t0--)
 		    obuf[t0] = obuf[t0 - 1];
 		obuf[iln] = NULL;

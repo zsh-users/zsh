@@ -9,6 +9,9 @@
 
 2026-06-04  Mikael Magnusson  <mikachu@gmail.com>
 
+	* Roman Perepelitsa: 44874: Src/Zle/zle_refresh.c: fix a memory
+	leak and potential heap corruption when rotating lines
+
 	* 54624: Src/Zle/complete.c: parse_class would underallocate if
 	posix character classes are used
 
