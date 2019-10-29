@@ -186,7 +186,7 @@ _zfs() {
 
 		if [[ "$OSTYPE" == "linux-gnu" ]]; then
 			rw_properties+=("acltype:value:(off noacl posixacl)")
-		elif [[ "$OSTYPE" == "solaris*" ]]; then
+		elif [[ "$implementation" == "solaris" ]]; then
 			rw_properties+=("aclmode:value:(discard mask passthrough)")
 		else
 			rw_properties+=("aclmode:value:(discard groupmask passthrough restricted)")

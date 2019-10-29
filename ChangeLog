@@ -1,3 +1,11 @@
+2019-10-29  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* unposted: Completion/Unix/Command/_zfs: tweak to check for
+	openzfs rather than Solaris
+
+	* github #40: Teddy Heinen: Completion/Unix/Command/_zfs:
+	adjust zfs completion to use acltype on linux instead of aclmode
+
 2019-10-28  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 44864: Src/jobs.c: Avoid infinite loop in interactive mode
