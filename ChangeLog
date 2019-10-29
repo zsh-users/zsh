@@ -1,5 +1,7 @@
 2019-10-29  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* github #41: Sebastian: Extend _dbus with dbus-launch completion
+
 	* unposted: Completion/Unix/Command/_zfs: tweak to check for
 	openzfs rather than Solaris
 

@@ -1,4 +1,4 @@
-#compdef dbus-send dbus-monitor
+#compdef dbus-send dbus-monitor dbus-launch
 
 local curcontext="$curcontext" state line expl find end ret=1
 typeset -A opt_args
@@ -26,6 +26,20 @@ case $service in
       '--address=-:bus address:->addresses' \
       - '(format)' \
       --monitor --profile --pcap --binary && ret=0
+  ;;
+  dbus-launch)
+    _arguments -C \
+      --version"[print the version of dbus-launch]" \
+      --help"[print the help info of dbus-launch]" \
+      --sh-syntax"[emit bourne-shell compatible code to set up environment variables]" \
+      --csh-syntax"[emit csh compatible code to set up environment variables]" \
+      --auto-syntax"[choose --csh-syntax or --sh-syntax based on the SHELL environment variable]" \
+      --binary-syntax"[use a nul-terminated syntax with the environment data]" \
+      --close-stderr"[close stderr stream before starting the d-bus daemon]" \
+      --exit-with-session"[create a persistent \"babysitter\" process]" \
+      --exit-with-x11"[create a persistent \"babysitter\" process that will connect to the x server]" \
+      --autolaunch="[scan for a previously-started session and reuse the values found there]:machine id:->machine-id" \
+      --config-file="[pass --config-file=FILENAME to the bus daemon]" && ret=0
   ;;
 esac
 
@@ -84,6 +98,14 @@ case $state in
       arg{0..9}:value \
       'arg0namespace:namespace' \
       'eavesdrop:eavesdropping:(true false)' && ret=0
+  ;;
+  machine-id)
+    { local machine_id="$(</var/lib/dbus/machine-id)" } 2>/dev/null
+    if [[ -n "$machine_id" ]]; then
+        _wanted machine-ids expl machine-id compadd $machine_id && ret=0
+    else
+        _message "No /var/lib/dbus/machine-id found" && ret=0
+    fi
   ;;
 esac
 
