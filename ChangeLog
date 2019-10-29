@@ -1,3 +1,8 @@
+2019-12-01  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* Sebastian: 44967: Completion/Linux/Command/_alsa-utils:
+	Completion for aplay from alsa-utils
+
 2019-12-01  Daniel Shahaf  <danielsh@apache.org>
 
 	* unposted: Src/Modules/zutil.c, Test/V05styles.ztst: zstyle:
