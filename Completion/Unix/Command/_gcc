@@ -440,6 +440,7 @@ args+=(
   '-print-multi-os-directory[Display the relative path to OS libraries]'
   '-print-sysroot[Display the target libraries directory]'
   '-print-sysroot-headers-suffix[Display the sysroot suffix used to find headers]'
+  '-save-stats=-[Save code generation statistics]:location:(cwd obj)'
   '-save-temps[Do not delete intermediate files]'
   '-no-canonical-prefixes[Do not canonicalize paths when building relative prefixes to other gcc components]'
   '-pipe[Use pipes rather than intermediate files]'

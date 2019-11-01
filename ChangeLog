@@ -1,5 +1,8 @@
 2019-11-06  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* Eitan Adler: 44882: Completion/Unix/Command/_gcc: add
+	completion of -save-stats flag
+
 	* unposted: Completion/Base/Utility/_sequence: fix missing local
 	declarations
 
