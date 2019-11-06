@@ -1,3 +1,8 @@
+2019-11-06  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* unposted: Completion/Base/Utility/_sequence: fix missing local
+	declarations
+
 2019-10-29  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* github #41: Sebastian: Extend _dbus with dbus-launch completion
