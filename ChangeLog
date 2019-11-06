@@ -1,5 +1,8 @@
 2019-11-06  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 44895: Completion/Solaris/Command/_svccfg: complete options
+	for state change notifications and other improvements
+
 	* Eitan Adler: 44882: Completion/Unix/Command/_gcc: add
 	completion of -save-stats flag
 

@@ -1,103 +1,131 @@
 #compdef svccfg
 
-_svccfg_properties() {
-	local -a props fmris
-	local fmri="$argv[$#]"
+local curcontext="$curcontext" ret=1
+local -a state line expl subcmds args
+local -A opt_args
 
-	# If There's more than one possible FMRI, bail
-	fmris=( ${(f)"$(svcs -H -o fmri $fmri)"} )
-	if [[ $#fmris -gt 1 ]]; then
-		_message "'$fmri' is ambiguous"
-		return 1
-	fi
+# Subcommands that don't make sense on the commandline are missing
+subcmds=(
+  apply export extract import inventory validate
+  add delete list
+  addpg addpropvalue delcust delpg delprop delpropvalue describe
+  editprop listpg listprop listcust setenv setprop unsetenv
+  setnotify listnotify delnotify
+  listsnap revert selectsnap
+  refresh
+  help
+)
 
-	# Get all the property names for the FMRI
-	props=( ${${${(f)"$(svccfg -s $fmri describe)"}:# *}%% *} )
+_arguments -s -A "-*" \
+  '-v[verbose]' \
+  '-s+[specify fmri on which to operate]:fmri:_svcs_fmri -c' \
+  '(1 *)-f+[read commands from file]:command file:_files' \
+  '1: :->subcmds' \
+  '*:: :->args' && ret=0
 
-	_multi_parts "$@" - / props
-}
+case $state in
+  subcmds)
+    _wanted commands expl 'svccfg subcommand' compadd -a subcmds && ret=0
+  ;;
+  args)
+    curcontext="${curcontext%:*}-$words[1]:"
 
-_svccfg() {
-	local context state line subcmds
-	typeset -A opt_args
+    case $words[1] in
+      import)
+        _arguments \
+          '-V[verify property updates]' \
+          ':file:_files'
+      ;;
 
-	# Subcommands that don't make sense on the commandline are missing
-	subcmds=(
-		apply export extract import inventory validate
-		add delete list
-		addpg addpropvalue delcust delpg delprop delpropvalue describe 
-		editprop listpg listprop listcust setenv setprop unsetenv
-		setnotify listnotify delnotify
-		listsnap revert selectsnap
-		refresh
-	)
+      apply|inventory) _files ;;
 
-	if [[ $service == "svccfg" ]]; then
-		_arguments -s \
-			'-?[help]' \
-			'-v[verbose]' \
-			'-s[FMRI on which to operate]:fmri:_svcs_fmri -c' \
-			- set1 \
-			'-f[read commands from file]:command file:_files' \
-			- set2 \
-			'*::command:->subcmd' && return 0
+      validate)
+        _alternative 'files:file:_files' 'fmris:fmri:_svcs_fmri -c'
+      ;;
 
-		if (( CURRENT == 1 )); then
-			_wanted commands expl 'svccfg subcommand' compadd -a subcmds
-			return
-		fi
-		service="$words[1]"
-		curcontext="${curcontext%:*}=$service:"
-	fi
+      export) _svcs_fmri -c ;;
 
-	case $service in
-	(import)
-		_arguments \
-			'-V[verify property updates]' \
-			':file:_files'
-		;;
+      delete)
+        _arguments \
+          '-f[force deletion if online or degraded]' \
+          '*:fmri:_svcs_fmri -c'
+      ;;
 
-	(apply|inventory)
-		_files
-		;;
+      describe)
+        local fmri=$opt_args[-s]
+        _arguments -A "-*" \
+          '-v[give all information]' \
+          '-t[show only template data]' \
+          ':property group or property:->properties'
 
-	(validate)
-		_alternative 'files:file:_files' 'fmris:fmri:_svcs_fmri -c'
-		;;
+        if [[ -n $state ]]; then
+          fmris=( ${(f)"$(_call_program properties svcs -H -o fmri $fmri)"} )
+          if (( $#fmris > 1 )); then
+            _message "'$fmri' is ambiguous"
+            return 1
+          fi
 
-	(export)
-		_svcs_fmri -c
-		;;
+          # Get all the property names for the FMRI
+          props=( ${${${(f)"$(_call_program properties svccfg -s $fmri describe)"}:# *}%% *} )
 
-	(delete)
-		_arguments \
-			'-f[force deletion if online or degraded]' \
-			'*:FMRI:_svcs_fmri -c'
-		;;
+          _multi_parts "$@" - / props && ret=0
+        fi
+      ;;
 
-	(describe)
-		local fmri=$opt_args[-s]
-		_arguments -A "-*" \
-			'-v[give all information]' \
-			'-t[show only template data]' \
-			":property group or property:_svccfg_properties $fmri"
-		;;
+      extract|add|delete|list|addpg|addpropvalue|delcust|delpg|delprop)
+      ;;
 
-	(extract|add|delete|list|addpg|addpropvalue|delcust|delpg|delprop)
-		;;
+      delpropvalue|editprop|listpg|listcust|setenv|setprop|unsetenv)
+      ;;
 
-	(delpropvalue|editprop|listpg|listprop|listcust|setenv|setprop|unsetenv)
-		;;
+      listprop)
+        _arguments \
+          '-l+[print the layer the value came from]:layer:(manifest system-profile enterprise-profile site-profile node-profile sysconfig-profile admin current all)' \
+          '(-o)-f[print the file a property came from]' \
+          '(-f)-o+[select fields to print]:field:_sequence compadd - propname pgname instname servicename layer proptype value file masked time' \
+          '*-G+[specify property group]:property group' \
+          '-P+[specify property name]:property name' && ret=0
+      ;;
 
-	(setnotify|listnotify|delnotify|listsnap|revert|selectsnap|refresh)
-		;;
+      setnotify)
+        args=( '2:notification parameter:->parameters' )
+      ;&
+      listnotify|delnotify|selectsnap)
+        _arguments $args \
+          '-g[apply to notification parameters in svc:/system/svc/global:default]' \
+          '1: :->tsets-classes'
 
-	(*)
-		_message "unknown svccfg subcommand: $service"
-		;;
-	esac
-}
+        case $state in
+          tsets-classes)
+            local states=( uninitialized offline online degraded maintenance disabled )
+            _alternative \
+              'state-transitions:state transition:_sequence compadd - all {to-,from-,}$^states' \
+              'event-classes:event class:_sequence compadd - problem-{diagnosed,updated,repaired,resolved}' && ret=0
+          ;;
+          parameters)
+            if compset -P 'mailto:'; then
+              _email_addresses -c && ret=0
+            elif compset -P 'snmp:'; then
+              _wanted values expl value compadd active inactive && ret=9
+            else
+              _wanted uri-formats expl 'URI format' compadd -S: mailto snmp && ret=0
+            fi
+          ;;
+        esac
+      ;;
 
-_svccfg "$@"
+      revert)
+        _wanted snapshots expl snapshot compadd initial previous running start && ret=0
+      ;;
 
-# vi:tw=0
+      refresh|listsnap)
+        _message 'no more arguments'
+      ;;
+      *) # fallback to default completion for unknown subcommands
+        _default && ret=0
+      ;;
+    esac
+  ;;
+esac
+
+return ret
