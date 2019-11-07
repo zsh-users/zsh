@@ -19,6 +19,7 @@ _svn () {
      wc-root               "the working copy root path"
      schedule              "'normal', 'add', 'delete', 'replace'"
      depth                 "'infinity', 'immediates', 'files', 'empty', 'exclude'"
+     changelist            "the changelist this file was added to, if any"
   )
 
   local update_policy
