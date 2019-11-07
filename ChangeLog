@@ -1,3 +1,8 @@
+2019-11-09  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 44904: Completion/Unix/Command/_subversion: Complete multiple
+	comma-separated arguments to --show-item=<TAB>.
+
 2019-11-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Doc/Zsh/compsys.yo: _values: Use the formal

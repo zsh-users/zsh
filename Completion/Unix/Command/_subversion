@@ -3,8 +3,9 @@
 _svn () {
   local curcontext="$curcontext" state line expl ret=1
   typeset -A opt_args
+  local i
 
-  # Colons in values must be escaped.
+  # Colons and closing square brackets in values must be escaped.
   local -A show_item_keys=(
      kind                  "the kind of TARGET (file or dir)"
      url                   "the URL of TARGET in the repository"
@@ -112,7 +113,11 @@ _svn () {
           done
           while (( idx=$args[(I)*--show-item:arg:] )); do
             # (q) to quote the parentheses in the value
-            args[idx]=( --show-item'=:item key:(('"`for i j in ${(kv)show_item_keys}; do print -rn - $i\\\\:"${(q)j}" ""; done`"'))' )
+            local -a show_items_plain_array
+            for i in ${(k)show_item_keys}; do
+              show_items_plain_array+=( $i\[${show_item_keys[$i]}\] )
+            done
+            args[idx]=( --show-item'=:item key:_values -s , "info items" ${show_items_plain_array[@]}' )
           done
           # All other options get {-x+,--long-x=}
           args=( ${args/(#b)(--[A-Za-z0-9-]##):arg:/$match[1]=:arg:} )
