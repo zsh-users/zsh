@@ -5147,7 +5147,7 @@ which values are already present on the command line and hence are not
 to be completed again.  If the tt(-w) option is given, other arguments
 are examined as well.
 
-The first non-option argument is used as a string to print as a
+The first non-option argument, var(desc), is used as a string to print as a
 description before listing the values.
 
 All other arguments describe the possible values and their
