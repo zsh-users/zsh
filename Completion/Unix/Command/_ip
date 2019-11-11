@@ -542,6 +542,7 @@ _regex_words options "ip options" \
   '-s*tatistics:output statistics' \
   '-d*etails:output more detailed information' \
   '-c*olor:color output' \
+  '-br*ief:brief output' \
   '-a*ll:executes specified command over all objects' \
   '-f*amily:select protocol family:$subcmd_family' \
   '-4:IPv4' \

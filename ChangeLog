@@ -1,3 +1,8 @@
+2019-11-11  skirit  <skirit@dump.cz>
+
+	* unposted (salsa.debian.org MR!1): Completion/Unix/Command/_ip:
+	Complete the -brief option
+
 2019-11-09  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 44904: Completion/Unix/Command/_subversion: Complete multiple
