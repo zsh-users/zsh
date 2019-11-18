@@ -1,3 +1,8 @@
+2019-11-18  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* users/24445: Src/hist.c: Add missing support for :P to history
+	code (was already present in glob qualifiers and variables).
+
 2019-11-11  skirit  <skirit@dump.cz>
 
 	* unposted (salsa.debian.org MR!1): Completion/Unix/Command/_ip:

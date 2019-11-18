@@ -920,6 +920,16 @@ histsubchar(int c)
 	    case 'u':
 		sline = casemodify(sline, CASMOD_UPPER);
 		break;
+	    case 'P':
+		if (*sline != '/') {
+		    char *here = zgetcwd();
+		    if (here[strlen(here)-1] != '/')
+			sline = zhtricat(metafy(here, -1, META_HEAPDUP), "/", sline);
+		    else
+			sline = dyncat(here, sline);
+		}
+		sline = xsymlink(sline, 1);
+		break;
 	    default:
 		herrflush();
 		zerr("illegal modifier: %c", c);
