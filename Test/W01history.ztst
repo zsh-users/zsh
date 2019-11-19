@@ -81,3 +81,10 @@ F:Check that a history bug introduced by workers/34160 is working again.
 >for/testing
 >testing
 >path/for
+
+ $ZTST_testdir/../Src/zsh -fis <<<'
+ echo /my/path/for/testing
+ echo !1:1:P' 2>/dev/null
+0:Modifier :P
+>/my/path/for/testing
+>/my/path/for/testing
