@@ -1,5 +1,8 @@
 2019-11-19  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* users/24451: Src/compat.c: zgetcwd: Add a guard against
+	returning an empty string.
+
 	* unposted: Test/W01history.ztst: Add smoke test for :P history
 	modifier.
 

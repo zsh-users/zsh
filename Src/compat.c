@@ -519,7 +519,7 @@ zgetcwd(void)
 #endif /* HAVE_GETCWD */
     if (!ret)
 	ret = unmeta(pwd);
-    if (!ret)
+    if (!ret || *ret == '\0')
 	ret = dupstring(".");
     return ret;
 }
