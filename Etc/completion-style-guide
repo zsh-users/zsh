@@ -521,7 +521,7 @@ Misc. remarks
       since multiple arguments to the same option are represented in a
       colon-delimited fashion, backslashes and colons passed by the user
       are escaped. For instance, the option-arguments parsed from
-      `-afoo -a "bar" -a 1:2:3` appear in `$opt_args[-a]` as
+      `-a foo -a "bar" -a 1:2:3` appear in `$opt_args[-a]` as
       `foo:"bar":1\:2\:3`.
     * The `_call_program` helper used by many completion functions is
       implemented using `eval`, so arguments to it must be quoted
