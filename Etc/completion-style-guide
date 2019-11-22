@@ -8,17 +8,17 @@ to be distributed as part of zsh to maintain a level of consistency.
 Coding style:
 
 * Use two spaces for indentation and four for continuation lines except
-  where there are many continuation lines such as `_arguments' or
-  `_values' specs. Lines tend to be longer than in C code so less
+  where there are many continuation lines such as `_arguments` or
+  `_values` specs. Lines tend to be longer than in C code so less
   indentation makes sense.
 
-* For constructs such as `if' and `while', the `then' or `do' should be
+* For constructs such as `if` and `while`, the `then` or `do` should be
   on the end of the line after a semi-colon and space unless there
   isn't room for it (see the next point) in which case put it on the
   next line un-indented.
 
 * Please try not to use lines longer than 79 characters. Don't worry
-  about breaking long `_arguments' or `_values' specs though.
+  about breaking long `_arguments` or `_values` specs though.
 
 * Never use alternative, unusual, or optional syntax in completion
   functions (or any other shell code distributed with zsh). In other
@@ -49,14 +49,14 @@ generally appears in uppercase.
 It is a good idea to copy descriptions from the command's man page or
 --help output. If you do this, be careful that the description still
 makes sense. Some commands have a description like `print help message
-(this one) and exit' for --help but the `(this one)' part no longer
+(this one) and exit' for --help but the `(this one)` part no longer
 makes sense. A less obvious example is where the help output looks like:
   -X, --encoding=NAME        use input encoding NAME
 copying this description exactly would result in completion output that
 looks like this:
   --encoding   -X    -- use input encoding NAME
-In the help output, it is much clearer what is meant by `NAME' because
-it appears after `--encoding=' but it doesn't in the completion
+In the help output, it is much clearer what is meant by `NAME` because
+it appears after `--encoding=` but it doesn't in the completion
 listing. So it is better to use a description of this form:
   --encoding   -X    -- use specified input encoding
 The word specify is commonly used with options that take arguments.
@@ -78,8 +78,8 @@ things (such as _files), and states should have plural names.
 In a function, allow any descriptions passed as an argument to override
 the default you define. For example:
   _wanted directories expl directory _files -/ "$@" -
-The "$@" adds descriptions passed as parameters and the trailing `-'
-tells _wanted where to put options specifying the `directory' description.
+The "$@" adds descriptions passed as parameters and the trailing `-`
+tells _wanted where to put options specifying the `directory` description.
 
 Where two matches have identical meaning, give them the same
 description so that the completion system can group them together.
@@ -104,8 +104,8 @@ Contexts, tags and all that
 ---------------------------
 
 The completion system keeps track of the current context in the
-parameter `curcontext'. Its content is the hierarchical name for the
-current context sans the `:completion:' and the last colon and the tag
+parameter `curcontext`. Its content is the hierarchical name for the
+current context sans the `:completion:` and the last colon and the tag
 currently tried. The tags represent different types of matches. So,
 whenever you are about to add matches, you should use a tag for them
 and test if the user wants this type of matches to be generated.
@@ -115,17 +115,17 @@ of matches or if you can handle tag aliases in some sophisticated way.
 
 Most of the utility functions do the testing themselves, so you don't
 have to worry about that at all. For example if you are adding matches 
-with `_files', `_hosts' or functions like these, you can just call
+with `_files`, `_hosts` or functions like these, you can just call
 them and they do the tests needed and the loops over the tag aliases.
-The functions `_arguments' and `_values' do that too, but there is a
+The functions `_arguments` and `_values` do that too, but there is a
 small difference. These functions effectively change the context
-name and if you are using the `->state' form for actions, this changed
+name and if you are using the `->state` form for actions, this changed
 name component has to be reported back to the function calling
-`_arguments' or `_values'. This is done with the parameter `context',
+`_arguments` or `_values`. This is done with the parameter `context`,
 so you have to make that local in the calling function in the same way
-as you have to make local `line', `state', and `{opt,val}_args'. This
-parameter `context' should then be used when you start adding matches
-by giving it to functions like `_tags' via the `-C' options, as in:
+as you have to make local `line`, `state`, and `{opt,val}_args`. This
+parameter `context` should then be used when you start adding matches
+by giving it to functions like `_tags` via the `-C` options, as in:
 
   local context ...
   ...
@@ -137,12 +137,12 @@ by giving it to functions like `_tags' via the `-C' options, as in:
   fi
 
 This will put the context name given in the argument field of the
-`curcontext' parameter and this context will then be used to look 
+`curcontext` parameter and this context will then be used to look 
 up styles for the tags.
 
-But since this is often used, `_arguments' and `_values' have support
-to make your life easier in such cases. With the `-C' option, these
-functions set the parameter `curcontext', thus modifying the globally
+But since this is often used, `_arguments` and `_values` have support
+to make your life easier in such cases. With the `-C` option, these
+functions set the parameter `curcontext`, thus modifying the globally
 used hierarchical context name. This means, that you have to make that 
 local, but then you don't have to worry about giving the context name
 reported back to functions you call. E.g.:
@@ -156,15 +156,15 @@ reported back to functions you call. E.g.:
     ...
   fi
 
-In this case the parameter `context' is not set, so you don't have to
-make that local. But make sure that `curcontext' is local so that the
-value changed by `_arguments' and `_values' is only used in your
+In this case the parameter `context` is not set, so you don't have to
+make that local. But make sure that `curcontext` is local so that the
+value changed by `_arguments` and `_values` is only used in your
 function (and make sure to initialise it to its old value as in the
 example).
 
-All this only works if the specifications given to `_arguments' define 
+All this only works if the specifications given to `_arguments` define 
 options and arguments that are completely separate. If there is more
-than one `->state' action and more than one of them might be needed
+than one `->state` action and more than one of them might be needed
 for the same word, you'll have to use a loop:
 
   local state context line i expl ret=1
@@ -184,47 +184,47 @@ for the same word, you'll have to use a loop:
 
   return ret
 
-As you can see, `state' and `context' are really arrays. In this
-example, completion for the first argument has to complete both `foo's 
-and `bar's.
+As you can see, `state` and `context` are really arrays. In this
+example, completion for the first argument has to complete both `foo`s 
+and `bar`s.
 
 Then, before adding the matches, see if matches of that type are
 requested by the user in the current context. If you will add only one 
 type of matches, this is very simple. You can use the function
-`_wanted' for this. Well, you can often use it, that is. Use it as in:
+`_wanted` for this. Well, you can often use it, that is. Use it as in:
 
   _wanted names expl 'name' compadd - alice bob
 
-This is like testing if the tag `names' is requested by the user and
-then calling `_all_labels' with the same arguments.
+This is like testing if the tag `names` is requested by the user and
+then calling `_all_labels` with the same arguments.
 
-The `_all_labels' function implements the loop over the tag aliases and
+The `_all_labels` function implements the loop over the tag aliases and
 handles the user-defined description, using (in the example) the
-parameter `expl' to store options to give to the command. These options
+parameter `expl` to store options to give to the command. These options
 are inserted into the command line either directly before a single
 hyphen if there is such an argument or after the first word if there
-is no single hyphen. Since using `_all_labels' is so much more convenient
-than writing the loop with the `_next_label' function (see below), but
+is no single hyphen. Since using `_all_labels` is so much more convenient
+than writing the loop with the `_next_label` function (see below), but
 some functions called to generate matches don't accept a single hyphen
 as an argument anywhere but want the options built as their last arguments,
-`_all_labels' will *replace* the hyphen with the options if the hyphen is
+`_all_labels` will *replace* the hyphen with the options if the hyphen is
 the last argument. A good example for such a function is
-`_combination' which can be called like:
+`_combination` which can be called like:
 
   _all_labels foo expl 'descr...' _combination ... -
 
-And the `-' will be replaced by the options that are to be given to
-`compadd'.
+And the `-` will be replaced by the options that are to be given to
+`compadd`.
 
-Note that you can also give the `-J' and `-V' options with the
-optional `1' or `2' preceding them supported by `_description':
+Note that you can also give the `-J` and `-V` options with the
+optional `1` or `2` preceding them supported by `_description`:
 
   _wanted -2V names expl 'name' compadd ...
 
-In some cases one needs to call multiple functions or call `compadd'
+In some cases one needs to call multiple functions or call `compadd`
 more than once to generate the matches. In such a case one needs to
 implement the loop over the tag aliases directly. This is done with the 
-`_next_label' function. Like this:
+`_next_label` function. Like this:
 
   while _next_label names expl 'name'; do
     compadd "$expl[@]" - alice bob && ret=0
@@ -232,13 +232,13 @@ implement the loop over the tag aliases directly. This is done with the
   done
   return ret
 
-Simple enough, I hope. But `_next_label' can do some more: utility
-functions normally accept options which are then given to `compadd'.
-Since these may contain options for the description and `_next_label' may
+Simple enough, I hope. But `_next_label` can do some more: utility
+functions normally accept options which are then given to `compadd`.
+Since these may contain options for the description and `_next_label` may
 generate such options, too, it isn't entirely trivial to decide which
-of these options should take precedence. But `_next_label' can do the work
+of these options should take precedence. But `_next_label` can do the work
 for you here. All you have to do is to give the options your utility
-function gets to `_next_label', as in:
+function gets to `_next_label`, as in:
 
   while _next_label names expl 'name' "$@"; do
     compadd "$expl[@]" - alice bob
@@ -246,13 +246,13 @@ function gets to `_next_label', as in:
   done
 
 That's all. Note that the positional argument "$@" are *not* given to
-`compadd'. They will be stuffed into the `expl' array by `_next_label'.
+`compadd`. They will be stuffed into the `expl` array by `_next_label`.
 
 The most complicated case is where you can offer multiple types of
 matches. In this case the user should be able to say which types he
 wants to see at all and of those which he wants to see he should be
 able to say which types should be tried first. The generic solution
-for this uses `_tags' and `_requested':
+for this uses `_tags` and `_requested`:
 
   local expl ret=1
 
@@ -266,27 +266,27 @@ for this uses `_tags' and `_requested':
     (( ret )) || break   # leave the loop if matches were added
   done
 
-`_tags' with tags as arguments registers those tags and checks which
+`_tags` with tags as arguments registers those tags and checks which
 of them the user wants to see and in which order the tags are to be
 tried. This means that internally these tags are stored in multiple
 sets. The types of matches represented by the tags from the first set
 should be tried first. If that generates no matches, the second set is
-tried and so on. `_tags' without arguments just makes the next set be
+tried and so on. `_tags` without arguments just makes the next set be
 tried (on the first call it makes the first set be used). The function
-`_requested' then tests if the tag given as its first argument is in
+`_requested` then tests if the tag given as its first argument is in
 the set currently used and returns zero if it is,  i.e. if matches of
-that type should be added now. The arguments accepted by `_requested'
-are the same as for `_wanted'. I.e. you can call it with only the tag
-to test, with the `tag array description' or with that plus the
+that type should be added now. The arguments accepted by `_requested`
+are the same as for `_wanted`. I.e. you can call it with only the tag
+to test, with the `tag array description` or with that plus the
 command to execute.
 
-In some cases (like the `users' and `hosts' tags in the example) you
+In some cases (like the `users` and `hosts` tags in the example) you
 don't need do the loop over the tag aliases yourself, because the
-utility functions like `_users' and `_hosts' do it automatically.
+utility functions like `_users` and `_hosts` do it automatically.
 
 This looks good already. But in many cases such as this one you can
-also use the function `_alternative' which simply implements a loop
-like the one above. It gets arguments of the form `tag:descr:action'.
+also use the function `_alternative` which simply implements a loop
+like the one above. It gets arguments of the form `tag:descr:action`.
 E.g.:
 
   _alternative \
@@ -297,14 +297,14 @@ E.g.:
 Which does the same as the previous example. (Note the empty
 descriptions in the last two arguments -- the actions start with a
 space so that they are executed without giving the description
-build by `_alternative', i.e. we just use the description added by
-`_users' and `_hosts').
+build by `_alternative`, i.e. we just use the description added by
+`_users` and `_hosts`).
 
 In cases where you have to keep track of the context yourself, you can 
-give the sub-context you want to use to `_tags', `_wanted' and
-`_alternative' with the `-C' option as described above. You don't need 
-to give it to `_requested' -- that function will work on the context
-used by the corresponding call to `_tags' automatically.
+give the sub-context you want to use to `_tags`, `_wanted` and
+`_alternative` with the `-C` option as described above. You don't need 
+to give it to `_requested` -- that function will work on the context
+used by the corresponding call to `_tags` automatically.
 
 For the names of the tags: choose simple (short, if at all possible)
 names in plural. Also, first have a look at the tag names already used 
@@ -315,9 +315,9 @@ of the place where they are added.
 
 One final comment about when to use your own argument-contexts: do
 this when the command you are writing a completion function for has
-different `modes'. E.g. if it accepts host names after a `-h' option
-and users or hosts after `-u' and for some reason you can't use
-`_arguments' to do the work for you, then use context names as in:
+different `modes`. E.g. if it accepts host names after a `-h` option
+and users or hosts after `-u` and for some reason you can't use
+`_arguments` to do the work for you, then use context names as in:
 
   case "$1" in
   -h)
@@ -333,36 +333,36 @@ Styles
 ------
 
 Users can associate patterns for hierarchical context names with
-certain styles using the `zstyle' builtin. The completion code
+certain styles using the `zstyle` builtin. The completion code
 should then use these styles to decide how matches should be added and 
 to get user-configured values. This, too, is done using the builtin
-`zstyle'.
+`zstyle`.
 
-Basically styles map names to a bunch of strings (the `value'). In
+Basically styles map names to a bunch of strings (the `value`). In
 many cases you want to treat the value as a boolean, so let's start
-with that. To test if, for example, the style `verbose' is set for 
-the tag `options' in the context you are currently in, you can just do:
+with that. To test if, for example, the style `verbose` is set for 
+the tag `options` in the context you are currently in, you can just do:
 
   if zstyle -t ":completion:${curcontext}:options" verbose; then
     # yes, it is set...
   fi
 
-I.e. with the -t option and two arguments `zstyle' takes the first one
+I.e. with the -t option and two arguments `zstyle` takes the first one
 as a context and the second one as a style name and returns zero if that
-style has the boolean value `true'. Internally it checks if the style
-is set to one of `yes', `true', `on', or `1' and interprets that as
-`true' and every other value as `false'.
+style has the boolean value `true`. Internally it checks if the style
+is set to one of `yes`, `true`, `on`, or `1` and interprets that as
+`true` and every other value as `false`.
 
 For more complicated styles for which you want to test if the value
-matches a certain pattern, you can use `zstyle' with the -m option and
+matches a certain pattern, you can use `zstyle` with the -m option and
 three arguments:
 
   if zstyle -m ":completion:${curcontext}:foo" bar '*baz*'; then
     ...
   fi
 
-This tests if the value of the style `bar' for the tag `foo' matches
-the pattern `*baz*' and returns zero if it does.
+This tests if the value of the style `bar` for the tag `foo` matches
+the pattern `*baz*` and returns zero if it does.
 
 If you just want to see if one of the strings in the value is exactly
 equal to any of a number of a strings, you can use the -t option and
@@ -373,35 +373,35 @@ give the strings after the style name:
   fi
 
 But sometimes you want to actually get the value stored for a certain
-style instead of just testing it. For this `zstyle' supports four
-options: `-b', `-s', `-a', and `-h'. After these options, three
+style instead of just testing it. For this `zstyle` supports four
+options: `-b`, `-s`, `-a`, and `-h`. After these options, three
 arguments are expected, the context, the style, and a parameter name.
 The parameter will then be set to the value of the style and the option
 says how the strings stored as a value will be stored in the
 parameter:
 
-  - `-b': the parameter will be set to a either `yes' or `no'
-  - `-s': the parameter will be set to all strings in the value
+  - `-b`: the parameter will be set to a either `yes` or `no`
+  - `-s`: the parameter will be set to all strings in the value
           concatenated (separated by spaces) to one string
-  - `-a': the parameter will be set to an array containing the strings 
+  - `-a`: the parameter will be set to an array containing the strings 
           from the value as elements
-  - `-h': the parameter will be set to an association with the strings 
+  - `-h`: the parameter will be set to an association with the strings 
           from the value being interpreted alternatingly as keys and
 	  values
 
 Some random comments about style names. Use the ones already in use if 
-possible. Especially, use the `verbose' style if you can add
+possible. Especially, use the `verbose` style if you can add
 matches in a simple and a verbose way. Use the verbose form only if
-the `verbose' style is `true' for the current context. Also, if
+the `verbose` style is `true` for the current context. Also, if
 the matches you want to add have a common prefix which is somehow
-special, use the `prefix-needed' and `prefix-hidden' styles. The first 
+special, use the `prefix-needed` and `prefix-hidden` styles. The first 
 one says if the user has to give the prefix on the line to make these
 matches be added and the second one says if the prefix should be
 visible in the list.
 
 And finally, if you need a style whose value can sensibly be
 interpreted as a list of words, use array or association styles with
-the `-a' or `-h' options to `zstyle'. Otherwise you should only make
+the `-a` or `-h` options to `zstyle`. Otherwise you should only make
 sure that an empty value for a style is treated in the same way as if
 the style wasn't set at all (this is used elsewhere and we want to
 keep things consistent).
@@ -411,7 +411,7 @@ Descriptions
 ------------
 
 Always use description. This is important. Really. *Always* use
-descriptions. If you have just written down a `compadd' without a
+descriptions. If you have just written down a `compadd` without a
 "$expl[@]" (or equivalent), you have just made an error. Even in
 helper functions where you use a "$@": if you can't be sure that there 
 is a description in the arguments, add one. You can (and, in most
@@ -429,8 +429,8 @@ throughout the completion system) and do:
   _description tag expl <descr>
   compadd "$expl@]" - <matches ...>
 
-Note that this function also accepts `-V' and `-J', optionally (in the 
-same word) preceded by `1' or `2' to describe the type of group you
+Note that this function also accepts `-V` and `-J`, optionally (in the 
+same word) preceded by `1` or `2` to describe the type of group you
 want to use. For example:
 
   _description tag expl '...'
@@ -444,8 +444,8 @@ is *not* the right way to use a unsorted group. Instead do:
 and everything will work fine.
 
 Also, if you are about to add multiple different types of matches, use 
-multiple calls to `_description' and add them with multiple calls to
-`compadd'. But in almost all cases you should then add them using
+multiple calls to `_description` and add them with multiple calls to
+`compadd`. But in almost all cases you should then add them using
 different tags anyway, so, see above.
 
 And since a tag directly corresponds to a group of matches, you'll
@@ -466,67 +466,67 @@ and description at the same time.
 Misc. remarks
 -------------
 
-1)  Supply match specifications to `compadd' if there are sensible ones.
+1)  Supply match specifications to `compadd` if there are sensible ones.
 2)  Use helper functions that do option completion for you (like
-    `_arguments' and `_values') -- it will make your life much
+    `_arguments` and `_values`) -- it will make your life much
     easier.
-3)  Use helper functions like `_users' and `_groups' instead of some ad hoc
+3)  Use helper functions like `_users` and `_groups` instead of some ad hoc
     mechanisms to generate such information. This ensures that users can
     change the way these things will be completed everywhere by just using
     their own implementations for these functions.
 4)  Make sure that the return value of your functions is correct: zero
     if matches were added and non-zero if no matches were found.
-    In some cases you'll need to test the value of `$compstate[nmatches]'
+    In some cases you'll need to test the value of `$compstate[nmatches]`
     for this. This should always be done by first saving the old value
-    (`local nm="$compstate[nmatches]"') and later comparing this with
+    (`local nm="$compstate[nmatches]"`) and later comparing this with
     the current value after all matches have been added (e.g. by
-    writing `[[ nm -ne compstate[nmatches] ]]' at the end of your
+    writing `[[ nm -ne compstate[nmatches] ]]` at the end of your
     function).
     This guarantees that your functions will be re-usable because calling
     functions may rely on the correct return value.
 5)  When writing helper functions that generate matches, the arguments
-    of these should be given unchanged to `compadd' (if they are not
+    of these should be given unchanged to `compadd` (if they are not
     used by the helper function itself).
 6)  When matches with a common prefix such as option names are generated,
-    add them *with* the prefix (like `-', `+', or `--' for options).
-    Then check the `prefix-needed' style to see if the matches are to be
-    added when the prefix is on the line and use the `prefix-hidden'
+    add them *with* the prefix (like `-`, `+`, or `--` for options).
+    Then check the `prefix-needed` style to see if the matches are to be
+    added when the prefix is on the line and use the `prefix-hidden`
     style to see if the prefix should be listed or not.
 7)  If at all possible, completion code for a command or a suite of
     commands should go into only one file. If a command has sub-commands,
-    implementing a state-machine might be a good idea. See the `_rpm' 
-    and `_pbm' files for examples of different styles. Also see the
-    documentation for `_arguments' and `_values' for two functions
+    implementing a state-machine might be a good idea. See the `_rpm` 
+    and `_pbm` files for examples of different styles. Also see the
+    documentation for `_arguments` and `_values` for two functions
     that may help you with this.
 8)  If a completion function generates completely different types of
     completions (for example, because the command has several
     completely different modes), it should allow users to define
     functions that separately override the behavior for these
     different types. This can easily be achieved by using the
-    `_call_function' utility function, as in:
+    `_call_function` utility function, as in:
 
       _call_function ret _command_$subcommand && return ret
 
-    This will try to call the function `_command_$subcommand' and if
+    This will try to call the function `_command_$subcommand` and if
     it exists, it will be called and the completion function exits
-    with its exit status. After this call to `call_function' the
+    with its exit status. After this call to `call_function` the
     completion function would contain the code for the default way to
     generate the matches.
-    See the `_email_addresses', `_rpm' and `_nslookup' files for examples.
+    See the `_email_addresses`, `_rpm` and `_nslookup` files for examples.
 9)  Be mindful of quoting/escaping edge cases. Notably:
-    * Elements of the `$words' array are derived verbatim from the user's
+    * Elements of the `$words` array are derived verbatim from the user's
       command-line input -- if they type an argument in quotes or escaped
       by backslashes, that is how it appears in the array.
     * Option-arguments are stored in `$opt_args` the same way. Further,
       since multiple arguments to the same option are represented in a
       colon-delimited fashion, backslashes and colons passed by the user
       are escaped. For instance, the option-arguments parsed from
-      `-afoo -a "bar" -a 1:2:3' appear in `$opt_args[-a]` as
-      `foo:"bar":1\:2\:3'.
+      `-afoo -a "bar" -a 1:2:3` appear in `$opt_args[-a]` as
+      `foo:"bar":1\:2\:3`.
     * The `_call_program` helper used by many completion functions is
-      implemented using `eval', so arguments to it must be quoted
+      implemented using `eval`, so arguments to it must be quoted
       accordingly. As mentioned above, most of the user's own input comes
       pre-escaped, but you may run into problems passing file names or
       data derived from another command's output to the helper. Consider
       using some variation of the `q` expansion flag to deal with this:
-      `_call_program vals $words[1] ${(q-)myfile}'
+      `_call_program vals $words[1] ${(q-)myfile}`
