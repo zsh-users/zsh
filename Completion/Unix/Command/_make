@@ -118,35 +118,9 @@ _make-parseMakefile () {
   done
 }
 
-_make-findBasedir () {
-  local file index basedir
-  basedir=$PWD
-  for (( index=0; index < $#@; index++ ))
-  do
-    if [[ $@[index] == -C ]]
-    then
-      file=${~@[index+1]} 2>/dev/null
-      if [[ -z $file ]]
-      then
-        # make returns with an error if an empty arg is given
-        # even if the concatenated path is a valid directory
-        return
-      elif [[ $file == /* ]]
-      then
-        # Absolute path, replace base directory
-        basedir=$file
-      else
-        # Relative, concatenate path
-        basedir=$basedir/$file
-      fi
-    fi
-  done
-  print -- $basedir
-}
-
 _make() {
 
-  local prev="$words[CURRENT-1]" file expl tmp is_gnu incl match
+  local prev="$words[CURRENT-1]" file expl tmp is_gnu incl match basedir
   local context state state_descr line
   local -a option_specs
   local -A VARIABLES VAR_ARGS opt_args
@@ -214,15 +188,18 @@ _make() {
   _arguments -s $option_specs \
     '*:make target:->target' && ret=0
 
+  basedir=${(Q)~opt_args[-C]:-${opt_args[--directory]}}
+  VAR_ARGS[CURDIR]="${basedir:=$PWD}"
+
   case $state in
     (dir)
     _description directories expl "$state_descr"
-    _files "$expl[@]" -W ${(q)$(_make-findBasedir ${words[1,CURRENT-1]})} -/ && ret=0
+    _files "$expl[@]" -W $basedir -/ && ret=0
     ;;
 
     (file)
     _description files expl "$state_descr"
-    _files "$expl[@]" -W ${(q)$(_make-findBasedir $words)} && ret=0
+    _files "$expl[@]" -W $basedir && ret=0
     ;;
 
     (debug)
@@ -239,11 +216,9 @@ _make() {
     file=${(v)opt_args[(I)(-f|--file|--makefile)]}
     if [[ -n $file ]]
     then
-      [[ $file == [^/]* ]] && file=${(q)$(_make-findBasedir $words)}/$file
+      [[ $file == [^/]* ]] && file=$basedir/$file
       [[ -r $file ]] || file=
     else
-      local basedir
-      basedir=${$(_make-findBasedir $words)}
       if [[ $is_gnu == gnu && -r $basedir/GNUmakefile ]]
       then
         file=$basedir/GNUmakefile
@@ -287,7 +262,7 @@ _make() {
       _alternative \
         'targets:make target:compadd -Q -a TARGETS' \
         'variables:make variable:compadd -S = -F keys -k VARIABLES' \
-        '*:file:_files' && ret=0
+        '*:file:_files -W $basedir' && ret=0
     fi
   esac
 
