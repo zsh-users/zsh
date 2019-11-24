@@ -1,5 +1,7 @@
 2019-11-24  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 44923: Completion/Unix/Command/_git: update options for 2.24
+
 	* 44896: Completion/Unix/Command/_make: use opt_args to find
 	base directory and use it for $(CURDIR)
 
