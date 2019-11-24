@@ -2866,11 +2866,13 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 	    pushnode(args, dupstring("fg"));
     }
 
-    if ((how & Z_ASYNC) || output) {
+    if ((how & Z_ASYNC) || output ||
+	(last1 == 2 && input && EMULATION(EMULATE_SH))) {
 	/*
-	 * If running in the background, or not the last command in a
-	 * pipeline, we don't need any of the rest of this function to
-	 * affect the state in the main shell, so fork immediately.
+	 * If running in the background, not the last command in a
+	 * pipeline, or the last command in a multi-stage pipeline
+	 * in sh mode, we don't need any of the rest of this function
+	 * to affect the state in the main shell, so fork immediately.
 	 *
 	 * In other cases we may need to process the command line
 	 * a bit further before we make the decision.
