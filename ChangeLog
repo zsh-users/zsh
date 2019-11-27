@@ -1,3 +1,8 @@
+2019-11-26  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 44912: Completion/Base/Completer/_expand: Don't set done_quote=1
+	if the glob result is empty.  Fixes more cases of missing quotes.
+
 2019-11-24  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 44923: Completion/Unix/Command/_git: update options for 2.24

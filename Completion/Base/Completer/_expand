@@ -108,7 +108,7 @@ integer done_quote
 local orig_exp=$exp
 if [[ "$force" = *g* ]] || zstyle -T ":completion:${curcontext}:" glob; then
   eval 'exp=( ${~exp//(#b)\\([ 	\"'"\'"'
-])/$match[1]} ); exp=( ${(q)exp} )' 2>/dev/null && done_quote=1
+])/$match[1]} ); exp=( ${(q)exp} )' 2>/dev/null && (( $#exp )) && done_quote=1
 fi
 # If the globbing failed, or we didn't try globbing, we'll do
 # it again without the "~" so globbing is simply omitted.
