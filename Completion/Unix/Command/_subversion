@@ -128,7 +128,7 @@ _svn () {
         case $cmd in;
           (add)
             args+=(
-              '*:file:_files -g "*(^e:_svn_controlled:)"'
+              '*:file:_files -g "*(e:_svn_uncontrolled:)"'
             )
           ;;
           (auth)
@@ -350,7 +350,22 @@ _svnadmin () {
 
 (( $+functions[_svn_controlled] )) ||
 _svn_controlled() {
-  [[ -f ${(M)REPLY##*/}.svn/text-base/${REPLY##*/}.svn-base ]]
+  # For svn<=1.6, this was implemented as:
+  #     [[ -f ${(M)REPLY##*/}.svn/text-base/${REPLY##*/}.svn-base ]]
+  # However, because that implementation returns false for all files on svn>=1.7, and
+  # because 1.6 has been deprecated for 8 years and EOL for 6 years, we opt to DTRT
+  # for >=1.7.  Therefore:
+
+  # TODO: Reimplement this function and _svn_uncontrolled for svn>=1.7.
+  # (Use 'svn st' or 'svn info', not 'svn ls')
+  return 0
+}
+
+
+(( $+functions[_svn_uncontrolled] )) ||
+_svn_uncontrolled() {
+  # TODO: See comments in _svn_controlled
+  return 0
 }
 
 (( $+functions[_svn_conflicts] )) ||
