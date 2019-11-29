@@ -1,5 +1,9 @@
 2019-11-29  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 44947: Completion/Unix/Command/_subversion: Complete the
+	'auth', 'changelist', 'patch', 'resolve', and 'x-unshelve'
+	subcommands.
+
 	* 44946: Completion/Unix/Command/_subversion: Make _svn_conflicts
 	not offer all files in the directory.
 

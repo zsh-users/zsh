@@ -131,6 +131,18 @@ _svn () {
               '*:file:_files -g "*(^e:_svn_controlled:)"'
             )
           ;;
+          (auth)
+            args+=(
+              '*:auth pattern: '
+            )
+          ;;
+          (changelist)
+            args[(r)--remove]='(1)--remove'
+            args+=(
+              '(--remove)1:changelist name:_svn_changelists'
+              '*:file:_files -g "*(e:_svn_controlled:)"'
+            )
+          ;;
           (commit)
             args=(
 	      ${args/(#b)(*--file*):arg:/$match[1]:file:_files}
@@ -167,6 +179,12 @@ _svn () {
           (mergeinfo)
             args[(r)--show-revs=:arg:]=( '--show-revs=:revisions:(merged eligible)' )
           ;;
+          (patch)
+            args+=(
+              '1:patch file:_files'
+              '2::working copy to patch:_files'
+	    )
+          ;;
 	  (propget|propedit|propdel)
 	    args+=(
 		'1:property name:_svn_props'
@@ -181,7 +199,7 @@ _svn () {
 	    '*:path or url: _alternative "files:file:_files" "urls:URL:_svn_urls"'
 	    )
 	  ;;
-          (resolved)
+          (resolve|resolved)
             args+=(
               '*:file:_files -g "*(e:_svn_conflicts:)"'
             )
@@ -191,9 +209,9 @@ _svn () {
               '*:file:_files -g "(.svn|*)(/e:_svn_deletedfiles:,e:_svn_status:)"'
             )
           ;;
-	  (unshelve)
-	    args+=( '1:shelf name:compadd - ${${(f)"$(_call_program shelves svn unshelve -q --list)"}%%      *}' )
-	  ;;
+          (x-unshelve)
+            args+=( '1:shelf name:compadd - ${(f)"$(_call_program shelves svn x-shelves --quiet)"}' '2::shelf version' )
+          ;;
           (*)
             case $usage in
               *(SRC|DST|TARGET|URL*PATH)*)
