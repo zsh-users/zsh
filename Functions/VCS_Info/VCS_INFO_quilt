@@ -78,7 +78,7 @@ function VCS_INFO_quilt-dirfind() {
     VCS_INFO_bydir_detect ${dir}
     ret=$?
     vcs_comm[detect_need_file]=${oldfile}
-    printf '%s' ${vcs_comm[basedir]}
+    REPLY=${vcs_comm[basedir]}
     vcs_comm[basedir]="${olddir}"
     return ${ret}
 }
@@ -113,8 +113,8 @@ function VCS_INFO_quilt-patch2subject() {
         ;;
     esac
 
-    pc="$(VCS_INFO_quilt-dirfind .pc .version)"
-    ret=$?
+    VCS_INFO_quilt-dirfind .pc .version
+    ret=$? pc=$REPLY
     if (( ret == 0 )); then
         [[ ${quiltmode} == 'standalone' ]] && root=${pc}
         pc=${pc}/.pc
@@ -138,8 +138,8 @@ function VCS_INFO_quilt-patch2subject() {
             zstyle -s "${context}" quilt-patch-dir patches || patches="${QUILT_PATCHES}"
             if [[ "${patches}" != /* ]]; then
                 tmp=${patches:-patches}
-                patches="$(VCS_INFO_quilt-dirfind "${tmp}")"
-                ret=$?
+                VCS_INFO_quilt-dirfind "${tmp}"
+                ret=$? patches=$REPLY
                 (( ret )) && return ${ret}
                 patches=${patches}/${tmp}
             else

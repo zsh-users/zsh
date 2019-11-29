@@ -49,6 +49,10 @@ The behaviour of :h has similarly changed.
 The behaviour has also changed in forms such as ${foo:t2) and *(:t2),
 but in those cases the previous behaviour was not meaningful.
 
+The vcs_info function VCS_INFO_quilt-dirfind now returns a string value
+by setting $REPLY.  Previously it printed the value to standard output.
+This only affects you if you override that function in your dotfiles.
+
 Incompatibilities between 5.6.2 and 5.7.1
 -----------------------------------------
 
