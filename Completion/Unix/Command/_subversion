@@ -337,7 +337,7 @@ _svn_controlled() {
 
 (( $+functions[_svn_conflicts] )) ||
 _svn_conflicts() {
-  [ -n $REPLY.(mine|r<->)(N[1]) ]
+  () { (( $# > 0 )) } $REPLY.(mine|r<->)(NY1)
 }
 
 (( $+functions[_svn_deletedfiles] )) ||
