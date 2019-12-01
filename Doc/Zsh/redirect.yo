@@ -42,18 +42,18 @@ otherwise, it is truncated to zero length.
 xitem(tt(>|) var(word))
 item(tt(>!) var(word))(
 Same as tt(>), except that the file is truncated to zero length
-if it exists, even if tt(CLOBBER) is unset.
+if it exists, regardless of tt(CLOBBER).
 )
 item(tt(>>) var(word))(
 Open file var(word) for writing in append mode as standard output.
-If the file does not exist, and the tt(CLOBBER)
-option is unset, this causes an error;
+If the file does not exist, and the tt(CLOBBER) and tt(APPEND_CREATE)
+options are both unset, this causes an error;
 otherwise, the file is created.
 )
 xitem(tt(>>|) var(word))
 item(tt(>>!) var(word))(
 Same as tt(>>), except that the file is created if it does not
-exist, even if tt(CLOBBER) is unset.
+exist, regardless of tt(CLOBBER) and tt(APPEND_CREATE).
 )
 item(tt(<<)[tt(-)] var(word))(
 The shell input is read up to a line that is the same as
