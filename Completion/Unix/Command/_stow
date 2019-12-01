@@ -40,20 +40,12 @@ case $service in
       "--defer=[don't stow files beginning with this perl regex]:regexp:"
       '--override=[force stowing files beginning with this perl regex]:regexp:'
       '--no-folding[disable any further tree folding or tree refolding]'
+      '--dotfiles[enable special handling for dotfiles]'
       '(-p --compat)'{-p,--compat}'[use legacy algorithm for unstowing]'
       '(-n -no --simulate)'{-n,--no,--simulate}'[do not actually make any filesystem changes]'
       '(-v --verbose)'{-v,--verbose}'[increase or set the level of verbosity (from 0 to 5)]'
       '*:stow package:->stow_package'
     )
-
-    if (( ${+commands[stow]} )) ; then
-      if [[ "$( _call_program version stow --version 2>/dev/null )" =~ "stow\ \(GNU\ Stow\)\ version\ ([0-9]+\.[0-9]+\.[0-9]+)" ]]; then
-        autoload -Uz is-at-least
-        if is-at-least 2.3.0 "$match[1]" ; then
-          arguments+=( '--dotfiles[enable special handling for dotfiles]' )
-        fi
-      fi
-    fi
 
     _arguments -s -W -C $arguments && ret=0
 
