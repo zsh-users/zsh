@@ -51,7 +51,7 @@ options+=(
   '(-*batch -*interactive)'$^dashes'-interactive[force interactive I/O]'
   $^dashes'-lookaside[specify size and number of entries for lookaside memory]:size (bytes): :entries'
   $^dashes'-maxsize[specify maximum size for a --deserialize database]:size'
-  $^dashes'-memtrace[trace all memory allocations and deallocations'
+  $^dashes'-memtrace[trace all memory allocations and deallocations]'
   $^dashes'-mmap[set default mmap size]:size'
   $^dashes'-newline[set output row separator]:separator [\n]'
   $^dashes'-pagecache[specify size and number of slots for page cache memory]:size (bytes): :slots'
