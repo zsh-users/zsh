@@ -10,9 +10,9 @@ __stow_packages() {
   local -a stow_pkg_list=( $stow_dir/*(-/N:t) )
 
   if [[ ${#stow_pkg_list} -gt 0 ]]; then
-    _values -C "packages from $stow_dir" ${stow_pkg_list[@]}
+    _values -C "package from $stow_dir" ${${stow_pkg_list//\\/\\\\}//:/\\:}
   else
-    _message "no packages found in $stow_dir"
+    _message "no package found in $stow_dir"
   fi
 }
 
