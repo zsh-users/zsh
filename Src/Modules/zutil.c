@@ -88,7 +88,8 @@ typedef struct style *Style;
 
 struct style {
     struct hashnode node;
-    Stypat pats;		/* patterns */
+    Stypat pats;		/* patterns, sorted by weight descending, then
+                                   by order of definition, newest first. */
 };
 
 struct stypat {
@@ -337,7 +338,19 @@ setstypat(Style s, char *pat, Patprog prog, char **vals, int eval)
     p->eval = eprog;
     p->next = NULL;
 
-    /* Calculate the weight. */
+    /* Calculate the weight.
+     *
+     * The weight of a pattern is scored as follows:
+     *
+     * - The pattern is split to colon-separated components.
+     * - A component equal to '*' (with nothing else) scores 0 points.
+     * - A component that's a pattern, otherwise, scores 1 point.
+     * - A component that's a literal string scores 2 points.
+     * - The score of a pattern is the sum of the score of its components.
+     *
+     * This corresponds to the notion of 'more specific' in the zshmodules(1)
+     * documentation of zstyle.
+     */
 
     for (weight = 0, tmp = 2, first = 1, str = pat; *str; str++) {
 	if (first && *str == '*' && (!str[1] || str[1] == ':')) {
@@ -362,9 +375,9 @@ setstypat(Style s, char *pat, Patprog prog, char **vals, int eval)
     }
     p->weight = (weight += tmp);
 
+    /* Insert 'q' to 's->pats', using 'qq' as a temporary. */
     for (qq = NULL, q = s->pats; q && q->weight >= weight;
 	 qq = q, q = q->next);
-
     p->next = q;
     if (qq)
 	qq->next = p;

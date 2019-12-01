@@ -141,3 +141,13 @@
 >scalar-style
 >        :ztst:context:* second-scalar-value
 
+ (zstyle 'ctx?' foo one
+  zstyle 'ctx*' foo two
+  zstyle -s 'ctx1' foo bar && print $bar)
+ (zstyle 'ctx*' foo two
+  zstyle 'ctx?' foo one
+  zstyle -s 'ctx1' foo bar && print $bar)
+0:patterns of equal weight are used in order of definition
+>one
+>two
+

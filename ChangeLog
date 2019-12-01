@@ -1,5 +1,8 @@
 2019-12-01  Daniel Shahaf  <danielsh@apache.org>
 
+	* unposted: Src/Modules/zutil.c, Test/V05styles.ztst: zstyle:
+	Add a unit test and some comments.
+
 	* unposted: Completion/Unix/Command/_sqlite: Fix syntax error
 
 2019-11-30  Daniel Shahaf  <d.s@daniel.shahaf.name>
