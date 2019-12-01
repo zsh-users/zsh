@@ -59,6 +59,12 @@ vcs_info () {
     local -x LC_MESSAGES
     local -i maxexports
     local -a msgs
+
+    # vcs_comm is used internally for passing values among VCS_INFO_* functions.
+    # It is not part of the public API.
+    #
+    # hook_com, backend_misc, and user_data are public API; see zshcontrib(1)
+    # and Misc/vcs_info-examples.
     local -A vcs_comm hook_com backend_misc user_data
 
     LC_MESSAGES=C
