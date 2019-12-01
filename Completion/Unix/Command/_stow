@@ -47,7 +47,7 @@ case $service in
       '*:stow package:->stow_package'
     )
 
-    _arguments -s -W -C $arguments && ret=0
+    _arguments -s -C $arguments && ret=0
 
     case $state in
       (stow_package)
@@ -80,7 +80,7 @@ case $service in
       '(-a --aliens)'{-a,--aliens}'[report non-symlinks in the target directory]'
       '(-l --list)'{-l,--list}'[list packages in the target directory]'
     )
-    _arguments -W $arguments
+    _arguments $arguments
     ;;
 esac
 
