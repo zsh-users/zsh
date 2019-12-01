@@ -46,16 +46,18 @@ if (( ${+svninfo[Working_Copy_Root_Path]} )); then
   ${vcs_comm[cmd]} info --non-interactive -- "${svnbase}" | while IFS=: read a b; do svninfo[${a// /_}]="${b## #}"; done
 else
   # svn 1.0-1.6
-  while [[ -d "${svnbase}/../.svn" ]]; do
+  svnbase=${svnbase:P}
+  while [[ -d "${svnbase:h}/.svn" ]]; do
       parentinfo=()
-      ${vcs_comm[cmd]} info --non-interactive -- "${svnbase}/.." | while IFS=: read a b; do parentinfo[${a// /_}]="${b## #}"; done
+      ${vcs_comm[cmd]} info --non-interactive -- "${svnbase:h}" | while IFS=: read a b; do parentinfo[${a// /_}]="${b## #}"; done
       [[ ${parentinfo[Repository_UUID]} != ${svninfo[Repository_UUID]} ]] && break
       svninfo=(${(kv)parentinfo})
-      svnbase="${svnbase}/.."
+      svnbase=${svnbase:h}
+      if [[ $svnbase == '/' ]]; then
+	  break
+      fi
   done
 fi
-
-svnbase=${svnbase:P}
 
 rrn=${svnbase:t}
 zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" branchformat svnbranch || svnbranch="%b:%r"

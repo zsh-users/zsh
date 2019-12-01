@@ -1,5 +1,8 @@
 2019-12-03  Daniel Shahaf  <danielsh@apache.org>
 
+	* 44961: Functions/VCS_Info/Backends/VCS_INFO_get_data_svn:
+	vcs_info svn: Fix infinite loop when /.svn exists.
+
 	* 44962: Functions/VCS_Info/VCS_INFO_bydir_detect,
 	Functions/VCS_Info/vcs_info: vcs_info: Document internal function
 	and variable
