@@ -18,7 +18,7 @@ __stow_packages() {
 
 case $service in
   stow)
-    local context state line curcontext="$curcontext" ret=1
+    local state line curcontext="$curcontext" ret=1
     typeset -A opt_args
     # Others local variables
     local stow_dir arguments
