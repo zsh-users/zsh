@@ -4,7 +4,8 @@
 # A zsh completion script for GNU stow (https://www.gnu.org/software/stow/)
 #
 
-__stow_complete_packages() {
+(( $+functions[__stow_packages] )) ||
+__stow_packages() {
   local stow_dir=${(Q)1}
   local -a stow_pkg_list=( $stow_dir/*(-/N:t) )
 
@@ -68,7 +69,7 @@ case $service in
           stow_dir="$PWD"
         fi
 
-        __stow_complete_packages "$stow_dir"
+        __stow_packages "$stow_dir"
 
         ;;
     esac
