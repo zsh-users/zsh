@@ -1,5 +1,8 @@
 2019-12-01  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* unposted: Completion/Unix/Command/_killall: another place
+	to complete selinux contexts that was missed in 44781
+
 	* 44968: Completion/Unix/Command/_objdump,
 	Completion/Unix/Command/_readelf: cleanup and update objdump
 	and readelf completions

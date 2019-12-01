@@ -32,7 +32,7 @@ if _pick_variant psmisc=PSmisc unix --version; then
     "*: :_process_names $opts"
   )
   [[ $CURRENT = 2 || ( $CURRENT = 3 && $words[2] = (-Z|--context) ) ]] && \
-    args+=( '(-Z --context)'{-Z+,--context=}'[specify SELinux security context]:regex pattern: ' )
+    args+=( '(-Z --context)'{-Z+,--context=}'[specify SELinux security context]:regex pattern:_selinux_contexts' )
 
   _arguments -s -S -C : $args && ret=0
 
