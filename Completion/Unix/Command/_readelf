@@ -11,8 +11,6 @@ args=(
   '(-h --file-header)'{-h,--file-header}'[show file header]'
   '(-l --program-headers --segments)'{-l,--program-headers,--segments}'[show program headers]'
   '(-S --section-headers --sections)'{-S,--section-headers,--sections}'[show sections header]'
-  '(-s --syms --symbols)'{-s,--syms,--symbols}'[show symbol table]'
-  '(-n --notes)'{-n,--notes}'[show core notes (if present)]'
   '(-r --relocs)'{-r,--relocs}'[show relocations (if present)]'
   '(-d --dynamic)'{-d,--dynamic}'[show dynamic section (if present)]'
   '(-V --version-info)'{-V,--version-info}'[show version sections (if present)]'
@@ -35,16 +33,25 @@ case $variant in
       '(-t --section-details)'{-t,--section-details}'[show section details]'
       '(-e --headers)'{-e,--headers}'[show file, program and sections headers]'
       '(-s --syms --symbols)'{-s,--syms,--symbols}'[show symbol table]'
+      '(-n --notes)'{-n,--notes}'[show core notes (if present)]'
       '(-u --unwind)'{-u,--unwind}'[show unwind info (if present)]'
       '(-D --use-dynamic)'{-D,--use-dynamic}'[use dynamic section info when showing symbols]'
     )
   ;|
-  binutils)
+  elfutils|binutils)
     args+=(
       '--dyn-syms[show dynamic symbol table]'
+    )
+  ;|
+  binutils)
+    args+=(
       \*{-R,--relocated-dump=}"[dump contents of specified section as relocated bytes]:section:($sections)"
       "--dwarf-depth=[don't show DIEs at greater than specified depth]:depth"
       '--dwarf-start=[show DIEs starting at specified depth or deeper]:depth'
+      '--ctf=[display compact C type format info from section]:section'
+      '--ctf-parent=[use specified section as the CTF parent]:section'
+      '--ctf-symbols=[use specified section as the CTF external symbol table]:section'
+      '--ctf-strings=[use specified section as the CTF external string table]:section'
     )
   ;;
   elfutils)
@@ -56,6 +63,8 @@ case $variant in
       '(-z --decompress)'{-z,--decompress}'[show compression information; decompress before dumping data]'
       '(--symbols)-s[show symbol table]'
       '(-s)--symbols=-[show symbol table]::section:(.dynsym .symtab)'
+      '(--notes)-n[show core notes (if present)]'
+      '(-n)--notes=-[show core notes (if present)]::section'
     )
   ;;
 esac

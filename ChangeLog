@@ -1,5 +1,9 @@
 2019-12-01  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 44968: Completion/Unix/Command/_objdump,
+	Completion/Unix/Command/_readelf: cleanup and update objdump
+	and readelf completions
+
 	* Sebastian: 44967: Completion/Linux/Command/_alsa-utils:
 	Completion for aplay from alsa-utils
 
