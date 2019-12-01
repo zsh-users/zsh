@@ -28,6 +28,10 @@ case $service in
       '(- *)'{--version,-V}'[show version number]'
       '(-d --dir)'{-d+,--dir=}'[set the stow dir (default is current dir)]:stow dir:_files -/'
       '(-t --target)'{-t+,--target=}'[set the target dir (default is parent of stow dir)]:target dir:_files -/'
+      # Several distinct actions can be specified in a single invocation
+      # of the stow command (stow/unstow/restow). However, neither the
+      # stow command nor this script will prevent you from using
+      # different actions on the same package.
       '*'{-S,--stow}'[stow the package names that follow]:stow package:->stow_package'
       '*'{-D,--delete}'[unstow the package names that follow]:stow package:->stow_package'
       '*'{-R,--restow}'[restow (unstow and stow again) the package names that follow]:stow package:->stow_package'
