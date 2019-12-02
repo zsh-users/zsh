@@ -212,6 +212,16 @@ function +vi-git-remotebranch() {
 }
 
 
+### Derive hook names dynamically
+# With the following line:
+zstyle -e ':vcs_info:git+set-message:*' hooks 'reply=( ${${(k)functions[(I)[+]vi-git-set-message*]}#+vi-} )'
+# Any function named `+vi-git-set-message-<anything>' would be automatically
+# registered as a hook. For example:
++vi-git-set-message-foo() {}
++vi-git-set-message-bar() {}
+# Both of these functions would be called, even if they are defined after the zstyle is set.
+
+
 ### hg: Show marker when the working directory is not on a branch head
 # This may indicate that running `hg up` will do something
 # NOTE: the branchheads.cache file is not updated with every Mercurial

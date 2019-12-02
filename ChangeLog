@@ -1,3 +1,8 @@
+2019-12-02  Daniel Shahaf  <danielsh@apache.org>
+
+	* unposted: Misc/vcs_info-examples: vcs_info: Add an example
+	of using $functions to find hooks by name.
+
 2019-12-01  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* unposted: Completion/Unix/Command/_killall: another place
