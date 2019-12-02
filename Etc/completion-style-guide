@@ -69,11 +69,34 @@ for example, do not use:
   '--timeout[specify connection timeout in milliseconds]:timeout'
 but use:
   '--timeout[specify connection timeout]:timeout (ms)'
-  
+To indicate a default value, use square brackets:
+  '--timeout[specify connection timeout]:timeout (ms) [5000]'
+These two conventions can be used together or individually as appropriate.
+
 Group descriptions should be singular because only one thing is being
 completed even though many may be listed. This applies even where you
 complete a list of the things. Tags, functions for completing types of
 things (such as _files), and states should have plural names.
+
+Group descriptions can be omitted where they are handled by a helper/type
+function. For example, the `file' description in the following line is
+unnecessary, as `_files' provides it by default:
+  '--import=[import specified file]:file:_files'
+In this case, the following syntax can be used instead:
+  '--import=[import specified file]: :_files'
+Of course, it may make sense to add an explicit description which is
+more specific than the default:
+  '--config=[use specified config file]:config file:_files'
+
+Similarly, group descriptions can and should be omitted where a `->state'
+is involved, as the description in the argument spec is always ignored
+in these cases. For example, instead of:
+  '--config=[use specified config file]:config file:->config-files'
+use:
+  '--config=[use specified config file]: :->config-files'
+Setting an explicit description here constitutes (a small amount of)
+unnecessary noise, and may be misleading to other developers who update
+the function.
 
 In a function, allow any descriptions passed as an argument to override
 the default you define. For example:

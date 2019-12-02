@@ -1,5 +1,8 @@
 2019-12-02  dana  <dana@dana.is>
 
+	* 44969: Etc/completion-style-guide: Mention defaults and
+	superfluous descriptions
+
 	* unposted (cf. 44967): Completion/Linux/Command/_alsa-utils:
 	Fix minor syntax error in arg spec
 
