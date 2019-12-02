@@ -13,7 +13,7 @@ opts=(
   '(-L --list-pcms)'{-L,--list-pcms}'[list device names]'
   '(-D --device)'{-D+,--device=}'[select PCM by name]'
   '(-q --quiet)'{-q,--quiet}'[quiet mode]'
-  '(-t --file-type)'{-t+,--file-type+}'[file type (voc, wav, raw or au)]'
+  '(-t --file-type)'{-t+,--file-type=}'[file type (voc, wav, raw or au)]'
   '(-c --channels)'{-c+,--channels=}'[channels]'
   '(-r --rate)'{-r+,--rate=}'[sample rate]'
   '(-f --format)'{-f+,--format=}'[sample format (case insensitive)]'

@@ -1,3 +1,8 @@
+2019-12-02  dana  <dana@dana.is>
+
+	* unposted (cf. 44967): Completion/Linux/Command/_alsa-utils:
+	Fix minor syntax error in arg spec
+
 2019-12-02  Daniel Shahaf  <danielsh@apache.org>
 
 	* unposted: Misc/vcs_info-examples: vcs_info: Add an example
