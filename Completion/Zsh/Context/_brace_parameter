@@ -177,7 +177,7 @@ if [[ $PREFIX = *'${('[^\)]# ]]; then
     "s:split words on specified string"
     "Z:split words as if zsh command line (with options)"
     # "_:extended flags, for future expansion"
-    "S:search substrings in #, %, / expressions"
+    "S:match non-greedy in /, // or search substrings in % and # expressions"
     "I:search <argument>th match in #, %, / expressions"
     "B:include index of beginning of match in #, % expressions"
     "E:include index of one past end of match in #, % expressions"
