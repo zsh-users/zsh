@@ -1878,13 +1878,17 @@ describekeybriefly(UNUSED(char **args))
 {
     char *seq, *str, *msg, *is;
     Thingy func;
+    Keymap km;
 
     if (statusline)
 	return 1;
     clearlist = 1;
     statusline = "Describe key briefly: _";
     zrefresh();
+    if (invicmdmode() && region_active && (km = openkeymap("visual")))
+        selectlocalmap(km);
     seq = getkeymapcmd(curkeymap, &func, &str);
+    selectlocalmap(NULL);
     statusline = NULL;
     if(!*seq)
 	return 1;

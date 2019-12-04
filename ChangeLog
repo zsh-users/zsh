@@ -1,5 +1,7 @@
 2019-12-04  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 44976: Src/Zle/zle_main.c: describe-key-briefly in visual mode
+
 	* Sebastian: 44970: Completion/Zsh/Context/_brace_parameter:
 	Update the description of S flag
 
