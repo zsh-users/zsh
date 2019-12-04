@@ -1674,7 +1674,7 @@ For example, with the tt(EXTENDED_GLOB) option set, the following:
 
 example(watch=('^(pws|barts)'))
 
-causes reports for activity assoicated with any user other than tt(pws)
+causes reports for activity associated with any user other than tt(pws)
 or tt(barts).
 )
 vindex(WATCHFMT)

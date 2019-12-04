@@ -18,7 +18,7 @@ editing the file `tt(myfile)'.
 
 When the array is accessed as a whole, the keys are the names of files in
 the current directory, and the values are empty (to save a huge overhead in
-memory).  Thus tt(${(k)mapfile}) has the same affect as the glob operator
+memory).  Thus tt(${(k)mapfile}) has the same effect as the glob operator
 tt(*(D)), since files beginning with a dot are not special.  Care must be
 taken with expressions such as tt(rm ${(k)mapfile}), which will delete
 every file in the current directory without the usual `tt(rm *)' test.

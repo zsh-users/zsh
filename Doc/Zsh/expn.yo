@@ -1139,7 +1139,7 @@ form of single quoting is used that only quotes the string if needed to
 protect special characters.  Typically this form gives the most readable
 output.
 
-If a tt(q+) is given, an extended form of minmal quoting is used that
+If a tt(q+) is given, an extended form of minimal quoting is used that
 causes unprintable characters to be rendered using tt($')var(...)tt(').
 This quoting is similar to that used by the output of values by the
 tt(typeset) family of commands.

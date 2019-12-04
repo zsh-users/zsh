@@ -2146,7 +2146,7 @@ Of course, a hackish workaround is available in sh (and \fBzsh\fP):
 %\0ll\0'fuu\0bar'
 fuu\0bar\0not\0found
 .De
-If you like the sh behaviour, \fBzsh\fP can accomodate you:
+If you like the sh behaviour, \fBzsh\fP can accommodate you:
 .Ds
 %\0ls\0${=srcs}
 exec.c\0\0glob.c\0\0init.c
@@ -2441,7 +2441,7 @@ and command line while leaving command output unhighlighted, try this:
 %\0POSTEDIT=`echotc\0se`
 %\0PROMPT='%S%%\0'
 .De
-This trick is mostly superceded by the zle_highlight array parameter.
+This trick is mostly superseded by the zle_highlight array parameter.
 .Sh "Login/logout watching"
 .PP
 You can specify login or logout events to monitor

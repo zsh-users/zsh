@@ -55,7 +55,7 @@ For any other function, including any defined at an interactive prompt or
 an autoload function whose path has not yet been resolved, this is
 the empty string.  However, the hash element is reported as defined
 just so long as the function is present:  the keys to this hash are
-the same as those to tt($funcions).
+the same as those to tt($functions).
 )
 vindex(dis_functions_source)
 item(tt(dis_functions_source))(

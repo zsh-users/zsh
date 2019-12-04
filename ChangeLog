@@ -1,3 +1,10 @@
+2019-12-04  Martijn Dekker  <martijn@inlv.org>
+
+	* 44981: Doc/Zsh/cond.yo, Doc/Zsh/contrib.yo, Doc/Zsh/expn.yo,
+	Doc/Zsh/mod_mapfile.yo, Doc/Zsh/mod_parameter.yo,
+	Doc/Zsh/params.yo, Doc/intro.ms: Fix some typos in the
+	documentation.
+
 2019-12-03  Daniel Shahaf  <danielsh@apache.org>
 
 	* 44960: Functions/VCS_Info/Backends/VCS_INFO_get_data_cvs:

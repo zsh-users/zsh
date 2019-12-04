@@ -677,7 +677,7 @@ As an example, ~[g:p:s] might specify:
 startitem()
 item(tt(g))(
 The top level directory for your git area.  This first component
-has to match, or the function will retrun indicating another
+has to match, or the function will return indicating another
 directory name hook function should be tried.
 )
 item(tt(p))(
