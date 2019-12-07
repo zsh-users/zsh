@@ -43,7 +43,8 @@ case $service in
       '--dotfiles[enable special handling for dotfiles]'
       '(-p --compat)'{-p,--compat}'[use legacy algorithm for unstowing]'
       '(-n -no --simulate)'{-n,--no,--simulate}'[do not actually make any filesystem changes]'
-      '(-v --verbose)'{-v,--verbose}'[increase or set the level of verbosity (from 0 to 5)]'
+      '*-v[increase verbosity]'
+      '*--verbose=-[increase verbosity]::level:(0 1 2 3 4 5)'
       '*:stow package:->stow_package'
     )
 
