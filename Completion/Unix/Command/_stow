@@ -66,7 +66,7 @@ case $service in
           stow_dir="$PWD"
         fi
 
-        __stow_packages "$stow_dir"
+        __stow_packages "$stow_dir" && ret=0
 
         ;;
     esac
