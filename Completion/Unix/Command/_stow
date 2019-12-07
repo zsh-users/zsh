@@ -32,9 +32,9 @@ case $service in
       # of the stow command (stow/unstow/restow). However, neither the
       # stow command nor this script will prevent you from using
       # different actions on the same package.
-      '*'{-S,--stow}'[stow the package names that follow]:stow package:->stow_package'
-      '*'{-D,--delete}'[unstow the package names that follow]:stow package:->stow_package'
-      '*'{-R,--restow}'[restow (unstow and stow again) the package names that follow]:stow package:->stow_package'
+      '*'{-S,--stow}'[stow the package names that follow]: :->stow_package'
+      '*'{-D,--delete}'[unstow the package names that follow]: :->stow_package'
+      '*'{-R,--restow}'[restow (unstow and stow again) the package names that follow]: :->stow_package'
       '--adopt[adopt already existing plain file]'
       '--ignore=[ignore files ending with this perl regex]:regexp:'
       "--defer=[don't stow files beginning with this perl regex]:regexp:"
