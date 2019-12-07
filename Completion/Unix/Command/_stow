@@ -26,8 +26,8 @@ case $service in
     arguments=(
       '(- *)'{--help,-h}'[show help]'
       '(- *)'{--version,-V}'[show version number]'
-      '(-d --dir)'{-d+,--dir=}'[set the stow dir (default is current dir)]:stow dir:_files -/'
-      '(-t --target)'{-t+,--target=}'[set the target dir (default is parent of stow dir)]:target dir:_files -/'
+      '(-d --dir)'{-d+,--dir=}'[set the stow dir (default is current dir)]:stow dir [$PWD]:_files -/'
+      '(-t --target)'{-t+,--target=}'[set the target dir (default is parent of stow dir)]:target dir [../$PWD]:_files -/'
       # Several distinct actions can be specified in a single invocation
       # of the stow command (stow/unstow/restow). However, neither the
       # stow command nor this script will prevent you from using
