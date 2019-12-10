@@ -3178,7 +3178,27 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
     /* Compute line prefix/suffix. */
     lpl = offs;
     lpre = zhalloc(lpl + 1);
-    memcpy(lpre, s, lpl);
+    if (comppatmatch)
+    {
+	int ccount;
+	char *psrc, *pdst;
+	for (ccount = 0, psrc = s, pdst = lpre;
+	     ccount < lpl;
+	     ++ccount, ++psrc, ++pdst)
+	{
+	    if (*psrc == Meta)
+	    {
+		ccount++;
+		*pdst++ = *psrc++;
+		*pdst = *psrc;
+	    } else if (*psrc == Dash)
+		*pdst = '-';
+	    else
+		*pdst = *psrc;
+	}
+    }
+    else
+	memcpy(lpre, s, lpl);
     lpre[lpl] = '\0';
     qlpre = quotename(lpre);
     lsuf = dupstring(s + offs);

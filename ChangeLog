@@ -1,3 +1,8 @@
+2019-12-10  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 44997: Src/Zle/compctl.c: prefix needed extra munging for
+	hyphen with GLOB_COMPLETE in compctl.
+
 2019-12-04  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 44976: Src/Zle/zle_main.c: describe-key-briefly in visual mode
