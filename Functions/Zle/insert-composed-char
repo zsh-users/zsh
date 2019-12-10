@@ -27,7 +27,7 @@
 #  '   Acute
 #  >   Circumflex
 #  ?   Tilde
-#  -   Macron.  (A horizonal bar over the letter.)
+#  -   Macron.  (A horizontal bar over the letter.)
 #  (   Breve.  (A shallow dish shape over the letter.)
 #  .   Dot above, or no dot with lower case i, or dot in the middle of L or l.
 #  :   Diaeresis (Umlaut)
@@ -43,7 +43,7 @@
 #  9   Horn
 # Hence A! is upper case A with a grave, c, is lower case c with cedilla.
 #
-# Some other composed charaters:
+# Some other composed characters:
 # Various ligatures:
 #  AE ae OE oe IJ ij
 #

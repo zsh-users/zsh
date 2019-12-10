@@ -1,3 +1,10 @@
+2019-12-11  Martijn Dekker  <martijn@inlv.org>
+
+	* 45003: Etc/FAQ.yo, Etc/zsh-development-guide,
+	Functions/Prompts/prompt_oliver_setup,
+	Functions/Zle/insert-composed-char, NEWS, README: Fix more
+	documentation typos
+
 2019-12-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 44997: Src/Zle/compctl.c: prefix needed extra munging for

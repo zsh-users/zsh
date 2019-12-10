@@ -5,7 +5,7 @@ prompt_oliver_help() {
 With this prompt theme, the prompt contains the current directory,
 history number, number of jobs (if non-zero) and the previous
 command's exit code (if non-zero) and a final character which
-depends on priviledges.
+depends on privileges.
 
 The colour of the prompt depends on two associative arrays -
 $pcolour and $tcolour. Each array is indexed by the name of the

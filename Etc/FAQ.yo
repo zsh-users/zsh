@@ -1390,7 +1390,7 @@ sect(Why do my autoloaded functions not autoload [the first time]?)
   redefine the function when you called it.
 
   From version 3.1, there is an option tt(KSH_AUTOLOAD) to allow full ksh
-  compatiblity, i.e. the function myem(must) be in the second form
+  compatibility, i.e. the function myem(must) be in the second form
   above.  If that is not set, zsh tries to guess which form you are
   using:  if the file contains only a complete definition of the
   function in the second form, and nothing else apart from comments
@@ -1936,7 +1936,7 @@ label(327)
      operator.  As the mytt(**) operator cannot be grouped (inside
      parentheses it is treated as mytt(*)), this is one way to exclude some
      subdirectories from matching a mytt(**).  Note that this can be quite
-     inefficent because the shell performs a complete search for
+     inefficient because the shell performs a complete search for
      mytt(**/foo) before it uses the pattern after the mytt(~) to exclude
      files from the match.  The file is excluded if mytt(bar) occurs
      em(anywhere), in any directory segment or the final file name.
@@ -2483,7 +2483,7 @@ label(52)
   tt(unsubscribe) to unsubscribe.  The mailing software (tt(ezlm)) has
   various bells and whistles: you can retrieve archived messages.
   Mail email(zsh-workers-help@zsh.org) for detailed information.
-  Adminstrative matters are best sent to
+  Administrative matters are best sent to
   email(zsh-workers-owner@zsh.org).
   real name is email(Geoff Wing <gcw@zsh.org>).
   

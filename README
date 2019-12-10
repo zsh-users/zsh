@@ -204,7 +204,7 @@ of this change is that variables that should have active ranges need
   [[ b = [${~cset}] ]]
 
 The "~" causes the "-" character to be active.  In sh emulation the
-"~" is unncessary in this example and double quotes must be used to
+"~" is unnecessary in this example and double quotes must be used to
 suppress the range behaviour of the "-".
 
 2) The first argument to 'repeat' is now evaluated as an arithmetic
@@ -217,7 +217,7 @@ leading zeroes and the OCTAL_ZEROES option is set.
 3) For some time the shell has had a POSIX_TRAPS option which determines
 whether the EXIT trap has POSIX behaviour (the trap is only run at shell
 exit) or traditional zsh behaviour (the trap is run once and discarded
-when the enclosing fuction or shell exits, whichever happens first).
+when the enclosing function or shell exits, whichever happens first).
 The use of this option has now been made "sticky" on the EXIT trap ---
 in other words, the setting of the option at the point where the trap is
 set now determines whether the trap has POSIX or traditional zsh
@@ -344,7 +344,7 @@ can be used with both assoiative arrays and normal arrays.  In the
 unlikely event that you wish to create an array with an entry
 matching a file whose name consists of one of a range of characters
 matched as a [...] expression, followed by an equal sign, followed
-by arbitrary other charaters, it is now necessary to quote the equals
+by arbitrary other characters, it is now necessary to quote the equals
 sign.
 
 Incompatibilites between 5.0.7 and 5.0.8
@@ -361,7 +361,7 @@ or both of the arguments were floating point.  Now, the C math
 library fmod() operator is used to implement the operation where
 one of the arguments is floating point.  For example:
 
-Old behavour:
+Old behaviour:
 
 % print $(( 5.5 % 2 ))
 1

@@ -547,7 +547,7 @@ Expansion (parameters, globbing, etc.) and redirection
   calculated by the (l) and (r) flags or the # operator should take
   account of the printing width of characters in multibyte mode, whether
   0, 1 or more.  (mm) causes printing characters to count as 1 and
-  non-printing chracters to count as 0.
+  non-printing characters to count as 0.
 
 - The parameter substitution flag (q-) picks the most minimal way of
   quoting the parameter words, to make the result as readable as possible.
