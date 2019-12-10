@@ -30,8 +30,8 @@
 #include "zsh.mdh"
 #include "compat.pro"
 
-/* Return pointer to first occurence of string t *
- * in string s.  Return NULL if not present.     */
+/* Return pointer to first occurrence of string t *
+ * in string s.  Return NULL if not present.      */
 
 /**/
 #ifndef HAVE_STRSTR

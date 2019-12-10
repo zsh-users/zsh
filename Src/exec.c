@@ -4299,7 +4299,7 @@ save_params(Estate state, Wordcode pc, LinkList *restore_p, LinkList *remove_p)
 		       (unset(RESTRICTED) || !(pm->node.flags & PM_RESTRICTED))) {
 		/*
 		 * In this case we're just saving parts of
-		 * the parameter in a tempory, so use heap allocation
+		 * the parameter in a temporary, so use heap allocation
 		 * and don't bother copying every detail.
 		 */
 		tpm = (Param) hcalloc(sizeof *tpm);

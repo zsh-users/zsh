@@ -850,7 +850,7 @@
 
   # With non-special command: original value restored
   # With special builtin: new value kept
-  # With special builtin preceeded by "command": original value restored.
+  # With special builtin preceded by "command": original value restored.
   (setopt posixbuiltins
   FOO=val0
   FOO=val1 true; echo $FOO

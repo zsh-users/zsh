@@ -163,7 +163,7 @@ promptpath(char *p, int npath, int tilde)
  *
  * txtchangep gives an integer controlling the attributes of
  * the prompt.  This is for use in zle to maintain the attributes
- * consistenly.  Other parts of the shell should not need to use it.
+ * consistently.  Other parts of the shell should not need to use it.
  */
 
 /**/

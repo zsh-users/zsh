@@ -386,7 +386,7 @@
   esac)
   print after case in subshell)
   '
-0:Non-arithmetic subst with command subsitution parse from hell
+0:Non-arithmetic subst with command substitution parse from hell
 >yes, this one after case in subshell
 
   print "a$((echo one subst)

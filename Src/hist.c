@@ -181,7 +181,7 @@ mod_export char *chline;
  * To avoid having to modify this every time we modify chline,
  * we set it when we push the stack, and unset it when we pop
  * the appropriate value off the stack.  As it's never modified
- * on the stack this is the only maintainance we ever do on it.
+ * on the stack this is the only maintenance we ever do on it.
  * In return, ZLE has to check both zle_chline and (if that's
  * NULL) chline to get the current value.
  */
@@ -476,7 +476,7 @@ herrflush(void)
      *
      * Note that this is a side effect --- this is not the usual reason
      * for testing lex_add_raw which is to add the text to a different
-     * buffer used when we are actually parsing the command substituion
+     * buffer used when we are actually parsing the command substitution
      * (nothing to do with ZLE).  Sorry.
      */
     while (inbufct && (!strin || lex_add_raw)) {

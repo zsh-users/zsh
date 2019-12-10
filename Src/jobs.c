@@ -1085,7 +1085,7 @@ printjob(Job jn, int lng, int synch)
 	{
 	    /*
 	     * A subjob still has process, which must finish before
-	     * further excution of the superjob, which the user wants to
+	     * further execution of the superjob, which the user wants to
 	     * know about.  So report the status of the subjob as if it
 	     * were the user-visible superjob.
 	     */

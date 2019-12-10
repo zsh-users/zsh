@@ -1120,7 +1120,7 @@ struct m_hdr {
 /* length of memory header, length of first field of memory header and
    minimal size of a block left free (if we allocate memory and take a
    block from the free list that is larger than needed, it must have at
-   least M_MIN extra bytes to be splitted; if it has, the rest is put on
+   least M_MIN extra bytes to be split; if it has, the rest is put on
    the free list) */
 
 #define M_HSIZE (sizeof(struct m_hdr))

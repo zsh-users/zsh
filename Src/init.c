@@ -137,7 +137,7 @@ loop(int toplevel, int justonce)
 		else
 		    stophist = hstop;
 		/*
-		 * Reset all errors, including user interupts.
+		 * Reset all errors, including user interrupts.
 		 * This is what allows ^C in an interactive shell
 		 * to return us to the command line.
 		 */
@@ -203,7 +203,7 @@ loop(int toplevel, int justonce)
 		 * that would be inconsistent with the case where
 		 * we didn't execute a preexec function.  This is
 		 * an implementation detail that an interrupting user
-		 * does't care about.
+		 * doesn't care about.
 		 */
 		errflag &= ~ERRFLAG_ERROR;
 	    }
@@ -362,7 +362,7 @@ static void parseopts_setemulate(char *nam, int flags)
  * Parse shell options.
  *
  * If (flags & PARSEARGS_TOPLEVEL):
- * - we are doing shell initilisation
+ * - we are doing shell initialisation
  * - nam is the name under which the shell was started
  * - set up emulation and standard options based on that.
  * Otherwise:

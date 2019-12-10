@@ -996,7 +996,7 @@ printshfuncnode(HashNode hn, int printflags)
  * expansion of leading tabs.
  * expand = 0 is standard: use hard tabs.
  * expand > 0 uses that many spaces.
- * expand < 0 uses no identation.
+ * expand < 0 uses no indentation.
  *
  * Note this function and the following two are called with
  * interrupts queued, so saving and restoring text_expand_tabs

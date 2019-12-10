@@ -274,7 +274,7 @@ addpath(char *s, int l)
 }
 
 /* stat the filename s appended to pathbuf.  l should be true for lstat,    *
- * false for stat.  If st is NULL, the file is only checked for existance.  *
+ * false for stat.  If st is NULL, the file is only checked for existence.  *
  * s == "" is treated as s == ".".  This is necessary since on most systems *
  * foo/ can be used to reference a non-directory foo.  Returns nonzero if   *
  * the file does not exists.                                                */
@@ -566,7 +566,7 @@ scanner(Complist q, int shortcircuit)
 		continue;
 	    errsfound = errssofar;
 	    if (pattry(p, fn)) {
-		/* if this name matchs the pattern... */
+		/* if this name matches the pattern... */
 		if (pbcwdsav == pathbufcwd &&
 		    strlen(fn) + pathpos - pathbufcwd >= PATH_MAX) {
 		    int err;

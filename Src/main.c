@@ -34,7 +34,7 @@
  * Support for Cygwin binary/text mode filesystems.
  * Peter A. Castro <doctor@fruitbat.org>
  *
- * This deserves some explaination, because it uses Cygwin specific
+ * This deserves some explanation, because it uses Cygwin specific
  * runtime functions.
  *
  * Cygwin supports the notion of binary or text mode access to files
@@ -43,7 +43,7 @@
  * and all.  If it's on a text mounted filesystem, Cygwin will strip out
  * the CRs.  This presents a problem because zsh code doesn't allow for
  * CRLF's as line terminators.  So, we must force all open files to be
- * in text mode reguardless of the underlying filesystem attributes.
+ * in text mode regardless of the underlying filesystem attributes.
  * However, we only want to do this for reading, not writing as we still
  * want to write files in the mode of the filesystem.  To do this,
  * we have two options: augment all {f}open() calls to have O_TEXT added to

@@ -98,7 +98,7 @@
 
 /*
  * In utmpx, the ut_name field is replaced by ut_user.
- * Howver, on some systems ut_name may already be defined this
+ * However, on some systems ut_name may already be defined this
  * way for the purposes of utmp.
  */
 # ifndef ut_name

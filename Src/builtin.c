@@ -1718,7 +1718,7 @@ fcsubs(char **sp, struct asgment *sub)
 	newstr = sub->value.scalar;
 	sub = (Asgment)sub->node.next;
 	oldpos = s;
-	/* loop over occurences of oldstr in s, replacing them with newstr */
+	/* loop over occurrences of oldstr in s, replacing them with newstr */
 	while ((newpos = (char *)strstr(oldpos, oldstr))) {
 	    newmem = (char *) zhalloc(1 + (newpos - s)
 				      + strlen(newstr) + strlen(newpos + strlen(oldstr)));
@@ -2526,7 +2526,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 		 * Attempt to assign a scalar value to an array.
 		 * This can happen if the array is special.
 		 * We'll be lenient and guess what the user meant.
-		 * This is how normal assigment works.
+		 * This is how normal assignment works.
 		 */
 		if (*asg->value.scalar) {
 		    /* Array with one value */

@@ -584,7 +584,7 @@ gettext2(Estate state)
 		    state->pc = end;
 		    if (!nargs) {
 			/*
-			 * Unnamed fucntion.
+			 * Unnamed function.
 			 * We're not going to pull any arguments off
 			 * later, so skip them now...
 			 */

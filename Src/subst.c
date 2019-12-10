@@ -91,7 +91,7 @@ keyvalpairelement(LinkList list, LinkNode node)
  * "flag"s contains PREFORK_* flags, defined in zsh.h.
  *
  * "ret_flags" is used to return PREFORK_* values from nested parameter
- * substitions.  It may be NULL in which case PREFORK_SUBEXP must not
+ * substitutions.  It may be NULL in which case PREFORK_SUBEXP must not
  * appear in flags; any return value from below will be discarded.
  */
 
@@ -1548,7 +1548,7 @@ untok_and_escape(char *s, int escapes, int tok_arg)
 /*
  * See if an argument str looks like a subscript or length following
  * a colon and parse it.  It must be followed by a ':' or nothing.
- * If this succeeds, expand and return the evaulated expression if
+ * If this succeeds, expand and return the evaluated expression if
  * found, else return NULL.
  *
  * We assume this is what is meant if the first character is not
@@ -1682,7 +1682,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
      */
     int wantt = 0;
     /*
-     * Indicates spliting a string into an array.  There aren't
+     * Indicates splitting a string into an array.  There aren't
      * actually that many special cases for this --- which may
      * be why it doesn't work properly; we split in some cases
      * where we shouldn't, in particular on the multsubs for
@@ -1732,7 +1732,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
     int mods = 0;
     /*
      * The (z) flag, nothing to do with SH_WORD_SPLIT which is tied
-     * spbreak, see above; fairly straighforward in use but c.f.
+     * spbreak, see above; fairly straightforward in use but cf.
      * the comment for mods.
      *
      * This gets set to one of the LEXFLAGS_* values.
@@ -2725,7 +2725,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
      * substitution is in quotes) always good enough?  Potentially
      * we may be OK by now --- all potential `@'s and subexpressions
      * have been handled, including any [@] index which comes up
-     * by virture of v->isarr being set to SCANPM_ISVAR_AT which
+     * by virtue of v->isarr being set to SCANPM_ISVAR_AT which
      * is now in isarr.
      *
      * However, if we are replacing multsub() with something that
@@ -3110,7 +3110,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 
 	    /*
 	     * Either loop over an array doing replacements or
-	     * do the replacment on a string.
+	     * do the replacement on a string.
 	     *
 	     * We need an untokenized value for matching.
 	     */

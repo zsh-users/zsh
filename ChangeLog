@@ -1,5 +1,14 @@
 2019-12-11  Martijn Dekker  <martijn@inlv.org>
 
+	* 45004: Src/builtin.c, Src/compat.c, Src/exec.c, Src/glob.c,
+	Src/hashtable.c, Src/hist.c, Src/init.c, Src/jobs.c,
+	Src/lex.c, Src/main.c, Src/mem.c, Src/module.c, Src/params.c,
+	Src/parse.c, Src/pattern.c, Src/prompt.c, Src/subst.c,
+	Src/text.c, Src/watch.c, Src/zsh.h, Test/A02alias.ztst,
+	Test/C01arith.ztst, Test/C02cond.ztst, Test/D03procsubst.ztst,
+	Test/D06subscript.ztst, Test/D08cmdsubst.ztst,
+	Test/E01options.ztst, Test/V10private.ztst: Fix typos in comments
+
 	* 45003: Etc/FAQ.yo, Etc/zsh-development-guide,
 	Functions/Prompts/prompt_oliver_setup,
 	Functions/Zle/insert-composed-char, NEWS, README: Fix more

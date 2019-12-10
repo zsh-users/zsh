@@ -442,7 +442,7 @@ add_autobin(const char *module, const char *bnam, int flags)
 }
 
 /* Remove the builtin added previously by addbuiltin().  Returns *
- * zero on succes and -1 if there is no builtin with that name.  */
+ * zero on success and -1 if there is no builtin with that name. */
 
 /**/
 int

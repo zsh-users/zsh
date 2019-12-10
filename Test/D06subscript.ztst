@@ -190,7 +190,7 @@
 
   typeset -ga empty
   echo X${${empty##*}[-1]}X
-0:Negative index applied to substition result from empty array
+0:Negative index applied to substitution result from empty array
 >XX
 
   print $empty[(i)] $empty[(I)]
@@ -221,7 +221,7 @@
 >fimble two three four
 
   print X$array[(R)notfound]X
-0:(R) yuckily returns the first element on failure withe KSH_ZERO_SUBSCRIPT
+0:(R) yuckily returns the first element on failure with KSH_ZERO_SUBSCRIPT
 >XfimbleX
 
   unsetopt KSH_ZERO_SUBSCRIPT

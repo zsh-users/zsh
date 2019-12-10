@@ -129,7 +129,7 @@
   setopt ALIAS_FUNC_DEF
   eval 'goodalias() { print does now work; }'
   isafunc)
-0:ALIAS_FUNC_DEF causes the icky behaviour to be avaliable
+0:ALIAS_FUNC_DEF causes the icky behaviour to be available
 >does now work
 
   (alias thisisokthough='thisworks() { print That worked; }'

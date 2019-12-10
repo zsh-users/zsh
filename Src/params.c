@@ -3548,7 +3548,7 @@ setiparam(char *s, zlong val)
 
 /*
  * Set an integer parameter without forcing creation of an integer type.
- * This is useful if the integer is going to be set to a parmaeter which
+ * This is useful if the integer is going to be set to a parameter which
  * would usually be scalar but may not exist.
  */
 

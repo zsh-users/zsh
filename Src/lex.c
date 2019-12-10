@@ -2109,7 +2109,7 @@ skipcomm(void)
 	hist_in_word(1);
     } else {
 	/*
-	 * Set up for nested command subsitution, however
+	 * Set up for nested command substitution, however
 	 * we don't actually need the string until we get
 	 * back to the top level and recover the lot.
 	 * The $() body just appears empty.

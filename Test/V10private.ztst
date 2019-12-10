@@ -104,7 +104,7 @@
   private -h path
   print X$path
  }
-0:privates may hide tied paramters
+0:privates may hide tied parameters
 >X
 
  # Deliberate type mismatch here

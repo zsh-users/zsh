@@ -388,7 +388,7 @@ F:Failures in these cases do not indicate a problem in the shell.
      eval test $w
      print $?
   done
-0:test compatability weirdness: treat ! as a string sometimes
+0:test compatibility weirdness: treat ! as a string sometimes
 >0
 >0
 >1

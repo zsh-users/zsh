@@ -26,7 +26,7 @@
 >SEcond	ViErtE
 
   diff =(cat FILE1) =(cat FILE2)
-1:=(...) substituion
+1:=(...) substitution
 >1c1
 >< First	Second	Third	Fourth
 >---

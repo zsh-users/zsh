@@ -455,7 +455,7 @@ enum {
  */
 #define FDT_FLOCK_EXEC		6
 /*
- * Entry used by a process substition.
+ * Entry used by a process substitution.
  * This marker is not tested internally as we associated the file
  * descriptor with a job for closing.
  *
@@ -1255,7 +1255,7 @@ enum {
 /*
  * Assignment has value?
  * If the assignment is an arrray, then it certainly has a value --- we
- * can only tell if there's an expicit assignment.
+ * can only tell if there's an explicit assignment.
  */
 
 #define ASG_VALUEP(asg) (ASG_ARRAYP(asg) ||			\
@@ -1444,8 +1444,8 @@ struct builtin {
   */
 #define BINF_HANDLES_OPTS	(1<<18)
 /*
- * Handles the assignement interface.  The argv list actually contains
- * two nested litsts, the first of normal arguments, and the second of
+ * Handles the assignment interface.  The argv list actually contains
+ * two nested lists, the first of normal arguments, and the second of
  * assignment structures.
  */
 #define BINF_ASSIGN		(1<<19)
@@ -2006,7 +2006,7 @@ enum {
 enum {
     /*
      * Set if the string had whitespace at the start
-     * that should cause word splitting against any preceeding string.
+     * that should cause word splitting against any preceding string.
      */
     MULTSUB_WS_AT_START = 1,
     /*
@@ -2272,9 +2272,9 @@ struct histent {
  */
 #define LEXFLAGS_NEWLINE	0x0010
 
-/******************************************/
-/* Definitions for programable completion */
-/******************************************/
+/*******************************************/
+/* Definitions for programmable completion */
+/*******************************************/
 
 /* Nothing special. */
 #define IN_NOTHING 0

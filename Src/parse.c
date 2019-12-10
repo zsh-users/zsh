@@ -1811,7 +1811,7 @@ par_simple(int *cmplx, int nr)
 	    for (ptr = str; *ptr; ptr++) {
 		/*
 		 * We can't treat this as "simple" if it contains
-		 * expansions that require process subsitution, since then
+		 * expansions that require process substitution, since then
 		 * we need process handling.
 		 */
 		if (ptr[1] == Inpar &&
