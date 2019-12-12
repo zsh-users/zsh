@@ -2534,3 +2534,26 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 0:Global variables are not trashed by "foo=bar builtin" (regression test)
 >function-value
 >global-value
+
+ foo=pws
+ print ${foo%*}
+0:Smallest match at end can match zero-length string
+>pws
+
+ foo=pws
+ print ${foo%?}
+0:Smallest match at end with a character always matches one
+>pw
+
+ setopt extendedglob
+ foo=pws
+ print ${foo%s#}
+ print ${foo%%s#}
+0:Smallest / largest match with non-trivial closure
+>pws
+>pw
+
+ foo=pws
+ print ${foo%%*}
+0:Largest match at end matches entire string
+>

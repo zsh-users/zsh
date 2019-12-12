@@ -1,3 +1,9 @@
+2019-12-12  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 45001: Src/glob.c, Test/D04parameter.ztst: ${...%...} didn't
+	test for zero-length matches, which should be preferred where
+	possible.
+
 2019-12-11  Martijn Dekker  <martijn@inlv.org>
 
 	* 45004: Src/builtin.c, Src/compat.c, Src/exec.c, Src/glob.c,

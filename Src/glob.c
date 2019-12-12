@@ -2909,6 +2909,12 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 	     */
 	    mb_charinit();
 	    tmatch = NULL;
+	    set_pat_start(p, l);
+	    if (pattrylen(p, send, 0, 0, &patstralloc, umltot) &&
+		!--n) {
+		*sp = get_match_ret(&imd, umltot, umltot);
+		return 1;
+	    }
 	    for (ioff = 0, t = s, umlen = umltot; t < send; ioff++) {
 		set_pat_start(p, t-s);
 		if (pattrylen(p, t, umlen, 0, &patstralloc, ioff))
