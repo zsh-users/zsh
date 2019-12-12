@@ -912,7 +912,7 @@ cd_get_dest(char *nam, char **argv, int hard, int func)
 	char *end;
 
 	doprintdir++;
-	if (argv[0][1] && (argv[0][0] == '+' || argv[0][0] == '-')
+	if (!isset(POSIXCD) && argv[0][1] && (argv[0][0] == '+' || argv[0][0] == '-')
 	    && strspn(argv[0]+1, "0123456789") == strlen(argv[0]+1)) {
 	    dd = zstrtol(argv[0] + 1, &end, 10);
 	    if (*end == '\0') {

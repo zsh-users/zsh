@@ -290,6 +290,8 @@ of the list shown by the tt(dirs) command, starting with zero.
 An argument of the form `tt(-)var(n)' counts from the right.
 If the tt(PUSHD_MINUS) option is set, the meanings of `tt(PLUS())'
 and `tt(-)' in this context are swapped.
+If the tt(POSIX_CD) option is set, this form of tt(cd) is not recognised
+and will be interpreted as the first form.
 
 If the tt(-q) (quiet) option is specified, the hook function tt(chpwd)
 and the functions in the array tt(chpwd_functions) are not called.

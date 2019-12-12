@@ -148,7 +148,8 @@ ifzman(zmanref(zshbuiltins))\
 ifnzman(noderef(Shell Builtin Commands)).
 If the option is set, the shell does not test for directories beneath
 the local directory (`tt(.)') until after all directories in tt(cdpath)
-have been tested.
+have been tested, and the tt(cd) and tt(chdir) commands do not recognise
+arguments of the form `{tt(PLUS())|tt(-)}var(n)' as directory stack entries.
 
 Also, if the option is set, the conditions under which the shell
 prints the new directory after changing to it are modified.  It is
