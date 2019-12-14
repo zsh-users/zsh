@@ -5,11 +5,11 @@ THE Z SHELL (ZSH)
 Version
 -------
 
-This is version 5.7.1 of the shell.  This is a stable release.  There are
-a few visible improvements since 5.6 as well as many bugfixes.
+This is version 5.8 of the shell.  This is a stable release.  There are
+a few visible improvements since 5.7 as well as many bugfixes.
 
 Note in particular the changes highlighted under "Incompatibilities since
-5.6.2" below.  See NEWS for more information.
+5.7.1" below.  See NEWS for more information.
 
 Installing Zsh
 --------------
@@ -52,6 +52,9 @@ but in those cases the previous behaviour was not meaningful.
 The vcs_info function VCS_INFO_quilt-dirfind now returns a string value
 by setting $REPLY.  Previously it printed the value to standard output.
 This only affects you if you override that function in your dotfiles.
+
+The cd and chdir builtins no longer interpret operands like -1 and +2 as
+stack entries when POSIX_CD is enabled.
 
 Incompatibilities between 5.6.2 and 5.7.1
 -----------------------------------------
