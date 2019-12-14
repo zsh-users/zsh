@@ -1,3 +1,8 @@
+2019-12-14  dana  <dana@dana.is>
+
+	* unposted: Config/version.mk, Etc/FAQ.yo, README: Update for
+	5.7.1-test-1
+
 2019-12-12  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 45001: Src/glob.c, Test/D04parameter.ztst: ${...%...} didn't
