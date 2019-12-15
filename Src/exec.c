@@ -4646,19 +4646,25 @@ getoutput(char *cmd, int qt)
     return NULL;
 }
 
-/* read output of command substitution */
+/* read output of command substitution
+ *
+ * The file descriptor "in" is closed by the function.
+ *
+ * "qt" indicates if the substitution was in double quotes.
+ *
+ * "readerror", if not NULL, is used to return any error that
+ * occurred during the read.
+ */
 
 /**/
 mod_export LinkList
 readoutput(int in, int qt, int *readerror)
 {
     LinkList ret;
-    char *buf, *ptr;
-    int bsiz, c, cnt = 0;
-    FILE *fin;
+    char *buf, *bufptr, *ptr, inbuf[64];
+    int bsiz, c, cnt = 0, readret;
     int q = queue_signal_level();
 
-    fin = fdopen(in, "r");
     ret = newlinklist();
     ptr = buf = (char *) hcalloc(bsiz = 64);
     /*
@@ -4670,33 +4676,38 @@ readoutput(int in, int qt, int *readerror)
      */
     dont_queue_signals();
     child_unblock();
-    while ((c = fgetc(fin)) != EOF || errno == EINTR) {
-	if (c == EOF) {
-	    errno = 0;
-	    clearerr(fin);
-	    continue;
+    for (;;) {
+	readret = read(in, inbuf, 64);
+	if (readret <= 0) {
+	    if (readret < 0 && errno == EINTR)
+		continue;
+	    else
+		break;
 	}
-	if (imeta(c)) {
-	    *ptr++ = Meta;
-	    c ^= 32;
-	    cnt++;
-	}
-	if (++cnt >= bsiz) {
-	    char *pp;
-	    queue_signals();
-	    pp = (char *) hcalloc(bsiz *= 2);
-	    dont_queue_signals();
+	for (bufptr = inbuf; bufptr < inbuf + readret; bufptr++) {
+	    c = *bufptr;
+	    if (imeta(c)) {
+		*ptr++ = Meta;
+		c ^= 32;
+		cnt++;
+	    }
+	    if (++cnt >= bsiz) {
+		char *pp;
+		queue_signals();
+		pp = (char *) hcalloc(bsiz *= 2);
+		dont_queue_signals();
 
-	    memcpy(pp, buf, cnt - 1);
-	    ptr = (buf = pp) + cnt - 1;
+		memcpy(pp, buf, cnt - 1);
+		ptr = (buf = pp) + cnt - 1;
+	    }
+	    *ptr++ = c;
 	}
-	*ptr++ = c;
     }
     child_block();
     restore_queue_signals(q);
     if (readerror)
-	*readerror = ferror(fin) ? errno : 0;
-    fclose(fin);
+	*readerror = readret < 0 ? errno : 0;
+    close(in);
     while (cnt && ptr[-1] == '\n')
 	ptr--, cnt--;
     *ptr = '\0';
