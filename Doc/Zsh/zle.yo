@@ -2729,10 +2729,10 @@ limited to 256 (i.e. the range 0 to 255).
 
 Some modern terminal emulators have support for 24-bit true colour (16
 million colours). In this case, the hex triplet format can be used. This
-consists of either a three or six digit hexadecimal number describing
-the red, green and blue components of the colour. Hex triplets can also
-be used with 88 and 256 colour terminals via the tt(zsh/nearcolor)
-module (see ifzman(zmanref(zshmodules))\
+consists of a `tt(#)' followed by either a three or six digit hexadecimal
+number describing the red, green and blue components of the colour. Hex
+triplets can also be used with 88 and 256 colour terminals via the
+tt(zsh/nearcolor) module (see ifzman(zmanref(zshmodules))\
 ifnzman(noderef(The zsh/nearcolor Module))\
 ).
 
