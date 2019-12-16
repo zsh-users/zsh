@@ -20,6 +20,11 @@
 
 2019-12-12  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Marijn: 45009: Src/builtin.c, Doc/Zsh/builtins.yo,
+	Doc/Zsh/options.yo: POSIX_CD needs to suppress special
+	use of options so that POSIX-allowed argument forms work as
+	expected.
+
 	* 45001: Src/glob.c, Test/D04parameter.ztst: ${...%...} didn't
 	test for zero-length matches, which should be preferred where
 	possible.
