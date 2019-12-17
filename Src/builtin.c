@@ -5665,7 +5665,7 @@ bin_break(char *name, char **argv, UNUSED(Options ops), int func)
 	    }
 	    return lastval;
 	}
-	zexit(num, 0);	/* else treat return as logout/exit */
+	zexit(num, ZEXIT_NORMAL);	/* else treat return as logout/exit */
 	break;
     case BIN_LOGOUT:
 	if (unset(LOGINSHELL)) {
@@ -5687,7 +5687,7 @@ bin_break(char *name, char **argv, UNUSED(Options ops), int func)
 	     * If we are already exiting... give this all up as
 	     * a bad job.
 	     */
-	    if (stopmsg || (zexit(0,2), !stopmsg)) {
+	    if (stopmsg || (zexit(0, ZEXIT_DEFERRED), !stopmsg)) {
 		retflag = 1;
 		breaks = loops;
 		exit_pending = 1;
@@ -5695,7 +5695,7 @@ bin_break(char *name, char **argv, UNUSED(Options ops), int func)
 		exit_val = num;
 	    }
 	} else
-	    zexit(num, 0);
+	    zexit(num, ZEXIT_NORMAL);
 	break;
     }
     return 0;
@@ -5780,14 +5780,15 @@ _realexit(void)
 
 /* exit the shell.  val is the return value of the shell.  *
  * from_where is
- *   1   if zexit is called because of a signal
- *   2   if we can't actually exit yet (e.g. functions need
- *       terminating) but should perform the usual interactive tests.
+ *   ZEXIT_SIGNAL   if zexit is called because of a signal
+ *   ZEXIT_DEFERRED if we can't actually exit yet (e.g., functions need
+ *                  terminating) but should perform the usual interactive
+ *                  tests.
  */
 
 /**/
 mod_export void
-zexit(int val, int from_where)
+zexit(int val, enum zexit_t from_where)
 {
     /*
      * Don't do anything recursively:  see below.
@@ -5798,7 +5799,7 @@ zexit(int val, int from_where)
     if (shell_exiting == -1)
 	return;
 
-    if (isset(MONITOR) && !stopmsg && from_where != 1) {
+    if (isset(MONITOR) && !stopmsg && from_where != ZEXIT_SIGNAL) {
 	scanjobs();    /* check if jobs need printing           */
 	if (isset(CHECKJOBS))
 	    checkjobs();   /* check if any jobs are running/stopped */
@@ -5808,7 +5809,8 @@ zexit(int val, int from_where)
 	}
     }
     /* Positive shell_exiting means we have been here before */
-    if (from_where == 2 || (shell_exiting++ && from_where))
+    if (from_where == ZEXIT_DEFERRED ||
+	(shell_exiting++ && from_where != ZEXIT_NORMAL))
 	return;
 
     /*
@@ -5824,12 +5826,12 @@ zexit(int val, int from_where)
 
     if (isset(MONITOR)) {
 	/* send SIGHUP to any jobs left running  */
-	killrunjobs(from_where == 1);
+	killrunjobs(from_where == ZEXIT_SIGNAL);
     }
     if (isset(RCS) && interact) {
 	if (!nohistsave) {
 	    int writeflags = HFILE_USE_OPTIONS;
-	    if (from_where == 1)
+	    if (from_where == ZEXIT_SIGNAL)
 		writeflags |= HFILE_NO_REWRITE;
 	    saveandpophiststack(1, writeflags);
 	    savehistfile(NULL, 1, writeflags);

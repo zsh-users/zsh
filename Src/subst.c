@@ -3044,7 +3044,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
                              * shouldn't be any if not interactive.
                              */
                             stopmsg = 1;
-                            zexit(1, 0);
+                            zexit(1, ZEXIT_NORMAL);
                         } else
                             _exit(1);
                     }

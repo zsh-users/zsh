@@ -905,7 +905,7 @@ getbyte(long do_keytmout, int *timeout, int full)
 		if ((zlereadflags & ZLRF_IGNOREEOF) && icnt++ < 20)
 		    continue;
 		stopmsg = 1;
-		zexit(1, 0);
+		zexit(1, ZEXIT_NORMAL);
 	    }
 	    icnt = 0;
 	    if (errno == EINTR) {
@@ -928,7 +928,7 @@ getbyte(long do_keytmout, int *timeout, int full)
 	    } else if (errno != 0) {
 		zerr("error on TTY read: %e", errno);
 		stopmsg = 1;
-		zexit(1, 0);
+		zexit(1, ZEXIT_NORMAL);
 	    }
 	}
 	if (cc == '\r')		/* undo the exchange of \n and \r determined by */

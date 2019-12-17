@@ -161,7 +161,7 @@ loop(int toplevel, int justonce)
 		 * Handle that now.
 		 */
 		stopmsg = 1;
-		zexit(exit_val, 0);
+		zexit(exit_val, ZEXIT_NORMAL);
 	    }
 	    if (tok == LEXERR && !lastval)
 		lastval = 1;
@@ -1371,7 +1371,7 @@ init_misc(char *cmd, char *zsh_name)
 	bshin = fdopen(SHIN, "r");
 	execstring(cmd, 0, 1, "cmdarg");
 	stopmsg = 1;
-	zexit((exit_pending || shell_exiting) ? exit_val : lastval, 0);
+	zexit((exit_pending || shell_exiting) ? exit_val : lastval, ZEXIT_NORMAL);
     }
 
     if (interact && isset(RCS))
@@ -1778,20 +1778,20 @@ zsh_main(UNUSED(int argc), char **argv)
 	    if (!lastval)
 		lastval = 1;
 	    stopmsg = 1;
-	    zexit(lastval, 0);
+	    zexit(lastval, ZEXIT_NORMAL);
 	}
 	if (!(isset(IGNOREEOF) && interact)) {
 #if 0
 	    if (interact)
 		fputs(islogin ? "logout\n" : "exit\n", shout);
 #endif
-	    zexit(lastval, 0);
+	    zexit(lastval, ZEXIT_NORMAL);
 	    continue;
 	}
 	noexitct++;
 	if (noexitct >= 10) {
 	    stopmsg = 1;
-	    zexit(lastval, 0);
+	    zexit(lastval, ZEXIT_NORMAL);
 	}
 	/*
 	 * Don't print the message if it was already handled by

@@ -3222,6 +3222,14 @@ enum {
 /* Hooks in core.                      */
 /***************************************/
 
+/* The type of zexit()'s second parameter, which see. */
+enum zexit_t {
+    /* This isn't a bitfield. The values are here just for explicitness. */
+    ZEXIT_NORMAL = 0,
+    ZEXIT_SIGNAL = 1,
+    ZEXIT_DEFERRED = 2
+};
+
 #define EXITHOOK       (zshhooks + 0)
 #define BEFORETRAPHOOK (zshhooks + 1)
 #define AFTERTRAPHOOK  (zshhooks + 2)

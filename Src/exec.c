@@ -5949,7 +5949,7 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	     * exit command was handled.
 	     */
 	    stopmsg = 1;
-	    zexit(exit_val, 0);
+	    zexit(exit_val, ZEXIT_NORMAL);
 	}
     }
 

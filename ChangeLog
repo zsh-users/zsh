@@ -1,5 +1,10 @@
 2019-12-17  Daniel Shahaf  <danielsh@apache.org>
 
+	* 45058: Src/Modules/zpty.c, Src/Zle/zle_main.c, Src/builtin.c,
+	Src/exec.c, Src/init.c, Src/signals.c, Src/subst.c, Src/zsh.h:
+	internal: Add symbolic names to possible values of zexit()'s
+	"from_where" parameter. No functional change.
+
 	* unposted: Src/builtin.c: Update comment to reflect variable
 	rename in 41012 (zsh-5.3.1-182-gd7110d8f0).
 

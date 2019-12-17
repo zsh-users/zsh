@@ -426,7 +426,7 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 	execode(prog, 1, 0, "zpty");
 	stopmsg = 2;
 	mypid = 0; /* trick to ensure we _exit() */
-	zexit(lastval, 0);
+	zexit(lastval, ZEXIT_NORMAL);
     }
     master = movefd(master);
     if (master == -1) {
