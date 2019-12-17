@@ -1,3 +1,8 @@
+2020-03-12  Daniel Shahaf  <danielsh@apache.org>
+
+	* unposted: .editorconfig: Specify spaces rather than tabs for
+	zsh scripts.
+
 2020-03-11  dana  <dana@dana.is>
 
 	* 45470: Test/C02cond.ztst: Simplify '-N cond' test

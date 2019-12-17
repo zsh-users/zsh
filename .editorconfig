@@ -6,10 +6,16 @@ root = true
 end_of_line = lf
 tab_width   = 8
 indent_size = 2
-indent_style = tab
+indent_style = space
+
+[Functions/VCS_Info/**/*]
+indent_size = 4
+indent_style = space
 
 [ChangeLog]
 indent_size = 8
+indent_style = tab
 
 [*.[ch]]
 indent_size = 4
+indent_style = tab
