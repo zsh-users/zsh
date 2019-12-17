@@ -5807,7 +5807,7 @@ zexit(int val, int from_where)
 	    return;
 	}
     }
-    /* Positive in_exit means we have been here before */
+    /* Positive shell_exiting means we have been here before */
     if (from_where == 2 || (shell_exiting++ && from_where))
 	return;
 
