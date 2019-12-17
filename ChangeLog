@@ -1,3 +1,8 @@
+2019-12-17  Daniel Shahaf  <danielsh@apache.org>
+
+	* unposted: Src/builtin.c: Update comment to reflect variable
+	rename in 41012 (zsh-5.3.1-182-gd7110d8f0).
+
 2019-12-16  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 44698, 45000: Baptiste BEAUPLAT: Completion for sbuild
