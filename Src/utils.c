@@ -2201,6 +2201,31 @@ gettempname(const char *prefix, int use_heap)
 #ifdef HAVE__MKTEMP
     /* Zsh uses mktemp() safely, so silence the warnings */
     ret = (char *) _mktemp(ret);
+#elif HAVE_MKSTEMP && defined(DEBUG)
+    {
+	/* zsh uses mktemp() safely (all callers use O_EXCL, and one of them
+	 * uses mkfifo()/mknod(), as opposed to open()), but some compilers
+	 * warn about this anyway and give no way to disable the warning. To
+	 * appease them, use mkstemp() and then close the fd and unlink the
+	 * filename, to match callers' expectations.
+	 *
+	 * But do this in debug builds only, because we don't want to suffer
+	 * x3 the disk access (touch, unlink, touch again) in production.
+	 */
+	int fd;
+	errno = 0;
+	fd = mkstemp(ret);
+	if (fd < 0)
+	    zwarn("can't get a temporary filename: %e", errno);
+	else {
+	    close(fd);
+	    ret = ztrdup(ret);
+
+	    errno = 0;
+	    if (unlink(ret) < 0)
+		zwarn("unlinking a temporary filename failed: %e", errno);
+	}
+    }
 #else
     ret = (char *) mktemp(ret);
 #endif
