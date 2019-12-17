@@ -5601,7 +5601,11 @@ bin_getopts(UNUSED(char *name), char **argv, UNUSED(Options ops), UNUSED(int fun
     return 0;
 }
 
-/* Flag that we should exit the shell as soon as all functions return. */
+/* Boolean flag that we should exit the shell as soon as all functions return.
+ *
+ * Set by the 'exit' builtin.
+ */
+
 /**/
 mod_export int
 exit_pending;

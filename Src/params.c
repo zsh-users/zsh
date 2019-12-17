@@ -44,7 +44,11 @@
 #endif
 #endif
 
-/* what level of localness we are at */
+/* What level of localness we are at.
+ *
+ * Hand-wavingly, this is incremented at every function call and decremented
+ * at every function return.  See startparamscope().
+ */
  
 /**/
 mod_export int locallevel;

@@ -971,6 +971,10 @@ hashcmd(char *arg0, char **pp)
     return cn;
 }
 
+/* The value that 'locallevel' had when we forked. When we get back to this
+ * level, the current process (which is a subshell) will terminate.
+ */
+
 /**/
 int
 forklevel;
