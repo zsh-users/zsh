@@ -1,5 +1,8 @@
 2019-12-18  Daniel Shahaf  <danielsh@apache.org>
 
+	* 45065: Src/Makefile.in: Make 'make -s' print nothing when it
+	does nothing.
+
 	* 45064: Src/utils.c: Fix the mktemp() warning, in debug
 	builds only.
 

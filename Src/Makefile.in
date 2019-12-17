@@ -94,7 +94,6 @@ zsh.res.o: $(sdir)/zsh.rc $(sdir)/zsh.ico
 stamp-modobjs: modobjs
 	@if cmp -s stamp-modobjs.tmp stamp-modobjs; then \
 	    rm -f stamp-modobjs.tmp; \
-	    echo "\`stamp-modobjs' is up to date."; \
 	else \
 	    mv -f stamp-modobjs.tmp stamp-modobjs; \
 	    echo "Updated \`stamp-modobjs'."; \
