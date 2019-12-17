@@ -20,7 +20,7 @@
 
 2019-12-12  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* Marijn: 45009: Src/builtin.c, Doc/Zsh/builtins.yo,
+	* Martijn: 45009: Src/builtin.c, Doc/Zsh/builtins.yo,
 	Doc/Zsh/options.yo: POSIX_CD needs to suppress special
 	use of options so that POSIX-allowed argument forms work as
 	expected.
