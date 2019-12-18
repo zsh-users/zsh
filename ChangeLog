@@ -1,3 +1,8 @@
+2019-12-18  Daniel Shahaf  <danielsh@apache.org>
+
+	* 45073: Doc/Zsh/contrib.yo: regex-replace docs: Simplify grammar
+	(avoid a double negative, state defaults first).
+
 2019-12-17  Daniel Shahaf  <danielsh@apache.org>
 
 	* 45058: Src/Modules/zpty.c, Src/Zle/zle_main.c, Src/builtin.c,
