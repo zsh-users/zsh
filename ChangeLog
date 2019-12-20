@@ -1,3 +1,7 @@
+2019-12-20  dana  <dana@dana.is>
+
+	* 45055: Doc/Zsh/compsys.yo: Clarify _files documentation
+
 2019-12-18  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 45083: Src/exec.c: execarith() needs signal protection as

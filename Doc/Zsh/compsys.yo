@@ -4518,9 +4518,12 @@ New plugins will be picked up and run automatically.
 )
 findex(_files)
 item(tt(_files))(
-The function tt(_files) calls tt(_path_files) with all the arguments it
-was passed except for tt(-g) and tt(-/).  The use of these two options
-depends on the setting of the  tt(file-patterns) style.
+The function tt(_files) is a wrapper around tt(_path_files). It supports
+all of the same functionality, with some enhancements DASH()- notably, it
+respects the tt(list-dirs-first) style, and it allows users to override
+the behaviour of the tt(-g) and tt(-/) options with the tt(file-patterns)
+style. tt(_files) should therefore be preferred over tt(_path_files) in
+most cases.
 
 This function accepts the full set of options allowed by
 tt(_path_files), described below.
