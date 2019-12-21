@@ -1,5 +1,8 @@
 2019-12-21  Daniel Shahaf  <danielsh@apache.org>
 
+	* unposted: Test/A01grammar.ztst: Group related tests.
+	No functional change.
+
 	* unposted: Etc/BUGS: Add two bugs discussed on -workers@
 	this week
 

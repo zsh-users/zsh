@@ -466,14 +466,6 @@
 >Status after always block is 1.
 ?(eval):3: bad substitution
 
-  fn() { { return } always { echo always 1 }; echo not executed }
-  fn
-  fn() { { echo try 2 } always { return }; echo not executed }
-  fn
-0:Always block interaction with return
->always 1
->try 2
-
 # Outputting of structures from the wordcode is distinctly non-trivial,
 # we probably ought to have more like the following...
   fn1() { { echo foo; } }
@@ -719,6 +711,14 @@
 >success2
 >read it
 >read it
+
+  fn() { { return } always { echo always 1 }; echo not executed }
+  fn
+  fn() { { echo try 2 } always { return }; echo not executed }
+  fn
+0:Always block interaction with return
+>always 1
+>try 2
 
   (
   mywrap() { echo BEGIN; true; echo END }
