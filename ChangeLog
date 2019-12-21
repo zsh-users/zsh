@@ -1,5 +1,8 @@
 2019-12-22  Daniel Shahaf  <danielsh@apache.org>
 
+	* 45113: Doc/Zsh/contrib.yo: vcs_info docs: Clarify documentation
+	of the %p/%u/%a patch-format expandos.
+
 	* 45114: Functions/VCS_Info/VCS_INFO_patch2subject: vcs_info
 	quilt: Improve support for svn-style patch headers.
 
