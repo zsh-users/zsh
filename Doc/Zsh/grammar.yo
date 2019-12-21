@@ -313,23 +313,23 @@ An `error' in this context is a condition such as a syntax error which
 causes the shell to abort execution of the current function, script, or
 list.  Syntax errors encountered while the shell is parsing the
 code do not cause the var(always-list) to be executed.  For example,
-an erroneously constructed tt(if) block in tt(try-list) would cause the
-shell to abort during parsing, so that tt(always-list) would not be
+an erroneously constructed tt(if) block in var(try-list) would cause the
+shell to abort during parsing, so that var(always-list) would not be
 executed, while an erroneous substitution such as tt(${*foo*}) would
-cause a run-time error, after which tt(always-list) would be executed.
+cause a run-time error, after which var(always-list) would be executed.
 
 An error condition can be tested and reset with the special integer
-variable tt(TRY_BLOCK_ERROR).  Outside an tt(always-list) the value is
-irrelevant, but it is initialised to tt(-1).  Inside tt(always-list), the
-value is 1 if an error occurred in the tt(try-list), else 0.  If
-tt(TRY_BLOCK_ERROR) is set to 0 during the tt(always-list), the error
-condition caused by the tt(try-list) is reset, and shell execution
-continues normally after the end of tt(always-list).  Altering the value
-during the tt(try-list) is not useful (unless this forms part of an
+variable tt(TRY_BLOCK_ERROR).  Outside an var(always-list) the value is
+irrelevant, but it is initialised to tt(-1).  Inside var(always-list), the
+value is 1 if an error occurred in the var(try-list), else 0.  If
+tt(TRY_BLOCK_ERROR) is set to 0 during the var(always-list), the error
+condition caused by the var(try-list) is reset, and shell execution
+continues normally after the end of var(always-list).  Altering the value
+during the var(try-list) is not useful (unless this forms part of an
 enclosing tt(always) block).
 
-Regardless of tt(TRY_BLOCK_ERROR), after the end of tt(always-list) the
-normal shell status tt($?) is the value returned from tt(try-list).
+Regardless of tt(TRY_BLOCK_ERROR), after the end of var(always-list) the
+normal shell status tt($?) is the value returned from var(try-list).
 This will be non-zero if there was an error, even if tt(TRY_BLOCK_ERROR)
 was set to zero.
 

@@ -1,5 +1,8 @@
 2019-12-22  Daniel Shahaf  <danielsh@apache.org>
 
+	* 45110: Doc/Zsh/grammar.yo: zshmisc(1): Fix markup of "try-list"
+	and "always-list".
+
 	* 45111: Doc/Zsh/grammar.yo, Etc/BUGS, NEWS,
 	Test/A01grammar.ztst: zshmisc(1): Clarify the documentation of
 	'return' and 'exit' in conjunction with try/always
