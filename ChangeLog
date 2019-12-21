@@ -1,3 +1,8 @@
+2019-12-22  Daniel Shahaf  <danielsh@apache.org>
+
+	* 45109: Test/B01cd.ztst, Test/ztst.vim, Util/zyodl.vim: Add
+	Vim highlighting file for Test/*.ztst files.
+
 2019-12-21  dana  <dana@dana.is>
 
 	* unposted: Config/version.mk: Update for 5.7.1-test-2

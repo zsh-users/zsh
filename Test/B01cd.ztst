@@ -105,6 +105,8 @@
 #   is to be skipped.
 # ZTST_skip: Set this in any test case if that single test case is to be
 #   skipped.  Testing resumes at the next test case in the same file.
+#
+# Syntax highlighting for Vim is available, see Test/ztst.vim.
  cd cdtst.tmp/sub/fake &&
  pwd &&
  print $PWD

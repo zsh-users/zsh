@@ -35,6 +35,8 @@
 if exists("b:current_syntax")
   finish
 endif
+let s:cpo_save = &cpo
+set cpo&vim
 
 "" Syntax groups:
 syn clear
@@ -80,4 +82,5 @@ hi def link zyodlSItemArg1 Macro
 hi def link zyodlSItemArg2 Underlined
 
 let b:current_syntax = "zyodl"
-
+let &cpo = s:cpo_save
+unlet s:cpo_save
