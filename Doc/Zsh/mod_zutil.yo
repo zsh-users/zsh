@@ -81,17 +81,23 @@ item(tt(zstyle -s) var(context) var(style) var(name) [ var(sep) ])(
 The parameter var(name) is set to the value of the style interpreted as a
 string.  If the value contains several strings they are concatenated with
 spaces (or with the var(sep) string if that is given) between them.
+
+Return tt(0) if the style is set, tt(1) otherwise.
 )
 item(tt(zstyle -b) var(context) var(style) var(name))(
 The value is stored in var(name) as a boolean, i.e. as the string
 `tt(yes)' if the value has only one string and that string is equal to one
 of `tt(yes)', `tt(true)', `tt(on)', or `tt(1)'. If the value is any other
 string or has more than one string, the parameter is set to `tt(no)'.
+
+Return tt(0) if var(name) is set to `tt(yes)', tt(1) otherwise.
 )
 item(tt(zstyle -a) var(context) var(style) var(name))(
 The value is stored in var(name) as an array. If var(name) is declared 
 as an associative array,  the first, third, etc. strings are used as the
 keys and the other strings are used as the values.
+
+Return tt(0) if the style is set, tt(1) otherwise.
 )
 xitem(tt(zstyle -t) var(context) var(style) [ var(string) ... ])
 item(tt(zstyle -T) var(context) var(style) [ var(string) ... ])(
