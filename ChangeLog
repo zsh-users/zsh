@@ -1,5 +1,8 @@
 2019-12-22  Daniel Shahaf  <danielsh@apache.org>
 
+	* 45114: Functions/VCS_Info/VCS_INFO_patch2subject: vcs_info
+	quilt: Improve support for svn-style patch headers.
+
 	* 45115: Misc/vcs_info-examples: vcs_info examples: Make the
 	quilt-patch-dir example friendlier.
 

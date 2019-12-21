@@ -14,10 +14,7 @@
             IFS= read -r "lines[$i]"
             if [[ -z ${lines[$i]} ]] || [[ ${lines[$i]} == (#b)(---[^-]|Index:)* ]]; then
                 lines[$i]=()
-                # For 'svn log -r N --diff' output, read the first paragraph too.
-                if ! [[ $lines[i-1] =~ $svn_log_pattern ]]; then
-                    break
-                fi
+                break
             fi
         done < "$1"
         
@@ -55,9 +52,18 @@
               fi
             } < "$1"
             REPLY=$needle
-        elif [[ $lines[2] =~ $svn_log_pattern ]]; then
-            REPLY=$lines[4]
-            if (( ${+lines[5]} )); then REPLY+='...'; fi
+        elif [[ $lines[1] =~ $svn_log_pattern ]] || [[ $lines[2] =~ $svn_log_pattern ]]; then
+            # Read up to the next blank line, and the first two lines after it.
+            integer multiline=0
+            {
+              while read -r needle; [[ -n $needle ]]; do done
+              # Read the first line of the second paragraph, which is the first
+              # line of the log message.
+              read -r needle
+              read -r && [[ -n $REPLY ]] && multiline=1
+            } < "$1"
+            REPLY=$needle
+            if (( multiline )); then REPLY+='...'; fi
         elif (( ${+lines[1]} )); then
             # The first line of the file is not part of the diff.
             REPLY=${lines[1]}
