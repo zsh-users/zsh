@@ -1,3 +1,8 @@
+2019-12-21  Daniel Shahaf  <danielsh@apache.org>
+
+	* unposted: Etc/BUGS: Add two bugs discussed on -workers@
+	this week
+
 2019-12-20  dana  <dana@dana.is>
 
 	* 45055: Doc/Zsh/compsys.yo: Clarify _files documentation

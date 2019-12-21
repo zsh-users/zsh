@@ -26,3 +26,19 @@ skipped when STTY=... is set for that command
 41203 and others: Make it easier to maintain C modules out of tree.
 (May require defining a stable API for modules, see 41254)
 ------------------------------------------------------------------------
+44007 - Martijn - exit in trap executes rest of function (prints "fn2")
+[[[
+trap 'echo $1; exit; echo $2' USR1
+fn() {
+  echo fn1
+  kill -USR1 $$
+  echo fn2
+}
+echo out1
+fn trap1 trap2
+echo out2
+]]]
+------------------------------------------------------------------------
+45075 - Daniel Shahaf - '{ exit } always { foo }' - docs/code mismatch
+and return/exit differences
+------------------------------------------------------------------------
