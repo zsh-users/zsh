@@ -54,7 +54,9 @@ syn match  ztstDirective           /^%.*/
 
 syn match  ztstComment             /^#.*/
 
-syn keyword ztstSpecialVariable ZTST_unimplemented ZTST_skip ZTST_testdir containedin=@zsh 
+" Highlight those variables which are /de jure/ or /de facto/ APIs of the test
+" harness to the test files.
+syn keyword ztstSpecialVariable ZTST_unimplemented ZTST_skip ZTST_testdir ZTST_fd ZTST_srcdir containedin=@zsh 
 
 "" Highlight groups:
 hi def link ztstExitCode                  Number

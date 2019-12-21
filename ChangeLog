@@ -1,5 +1,7 @@
 2019-12-22  Daniel Shahaf  <danielsh@apache.org>
 
+	* 45107: Test/ztst.vim: Highlight some more special variables
+
 	* 45108: Test/ztst.vim: Conceal the '>' or '?' on pattern
 	expected output / expected errput lines.
 
