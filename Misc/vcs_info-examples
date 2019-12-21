@@ -468,8 +468,16 @@ zstyle ':vcs_info:-quilt-.quilt-standalone:*:*' quilt-patch-dir debian/patches
 # and so we want addon mode to also use a $QUILT_PATCHES value of
 # `debian/patches' in some directories. In the other directories we never
 # want the default `patches' though but a dedicated place for them.
-# Say `~/patches/<repository-name>'. Now we'll use some evaluated-style
-# magic to achieve all that:
+# Say `~/patches/<repository-name>'.
+#
+# First of all, even without any configuration, vcs_info will do the right
+# thing most of the time. Whenever quilt has already run in a directory,
+# vcs_info will figure out whether that directory uses `patches' or
+# `debian/patches' by interrogating metadata in the `.pc/' subdirectory,
+# which quilt creates. To make vcs_info find the patches dir correctly even
+# when the `.pc/' directory doesn't exist, read on.
+#
+# We'll use some evaluated-style magic to achieve that:
 zstyle -e ':vcs_info:*.quilt-addon:*:*' quilt-patch-dir 'my-patches-func'
 
 # That runs something called `my-patches-func', and the value of $reply is
@@ -486,19 +494,17 @@ function my-patches-func() {
     fi
 
     # Now the part about the dedicated directory is a little trickier.
-    # It requires some knowledge of vcs_info's internals. Not much though.
-    # Everything about this is described in the manual because this
-    # variable (plus a few others) may be of interest in hooks, where
-    # they are available, too.
-    #
-    # The variable in question here is `$rrn' which is an abbreviation
-    # of repository-root-name. if you're in
+    # The variable in question here is `$context', which is the zstyle
+    # context used for lookups. Its last component is the repository-root-name,
+    # or ${rrn} for short. If you're in
     #   /usr/src/zsh/Functions
     # and the repository being
     #   /usr/src/zsh
-    # then the value of `$rrn' is `zsh'. Now in case the variable is
-    # empty (it shouldn't at this point, but you never know), let's
-    # drop back to quilt's default "patches".
+    # then the value of `$rrn' would be `zsh'.
+    local rrn=${context##*:}
+
+    # Now, in case the variable is empty (it shouldn't at this point, but you
+    # never know), let's drop back to quilt's default value, "patches".
     if [[ -z ${rrn} ]]; then
         reply=( patches )
         return 0

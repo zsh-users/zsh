@@ -1,5 +1,8 @@
 2019-12-22  Daniel Shahaf  <danielsh@apache.org>
 
+	* 45115: Misc/vcs_info-examples: vcs_info examples: Make the
+	quilt-patch-dir example friendlier.
+
 	* 45116: Misc/vcs_info-examples: vcs_info examples: Add an
 	example of showing Git environment variables.
 
