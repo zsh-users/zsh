@@ -222,6 +222,31 @@ zstyle -e ':vcs_info:git+set-message:*' hooks 'reply=( ${${(k)functions[(I)[+]vi
 # Both of these functions would be called, even if they are defined after the zstyle is set.
 
 
+## git: Display pertinent environment variables
+# If environment variables such as $GIT_DIR, $GIT_WORK_TREE, etc are set in the
+# environment, they'll be shown in the value of the %m expando.
+#
+# Note that the %m expando is not used by default. To see a change, either change
+# `[misc]' to `[branch]', or set the `formats` style to a value that includes `%m'.
+zstyle ':vcs_info:git+post-backend:*' hooks git-post-backend-envvars
++vi-git-post-backend-envvars() {
+  local param
+  # This uses the ${parameters} special variable (provided by the zsh/parameter
+  # module), in conjunction with the parameter expansion flags ${(k)foo} and
+  # ${(M)foo:#pattern} (documented in "Parameter Expansion" in zshexpn(1))
+  # and the (R) subscript flag (documented in "Subscript Flags" in zshparam(1)),
+  # to iterate over the names of all environment variables named "GIT_*".  Then
+  # it uses the ${(P)foo} parameter expansion flag to show the values of those
+  # parameters.
+  #
+  # The value of ${hook_com[misc]} is substituted for %m in the values of the
+  # 'formats' and 'actionformats' styles.
+  for param in ${(Mk)parameters[(R)*export*]:#GIT_*}; do
+    hook_com[misc]+=";%U${param//'%'/%%}%u=%F{white}${${(P)param}//'%'/%%}%f"
+  done
+}
+
+
 ### hg: Show marker when the working directory is not on a branch head
 # This may indicate that running `hg up` will do something
 # NOTE: the branchheads.cache file is not updated with every Mercurial
