@@ -34,6 +34,16 @@ path the leading '/' counts as one component.
 
 The functions builtin gained a -c option to efficiently copy functions.
 
+The zshmisc(1) manual page incorrectly stated that when 'exit' is used
+in a `try' block inside a function, the corresponding `always' block will
+be executed.  The manual page has been corrected.  The shell's behaviour
+has not changed, but code such as the following:
+.
+    f() { { exit } always { echo Hello world } }
+.
+should be changed either to use 'return' instead of 'exit', or to have
+the try/always block outside of any function.
+
 Changes from 5.6.2 to 5.7.1
 ---------------------------
 

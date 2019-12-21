@@ -297,11 +297,11 @@ findex(always)
 cindex(always blocks)
 cindex(try blocks)
 item(tt({) var(try-list) tt(} always {) var(always-list) tt(}))(
-First execute var(try-list).  Regardless of errors, or tt(break),
-tt(continue), or tt(return) commands encountered within var(try-list),
+First execute var(try-list).  Regardless of errors, or tt(break) or
+tt(continue) commands encountered within var(try-list),
 execute var(always-list).  Execution then continues from the
 result of the execution of var(try-list); in other words, any error,
-or tt(break), tt(continue), or tt(return) command is treated in the
+or tt(break) or tt(continue) command is treated in the
 normal way, as if var(always-list) were not present.  The two
 chunks of code are referred to as the `try block' and the `always block'.
 
@@ -345,10 +345,16 @@ example({
 }
 # The error condition has been reset.)
 
-An tt(exit) command (or a tt(return) command executed at the outermost
-function level of a script) encountered in tt(try-list) does em(not) cause
+When a tt(try) block occurs outside of any function, 
+a tt(return) or a tt(exit) encountered in var(try-list) does em(not) cause
 the execution of var(always-list).  Instead, the shell exits immediately
 after any tt(EXIT) trap has been executed.
+Otherwise, a tt(return) command encountered in var(try-list) will cause the
+execution of var(always-list), just like tt(break) and tt(continue).
+
+COMMENT(The semantics of calling 'exit' in try-list inside a function are
+deliberately left unspecified, because historically there was a mismatch between
+the documented and implemented behaviours.  Cf. 20076, 21734/21735, 45075.)
 )
 findex(function)
 xitem(tt(function) var(word) ... [ tt(()) ] [ var(term) ] tt({) var(list) tt(}))

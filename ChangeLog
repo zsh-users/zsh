@@ -1,5 +1,9 @@
 2019-12-22  Daniel Shahaf  <danielsh@apache.org>
 
+	* 45111: Doc/Zsh/grammar.yo, Etc/BUGS, NEWS,
+	Test/A01grammar.ztst: zshmisc(1): Clarify the documentation of
+	'return' and 'exit' in conjunction with try/always
+
 	* 45112: Doc/Zsh/mod_zutil.yo: zshmodules: Explicitly document
 	the return values of the 'zstyle' getters -s, -b, and -a.
 

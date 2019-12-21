@@ -729,6 +729,7 @@
 3:Exit and always block with functions: simple
 >BEGIN
 >END
+F:Note that the behaviour of 'exit' inside try-list inside a function is unspecified.
 
   (
   mytrue() { echo mytrue; return 0 }
@@ -741,6 +742,7 @@
 >BEGIN
 >mytrue
 >END
+F:Note that the behaviour of 'exit' inside try-list inside a function is unspecified.
 
   (emulate sh -c '
    fn() {

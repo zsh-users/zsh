@@ -39,6 +39,3 @@ fn trap1 trap2
 echo out2
 ]]]
 ------------------------------------------------------------------------
-45075 - Daniel Shahaf - '{ exit } always { foo }' - docs/code mismatch
-and return/exit differences
-------------------------------------------------------------------------
