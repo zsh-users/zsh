@@ -1,6 +1,8 @@
 "" A Vim syntax highlighting file for Test/*.ztst
 "
-" See ../Util/zyodl.vim for installation instructions
+" See ../Util/zyodl.vim for installation instructions.
+" Also, it's recommended to 'setlocal conceallevel=3 concealcursor=nc'.
+"
 " See B01cd.ztst for cases we cover
 
 " TODO: Some zsh syntax isn't highlighted, e.g., «{ cd $0 }» doesn't highlight either 'cd' or '$0'
@@ -10,7 +12,6 @@
 "   I haven't found yet a legitimate use where they aren't highlighted, but
 "   they aren't highlighted in theoretical cases such as (( ++ZTST_skip )).
 "   (This example is theoretical because those variables are string-typed.)
-" TODO: for glob-like output/errput lines, conceal the '>' or '?' to align them with adjacent lines.
 
 "" Boilerplate:
 if exists("b:current_syntax")
@@ -33,11 +34,18 @@ syn region ztstTestName            start=// end=/$/ contained
 
 syn match  ztstInputMarker         /^</                       nextgroup=ztstInput
 syn region ztstInput               start=// end=/$/ contained
-syn match  ztstOutputMarker        /^[*]\?>/                  nextgroup=ztstOutput   contains=ztstPatternMarker
+
+syn match  ztstOutputPattern       /^[*]>/                    nextgroup=ztstOutput   contains=ztstOutputPatternSigil,ztstOutputPatternMarker
+syn match  ztstOutputPatternSigil  /[*]/            contained
+syn match  ztstOutputPatternMarker /[>]/            contained conceal
+syn match  ztstOutputLiteral       /^>/                       nextgroup=ztstOutput
 syn region ztstOutput              start=// end=/$/ contained
-syn match  ztstErrputMarker        /^[*]\??/                  nextgroup=ztstErrput   contains=ztstPatternMarker
+
+syn match  ztstErrputPattern       /^[*][?]/                  nextgroup=ztstErrput   contains=ztstErrputPatternSigil,ztstErrputPatternMarker
+syn match  ztstErrputPatternSigil  /[*]/            contained
+syn match  ztstErrputPatternMarker /[?]/            contained conceal
+syn match  ztstErrputLiteral       /^[?]/                     nextgroup=ztstErrput
 syn region ztstErrput              start=// end=/$/ contained
-syn match  ztstPatternMarker       /[*]/            contained
 
 syn match  ztstFrequentExplanationMarker /^F:/                nextgroup=ztstFrequentExplanation
 syn region ztstFrequentExplanation start=// end=/$/ contained
@@ -56,11 +64,14 @@ hi def link ztstTestName                  Title
 hi def link ztstInput                     Normal
 hi def link ztstInputMarker               Ignore
 hi def link ztstOutput                    String
-hi def link ztstOutputMarker              Ignore
+hi def link ztstOutputPatternSigil        Type
+hi def link ztstOutputPatternMarker       Ignore
+hi def link ztstOutputLiteral             Ignore
 hi def link ztstErrput                    Identifier
-hi def link ztstErrputMarker              Ignore
+hi def link ztstErrputPatternSigil        Type
+hi def link ztstErrputPatternMarker       Ignore
+hi def link ztstErrputLiteral             Ignore
 hi def link ztstDirective                 Statement
-hi def link ztstPatternMarker             Type
 hi def link ztstComment                   Comment
 hi def link ztstFrequentExplanation       PreProc
 hi def link ztstFrequentExplanationMarker Ignore

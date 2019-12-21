@@ -1,5 +1,8 @@
 2019-12-22  Daniel Shahaf  <danielsh@apache.org>
 
+	* 45108: Test/ztst.vim: Conceal the '>' or '?' on pattern
+	expected output / expected errput lines.
+
 	* 45109: Test/B01cd.ztst, Test/ztst.vim, Util/zyodl.vim: Add
 	Vim highlighting file for Test/*.ztst files.
 
