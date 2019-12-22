@@ -147,11 +147,36 @@
 ?+(anon):0> true
 ?+fn:0> gn
 
-  f() {
-    f() { echo inner }
-  }
-  functions -T f
-  f
-  which f | grep '# traced'
+  test_cases=(
+      f            # baseline
+      foo-bar      # Dash
+      ヌ           # Meta (the UTF-8 representation of this character has an 0x83 byte)
+      \$\'ba\\0z\' # Nul, escaped as though by ${(qqqq)}
+  )
+  for 1 in "$test_cases[@]"; do
+    eval "
+      ${1}() {
+        ${1}() { echo inner }
+      }
+      functions -T ${1}
+      ${1}
+      which ${1}
+    "
+  done
 0:a function that redefines itself preserves tracing
+>f () {
 >	# traced
+>	echo inner
+>}
+>foo-bar () {
+>	# traced
+>	echo inner
+>}
+>$'\M-c\M-\C-C\M-\C-L' () {
+>	# traced
+>	echo inner
+>}
+>$'ba\C-@z' () {
+>	# traced
+>	echo inner
+>}

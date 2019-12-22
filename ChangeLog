@@ -1,5 +1,8 @@
 2019-12-26  Daniel Shahaf  <danielsh@apache.org>
 
+	* unposted (follow-up to 45131): Test/E02xtrace.ztst: Extra
+	testing by Mikael
+
 	* 45137: Src/Modules/zutil.c, Test/V13zformat.ztst: zformat:
 	Allow the specifying minimum width and a dot with an empty
 	maximum width.
