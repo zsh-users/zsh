@@ -6,37 +6,58 @@ To create a zsh release:
 - Bump or update:
 
 	Config/version.mk to today's date
-	Config/version.mk version number (sequence: 5.4.2, 5.4.2-dev-$((i++)), 5.4.2-test-$((++j)), 5.5)
+	Config/version.mk version number
 	Etc/FAQ.yo
 	README
 	NEWS
+
+  The version-number sequence is as follows:
+
+	5.8, 5.8.0.1-dev, 5.8.0.2-test, 5.8.1, 5.8.1.1-dev, 5.8.1.2-test, 5.9
+
+  Please note:
+
+	- All version numbers in this document are examples only and may not
+	  reflect the actual version history of the shell.
+	- A slightly different ordering of version-number components was used
+	  prior to zsh 5.8. All subsequent releases should use the scheme
+	  described above.
+	- Usually there is only one -dev version (1-dev), but there may be more
+	  if for example there is a wordcode compatibility break, in which case
+	  the sequence would be something like 1-dev, 2-dev, 3-test, .... No
+	  special release process is associated with a -dev version bump.
+	- Usually at least one -test version is released for public testing in
+	  the lead-up to the final release of the next stable version.
 
   README should document compatibility-breaking changes. Generally, NEWS should
   document new features and major bug fixes (but not routine fixes or changes to
   completion/contrib functions).
 
+  For -test releases, you may update the FAQ, README, etc., to refer to the
+  upcoming stable version number.
+
 - Commit those changes with an "unposted" ChangeLog entry.
 
-	git commit -am "Test release: 5.5.1-test-1." &&
+	git commit -am "Test release: 5.8.1.2-test." &&
 		zshdev-add-nnnnn-and-changelog unposted
 	# (Everyone has a different way of getting the "unposted" magic string
 	# into ChangeLog and the log message.  This script is how I do it; YMMV;
 	# see Etc/zsh-development-guide for alternative scripts.)
 
-- Create signed git tag named "zsh-5.5.1-..." (not "5.5.1-...")
+- Create signed git tag named "zsh-5.8.1..." (not "5.8.1...")
 
-	git tag --sign -m "Tag version zsh-5.5.1-test-1." zsh-5.5.1-test-1
+	git tag --sign -m "Tag version zsh-5.8.1.2-test." zsh-5.8.1.2-test
 
 - If the tagged release is a stable release (as opposed to a test release):
 
-	vi Config/version.mk # bump to 5.6-dev-0 and tomorrow's date
+	vi Config/version.mk # bump to 5.9.0.1-dev and tomorrow's date
 	git commit -am "Post-release version bump." &&
 		zshdev-add-nnnnn-and-changelog unposted
 		# or local equivalent (see above)
 
 - Create tarball:
 
-	git checkout zsh-5.5.1-test-1
+	git checkout zsh-5.8.1.2-test
 	git diff HEAD # ensure no local mods
 	rm -f Doc/help.txt Doc/help/[_a-zA-Z0-9]* # some devs have had issues with these
 	Util/preconfig && ./configure ...
@@ -50,11 +71,11 @@ To create a zsh release:
 	git clone git://git.code.sf.net/p/zsh/web
 	git clone ssh://git.code.sf.net/p/zsh/web
 
-- Upload to sf.net
+- Upload to sf.net:
 
 	Test releases go to the "zsh-test" directory.
 	Stable releases to zsh/ and zsh-doc/.
-	After uploading, select the tar.xz artifact, press the 🛈 button ("View Details") to its right, and press [Select All] next to "Default Download For:".  This should cause sf.net to offer that artifact in the "Looking for the latest version?" line.
+	For stable releases only, after uploading, select the tar.xz artifact under zsh/, press the 🛈 button ("View Details") to its right, and press [Select All] next to "Default Download For:".  This should cause sf.net to offer that artifact in the "Looking for the latest version?" line.
 
 - If the new release is a stable release, update zsh.sf.net:
 
@@ -94,7 +115,7 @@ To create a zsh release:
 	# several minutes to appear afterwards
 	rsync ...
 
-- Upload the build artefacts to zsh.org/pub; you may need assistance from
+- For stable releases, upload the build artefacts to zsh.org/pub; you may need assistance from
   another dev if you don't have access to do this.
 
 - Post to -workers@
