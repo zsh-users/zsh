@@ -1,5 +1,8 @@
 2019-12-22  Daniel Shahaf  <danielsh@apache.org>
 
+	* unposted: Test/B01cd.ztst, Util/ztst.vim: Fix broken build:
+	45109 (!) broke Test/Y01completion.ztst.
+
 	* 45110: Doc/Zsh/grammar.yo: zshmisc(1): Fix markup of "try-list"
 	and "always-list".
 
