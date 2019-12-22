@@ -1,5 +1,7 @@
 2019-12-21  dana  <dana@dana.is>
 
+	* 45101: Etc/creating-a-release.txt: Adjust white space
+
 	* 45101 (tweaked per 45104): Etc/creating-a-release.txt:
 	Document new dev/test versioning scheme, clarify other release
 	steps. New versioning scheme not to be used until after 5.8

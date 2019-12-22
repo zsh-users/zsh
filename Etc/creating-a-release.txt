@@ -66,7 +66,8 @@ To create a zsh release:
 	make tarxz-doc tarxz-src
 	for i in zsh*.tar.?z ; do gpg -ab -- $i ; done
 
-- [one time step] Add your key to http://zsh.sf.net/Arc/source.html; see README in the 'web' repository for how to do this.  Its URL is:
+- [one time step] Add your key to http://zsh.sf.net/Arc/source.html; see README
+  in the 'web' repository for how to do this.  Its URL is:
 
 	git clone git://git.code.sf.net/p/zsh/web
 	git clone ssh://git.code.sf.net/p/zsh/web
@@ -75,7 +76,10 @@ To create a zsh release:
 
 	Test releases go to the "zsh-test" directory.
 	Stable releases to zsh/ and zsh-doc/.
-	For stable releases only, after uploading, select the tar.xz artifact under zsh/, press the 🛈 button ("View Details") to its right, and press [Select All] next to "Default Download For:".  This should cause sf.net to offer that artifact in the "Looking for the latest version?" line.
+	For stable releases only, after uploading, select the tar.xz artifact
+	under zsh/, press the 🛈 button ("View Details") to its right, and press
+	[Select All] next to "Default Download For:".  This should cause sf.net
+	to offer that artifact in the "Looking for the latest version?" line.
 
 - If the new release is a stable release, update zsh.sf.net:
 
@@ -115,8 +119,8 @@ To create a zsh release:
 	# several minutes to appear afterwards
 	rsync ...
 
-- For stable releases, upload the build artefacts to zsh.org/pub; you may need assistance from
-  another dev if you don't have access to do this.
+- For stable releases, upload the build artefacts to zsh.org/pub; you may need
+  assistance from another dev if you don't have access to do this.
 
 - Post to -workers@
 
