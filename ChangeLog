@@ -1,3 +1,8 @@
+2019-12-26  Daniel Shahaf  <danielsh@apache.org>
+
+	* 45131: Src/exec.c, Test/E02xtrace.ztst: Make a function that
+	redefines itself preserve its tracedness.
+
 2019-12-23  Daniel Shahaf  <danielsh@apache.org>
 
 	* unposted: Completion/Unix/Command/_stdbuf: Fix mismatch

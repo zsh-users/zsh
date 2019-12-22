@@ -146,3 +146,12 @@
 ?+(anon):0> '(anon)'
 ?+(anon):0> true
 ?+fn:0> gn
+
+  f() {
+    f() { echo inner }
+  }
+  functions -T f
+  f
+  which f | grep '# traced'
+0:a function that redefines itself preserves tracing
+>	# traced
