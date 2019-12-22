@@ -577,6 +577,7 @@ int
 bin_setopt(char *nam, char **args, UNUSED(Options ops), int isun)
 {
     int action, optno, match = 0;
+    int retval = 0;
 
     /* With no arguments or options, display options. */
     if (!*args) {
@@ -604,18 +605,28 @@ bin_setopt(char *nam, char **args, UNUSED(Options ops), int isun)
 		    inittyptab();
 		    return 1;
 		}
-		if(!(optno = optlookup(*args)))
+		if(!(optno = optlookup(*args))) {
 		    zwarnnam(nam, "no such option: %s", *args);
-		else if(dosetopt(optno, action, 0, opts))
-		    zwarnnam(nam, "can't change option: %s", *args);
+		    retval = 1;
+		} else {
+		    retval = !!dosetopt(optno, action, 0, opts);
+		    if (retval) {
+			zwarnnam(nam, "can't change option: %s", *args);
+		    }
+		}
 		break;
 	    } else if(**args == 'm') {
 		match = 1;
 	    } else {
-	    	if (!(optno = optlookupc(**args)))
+	    	if (!(optno = optlookupc(**args))) {
 		    zwarnnam(nam, "bad option: -%c", **args);
-		else if(dosetopt(optno, action, 0, opts))
-		    zwarnnam(nam, "can't change option: -%c", **args);
+		    retval = 1;
+		} else {
+		    retval = !!dosetopt(optno, action, 0, opts);
+		    if (retval) {
+			zwarnnam(nam, "can't change option: -%c", **args);
+		    }
+		}
 	    }
 	}
 	args++;
@@ -625,10 +636,15 @@ bin_setopt(char *nam, char **args, UNUSED(Options ops), int isun)
     if (!match) {
 	/* Not globbing the arguments -- arguments are simply option names. */
 	while (*args) {
-	    if(!(optno = optlookup(*args++)))
+	    if(!(optno = optlookup(*args++))) {
 		zwarnnam(nam, "no such option: %s", args[-1]);
-	    else if(dosetopt(optno, !isun, 0, opts))
-		zwarnnam(nam, "can't change option: %s", args[-1]);
+		retval = 1;
+	    } else {
+		retval = !!dosetopt(optno, !isun, 0, opts);
+		if (retval) {
+		    zwarnnam(nam, "can't change option: %s", args[-1]);
+		}
+	    }
 	}
     } else {
 	/* Globbing option (-m) set. */
@@ -651,7 +667,8 @@ bin_setopt(char *nam, char **args, UNUSED(Options ops), int isun)
 	    tokenize(s);
 	    if (!(pprog = patcompile(s, PAT_HEAPDUP, NULL))) {
 		zwarnnam(nam, "bad pattern: %s", *args);
-		continue;
+		retval = 1;
+		break;
 	    }
 	    /* Loop over expansions. */
 	    scanmatchtable(optiontab, pprog, 0, 0, OPT_ALIAS,
@@ -660,7 +677,7 @@ bin_setopt(char *nam, char **args, UNUSED(Options ops), int isun)
 	}
     }
     inittyptab();
-    return 0;
+    return retval;
 }
 
 /* Identify an option name */
@@ -769,37 +786,101 @@ dosetopt(int optno, int value, int force, char *new_opts)
 	    return -1;
     } else if(optno == PRIVILEGED && !value) {
 	/* unsetting PRIVILEGED causes the shell to make itself unprivileged */
-#ifdef HAVE_SETUID
-	int ignore_err;
-	errno = 0;
-	/*
-	 * Set the GID first as if we set the UID to non-privileged it
-	 * might be impossible to restore the GID.
-	 *
-	 * Some OSes (possibly no longer around) have been known to
-	 * fail silently the first time, so we attempt the change twice.
-	 * If it fails we are guaranteed to pick this up the second
-	 * time, so ignore the first time.
-	 *
-	 * Some versions of gcc make it hard to ignore the results the
-	 * first time, hence the following.  (These are probably not
-	 * systems that require the doubled calls.)
-	 */
-	ignore_err = setgid(getgid());
-	(void)ignore_err;
-	ignore_err = setuid(getuid());
-	(void)ignore_err;
-	if (setgid(getgid())) {
-            zwarn("failed to change group ID: %e", errno);
-            return -1;
-        } else if (setuid(getuid())) {
-            zwarn("failed to change user ID: %e", errno);
-            return -1;
+
+	int skip_setuid = 0;
+	int skip_setgid = 0;
+
+#if defined(HAVE_GETEGID) && defined(HAVE_SETGID) && defined(HAVE_GETUID)
+	int orig_egid = getegid();
+#endif
+
+#if defined(HAVE_GETEUID) && defined(HAVE_GETUID)
+	if (geteuid() == getuid()) {
+	    skip_setuid = 1;
 	}
+#endif
+
+#if defined(HAVE_GETEGID) && defined(HAVE_GETGID)
+	if (getegid() == getgid()) {
+	    skip_setgid = 1;
+	}
+#endif
+
+	if (!skip_setgid) {
+	    int setgid_err;
+#ifdef HAVE_SETRESGID
+	    setgid_err = setresgid(getgid(), getgid(), getgid());
+#elif defined(HAVE_SETREGID)
+#if defined(HAVE_GETEGID) && defined(HAVE_SETGID) && defined(HAVE_GETUID)
+	    setgid_err = setregid(getgid(), getgid());
 #else
-        zwarn("setuid not available");
-        return -1;
-#endif /* not HAVE_SETUID */
+	    zwarnnam("unsetopt",
+		"PRIVILEGED: can't drop privileges; setregid available, but cannot check if saved gid changed");
+	    return -1;
+#endif
+#else
+	    zwarnnam("unsetopt", "PRIVILEGED: can't drop privileges; setresgid and setregid not available");
+	    return -1;
+#endif
+	    if (setgid_err) {
+		zwarnnam("unsetopt", "PRIVILEGED: can't drop privileges; failed to change group ID: %e", errno);
+		return -1;
+	    }
+	}
+
+	if (!skip_setuid) {
+#if defined(HAVE_GETEUID) && defined(HAVE_SETUID)
+	    int orig_euid = geteuid();
+#endif
+	    int setuid_err;
+#if defined(HAVE_GETEUID) && defined(HAVE_INITGROUPS) && defined(HAVE_GETPWUID)
+	    if (geteuid() == 0) {
+		struct passwd *pw = getpwuid(getuid());
+		if (pw == NULL) {
+		    zwarnnam("unsetopt", "can't drop privileges; failed to get user information for uid %d: %e",
+			    getuid(), errno);
+		    return -1;
+		}
+		if (initgroups(pw->pw_name, pw->pw_gid)) {
+		    zwarnnam("unsetopt", "can't drop privileges; failed to set supplementary group list: %e", errno);
+		    return -1;
+		}
+	    }
+#endif
+
+#ifdef HAVE_SETRESUID
+	    setuid_err = setresuid(getuid(), getuid(), getuid());
+#elif defined(HAVE_SETREUID)
+#if defined(HAVE_GETEUID) && defined(HAVE_SETUID) && defined(HAVE_GETUID)
+	    setuid_err = setreuid(getuid(), getuid());
+#else
+	    zwarnnam("unsetopt",
+		"PRIVILEGED: can't drop privileges; setreuid available, but cannot check if saved uid changed");
+	    return -1;
+#endif
+#else
+	    zwarnnam("unsetopt", "PRIVILEGED: can't drop privileges; setresuid and setreuid not available");
+	    return -1;
+#endif
+	    if (setuid_err) {
+		zwarnnam("unsetopt", "PRIVILEGED: can't drop privileges; failed to change user ID: %e", errno);
+		return -1;
+	    }
+#if defined(HAVE_GETEUID) && defined(HAVE_SETUID) && defined(HAVE_GETUID)
+	    if (getuid() != 0 && !setuid(orig_euid)) {
+		zwarnnam("unsetopt", "PRIVILEGED: can't drop privileges; was able to restore the euid");
+		return -1;
+	    }
+#endif
+	}
+
+#if defined(HAVE_GETEGID) && defined(HAVE_SETGID) && defined(HAVE_GETUID)
+	if (getuid() != 0 && !skip_setgid && !setgid(orig_egid)) {
+	    zwarnnam("unsetopt", "PRIVILEGED: can't drop privileges; was able to restore the egid");
+	    return -1;
+	}
+#endif
+
 #ifdef JOB_CONTROL
     } else if (!force && optno == MONITOR && value) {
 	if (new_opts[optno] == value)
