@@ -1,5 +1,7 @@
 2019-12-21  dana  <dana@dana.is>
 
+	* unposted: Config/version.mk: Update for 5.7.1-test-2
+
 	* 45101: Etc/creating-a-release.txt: Adjust white space
 
 	* 45101 (tweaked per 45104): Etc/creating-a-release.txt:
