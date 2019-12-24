@@ -1,5 +1,8 @@
 2019-12-26  Daniel Shahaf  <danielsh@apache.org>
 
+	* 45138: Src/Modules/zutil.c, Test/V13zformat.ztst: Add zformat
+	unit tests.
+
 	* 45131: Src/exec.c, Test/E02xtrace.ztst: Make a function that
 	redefines itself preserve its tracedness.
 

@@ -913,13 +913,13 @@ bin_zformat(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     switch (opt) {
     case 'f':
 	{
-	    char **ap, *specs[256], *out;
+	    char **ap, *specs[256] = {0}, *out;
 	    int olen, oused = 0;
-
-	    memset(specs, 0, 256 * sizeof(char *));
 
 	    specs['%'] = "%";
 	    specs[')'] = ")";
+
+	    /* Parse the specs in argv. */
 	    for (ap = args + 2; *ap; ap++) {
 		if (!ap[0][0] || ap[0][0] == '-' || ap[0][0] == '.' ||
 		    idigit(ap[0][0]) || ap[0][1] != ':') {
