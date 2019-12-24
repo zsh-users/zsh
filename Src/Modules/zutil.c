@@ -797,8 +797,7 @@ static char *zformat_substring(char* instr, char **specs, char **outp,
 	    if ((*s == '.' || testit) && idigit(s[1])) {
 		for (max = 0, s++; idigit(*s); s++)
 		    max = (max * 10) + (int) STOUC(*s) - '0';
-	    }
-	    else if (testit)
+	    } else if (*s == '.' || testit)
 		s++;
 
 	    if (testit && STOUC(*s)) {

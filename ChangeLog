@@ -1,5 +1,9 @@
 2019-12-26  Daniel Shahaf  <danielsh@apache.org>
 
+	* 45137: Src/Modules/zutil.c, Test/V13zformat.ztst: zformat:
+	Allow the specifying minimum width and a dot with an empty
+	maximum width.
+
 	* 45138: Src/Modules/zutil.c, Test/V13zformat.ztst: Add zformat
 	unit tests.
 

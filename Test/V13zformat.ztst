@@ -17,12 +17,14 @@
  zformat_and_print_s '%s'   foo
  zformat_and_print_s '%5s'  min
  zformat_and_print_s '%-5s' neg
+ zformat_and_print_s '%5.s' empty
  zformat_and_print_s '%.5s' max
  zformat_and_print_s '%.5s' truncated
 0:basic zformat test
 >'foo'
 >'min  '
 >'  neg'
+>'empty'
 >'max'
 >'trunc'
 
