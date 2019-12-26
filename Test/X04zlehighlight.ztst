@@ -157,5 +157,3 @@
 %clean
 
   zmodload -ui zsh/zpty
-
-# vim:ft=zsh
