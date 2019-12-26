@@ -1310,9 +1310,8 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       inet_aton inet_pton inet_ntop \
 	       getlogin getpwent getpwnam getpwuid getgrgid getgrnam \
 	       initgroups nis_list \
-	       getuid setuid seteuid setreuid setresuid setsid \
-	       getgid setgid setegid setregid setresgid \
-	       geteuid getegid \
+	       setuid seteuid setreuid setresuid setsid \
+	       setgid setegid setregid setresgid \
 	       memcpy memmove strstr strerror strtoul \
 	       getrlimit getrusage \
 	       setlocale \

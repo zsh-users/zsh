@@ -1391,3 +1391,18 @@ F:Regression test for workers/41811
 ?(anon):4: `break' active at end of function scope
 ?(anon):4: `break' active at end of function scope
 ?(anon):4: `break' active at end of function scope
+
+# There are further tests for PRIVILEGED in P01privileged.ztst.
+ if [[ -o privileged ]]; then
+   unsetopt privileged
+ fi
+ unsetopt privileged
+0:PRIVILEGED sanity check: unsetting is idempotent
+F:If this test fails at the first unsetopt, refer to P01privileged.ztst.
+
+  if [[ -o privileged ]]; then
+    (( UID != EUID ))
+  else
+    (( UID == EUID ))
+  fi
+0:PRIVILEGED sanity check: default value is correct

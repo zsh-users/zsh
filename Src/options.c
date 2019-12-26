@@ -607,25 +607,21 @@ bin_setopt(char *nam, char **args, UNUSED(Options ops), int isun)
 		}
 		if(!(optno = optlookup(*args))) {
 		    zwarnnam(nam, "no such option: %s", *args);
-		    retval = 1;
-		} else {
-		    retval = !!dosetopt(optno, action, 0, opts);
-		    if (retval) {
-			zwarnnam(nam, "can't change option: %s", *args);
-		    }
+		    retval |= 1;
+		} else if (dosetopt(optno, action, 0, opts)) {
+		    zwarnnam(nam, "can't change option: %s", *args);
+		    retval |= 1;
 		}
 		break;
 	    } else if(**args == 'm') {
 		match = 1;
 	    } else {
-	    	if (!(optno = optlookupc(**args))) {
+		if (!(optno = optlookupc(**args))) {
 		    zwarnnam(nam, "bad option: -%c", **args);
-		    retval = 1;
-		} else {
-		    retval = !!dosetopt(optno, action, 0, opts);
-		    if (retval) {
-			zwarnnam(nam, "can't change option: -%c", **args);
-		    }
+		    retval |= 1;
+		} else if (dosetopt(optno, action, 0, opts)) {
+		    zwarnnam(nam, "can't change option: -%c", **args);
+		    retval |= 1;
 		}
 	    }
 	}
@@ -638,12 +634,10 @@ bin_setopt(char *nam, char **args, UNUSED(Options ops), int isun)
 	while (*args) {
 	    if(!(optno = optlookup(*args++))) {
 		zwarnnam(nam, "no such option: %s", args[-1]);
-		retval = 1;
-	    } else {
-		retval = !!dosetopt(optno, !isun, 0, opts);
-		if (retval) {
-		    zwarnnam(nam, "can't change option: %s", args[-1]);
-		}
+		retval |= 1;
+	    } else if (dosetopt(optno, !isun, 0, opts)) {
+		zwarnnam(nam, "can't change option: %s", args[-1]);
+		retval |= 1;
 	    }
 	}
     } else {
@@ -667,7 +661,7 @@ bin_setopt(char *nam, char **args, UNUSED(Options ops), int isun)
 	    tokenize(s);
 	    if (!(pprog = patcompile(s, PAT_HEAPDUP, NULL))) {
 		zwarnnam(nam, "bad pattern: %s", *args);
-		retval = 1;
+		retval |= 1;
 		break;
 	    }
 	    /* Loop over expansions. */
@@ -787,99 +781,91 @@ dosetopt(int optno, int value, int force, char *new_opts)
     } else if(optno == PRIVILEGED && !value) {
 	/* unsetting PRIVILEGED causes the shell to make itself unprivileged */
 
-	int skip_setuid = 0;
-	int skip_setgid = 0;
+	/* If set, return -1 so lastval will be non-zero. */
+	int failed = 0;
 
-#if defined(HAVE_GETEGID) && defined(HAVE_SETGID) && defined(HAVE_GETUID)
-	int orig_egid = getegid();
+#ifdef HAVE_SETUID
+	const int orig_euid = geteuid();
 #endif
+	const int orig_egid = getegid();
 
-#if defined(HAVE_GETEUID) && defined(HAVE_GETUID)
-	if (geteuid() == getuid()) {
-	    skip_setuid = 1;
-	}
-#endif
-
-#if defined(HAVE_GETEGID) && defined(HAVE_GETGID)
-	if (getegid() == getgid()) {
-	    skip_setgid = 1;
-	}
-#endif
-
-	if (!skip_setgid) {
+	/*
+	 * Set the GID first as if we set the UID to non-privileged it
+	 * might be impossible to restore the GID.
+	 */
+	{
+#ifndef HAVE_SETRESGID
+	    zwarnnam("unsetopt", "PRIVILEGED: can't drop privileges; setresgid() and friends not available");
+	    return -1;
+#else
 	    int setgid_err;
-#ifdef HAVE_SETRESGID
 	    setgid_err = setresgid(getgid(), getgid(), getgid());
-#elif defined(HAVE_SETREGID)
-#if defined(HAVE_GETEGID) && defined(HAVE_SETGID) && defined(HAVE_GETUID)
-	    setgid_err = setregid(getgid(), getgid());
-#else
-	    zwarnnam("unsetopt",
-		"PRIVILEGED: can't drop privileges; setregid available, but cannot check if saved gid changed");
-	    return -1;
-#endif
-#else
-	    zwarnnam("unsetopt", "PRIVILEGED: can't drop privileges; setresgid and setregid not available");
-	    return -1;
-#endif
 	    if (setgid_err) {
 		zwarnnam("unsetopt", "PRIVILEGED: can't drop privileges; failed to change group ID: %e", errno);
 		return -1;
 	    }
+#endif
 	}
 
-	if (!skip_setuid) {
-#if defined(HAVE_GETEUID) && defined(HAVE_SETUID)
-	    int orig_euid = geteuid();
-#endif
+	/* Set the UID second. */
+	{
+#ifndef HAVE_SETRESUID
+	    zwarnnam("unsetopt", "PRIVILEGED: can't drop privileges; setresuid() and friends not available");
+	    return -1;
+#else
 	    int setuid_err;
-#if defined(HAVE_GETEUID) && defined(HAVE_INITGROUPS) && defined(HAVE_GETPWUID)
+
+# ifdef HAVE_INITGROUPS
+	    /* Set the supplementary groups list. */
 	    if (geteuid() == 0) {
 		struct passwd *pw = getpwuid(getuid());
 		if (pw == NULL) {
-		    zwarnnam("unsetopt", "can't drop privileges; failed to get user information for uid %d: %e",
-			    getuid(), errno);
-		    return -1;
-		}
-		if (initgroups(pw->pw_name, pw->pw_gid)) {
+		    zwarnnam("unsetopt", "can't drop privileges; failed to get user information for uid %L: %e",
+			    (long)getuid(), errno);
+		    failed = 1;
+		} else if (initgroups(pw->pw_name, pw->pw_gid)) {
 		    zwarnnam("unsetopt", "can't drop privileges; failed to set supplementary group list: %e", errno);
 		    return -1;
 		}
+	    } else if (getuid() != 0 &&
+		    (geteuid() != getuid() || orig_egid != getegid())) {
+		zwarnnam("unsetopt", "PRIVILEGED: supplementary group list not changed due to lack of permissions: EUID=%L",
+			(long)geteuid());
+		failed = 1;
 	    }
-#endif
+# else
+	    /* initgroups() isn't in POSIX.  If it's not available on the system,
+	     * we silently skip it. */
+# endif
 
-#ifdef HAVE_SETRESUID
 	    setuid_err = setresuid(getuid(), getuid(), getuid());
-#elif defined(HAVE_SETREUID)
-#if defined(HAVE_GETEUID) && defined(HAVE_SETUID) && defined(HAVE_GETUID)
-	    setuid_err = setreuid(getuid(), getuid());
-#else
-	    zwarnnam("unsetopt",
-		"PRIVILEGED: can't drop privileges; setreuid available, but cannot check if saved uid changed");
-	    return -1;
-#endif
-#else
-	    zwarnnam("unsetopt", "PRIVILEGED: can't drop privileges; setresuid and setreuid not available");
-	    return -1;
-#endif
 	    if (setuid_err) {
 		zwarnnam("unsetopt", "PRIVILEGED: can't drop privileges; failed to change user ID: %e", errno);
 		return -1;
 	    }
-#if defined(HAVE_GETEUID) && defined(HAVE_SETUID) && defined(HAVE_GETUID)
-	    if (getuid() != 0 && !setuid(orig_euid)) {
-		zwarnnam("unsetopt", "PRIVILEGED: can't drop privileges; was able to restore the euid");
-		return -1;
-	    }
 #endif
 	}
 
-#if defined(HAVE_GETEGID) && defined(HAVE_SETGID) && defined(HAVE_GETUID)
-	if (getuid() != 0 && !skip_setgid && !setgid(orig_egid)) {
+#ifdef HAVE_SETGID
+	if (getuid() != 0 && orig_egid != getegid() &&
+		(setgid(orig_egid) != -1 || setegid(orig_egid) != -1)) {
 	    zwarnnam("unsetopt", "PRIVILEGED: can't drop privileges; was able to restore the egid");
 	    return -1;
 	}
 #endif
+
+#ifdef HAVE_SETUID
+	if (getuid() != 0 && orig_euid != geteuid() &&
+		(setuid(orig_euid) != -1 || seteuid(orig_euid) != -1)) {
+	    zwarnnam("unsetopt", "PRIVILEGED: can't drop privileges; was able to restore the euid");
+	    return -1;
+	}
+#endif
+
+	if (failed) {
+	    /* A warning message has been printed. */
+	    return -1;
+	}
 
 #ifdef JOB_CONTROL
     } else if (!force && optno == MONITOR && value) {
