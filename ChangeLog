@@ -1,3 +1,8 @@
+2019-12-26  dana  <dana@dana.is>
+
+	* unposted: Src/utils.c: Fix macro guard missed in previous
+	commit
+
 2019-12-26  Daniel Shahaf  <danielsh@apache.org>
 
 	* unposted: Src/utils.c: internal: Allow %L in zerrmsg() in

@@ -287,9 +287,7 @@ zerrmsg(FILE *file, const char *fmt, va_list ap)
 {
     const char *str;
     int num;
-#ifdef DEBUG
     long lnum;
-#endif
 #ifdef HAVE_STRERROR_R
 #define ERRBUFSIZE (80)
     int olderrno;
