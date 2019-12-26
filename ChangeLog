@@ -1,3 +1,8 @@
+2019-12-26  Daniel Shahaf  <danielsh@apache.org>
+
+	* unposted: Src/utils.c: internal: Allow %L in zerrmsg() in
+	non-debug builds, too.
+
 2019-12-23  Daniel Shahaf  <danielsh@apache.org>
 
 	* unposted: Completion/Unix/Command/_stdbuf: Fix mismatch
