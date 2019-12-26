@@ -270,7 +270,7 @@ zshlex(void)
     do {
 	if (inrepeat_)
 	    ++inrepeat_;
-	if (inrepeat_ == 3 && isset(SHORTLOOPS))
+	if (inrepeat_ == 3 && (isset(SHORTLOOPS) || isset(SHORTREPEAT)))
 	    incmdpos = 1;
 	tok = gettok();
     } while (tok != ENDINPUT && exalias());

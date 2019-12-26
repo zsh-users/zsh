@@ -1593,7 +1593,7 @@ par_repeat(int *cmplx)
 	if (tok != ZEND)
 	    YYERRORV(oecused);
 	zshlex();
-    } else if (unset(SHORTLOOPS)) {
+    } else if (unset(SHORTLOOPS) && unset(SHORTREPEAT)) {
 	YYERRORV(oecused);
     } else
 	par_save_list1(cmplx);

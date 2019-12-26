@@ -1377,6 +1377,14 @@ item(tt(SHORT_LOOPS) <C> <Z>)(
 Allow the short forms of tt(for), tt(repeat), tt(select),
 tt(if), and tt(function) constructs.
 )
+pindex(SHORT_REPEAT)
+pindex(NO_SHORT_REPEAT)
+pindex(SHORTREPEAT)
+pindex(NOSHORTREPEAT)
+item(tt(SHORT_REPEAT))(
+Allow the short form tt(repeat) as tt(SHORT_LOOPS) but without enabling
+it for the other constructs.
+)
 pindex(SUN_KEYBOARD_HACK)
 pindex(NO_SUN_KEYBOARD_HACK)
 pindex(SUNKEYBOARDHACK)

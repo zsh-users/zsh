@@ -1,3 +1,9 @@
+2020-04-02  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 45142: Doc/Zsh/grammar.yo, Doc/Zsh/options.yo, Src/lex.c,
+	Src/options.c, Src/parse.c, Src/zsh.h, Test/E01options.ztst:
+	Add SHORT_REPEAT option
+
 2020-04-02  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Test/D02glob.ztst: Make test platform-independent.

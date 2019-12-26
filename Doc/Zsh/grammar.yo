@@ -428,6 +428,8 @@ else the end of the test will not be recognized.  For the
 tt(for), tt(repeat), tt(case) and tt(select) commands no such special form
 for the arguments is necessary, but the other condition (the special form
 of var(sublist) or use of the tt(SHORT_LOOPS) option) still applies.
+The tt(SHORT_REPEAT) option is available to enable the short version only
+for the tt(repeat) command.
 
 startitem()
 item(tt(if) var(list) tt({) var(list) tt(}) [ tt(elif) var(list) tt({) var(list) tt(}) ] ... [ tt(else {) var(list) tt(}) ])(

@@ -1109,15 +1109,22 @@ F:Regression test for workers/41811
     eval 'for f (word1 word2) print $f'
     eval 'repeat 3 print nonsense'
   }
-  unsetopt shortloops
-  print option unset
+  unsetopt shortloops shortrepeat
+  print shortloops and shortrepeat unset
+  fn
+  setopt shortrepeat
+  print shortrepeat set
   fn
   setopt shortloops
-  print option set
+  print shortloops set
   fn
 0:SHORT_LOOPS option
->option unset
->option set
+>shortloops and shortrepeat unset
+>shortrepeat set
+>nonsense
+>nonsense
+>nonsense
+>shortloops set
 >foo
 >bar
 >word1
@@ -1125,6 +1132,8 @@ F:Regression test for workers/41811
 >nonsense
 >nonsense
 >nonsense
+?(eval):1: parse error near `print'
+?(eval):1: parse error near `print'
 ?(eval):1: parse error near `print'
 ?(eval):1: parse error near `print'
 ?(eval):1: parse error near `print'
