@@ -1,5 +1,9 @@
 2020-01-07  Daniel Shahaf  <danielsh@apache.org>
 
+	* unposted: Util/ztst-syntax.vim: internal: ztst.vim: Use
+	:syn-sync to work around (#x) and "`\\\\\\\\`" confusing the
+	highlighting.
+
 	* unposted: Util/zyodl.vim: internal: zyodl.vim: Support glob
 	qualifiers in example()'s
 

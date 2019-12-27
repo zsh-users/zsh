@@ -58,6 +58,16 @@ syn match  ztstComment             /^#.*/
 " harness to the test files.
 syn keyword ztstSpecialVariable ZTST_unimplemented ZTST_skip ZTST_testdir ZTST_fd ZTST_srcdir containedin=@zsh 
 
+"" Sync
+" The following is sufficient for our modest line-based format, and helps
+" sidestep problems resulting from test cases that use syntax constructs
+" that confuse us and/or syntax/zsh.vim.  If we outgrow it, we should sync
+" on empty lines instead.
+"
+" If you run into syntax highlighting issues, just scroll the line that throws
+" the syntax highlighting off off the top of the screen.
+syn sync maxlines=1
+
 "" Highlight groups:
 hi def link ztstExitCode                  Number
 hi def link ztstFlags                     Normal
