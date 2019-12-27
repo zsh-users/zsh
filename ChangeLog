@@ -1,5 +1,8 @@
 2019-12-26  dana  <dana@dana.is>
 
+	* 45130: Completion/Base/Utility/_multi_parts: Always pass -f
+	to compadd if given by caller
+
 	* unposted: Src/utils.c: Fix macro guard missed in previous
 	commit
 
