@@ -1,3 +1,9 @@
+2019-12-27  Daniel Shahaf  <danielsh@apache.org>
+
+	* unposted: Test/B01cd.ztst, Util/ztst-ftplugin.vim,
+	Util/ztst-syntax.vim: internal: Vim ztst support: Add an ftplugin
+	in addition to the syntax highlighter.
+
 2019-12-26  dana  <dana@dana.is>
 
 	* 45130: Completion/Base/Utility/_multi_parts: Always pass -f
