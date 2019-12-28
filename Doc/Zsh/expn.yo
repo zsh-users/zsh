@@ -2264,12 +2264,13 @@ parentheses can be referenced.
 
 For example,
 
-example(foo="a string with a message"
-if [[ $foo = (a|an)' '(#b)(*)' '* ]]; then
+example(foo="a_string_with_a_message"
+if [[ $foo = (a|an)_(#b)(*) ]]; then
   print ${foo[$mbegin[1],$mend[1]]}
 fi)
 
-prints `tt(string with a)'.  Note that the first parenthesis is before the
+prints `tt(string_with_a_message)'.
+Note that the first set of parentheses is before the
 tt((#b)) and does not create a backreference.
 
 Backreferences work with all forms of pattern matching other than filename

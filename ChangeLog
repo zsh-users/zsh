@@ -1,3 +1,8 @@
+2019-12-28  Sebastian Gniazdowski  <sgniazdowski@gmail.com>
+
+	* 45150 + 45152: Doc/Zsh/expn.yo: zshexpn: Use a more minimal
+	example in the documentation of (#b).
+
 2019-12-27  Daniel Shahaf  <danielsh@apache.org>
 
 	* unposted: Test/B01cd.ztst, Util/ztst-ftplugin.vim,
