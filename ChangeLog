@@ -1,3 +1,8 @@
+2020-01-07  Daniel Shahaf  <danielsh@apache.org>
+
+	* unposted: Util/zyodl.vim: internal: zyodl.vim: Support yodl
+	comments.
+
 2020-01-07  Damien Thébault  <damien.thebault@gmail.com>
 
 	* github #44: Completion/Unix/Command/_picocom: Allow completion
