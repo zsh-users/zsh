@@ -6,6 +6,7 @@ scripts names:
  C: shell commands with special syntax
  D: substititution
  E: options
+ P: privileged (needs super-user privileges)
  V: modules
  W: builtin interactive commands and constructs
  X: line editing
