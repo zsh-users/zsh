@@ -783,10 +783,12 @@ dosetopt(int optno, int value, int force, char *new_opts)
 
 /* For simplicity's sake, require both setresgid() and setresuid() up-front. */
 #if !defined(HAVE_SETRESGID)
-	zwarnnam("unsetopt", "PRIVILEGED: can't drop privileges; setresgid() and friends not available");
+	zwarnnam("unsetopt",
+	    "PRIVILEGED: can't drop privileges; setresgid() and friends not available");
 	return -1;
 #elif !defined(HAVE_SETRESUID)
-	zwarnnam("unsetopt", "PRIVILEGED: can't drop privileges; setresuid() and friends not available");
+	zwarnnam("unsetopt",
+	    "PRIVILEGED: can't drop privileges; setresuid() and friends not available");
 	return -1;
 #else
 	/* If set, return -1 so lastval will be non-zero. */
@@ -799,7 +801,9 @@ dosetopt(int optno, int value, int force, char *new_opts)
 	 * might be impossible to restore the GID.
 	 */
 	if (setresgid(getgid(), getgid(), getgid())) {
-	    zwarnnam("unsetopt", "PRIVILEGED: can't drop privileges; failed to change group ID: %e", errno);
+	    zwarnnam("unsetopt",
+		"PRIVILEGED: can't drop privileges; failed to change group ID: %e",
+		errno);
 	    return -1;
 	}
 
@@ -817,18 +821,22 @@ dosetopt(int optno, int value, int force, char *new_opts)
 	if (geteuid() == 0) {
 	    struct passwd *pw = getpwuid(getuid());
 	    if (pw == NULL) {
-		zwarnnam("unsetopt", "can't drop privileges; failed to get user information for uid %L: %e",
+		zwarnnam("unsetopt",
+		    "can't drop privileges; failed to get user information for uid %L: %e",
 		    (long)getuid(), errno);
 		failed = 1;
 	    /* This may behave strangely in the unlikely event that the same user
 	     * name appears with multiple UIDs in the passwd database */
 	    } else if (initgroups(pw->pw_name, getgid())) {
-		zwarnnam("unsetopt", "can't drop privileges; failed to set supplementary group list: %e", errno);
+		zwarnnam("unsetopt",
+		    "can't drop privileges; failed to set supplementary group list: %e",
+		    errno);
 		return -1;
 	    }
 	} else if (getuid() != 0 &&
 	    (geteuid() != getuid() || orig_egid != getegid())) {
-	    zwarnnam("unsetopt", "PRIVILEGED: supplementary group list not changed due to lack of permissions: EUID=%L",
+	    zwarnnam("unsetopt",
+		"PRIVILEGED: supplementary group list not changed due to lack of permissions: EUID=%L",
 		(long)geteuid());
 	    failed = 1;
 	}
@@ -839,19 +847,23 @@ dosetopt(int optno, int value, int force, char *new_opts)
 
 	/* Set the UID second. */
 	if (setresuid(getuid(), getuid(), getuid())) {
-	    zwarnnam("unsetopt", "PRIVILEGED: can't drop privileges; failed to change user ID: %e", errno);
+	    zwarnnam("unsetopt",
+		"PRIVILEGED: can't drop privileges; failed to change user ID: %e",
+		errno);
 	    return -1;
 	}
 
 	if (getuid() != 0 && orig_egid != getegid() &&
 		(setgid(orig_egid) != -1 || setegid(orig_egid) != -1)) {
-	    zwarnnam("unsetopt", "PRIVILEGED: can't drop privileges; was able to restore the egid");
+	    zwarnnam("unsetopt",
+		"PRIVILEGED: can't drop privileges; was able to restore the egid");
 	    return -1;
 	}
 
 	if (getuid() != 0 && orig_euid != geteuid() &&
 		(setuid(orig_euid) != -1 || seteuid(orig_euid) != -1)) {
-	    zwarnnam("unsetopt", "PRIVILEGED: can't drop privileges; was able to restore the euid");
+	    zwarnnam("unsetopt",
+		"PRIVILEGED: can't drop privileges; was able to restore the euid");
 	    return -1;
 	}
 
