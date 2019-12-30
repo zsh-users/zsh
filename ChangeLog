@@ -1,3 +1,9 @@
+2019-12-31  Daniel Shahaf  <danielsh@apache.org>
+
+	* users/24582 + users/24583: Test/D04parameter.ztst,
+	Test/Y01completion.ztst: Add regression tests for the previous
+	commit.
+
 2019-12-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/24581: Src/Zle/zle_tricky.c, Src/hist.c: Array assignments

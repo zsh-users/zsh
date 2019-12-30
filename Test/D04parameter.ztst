@@ -640,6 +640,74 @@
 >echo
 >$(|||) bar
 
+ argv=(
+  $'a=() b=()'
+  $'a=(foo) b=(bar)'
+  $'a=(foo) b=() c=() d=(bar) e=(baz) f=() g=()'
+  $'a=(foo) b=() c=() d=(bar)\ne=(baz) f=() g=()'
+  $'a=(foo) b=() d=(bar)'
+ )
+ for 1; print -rl -- ${(z)1} && print
+0:${(z)} regression test: multiple array assignments
+>a=(
+>)
+>b=(
+>)
+>
+>a=(
+>foo
+>)
+>b=(
+>bar
+>)
+>
+>a=(
+>foo
+>)
+>b=(
+>)
+>c=(
+>)
+>d=(
+>bar
+>)
+>e=(
+>baz
+>)
+>f=(
+>)
+>g=(
+>)
+>
+>a=(
+>foo
+>)
+>b=(
+>)
+>c=(
+>)
+>d=(
+>bar
+>)
+>;
+>e=(
+>baz
+>)
+>f=(
+>)
+>g=(
+>)
+>
+>a=(
+>foo
+>)
+>b=(
+>)
+>d=(
+>bar
+>)
+>
+
   foo=$'\x06ZUI\x1f text-field example: \x1azuitfieldtfield1_1\x1a\'\'\x1a\'\'\x1a1\x1aZUI\\[my_tfield1_width\\]\x1aZUI\\[my_tfield1_start\\]\x1aZUI\\[my_tfield1_data\\]\x1c'
   print "${#${(z@)foo}}"
 0:Test real-world data that once seemed to fail
