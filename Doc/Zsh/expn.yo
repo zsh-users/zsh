@@ -1394,11 +1394,40 @@ used with the tt(${)...tt(/)...tt(}) forms.
 
 startitem()
 item(tt(S))(
-Search substrings as well as beginnings or ends; with tt(#) start
-from the beginning and with tt(%) start from the end of the string.
+With tt(#) or tt(##), search for the match that starts closest to the start of
+the string (a `substring match'). Of all matches at a particular position,
+tt(#) selects the shortest and tt(##) the longest:
+
+example(% str="aXbXc"
+% echo ${+LPAR()S+RPAR()str#X*}
+abXc
+% echo ${+LPAR()S+RPAR()str##X*}
+a
+% )
+
+With tt(%) or tt(%%), search for the match that starts closest to the end of
+the string:
+
+example(% str="aXbXc"
+% echo ${+LPAR()S+RPAR()str%X*}
+aXbc
+% echo ${+LPAR()S+RPAR()str%%X*}
+aXb
+% )
+
+(Note that tt(%) and tt(%%) don't search for the match that ends closest to the
+end of the string, as one might expect.)
+
 With substitution via tt(${)...tt(/)...tt(}) or
 tt(${)...tt(//)...tt(}), specifies non-greedy matching, i.e. that the
-shortest instead of the longest match should be replaced.
+shortest instead of the longest match should be replaced:
+
+example(% str="abab"
+% echo ${str/*b/_}
+_
+% echo ${+LPAR()S+RPAR()str/*b/_}
+_ab
+% )
 )
 item(tt(I:)var(expr)tt(:))(
 Search the var(expr)th match (where var(expr) evaluates to a number).
