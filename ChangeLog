@@ -1,3 +1,8 @@
+2020-01-02  Daniel Shahaf  <danielsh@apache.org>
+
+	* 45181: Src/glob.c, Test/D04parameter.ztst: Fix workers/45164:
+	${(S)%%} will now consider the empty string as a potential match.
+
 2020-01-01  dana  <dana@dana.is>
 
 	* Stephane: 45183: Doc/Zsh/builtins.yo, Doc/Zsh/contrib.yo,

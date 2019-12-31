@@ -3059,7 +3059,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 	case (SUB_END|SUB_SUBSTR):
 	case (SUB_END|SUB_LONG|SUB_SUBSTR):
 	    /* Longest/shortest at end, matching substrings.       */
-	    if (!(fl & SUB_LONG)) {
+	    {
 		set_pat_start(p, l);
 		if (pattrylen(p, send, 0, 0, &patstralloc, umltot) &&
 		    !--n) {
@@ -3397,7 +3397,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 	case (SUB_END|SUB_SUBSTR):
 	case (SUB_END|SUB_LONG|SUB_SUBSTR):
 	    /* Longest/shortest at end, matching substrings.       */
-	    if (!(fl & SUB_LONG)) {
+	    {
 		set_pat_start(p, l);
 		if (pattrylen(p, send, 0, 0, &patstralloc, uml) && !--n) {
 		    *sp = get_match_ret(&imd, uml, uml);

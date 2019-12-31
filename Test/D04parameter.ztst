@@ -2639,7 +2639,7 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 
  foo=pws
  print 2: ${(S)foo%%*}
--f:(S) with zero-length matches at end, part 1 (workers/45164)
+0:(S) with zero-length matches at end, part 1 (workers/45164)
 >2: pws
 
  foo=pws
