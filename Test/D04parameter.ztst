@@ -2625,3 +2625,28 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
  print ${foo%%*}
 0:Largest match at end matches entire string
 >
+
+ foo=pws
+ print 1: ${(S)foo#*}
+ print 2: ${(S)foo##*}
+ print 3: ${(S)foo#?}
+ print 4: ${(S)foo##?}
+0:(S) with zero-length matches at start
+>1: pws
+>2:
+>3: ws
+>4: ws
+
+ foo=pws
+ print 2: ${(S)foo%%*}
+-f:(S) with zero-length matches at end, part 1 (workers/45164)
+>2: pws
+
+ foo=pws
+ print 1: ${(S)foo%*}
+ print 3: ${(S)foo%?}
+ print 4: ${(S)foo%%?}
+0:(S) with zero-length matches at end, part 2
+>1: pws
+>3: pw
+>4: pw

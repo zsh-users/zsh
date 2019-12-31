@@ -1,5 +1,8 @@
 2020-01-01  Daniel Shahaf  <danielsh@apache.org>
 
+	* unposted: Test/D04parameter.ztst: Add some tests for ${(S)},
+	including a regression test for workers/45164.
+
 	* 45169/0002 (tweaked for trailing newlines): Etc/BUGS,
 	Test/C03traps.ztst: Add an expected-to-fail test for
 	workers/44007.
