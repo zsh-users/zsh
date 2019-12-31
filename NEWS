@@ -4,8 +4,22 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
-Changes since 5.7.1
--------------------
+Changes since 5.7.1-test-3
+--------------------------
+
+CVE-2019-20044: When unsetting the PRIVILEGED option, the shell sets its
+effective user and group IDs to match their respective real IDs. On some
+platforms (including Linux and macOS, but not FreeBSD), when the RUID and
+EUID were both non-zero, it was possible to regain the shell's former
+privileges by e.g. assigning to the EUID or EGID parameter. In the course
+of investigating this issue, it was also found that the setopt built-in
+did not correctly report errors when unsetting the option, which
+prevented users from handling them as the documentation recommended.
+setopt now returns non-zero if it is unable to safely drop privileges.
+[ Reported by Sam Foxman <samfoxman320@gmail.com>. ]
+
+Changes from 5.7.1 to 5.7.1-test-3
+----------------------------------
 
 The zsh/zutil module's zparseopts builtin learnt an -F option to abort
 parsing when an unrecognised option-like parameter is encountered.
