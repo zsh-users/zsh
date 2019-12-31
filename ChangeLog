@@ -1,5 +1,9 @@
 2020-01-01  Daniel Shahaf  <danielsh@apache.org>
 
+	* 45169/0002 (tweaked for trailing newlines): Etc/BUGS,
+	Test/C03traps.ztst: Add an expected-to-fail test for
+	workers/44007.
+
 	* 45169/0001: Test/B01cd.ztst, Test/ztst.zsh,
 	Util/ztst-syntax.vim: In the test suite, allow test cases to
 	be marked as expected to fail.

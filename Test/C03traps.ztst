@@ -881,6 +881,23 @@ F:Must be tested with a top-level script rather than source or function
   $ZTST_testdir/../Src/zsh -f <<<'fn() { exit 0; }; trap fn EXIT; false'
 0:Explicit exit status overrides implicit: script-like code path
 
+ $ZTST_testdir/../Src/zsh -f <<<$'
+ trap \'echo $1; exit; echo $2\' USR1
+ fn() {
+         echo fn1
+         kill -s USR1 $$
+         echo fn2
+ }
+ echo out1
+ fn trap1 trap2
+ echo out2
+ '
+-f:(workers/44007) function execution continues after 'exit' in trap
+>out1
+>fn1
+>trap1
+# As of 5.7.1-test-2, the output was "out1 fn1 trap1 fn2" (on separate lines).
+
 %clean
 
   rm -f TRAPEXIT
