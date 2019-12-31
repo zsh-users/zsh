@@ -28,7 +28,7 @@ syn include @zsh                   syntax/zsh.vim
 syn match  ztstPayload             /^\s\+\zs.*/ contains=@zsh
 
 syn match  ztstExitCode            /^\d\+\|^-/                nextgroup=ztstFlags
-syn match  ztstFlags               /[.dDq]*:/       contained nextgroup=ztstTestName contains=ztstColon
+syn match  ztstFlags               /[.dDqf]*:/      contained nextgroup=ztstTestName contains=ztstColon
 syn match  ztstColon               /:/              contained
 syn region ztstTestName            start=// end=/$/ contained 
 

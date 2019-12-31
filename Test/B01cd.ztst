@@ -70,11 +70,13 @@
 # the expected status returned by the code when run, or - if it is
 # irrelevant.  An optional set of single-letter flags follows the status
 # or -.  The following are understood:
-#  . d   Don't diff stdout against the expected stdout.
+#  . d  Don't diff stdout against the expected stdout.
 #   D   Don't diff stderr against the expected stderr.
 #   q   All redirection lines given in the test script (not the lines
 #       actually produced by the test) are subject to ordinary quoted shell
 #       expansion (i.e. not globbing).
+#   f   Test is expected to fail. If the test's exit code, stdout, and stderr
+#       match, report a problem; otherwise, carry on to the next test case.
 # This can be followed by a `:' and a message describing the
 # test, which will be printed if the test fails, along with a
 # description of the failure that occurred.  The `:' and message are
