@@ -1236,8 +1236,10 @@ get_comp_string(void)
 	else if (tok == OUTPAR) {
 	    if (parct)
 		parct--;
-	    else
+	    else if (linarr) {
 		linarr = 0;
+		incmdpos = 1;
+	    }
 	}
 	if (inredir && IS_REDIROP(tok)) {
             rdstr = rdstrbuf;

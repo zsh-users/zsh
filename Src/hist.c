@@ -3321,6 +3321,7 @@ bufferwords(LinkList list, char *buf, int *index, int flags)
     int owb = wb, owe = we, oadx = addedx, onc = nocomments;
     int ona = noaliases, ocs = zlemetacs, oll = zlemetall;
     int forloop = 0, rcquotes = opts[RCQUOTES];
+    int envarray = 0;
     char *p, *addedspaceptr;
 
     if (!list)
@@ -3404,6 +3405,14 @@ bufferwords(LinkList list, char *buf, int *index, int flags)
 	ctxtlex();
 	if (tok == ENDINPUT || tok == LEXERR)
 	    break;
+	/*
+	 * After an array assignment, return to the initial
+	 * start-of-command state.  There could be a second ENVARRAY.
+	 */
+	if (tok == OUTPAR && envarray) {
+	    incmdpos = 1;
+	    envarray = 0;
+	}
 	if (tok == FOR) {
 	    /*
 	     * The way for (( expr1 ; expr2; expr3 )) is parsed is:
@@ -3441,6 +3450,7 @@ bufferwords(LinkList list, char *buf, int *index, int flags)
 	    switch (tok) {
 	    case ENVARRAY:
 		p = dyncat(tokstr, "=(");
+		envarray = 1;
 		break;
 
 	    case DINPAR:

@@ -1,3 +1,9 @@
+2019-12-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/24581: Src/Zle/zle_tricky.c, Src/hist.c: Array assignments
+	after the first weren't parsed correctly by ${(z)...} or by
+	completion.
+
 2019-12-31  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 45160: Doc/Zsh/expn.yo: zshexpn: Expand documentation
