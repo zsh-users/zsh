@@ -400,7 +400,7 @@ backslashes.
 For example, the following piece of filename generation code
 with the tt(EXTENDED_GLOB) option:
 
-example(print *.c+LPAR()#q:s/#%+LPAR()#b+RPAR()s+LPAR()*+RPAR().c/'S${match[1]}.C'/+RPAR())
+example(print -r -- *.c+LPAR()#q:s/#%+LPAR()#b+RPAR()s+LPAR()*+RPAR().c/'S${match[1]}.C'/+RPAR())
 
 takes the expansion of tt(*.c) and applies the glob qualifiers in the
 tt(LPAR()#q)var(...)tt(RPAR()) expression, which consists of a substitution
@@ -2522,11 +2522,11 @@ therefore matches files in the current directory as well as
 subdirectories.
 Thus:
 
-example(ls (*/)#bar)
+example(ls -ld -- (*/)#bar)
 
 or
 
-example(ls **/bar)
+example(ls -ld -- **/bar)
 
 does a recursive directory search for files named `tt(bar)' (potentially
 including the file `tt(bar)' in the current directory).  This form does not
@@ -2541,11 +2541,11 @@ they are treated as if both a tt(/) plus a further tt(*) are present.
 Hence:
 
 example(setopt GLOBSTARSHORT
-ls **.c)
+ls -ld -- **.c)
 
 is equivalent to
 
-example(ls **/*.c)
+example(ls -ld -- **/*.c)
 subsect(Glob Qualifiers)
 cindex(globbing, qualifiers)
 cindex(qualifiers, globbing)
@@ -2737,7 +2737,7 @@ appropriate test.  For example,
 
 example(nt+LPAR()RPAR() { [[ $REPLY -nt $NTREF ]] }
 NTREF=reffile
-ls -l *(+nt))
+ls -ld -- *(+nt))
 
 lists all files in the directory that have been modified more recently than
 tt(reffile).
@@ -2928,36 +2928,36 @@ is performed, although note that the presence of the parentheses
 causes the entire expression to be subjected to any global pattern matching
 options such as tt(NULL_GLOB). Thus:
 
-example(ls *(-/))
+example(ls -ld -- *(-/))
 
 lists all directories and symbolic links that point to directories,
 and
 
-example(ls *(-@))
+example(ls -ld -- *(-@))
 
 lists all broken symbolic links, and
 
-example(ls *(%W))
+example(ls -ld -- *(%W))
 
 lists all world-writable device files in the current directory, and
 
-example(ls *(W,X))
+example(ls -ld -- *(W,X))
 
 lists all files in the current directory that are
 world-writable or world-executable, and
 
-example(echo /tmp/foo*(u0^@:t))
+example(print -rC1 /tmp/foo*(u0^@:t))
 
 outputs the basename of all root-owned files beginning with the string
 `tt(foo)' in tt(/tmp), ignoring symlinks, and
 
-example(ls *.*~(lex|parse).[ch](^D^l1))
+example(ls -ld -- *.*~(lex|parse).[ch](^D^l1))
 
 lists all files having a link count of one whose names contain a dot
 (but not those starting with a dot, since tt(GLOB_DOTS) is explicitly
 switched off) except for tt(lex.c), tt(lex.h), tt(parse.c) and tt(parse.h).
 
-example(print b*.pro+LPAR()#q:s/pro/shmo/+RPAR()(#q.:s/builtin/shmiltin/))
+example(print -rC1 b*.pro+LPAR()#q:s/pro/shmo/+RPAR()(#q.:s/builtin/shmiltin/))
 
 demonstrates how colon modifiers and other qualifiers may be chained
 together.  The ordinary qualifier `tt(.)' is applied first, then the colon

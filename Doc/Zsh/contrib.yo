@@ -4418,24 +4418,28 @@ the elements from the tt(input) list in each run.  If no var(command) is
 provided, then no var(arg) list may be provided, and in that event the
 default command is `tt(print)' with arguments `tt(-r -)tt(-)'.
 
-For example, to get a long tt(ls) listing of all plain files in the
-current directory or its subdirectories:
+For example, to get a long tt(ls) listing of all non-hidden plain files
+in the current directory or its subdirectories:
 
 example(autoload -U zargs
-zargs -- **/*(.) -- ls -l)
+zargs -- **/*(.) -- ls -ld --)
 
-Note that `tt(-)tt(-)' is used both to mark the end of the var(option)
-list and to mark the end of the var(input) list, so it must appear twice
-whenever the var(input) list may be empty.  If there is guaranteed to be
-at least one var(input) and the first var(input) does not begin with a
-`tt(-)', then the first `tt(-)tt(-)' may be omitted.
+The first and third occurrences of `tt(-)tt(-)' are used to mark the end
+of options for tt(zargs) and tt(ls) respectively to guard against
+filenames starting with `tt(-)', while the second is used to separate the
+list of files from the command to run (`tt(ls -ld --)').
+
+The first `tt(-)tt(-)' would also be needed if there was a chance the
+list might be empty as in:
+
+example(zargs -r -- ./*.back(#qN) -- rm -f)
 
 In the event that the string `tt(-)tt(-)' is or may be an var(input), the
 tt(-e) option may be used to change the end-of-inputs marker.  Note that
 this does em(not) change the end-of-options marker.  For example, to use
 `tt(..)' as the marker:
 
-example(zargs -e.. -- **/*(.) .. ls -l)
+example(zargs -e.. -- **/*(.) .. ls -ld --)
 
 This is a good choice in that example because no plain file can be named
 `tt(..)', but the best end-marker depends on the circumstances.
