@@ -24,6 +24,7 @@
 "   COMMENT(foo var(foo) foo)
 "   comment(foo)
 "   example(print *.c+LPAR()#q:s/#%+LPAR()#b+RPAR()s+LPAR()*+RPAR().c/'S${match[1]}.C'/+RPAR())
+"   example(zargs -- **/*(.) -- ls -l)
 "   ifzman(zmanref(zshmisc))ifnzman(noderef(Redirection))
 "   LPAR()foo 42 foo+RPAR()
 "   chapter(foo (foo) foo)
@@ -52,7 +53,7 @@ syn match  zyodlSpecial "+\?\<\(LPAR\|RPAR\|PLUS\)()"
 syn match  zyodlNumber  "\d\+"
 syn region zyodlItem    start="\<xitem(" end=")" contains=zyodlSpecial,@zyodlInline
 syn region zyodlItem    start="\<item("  end=")" contains=zyodlSpecial,@zyodlInline
-syn region zyodlExample start="\<example(" end=")" contains=zyodlSpecial
+syn region zyodlExample start="\<example(" end=")" contains=zyodlSpecial,zyodlParenthetical
 syn region zyodlComment start="\<COMMENT(" end=")" contains=zyodlSpecial,@zyodlInline,zyodlParenthetical
 " comment that gets output in generated texinfo/roff source
 syn region zyodlComment start="\<comment(" end=")"

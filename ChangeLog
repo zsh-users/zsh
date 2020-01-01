@@ -1,5 +1,8 @@
 2020-01-07  Daniel Shahaf  <danielsh@apache.org>
 
+	* unposted: Util/zyodl.vim: internal: zyodl.vim: Support glob
+	qualifiers in example()'s
+
 	* unposted: Util/zyodl.vim: internal: zyodl.vim: Support yodl
 	comments.
 
