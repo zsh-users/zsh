@@ -1,5 +1,8 @@
 2020-01-02  Daniel Shahaf  <danielsh@apache.org>
 
+	* unposted (after 45183): Doc/Zsh/contrib.yo: Fix yodl error:
+	"contrib.yo:4457: No macro: back(...)".
+
 	* 45181: Src/glob.c, Test/D04parameter.ztst: Fix workers/45164:
 	${(S)%%} will now consider the empty string as a potential match.
 

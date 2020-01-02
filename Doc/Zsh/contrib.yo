@@ -4432,7 +4432,7 @@ list of files from the command to run (`tt(ls -ld --)').
 The first `tt(-)tt(-)' would also be needed if there was a chance the
 list might be empty as in:
 
-example(zargs -r -- ./*.back(#qN) -- rm -f)
+example(zargs -r -- ./*.back+LPAR()#qN+RPAR() -- rm -f)
 
 In the event that the string `tt(-)tt(-)' is or may be an var(input), the
 tt(-e) option may be used to change the end-of-inputs marker.  Note that
