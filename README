@@ -33,6 +33,10 @@ details, see the documentation.
 Incompatibilities since 5.7.1
 -----------------------------
 
+Build-time change: The default value of the --enable-gdbm configure
+argument has changed from "yes" to "no".  Thus, the zsh/db/gdbm module will
+not be built unless --enable-gdbm is passed explicitly.
+
 The history expansion !:1:t2 used to be interpreted such that the 2
 was a separate character added after the history expansion.  Now
 it is an argument to the :t modifier.

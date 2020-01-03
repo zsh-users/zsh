@@ -444,9 +444,10 @@ dnl Do you want to look for capability support?
 AC_ARG_ENABLE(cap,
 AS_HELP_STRING([--enable-cap],[enable the search for POSIX capabilities (may require additional headers to be added by hand)]))
 
+# Default off for licensing reasons
 AC_ARG_ENABLE(gdbm,
-AS_HELP_STRING([--disable-gdbm],[turn off search for gdbm library]),
-[gdbm="$enableval"], [gdbm=yes])
+AS_HELP_STRING([--enable-gdbm],[enable the search for the GDBM library (see the zsh/db/gdbm module)]),
+[gdbm="$enableval"], [gdbm=no])
 
 dnl ------------------
 dnl CHECK THE COMPILER
@@ -3297,14 +3298,5 @@ if test "x$additionalfpath" != x; then
 fi
 echo "See config.modules for installed modules and functions.
 "
-
-case x$LIBS in
-  *-lgdbm*)
-  echo "WARNING: zsh will be linked against libgdbm.
-This means the binary is covered by the GNU General Public License.
-This does not affect the source code.
-Run configure with --disable-gdbm if required."
-  ;;
-esac
 
 exit 0
