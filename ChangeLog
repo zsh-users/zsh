@@ -1,5 +1,7 @@
 2020-01-03  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 45218: Completion/Unix/Command/_swaks: add more options
+
 	* 45196: Completion/Unix/Command/_make: fix completion after
 	make -C, allowing for -C being used multiple times
 
