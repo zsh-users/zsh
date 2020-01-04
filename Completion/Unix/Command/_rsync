@@ -51,10 +51,11 @@ elif compset -P 1 '*::' || compset -P 1 'rsync://*/'; then
   fi
 
   remfiles=(${${(f)"$(_call_program files rsync $pat 2>/dev/null)"}:#([ 	]|MOTD:)*})
+  remfiles=( ${(M)remfiles:#*$'\t'*} )
 
   remmodules=(${remfiles/[ 	]##/:})
 
-  _describe "remote modules" remmodules -S/
+  _describe -V "remote modules" remmodules -S/
 
 elif compset -P 'rsync://'; then
   _rsync_user_or_host / "$@"
