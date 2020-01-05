@@ -590,6 +590,30 @@ different name spaces.
 item(tt(-X) var(explanation))(
 The var(explanation) string will be printed with the list of matches,
 above the group currently selected.
+
+Within the var(explanation), the following sequences may be used to
+specify output attributes
+ifnzman((see noderef(Prompt Expansion)))\
+ifzman(as described in the section EXPANSION OF PROMPT SEQUENCES in
+zmanref(zshmisc)):
+`tt(%B)', `tt(%S)', `tt(%U)', `tt(%F)', `tt(%K)' and their lower case
+counterparts, as well as `tt(%{)...tt(%})'.  `tt(%F)', `tt(%K)' and
+`tt(%{)...tt(%})' take arguments in the same form as prompt
+expansion.  (Note that the sequence `tt(%G)' is not available; an
+argument to `tt(%{)' should be used instead.)  The sequence `tt(%%)'
+produces a literal `tt(%)'.
+
+These sequences are most often employed by users when customising the
+tt(format) style
+(see
+ifzman(zmanref(zshcompsys))\
+ifnzman(noderef(Completion System))\
+),
+but they must also be taken into account when writing completion
+functions, as passing descriptions with unescaped `tt(%)' characters
+to utility functions such as tt(_arguments) and tt(_message) may
+produce unexpected results. If arbitrary text is to be passed in a
+description, it can be escaped using e.g. tt(${my_str//\%/%%}).
 )
 item(tt(-x) var(message))(
 Like tt(-X), but the var(message) will be printed even if there are no 

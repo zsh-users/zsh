@@ -1609,16 +1609,12 @@ item(tt(format))(
 If this is set for the tt(descriptions) tag, its value is used as a
 string to display above matches in completion lists.  The sequence
 `tt(%d)' in this string will be replaced with a short description of
-what these matches are.  This string may also contain the following
-sequences to specify output attributes
-ifnzman((see noderef(Prompt Expansion)))\
-ifzman(as described in the section EXPANSION OF PROMPT SEQUENCES in
-zmanref(zshmisc)):
-`tt(%B)', `tt(%S)', `tt(%U)', `tt(%F)', `tt(%K)' and their lower case
-counterparts, as well as `tt(%{)...tt(%})'.  `tt(%F)', `tt(%K)' and
-`tt(%{)...tt(%})' take arguments in the same form as prompt
-expansion.  Note that the sequence `tt(%G)' is not available; an argument
-to `tt(%{)' should be used instead.
+what these matches are.  This string may also contain the output
+attribute sequences understood by tt(compadd -X)
+(see
+ifzman(zmanref(zshcompwid))\
+ifnzman(noderef(Completion Widgets))\
+).
 
 The style is tested with each tag valid for the current completion
 before it is tested for the tt(descriptions) tag.  Hence different format 
@@ -4588,7 +4584,9 @@ not set with the former.
 If the tt(-r) option is given, no style is used; the var(descr) is
 taken literally as the string to display.  This is most useful
 when the var(descr) comes from a pre-processed argument list
-which already contains an expanded description.
+which already contains an expanded description.  Note that this
+option does not disable the `tt(%)'-sequence parsing done by
+tt(compadd).
 
 The tt(-12VJ) options and the var(group) are passed to tt(compadd) and
 hence determine the group the message string is added to.
