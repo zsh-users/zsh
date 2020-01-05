@@ -2553,6 +2553,7 @@ wmemcpy wmemmove wmemset; do
       AC_MSG_NOTICE([all functions found, multibyte support enabled])
       zsh_cv_c_unicode_support=yes
     else
+      # Warns at the end of configure
       AC_MSG_NOTICE([missing functions, multibyte support disabled])
       zsh_cv_c_unicode_support=no
     fi
@@ -3298,5 +3299,19 @@ if test "x$additionalfpath" != x; then
 fi
 echo "See config.modules for installed modules and functions.
 "
+
+if test x$zsh_cv_c_unicode_support != xyes; then
+  if test "x$zfuncs_absent" = x; then
+    # The user opted out.
+    AC_MSG_WARN([You have chosen to build without multibyte support.])
+    AC_MSG_WARN([This configuration may not be suitable for production use. It is known to cause errors in 'make test'. We strongly recommend to re-run configure with --enable-multibyte.])
+  else
+    # Some requisite functions are missing.
+    AC_MSG_WARN([Multibyte support cannot be enabled: some standard library functions are missing: $zfuncs_absent])
+    AC_MSG_WARN([This configuration may not be suitable for production use. It is known to cause errors in 'make test'. If your system provides those functions, we recommend to re-run configure appropriately.])
+    # If your system doesn't have those functions, consider patching the
+    # test suite and sending the patch to zsh-workers@ for inclusion.
+  fi
+fi
 
 exit 0
