@@ -1,3 +1,8 @@
+2020-01-05  Andrey Butirsky  <butirsky@gmail.com>
+
+	* 45239: Functions/Newuser/zsh-newuser-install: Remove
+	'appendhistory' from zsh-newuser-install
+
 2020-01-03  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* 45218: Completion/Unix/Command/_swaks: add more options

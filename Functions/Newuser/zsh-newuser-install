@@ -899,7 +899,6 @@ __zni_options_config() {
   # The "no" prefix is used to indicate options on by default.
   __zni_apply_defaults -o autocd '' "Change directory given just path." \
     extendedglob '' "Use additional pattern matching features." \
-    appendhistory '' "Append new history lines instead of overwriting." \
     '!nomatch' '' "Unmatched patterns cause an error." \
     '!beep' '' "Beep on errors." \
     notify '' "Immediately report changes in background job status."
