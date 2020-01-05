@@ -1,5 +1,8 @@
 2020-01-05  dana  <dana@dana.is>
 
+	* unposted: Completion/Unix/Command/_tac: Eliminate superfluous
+	variable
+
 	* 45226 (with Daniel, 45223): Completion/Unix/Command/_man:
 	Improve completion of file paths
 

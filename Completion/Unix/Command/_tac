@@ -1,11 +1,7 @@
 #compdef tac gtac
 
-local variant
-
-_pick_variant -r variant gnu='Free Soft' unix --version
-
 # NetBSD (at least) has its own bare-bones version of this tool
-[[ $variant == gnu ]] || {
+_pick_variant gnu='Free Soft' unix --version || {
   _default
   return
 }
