@@ -1,3 +1,8 @@
+2020-01-07  Damien Thébault  <damien.thebault@gmail.com>
+
+	* github #44: Completion/Unix/Command/_picocom: Allow completion
+	for picocom to list symlinks to character devices
+
 2020-01-06  dana  <dana@dana.is>
 
 	* Eitan Adler: 45245: Completion/Unix/Command/_gcc: add some

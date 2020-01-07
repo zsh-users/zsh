@@ -47,7 +47,7 @@ function _picocom () {
            '--omap[define output character map]:output character map:'
            '--emap[define local echo character map]:local echo character map:'
            '(--help -h)'{--help,-h}'[display help message]'
-           '*:device:_files -g "*(%c)"' )
+           '*:device:_files -g "*(-%c)"' )
 
     _arguments -C : "${args[@]}"
 }
