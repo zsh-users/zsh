@@ -13,6 +13,11 @@ if [[ "$service" = -value-* ]]; then
     args2=()
   fi
 else
+  # On some systems (macOS), cc/gcc/g++ are actually clang; treat them accordingly
+  [[ $service != clang* ]] &&
+  _pick_variant clang=clang unix --version &&
+  service=clang-$service
+
   args2=( '*:input file:_files -g "*.([cCmisSoak]|cc|cpp|cxx|ii|k[ih])(-.)"' )
 fi
 
