@@ -1,5 +1,9 @@
 2020-01-10  Daniel Shahaf  <danielsh@apache.org>
 
+	* 45266: Completion/Linux/Command/_losetup: Fix losetup
+	completion, broken in da085b7a20729401c725f91ae930200d0deda64f
+	(41720).
+
 	* unposted: Doc/Zsh/mod_zpty.yo: Fix punctuation.
 
 2020-01-10  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
