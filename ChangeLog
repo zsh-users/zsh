@@ -1,3 +1,8 @@
+2020-01-09  Daniel Shahaf  <danielsh@apache.org>
+
+	* unposted: Completion/Debian/Command/_sbuild,
+	Completion/Unix/Command/_growisofs: Two additional typo fixes.
+
 2020-01-09  Jens Schleusener  <Jens.Schleusener@fossies.org>
 
 	* 45269: Completion/BSD/Command/_mixerctl,
