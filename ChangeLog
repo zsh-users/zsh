@@ -1,3 +1,36 @@
+2020-01-09  Jens Schleusener  <Jens.Schleusener@fossies.org>
+
+	* 45269: Completion/BSD/Command/_mixerctl,
+	Completion/Darwin/Command/_fs_usage,
+	Completion/Darwin/Type/_mac_files_for_application,
+	Completion/Debian/Command/_sbuild,
+	Completion/Linux/Command/_brctl,
+	Completion/Linux/Command/_findmnt,
+	Completion/Linux/Command/_ltrace,
+	Completion/Mandriva/Command/_urpmi,
+	Completion/Redhat/Command/_yum,
+	Completion/Unix/Command/_attr, Completion/Unix/Command/_git,
+	Completion/Unix/Command/_graphicsmagick,
+	Completion/Unix/Command/_iconv,
+	Completion/Unix/Command/_imagemagick,
+	Completion/Unix/Command/_links,
+	Completion/Unix/Command/_luarocks,
+	Completion/Unix/Command/_objdump, Completion/Unix/Command/_od,
+	Completion/Unix/Command/_pandoc, Completion/Unix/Command/_ping,
+	Completion/Unix/Command/_pkg-config,
+	Completion/Unix/Command/_postgresql,
+	Completion/Unix/Command/_rubber,
+	Completion/Unix/Command/_transmission,
+	Completion/Unix/Type/_baudrates,
+	Completion/Unix/Type/_path_files, Etc/FAQ.yo,
+	Functions/Zftp/zfautocheck, Misc/c2z, Src/Modules/curses.c,
+	Src/Modules/db_gdbm.c, Src/Modules/parameter.c, Src/Zle/comp.h,
+	Src/Zle/compcore.c, Src/Zle/compctl.c, Src/Zle/complete.c,
+	Src/Zle/compresult.c, Src/Zle/computil.c, Src/Zle/zle_keymap.c,
+	Src/Zle/zle_main.c, Src/Zle/zle_refresh.c, Src/pattern.c,
+	Src/zsh.h, Src/ztype.h, Test/B01cd.ztst, Test/D04parameter.ztst:
+	Fix misspellings in completions and elsewhere.
+
 2020-01-08  dana  <dana@dana.is>
 
 	* 45261: Completion/Unix/Command/_gcc: Detect clang-as-gcc

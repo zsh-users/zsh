@@ -56,7 +56,7 @@ case $service in
       '-r[act recursively]' \
       '-s[act on symbolic links]' \
       '(-w)-v[always display file name]' \
-      '(-c -d)-x[use hexademical format for value input and output]' \
+      '(-c -d)-x[use hexadecimal format for value input and output]' \
       '*: :_files' \
       + '(op)' \
       '(-l -x)-c[remove all attributes]' \

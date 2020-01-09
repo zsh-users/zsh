@@ -35,7 +35,7 @@ typedef struct cexpl *Cexpl;
 typedef struct cmgroup *Cmgroup;
 typedef struct cmatch *Cmatch;
 
-/* This is for explantion strings. */
+/* This is for explanation strings. */
 
 struct cexpl {
     int always;                 /* display even without matches */
@@ -126,8 +126,8 @@ struct cmatch {
 
 #define CMF_FILE     (1<< 0)	/* this is a file */
 #define CMF_REMOVE   (1<< 1)	/* remove the suffix */
-#define CMF_ISPAR    (1<< 2)	/* is paramter expansion */
-#define CMF_PARBR    (1<< 3)	/* paramter expansion with a brace */
+#define CMF_ISPAR    (1<< 2)	/* is parameter expansion */
+#define CMF_PARBR    (1<< 3)	/* parameter expansion with a brace */
 #define CMF_PARNEST  (1<< 4)	/* nested parameter expansion */
 #define CMF_NOLIST   (1<< 5)	/* should not be listed */
 #define CMF_DISPLINE (1<< 6)	/* display strings one per line */

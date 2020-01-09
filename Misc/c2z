@@ -10,7 +10,7 @@
 # uses the csh to parse its own dot-files, then processes csh output to
 # convert the csh settings to zsh.
 #
-# When run as a zsh fuction, c2z runs csh as if it were an interactive
+# When run as a zsh function, c2z runs csh as if it were an interactive
 # shell whenever the parent zsh is interactive.  When run as a shell
 # script, the -i switch can be used to force this behavior.
 #

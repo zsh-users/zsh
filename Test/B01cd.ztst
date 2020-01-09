@@ -53,7 +53,7 @@
 # stderr.
 #
 # The rules for '<', '>' and '?' lines are the same: only the first
-# character is stripped (with the excpetion for '*' noted below), with
+# character is stripped (with the exception for '*' noted below), with
 # subsequent whitespace being significant; lines are not subject to any
 # substitution unless the `q' flag (see below) is set.
 #

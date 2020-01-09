@@ -59,7 +59,7 @@ case "$service" in
       '--boxes[report overfull and underfull boxes]' \
       '--check[report errors or warnings default action]' \
       '--deps[show the target file s dependencies]' \
-      '--errors[show all errors that occured during compilation]' \
+      '--errors[show all errors that occurred during compilation]' \
       '--refs[show the list of undefined references]' \
       '--warnings[show all LaTeX warnings]' \
       ':LaTeX file:_files -g "*.(tex|dtx|lhs|w)(-.)"'

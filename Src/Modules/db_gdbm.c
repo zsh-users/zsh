@@ -766,7 +766,7 @@ static int remove_tied_name( const char *name ) {
 
 /*
  * Unmetafy that:
- * - duplicates bufer to work on it,
+ * - duplicates buffer to work on it,
  * - does zalloc of exact size for the new string,
  * - restores work buffer to original content, to restore strlen
  */

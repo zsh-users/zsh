@@ -1254,7 +1254,7 @@ enum {
 
 /*
  * Assignment has value?
- * If the assignment is an arrray, then it certainly has a value --- we
+ * If the assignment is an array, then it certainly has a value --- we
  * can only tell if there's an explicit assignment.
  */
 

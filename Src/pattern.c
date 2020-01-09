@@ -2492,7 +2492,7 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalenin,
 	     * Optimization: if we didn't find any Meta characters
 	     * to begin with, we don't need to look for them now.
 	     *
-	     * For patstralloc pased in, we want the unmetafied length.
+	     * For patstralloc passed in, we want the unmetafied length.
 	     */
 	    if (patstralloc == &patstralloc_struct &&
 		patstralloc->unmetalen != origlen) {

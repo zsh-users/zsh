@@ -6,7 +6,7 @@ typeset -A opt_args
 _arguments -s -C -A '-*' : \
   '-e[exclude fs_usage and the specified processes from sampling]' \
   '-w[use wider output]' \
-  '*-f+[specify output filtering mode]:mode:(nework filesys pathname exec diskio cachehit)' \
+  '*-f+[specify output filtering mode]:mode:(network filesys pathname exec diskio cachehit)' \
   '-b[annotate disk I/O events with BootCache info]' \
   '(-R -S -E)-t+[specify run timeout]:seconds' \
   '(-t)-R+[specify raw trace file to process]:raw trace file:_files' \

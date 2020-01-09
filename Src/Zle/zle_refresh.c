@@ -388,7 +388,7 @@ zle_free_highlight(void)
 
 /*
  * Interface to the region_highlight ZLE parameter.
- * Converts betwen a format like "P32 42 underline,bold" to
+ * Converts between a format like "P32 42 underline,bold" to
  * the format in the region_highlights variable.  Note that
  * the region_highlights variable stores the internal (point/mark)
  * region in element zero.

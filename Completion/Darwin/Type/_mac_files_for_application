@@ -44,7 +44,7 @@ _mac_files_for_application() {
   local -a glob_patterns
   glob_patterns=()
 
-  # Try to get extentions from "Info.plist" XML file.
+  # Try to get extensions from "Info.plist" XML file.
   if [[ -f "$app_path/Contents/Info.plist" ]]; then
     local -a exts types
     _mac_parse_info_plist

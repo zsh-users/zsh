@@ -1187,7 +1187,7 @@ _git-log () {
       fi
 
       # TODO: Write a wrapper function that checks whether we have a
-      # committish range or comittish and calls __git_tree_files
+      # committish range or committish and calls __git_tree_files
       # appropriately.
       if __git_is_committish_range $line[1]; then
 	__git_tree_files ${PREFIX:-.} $(__git_committish_range_last $line[1]) && ret=0
@@ -1671,7 +1671,7 @@ _git-shortlog () {
           ;;
         (*)
           # TODO: Write a wrapper function that checks whether we have a
-          # committish range or comittish and calls __git_tree_files
+          # committish range or committish and calls __git_tree_files
           # appropriately.
           if __git_is_committish_range $line[1]; then
             __git_tree_files ${PREFIX:-.} $(__git_committish_range_last $line[1]) && ret=0
@@ -2101,7 +2101,7 @@ _git-switch() {
   case $state in
     branches)
       if [[ -n ${opt_args[(i)--guess]} ]]; then
-	# --guess is the default but if it has been explictly specified,
+	# --guess is the default but if it has been explicitly specified,
 	# we'll only complete remote branches
 	__git_remote_branch_names_noprefix && ret=0
       else
@@ -5432,7 +5432,7 @@ _git-daemon () {
     '--strict-paths[match paths exactly]' \
     '--access-hook=-[allow an external tool to accept or decline service]:path:_directories' \
     '--base-path=-[remap all the path requests as relative to the given path]:path:_directories' \
-    '--base-path-relaxed[allow lookup of base path witout prefix]' \
+    '--base-path-relaxed[allow lookup of base path without prefix]' \
     '--interpolated-path=-[dynamically construct alternate paths]:path:_directories' \
     '--export-all[allow pulling from all repositories without verification]' \
     '(--port --listen --user --group)--inetd[run server as an inetd service]' \
@@ -6100,7 +6100,7 @@ _git_column_layouts() {
     '(always never)auto[show in columns if the output is to the terminal]' \
     '(row plain)column[fill columns before rows]' \
     '(column plain)row[fill rows before columns]' \
-    '(column row)plain[show in one colum]' \
+    '(column row)plain[show in one column]' \
     '(nodense)dense[make unequal size columns to utilize more space]' \
     '(dense)nodense[make equal size columns]'
 }

@@ -893,7 +893,7 @@ getbyte(long do_keytmout, int *timeout, int full)
 		break;
 	    if (r == 0) {
 		/* The test for IGNOREEOF was added to make zsh ignore ^Ds
-		   that were typed while commands are running.  Unfortuantely
+		   that were typed while commands are running.  Unfortunately
 		   this caused trouble under at least one system (SunOS 4.1).
 		   Here shells that lost their xterm (e.g. if it was killed
 		   with -9) didn't fail to read from the terminal but instead

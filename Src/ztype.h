@@ -66,7 +66,7 @@
  * shell initialisation.
  */
 #define ZTF_INIT     (0x0001) /* One-off initialisation done */
-#define ZTF_INTERACT (0x0002) /* Shell interative and reading from stdin */
+#define ZTF_INTERACT (0x0002) /* Shell interactive and reading from stdin */
 #define ZTF_SP_COMMA (0x0004) /* Treat comma as a special characters */
 #define ZTF_BANGCHAR (0x0008) /* Treat bangchar as a special character */
 

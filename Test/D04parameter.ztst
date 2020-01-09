@@ -2512,7 +2512,7 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
     local -a x
     : <<< ${(F)x/y}
   }
-0:Separation / join logic regresssion test
+0:Separation / join logic regression test
 
   testpath=/one/two/three/four
   for (( i = 0; i <= 6; ++i )); do

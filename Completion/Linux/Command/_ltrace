@@ -5,7 +5,7 @@ local root hlp="-h --help -V --version"
 (( EUID )) && root='!'
 
 _arguments -s -S $args \
-  "(-c -a --align $hlp)"{-a+,--align=}"[align return values in a secific column]:column [$((COLUMNS*5/8))]" \
+  "(-c -a --align $hlp)"{-a+,--align=}"[align return values in a specific column]:column [$((COLUMNS*5/8))]" \
   "(-c $hlp)-A+[specify maximum number of array elements to print]:elements" \
   "(-c -b --no-signals $hlp)"{-b,--no-signals}"[don't print signals]" \
   "(-a --align -A -b --no-signals -i -n --indent -r -s -t -tt -ttt -T $hlp)-c[count time and calls, and report a summary on exit]" \

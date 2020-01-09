@@ -38,7 +38,7 @@ if _pick_variant -r variant libiconv='GNU*libiconv' glibc='(Free Soft|GNU*libc|G
   _arguments -C -S -s : $args && return 0
 
   if [[ $state = *_codeset ]]; then
-    # suffix is meaningfull only for output encoding
+    # suffix is meaningful only for output encoding
     if [[ $state = to_codeset ]] && compset -P '*[^/]/'; then
       _wanted suffix expl suffix compadd "$@" /TRANSLIT /IGNORE && ret=0
     else
