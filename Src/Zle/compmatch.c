@@ -1399,7 +1399,7 @@ pattern_match_restrict(Cpattern p, Cpattern wp, convchar_t *wsc, int wsclen,
 	if (prestrict->tp == CPAT_CHAR) {
 	    /*
 	     * Easy case: restricted to an exact character on
-	     * the line.  Procede as normal.
+	     * the line.  Proceed as normal.
 	     */
 	    c = prestrict->u.chr;
 	} else {

@@ -250,7 +250,7 @@ strmetasort(char **array, int sortwhat, int *unmetalenp)
 	if (unmetalenp) {
 	    /*
 	     * Already unmetafied.  We just need to check for
-	     * embededded nulls.
+	     * embedded nulls.
 	     */
 	    int count = unmetalenp[arrptr-array];
 	    /* Remember this length for sorted array */

@@ -2999,7 +2999,7 @@ struct sortelt {
     int origlen;
     /*
      * The length of the string, if needed, else -1.
-     * The length is only needed if there are embededded nulls.
+     * The length is only needed if there are embedded nulls.
      */
     int len;
 };
