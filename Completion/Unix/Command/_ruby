@@ -49,7 +49,7 @@ opts=(
   '--jit[enable jit with default options]'
   '--jit-warnings[enable printing JIT warnings]'
   '--jit-debug[enable JIT debugging (very slow)]'
-  '--jit-wait[wait until JIT compilation is finished everytime (for testing)]'
+  '--jit-wait[wait until JIT compilation is finished every time (for testing)]'
   '--jit-save-temps[save JIT temporary files]'
   '--jit-verbose=-[print JIT logs of level num or less to stderr]:maximum log level [0]'
   '--jit-max-cache=-[specify max number of methods to be JIT-ed in a cache]:number [1000]'

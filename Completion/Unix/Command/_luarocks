@@ -305,7 +305,7 @@ __luarocks_installed_rocks(){
     fi
   fi
 }
-# Used to complete one or more of the followings:
+# Used to complete one or more of the following:
 # - .rockspec file
 # - .src.rock file
 # - external rock

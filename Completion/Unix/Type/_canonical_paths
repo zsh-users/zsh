@@ -96,7 +96,7 @@ _canonical_paths() {
 
     # This style controls how many parent directory links (..) to chase searching
     # for possible completions. The default is 8. Note that this chasing is
-    # triggered only when the user enters atleast a .. and the path completed
+    # triggered only when the user enters at least a .. and the path completed
     # contains only . or .. components. A value of 0 turns off .. link chasing
     # altogether.
 

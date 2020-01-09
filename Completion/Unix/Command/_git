@@ -4352,7 +4352,7 @@ _git-send-email () {
     '--smtp-pass=[specify password to use for SMTP-AUTH]::password' \
     '--smtp-server=[specify SMTP server to connect to, or sendmail command]: : __git_sendmail_smtpserver_values' \
     '--smtp-server-port=[specify port to connect to SMTP server on]:smtp port:_ports' \
-    '--smtp-server-option=[specify the outgoing SMTP server option to use]:SMPT server option' \
+    '--smtp-server-option=[specify the outgoing SMTP server option to use]:SMTP server option' \
     '--smtp-ssl-cert-path=[path to ca-certificates (directory or file)]:ca certificates path:_files' \
     '--smtp-user=[specify user to use for SMTP-AUTH]:smtp user:_users' \
     '(--no-smtp-auth)--smtp-auth=[specify allowed AUTH mechanisms]:space-separated list of mechanisms' \
@@ -5421,7 +5421,7 @@ _git-verify-pack () {
     '*:index file:_files -g "*.idx(-.)"'
 }
 
-# Synching Repositories
+# Syncing Repositories
 
 (( $+functions[_git-daemon] )) ||
 _git-daemon () {

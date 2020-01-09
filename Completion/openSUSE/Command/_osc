@@ -119,7 +119,7 @@ _osc_cmd_do() {
     local -a cmdlist
     local tag=0
     
-    # only start completion if theres some '-' on the line
+    # only start completion if there's some '-' on the line
     if ! [ "$words[2]" = "-" ]; then
 	_complete
 	return

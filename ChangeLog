@@ -31,6 +31,10 @@
 	Src/zsh.h, Src/ztype.h, Test/B01cd.ztst, Test/D04parameter.ztst:
 	Fix misspellings in completions and elsewhere.
 
+2020-01-08  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 45272, 45273: Fix more typos.
+
 2020-01-08  dana  <dana@dana.is>
 
 	* 45261: Completion/Unix/Command/_gcc: Detect clang-as-gcc

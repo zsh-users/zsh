@@ -33,7 +33,7 @@ commands=(
   "lsjson\:'list directories and objects in the path in JSON format'"
   "lsl\:'list the objects in path with modification time, size and path'"
   "md5sum\:'produce an md5sum file for all the objects in the path'"
-  "mkdir\:'make the path if it doesnt already exist'"
+  "mkdir\:'make the path if it does not already exist'"
   "mount\:'mount the remote as file system on a mountpoint'"
   "move\:'move files from source to dest'"
   "moveto\:'move file or directory from source to dest'"
