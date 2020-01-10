@@ -25,7 +25,7 @@ monitored with ZLE descriptor handlers (see ifzman(zmanref(zshzle))\
 ifnzman(noderef(Zle Builtins))) or manipulated with tt(sysread) and
 tt(syswrite) (see ifzman(THE ZSH/SYSTEM MODULE in zmanref(zshmodules))\
 ifnzman(noderef(The zsh/system Module))).  em(Warning): Use of tt(sysread)
-and tt(syswrite) is em(not) recommended, use tt(zpty -r) and tt(zpty -w)
+and tt(syswrite) is em(not) recommended; use tt(zpty -r) and tt(zpty -w)
 unless you know exactly what you are doing.
 )
 item(tt(zpty) tt(-d) [ var(name) ... ])(

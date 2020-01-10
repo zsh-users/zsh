@@ -1,3 +1,7 @@
+2020-01-10  Daniel Shahaf  <danielsh@apache.org>
+
+	* unposted: Doc/Zsh/mod_zpty.yo: Fix punctuation.
+
 2020-01-10  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 45264: configure.ac: use /dev/fd on Cygwin for process
