@@ -1,3 +1,8 @@
+2020-01-12  Daniel Shahaf  <danielsh@apache.org>
+
+	* users/24633: Test/D02glob.ztst: Add an xfail test for
+	users/24619.
+
 2020-01-11  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* unposted: Completion/Unix/Command/_cat: additional typo fix
