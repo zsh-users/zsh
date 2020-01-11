@@ -6116,15 +6116,22 @@ __git_date_formats () {
 
   date_formats=(
     relative:'show dates relative to the current time'
-    local:'show timestamps in local timezone'
+    local:'show timestamps in the local timezone'
     iso{,8601}:'show timestamps in ISO 8601 format'
+    iso{,8601}-local:'show timestamps in ISO 8601 format in the local timezone'
     iso-strict:'show timestamps in strict ISO 8601 format'
+    iso-strict-local:'show timestamps in strict ISO 8601 format in the local timezone'
     rfc{,2822}:'show timestamps in RFC 2822 format'
+    rfc{,2822}-local:'show timestamps in RFC 2822 format in the local timezone'
     short:'show only date but not time'
+    short-local:'show only date but not time in the local timezone'
     raw:'show date in internal raw git format (%s %z)'
+    raw-local:'show date in internal raw git format (%s %z) in the local timezone'
     human:'elide some current and recent date elements'
+    human-local:'elide some current and recent date elements in the local timezone'
     unix:'show date as a Unix epoch timestamp'
-    default:'show timestamp in the original timezone'
+    default:'show timestamp in rfc-like format'
+    default-local:'show timestamp in rfc-like format in the local timezone'
   )
 
   _describe -t date-formats 'date format' date_formats -- '( format\:custom\ format )' -S :

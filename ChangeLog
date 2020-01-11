@@ -1,3 +1,8 @@
+2020-01-11  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* Eitan: 45280: Completion/Unix/Command/_git: add -local
+	variants to completed date formats
+
 2020-01-11  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* users/24628 (fixed up): Doc/Zsh/contrib.yo: Add example of how
