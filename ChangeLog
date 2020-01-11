@@ -1,5 +1,7 @@
 2020-01-11  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* unposted: Completion/Unix/Command/_cat: additional typo fix
+
 	* Eitan: 45280: Completion/Unix/Command/_git: add -local
 	variants to completed date formats
 
