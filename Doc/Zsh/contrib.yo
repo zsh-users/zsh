@@ -2227,7 +2227,20 @@ is set in the context tt(:zle:*) to tt(true) if the word style is
 tt(bash) and tt(false) otherwise.  It may be overridden by setting it in
 the more specific context tt(:zle:forward-word*).
 
-Here are some examples of use of the styles, actually taken from the
+It is possible to create widgets with specific behaviour by defining
+a new widget implemented by the appropriate generic function, then
+setting a style for the context of the specific widget.  For example,
+the following defines a widget tt(backward-kill-space-word) using
+tt(backward-kill-word-match), the generic widget implementing
+tt(backward-kill-word) behaviour, and ensures that the new widget
+always implements space-delimited behaviour.
+
+example(zle -N backward-kill-space-word backward-kill-word-match
+zstyle :zle:backward-kill-space-word word-style space)
+
+The widget tt(backward-kill-space-word) can now be bound to a key.
+
+Here are some further examples of use of the styles, actually taken from the
 simplified interface in tt(select-word-style):
 
 example(zstyle ':zle:*' word-style standard

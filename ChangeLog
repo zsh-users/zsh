@@ -1,3 +1,8 @@
+2020-01-11  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* users/24628 (fixed up): Doc/Zsh/contrib.yo: Add example of how
+	to bind word matching widget with a fixed style.
+
 2020-01-10  Daniel Shahaf  <danielsh@apache.org>
 
 	* 45266: Completion/Linux/Command/_losetup: Fix losetup
