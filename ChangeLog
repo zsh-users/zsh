@@ -1,5 +1,8 @@
 2020-01-15  Daniel Shahaf  <danielsh@apache.org>
 
+	* 45287: Doc/Zsh/expn.yo: zshexpn: Describe parameter elision
+	and add some introductory prose
+
 	* 45302: Src/builtin.c: bin_umask(): Queue signals around
 	umask().
 
