@@ -1,3 +1,8 @@
+2020-01-15  Daniel Shahaf  <danielsh@apache.org>
+
+	* 45288: Completion/Unix/Command/_git: Complete bisect/new as
+	well as bisect/bad.
+
 2020-01-06  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 45246: configure.ac: Make --disable-multibyte warn, since

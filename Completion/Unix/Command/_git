@@ -6702,14 +6702,12 @@ __git_heads_local () {
   local f gitdir
   declare -a heads
 
-  heads=(${(f)"$(_call_program headrefs git for-each-ref --format='"%(refname:short)"' refs/heads 2>/dev/null)"})
+  heads=(${(f)"$(_call_program headrefs git for-each-ref --format='"%(refname:short)"' refs/heads refs/bisect refs/stash 2>/dev/null)"})
   gitdir=$(_call_program gitdir git rev-parse --git-dir 2>/dev/null)
   if __git_command_successful $pipestatus; then
     for f in HEAD FETCH_HEAD ORIG_HEAD MERGE_HEAD; do
       [[ -f $gitdir/$f ]] && heads+=$f
     done
-    [[ -f $gitdir/refs/stash ]] && heads+=stash
-    [[ -f $gitdir/refs/bisect/bad ]] && heads+=bisect/bad
   fi
 
   __git_describe_commit heads heads-local "local head" "$@"
