@@ -1,3 +1,8 @@
+2020-01-13  Daniel Shahaf  <danielsh@apache.org>
+
+	* 45290: Test/list-XFails: New helper script for listing
+	XFail tests.
+
 2020-01-12  Daniel Shahaf  <danielsh@apache.org>
 
 	* users/24633: Test/D02glob.ztst: Add an xfail test for
