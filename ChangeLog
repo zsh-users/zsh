@@ -1,3 +1,8 @@
+2020-01-14  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* users/24656: Doc/Zsh/mod_zutil.yo: docs: Add an example of
+	setting and querying zstyles
+
 2020-01-14  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* users/24659: Doc/Zsh/compsys.yo: Cross-reference use of
