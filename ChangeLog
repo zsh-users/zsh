@@ -1,3 +1,7 @@
+2020-01-13  dana  <dana@dana.is>
+
+	* 45296: Test/D02glob.ztst: Clean up after test from users/24633
+
 2020-01-13  Daniel Shahaf  <danielsh@apache.org>
 
 	* 45290: Test/list-XFails: New helper script for listing

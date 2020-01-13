@@ -741,3 +741,8 @@
 >glob.tmp/secret-s000/  glob.tmp/secret-s000
 >glob.tmp/secret-s111/  glob.tmp/secret-s111
 >glob.tmp/secret-s444/  glob.tmp/secret-s444
+
+%clean
+
+ # Fix unreadable-directory permissions so ztst can clean up properly
+ chmod +rwx glob.tmp/secret-*(N) 2> /dev/null
