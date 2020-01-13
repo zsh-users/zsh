@@ -1,3 +1,8 @@
+2020-01-15  dana  <dana@dana.is>
+
+	* Daniel: 45291: Src/glob.c, Test/D02glob.ztst: A glob with a
+	trailing slash will now match unreadable/unexecutable directories.
+
 2020-01-15  Daniel Shahaf  <danielsh@apache.org>
 
 	* 45288: Completion/Unix/Command/_git: Complete bisect/new as

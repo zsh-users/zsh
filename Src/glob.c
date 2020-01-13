@@ -279,11 +279,11 @@ addpath(char *s, int l)
  * foo/ can be used to reference a non-directory foo.  Returns nonzero if   *
  * the file does not exists.                                                */
 
-/**/
 static int
 statfullpath(const char *s, struct stat *st, int l)
 {
     char buf[PATH_MAX+1];
+    int check_for_being_a_directory = 0;
 
     DPUTS(strlen(s) + !*s + pathpos - pathbufcwd >= PATH_MAX,
 	  "BUG: statfullpath(): pathname too long");
@@ -294,16 +294,44 @@ statfullpath(const char *s, struct stat *st, int l)
 	 * Don't add the '.' if the path so far is empty, since
 	 * then we get bogus empty strings inserted as files.
 	 */
-	buf[pathpos - pathbufcwd] = '.';
-	buf[pathpos - pathbufcwd + 1] = '\0';
-	l = 0;
+	if (st) {
+	    buf[pathpos - pathbufcwd] = '.';
+	    buf[pathpos - pathbufcwd + 1] = '\0';
+	    l = 0;
+	}
+	else {
+	    check_for_being_a_directory = 1;
+	}
     }
     unmetafy(buf, NULL);
-    if (!st) {
-	char lbuf[1];
-	return access(buf, F_OK) && (!l || readlink(buf, lbuf, 1) < 0);
+    if (st) {
+	return l ? lstat(buf, st) : stat(buf, st);
     }
-    return l ? lstat(buf, st) : stat(buf, st);
+    else if (check_for_being_a_directory) {
+	struct stat tmp;
+	if (stat(buf, &tmp))
+	    return -1;
+
+	return S_ISDIR(tmp.st_mode) ? 0 : -1;
+    }
+    else {
+	char lbuf[1];
+
+	/* If it exists, signal success. */
+	if (access(buf, F_OK) == 0)
+	    return 0;
+
+	/* Would a dangling symlink be good enough? */
+	if (l == 0)
+	    return -1;
+
+	/* Is it a dangling symlink? */
+	if (readlink(buf, lbuf, 1) >= 0)
+	    return 0;
+
+	/* Guess it doesn't exist, then. */
+	return -1;
+    }
 }
 
 /* This may be set by qualifier functions to an array of strings to insert
@@ -327,10 +355,12 @@ insert(char *s, int checked)
     if (gf_listtypes || gf_markdirs) {
 	/* Add the type marker to the end of the filename */
 	mode_t mode;
-	checked = statted = 1;
 	if (statfullpath(s, &buf, 1)) {
 	    unqueue_signals();
 	    return;
+	}
+	else {
+	    checked = statted = 1;
 	}
 	mode = buf.st_mode;
 	if (gf_follow) {
@@ -387,11 +417,10 @@ insert(char *s, int checked)
 	    qn = qn->next;
 	}
     } else if (!checked) {
-	if (statfullpath(s, &buf, 1)) {
+	if (statfullpath(s, NULL, 1)) {
 	    unqueue_signals();
 	    return;
 	}
-	statted = 1;
 	news = dyncat(pathbuf, news);
     } else
 	news = dyncat(pathbuf, news);
