@@ -2060,6 +2060,9 @@ specification.  The value should be in the form described in
 ifzman(the section `Completion Matching Control' in zmanref(zshcompwid))\
 ifnzman(noderef(Completion Matching Control))\
 .  For examples of this, see the description of the tt(tag-order) style.
+
+For notes comparing the use of this and the tt(matcher-list) style, see
+under the description of the tt(tag-order) style.
 )
 kindex(matcher-list, completion style)
 item(tt(matcher-list))(
@@ -2124,6 +2127,9 @@ If there is no current matcher or it is empty, and the option
 tt(NO_CASE_GLOB) is in effect, the matching for files is performed
 case-insensitively in any case.  However, any matcher must
 explicitly specify case-insensitive matching if that is required.
+
+For notes comparing the use of this and the tt(matcher) style, see
+under the description of the tt(tag-order) style.
 )
 kindex(max-errors, completion style)
 item(tt(max-errors))(

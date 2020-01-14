@@ -1,3 +1,8 @@
+2020-01-14  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* users/24659: Doc/Zsh/compsys.yo: Cross-reference use of
+	matcher and matcher-list with tag-order.
+
 2020-01-13  dana  <dana@dana.is>
 
 	* 45296: Test/D02glob.ztst: Clean up after test from users/24633
