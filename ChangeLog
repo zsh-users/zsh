@@ -1,3 +1,8 @@
+2020-01-16  Daniel Shahaf  <danielsh@apache.org>
+
+	* 45304: Src/loop.c, Test/A01grammar.ztst: Do execute the always
+	block even when the try/always block itself is the last command.
+
 2020-01-15  dana  <dana@dana.is>
 
 	* 45292: Test/D02glob.ztst: Add regression test for macOS stat(2)

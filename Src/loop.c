@@ -742,7 +742,7 @@ exectry(Estate state, int do_exec)
 
     /* The :try clause */
     ++try_tryflag;
-    execlist(state, 1, do_exec);
+    execlist(state, 1, 0);
     --try_tryflag;
 
     /* Don't record errflag here, may be reset.  However, */
