@@ -28,7 +28,7 @@ syn include @zsh                   syntax/zsh.vim
 syn match  ztstPayload             /^\s\+\zs.*/ contains=@zsh
 
 syn match  ztstExitCode            /^\d\+\|^-/                nextgroup=ztstFlags
-syn match  ztstFlags               /[.dDq]*:/       contained nextgroup=ztstTestName contains=ztstColon
+syn match  ztstFlags               /[.dDqf]*:/      contained nextgroup=ztstTestName contains=ztstColon
 syn match  ztstColon               /:/              contained
 syn region ztstTestName            start=// end=/$/ contained 
 
@@ -57,6 +57,16 @@ syn match  ztstComment             /^#.*/
 " Highlight those variables which are /de jure/ or /de facto/ APIs of the test
 " harness to the test files.
 syn keyword ztstSpecialVariable ZTST_unimplemented ZTST_skip ZTST_testdir ZTST_fd ZTST_srcdir containedin=@zsh 
+
+"" Sync
+" The following is sufficient for our modest line-based format, and helps
+" sidestep problems resulting from test cases that use syntax constructs
+" that confuse us and/or syntax/zsh.vim.  If we outgrow it, we should sync
+" on empty lines instead.
+"
+" If you run into syntax highlighting issues, just scroll the line that throws
+" the syntax highlighting off off the top of the screen.
+syn sync maxlines=1
 
 "" Highlight groups:
 hi def link ztstExitCode                  Number

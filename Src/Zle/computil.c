@@ -967,7 +967,7 @@ struct caarg {
 #define CAA_RARGS  4
 #define CAA_RREST  5
 
-/* The cache of parsed descriptons. */
+/* The cache of parsed descriptions. */
 
 #define MAX_CACACHE 8
 static Cadef cadef_cache[MAX_CACACHE];

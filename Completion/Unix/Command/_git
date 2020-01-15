@@ -1187,7 +1187,7 @@ _git-log () {
       fi
 
       # TODO: Write a wrapper function that checks whether we have a
-      # committish range or comittish and calls __git_tree_files
+      # committish range or committish and calls __git_tree_files
       # appropriately.
       if __git_is_committish_range $line[1]; then
 	__git_tree_files ${PREFIX:-.} $(__git_committish_range_last $line[1]) && ret=0
@@ -1671,7 +1671,7 @@ _git-shortlog () {
           ;;
         (*)
           # TODO: Write a wrapper function that checks whether we have a
-          # committish range or comittish and calls __git_tree_files
+          # committish range or committish and calls __git_tree_files
           # appropriately.
           if __git_is_committish_range $line[1]; then
             __git_tree_files ${PREFIX:-.} $(__git_committish_range_last $line[1]) && ret=0
@@ -2101,7 +2101,7 @@ _git-switch() {
   case $state in
     branches)
       if [[ -n ${opt_args[(i)--guess]} ]]; then
-	# --guess is the default but if it has been explictly specified,
+	# --guess is the default but if it has been explicitly specified,
 	# we'll only complete remote branches
 	__git_remote_branch_names_noprefix && ret=0
       else
@@ -4352,7 +4352,7 @@ _git-send-email () {
     '--smtp-pass=[specify password to use for SMTP-AUTH]::password' \
     '--smtp-server=[specify SMTP server to connect to, or sendmail command]: : __git_sendmail_smtpserver_values' \
     '--smtp-server-port=[specify port to connect to SMTP server on]:smtp port:_ports' \
-    '--smtp-server-option=[specify the outgoing SMTP server option to use]:SMPT server option' \
+    '--smtp-server-option=[specify the outgoing SMTP server option to use]:SMTP server option' \
     '--smtp-ssl-cert-path=[path to ca-certificates (directory or file)]:ca certificates path:_files' \
     '--smtp-user=[specify user to use for SMTP-AUTH]:smtp user:_users' \
     '(--no-smtp-auth)--smtp-auth=[specify allowed AUTH mechanisms]:space-separated list of mechanisms' \
@@ -5421,7 +5421,7 @@ _git-verify-pack () {
     '*:index file:_files -g "*.idx(-.)"'
 }
 
-# Synching Repositories
+# Syncing Repositories
 
 (( $+functions[_git-daemon] )) ||
 _git-daemon () {
@@ -5432,7 +5432,7 @@ _git-daemon () {
     '--strict-paths[match paths exactly]' \
     '--access-hook=-[allow an external tool to accept or decline service]:path:_directories' \
     '--base-path=-[remap all the path requests as relative to the given path]:path:_directories' \
-    '--base-path-relaxed[allow lookup of base path witout prefix]' \
+    '--base-path-relaxed[allow lookup of base path without prefix]' \
     '--interpolated-path=-[dynamically construct alternate paths]:path:_directories' \
     '--export-all[allow pulling from all repositories without verification]' \
     '(--port --listen --user --group)--inetd[run server as an inetd service]' \
@@ -6100,7 +6100,7 @@ _git_column_layouts() {
     '(always never)auto[show in columns if the output is to the terminal]' \
     '(row plain)column[fill columns before rows]' \
     '(column plain)row[fill rows before columns]' \
-    '(column row)plain[show in one colum]' \
+    '(column row)plain[show in one column]' \
     '(nodense)dense[make unequal size columns to utilize more space]' \
     '(dense)nodense[make equal size columns]'
 }
@@ -6116,15 +6116,22 @@ __git_date_formats () {
 
   date_formats=(
     relative:'show dates relative to the current time'
-    local:'show timestamps in local timezone'
+    local:'show timestamps in the local timezone'
     iso{,8601}:'show timestamps in ISO 8601 format'
+    iso{,8601}-local:'show timestamps in ISO 8601 format in the local timezone'
     iso-strict:'show timestamps in strict ISO 8601 format'
+    iso-strict-local:'show timestamps in strict ISO 8601 format in the local timezone'
     rfc{,2822}:'show timestamps in RFC 2822 format'
+    rfc{,2822}-local:'show timestamps in RFC 2822 format in the local timezone'
     short:'show only date but not time'
+    short-local:'show only date but not time in the local timezone'
     raw:'show date in internal raw git format (%s %z)'
+    raw-local:'show date in internal raw git format (%s %z) in the local timezone'
     human:'elide some current and recent date elements'
+    human-local:'elide some current and recent date elements in the local timezone'
     unix:'show date as a Unix epoch timestamp'
-    default:'show timestamp in the original timezone'
+    default:'show timestamp in rfc-like format'
+    default-local:'show timestamp in rfc-like format in the local timezone'
   )
 
   _describe -t date-formats 'date format' date_formats -- '( format\:custom\ format )' -S :

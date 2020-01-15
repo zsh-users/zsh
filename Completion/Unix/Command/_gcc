@@ -13,6 +13,11 @@ if [[ "$service" = -value-* ]]; then
     args2=()
   fi
 else
+  # On some systems (macOS), cc/gcc/g++ are actually clang; treat them accordingly
+  [[ $service != clang* ]] &&
+  _pick_variant clang=clang unix --version &&
+  service=clang-$service
+
   args2=( '*:input file:_files -g "*.([cCmisSoak]|cc|cpp|cxx|ii|k[ih])(-.)"' )
 fi
 
@@ -350,10 +355,12 @@ if [[ "$service" = clang* ]]; then
         "-nostdinc[Do not search standard system directories or compiler builtin directories for include files]"
         "-nostdlibinc[Do not search standard system directories for include files]"
         "-nobuiltininc[Do not search builtin directory for include files]"
+        "--help[Display this information]"
     )
 else
     args+=(
       '-flto=-[Enable link-time optimization]::jobs:'
+      '*--help=-[Display this information]:class:->help'
     )
 fi
 
@@ -427,7 +434,6 @@ args+=(
   '*-isystem:second include path directory (system):_files -/'
   '--sysroot=-[Use <directory> as the root directory for headers and libraries]:directory:_files -/'
   '-pass-exit-codes[Exit with highest error code from a phase]'
-  '*--help=-[Display this information]:class:->help'
   '--target-help[Display target specific command line options]'
   '-dumpspecs[Display all of the built in spec strings]'
   '-dumpversion[Display the version of the compiler]'
@@ -676,7 +682,6 @@ args+=(
   '-Wunderflow[Warn about underflow of numerical constant expressions]'
   '-Wuninitialized[Warn about uninitialized automatic variables]'
   '-Wunknown-pragmas[Warn about unrecognized pragmas]'
-  '-Wunreachable-code[Does nothing. Preserved for backward compatibility]'
   '-Wunsafe-loop-optimizations[Warn if the loop cannot be optimized due to nontrivial assumptions]'
   '-Wunsuffixed-float-constants[Warn about unsuffixed float constants]'
   '-Wunused-but-set-parameter[Warn when a function parameter is only set, otherwise unused]'
@@ -730,6 +735,20 @@ args+=(
   '-Werror=-[Treat specified warning as error (or all if none specified)]::warning:->werror'
   '-Wfatal-errors[Exit on the first error occurred]'
 )
+# clang specific warnings
+if [[ "$service" = clang* ]]; then
+  args+=(
+    '-Wunreachable-code[Warn on code that will not be executed]'
+    '-Wunreachable-code-aggressive[Controls -Wunreachable-code, -Wunreachable-code-break, -Wunreachable-code-return]'
+    '-Wunreachable-code-break[Warn when break will never be executed]'
+    '-Wunreachable-code-loop-increment[Warn when loop will be executed only once]'
+    '-Wunreachable-code-return[Warn when return will not be executed]'
+  )
+else
+  args+=(
+    '-Wunreachable-code[Does nothing. Preserved for backward compatibility]'
+  )
+fi
 # optimizers (from --help=optimizers), except for -O
 args+=(
 # --help=optimizers,^joined

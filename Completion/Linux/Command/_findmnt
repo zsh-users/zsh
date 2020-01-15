@@ -32,7 +32,7 @@ _arguments -s -C \
   '(H -U --uniq)'{-U,--uniq}'[ignore filesystems with duplicated mount targets]' \
   '(H -u --notruncate)'{-u,--notruncate}'[do not truncate text in columns]' \
   '(H -v --nofsroot)'{-v,--nofsroot}'[do not print \[/dir\] in the SOURCE column]' \
-  '(H -w --timeout)'{-w+,--timeout}'[specify timeout for --poll]:miliseconds: ' \
+  '(H -w --timeout)'{-w+,--timeout}'[specify timeout for --poll]:milliseconds: ' \
   '(H -x --verify)'{-x,--verify}'[check mount table content]' \
   '(H)--verbose[print more information]' \
   '(H)1: :->sources_targets' \

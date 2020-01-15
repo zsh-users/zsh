@@ -1726,7 +1726,7 @@ static Patprog patcomp, filecomp;
  * lppre/lpsuf -- the path prefix/suffix, unexpanded                       *
  * fpre/fsuf   -- prefix/suffix of the pathname component the cursor is in *
  * prpre       -- ppre in expanded form usable for opendir                 *
- * qipre, qisuf-- ingnored quoted string                                   *
+ * qipre, qisuf-- ignored quoted string                                   *
  *                                                                         *
  * The integer variables hold the lengths of lpre, lsuf, rpre, rsuf,       *
  * fpre, fsuf, lppre, and lpsuf.  noreal is non-zero if we have rpre/rsuf. */

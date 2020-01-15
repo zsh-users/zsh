@@ -139,7 +139,7 @@ case ${variant}:${${service#ping}:-4} in
   darwin*:6)
     args+=(
       '-B+[bind the socket to specified interface for sending]:interface:_net_interfaces'
-      '-G+[specify max,min,increment size for ICMP payload for sweeping pings]:max,min,incr (defalt min=0 incr=1)'
+      '-G+[specify max,min,increment size for ICMP payload for sweeping pings]:max,min,incr (default min=0 incr=1)'
       '-z+[specify traffic class]:traffic class'
     )
   ;|

@@ -17,18 +17,37 @@ item(tt(zstyle -m) var(context) var(style) var(pattern))(
 This builtin command is used to define and lookup styles.  Styles are
 pairs of names and values, where the values consist of any number of
 strings.  They are stored together with patterns and lookup is done by
-giving a string, called the `context', which is compared to the
-patterns.  The definition stored for the first matching pattern will be 
-returned.
+giving a string, called the `em(context)', which is matched against the
+patterns.  The definition stored for the most specific pattern that matches
+will be returned.
 
-For ordering of comparisons, patterns are searched from most specific to
-least specific, and patterns that are equally specific keep the order in 
-which they were defined.  A pattern is considered to be more specific
+A pattern is considered to be more specific
 than another if it contains more components (substrings separated by
 colons) or if the patterns for the components are more specific, where 
 simple strings are considered to be more specific than patterns and
 complex patterns are considered to be more specific than the pattern
-`tt(*)'.
+`tt(*)'.  A `tt(*)' in the pattern will match zero or more characters
+in the context; colons are not treated specially in this regard.
+If two patterns are equally specific, the tie is broken in favour of
+the pattern that was defined first.
+
+em(Example)
+
+For example, to define your preferred form of precipitation depending on which
+city you're in, you might set the following in your tt(zshrc):
+
+example(zstyle ':weather:europe:*' preferred-precipitation rain
+zstyle ':weather:europe:germany:* preferred-precipitation none
+zstyle ':weather:europe:germany:*:munich' preferred-precipitation snow)
+
+Then, the fictional `tt(weather)' plugin might run under the hood a command
+such as
+
+example(zstyle -s ":weather:${continent}:${country}:${county}:${city}" preferred-precipitation REPLY)
+
+in order to retrieve your preference into the scalar variable tt($REPLY).
+
+em(Usage)
 
 The first form (without arguments) lists the definitions.  Styles
 are shown in alphabetic order and patterns are shown in the order
@@ -39,7 +58,7 @@ tt(zstyle).  The optional first argument is a pattern which will be matched
 against the string supplied as the pattern for the context; note that
 this means, for example, `tt(zstyle -L ":completion:*")' will
 match any supplied pattern beginning `tt(:completion:)', not
-just tt(":completion:*"):  use tt(":completion:\*") to match that.
+just tt(":completion:*"):  use tt(':completion:\*') to match that.
 The optional second argument limits the output to a specific var(style) (not a
 pattern).  tt(-L) is not compatible with any other options.
 

@@ -87,7 +87,7 @@ _urpmi() {
     "($help)--auto[automatically select a package in choices]"
     "($help)--force[force invocation even if some packages do not exist]"
     "($help)--parallel[distributed urpmi across machines of alias]:urpmi alias name:_urpmi_parallel_alias"
-    "($help)--root[use another root for rpm installation]:root diretory:_files -/"
+    "($help)--root[use another root for rpm installation]:root directory:_files -/"
     "($help)--test[test only, do not modify system]"
     "($help)-a[select all matches on command line]"
   )
@@ -147,7 +147,7 @@ _urpmi() {
 	"($help : -)"{--help,-h}"[print usage information]" \
 	"($help :)-a[select all media]" \
 	"($help)-c[clean headers cache directory]" \
-	"($help)-y[fuzzy mathing on media names]" \
+	"($help)-y[fuzzy matching on media names]" \
 	"(-a)"{,\*}":media:_sequence _urpmi_media" \
        && ret=0
     ;;
@@ -189,7 +189,7 @@ _urpmi() {
 	"($help)--more-choices[propose more choices than the default]" \
 	"($help --no-resume)--resume[resume transfer of partially-downloaded files]" \
 	"($help --resume)--no-resume[do not resume transfer of partially-downloaded files]" \
-	"($help)--root[use another root for rpm installation]:root diretory:_files -/" \
+	"($help)--root[use another root for rpm installation]:root directory:_files -/" \
 	"($help)--skip[packages which installation should be skipped]:packages: " \
 	"($help)--split-length[small transaction length]:transaction length: " \
 	"($help)--split-level[split in small transaction]:transaction size: " \

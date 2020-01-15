@@ -39,11 +39,11 @@ be familiar to most command line users.
 
 Typically, options are single letters preceded by a hyphen (tt(-)).
 Options that take an argument accept it either immediately following the
-option letter or after white space, for example `tt(print -C3 *)' or
-`tt(print -C 3 *)' are equivalent.  Arguments to options are not the
+option letter or after white space, for example `tt(print -C3 {1..9})' or
+`tt(print -C 3 {1..9})' are equivalent.  Arguments to options are not the
 same as arguments to the command; the documentation indicates which is
 which.  Options that do not take an argument may be combined in a single
-word, for example `tt(print -ca *)' and `tt(print -c -a *)' are
+word, for example `tt(print -rca -- *)' and `tt(print -r -c -a -- *)' are
 equivalent.
 
 Some shell builtin commands also take options that begin with `tt(+)'
@@ -54,14 +54,14 @@ Options (together with their individual arguments, if any) must appear
 in a group before any non-option arguments; once the first non-option
 argument has been found, option processing is terminated.
 
-All builtin commands other than precommand modifiers, even those that
-have no options, can be given the argument `tt(-)tt(-)' to terminate option
-processing.  This indicates that the following words are non-option
-arguments, but is otherwise ignored.  This is useful in cases where
-arguments to the command may begin with `tt(-)'.  For historical
-reasons, most builtin commands also recognize a single `tt(-)' in a
-separate word for this purpose; note that this is less standard and
-use of `tt(-)tt(-)' is recommended.
+All builtin commands other than `tt(echo)' and precommand modifiers,
+even those that have no options, can be given the argument `tt(-)tt(-)'
+to terminate option processing.  This indicates that the following words
+are non-option arguments, but is otherwise ignored.  This is useful in
+cases where arguments to the command may begin with `tt(-)'.  For
+historical reasons, most builtin commands (including `tt(echo)') also
+recognize a single `tt(-)' in a separate word for this purpose; note
+that this is less standard and use of `tt(-)tt(-)' is recommended.
 
 startitem()
 prefix(-)
@@ -114,9 +114,9 @@ var(text) is any non-empty string, it is replaced by the text
 a literal string, not a pattern.  A trailing space in var(value) is not
 special in this case.  For example,
 
-example(alias -s ps=gv)
+example(alias -s ps='gv --')
 
-will cause the command `tt(*.ps)' to be expanded to `tt(gv *.ps)'.  As
+will cause the command `tt(*.ps)' to be expanded to `tt(gv -- *.ps)'.  As
 alias expansion is carried out earlier than globbing, the `tt(*.ps)' will
 then be expanded.  Suffix aliases constitute a different name space from
 other aliases (so in the above example it is still possible
@@ -1258,7 +1258,10 @@ If given together with tt(-o) or tt(-O), sorting is performed
 case-independently.
 )
 item(tt(-l))(
-Print the arguments separated by newlines instead of spaces.
+Print the arguments separated by newlines instead of spaces.  Note: if
+the list of arguments is empty, tt(print -l) will still output one empty
+line. To print a possibly-empty list of arguments one per line, use
+tt(print -C1), as in `tt(print -rC1 -- "$list[@]")'.
 )
 item(tt(-m))(
 Take the first argument as a pattern (should be quoted), and remove
@@ -1269,7 +1272,9 @@ item(tt(-n))(
 Do not add a newline to the output.
 )
 item(tt(-N))(
-Print the arguments separated and terminated by nulls.
+Print the arguments separated and terminated by nulls. Again,
+tt(print -rNC1 -- "$list[@]") is a canonical way to print an
+arbitrary list as null-delimited records.
 )
 item(tt(-o))(
 Print the arguments sorted in ascending order.

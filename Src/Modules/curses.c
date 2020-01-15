@@ -1519,7 +1519,7 @@ zccmd_resize(const char *nam, char **args)
             // is not available.
             return 0;
         } else {
-            // Without this call some window moves are innacurate. Tested on
+            // Without this call some window moves are inaccurate. Tested on
             // OS X ncurses 5.4, Homebrew ncursesw 6.0-2, Arch Linux ncursesw
             // 6.0, Ubuntu 14.04 ncurses 5.9, FreeBSD ncursesw.so.8
             //

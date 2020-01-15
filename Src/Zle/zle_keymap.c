@@ -55,7 +55,7 @@ struct keymapname {
     HashNode next;	/* next in the hash chain */
     char *nam;		/* name of the keymap */
     int flags;		/* various flags (see below) */
-    Keymap keymap;	/* the keymap itsef */
+    Keymap keymap;	/* the keymap itself */
 };
 
 /* Can't be deleted (.safe) */

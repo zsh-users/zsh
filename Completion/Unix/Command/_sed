@@ -38,7 +38,7 @@ cmds_end=(
   'n:read the next line of input into pattern space'
   'N:append the next line of input to the pattern space'
   'p:print the current pattern space'
-  'P:print upto the first newline of the current pattern space'
+  'P:print up to the first newline of the current pattern space'
   'x:exchange hold and pattern spaces'
   '}:end group'
 )

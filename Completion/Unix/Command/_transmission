@@ -50,7 +50,7 @@ local global_only_actions=(
   '(- :)'{-m,--portmap}'[enable portmapping via NAT-PMP or UPnP]'
   '(- :)'{-M,--no-portmap}'[disable portmapping]'
   '(- :)'{-o,--dht}'[enable distributed hash table]'
-  '(- :)'{-O,--no-dht}'[disable distribued hash table]'
+  '(- :)'{-O,--no-dht}'[disable distributed hash table]'
   '(- :)'{-u,--uplimit}'[limit the maximum upload speed to limit kB/s]:limit:{_message "limit in kB/sec"}'
   '(- :)'{-U,--no-uplimit}'[disable upload speed limits]'
   '(- :)--utp[enable uTP for peer connections]'
@@ -69,7 +69,7 @@ local torrent_add_options=(
   '(-c --incomplete-dir)'{-C,--no-incomplete-dir}'[don'"'"'t store incomplete torrents in a different directory]'
   {-w-,--download-dir=}'[when used in conjunction with --add, set the new torrent'"'"'s download folder]:dir:{_files -/}'
 )
-# `torrent_action_only_actions`: *actions* that can be speficied only when explicitly selecting a specific set of torrents
+# `torrent_action_only_actions`: *actions* that can be specified only when explicitly selecting a specific set of torrents
 local torrent_action_only_actions=(
   {-f,--files}'[get a file list for the current torrent(s)]'
   {-g,--get}'[mark file(s) for download]:torrent_file:_transmission-remote_torrent_get'
@@ -154,7 +154,7 @@ _transmission-remote_torrent(){
   local torrents_list_lines=(${(f)"$(transmission-remote "${authentication_args}" --list 2> /dev/null)"})
   local -a parts
   local -a torrents_ids torrents_names
-  # While itereating through every line in the output above, we don't need the
+  # While iterating through every line in the output above, we don't need the
   # first and last line which are just a header and summary
   for (( t = 2; t < ${#torrents_list_lines[@]} - 1; ++t )); do
     parts=(${(@s. .)torrents_list_lines[$t]})

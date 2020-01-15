@@ -13,7 +13,7 @@ if (( CURRENT == 2 )); then
     hairpin:toggle\ hairpin\ mode\ on\ a\ port
     showmacs:show\ a\ list\ of\ learned\ MAC\ addresses
     setageing:set\ MAC\ address\ ageing\ time
-    setgcint:set\ grabage\ collection\ interval
+    setgcint:set\ garbage\ collection\ interval
     stp:control\ use\ of\ spanning\ tree\ protocol
     showstp:show\ bridge\ stp\ info
     setbridgeprio:set\ bridge\ priority

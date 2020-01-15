@@ -381,7 +381,12 @@ _man() {
 
     (( $#sects )) || return 1
 
-    _tags manuals.${^sects}
+    if [[ $PREFIX$SUFFIX == */* ]]; then
+      _tags manuals.${^sects} files
+    else
+      _tags manuals.${^sects}
+    fi
+
     while _tags; do
       for sect_dirname in $sects; do
         d=$sect_dirname
@@ -390,6 +395,8 @@ _man() {
         _requested manuals.$sect_dirname expl "manual page, section $d" _man_pages &&
             ret=0
       done
+      [[ $PREFIX$SUFFIX == */* ]] &&
+      _requested files expl directory _files -/ && ret=0
       (( ret )) || return 0
     done
     ## To fall back to other sections' manpages when completing filenames, like

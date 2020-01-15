@@ -366,6 +366,7 @@ ZTST_test() {
   local last match mbegin mend found substlines
   local diff_out diff_err
   local ZTST_skip
+  integer expected_to_fail
 
   while true; do
     rm -f $ZTST_in $ZTST_out $ZTST_err
@@ -460,8 +461,21 @@ $ZTST_curline"
 	fi
       fi
 
+      if [[ $ZTST_flags = *f* ]]; then
+        expected_to_fail=1
+        ZTST_xfail_diff() { ZTST_diff "$@" > /dev/null }
+        ZTST_diff=ZTST_xfail_diff
+      else
+        expected_to_fail=0
+        ZTST_diff=ZTST_diff
+      fi
+
       # First check we got the right status, if specified.
       if [[ $ZTST_xstatus != - && $ZTST_xstatus != $ZTST_status ]]; then
+        if (( expected_to_fail )); then
+          ZTST_verbose 1 "Test failed, as expected."
+          continue
+        fi
 	ZTST_testfailed "bad status $ZTST_status, expected $ZTST_xstatus from:
 $ZTST_code${$(<$ZTST_terr):+
 Error output:
@@ -480,7 +494,11 @@ $(<$ZTST_terr)"
 	rm -rf $ZTST_out
 	print -r -- "${(e)substlines}" >$ZTST_out
       fi
-      if [[ $ZTST_flags != *d* ]] && ! ZTST_diff $diff_out -u $ZTST_out $ZTST_tout; then
+      if [[ $ZTST_flags != *d* ]] && ! $ZTST_diff $diff_out -u $ZTST_out $ZTST_tout; then
+        if (( expected_to_fail )); then
+          ZTST_verbose 1 "Test failed, as expected."
+          continue
+        fi
 	ZTST_testfailed "output differs from expected as shown above for:
 $ZTST_code${$(<$ZTST_terr):+
 Error output:
@@ -492,10 +510,18 @@ $(<$ZTST_terr)}"
 	rm -rf $ZTST_err
 	print -r -- "${(e)substlines}" >$ZTST_err
       fi
-      if [[ $ZTST_flags != *D* ]] && ! ZTST_diff $diff_err -u $ZTST_err $ZTST_terr; then
+      if [[ $ZTST_flags != *D* ]] && ! $ZTST_diff $diff_err -u $ZTST_err $ZTST_terr; then
+        if (( expected_to_fail )); then
+          ZTST_verbose 1 "Test failed, as expected."
+          continue
+        fi
 	ZTST_testfailed "error output differs from expected as shown above for:
 $ZTST_code"
 	return 1
+      fi
+      if (( expected_to_fail )); then
+        ZTST_testfailed "test was expected to fail, but passed."
+        return 1
       fi
     fi
     ZTST_verbose 1 "Test successful."

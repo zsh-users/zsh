@@ -1552,7 +1552,7 @@ setpmnameddirs(Param pm, HashTable ht)
 	    }
 	}
 
-    /* The INTERACTIVE stuff ensures that the dirs are not immediatly removed
+    /* The INTERACTIVE stuff ensures that the dirs are not immediately removed
      * when the sub-pms are deleted. */
 
     i = opts[INTERACTIVE];

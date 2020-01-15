@@ -37,7 +37,7 @@ _arguments -C \
   '-memory-cache-size[cache memory]:size (bytes) [1048576]' \
   '-image-cache-size[image cache memory]:size (bytes) [1048576]' \
   '-font-cache-size[specify font cache size]:size (bytes) [2097152]' \
-  "-aggressive-cache[cache everything regardless of server's caching recomendations]:enable [1]:((1\\:on 0\\:off))" \
+  "-aggressive-cache[cache everything regardless of server's caching recommendations]:enable [1]:((1\\:on 0\\:off))" \
   '-address-preference[specify IP version preference]:preference:((
     0\:system\ default
     1\:prefer\ IPv4

@@ -115,7 +115,7 @@ _sbuild() {
     '--finished-build-commands=[run commands after package is built]:commands' \
     '--build-failed-commands=[run commands after dpkg-buildpackage fails]:commands' \
     '--chroot-cleanup-commands=[run commands after chroot cleanup]:commands' \
-    '--post-build-commands=[run commands after package is build sucessfuly]:commands' \
+    '--post-build-commands=[run commands after package is built successfully]:commands' \
     '--post-build-failed-commands[run commands after package failed to build]:commands' \
     '--anything-failed-commands=[run commands for all --xxx-failed-commands option]:commands' \
     '--log-external-command-output[external commands output are logged]' \

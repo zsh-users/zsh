@@ -39,7 +39,7 @@ _yum() {
     '--color=[control whether color is used]:(always auto never)' \
     '--releasever=[set value of $releasever in yum config and repo files]:value' \
     "--downloadonly[don't update, just download]" \
-    '--downloaddir=[specify alternate directory to store packages]:directort:_directories' \
+    '--downloaddir=[specify alternate directory to store packages]:directory:_directories' \
     '--setopt=[set arbitrary config and repo options]:option' \
     '--bugfix[include bugfix relevant packages in updates]' \
     '--security[include security relevant packages in updates]' \

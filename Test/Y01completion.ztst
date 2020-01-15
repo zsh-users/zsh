@@ -216,6 +216,15 @@ F:regression test workers/31611
 >NO:{3pm}
 >NO:{10pm}
 
+ comptest $'a=() b=(\t'
+0:multiple envarrays
+>line: {a=() b=(}{}
+>DESCRIPTION:{file}
+>DI:{dir1}
+>DI:{dir2}
+>FI:{file1}
+>FI:{file2}
+
 %clean
 
   zmodload -ui zsh/zpty

@@ -1492,7 +1492,7 @@ set_comp_sep(void)
      *     are specially handled (but currently only if RCQUOTES is not
      *     set, which isn't necessarily correct if the quotes were typed by
      *     the user).
-     * osq: c.f. odq, taking account of Snull's and embeded "'"'s.
+     * osq: c.f. odq, taking account of Snull's and embedded "'"'s.
      * qttype: type of quotes using standard QT_* definitions.
      * lsq: when quoting is single quotes (QT_SINGLE), counts the offset
      *      adjustment needed in the word being examined in the lexer loop.

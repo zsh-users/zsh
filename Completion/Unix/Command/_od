@@ -26,7 +26,7 @@ if _pick_variant gnu=GNU unix --version; then
   args=( ${(R)args:#(|\*)(|\(*\))-[hBIL]*} )
   args+=(
     '--traditional'
-    '--endian=[swap input bytes]:endianess:(big little)'
+    '--endian=[swap input bytes]:endianness:(big little)'
     {-S+,--strings=-}'[output strings of at least specified bytes long]:length'
     {-w-,--width=-}'[output specified bytes per line]:bytes'
     '(- : *)--help[display help and exit]'

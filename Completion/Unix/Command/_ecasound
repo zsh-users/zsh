@@ -36,7 +36,7 @@ _arguments -C \
   '*-eS\:-[audio stamp]:stamp-id (int)' \
   '*-ea\:-[amplify signal]:amplification value (percent)' \
   '*-eac\:-[amplify signal of channel]: :->eac' \
-  '*-eaw\:-[amplify singal (clipping)]: :->eaw' \
+  '*-eaw\:-[amplify signal (clipping)]: :->eaw' \
   '*-eal\:-[limits audio level]:limit (percent)' \
   '*-ec\:-[compressor (a simple one)]: :->ec' \
   '*-eca\:-[a more advanced compressor]: :->eca' \

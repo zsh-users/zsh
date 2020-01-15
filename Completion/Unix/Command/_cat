@@ -51,7 +51,7 @@ elif [[ $OSTYPE = solaris* ]]; then
     '*: :_files'
   )
 else
-  # POSIX reqires '-u', and most OSes may support '-n'
+  # POSIX requires '-u', and most OSes may support '-n'
   args=(
     '-n[number all output lines]'
     '-u[do not buffer output]'

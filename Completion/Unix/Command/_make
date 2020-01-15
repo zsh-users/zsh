@@ -120,12 +120,12 @@ _make-parseMakefile () {
 
 _make() {
 
-  local prev="$words[CURRENT-1]" file expl tmp is_gnu incl match basedir
+  local prev="$words[CURRENT-1]" file expl tmp is_gnu incl match basedir nul=$'\0'
   local context state state_descr line
   local -a option_specs
   local -A VARIABLES VAR_ARGS opt_args
   local -aU TARGETS keys
-  local ret=1
+  local -i cdir=-1 ret=1
 
   # VAR=VAL on the current command line
   for tmp in $words; do
@@ -142,7 +142,7 @@ _make() {
     incl="(-|)include"
     option_specs=(
       '(-B --always-make)'{-B,--always-make}'[unconditionally make all targets]'
-      '*'{-C,--directory=}'[change directory first]:change to directory:->dir'
+      '*'{-C,--directory=}'[change directory first]:change to directory:->cdir'
       '-d[print lots of debug information]'
       '--debug=-[print various types of debug information]:debug options:->debug'
       '(-e --environment-overrides)'{-e,--environment-overrides}'[environment variables override makefiles]'
@@ -177,7 +177,7 @@ _make() {
     # Basic make options only.
     incl=.include
     option_specs=(
-      '-C[change directory first]:directory:->dir'
+      '-C[change directory first]:directory:->cdir'
       '-I[include directory for makefiles]:directory:->dir'
       '-f[specify makefile]:makefile:->file'
       '-o[specify file not to remake]:file not to remake:->file'
@@ -188,11 +188,12 @@ _make() {
   _arguments -s $option_specs \
     '*:make target:->target' && ret=0
 
-  basedir=${(Q)~opt_args[-C]:-${opt_args[--directory]}}
-  VAR_ARGS[CURDIR]="${basedir:=$PWD}"
+  [[ $state = cdir ]] && cdir=-2
+  basedir=${(j./.)${${~"${(@s.:.):-$PWD:${(Q)${opt_args[-C]:-$opt_args[--directory]}//\\:/$nul}}"}[(R)/*,cdir]}//$nul/:}
+  VAR_ARGS[CURDIR]="${basedir}"
 
   case $state in
-    (dir)
+    (*dir)
     _description directories expl "$state_descr"
     _files "$expl[@]" -W $basedir -/ && ret=0
     ;;

@@ -610,7 +610,7 @@ _pgsql_initdb() {
     + x # Exclusive options
     $common_opts_excl
     + '(l)' # Locale options (general)
-    {-l+,--locale=}'[specify locale (all catgories)]: :_locales'
+    {-l+,--locale=}'[specify locale (all categories)]: :_locales'
     '--no-locale[equivalent to --locale=C]'
     + lc # Locale options (specific) -- unlike createdb, NOT exclusive with -l
     '--lc-collate=[specify LC_COLLATE setting]: :_locales'

@@ -335,9 +335,9 @@ _arguments -C \
   '--data-dir=[specify the user data directory to search for pandoc data files]:dir:_pandoc_data_dir' \
   '--base-header-level=[specify the base level for headers (defaults to 1)]:number:_pandoc_header_level' \
   '--strip-empty-paragraphs[deprecated. Use the +empty_paragraphs extension instead]: :' \
-  '--indented-code-classes=[classes to use for indented code blocks]:class:{_message "Classes seperated with ,"}' \
+  '--indented-code-classes=[classes to use for indented code blocks]:class:{_message "Classes separated with ,"}' \
   '*--filter=[specify an executable to be used as a filter transforming the pandoc AST after the input is parsed and before the output is written]:file:_pandoc_filter' \
-  '*--lua-filter=[transform the document in a similar fashion as JSON filters (see --filter), but use pandoc'"'"'s build-in lua filtering system]:file:_pandoc_lua_filter' \
+  '*--lua-filter=[transform the document in a similar fashion as JSON filters (see --filter), but use pandoc'"'"'s built-in lua filtering system]:file:_pandoc_lua_filter' \
   {-p,--preserve-tabs}'[preserve tabs instead of converting them to spaces]: :' \
   '--tab-stop=[specify the number of spaces per tab (default is 4)]:number:{_message -r "choose a number equals to or greater then 1"}' \
   '--track-changes=[specifies what to do with insertions, deletions, and comments produced by the MS Word "Track Changes" feature]: :_pandoc_track_changes' \

@@ -4,7 +4,7 @@
 # With first argument including n, don't change to the old directory; else do.
 #
 # Set do_close to 1 if the connection was not previously open, 0 otherwise
-# With first arguemnt including d, don't set do_close to 1.  Broadly
+# With first argument including d, don't set do_close to 1.  Broadly
 # speaking, we use this mechanism to shut the connection after use
 # if the connection had been explicitly closed (i.e. didn't time out,
 # which zftp test investigates) and we are not using a directory

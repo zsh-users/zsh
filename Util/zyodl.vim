@@ -21,7 +21,10 @@
 "   xitem(foo)
 "   item(foo)(foo)
 "   sitem(foo)(foo foo)
+"   COMMENT(foo var(foo) foo)
+"   comment(foo)
 "   example(print *.c+LPAR()#q:s/#%+LPAR()#b+RPAR()s+LPAR()*+RPAR().c/'S${match[1]}.C'/+RPAR())
+"   example(zargs -- **/*(.) -- ls -l)
 "   ifzman(zmanref(zshmisc))ifnzman(noderef(Redirection))
 "   LPAR()foo 42 foo+RPAR()
 "   chapter(foo (foo) foo)
@@ -50,7 +53,10 @@ syn match  zyodlSpecial "+\?\<\(LPAR\|RPAR\|PLUS\)()"
 syn match  zyodlNumber  "\d\+"
 syn region zyodlItem    start="\<xitem(" end=")" contains=zyodlSpecial,@zyodlInline
 syn region zyodlItem    start="\<item("  end=")" contains=zyodlSpecial,@zyodlInline
-syn region zyodlExample start="\<example(" end=")" contains=zyodlSpecial
+syn region zyodlExample start="\<example(" end=")" contains=zyodlSpecial,zyodlParenthetical
+syn region zyodlComment start="\<COMMENT(" end=")" contains=zyodlSpecial,@zyodlInline,zyodlParenthetical
+" comment that gets output in generated texinfo/roff source
+syn region zyodlComment start="\<comment(" end=")"
 syn region zyodlTitle   start="\<\(chapter\|subsect\|sect\)(" end=")" contains=zyodlSpecial,@zyodlInline,zyodlParenthetical
 syn match  zyodlTitle   "^texinode(.*$"
 syn region zyodlParenthetical start="\w\@<!(" end=")" transparent contained contains=zyodlParenthetical
@@ -70,11 +76,12 @@ hi def link zyodlVar Identifier
 " Not ':hi def link zyodlBold Bold' since there's no such group.
 hi def zyodlBold gui=bold cterm=bold
 hi def link zyodlEmph Type
-hi def link zyodlIndex Comment
+hi def link zyodlIndex PreProc
 hi def link zyodlSpecial Special
 hi def link zyodlNumber Number
 hi def link zyodlItem Keyword
 hi def link zyodlExample String
+hi def link zyodlComment Comment
 hi def link zyodlTitle Title
 hi def link zyodlCond Conditional
 hi def link zyodlRef Include

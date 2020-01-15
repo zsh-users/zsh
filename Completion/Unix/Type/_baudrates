@@ -11,7 +11,7 @@
 #
 #     -l LIMIT     Lower limit. Like -u but for the lower boundary.
 #
-#     -f FUNCTION  If given FUNCION is used as a predicate to filter the
+#     -f FUNCTION  If given FUNCTION is used as a predicate to filter the
 #                  value in the complete list to generate an arbitrary
 #                  sub-set.
 #

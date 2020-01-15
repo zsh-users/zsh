@@ -135,7 +135,7 @@ ___luarocks_installed_rocks_cache_policy(){
   #   ) if configuration files are newer:
   #     * set and cache the values from the commands above
   #   ) else:
-  #     * retrive from cache the values of the commands above
+  #     * retrieve from cache the values of the commands above
   #   ) end if
   # ) end if
 
@@ -190,7 +190,7 @@ ___luarocks_installed_rocks_cache_policy(){
 }
 (( $+functions[__luarocks_installed_rocks] )) ||
 __luarocks_installed_rocks(){
-  # This function optionally recieves one argument of the tree in which
+  # This function optionally receives one argument of the tree in which
   # installed rocks are searched for. If this argument is used, the installed
   # rocks which will be completed by this function will not use the cache which
   # is valid only for installed rocks on default trees like /usr/lib/luarocks
@@ -305,7 +305,7 @@ __luarocks_installed_rocks(){
     fi
   fi
 }
-# Used to complete one or more of the followings:
+# Used to complete one or more of the following:
 # - .rockspec file
 # - .src.rock file
 # - external rock

@@ -400,7 +400,7 @@ backslashes.
 For example, the following piece of filename generation code
 with the tt(EXTENDED_GLOB) option:
 
-example(print *.c+LPAR()#q:s/#%+LPAR()#b+RPAR()s+LPAR()*+RPAR().c/'S${match[1]}.C'/+RPAR())
+example(print -r -- *.c+LPAR()#q:s/#%+LPAR()#b+RPAR()s+LPAR()*+RPAR().c/'S${match[1]}.C'/+RPAR())
 
 takes the expansion of tt(*.c) and applies the glob qualifiers in the
 tt(LPAR()#q)var(...)tt(RPAR()) expression, which consists of a substitution
@@ -582,7 +582,25 @@ and subscript notation to access individual array elements.
 Note in particular the fact that words of unquoted parameters are not
 automatically split on whitespace unless the option tt(SH_WORD_SPLIT) is
 set; see references to this option below for more details.  This is an
-important difference from other shells.
+important difference from other shells.  However, as in other shells,
+null words are elided from unquoted parameters' expansions.
+
+With default options, after the assignments:
+
+example(array=("first word" "" "third word")
+scalar="only word")
+
+then tt($array) substitutes two words, `tt(first word)' and `tt(third
+word)', and tt($scalar) substitutes a single word `tt(only word)'.  Note
+that second element of tt(array) was elided.  Scalar parameters can
+be elided too if their value is null (empty).  To avoid elision, use quoting as
+follows: tt("$scalar") for scalars and tt("${array[@]}") or tt("${(@)array}")
+for arrays.  (The last two forms are equivalent.)
+
+Parameter expansions can involve em(flags), as in `tt(${(@kv)aliases})',
+and other operators, such as `tt(${PREFIX:-"/usr/local"})'.  Parameter
+expansions can also be nested.  These topics will be introduced below.
+The full rules are complicated and are noted at the end.
 
 In the expansions discussed below that require a pattern, the form of
 the pattern is the same as that used for filename generation;
@@ -594,17 +612,8 @@ noderef(Modifiers) in noderef(History Expansion) can be
 applied:  for example, tt(${i:s/foo/bar/}) performs string
 substitution on the expansion of parameter tt($i).
 
-In the following descriptions, `word' refers to a single word
+In the following descriptions, `var(word)' refers to a single word
 substituted on the command line, not necessarily a space delimited word.
-With default options, after the assignments:
-
-example(array=("first word" "second word")
-scalar="only word")
-
-then tt($array) substitutes two words, `tt(first word)' and `tt(second
-word)', and tt($scalar) substitutes a single word `tt(only word)'.  This
-may be modified by explicit or implicit word-splitting, however.  The
-full rules are complicated and are noted at the end.
 
 startitem()
 item(tt(${)var(name)tt(}))(
@@ -1394,11 +1403,40 @@ used with the tt(${)...tt(/)...tt(}) forms.
 
 startitem()
 item(tt(S))(
-Search substrings as well as beginnings or ends; with tt(#) start
-from the beginning and with tt(%) start from the end of the string.
+With tt(#) or tt(##), search for the match that starts closest to the start of
+the string (a `substring match'). Of all matches at a particular position,
+tt(#) selects the shortest and tt(##) the longest:
+
+example(% str="aXbXc"
+% echo ${+LPAR()S+RPAR()str#X*}
+abXc
+% echo ${+LPAR()S+RPAR()str##X*}
+a
+% )
+
+With tt(%) or tt(%%), search for the match that starts closest to the end of
+the string:
+
+example(% str="aXbXc"
+% echo ${+LPAR()S+RPAR()str%X*}
+aXbc
+% echo ${+LPAR()S+RPAR()str%%X*}
+aXb
+% )
+
+(Note that tt(%) and tt(%%) don't search for the match that ends closest to the
+end of the string, as one might expect.)
+
 With substitution via tt(${)...tt(/)...tt(}) or
 tt(${)...tt(//)...tt(}), specifies non-greedy matching, i.e. that the
-shortest instead of the longest match should be replaced.
+shortest instead of the longest match should be replaced:
+
+example(% str="abab"
+% echo ${str/*b/_}
+_
+% echo ${+LPAR()S+RPAR()str/*b/_}
+_ab
+% )
 )
 item(tt(I:)var(expr)tt(:))(
 Search the var(expr)th match (where var(expr) evaluates to a number).
@@ -2264,12 +2302,13 @@ parentheses can be referenced.
 
 For example,
 
-example(foo="a string with a message"
-if [[ $foo = (a|an)' '(#b)(*)' '* ]]; then
+example(foo="a_string_with_a_message"
+if [[ $foo = (a|an)_(#b)(*) ]]; then
   print ${foo[$mbegin[1],$mend[1]]}
 fi)
 
-prints `tt(string with a)'.  Note that the first parenthesis is before the
+prints `tt(string_with_a_message)'.
+Note that the first set of parentheses is before the
 tt((#b)) and does not create a backreference.
 
 Backreferences work with all forms of pattern matching other than filename
@@ -2492,11 +2531,11 @@ therefore matches files in the current directory as well as
 subdirectories.
 Thus:
 
-example(ls (*/)#bar)
+example(ls -ld -- (*/)#bar)
 
 or
 
-example(ls **/bar)
+example(ls -ld -- **/bar)
 
 does a recursive directory search for files named `tt(bar)' (potentially
 including the file `tt(bar)' in the current directory).  This form does not
@@ -2511,11 +2550,11 @@ they are treated as if both a tt(/) plus a further tt(*) are present.
 Hence:
 
 example(setopt GLOBSTARSHORT
-ls **.c)
+ls -ld -- **.c)
 
 is equivalent to
 
-example(ls **/*.c)
+example(ls -ld -- **/*.c)
 subsect(Glob Qualifiers)
 cindex(globbing, qualifiers)
 cindex(qualifiers, globbing)
@@ -2707,7 +2746,7 @@ appropriate test.  For example,
 
 example(nt+LPAR()RPAR() { [[ $REPLY -nt $NTREF ]] }
 NTREF=reffile
-ls -l *(+nt))
+ls -ld -- *(+nt))
 
 lists all files in the directory that have been modified more recently than
 tt(reffile).
@@ -2898,36 +2937,36 @@ is performed, although note that the presence of the parentheses
 causes the entire expression to be subjected to any global pattern matching
 options such as tt(NULL_GLOB). Thus:
 
-example(ls *(-/))
+example(ls -ld -- *(-/))
 
 lists all directories and symbolic links that point to directories,
 and
 
-example(ls *(-@))
+example(ls -ld -- *(-@))
 
 lists all broken symbolic links, and
 
-example(ls *(%W))
+example(ls -ld -- *(%W))
 
 lists all world-writable device files in the current directory, and
 
-example(ls *(W,X))
+example(ls -ld -- *(W,X))
 
 lists all files in the current directory that are
 world-writable or world-executable, and
 
-example(echo /tmp/foo*(u0^@:t))
+example(print -rC1 /tmp/foo*(u0^@:t))
 
 outputs the basename of all root-owned files beginning with the string
 `tt(foo)' in tt(/tmp), ignoring symlinks, and
 
-example(ls *.*~(lex|parse).[ch](^D^l1))
+example(ls -ld -- *.*~(lex|parse).[ch](^D^l1))
 
 lists all files having a link count of one whose names contain a dot
 (but not those starting with a dot, since tt(GLOB_DOTS) is explicitly
 switched off) except for tt(lex.c), tt(lex.h), tt(parse.c) and tt(parse.h).
 
-example(print b*.pro+LPAR()#q:s/pro/shmo/+RPAR()(#q.:s/builtin/shmiltin/))
+example(print -rC1 b*.pro+LPAR()#q:s/pro/shmo/+RPAR()(#q.:s/builtin/shmiltin/))
 
 demonstrates how colon modifiers and other qualifiers may be chained
 together.  The ordinary qualifier `tt(.)' is applied first, then the colon

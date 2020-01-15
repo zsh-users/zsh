@@ -8,4 +8,4 @@ _arguments -s -S -A "-*" \
   '(-a -n -v)-q[Suppress all printing when setting a variable]' \
   '(-a -n -v)-t[Attempt to select the next possible value of an enum]' \
   '(-q -t)-v[Show all possible values of variables]' \
-  '(-a)*:mixerctl varible:_multi_parts -i -S = -q . _cache_mixerctlvars'
+  '(-a)*:mixerctl variable:_multi_parts -i -S = -q . _cache_mixerctlvars'

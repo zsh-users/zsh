@@ -208,7 +208,7 @@ else
     '-G[specify path and file-name of a generic boot-image]:boot image:_files' \
     '-hard-disk-boot[specify that the el torito boot-image  is a hard-disk image]' \
     '-no-emul-boot[specify that the el torito boot-image is a "no emulation" image]' \
-    '-no-boot[specify that the el torito CD should be markes an non-bootable]' \
+    '-no-boot[specify that the el torito CD should be marked non-bootable]' \
     '-boot-load-seg[specify the load-segment address of the boot-image for a "no emulation" image]:segment address' \
     '-boot-lead-size[specify the number of 512-byte sectors to load in "no emulation" mode]:load sectors' \
     '-boot-info-table[specify that a 56-byte table of CD-ROM-layout information should be written]' \

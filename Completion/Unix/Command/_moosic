@@ -83,7 +83,7 @@ _moosic_add_cmds() {
     "noloop:turn loop mode off"
     "toggle-loop:toggle loop mode"
     "reconfigure:daemon reload configuration file"
-    "showconfig:show dameon filetype associations"
+    "showconfig:show daemon filetype associations"
     "start-server:starts new instance of daemon with given options"
     {quit,exit,die}":quit daemon"
     )

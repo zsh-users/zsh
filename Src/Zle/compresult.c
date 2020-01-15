@@ -827,7 +827,7 @@ do_ambiguous(void)
 	 * if the completion is completely ambiguous') is set, and some    *
 	 * prefix was inserted, return now, bypassing the list-displaying  *
 	 * code.  On the way, invalidate the list and note that we don't   *
-	 * want to enter an AUTO_MENU imediately.                          */
+	 * want to enter an AUTO_MENU immediately.                          */
 	if ((uselist == 3 ||
 	     (!uselist && isset(BASHAUTOLIST) && isset(LISTAMBIGUOUS))) &&
 	    la && iforcemenu != -1) {

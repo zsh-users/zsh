@@ -237,7 +237,7 @@ enum {
 /*
  * We keep an fd open for communication between the main shell
  * and forked off bits and pieces.  This allows us to know
- * if something happend in a subshell:  mode changed, type changed,
+ * if something happened in a subshell:  mode changed, type changed,
  * connection was closed.  If something too substantial happened
  * in a subshell --- connection opened, ZFTP_USER and ZFTP_PWD changed
  * --- we don't try to track it because it's too complicated.

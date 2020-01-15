@@ -84,7 +84,7 @@ char *compiprefix,
 Param *comprpms;
 
 /* 
- * An array of Param structures for elemens of $compstate; see
+ * An array of Param structures for elements of $compstate; see
  * 'compkparams' below.
  *
  * See CP_KEYPARAMS.

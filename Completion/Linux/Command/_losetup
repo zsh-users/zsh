@@ -1,4 +1,4 @@
-#lcompdef losetup -value-,LOOPDEV_DEBUG,-default-
+#compdef losetup -value-,LOOPDEV_DEBUG,-default-
 
 if [[ $service = *LOOPDEV_DEBUG* ]]; then
   local expl

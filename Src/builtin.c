@@ -7287,8 +7287,11 @@ bin_umask(char *nam, char **args, Options ops, UNUSED(int func))
     char *s = *args;
 
     /* Get the current umask. */
-    um = umask(0);
+    queue_signals();
+    um = umask(0777);
     umask(um);
+    unqueue_signals();
+
     /* No arguments means to display the current setting. */
     if (!s) {
 	if (OPT_ISSET(ops,'S')) {

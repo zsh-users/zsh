@@ -52,8 +52,8 @@ case $variant in
       '(-m --architecture)'{-m+,--architecture=}'[specify the target architecture]:architecture:->architectures'
       \*{-M+,--disassembler-options=}'[pass target specific information to the disassembler]:option:->disassembler_options'
 
-      "(-E --endian)-E+[assume endianess when disassembling]:endianess:((B\:\"assume big endian format when disassembling\" L\:\"assume little endian format when disassembling\"))"
-      "(-E --endian)--endian=[assume endianess when disassembling]:endianess:((big\:\"assume big endian format when disassembling\" little\:\"assume little endian format when disassembling\"))"
+      "(-E --endian)-E+[assume endianness when disassembling]:endianness:((B\:\"assume big endian format when disassembling\" L\:\"assume little endian format when disassembling\"))"
+      "(-E --endian)--endian=[assume endianness when disassembling]:endianness:((big\:\"assume big endian format when disassembling\" little\:\"assume little endian format when disassembling\"))"
 
       '--file-start-context[include context from start of file (with -S)]'
       \*{-I+,--include=}'[add directory to search list for source files]:directory:_files -/'

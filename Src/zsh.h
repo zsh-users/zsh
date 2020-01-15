@@ -1254,7 +1254,7 @@ enum {
 
 /*
  * Assignment has value?
- * If the assignment is an arrray, then it certainly has a value --- we
+ * If the assignment is an array, then it certainly has a value --- we
  * can only tell if there's an explicit assignment.
  */
 
@@ -2999,7 +2999,7 @@ struct sortelt {
     int origlen;
     /*
      * The length of the string, if needed, else -1.
-     * The length is only needed if there are embededded nulls.
+     * The length is only needed if there are embedded nulls.
      */
     int len;
 };

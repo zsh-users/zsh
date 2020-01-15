@@ -425,7 +425,7 @@ for prepath in "$prepaths[@]"; do
 
   tmp1=( "$prepath$realpath$donepath$tmp2" )
 
-  # count of attemps for pws non-canonical hack
+  # count of attempts for pws non-canonical hack
   (( npathcheck = 0 ))
   while true; do
 

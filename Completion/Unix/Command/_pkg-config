@@ -36,7 +36,7 @@ arguments=(
       "--print-requires[list all modules the package requires]"
       "--print-requires-private[list all modules the package requires for static linking (see --static)]"
 #      "--msvc-syntax[output linker flags in a form compatible with MSVC++ (Windows only)]"
-#      "--dont-define-prefix[disables automatic overiding of the variable \"prefix\" (Windows only)]"
+#      "--dont-define-prefix[disables automatic overriding of the variable \"prefix\" (Windows only)]"
 #      "--prefix-variable=[set the name of the variable \"prefix\" (Windows only)]:prefix value"
       "*: :->packages"
 )

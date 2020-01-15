@@ -44,7 +44,7 @@ case "$service" in
       '*-dispose:GIF disposal method:((0:no\ disposal 1\:don'\''t\ dispose\ between\ frames 2\:overwrite\ frame\ with\ background\ color 3\:overwrite\ with\ previous\ frame))' \
       '*-dither[apply dithering]' \
       '*-edge:edge detection factor (0.0 - 99.9%%)' \
-      '*-endian:image endianess:(MSB LSB)' \
+      '*-endian:image endianness:(MSB LSB)' \
       '*+endian' \
       '*-enhance[enhance noisy image]' \
       '*-filter:filter type for resizing:(Point Box Triangle Hermite Hanning Hamming Blackman Gaussian Quadratic Cubic Catrom Mitchell Lanczos Bessel Sinc)' \
@@ -166,7 +166,7 @@ case "$service" in
       '-descend[descend window hierarchy]' \
       '-dispose:GIF disposal method:((0:no\ disposal 1\:don'\''t\ dispose\ between\ frames 2\:overwrite\ frame\ with\ background\ color 3\:overwrite\ with\ previous\ frame))' \
       '-dither[apply dithering]' \
-      '(+endian)-endian:image endianess:(MSB LSB)' \
+      '(+endian)-endian:image endianness:(MSB LSB)' \
       '(-endian)+endian' \
       '-frame[include window manager frame]' \
       '(- *)-help[display help information]' \
@@ -218,7 +218,7 @@ case "$service" in
       '*-dither[apply dithering]' \
       '*+dither[render Postscript without aliasing]' \
       '*-draw:drawing primitive:compadd -S "\\ " - rectangle circle ellipse polygon color matte text image' \
-      '*-endian:image endianess:(MSB LSB)' \
+      '*-endian:image endianness:(MSB LSB)' \
       '*+endian' \
       '*-filter:filter type for resizing:(Point Box Triangle Hermite Hanning Hamming Blackman Gaussian Quadratic Cubic Catrom Mitchell Lanczos Bessel Sinc)' \
       '*-frame[draw frame around image]' \
@@ -297,7 +297,7 @@ case "$service" in
       '-draw:drawing primitive:compadd -S "\\ " - rectangle circle ellipse polygon color matte text image' \
       '-edge:edge detection factor (0.0 - 99.9%%)' \
       '-emboss[emboss image]' \
-      '(+endian)-endian:image endianess:(MSB LSB)' \
+      '(+endian)-endian:image endianness:(MSB LSB)' \
       '(-endian)+endian' \
       '-enhance[enhance image]' \
       '-equalize[histogram equalization]' \
@@ -511,7 +511,7 @@ case "$service" in
       '-file:output file:_files' \
       '-get[get files]' \
       '-port:port: _ports' \
-      '-proxy:host of proxy ftp deamon:_hosts' \
+      '-proxy:host of proxy ftp daemon:_hosts' \
       '-print[print files]' \
       '-prune[process files from remote directory]' \
       '-put[put files]' \

@@ -2244,7 +2244,7 @@ sect(What is multibyte input?)
   zsh will be able to use any such encoding as long as it contains ASCII as
   a single-octet subset and the system can provide information about other
   characters.  However, in the case of Unicode, UTF-8 is the only one you
-  are likely to enounter that is useful in zsh.
+  are likely to encounter that is useful in zsh.
 
   (In case you're confused: Unicode is the character set, while UTF-8 is
   an encoding of it.  You might hear about other encodings, such as UCS-2
