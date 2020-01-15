@@ -7,7 +7,7 @@ The tt(zsh/zutil) module only adds some builtins:
 
 startitem()
 findex(zstyle)
-xitem(tt(zstyle) [ tt(-L) [ var(pattern) [ var(style) ] ] ])
+xitem(tt(zstyle) [ tt(-L) [ var(metapattern) [ var(style) ] ] ])
 xitem(tt(zstyle) [ tt(-e) | tt(-) | tt(-)tt(-) ] var(pattern) var(style) var(string) ...)
 xitem(tt(zstyle -d) [ var(pattern) [ var(style) ... ] ])
 xitem(tt(zstyle -g) var(name) [ var(pattern) [ var(style) ] ])
@@ -52,14 +52,15 @@ em(Usage)
 The forms that operate on patterns are the following.
 
 startitem()
-item(tt(zstyle) [ tt(-L) [ var(pattern) [ var(style) ] ] ])(
+item(tt(zstyle) [ tt(-L) [ var(metapattern) [ var(style) ] ] ])(
 Without arguments, lists style definitions.  Styles
 are shown in alphabetic order and patterns are shown in the order
 tt(zstyle) will test them.
 
 If the tt(-L) option is given, listing is done in the form of calls to
-tt(zstyle).  The optional first argument is a pattern which will be matched
-against the string supplied as the pattern for the context; note that
+tt(zstyle).  The optional first argument, var(metapattern), is a pattern which
+will be matched against the string supplied as var(pattern) when the style was
+defined.  Note:
 this means, for example, `tt(zstyle -L ":completion:*")' will
 match any supplied pattern beginning `tt(:completion:)', not
 just tt(":completion:*"):  use tt(':completion:\*') to match that.
