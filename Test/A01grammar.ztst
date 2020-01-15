@@ -928,3 +928,7 @@ F:Note that the behaviour of 'exit' inside try-list inside a function is unspeci
 >PIPE
 >and true
 >or false
+
+ $ZTST_testdir/../Src/zsh -fc '{ ( ) } always { echo foo }'
+-f:exec last command optimization inhibited for try/always
+>foo

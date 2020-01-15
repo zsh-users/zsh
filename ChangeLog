@@ -1,5 +1,8 @@
 2020-01-16  Daniel Shahaf  <danielsh@apache.org>
 
+	* 45305: Test/A01grammar.ztst: Add an XFail test: The
+	exec-last-command optimization is applied to try/always.
+
 	* 45307: Doc/Zsh/mod_zutil.yo: zstyle docs: Unoverload a
 	placeholder variable name.
 
