@@ -1,5 +1,8 @@
 2020-01-16  Daniel Shahaf  <danielsh@apache.org>
 
+	* 45306: Doc/Zsh/mod_zutil.yo: zstyle docs: Introduce the first
+	synopsis in the same way as all others: with an item()().
+
 	* unposted: Doc/Zsh/options.yo, Doc/Zsh/params.yo: docs: Fix
 	a cross-reference.
 

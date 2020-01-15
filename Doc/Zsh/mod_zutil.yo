@@ -49,7 +49,11 @@ in order to retrieve your preference into the scalar variable tt($REPLY).
 
 em(Usage)
 
-The first form (without arguments) lists the definitions.  Styles
+The forms that operate on patterns are the following.
+
+startitem()
+item(tt(zstyle) [ tt(-L) [ var(pattern) [ var(style) ] ] ])(
+Without arguments, lists style definitions.  Styles
 are shown in alphabetic order and patterns are shown in the order
 tt(zstyle) will test them.
 
@@ -61,10 +65,7 @@ match any supplied pattern beginning `tt(:completion:)', not
 just tt(":completion:*"):  use tt(':completion:\*') to match that.
 The optional second argument limits the output to a specific var(style) (not a
 pattern).  tt(-L) is not compatible with any other options.
-
-The other forms are the following:
-
-startitem()
+)
 item(tt(zstyle) [ tt(-) | tt(-)tt(-) | tt(-e) ] var(pattern) var(style) var(string) ...)(
 vindex(reply, use of)
 Defines the given var(style) for the var(pattern) with the var(string)s as
@@ -93,7 +94,7 @@ combination is returned.
 )
 enditem()
 
-The other forms can be used to look up or test patterns.
+The other forms can be used to look up or test styles for a given context.
 
 startitem()
 item(tt(zstyle -s) var(context) var(style) var(name) [ var(sep) ])(
