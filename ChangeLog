@@ -36,6 +36,20 @@
 	* 45131: Src/exec.c, Test/E02xtrace.ztst: Make a function that
 	redefines itself preserve its tracedness.
 
+2020-01-16  Daniel Shahaf  <danielsh@apache.org>
+
+	* 45305: Test/A01grammar.ztst: Add an XFail test: The
+	exec-last-command optimization is applied to try/always.
+
+	* 45307: Doc/Zsh/mod_zutil.yo: zstyle docs: Unoverload a
+	placeholder variable name.
+
+	* 45306: Doc/Zsh/mod_zutil.yo: zstyle docs: Introduce the first
+	synopsis in the same way as all others: with an item()().
+
+	* unposted: Doc/Zsh/options.yo, Doc/Zsh/params.yo: docs: Fix
+	a cross-reference.
+
 2020-01-15  Daniel Shahaf  <danielsh@apache.org>
 
 	* 45287: Doc/Zsh/expn.yo: zshexpn: Describe parameter elision

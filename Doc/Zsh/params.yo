@@ -129,7 +129,7 @@ both var(key) and var(value) undergo all forms of expansion
 allowed for single word shell expansions (this does not include filename
 generation); these are as performed by the parameter expansion flag
 tt(LPAR()e+RPAR()) as described in
-ifzman(zmanref(zshparam))\
+ifzman(zmanref(zshexpn))\
 ifnzman(noderef(Parameter Expansion)).
 Nested parentheses may surround var(value) and are included as part of the
 value, which is joined into a plain string; this differs from ksh which
