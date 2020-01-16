@@ -742,6 +742,17 @@
 >glob.tmp/secret-s111/  glob.tmp/secret-s111
 >glob.tmp/secret-s444/  glob.tmp/secret-s444
 
+ # On macOS, stat(2) allows files to be treated as directories if the calling
+ # process has super-user privileges. e.g., stat() on /my/regular/file/. will
+ # succeed as root but (correctly) fail otherwise. This can produce strange
+ # results when globbing, depending on how it's implemented. This test should,
+ # when run with privileges, confirm that the implementation avoids this
+ # problem. See workers/42891 and workers/45291
+ : > glob.tmp/not-a-directory
+ print -r - glob.tmp/not-a-dir*(N) , glob.tmp/not-a-dir*/(N)
+0:non-directories not globbed as directories
+>glob.tmp/not-a-directory ,
+
 %clean
 
  # Fix unreadable-directory permissions so ztst can clean up properly

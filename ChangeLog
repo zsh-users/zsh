@@ -1,5 +1,8 @@
 2020-01-15  dana  <dana@dana.is>
 
+	* 45292: Test/D02glob.ztst: Add regression test for macOS stat(2)
+	misbehaviour, now worked around by previous fix (see workers/42891)
+
 	* Daniel: 45291: Src/glob.c, Test/D02glob.ztst: A glob with a
 	trailing slash will now match unreadable/unexecutable directories.
 
