@@ -7075,21 +7075,23 @@ __git_files_relative () {
 
 (( $+functions[__git_files] )) ||
 __git_files () {
-  local compadd_opts opts tag description gitcdup gitprefix files expl
+  local compadd_opts opts tag description gittoplevel gitprefix files expl
 
   zparseopts -D -E -a compadd_opts V+: J+: 1 2 o+: n f x+: X+: M+: P: S: r: R: q F:
   zparseopts -D -E -a opts -- -cached -deleted -modified -others -ignored -unmerged -killed x+: --exclude+:
   tag=$1 description=$2; shift 2
 
-  gitcdup=$(_call_program gitcdup git rev-parse --show-cdup 2>/dev/null)
+  gittoplevel=$(_call_program toplevel git rev-parse --show-toplevel 2>/dev/null)
   __git_command_successful $pipestatus || return 1
+  [[ -n $gittoplevel ]] && gittoplevel+="/"
 
   gitprefix=$(_call_program gitprefix git rev-parse --show-prefix 2>/dev/null)
   __git_command_successful $pipestatus || return 1
 
   # TODO: --directory should probably be added to $opts when --others is given.
 
-  local pref=$gitcdup$gitprefix$PREFIX
+  local pref=${(Q)${~PREFIX}}
+  [[ $pref[1] == '/' ]] || pref=$gittoplevel$gitprefix$pref
 
   # First allow ls-files to pattern-match in case of remote repository
   files=(${(0)"$(_call_program files git ls-files -z --exclude-standard ${(q)opts} -- ${(q)${pref:+$pref\*}:-.} 2>/dev/null)"})
@@ -8131,7 +8133,8 @@ _git() {
         ;;
       (option-or-argument)
         curcontext=${curcontext%:*:*}:git-$words[1]:
-	(( $+opt_args[--git-dir] )) && local -x GIT_DIR=$opt_args[--git-dir]
+        (( $+opt_args[--git-dir] )) && local -x GIT_DIR=${(Q)${~opt_args[--git-dir]}}
+        (( $+opt_args[--work-tree] )) && local -x GIT_WORK_TREE=${(Q)${~opt_args[--work-tree]}}
 	if ! _call_function ret _git-$words[1]; then
 	  if [[ $words[1] = \!* ]]; then
 	    words[1]=${words[1]##\!}
