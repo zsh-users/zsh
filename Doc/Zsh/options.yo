@@ -2334,7 +2334,9 @@ cindex(sh, field splitting style)
 item(tt(SH_WORD_SPLIT) (tt(-y)) <K> <S>)(
 Causes field splitting to be performed on unquoted parameter expansions.
 Note that this option has nothing to do with word splitting.
-(See noderef(Parameter Expansion).)
+(See 
+ifzman(zmanref(zshexpn))\
+ifnzman(noderef(Parameter Expansion)).)
 )
 pindex(TRAPS_ASYNC)
 pindex(NO_TRAPS_ASYNC)
