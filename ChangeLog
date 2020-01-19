@@ -1,3 +1,12 @@
+2020-01-19  Eitan Adler  <lists@eitanadler.com>
+
+	* 45332: Completion/Unix/Command/_git: add completion for
+	git-version
+
+2020-01-19  Mikael Magnusson  <mikachu@gmail.com>
+
+	* unposted: _brace_parameter: add missing \
+
 2020-01-16  Daniel Shahaf  <danielsh@apache.org>
 
 	* 45305: Test/A01grammar.ztst: Add an XFail test: The

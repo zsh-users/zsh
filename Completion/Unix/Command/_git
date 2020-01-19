@@ -407,6 +407,12 @@ _git-bundle () {
   return ret
 }
 
+(( $+functions[_git-version] )) ||
+_git-version () {
+  _arguments -S $endopt \
+    '--build-options[also print build options]'
+}
+
 (( $+functions[_git-check-ignore] )) ||
 _git-check-ignore () {
   _arguments -s -S $endopt \
@@ -5951,7 +5957,8 @@ _git_commands () {
     show-branch:'show branches and their commits'
     verify-commit:'check GPG signature of commits'
     verify-tag:'check GPG signature of tags'
-    whatchanged:'show commit-logs and differences they introduce')
+    whatchanged:'show commit-logs and differences they introduce'
+    version:'show git version')
 
   interaction_commands=(
     archimport:'import an Arch repository into git'
