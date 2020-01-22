@@ -1,3 +1,8 @@
+2020-03-28  Gastón Haro  <harogaston@users.noreply.github.com>
+
+	* github #46: Completion/Unix/Command/_git: Better restrict
+	git-restore(1) file completions
+
 2020-03-28  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 45644: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
