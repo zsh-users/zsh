@@ -1569,7 +1569,12 @@ _git-restore() {
     pathspecs)
       if [[ -z ${opt_args[(I)-s|--source|-S|--staged]} ]] &&
 	# use index as a default base unless -S is specified
-	__git_ignore_line __git_modified_files
+	__git_ignore_line __git_changed-in-working-tree_files
+      then
+	ret=0
+      elif [[ -z ${opt_args[(I)-s|--source|-W|--worktree]} ]] &&
+	# use index as a default base unless -S is specified
+	__git_ignore_line __git_changed-in-index_files
       then
 	ret=0
       else
