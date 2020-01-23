@@ -1,3 +1,8 @@
+2020-01-23  Daniel Shahaf  <danielsh@apache.org>
+
+	* 45340: Src/params.c: internal: Document the difference between
+	paramtab and realparamtab.
+
 2020-01-19  Eitan Adler  <lists@eitanadler.com>
 
 	* 45332: Completion/Unix/Command/_git: add completion for
