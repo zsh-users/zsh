@@ -1,5 +1,8 @@
 2020-01-29  Daniel Shahaf  <danielsh@apache.org>
 
+	* 45343: Src/exec.c, Src/math.c: Queue signals around arithmetic
+	evaluations
+
 	* 45344: INSTALL: Document where third-party completion functions
 	should be installed.
 

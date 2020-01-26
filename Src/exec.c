@@ -5101,7 +5101,6 @@ execarith(Estate state, UNUSED(int do_exec))
     mnumber val = zero_mnumber;
     int htok = 0;
 
-    queue_signals();
     if (isset(XTRACE)) {
 	printprompt4();
 	fprintf(xtrerr, "((");
@@ -5121,8 +5120,6 @@ execarith(Estate state, UNUSED(int do_exec))
 	fprintf(xtrerr, " ))\n");
 	fflush(xtrerr);
     }
-    unqueue_signals();
-
     if (errflag) {
 	errflag &= ~ERRFLAG_ERROR;
 	return 2;

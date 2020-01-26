@@ -1133,8 +1133,7 @@ notzero(mnumber a)
 
 /* macro to pop three values off the value stack */
 
-/**/
-void
+static void
 op(int what)
 {
     mnumber a, b, c, *spval;
@@ -1569,14 +1568,19 @@ mathparse(int pc)
 
     if (errflag)
 	return;
+    queue_signals();
     mtok = zzlex();
     /* Handle empty input */
-    if (pc == TOPPREC && mtok == EOI)
+    if (pc == TOPPREC && mtok == EOI) {
+	unqueue_signals();
 	return;
+    }
     checkunary(mtok, optr);
     while (prec[mtok] <= pc) {
-	if (errflag)
+	if (errflag) {
+	    unqueue_signals();
 	    return;
+	}
 	switch (mtok) {
 	case NUM:
 	    push(yyval, NULL, 0);
@@ -1595,6 +1599,7 @@ mathparse(int pc)
 	    if (mtok != M_OUTPAR) {
 		if (!errflag)
 		    zerr("bad math expression: ')' expected");
+		unqueue_signals();
 		return;
 	    }
 	    break;
@@ -1613,6 +1618,7 @@ mathparse(int pc)
 	    if (mtok != COLON) {
 		if (!errflag)
 		    zerr("bad math expression: ':' expected");
+		unqueue_signals();
 		return;
 	    }
 	    if (q)
@@ -1636,4 +1642,5 @@ mathparse(int pc)
 	mtok = zzlex();
 	checkunary(mtok, optr);
     }
+    unqueue_signals();
 }
