@@ -25,7 +25,13 @@ syn clear
 
 syn include @zsh                   syntax/zsh.vim
 
-syn match  ztstPayload             /^\s\+\zs.*/ contains=@zsh
+" Note that we don't do /^\s\zs.*/ here.  If we did that, lines that start
+" with " #" (a space and a hash sign) would not be highlighted as comments,
+" because zshComment's patterns won't match unless the '#' is preceded by
+" a space or start-of-line.  See:
+"
+" https://github.com/chrisbra/vim-zsh/issues/21#issuecomment-577738791
+syn match  ztstPayload             /^\s.*/ contains=@zsh
 
 syn match  ztstExitCode            /^\d\+\|^-/                nextgroup=ztstFlags
 syn match  ztstFlags               /[.dDqf]*:/      contained nextgroup=ztstTestName contains=ztstColon
