@@ -489,7 +489,7 @@ fi
 if test -n "$auto_ldflags"; then
   case "${enable_zsh_debug}$host_os" in
     yesaix*|yeshpux*|yesnetbsd*|yesopenbsd*) ;;  # "ld -g" is not valid on these systems
-    darwin*) LDFLAGS=-Wl,-x ;;
+    darwin*) LDFLAGS=-Wl,-x,-dead_strip,-bind_at_load ;;
     yes*)    LDFLAGS=-g ;;
     *)       LDFLAGS=-s ;;
   esac
