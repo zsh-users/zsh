@@ -1,3 +1,8 @@
+2020-02-02  WGH  <wgh@torlan.ru>
+
+	* 45365: Completion/Unix/Command/_git: Fix __git_recent_branches
+	for the case when a commit has an empty message
+
 2020-01-29  Daniel Shahaf  <danielsh@apache.org>
 
 	* 45343: Src/exec.c, Src/math.c: Queue signals around arithmetic
