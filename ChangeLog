@@ -1,3 +1,7 @@
+2020-02-02  Daniel Shahaf  <danielsh@apache.org>
+
+	* 45372: Etc/BUGS: Record a symlink loop bug involving :P
+
 2020-02-02  WGH  <wgh@torlan.ru>
 
 	* 45365: Completion/Unix/Command/_git: Fix __git_recent_branches
