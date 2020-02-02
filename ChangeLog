@@ -1,3 +1,8 @@
+2020-02-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 45373: Src/loop.c, Test/C03traps.ztst: ERR_EXIT failed on
+	command substitution in else branch.
+
 2020-02-02  Daniel Shahaf  <danielsh@apache.org>
 
 	* 45372: Etc/BUGS: Record a symlink loop bug involving :P

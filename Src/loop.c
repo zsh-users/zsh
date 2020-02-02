@@ -570,7 +570,7 @@ execif(Estate state, int do_exec)
 
     if (run) {
 	/* we need to ignore lastval until we reach execcmd() */
-	if (olderrexit)
+	if (olderrexit || run == 2)
 	    noerrexit = olderrexit;
 	else if (lastval)
 	    noerrexit |= NOERREXIT_EXIT | NOERREXIT_RETURN | NOERREXIT_UNTIL_EXEC;
