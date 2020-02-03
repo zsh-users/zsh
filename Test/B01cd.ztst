@@ -145,6 +145,10 @@ F:something is broken.  But you already knew that.
 1:Implicit cd with unset HOME.
 ?zsh:cd:1: HOME not set
 
+ $ZTST_testdir/../Src/zsh -fc 'cd -P ////dev && pwd'
+-f:(workers/45367) cd -P squashes multiple leading slashes
+>/dev  
+
 %clean
 # This optional section cleans up after the test, if necessary,
 # e.g. killing processes etc.  This is in addition to the removal of *.tmp

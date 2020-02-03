@@ -1,3 +1,9 @@
+2020-02-03  Daniel Shahaf  <danielsh@apache.org>
+
+	* 45368: Test/B01cd.ztst, Test/D02glob.ztst: Add tests for
+	workers/45367's issue about double slashes in 'cd -P' and
+	/home/daniel/in/zsh.
+
 2020-02-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 45373: Src/loop.c, Test/C03traps.ztst: ERR_EXIT failed on
