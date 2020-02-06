@@ -1,3 +1,8 @@
+2020-02-06  Daniel Shahaf  <danielsh@apache.org>
+
+	* 45385: Test/V01zmodload.ztst: Add a test for 'zmodload -Fa'
+	preemptively disabling ("blacklisting"?) features.
+
 2020-02-06  dana  <dana@dana.is>
 
 	* unposted: Config/version.mk: Update for 5.7.1-test-3

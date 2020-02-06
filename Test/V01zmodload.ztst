@@ -348,6 +348,20 @@
 ?(eval):6: unknown function: systell
 ?(eval):9: file descriptor out of range
 
+ $ZTST_testdir/../Src/zsh -fc '
+  zmodload zsh/zutil
+  zmodload -Fal zsh/zutil | grep parse
+  zmodload -u zsh/zutil
+  #
+  zmodload -Fa zsh/zutil -b:zregexparse
+  zmodload zsh/zutil
+  zmodload -Fal zsh/zutil | grep parse >&2
+ '
+0:zmodload -Fa can disable features from being loaded
+>b:zparseopts
+>b:zregexparse
+?b:zparseopts
+
 %clean
 
  eval "$deps"
