@@ -1,5 +1,8 @@
 2020-02-06  dana  <dana@dana.is>
 
+	* Roman Perepelitsa: 45382: Src/Modules/system.c: Fix infinite
+	loop in sysread
+
 	* Martin von Wittich: 45388 (tweaked):
 	Completion/Unix/Type/_diff_options: Restore -w completion lost
 	in workers/43351

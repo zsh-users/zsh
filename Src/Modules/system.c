@@ -174,7 +174,7 @@ bin_sysread(char *nam, char **args, Options ops, UNUSED(int func))
 	}
 
 	while ((ret = select(infd+1, (SELECT_ARG_2_T) &fds,
-			     NULL, NULL,&select_tv)) < 1) {
+			     NULL, NULL,&select_tv)) < 0) {
 	    if (errno != EINTR || errflag || retflag || breaks || contflag)
 		break;
 	}
