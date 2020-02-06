@@ -2,7 +2,7 @@
 
 	* 45368: Test/B01cd.ztst, Test/D02glob.ztst: Add tests for
 	workers/45367's issue about double slashes in 'cd -P' and
-	/home/daniel/in/zsh.
+	$PWD.
 
 2020-02-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
