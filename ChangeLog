@@ -1,5 +1,7 @@
 2020-02-06  dana  <dana@dana.is>
 
+	* unposted: Config/version.mk: Update for 5.7.1-test-3
+
 	* Roman Perepelitsa: 45382: Src/Modules/system.c: Fix infinite
 	loop in sysread
 
