@@ -1,3 +1,9 @@
+2020-02-06  dana  <dana@dana.is>
+
+	* Martin von Wittich: 45388 (tweaked):
+	Completion/Unix/Type/_diff_options: Restore -w completion lost
+	in workers/43351
+
 2020-02-03  Daniel Shahaf  <danielsh@apache.org>
 
 	* 45368: Test/B01cd.ztst, Test/D02glob.ztst: Add tests for
