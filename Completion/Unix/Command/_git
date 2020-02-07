@@ -1567,18 +1567,14 @@ _git-restore() {
 
   case $state in
     pathspecs)
-      if [[ -z ${opt_args[(I)-s|--source|-S|--staged]} ]] &&
-	# use index as a default base unless -S is specified
-	__git_ignore_line __git_changed-in-working-tree_files
+      if [[ -z ${opt_args[(I)-S|--staged]} ]]
       then
-	ret=0
-      elif [[ -z ${opt_args[(I)-s|--source|-W|--worktree]} ]] &&
-	# use index as a default base unless -S is specified
-	__git_ignore_line __git_changed-in-index_files
+        __git_ignore_line __git_changed-in-working-tree_files
+      elif [[ -z ${opt_args[(I)-W|--worktree]} ]]
       then
-	ret=0
+        __git_ignore_line __git_changed-in-index_files
       else
-	__git_ignore_line __git_tree_files ${PREFIX:-.} ${(Qv)opt_args[(i)-s|--source]:-HEAD} && ret=0
+        __git_ignore_line __git_tree_files ${PREFIX:-.} ${(Qv)opt_args[(i)-s|--source]:-HEAD} && ret=0
       fi
     ;;
     sources)
