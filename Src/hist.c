@@ -2589,11 +2589,13 @@ resizehistents(void)
 }
 
 static int
-readhistline(int start, char **bufp, int *bufsiz, FILE *in)
+readhistline(int start, char **bufp, int *bufsiz, FILE *in, int *readbytes)
 {
     char *buf = *bufp;
     if (fgets(buf + start, *bufsiz - start, in)) {
-	int len = start + strlen(buf + start);
+	int len = strlen(buf + start);
+	*readbytes += len;
+	len += start;
 	if (len == start)
 	    return -1;
 	if (buf[len - 1] != '\n') {
@@ -2602,7 +2604,7 @@ readhistline(int start, char **bufp, int *bufsiz, FILE *in)
 		    return -1;
 		*bufp = zrealloc(buf, 2 * (*bufsiz));
 		*bufsiz = 2 * (*bufsiz);
-		return readhistline(len, bufp, bufsiz, in);
+		return readhistline(len, bufp, bufsiz, in, readbytes);
 	    }
 	}
 	else {
@@ -2610,7 +2612,7 @@ readhistline(int start, char **bufp, int *bufsiz, FILE *in)
 	    if (len > 1 && buf[len - 2] == '\\') {
 		buf[--len - 1] = '\n';
 		if (!feof(in))
-		    return readhistline(len, bufp, bufsiz, in);
+		    return readhistline(len, bufp, bufsiz, in, readbytes);
 	    }
 	}
 	return len;
@@ -2630,7 +2632,7 @@ readhistfile(char *fn, int err, int readflags)
     short *words;
     struct stat sb;
     int nwordpos, nwords, bufsiz;
-    int searching, newflags, l, ret, uselex;
+    int searching, newflags, l, ret, uselex, readbytes;
 
     if (!fn && !(fn = getsparam("HISTFILE")))
 	return;
@@ -2672,13 +2674,15 @@ readhistfile(char *fn, int err, int readflags)
 	} else
 	    searching = 0;
 
+	fpos = ftell(in);
+	readbytes = 0;
 	newflags = HIST_OLD | HIST_READ;
 	if (readflags & HFILE_FAST)
 	    newflags |= HIST_FOREIGN;
 	if (readflags & HFILE_SKIPOLD
 	 || (hist_ignore_all_dups && newflags & hist_skip_flags))
 	    newflags |= HIST_MAKEUNIQUE;
-	while (fpos = ftell(in), (l = readhistline(0, &buf, &bufsiz, in))) {
+	while (fpos += readbytes, readbytes = 0, (l = readhistline(0, &buf, &bufsiz, in, &readbytes))) {
 	    char *pt;
 	    int remeta = 0;
 
