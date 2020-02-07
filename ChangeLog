@@ -1,3 +1,7 @@
+2020-02-07  dana  <dana@dana.is>
+
+	* unposted: Completion/Unix/Command/_zip: Recognise '--'
+
 2020-02-06  Daniel Shahaf  <danielsh@apache.org>
 
 	* 45385: Test/V01zmodload.ztst: Add a test for 'zmodload -Fa'
