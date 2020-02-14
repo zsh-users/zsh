@@ -9,36 +9,44 @@ local shell usr
 (( $words[(i)-(l|-login)] < CURRENT )) || args=( '-[use a login shell]' )
 case $OSTYPE in
   linux*)
+    # Some of these options only apply to util-linux, not shadow-utils
     args=( -S $args
-      '(-c --command --session-command *)'{-c,--command=}'[pass command to shell]:command string:_cmdstring'
+      '(-c --command --session-command *)'{-c+,--command=}'[pass command to shell]:command string:_cmdstring'
       "(-c --command *)--session-command=[pass command to shell and don't create a new session]:command string:_cmdstring"
       '(--fast -f)'{-f,--fast}'[pass -f to shell]'
       '(-l --login -m -p --preserve-environment)'{-l,--login}'[use a login shell]'
       '(-l --login -m -p --preserve-environment)'{-m,-p,--preserve-environment}"[don't reset environment]"
-      '(-s --shell)'{-s,--shell=}'[run the specified shell]:shell:->shells'
+      '(-s --shell)'{-s+,--shell=}'[run the specified shell]:shell:->shells'
       '(-)--help[display help information]'
       '(-)--version[display version information]'
     )
-    (( EUID )) || args+=(
-      '(-g --group)'{-g,--group=}'[specify primary group]:group:_groups'
-      \*{-G,--supp-group=}'[specify supplemental group]:group:_groups'
+    (( $#_comp_priv_prefix || EUID == 0 )) && args+=(
+      '(-g --group)'{-g+,--group=}'[specify primary group]:group:_groups'
+      \*{-G+,--supp-group=}'[specify supplemental group]:group:_groups'
     )
     first="(--help --version)${first#???}"
   ;;
   *bsd*|darwin*|dragonfly*)
     args+=(
-      '-c[use settings from specified login class]:class'
       '-f[if the invoked shell is csh, prevent it from reading .cshrc]'
       '(-m)-l[use a login shell]'
       "(-l)-m[don't reset environment]"
     )
   ;|
+  *bsd*|dragonfly*)
+    args+=(
+      '-c+[use settings from specified login class]:class'
+    )
+  ;|
   freebsd*) args+=( '-s[set the MAC label]' ) ;;
   openbsd*)
     args+=(
-      '(-K)-a[specify authentication type]:authentication type'
+      # See login.conf(5)
+      '(-K)-a+[specify authentication type]:authentication type:(
+        activ chpass crypto lchpass passwd radius reject skey snk token yubikey
+      )'
       '(-a)-K[shorthand for -a passwd]'
-      '-s[run the specified shell]:shell:->shells'
+      '-s+[run the specified shell]:shell:->shells'
       '-L[loop until login succeeds]'
     )
   ;;
@@ -57,13 +65,26 @@ fi
 
 _arguments $args ${(e)first} "*:shell arguments:= ->rest" && return
 
-usr=${line[norm]/--/root}
-if (( $#opt_args[(i)-(s|-shell)] )); then
+usr=${${(Q)line[norm]}/--/root}
+# OpenBSD supports appending a log-in method to the user name, as in usr:radius
+[[ $OSTYPE == openbsd* ]] && usr=${usr%:*}
+
+# Normal users generally don't appear in passwd on macOS; try the Directory
+# Service first
+if [[ $OSTYPE == darwin* ]] && (( $+commands[dscl] )); then
+  shell=${"$(
+    _call_program shells dscl . -read /Users/${(q)usr} UserShell
+  )"#UserShell: }
+fi
+
+if [[ -n $shell ]]; then
+  : # Found above
+elif (( ${#${(@M)args:#*-s[+\[]*:*}} && $#opt_args[(i)-(s|-shell)] )); then
   shell=${(v)opt_args[(i)-(s|-shell)]}
 elif (( ${+commands[getent]} )); then
-  shell="${$(_call_program shells getent passwd $usr)##*:}"
+  shell="${$(_call_program shells getent passwd ${(q)usr})##*:}"
 else
-  shell="${${(M@)${(@f)$(</etc/passwd)}:#$usr*}##*:}"
+  shell="${${(M@)${(@f)$(</etc/passwd)}:#${usr}:*}##*:}"
 fi
 
 case $state in
