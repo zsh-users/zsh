@@ -1,5 +1,7 @@
 2020-02-14  dana  <dana@dana.is>
 
+	* unposted: Config/version.mk: Update for 5.8
+
 	* Sam Foxman, Daniel Shahaf, dana: CVE-2019-20044: NEWS,
 	README, Src/openssh_bsd_setres_id.c, Src/options.c, Src/zsh.mdd,
 	Src/zsh_system.h, Test/E01options.ztst, Test/P01privileged.ztst,
