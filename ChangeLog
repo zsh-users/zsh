@@ -1,5 +1,8 @@
 2020-02-14  dana  <dana@dana.is>
 
+	* unposted: Test/V01zmodload.ztst: Fix failing test from
+	workers/45385
+
 	* 45423 (tweaked): Completion/Unix/Command/_su: Improve arg
 	handling, shell look-ups
 
