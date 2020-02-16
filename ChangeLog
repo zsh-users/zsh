@@ -1,5 +1,9 @@
 2020-02-17  brian m. carlson  <sandals@crustytoothpaste.net>
 
+	* github #48/0002:
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_git: vcs_info git:
+	properly detect bare repositories
+
 	* github #48/0001:
 	Functions/VCS_Info/Backends/VCS_INFO_get_data_git: vcs_info git:
 	avoid warnings in bare repositories
