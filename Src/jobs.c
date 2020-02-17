@@ -1854,13 +1854,14 @@ scanjobs(void)
 
 /* This simple function indicates whether or not s may represent      *
  * a number.  It returns true iff s consists purely of digits and     *
- * minuses.  Note that minus may appear more than once, and the empty *
- * string will produce a `true' response.                             */
+ * minuses.  Note that minus may appear more than once.               */
 
 /**/
 static int
 isanum(char *s)
 {
+    if (*s == '\0')
+	return 0;
     while (*s == '-' || idigit(*s))
 	s++;
     return *s == '\0';

@@ -65,5 +65,13 @@
     trap 'exit 11' URG
     kill -URG ''
   )
-1f:kill with empty pid and sigspec should not send signal to current process group
+1:kill with empty pid and sigspec should not send signal to current process group
 ?(eval):kill:3: illegal pid: 
+
+  (
+    trap 'exit 19' TERM
+    kill ''
+  )
+1:Plain kill with empty pid should not send signal to current process group
+?(eval):kill:3: illegal pid: 
+

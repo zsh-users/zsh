@@ -1,5 +1,8 @@
 2020-02-18  Chris Down  <chris@chrisdown.name>
 
+	* 45453: Src/jobs.c, Test/B11kill.ztst: builtins: kill: Do not
+	signal current process group when pid is empty
+
 	* 45452: Test/B11kill.ztst: builtins: kill: Add `kill ''`
 	regression test with explicit sigspec
 
