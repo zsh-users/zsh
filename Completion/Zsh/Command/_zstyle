@@ -5,9 +5,6 @@ local nm=$compstate[nmatches] taglist patterns contexts MATCH
 integer MBEGIN MEND
 typeset -A opt_args styles
 
-_vcs_info_hooks() {
-  compadd - ${functions[(I)+vi-*]#+vi-}
-}
 # Assoc array of styles; the values give the possible top-level
 # contexts:
 #   c   completion

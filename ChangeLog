@@ -1,3 +1,11 @@
+2020-02-19  Daniel Shahaf  <danielsh@apache.org>
+
+	* 45447: Completion/Zsh/Command/_zstyle,
+	Completion/Zsh/Function/_vcs_info,
+	Completion/Zsh/Type/_vcs_info_hooks: Complete vcs_info_hookadd
+	and vcs_info_hookdel. Expose _vcs_info_hooks as a top-level
+	helper function.
+
 2020-02-18  Chris Down  <chris@chrisdown.name>
 
 	* 45463: Test/B11kill.ztst: test: kill: Document why we use
