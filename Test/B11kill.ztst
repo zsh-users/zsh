@@ -58,3 +58,12 @@
   )
 1:kill with sigspec only
 ?(eval):kill:2: not enough arguments
+
+# Regression tests: `kill ''` should not result in `kill 0`.
+
+  (
+    trap 'exit 11' URG
+    kill -URG ''
+  )
+1f:kill with empty pid and sigspec should not send signal to current process group
+?(eval):kill:3: illegal pid: 

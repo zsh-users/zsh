@@ -1,5 +1,8 @@
 2020-02-18  Chris Down  <chris@chrisdown.name>
 
+	* 45452: Test/B11kill.ztst: builtins: kill: Add `kill ''`
+	regression test with explicit sigspec
+
 	* 45451: Test/B11kill.ztst: builtins: kill: Add basic test suite
 
 2020-02-17  brian m. carlson  <sandals@crustytoothpaste.net>
