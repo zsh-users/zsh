@@ -60,6 +60,15 @@
 ?(eval):kill:2: not enough arguments
 
 # Regression tests: `kill ''` should not result in `kill 0`.
+#
+# We use SIGURG where an explicit sigspec can be provided as:
+#
+# 1. By default it's non-terminal, so even if we regress, we won't kill the
+#    test runner and other processes in the process group since we'll stop
+#    running this test before we get to the plain kill (and thus SIGTERM)
+#    cases;
+# 2. It's also unlikely to be sent for any other reason during the process
+#    lifetime, so the test shouldn't be flaky.
 
   (
     trap 'exit 11' URG
