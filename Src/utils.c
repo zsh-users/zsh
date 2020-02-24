@@ -1023,7 +1023,7 @@ xsymlinks(char *s, int full)
  */
 
 /**/
-char *
+mod_export char *
 xsymlink(char *s, int heap)
 {
     if (*s != '/')

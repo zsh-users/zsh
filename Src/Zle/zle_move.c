@@ -166,7 +166,7 @@ decpos(int *pos)
  */
 
 /**/
-char *
+mod_export char *
 backwardmetafiedchar(char *start, char *endptr, convchar_t *retchr)
 {
 #ifdef MULTIBYTE_SUPPORT

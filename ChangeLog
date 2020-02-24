@@ -1,3 +1,9 @@
+2020-02-24  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 45487: Src/Zle/zle_keymap.c, Src/Zle/zle_main.c,
+	Src/Zle/zle_move.c, Src/builtin.c, Src/compat.c, Src/utils.c:
+	Add missing mod_export for AIX compilation.
+
 2020-02-19  Daniel Shahaf  <danielsh@apache.org>
 
 	* 45447: Completion/Zsh/Command/_zstyle,

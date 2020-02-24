@@ -2597,7 +2597,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
  */
 
 /**/
-int
+mod_export int
 bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 {
     Param pm;

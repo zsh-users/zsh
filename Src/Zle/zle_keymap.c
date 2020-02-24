@@ -404,7 +404,7 @@ scankeys(HashNode hn, UNUSED(int flags))
 /**************************/
 
 /**/
-Keymap
+mod_export Keymap
 openkeymap(char *name)
 {
     KeymapName n = (KeymapName) keymapnamtab->getnode(keymapnamtab, name);

@@ -496,7 +496,7 @@ zgetdir(struct dirsav *d)
  */
 
 /**/
-char *
+mod_export char *
 zgetcwd(void)
 {
     char *ret = zgetdir(NULL);

@@ -1056,7 +1056,7 @@ getrestchar(int inchar, char *outstr, int *outcount)
 #endif
 
 /**/
-void
+mod_export void
 redrawhook(void)
 {
     Thingy initthingy;
