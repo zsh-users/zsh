@@ -1,3 +1,8 @@
+2020-02-25  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 45488: Marc Cornella: Completion/bashcompinit: Need "$@"
+	quoting for empty words in COMP_WORDS for bash completion.
+
 2020-02-24  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 45487: Src/Zle/zle_keymap.c, Src/Zle/zle_main.c,
