@@ -1,3 +1,10 @@
+2020-02-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/24710: Src/exec.c, Src/jobs.c, Src/signals.c: when using
+	kill or killpg to test for continued existince of a process
+	group, check errono is ESRCH on failure as EPERM indicates
+	processes exist but under a different UID.
+
 2020-02-27  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 45492: Test/D02glob.ztst: skip test added by users/24633 

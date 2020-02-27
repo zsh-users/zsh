@@ -539,7 +539,8 @@ wait_for_processes(void)
 #endif
 		if (WIFEXITED(status) &&
 		    pn->pid == jn->gleader &&
-		    killpg(pn->pid, 0) == -1) {
+		    killpg(pn->pid, 0) == -1  &&
+		    errno == ESRCH) {
 		    if (last_attached_pgrp == jn->gleader &&
 			!(jn->stat & STAT_NOSTTY)) {
 			/*

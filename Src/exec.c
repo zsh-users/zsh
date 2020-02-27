@@ -1036,7 +1036,8 @@ entersubsh(int flags, struct entersubsh_ret *retp)
     } else if (thisjob != -1 && (flags & ESUB_PGRP)) {
 	if (jobtab[list_pipe_job].gleader && (list_pipe || list_pipe_child)) {
 	    if (setpgrp(0L, jobtab[list_pipe_job].gleader) == -1 ||
-		killpg(jobtab[list_pipe_job].gleader, 0) == -1) {
+		(killpg(jobtab[list_pipe_job].gleader, 0) == -1  &&
+		 errno == ESRCH)) {
 		jobtab[list_pipe_job].gleader =
 		    jobtab[thisjob].gleader = (list_pipe_child ? mypgrp : getpid());
 		setpgrp(0L, jobtab[list_pipe_job].gleader);

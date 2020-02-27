@@ -283,7 +283,8 @@ handle_sub(int job, int fg)
 
 	    if ((cp = ((WIFEXITED(jn->procs->status) ||
 			WIFSIGNALED(jn->procs->status)) &&
-		       killpg(jn->gleader, 0) == -1))) {
+		       (killpg(jn->gleader, 0) == -1 &&
+			errno == ESRCH)))) {
 		Process p;
 		for (p = jn->procs; p->next; p = p->next);
 		jn->gleader = p->pid;
@@ -541,9 +542,13 @@ update_job(Job jn)
 
 	/* is this job in the foreground of an interactive shell? */
 	if (mypgrp != pgrp && inforeground &&
-	    (jn->gleader == pgrp || (pgrp > 1 && kill(-pgrp, 0) == -1))) {
+	    (jn->gleader == pgrp ||
+	     (pgrp > 1 &&
+	      (kill(-pgrp, 0) == -1 && errno == ESRCH)))) {
 	    if (list_pipe) {
-		if (somestopped || (pgrp > 1 && kill(-pgrp, 0) == -1)) {
+		if (somestopped || (pgrp > 1 &&
+				    kill(-pgrp, 0) == -1 &&
+				    errno == ESRCH)) {
 		    attachtty(mypgrp);
 		    /* check window size and adjust if necessary */
 		    adjustwinsize(0);
@@ -2470,7 +2475,8 @@ bin_fg(char *name, char **argv, Options ops, int func)
 		    if ((jobtab[job].stat & STAT_SUPERJOB) &&
 			((!jobtab[job].procs->next ||
 			  (jobtab[job].stat & STAT_SUBLEADER) ||
-			  killpg(jobtab[job].gleader, 0) == -1)) &&
+			  (killpg(jobtab[job].gleader, 0) == -1  &&
+			  errno == ESRCH))) &&
 			jobtab[jobtab[job].other].gleader)
 			attachtty(jobtab[jobtab[job].other].gleader);
 		    else
