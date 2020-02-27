@@ -729,11 +729,15 @@
 >not/exist
 >exist
 
- mkdir -m 000 glob.tmp/secret-d000
- mkdir -m 111 glob.tmp/secret-d111
- mkdir -m 444 glob.tmp/secret-d444
- for 1 in 000 111 444 ; do ln -s secret-d$1 glob.tmp/secret-s$1; done
- print -rC 2 -- glob.tmp/secret-*/ glob.tmp/secret-*(-/)
+ if [[ $OSTYPE = cygwin* ]]; then
+   ZTST_skip='Cygwin ignores search permission of directories'
+ else
+   mkdir -m 000 glob.tmp/secret-d000
+   mkdir -m 111 glob.tmp/secret-d111
+   mkdir -m 444 glob.tmp/secret-d444
+   for 1 in 000 111 444 ; do ln -s secret-d$1 glob.tmp/secret-s$1; done
+   print -rC 2 -- glob.tmp/secret-*/ glob.tmp/secret-*(-/)
+ fi
 -f:unreadable directories can be globbed (users/24619, users/24626)
 >glob.tmp/secret-d000/  glob.tmp/secret-d000
 >glob.tmp/secret-d111/  glob.tmp/secret-d111

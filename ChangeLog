@@ -1,3 +1,8 @@
+2020-02-27  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 45492: Test/D02glob.ztst: skip test added by users/24633 
+	on Cygwin.
+
 2020-02-25  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 45488: Marc Cornella: Completion/bashcompinit: Need "$@"
