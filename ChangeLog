@@ -1,5 +1,7 @@
 2020-03-06  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* 45509: Test/B01cd.ztst: Fix typos.
+
 	* 45490 (+45495 and a test): .gitignore,
 	Src/Builtins/rlimits.awk, Src/Builtins/rlimits.c,
 	Src/Builtins/rlimits.mdd, Test/B12limit.ztst, configure.ac:
