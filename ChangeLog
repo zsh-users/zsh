@@ -1,3 +1,10 @@
+2020-03-06  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 45490 (+45495 and a test): .gitignore,
+	Src/Builtins/rlimits.awk, Src/Builtins/rlimits.c,
+	Src/Builtins/rlimits.mdd, Test/B12limit.ztst, configure.ac:
+	Refactor rlimits.c.
+
 2020-03-05  Bryan Irvine  <sparctacus@gmail.com>
 
 	* github #49: Completion/BSD/Type/_obsd_architectures: Fix typo:
