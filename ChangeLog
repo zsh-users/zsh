@@ -1,3 +1,64 @@
+2020-03-07  Daniel Shahaf  <danielsh@apache.org>
+
+	* unposted: README: Move a new incompatibility notice.
+
+	* unposted: Test/V01zmodload.ztst: Fix trailing whitespace in
+	test expectations.
+
+2020-01-29  Daniel Shahaf  <danielsh@apache.org>
+
+	* 45342: Test/V01zmodload.ztst: Add tests for interaction
+	between autoloadable parameters and module loading.
+
+2020-01-17  Daniel Shahaf  <danielsh@apache.org>
+
+	* 45313: Completion/Unix/Command/_git: Support completion from
+	outside of a worktree when --git-dir/--work-tree are specified
+	on the command line
+
+2020-01-16  Daniel Shahaf  <danielsh@apache.org>
+
+	* 45304: Src/loop.c, Test/A01grammar.ztst: Do execute the always
+	block even when the try/always block itself is the last command.
+
+2020-01-15  dana  <dana@dana.is>
+
+	* 45292: Test/D02glob.ztst: Add regression test for macOS stat(2)
+	misbehaviour, now worked around by previous fix (see workers/42891)
+
+	* Daniel: 45291: Src/glob.c, Test/D02glob.ztst: A glob with a
+	trailing slash will now match unreadable/unexecutable directories.
+
+2020-01-15  Daniel Shahaf  <danielsh@apache.org>
+
+	* 45288: Completion/Unix/Command/_git: Complete bisect/new as
+	well as bisect/bad.
+
+2020-01-06  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 45246: configure.ac: Make --disable-multibyte warn, since
+	the test suite fails in that configuration.
+
+2020-01-06  Daniel Shahaf  <danielsh@apache.org>
+
+	* 45213: README, configure.ac: Make --enable-gdbm default to
+	false, rather than default to true with an unavoidable warning.
+
+2019-12-26  Daniel Shahaf  <danielsh@apache.org>
+
+	* unposted (follow-up to 45131): Test/E02xtrace.ztst: Extra
+	testing by Mikael
+
+	* 45137: Src/Modules/zutil.c, Test/V13zformat.ztst: zformat:
+	Allow the specifying minimum width and a dot with an empty
+	maximum width.
+
+	* 45138: Src/Modules/zutil.c, Test/V13zformat.ztst: Add zformat
+	unit tests.
+
+	* 45131: Src/exec.c, Test/E02xtrace.ztst: Make a function that
+	redefines itself preserve its tracedness.
+
 2020-03-06  Daniel Shahaf  <danielsh@apache.org>
 
 	* unposted: Completion/BSD/Type/_obsd_architectures: Remove

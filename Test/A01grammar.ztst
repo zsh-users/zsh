@@ -930,5 +930,5 @@ F:Note that the behaviour of 'exit' inside try-list inside a function is unspeci
 >or false
 
  $ZTST_testdir/../Src/zsh -fc '{ ( ) } always { echo foo }'
--f:exec last command optimization inhibited for try/always
+0:exec last command optimization inhibited for try/always
 >foo

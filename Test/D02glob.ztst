@@ -729,22 +729,29 @@
 >not/exist
 >exist
 
- if [[ $OSTYPE = cygwin* ]]; then
-   ZTST_skip='Cygwin ignores search permission of directories'
- else
-   mkdir -m 000 glob.tmp/secret-d000
-   mkdir -m 111 glob.tmp/secret-d111
-   mkdir -m 444 glob.tmp/secret-d444
-   for 1 in 000 111 444 ; do ln -s secret-d$1 glob.tmp/secret-s$1; done
-   print -rC 2 -- glob.tmp/secret-*/ glob.tmp/secret-*(-/)
- fi
--f:unreadable directories can be globbed (users/24619, users/24626)
+ mkdir -m 000 glob.tmp/secret-d000
+ mkdir -m 111 glob.tmp/secret-d111
+ mkdir -m 444 glob.tmp/secret-d444
+ for 1 in 000 111 444 ; do ln -s secret-d$1 glob.tmp/secret-s$1; done
+ print -rC 2 -- glob.tmp/secret-*/ glob.tmp/secret-*(-/)
+0:unreadable directories can be globbed (users/24619, users/24626)
 >glob.tmp/secret-d000/  glob.tmp/secret-d000
 >glob.tmp/secret-d111/  glob.tmp/secret-d111
 >glob.tmp/secret-d444/  glob.tmp/secret-d444
 >glob.tmp/secret-s000/  glob.tmp/secret-s000
 >glob.tmp/secret-s111/  glob.tmp/secret-s111
 >glob.tmp/secret-s444/  glob.tmp/secret-s444
+
+ # On macOS, stat(2) allows files to be treated as directories if the calling
+ # process has super-user privileges. e.g., stat() on /my/regular/file/. will
+ # succeed as root but (correctly) fail otherwise. This can produce strange
+ # results when globbing, depending on how it's implemented. This test should,
+ # when run with privileges, confirm that the implementation avoids this
+ # problem. See workers/42891 and workers/45291
+ : > glob.tmp/not-a-directory
+ print -r - glob.tmp/not-a-dir*(N) , glob.tmp/not-a-dir*/(N)
+0:non-directories not globbed as directories
+>glob.tmp/not-a-directory ,
 
  () { echo $1:P } ////dev
 -f:(workers/45367) modifier ':P' squashes multiple slashes

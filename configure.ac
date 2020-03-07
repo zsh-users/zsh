@@ -444,9 +444,10 @@ dnl Do you want to look for capability support?
 AC_ARG_ENABLE(cap,
 AS_HELP_STRING([--enable-cap],[enable the search for POSIX capabilities (may require additional headers to be added by hand)]))
 
+# Default off for licensing reasons
 AC_ARG_ENABLE(gdbm,
-AS_HELP_STRING([--disable-gdbm],[turn off search for gdbm library]),
-[gdbm="$enableval"], [gdbm=yes])
+AS_HELP_STRING([--enable-gdbm],[enable the search for the GDBM library (see the zsh/db/gdbm module)]),
+[gdbm="$enableval"], [gdbm=no])
 
 dnl ------------------
 dnl CHECK THE COMPILER
@@ -2541,6 +2542,7 @@ wmemcpy wmemmove wmemset; do
       AC_MSG_NOTICE([all functions found, multibyte support enabled])
       zsh_cv_c_unicode_support=yes
     else
+      # Warns at the end of configure
       AC_MSG_NOTICE([missing functions, multibyte support disabled])
       zsh_cv_c_unicode_support=no
     fi
@@ -3287,13 +3289,18 @@ fi
 echo "See config.modules for installed modules and functions.
 "
 
-case x$LIBS in
-  *-lgdbm*)
-  echo "WARNING: zsh will be linked against libgdbm.
-This means the binary is covered by the GNU General Public License.
-This does not affect the source code.
-Run configure with --disable-gdbm if required."
-  ;;
-esac
+if test x$zsh_cv_c_unicode_support != xyes; then
+  if test "x$zfuncs_absent" = x; then
+    # The user opted out.
+    AC_MSG_WARN([You have chosen to build without multibyte support.])
+    AC_MSG_WARN([This configuration may not be suitable for production use. It is known to cause errors in 'make test'. We strongly recommend to re-run configure with --enable-multibyte.])
+  else
+    # Some requisite functions are missing.
+    AC_MSG_WARN([Multibyte support cannot be enabled: some standard library functions are missing: $zfuncs_absent])
+    AC_MSG_WARN([This configuration may not be suitable for production use. It is known to cause errors in 'make test'. If your system provides those functions, we recommend to re-run configure appropriately.])
+    # If your system doesn't have those functions, consider patching the
+    # test suite and sending the patch to zsh-workers@ for inclusion.
+  fi
+fi
 
 exit 0

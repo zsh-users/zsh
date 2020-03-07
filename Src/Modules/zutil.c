@@ -797,8 +797,7 @@ static char *zformat_substring(char* instr, char **specs, char **outp,
 	    if ((*s == '.' || testit) && idigit(s[1])) {
 		for (max = 0, s++; idigit(*s); s++)
 		    max = (max * 10) + (int) STOUC(*s) - '0';
-	    }
-	    else if (testit)
+	    } else if (*s == '.' || testit)
 		s++;
 
 	    if (testit && STOUC(*s)) {
@@ -913,13 +912,13 @@ bin_zformat(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     switch (opt) {
     case 'f':
 	{
-	    char **ap, *specs[256], *out;
+	    char **ap, *specs[256] = {0}, *out;
 	    int olen, oused = 0;
-
-	    memset(specs, 0, 256 * sizeof(char *));
 
 	    specs['%'] = "%";
 	    specs[')'] = ")";
+
+	    /* Parse the specs in argv. */
 	    for (ap = args + 2; *ap; ap++) {
 		if (!ap[0][0] || ap[0][0] == '-' || ap[0][0] == '.' ||
 		    idigit(ap[0][0]) || ap[0][1] != ':') {
