@@ -355,7 +355,7 @@
    echo $+options
  '
 -f:can unset a non-readonly autoloadable parameter before loading the module
->0  
+>0
 # Currently prints '1'.
 
  $ZTST_testdir/../Src/zsh -fc '
@@ -364,7 +364,7 @@
    echo $+options
  '
 0:can unset a non-readonly autoloadable parameter after loading the module
->0  
+>0
 
  $ZTST_testdir/../Src/zsh -fc '
    if zmodload -e zsh/parameter; then zmodload -u zsh/parameter; fi
@@ -387,7 +387,7 @@
    echo $options
  '
 0:unloading a module doesn't implicitly unset autoloadable parameters
-*>(on|off) *  
+*>(on|off) *
 
 %clean
 

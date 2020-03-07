@@ -1,3 +1,8 @@
+2020-03-07  Daniel Shahaf  <danielsh@apache.org>
+
+	* unposted: Test/V01zmodload.ztst: Fix trailing whitespace in
+	test expectations.
+
 2020-01-29  Daniel Shahaf  <danielsh@apache.org>
 
 	* 45342: Test/V01zmodload.ztst: Add tests for interaction
