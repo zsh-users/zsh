@@ -70,7 +70,7 @@
 # the expected status returned by the code when run, or - if it is
 # irrelevant.  An optional set of single-letter flags follows the status
 # or -.  The following are understood:
-#  . d  Don't diff stdout against the expected stdout.
+#   d   Don't diff stdout against the expected stdout.
 #   D   Don't diff stderr against the expected stderr.
 #   q   All redirection lines given in the test script (not the lines
 #       actually produced by the test) are subject to ordinary quoted shell
@@ -96,8 +96,8 @@
 # itself.  (The example below isn't particularly useful as errors with
 # `cd' are unusual.)
 #
-# A couple of features aren't used in this file, but are usefuil in cases
-# where features may not be available so should not be tested.  They boh
+# A couple of features aren't used in this file, but are useful in cases
+# where features may not be available so should not be tested.  They both
 # take the form of variables.  Note that to keep the test framework simple
 # there is no magic in setting the variables: the chunk of code being
 # executed needs to avoid executing any test code by appropriate structure
@@ -144,6 +144,10 @@ F:something is broken.  But you already knew that.
  (unset HOME; ARGV0=sh $ZTST_testdir/../Src/zsh -c cd)
 1:Implicit cd with unset HOME.
 ?zsh:cd:1: HOME not set
+
+ $ZTST_testdir/../Src/zsh -fc 'cd -P ////dev && pwd'
+-f:(workers/45367) cd -P squashes multiple leading slashes
+>/dev  
 
 %clean
 # This optional section cleans up after the test, if necessary,

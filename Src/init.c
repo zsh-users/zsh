@@ -882,7 +882,7 @@ setupvals(char *cmd, char *runscript, char *zsh_name)
     char *ptr;
     int i, j;
 #if defined(SITEFPATH_DIR) || defined(FPATH_DIR) || defined (ADDITIONAL_FPATH) || defined(FIXED_FPATH_DIR)
-#define FPATH_NEEDS_INIT 1
+# define FPATH_NEEDS_INIT 1
     char **fpathptr;
 # if defined(FPATH_DIR) && defined(FPATH_SUBDIRS)
     char *fpath_subdirs[] = FPATH_SUBDIRS;
@@ -994,18 +994,29 @@ setupvals(char *cmd, char *runscript, char *zsh_name)
 # endif /* ADDITONAL_FPATH */
     fpath = fpathptr = (char **)zalloc((fpathlen+1)*sizeof(char *));
 # ifdef FIXED_FPATH_DIR
+    /* Zeroth: /usr/local/share/zsh/site-functions */
     *fpathptr++ = ztrdup(FIXED_FPATH_DIR);
     fpathlen--;
 # endif
 # ifdef SITEFPATH_DIR
+    /* First: the directory from --enable-site-fndir
+     *
+     * default: /usr/local/share/zsh/site-functions
+     * (but changeable by passing --prefix or --datadir to configure) */
     *fpathptr++ = ztrdup(SITEFPATH_DIR);
     fpathlen--;
 # endif /* SITEFPATH_DIR */
 # if defined(ADDITIONAL_FPATH)
+    /* Second: the directories from --enable-additional-fpath
+     * 
+     * default: empty list */
     for (j = 0; j < more_fndirs_len; j++)
 	*fpathptr++ = ztrdup(more_fndirs[j]);
 # endif
 # ifdef FPATH_DIR
+    /* Third: The directory from --enable-fndir
+     *
+     * default: /usr/local/share/zsh/${ZSH_VERSION}/functions */
 #  ifdef FPATH_SUBDIRS
 #   ifdef ADDITIONAL_FPATH
     for (j = more_fndirs_len; j < fpathlen; j++)
@@ -1013,7 +1024,7 @@ setupvals(char *cmd, char *runscript, char *zsh_name)
 #   else
     for (j = 0; j < fpathlen; j++)
 	*fpathptr++ = tricat(FPATH_DIR, "/", fpath_subdirs[j]);
-#endif
+#   endif
 #  else
     *fpathptr++ = ztrdup(FPATH_DIR);
 #  endif

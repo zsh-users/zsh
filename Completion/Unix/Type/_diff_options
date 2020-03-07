@@ -92,6 +92,7 @@ if _pick_variant -r variant -c $cmd gnu=GNU unix -v || [[ $OSTYPE = freebsd<12->
     '--ignore-file-name-case[ignore case when comparing file names]' \
     '!(--ignore-file-name-case)--no-ignore-file-name-case' \
     '(-b --ignore-space-change)'{-b,--ignore-space-change}'[ignore changes in the amount of white space]' \
+    '(-w --ignore-all-space)'{-w,--ignore-all-space}'[ignore all white space]' \
     '(-B --ignore-blank-lines)'{-B,--ignore-blank-lines}'[ignore lines that are all blank]' \
     '(-I --ignore-matching-lines)'{-I+,--ignore-matching-lines=}'[ignore lines that match regex]:line exclusion regex:' \
     '--strip-trailing-cr[strip trailing carriage return on input]' \

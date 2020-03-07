@@ -32,20 +32,7 @@
 
 #if defined(HAVE_GETRLIMIT) && defined(RLIM_INFINITY)
 
-#if defined(HAVE_RLIMIT_POSIXLOCKS) && !defined(HAVE_RLIMIT_LOCKS)
-#  define RLIMIT_LOCKS		RLIMIT_POSIXLOCKS
-#  define HAVE_RLIMIT_LOCKS     1
-#endif
-
-#if defined(HAVE_RLIMIT_NTHR) && !defined(HAVE_RLIMIT_PTHREAD)
-#  define RLIMIT_PTHREAD	RLIMIT_NTHR
-#  define HAVE_RLIMIT_PTHREAD   1
-#  define THREAD_FMT            "-T: threads                         "
-#else
-#  define THREAD_FMT            "-T: threads per process             "
-#endif
-
-enum {
+enum zlimtype {
     ZLIMTYPE_MEMORY,
     ZLIMTYPE_NUMBER,
     ZLIMTYPE_TIME,
@@ -53,11 +40,214 @@ enum {
     ZLIMTYPE_UNKNOWN
 };
 
-/* Generated rec array containing limits required for the limit builtin.     *
- * They must appear in this array in numerical order of the RLIMIT_* macros. */
+typedef struct resinfo_T {
+    int	res;		/* RLIMIT_XXX */
+    char* name;		/* used by limit builtin */
+    enum zlimtype type;
+    int unit;		/* 1, 512, or 1024 */
+    char opt;		/* option character */
+    char* descr;	/* used by ulimit builtin */
+} resinfo_T;
 
-# include "rlimits.h"
+/* table of known resources */
+static const resinfo_T known_resources[] = {
+    {RLIMIT_CPU, "cputime", ZLIMTYPE_TIME, 1,
+		't', "cpu time (seconds)"},
+    {RLIMIT_FSIZE, "filesize", ZLIMTYPE_MEMORY, 512,
+		'f', "file size (blocks)"},
+    {RLIMIT_DATA, "datasize", ZLIMTYPE_MEMORY, 1024,
+		'd', "data seg size (kbytes)"},
+    {RLIMIT_STACK, "stacksize", ZLIMTYPE_MEMORY, 1024,
+		's', "stack size (kbytes)"},
+    {RLIMIT_CORE, "coredumpsize", ZLIMTYPE_MEMORY, 512,
+		'c', "core file size (blocks)"},
+# ifdef HAVE_RLIMIT_NOFILE
+    {RLIMIT_NOFILE, "descriptors", ZLIMTYPE_NUMBER, 1,
+		'n', "file descriptors"},
+# endif
+# if defined(HAVE_RLIMIT_AS) && !defined(RLIMIT_VMEM_IS_AS)
+    {RLIMIT_AS, "addressspace", ZLIMTYPE_MEMORY, 1024,
+		'v', "address space (kbytes)"},
+# endif
+# if defined(HAVE_RLIMIT_RSS) && !defined(RLIMIT_VMEM_IS_RSS) && !defined(RLIMIT_RSS_IS_AS)
+    {RLIMIT_RSS, "resident", ZLIMTYPE_MEMORY, 1024,
+		'm', "resident set size (kbytes)"},
+# endif
+# if defined(HAVE_RLIMIT_VMEM)
+    {RLIMIT_VMEM,
+#  if defined(RLIMIT_VMEM_IS_RSS)
+		 "resident", ZLIMTYPE_MEMORY, 1024,
+		 'm', "memory size (kbytes)"},
+#  else
+		 "vmemorysize", ZLIMTYPE_MEMORY, 1024,
+		 'v', "virtual memory size (kbytes)"},
+#  endif
+# endif
+# ifdef HAVE_RLIMIT_NPROC
+    {RLIMIT_NPROC, "maxproc", ZLIMTYPE_NUMBER, 1,
+		'u', "processes"},
+# endif
+# ifdef HAVE_RLIMIT_MEMLOCK
+    {RLIMIT_MEMLOCK, "memorylocked", ZLIMTYPE_MEMORY, 1024,
+		'l', "locked-in-memory size (kbytes)"},
+# endif
+    /* Linux */
+# ifdef HAVE_RLIMIT_LOCKS
+    {RLIMIT_LOCKS, "maxfilelocks", ZLIMTYPE_NUMBER, 1,
+		'x', "file locks"},
+# endif
+# ifdef HAVE_RLIMIT_SIGPENDING
+    {RLIMIT_SIGPENDING, "sigpending", ZLIMTYPE_NUMBER, 1,
+		'i', "pending signals"},
+# endif
+# ifdef HAVE_RLIMIT_MSGQUEUE
+    {RLIMIT_MSGQUEUE, "msgqueue", ZLIMTYPE_NUMBER, 1,
+		'q', "bytes in POSIX msg queues"},
+# endif
+# ifdef HAVE_RLIMIT_NICE
+    {RLIMIT_NICE, "nice", ZLIMTYPE_NUMBER, 1,
+		'e', "max nice"},
+# endif
+# ifdef HAVE_RLIMIT_RTPRIO
+    {RLIMIT_RTPRIO, "rt_priority", ZLIMTYPE_NUMBER, 1,
+		'r', "max rt priority"},
+# endif
+# ifdef HAVE_RLIMIT_RTTIME
+    {RLIMIT_RTTIME, "rt_time", ZLIMTYPE_MICROSECONDS, 1,
+		'N', "rt cpu time (microseconds)"},
+# endif
+    /* BSD */
+# ifdef HAVE_RLIMIT_SBSIZE
+    {RLIMIT_SBSIZE, "sockbufsize", ZLIMTYPE_MEMORY, 1,
+		'b', "socket buffer size (bytes)"},
+# endif
+# ifdef HAVE_RLIMIT_KQUEUES /* FreeBSD */
+    {RLIMIT_KQUEUES, "kqueues", ZLIMTYPE_NUMBER, 1,
+		'k', "kqueues"},
+# endif
+# ifdef HAVE_RLIMIT_NPTS    /* FreeBSD */
+    {RLIMIT_NPTS, "pseudoterminals", ZLIMTYPE_NUMBER, 1,
+		'p', "pseudo-terminals"},
+# endif
+# ifdef HAVE_RLIMIT_SWAP    /* FreeBSD */
+    {RLIMIT_SWAP, "swapsize", ZLIMTYPE_MEMORY, 1024,
+		'w', "swap size (kbytes)"},
+# endif
+# ifdef HAVE_RLIMIT_UMTXP   /* FreeBSD */
+    {RLIMIT_UMTXP, "umtxp", ZLIMTYPE_NUMBER, 1,
+		'o', "umtx shared locks"},
+# endif
 
+# ifdef HAVE_RLIMIT_POSIXLOCKS	/* DragonFly */
+    {RLIMIT_POSIXLOCKS, "posixlocks", ZLIMTYPE_NUMBER, 1,
+		'x', "number of POSIX locks"},
+# endif
+# if defined(HAVE_RLIMIT_NTHR) && !defined(HAVE_RLIMIT_RTPRIO) /* Net/OpenBSD */
+    {RLIMIT_NTHR, "maxpthreads", ZLIMTYPE_NUMBER, 1,
+		'r', "threads"},
+# endif
+    /* others */
+# if defined(HAVE_RLIMIT_PTHREAD) && !defined(HAVE_RLIMIT_NTHR)	/* IRIX ? */
+    {RLIMIT_PTHREAD, "maxpthreads", ZLIMTYPE_NUMBER, 1,
+		'T', "threads per process"},
+# endif
+# ifdef HAVE_RLIMIT_AIO_MEM /* HP-UX ? */
+    {RLIMIT_AIO_MEM, "aiomemorylocked", ZLIMTYPE_MEMORY, 1024,
+		'N', "AIO locked-in-memory (kbytes)"},
+# endif
+# ifdef HAVE_RLIMIT_AIO_OPS /* HP-UX ? */
+    {RLIMIT_AIO_OPS, "aiooperations", ZLIMTYPE_NUMBER, 1,
+		'N', "AIO operations"},
+# endif
+# ifdef HAVE_RLIMIT_TCACHE  /* HP-UX ? */
+    {RLIMIT_TCACHE, "cachedthreads", ZLIMTYPE_NUMBER, 1,
+		'N', "cached threads"},
+# endif
+};
+
+/* resinfo[RLIMIT_XXX] points to the corresponding entry
+ * in known_resources[] */
+static const resinfo_T **resinfo;
+
+/**/
+static void
+set_resinfo(void)
+{
+    int i;
+
+    resinfo = (const resinfo_T **)zshcalloc(RLIM_NLIMITS*sizeof(resinfo_T *));
+
+    for (i=0; i<sizeof(known_resources)/sizeof(resinfo_T); ++i) {
+	resinfo[known_resources[i].res] = &known_resources[i];
+    }
+    for (i=0; i<RLIM_NLIMITS; ++i) {
+	if (!resinfo[i]) {
+	    /* unknown resource */
+	    resinfo_T *info = (resinfo_T *)zshcalloc(sizeof(resinfo_T));
+	    char *buf = (char *)zalloc(12);
+	    snprintf(buf, 12, "UNKNOWN-%d", i);
+	    info->res = - 1;	/* negative value indicates "unknown" */
+	    info->name = buf;
+	    info->type = ZLIMTYPE_UNKNOWN;
+	    info->unit = 1;
+	    info->opt = 'N';
+	    info->descr = buf;
+	    resinfo[i] = info;
+	}
+    }
+}
+
+/**/
+static void
+free_resinfo(void)
+{
+    int i;
+    for (i=0; i<RLIM_NLIMITS; ++i) {
+	if (resinfo[i]->res < 0) {  /* unknown resource */
+	    free(resinfo[i]->name);
+	    free((void*)resinfo[i]);
+	}
+    }
+    free(resinfo);
+    resinfo = NULL;
+}
+
+/* Find resource by its option character */
+
+/**/
+static int
+find_resource(char c)
+{
+    int i;
+    for (i=0; i<RLIM_NLIMITS; ++i) {
+	if (resinfo[i]->opt == c)
+	    return i;
+    }
+    return -1;
+}
+
+/* Print a value of type rlim_t */
+
+/**/
+static void
+printrlim(rlim_t val, const char *unit)
+{
+# ifdef RLIM_T_IS_QUAD_T
+	printf("%qd%s", val, unit);
+# else
+#  ifdef RLIM_T_IS_LONG_LONG
+	printf("%lld%s", val, unit);
+#  else
+#   ifdef RLIM_T_IS_UNSIGNED
+	printf("%lu%s", (unsigned long)val, unit);
+#   else
+	printf("%ld%s", (long)val, unit);
+#   endif /* RLIM_T_IS_UNSIGNED */
+#  endif /* RLIM_T_IS_LONG_LONG */
+# endif /* RLIM_T_IS_QUAD_T */
+}
+
+/**/
 static rlim_t
 zstrtorlimt(const char *s, char **t, int base)
 {
@@ -97,8 +287,8 @@ static void
 showlimitvalue(int lim, rlim_t val)
 {
     /* display limit for resource number lim */
-    if (lim < ZSH_NLIMITS)
-	printf("%-16s", recs[lim]);
+    if (lim < RLIM_NLIMITS)
+	printf("%-16s", resinfo[lim]->name);
     else
     {
 	/* Unknown limit, hence unknown units. */
@@ -106,81 +296,25 @@ showlimitvalue(int lim, rlim_t val)
     }
     if (val == RLIM_INFINITY)
 	printf("unlimited\n");
-    else if (lim >= ZSH_NLIMITS)
-    {
-# ifdef RLIM_T_IS_QUAD_T
-	printf("%qd\n", val);
-# else
-#  ifdef RLIM_T_IS_LONG_LONG
-	printf("%lld\n", val);
-#  else
-#   ifdef RLIM_T_IS_UNSIGNED
-	printf("%lu\n", (unsigned long)val);
-#   else
-	printf("%ld\n", (long)val);
-#   endif /* RLIM_T_IS_UNSIGNED */
-#  endif /* RLIM_T_IS_LONG_LONG */
-# endif /* RLIM_T_IS_QUAD_T */
-    }
-    else if (limtype[lim] == ZLIMTYPE_TIME) {
+    else if (lim >= RLIM_NLIMITS)
+	printrlim(val, "\n");
+    else if (resinfo[lim]->type == ZLIMTYPE_TIME) {
 	/* time-type resource -- display as hours, minutes and
 	   seconds. */
 	printf("%d:%02d:%02d\n", (int)(val / 3600),
 	       (int)(val / 60) % 60, (int)(val % 60));
-    } else if (limtype[lim] == ZLIMTYPE_MICROSECONDS) {
-	/* microseconds */
-# ifdef RLIM_T_IS_QUAD_T
-	printf("%qdus\n", val);
-# else
-#  ifdef RLIM_T_IS_LONG_LONG
-	printf("%lldus\n", val);
-#  else
-#   ifdef RLIM_T_IS_UNSIGNED
-	printf("%luus\n", (unsigned long)val);
-#   else
-	printf("%ldus\n", (long)val);
-#   endif /* RLIM_T_IS_UNSIGNED */
-#  endif /* RLIM_T_IS_LONG_LONG */
-# endif /* RLIM_T_IS_QUAD_T */
-    } else if (limtype[lim] == ZLIMTYPE_NUMBER ||
-	       limtype[lim] == ZLIMTYPE_UNKNOWN) {
-	/* pure numeric resource */
-# ifdef RLIM_T_IS_QUAD_T
-	printf("%qd\n", val);
-# else
-#  ifdef RLIM_T_IS_LONG_LONG
-	printf("%lld\n", val);
-#  else
-#   ifdef RLIM_T_IS_UNSIGNED
-	printf("%lu\n", (unsigned long)val);
-#   else
-	printf("%ld\n", (long)val);
-#   endif /* RLIM_T_IS_UNSIGNED */
-#  endif /* RLIM_T_IS_LONG_LONG */
-# endif /* RLIM_T_IS_QUAD_T */
-    } else if (val >= 1024L * 1024L)
-	/* memory resource -- display with `K' or `M' modifier */
-# ifdef RLIM_T_IS_QUAD_T
-	printf("%qdMB\n", val / (1024L * 1024L));
-    else
-	printf("%qdkB\n", val / 1024L);
-# else
-#  ifdef RLIM_T_IS_LONG_LONG
-	printf("%lldMB\n", val / (1024L * 1024L));
-    else
-	printf("%lldkB\n", val / 1024L);
-#  else
-#   ifdef RLIM_T_IS_UNSIGNED
-    printf("%luMB\n", (unsigned long)(val / (1024L * 1024L)));
-    else
-	printf("%lukB\n", (unsigned long)(val / 1024L));
-#   else
-    printf("%ldMB\n", (long)val / (1024L * 1024L));
-    else
-	printf("%ldkB\n", (long)val / 1024L);
-#   endif /* RLIM_T_IS_UNSIGNED */
-#  endif /* RLIM_T_IS_LONG_LONG */
-# endif /* RLIM_T_IS_QUAD_T */
+    } else if (resinfo[lim]->type == ZLIMTYPE_MICROSECONDS)
+	printrlim(val, "us\n");	/* microseconds */
+    else if (resinfo[lim]->type == ZLIMTYPE_NUMBER ||
+	       resinfo[lim]->type == ZLIMTYPE_UNKNOWN)
+	printrlim(val, "\n");	/* pure numeric resource */
+    else {
+	/* memory resource -- display with `k' or `M' modifier */
+	if (val >= 1024L * 1024L)
+	    printrlim(val/(1024L * 1024L), "MB\n");
+	else
+	    printrlim(val/1024L, "kB\n");
+    }
 }
 
 /* Display resource limits.  hard indicates whether `hard' or `soft'  *
@@ -193,7 +327,7 @@ showlimits(char *nam, int hard, int lim)
 {
     int rt;
 
-    if (lim >= ZSH_NLIMITS)
+    if (lim >= RLIM_NLIMITS)
     {
 	/*
 	 * Not configured into the shell.  Ask the OS
@@ -215,7 +349,7 @@ showlimits(char *nam, int hard, int lim)
     else
     {
 	/* main loop over resource types */
-	for (rt = 0; rt != ZSH_NLIMITS; rt++)
+	for (rt = 0; rt != RLIM_NLIMITS; rt++)
 	    showlimitvalue(rt, (hard) ? limits[rt].rlim_max :
 			   limits[rt].rlim_cur);
     }
@@ -234,7 +368,7 @@ printulimit(char *nam, int lim, int hard, int head)
     rlim_t limit;
 
     /* get the limit in question */
-    if (lim >= ZSH_NLIMITS)
+    if (lim >= RLIM_NLIMITS)
     {
 	struct rlimit vals;
 
@@ -248,199 +382,25 @@ printulimit(char *nam, int lim, int hard, int head)
     else
 	limit = (hard) ? limits[lim].rlim_max : limits[lim].rlim_cur;
     /* display the appropriate heading */
-    switch (lim) {
-    case RLIMIT_CORE:
-	if (head)
-	    printf("-c: core file size (blocks)         ");
-	if (limit != RLIM_INFINITY)
-	    limit /= 512;
-	break;
-    case RLIMIT_DATA:
-	if (head)
-	    printf("-d: data seg size (kbytes)          ");
-	if (limit != RLIM_INFINITY)
-	    limit /= 1024;
-	break;
-    case RLIMIT_FSIZE:
-	if (head)
-	    printf("-f: file size (blocks)              ");
-	if (limit != RLIM_INFINITY)
-	    limit /= 512;
-	break;
-# ifdef HAVE_RLIMIT_SIGPENDING
-    case RLIMIT_SIGPENDING:
-	if (head)
-	    printf("-i: pending signals                 ");
-	break;
-# endif
-# ifdef HAVE_RLIMIT_MEMLOCK
-    case RLIMIT_MEMLOCK:
-	if (head)
-	    printf("-l: locked-in-memory size (kbytes)  ");
-	if (limit != RLIM_INFINITY)
-	    limit /= 1024;
-	break;
-# endif /* HAVE_RLIMIT_MEMLOCK */
-/* If RLIMIT_VMEM and RLIMIT_RSS are defined and equal, avoid *
- * duplicate case statement.  Observed on QNX Neutrino 6.1.0. */
-# if defined(HAVE_RLIMIT_RSS) && !defined(RLIMIT_VMEM_IS_RSS) && !defined(RLIMIT_RSS_IS_AS)
-    case RLIMIT_RSS:
-	if (head)
-	    printf("-m: resident set size (kbytes)      ");
-	if (limit != RLIM_INFINITY)
-	    limit /= 1024;
-	break;
-# endif /* HAVE_RLIMIT_RSS */
-# if defined(HAVE_RLIMIT_VMEM) && defined(HAVE_RLIMIT_RSS) && defined(RLIMIT_VMEM_IS_RSS)
-    case RLIMIT_VMEM:
-	if (head)
-	    printf("-m: memory size (kbytes)            ");
-	if (limit != RLIM_INFINITY)
-	    limit /= 1024;
-	break;
-# endif /* HAVE_RLIMIT_VMEM */
-# ifdef HAVE_RLIMIT_NOFILE
-    case RLIMIT_NOFILE:
-	if (head)
-	    printf("-n: file descriptors                ");
-	break;
-# endif /* HAVE_RLIMIT_NOFILE */
-# ifdef HAVE_RLIMIT_MSGQUEUE
-    case RLIMIT_MSGQUEUE:
-	if (head)
-	    printf("-q: bytes in POSIX msg queues       ");
-	break;
-# endif
-    case RLIMIT_STACK:
-	if (head)
-	    printf("-s: stack size (kbytes)             ");
-	if (limit != RLIM_INFINITY)
-	    limit /= 1024;
-	break;
-    case RLIMIT_CPU:
-	if (head)
-	    printf("-t: cpu time (seconds)              ");
-	break;
-# ifdef HAVE_RLIMIT_NPROC
-    case RLIMIT_NPROC:
-	if (head)
-	    printf("-u: processes                       ");
-	break;
-# endif /* HAVE_RLIMIT_NPROC */
-# if defined(HAVE_RLIMIT_VMEM) && (!defined(HAVE_RLIMIT_RSS) || !defined(RLIMIT_VMEM_IS_RSS))
-    case RLIMIT_VMEM:
-	if (head)
-	    printf("-v: virtual memory size (kbytes)    ");
-	if (limit != RLIM_INFINITY)
-	    limit /= 1024;
-	break;
-# endif /* HAVE_RLIMIT_VMEM */
-# if defined HAVE_RLIMIT_AS && !defined(RLIMIT_VMEM_IS_AS)
-    case RLIMIT_AS:
-	if (head)
-	    printf("-v: address space (kbytes)          ");
-	if (limit != RLIM_INFINITY)
-	    limit /= 1024;
-	break;
-# endif /* HAVE_RLIMIT_AS */
-# ifdef HAVE_RLIMIT_LOCKS
-    case RLIMIT_LOCKS:
-	if (head)
-	    printf("-x: file locks                      ");
-	break;
-# endif /* HAVE_RLIMIT_LOCKS */
-# ifdef HAVE_RLIMIT_AIO_MEM
-    case RLIMIT_AIO_MEM:
-	if (head)
-	    printf("-N %2d: AIO locked-in-memory (kbytes)", RLIMIT_AIO_MEM);
-	if (limit != RLIM_INFINITY)
-	    limit /= 1024;
-	break;
-# endif /* HAVE_RLIMIT_AIO_MEM */
-# ifdef HAVE_RLIMIT_AIO_OPS
-    case RLIMIT_AIO_OPS:
-	if (head)
-	    printf("-N %2d: AIO operations               ", RLIMIT_AIO_OPS);
-	break;
-# endif /* HAVE_RLIMIT_AIO_OPS */
-# ifdef HAVE_RLIMIT_TCACHE
-    case RLIMIT_TCACHE:
-	if (head)
-	    printf("-N %2d: cached threads               ", RLIMIT_TCACHE);
-	break;
-# endif /* HAVE_RLIMIT_TCACHE */
-# ifdef HAVE_RLIMIT_SBSIZE
-    case RLIMIT_SBSIZE:
-	if (head)
-	    printf("-b: socket buffer size (bytes)      ");
-	break;
-# endif /* HAVE_RLIMIT_SBSIZE */
-# ifdef HAVE_RLIMIT_PTHREAD
-    case RLIMIT_PTHREAD:
-	if (head)
-	    printf("%s", THREAD_FMT);
-	break;
-# endif /* HAVE_RLIMIT_PTHREAD */
-# ifdef HAVE_RLIMIT_NICE
-    case RLIMIT_NICE:
-	if (head)
-	    printf("-e: max nice                        ");
-	break;
-# endif /* HAVE_RLIMIT_NICE */
-# ifdef HAVE_RLIMIT_RTPRIO
-    case RLIMIT_RTPRIO:
-	if (head)
-	    printf("-r: max rt priority                 ");
-	break;
-# endif /* HAVE_RLIMIT_RTPRIO */
-# ifdef HAVE_RLIMIT_NPTS
-    case RLIMIT_NPTS:
-	if (head)
-	    printf("-p: pseudo-terminals                ");
-	break;
-# endif /* HAVE_RLIMIT_NPTS */
-# ifdef HAVE_RLIMIT_SWAP
-    case RLIMIT_SWAP:
-	if (head)
-	    printf("-w: swap size (kbytes)              ");
-	if (limit != RLIM_INFINITY)
-	    limit /= 1024;
-	break;
-# endif /* HAVE_RLIMIT_SWAP */
-# ifdef HAVE_RLIMIT_KQUEUES
-    case RLIMIT_KQUEUES:
-	if (head)
-	    printf("-k: kqueues                         ");
-	break;
-# endif /* HAVE_RLIMIT_KQUEUES */
-# ifdef HAVE_RLIMIT_UMTXP
-    case RLIMIT_UMTXP:
-	if (head)
-	    printf("-o: umtx shared locks               ");
-	break;
-# endif /* HAVE_RLIMIT_UMTXP */
-    default:
-	if (head)
-	    printf("-N %2d:                              ", lim);
-	break;
+    if (head) {
+	if (lim < RLIM_NLIMITS) {
+	    const resinfo_T *info = resinfo[lim];
+	    if (info->opt == 'N')
+		printf("-N %2d: %-29s", lim, info->descr);
+	    else
+		printf("-%c: %-32s", info->opt, info->descr);
+	}
+	else
+	    printf("-N %2d: %-29s", lim, "");
     }
     /* display the limit */
     if (limit == RLIM_INFINITY)
 	printf("unlimited\n");
     else {
-# ifdef RLIM_T_IS_QUAD_T
-	printf("%qd\n", limit);
-# else
-#  ifdef RLIM_T_IS_LONG_LONG
-	printf("%lld\n", limit);
-#  else
-#   ifdef RLIM_T_IS_UNSIGNED
-	printf("%lu\n", (unsigned long)limit);
-#   else
-	printf("%ld\n", (long)limit);
-#   endif /* RLIM_T_IS_UNSIGNED */
-#  endif /* RLIM_T_IS_LONG_LONG */
-# endif /* RLIM_T_IS_QUAD_T */
+	if (lim < RLIM_NLIMITS)
+	    printrlim(limit/resinfo[lim]->unit, "\n");
+	else
+	    printrlim(limit, "\n");
     }
 
     return 0;
@@ -450,7 +410,7 @@ printulimit(char *nam, int lim, int hard, int head)
 static int
 do_limit(char *nam, int lim, rlim_t val, int hard, int soft, int set)
 {
-    if (lim >= ZSH_NLIMITS) {
+    if (lim >= RLIM_NLIMITS) {
 	struct rlimit vals;
 	if (getrlimit(lim, &vals) < 0)
 	{
@@ -558,8 +518,8 @@ bin_limit(char *nam, char **argv, Options ops, UNUSED(int func))
 	    lim = (int)zstrtol(s, NULL, 10);
 	}
 	else
-	    for (lim = -1, limnum = 0; limnum < ZSH_NLIMITS; limnum++)
-		if (!strncmp(recs[limnum], s, strlen(s))) {
+	    for (lim = -1, limnum = 0; limnum < RLIM_NLIMITS; limnum++)
+		if (!strncmp(resinfo[limnum]->name, s, strlen(s))) {
 		    if (lim != -1)
 			lim = -2;
 		    else
@@ -576,7 +536,7 @@ bin_limit(char *nam, char **argv, Options ops, UNUSED(int func))
 	/* without value for limit, display the current limit */
 	if (!(s = *argv++))
 	    return showlimits(nam, hard, lim);
-	if (lim >= ZSH_NLIMITS)
+	if (lim >= RLIM_NLIMITS)
 	{
 	    val = zstrtorlimt(s, &s, 10);
 	    if (*s)
@@ -586,7 +546,7 @@ bin_limit(char *nam, char **argv, Options ops, UNUSED(int func))
 		return 1;
 	    }
 	}
-	else if (limtype[lim] == ZLIMTYPE_TIME) {
+	else if (resinfo[lim]->type == ZLIMTYPE_TIME) {
 	    /* time-type resource -- may be specified as seconds, or minutes or *
 	     * hours with the `m' and `h' modifiers, and `:' may be used to add *
 	     * together more than one of these.  It's easier to understand from *
@@ -604,9 +564,9 @@ bin_limit(char *nam, char **argv, Options ops, UNUSED(int func))
 		    return 1;
 		}
 	    }
-	} else if (limtype[lim] == ZLIMTYPE_NUMBER ||
-		   limtype[lim] == ZLIMTYPE_UNKNOWN ||
-		   limtype[lim] == ZLIMTYPE_MICROSECONDS) {
+	} else if (resinfo[lim]->type == ZLIMTYPE_NUMBER ||
+		   resinfo[lim]->type == ZLIMTYPE_UNKNOWN ||
+		   resinfo[lim]->type == ZLIMTYPE_MICROSECONDS) {
 	    /* pure numeric resource -- only a straight decimal number is
 	    permitted. */
 	    char *t = s;
@@ -642,7 +602,7 @@ static int
 do_unlimit(char *nam, int lim, int hard, int soft, int set, int euid)
 {
     /* remove specified limit */
-    if (lim >= ZSH_NLIMITS) {
+    if (lim >= RLIM_NLIMITS) {
 	struct rlimit vals;
 	if (getrlimit(lim, &vals) < 0)
 	{
@@ -718,8 +678,8 @@ bin_unlimit(char *nam, char **argv, Options ops, UNUSED(int func))
 	    if (idigit(**argv)) {
 		lim = (int)zstrtol(*argv, NULL, 10);
 	    } else {
-		for (lim = -1, limnum = 0; limnum < ZSH_NLIMITS; limnum++)
-		    if (!strncmp(recs[limnum], *argv, strlen(*argv))) {
+		for (lim = -1, limnum = 0; limnum < RLIM_NLIMITS; limnum++)
+		    if (!strncmp(resinfo[limnum]->name, *argv, strlen(*argv))) {
 			if (lim != -1)
 			    lim = -2;
 			else
@@ -800,116 +760,14 @@ bin_ulimit(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		    resmask = (1 << RLIM_NLIMITS) - 1;
 		    nres = RLIM_NLIMITS;
 		    continue;
-		case 't':
-		    res = RLIMIT_CPU;
-		    break;
-		case 'f':
-		    res = RLIMIT_FSIZE;
-		    break;
-		case 'd':
-		    res = RLIMIT_DATA;
-		    break;
-		case 's':
-		    res = RLIMIT_STACK;
-		    break;
-		case 'c':
-		    res = RLIMIT_CORE;
-		    break;
-# ifdef HAVE_RLIMIT_SBSIZE
-		case 'b':
-		    res = RLIMIT_SBSIZE;
-		    break;
-# endif /* HAVE_RLIMIT_SBSIZE */
-# ifdef HAVE_RLIMIT_MEMLOCK
-		case 'l':
-		    res = RLIMIT_MEMLOCK;
-		    break;
-# endif /* HAVE_RLIMIT_MEMLOCK */
-# ifdef HAVE_RLIMIT_RSS
-		case 'm':
-		    res = RLIMIT_RSS;
-		    break;
-# endif /* HAVE_RLIMIT_RSS */
-# ifdef HAVE_RLIMIT_NOFILE
-		case 'n':
-		    res = RLIMIT_NOFILE;
-		    break;
-# endif /* HAVE_RLIMIT_NOFILE */
-# ifdef HAVE_RLIMIT_NPROC
-		case 'u':
-		    res = RLIMIT_NPROC;
-		    break;
-# endif /* HAVE_RLIMIT_NPROC */
-# if defined(HAVE_RLIMIT_VMEM) || defined(HAVE_RLIMIT_AS)
-		case 'v':
-#  ifdef HAVE_RLIMIT_VMEM
-		    res = RLIMIT_VMEM;
-#  else
-		    res = RLIMIT_AS;
-#  endif
-		    break;
-# endif /* HAVE_RLIMIT_VMEM */
-# ifdef HAVE_RLIMIT_LOCKS
-		case 'x':
-		    res = RLIMIT_LOCKS;
-		    break;
-# endif
-# ifdef HAVE_RLIMIT_SIGPENDING
-		case 'i':
-		    res = RLIMIT_SIGPENDING;
-		    break;
-# endif
-# ifdef HAVE_RLIMIT_MSGQUEUE
-		case 'q':
-		    res = RLIMIT_MSGQUEUE;
-		    break;
-# endif
-# ifdef HAVE_RLIMIT_NICE
-		case 'e':
-		    res = RLIMIT_NICE;
-		    break;
-# endif
-# ifdef HAVE_RLIMIT_RTPRIO
-		case 'r':
-		    res = RLIMIT_RTPRIO;
-		    break;
-# else
-#  ifdef HAVE_RLIMIT_NTHR
-		    /* For compatibility with sh on NetBSD */
-		case 'r':
-		    res = RLIMIT_NTHR;
-		    break;
-#  endif /* HAVE_RLIMIT_NTHR */
-# endif
-# ifdef HAVE_RLIMIT_NPTS
-		case 'p':
-		    res = RLIMIT_NPTS;
-		    break;
-# endif
-# ifdef HAVE_RLIMIT_SWAP
-		case 'w':
-		    res = RLIMIT_SWAP;
-		    break;
-# endif
-# ifdef HAVE_RLIMIT_KQUEUES
-		case 'k':
-		    res = RLIMIT_KQUEUES;
-		    break;
-# endif
-# ifdef HAVE_RLIMIT_PTHREAD
-		case 'T':
-		    res = RLIMIT_PTHREAD;
-		    break;
-# endif
-# ifdef HAVE_RLIMIT_UMTXP
-		case 'o':
-		    res = RLIMIT_UMTXP;
-		    break;
-# endif
 		default:
-		    /* unrecognised limit */
-		    zwarnnam(name, "bad option: -%c", *options);
-		    return 1;
+		    res = find_resource(*options);
+		    if (res < 0) {
+			/* unrecognised limit */
+			zwarnnam(name, "bad option: -%c", *options);
+			return 1;
+		    }
+		    break;
 		}
 		if (options[1]) {
 		    resmask |= 1 << res;
@@ -961,34 +819,8 @@ bin_ulimit(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		    return 1;
 		}
 		/* scale appropriately */
-		switch (res) {
-		case RLIMIT_FSIZE:
-		case RLIMIT_CORE:
-		    limit *= 512;
-		    break;
-		case RLIMIT_DATA:
-		case RLIMIT_STACK:
-# ifdef HAVE_RLIMIT_RSS
-		case RLIMIT_RSS:
-# endif /* HAVE_RLIMIT_RSS */
-# ifdef HAVE_RLIMIT_MEMLOCK
-		case RLIMIT_MEMLOCK:
-# endif /* HAVE_RLIMIT_MEMLOCK */
-/* If RLIMIT_VMEM and RLIMIT_RSS are defined and equal, avoid *
- * duplicate case statement.  Observed on QNX Neutrino 6.1.0. */
-# if defined(HAVE_RLIMIT_VMEM) && !defined(RLIMIT_VMEM_IS_RSS)
-		case RLIMIT_VMEM:
-# endif /* HAVE_RLIMIT_VMEM */
-/* ditto RLIMIT_VMEM and RLIMIT_AS */
-# if defined(HAVE_RLIMIT_AS) && !defined(RLIMIT_VMEM_IS_AS) && !defined(RLIMIT_RSS_IS_AS)
-		case RLIMIT_AS:
-# endif /* HAVE_RLIMIT_AS */
-# ifdef HAVE_RLIMIT_AIO_MEM
-		case RLIMIT_AIO_MEM:
-# endif /* HAVE_RLIMIT_AIO_MEM */
-		    limit *= 1024;
-		    break;
-		}
+		if (res < RLIM_NLIMITS)
+		    limit *= resinfo[res]->unit;
 	    }
 	    if (do_limit(name, res, limit, hard, soft, 1))
 		ret++;
@@ -1052,6 +884,7 @@ enables_(Module m, int **enables)
 int
 boot_(UNUSED(Module m))
 {
+    set_resinfo();
     return 0;
 }
 
@@ -1059,6 +892,7 @@ boot_(UNUSED(Module m))
 int
 cleanup_(Module m)
 {
+    free_resinfo();
     return setfeatureenables(m, &module_features, NULL);
 }
 

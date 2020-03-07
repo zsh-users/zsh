@@ -1312,6 +1312,7 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       getlogin getpwent getpwnam getpwuid getgrgid getgrnam \
 	       initgroups nis_list \
 	       setuid seteuid setreuid setresuid setsid \
+	       setgid setegid setregid setresgid \
 	       memcpy memmove strstr strerror strtoul \
 	       getrlimit getrusage \
 	       setlocale \
@@ -1928,6 +1929,7 @@ zsh_LIMIT_PRESENT(RLIMIT_SIGPENDING)
 zsh_LIMIT_PRESENT(RLIMIT_MSGQUEUE)
 zsh_LIMIT_PRESENT(RLIMIT_NICE)
 zsh_LIMIT_PRESENT(RLIMIT_RTPRIO)
+zsh_LIMIT_PRESENT(RLIMIT_RTTIME)
 zsh_LIMIT_PRESENT(RLIMIT_POSIXLOCKS)
 zsh_LIMIT_PRESENT(RLIMIT_NPTS)
 zsh_LIMIT_PRESENT(RLIMIT_SWAP)

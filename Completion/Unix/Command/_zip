@@ -82,7 +82,7 @@ case $service in
       '*:file:->files' && ret=0
   ;;
   unzip)
-    _arguments -C -s \
+    _arguments -C -s -S \
       '(-Z)-M[page output]' \
       - unzip \
       '(-f -u -l -t -z -d -p)-c[extract files to stdout including file names]' \
@@ -130,7 +130,7 @@ esac
 [[ $state == zipinfo ]] && uzi="-Z[zipinfo mode]"
 
 if [[ $service == zipinfo ]] || [[ -n $uzi ]]; then
-    _arguments -C -s \
+    _arguments -C -s -S \
       $uzi \
       '(-2 -s -m -l -v -h -t -T -z)-1[filenames only]' \
       '(-1 -s -m -l -v -T)-2[just filenames but allow -h/-t/-z]' \
@@ -170,7 +170,7 @@ case $state in
       fi 2>/dev/null
       if [[ $zipfile !=  $_zip_cache_name ]]; then
 	_zip_cache_name="$zipfile"
-	_zip_cache_list=( ${(f)"$(zipinfo -1 $_zip_cache_name)"} )
+	_zip_cache_list=( ${(f)"$(zipinfo -1 -- $_zip_cache_name)"} )
       fi
      _wanted files expl 'file from archive' \
 	 _multi_parts / _zip_cache_list && return

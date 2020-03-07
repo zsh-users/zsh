@@ -500,6 +500,15 @@
 >Succeed 2
 >Succeed 3
 
+  (set -e
+   if false; then
+   else
+       a=$(false)
+       print This should not appear
+   fi
+  )
+1:ERREXIT is triggered in an else block after a cmd subst returning false
+
   fn() {
     emulate -L zsh
     setopt errreturn

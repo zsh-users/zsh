@@ -251,6 +251,16 @@ source code in the directory that "configure" is in.  For example,
 Note that this is mutually exclusive with using the source directories
 as make can become confused by build files created in the source directories.
 
+Writing third-party autoloadable functions
+------------------------------------------
+
+Third-party autoloadable functions, including but not limited to completion
+functions, should be installed into the share/zsh/site-functions/ directory
+under the respective installation prefix.  That would typically be written as
+$(DESTDIR)$(PREFIX)/share/zsh/site-functions/ in a makefile.  If the
+third-party tool's $(PREFIX) is not the same as zsh's prefix, then that
+directory should be added to $fpath in zsh's initialization files.
+
 
 ================================
 AUTOMATIC NEW USER CONFIGURATION

@@ -57,6 +57,169 @@
 	* 45131: Src/exec.c, Test/E02xtrace.ztst: Make a function that
 	redefines itself preserve its tracedness.
 
+2020-03-06  Daniel Shahaf  <danielsh@apache.org>
+
+	* unposted: Completion/BSD/Type/_obsd_architectures: Remove
+	'sgi', as that OpenBSD port has been discontinued.
+
+2020-03-06  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 45509: Test/B01cd.ztst: Fix typos.
+
+	* 45490 (+45495 and a test): .gitignore,
+	Src/Builtins/rlimits.awk, Src/Builtins/rlimits.c,
+	Src/Builtins/rlimits.mdd, Test/B12limit.ztst, configure.ac:
+	Refactor rlimits.c.
+
+2020-03-05  Bryan Irvine  <sparctacus@gmail.com>
+
+	* github #49: Completion/BSD/Type/_obsd_architectures: Fix typo:
+	longson should be loongson
+
+2020-02-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/24710: Src/exec.c, Src/jobs.c, Src/signals.c: when using
+	kill or killpg to test for continued existince of a process
+	group, check errono is ESRCH on failure as EPERM indicates
+	processes exist but under a different UID.
+
+2020-02-27  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 45492: Test/D02glob.ztst: skip test added by users/24633 
+	on Cygwin.
+
+2020-02-25  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 45488: Marc Cornella: Completion/bashcompinit: Need "$@"
+	quoting for empty words in COMP_WORDS for bash completion.
+
+2020-02-24  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 45487: Src/Zle/zle_keymap.c, Src/Zle/zle_main.c,
+	Src/Zle/zle_move.c, Src/builtin.c, Src/compat.c, Src/utils.c:
+	Add missing mod_export for AIX compilation.
+
+2020-02-19  Daniel Shahaf  <danielsh@apache.org>
+
+	* 45447: Completion/Zsh/Command/_zstyle,
+	Completion/Zsh/Function/_vcs_info,
+	Completion/Zsh/Type/_vcs_info_hooks: Complete vcs_info_hookadd
+	and vcs_info_hookdel. Expose _vcs_info_hooks as a top-level
+	helper function.
+
+2020-02-18  Chris Down  <chris@chrisdown.name>
+
+	* 45463: Test/B11kill.ztst: test: kill: Document why we use
+	SIGURG
+
+	* 45453: Src/jobs.c, Test/B11kill.ztst: builtins: kill: Do not
+	signal current process group when pid is empty
+
+	* 45452: Test/B11kill.ztst: builtins: kill: Add `kill ''`
+	regression test with explicit sigspec
+
+	* 45451: Test/B11kill.ztst: builtins: kill: Add basic test suite
+
+2020-02-17  brian m. carlson  <sandals@crustytoothpaste.net>
+
+	* github #48/0002:
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_git: vcs_info git:
+	properly detect bare repositories
+
+	* github #48/0001:
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_git: vcs_info git:
+	avoid warnings in bare repositories
+
+2020-02-14  dana  <dana@dana.is>
+
+	* unposted: Config/version.mk: Post-release version bump
+
+	* unposted: Config/version.mk: Update for 5.8
+
+	* Sam Foxman, Daniel Shahaf, dana: CVE-2019-20044: NEWS,
+	README, Src/openssh_bsd_setres_id.c, Src/options.c, Src/zsh.mdd,
+	Src/zsh_system.h, Test/E01options.ztst, Test/P01privileged.ztst,
+	Test/README, configure.ac: Fix insecure dropping of privileges
+	when unsetting PRIVILEGED option
+
+	* unposted: Test/V01zmodload.ztst: Fix failing test from
+	workers/45385
+
+	* 45423 (tweaked): Completion/Unix/Command/_su: Improve arg
+	handling, shell look-ups
+
+2020-02-07  dana  <dana@dana.is>
+
+	* unposted: Completion/Unix/Command/_zip: Recognise '--'
+
+2020-02-06  Daniel Shahaf  <danielsh@apache.org>
+
+	* 45385: Test/V01zmodload.ztst: Add a test for 'zmodload -Fa'
+	preemptively disabling ("blacklisting"?) features.
+
+2020-02-06  dana  <dana@dana.is>
+
+	* unposted: Config/version.mk: Update for 5.7.1-test-3
+
+	* Roman Perepelitsa: 45382: Src/Modules/system.c: Fix infinite
+	loop in sysread
+
+	* Martin von Wittich: 45388 (tweaked):
+	Completion/Unix/Type/_diff_options: Restore -w completion lost
+	in workers/43351
+
+2020-02-03  Daniel Shahaf  <danielsh@apache.org>
+
+	* 45368: Test/B01cd.ztst, Test/D02glob.ztst: Add tests for
+	workers/45367's issue about double slashes in 'cd -P' and
+	$PWD.
+
+2020-02-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 45373: Src/loop.c, Test/C03traps.ztst: ERR_EXIT failed on
+	command substitution in else branch.
+
+2020-02-02  Daniel Shahaf  <danielsh@apache.org>
+
+	* 45372: Etc/BUGS: Record a symlink loop bug involving :P
+
+2020-02-02  WGH  <wgh@torlan.ru>
+
+	* 45365: Completion/Unix/Command/_git: Fix __git_recent_branches
+	for the case when a commit has an empty message
+
+2020-01-29  Daniel Shahaf  <danielsh@apache.org>
+
+	* 45343: Src/exec.c, Src/math.c: Queue signals around arithmetic
+	evaluations
+
+	* 45344: INSTALL: Document where third-party completion functions
+	should be installed.
+
+2020-01-28  Daniel Shahaf  <danielsh@apache.org>
+
+	* 45345: Util/ztst-syntax.vim: internal: ztst.vim: Fix
+	highlighting of zsh comments in test payload
+
+2020-01-26  Daniel Shahaf  <danielsh@apache.org>
+
+	* unposted: Src/init.c: internal: Add some comments and fix
+	indentation.  No functional change.
+
+2020-01-23  Daniel Shahaf  <danielsh@apache.org>
+
+	* 45340: Src/params.c: internal: Document the difference between
+	paramtab and realparamtab.
+
+2020-01-19  Eitan Adler  <lists@eitanadler.com>
+
+	* 45332: Completion/Unix/Command/_git: add completion for
+	git-version
+
+2020-01-19  Mikael Magnusson  <mikachu@gmail.com>
+
+	* unposted: _brace_parameter: add missing \
+
 2020-01-16  Daniel Shahaf  <danielsh@apache.org>
 
 	* 45305: Test/A01grammar.ztst: Add an XFail test: The

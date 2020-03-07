@@ -478,7 +478,13 @@ static initparam argvparam_pm = IPDEF9("", &pparams, NULL, \
 
 static Param argvparam;
 
-/* hash table containing the parameters */
+/* "parameter table" - hash table containing the parameters
+ *
+ * realparamtab always points to the shell's global table.  paramtab is sometimes
+ * temporarily changed to point at another table, while dealing with the keys
+ * of an associative array (for example, see makecompparams() which initializes
+ * the associative array ${compstate}).
+ */
  
 /**/
 mod_export HashTable paramtab, realparamtab;

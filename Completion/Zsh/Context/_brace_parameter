@@ -38,7 +38,7 @@ if [[ $PREFIX = *'${('[^\)]# ]]; then
 	case $char in
 	  (g)
 	  compset -P '*'
-	  flags=('o:octal escapes' 'c:expand ^X etc.' 'e:expand \M-t etc.')
+	  flags=('o:octal escapes' 'c:expand ^X etc.' 'e:expand \\M-t etc.')
 	  _describe -t format 'format option' flags -Q -S ''
 	  ;;
 

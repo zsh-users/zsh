@@ -407,6 +407,12 @@ _git-bundle () {
   return ret
 }
 
+(( $+functions[_git-version] )) ||
+_git-version () {
+  _arguments -S $endopt \
+    '--build-options[also print build options]'
+}
+
 (( $+functions[_git-check-ignore] )) ||
 _git-check-ignore () {
   _arguments -s -S $endopt \
@@ -5951,7 +5957,8 @@ _git_commands () {
     show-branch:'show branches and their commits'
     verify-commit:'check GPG signature of commits'
     verify-tag:'check GPG signature of tags'
-    whatchanged:'show commit-logs and differences they introduce')
+    whatchanged:'show commit-logs and differences they introduce'
+    version:'show git version')
 
   interaction_commands=(
     archimport:'import an Arch repository into git'
@@ -6655,8 +6662,8 @@ __git_recent_branches() {
 
   # 4. Obtain log messages for all of them in one shot.
   # TODO: we'd really like --sort=none here...  but git doesn't support such a thing.
-  # The \n removal is because for-each-ref prints a \n after each entry.
-  descriptions=( ${(0)"$(_call_program all-descriptions "git --no-pager for-each-ref --format='%(refname)%00%(subject)%00'" refs/heads/${(q)^branches} "--")"//$'\n'} )
+  local z=$'\0'
+  descriptions=( "${(0)"$(_call_program all-descriptions "git --no-pager for-each-ref --format='%(refname)%00%(subject)'" refs/heads/${(q)^branches} "--")"//$'\n'/$z}" )
 
   # 5. Synthesize the data structure _describe wants.
   local -a branches_colon_descriptions

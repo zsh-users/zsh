@@ -138,7 +138,11 @@ VCS_INFO_git_handle_patches () {
 
 gitdir=${vcs_comm[gitdir]}
 VCS_INFO_git_getbranch ${gitdir}
-gitbase=$( ${vcs_comm[cmd]} rev-parse --show-toplevel )
+gitbase=$( ${vcs_comm[cmd]} rev-parse --show-toplevel 2> /dev/null )
+if [[ -z ${gitbase} ]]; then
+    # Bare repository
+    gitbase=${gitdir:P}
+fi
 rrn=${gitbase:t}
 if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" get-revision ; then
     gitsha1=$(${vcs_comm[cmd]} rev-parse --quiet --verify HEAD)

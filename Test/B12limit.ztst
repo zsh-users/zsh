@@ -1,0 +1,10 @@
+# check if there is unknown resouce(s)
+
+%test
+
+ limit | grep UNKNOWN || print OK
+0:Check if there is unknown resouce(s) in the system
+>OK
+F:A failure here does not indicate any error in zsh. It just means there
+F:is a resource in your system that is unknown to zsh developers. Please
+F:report this to zsh-workers mailing list.

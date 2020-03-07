@@ -74,7 +74,6 @@
 #    HASH_LIST_ALL )
 #    PRINT_EXIT_STATUS   haven't worked out what this does yet, although
 #                        Bart suggested a fix.
-#    PRIVILEGED (similar to GLOBAL_RCS)
 #    RCS        (  "      "    "    " )
 #    SH_OPTION_LETTERS   even I found this too dull to set up a test for
 #    SINGLE_COMMAND      kills shell
@@ -94,6 +93,15 @@
   lspath==ls
 
 %test
+
+  # setopt should move on to the next operation in the face of an error, but
+  # preserve the >0 return code
+  unsetopt aliases
+  setopt not_a_real_option aliases && return 2
+  print -r - $options[aliases]
+0:setopt error handling
+?(eval):setopt:4: no such option: not_a_real_option
+>on
 
   alias echo='print foo'
   unsetopt aliases
@@ -1391,3 +1399,18 @@ F:Regression test for workers/41811
 ?(anon):4: `break' active at end of function scope
 ?(anon):4: `break' active at end of function scope
 ?(anon):4: `break' active at end of function scope
+
+# There are further tests for PRIVILEGED in P01privileged.ztst.
+ if [[ -o privileged ]]; then
+   unsetopt privileged
+ fi
+ unsetopt privileged
+0:PRIVILEGED sanity check: unsetting is idempotent
+F:If this test fails at the first unsetopt, refer to P01privileged.ztst.
+
+  if [[ -o privileged ]]; then
+    (( UID != EUID ))
+  else
+    (( UID == EUID ))
+  fi
+0:PRIVILEGED sanity check: default value is correct

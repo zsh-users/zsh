@@ -123,7 +123,6 @@ Src/Builtins/*.mdh
 Src/Builtins/*.mdhi
 Src/Builtins/*.mdhs
 Src/Builtins/*.mdh.tmp
-Src/Builtins/rlimits.h
 
 Src/Modules/Makefile.in
 Src/Modules/*.export
