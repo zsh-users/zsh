@@ -31,12 +31,15 @@ Zsh is a shell with lots of features.  For a list of some of these, see the
 file FEATURES, and for the latest changes see NEWS.  For more
 details, see the documentation.
 
-Incompatibilities since 5.7.1
------------------------------
+Incompatibilities since 5.8
+---------------------------
 
 Build-time change: The default value of the --enable-gdbm configure
 argument has changed from "yes" to "no".  Thus, the zsh/db/gdbm module will
 not be built unless --enable-gdbm is passed explicitly.
+
+Incompatibilities since 5.7.1
+-----------------------------
 
 The history expansion !:1:t2 used to be interpreted such that the 2
 was a separate character added after the history expansion.  Now

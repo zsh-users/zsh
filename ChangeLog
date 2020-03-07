@@ -1,5 +1,7 @@
 2020-03-07  Daniel Shahaf  <danielsh@apache.org>
 
+	* unposted: README: Move a new incompatibility notice.
+
 	* unposted: Test/V01zmodload.ztst: Fix trailing whitespace in
 	test expectations.
 
