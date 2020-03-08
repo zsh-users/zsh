@@ -19,8 +19,20 @@ fi
 if [[ -r $config ]]; then
   local key line host
   local -a lines=("${(@f)$(<"$config")}") 2>/dev/null
+  local -a match_args
   while (($#lines)); do
     IFS=$'=\t ' read -r key line <<<"${lines[1]}"
+    if [[ "$key" == ((#i)match) ]]; then
+      match_args=(${(z)line})
+      while [[ $#match_args -ge 2 ]]; do
+	if [[ "${match_args[1]}" == (#i)(canonical|final|(|original)host) ]]; then
+	  key="Host"
+	  line="${match_args[2]//,/ }"
+	  break
+	fi
+	shift 2 match_args
+      done
+    fi
     case "$key" in
     ((#i)include)
       lines[1]=("${(@f)$(cd $HOME/.ssh; cat ${(z)~line})}") 2>/dev/null;;
