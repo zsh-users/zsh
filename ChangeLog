@@ -1,3 +1,8 @@
+2020-03-10  Romain Porte  <debian@microjoe.org>
+
+	* 45524: Completion/Debian/Command/_dscverify: Add completion
+	for dscverify(1) from Debian's devscripts.
+
 2020-03-09  Daniel Shahaf  <danielsh@apache.org>
 
 	* 45518 + unposted tweak (change single quotes to double quotes):
