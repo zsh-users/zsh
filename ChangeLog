@@ -1,3 +1,10 @@
+2020-03-11  dana  <dana@dana.is>
+
+	* 45424 (tweaked): Completion/Solaris/Command/_pfexec,
+	Completion/Unix/Command/_doas, Completion/Unix/Command/_su,
+	Completion/Unix/Command/_sudo, Completion/Zsh/Type/_command_names:
+	Add **/sbin to PATH when completing commands like sudo
+
 2020-03-10  Romain Porte  <debian@microjoe.org>
 
 	* 45524: Completion/Debian/Command/_dscverify: Add completion

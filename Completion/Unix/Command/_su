@@ -63,6 +63,12 @@ if (( $words[(i)-] < CURRENT )); then
   norm=2
 fi
 
+# This is set so that _command_names will understand that we're completing for
+# a privileged command, but _call_program won't actually prepend anything to
+# commands if gain-privileges is enabled (which would be undesirable here since
+# su always prompts for a password). We delay setting it until this point so it
+# doesn't cause issues for the check above
+local -a _comp_priv_prefix=( '' )
 _arguments $args ${(e)first} "*:shell arguments:= ->rest" && return
 
 usr=${${(Q)line[norm]}/--/root}

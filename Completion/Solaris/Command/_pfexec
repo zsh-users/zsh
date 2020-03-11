@@ -22,11 +22,15 @@ _privset() {
 }
 
 _pfexec() {
+	local cmd cpp
 	local -a _comp_priv_prefix
- 	_arguments \
-		'-P[privileges to acquire]:privspec:_privset' \
- 		'(-):command name: _command_names -e' \
-		'*::arguments:{ _comp_priv_prefix=( pfexec ${(kv)opt_args[-P]} ) ; _normal }'
+	local -A opt_args
+	cmd="$words[1]"
+	cpp='_comp_priv_prefix=( $cmd ${(kv)opt_args[(I)-P]} )'
+	_arguments \
+		'-P+[privileges to acquire]:privspec:_privset' \
+		"(-): :{ $cpp; _command_names -e }" \
+		"*:: :{ $cpp; _normal }"
 }
 
 _pfexec "$@"
