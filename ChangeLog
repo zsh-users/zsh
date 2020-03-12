@@ -1,5 +1,7 @@
 2020-03-11  dana  <dana@dana.is>
 
+	* 45470: Test/C02cond.ztst: Simplify '-N cond' test
+
 	* 45424 (tweaked): Completion/Solaris/Command/_pfexec,
 	Completion/Unix/Command/_doas, Completion/Unix/Command/_su,
 	Completion/Unix/Command/_sudo, Completion/Zsh/Type/_command_names:
