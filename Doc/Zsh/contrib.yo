@@ -1177,7 +1177,7 @@ If there are two different ways of gathering
 information, you can select the simpler one by setting this style to true;
 the default is to use the not-that-simple code, which is potentially a lot
 slower but might be more accurate in all possible cases. This style is
-used by the tt(bzr) and tt(hg) backends. In the case of tt(hg) it will invoke
+used by the tt(bzr), tt(hg), and tt(git) backends. In the case of tt(hg) it will invoke
 the external hexdump program to parse the binary dirstate cache file; this
 method will not return the local revision number.
 )
@@ -1236,7 +1236,7 @@ item(tt(get-unapplied))(
 This boolean style controls whether a backend should attempt to gather a list
 of unapplied patches (for example with Mercurial Queue patches).
 
-Used by the tt(quilt) and tt(hg) backends.
+Used by the tt(quilt), tt(hg), and tt(git) backends.
 )
 enditem()
 

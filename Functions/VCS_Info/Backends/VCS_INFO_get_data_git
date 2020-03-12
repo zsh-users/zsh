@@ -261,17 +261,20 @@ elif [[ -d "${gitdir}/rebase-apply" ]]; then
     # 'git rebase' without -i
     patchdir="${gitdir}/rebase-apply"
     local next="${patchdir}/next"
+    local this_patch_file
     if [[ -f $next ]]; then
         local cur=$(< $next)
         local p subject
-        # Fake patch names for all but current patch
+        # Fake patch names for patches "before" the current patch
+        #
+        # Note: With git 2.24, (( cur == 1 )), so the loop body never runs.
         for ((p = 1; p < cur; p++)); do
             printf -v "git_patches_applied[$p]"  "%04d ?" "$p"
         done
+        # Set $subject to the info for the current patch
         if [[ -f "${patchdir}/msg-clean" ]]; then
             subject="${$(< "${patchdir}/msg-clean")[(f)1]}"
-        elif local this_patch_file
-             printf -v this_patch_file "%s/%04d" "${patchdir}" "${cur}"
+        elif printf -v this_patch_file "%s/%04d" "${patchdir}" "${cur}"
              [[ -f $this_patch_file ]]
         then
             () {
@@ -286,11 +289,27 @@ elif [[ -d "${gitdir}/rebase-apply" ]]; then
         else
             git_patches_applied+=("? $subject")
         fi
-        local last="$(< "${patchdir}/last")"
-        if (( cur+1 <= last )); then
-          git_patches_unapplied=( {$((cur+1))..$last} )
+        # Handle patches scheduled for after the current patch, if instructed to.
+        if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" get-unapplied; then
+            local last="$(< "${patchdir}/last")"
+            if [[ -r ${patchdir}/original-commit && -r ${patchdir}/orig-head ]] &&
+                ! zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" use-simple
+            then
+                git_patches_unapplied+=( ${(f)"$(${vcs_comm[cmd]} log --reverse --pretty="%h %s" "$(<${patchdir}/original-commit)..$(<${patchdir}/orig-head)")"} )
+            else
+                for ((p = cur+1; p <= last; p++)); do
+                    printf -v this_patch_file "%s/%04d" "${patchdir}" "${p}"
+                    if [[ -f $this_patch_file ]]; then
+                        VCS_INFO_patch2subject "${this_patch_file}"
+                        git_patches_unapplied+=( "$p $REPLY" )
+                    else
+                        git_patches_unapplied+=( "$p ?" )
+                    fi
+                done
+            fi
         fi
     fi
+    unset this_patch_file
 
     VCS_INFO_git_handle_patches
 elif [[ -f "${gitdir}/MERGE_HEAD" ]]; then
