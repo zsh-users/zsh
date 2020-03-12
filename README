@@ -38,6 +38,11 @@ Build-time change: The default value of the --enable-gdbm configure
 argument has changed from "yes" to "no".  Thus, the zsh/db/gdbm module will
 not be built unless --enable-gdbm is passed explicitly.
 
+vcs_info quilt: The value of the 'quiltcommand' style used to be taken for the
+name of an external command.  Now it may also be a shell function.  Normal
+command word precedece rules apply, so if you have a function and a command
+with the same name, the function will be used.
+
 Incompatibilities since 5.7.1
 -----------------------------
 

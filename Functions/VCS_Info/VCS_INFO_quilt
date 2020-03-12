@@ -133,7 +133,7 @@ function VCS_INFO_quilt-patch2subject() {
         # This zstyle call needs to be moved further up if `quilt' needs
         # to be run in more places than this one.
         zstyle -s "${context}" quiltcommand quiltcommand || quiltcommand='quilt'
-        quilt_env=(env)
+        quilt_env=()
         if [ -z "$patches" ]; then
             zstyle -s "${context}" quilt-patch-dir patches || patches="${QUILT_PATCHES}"
             if [[ "${patches}" != /* ]]; then
@@ -147,7 +147,8 @@ function VCS_INFO_quilt-patch2subject() {
             fi
             quilt_env+=(QUILT_PATCHES="$patches")
         fi
-        unapplied=( ${(f)"$(${quilt_env[@]} $quiltcommand --quiltrc /dev/null unapplied 2> /dev/null)"} )
+        unapplied=( ${(f)"$(if (( $+quilt_env[1] )); then export ${quilt_env[@]}; fi
+                            $quiltcommand --quiltrc /dev/null unapplied 2> /dev/null)"} )
         unapplied=( ${unapplied:#} )
     else
         unapplied=()

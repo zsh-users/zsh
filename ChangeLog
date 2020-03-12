@@ -1,5 +1,8 @@
 2020-03-15  Daniel Shahaf  <danielsh@apache.org>
 
+	* 45543: Functions/VCS_Info/VCS_INFO_quilt, README: vcs_info
+	quilt: Allow quiltcommand to be a function.
+
 	* 45547: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
 	vcs_info git: In interactive rebases, process
 	gen-unapplied-string arguments like gen-applied-string arguments
