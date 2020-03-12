@@ -1,5 +1,10 @@
 2020-03-15  Daniel Shahaf  <danielsh@apache.org>
 
+	* 45547: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	vcs_info git: In interactive rebases, process
+	gen-unapplied-string arguments like gen-applied-string arguments
+	are processed.
+
 	* 45546: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
 	vcs_info git: In interactive rebases, properly support the full
 	form of the "exec" verb.

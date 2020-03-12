@@ -196,15 +196,16 @@ elif [[ -d "${gitdir}/rebase-merge" ]]; then
     # 'git rebase -i'
     patchdir="${gitdir}/rebase-merge"
     local p
-    [[ -f "${patchdir}/done" ]] &&
-    for p in ${(f)"$(< "${patchdir}/done")"}; do
+    VCS_INFO_git_map_rebase_line_to_hash_and_subject() {
+        local p=$1
+        unset REPLY
         # pick/edit/fixup/squash/reword: Add "$hash $subject" to $git_patches_applied.
         # exec: Add "exec ${command}" to $git_patches_applied.
         # (anything else): As 'exec'.
         case $p in
             ([#]*)
                 # Comment line.  Skip.
-                continue
+                return 0
                 ;; 
             ((p|pick|e|edit|r|reword|f|fixup|s|squash)' '*)
                 # The line is of the form "pick $hash $subject".
@@ -241,11 +242,19 @@ elif [[ -d "${gitdir}/rebase-merge" ]]; then
                     p+=" ?"
                 fi
         esac
-        git_patches_applied+=("$p")
-    done
+        REPLY=$p
+    }
+    if [[ -f "${patchdir}/done" ]] ; then
+        for p in ${(f)"$(< "${patchdir}/done")"}; do
+            VCS_INFO_git_map_rebase_line_to_hash_and_subject "$p"
+            (( $+REPLY )) && git_patches_applied+=( "$REPLY" )
+        done
+    fi
     if [[ -f "${patchdir}/git-rebase-todo" ]] ; then
-        # TODO: Process ${patchdir}/git-rebase-todo lines like ${patchdir}/done lines are
-        git_patches_unapplied=( ${${(f)${"$(<"${patchdir}/git-rebase-todo")"}}:#[#]*} )
+        for p in ${(f)"$(< "${patchdir}/git-rebase-todo")"}; do
+            VCS_INFO_git_map_rebase_line_to_hash_and_subject "$p"
+            (( $+REPLY )) && git_patches_unapplied+=( "$REPLY" )
+        done
     fi
     VCS_INFO_git_handle_patches
 elif [[ -d "${gitdir}/rebase-apply" ]]; then
