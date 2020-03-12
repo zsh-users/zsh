@@ -229,11 +229,11 @@ elif [[ -d "${gitdir}/rebase-merge" ]]; then
                         p="${p%% *} ?"
                 fi
                 ;;
-            (x *)
+            ((x|exec) *)
                 # The line is of the form 'exec foo bar baz' where 'foo bar
                 # baz' is a shell command.  There's no way to map _that_ to
                 # "$hash $subject", but I hope this counts as making an effort.
-                p=${p/x /exec }
+                p=${p/#x /exec }
                 ;;
             (*)
                 # Forward compatibility with not-yet-existing 'git rebase -i' verbs.
