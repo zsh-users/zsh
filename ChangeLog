@@ -1,5 +1,9 @@
 2020-03-15  Daniel Shahaf  <danielsh@apache.org>
 
+	* 45541: Functions/VCS_Info/test-repo-git-rebase-apply: internal:
+	vcs_info git: Add a test case repository for rebase-apply
+	situations
+
 	* 45539: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
 	vcs_info git: In non-interactive rebases, obtain applied
 	patches' names.
