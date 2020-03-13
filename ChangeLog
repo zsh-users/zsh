@@ -1,5 +1,8 @@
 2022-01-27  dana  <dana@dana.is>
 
+	* unposted: Completion/Unix/Command/_git: Fix copy/paste error
+	in earlier commit that broke `git stash drop`
+
 	* Marc Cornellà: security/82 (tweaked):
 	Functions/VCS_Info/VCS_INFO_formats: Fix typo in
 	hook_com[base-name_orig] assignment

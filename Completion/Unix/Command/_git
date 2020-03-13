@@ -1809,7 +1809,7 @@ _git-stash () {
           _nothing
           ;;
         (drop)
-          _arguments -S $endopt \_git-notes
+          _arguments -S $endopt \
             '(-q --quiet)'{-q,--quiet}'[suppress all output]' \
             ':: :__git_stashes' && ret=0
           ;;
