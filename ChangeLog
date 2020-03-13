@@ -1,3 +1,8 @@
+2020-03-13  dana  <dana@dana.is>
+
+	* 45537 (tweaked per 45550, needs 45536): Test/E02xtrace.ztst:
+	Fix inconsistent function-name encoding in preserves-xtrace test
+
 2020-03-12  Daniel Shahaf  <danielsh@apache.org>
 
 	* unposted: .editorconfig: Specify spaces rather than tabs for

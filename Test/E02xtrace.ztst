@@ -160,7 +160,7 @@
       }
       functions -T ${1}
       ${1}
-      which ${1}
+      LC_ALL=C which ${1}
     "
   done
 0:a function that redefines itself preserves tracing
