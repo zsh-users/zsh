@@ -1,5 +1,8 @@
 2020-03-13  dana  <dana@dana.is>
 
+	* 45531: Completion/Unix/Command/_sh: Complete options more
+	accurately
+
 	* 45537 (tweaked per 45550, needs 45536): Test/E02xtrace.ztst:
 	Fix inconsistent function-name encoding in preserves-xtrace test
 
