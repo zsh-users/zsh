@@ -1,5 +1,8 @@
 2020-03-13  dana  <dana@dana.is>
 
+	* 45534: Completion/Darwin/Command/_hdiutil: Update image-file
+	extensions, image/disk formats, &c.
+
 	* 45531: Completion/Unix/Command/_sh: Complete options more
 	accurately
 
