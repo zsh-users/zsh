@@ -1,5 +1,8 @@
 2020-03-13  dana  <dana@dana.is>
 
+	* unposted: Completion/Unix/Command/_git: Fix copy/paste error
+	in earlier commit that broke `git stash drop`
+
 	* 45535: Completion/Unix/Command/_lz4: Order compression levels
 	numerically
 
