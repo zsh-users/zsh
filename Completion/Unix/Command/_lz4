@@ -42,8 +42,8 @@ args=(
   '(b t -k --keep)--rm[remove source file]'
   '!(b t -c --stdout)--to-stdout'
   + b # Benchmark-mode options
-  "(C c d t)-b-[benchmark file using specified compression level]::compression level:(${(j< >)levels//-/})"
-  "(C c d t)-e-[specify upper compression level limit (with -b)]:compression level:(${(j< >)levels//-/})"
+  "(C c d t)-b-[benchmark file using specified compression level]:: :->levels"
+  "(C c d t)-e-[specify upper compression level limit (with -b)]: :->levels"
   '(C c d t)-i-[specify minimum evaluation time (with -b)]:evaluation time (seconds)'
   + c # Compress-mode options
   "(b d t ${(j< >)levels} -c0 -c1 -c2 -hc)"${^levels}
@@ -97,6 +97,11 @@ case $state in
     else
       _message 'no more arguments' && ret=0
     fi
+    ;;
+  levels)
+    _wanted levels expl 'compression level' \
+      compadd -o numeric - ${levels/#-/} \
+    && ret=0
     ;;
 esac
 
