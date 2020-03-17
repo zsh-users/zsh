@@ -19,8 +19,14 @@ _arguments -C -S : \
   ':mountpoint:_files -/' && ret=0
 
 if [[ $state == options ]]; then
-  _values -s , "sshfs or fuse or mount options" \
+  # TODO complete ssh(1) options
+  _values -s , "options to ssh, sshfs, mount, or FUSE" \
+    'port:number' \
+    'compression: :(yes no)' \
     reconnect delay_connect sshfs_sync no_readahead sync_readdir \
+    sshfs_debug \
+    'cache: :(yes no)' \
+    'cache_timeout:timeout (seconds)' \
     'dir_cache:cache setting:(yes no)' \
     'dcache_max_size:size [10000]' \
     'dcache_timeout:timeout (seconds) [20]' \
@@ -37,12 +43,13 @@ if [[ $state == options ]]; then
     sftp_server:path:_files \
     directport:port:_ports \
     slave disable_hardlink transform_symlinks follow_symlinks no_check_root password_stdin \
+    debug \
     allow_other allow_root auto_unmount nonempty default_permissions \
     fsname:filesystem\ name \
     subtype:filesystem\ type \
     large_read \
     max_read:max\ size \
-    hard_remove use_ino readdir_ino direct_io kernel_cache auto_cache \
+    hard_remove use_ino readdir_ino direct_io kernel_cache auto_cache noauto_cache \
     'umask:permissions' \
     'uid:owner' 'gid:group' \
     'entry_timeout:timeout (seconds) [1]' \
@@ -60,7 +67,7 @@ if [[ $state == options ]]; then
     congestion_threshold:threshold \
     async_read sync_read atomic_o_trunc big_writes no_remote_lock no_remote_flock \
     no_remote_posix_lock splice_write splice_move splice_read \
-    from_code:charset to_code:charset subdir:_directories rellinks && ret=0
+    from_code:charset to_code:charset subdir:_directories rellinks norellinks && ret=0
 fi
 
 return ret
