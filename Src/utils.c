@@ -711,7 +711,7 @@ wcs_nicechar_sel(wchar_t c, size_t *widthp, char **swidep, int quotable)
 	    if (widthp)
 		*widthp = 6;
 	} else {
-	    strcpy(buf, nicechar((int)c));
+	    strcpy(buf, nicechar_sel((int)c, quotable));
 	    /*
 	     * There may be metafied characters from nicechar(),
 	     * so compute width and end position independently.
@@ -771,7 +771,7 @@ mod_export int is_wcs_nicechar(wchar_t c)
 	if (c == 0x7f || c == L'\n' || c == L'\t' || c < 0x20)
 	    return 1;
 	if (c >= 0x80) {
-	    return (c >= 0x100);
+	    return (c >= 0x100 || is_nicechar((int)c));
 	}
     }
     return 0;

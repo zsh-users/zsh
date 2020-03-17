@@ -1,3 +1,8 @@
+2020-03-17  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 45536: Src/utils.c: fix handling of 8bit character in
+	is_wcs_nicechar() and wcs_nicechar_sel() under C-locale.
+
 2020-03-15  Daniel Shahaf  <danielsh@apache.org>
 
 	* 45541: Functions/VCS_Info/test-repo-git-rebase-apply: internal:
