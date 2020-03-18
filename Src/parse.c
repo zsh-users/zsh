@@ -173,6 +173,7 @@ struct heredocs *hdocs;
  *     - followed by offset to first string
  *     - followed by length of string table
  *     - followed by number of patterns for body
+ *     - followed by a placeholder
  *     - followed by codes for body
  *     - followed by strings for body
  *     - if number of names is 0, followed by:
@@ -1691,6 +1692,7 @@ par_funcdef(int *cmplx)
     ecadd(0); /* p + num + 2 */
     ecadd(0); /* p + num + 3 */
     ecadd(0); /* p + num + 4 */
+    ecadd(0); /* p + num + 5 */
 
     nocorrect = 0;
     incmdpos = 1;
@@ -1730,6 +1732,7 @@ par_funcdef(int *cmplx)
     ecbuf[p + num + 2] = so - oecssub;
     ecbuf[p + num + 3] = ecsoffs - so; /* "length of string table" */
     ecbuf[p + num + 4] = ecnpats; /* "number of patterns for body" */
+    ecbuf[p + num + 5] = 0;
     ecbuf[p + 1] = num; /* "number of names" */
 
     ecnpats = onp;
@@ -2053,6 +2056,7 @@ par_simple(int *cmplx, int nr)
 	    ecadd(0);
 	    ecadd(0);
 	    ecadd(0);
+	    ecadd(0);
 
 	    ecnfunc++;
 	    ecssub = so = ecsoffs;
@@ -2108,6 +2112,7 @@ par_simple(int *cmplx, int nr)
 	    ecbuf[p + argc + 2] = so - oecssub;
 	    ecbuf[p + argc + 3] = ecsoffs - so;
 	    ecbuf[p + argc + 4] = ecnpats;
+	    ecbuf[p + argc + 5] = 0;
 
 	    ecnpats = onp;
 	    ecssub = oecssub;

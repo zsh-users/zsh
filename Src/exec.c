@@ -5169,6 +5169,7 @@ execfuncdef(Estate state, Eprog redir_prog)
     sbeg = *state->pc++;
     nstrs = *state->pc++;
     npats = *state->pc++;
+    (void) *state->pc++;
 
     nprg = (end - state->pc);
     plen = nprg * sizeof(wordcode);
@@ -6138,7 +6139,7 @@ stripkshdef(Eprog prog, char *name)
 	int sbeg = pc[2], nstrs = pc[3], nprg, npats = pc[4], plen, len, i;
 	Patprog *pp;
 
-	pc += 5;
+	pc += 6;
 
 	nprg = end - pc;
 	plen = nprg * sizeof(wordcode);

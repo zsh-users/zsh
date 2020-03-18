@@ -600,7 +600,7 @@ gettext2(Estate state)
 		    n->u._funcdef.end = end;
 		    n->u._funcdef.nargs = nargs;
 		    state->strs += *state->pc;
-		    state->pc += 3;
+		    state->pc += 4;
 		}
 	    } else {
 		state->strs = s->u._funcdef.strs;

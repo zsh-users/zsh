@@ -1,5 +1,8 @@
 2020-03-22  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 45583/0007: Config/version.mk, Src/exec.c, Src/parse.c,
+	Src/text.c: WC_FUNCDEF: Add a placeholder element.
+
 	* 45583/0006: Src/parse.c: internal: Add some comments for
 	orientation. No functional change.
 
