@@ -253,14 +253,13 @@ struct heredocs *hdocs;
  * to avoid a lot of string parsing and some more string duplication.
  */
 
-/**/
-int eclen, ecused, ecnpats;
-/**/
-Wordcode ecbuf;
-/**/
-Eccstr ecstrs;
-/**/
-int ecsoffs, ecssub, ecnfunc;
+static int eclen, ecused, ecnpats;
+
+static Wordcode ecbuf;
+
+static Eccstr ecstrs;
+
+static int ecsoffs, ecssub, ecnfunc;
 
 #define EC_INIT_SIZE         256
 #define EC_DOUBLE_THRESHOLD  32768
