@@ -1,3 +1,7 @@
+2020-03-18  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted: .editorconfig: Specify tabs for Makefiles.
+
 2020-03-17  Daniel Shahaf  <danielsh@apache.org>
 
 	* 45572: Completion/Linux/Command/_sshfs: Complete some more

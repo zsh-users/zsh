@@ -8,6 +8,9 @@ tab_width   = 8
 indent_size = 2
 indent_style = space
 
+[**/Makefile*]
+indent_style = tab
+
 [Functions/VCS_Info/**/*]
 indent_size = 4
 indent_style = space
