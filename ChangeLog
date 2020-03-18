@@ -1,5 +1,8 @@
 2020-03-22  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 45583/0006: Src/parse.c: internal: Add some comments for
+	orientation. No functional change.
+
 	* 45583/0005: Src/parse.c: internal: Document the WC_FUNCDEF
 	data layout for anonymous functions with arguments (follow-up
 	to 29492)

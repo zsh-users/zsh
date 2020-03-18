@@ -1676,7 +1676,7 @@ par_funcdef(int *cmplx)
     zshlex();
 
     p = ecadd(0);
-    ecadd(0);
+    ecadd(0); /* p + 1 */
 
     while (tok == STRING) {
 	if ((*tokstr == Inbrace || *tokstr == '{') &&
@@ -1688,9 +1688,9 @@ par_funcdef(int *cmplx)
 	num++;
 	zshlex();
     }
-    ecadd(0);
-    ecadd(0);
-    ecadd(0);
+    ecadd(0); /* p + num + 2 */
+    ecadd(0); /* p + num + 3 */
+    ecadd(0); /* p + num + 4 */
 
     nocorrect = 0;
     incmdpos = 1;
@@ -1728,15 +1728,15 @@ par_funcdef(int *cmplx)
 
     ecadd(WCB_END());
     ecbuf[p + num + 2] = so - oecssub;
-    ecbuf[p + num + 3] = ecsoffs - so;
-    ecbuf[p + num + 4] = ecnpats;
-    ecbuf[p + 1] = num;
+    ecbuf[p + num + 3] = ecsoffs - so; /* "length of string table" */
+    ecbuf[p + num + 4] = ecnpats; /* "number of patterns for body" */
+    ecbuf[p + 1] = num; /* "number of names" */
 
     ecnpats = onp;
     ecssub = oecssub;
     ecnfunc++;
 
-    ecbuf[p] = WCB_FUNCDEF(ecused - 1 - p);
+    ecbuf[p] = WCB_FUNCDEF(ecused - 1 - p); /* "offset to after body" */
 
     /* If it's an anonymous function... */
     if (num == 0) {
