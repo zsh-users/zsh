@@ -5166,7 +5166,6 @@ execfuncdef(Estate state, Eprog redir_prog)
 
     end = beg + WC_FUNCDEF_SKIP(state->pc[-1]);
     names = ecgetlist(state, *state->pc++, EC_DUPTOK, &htok);
-    nprg = end - beg;
     sbeg = *state->pc++;
     nstrs = *state->pc++;
     npats = *state->pc++;
