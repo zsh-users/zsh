@@ -35,25 +35,25 @@ syn match  ztstPayload             /^\s.*/ contains=@zsh
 
 syn match  ztstExitCode            /^\d\+\|^-/                nextgroup=ztstFlags
 syn match  ztstFlags               /[.dDqf]*:/      contained nextgroup=ztstTestName contains=ztstColon
-syn match  ztstColon               /:/              contained
+syn match  ztstColon               /:.\@=/          contained
 syn region ztstTestName            start=// end=/$/ contained 
 
-syn match  ztstInputMarker         /^</                       nextgroup=ztstInput
+syn match  ztstInputMarker         /^<.\@=/                   nextgroup=ztstInput
 syn region ztstInput               start=// end=/$/ contained
 
 syn match  ztstOutputPattern       /^[*]>/                    nextgroup=ztstOutput   contains=ztstOutputPatternSigil,ztstOutputPatternMarker
 syn match  ztstOutputPatternSigil  /[*]/            contained
-syn match  ztstOutputPatternMarker /[>]/            contained conceal
-syn match  ztstOutputLiteral       /^>/                       nextgroup=ztstOutput
+syn match  ztstOutputPatternMarker /[>].\@=/        contained conceal
+syn match  ztstOutputLiteral       /^>.\@=/                   nextgroup=ztstOutput
 syn region ztstOutput              start=// end=/$/ contained
 
 syn match  ztstErrputPattern       /^[*][?]/                  nextgroup=ztstErrput   contains=ztstErrputPatternSigil,ztstErrputPatternMarker
 syn match  ztstErrputPatternSigil  /[*]/            contained
-syn match  ztstErrputPatternMarker /[?]/            contained conceal
-syn match  ztstErrputLiteral       /^[?]/                     nextgroup=ztstErrput
+syn match  ztstErrputPatternMarker /[?].\@=/        contained conceal
+syn match  ztstErrputLiteral       /^[?].\@=/                 nextgroup=ztstErrput
 syn region ztstErrput              start=// end=/$/ contained
 
-syn match  ztstFrequentExplanationMarker /^F:/                nextgroup=ztstFrequentExplanation
+syn match  ztstFrequentExplanationMarker /^F:.\@=/            nextgroup=ztstFrequentExplanation
 syn region ztstFrequentExplanation start=// end=/$/ contained
 
 syn match  ztstDirective           /^%.*/
@@ -75,6 +75,15 @@ syn keyword ztstSpecialVariable ZTST_unimplemented ZTST_skip ZTST_testdir ZTST_f
 syn sync maxlines=1
 
 "" Highlight groups:
+" Note: every group that's defaulted to "Ignore" has a match pattern that ends
+" with /.\@=/.  This ensures the Ignore will only be effective if there is an
+" immediately following group that _will_ be highlighted.  (That group will be
+" one of ztstTestName, ztstInput, ztstOutput, and ztstErrput.)
+"
+" ### The Ignore would still apply if the rest of the line is all-whitespace.
+" ###
+" ### If you run into such lines, consider setting the 'list' and 'listchars'
+" ### options appropriately.
 hi def link ztstExitCode                  Number
 hi def link ztstFlags                     Normal
 hi def link ztstColon                     Ignore
