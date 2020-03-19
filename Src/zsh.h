@@ -866,8 +866,8 @@ struct eccstr {
 #define EC_DUP    1
 #define EC_DUPTOK 2
 
+/* See comment at the top of Src/parse.c for details. */
 #define WC_CODEBITS 5
-
 #define wc_code(C)   ((C) & ((wordcode) ((1 << WC_CODEBITS) - 1)))
 #define wc_data(C)   ((C) >> WC_CODEBITS)
 #define wc_bdata(D)  ((D) << WC_CODEBITS)
@@ -896,7 +896,11 @@ struct eccstr {
 #define WC_AUTOFN  20
 #define WC_TRY     21
 
-/* increment as necessary */
+/* 
+ * Increment as necessary.
+ * 
+ * If this exceeds 31, increment WC_CODEBITS.
+ */
 #define WC_COUNT   22
 
 #define WCB_END()           wc_bld(WC_END, 0)

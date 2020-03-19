@@ -102,6 +102,13 @@ struct heredocs *hdocs;
  * The parser now produces word code, reducing memory consumption compared
  * to the nested structs we had before.
  *
+ * Word codes are represented by the "wordcode" type.
+ *
+ * Each wordcode variable consists of a "code", in the least-significant bits
+ * of the value, and "data" in the other bits.  The macros wc_code() and wc_data()
+ * access the "code" and "data" parts of a wordcode.  The macros wc_bdata() and
+ * wc_bld() build wordcodes from code and data.
+ *
  * Word code layout:
  *
  *   WC_END
