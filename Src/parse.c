@@ -175,6 +175,10 @@ struct heredocs *hdocs;
  *     - followed by number of patterns for body
  *     - followed by codes for body
  *     - followed by strings for body
+ *     - if number of names is 0, followed by:
+ *       - the offset to the end of the funcdef
+ *       - the number of arguments to the function
+ *       - the arguments to the function
  *
  *   WC_FOR
  *     - data contains type (list, ...) and offset to after body
@@ -1734,8 +1738,9 @@ par_funcdef(int *cmplx)
 
     ecbuf[p] = WCB_FUNCDEF(ecused - 1 - p);
 
+    /* If it's an anonymous function... */
     if (num == 0) {
-	/* Unnamed function */
+	/* ... look for arguments to it. */
 	int parg = ecadd(0);
 	ecadd(0);
 	while (tok == STRING) {
@@ -2110,8 +2115,9 @@ par_simple(int *cmplx, int nr)
 
 	    ecbuf[p] = WCB_FUNCDEF(ecused - 1 - p);
 
+	    /* If it's an anonymous function... */
 	    if (argc == 0) {
-		/* Unnamed function */
+		/* ... look for arguments to it. */
 		int parg = ecadd(0);
 		ecadd(0);
 		while (tok == STRING || IS_REDIROP(tok)) {
