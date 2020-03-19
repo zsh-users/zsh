@@ -199,9 +199,29 @@
 ?+f:0> echo traced named function
 >traced named function
 
- function -T -T { echo trace function literally named "-T" }
+ function -T -- -T { echo trace function literally named "-T" }
  -T
+ function -T -- { echo trace anonymous function }
+ functions -- -- # no output
 0:define traced function: parse test
 ?+-T:0> echo trace function literally named -T
 >trace function literally named -T
+?+(anon):0> echo trace anonymous function
+>trace anonymous function
+
+ function -- g { echo g }
+ g
+ function -- { echo anonymous }
+ functions -- -- # no output
+0:function end-of-"options" syntax, #1
+>g
+>anonymous
+
+ function -- -T { echo runs }
+ functions -- -- # no output
+ echo the definition didn\'t execute it
+ -T
+0:function end-of-"options" syntax, #2
+>the definition didn't execute it
+>runs
 

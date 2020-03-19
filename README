@@ -43,12 +43,23 @@ name of an external command.  Now it may also be a shell function.  Normal
 command word precedece rules apply, so if you have a function and a command
 with the same name, the function will be used.
 
-The syntax "function -T { ... }" used to define a function named "-T".
-It now defines an anonymous function with single-level tracing enabled ---
-same as "function f { ... }; functions -T f; f", but without naming the
-function.  The syntax "function -T foo { ... }" is similarly affected: it
-now defines a function "foo" with tracing enabled; previously it defined
-two functions, named "-T" and "foo" (see the MULTI_FUNC_DEF option).
+The "function" reserved word, used to define functions, gained a new -T option.
+That affects syntaxes such as:
+
+1. "function -T { ... }".  It used to define a function named "-T".  It
+now defines and executes an anonymous function with single-level tracing
+enabled --- same as "function f { ... }; functions -T f; f", but without
+naming the function.
+
+2. "function -T foo { ... }".  It used to define two functions, named "-T"
+and "foo" (see the MULTI_FUNC_DEF option).  It now defines a function
+"foo" with tracing enabled.
+
+3. "function -- { ... }".  It used to define a function named "--".  It
+now defines and executes an anonymous function.  The "--" is taken to be
+an end-of-options guard (same as "ls --").
+
+The sh-compatible function definition syntax, "f() { ... }", is unchanged.
 
 Incompatibilities since 5.7.1
 -----------------------------

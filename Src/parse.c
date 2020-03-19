@@ -1680,10 +1680,18 @@ par_funcdef(int *cmplx)
     p = ecadd(0);
     ecadd(0); /* p + 1 */
 
-    if (tok == STRING && tokstr[0] == Dash &&
-	tokstr[1] == 'T' && !tokstr[2]) {
-	++do_tracing;
-	zshlex();
+    /* Consume an initial (-T), (--), or (-T --).
+     * Anything else is a literal function name.
+     */
+    if (tok == STRING && tokstr[0] == Dash) {
+	if (tokstr[1] == 'T' && !tokstr[2]) {
+	    ++do_tracing;
+	    zshlex();
+	}
+	if (tok == STRING && tokstr[0] == Dash &&
+	    tokstr[1] == Dash && !tokstr[2]) {
+	    zshlex();
+	}
     }
 
     while (tok == STRING) {
