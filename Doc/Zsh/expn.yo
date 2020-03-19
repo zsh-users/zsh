@@ -1377,16 +1377,29 @@ i.e.  tt("${(@s.:.)line}").
 item(tt(Z:)var(opts)tt(:))(
 As tt(z) but takes a combination of option letters between a following
 pair of delimiter characters.  With no options the effect is identical
-to tt(z).  tt(LPAR()Z+PLUS()c+PLUS()RPAR())
+to tt(z).  The following options are available:
+
+startitem()
+item(tt(LPAR()Z+PLUS()c+PLUS()RPAR()))(
 causes comments to be parsed as a string and retained; any field in the
 resulting array beginning with an unquoted comment character is a
-comment.  tt(LPAR()Z+PLUS()C+PLUS()RPAR()) causes comments to be parsed
+comment.
+)
+item(tt(LPAR()Z+PLUS()C+PLUS()RPAR()))(
+causes comments to be parsed
 and removed.  The rule for comments is standard: anything between a word
 starting with the third character of tt($HISTCHARS), default tt(#), up to
-the next newline is a comment.  tt(LPAR()Z+PLUS()n+PLUS()RPAR()) causes
+the next newline is a comment.
+)
+item(tt(LPAR()Z+PLUS()n+PLUS()RPAR()))(
+causes
 unquoted newlines to be treated as ordinary whitespace, else they are
 treated as if they are shell code delimiters and converted to
-semicolons.  Options are combined within the same set of delimiters,
+semicolons.
+)
+enditem()
+
+Options are combined within the same set of delimiters,
 e.g. tt(LPAR()Z+PLUS()Cn+PLUS()RPAR()).
 )
 item(tt(_:)var(flags)tt(:))(
