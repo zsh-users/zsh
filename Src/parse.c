@@ -173,7 +173,7 @@ struct heredocs *hdocs;
  *     - followed by offset to first string
  *     - followed by length of string table
  *     - followed by number of patterns for body
- *     - followed by a placeholder
+ *     - followed by an integer indicating tracing status
  *     - followed by codes for body
  *     - followed by strings for body
  *     - if number of names is 0, followed by:
@@ -1670,6 +1670,7 @@ par_funcdef(int *cmplx)
     int oecused = ecused, num = 0, onp, p, c = 0;
     int so, oecssub = ecssub;
     zlong oldlineno = lineno;
+    int do_tracing = 0;
 
     lineno = 0;
     nocorrect = 1;
@@ -1678,6 +1679,12 @@ par_funcdef(int *cmplx)
 
     p = ecadd(0);
     ecadd(0); /* p + 1 */
+
+    if (tok == STRING && tokstr[0] == Dash &&
+	tokstr[1] == 'T' && !tokstr[2]) {
+	++do_tracing;
+	zshlex();
+    }
 
     while (tok == STRING) {
 	if ((*tokstr == Inbrace || *tokstr == '{') &&
@@ -1732,7 +1739,7 @@ par_funcdef(int *cmplx)
     ecbuf[p + num + 2] = so - oecssub;
     ecbuf[p + num + 3] = ecsoffs - so; /* "length of string table" */
     ecbuf[p + num + 4] = ecnpats; /* "number of patterns for body" */
-    ecbuf[p + num + 5] = 0;
+    ecbuf[p + num + 5] = do_tracing;
     ecbuf[p + 1] = num; /* "number of names" */
 
     ecnpats = onp;

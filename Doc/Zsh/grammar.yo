@@ -357,7 +357,7 @@ deliberately left unspecified, because historically there was a mismatch between
 the documented and implemented behaviours.  Cf. 20076, 21734/21735, 45075.)
 )
 findex(function)
-xitem(tt(function) var(word) ... [ tt(()) ] [ var(term) ] tt({) var(list) tt(}))
+xitem(tt(function) [ tt(-T) ] var(word) ... [ tt(()) ] [ var(term) ] tt({) var(list) tt(}))
 xitem(var(word) ... tt(()) [ var(term) ] tt({) var(list) tt(}))
 item(var(word) ... tt(()) [ var(term) ] var(command))(
 where var(term) is one or more newline or tt(;).
@@ -366,6 +366,17 @@ Normally, only one var(word) is provided; multiple var(word)s
 are usually only useful for setting traps.
 The body of the function is the var(list) between
 the tt({) and tt(}).  See noderef(Functions).
+
+The options of tt(function) have the following meanings:
+
+startitem()
+item(-T)(
+Enable tracing for this function, as though with tt(functions -T).  See the
+documentation of the tt(-f) option to the tt(typeset) builtin, in
+ifzman(zmanref(zshbuiltins))\
+ifnzman(noderef(Shell Builtin Commands)).
+)
+enditem()
 
 If the option tt(SH_GLOB) is set for compatibility with other shells, then
 whitespace may appear between the left and right parentheses when

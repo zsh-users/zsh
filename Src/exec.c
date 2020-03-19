@@ -5157,23 +5157,25 @@ execfuncdef(Estate state, Eprog redir_prog)
 {
     Shfunc shf;
     char *s = NULL;
-    int signum, nprg, sbeg, nstrs, npats, len, plen, i, htok = 0, ret = 0;
+    int signum, nprg, sbeg, nstrs, npats, do_tracing, len, plen, i, htok = 0, ret = 0;
     int anon_func = 0;
     Wordcode beg = state->pc, end;
     Eprog prog;
     Patprog *pp;
     LinkList names;
+    int tracing_flags;
 
     end = beg + WC_FUNCDEF_SKIP(state->pc[-1]);
     names = ecgetlist(state, *state->pc++, EC_DUPTOK, &htok);
     sbeg = *state->pc++;
     nstrs = *state->pc++;
     npats = *state->pc++;
-    (void) *state->pc++;
+    do_tracing = *state->pc++;
 
     nprg = (end - state->pc);
     plen = nprg * sizeof(wordcode);
     len = plen + (npats * sizeof(Patprog)) + nstrs;
+    tracing_flags = do_tracing ? PM_TAGGED_LOCAL : 0;
 
     if (htok && names) {
 	execsubst(names);
@@ -5223,7 +5225,7 @@ execfuncdef(Estate state, Eprog redir_prog)
 
 	shf = (Shfunc) zalloc(sizeof(*shf));
 	shf->funcdef = prog;
-	shf->node.flags = 0;
+	shf->node.flags = tracing_flags;
 	/* No dircache here, not a directory */
 	shf->filename = ztrdup(scriptfilename);
 	shf->lineno =

@@ -1,5 +1,8 @@
 2020-03-22  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 45583/0008: Doc/Zsh/grammar.yo, README, Src/exec.c,
+	Src/parse.c, Test/E02xtrace.ztst: Add the 'function -T' syntax.
+
 	* 45583/0007: Config/version.mk, Src/exec.c, Src/parse.c,
 	Src/text.c: WC_FUNCDEF: Add a placeholder element.
 
