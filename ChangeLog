@@ -1,5 +1,8 @@
 2020-03-22  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 45583/0003: Src/parse.c, Src/zsh.h: internal: Add some comments
+	around Eccstr. No functional change.
+
 	* 45583/0002: Src/parse.c: internal: Reduce some variables'
 	visibility. No functional change.
 

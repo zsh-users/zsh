@@ -832,13 +832,33 @@ struct estate {
     char *strs;			/* strings from prog */
 };
 
+/* 
+ * A binary tree of strings.
+ *
+ * Refer to the "Word code." comment at the top of Src/parse.c for details.
+ */
 typedef struct eccstr *Eccstr;
-
 struct eccstr {
+    /* Child pointers. */
     Eccstr left, right;
+
+    /* String; pointer into to estate::strs. */
     char *str;
-    wordcode offs, aoffs;
+
+    /* Wordcode of a long string, as described in the Src/parse.c comment. */
+    wordcode offs;
+
+    /* Raw memory offset of str in estate::strs. */
+    wordcode aoffs;
+
+    /* 
+     * ### The number of starts and ends of function definitions up to this point.
+     *
+     * String reuse may only happen between strings that have the same "nfunc" value.
+     */
     int nfunc;
+
+    /* Hash of str. */
     int hashval;
 };
 

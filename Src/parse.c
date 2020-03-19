@@ -253,13 +253,24 @@ struct heredocs *hdocs;
  * to avoid a lot of string parsing and some more string duplication.
  */
 
-static int eclen, ecused, ecnpats;
+/* Number of wordcodes allocated. */
+static int eclen;
+/* Number of wordcodes populated. */
+static int ecused;
+/* Number of patterns... */
+static int ecnpats;
 
 static Wordcode ecbuf;
 
 static Eccstr ecstrs;
 
-static int ecsoffs, ecssub, ecnfunc;
+static int ecsoffs, ecssub;
+
+/*
+ * ### The number of starts and ends of function definitions up to this point.
+ * Never decremented.
+ */
+static int ecnfunc;
 
 #define EC_INIT_SIZE         256
 #define EC_DOUBLE_THRESHOLD  32768
@@ -363,7 +374,11 @@ ecispace(int p, int n)
     ecadjusthere(p, n);
 }
 
-/* Add one wordcode. */
+/* 
+ * Add one wordcode.
+ *
+ * Return the index of the added wordcode.
+ */
 
 static int
 ecadd(wordcode c)
@@ -402,6 +417,7 @@ ecstrcode(char *s)
     unsigned val = hasher(s);
 
     if ((l = strlen(s) + 1) && l <= 4) {
+	/* Short string. */
 	t = has_token(s);
 	wordcode c = (t ? 3 : 2);
 	switch (l) {
@@ -412,11 +428,13 @@ ecstrcode(char *s)
 	}
 	return c;
     } else {
+	/* Long string. */
 	Eccstr p, *pp;
 	long cmp;
 
 	for (pp = &ecstrs; (p = *pp); ) {
 	    if (!(cmp = p->nfunc - ecnfunc) && !(cmp = (((long)p->hashval) - ((long)val))) && !(cmp = strcmp(p->str, s))) {
+		/* Re-use the existing string. */
 		return p->offs;
             }
 	    pp = (cmp < 0 ? &(p->left) : &(p->right));
@@ -493,7 +511,12 @@ init_parse(void)
 
 /* Build eprog. */
 
-/* careful: copy_ecstr is from arg1 to arg2, unlike memcpy */
+/*
+ * Copy the strings of s and all its descendants in the binary tree to the
+ * memory block p.
+ *
+ * careful: copy_ecstr is from arg1 to arg2, unlike memcpy
+ */
 
 static void
 copy_ecstr(Eccstr s, char *p)
