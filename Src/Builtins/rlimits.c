@@ -77,11 +77,12 @@ static const resinfo_T known_resources[] = {
     {RLIMIT_VMEM,
 #  if defined(RLIMIT_VMEM_IS_RSS)
 		 "resident", ZLIMTYPE_MEMORY, 1024,
-		 'm', "memory size (kbytes)"},
+		 'm', "memory size (kbytes)"
 #  else
 		 "vmemorysize", ZLIMTYPE_MEMORY, 1024,
-		 'v', "virtual memory size (kbytes)"},
+		 'v', "virtual memory size (kbytes)"
 #  endif
+    },
 # endif
 # ifdef HAVE_RLIMIT_NPROC
     {RLIMIT_NPROC, "maxproc", ZLIMTYPE_NUMBER, 1,

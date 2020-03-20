@@ -1,5 +1,8 @@
 2020-03-20  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Src/Builtins/rlimits.c: Deconfuse $EDITOR's balanced
+	braces mode.  No functional change.
+
 	* unposted: Doc/Zsh/expn.yo: ${(Z)}: Convert documentation to
 	a description block.
 
