@@ -690,10 +690,9 @@
  # This is a bit brittle as it depends on PATH_MAX.
  # We could use sysconf..
  bad_pwd="/${(l:16000:: :):-}"
- print ${bad_pwd:P}
+ print ${bad_pwd:P} | wc -c
 0:modifier ':P' with path too long
-?(eval):4: path expansion failed, using root directory
->/
+>16002
 
  foo=a
  value="ac"
@@ -765,7 +764,7 @@
   } always {
     rm -f glob.tmp/trap glob.tmp/loop
   }
--f:the ':P' modifier handles symlink loops in the last path component
+0:the ':P' modifier handles symlink loops in the last path component
 *>*/(trap|loop)
 *>*/(trap|loop)
 
@@ -777,7 +776,7 @@
   } always {
     rm -f glob.tmp/trap glob.tmp/loop
   }
--f:the ':P' modifier handles symlink loops before the last path component
+0:the ':P' modifier handles symlink loops before the last path component
 *>*/glob.tmp/loop/trailing/components
 *>*/glob.tmp/(loop|trap)/trailing/components
 
@@ -789,7 +788,7 @@
   } always {
     rm -f glob.tmp/flip glob.tmp/flop
   }
--f:the ':P' modifier handles symlink loops other than the trivial case
+0:the ':P' modifier handles symlink loops other than the trivial case
 *>*/glob.tmp/(flip|flop)
 *>*/glob.tmp/(flip|flop)/trailing/components
 

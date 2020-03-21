@@ -1038,11 +1038,11 @@ xsymlink(char *s, int heap)
     if (*s != '/')
 	return NULL;
     *xbuf = '\0';
-    if (xsymlinks(s + 1, 1) < 0)
+    if (!chrealpath(&s, 'P', heap)) {
 	zwarn("path expansion failed, using root directory");
-    if (!*xbuf)
 	return heap ? dupstring("/") : ztrdup("/");
-    return heap ? dupstring(xbuf) : ztrdup(xbuf);
+    }
+    return s;
 }
 
 /**/
