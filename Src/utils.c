@@ -919,7 +919,14 @@ slashsplit(char *s)
     return r;
 }
 
-/* expands symlinks and .. or . expressions */
+/* expands symlinks and .. or . expressions
+ *
+ * Puts the result in the global "xbuf"
+ *
+ * If "full" is true, resolve one level of symlinks only.
+ *
+ * WARNING: This will segfault on symlink loops (thread: workers/45282)
+ */
 
 /**/
 static int
@@ -1050,10 +1057,10 @@ void
 print_if_link(char *s, int all)
 {
     if (*s == '/') {
-	*xbuf = '\0';
 	if (all) {
 	    char *start = s + 1;
 	    char xbuflink[PATH_MAX+1];
+	    *xbuf = '\0';
 	    for (;;) {
 		if (xsymlinks(start, 0) > 0) {
 		    printf(" -> ");
@@ -1068,8 +1075,11 @@ print_if_link(char *s, int all)
 		}
 	    }
 	} else {
-	    if (xsymlinks(s + 1, 1) > 0)
-		printf(" -> "), zputs(*xbuf ? xbuf : "/", stdout);
+	    if (chrealpath(&s, 'P', 0)) {
+		printf(" -> ");
+		zputs(*s ? s : "/", stdout);
+		zsfree(s);
+	    }
 	}
     }
 }
