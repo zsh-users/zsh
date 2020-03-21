@@ -5,6 +5,9 @@
   ln -s real step3
   ln -s step3 step2
   ln -s step2 step1
+  ln -s loop loop
+  ln -s flip flop
+  ln -s flop flip
   touch real
   chmod +x real
   prefix=$PWD
@@ -20,3 +23,9 @@
 0q:whence symlink resolution
 >$prefix/step1 -> $prefix/step2 -> $prefix/step3 -> $prefix/real
 >$prefix/step1 -> $prefix/real
+
+  (
+    path=( $PWD/whence.tmp $path )
+    whence -S flip || whence -S loop || whence -s flip || whence -s loop
+  )
+1:whence deals with symlink loops gracefully

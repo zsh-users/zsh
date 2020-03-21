@@ -922,8 +922,6 @@ slashsplit(char *s)
 /* expands .. or . expressions and one level of symlinks
  *
  * Puts the result in the global "xbuf"
- *
- * WARNING: This will segfault on symlink loops (thread: workers/45282)
  */
 
 /**/

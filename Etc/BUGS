@@ -29,6 +29,3 @@ skipped when STTY=... is set for that command
 44007 - Martijn - exit in trap executes rest of function
 See test case in Test/C03traps.ztst.
 ------------------------------------------------------------------------
-45282: xsymlinks() segfaults on symlink loops
-Fixed for some cases; need to audit remaining callers
-------------------------------------------------------------------------
