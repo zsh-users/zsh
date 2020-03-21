@@ -1,0 +1,22 @@
+%prep
+
+  mkdir whence.tmp
+  pushd whence.tmp
+  ln -s real step3
+  ln -s step3 step2
+  ln -s step2 step1
+  touch real
+  chmod +x real
+  prefix=$PWD
+  popd
+
+%test
+
+  (
+    path=( $PWD/whence.tmp $path )
+    whence -S step1
+    whence -s step1
+  )
+0q:whence symlink resolution
+>$prefix/step1 -> $prefix/step2 -> $prefix/step3 -> $prefix/real
+>$prefix/step1 -> $prefix/real
