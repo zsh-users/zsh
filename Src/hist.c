@@ -842,7 +842,7 @@ histsubchar(int c)
 		break;
 
 	    case 'A':
-		if (!chrealpath(&sline, 'A')) {
+		if (!chrealpath(&sline, 'A', 1)) {
 		    herrflush();
 		    zerr("modifier failed: A");
 		    return -1;
@@ -1928,12 +1928,14 @@ chabspath(char **junkptr)
  * If mode is 'A', resolve dot-dot before symlinks.  Else, mode should be 'P'.
  * Refer to the documentation of the :A and :P modifiers for details.
  *
+ * use_heap is 1 if the result is to be allocated on the heap, 0 otherwise.
+ *
  * Return 0 for error, non-zero for success.
  */
 
 /**/
 int
-chrealpath(char **junkptr, char mode)
+chrealpath(char **junkptr, char mode, int use_heap)
 {
     char *str;
 #ifdef HAVE_REALPATH
@@ -2000,14 +2002,15 @@ chrealpath(char **junkptr, char mode)
 	str++;
     }
 
+    use_heap = (use_heap ? META_HEAPDUP : META_DUP);
     if (real) {
-	*junkptr = metafy(str = bicat(real, nonreal), -1, META_HEAPDUP);
+	*junkptr = metafy(str = bicat(real, nonreal), -1, use_heap);
 	zsfree(str);
 #ifdef REALPATH_ACCEPTS_NULL
 	free(real);
 #endif
     } else {
-	*junkptr = metafy(nonreal, lastpos - nonreal + 1, META_HEAPDUP);
+	*junkptr = metafy(nonreal, lastpos - nonreal + 1, use_heap);
     }
 #endif
 
