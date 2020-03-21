@@ -757,6 +757,42 @@
 -f:(workers/45367) modifier ':P' squashes multiple slashes
 >/dev  
 
+  ln -s loop glob.tmp/loop
+  ln -s loop glob.tmp/trap
+  { 
+    (set -- glob.tmp/trap; echo $1:P)
+    (set -- glob.tmp/loop; echo $1:P)
+  } always {
+    rm -f glob.tmp/trap glob.tmp/loop
+  }
+-f:the ':P' modifier handles symlink loops in the last path component
+*>*/(trap|loop)
+*>*/(trap|loop)
+
+  ln -s loop glob.tmp/loop
+  ln -s loop glob.tmp/trap
+  { 
+    (set -- glob.tmp/loop/trailing/components; echo $1:P)
+    (set -- glob.tmp/trap/trailing/components; echo $1:P)
+  } always {
+    rm -f glob.tmp/trap glob.tmp/loop
+  }
+-f:the ':P' modifier handles symlink loops before the last path component
+*>*/glob.tmp/loop/trailing/components
+*>*/glob.tmp/(loop|trap)/trailing/components
+
+  ln -s flip glob.tmp/flop
+  ln -s flop glob.tmp/flip
+  {
+    (set -- glob.tmp/flip; echo $1:P)
+    (set -- glob.tmp/flip/trailing/components; echo $1:P)
+  } always {
+    rm -f glob.tmp/flip glob.tmp/flop
+  }
+-f:the ':P' modifier handles symlink loops other than the trivial case
+*>*/glob.tmp/(flip|flop)
+*>*/glob.tmp/(flip|flop)/trailing/components
+
 %clean
 
  # Fix unreadable-directory permissions so ztst can clean up properly
