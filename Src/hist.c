@@ -842,7 +842,7 @@ histsubchar(int c)
 		break;
 
 	    case 'A':
-		if (!chrealpath(&sline)) {
+		if (!chrealpath(&sline, 'A')) {
 		    herrflush();
 		    zerr("modifier failed: A");
 		    return -1;
@@ -1922,9 +1922,18 @@ chabspath(char **junkptr)
     return 1;
 }
 
+/*
+ * Resolve symlinks in junkptr.
+ *
+ * If mode is 'A', resolve dot-dot before symlinks.  Else, mode should be 'P'.
+ * Refer to the documentation of the :A and :P modifiers for details.
+ *
+ * Return 0 for error, non-zero for success.
+ */
+
 /**/
 int
-chrealpath(char **junkptr)
+chrealpath(char **junkptr, char mode)
 {
     char *str;
 #ifdef HAVE_REALPATH
@@ -1936,12 +1945,14 @@ chrealpath(char **junkptr)
 # endif
 #endif
 
+    DPUTS1(mode != 'A' && mode != 'P', "chrealpath: mode='%c' is invalid", mode);
+
     if (!**junkptr)
 	return 1;
 
-    /* Notice that this means ..'s are applied before symlinks are resolved! */
-    if (!chabspath(junkptr))
-	return 0;
+    if (mode == 'A')
+	if (!chabspath(junkptr))
+	    return 0;
 
 #ifndef HAVE_REALPATH
     return 1;

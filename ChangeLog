@@ -1,5 +1,8 @@
 2020-03-25  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 45583/0002: Src/hist.c, Src/subst.c: chrealpath: Make symlink
+	resolution optional.
+
 	* 45583/0001: Test/D02glob.ztst: Add tests for the segfault on
 	resolving a symlink loop bug (workers/45282).
 

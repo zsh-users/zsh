@@ -4399,7 +4399,7 @@ modify(char **str, char **ptr, int inbrace)
 			chabspath(&copy);
 			break;
 		    case 'A':
-			chrealpath(&copy);
+			chrealpath(&copy, 'A');
 			break;
 		    case 'c':
 		    {
@@ -4485,7 +4485,7 @@ modify(char **str, char **ptr, int inbrace)
 		    chabspath(str);
 		    break;
 		case 'A':
-		    chrealpath(str);
+		    chrealpath(str, 'A');
 		    break;
 		case 'c':
 		{
