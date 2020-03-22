@@ -1,3 +1,8 @@
+2020-03-22  Rin Okuyama  <rokuyama.rk@gmail.com>
+
+	* github #51: aczsh.m4, configure.ac: Fix configure for cross
+	build.
+
 2020-03-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 45601: Test/E02xtrace.ztst: Fix status in new functions -T

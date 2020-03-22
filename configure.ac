@@ -1936,77 +1936,9 @@ zsh_LIMIT_PRESENT(RLIMIT_SWAP)
 zsh_LIMIT_PRESENT(RLIMIT_KQUEUES)
 zsh_LIMIT_PRESENT(RLIMIT_UMTXP)
 
-AH_TEMPLATE([RLIMIT_VMEM_IS_RSS],
-[Define to 1 if RLIMIT_VMEM and RLIMIT_RSS both exist and are equal.])
-AC_CACHE_CHECK(if RLIMIT_VMEM and RLIMIT_RSS are the same,
-zsh_cv_rlimit_vmem_is_rss,
-[AC_RUN_IFELSE([AC_LANG_SOURCE([[
-#include <sys/types.h>
-#ifdef HAVE_SYS_TIME_H
-#include <sys/time.h>
-#endif
-#include <sys/resource.h>
-int main()
-{
-int ret = 1;
-#if defined(HAVE_RLIMIT_VMEM) && defined(HAVE_RLIMIT_RSS)
-if (RLIMIT_RSS == RLIMIT_VMEM) ret = 0;
-#endif
-return ret;
-}]])],[zsh_cv_rlimit_vmem_is_rss=yes],[zsh_cv_rlimit_vmem_is_rss=no],[zsh_cv_rlimit_vmem_is_rss=no])])
-
-if test x$zsh_cv_rlimit_vmem_is_rss = xyes; then
-  AC_DEFINE(RLIMIT_VMEM_IS_RSS)
-fi
-
-
-AH_TEMPLATE([RLIMIT_VMEM_IS_AS],
-[Define to 1 if RLIMIT_VMEM and RLIMIT_AS both exist and are equal.])
-AC_CACHE_CHECK(if RLIMIT_VMEM and RLIMIT_AS are the same,
-zsh_cv_rlimit_vmem_is_as,
-[AC_RUN_IFELSE([AC_LANG_SOURCE([[
-#include <sys/types.h>
-#ifdef HAVE_SYS_TIME_H
-#include <sys/time.h>
-#endif
-#include <sys/resource.h>
-int main()
-{
-int ret = 1;
-#if defined(HAVE_RLIMIT_VMEM) && defined(HAVE_RLIMIT_AS)
-if (RLIMIT_AS == RLIMIT_VMEM) ret = 0;
-#endif
-return ret;
-}]])],[zsh_cv_rlimit_vmem_is_as=yes],[zsh_cv_rlimit_vmem_is_as=no],[zsh_cv_rlimit_vmem_is_as=no])])
-
-if test x$zsh_cv_rlimit_vmem_is_as = xyes; then
-  AC_DEFINE(RLIMIT_VMEM_IS_AS)
-fi
-
-
-AH_TEMPLATE([RLIMIT_RSS_IS_AS],
-[Define to 1 if RLIMIT_RSS and RLIMIT_AS both exist and are equal.])
-AC_CACHE_CHECK(if RLIMIT_RSS and RLIMIT_AS are the same,
-zsh_cv_rlimit_rss_is_as,
-[AC_RUN_IFELSE([AC_LANG_SOURCE([[
-#include <sys/types.h>
-#ifdef HAVE_SYS_TIME_H
-#include <sys/time.h>
-#endif
-#include <sys/resource.h>
-int main()
-{
-int ret = 1;
-#if defined(HAVE_RLIMIT_RSS) && defined(HAVE_RLIMIT_AS)
-if (RLIMIT_AS == RLIMIT_RSS) ret = 0;
-#endif
-return ret;
-}]])],[zsh_cv_rlimit_rss_is_as=yes],[zsh_cv_rlimit_rss_is_as=no],[zsh_cv_rlimit_rss_is_as=no])])
-
-if test x$zsh_cv_rlimit_rss_is_as = xyes; then
-  AC_DEFINE(RLIMIT_RSS_IS_AS)
-fi
-
+zsh_LIMITS_EQUAL(VMEM, vmem, RSS, rss)
+zsh_LIMITS_EQUAL(VMEM, vmem, AS, as)
+zsh_LIMITS_EQUAL(RSS, rss, AS, as)
 
 dnl --------------------------------------------
 dnl Check for members of struct rusage
