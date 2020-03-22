@@ -1,5 +1,8 @@
 2020-03-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 45601: Test/E02xtrace.ztst: Fix status in new functions -T
+	test.
+
 	* 45563: Src/utils.c: %z supplies zlong for errors and warnings.
 
 2020-03-22  Daniel Shahaf  <d.s@daniel.shahaf.name>

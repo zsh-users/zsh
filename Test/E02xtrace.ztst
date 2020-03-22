@@ -203,7 +203,7 @@
  -T
  function -T -- { echo trace anonymous function }
  functions -- -- # no output
-0:define traced function: parse test
+1:define traced function: parse test
 ?+-T:0> echo trace function literally named -T
 >trace function literally named -T
 ?+(anon):0> echo trace anonymous function
