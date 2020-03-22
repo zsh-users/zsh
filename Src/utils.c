@@ -130,6 +130,7 @@ set_widearray(char *mb_array, Widechar_array wca)
    %l	const char *, int	C string of given length (null not required)
    %L	long			decimal value
    %d	int			decimal value
+   %z	zlong			decimal value
    %%	(none)			literal '%'
    %c	int			character at that codepoint
    %e	int			strerror() message (argument is typically 'errno')
@@ -331,6 +332,14 @@ zerrmsg(FILE *file, const char *fmt, va_list ap)
 		num = va_arg(ap, int);
 		fprintf(file, "%d", num);
 		break;
+	    case 'z':
+	    {
+		zlong znum = va_arg(ap, zlong);
+		char buf[DIGBUFSIZE];
+		convbase(buf, znum, 10);
+		fputs(buf, file);
+		break;
+	    }
 	    case '%':
 		putc('%', file);
 		break;

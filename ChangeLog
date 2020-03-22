@@ -1,3 +1,7 @@
+2020-03-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 45563: Src/utils.c: %z supplies zlong for errors and warnings.
+
 2020-03-22  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 45583/0009: README, Src/parse.c, Test/E02xtrace.ztst: Add
