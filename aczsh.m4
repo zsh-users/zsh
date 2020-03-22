@@ -688,7 +688,7 @@ if test $zsh_cv_have_$1 = yes; then
   AC_DEFINE(HAVE_$1)
 fi])
 
-dnl Check whether rlimit $1, e.g. AS, is the same as rlmit $3, e.g. VMEM.
+dnl Check whether rlmit $1, e.g. AS, is the same as rlmit $3, e.g. VMEM.
 dnl $2 is lowercase $1, $4 is lowercase $3.
 AC_DEFUN(zsh_LIMITS_EQUAL,
 [AH_TEMPLATE([RLIMIT_]$1[_IS_]$3,
