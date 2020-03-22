@@ -1,3 +1,8 @@
+2020-08-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 47300: Src/parse.c, Src/zsh.h: Document the EC_NODUP, EC_DUP,
+	EC_DUPTOK triplet.
+
 2020-08-08  Mikael Magnusson  <mikachu@gmail.com>
 
 	* unposted: Completion/BSD/Command/_kdump,

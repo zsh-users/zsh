@@ -862,9 +862,26 @@ struct eccstr {
     int hashval;
 };
 
-#define EC_NODUP  0
-#define EC_DUP    1
-#define EC_DUPTOK 2
+/*
+ * Values for the "dup" parameter to ecgetstr().
+ */
+enum ec_dup_t {
+    /* 
+     * Make no promises about how the return value is allocated, except that
+     * the caller does not need to explicitly free it.  It might be heap allocated,
+     * a static string, or anything in between.
+     */
+    EC_NODUP = 0,
+
+    /* Allocate the return value from the heap. */
+    EC_DUP = 1,
+
+    /* 
+     * If the string contains tokens (as indicated by the least significant bit
+     * of the wordcode), behave as EC_DUP; otherwise, as EC_NODUP.
+     */
+    EC_DUPTOK = 2
+};
 
 /* See comment at the top of Src/parse.c for details. */
 #define WC_CODEBITS 5

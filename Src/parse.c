@@ -2828,6 +2828,13 @@ freeeprog(Eprog p)
     }
 }
 
+/*
+ * dup is of type 'enum ec_dup_t'.
+ *
+ * If tokflag is not NULL, *tokflag will be set to 1 if the string contains
+ * tokens and to 0 otherwise.
+ */
+
 /**/
 char *
 ecgetstr(Estate s, int dup, int *tokflag)
