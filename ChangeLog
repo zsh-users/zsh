@@ -1,5 +1,9 @@
 2020-08-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 47296 (+ unposted additional tests and comments): Src/loop.c,
+	Test/A05execution.ztst: 'repeat' loops: Let the repeat count
+	use $?.
+
 	* 47300: Src/parse.c, Src/zsh.h: Document the EC_NODUP, EC_DUP,
 	EC_DUPTOK triplet.
 

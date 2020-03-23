@@ -497,7 +497,6 @@ execrepeat(Estate state, UNUSED(int do_exec))
 
     end = state->pc + WC_REPEAT_SKIP(code);
 
-    lastval = 0;
     tmp = ecgetstr(state, EC_DUPTOK, &htok);
     if (htok) {
 	singsub(&tmp);
@@ -506,6 +505,7 @@ execrepeat(Estate state, UNUSED(int do_exec))
     count = mathevali(tmp);
     if (errflag)
 	return 1;
+    lastval = 0; /* used when the repeat count is zero */
     pushheap();
     cmdpush(CS_REPEAT);
     loops++;

@@ -401,3 +401,17 @@ F:anonymous function, and a descriptor leak when backgrounding a pipeline
  (( exit 130 ) | { sleep 1; echo hello })
 0:exit code 130 isn't mistaken for a signal (unit test for workers/46060)
 >hello
+
+  (exit 3); repeat "$?" echo x
+  (exit 3); repeat '?' echo y
+0:'repeat' loop can use lastval in the count
+>x
+>x
+>x
+>y
+>y
+>y
+
+ (exit 4); repeat 0 do done
+0:'repeat 0' resets lastval
+
