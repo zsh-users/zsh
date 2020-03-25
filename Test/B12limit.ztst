@@ -8,3 +8,13 @@
 F:A failure here does not indicate any error in zsh. It just means there
 F:is a resource in your system that is unknown to zsh developers. Please
 F:report this to zsh-workers mailing list.
+
+  () {
+    set -- ${(f)"$(ulimit -a)"}
+    set -- ${@%%:*}
+    typeset -aU unique_options=( "$@" )
+    # The value of $unique_options is, e.g., ( -t -f '-N 2' -s ... ).
+    (( $# == $#unique_options ))
+  }
+0:check if limit option letters are unique
+
