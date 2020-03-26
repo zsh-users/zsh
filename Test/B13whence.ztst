@@ -1,7 +1,10 @@
 %prep
 
   mkdir whence.tmp
-  pushd whence.tmp
+  ln -s . whence.tmp/cwd
+  # cd through the symlink in order to test the case that ${prefix} and
+  # ${prefix:P} are different
+  pushd whence.tmp/cwd
   ln -s real step3
   ln -s step3 step2
   ln -s step2 step1
@@ -16,13 +19,13 @@
 %test
 
   (
-    path=( $PWD/whence.tmp $path )
+    path=( ${PWD:P}/whence.tmp $path )
     whence -S step1
     whence -s step1
   )
 0q:whence symlink resolution
->$prefix/step1 -> $prefix/step2 -> $prefix/step3 -> $prefix/real
->$prefix/step1 -> $prefix/real
+>${prefix:P}/step1 -> ${prefix:P}/step2 -> ${prefix:P}/step3 -> ${prefix:P}/real
+>${prefix:P}/step1 -> ${prefix:P}/real
 
   (
     path=( $PWD/whence.tmp $path )
