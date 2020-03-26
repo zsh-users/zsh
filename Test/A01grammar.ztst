@@ -557,6 +557,13 @@
 >Hip hip hooray
 >Hip hip hooray
 
+  repeat 2*2 print yeah
+0:Tokens in repeat argument
+>yeah
+>yeah
+>yeah
+>yeah
+
   case bravo {
     (alpha) print schmalpha
 	    ;;

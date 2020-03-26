@@ -1,3 +1,8 @@
+2020-03-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 45616: Src/loop.c, Test/A01grammar.ztst: Remove tokens
+	from count to repeat keyword.
+
 2020-03-25  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 45583/0008: Etc/BUGS, Src/utils.c, Test/B13whence.ztst:

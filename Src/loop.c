@@ -499,8 +499,10 @@ execrepeat(Estate state, UNUSED(int do_exec))
 
     lastval = 0;
     tmp = ecgetstr(state, EC_DUPTOK, &htok);
-    if (htok)
+    if (htok) {
 	singsub(&tmp);
+	untokenize(tmp);
+    }
     count = mathevali(tmp);
     if (errflag)
 	return 1;
