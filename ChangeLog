@@ -1,5 +1,13 @@
 2020-03-26  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 45626: Functions/VCS_Info/Backends/VCS_INFO_get_data_bzr,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_p4,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_svk,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_svn,
+	Functions/VCS_Info/VCS_INFO_set-branch-format,
+	Functions/VCS_Info/vcs_info: vcs_info: Deduplicate calling the
+	set-branch-format hook.
+
 	* 45624: Functions/VCS_Info/Backends/VCS_INFO_get_data_fossil,
 	Functions/VCS_Info/Backends/VCS_INFO_get_data_p4,
 	Functions/VCS_Info/VCS_INFO_bydir_detect: vcs_info: Set $rrn

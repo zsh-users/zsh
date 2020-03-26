@@ -60,13 +60,7 @@ else
 fi
 
 rrn=${svnbase:t}
-zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" branchformat svnbranch || svnbranch="%b:%r"
-hook_com=( branch "${svninfo[URL]##*/}" revision "${cwdinfo[Revision]}" )
-if VCS_INFO_hook 'set-branch-format' "${svnbranch}"; then
-    zformat -f svnbranch "${svnbranch}" "b:${hook_com[branch]}" "r:${hook_com[revision]}"
-else
-    svnbranch=${hook_com[branch-replace]}
-fi
-hook_com=()
+VCS_INFO_set-branch-format "${svninfo[URL]##*/}" "${cwdinfo[Revision]}" &&
+    svnbranch="${REPLY}"
 VCS_INFO_formats '' "${svnbranch}" "${svnbase}" '' '' "${cwdinfo[Revision]}" ''
 return 0

@@ -22,6 +22,7 @@ static_functions=(
     VCS_INFO_hexdump
     VCS_INFO_hook
     VCS_INFO_set-patch-format
+    VCS_INFO_set-branch-format
     VCS_INFO_maxexports
     VCS_INFO_nvcsformats
     VCS_INFO_patch2subject

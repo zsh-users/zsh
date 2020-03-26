@@ -100,14 +100,7 @@ else
 fi
 
 rrn=${bzrbase:t}
-zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" branchformat bzrbr || bzrbr="%b:%r"
-hook_com=( branch "${bzrinfo[2]}" revision "${bzrinfo[1]}" )
-if VCS_INFO_hook 'set-branch-format' "${bzrbr}"; then
-    zformat -f bzrbr "${bzrbr}" "b:${hook_com[branch]}" "r:${hook_com[revision]}"
-else
-    bzrbr=${hook_com[branch-replace]}
-fi
-hook_com=()
-
+VCS_INFO_set-branch-format "${bzrinfo[2]}" "${bzrinfo[1]}" &&
+    bzrbr="${REPLY}"
 VCS_INFO_formats '' "${bzrbr}" "${bzrbase}" '' "${bzr_changes}" "${bzrinfo[1]}" "${bzr_changes}"
 return 0
