@@ -258,14 +258,14 @@ elif [[ -d "${gitdir}/rebase-merge" ]]; then
     fi
     VCS_INFO_git_handle_patches
 elif [[ -d "${gitdir}/rebase-apply" ]]; then
-    # 'git rebase' without -i
+    # 'git rebase' without -i, or 'git am'
     patchdir="${gitdir}/rebase-apply"
     local next="${patchdir}/next"
     local this_patch_file
     if [[ -f $next ]]; then
         local cur=$(< $next)
         local p subject
-        # Fake patch names for patches "before" the current patch
+        # Compute patch names for patches "before" the current patch
         if [[ -r ${patchdir}/rewritten ]]; then
             if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" use-simple; then
                 git_patches_applied=( ${${(f)"$(<${patchdir}/rewritten)"}// */' ?'} )
@@ -280,7 +280,13 @@ elif [[ -d "${gitdir}/rebase-apply" ]]; then
             # of these versions have original-commit and orig-head and would
             # take the 'if' branch, rather than this 'else' branch.
             for ((p = 1; p < cur; p++)); do
-                printf -v "git_patches_applied[$p]"  "%04d ?" "$p"
+                printf -v this_patch_file "%s/%04d" "${patchdir}" "${p}"
+                if [[ -f $this_patch_file ]]; then
+                    VCS_INFO_patch2subject "${this_patch_file}"
+                    git_patches_applied+=( "$p $REPLY" )
+                else
+                    git_patches_applied+=( "$p ?" )
+                fi
             done
         fi
         # Set $subject to the info for the current patch
@@ -298,6 +304,8 @@ elif [[ -d "${gitdir}/rebase-apply" ]]; then
         subject=${subject:-'?'}
         if [[ -f "${patchdir}/original-commit" ]]; then
             git_patches_applied+=("$(< ${patchdir}/original-commit) $subject")
+        elif [[ -f "${patchdir}/next" ]]; then
+            git_patches_applied+=("$(< ${patchdir}/next) $subject")
         else
             git_patches_applied+=("? $subject")
         fi
