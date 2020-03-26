@@ -1,3 +1,9 @@
+2020-03-26  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 45591 (Cf. 45587, 45620): Test/V01zmodload.ztst,
+	Test/V07pcre.ztst: In the test suite, centralize testing that
+	compiled modules can be loaded successfully.
+
 2020-03-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 45616: Src/loop.c, Test/A01grammar.ztst: Remove tokens
