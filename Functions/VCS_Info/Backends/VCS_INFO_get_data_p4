@@ -17,6 +17,7 @@ local p4branch change
 # here down is synced as the revision.
 # I suppose the following might be slow on a tortuous client view.
 change="${${$(${vcs_comm[cmd]} changes -m 1 ...\#have)##Change }%% *}"
+rrn=${p4base:t}
 zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" branchformat p4branch || p4branch="%b:%r"
 hook_com=( branch "${p4info[Client_name]}" revision "${change}" )
 if VCS_INFO_hook 'set-branch-format' "${p4branch}"; then

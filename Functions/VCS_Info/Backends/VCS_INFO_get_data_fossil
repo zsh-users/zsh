@@ -20,5 +20,6 @@ if [ -n "$merging" ]; then
    action="merging"
 fi
 
+rrn=${fsinfo[local_root]:t}
 VCS_INFO_formats "$action" "${fsbranch}" "${fsinfo[local_root]}" '' "$changed" "${fshash}" "${fsinfo[repository]}"
 return 0
