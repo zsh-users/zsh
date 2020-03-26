@@ -1,4 +1,12 @@
-# check if there is unknown resouce(s)
+
+%prep
+
+  if ! zmodload zsh/rlimits 2>/dev/null
+  then
+    ZTST_unimplemented="the zsh/rlimits module was disabled by configure (see config.modules)"
+    return 0
+  fi
+  zmodload zsh/rlimits
 
 %test
 

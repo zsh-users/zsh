@@ -1,5 +1,8 @@
 2020-03-26  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 45584, 45620: Test/B12limit.ztst: zsh/rlimits: Skip the tests
+	for this module when it wasn't compiled in.
+
 	* 45591 (Cf. 45587, 45620): Test/V01zmodload.ztst,
 	Test/V07pcre.ztst: In the test suite, centralize testing that
 	compiled modules can be loaded successfully.
