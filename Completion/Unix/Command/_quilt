@@ -49,23 +49,59 @@ case $state in
   (cmd) 
     # Divide the subcommands to categories.  The categorization is our own;
     # it's not based on any preexisting categorization in the quilt docs.
-    local -a manip=( add delete edit fold fork import new refresh remove rename )
-    local -a tree=( pop push revert )
-    local -a other=( grep header mail setup snapshot upgrade )
-    local -a interrogate=( annotate applied diff files graph next patches previous series top unapplied )
+    local -a manip=(
+      add:'add files to a patch'
+      delete:'remove a patch from the series'
+      edit:'add files to the topmost patch and open them in $EDITOR'
+      fold:'integrate an external patch into the topmost patch'
+      fork:'replace the topmost patch with a copy'
+      import:'add external patches to the series'
+      new:'add an empty patch to the series'
+      refresh:'update a patch with in-tree edits'
+      remove:'remove files from a given patch'
+      rename:"change a patch's name"
+    )
+    local -a tree=(
+      pop:'unapply a patch to the tree'
+      push:'apply a patch to the tree'
+      revert:'discard in-tree changes to files in a given patch'
+    )
+    local -a other=(
+      grep:'print file lines matching pattern'
+      header:"print or change a patch's prologue"
+      mail:'send patches by email'
+      setup:'initialize a source tree'
+      snapshot:'save a snapshot of the tree to diff against'
+      upgrade:'upgrade quilt metadata'
+    )
+    local -a interrogate=(
+      annotate:'show which patches modify which lines'
+      applied:'print the list of patches up to a given patch'
+      diff:'print differences between files'
+      files:'print the list of files that a given patch changes'
+      graph:'generate a patches dependency graph'
+      next:'print the name of the patch that follows a given patch'
+      patches:'print the list of patches that touch a given file'
+      previous:'print the name of the patch that precedes a given patch'
+      series:'print the list of all patches'
+      top:'print the name of the last applied patch'
+      unapplied:'print the list of patches following a given patch'
+    )
     local -A cmdtypes=(
       [manip]='series manipulator commands'
       [tree]='tree manipulator commands'
       [other]='other commands'
       [interrogate]='series interrogator commands'
     )
-    local -a expl=( )
     local ret=1
     _tags ${cmdtypes// /-}
     while _tags; do
       for k in ${(ok)cmdtypes}; do
-        _requested ${cmdtypes[$k]// /-} expl ${cmdtypes[$k]} \
-          compadd -a - $k && ret=0
+        if _requested ${cmdtypes[$k]// /-}
+        then
+          _describe -t ${cmdtypes[$k]// /-} ${cmdtypes[$k]} $k &&
+            ret=0
+        fi
       done
     done
     return ret
