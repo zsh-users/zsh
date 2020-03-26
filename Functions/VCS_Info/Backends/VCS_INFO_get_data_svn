@@ -10,6 +10,7 @@ local -i rc
 local -A svninfo parentinfo cwdinfo
 local -A hook_com
 integer -r SVN_ERR_WC_UPGRADE_REQUIRED=155036 # from /usr/local/include/subversion-1/svn_error_codes.h
+integer -r SVN_ERR_WC_UNSUPPORTED_FORMAT=155021
 
 svnbase=".";
 svninfo=()
@@ -22,7 +23,14 @@ rc=$?
 if (( rc != 0 )) ; then
   if (( rc == 1 )) && [[ -n ${(M)dat:#"svn: E${SVN_ERR_WC_UPGRADE_REQUIRED}: "*} ]]; then
     hook_com=()
-    VCS_INFO_formats '' '?' '?' '' '' '?' 'upgrade required'
+    # User should run 'svn upgrade'
+    VCS_INFO_formats '' '?' '?' '' '' '?' 'working copy upgrade required'
+    return $?
+  elif (( rc == 1 )) && [[ -n ${(M)dat:#"svn: E${SVN_ERR_WC_UNSUPPORTED_FORMAT}: "*} ]]; then
+    hook_com=()
+    # User probably needs to install a newer svn, but we're not sure, so point
+    # the user to svn's error message.
+    VCS_INFO_formats '' '?' '?' '' '' '?' 'svn error'
     return $?
   else
     return 1
