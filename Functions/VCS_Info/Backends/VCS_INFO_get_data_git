@@ -292,9 +292,24 @@ elif [[ -d "${gitdir}/rebase-apply" ]]; then
         # Set $subject to the info for the current patch
         if [[ -f "${patchdir}/msg-clean" ]]; then
             subject="${$(< "${patchdir}/msg-clean")[(f)1]}"
+        elif [[ -f "${patchdir}/final-commit" ]]; then
+            # This value is not rfc2047-encoded.  It's also available via
+            # "${patchdir}/info".
+            subject="${$(< "${patchdir}/final-commit")[(f)1]}"
         elif printf -v this_patch_file "%s/%04d" "${patchdir}" "${cur}"
              [[ -f $this_patch_file ]]
         then
+            # This branch is last for several reasons:
+            # 
+            # - The "Subject" header will be MIME-encoded (rfc2047).
+            # 
+            # - If the mail has full rfc822 headers (including "Received" and
+            #   so on), we won't find the "Subject:" header, since
+            #   VCS_INFO_patch2subject only checks the first few lines.
+            #
+            # - In --scissors mode, we may find the outer "Subject:" header,
+            #   whereas the inner one (after the scissors line) will be used,
+            #   if present.
             () {
               local REPLY
               VCS_INFO_patch2subject "${this_patch_file}"
