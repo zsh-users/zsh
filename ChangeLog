@@ -1,5 +1,8 @@
 2020-03-28  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Test/V07pcre.ztst: Fix syntax error introduced
+	in 45591.
+
 	* 45640: Test/B13whence.ztst: Fix new test when ${PWD}'s value
 	contains symlinks.
 

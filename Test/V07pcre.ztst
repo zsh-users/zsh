@@ -1,6 +1,6 @@
 %prep
 
-  if ! zmodload zsh/pcre 2>/dev/null; then
+  if ! zmodload zsh/pcre 2>/dev/null
   then
     ZTST_unimplemented="the zsh/pcre module was disabled by configure (see config.modules)"
     return 0
