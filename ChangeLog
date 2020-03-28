@@ -1,3 +1,8 @@
+2020-03-28  Gastón Haro  <gaston.haro@fing.edu.uy>
+
+	* github #46: Completion/Unix/Command/_git: _git-restore:
+	Complete arguments to the --source option after a '=' sign
+
 2020-03-28  Gastón Haro  <harogaston@users.noreply.github.com>
 
 	* github #46: Completion/Unix/Command/_git: Better restrict

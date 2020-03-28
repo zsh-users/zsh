@@ -1548,7 +1548,7 @@ _git-restore() {
   local -A opt_args
 
   _arguments -C -s -S $endopt \
-    '(-s --source)'{-s,--source}'[specify which tree-ish to checkout from]:source tree:->sources' \
+    '(-s --source)'{-s,--source=}'[specify which tree-ish to checkout from]:source tree:->sources' \
     '(-S --staged)'{-S,--staged}'[restore the index]' \
     '(-W --worktree)'{-W,--worktree}'[restore the working tree (default)]' \
     '--ignore-unmerged[ignore unmerged entries]' \
