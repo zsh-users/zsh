@@ -1,3 +1,8 @@
+2020-03-29  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 45649: Completion/Unix/Command/_unison: completion: Simplify
+	Unison completion. No functional change.
+
 2020-03-29  Henri Menke  <henri@icp.uni-stuttgart.de>
 
 	* 45646: Completion/Unix/Command/_unison: completion: Unison:

@@ -84,9 +84,6 @@ _arguments \
     '*:profile:->profile'
 
 if [[ $state == profile ]]; then
-    local -a profiles
-
-    profiles=( ${UNISON:-~/.unison}/*.prf(N) )
-    (( $#profiles )) && \
-	compadd "$@" - ${${profiles#${UNISON:-~/.unison}/}%.prf}
+    local -a profiles=( ${UNISON:-~/.unison}/*.prf(N:t:r) )
+    compadd "$@" -a profiles
 fi
