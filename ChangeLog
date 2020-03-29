@@ -1,3 +1,8 @@
+2020-03-29  Henri Menke  <henri@icp.uni-stuttgart.de>
+
+	* 45646: Completion/Unix/Command/_unison: completion: Unison:
+	Honour the $UNISON variable
+
 2020-03-28  Gastón Haro  <gaston.haro@fing.edu.uy>
 
 	* github #46: Completion/Unix/Command/_git: _git-restore:
