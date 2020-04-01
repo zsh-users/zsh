@@ -690,7 +690,7 @@
  # This is a bit brittle as it depends on PATH_MAX.
  # We could use sysconf..
  bad_pwd="/${(l:16000:: :):-}"
- print ${bad_pwd:P} | wc -c
+ print ${bad_pwd:P} | wc -c | tr -d '\t '
 0:modifier ':P' with path too long
 >16002
 

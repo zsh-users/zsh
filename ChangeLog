@@ -1,3 +1,8 @@
+2020-04-01  dana  <dana@dana.is>
+
+	* unposted: Test/D02glob.ztst: Fix platform-dependent test
+	failure introduced by workers/45583
+
 2020-03-29  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 45649: Completion/Unix/Command/_unison: completion: Simplify
