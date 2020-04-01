@@ -13,8 +13,13 @@
 # same requirements here.)
 #
 # If either of the aforementioned environment variables is not set, the test
-# script will try to pick the first two >0 IDs from the passwd/group databases
-# on the current system.
+# script will try to use the UID/GID of the test directory, if not 0, for the
+# two effective IDs. (This is intended to work around issues that might occur
+# when e.g. the test directory lives under a home directory with mode 0700.
+# Unfortunately, if this is the case, it will not be possible to use anything
+# besides the directory owner or root as the test shell's EUID -- maintainers
+# take note.) Otherwise, the script will pick the first >0 ID(s) from the
+# passwd/group databases on the current system.
 #
 # If either variable is set, the tests will run, but they will likely fail
 # without super-user privileges.
@@ -45,10 +50,12 @@
     euid=${ZSH_TEST_UNPRIVILEGED_UID##*:}
   else
     print -ru$ZTST_fd 'Selecting unprivileged UID:EUID pair automatically'
+    # See above for why we do this
+    zmodload -sF zsh/stat b:zstat && euid=${"$( zstat +uid -- $ZTST_testdir )":#0}
     local tmp=$( getent passwd 2> /dev/null || < /etc/passwd )
     # Note: Some awks require -v and its argument to be separate
-    ruid=$( awk -F:            '$3 > 0 { print $3; exit; }' <<< $tmp )
-    euid=$( awk -F: -v u=$ruid '$3 > u { print $3; exit; }' <<< $tmp )
+    ruid=$( awk -F: -v u=${euid:-0} '$3 > 0 && $3 != u { print $3; exit; }' <<< $tmp )
+    euid=${euid:-"$( awk -F: -v u=$ruid '$3 > u { print $3; exit; }' <<< $tmp )"}
   fi
   #
   if [[ -n $ZSH_TEST_UNPRIVILEGED_GID ]]; then
@@ -56,10 +63,12 @@
     egid=${ZSH_TEST_UNPRIVILEGED_GID##*:}
   else
     print -ru$ZTST_fd 'Selecting unprivileged GID:EGID pair automatically'
+    # See above again -- this shouldn't have the same impact as the UID, though
+    zmodload -sF zsh/stat b:zstat && egid=${"$( zstat +gid -- $ZTST_testdir )":#0}
     local tmp=$( getent group 2> /dev/null || < /etc/group )
     # Note: Some awks require -v and its argument to be separate
-    rgid=$( awk -F:            '$3 > 0 { print $3; exit; }' <<< $tmp )
-    egid=$( awk -F: -v g=$rgid '$3 > g { print $3; exit; }' <<< $tmp )
+    rgid=$( awk -F: -v g=${egid:-0} '$3 > 0 && $3 != g { print $3; exit; }' <<< $tmp )
+    egid=${egid:="$( awk -F: -v g=$rgid '$3 > g { print $3; exit; }' <<< $tmp )"}
   fi
   #
   [[ $ruid/$euid == <1->/<1-> && $ruid != $euid ]] || ruid= euid=
@@ -134,11 +143,9 @@
 
 %test
 
-  re_zsh $ruid $ruid -1 -1 'echo $UID/$EUID $options[privileged]'
   re_zsh $euid $euid -1 -1 'echo $UID/$EUID $options[privileged]'
   re_zsh $ruid $euid -1 -1 'echo $UID/$EUID $options[privileged]'
 0q:PRIVILEGED automatically enabled when RUID != EUID
->$ruid/$ruid off
 >$euid/$euid off
 >$ruid/$euid on
 

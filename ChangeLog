@@ -1,5 +1,8 @@
 2020-04-01  dana  <dana@dana.is>
 
+	* 45542: Test/P01privileged.ztst: Use test-directory owner for
+	auto-determined EUID/EGID
+
 	* unposted: Test/D02glob.ztst: Fix platform-dependent test
 	failure introduced by workers/45583
 
