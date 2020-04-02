@@ -1,3 +1,7 @@
+2020-04-02  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted: Test/D02glob.ztst: Make test platform-independent.
+
 2020-04-01  dana  <dana@dana.is>
 
 	* 45542: Test/P01privileged.ztst: Use test-directory owner for
