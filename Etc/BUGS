@@ -29,3 +29,6 @@ skipped when STTY=... is set for that command
 44007 - Martijn - exit in trap executes rest of function
 See test case in Test/C03traps.ztst.
 ------------------------------------------------------------------------
+45656: 'zsh -o nobanghist -o emacs' segfaults
+analysis in workers/45657
+------------------------------------------------------------------------
