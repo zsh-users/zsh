@@ -73,7 +73,7 @@ _retrieve_mac_apps() {
     typeset retrieve
     if ! zstyle -s ":completion:*:*:${service}:commands" search-method retrieve
     then
-      if [[ -d /.Spotlight-V100 ]]; then
+      if [[ "$( command mdutil -s / 2>&1 )" == *enabled* ]]; then
         # / is indexed to use Spotlight
         retrieve=_mac_apps_spotlight_retrieve
       else
@@ -88,7 +88,10 @@ _retrieve_mac_apps() {
     if ! zstyle -a ":completion:${curcontext}:" application-path app_dir_root
     then
       if [[ $retrieve = _mac_apps_old_retrieve ]]; then
-        app_dir_root=( {,/Developer,/Network,"$HOME"}/{Applications*(N),Desktop} )
+        app_dir_root=(
+          {,/Developer,/Network,/System,$HOME}/{Applications*(N),Desktop}
+        )
+        app_dir_root=( $^app_dir_root(N) )
       else
         app_dir_root=( / )
       fi

@@ -1,3 +1,8 @@
+2020-04-05  dana  <dana@dana.is>
+
+	* 45655: Completion/Darwin/Type/_retrieve_mac_apps: Update
+	search paths and Spotlight index check for recent macOS
+
 2020-04-05  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 45656: Etc/BUGS: Document the -o emacs segfault bug.
