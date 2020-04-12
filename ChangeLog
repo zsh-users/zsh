@@ -1,3 +1,8 @@
+2020-04-12  dg1727  <dg1727@protonmail.com>
+
+	* 45661: Doc/Zsh/params.yo: docs: Clarify the effect of
+	KSH_ARRAYS on the (I) subscript.
+
 2020-04-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 45660: Src/builtin,c, Src/init.c: Delay initial setting of

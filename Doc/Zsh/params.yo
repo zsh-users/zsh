@@ -399,6 +399,10 @@ Like `tt(i)', but gives the index of the last match, or all possible
 matching keys in an associative array.  On failure substitutes 0, or
 the empty string for an associative array.  This flag is best when
 testing for values or keys that do not exist.
+
+Note: If the option tt(KSH_ARRAYS) is in effect and no match is found, the
+result is indistinguishable from the case when the first element of the array
+matches.
 )
 item(tt(k))(
 If used in a subscript on an associative array, this flag causes the keys
