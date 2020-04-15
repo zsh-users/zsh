@@ -2837,7 +2837,9 @@ negates all qualifiers following it
 )
 item(tt(-))(
 toggles between making the qualifiers work on symbolic links (the
-default) and the files they point to
+default) and the files they point to, if any; any symbolic link for
+whose target the `tt(stat)' system call fails (whatever the cause of the
+failure) is treated as a file in its own right
 )
 item(tt(M))(
 sets the tt(MARK_DIRS) option for the current pattern

@@ -1,3 +1,8 @@
+2020-04-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 45684: Doc/Zsh/expn.yo: - glob qualifier behaviour in error
+	cases.
+
 2020-04-12  dg1727  <dg1727@protonmail.com>
 
 	* 45661: Doc/Zsh/params.yo: docs: Clarify the effect of
