@@ -29,6 +29,7 @@
 
 #include "system.mdh"
 #include "system.pro"
+#include <math.h>
 
 #ifdef HAVE_POLL_H
 # include <poll.h>
@@ -531,7 +532,9 @@ static int
 bin_zsystem_flock(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     int cloexec = 1, unlock = 0, readlock = 0;
-    zlong timeout = -1;
+    double timeout = -1;
+    long timeout_interval = 1e6;
+    mnumber timeout_param;
     char *fdvar = NULL;
 #ifdef HAVE_FCNTL_H
     struct flock lck;
@@ -583,7 +586,51 @@ bin_zsystem_flock(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		} else {
 		    optarg = *args++;
 		}
-		timeout = mathevali(optarg);
+		timeout_param = matheval(optarg);
+		timeout = (timeout_param.type & MN_FLOAT) ?
+		    timeout_param.u.d : (double)timeout_param.u.l;
+
+		/*
+		 * timeout must not overflow time_t, but little is known
+		 * about this type's limits.  Conservatively limit to 2^30-1
+		 * (34 years).  Then it can only overflow if time_t is only
+		 * a 32-bit int and CLOCK_MONOTONIC is not supported, in which
+		 * case there is a Y2038 problem anyway.
+		 */
+		if (timeout < 1e-6 || timeout > 1073741823.) {
+		    zwarnnam(nam, "flock: invalid timeout value: '%s'",
+			     optarg);
+		    return 1;
+		}
+		break;
+
+	    case 'i':
+		/* retry interval in seconds */
+		if (optptr[1]) {
+		    optarg = optptr + 1;
+		    optptr += strlen(optarg) - 1;
+		} else if (!*args) {
+		    zwarnnam(nam,
+			     "flock: option %c requires "
+			     "a numeric retry interval",
+			     opt);
+		    return 1;
+		} else {
+		    optarg = *args++;
+		}
+		timeout_param = matheval(optarg);
+		if (!(timeout_param.type & MN_FLOAT)) {
+		    timeout_param.type = MN_FLOAT;
+		    timeout_param.u.d = (double)timeout_param.u.l;
+		}
+		timeout_param.u.d *= 1e6;
+		if (timeout_param.u.d < 1
+		    || timeout_param.u.d > 0.999 * LONG_MAX) {
+		    zwarnnam(nam, "flock: invalid interval value: '%s'",
+			     optarg);
+		    return 1;
+		}
+		timeout_interval = (long)timeout_param.u.d;
 		break;
 
 	    case 'u':
@@ -647,7 +694,24 @@ bin_zsystem_flock(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     lck.l_len = 0;  /* lock the whole file */
 
     if (timeout > 0) {
-	time_t end = time(NULL) + (time_t)timeout;
+	/*
+	 * Get current time, calculate timeout time.
+	 * No need to check for overflow, already checked above.
+	 */
+	struct timespec now, end;
+	double timeout_s;
+	long remaining_us;
+	zgettime_monotonic_if_available(&now);
+	end.tv_sec = now.tv_sec;
+	end.tv_nsec = now.tv_nsec;
+	end.tv_nsec += modf(timeout, &timeout_s) * 1000000000L;
+	end.tv_sec += timeout_s;
+	if (end.tv_nsec >= 1000000000L) {
+	    end.tv_nsec -= 1000000000L;
+	    end.tv_sec += 1;
+	}
+
+	/* Try acquiring lock, loop until timeout. */
 	while (fcntl(flock_fd, F_SETLK, &lck) < 0) {
 	    if (errflag) {
                 zclose(flock_fd);
@@ -658,11 +722,16 @@ bin_zsystem_flock(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		zwarnnam(nam, "failed to lock file %s: %e", args[0], errno);
 		return 1;
 	    }
-	    if (time(NULL) >= end) {
+	    zgettime_monotonic_if_available(&now);
+	    remaining_us = timespec_diff_us(&now, &end);
+	    if (remaining_us <= 0) {
                 zclose(flock_fd);
 		return 2;
             }
-	    sleep(1);
+	    if (remaining_us <= timeout_interval) {
+		timeout_interval = remaining_us;
+	    }
+	    zsleep(timeout_interval);
 	}
     } else {
 	while (fcntl(flock_fd, timeout == 0 ? F_SETLK : F_SETLKW, &lck) < 0) {

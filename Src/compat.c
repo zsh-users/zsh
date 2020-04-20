@@ -126,6 +126,32 @@ zgettime(struct timespec *ts)
     return ret;
 }
 
+/* Likewise with CLOCK_MONOTONIC if available. */
+
+/**/
+mod_export int
+zgettime_monotonic_if_available(struct timespec *ts)
+{
+    int ret = -1;
+
+#if defined(HAVE_CLOCK_GETTIME) && defined(CLOCK_MONOTONIC)
+    struct timespec dts;
+    if (clock_gettime(CLOCK_MONOTONIC, &dts) < 0) {
+	zwarn("unable to retrieve CLOCK_MONOTONIC time: %e", errno);
+	ret--;
+    } else {
+	ret++;
+	ts->tv_sec = (time_t) dts.tv_sec;
+	ts->tv_nsec = (long) dts.tv_nsec;
+    }
+#endif
+
+    if (ret) {
+	ret = zgettime(ts);
+    }
+    return ret;
+}
+
 
 /* compute the difference between two calendar times */
 

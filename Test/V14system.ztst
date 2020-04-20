@@ -1,0 +1,150 @@
+# Test zsh/system module
+
+%prep
+
+  if zmodload -s zsh/system && zmodload -s zsh/zselect; then
+    tst_dir=V14.tmp
+    mkdir -p -- $tst_dir
+  else
+    ZTST_unimplemented='the zsh/system and zsh/zselect modules are not available'
+  fi
+  : > $tst_dir/file # File on which to acquire flock.
+
+%test
+
+  (
+    zsystem flock -t 0.1 -i 0.000001 $tst_dir/file
+  )
+0:zsystem flock valid time arguments
+
+  (
+    zsystem flock -t -1         $tst_dir/file ||
+    zsystem flock -t 0.49e-6    $tst_dir/file ||
+    zsystem flock -t 1073741824 $tst_dir/file ||
+    zsystem flock -t 1e100      $tst_dir/file ||
+    zsystem flock -i -1         $tst_dir/file ||
+    zsystem flock -i 0.49e-6    $tst_dir/file ||
+    zsystem flock -i 1e100      $tst_dir/file
+  )
+1:zsystem flock invalid time arguments
+?(eval):zsystem:2: flock: invalid timeout value: '-1'
+?(eval):zsystem:3: flock: invalid timeout value: '0.49e-6'
+?(eval):zsystem:4: flock: invalid timeout value: '1073741824'
+?(eval):zsystem:5: flock: invalid timeout value: '1e100'
+?(eval):zsystem:6: flock: invalid interval value: '-1'
+?(eval):zsystem:7: flock: invalid interval value: '0.49e-6'
+?(eval):zsystem:8: flock: invalid interval value: '1e100'
+
+  (
+    # Lock file for 1 second in the background.
+    lock_flag=$tst_dir/locked1
+    (zsystem flock $tst_dir/file \
+     && touch $lock_flag \
+     && zselect -t 100
+     mv $lock_flag $lock_flag.done) &
+    # Wait until sub-shell above has started.
+    while ! [[ -f $lock_flag || -f $lock_flag.done ]]; do
+      zselect -t 1
+    done
+    if [[ -f $lock_flag.done ]]; then
+      echo "Background shell should not have completed already." 1>&2
+    else
+      # Attempt to lock file with 0.5 second timeout: must fail.
+      zsystem flock -t 0.5 $tst_dir/file
+    fi
+  )
+2:zsystem flock unsuccessful wait test
+F:This timing test might fail due to process scheduling issues unrelated to zsh.
+
+  (
+    # Lock file for 0.5 second in the background.
+    lock_flag=$tst_dir/locked2
+    (zsystem flock $tst_dir/file \
+      && touch $lock_flag \
+      && zselect -t 50
+      mv $lock_flag $lock_flag.done) &
+    # Wait until sub-shell above has started.
+    while ! [[ -f $lock_flag || -f $lock_flag.done ]]; do
+      zselect -t 1
+    done
+    if [[ -f $lock_flag.done ]]; then
+      echo "Background shell should not have completed already." 1>&2
+    fi
+    typeset -F SECONDS
+    start=$SECONDS
+    # Attempt to lock file without a timeout:
+    # must succeed after sub-shell above releases it (0.5 second).
+    if zsystem flock $tst_dir/file; then
+      elapsed=$[ $SECONDS - $start ]
+      if [[ $elapsed -ge 0.3 && $elapsed -le 0.7 ]]; then
+        echo "elapsed time seems OK" 1>&2
+      else
+        echo "elapsed time $elapsed should be ~ 0.5 second" 1>&2
+      fi
+    fi
+  )
+0:zsystem flock successful wait test, no timeout
+?elapsed time seems OK
+F:This timing test might fail due to process scheduling issues unrelated to zsh.
+
+  (
+    # Lock file for 0.5 second in the background.
+    lock_flag=$tst_dir/locked3
+    (zsystem flock $tst_dir/file \
+      && touch $lock_flag \
+      && zselect -t 50
+      mv $lock_flag $lock_flag.done) &
+    # Wait until sub-shell above has started.
+    while ! [[ -f $lock_flag || -f $lock_flag.done ]]; do
+      zselect -t 1
+    done
+    if [[ -f $lock_flag.done ]]; then
+      echo "Background shell should not have completed already." 1>&2
+    fi
+    typeset -F SECONDS
+    start=$SECONDS
+    # Attempt to lock file with 1-second timeout:
+    # must succeed 1 second after start because we retry every 1 second.
+    if zsystem flock -t 1 $tst_dir/file; then
+      elapsed=$[ $SECONDS - $start ]
+      if [[ $elapsed -ge 0.8 && $elapsed -le 1.2 ]]; then
+        echo "elapsed time seems OK" 1>&2
+      else
+        echo "elapsed time $elapsed should be ~ 1 second" 1>&2
+      fi
+    fi
+  )
+0:zsystem flock successful wait test, integral seconds
+?elapsed time seems OK
+F:This timing test might fail due to process scheduling issues unrelated to zsh.
+
+  (
+    # Lock file for 0.25 second in the background.
+    lock_flag=$tst_dir/locked4
+    (zsystem flock $tst_dir/file \
+      && touch $lock_flag \
+      && zselect -t 25
+      mv $lock_flag $lock_flag.done) &
+    # Wait until sub-shell above has started.
+    while ! [[ -f $lock_flag || -f $lock_flag.done ]]; do
+      zselect -t 1
+    done
+    if [[ -f $lock_flag.done ]]; then
+      echo "Background shell should not have completed already." 1>&2
+    fi
+    typeset -F SECONDS
+    start=$SECONDS
+    # Attempt to lock file with 0.4-second timeout, retrying every 0.1 second:
+    # must succeed 0.3 second after start.
+    if zsystem flock -t 0.4 -i 0.1 $tst_dir/file; then
+      elapsed=$[ $SECONDS - $start ]
+      if [[ $elapsed -ge 0.2 && $elapsed -le 0.5 ]]; then
+        echo "elapsed time seems OK" 1>&2
+      else
+        echo "elapsed time $elapsed should be ~ 0.3 second" 1>&2
+      fi
+    fi
+  )
+0:zsystem flock successful wait test, fractional seconds
+?elapsed time seems OK
+F:This timing test might fail due to process scheduling issues unrelated to zsh.

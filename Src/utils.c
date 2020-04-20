@@ -2749,6 +2749,42 @@ read_poll(int fd, int *readchar, int polltty, zlong microseconds)
 }
 
 /*
+ * Return the difference between 2 times, given as struct timespec*,
+ * expressed in microseconds, as a long.  If the difference doesn't fit
+ * into a long, return LONG_MIN or LONG_MAX so that the times can still
+ * be compared.
+ *
+ * Note: returns a long rather than a zlong because zsleep() below
+ * takes a long.
+ */
+
+/**/
+long
+timespec_diff_us(const struct timespec *t1, const struct timespec *t2)
+{
+    int reverse = (t1->tv_sec > t2->tv_sec);
+    time_t diff_sec;
+    long diff_usec, max_margin, res;
+
+    /* Don't just subtract t2-t1 because time_t might be unsigned. */
+    diff_sec = (reverse ? t1->tv_sec - t2->tv_sec : t2->tv_sec - t1->tv_sec);
+    if (diff_sec > LONG_MAX / 1000000L) {
+	goto overflow;
+    }
+    res = diff_sec * 1000000L;
+    max_margin = LONG_MAX - res;
+    diff_usec = (reverse ?
+		 t1->tv_nsec - t2->tv_nsec : t2->tv_nsec - t1->tv_nsec
+		 ) / 1000;
+    if (diff_usec <= max_margin) {
+	res += diff_usec;
+	return (reverse ? -res : res);
+    }
+ overflow:
+    return (reverse ? LONG_MIN : LONG_MAX);
+}
+
+/*
  * Sleep for the given number of microseconds --- must be within
  * range of a long at the moment, but this is only used for
  * limited internal purposes.
