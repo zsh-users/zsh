@@ -1,5 +1,8 @@
 2020-04-20  dana  <dana@dana.is>
 
+	* unposted: NEWS, README: Document zsh/system changes from
+	workers/45708
+
 	* unposted: Doc/Zsh/mod_system.yo: Adjust documentation from
 	workers/45708
 
