@@ -1826,6 +1826,24 @@ be unsuccessful until that point.  If the value is any other
 string, menu completion will be started when the string typed by the
 user is longer than the common prefix to the corresponding IDs.
 )
+kindex(insert-sections, completion style)
+item(tt(insert-sections))(
+This style is used with tags of the form `tt(manuals.)var(X)' when
+completing names of manual pages. If set to `true' and the var(X) in the
+tag name matches the section number of the page being completed, the
+section number is inserted along with the page name. For example, given
+
+example(zstyle ':completion:*:manuals.*' insert-sections true)
+
+tt(man ssh_<TAB>) may be completed to tt(man 5 ssh_config).
+
+This is especially useful in conjunction with tt(separate-sections), as
+it ensures that the page requested of tt(man) corresponds to the one
+displayed in the completion listing when there are multiple pages with the
+same name (e.g., tt(printf+LPAR()1+RPAR()) and tt(printf+LPAR()3+RPAR())).
+
+The default for this style is `false'.
+)
 kindex(insert-tab, completion style)
 item(tt(insert-tab))(
 If this is set to `true', the completion system will
@@ -2445,7 +2463,7 @@ For example,
 example(zstyle ':completion:*' recursive-files '*/zsh/*')
 
 If the current directory is tt(/home/pws/zsh/Src), then
-tt(zle_tr)em(TAB) can be completed to tt(Zle/zle_tricky.c).
+tt(zle_tr<TAB>) can be completed to tt(Zle/zle_tricky.c).
 )
 kindex(regular, completion style)
 item(tt(regular))(
@@ -2502,12 +2520,13 @@ kindex(separate-sections, completion style)
 item(tt(separate-sections))(
 This style is used with the tt(manuals) tag when completing names of
 manual pages.  If it is `true', entries for different sections are
-added separately using tag names of the form `tt(manual.)var(X)',
+added separately using tag names of the form `tt(manuals.)var(X)',
 where var(X) is the section number.  When the tt(group-name) style is
 also in effect, pages from different sections will appear separately.
 This style is also used similarly with the tt(words) style when
 completing words for the dict command. It allows words from different
-dictionary databases to be added separately.
+dictionary databases to be added separately. See also tt(insert-sections).
+
 The default for this style is `false'.
 )
 kindex(show-ambiguity, completion style)

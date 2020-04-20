@@ -1,3 +1,8 @@
+2020-04-20  dana  <dana@dana.is>
+
+	* 45702: Doc/Zsh/compsys.yo: Improve documentation of
+	{insert,separate}-sections
+
 2020-04-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 45684: Doc/Zsh/expn.yo: - glob qualifier behaviour in error
