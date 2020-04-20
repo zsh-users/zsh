@@ -1,5 +1,8 @@
 2020-04-20  dana  <dana@dana.is>
 
+	* unposted: Doc/Zsh/mod_system.yo: Adjust documentation from
+	workers/45708
+
 	* Cedric Ware: 45708: Doc/Zsh/mod_system.yo,
 	Src/Modules/system.c, Src/compat.c, Src/utils.c,
 	Test/V14system.ztst: Enable sub-second timeout in zsystem flock

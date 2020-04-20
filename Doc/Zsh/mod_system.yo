@@ -203,10 +203,9 @@ if the tt(-i) var(interval) option is given, otherwise once a second.
 so that the shell waits only until the var(timeout) and not longer.)
 If the attempt times out, status 2 is returned.
 
-(Note: var(timeout) must be less than
-ifzman(2^30-1)ifnzman(2NOTRANS(@sup{30})-1) seconds (about 34 years),
-and var(interval) must be less than 0.999 * LONG_MAX microseconds
-(only about 35 minutes on 32-bit systems).)
+(Note: var(timeout) is limited to 2^30-1 seconds (about 34 years), and
+var(interval) to 0.999 * LONG_MAX microseconds (only about 35 minutes
+on 32-bit systems).)
 
 If the option tt(-e) is given, the file descriptor for the lock is
 preserved when the shell uses tt(exec) to start a new process;
