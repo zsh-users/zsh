@@ -62,7 +62,7 @@ an end-of-options guard (same as "ls --").
 The sh-compatible function definition syntax, "f() { ... }", is unchanged.
 
 The time-out (-t) value given to zsh/system's `zsystem flock` command is
-now limited to 2^30-1 seconds.
+now limited to 2^30-1 seconds (= a little over 34 years).
 
 Incompatibilities between 5.7.1 and 5.8
 ---------------------------------------
