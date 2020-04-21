@@ -89,7 +89,7 @@ if [[ -n $state ]]; then
     _wanted hosts expl 'DNS server' _hosts && ret=0;
   else
     case $#line in
-      <3->) alts+=( 'classes:query class:compadd -M "m\:{a-z}={A-Z}" - IN CS CH HS' ) ;&
+      <3->) alts+=( 'classes:query class:compadd -M "m:{a-z}={A-Z}" - IN CS CH HS' ) ;&
       2) alts+=( 'types:query type:_dns_types' ) ;;
     esac
     _alternative 'hosts:host:_hosts' $alts && ret=0

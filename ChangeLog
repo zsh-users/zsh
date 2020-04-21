@@ -1,3 +1,8 @@
+2020-04-21  dana  <dana@dana.is>
+
+	* github #54: davey hathorn: Completion/Unix/Command/_dig:
+	Fix dig completion error
+
 2020-04-20  dana  <dana@dana.is>
 
 	* unposted: NEWS, README: Document zsh/system changes from
