@@ -7130,12 +7130,27 @@ __git_deleted_files () {
 
 (( $+functions[__git_modified_files] )) ||
 __git_modified_files () {
-  __git_files --modified modified-files 'modified file' $*
+  __git_status_files
+}
+
+(( $+functions[__git_status_files] )) ||
+__git_status_files () {
+  local -a status_files=( ${"${(0)"$(git status -z)"}"} )
+
+  local -a unstaged_files_with_status=( ${(M)status_files:#?[^ ]*} )
+  local -a unstaged_files=( ${unstaged_files_with_status/?? /} )
+  _describe -t unstaged 'Unstaged' unstaged_files && ret=0
+
+  local -a staged_files_with_status=( ${(M)status_files:#[^ \?]*} )
+  local -a staged_files=( ${staged_files_with_status/?? /} )
+  _describe -t staged 'Staged' staged_files && ret=0
+
+  return $ret
 }
 
 (( $+functions[__git_other_files] )) ||
 __git_other_files () {
-  __git_files --others untracked-files 'untracked file' $*
+
 }
 
 (( $+functions[__git_ignored_cached_files] )) ||
@@ -7179,8 +7194,14 @@ __git_changed-in-index_files () {
 
 (( $+functions[__git_treeish-to-index_files] )) ||
 __git_treeish-to-index_files () {
-  local tree=$1; shift
-  __git_diff-index_files $tree "files different between ${(qq)tree} and the index" treeish-to-index-files "$@"
+  __git_staged_files
+}
+
+(( $+functions[__git_staged_files] )) ||
+__git_staged_files () {
+  local -a staged_files=( ${"${(0)"$(git diff-index -z --name-only --no-color --cached HEAD)"}"} )
+  _describe -t staged 'Staged files' staged_files && ret=0
+  return $ret
 }
 
 (( $+functions[__git_changed-in-working-tree_files] )) ||
