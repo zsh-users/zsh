@@ -648,7 +648,7 @@ callcompfunc(char *s, char *fn)
 	if (compredirs)
 	    freearray(compredirs);
         if (rdstrs)
-            compredirs = zlinklist2array(rdstrs);
+            compredirs = zlinklist2array(rdstrs, 1);
         else
             compredirs = (char **) zshcalloc(sizeof(char *));
 
@@ -1922,7 +1922,7 @@ set_comp_sep(void)
 mod_export void
 set_list_array(char *name, LinkList l)
 {
-    setaparam(name, zlinklist2array(l));
+    setaparam(name, zlinklist2array(l, 1));
 }
 
 /* Get the words from a variable or a (list of words). */

@@ -438,22 +438,27 @@ hlinklist2array(LinkList list, int copy)
 
 /*
  * Convert a linked list whose data elements are strings to
- * an array.  The result is a permanently allocated, freearrayable
- * array.
+ * a permanently-allocated array.  The elements of the array are the same
+ * elements as the linked list data if copy is 0, else they are duplicated
+ * into permanent memory so the result is a permanently allocated,
+ * freearrayable array that's a deep copy of the linked list.
  */
 
 /**/
 mod_export char **
-zlinklist2array(LinkList list)
+zlinklist2array(LinkList list, int copy)
 {
     int l = countlinknodes(list);
     char **ret = (char **) zalloc((l + 1) * sizeof(char *)), **p;
     LinkNode n;
 
     for (n = firstnode(list), p = ret; n; incnode(n), p++) {
-	*p = ztrdup((char *) getdata(n));
+	*p = (char *) getdata(n);
+	if (copy)
+	    *p = ztrdup(*p);
     }
     *p = NULL;
 
     return ret;
 }
+

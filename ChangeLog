@@ -1,3 +1,10 @@
+2020-05-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 45729: Src/Modules/curses.c, Src/Zle/compcore.c,
+	Src/Zle/computil.c, Src/builtin.c, Src/linklist.c: internal:
+	Add a second parameter to zlinklist2array(), analogously to
+	hlinklist2array().
+
 2020-05-02  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Util/zyodl.vim: Use 'conceal' for some macros that

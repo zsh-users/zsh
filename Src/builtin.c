@@ -2280,7 +2280,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	} else if (asg->flags & ASG_ARRAY) {
 	    int flags = (asg->flags & ASG_KEY_VALUE) ? ASSPM_KEY_VALUE : 0;
 	    if (!(pm = assignaparam(pname, asg->value.array ?
-				 zlinklist2array(asg->value.array) :
+				 zlinklist2array(asg->value.array, 1) :
 				 mkarray(NULL), flags)))
 		return NULL;
 	}
@@ -2442,7 +2442,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	} else if (PM_TYPE(on) == PM_ARRAY && ASG_ARRAYP(asg)) {
 	    int flags = (asg->flags & ASG_KEY_VALUE) ? ASSPM_KEY_VALUE : 0;
 	    if (!(pm = assignaparam(pname, asg->value.array ?
-				    zlinklist2array(asg->value.array) :
+				    zlinklist2array(asg->value.array, 1) :
 				    mkarray(NULL), flags)))
 		return NULL;
 	    dont_set = 1;
@@ -2536,7 +2536,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 		    arrayval = mkarray(NULL);
 		}
 	    } else if (asg->value.array)
-		arrayval = zlinklist2array(asg->value.array);
+		arrayval = zlinklist2array(asg->value.array, 1);
 	    else
 		arrayval = mkarray(NULL);
 	    if (!(pm=assignaparam(pname, arrayval, flags)))
@@ -2923,7 +2923,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	apm->ename = ztrdup(asg0.name);
 	if (asg->value.array) {
 	    int flags = (asg->flags & ASG_KEY_VALUE) ? ASSPM_KEY_VALUE : 0;
-	    assignaparam(asg->name, zlinklist2array(asg->value.array), flags);
+	    assignaparam(asg->name, zlinklist2array(asg->value.array, 1), flags);
 	} else if (oldval)
 	    assignsparam(asg0.name, oldval, 0);
 	unqueue_signals();
@@ -3901,7 +3901,7 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 	}
 	unqueue_signals();
 	if (all) {
-	    allmatched = argv = zlinklist2array(matchednodes);
+	    allmatched = argv = zlinklist2array(matchednodes, 1);
 	    matchednodes = NULL;
 	    popheap();
 	} else

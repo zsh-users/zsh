@@ -3591,7 +3591,7 @@ bin_compvalues(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	if (cv_laststate.vals) {
 	    char **ret;
 
-	    ret = zlinklist2array(cv_laststate.vals);
+	    ret = zlinklist2array(cv_laststate.vals, 1);
 	    sethparam(args[1], ret);
 
 	    return 0;
@@ -4016,7 +4016,7 @@ bin_comptry(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 
 		    set = (Ctset) zalloc(sizeof(*set));
 
-		    set->tags = zlinklist2array(list);
+		    set->tags = zlinklist2array(list, 1);
 		    set->next = NULL;
 		    set->ptr = NULL;
 		    set->tag = NULL;
