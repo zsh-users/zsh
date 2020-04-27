@@ -1,5 +1,8 @@
 2020-05-02  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 45722: Doc/Zsh/mod_zutil.yo, V05styles.ztst: docs: Change
+	zstyle example to a non-hierarchical one
+
 	* 45752/0002: Completion/Unix/Command/_gcc: Complete --output
 	like -o.
 

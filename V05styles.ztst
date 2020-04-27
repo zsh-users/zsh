@@ -151,3 +151,16 @@
 >one
 >two
 
+ (
+  zstyle ':weather:*:Sunday:*' preferred-precipitation snow
+  zstyle ':weather:europe:*' preferred-precipitation rain
+  zstyle -s ':weather:europe:Sunday:foo' preferred-precipitation REPLY && print $REPLY
+ )
+ (
+  zstyle ':weather:europe:*' preferred-precipitation rain
+  zstyle ':weather:*:Sunday:*' preferred-precipitation snow
+  zstyle -s ':weather:europe:Sunday:foo' preferred-precipitation REPLY && print $REPLY
+ )
+0:the example in the documentation remains correct
+>snow
+>rain

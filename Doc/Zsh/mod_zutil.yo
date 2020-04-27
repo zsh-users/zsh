@@ -32,20 +32,27 @@ If two patterns are equally specific, the tie is broken in favour of
 the pattern that was defined first.
 
 em(Example)
+kindex(preferred-precipitation, example style)
+findex(weather, example function)
 
-For example, to define your preferred form of precipitation depending on which
-city you're in, you might set the following in your tt(zshrc):
+For example, a fictional `tt(weather)' plugin might state in its documentation
+that it looks up the tt(preferred-precipitation) style under the
+`tt(:weather:)var(continent)tt(:)var(day-of-the-week)tt(:)var(phase-of-the-moon))' context.
+According to this, you might set the following in your tt(zshrc):
 
-example(zstyle ':weather:europe:*' preferred-precipitation rain
-zstyle ':weather:europe:germany:*' preferred-precipitation none
-zstyle ':weather:europe:germany:*:munich' preferred-precipitation snow)
+example(zstyle ':weather:*:Sunday:*' preferred-precipitation snow
+zstyle ':weather:europe:*' preferred-precipitation rain)
 
-Then, the fictional `tt(weather)' plugin might run under the hood a command
-such as
+Then the plugin would run under the hood a command such as
 
-example(zstyle -s ":weather:${continent}:${country}:${county}:${city}" preferred-precipitation REPLY)
+example(zstyle -s ":weather:${continent}:${day_of_week}:${moon_phase}" preferred-precipitation REPLY)
 
 in order to retrieve your preference into the scalar variable tt($REPLY).
+On Sundays tt($REPLY) would be set to `tt(snow)'; in Europe it would be set
+to `tt(rain)'; and on Sundays in Europe it would be set to `tt(snow)' again,
+because the patterns `tt(:weather:europe:*)' and `tt(:weather:*:Sunday:*)' both
+match the var(context) argument to tt(zstyle -s), are equally specific, and the
+latter was defined first.
 
 em(Usage)
 
