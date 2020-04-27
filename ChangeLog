@@ -1,5 +1,8 @@
 2020-05-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 45731: Completion/Debian/Command/_debsnap: New completion
+	function.
+
 	* 45730: Completion/Base/Utility/_arguments, Doc/Zsh/compsys.yo,
 	Src/Zle/computil.c, Src/utils.c, Test/Y03arguments.ztst:
 	_arguments: Add the -0 flag, which makes $opt_args be populated
