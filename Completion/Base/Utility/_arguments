@@ -7,11 +7,13 @@ local long cmd="$words[1]" descr odescr mesg subopts opt opt2 usecc autod
 local oldcontext="$curcontext" hasopts rawret optarg singopt alwopt
 local setnormarg start rest
 local -a match mbegin mend
+integer opt_args_use_NUL_separators=0
 
 subopts=()
 singopt=()
-while [[ "$1" = -([AMO]*|[CRSWnsw]) ]]; do
+while [[ "$1" = -([AMO]*|[0CRSWnsw]) ]]; do
   case "$1" in
+  -0) opt_args_use_NUL_separators=1; shift ;;
   -C)  usecc=yes; shift ;;
   -O)  subopts=( "${(@P)2}" ); shift 2 ;;
   -O*) subopts=( "${(@P)${1[3,-1]}}" ); shift ;;
@@ -388,7 +390,7 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
             if [[ "$action" = -\>* ]]; then
 	      action="${${action[3,-1]##[ 	]#}%%[ 	]#}"
 	      if (( ! $state[(I)$action] )); then
-                comparguments -W line opt_args
+                comparguments -W line opt_args $opt_args_use_NUL_separators
                 state+=( "$action" )
                 state_descr+=( "$descr" )
 	        if [[ -n "$usecc" ]]; then
@@ -406,7 +408,7 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
                 local=yes
               fi
 
-              comparguments -W line opt_args
+              comparguments -W line opt_args $opt_args_use_NUL_separators
 
               if [[ "$action" = \ # ]]; then
 

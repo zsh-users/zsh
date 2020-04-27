@@ -3596,6 +3596,17 @@ strftimehandling:
     return buf - origbuf;
 }
 
+/*
+ * Return a string consisting of the elements of 'arr' joined by the character
+ * 'delim', which will be metafied if necessary.  The string will be allocated
+ * on the heap iff 'heap'.
+ *
+ * Comparable to:
+ *
+ *     char metafied_delim[] = { Meta, delim ^ 32, '\0' };
+ *     sepjoin(arr, metafied_delim, heap)
+ */
+
 /**/
 mod_export char *
 zjoin(char **arr, int delim, int heap)
@@ -3894,10 +3905,12 @@ wordcount(char *s, char *sep, int mul)
 
 /*
  * 's' is a NULL-terminated array of strings.
- * 'sep' is a string.
+ * 'sep' is a string, or NULL to split on ${IFS[1]}.
  *
  * Return a string consisting of the elements of 's' joined by 'sep',
  * allocated on the heap iff 'heap'.
+ *
+ * See also zjoin().
  */
 
 /**/

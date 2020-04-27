@@ -2375,6 +2375,23 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
     return 0;
 }
 
+/* Build a NUL-separated from a list.
+ *
+ * This is only used to populate values of $opt_args.
+ */
+
+static char *
+ca_nullist(LinkList l)
+{
+    if (l) {
+	char **array = zlinklist2array(l, 0 /* don't dup elements */);
+	char *ret = zjoin(array, '\0', 0 /* permanent allocation */);
+	free(array); /* the elements are owned by the list */
+	return ret;
+    } else
+	return ztrdup("");
+}
+
 /* Build a colon-list from a list.
  *
  * This is only used to populate values of $opt_args.
@@ -2563,7 +2580,7 @@ bin_comparguments(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     case 's': min = 1; max =  1; break;
     case 'M': min = 1; max =  1; break;
     case 'a': min = 0; max =  0; break;
-    case 'W': min = 2; max =  2; break;
+    case 'W': min = 3; max =  3; break;
     case 'n': min = 1; max =  1; break;
     default:
 	zwarnnam(nam, "invalid option: %s", args[0]);
@@ -2795,11 +2812,20 @@ bin_comparguments(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		return 0;
 	return 1;
     case 'W':
-        /* This gets two parameter names as arguments.  The first is set to
-         * the current word sans any option prefixes handled by comparguments.
+        /* This gets two parameter names and one integer as arguments.
+         *
+         * The first parameter is set to the current word sans any option
+         * prefixes handled by comparguments.
+         *
          * The second parameter is set to an array containing the options on
          * the line and their arguments.  I.e. the stuff _arguments returns
-         * to its caller in the `line' and `opt_args' parameters. */
+         * to its caller in the `line' and `opt_args' parameters.
+         *
+         * The integer is one if the second parameter (which is just $opt_args,
+         * you know) should encode multiple values by joining them with NULs
+         * and zero if it should encode multiple values by joining them with
+         * colons after backslash-escaping colons and backslashes.
+         */
 	{
 	    Castate s;
 	    char **ret, **p;
@@ -2807,6 +2833,7 @@ bin_comparguments(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    LinkList *a;
 	    Caopt o;
 	    int num;
+	    int opt_args_use_NUL_separators = (args[3][0] != '0');
 
 	    for (num = 0, s = lstate; s; s = s->snext)
 		num += countlinknodes(s->args);
@@ -2832,7 +2859,10 @@ bin_comparguments(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		    if (*a) {
 			*p++ = (o->gsname ? tricat(o->gsname, o->name, "") :
 				ztrdup(o->name));
-			*p++ = ca_colonlist(*a);
+			if (opt_args_use_NUL_separators)
+			    *p++ = ca_nullist(*a);
+			else
+			    *p++ = ca_colonlist(*a);
 		    }
 	    *p = NULL;
 

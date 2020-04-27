@@ -231,8 +231,14 @@
 
  tst_arguments '-a:one: :two' ':descr:{compadd -Q - $opt_args[-a]}'
  comptest $'tst -a 1:x \\2 \t'
-0:opt_args with multiple arguments and quoting of colons and backslashes
+0:opt_args with multiple arguments and quoting of colons and backslashes, part #1: default behaviour
 >line: {tst -a 1:x \2 1\:x:\\2 }{}
+
+ # Same as previous test, except with -0 and (qqqq) added
+ tst_arguments -0 : '-a:one: :two' ':descr:{compadd -Q - ${(qqqq)opt_args[-a]}}'
+ comptest $'tst -a 1:x \\2 \t'
+0:opt_args with multiple arguments and quoting of colons and backslashes, part #2: NUL escaping
+>line: {tst -a 1:x \2 $'1:x\0\\2' }{}
 
  tst_arguments -a -b
  comptest $'tst  rest -\t\C-w\eb\C-b-\t'

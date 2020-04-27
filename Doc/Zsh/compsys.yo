@@ -3740,6 +3740,12 @@ The default var(matchspec) allows partial word completion after `tt(_)' and
 var(matchspec) is:
 example(tt(r:|[_-]=* r:|=*))
 )
+item(tt(-0))(
+When populating values of the `tt(opt_args)' associative array, don't
+backslash-escape colons and backslashes and use NUL rather than colon for
+joining multiple values. This option is described in more detail below, under
+the heading em(var(spec)s: actions).
+)
 enditem()
 
 em(var(spec)s: overview)
@@ -3912,6 +3918,7 @@ specific contexts: on the first call `tt(_arguments $global_options)' is
 used, and on subsequent calls `tt(_arguments !$^global_options)'.
 
 em(var(spec)s: actions)
+COMMENT(If you change this section title, change the references to it in running text.)
 
 In each of the forms above the var(action) determines how
 completions should be generated.  Except for the `tt(->)var(string)'
@@ -4033,9 +4040,21 @@ the normal arguments from the command line, i.e. the words from the
 command line after the command name excluding all options and their
 arguments.  Options are stored in the associative array
 `tt(opt_args)' with option names as keys and their arguments as
-the values.  For options that have more than one argument these are
-given as one string, separated by colons.  All colons and backslashes
-in the original arguments are preceded with backslashes.
+the values.  By default, all colons and backslashes in the value are escaped
+with backslashes, and if an option has multiple arguments (for example, when
+using an var(optspec) of the form `tt(*)var(optspec)'), they are joined with
+(unescaped) colons.  However, if the tt(-0) option was passed, no backslash
+escaping is performed, and multiple values are joined with NUL bytes.  For
+example, after `tt(zsh -o foo:foo -o bar:bar -o <TAB>)', the contents of
+`tt(opt_args)' would be
+
+example(typeset -A opt_args=( [-o]='foo\:foo:bar\:bar:' ))
+
+by default, and
+
+example(typeset -A opt_args=( [-o]=$'foo:foo\x00bar:bar\x00' ))
+
+if tt(_arguments) had been called with the tt(-0) option.
 
 The parameter `tt(context)' is set when returning to the calling function
 to perform an action of the form `tt(->)var(string)'.  It is set to an
