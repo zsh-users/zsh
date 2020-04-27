@@ -37,7 +37,7 @@ For example, to define your preferred form of precipitation depending on which
 city you're in, you might set the following in your tt(zshrc):
 
 example(zstyle ':weather:europe:*' preferred-precipitation rain
-zstyle ':weather:europe:germany:* preferred-precipitation none
+zstyle ':weather:europe:germany:*' preferred-precipitation none
 zstyle ':weather:europe:germany:*:munich' preferred-precipitation snow)
 
 Then, the fictional `tt(weather)' plugin might run under the hood a command
