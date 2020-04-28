@@ -49,7 +49,7 @@ Styles modify various operations of the completion system, such as
 output formatting, but also what kinds of completers are used (and in
 what order), or which tags are examined.  Styles may accept arguments
 and are manipulated using the tt(zstyle) command described in
-ifzman(see zmanref(zshmodules))\
+ifzman(zmanref(zshmodules))\
 ifnzman(noderef(The zsh/zutil Module)).
 
 In summary, tags describe em(what) the completion objects are, and style
@@ -658,8 +658,8 @@ ifnzman(noderef(Bindable Commands)).
 When looking up styles the completion system uses full context names,
 including the tag.  Looking up the value of a style therefore consists of
 two things: the context, which is matched to the most specific (best
-fitting) style pattern, and the name of the style itself, which must be
-matched exactly.  The following examples demonstrate that style patterns
+fitting) pattern, and the name of the style itself, which must be
+matched exactly.  The following examples demonstrate that patterns
 may be loosely defined for styles that apply broadly, or as tightly
 defined as desired for styles that apply in narrower circumstances.
 
@@ -673,7 +673,7 @@ example(zstyle ':completion:*' verbose yes)
 in a startup file (probably tt(.zshrc)).
 This gives the tt(verbose) style the value tt(yes) in every
 context inside the completion system, unless that context has a more
-specific definition.  It is best to avoid giving the context as `tt(*)'
+specific definition.  It is best to avoid giving the pattern as `tt(*)'
 in case the style has some meaning outside the completion system.
 
 Many such general purpose styles can be configured simply by using the
@@ -710,15 +710,21 @@ as tt(menu) and tt(list-rows-first).
 
 Note that the order in which styles are em(defined) does not matter; the
 style mechanism uses the most specific possible match for a particular
-style to determine the set of values.  More precisely, strings are
+style to determine the set of values.  Strings are
 preferred over patterns (for example, `tt(:completion::complete:::foo)' is
 more specific than `tt(:completion::complete:::*')), and longer patterns are
-preferred over shorter patterns.
+preferred over the pattern `tt(*)'. See 
+ifzman(zmanref(zmodules))ifnzman(noderef(The zsh/zutil Module))
+for details.
 
-A good rule of thumb is that any completion style pattern that needs to
-include more than one wildcard (tt(*)) and that does not end in a tag
-name, should include all six colons (tt(:)), possibly surrounding
-additional wildcards.
+Context patterns that use something other than a wildcard (tt(*)) to match the
+middle parts of the context DASH()- the var(completer), var(command), and
+var(argument) in
+tt(:completion:)var(function)tt(:)var(completer)tt(:)var(command)tt(:)var(argument)tt(:)var(tag)
+DASH()- should include all six colons (tt(:)) explicitly. Without this,
+a pattern such as tt(:completion:*:foo:*) could match tt(foo) against a
+component other than the intended one (for example, against var(completer) when
+a match against var(command) was intended).
 
 Style names like those of tags are arbitrary and depend on the completion
 function.  However, the following two sections list some of the most
