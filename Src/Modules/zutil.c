@@ -96,7 +96,7 @@ struct stypat {
     Stypat next;
     char *pat;			/* pattern string */
     Patprog prog;		/* compiled pattern */
-    int weight;			/* how specific is the pattern? */
+    zulong weight;		/* how specific is the pattern? */
     Eprog eval;			/* eval-on-retrieve? */
     char **vals;
 };
@@ -293,7 +293,9 @@ newzstyletable(int size, char const *name)
 static int
 setstypat(Style s, char *pat, Patprog prog, char **vals, int eval)
 {
-    int weight, tmp, first;
+    zulong weight;
+    int tmp;
+    int first;
     char *str;
     Stypat p, q, qq;
     Eprog eprog = NULL;
@@ -348,6 +350,12 @@ setstypat(Style s, char *pat, Patprog prog, char **vals, int eval)
      * - A component that's a literal string scores 2 points.
      * - The score of a pattern is the sum of the score of its components.
      *
+     * The result of this calculation is stored in the low bits of 'weight'.
+     * The high bits of 'weight' are used to store the number of ':'-separated
+     * components.  This provides a lexicographic comparison: first compare
+     * the number of components, and if that's equal, compare the specificity
+     * of the components.
+     *
      * This corresponds to the notion of 'more specific' in the zshmodules(1)
      * documentation of zstyle.
      */
@@ -367,6 +375,7 @@ setstypat(Style s, char *pat, Patprog prog, char **vals, int eval)
 
 	if (*str == ':') {
 	    /* Yet another component. */
+	    weight += ZLONG_CONST(1) << (CHAR_BIT * sizeof(weight) / 2);
 
 	    first = 1;
 	    weight += tmp;

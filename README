@@ -64,6 +64,25 @@ The sh-compatible function definition syntax, "f() { ... }", is unchanged.
 The time-out (-t) value given to zsh/system's `zsystem flock` command is
 now limited to 2^30-1 seconds (= a little over 34 years).
 
+zstyle: For background, recall that the zstyle builtin associates styles with
+values for particular contexts, and when a context (such as ':foo:bar:baz') is
+matched by multiple patterns (such as ':foo:*' and ':foo:bar:*'), the style's
+value for the more specific of the patterns is used.  In zsh 5.8 and earlier
+the determination of which pattern is "more specific" used semantics slightly
+different to those the documentation promised.  The implementation was changed
+to match the documentation.  The upshot of this is that if you set a single
+style in multiple contexts, zsh 5.9 may use the values set for a pattern other
+than the one zsh 5.8 used.  For example, if you do
+    zstyle ':foo:bar:*'   style value1
+    zstyle ':foo:*:baz:*' style value2
+and the style is looked up under a context that both patterns match (e.g.,
+:foo:bar:baz:qux), zsh 5.9 will use value2 -- which is consistent with the
+documentation of both 5.8 and 5.9 -- but zsh 5.8 will use value1.  If this
+affects you, make the implied colons in the first pattern explicit, as in:
+    zstyle ':foo:bar:*:*' style value1
+    zstyle ':foo:*:baz:*' style value2
+This will use value1 in both 5.8 and 5.9.
+
 Incompatibilities between 5.7.1 and 5.8
 ---------------------------------------
 
