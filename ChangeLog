@@ -1,5 +1,8 @@
 2020-05-02  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Util/zyodl.vim: Use 'conceal' for some macros that
+	expand to a single character.
+
 	* 45737 (+ docs, and update the test from 45722):
 	Doc/Zsh/mod_zutil.yo, README, Src/Modules/zutil.c,
 	Test/V05styles.ztst: zstyle: When determining the weight

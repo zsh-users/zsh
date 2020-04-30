@@ -12,6 +12,11 @@
 "      autocmd BufRead,BufNewFile **/Doc/Zsh/*.yo setfiletype zyodl
 " Or alternatively:
 " 1. Append the contents of Doc/Zsh/.vimrc to your .vimrc, changing «<sfile>» to «%».
+"
+" You may also wish to set:
+"     autocmd FileType zyodl setlocal conceallevel=2
+" in order to benefit from the 'conceal' behaviour for LPAR(), RPAR(), and
+" friends.
 
 "" Test case:
 "   texinode()()()()
@@ -49,7 +54,6 @@ syn region zyodlVar     start="\<var("     end=")" contains=zyodlSpecial,zyodlPa
 syn region zyodlBold    start="\<bf("      end=")" contains=zyodlSpecial,zyodlParenthetical
 syn region zyodlEmph    start="\<em("      end=")" contains=zyodlSpecial,zyodlParenthetical
 syn region zyodlIndex   start="\<.index("  end=")" contains=zyodlSpecial
-syn match  zyodlSpecial "+\?\<\(LPAR\|RPAR\|PLUS\)()"
 syn match  zyodlNumber  "\d\+"
 syn region zyodlItem    start="\<xitem(" end=")" contains=zyodlSpecial,@zyodlInline
 syn region zyodlItem    start="\<item("  end=")" contains=zyodlSpecial,@zyodlInline
@@ -70,6 +74,12 @@ syn keyword zyodlKeyword sitem nextgroup=zyodlSItemArg1
 syn region zyodlSItemArg1 oneline start="(" end=")" contains=zyodlSpecial,@zyodlInline nextgroup=zyodlSItemArg2 contained
 syn region zyodlSItemArg2 start="(" end=")" contains=zyodlSpecial,@zyodlInline contained skip="\w\@<!([^)]*)"
 
+syn keyword zyodlBullet  itemiz      conceal cchar=• 
+syn match   zyodlSpecial "\<DASH()-" conceal cchar=—
+syn match   zyodlSpecial "+\?LPAR()" conceal cchar=(
+syn match   zyodlSpecial "+\?RPAR()" conceal cchar=)
+syn match   zyodlSpecial "+\?PLUS()" conceal cchar=+
+ 
 "" Highlight groups:
 hi def link zyodlTt Constant
 hi def link zyodlVar Identifier
