@@ -1004,7 +1004,7 @@ args+=(
   '--help[Display this information]'
   '--no-warnings[Same as -w]'
   '--optimize[Same as -O]'
-  '--output[Same as -o]'
+  '--output:output file:_files -g "^*.(c|h|cc|C|cxx|cpp|hpp)(-.)"'
   '--param[Set parameter <param> to value.  See manpage for a complete list of parameters]:name=value'
   '--verbose[Same as -v]'
   '--version[Display version information]'

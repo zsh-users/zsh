@@ -1,5 +1,8 @@
 2020-05-02  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 45752/0002: Completion/Unix/Command/_gcc: Complete --output
+	like -o.
+
 	* 45752/0001: Completion/Unix/Command/_gcc: Add .cpp and .hpp
 	to the ignored extensions list.
 
