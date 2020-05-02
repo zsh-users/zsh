@@ -390,7 +390,7 @@ languages=(
 # generic options (from --help)
 args+=(
   '-###[print commands to run this compilation]'
-  '-o:output file:_files -g "^*.(c|h|cc|C|cxx)(-.)"'
+  '-o:output file:_files -g "^*.(c|h|cc|C|cxx|cpp|hpp)(-.)"'
   '-x[Specify the language of the following input files]:input file language:('"$languages"')'
   '+e-:virtual function definitions in classes:((0\:only\ interface 1\:generate\ code))'
   '-d-:dump:->dump'
