@@ -2548,7 +2548,7 @@ label(62)
     zsh-workers-subscribe@zsh.org
   )
   (the actual content is unimportant).  Replace tt(subscribe) with
-  tt(unsubscribe) to unsubscribe.  The mailing software (tt(ezlm)) has
+  tt(unsubscribe) to unsubscribe.  The mailing software (tt(ezmlm)) has
   various bells and whistles: you can retrieve archived messages.
   Mail email(zsh-workers-help@zsh.org) for detailed information.
   Administrative matters are best sent to

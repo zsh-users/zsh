@@ -598,7 +598,7 @@ changes to descendant directories; earlier directories on the
 list are not pruned.  For example, changing from ~pws/yet/another
 to ~pws/some/other/dir does not cause ~pws to be pruned.
 )
-item(tt(pattern:var(pattern)))(
+item(tt(pattern:)var(pattern))(
 Gives a zsh pattern for directories that should not be
 added to the recent list (if not already there).  This element
 can be repeated to add different patterns.  For example,
@@ -660,7 +660,7 @@ sect(Abbreviated dynamic references to directories)
 
 The dynamic directory naming system is described in the subsection
 em(Dynamic named directories) of
-ifzman(the section em(Filename Expansion) in zmanref(expn))\
+ifzman(the section em(Filename Expansion) in zmanref(zshexpn))\
 ifnzman(noderef(Filename Expansion)).  In this, a reference to
 tt(~[)var(...)tt(]) is expanded by a function found by the hooks
 mechanism.

@@ -2900,8 +2900,8 @@ repeated, but note that the maximum number of sort operators of any kind
 that may appear in any glob expression is 12.
 )
 item(tt(O)var(c))(
-like `tt(o)', but sorts in descending order; i.e. `tt(*(^oc))' is the
-same as `tt(*(Oc))' and `tt(*(^Oc))' is the same as `tt(*(oc))'; `tt(Od)'
+like `tt(o)', but sorts in descending order; i.e. `tt(*+LPAR()^o)var(c)tt(+RPAR())' is the
+same as `tt(*+LPAR()O)var(c)tt(+RPAR())' and `tt(*+LPAR()^O)var(c)tt(+RPAR())' is the same as `tt(*+LPAR()o)var(c)tt(+RPAR())'; `tt(Od)'
 puts files in the current directory before those in subdirectories at each
 level of the search.
 )
