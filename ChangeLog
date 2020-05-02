@@ -1,5 +1,8 @@
 2020-05-02  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Test/V05styles.ztst: Revert unintentional move
+	from 45722.
+
 	* 45739: Doc/Zsh/compsys.yo, Doc/Zsh/zftpsys.yo: docs:
 	Clarifications about zstyle patterns.
 
