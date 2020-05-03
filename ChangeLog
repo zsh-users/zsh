@@ -1,3 +1,8 @@
+2020-05-23  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 45614: Completion/Redhat/Command/_dnf: add support for several
+	subcommands and options.
+
 2020-05-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 45731: Completion/Debian/Command/_debsnap: New completion
