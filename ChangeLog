@@ -1,3 +1,8 @@
+2020-05-05  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 45764: Test/D07multibyte.ztst: Add a regression test for 45772.
+	Test by Roman
+
 2020-05-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 45772: Src/params.c: Upon restoring locale variables, restore

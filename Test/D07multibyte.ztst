@@ -585,3 +585,17 @@
 >OK
 F:A failure here may indicate the system regex library does not
 F:support character sets outside the portable 7-bit range.
+
+  (
+    locale=$LANG
+    unset -m 'LC_*|LANG'
+    export LC_CTYPE=$locale
+    echo '\u276F'  # this works
+    () {
+      local LC_ALL=C
+    }  
+    echo '\u276F'  # this doesn't work
+  )
+0:locale gets restored when locale parameters go out of scope (regression test for 45772)
+>❯
+>❯
