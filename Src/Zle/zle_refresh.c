@@ -212,9 +212,9 @@ static zattr default_atr_on, special_atr_on;
 
 /*
  * Array of region highlights, no special termination.
- * The first element (0) always describes the region between
- * point and mark.  Any other elements are set by the user
- * via the parameter region_highlight.
+ * The first N_SPECIAL_HIGHLIGHTS elements describe special uses of
+ * highlighting, documented under N_SPECIAL_HIGHLIGHTS.
+ * Any other elements are set by the user via the parameter region_highlight.
  */
 
 /**/
@@ -414,16 +414,19 @@ get_region_highlight(UNUSED(Param pm))
 	 arrsize--;
 	 rhp++, arrp++) {
 	char digbuf1[DIGBUFSIZE], digbuf2[DIGBUFSIZE];
-	int atrlen = 0, alloclen;
+	int atrlen, alloclen;
+	const char owner_equals[] = "owner=";
 
 	sprintf(digbuf1, "%d", rhp->start);
 	sprintf(digbuf2, "%d", rhp->end);
 
 	atrlen = output_highlight(rhp->atr, NULL);
 	alloclen = atrlen + strlen(digbuf1) + strlen(digbuf2) +
-	    3; /* 2 spaces, 1 0 */
+	    3; /* 2 spaces, 1 terminating NUL */
 	if (rhp->flags & ZRH_PREDISPLAY)
 	    alloclen += 2; /* "P " */
+	if (rhp->owner)
+	    alloclen += 1 /* space */ + strlen(owner_equals) + strlen(rhp->owner);
 	*arrp = (char *)zhalloc(alloclen * sizeof(char));
 	/*
 	 * On input we allow a space after the flags.
@@ -436,6 +439,12 @@ get_region_highlight(UNUSED(Param pm))
 		(rhp->flags & ZRH_PREDISPLAY) ? "P" : "",
 		digbuf1, digbuf2);
 	(void)output_highlight(rhp->atr, *arrp + strlen(*arrp));
+
+	if (rhp->owner) {
+	    strcat(*arrp, " ");
+	    strcat(*arrp, owner_equals);
+	    strcat(*arrp, rhp->owner);
+	}
     }
     *arrp = NULL;
     return retarr;
@@ -502,7 +511,15 @@ set_region_highlight(UNUSED(Param pm), char **aval)
 	while (inblank(*strp))
 	    strp++;
 
-	match_highlight(strp, &rhp->atr);
+	strp = (char*) match_highlight(strp, &rhp->atr);
+
+	while (inblank(*strp))
+	    strp++;
+
+	if (strpfx("owner=", strp))
+	    rhp->owner = ztrdup(strp + 6);
+	else
+	    rhp->owner = NULL;
     }
 
     freearray(av);
