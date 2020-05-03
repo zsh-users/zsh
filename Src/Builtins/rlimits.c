@@ -50,6 +50,13 @@ typedef struct resinfo_T {
 } resinfo_T;
 
 /* table of known resources */
+/*
+ * How to add a new resource:
+ * 1. Add zsh_LIMIT_PRESENT(RLIMIT_XXX) in configure.ac.
+ * 2. Add an entry for RLIMIT_XXX to known_resources[].
+ *    Make sure the option letter (resinto_T.opt) is unique.
+ * 3. Build zsh and run the test B12rlimit.ztst.
+ */
 static const resinfo_T known_resources[] = {
     {RLIMIT_CPU, "cputime", ZLIMTYPE_TIME, 1,
 		't', "cpu time (seconds)"},
