@@ -1,5 +1,8 @@
 2020-06-11  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* gitlab !12: Jan Máslo: Completion/Linux/Command/_mat,
+	Completion/Linux/Command/_mat2: new completions
+
 	* 46036: Completion/Zsh/Type/_ps1234: fix colouring in prompt
 	completion
 
