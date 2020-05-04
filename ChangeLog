@@ -1,6 +1,6 @@
 2020-05-23  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
-	* unposted: Src/Builtins/rlimits.cL add a comment about how to
+	* unposted: Src/Builtins/rlimits.c: add a comment about how to
 	add a new resource.
 
 	* 45614: Completion/Redhat/Command/_dnf: add support for several
