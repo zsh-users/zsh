@@ -74,8 +74,9 @@ syn keyword zyodlKeyword sitem nextgroup=zyodlSItemArg1
 syn region zyodlSItemArg1 oneline start="(" end=")" contains=zyodlSpecial,@zyodlInline nextgroup=zyodlSItemArg2 contained
 syn region zyodlSItemArg2 start="(" end=")" contains=zyodlSpecial,@zyodlInline contained skip="\w\@<!([^)]*)"
 
-" Continuation lines
+" Miscellany
 syn match zyodlLineJoiner /\\$/
+syn keyword zyodlNote note Note NOTE
 
 syn keyword zyodlBullet  itemiz      conceal cchar=• 
 syn match   zyodlSpecial "\<DASH()-" conceal cchar=—
@@ -101,6 +102,7 @@ hi def link zyodlRef Include
 hi def link zyodlSItemArg1 Macro
 hi def link zyodlSItemArg2 Underlined
 hi def link zyodlLineJoiner Special
+hi def link zyodlNote Todo
 
 let b:current_syntax = "zyodl"
 let &cpo = s:cpo_save
