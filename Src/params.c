@@ -5569,6 +5569,14 @@ startparamscope(void)
     locallevel++;
 }
 
+#ifdef USE_LOCALE
+/*
+ * Flag that one of the special LC_ functions or LANG changed on scope
+ * end
+ */
+static int lc_update_needed;
+#endif /* USE_LOCALE */
+
 /* End a parameter scope: delete the parameters local to the scope. */
 
 /**/
@@ -5579,7 +5587,28 @@ endparamscope(void)
     locallevel--;
     /* This pops anything from a higher locallevel */
     saveandpophiststack(0, HFILE_USE_OPTIONS);
+#ifdef USE_LOCALE
+    lc_update_needed = 0;
+#endif
     scanhashtable(paramtab, 0, 0, 0, scanendscope, 0);
+#ifdef USE_LOCALE
+    if (lc_update_needed)
+    {
+	/* Locale changed --- ensure it is restored. */
+	char *val;
+	if ((val = getsparam_u("LC_ALL")) && *val) {
+	    setlocale(LC_ALL, val);
+	} else {
+	    struct localename *ln;
+	    if ((val = getsparam_u("LANG")) && *val)
+		setlang(val);
+	    for (ln = lc_names; ln->name; ln++) {
+		if ((val = getsparam_u(ln->name)) && *val)
+		    setlocale(ln->category, val);
+	    }
+	}
+    }
+#endif /* USE_LOCALE */
     unqueue_signals();
 }
 
@@ -5600,6 +5629,11 @@ scanendscope(HashNode hn, UNUSED(int flags))
 	     */
 	    Param tpm = pm->old;
 
+#ifdef USE_LOCALE
+	    if (!strncmp(pm->node.nam, "LC_", 3) ||
+		!strcmp(pm->node.nam, "LANG"))
+		lc_update_needed = 1;
+#endif
 	    if (!strcmp(pm->node.nam, "SECONDS"))
 	    {
 		setsecondstype(pm, PM_TYPE(tpm->node.flags), PM_TYPE(pm->node.flags));

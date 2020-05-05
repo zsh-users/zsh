@@ -1,3 +1,8 @@
+2020-05-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 45772: Src/params.c: Upon restoring locale variables, restore
+	the corresponding system settings.
+
 2020-05-23  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* unposted: Src/Builtins/rlimits.c: add a comment about how to
