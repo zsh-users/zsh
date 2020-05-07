@@ -49,16 +49,22 @@ def(item)(2)(
 ARG1: ARG2)\
 def(nofill)(1)(ARG1)\
 def(uref)(1)(url(ARG1)(ARG1))\
+COMMENT(TODO: make this expand to a Unicode em dash (U+2014) in HTML output)\
+def(emdash)(0)(\
+    whenlatex(---)\
+    whenhtml(---)\
+    whenman(--)whenms(--)whensgml(--)\
+    whentxt(--))\
 def(LPAR)(0)(CHAR(40))\
 def(RPAR)(1)(CHAR(41))
 myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2010/02/15)
 COMMENT(-- the following are for Usenet and must appear first)\
 description(\
 mydit(Archive-Name:) unix-faq/shell/zsh
-mydit(Last-Modified:) 2015/05/31
+mydit(Last-Modified:) 2020/05/06
 mydit(Submitted-By:) email(coordinator@zsh.org (Peter Stephenson))
 mydit(Posting-Frequency:) Monthly
-mydit(Copyright:) (C) P.W. Stephenson, 1995--2016 (see end of document)
+mydit(Copyright:) (C) P.W. Stephenson, 1995--2020 (see end of document)
 )
 
 This document contains a list of frequently-asked (or otherwise
@@ -150,6 +156,7 @@ Chapter 6:  The future of zsh
 6.2. Where do I report bugs, get more info / who's working on zsh?
 6.3. What's on the wish-list?
 6.4. Did zsh have problems in the year 2000?
+6.5. When reporting a bug, how do I reduce my mytt(.zshrc) into a minimal reproduction recipe?
 
 Acknowledgments
 
@@ -2527,6 +2534,98 @@ sect(Did zsh have problems in the year 2000?)
   show problems here.
 
 
+sect(When reporting a bug, how do I reduce my mytt(.zshrc) into a minimal reproduction recipe?)
+
+  When reporting a bug, the gold standard is to include with the bug
+  a myem(minimal reproduction recipe), with which anyone who reads the bug
+  report can url(reproduce the bug for themselves)
+  (https://www.chiark.greenend.org.uk/~sgtatham/bugs.html#showmehow)
+  at will.
+
+  When you run into a bug in the shell, particularly during interactive
+  use, a reproduction recipe would ideally start by running tt(zsh -f)
+  and then, within that instance of the shell, run a minimal short
+  sequence of commands that reproduces the bug.  A good way to devise
+  such recipes is the following:
+
+COMMENT(For reference, here's Vim's write-up of a similar process:
+https://github.com/chrisbra/vim_faq/blob/de424bd8e08bcf0e6b1e0563ee49514dfed926ae/vim_faq.txt#L1153-L1228)
+
+  enumeration(
+  myeit() First, ensure the bug is reproducible.  To do this, start
+  a new instance of the shell emdash() for example, open a new tab in
+  your terminal emulator emdash() and reproduce the bug there.
+
+  myeit() Start a new instance of the shell by running the
+  command mytt(zsh -f) from your regular shell prompt, and reproduce the
+  bug there.  (The mytt(-f) flag inhibits mytt(.zshenv),
+  mytt(/etc/zprofile), mytt(.zprofile), mytt(/etc/zshrc), and
+  mytt(.zshrc) from being sourced.)
+
+  If you succeeded in reproducing the bug in mytt(zsh -f), copy the
+  commands you used and their outputs (from the mytt(zsh -f) invocation
+  to the point the bug occurred) and include them in your bug report.
+  Skip the remaining steps of this procedure.
+
+  If, however, the bug happens in your regular shell but not in mytt(zsh
+  -f), read the next steps.
+
+  myeit() Make a backup of your tt(.zshrc) file.
+
+  myeit() Delete your tt(.zshrc) file, start a new instance of zsh, and confirm
+  that the problem does em(not) reproduce there.  (If the problem
+  does reproduce there, it's caused by something in mytt(.zshenv),
+  mytt(.zprofile), mytt(/etc/zprofile), or mytt(/etc/zshrc), so apply
+  this procedure from the top to those files rather than to your
+  mytt(.zshrc).)
+  COMMENT(Note that mytt(/etc/zshenv) is not mentioned, since by this
+  point we have established the bug does not occur under mytt(zsh -f),
+  which sources mytt(/etc/zshenv).)
+  COMMENT(mytt(.zlogout) and mytt(/etc/zlogout) aren't mentioned because
+  they're unlikely to be relevant to most readers.)
+
+  myeit() At this point, you know that the problem is caused by
+  something in your mytt(.zshrc) file, but not what line exactly.
+  To find the responsible line, we will use
+  a url(variation)(https://en.wikipedia.org/wiki/Delta_debugging)
+  of the url(binary search)(https://en.wikipedia.org/wiki/Binary_search)
+  algorithm, as follows:
+
+  Suppose your mytt(.zshrc) file has 200 lines.  To start, copy
+  the em(first) half of your mytt(.zshrc) emdash() that is, lines
+  1 through 100 emdash() from the backup copy to your live mytt(.zshrc)
+  file, and check whether the bug reproduces then.  Now, empty the live
+  mytt(.zshrc) file again, and copy the em(second) half of your
+  mytt(.zshrc) file from the backup to the live mytt(.zshrc) file
+  emdash() the live file should now contain lines 101 through 200, only
+  emdash() and see whether the problem reproduces.
+
+  Normally, the bug will reproduce em(either) with lines 1 through 100
+  em(or) with lines 101 through 200, but not in both cases.  To isolate
+  the specific line that causes the bug, repeat the above process on the
+  relevant half of the file: for example, if you've determined that the
+  bug reproduces when only lines 101 through 200 are installed, check
+  whether the bug reproduces (a) when only lines 101 through 150 are
+  installed, and (b) when only lines 151 through 200 are installed.
+  Repeat the process until the resulting mytt(.zshrc) is minimal.
+
+  It is not important to break the file into two halves exactly.
+  Breaking the file into two parts sized one-third and two-thirds, for
+  example, will work equally well.  You can even try restoring one line
+  at a time, but this is impractical for all but the shortest
+  mytt(.zshrc) files.
+
+  myeit() Include the minimal set of lines you devised in the previous
+  step, along with the commands you used and their outputs, in your bug
+  report.
+
+  myeit() Restore your mytt(.zshrc) from backup.
+  )
+
+  Bug reports should be emailed to the mytt(zsh-workers@zsh.org) public
+  mailing list; see link(6.2)(62) for details.
+
+
 nsect(Acknowledgments:)
 
 Thanks to zsh-list, in particular Bart Schaefer, for suggestions
@@ -2542,7 +2641,7 @@ Wischnowsky).
 nsect(Copyright Information:)
 
 This document is copyright (C) P.W. Stephenson, 1995, 1996, 1997,
-1998, 1999, 2000, 2012. This text originates in the U.K. and the author
+1998, 1999, 2000, 2012, 2020. This text originates in the U.K. and the author
 asserts his moral rights under the Copyrights, Designs and Patents Act,
 1988.
 

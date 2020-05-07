@@ -83,6 +83,7 @@ syn match   zyodlSpecial "\<DASH()-" conceal cchar=—
 syn match   zyodlSpecial "+\?LPAR()" conceal cchar=(
 syn match   zyodlSpecial "+\?RPAR()" conceal cchar=)
 syn match   zyodlSpecial "+\?PLUS()" conceal cchar=+
+syn match   zyodlFAQDash "+\?\<emdash()" conceal cchar=—
  
 "" Highlight groups:
 hi def link zyodlTt Constant
@@ -103,6 +104,9 @@ hi def link zyodlSItemArg1 Macro
 hi def link zyodlSItemArg2 Underlined
 hi def link zyodlLineJoiner Special
 hi def link zyodlNote Todo
+
+"" Derived highlighting groups:
+hi def link zyodlFAQDash zyodlSpecial
 
 let b:current_syntax = "zyodl"
 let &cpo = s:cpo_save
