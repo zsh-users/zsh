@@ -1,3 +1,9 @@
+2020-05-07  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted: Completion/Debian/Command/_dscverify,
+	Completion/Unix/Command/_pandoc: Use alternation patterns rather
+	than brace expansion
+
 2020-05-05  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 45764: Test/D07multibyte.ztst: Add a regression test for 45772.

@@ -391,7 +391,7 @@ _arguments -C \
   '--epub-chapter-level=[specify the header level at which to split the EPUB into separate "chapter" files]:number:_pandoc_header_level' \
   '--pdf-engine=[use the specified engine when producing PDF output]:program:_pandoc_pdf_engine' \
   '*--pdf-engine-opt=[use the given string as a command-line argument to the pdf-engine]:string:_pandoc_pdf_engine_opts' \
-  '*--bibliography=[set the bibliography field in the document'"'"'s metadata to FILE]:file:{_files -g "*.{bib,bibtex,copac,json,yaml,enl,xml,wos,medline,mods,ris}"}' \
+  '*--bibliography=[set the bibliography field in the document'"'"'s metadata to FILE]:file:{_files -g "*.(bib|bibtex|copac|json|yaml|enl|xml|wos|medline|mods|ris)"}' \
   '--csl=[set the csl field in the document'"'"'s metadata to FILE]:file:{_files -g "*.csl"}' \
   '--citation-abbreviations=[set the citation-abbreviations field in the document'"'"'s metadata to FILE]:file:_files' \
   '--natbib[use natbib for citations in LaTeX output]' \

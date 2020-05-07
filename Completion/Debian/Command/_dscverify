@@ -9,10 +9,10 @@ _dscverify() {
     '--help[show the help message and exit]'
     '--version[show the version + copyright and exit]'
     '--no-default-keyrings[do not check against the default keyrings]'
-    '*--keyring[add keyring to the list of keyrings used]:keyring:_files -g "*.{kbx,gpg}(-.)"'
+    '*--keyring[add keyring to the list of keyrings used]:keyring:_files -g "*.(kbx|gpg)(-.)"'
     '(--nosigcheck --no-sig-check -u)'{--nosigcheck,--no-sig-check,-u}'[do not verify the GPG signature]'
     '--verbose[do not suppress GPG output]'
-    '*:dsc file:_files -g "*.{changes,dsc,buildinfo}(-.)"'
+    '*:dsc file:_files -g "*.(changes|dsc|buildinfo)(-.)"'
   )
 
   local first_only=(
