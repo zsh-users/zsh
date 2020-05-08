@@ -20,8 +20,10 @@ if [[ "$1" = *[urtx]* ]]; then
     _files "$expl[@]" -g '*.(tar|TAR).bz2(-.)'
   elif [[ "$1" = *J* ]]; then
     _files "$expl[@]" -g '*.(tar|TAR).(lzma|xz)(-.)'
-  elif [[ "$_cmd_variant[$service]" == (gnu|libarchive) ]]; then
+  elif [[ "$_cmd_variant[$service]" == gnu ]]; then
     _files "$expl[@]" -g '*.((tar|TAR)(.gz|.GZ|.Z|.bz2|.lzma|.xz|)|(tbz|tgz|txz))(-.)'
+  elif [[ "$_cmd_variant[$service]" == libarchive ]]; then
+    _files "$expl[@]" -g '*.((tar|TAR)(.gz|.GZ|.Z|.bz2|.lzma|.xz|)|(tbz|tgz|txz|zip))(-.)'
   else
     _files "$expl[@]" -g '*.(tar|TAR)(-.)'
   fi
