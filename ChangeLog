@@ -1,4 +1,10 @@
+2020-05-09: Eitan Adler <lists@eitanadler.com>
+
+	* noraj: gitlab !13: Completion/Unix/Type/_tar_archive: libarchive and
+	GNU tar can uncompress zstandard (zstd) based files
+
 2020-05-07: Eitan Adler <lists@eitanadler.com>
+
 	* unposted: Completion/Unix/Type/_tar_archive: libarchive based
 	tar can uncompress zip files
 
