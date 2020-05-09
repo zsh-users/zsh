@@ -1565,6 +1565,11 @@ check_colon_subscript(char *str, char **endp)
     if (!*str || ialpha(*str) || *str == '&')
 	return NULL;
 
+    if (*str == ':') {
+	*endp = str;
+	return dupstring("0");
+    }
+
     *endp = parse_subscript(str, 0, ':');
     if (!*endp) {
 	/* No trailing colon? */
@@ -1575,8 +1580,10 @@ check_colon_subscript(char *str, char **endp)
     sav = **endp;
     **endp = '\0';
     str = dupstring(str);
-    if (parsestr(&str))
+    if (parsestr(&str)) {
+	**endp = sav;
 	return NULL;
+    }
     singsub(&str);
     remnulargs(str);
     untokenize(str);
@@ -2781,7 +2788,6 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	}
 
 	if (bct) {
-	noclosebrace:
 	    zerr("closing brace expected");
 	    return NULL;
 	}
@@ -2937,9 +2943,12 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	    }
 	    break;
 	case ':':
-	    /* this must be `::=', unconditional assignment */
-	    if (*s != '=' && *s != Equals)
-		goto noclosebrace;
+	    /* this could be either `::=', unconditional assignment
+	     * or a ${name:offset:length} with an empty offset */
+	    if (*s != '=' && *s != Equals) {
+		s -= 1;
+		goto colonsubscript;
+	    }
 	    vunset = 1;
 	    s++;
 	    /* Fall through */
@@ -3282,6 +3291,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	 * if there isn't a trailing modifier?  Why don't we do this
 	 * e.g. when we handle the ${(t)...} flag?
 	 */
+colonsubscript:
 	if (chkset) {
 	    val = dupstring(vunset ? "0" : "1");
 	    isarr = 0;
