@@ -1,7 +1,7 @@
 2020-05-12  Mikael Magnusson  <mikachu@gmail.com>
 
-	* 45796: Src/subst.c: Support ${name:offset:length} with an
-	empty offset
+	* 45796: Src/subst.c, Test/D04parameter.ztst: Support
+	${name:offset:length} with an empty offset
 
 2020-05-09: Eitan Adler <lists@eitanadler.com>
 

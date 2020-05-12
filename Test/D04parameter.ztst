@@ -1615,6 +1615,8 @@
    print ${foo: -1}
    print ${foo: -10}
    print ${foo:5:-2}
+   print ${foo::3}
+   print ${foo: }
 0:Bash-style offsets, scalar
 >456789
 >56789
@@ -1627,6 +1629,8 @@
 >9
 >123456789
 >67
+>123
+>123456789
 
    foo=(1 2 3 4 5 6 7 8 9)
    print ${foo:3}
@@ -1687,9 +1691,11 @@
 ?(eval):1: not an identifier: [0]
 
    str=rts
+   print ${str:0: }
    print ${str:0:}
 1:Regression test for missing length after offset
-?(eval):2: unrecognized modifier
+>
+?(eval):3: unrecognized modifier
 
    foo="123456789"
    print ${foo:5:-6}
