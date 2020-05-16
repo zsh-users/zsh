@@ -1685,6 +1685,9 @@ example(zstyle ':completion:*' group-name '')
 
 All matches for which no group name is defined will be put in a group
 named tt(-default-).
+
+To display the group name in the output, see the tt(format) style (q.v.)
+under the tt(descriptions) tag.
 )
 kindex(group-order, completion style)
 item(tt(group-order))(

@@ -1,3 +1,8 @@
+2020-05-16  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* users/24843: Doc/Zsh/compsys.yo: zshcompsys(1): Point to the
+	'format' style from the 'tag-order' style.
+
 2020-05-12  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 45796: Src/subst.c, Test/D04parameter.ztst: Support
