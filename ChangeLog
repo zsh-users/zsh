@@ -1,3 +1,8 @@
+2020-05-20  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 45862: Test/D04parameter.ztst: Add test cases for 45843#1
+	and 45843#2, adapted from Aaron Esau and pws.
+
 2020-05-17  Eitan Adler <lists@eitanadler.com>
 
 	* Eitan Adler: unposted: config.guess, config.sub: update to

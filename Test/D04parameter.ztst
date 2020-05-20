@@ -2656,3 +2656,13 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 >1: pws
 >3: pw
 >4: pw
+
+ # Using a subshell because it segfaults.
+ ("${: :${{{\"{{lorem ipsum dolor sit amet}}")
+-f:regression test for workers/45843#1
+?(eval):1: bad substitution
+
+# Temporarily using the 'D' flag because it generates a "BUG:" message in
+# debug builds only.
+ $ZTST_testdir/../Src/zsh -fc $'$\\\n('
+1Df:regression test for workers/45843#2: escaped newline in command substitution start token
