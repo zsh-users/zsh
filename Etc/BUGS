@@ -32,3 +32,28 @@ See test case in Test/C03traps.ztst.
 45656: 'zsh -o nobanghist -o emacs' segfaults
 analysis in workers/45657
 ------------------------------------------------------------------------
+44133 debian #924736 (partial patch in 44134) three setopts following `    #`
+------------------------------------------------------------------------
+44850 terminal issues with continuation markers
+------------------------------------------------------------------------
+45422 _arguments !-x !+x
+------------------------------------------------------------------------
+45482 print -v with multibyte characters
+------------------------------------------------------------------------
+45568 repeat-count "illegal character"
+------------------------------------------------------------------------
+45656 -o nobanghist -o emacs segfaults
+------------------------------------------------------------------------
+users/24765 -direct terminals. Not a bug as such but we may need to do
+  something if -direct values in TERM are ever common
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+45393/45396 [PATCH] avoid lseek(2) calls.
+45768 is similar.
+------------------------------------------------------------------------
+45007 [PATCH] has_colors in configure.ac.
+The originator has a gentoo.org address which might provide some extra clues.
+------------------------------------------------------------------------
+44525, 45778 [PATCH] prompt redrawn on the wrong line upon SIGWINCH 
+------------------------------------------------------------------------
