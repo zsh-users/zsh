@@ -216,6 +216,16 @@ F:regression test workers/31611
 >NO:{3pm}
 >NO:{10pm}
 
+  comptesteval "_tst() { _arguments ':desc:_sequence compadd - 1 2 3' }"
+  comptesteval "zstyle ':completion:*:tst:*' ignored-patterns 2"
+  comptest $'tst 1,\t'
+  comptesteval "zstyle -d ':completion:*:tst:*' ignored-patterns"
+0:-F doesn't break _sequence
+>line: {tst 1,}{}
+>DESCRIPTION:{desc}
+>NO:{2}
+>NO:{3}
+
  comptest $'a=() b=(\t'
 0:multiple envarrays
 >line: {a=() b=(}{}

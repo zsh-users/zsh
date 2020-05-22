@@ -1,3 +1,8 @@
+2020-06-26  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 45895: oxiedi: Completion/Base/Utility/_sequence,
+	Test/Y01completion.ztst: ignore dedup patterns in _sequence
+
 2020-06-25  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 46068 (tweaked) (was: github #57): Doc/Zsh/zle.yo, README,

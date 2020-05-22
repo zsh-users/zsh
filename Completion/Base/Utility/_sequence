@@ -8,10 +8,10 @@
 # -d     : duplicate values allowed
 
 local curcontext="$curcontext" nm="$compstate[nmatches]" pre qsep nosep minus
-local -a opts sep num pref suf cont end uniq dedup
+local -a opts sep num pref suf cont end uniq dedup garbage
 
 zparseopts -D -a opts s:=sep n:=num p:=pref i:=pref P:=pref I:=suf S:=suf \
-    q=suf r:=suf R:=suf C:=cont d=uniq M+: J+: V+: 1 2 o+: X+: x+:
+    q=suf r:=suf R:=suf C:=cont F:=garbage d=uniq M+: J+: V+: 1 2 o+: X+: x+:
 (( $#cont )) && curcontext="${curcontext%:*}:$cont[2]"
 (( $#sep )) || sep[2]=,
 
