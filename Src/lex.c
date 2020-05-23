@@ -541,6 +541,17 @@ cmd_or_math_sub(void)
 {
     int c = hgetc(), ret;
 
+    if (c == '\\') {
+	c = hgetc();
+	if (c != '\n') {
+	    hungetc(c);
+	    hungetc('\\');
+	    lexstop = 0;
+	    return skipcomm() ? CMD_OR_MATH_ERR : CMD_OR_MATH_CMD;
+	}
+	c = hgetc();
+    }
+
     if (c == '(') {
 	int lexpos = (int)(lexbuf.ptr - tokstr);
 	add(Inpar);
@@ -998,6 +1009,16 @@ gettokstr(int c, int sub)
 	    break;
 	case LX2_STRING:
 	    e = hgetc();
+	    if (e == '\\') {
+		e = hgetc();
+		if (e != '\n') {
+		    hungetc(e);
+		    hungetc('\\');
+		    lexstop = 0;
+		    break;
+		}
+		e = hgetc();
+	    }
 	    if (e == '[') {
 		cmdpush(CS_MATHSUBST);
 		add(String);

@@ -2662,7 +2662,25 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 -f:regression test for workers/45843#1
 ?(eval):1: bad substitution
 
-# Temporarily using the 'D' flag because it generates a "BUG:" message in
-# debug builds only.
  $ZTST_testdir/../Src/zsh -fc $'$\\\n('
-1Df:regression test for workers/45843#2: escaped newline in command substitution start token
+1:regression test for workers/45843#2: escaped newline in command substitution start token
+?zsh:2: parse error near `$('
+
+# `
+
+ eval $'echo $\\\n(printf "%d\\n" $(( 4 + 2 )) )'
+0:Normal command substitution with escaped newline
+>6
+
+ eval $'echo $\\\n(( 14 / 2 ))'
+0:Normal math eval with escaped newline after $
+>7
+
+ eval $'echo $(\\\n( 15 / 3 ))'
+0:Normal math eval with escaped newline after $(
+>5
+
+  function '*' { echo What a star; }
+  eval 'echo $(\*)'
+0:Backslash character other than newline is normal after $(
+>What a star
