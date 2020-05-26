@@ -5147,9 +5147,25 @@ exectime(Estate state, UNUSED(int do_exec))
     return lastval;
 }
 
-/* Define a shell function */
-
+/* The string displayed in lieu of the name of an anonymous function (in PS4,
+ * zprof output, etc)
+ */
 static const char *const ANONYMOUS_FUNCTION_NAME = "(anon)";
+
+/* 
+ * Take a function name argument and return true iff it is equal to the string
+ * used for the names of anonymous functions, "(anon)".
+ *
+ * Note that it's possible to define a named function literally called "(anon)"
+ * (though I doubt anyone would ever do that).
+ */
+/**/
+int is_anonymous_function_name(const char *name)
+{
+    return !strcmp(name, ANONYMOUS_FUNCTION_NAME);
+}
+
+/* Define a shell function */
 
 /**/
 static int

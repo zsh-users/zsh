@@ -1,3 +1,9 @@
+2020-05-28  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 45923 (with memory leak fixed, cf. 45924): Src/Modules/zprof.c,
+	Src/exec.c: zprof: Don't tally all anonymous functions as though
+	they were a single function named "(anon)".
+
 2020-05-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 45900: Src/lex.c, Test/D04parameter.ztst: Fix issues with

@@ -213,7 +213,25 @@ bin_zprof(UNUSED(char *nam), UNUSED(char **args), Options ops, UNUSED(int func))
     return 0;
 }
 
-/**/
+static char *
+name_for_anonymous_function(char *name)
+{
+    char lineno[DIGBUFSIZE];
+    char *parts[7];
+
+    convbase(lineno, funcstack[0].flineno, 10);
+
+    parts[0] = name;
+    parts[1] = " [";
+    parts[2] = funcstack[0].filename ? funcstack[0].filename : "";
+    parts[3] = ":";
+    parts[4] = lineno;
+    parts[5] = "]";
+    parts[6] = NULL;
+
+    return sepjoin(parts, "", 1);
+}
+
 static int
 zprof_wrapper(Eprog prog, FuncWrap w, char *name)
 {
@@ -224,12 +242,19 @@ zprof_wrapper(Eprog prog, FuncWrap w, char *name)
     struct timeval tv;
     struct timezone dummy;
     double prev = 0, now;
+    char *name_for_lookups;
+
+    if (is_anonymous_function_name(name)) {
+        name_for_lookups = name_for_anonymous_function(name);
+    } else {
+        name_for_lookups = name;
+    }
 
     if (zprof_module && !(zprof_module->node.flags & MOD_UNLOAD)) {
         active = 1;
-        if (!(f = findpfunc(name))) {
+        if (!(f = findpfunc(name_for_lookups))) {
             f = (Pfunc) zalloc(sizeof(*f));
-            f->name = ztrdup(name);
+            f->name = ztrdup(name_for_lookups);
             f->calls = 0;
             f->time = f->self = 0.0;
             f->next = calls;
