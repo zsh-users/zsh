@@ -1,3 +1,8 @@
+2020-06-07  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted: Etc/FAQ.yo: FAQ: Update section number in links to
+	the "The future of zsh" section.
+
 2020-06-06  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Etc/BUGS: Add users/24904 to Etc/BUGS (a process

@@ -73,7 +73,7 @@ rather than this document.
 
 If you just want to know how to get your hands on the latest version,
 skip to question link(1.6)(16); if you want to know what to do with
-insoluble problems, go to link(5.2)(52).
+insoluble problems, go to link(6.2)(62).
 
 whentxt(Notation: Quotes `like this' are ordinary textual quotation
 marks.  Other uses of quotation marks are input to the shell.)
@@ -212,7 +212,7 @@ email(mail-server@rtfm.mit.edu)
   when you are on the title you want.)
 
   For any more eclectic information, you should contact the mailing
-  list:  see question link(5.2)(52).
+  list:  see question link(6.2)(62).
 
 
 sect(What is it?)
@@ -227,7 +227,7 @@ sect(What is it?)
 
   It was written by Paul Falstad when a student at Princeton; however,
   Paul doesn't maintain it any more and enquiries should be sent to
-  the mailing list (see question link(5.2)(52)).  Zsh is distributed under a
+  the mailing list (see question link(6.2)(62)).  Zsh is distributed under a
   standard Berkeley style copyright.
 
   For more information, the files Doc/intro.txt or Doc/intro.troff
@@ -292,8 +292,8 @@ sect(On what machines will it run?)
   If you need to change something to support a new machine, it would be
   appreciated if you could add any necessary preprocessor code and
   alter configure.in and acconfig.h to configure zsh automatically,
-  then send the required context diffs to the list (see question
-  link(5.2)(52)).  Please make sure you have the latest version first.
+  then send the required unified diffs to the list (see question
+  link(6.2)(62)).  Please make sure you have the latest version first.
 
   To get it to work, retrieve the source distribution (see question
   link(1.6)(16)), un-gzip it, un-tar it and read the INSTALL file in the top
@@ -321,7 +321,7 @@ sect(What's the latest version?)
   tt(development) subdirectory.
 
   Note also that as the shell changes, it may become incompatible with
-  older versions; see the end of question link(5.1)(51) for a partial list.
+  older versions; see the end of question link(6.1)(61) for a partial list.
   Changes of this kind are almost always forced by an awkward or
   unnecessary feature in the original design (as perceived by current
   users), or to enhance compatibility with other Bourne shell
@@ -2419,7 +2419,7 @@ chapter(The future of zsh)
 
 sect(What bugs are currently known and unfixed? (Plus recent \
 important changes))
-label(51)
+label(61)
 
   Bugs tend to be tracked on the zsh-workers mailing list; see the
   next section.  Check the mailing list to see if a bug has been
@@ -2433,7 +2433,7 @@ label(51)
 
 
 sect(Where do I report bugs, get more info / who's working on zsh?)
-label(52)
+label(62)
 
   The shell is being maintained by various (entirely self-appointed)
   subscribers to the mailing list,
