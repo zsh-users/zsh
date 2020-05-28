@@ -1,4 +1,4 @@
-#compdef svn svnlite=svn svnadmin svnadmin-static=svnadmin
+#compdef svn svnlite=svn svnadmin svnadmin-static=svnadmin svnliteadmin=svnadmin
 
 _svn () {
   local curcontext="$curcontext" state line expl ret=1
