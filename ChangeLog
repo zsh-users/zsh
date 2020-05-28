@@ -1,5 +1,8 @@
 2020-06-07  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 45932: Etc/FAQ.yo: FAQ (3.1): Update ksh compatibility answer
+	for reserved word typeset.
+
 	* 45933: Etc/FAQ.yo: FAQ: Add "Why does my bash script report
 	an error when I run it under zsh?".
 

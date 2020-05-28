@@ -988,7 +988,7 @@ label(31)
   been automatic word splitting in scalars, which is a sort of
   uncontrollable poor man's array.
 
-  Note that this happens regardless of the value of the internal field
+  Note that word splitting happens regardless of the value of the internal field
   separator, tt($IFS); in other words, with mytt(IFS=:; foo=a:b; args $foo)
   you get the answer 1.
 
@@ -1020,22 +1020,32 @@ label(31)
   or (entirely equivalent) when mytt(emulate ksh) or mytt(emulate sh) is in
   effect.
 
-  There is one other effect of word splitting which differs between ksh
+  There used to be another effect of word splitting which differed between ksh
   and zsh.  In ksh, the builtin commands that declare parameters such
   as tt(typeset) and tt(export) force word-splitting not to take place
   after on an assignment argument:
   verb(
     typeset param=`echo foo bar`
   )
-  in ksh will create a parameter with value mytt(foo bar), but in zsh will
+  in ksh will create a parameter with value mytt(foo bar).
+  
+  zsh used to
   create a parameter tt(param) with value tt(foo) and a parameter tt(bar)
-  whose value is empty.  Contrast this with a normal assignment (no
+  whose value was empty.  Contrast this with a normal assignment (no
   tt(typeset) or other command in front), which never causes a word split
-  unless you have tt(GLOB_ASSIGN) set.  From zsh version 4.0.2 the option
-  tt(KSH_TYPESET), set automatically in compatibility mode, fixes this
-  problem.  Note that in bash this behaviour occurs with all arguments that
-  look like assignments, whatever the command name; to get this behaviour
-  in zsh you have to set the option tt(MAGIC_EQUAL_SUBST).
+  unless you have tt(GLOB_ASSIGN) set.
+  
+  zsh version 4.0.2 and newer creates a single parameter with value
+  mytt(foo bar), like ksh does, when the option tt(KSH_TYPESET) is set.
+  This option gets set automatically when in ksh compatibility mode.
+
+  zsh 5.1 and newer create a single parameter with value mytt(foo bar) by
+  default, in both compatibility and native modes. The older behaviour
+  can be obtained with mytt(disable -r typeset).
+
+  If the options mytt(MAGIC_EQUAL_SUBST) and mytt(KSH_TYPESET) are both
+  set, arguments that look like assignments will not undergo word
+  splitting, whatever the command name.
 
 sect(In which startup file do I put...?)
 
