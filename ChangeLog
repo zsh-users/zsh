@@ -1,5 +1,8 @@
 2020-06-07  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 45933: Etc/FAQ.yo: FAQ: Add "Why does my bash script report
+	an error when I run it under zsh?".
+
 	* 45791 (tweaked): Etc/FAQ.yo, Util/zyodl.vim: FAQ: Explain
 	how to binary search one's dotfiles
 

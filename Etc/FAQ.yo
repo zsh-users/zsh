@@ -135,6 +135,7 @@ Chapter 3:  How to get various things to work
 3.28. How do I edit the input buffer in $EDITOR?
 3.29. Why does `which' output for missing commands go to stdout?
 3.30. Why doesn't the expansion mytt(*.{tex,aux,pdf}) do what I expect?
+3.31. Why does my bash script report an error when I run it under zsh?
 
 Chapter 4:  The mysteries of completion
 4.1. What is completion?
@@ -864,6 +865,7 @@ mytt(compctl)
 
 
 sect(Similarities with bash)
+label(25)
 
   The Bourne-Again Shell, bash, is another enhanced Bourne-like shell;
   the most obvious difference from zsh is that it does not attempt to
@@ -966,9 +968,9 @@ label(31)
   Unless you need strict sh/ksh compatibility, you should ask yourself
   whether you really want this behaviour, as it can produce unexpected
   effects for variables with entirely innocuous embedded spaces.  This
-  can cause horrendous quoting problems when invoking scripts from
-  other shells.  The natural way to produce word-splitting behaviour
-  in zsh is via arrays.  For example,
+  can cause horrendous quoting problems when invoking scripts written
+  for other shells (see link(3.31)(331)).  The natural way to produce
+  word-splitting behaviour in zsh is via arrays.  For example,
   verb(
     set -A array one two three twenty
   )
@@ -2039,6 +2041,55 @@ sect(Why doesn't the expansion mytt(*.{tex,aux,pdf}) do what I expect?)
   parentheses: again, see link(2.1)(21), and search for mytt(@+LPAR()).
   This is harder for the user to remember but easier for the shell to
   parse!
+
+
+sect(Why does my bash script report an error when I run it under zsh?)
+label(331)
+
+  bash and zsh are different programming languages.  They are not
+  interchangeable; programs written for either of these languages will,
+  in general, not run under the other.  (The situation is similar with
+  many other pairs of closely-related languages, such as Python 2 and
+  Python 3; C and C++; and even C89 and C11.)
+
+  So, don't run bash scripts under zsh.  If the scripts were written for
+  bash, run them in bash.  There's absolutely no problem with having
+  mytt(#!/usr/bin/env bash) scripts even if mytt(zsh) is your shell for
+  interactive sessions.
+  
+  In fact, if you've recently changed to zsh, we myem(recommend) that
+  you keep your scripts as mytt(#!/usr/bin/env bash), at least for
+  a while: this would make the change more gradual and flatten your
+  learning curve.  Once you're used to zsh, you can decide for each
+  script whether to port it to zsh or keep it as-is.
+
+  That's the answer for myem(scripts), i.e., for external commands that
+  are located in tt($PATH), or located elsewhere and are executed by
+  giving their path explicitly (as in mytt(ls), mytt(/etc/rc.d/sshd),
+  and mytt(./configure)).  For myem(plugins) emdash() code that is
+  executed within the shell itself, that's loaded via the mytt(.),
+  mytt(source), or mytt(autoload) builtins, added to mytt(.zshrc), or
+  pasted interactively at the shell prompt emdash() the answer is
+  different.
+
+  Since the bash and zsh languages do have a common subset, it is
+  feasible to write non-trivial plugins that would run under either of
+  them, if one is sufficiently familiar with both of them.  However,
+  a difference between bash's behaviour and zsh's does not imply that
+  zsh has a bug.  It myem(might) be a bug in zsh, but it might also be
+  a bug in bash, or simply a difference that isn't a bug in either shell
+  (see link(3.1)(31) for an example).
+
+  When bash and zsh behave differently on the same input, whether zsh's
+  behaviour is a bug does not depend on what bash does on the same
+  input; rather, it depends on what zsh's user manual specifies.
+  (By way of comparison, it's not a bug in Emacs that mytt(:q!) doesn't
+  cause it to exit.)
+
+  If you'd like to run a bash script under zsh, you must port the script
+  properly, reviewing it line by line for differences between the two
+  languages and adjusting the script accordingly, just like you would
+  when translating a book from American English to British English.
 
 
 chapter(The mysteries of completion)
