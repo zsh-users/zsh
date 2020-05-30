@@ -3128,11 +3128,13 @@ spckword(char **s, int hist, int cmd, int ask)
     int preflen = 0;
     int autocd = cmd && isset(AUTOCD) && strcmp(*s, ".") && strcmp(*s, "..");
 
-    if ((histdone & HISTFLAG_NOEXEC) || **s == '-' || **s == '%')
+    if (!(*s)[0] || !(*s)[1])
+	return;
+    if ((histdone & HISTFLAG_NOEXEC) ||
+	/* Leading % is a job, else leading hyphen is an option */
+	(cmd ? **s == '%' : (**s == '-' || **s == Dash)))
 	return;
     if (!strcmp(*s, "in"))
-	return;
-    if (!(*s)[0] || !(*s)[1])
 	return;
     if (cmd) {
 	if (shfunctab->getnode(shfunctab, *s) ||
@@ -3151,8 +3153,12 @@ spckword(char **s, int hist, int cmd, int ask)
     if (*t == Tilde || *t == Equals || *t == String)
 	t++;
     for (; *t; t++)
-	if (itok(*t))
-	    return;
+	if (itok(*t)) {
+	    if (*t == Dash)
+		*t = '-';
+	    else
+		return;
+	}
     best = NULL;
     for (t = *s; *t; t++)
 	if (*t == '/')
