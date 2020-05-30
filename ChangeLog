@@ -1,5 +1,10 @@
 2020-06-01  Matthew Martin  <phy1729@gmail.com>
 
+	* 45940: Completion/BSD/Command/_kdump,
+	Completion/BSD/Command/_ktrace,
+	Completion/BSD/Type/_ktrace_points: Add _kdump and _ktrace
+	completers and supporting _ktrace_points type.
+
 	* 45939: Completion/Linux/Command/_ionice,
 	Completion/Unix/Command/_lsof, Completion/Unix/Command/_pgrep,
 	Completion/Unix/Command/_renice, Completion/Unix/Type/_pgids:
