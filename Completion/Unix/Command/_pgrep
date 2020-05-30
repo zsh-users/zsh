@@ -149,7 +149,7 @@ case $state in
     _pgrep_sequence ppids 'parent process ID' ppid
     ;;
   (pgid)
-    _pgrep_sequence pgids 'process group ID' pgid
+    _sequence _pgids
     ;;
   (projid)
     _pgrep_sequence project-ids 'project ID' project

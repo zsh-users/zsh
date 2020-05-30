@@ -12,7 +12,7 @@ else
   _describe -o option opts && ret=0
 
   case ${(v)words[(I)-?]} in
-    -g) _message -e pgids 'process group ID' && ret=0 ;;
+    -g) _pgids && ret=0 ;;
     -u) _users && ret=0 ;;
     *)  _pids && ret=0;;
   esac

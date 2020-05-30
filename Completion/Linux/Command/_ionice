@@ -17,14 +17,14 @@ _arguments -C -s -S \
   '(- *)'{-h,--help}'[display help information]' \
   + '(args)' \
   '(H)'{-p-,--pid=-}'[interpret args as process ID]::process id:_pids' \
-  '(H)'{-P-,--pgid=-}'[specify process group IDs]::process group' \
+  '(H)'{-P-,--pgid=-}'[specify process group IDs]::process group:_pgids' \
   '(H)'{-u-,--uid=-}'[act on running process owned by specified users]::user id' && ret=0
 
 if [[ -n $state ]]; then
   if (( $+opt_args[args--p] || $+opt_args[args---pid] )); then
     _pids && ret=0
   elif (( $+opt_args[args--P] || $+opt_args[args---pgid] )); then
-    _message -e pgids 'process group'
+    _pgids && ret=0
   elif (( $+opt_args[args--u] || $+opt_args[args---uid] )); then
     _message -e uids 'user id'
   else

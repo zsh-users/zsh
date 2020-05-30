@@ -1,3 +1,10 @@
+2020-06-01  Matthew Martin  <phy1729@gmail.com>
+
+	* 45939: Completion/Linux/Command/_ionice,
+	Completion/Unix/Command/_lsof, Completion/Unix/Command/_pgrep,
+	Completion/Unix/Command/_renice, Completion/Unix/Type/_pgids:
+	Add _pgids type.
+
 2020-06-01  Doron Behar  <doron.behar@gmail.com>
 
 	* gitlab !14: Completion/Linux/Command/_modutils: modutils

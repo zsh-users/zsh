@@ -34,7 +34,7 @@ _arguments -C -s -S $args \
   '-f[inhibit listing of kernel file structure info]::info type:->file-structures' \
   '+f[enable listing of kernel file structure info]::info type:->file-structures' \
   '-F[select output fields]:fields:->fields' \
-  '-g[select by process group id]::process group id' \
+  '-g[select by process group id]::process group id:_sequence -s , _pgids' \
   '(*)*-i[select internet files]::address:->addresses' \
   '-K+[select listing of tasks of processes]::value:((i\:ignore\ tasks))' \
   '-k[specify kernel name list file]:kernel file:_files' \
