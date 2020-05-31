@@ -106,7 +106,7 @@ _modutils() {
     ;&
 
     all-modules)
-      local kver=${opt_args[(i)(-S|-k|--set-version)]:-$(uname -r)}
+      local kver=${opt_args[(-S|-k|--set-version)]:-$(uname -r)}
 
       if _cache_invalid modules-$kver || ! _retrieve_cache modules-$kver;
       then
