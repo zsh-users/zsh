@@ -12,7 +12,19 @@ _modules_caching_policy()
 _modutils() {
   local curcontext="$curcontext" expl state line modules modaliases ign args ret=1
   local -A opt_args
-  local -r modules_dir=/lib/modules
+  local -a possible_modules_dirs=(
+    # Mostly every other distro
+    /lib/modules
+    # NixOS & possibly Guix
+    /run/booted-system/kernel-modules/lib/modules
+  )
+  local modules_dir tested_modules_dir
+  for tested_modules_dir in "${possible_modules_dirs[@]}"; do
+    if [[ -d "$tested_modules_dir" ]]; then
+      modules_dir="$tested_modules_dir"
+      break
+    fi
+  done
 
   local update_policy
   zstyle -s ":completion:*:*:$service:*" cache-policy update_policy
@@ -93,8 +105,10 @@ _modutils() {
     loaded-modules|loadable-modules)
       if [[ -r /proc/modules ]]; then
 	loaded_modules=(${${(f)"$(</proc/modules)"}%% *})
+      # For compatibilty with old systems. Kernels nowadays provide
+      # `/proc/modules` which is more reliable and faster for us.
       elif [[ -x /sbin/lsmod ]]; then
-	loaded_modules=(${${(f)"$(/sbin/lsmod)"}[2,-1]%% *})
+	loaded_modules=(${${(f)"$(_call_program loaded-modules /sbin/lsmod)"}[2,-1]%% *})
       else
 	return 1
       fi
@@ -108,6 +122,9 @@ _modutils() {
     all-modules)
       local kver=${(v)opt_args[(i)(-S|-k|--set-version)]:-$(uname -r)}
 
+      if [[ -z "$modules_dir" ]]; then
+        return
+      fi
       if _cache_invalid modules-$kver || ! _retrieve_cache modules-$kver;
       then
 	modules=( $modules_dir/$kver/(*~(source|build))/**/*.(o|ko|ko.gz|ko.xz)(.:t:r:r) )
@@ -137,7 +154,7 @@ _modutils() {
 	_message -e value 'parameter value'
       else
 	local params
-	params=( ${${(M)${(f)"$(_call_program module-parameters /sbin/modinfo "$words[2]" 2>/dev/null)"}:#parm:*}##parm:[[:space:]]##} )
+	params=( ${${(M)${(f)"$(_call_program module-parameters modinfo "$words[2]" 2>/dev/null)"}:#parm:*}##parm:[[:space:]]##} )
 	compset -S '=*'
 	if (( $#params )); then
 	  _values -S = -w 'module parameter' \
