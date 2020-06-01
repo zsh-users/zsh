@@ -3178,6 +3178,22 @@ AC_CONFIG_COMMANDS([stamp-h], [echo >stamp-h])
 
 AC_OUTPUT
 
+dnl Copy pre-built man pages and help files, for tarball out-of-tree builds.
+for manpage in `cd ${srcdir} && echo Doc/*.1`; do
+  if test x"$manpage" != x"Doc/*.1" && ! test -e "${manpage}"; then
+    cp ${srcdir}/${manpage} ./Doc/
+  fi
+done
+if ! test -e Doc/help.txt; then
+  cp ${srcdir}/Doc/help.txt ./Doc/
+fi
+mkdir -p ./Doc/help
+for helpfile in `cd ${srcdir} && echo Doc/help/*`; do
+  if test x"$helpfile" != x"Doc/help/*" && ! test -e "${helpfile}"; then
+    cp ${srcdir}/${helpfile} ./Doc/help/
+  fi
+done
+
 eval "zshbin1=${bindir}"
 eval "zshbin2=${zshbin1}"
 eval "zshman1=${mandir}"

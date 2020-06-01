@@ -1,3 +1,8 @@
+2020-06-03  Yasuhiro KIMURA  <yasu@utahime.org>
+
+	* 45950: configure.ac: Fix 'make install' in out-of-tree
+	tarball builds.
+
 2020-06-01  Matthew Martin  <phy1729@gmail.com>
 
 	* 45940: Completion/BSD/Command/_kdump,
