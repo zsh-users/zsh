@@ -1,3 +1,8 @@
+2020-06-08  Doron Behar  <doron.behar@gmail.com>
+
+	* gitlab !14 (fixup): Completion/Linux/Command/_modutils:
+	modutils comp: Fix getting the value of kver from opt_args
+
 2020-06-07  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 45932: Etc/FAQ.yo: FAQ (3.1): Update ksh compatibility answer
