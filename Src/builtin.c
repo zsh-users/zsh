@@ -2480,12 +2480,16 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	    return NULL;
 	}
 	if (on & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) {
-	    if (typeset_setwidth(cname, pm, ops, on, 0))
+	    if (typeset_setwidth(cname, pm, ops, on, 0)) {
+		unsetparam_pm(pm, 0, 1);
 		return NULL;
+	    }
 	}
 	if (on & (PM_INTEGER | PM_EFLOAT | PM_FFLOAT)) {
-	    if (typeset_setbase(cname, pm, ops, on, 0))
+	    if (typeset_setbase(cname, pm, ops, on, 0)) {
+		unsetparam_pm(pm, 0, 1);
 		return NULL;
+	    }
 	}
     } else {
 	if (idigit(*pname))
@@ -2503,8 +2507,10 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	 */
 	struct tieddata *tdp = (struct tieddata *)
 	    zalloc(sizeof(struct tieddata));
-	if (!tdp)
+	if (!tdp) {
+	    unsetparam_pm(pm, 0, 1);
 	    return NULL;
+	}
 	tdp->joinchar = joinchar;
 	tdp->arrptr = &altpm->u.arr;
 

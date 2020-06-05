@@ -1,3 +1,8 @@
+2020-06-05  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 45985: Src/builtin.c: typeset: Fix leaving corrupted entries
+	in paramtab
+
 2020-06-03  Yasuhiro KIMURA  <yasu@utahime.org>
 
 	* 45950: configure.ac: Fix 'make install' in out-of-tree
