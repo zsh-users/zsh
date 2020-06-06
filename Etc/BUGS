@@ -57,3 +57,10 @@ The originator has a gentoo.org address which might provide some extra clues.
 ------------------------------------------------------------------------
 44525, 45778 [PATCH] prompt redrawn on the wrong line upon SIGWINCH 
 ------------------------------------------------------------------------
+users/24904: 'func <(...) | wc -l' results in ENOENT on /proc/self/fd/13
+
+% efe() cat $1
+% efe <(seq 1 10) | wc -l
+cat: /proc/self/fd/13: No such file or directory
+0
+------------------------------------------------------------------------
