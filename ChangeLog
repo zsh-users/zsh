@@ -1,3 +1,8 @@
+2020-06-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* uwers/24909: Src/exec.c: Don't clean up files used for
+	substitution until after function has run.
+
 2020-06-08  Doron Behar  <doron.behar@gmail.com>
 
 	* gitlab !14 (fixup): Completion/Linux/Command/_modutils:

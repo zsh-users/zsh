@@ -3969,8 +3969,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 
 	    if (is_shfunc) {
 		/* It's a shell function */
-		pipecleanfilelist(filelist, 0);
 		execshfunc((Shfunc) hn, args);
+		pipecleanfilelist(filelist, 0);
 	    } else {
 		/* It's a builtin */
 		LinkList assigns = (LinkList)0;
