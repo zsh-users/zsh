@@ -1,3 +1,8 @@
+2020-06-09  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 46026: Doc/Zsh/options.yo, Src/exec.c, Src/options.c,
+	Src/zsh.h, Test/A04redirect.ztst: Add CLOBBER_EMPTY option.
+
 2020-06-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* uwers/24909: Src/exec.c: Don't clean up files used for

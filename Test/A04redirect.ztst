@@ -708,3 +708,17 @@
   cat <&$testfd
 0:Regression test for here document with fd declarator
 >  This is, in some sense, a here document.
+
+  (setopt noclobber clobberempty
+  rm -f foo
+  touch foo
+  print Works >foo
+  cat foo
+  print Works not >foo
+  # Make sure the file was not harmed
+  cat foo
+  )
+0:CLOBBER_EMPTY
+>Works
+>Works
+?(eval):6: file exists: foo

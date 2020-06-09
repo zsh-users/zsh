@@ -1168,6 +1168,22 @@ If the option is not set, and the option tt(APPEND_CREATE) is also
 not set, `tt(>>!)' or `tt(>>|)' must be used to create a file.
 If either option is set, `tt(>>)' may be used.
 )
+pindex(CLOBBER_EMPTY)
+pindex(NO_CLOBBER_EMPTY)
+pindex(CLOBBEREMPTY)
+pindex(NOCLOBBEREMPTY)
+cindex(clobbering, of empty files)
+cindex(file clobbering, of empty files)
+item(tt(CLOBBER_EMPTY))(
+This option is only used if the option tt(CLOBBER) is not set: note that
+it is set by default.
+
+If this option is set, then regular files of zero length may be
+ovewritten (`clobbered').  Note that it is possible another process
+has written to the file between this test and use of the file by
+the current process.  This option should therefore not be used in
+cases where files to be clobbered may be written to asynchronously.
+)
 pindex(CORRECT)
 pindex(NO_CORRECT)
 pindex(NOCORRECT)

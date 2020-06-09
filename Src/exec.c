@@ -2143,14 +2143,15 @@ clobber_open(struct redir *f)
 {
     struct stat buf;
     int fd, oerrno;
+    char *ufname = unmeta(f->name);
 
     /* If clobbering, just open. */
     if (isset(CLOBBER) || IS_CLOBBER_REDIR(f->type))
-	return open(unmeta(f->name),
+	return open(ufname,
 		O_WRONLY | O_CREAT | O_TRUNC | O_NOCTTY, 0666);
 
     /* If not clobbering, attempt to create file exclusively. */
-    if ((fd = open(unmeta(f->name),
+    if ((fd = open(ufname,
 		   O_WRONLY | O_CREAT | O_EXCL | O_NOCTTY, 0666)) >= 0)
 	return fd;
 
@@ -2158,11 +2159,27 @@ clobber_open(struct redir *f)
      * Try opening, and if it's a regular file then close it again    *
      * because we weren't supposed to open it.                        */
     oerrno = errno;
-    if ((fd = open(unmeta(f->name), O_WRONLY | O_NOCTTY)) != -1) {
-	if(!fstat(fd, &buf) && !S_ISREG(buf.st_mode))
-	    return fd;
+    if ((fd = open(ufname, O_WRONLY | O_NOCTTY)) != -1) {
+	if(!fstat(fd, &buf)) {
+	    if (!S_ISREG(buf.st_mode))
+		return fd;
+	    /*
+	     * If CLOBBER_EMPTY is in effect and the file is empty,
+	     * we are allowed to re-use it.
+	     *
+	     * Note: there is an intrinsic race here because another
+	     * process can write to this file at any time.  The only fix
+	     * would be file locking, which we wish to avoid in basic
+	     * file operations at this level.  This would not be
+	     * fixed. just additionally complicated, by re-opening the
+	     * file and truncating.
+	     */
+	    if (isset(CLOBBEREMPTY) && buf.st_size == 0)
+		return fd;
+	}
 	close(fd);
     }
+
     errno = oerrno;
     return -1;
 }
