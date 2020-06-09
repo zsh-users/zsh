@@ -63,4 +63,13 @@ users/24904: 'func <(...) | wc -l' results in ENOENT on /proc/self/fd/13
 % efe <(seq 1 10) | wc -l
 cat: /proc/self/fd/13: No such file or directory
 0
+
+This occurs because pipelines fork to the left, and named functions
+become their own job, which means descriptors numbered >= 10 are closed,
+including those opened by process substitution.
+------------------------------------------------------------------------
+45400: vared does not work in subshells, even when the parent shell is
+interactive and the subshell is the foreground job.  The USEZLE option is
+always turned off in subshells, for reasons lost to history.  There is a
+related, probably obsolete, vared special case for $TERM set to "emacs".
 ------------------------------------------------------------------------
