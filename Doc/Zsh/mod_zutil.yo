@@ -37,7 +37,7 @@ findex(weather, example function)
 
 For example, a fictional `tt(weather)' plugin might state in its documentation
 that it looks up the tt(preferred-precipitation) style under the
-`tt(:weather:)var(continent)tt(:)var(day-of-the-week)tt(:)var(phase-of-the-moon))' context.
+`tt(:weather:)var(continent)tt(:)var(day-of-the-week)tt(:)var(phase-of-the-moon)' context.
 According to this, you might set the following in your tt(zshrc):
 
 example(zstyle ':weather:europe:*' preferred-precipitation rain
