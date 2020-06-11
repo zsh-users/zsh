@@ -1,5 +1,8 @@
 2020-06-11  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 46036: Completion/Zsh/Type/_ps1234: fix colouring in prompt
+	completion
+
 	* users/24892: Completion/Unix/Type/_files,
 	Completion/Zsh/Command/_zstyle: fix local declaration with
 	recursive-files style and complete it for zstyle

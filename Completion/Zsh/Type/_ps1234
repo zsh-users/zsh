@@ -38,7 +38,7 @@ if compset -P '%[FK]'; then
   )
 
   _description -V ansi-colors expl 'ansi color'
-  grp="$expl[expl[(i)-V]+1]"
+  grp="$expl[expl[(i)-J]+1]"
   print -v ccol -f "($grp)=%s=%s" ${(kv)ansi}
   _comp_colors+=( $ccol )
   compadd "$expl[@]" $suf $pre -k ansi && ret=0
@@ -48,10 +48,10 @@ if compset -P '%[FK]'; then
     (( cols = $terminfo[colors] - 1 ))
     (( cols = cols > 255 ? 255 : cols ))
     _description -V terminal-colors expl 'terminal color'
-    grp="$expl[expl[(i)-V]+1]"
+    grp="$expl[expl[(i)-J]+1]"
     compadd "$expl[@]" $suf $pre {0..$cols}
     for c in {0..$cols}; do
-      _comp_colors+=( "($grp)=${c}=${${$(print -P "%F{$c}")#?\[}%m}" )
+      _comp_colors+=( "($grp)=${c}=${${${(%):-%F{$c\}}#?\[}%m}" )
     done
   else
     _message -e terminal-colors "number"
