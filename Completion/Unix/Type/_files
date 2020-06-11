@@ -1,6 +1,7 @@
 #compdef -redirect-,-default-,-default-
 
 local -a match mbegin mend
+local -a subtree
 local ret=1
 
 # Look for glob qualifiers. This is duplicated from _path_files because
@@ -110,7 +111,6 @@ for def in "$pats[@]"; do
           if _path_files -g "$pat" "$opts[@]" "$expl[@]"; then
 	    ret=0
 	  elif [[ $PREFIX$SUFFIX != */* ]] && zstyle -a ":completion:${curcontext}:$tag" recursive-files rfiles; then
-	    local subtree
 	    for rfile in $rfiles; do
 	      if [[ $PWD/ = ${~rfile} ]]; then
 		if [[ -z $subtree ]]; then

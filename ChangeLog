@@ -1,3 +1,9 @@
+2020-06-11  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* users/24892: Completion/Unix/Type/_files,
+	Completion/Zsh/Command/_zstyle: fix local declaration with
+	recursive-files style and complete it for zstyle
+
 2020-06-10  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Doc/Zsh/mod_zutil.yo: zstyle docs: Fix typo.
