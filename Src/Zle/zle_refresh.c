@@ -517,9 +517,26 @@ set_region_highlight(UNUSED(Param pm), char **aval)
 	while (inblank(*strp))
 	    strp++;
 
-	if (strpfx(memo_equals, strp))
-	    rhp->memo = ztrdup(strp + strlen(memo_equals));
-	else
+	if (strpfx(memo_equals, strp)) {
+	    const char *memo_start = strp + strlen(memo_equals);
+	    const char *memo_end = memo_start;
+
+	    /* 
+	     * Forward compatibility: end parsing at a comma or whitespace to
+	     * allow the following extensions:
+	     *
+	     * - A fifth field: "0 20 bold memo=foo bar".
+	     *
+	     * - Additional attributes in the fourth field: "0 20 bold memo=foo,bar".
+	     *
+	     * For similar reasons, we don't flag an error if the fourth field
+	     * doesn't start with "memo=" as we expect.
+	     */
+	    while (*memo_end && *memo_end != ',' && !inblank(*memo_end))
+		++memo_end;
+
+	    rhp->memo = ztrduppfx(memo_start, memo_end - memo_start);
+	} else
 	    rhp->memo = NULL;
     }
 

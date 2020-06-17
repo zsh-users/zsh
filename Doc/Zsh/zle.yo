@@ -989,15 +989,18 @@ ifnzman(noderef(Character Highlighting))\
 ifzman(the section `Character Highlighting' below);
 for example, tt(standout) or tt(fg=red,bold).)
 itemiz(Optionally, a string of the form `tt(memo=)var(token)'.
-The var(token) value is preserved verbatim but not parsed in any way.
-Plugins may use this to identify elements they had added, for example, in order
-to remove them with
-`tt(region_highlight=+LPAR() ${region_highlight:#*memo=)var(token)tt(} +RPAR())'.)
+The var(token) consists of everything between the `tt(=)' and the next
+whitespace, comma, NUL, or the end of the string.
+The var(token) is preserved verbatim but not parsed in any way.
+Plugins may use this to identify array elements they have added: for example,
+a plugin might set var(token) to its (the plugin's) name and then use
+`tt(region_highlight=+LPAR() ${region_highlight:#*memo=)var(token)tt(} +RPAR())'
+in order to remove array elements it have added.)
 enditemize()
 
 For example, 
 
-example(region_highlight=("P0 20 bold memo=myplugin"))
+example(region_highlight=("P0 20 bold memo=foobar"))
 
 specifies that the first twenty characters of the text including
 any predisplay string should be highlighted in bold.
