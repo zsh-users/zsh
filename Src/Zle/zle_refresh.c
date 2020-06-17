@@ -485,6 +485,7 @@ set_region_highlight(UNUSED(Param pm), char **aval)
 	 *aval;
 	 rhp++, aval++) {
 	char *strp, *oldstrp;
+	const char memo_equals[] = "memo=";
 
 	oldstrp = *aval;
 	if (*oldstrp == 'P') {
@@ -516,8 +517,8 @@ set_region_highlight(UNUSED(Param pm), char **aval)
 	while (inblank(*strp))
 	    strp++;
 
-	if (strpfx("memo=", strp))
-	    rhp->memo = ztrdup(strp + 5);
+	if (strpfx(memo_equals, strp))
+	    rhp->memo = ztrdup(strp + strlen(memo_equals));
 	else
 	    rhp->memo = NULL;
     }
