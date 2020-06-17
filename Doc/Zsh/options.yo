@@ -1124,7 +1124,7 @@ pindex(GLOBALRCS)
 pindex(NOGLOBALRCS)
 cindex(startup files, global, inhibiting)
 cindex(files, global startup, inhibiting)
-item(tt(GLOBAL_RCS) (tt(-d)) <D>)(
+item(tt(GLOBAL_RCS) (tt(+d)) <D>)(
 If this option is unset, the startup files tt(zprofile()),
 tt(zshrc()), tt(zlogin()) and tt(zlogout()) will not be run.  It
 can be disabled and re-enabled at any time, including inside local startup

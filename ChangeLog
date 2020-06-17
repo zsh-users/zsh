@@ -1,3 +1,8 @@
+2020-06-17  Miroslav Koškár  <mk@mkoskar.com>
+
+	* 46049: Doc/Zsh/options.yo: docs: Correct the sense of the
+	single-letter abstract of the GLOBAL_RCS option (-d)
+
 2020-06-11  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* gitlab !12: Jan Máslo: Completion/Linux/Command/_mat,
