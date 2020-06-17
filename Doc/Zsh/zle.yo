@@ -1008,6 +1008,14 @@ any predisplay string should be highlighted in bold.
 Note that the effect of tt(region_highlight) is not saved and disappears
 as soon as the line is accepted.
 
+Note that zsh 5.8 and older does not support the `tt(memo=)var(token)' field
+and may misparse the third (highlight specification) field when a memo
+is given.
+COMMENT(The syntax `tt(0 20 bold, memo=foobar)' (with an auxiliary comma)
+happens to work on both zsh 5.8 and zsh 5.9-to-be, but I'm deliberately leaving
+that undocumented as it's more of an accident of implementation than something
+I'm comfortable making a first-class-citizen API promise.)
+
 The final highlighting on the command line depends on both tt(region_highlight)
 and tt(zle_highlight); see
 ifzman(the section CHARACTER HIGHLIGHTING below)\
