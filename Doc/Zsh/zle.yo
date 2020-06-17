@@ -992,10 +992,16 @@ itemiz(Optionally, a string of the form `tt(memo=)var(token)'.
 The var(token) consists of everything between the `tt(=)' and the next
 whitespace, comma, NUL, or the end of the string.
 The var(token) is preserved verbatim but not parsed in any way.
+
 Plugins may use this to identify array elements they have added: for example,
 a plugin might set var(token) to its (the plugin's) name and then use
 `tt(region_highlight=+LPAR() ${region_highlight:#*memo=)var(token)tt(} +RPAR())'
-in order to remove array elements it have added.)
+in order to remove array elements it have added.
+
+(This example uses the `tt(${)var(name)tt(:#)var(pattern)tt(})' array-grepping
+syntax described in
+ifzman(the section `Parameter Expansion' in zmanref(zshexpn))\
+ifnzman(noderef(Parameter Expansion)).))
 enditemize()
 
 For example, 
