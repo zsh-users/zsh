@@ -137,11 +137,6 @@
   zpty_stop
 0:region_highlight memo information forward compatibility, #3: NULs
 >typeset -a region_highlight=( '0 4 fg=green memo=some' )
-F:Fails because the memo_end iteration works on plain characters, but $'\0' is
-F:encoded as META SPACE ("\x83\x20") and SPACE happens to test true for the
-F:loop termination condition.
-F:
-F:set_region_highlight() should be taught to handle strp's being metafied.
 
   zpty_start
   zpty_input 'rh_widget() { BUFFER="true"; region_highlight+=( "0 4 fg=#040810" ); }'

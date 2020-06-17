@@ -519,7 +519,7 @@ set_region_highlight(UNUSED(Param pm), char **aval)
 
 	if (strpfx(memo_equals, strp)) {
 	    const char *memo_start = strp + strlen(memo_equals);
-	    const char *memo_end = memo_start;
+	    const char *i, *memo_end;
 
 	    /* 
 	     * Forward compatibility: end parsing at a comma or whitespace to
@@ -527,14 +527,26 @@ set_region_highlight(UNUSED(Param pm), char **aval)
 	     *
 	     * - A fifth field: "0 20 bold memo=foo bar".
 	     *
-	     * - Additional attributes in the fourth field: "0 20 bold memo=foo,bar".
+	     * - Additional attributes in the fourth field: "0 20 bold memo=foo,bar"
+	     *   and "0 20 bold memo=foo\0bar".
 	     *
 	     * For similar reasons, we don't flag an error if the fourth field
 	     * doesn't start with "memo=" as we expect.
 	     */
-	    while (*memo_end && *memo_end != ',' && !inblank(*memo_end))
-		++memo_end;
+	    i = memo_start;
 
+	    /* ### TODO: Consider optimizing the common case that memo_start to
+	     *           end-of-string is entirely ASCII */
+	    while (1) {
+		int nbytes;
+		convchar_t c = unmeta_one(i, &nbytes);
+
+		if (c == '\0' || c == ',' || inblank(c)) {
+		    memo_end = i;
+		    break;
+		} else
+		    i += nbytes;
+	    }
 	    rhp->memo = ztrduppfx(memo_start, memo_end - memo_start);
 	} else
 	    rhp->memo = NULL;
