@@ -133,7 +133,7 @@ _zfs() {
 
 	# TODO: userused@ and groupused@ could have more extensive handling
 	ro_properties=(
-		"name" "type" "creation" "used" "available" "referenced"
+		"name" "type" "creation" "space" "used" "available" "referenced"
 		"compressratio" "mounted" "origin" "usedbychildren"
 		"usedbydataset" "usedbyrefreservation" "usedbysnapshots"
 		"defer_destroy" "userused@" "userrefs" "groupused@"

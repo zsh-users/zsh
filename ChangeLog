@@ -1,3 +1,8 @@
+2020-06-17  Eric Cook  <llua@gmx.com>
+
+	* 45982: Frederick Zhang: Completion/Unix/Command/_zfs:
+	Add space read-only property
+
 2020-06-17  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Util/ztst-syntax.vim: internal: ztst.vim: Recognize
