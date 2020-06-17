@@ -632,7 +632,7 @@ zle_save_positions(void)
 	    newrhp->next = NULL;
 	    newrhp->atr = rhp->atr;
 	    newrhp->flags = rhp->flags;
-	    /* TODO: save rhp->owner here? */
+	    /* TODO: save rhp->memo here? */
 	    if (zlemetaline) {
 		newrhp->start = rhp->start_meta;
 		newrhp->end = rhp->end_meta;
@@ -695,7 +695,7 @@ zle_restore_positions(void)
 
 	    rhp->atr = oldrhp->atr;
 	    rhp->flags = oldrhp->flags;
-	    rhp->owner = NULL;
+	    rhp->memo = NULL;
 	    if (zlemetaline) {
 		rhp->start_meta = oldrhp->start;
 		rhp->end_meta = oldrhp->end;

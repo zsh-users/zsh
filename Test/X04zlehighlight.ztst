@@ -95,15 +95,15 @@
 >0m27m24mCDE|32|trueCDE|39|
 
   zpty_start
-  zpty_input 'rh_widget() { region_highlight+=( "0 4 fg=green owner=someplugin" ); typeset -p region_highlight }'
+  zpty_input 'rh_widget() { region_highlight+=( "0 4 fg=green memo=someplugin" ); typeset -p region_highlight }'
   zpty_input 'zle -N rh_widget'
   zpty_input 'bindkey "\C-a" rh_widget'
   zpty_enable_zle
   zpty_input $'\C-a'
   zpty_line
   zpty_stop
-0:region_highlight owner information round trips
->typeset -a region_highlight=( '0 4 fg=green owner=someplugin' )
+0:region_highlight memo information round trips
+>typeset -a region_highlight=( '0 4 fg=green memo=someplugin' )
 
   zpty_start
   zpty_input 'rh_widget() { BUFFER="true"; region_highlight+=( "0 4 fg=#040810" ); }'

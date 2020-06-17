@@ -448,9 +448,9 @@ struct region_highlight {
      */
     int flags;
     /*
-     * User-settable "owner" key.  Metafied.
+     * User-settable "memo" key.  Metafied.
      */
-    const char *owner;
+    const char *memo;
 };
 
 /*

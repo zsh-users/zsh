@@ -415,7 +415,7 @@ get_region_highlight(UNUSED(Param pm))
 	 rhp++, arrp++) {
 	char digbuf1[DIGBUFSIZE], digbuf2[DIGBUFSIZE];
 	int atrlen, alloclen;
-	const char owner_equals[] = "owner=";
+	const char memo_equals[] = "memo=";
 
 	sprintf(digbuf1, "%d", rhp->start);
 	sprintf(digbuf2, "%d", rhp->end);
@@ -425,8 +425,8 @@ get_region_highlight(UNUSED(Param pm))
 	    3; /* 2 spaces, 1 terminating NUL */
 	if (rhp->flags & ZRH_PREDISPLAY)
 	    alloclen += 2; /* "P " */
-	if (rhp->owner)
-	    alloclen += 1 /* space */ + strlen(owner_equals) + strlen(rhp->owner);
+	if (rhp->memo)
+	    alloclen += 1 /* space */ + strlen(memo_equals) + strlen(rhp->memo);
 	*arrp = (char *)zhalloc(alloclen * sizeof(char));
 	/*
 	 * On input we allow a space after the flags.
@@ -440,10 +440,10 @@ get_region_highlight(UNUSED(Param pm))
 		digbuf1, digbuf2);
 	(void)output_highlight(rhp->atr, *arrp + strlen(*arrp));
 
-	if (rhp->owner) {
+	if (rhp->memo) {
 	    strcat(*arrp, " ");
-	    strcat(*arrp, owner_equals);
-	    strcat(*arrp, rhp->owner);
+	    strcat(*arrp, memo_equals);
+	    strcat(*arrp, rhp->memo);
 	}
     }
     *arrp = NULL;
@@ -516,10 +516,10 @@ set_region_highlight(UNUSED(Param pm), char **aval)
 	while (inblank(*strp))
 	    strp++;
 
-	if (strpfx("owner=", strp))
-	    rhp->owner = ztrdup(strp + 6);
+	if (strpfx("memo=", strp))
+	    rhp->memo = ztrdup(strp + 5);
 	else
-	    rhp->owner = NULL;
+	    rhp->memo = NULL;
     }
 
     freearray(av);

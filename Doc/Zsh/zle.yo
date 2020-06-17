@@ -988,16 +988,16 @@ used for contexts in the parameter tt(zle_highlight), see
 ifnzman(noderef(Character Highlighting))\
 ifzman(the section `Character Highlighting' below);
 for example, tt(standout) or tt(fg=red,bold).)
-itemiz(Optionally, a string of the form `tt(owner=)var(token)'.
+itemiz(Optionally, a string of the form `tt(memo=)var(token)'.
 The var(token) value is preserved verbatim but not parsed in any way.
 Plugins may use this to identify elements they had added, for example, in order
 to remove them with
-`tt(region_highlight=+LPAR() ${region_highlight:#*owner=)var(token)tt(} +RPAR())'.)
+`tt(region_highlight=+LPAR() ${region_highlight:#*memo=)var(token)tt(} +RPAR())'.)
 enditemize()
 
 For example, 
 
-example(region_highlight=("P0 20 bold owner=myplugin"))
+example(region_highlight=("P0 20 bold memo=myplugin"))
 
 specifies that the first twenty characters of the text including
 any predisplay string should be highlighted in bold.
