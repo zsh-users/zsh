@@ -53,7 +53,7 @@ syn match  ztstErrputPatternMarker /[?].\@=/        contained conceal
 syn match  ztstErrputLiteral       /^[?].\@=/                 nextgroup=ztstErrput
 syn region ztstErrput              start=// end=/$/ contained
 
-syn match  ztstFrequentExplanationMarker /^F:.\@=/            nextgroup=ztstFrequentExplanation
+syn match  ztstFrequentExplanationMarker /^F:/                nextgroup=ztstFrequentExplanation
 syn region ztstFrequentExplanation start=// end=/$/ contained
 
 syn match  ztstDirective           /^%.*/
