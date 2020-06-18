@@ -1,3 +1,8 @@
+2020-06-18  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 46067: Test/A05execution.ztst: Add a unit test for
+	workers/46060.
+
 2020-06-18  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 46060: Src/jobs.c: Ensure process has been signalled before
