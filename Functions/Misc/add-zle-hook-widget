@@ -47,9 +47,9 @@ function azhw:${^hooktypes} {
     for hook in "${(@)${(@on)hook_widgets[@]}#<->:}"; do
 	if [[ "$hook" = user:* ]]; then
 	    # Preserve $WIDGET within the renamed widget
-	    zle "$hook" -N -- "$@"
+	    zle "$hook" -f "nolast" -N -- "$@"
 	else
-	    zle "$hook" -Nw -- "$@"
+	    zle "$hook" -f "nolast" -Nw -- "$@"
 	fi || return
     done
     return 0

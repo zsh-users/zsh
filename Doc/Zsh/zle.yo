@@ -415,7 +415,7 @@ xitem(tt(zle) tt(-K) var(keymap))
 xitem(tt(zle) tt(-F) [ tt(-L) | tt(-w) ] [ var(fd) [ var(handler) ] ])
 xitem(tt(zle) tt(-I))
 xitem(tt(zle) tt(-T) [ tt(tc) var(function) | tt(-r) tt(tc) | tt(-L) ] )
-item(tt(zle) var(widget) [ tt(-n) var(num) ] [ tt(-Nw) ] [ tt(-K) var(keymap) ] var(args) ...)(
+item(tt(zle) var(widget) [ tt(-n) var(num) ] [ tt(-f) var(flag) ] [ tt(-Nw) ] [ tt(-K) var(keymap) ] var(args) ...)(
 The tt(zle) builtin performs a number of different actions concerning
 ZLE.
 
@@ -683,7 +683,7 @@ optional argument for debugging or testing.  Note that this
 transformation is not applied to other non-printing characters such as
 carriage returns and newlines.
 )
-item(var(widget) [ tt(-n) var(num) ] [ tt(-Nw) ] [ tt(-K) var(keymap) ] var(args) ...)(
+item(var(widget) [ tt(-n) var(num) ] [ tt(-f) var(flag) ] [ tt(-Nw) ] [ tt(-K) var(keymap) ] var(args) ...)(
 Invoke the specified var(widget).  This can only be done when ZLE is
 active; normally this will be within a user-defined widget.
 
@@ -701,6 +701,9 @@ parameter tt(WIDGET) and related parameters, so that the environment
 appears as if the top-level widget called by the user were still
 active.  With the option tt(-w), tt(WIDGET) and related parameters are set
 to reflect the widget being executed by the tt(zle) call.
+
+Normally, when var(widget) returns the special parameter tt(LASTWIDGET) will
+point to it.  This can be inhibited by passing the option tt(-f nolast).
 
 Any further arguments will be passed to the widget; note that as
 standard argument handling is performed, any general argument list

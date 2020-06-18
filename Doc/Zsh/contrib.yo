@@ -347,7 +347,7 @@ as the var(hook) argument.
 var(widgetname) is the name of a ZLE widget.  If no options are given this
 is added to the array of widgets to be invoked in the given hook context.
 Widgets are invoked in the order they were added, with
-example(tt(zle )var(widgetname)tt( -Nw -- "$@"))
+example(tt(zle )var(widgetname)tt( -Nw -f "nolast" -- "$@"))
 
 vindex(WIDGET, in hooks)
 Note that this means that the `tt(WIDGET)' special parameter tracks the

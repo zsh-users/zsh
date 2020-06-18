@@ -678,6 +678,7 @@ bin_zle_flags(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 		else if (!strcmp(*flag, "keepsuffix"))
 		    w->flags |= ZLE_KEEPSUFFIX;
 		*/
+		/* If you add magic strings here, be consistent with bin_zle_call() */
 	        else if (!strcmp(*flag, "vichange")) {
 		    if (invicmdmode()) {
 			startvichange(-1);
@@ -703,7 +704,7 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 {
     Thingy t;
     struct modifier modsave = zmod;
-    int ret, saveflag = 0, setbindk = 0, setlbindk, remetafy;
+    int ret, saveflag = 0, setbindk = 0, setlbindk = 0, remetafy;
     char *wname = *args++, *keymap_restore = NULL, *keymap_tmp;
 
     if (!wname)
@@ -727,12 +728,26 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
     while (*args && **args == '-') {
 	char skip_this_arg[2] = "x";
 	char *num;
+	char *flag;
 	if (!args[0][1] || args[0][1] == '-') {
 	    args++;
 	    break;
 	}
 	while (*++(*args)) {
 	    switch (**args) {
+	    case 'f':
+		flag = args[0][1] ? args[0]+1 : args[1];
+		if (flag == NULL || strcmp(flag, "nolast")) {
+		    zwarnnam(name, "%s", "'nolast' expected after -f");
+		    if (remetafy)
+			metafy_line();
+		    return 1;
+		}
+		if (!args[0][1])
+		    *++args = skip_this_arg;
+		/* If you add magic strings here, be consistent with bin_zle_flags() */
+		setlbindk = 1;
+		break;
 	    case 'n':
 		num = args[0][1] ? args[0]+1 : args[1];
 		if (!num) {
@@ -787,7 +802,7 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
      * a vi range to detect a repeated key */
     setbindk = setbindk ||
 	(t->widget && (t->widget->flags & (WIDGET_INT | ZLE_VIOPER)) == WIDGET_INT);
-    setlbindk = t->widget && (t->widget->flags & ZLE_NOLAST) == ZLE_NOLAST;
+    setlbindk |= t->widget && (t->widget->flags & ZLE_NOLAST) == ZLE_NOLAST;
     ret = execzlefunc(t, args, setbindk, setlbindk);
     unrefthingy(t);
     if (saveflag)

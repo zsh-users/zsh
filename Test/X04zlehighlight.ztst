@@ -198,6 +198,17 @@
 0:overlapping region_highlight with near-color (hex-triplets at input)
 >0m27m24mCDE|340|tCDE|3160|rCDE|39|CDE|340|ueCDE|39|
 
+  zpty_start
+  zpty_input 'f () { zle clear-screen; zle g -f nolast; BUFFER=": ${(q)LASTWIDGET}" }; zle -N f'
+  zpty_input 'g () { }; zle -N g'
+  zpty_input 'bindkey "\C-a" f'
+  zpty_enable_zle
+  zpty_input $'\C-a'
+  zpty_line 1 p
+  zpty_stop
+0:zle $widgetname -f nolast
+>0m27m24m0m27m24m: clear-screen
+
 %clean
 
   zmodload -ui zsh/zpty
