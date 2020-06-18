@@ -469,6 +469,8 @@ set_region_highlight(UNUSED(Param pm), char **aval)
 	/* no null termination, but include special highlighting at start */
 	int newsize = len + N_SPECIAL_HIGHLIGHTS;
 	int diffsize = newsize - n_region_highlights;
+
+	free_region_highlights_memos();
 	region_highlights = (struct region_highlight *)
 	    zrealloc(region_highlights,
 		     sizeof(struct region_highlight) * newsize);
@@ -2844,6 +2846,7 @@ zle_refresh_finish(void)
 
     if (region_highlights)
     {
+	free_region_highlights_memos();
 	zfree(region_highlights,
 	      sizeof(struct region_highlight) * n_region_highlights);
 	region_highlights = NULL;

@@ -557,6 +557,22 @@ zlegetline(int *ll, int *cs)
 }
 
 
+/*
+ * free() the 'memo' elements of region_highlights.
+ */
+
+/**/
+void
+free_region_highlights_memos(void)
+{
+    struct region_highlight *rhp;
+    for (rhp = region_highlights;
+	 rhp < region_highlights + n_region_highlights;
+	 rhp++) {
+	zsfree(rhp->memo);
+    }
+}
+
 /* Forward reference */
 struct zle_region;
 
@@ -684,6 +700,7 @@ zle_restore_positions(void)
 	     nreg++, oldrhp = oldrhp->next)
 	    ;
 	if (nreg + N_SPECIAL_HIGHLIGHTS != n_region_highlights) {
+	    free_region_highlights_memos();
 	    n_region_highlights = nreg + N_SPECIAL_HIGHLIGHTS;
 	    region_highlights = (struct region_highlight *)
 		zrealloc(region_highlights,
@@ -696,7 +713,7 @@ zle_restore_positions(void)
 
 	    rhp->atr = oldrhp->atr;
 	    rhp->flags = oldrhp->flags;
-	    rhp->memo = oldrhp->memo; /* transferring ownership */
+	    rhp->memo = oldrhp->memo; /* transferring ownership of the permanently-allocated memory */
 	    if (zlemetaline) {
 		rhp->start_meta = oldrhp->start;
 		rhp->end_meta = oldrhp->end;
@@ -710,6 +727,7 @@ zle_restore_positions(void)
 	    rhp++;
 	}
     } else if (region_highlights) {
+	free_region_highlights_memos();
 	zfree(region_highlights, sizeof(struct region_highlight) *
 	      n_region_highlights);
 	region_highlights  = NULL;
