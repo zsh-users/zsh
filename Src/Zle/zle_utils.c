@@ -568,6 +568,7 @@ struct zle_region  {
     int start;
     int end;
     int flags;
+    const char *memo;
 };
 
 /* Forward reference */
@@ -632,7 +633,7 @@ zle_save_positions(void)
 	    newrhp->next = NULL;
 	    newrhp->atr = rhp->atr;
 	    newrhp->flags = rhp->flags;
-	    /* TODO: save rhp->memo here? */
+	    newrhp->memo = ztrdup(rhp->memo);
 	    if (zlemetaline) {
 		newrhp->start = rhp->start_meta;
 		newrhp->end = rhp->end_meta;
@@ -695,7 +696,7 @@ zle_restore_positions(void)
 
 	    rhp->atr = oldrhp->atr;
 	    rhp->flags = oldrhp->flags;
-	    rhp->memo = NULL;
+	    rhp->memo = oldrhp->memo; /* transferring ownership */
 	    if (zlemetaline) {
 		rhp->start_meta = oldrhp->start;
 		rhp->end_meta = oldrhp->end;
