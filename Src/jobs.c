@@ -442,7 +442,7 @@ update_job(Job jn)
     Process pn;
     int job;
     int val = 0, status = 0;
-    int somestopped = 0, inforeground = 0;
+    int somestopped = 0, inforeground = 0, signalled = 0;
 
     for (pn = jn->auxprocs; pn; pn = pn->next) {
 #ifdef WIFCONTINUED
@@ -464,12 +464,15 @@ update_job(Job jn)
 	    return;                        /* so no need to update job table entry         */
 	if (WIFSTOPPED(pn->status))        /* some processes are stopped                   */
 	    somestopped = 1;               /* so job is not done, but entry needs updating */
-	if (!pn->next)                     /* last job in pipeline determines exit status  */
+	if (!pn->next) {
+	    /* last job in pipeline determines exit status  */
 	    val = (WIFSIGNALED(pn->status) ?
 		   0200 | WTERMSIG(pn->status) :
 		   (WIFSTOPPED(pn->status) ?
 		    0200 | WEXITSTATUS(pn->status) :
 		    WEXITSTATUS(pn->status)));
+	    signalled = WIFSIGNALED(pn->status);
+	}
 	if (pn->pid == jn->gleader)        /* if this process is process group leader      */
 	    status = pn->status;
     }
@@ -564,7 +567,7 @@ update_job(Job jn)
 		}
 		/* If we have `foo|while true; (( x++ )); done', and hit
 		 * ^C, we have to stop the loop, too. */
-		if ((val & 0200) && inforeground == 1 &&
+		if (signalled && inforeground == 1 &&
 		    ((val & ~0200) == SIGINT || (val & ~0200) == SIGQUIT)) {
 		    if (!errbrk_saved) {
 			errbrk_saved = 1;
@@ -581,7 +584,7 @@ update_job(Job jn)
 		adjustwinsize(0);
 	    }
 	}
-    } else if (list_pipe && (val & 0200) && inforeground == 1 &&
+    } else if (list_pipe && signalled && inforeground == 1 &&
 	       ((val & ~0200) == SIGINT || (val & ~0200) == SIGQUIT)) {
 	if (!errbrk_saved) {
 	    errbrk_saved = 1;

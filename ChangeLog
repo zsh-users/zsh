@@ -1,3 +1,8 @@
+2020-06-18  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 46060: Src/jobs.c: Ensure process has been signalled before
+	taking special action for SIGINT or SIGQUIT.
+
 2020-06-17  Eric Cook  <llua@gmx.com>
 
 	* 45982: Frederick Zhang: Completion/Unix/Command/_zfs:
