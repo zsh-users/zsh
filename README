@@ -86,9 +86,9 @@ This will use value1 in both 5.8 and 5.9.
 Elements of the region_highlight array have gained a fourth space-separated
 field.  Code written against 5.9 that sets the new field may break under 5.8:
 for example, the element "0 20 bold memo=foo", which is valid under 5.9, would
-not work under 5.8, because 5.8 does not recognize the space as terminating the
-highlighting specification.  On the other hand, code that does not set the new,
-fourth field will continue to work under both 5.8 and 5.9.
+not work under 5.8.  (Under the hood, 5.8 does not recognize the space as
+terminating the highlighting specification.)  On the other hand, code that does
+not set the new, fourth field will continue to work under both 5.8 and 5.9.
 (As it happens, adding a comma after "bold" will make both 5.8 and 5.9 do the
 right thing, but this should be viewed as an unsupported hack.)
 
