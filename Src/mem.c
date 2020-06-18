@@ -1655,7 +1655,7 @@ free(FREE_ARG_T p)
 
 /**/
 mod_export void
-zsfree(char *p)
+zsfree(const char *p)
 {
     if (p)
 	zfree(p, strlen(p) + 1);
