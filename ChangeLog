@@ -1,5 +1,8 @@
 2020-06-26  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 46075: drelo: Completion/Unix/Type/_find_net_interfaces:
+	prefer ip on linux for finding network interfaces
+
 	* 45895: oxiedi: Completion/Base/Utility/_sequence,
 	Test/Y01completion.ztst: ignore dedup patterns in _sequence
 
