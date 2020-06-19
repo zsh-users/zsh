@@ -40,10 +40,12 @@ local -a testfiles
 testfiles=(
   /usr/share/units.dat		# GNU on Fedora
   /usr/share/units/units.dat    # on gentoo
-  /usr/share/misc/units.dat     # on Debian
+  /usr/share/units/definitions.units # on Debian, units 2.00 and newer
   /usr/local/share/units.dat    # GNU DIY install
   /usr/share/lib/unittab	# Solaris
-  /usr/share/misc/units.lib     # BSD
+  /usr/share/misc/units.lib     # OpenBSD [as of 2020]; also FreeBSD 9.1
+  /usr/share/misc/definitions.units     # FreeBSD 12.1
+  /usr/share/misc/units.dat     # on Debian, units 1.88 and older
 )
 
 datfile=${opt_args[-f]:-${opt_args[--file]}}
