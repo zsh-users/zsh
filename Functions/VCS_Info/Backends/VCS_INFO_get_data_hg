@@ -5,7 +5,7 @@
 
 setopt localoptions extendedglob NO_shwordsplit
 
-local hgbase bmfile branchfile rebasefile dirstatefile mqseriesfile \
+local hgbase bmfile branchfile topicfile rebasefile dirstatefile mqseriesfile \
     curbmfile curbm \
     mqstatusfile mqguardsfile patchdir mergedir \
     r_csetid r_lrev r_branch i_bmhash i_bmname \
@@ -27,6 +27,7 @@ mergedir="${hgbase}/.hg/merge/"
 bmfile="${hgbase}/.hg/bookmarks"
 curbmfile="${hgbase}/.hg/bookmarks.current"
 branchfile="${hgbase}/.hg/branch"
+topicfile="${hgbase}/.hg/topic"
 rebasefile="${hgbase}/.hg/rebasestate"
 dirstatefile="${hgbase}/.hg/dirstate"
 mqstatusfile="${patchdir}/status" # currently applied patches
@@ -68,6 +69,14 @@ fi
 
 # If we still don't know the branch it's safe to assume default
 [[ -n ${r_branch} ]] || r_branch="default"
+
+# Show topic if there is any (the UI for this experimental concept is not yet
+# final, but for a long time the convention has been to join the branch name
+# and the topic name by a colon)
+if [[ -f ${topicfile} && -r ${topicfile} && -s ${topicfile} ]] ; then
+    IFS= read -r REPLY < ${topicfile}
+    r_branch=${r_branch}:${REPLY}
+fi
 
 # The working dir has uncommitted-changes if the revision ends with a +
 if [[ $r_lrev[-1] == + ]] ; then

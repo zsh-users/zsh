@@ -1328,7 +1328,8 @@ enditem()
 In tt(branchformat) these replacements are done:
 
 startsitem()
-sitem(tt(%b))(The branch name.)
+sitem(tt(%b))(The branch name. For tt(hg), the branch name can include a
+topic name.)
 sitem(tt(%r))(The current revision number or the tt(hgrevformat) style for
 tt(hg).)
 endsitem()
