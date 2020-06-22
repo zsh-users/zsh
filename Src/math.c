@@ -831,6 +831,8 @@ zzlex(void)
 	case ' ': /* Fall through! */
 	case '\t':
 	case '\n':
+	case '"': /* POSIX says ignore these */
+	case Dnull:
 	    break;
 	default:
 	    if (idigit(*--ptr) || *ptr == '.')

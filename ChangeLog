@@ -1,3 +1,8 @@
+2020-06-22  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 46079: Src/math.c, Test/C01arith.ztst: Ignore double quotes in
+	math expression: treat as white space.
+
 2020-06-22  Manuel Jacob  <me@manueljacob.de>
 
 	* 46091: Doc/Zsh/contrib.yo,

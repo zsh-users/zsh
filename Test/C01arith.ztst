@@ -180,9 +180,10 @@
 1:bases beyond 36 don't work
 ?(eval):1: invalid base (must be 2 to 36 inclusive): 37
 
+  fail=39
   print $(( 3 + "fail" ))
-1:parse failure in arithmetic
-?(eval):1: bad math expression: operand expected at `"fail" '
+0:Double quotes are not treated specially in arithmetic
+>42
 
   alias 3=echo
   print $(( 3 + "OK"); echo "Worked")
@@ -487,3 +488,8 @@
   let noexist==0 )
 1:Arithmetic, NO_UNSET part 3
 ?(eval):2: noexist: parameter not set
+
+  print $(( "6+2" / "1+3" ))
+0:Double quotes are not treated specially in arithmetic (POSIX)
+# and do not do grouping!  this is 6 + (2/1) + 3
+>11
