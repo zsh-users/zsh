@@ -1,3 +1,8 @@
+2020-06-28  zsugabubus  <zsugabubus>
+
+	* 46097: Completion/Unix/Command/_rm: Fix "assignment to invalid
+	subscript range" error in _rm.
+
 2020-06-28  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 46132: Doc/Zsh/expn.yo: docs: Use an itemized list in the

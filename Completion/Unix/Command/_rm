@@ -69,7 +69,7 @@ _arguments -C -s -S $opts \
 
 case $state in
   (file)
-    line[CURRENT]=()
+    (( CURRENT > 0 )) && line[CURRENT]=()
     line=( ${line//(#m)[\[\]()\\*?#<>~\^\|]/\\$MATCH} )
     _files -F line && ret=0
     ;;
