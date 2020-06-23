@@ -1,5 +1,9 @@
 2020-06-26  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 46106: Completion/BSD/Command/_usbconfig: new completion
+
+	* 46105: Completion/X/Command/_xinput: new xinput completion
+
 	* 46075: drelo: Completion/Unix/Type/_find_net_interfaces:
 	prefer ip on linux for finding network interfaces
 
