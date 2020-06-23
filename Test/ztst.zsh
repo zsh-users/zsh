@@ -146,6 +146,19 @@ $ZTST_failmsg"
   ZTST_testfailed=1
   return 1
 }
+ZTST_testxpassed() {
+  print -r "Test $ZTST_testname was expected to fail, but passed."
+  if [[ -n $ZTST_message ]]; then
+    print -r "Was testing: $ZTST_message"
+  fi
+  print -r "$ZTST_testname: test XPassed."
+  if [[ -n $ZTST_failmsg ]]; then
+    print -r "The following may (or may not) help identifying the cause:
+$ZTST_failmsg"
+  fi
+  ZTST_testfailed=1
+  return 1
+}
 
 # Print messages if $ZTST_verbose is non-empty
 ZTST_verbose() {
@@ -520,7 +533,7 @@ $ZTST_code"
 	return 1
       fi
       if (( expected_to_fail )); then
-        ZTST_testfailed "test was expected to fail, but passed."
+        ZTST_testxpassed
         return 1
       fi
     fi
