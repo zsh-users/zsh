@@ -571,6 +571,11 @@ position (if it could be the first word of a simple command),
 or if the alias is global.
 If the replacement text ends with a space, the next word in the shell input
 is always eligible for purposes of alias expansion.
+
+It is an error for the function name, var(word), in the sh-compatible function
+definition syntax `var(word) tt(+LPAR()+RPAR()) ...' to be a word that resulted
+from alias expansion, unless the tt(ALIAS_FUNC_DEF) option is set.
+
 findex(alias, use of)
 cindex(aliases, global)
 An alias is defined using the tt(alias) builtin; global aliases
@@ -655,26 +660,6 @@ is too late to expand the newly defined alias.  This is often
 a problem in shell scripts, functions, and code executed with `tt(source)'
 or `tt(.)'.  Consequently, use of functions rather than aliases is
 recommended in non-interactive code.
-
-Note also the unhelpful interaction of aliases and function definitions:
-
-example(alias func='noglob func'
-func+LPAR()RPAR() {
-    echo Do something with $*
-})
-
-Because aliases are expanded in function definitions, this causes the
-following command to be executed:
-
-example(noglob func+LPAR()RPAR() {
-    echo Do something with $*
-})
-
-which defines tt(noglob) as well as tt(func) as functions with the
-body given.  To avoid this, either quote the name tt(func) or use the
-alternative function definition form `tt(function func)'.  Ensuring the
-alias is defined after the function works but is problematic if the
-code fragment might be re-executed.
 
 texinode(Quoting)()(Aliasing)(Shell Grammar)
 sect(Quoting)

@@ -1,5 +1,8 @@
 2020-06-27  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* users/24959/0002: Doc/Zsh/grammar.yo: Update aliases
+	documentation for the addition of the ALIAS_FUNC_DEF option.
+
 	* users/24959/0001: Doc/Zsh/builtins.yo, Doc/Zsh/grammar.yo:
 	Extend documentation of global aliases.
 
