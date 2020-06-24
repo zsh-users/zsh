@@ -105,7 +105,13 @@ For each var(name) with a corresponding var(value), define an alias
 with that value.  A trailing space in var(value) causes the next word
 to be checked for alias expansion.  If the tt(-g) flag is present,
 define a global alias; global aliases are expanded even if they do not
-occur in command position.
+occur in command position:
+
+example(% perldoc --help 2>&1 | grep 'built-in functions'
+    -f   Search Perl built-in functions
+% alias -g HG='--help 2>&1 | grep'
+% perldoc HG 'built-in functions'
+    -f   Search Perl built-in functions)
 
 If the tt(-s) flag is present, define a suffix alias: if the command
 word on a command line is in the form `var(text)tt(.)var(name)', where

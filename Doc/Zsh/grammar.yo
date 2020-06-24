@@ -597,6 +597,15 @@ word, e.g. tt(\foo).  Any form of quoting works, although there is
 nothing to prevent an alias being defined for the quoted form such as
 tt(\foo) as well.
 
+In particular, note that quoting must be used when using tt(unalias) to remove
+global aliases:
+
+example(% alias -g foo=bar
+% unalias foo
+unalias: no such hash table element: bar
+% unalias \foo
+% )
+
 When tt(POSIX_ALIASES) is set, only plain unquoted strings are eligible
 for aliasing.  The tt(alias) builtin does not reject ineligible aliases,
 but they are not expanded.
