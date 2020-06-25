@@ -173,7 +173,7 @@ fi
   '--dump-options[show all options]'
 )
 
-extra=( ${${${args#\([^\)]#\)}#\*}%%[:=\[]*} )
+extra=( ${${${args#\([^\)]#\)}#\*}%%[=:\[]*} )
 extra=( ${allopts:|extra} )
 _arguments -C -s -S -A "-*" $args $extra '*:args:->args' && ret=0
 

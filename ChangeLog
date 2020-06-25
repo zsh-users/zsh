@@ -1,5 +1,8 @@
 2020-06-26  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* unposted c.f. 46034: Completion/Unix/Command/_gpg: workaround
+	incompatibility with sh_file_expansion option
+
 	* 46106: Completion/BSD/Command/_usbconfig: new completion
 
 	* 46105: Completion/X/Command/_xinput: new xinput completion
