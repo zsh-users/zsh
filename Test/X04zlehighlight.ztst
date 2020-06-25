@@ -95,6 +95,50 @@
 >0m27m24mCDE|32|trueCDE|39|
 
   zpty_start
+  zpty_input 'rh_widget() { region_highlight+=( "0 4 fg=green memo=someplugin" ); typeset -p region_highlight }'
+  zpty_input 'zle -N rh_widget'
+  zpty_input 'bindkey "\C-a" rh_widget'
+  zpty_enable_zle
+  zpty_input $'\C-a'
+  zpty_line
+  zpty_stop
+0:region_highlight memo information round trips
+>typeset -a region_highlight=( '0 4 fg=green memo=someplugin' )
+
+  zpty_start
+  zpty_input 'rh_widget() { region_highlight+=( "0 4 fg=green memo=someplugin,futureattribute=futurevalue" ); typeset -p region_highlight }'
+  zpty_input 'zle -N rh_widget'
+  zpty_input 'bindkey "\C-a" rh_widget'
+  zpty_enable_zle
+  zpty_input $'\C-a'
+  zpty_line
+  zpty_stop
+0:region_highlight memo information forward compatibility, #1
+>typeset -a region_highlight=( '0 4 fg=green memo=someplugin' )
+
+  zpty_start
+  zpty_input 'rh_widget() { region_highlight+=( "0 4 fg=green memo=someplugin futurefifthfield" ); typeset -p region_highlight }'
+  zpty_input 'zle -N rh_widget'
+  zpty_input 'bindkey "\C-a" rh_widget'
+  zpty_enable_zle
+  zpty_input $'\C-a'
+  zpty_line
+  zpty_stop
+0:region_highlight memo information forward compatibility, #2
+>typeset -a region_highlight=( '0 4 fg=green memo=someplugin' )
+
+  zpty_start
+  zpty_input 'rh_widget() { region_highlight+=( "0 4 fg=green memo=some'$'\0''plugin" ); typeset -p region_highlight }'
+  zpty_input 'zle -N rh_widget'
+  zpty_input 'bindkey "\C-a" rh_widget'
+  zpty_enable_zle
+  zpty_input $'\C-a'
+  zpty_line
+  zpty_stop
+0:region_highlight memo information forward compatibility, #3: NULs
+>typeset -a region_highlight=( '0 4 fg=green memo=some' )
+
+  zpty_start
   zpty_input 'rh_widget() { BUFFER="true"; region_highlight+=( "0 4 fg=#040810" ); }'
   zpty_input 'zle -N rh_widget'
   zpty_input 'bindkey "\C-a" rh_widget'

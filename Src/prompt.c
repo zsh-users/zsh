@@ -1724,10 +1724,11 @@ match_colour(const char **teststrp, int is_fg, int colour)
 /*
  * Match a set of highlights in the given teststr.
  * Set *on_var to reflect the values found.
+ * Return a pointer to the first character not consumed.
  */
 
 /**/
-mod_export void
+mod_export const char *
 match_highlight(const char *teststr, zattr *on_var)
 {
     int found = 1;
@@ -1745,7 +1746,7 @@ match_highlight(const char *teststr, zattr *on_var)
 	    atr = match_colour(&teststr, is_fg, 0);
 	    if (*teststr == ',')
 		teststr++;
-	    else if (*teststr)
+	    else if (*teststr && *teststr != ' ')
 		break;
 	    found = 1;
 	    /* skip out of range colours but keep scanning attributes */
@@ -1758,7 +1759,7 @@ match_highlight(const char *teststr, zattr *on_var)
 
 		    if (*val == ',')
 			val++;
-		    else if (*val)
+		    else if (*val && *val != ' ')
 			break;
 
 		    *on_var |= hl->mask_on;
@@ -1769,6 +1770,8 @@ match_highlight(const char *teststr, zattr *on_var)
 	    }
 	}
     }
+
+    return teststr;
 }
 
 /*

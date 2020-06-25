@@ -212,9 +212,9 @@ static zattr default_atr_on, special_atr_on;
 
 /*
  * Array of region highlights, no special termination.
- * The first element (0) always describes the region between
- * point and mark.  Any other elements are set by the user
- * via the parameter region_highlight.
+ * The first N_SPECIAL_HIGHLIGHTS elements describe special uses of
+ * highlighting, documented under N_SPECIAL_HIGHLIGHTS.
+ * Any other elements are set by the user via the parameter region_highlight.
  */
 
 /**/
@@ -414,16 +414,19 @@ get_region_highlight(UNUSED(Param pm))
 	 arrsize--;
 	 rhp++, arrp++) {
 	char digbuf1[DIGBUFSIZE], digbuf2[DIGBUFSIZE];
-	int atrlen = 0, alloclen;
+	int atrlen, alloclen;
+	const char memo_equals[] = "memo=";
 
 	sprintf(digbuf1, "%d", rhp->start);
 	sprintf(digbuf2, "%d", rhp->end);
 
 	atrlen = output_highlight(rhp->atr, NULL);
 	alloclen = atrlen + strlen(digbuf1) + strlen(digbuf2) +
-	    3; /* 2 spaces, 1 0 */
+	    3; /* 2 spaces, 1 terminating NUL */
 	if (rhp->flags & ZRH_PREDISPLAY)
 	    alloclen += 2; /* "P " */
+	if (rhp->memo)
+	    alloclen += 1 /* space */ + strlen(memo_equals) + strlen(rhp->memo);
 	*arrp = (char *)zhalloc(alloclen * sizeof(char));
 	/*
 	 * On input we allow a space after the flags.
@@ -436,6 +439,12 @@ get_region_highlight(UNUSED(Param pm))
 		(rhp->flags & ZRH_PREDISPLAY) ? "P" : "",
 		digbuf1, digbuf2);
 	(void)output_highlight(rhp->atr, *arrp + strlen(*arrp));
+
+	if (rhp->memo) {
+	    strcat(*arrp, " ");
+	    strcat(*arrp, memo_equals);
+	    strcat(*arrp, rhp->memo);
+	}
     }
     *arrp = NULL;
     return retarr;
@@ -460,6 +469,8 @@ set_region_highlight(UNUSED(Param pm), char **aval)
 	/* no null termination, but include special highlighting at start */
 	int newsize = len + N_SPECIAL_HIGHLIGHTS;
 	int diffsize = newsize - n_region_highlights;
+
+	free_region_highlights_memos();
 	region_highlights = (struct region_highlight *)
 	    zrealloc(region_highlights,
 		     sizeof(struct region_highlight) * newsize);
@@ -476,6 +487,7 @@ set_region_highlight(UNUSED(Param pm), char **aval)
 	 *aval;
 	 rhp++, aval++) {
 	char *strp, *oldstrp;
+	const char memo_equals[] = "memo=";
 
 	oldstrp = *aval;
 	if (*oldstrp == 'P') {
@@ -502,7 +514,44 @@ set_region_highlight(UNUSED(Param pm), char **aval)
 	while (inblank(*strp))
 	    strp++;
 
-	match_highlight(strp, &rhp->atr);
+	strp = (char*) match_highlight(strp, &rhp->atr);
+
+	while (inblank(*strp))
+	    strp++;
+
+	if (strpfx(memo_equals, strp)) {
+	    const char *memo_start = strp + strlen(memo_equals);
+	    const char *i, *memo_end;
+
+	    /* 
+	     * Forward compatibility: end parsing at a comma or whitespace to
+	     * allow the following extensions:
+	     *
+	     * - A fifth field: "0 20 bold memo=foo bar".
+	     *
+	     * - Additional attributes in the fourth field: "0 20 bold memo=foo,bar"
+	     *   and "0 20 bold memo=foo\0bar".
+	     *
+	     * For similar reasons, we don't flag an error if the fourth field
+	     * doesn't start with "memo=" as we expect.
+	     */
+	    i = memo_start;
+
+	    /* ### TODO: Consider optimizing the common case that memo_start to
+	     *           end-of-string is entirely ASCII */
+	    while (1) {
+		int nbytes;
+		convchar_t c = unmeta_one(i, &nbytes);
+
+		if (c == '\0' || c == ',' || inblank(c)) {
+		    memo_end = i;
+		    break;
+		} else
+		    i += nbytes;
+	    }
+	    rhp->memo = ztrduppfx(memo_start, memo_end - memo_start);
+	} else
+	    rhp->memo = NULL;
     }
 
     freearray(av);
@@ -2797,6 +2846,7 @@ zle_refresh_finish(void)
 
     if (region_highlights)
     {
+	free_region_highlights_memos();
 	zfree(region_highlights,
 	      sizeof(struct region_highlight) * n_region_highlights);
 	region_highlights = NULL;

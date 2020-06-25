@@ -974,33 +974,53 @@ of the non-editable parts of the command line in tt(PREDISPLAY)
 and tt(POSTDISPLAY) are possible, but note that the tt(P) flag
 is needed for character indexing to include tt(PREDISPLAY).
 
-Each string consists of the following parts:
+Each string consists of the following whitespace-separated parts:
 
 startitemize()
 itemiz(Optionally, a `tt(P)' to signify that the start and end offset that
 follow include any string set by the tt(PREDISPLAY) special parameter;
 this is needed if the predisplay string itself is to be highlighted.
-Whitespace may follow the `tt(P)'.)
-itemiz(A start offset in the same units as tt(CURSOR), terminated by
-whitespace.)
-itemiz(An end offset in the same units as tt(CURSOR), terminated by
-whitespace.)
+Whitespace between the `tt(P)' and the start offset is optional.)
+itemiz(A start offset in the same units as tt(CURSOR).)
+itemiz(An end offset in the same units as tt(CURSOR).)
 itemiz(A highlight specification in the same format as
 used for contexts in the parameter tt(zle_highlight), see
 ifnzman(noderef(Character Highlighting))\
 ifzman(the section `Character Highlighting' below);
-for example, tt(standout) or tt(fg=red,bold)).
+for example, tt(standout) or tt(fg=red,bold).)
+itemiz(Optionally, a string of the form `tt(memo=)var(token)'.
+The var(token) consists of everything between the `tt(=)' and the next
+whitespace, comma, NUL, or the end of the string.
+The var(token) is preserved verbatim but not parsed in any way.
+
+Plugins may use this to identify array elements they have added: for example,
+a plugin might set var(token) to its (the plugin's) name and then use
+`tt(region_highlight=+LPAR() ${region_highlight:#*memo=)var(token)tt(} +RPAR())'
+in order to remove array elements it have added.
+
+(This example uses the `tt(${)var(name)tt(:#)var(pattern)tt(})' array-grepping
+syntax described in
+ifzman(the section `Parameter Expansion' in zmanref(zshexpn))\
+ifnzman(noderef(Parameter Expansion)).))
 enditemize()
 
 For example, 
 
-example(region_highlight=("P0 20 bold"))
+example(region_highlight=("P0 20 bold memo=foobar"))
 
 specifies that the first twenty characters of the text including
 any predisplay string should be highlighted in bold.
 
 Note that the effect of tt(region_highlight) is not saved and disappears
 as soon as the line is accepted.
+
+Note that zsh 5.8 and older do not support the `tt(memo=)var(token)' field
+and may misparse the third (highlight specification) field when a memo
+is given.
+COMMENT(The syntax `tt(0 20 bold, memo=foobar)' (with an auxiliary comma)
+happens to work on both zsh <=5.8 and zsh 5.9-to-be, but that seems to be more of
+an accident of implementation than something we should make a first-class-citizen
+API promise.  It's mentioned in the "Incompatibilities" section of README.)
 
 The final highlighting on the command line depends on both tt(region_highlight)
 and tt(zle_highlight); see

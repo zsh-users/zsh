@@ -447,6 +447,10 @@ struct region_highlight {
      * Any of the flags defined above.
      */
     int flags;
+    /*
+     * User-settable "memo" key.  Metafied.
+     */
+    const char *memo;
 };
 
 /*
