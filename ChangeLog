@@ -1,3 +1,8 @@
+2020-06-26  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 46110: Src/subst.c, Test/D03procsubst.ztst: If =subst occurs
+	before =(subst) we should allow for the possibility of the latter.
+
 2020-06-26  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
 	* unposted c.f. 46034: Completion/Unix/Command/_gpg: workaround

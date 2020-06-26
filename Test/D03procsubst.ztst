@@ -156,3 +156,7 @@
   procfunc <(echo argument)
 0:With /proc/self file descriptors must not be tidied up too early
 >argument
+
+  $ZTST_testdir/../Src/zsh -df -o shfileexpansion -c 'cat =(echo hi)'
+0:EQUALS expansion followed by =(...) (sh ordering) should work
+>hi

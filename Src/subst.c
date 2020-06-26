@@ -796,7 +796,7 @@ filesubstr(char **namptr, int assign)
 	    *namptr = dyncat(hom, ptr);
 	    return 1;
 	}
-    } else if (*str == Equals && isset(EQUALS) && str[1]) {   /* =foo */
+    } else if (*str == Equals && isset(EQUALS) && str[1] && str[1] != Inpar) {   /* =foo */
 	char *expn = equalsubstr(str+1, assign, isset(NOMATCH));
 	if (expn) {
 	    *namptr = expn;
