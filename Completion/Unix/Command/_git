@@ -2396,6 +2396,7 @@ __git_config_option-or-value () {
     blame.date:'date format to use in output::__git_date_formats:iso'
     'branch.*.description:branch description:branch description:->string'
     branch.sort:"default sorting order for 'git branch' output::__git_ref_sort_keys"
+    checkout.defaultRemote:'assumed remote name when specifying an unqualified remote branch name:remote name:__git_remotes'
     cvsexportcommit.cvsdir:'the default location of the CVS checkout to use for the export:cvs export dir:_directories'
     column.ui:'specify whether supported commands should output in columns.::->column:never'
     column.branch:'specify whether to output branch listing in git branch in columns::_git_column_layouts:never'
@@ -2455,6 +2456,7 @@ __git_config_option-or-value () {
     'credential.*.helper:external helper to be called when a username or password credential is needed::_cmdstring'
     'credential.*.useHttpPath:consider the "path" component of an http or https URL to be important::->bool:false'
     'credential.*.username:if no username is set use this username by default:default username:->string'
+    credentialCache.ignoreSIGHUP:'ignore SIGHUP in git-credential-cache—daemon::->bool:false'
     add.ignore-errors:'ignore indexing errors when adding files::->bool:false'
     add.ignoreErrors:'ignore indexing errors when adding files::->bool:false'
     am.keepcr:'keep CR characters when splitting mails::->bool:false'
@@ -2557,12 +2559,15 @@ __git_config_option-or-value () {
     difftool.prompt:'prompt before each invocation of the diff tool::->bool:true'
     diff.wordRegex:'regex used to determine what a word is when performing word-by-word diff:regular expression:->string'
     diff.guitool:'diff tool with gui to use::__git_difftools'
+    merge.guitool:'merge tool with gui to use::__git_difftools'
     fastimport.unpackLimit:"whether to import objects as loose object files or as a pack:threshold for packing (number of objects imported):->int"
     feature.experimental:'enable config options that are new to Git::->bool:false'
     feature.manyFiles:'enable config options that optimize for repos with many files::->bool:false'
+    fetch.output:'output format:format:compadd compact full'
     fetch.parallel:'specify maximum number of fetch operations to run in parallel:number:->int'
     fetch.prune:'remove any remote tracking branches that no longer exist remotely::->bool:false'
     fetch.pruneTags:"maintain one-to-one correspondence with upstream tag refs::->bool:false"
+    fetch.showForcedUpdates:"show forced updates::->bool:true"
     fetch.unpackLimit:'maximum number of objects to unpack when fetching:unpack limit:->int'
     fetch.recurseSubmodules:'recurse into submodules (as needed) when fetching::->fetch.recurseSubmodules:on-demand'
     fetch.fsckObjects:'check all fetched objects::->bool:false'
@@ -2614,7 +2619,10 @@ __git_config_option-or-value () {
     'gitcvs.*.dbTableNamePrefix:database table name prefix:prefix:->string'
     gitcvs.usecrlfattr:'use end-of-line conversion attributes::->bool:false'
     gitcvs.allbinary:'treat all files from CVS as binary::->bool:false'
-    gpg.program:'use program instead of "gpg" found on $PATH when making or verifying a PGP signature::_cmdstring'
+    gpg.format:'private key format for --gpg-sign:format:compadd openpgp x509'
+    gpg.minTrustLevel:'minimum trust level for signature verification:trust level:compadd undefined never marginal fully ultimate' # TODO: sort in this order (use compadd -V)
+    {gpg.program,gpg.openpgp.program}:'use program instead of "gpg" found on $PATH when making or verifying a PGP signature::_cmdstring'
+    gpg.x509.program:'use program instead of "gpgsm" found on $PATH when making or verifying an x509 signature::_cmdstring'
     gui.commitmsgwidth:'width of commit message window:width::->int:75'
     gui.diffcontext:'number of context lines used in diff window:context::->int:5'
     gui.encoding:'encoding to use for displaying file contents::->encoding'
@@ -2776,10 +2784,13 @@ __git_config_option-or-value () {
     push.followTags:'enable --follow-tags option by default::->bool:false'
     push.gpgSign:'GPG-sign pushes::->bool:false'
     push.recurseSubmodules:'ensure all submodule commits are available on a remote-tracking branch'
+    push.pushOption:'transmit strings to server to pass to pre/post-receive hooks::->string'
     rebase.stat:'show a diffstat of what changed upstream since last rebase::->bool:false'
     rebase.autoSquash:'autosquash by default::->bool:false'
     rebase.autoStash:'autostash by default::->bool:false'
+    rebase.instructionFormat:'interactive rebase todo list format::__git_format_placeholders'
     rebase.missingCommitsCheck:'print a warning if some commits are removed'
+    rebase.rescheduleFailedExec:"automatically re-schedule any 'exec' that fails::->bool"
     receive.autogc:'run git gc --auto after receiving data::->bool:true'
     receive.fsckObjects:'check all received objects::->bool:true'
     receive.hiderefs:'string(s) receive-pack uses to decide which refs to omit from its initial advertisement:hidden refs:->string'
@@ -2795,6 +2806,7 @@ __git_config_option-or-value () {
     'remote.*.promisor:use this remote to fetch promisor objects::->bool:false'
     'remote.*.pushurl:push URL of a remote repository::__git_any_repositories'
     'remote.*.proxy:URL of proxy to use for a remote repository::_urls'
+    "remote.*.pruneTags:maintain one-to-one correspondence with remote's tag refs::->bool:false"
     'remote.*.prune:remove any remote tracking branches that no longer exist remotely::->bool:false'
     'remote.*.fetch:default set of refspecs for git fetch::__git_ref_specs_fetchy'
     'remote.*.push:default set of refspecs for git push::__git_ref_specs_pushy'
@@ -2805,9 +2817,13 @@ __git_config_option-or-value () {
     'remote.*.uploadpack:default program to execute on remote when fetching:git upload-pack command:_cmdstring'
     'remote.*.tagopt:options for retrieving remote tags::->remote.tagopt'
     'remote.*.vcs:interact with the remote through git-remote helper:remote VCS:->string'
+    repack.packKeptObjects:'repack objects in packs marked with .keep::->bool'
+    repack.useDeltaIslands:'pass --delta-islands to git-pack-objects::->bool:false'
     repack.usedeltabaseoffset:'use delta-base offsets::->bool:true'
+    repack.writeBitmaps:'trade off disk space for faster subsequent repacks::->bool'
     rerere.autoupdate:'update index after resolution::->bool:false'
     rerere.enabled:'record resolved conflicts::->bool'
+    reset.quiet:'pass --quiet by default::->bool:false'
     sendemail.identity:'default identity::__git_sendemail_identities'
     sendemail.smtpencryption:'encryption method to use::->sendemail.smtpencryption'
     sendemail.aliasesfile:'file containing email aliases:email aliases file:_files'
@@ -2865,7 +2881,9 @@ __git_config_option-or-value () {
     sendemail.assume8bitEncoding:'encoding to use for non-ASCII messages::__git_encodings'
     sequence.editor:'text editor used by git rebase -i::_cmdstring'
     showbranch.default:'default set of branches for git show-branch::->branch'
+    status.aheadBehind:"display detailed ahead/behind counts relative to upstream branch::->bool:true"
     status.relativePaths:'show paths relative to current directory::->bool:false'
+    status.showStash:'show number of stashes::->bool:false'
     status.showUntrackedFiles:'show untracked files::->status.showUntrackedFiles:normal'
     status.submodulesummary:'include submodule summary::->bool:false'
     status.branch:'show branch and tracking info in short format::->bool:false'
@@ -2879,6 +2897,7 @@ __git_config_option-or-value () {
     'submodule.*.update:update strategy to use::->submodule.update:none'
     'submodule.*.ignore:ignore modifications to submodules with git status and git diff-*::->submodule.ignore'
     submodule.recurse:'recurse into submodules by default (for most git commands)::->bool:false'
+    ssh.variant:'SSH command flavour:flavour id:compadd ssh simple plink putty tortoiseplink'
     svn.noMetadata:'disable git-svn-id: lines at end of commits::->bool:false'
     svn.useSvmProps:'use remappings of URLs and UUIDs from mirrors::->bool:false'
     svn.useSvnsyncProps:'use remappings of URLs and UUIDs for the svnsync command::->bool:false'
@@ -2920,6 +2939,8 @@ __git_config_option-or-value () {
     versionsort.suffix:'specify sort order of suffixes applied to tags:suffix'
     web.browser:'web browser to use::__git_browsers'
     worktree.guessRemote:'with add, if branch matches remote track it::->bool:true'
+
+    {fetch.fsck.skipList,receive.fsck.skipList,fsck.skipList}:'ignore objects broken in a non-fatal way:path to a list of objects:_files'
   )
 
   declare -a git_present_options # 'present' is an adjective
@@ -3024,6 +3045,7 @@ __git_config_option-or-value () {
       elif compset -P '[^.]##.'; then
         local opt
         declare -a match mbegin mend
+        # TODO: completing 'gpg.openpgp<TAB>' doesn't offer 'gpg.openpgp.program'
         for opt in ${${${${(M)git_options:#(#i)${IPREFIX}[^.:]##:*}#(#i)${IPREFIX}}/#(#b)([^:]##:)([^\\:]#(\\?[^\\:]#)#:[^\\:]#(\\?[^\\:]#)#:->bool)/$match[1]whether or not to $match[2]}/#(#b)([^:]##:([^\\:]#(\\?[^\\:]#)#))*/$match[1]}; do
           if (( ${git_options[(I)${IPREFIX}${opt%%:*}.*]} )); then
             sections_and_options+=$opt
@@ -3553,7 +3575,7 @@ __git_config_option-or-value () {
         (*)
           # TODO: Do we need to set up a _requested/_next_label?
           declare -a action
-          _description values expl "$parts[2]"
+          _description values expl "$parts[3]"
           eval "action=($parts[4])"
           "$action[1]" "$expl[@]" "${(@)action[2,-1]}" && ret=0
           ;;
@@ -7981,6 +8003,8 @@ __git_diff-or-merge-tools () {
     diffuse
     ecmerge
     emerge
+    examdiff
+    guiffy
     gvimdiff
     gvimdiff2
     gvimdiff3
@@ -7994,6 +8018,7 @@ __git_diff-or-merge-tools () {
     vimdiff
     vimdiff2
     vimdiff3
+    winmerge
     xxdiff)
 
   builtindifftools=($builtintools kompare)
