@@ -2963,6 +2963,7 @@ __git_config_option-or-value () {
       pretty
       remotes
       ${(u)${(M)${git_options%%:*}:#*[.][*][.]*}%%.*}
+      ${(u)${(M)git_present_options:#*[.][*][.]*}%%.*}
     )
     local key
     for key in $git_present_options ; do
@@ -3008,6 +3009,7 @@ __git_config_option-or-value () {
 
       if compset -P '[^.]##.*.'; then
         declare -a match mbegin mend
+        # TODO: completing 'gpg.openpgp<TAB>' adds both 'gpg.openpgp.program' and 'gpg.*.program' to $options, so it ends up being listed as 'unknown option name' even though we have a description
         # When completing 'remote.foo.<TAB>', offer 'bar' if $git_options contains 'remote.foo.bar'.
         options+=(${${${${(M)git_options:#(#i)${IPREFIX}[^.:]##:*}#(#i)${IPREFIX}}/#(#b)([^:]##:)([^\\:]#(\\?[^\\:]#)#:[^\\:]#(\\?[^\\:]#)#:->bool)/$match[1]whether or not to $match[2]}/#(#b)([^:]##:([^\\:]#(\\?[^\\:]#)#))*/$match[1]})
         # When completing 'remote.foo.<TAB>', offer 'bar' if $git_options contains 'remote.*.bar'.
@@ -3045,8 +3047,7 @@ __git_config_option-or-value () {
       elif compset -P '[^.]##.'; then
         local opt
         declare -a match mbegin mend
-        # TODO: completing 'gpg.openpgp<TAB>' doesn't offer 'gpg.openpgp.program'
-        for opt in ${${${${(M)git_options:#(#i)${IPREFIX}[^.:]##:*}#(#i)${IPREFIX}}/#(#b)([^:]##:)([^\\:]#(\\?[^\\:]#)#:[^\\:]#(\\?[^\\:]#)#:->bool)/$match[1]whether or not to $match[2]}/#(#b)([^:]##:([^\\:]#(\\?[^\\:]#)#))*/$match[1]}; do
+        for opt in ${${${${(M)git_options:#(#i)${IPREFIX}[^.:][^:]#:*}#(#i)${IPREFIX}}/#(#b)([^:]##:)([^\\:]#(\\?[^\\:]#)#:[^\\:]#(\\?[^\\:]#)#:->bool)/$match[1]whether or not to $match[2]}/#(#b)([^:]##:([^\\:]#(\\?[^\\:]#)#))*/$match[1]}; do
           if (( ${git_options[(I)${IPREFIX}${opt%%:*}.*]} )); then
             sections_and_options+=$opt
           else
