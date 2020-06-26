@@ -1,5 +1,8 @@
 2020-06-28  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 46132: Doc/Zsh/expn.yo: docs: Use an itemized list in the
+	documentation of the *(o) glob qualifier.
+
 	* 46131: Completion/Unix/Command/_git: _git-config: Partly
 	fix a bug whereby a 'foo.ba<TAB>' wouldn't be completed to
 	'foo.bar.baz'.

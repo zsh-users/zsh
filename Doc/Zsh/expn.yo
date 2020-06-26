@@ -2869,18 +2869,26 @@ matches in directory traversal order will be considered.
 Implies tt(oN) when no tt(o)var(c) qualifier is used.
 )
 item(tt(o)var(c))(
-specifies how the names of the files should be sorted. If var(c) is
-tt(n) they are sorted by name; if it is tt(L) they
-are sorted depending on the size (length) of the files; if tt(l)
-they are sorted by the number of links; if tt(a), tt(m), or tt(c)
-they are sorted by the time of the last access, modification, or
-inode change respectively; if tt(d), files in subdirectories appear before
+specifies how the names of the files should be sorted. The following values
+of var(c) sort in the following ways:
+
+startsitem()
+sitem(tt(n))(By name.)
+sitem(tt(L))(By the size (length) of the files.)
+sitem(tt(l))(By number of links.)
+sitem(tt(a))(By time of last access, youngest first.)
+sitem(tt(m))(By time of last modification, youngest first.)
+sitem(tt(c))(By time of last inode change, youngest first.)
+sitem(tt(d))(By directories: files in subdirectories appear before
 those in the current directory at each level of the search DASH()- this is best
 combined with other criteria, for example `tt(odon)' to sort on names for
-files within the same directory; if tt(N), no sorting is performed.
-Note that tt(a), tt(m), and tt(c) compare
-the age against the current time, hence the first name in the list is the
-youngest file. Also note that the modifiers tt(^) and tt(-) are used,
+files within the same directory.)
+sitem(tt(N))(No sorting is performed.)
+xitem(tt(e)var(string))
+sitem(tt(+)var(cmd))(Sort by shell code (see below).)
+endsitem()
+
+Note that the modifiers tt(^) and tt(-) are used,
 so `tt(*(^-oL))' gives a list of all files sorted by file size in descending
 order, following any symbolic links.  Unless tt(oN) is used, multiple order
 specifiers may occur to resolve ties.
