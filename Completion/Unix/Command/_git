@@ -3025,11 +3025,7 @@ __git_config_option-or-value () {
         local opt
         declare -a match mbegin mend
         for opt in ${${${${(M)git_options:#(#i)${IPREFIX}[^.:]##:*}#(#i)${IPREFIX}}/#(#b)([^:]##:)([^\\:]#(\\?[^\\:]#)#:[^\\:]#(\\?[^\\:]#)#:->bool)/$match[1]whether or not to $match[2]}/#(#b)([^:]##:([^\\:]#(\\?[^\\:]#)#))*/$match[1]}; do
-          # TODO: Completing the option names 'core.splitIndex' or 'grep.column'
-          #       offers a second, trailing dot, because there are also options
-          #       called 'splitIndex.foo' and 'column.bar' (some of them are
-          #       added to $git_options as "unknown option name").
-          if (( ${git_options[(I)${opt%%:*}.*]} )); then
+          if (( ${git_options[(I)${IPREFIX}${opt%%:*}.*]} )); then
             sections_and_options+=$opt
           else
             options+=$opt

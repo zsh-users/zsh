@@ -1,5 +1,8 @@
 2020-06-28  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 46129: Completion/Unix/Command/_git: _git-config: Fix a bug
+	where a second trailing dot would be incorrectly offered.
+
 	* 46130: Completion/Unix/Command/_git: _git-config: Complete
 	some more options.
 
