@@ -2387,12 +2387,15 @@ __git_config_option-or-value () {
     advice.nestedTag:'show advice if a user attempts to recursively tag a tag object::->bool:true'
     author.email:'email address used for author in commits::_email_addresses -c'
     author.name:'full name used for author in commits:name:->string'
+    am.threeWay:'use 3-way merge if patch does not apply cleanly::->bool:false'
     blame.blankboundary:'show blank SHA-1 for boundary commits::->bool:false'
     blame.coloring:'determine the coloring scheme to be applied to blame output:scheme [none]:->string'
+    blame.showEmail:"show author email instead of author name::->bool:false"
     blame.showroot:'show root commits as normal commits::->bool:false'
     blame.ignoreRevsFile:'ignore revisions listed in the file:file:_files'
     blame.date:'date format to use in output::__git_date_formats:iso'
     'branch.*.description:branch description:branch description:->string'
+    branch.sort:"default sorting order for 'git branch' output::__git_ref_sort_keys"
     cvsexportcommit.cvsdir:'the default location of the CVS checkout to use for the export:cvs export dir:_directories'
     column.ui:'specify whether supported commands should output in columns.::->column:never'
     column.branch:'specify whether to output branch listing in git branch in columns::_git_column_layouts:never'
@@ -2404,7 +2407,9 @@ __git_config_option-or-value () {
     core.fileMode:'track changes to the executable bit of files::->bool:true'
     core.attributesfile:'look into this file for attributes in addition to .gitattributes:additional attributes file:_files'
     core.abbrev:'set the length object names are abbreviated to:length:->int:7'
+    core.checkRoundtripEncoding:"encodings to UTF-8 round trip check::_guard '' 'comma-separated list of encodings'" # _guard used as a hack because _message doesn't take compadd options
     core.commentchar:'comment character when using an editor::->string'
+    core.filesRefLockTimeout:"how long to retry locking a reference:retry time (milliseconds, or -1 for indefinite):->int:100"
     core.ignoreCygwinFSTricks:'use Cygwin stat()/lstat()::->bool:true'
     core.ignorecase:'use workarounds for non-case-sensitive filesystems::->bool:false'
     core.trustctime:'trust inode change time::->bool:true'
@@ -2426,6 +2431,7 @@ __git_config_option-or-value () {
     core.loosecompression:'level of compression to apply to non-pack files::->compression:1'
     core.packedGitWindowSize:'size of mappings of pack files:pack window size:->bytes'
     core.packedGitLimit:'maximum number of bytes to map from pack files:maximum pack file map size:->bytes'
+    core.packedRefsTimeout:"how long to retry locking the packed-refs file:retry time (milliseconds, or -1 for indefinite):->int:1000"
     core.precomposeunicode:'revert the unicode decomposition of filenames done by Mac OS::->bool:false'
     core.deltaBaseCacheLimit:'maximum size of cache for base objects:maximum base objects cache size:->bytes:96m'
     core.bigFileThreshold:'maximum size of files to compress:maximum compress size:->bytes:512m'
@@ -2439,7 +2445,10 @@ __git_config_option-or-value () {
     core.createObject:'take steps to prevent overwriting existing objects::->core.createObject:link'
     core.checkstat:'determine which stat fields to match between the index and work tree::->core.checkstat:default'
     core.notesRef:'show notes in given refs:refs:->string:refs/notes/commits'
+    core.sparseCheckoutCone:"enable git-sparse-checkout(1) cone mode::->bool:false"
     core.sparseCheckout:'use sparse checkout::->bool:false'
+    core.splitIndex:"enable the split-index feature::->bool:false"
+    core.useReplaceRefs:"honour 'replace' refs::->bool:true"
     credential.helper:'external helper to be called when a username or password credential is needed::_cmdstring'
     credential.useHttpPath:'consider the "path" component of an http or https URL to be important::->bool:false'
     credential.username:'If no username is set use this username by default:default username:->string'
@@ -2525,13 +2534,18 @@ __git_config_option-or-value () {
     'diff.*.xfuncname:regular expression that the diff driver should use to recognize the hunk header:regular expression:->string'
     diff.algorithm:'default diff algorithm::->diff.algorithm:default'
     diff.autorefreshindex:'run git update-index --refresh before git diff::->bool:true'
+    diff.colorMoved:"color moved lines in diffs::__git_color_moved"
+    diff.colorMovedWS:"ignore whitespace when detecting moved lines::__git_color_movedws"
+    diff.wsErrorHighlight:'highlight whitespace errors: :__git_ws_error_highlight'
     diff.context:'default number of context lines::->int:3'
     diff.dirstat:'comma separated list of --dirstat parameters specifying default behaviour:comma-separated list:->string:changes,noncumulative,3'
     diff.external:'command to generate diff with:diff command:_cmdstring'
+    diff.indentHeuristic:"heuristically shift hunk boundaries::->bool:true"
+    diff.interHunkContext:"combine hunks closer than N lines:number of lines:->int"
     diff.mnemonicprefix:'use mnemonic source and destination prefixes::->bool:false'
     diff.noprefix:'strip source and destination prefixes::->bool:false'
     diff.orderfile:'file to read patch order glob patterns from:order file:_files'
-    diff.renameLimit:'number of files to consider when detecting copy/renames:rename limit:->int'
+    diff.renameLimit:'number of files to consider when detecting copy/renames:limit (number of files):->int'
     diff.renames:'try to detect renames::->diff.renames:true'
     diff.ignoreSubmodules:'ignore submodules::->bool:false'
     diff.statGraphWidth:'width of the graph part in --stat output:width:->int'
@@ -2543,10 +2557,12 @@ __git_config_option-or-value () {
     difftool.prompt:'prompt before each invocation of the diff tool::->bool:true'
     diff.wordRegex:'regex used to determine what a word is when performing word-by-word diff:regular expression:->string'
     diff.guitool:'diff tool with gui to use::__git_difftools'
+    fastimport.unpackLimit:"whether to import objects as loose object files or as a pack:threshold for packing (number of objects imported):->int"
     feature.experimental:'enable config options that are new to Git::->bool:false'
     feature.manyFiles:'enable config options that optimize for repos with many files::->bool:false'
     fetch.parallel:'specify maximum number of fetch operations to run in parallel:number:->int'
     fetch.prune:'remove any remote tracking branches that no longer exist remotely::->bool:false'
+    fetch.pruneTags:"maintain one-to-one correspondence with upstream tag refs::->bool:false"
     fetch.unpackLimit:'maximum number of objects to unpack when fetching:unpack limit:->int'
     fetch.recurseSubmodules:'recurse into submodules (as needed) when fetching::->fetch.recurseSubmodules:on-demand'
     fetch.fsckObjects:'check all fetched objects::->bool:false'
@@ -2570,13 +2586,16 @@ __git_config_option-or-value () {
     gc.aggressiveDepth:'maximum delta depth:maximum delta depth::->int:250'
     gc.aggressiveWindow:'window size used in delta compression algorithm::->int:250'
     gc.auto:'minimum limit for packing loose objects with --auto::->int:6700'
+    gc.autoDetach:"make 'git gc --auto' run in the background::->bool:true"
     gc.autopacklimit:'minimum limit for packing packs with --auto::->int:50'
+    gc.bigPackThreshold:"keep large packs:size threshold:->bytes"
     gc.packrefs:'allow git gc to run git pack-refs::->gc.packrefs:true'
-    gc.pruneexpire:'grace period for pruning::->days+now'
+    gc.pruneexpire:'grace period for pruning:number of days, "now", or "never":->int'
     gc.reflogexpire:'grace period for git reflog expire::->days:90'
     gc.reflogexpireunreachable:'grace period for git reflog expire for unreachable entries::->days:30'
     gc.rerereresolved:'number of days to keep records of resolved merges::->days:60'
     gc.rerereunresolved:'number of days to keep records of unresolved merges::->days:15'
+    gc.worktreePruneExpire:'grace period for pruning worktrees:number of days, "now", or "never":->int' # git default: 3.months.ago
     gitcvs.commitmsgannotation:'string to append to each commit message::->string'
     gitcvs.enabled:'enable the cvs server interface::->bool:false'
     gitcvs.logfile:'name of log file for cvs pserver:log file:_files'
@@ -2627,10 +2646,12 @@ __git_config_option-or-value () {
     guitool.revunmerged:'show only unmerged branches in revprompt::->bool:false'
     guitool.title:'title of prompt dialog:prompt title:->string'
     guitool.prompt:'prompt to display:prompt:->string'
+    grep.column:"show column number of first match::->bool:false"
     grep.extendedRegexp:'enable --extended-regexp option by default (ignored when grep.patternType is set)::->bool:false'
     grep.fullname:'enable --full-name option by default::->bool:false'
     grep.lineNumber:'enable -n option by default::->bool:false'
     grep.patternType:'default matching pattern type::->grep.patternType:default'
+    grep.threads:"number of worker threads::->int"
     help.browser:'browser used to display help in web format::__git_browsers'
     help.htmlpath:'location of HTML help::->help.htmlpath'
     http.cookiefile:'file containing cookie lines which should be used in the Git http session::_files'
@@ -2699,6 +2720,7 @@ __git_config_option-or-value () {
     instaweb.local:'bind to 127.0.0.1::->bool:false'
     instaweb.modulepath:'module path for the Apache HTTP-daemon for instaweb:module directory:_directories'
     instaweb.port:'port to bind HTTP daemon to for instaweb::_ports'
+    interactive.diffFilter:"mark up diffs for human consumption:filter command:_cmdstring"
     interactive.singlekey:'accept one-letter input without Enter::->bool:false'
     log.abbrevCommit:'make git-log, git-show, and git-whatchanged assume --abbrev-commit::->bool:false'
     log.date:'default date-time mode::__git_date_formats'
@@ -2716,7 +2738,9 @@ __git_config_option-or-value () {
     merge.defaultToUpstream:'merge the upstream branches configured for the current branch by default::->bool:true'
     merge.ff:'allow fast-forward merges::->merge.ff:true'
     merge.log:'include summaries of merged commits in new merge commit messages::->bool:false'
-    merge.renameLimit:'number of files to consider when detecting copy/renames during merge:limit:->int'
+    merge.directoryRenames:"try to detect directory renames:mode:compadd false true conflict"
+    merge.renames:"try to detect renames::->diff.renames"
+    merge.renameLimit:'number of files to consider when detecting copy/renames during merge:limit (number of files):->int'
     merge.renormalize:'use canonical representation of files during merge::->bool:false'
     merge.stat:'print the diffstat between ORIG_HEAD and merge at end of merge::->bool:true'
     merge.tool:'tool used by git mergetool during merges::__git_mergetools'
@@ -2792,13 +2816,15 @@ __git_config_option-or-value () {
     sendemail.bcc:'value of Bcc\: header::_email_addresses'
     sendemail.cc:'value of Cc\: header::_email_addresses'
     sendemail.cccmd:'command to generate Cc\: header with:Cc\: command:_cmdstring'
-    sendemail.toccmd:'command to generate To\: header with:To\: command:_cmdstring'
+    sendemail.tocmd:'command to generate To\: header with:To\: command:_cmdstring'
     sendemail.chainreplyto:'send each email as a reply to the previous one::->bool:false'
     sendemail.confirm:'type of confirmation required before sending::->sendemail.confirm:auto'
     sendemail.envelopesender:'envelope sender to send emails as::_email_addresses'
     sendemail.from:'sender email address::_email_addresses'
     sendemail.multiedit:'edit all files at once::->bool:true'
     sendemail.signedoffbycc:'add Signed-off-by\: or Cc\: lines to Cc\: header::->bool:true'
+    sendemail.smtpBatchSize:"number of messages to send per SMTP connection::->int"
+    sendemail.smtpReloginDelay:"delay before reconnecting to SMTP server:delay (seconds):->int"
     sendemail.smtppass:'password to use for SMTP-AUTH:password:->string'
     sendemail.suppresscc:'rules for suppressing Cc\:::->sendemail.suppresscc'
     sendemail.suppressfrom:'add From\: address to the Cc\: list::->bool:false'
@@ -2811,6 +2837,7 @@ __git_config_option-or-value () {
     sendemail.smtpuser:'user to use for SMTP-AUTH:smtp user:_users'
     sendemail.thread:'set In-Reply-To\: and References\: headers::->bool:true'
     sendemail.validate:'perform sanity checks on patches::->bool:true'
+    sendemail.xmailer:'add the "X-Mailer" header::->bool:true'
     'sendemail.*.aliasesfile:file containing email aliases::_files'
     'sendemail.*.aliasfiletype:format of aliasesfile::->sendemail.aliasfiletype'
     'sendemail.*.annotate:review and edit each patch you are about to send::bool->false'
@@ -2843,12 +2870,15 @@ __git_config_option-or-value () {
     status.submodulesummary:'include submodule summary::->bool:false'
     status.branch:'show branch and tracking info in short format::->bool:false'
     status.short:'use short format by default::->bool:false'
+    status.renameLimit:'number of files to consider when detecting copy/renames:limit (number of files):->int'
+    status.renames:"detect renames in 'status' and 'commit'::->diff.renames"
     'submodule.*.branch:remote branch name for a submodule:branch name:->string'
     'submodule.*.fetchRecurseSubmodules:fetch commits of submodules::->bool'
     'submodule.*.path:path within project:submodule directory:_directories -qS \:'
     'submodule.*.url:URL to update from::__git_any_repositories'
     'submodule.*.update:update strategy to use::->submodule.update:none'
     'submodule.*.ignore:ignore modifications to submodules with git status and git diff-*::->submodule.ignore'
+    submodule.recurse:'recurse into submodules by default (for most git commands)::->bool:false'
     svn.noMetadata:'disable git-svn-id: lines at end of commits::->bool:false'
     svn.useSvmProps:'use remappings of URLs and UUIDs from mirrors::->bool:false'
     svn.useSvnsyncProps:'use remappings of URLs and UUIDs for the svnsync command::->bool:false'
@@ -2870,6 +2900,7 @@ __git_config_option-or-value () {
     'svn-remote.*.pushurl:URL to push to::_urls'
     'svn-remote.*.branches:branch mappings:branch mapping:->string'
     'svn-remote.*.tags:tag mappings:tag mapping:->string'
+    tag.gpgSign:'sign all tags::->bool'
     tag.sort:'default sorting method:sorting method:->string'
     'tar.*.command:specify a shell command through which the tar output generated by git archive should be piped::_cmdstring'
     'tar.*.remote:enable <format> for use by remote clients via git-upload-archive::->bool'
@@ -2994,6 +3025,10 @@ __git_config_option-or-value () {
         local opt
         declare -a match mbegin mend
         for opt in ${${${${(M)git_options:#(#i)${IPREFIX}[^.:]##:*}#(#i)${IPREFIX}}/#(#b)([^:]##:)([^\\:]#(\\?[^\\:]#)#:[^\\:]#(\\?[^\\:]#)#:->bool)/$match[1]whether or not to $match[2]}/#(#b)([^:]##:([^\\:]#(\\?[^\\:]#)#))*/$match[1]}; do
+          # TODO: Completing the option names 'core.splitIndex' or 'grep.column'
+          #       offers a second, trailing dot, because there are also options
+          #       called 'splitIndex.foo' and 'column.bar' (some of them are
+          #       added to $git_options as "unknown option name").
           if (( ${git_options[(I)${opt%%:*}.*]} )); then
             sections_and_options+=$opt
           else
@@ -3242,7 +3277,7 @@ __git_config_option-or-value () {
               _message 'git-merge options'
               ;;
             (bytes)
-              __git_guard_bytes "$parts[2]" && ret=0
+              __git_guard_bytes "$parts[3]" && ret=0
               ;;
             (color)
               compset -P '* '
@@ -3315,16 +3350,6 @@ __git_config_option-or-value () {
               _values -s , $parts[2] $values && ret=0
               ;;
             (days)
-              if [[ -n $current ]]; then
-                compadd - $current && ret=0
-              elif [[ -n $parts[5] ]]; then
-                compadd - $parts[5] && ret=0
-              else
-                __git_guard_number 'number of days'
-              fi
-              ;;
-            (days+now)
-              # TODO: This needs to be improved.
               if [[ -n $current ]]; then
                 compadd - $current && ret=0
               elif [[ -n $parts[5] ]]; then
@@ -3412,7 +3437,7 @@ __git_config_option-or-value () {
               elif [[ -n $parts[5] ]]; then
                 compadd - $parts[5] && ret=0
               else
-                __git_guard_number 'integer'
+                __git_guard_number ${parts[3]:-'integer'}
               fi
               ;;
             (merge.conflictstyle)
@@ -7383,6 +7408,29 @@ __git_setup_log_options () {
   )
 }
 
+(( $+functions[__git_ws_error_highlight] )) ||
+__git_ws_error_highlight() {
+  _values -s , "kind of line" all default none context old new
+}
+
+(( $+functions[__git_color_moved] )) ||
+__git_color_moved() {
+  local -a __git_color_moved=(
+    no:"do not highlight moved lines"
+    default:"like zebra"
+    plain:"highlight moved lines with color"
+    blocks:"greedily detect blocks of moved text of at least 20 characters"
+    zebra:"like blocks, with alternating colors between different blocks"
+    dimmed-zebra:"like zebra, uninteresting parts are dimmed"
+  )
+  _describe "mode" __git_color_moved
+}
+
+(( $+functions[__git_color_movedws] )) ||
+__git_color_movedws() {
+  _sequence compadd - no ignore-space-at-eol ignore-space-change ignore-all-space allow-indentation-change
+}
+
 (( $+functions[__git_setup_diff_options] )) ||
 __git_setup_diff_options () {
   # According to Git: "fatal: --name-only, --name-status, --check and -s are mutually exclusive"
@@ -7429,13 +7477,8 @@ __git_setup_diff_options () {
                                           none\:"disable word diff"))'
     '--word-diff-regex=-[specify what constitutes a word]:word regex'
     '(--color --no-color                            )--color-words=-[show colored-word diff]::word regex'
-    '(--color --no-color                            )--color-moved=-[color moved lines differently]::mode:((no\:"do not highlith moved lines"
-                                                                                                           default\:"like zebra"
-                                                                                                           plain\:"highlight moved lines with color"
-                                                                                                           blocks\:"greedily detect blocks of moved text of at least 20 characters"
-                                                                                                           zebra\:"like blocks, with alternating colors between different blocks"
-                                                                                                           dimmed-zebra\:"like zebra, uninteresting parts are dimmed"))'
-    '(--no-color-moved-ws)--color-moved-ws=[configure how whitespace is ignored when performing move detection for --color-moved]:mode:_sequence compadd - no ignore-space-at-eol ignore-space-change ignore-all-space allow-indentation-change'
+    '(--color --no-color                            )--color-moved=-[color moved lines differently]::mode:__git_color_moved'
+    '(--no-color-moved-ws)--color-moved-ws=[configure how whitespace is ignored when performing move detection for --color-moved]:mode:__git_color_movedws'
     "(--color-moved-ws)--no-color-moved-ws=[don't ignore whitespace when performing move detection]"
     "--ita-invisible-in-index[hide 'git add -N' entries from the index]"
     "!(--ita-invisible-in-index)--ita-visible-in-index"
@@ -7443,7 +7486,7 @@ __git_setup_diff_options () {
     $exclusive_diff_options'--check[warn if changes introduce trailing whitespace or space/tab indents]'
     '--full-index[show full object name of pre- and post-image blob]'
     '(--full-index)--binary[in addition to --full-index, output binary diffs for git-apply]'
-    '--ws-error-highlight=[specify where to highlight whitespace errors]: :_values -s , "kind of line" all default none context old new'
+    '--ws-error-highlight=[specify where to highlight whitespace errors]: :__git_ws_error_highlight'
     '--abbrev=[set minimum SHA1 display-length]: :__git_guard_number length'
     '(-B --break-rewrites)'{-B-,--break-rewrites=-}'[break complete rewrite changes into pairs of given size]:: :__git_guard_number size'
     '(-M --find-renames)'{-M-,--find-renames=-}'[detect renames with given scope]:: :__git_guard_number size'
@@ -7469,7 +7512,7 @@ __git_setup_diff_options () {
     '(-b --ignore-space-change -w --ignore-all-space)'{-w,--ignore-all-space}'[ignore white space when comparing lines]'
     '--ignore-blank-lines[do not show hunks that add or remove blank lines]'
     '--no-indent-heuristic[disable heuristic that shifts diff hunk boundaries to make patches easier to read]'
-    '--inter-hunk-context=[combine hunks closer than n lines]:n'
+    '--inter-hunk-context=[combine hunks closer than N lines]:number of lines'
     '--output-indicator-new=[specify the character to indicate a new line]:character [+]'
     '--output-indicator-old=[specify the character to indicate a old line]:character [-]'
     '--output-indicator-context=[specify the character to indicate a context line]:character [ ]'
