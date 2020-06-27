@@ -569,7 +569,7 @@ free_region_highlights_memos(void)
     for (rhp = region_highlights;
 	 rhp < region_highlights + n_region_highlights;
 	 rhp++) {
-	zfree(rhp->memo, 0);
+	zfree((char*) rhp->memo, 0);
     }
 }
 

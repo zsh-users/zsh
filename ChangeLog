@@ -1,5 +1,8 @@
 2020-06-27  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted (after 46068): Src/Zle/zle_utils.c: Fix a compiler
+	warning.
+
 	* 46072 + 46136: Doc/Zsh/contrib.yo, Doc/Zsh/zle.yo,
 	Functions/Misc/add-zle-hook-widget, Src/Zle/zle_thingy.c,
 	Test/X04zlehighlight.ztst: Add the 'zle $widget -f nolast'
