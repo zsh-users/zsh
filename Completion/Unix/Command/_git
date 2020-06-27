@@ -8087,7 +8087,7 @@ _git() {
     local -A git_aliases
     local a k v
     local endopt='!(-)--end-of-options'
-    aliases=(${(0)"$(_call_program aliases git config -z --get-regexp '\^alias\.')"})
+    aliases=(${(0)"$(_call_program aliases git config -z --get-regexp '\^alias\\.')"})
     for a in ${aliases}; do
         k="${${a/$'\n'*}/alias.}"
         v="${a#*$'\n'}"
