@@ -2346,7 +2346,7 @@ __git_config_value () {
 # Helper to _git-config().  May be called by other functions, too, provided
 # that The caller has set $line, $state, and $opt_args as _git-config() would
 # set them:
-# 
+#
 # - set $line[1] to the option name being completed (even if completing an
 #   option value).
 # - set $opt_args to git-config(1) options, as set by _arguments in
@@ -2916,7 +2916,7 @@ __git_config_option-or-value () {
     for key in $git_present_options ; do
       if (( ${+git_options[(r)(#i)${(b)key}:*]} )); then
         # $key is already in git_options
-        continue 
+        continue
       elif (( ${+sections_that_permit_arbitrary_subsection_names[(r)${(b)key%%.*}]} )); then
         if [[ $key == *.*.* ]]; then
           # If $key isn't an instance of a known foo.*.bar:baz $git_options entry...

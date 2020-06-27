@@ -1,3 +1,7 @@
+2020-06-27  Miroslav Koškár  <mk@mkoskar.com>
+
+	* 46139: Completion/Unix/Command/_git: Remove hanging whitespaces
+
 2020-06-27  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted (after 46068): Src/Zle/zle_utils.c: Fix a compiler
