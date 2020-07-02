@@ -1,5 +1,8 @@
 2020-07-05  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 46174/0002: Test/comptest: test harness: Restore indentation
+	after the previous commit. No functional change.
+
 	* 46174/0001: Test/comptest: test harness: Plug a symlink attack
 
 2020-07-03  Matthew Martin  <phy1729@gmail.com>
