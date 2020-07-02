@@ -112,17 +112,25 @@ zpty_run() {
 }
 
 comptesteval () {
+ {
+  # Avoid symlink attacks on the predictable filename
+  # TODO: either use =(:) or create this file in the tests' workdir
   local tmp=/tmp/comptest.$$
+  () {
+    setopt localoptions NO_CLOBBER ERR_EXIT
+    print -lr - "$@" > $tmp
+  } "$@"
 
-  print -lr - "$@" > $tmp
   # zpty_flush Before comptesteval
-  zpty -w zsh ". $tmp"
+  zpty -w zsh ". ${(q)tmp}"
   zpty -r -m zsh log_eval "*<PROMPT>*" || {
     print "prompt hasn't appeared."
     return 1
   }
   zpty_flush After comptesteval
+ } always {
   rm $tmp
+ }
 }
 
 comptest () {
