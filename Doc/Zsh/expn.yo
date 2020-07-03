@@ -1097,17 +1097,23 @@ are sorted before those with fewer or none.  Hence the array `tt(foo1 foo02
 foo2 foo3 foo20 foo23)' is sorted into the order shown.
 May be combined with `tt(i)' or `tt(O)'.
 )
+item(tt(-))(
+As tt(n), but a leading minus sign indicates a negative decimal
+integer.  A `tt(-)' not followed by an integer does not trigger
+numeric sorting.
+)
 item(tt(o))(
 Sort the resulting words in ascending order; if this appears on its
 own the sorting is lexical and case-sensitive (unless the locale
 renders it case-insensitive).  Sorting in ascending order is the
 default for other forms of sorting, so this is ignored if combined
-with `tt(a)', `tt(i)' or `tt(n)'.
+with `tt(a)', `tt(i)', `tt(n)' or `tt(DASH())'.
 )
 item(tt(O))(
 Sort the resulting words in descending order; `tt(O)' without `tt(a)',
-`tt(i)' or `tt(n)' sorts in reverse lexical order.  May be combined
-with `tt(a)', `tt(i)' or `tt(n)' to reverse the order of sorting.
+`tt(i)', `tt(n)' or `tt(DASH())' sorts in reverse lexical order.  May be
+combined with `tt(a)', `tt(i)', `tt(n)' or tt(DASH()) to reverse the
+order of sorting.
 )
 item(tt(P))(
 This forces the value of the parameter var(name) to be interpreted as a

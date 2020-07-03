@@ -2997,17 +2997,18 @@ enum {
     SORTIT_ANYOLDHOW = 0,	/* Defaults */
     SORTIT_IGNORING_CASE = 1,
     SORTIT_NUMERICALLY = 2,
-    SORTIT_BACKWARDS = 4,
+    SORTIT_NUMERICALLY_SIGNED = 4,
+    SORTIT_BACKWARDS = 8,
     /*
      * Ignore backslashes that quote another character---which may
      * be another backslash; the second backslash is active.
      */
-    SORTIT_IGNORING_BACKSLASHES = 8,
+    SORTIT_IGNORING_BACKSLASHES = 16,
     /*
      * Ignored by strmetasort(); used by paramsubst() to indicate
      * there is some sorting to do.
      */
-    SORTIT_SOMEHOW = 16,
+    SORTIT_SOMEHOW = 32,
 };
 
 /*

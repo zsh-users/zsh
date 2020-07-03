@@ -1,3 +1,9 @@
+2020-07-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/24971: Doc/Zsh/expn.yo, Src/sort.c, Src/subst.c,
+	Src/zsh.h, Test/D04parameter.ztst: Add parameter flag (-)
+	to allow signed numeric sorting.
+
 2020-06-28  zsugabubus  <zsugabubus>
 
 	* 46097: Completion/Unix/Command/_rm: Fix "assignment to invalid

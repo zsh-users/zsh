@@ -1398,6 +1398,13 @@
 >a6 a17 a117 b6 b17 b117
 >b117 b17 b6 a117 a17 a6
 
+  foo=(a-6 a117 a-17 a-34 b6 b-117 b17 b-2)
+  print ${(-)foo}
+  print ${(O-)foo}
+0:Numeric sorting of signed integers
+>a-34 a-17 a-6 a117 b-117 b-2 b6 b17
+>b17 b6 b-2 b-117 a117 a-6 a-17 a-34
+
   x=sprodj
   x[-10]=scrumf
   print $x

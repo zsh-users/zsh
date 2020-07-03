@@ -1979,6 +1979,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		case 'n':
 		    sortit |= SORTIT_NUMERICALLY;
 		    break;
+		case '-':
+		case Dash:
+		    sortit |= SORTIT_NUMERICALLY_SIGNED;
+		    break;
 		case 'a':
 		    sortit |= SORTIT_SOMEHOW;
 		    indord = 1;

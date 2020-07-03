@@ -135,12 +135,23 @@ eltpcmp(const void *a, const void *b)
 #endif
 
     if (sortnumeric) {
+	int mul = 0;
 	for (; *as == *bs && *as; as++, bs++);
 #ifndef HAVE_STRCOLL
 	cmp = (int)STOUC(*as) - (int)STOUC(*bs);
 #endif
-	if (idigit(*as) || idigit(*bs)) {
+	if (sortnumeric < 0) {
+	    if (*as == '-' && idigit(as[1]) && idigit(*bs)) {
+		cmp = -1;
+		mul = 1;
+	    } else if (*bs == '-' && idigit(bs[1]) && idigit(*as)) {
+		cmp = 1;
+		mul = 1;
+	    }
+	}
+	if (!mul && (idigit(*as) || idigit(*bs))) {
 	    for (; as > ao && idigit(as[-1]); as--, bs--);
+	    mul = (sortnumeric < 0 && as > ao && as[-1] == '-') ? -1 : 1;
 	    if (idigit(*as) && idigit(*bs)) {
 		while (*as == '0')
 		    as++;
@@ -148,13 +159,13 @@ eltpcmp(const void *a, const void *b)
 		    bs++;
 		for (; idigit(*as) && *as == *bs; as++, bs++);
 		if (idigit(*as) || idigit(*bs)) {
-		    cmp = (int)STOUC(*as) - (int)STOUC(*bs);
+		    cmp = mul * ((int)STOUC(*as) - (int)STOUC(*bs));
 		    while (idigit(*as) && idigit(*bs))
 			as++, bs++;
 		    if (idigit(*as) && !idigit(*bs))
-			return sortdir;
+			return mul * sortdir;
 		    if (idigit(*bs) && !idigit(*as))
-			return -sortdir;
+			return -mul * sortdir;
 		}
 	    }
 	}
@@ -195,7 +206,8 @@ zstrcmp(const char *as, const char *bs, int sortflags)
 
     sortdir = 1;
     sortnobslash = (sortflags & SORTIT_IGNORING_BACKSLASHES) ? 1 : 0;
-    sortnumeric = (sortflags & SORTIT_NUMERICALLY) ? 1 : 0;
+    sortnumeric = (sortflags & SORTIT_NUMERICALLY_SIGNED) ? -1 :
+	(sortflags & SORTIT_NUMERICALLY) ? 1 : 0;
 
     ret = eltpcmp(&aeptr, &beptr);
 
@@ -389,7 +401,8 @@ strmetasort(char **array, int sortwhat, int *unmetalenp)
     oldsortnumeric = sortnumeric;
 
     sortdir = (sortwhat & SORTIT_BACKWARDS) ? -1 : 1;
-    sortnumeric = (sortwhat & SORTIT_NUMERICALLY) ? 1 : 0;
+    sortnumeric = (sortwhat & SORTIT_NUMERICALLY_SIGNED) ? -1 :
+	(sortwhat & SORTIT_NUMERICALLY) ? 1 : 0;
 
     qsort(sortptrarr, nsort, sizeof(SortElt), eltpcmp);
 
