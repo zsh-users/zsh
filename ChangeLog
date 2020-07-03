@@ -1,3 +1,8 @@
+2020-07-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted (cf. users/24972, users/24978): Doc/Zsh/expn.yo:
+	Use an ASCII hyphen/minus rather than a dash.
+
 2020-07-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/24971: Doc/Zsh/expn.yo, Src/sort.c, Src/subst.c,

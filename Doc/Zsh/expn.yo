@@ -1107,12 +1107,12 @@ Sort the resulting words in ascending order; if this appears on its
 own the sorting is lexical and case-sensitive (unless the locale
 renders it case-insensitive).  Sorting in ascending order is the
 default for other forms of sorting, so this is ignored if combined
-with `tt(a)', `tt(i)', `tt(n)' or `tt(DASH())'.
+with `tt(a)', `tt(i)', `tt(n)' or `tt(-)'.
 )
 item(tt(O))(
 Sort the resulting words in descending order; `tt(O)' without `tt(a)',
-`tt(i)', `tt(n)' or `tt(DASH())' sorts in reverse lexical order.  May be
-combined with `tt(a)', `tt(i)', `tt(n)' or tt(DASH()) to reverse the
+`tt(i)', `tt(n)' or `tt(-)' sorts in reverse lexical order.  May be
+combined with `tt(a)', `tt(i)', `tt(n)' or `tt(-)' to reverse the
 order of sorting.
 )
 item(tt(P))(
