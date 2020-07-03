@@ -1,5 +1,8 @@
 2020-07-05  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 46175/0001: Test/E01options.ztst: Add a unit test for the
+	RM_STAR_SILENT option.
+
 	* 46174/0002: Test/comptest: test harness: Restore indentation
 	after the previous commit. No functional change.
 

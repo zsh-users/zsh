@@ -57,7 +57,6 @@
 #    PROMPT_CR
 #    PUSHD_SILENT
 #    REC_EXACT
-#    RM_STAR_SILENT
 #    RM_STAR_WAIT
 #    SHARE_HISTORY
 #    SINGLE_LINE_ZLE
@@ -91,6 +90,9 @@
   mydirhome=`export HOME=$mydir/homedir; print -P %~`
   catpath=$(which cat)
   lspath==ls
+
+  # If the module fails to load, individual test points will skip.
+  zmodload zsh/zpty 2>/dev/null || true 
 
 %test
 
@@ -1423,3 +1425,26 @@ F:If this test fails at the first unsetopt, refer to P01privileged.ztst.
     (( UID == EUID ))
   fi
 0:PRIVILEGED sanity check: default value is correct
+
+  if zmodload -e zsh/zpty 2>/dev/null; then
+    for target_dir target_pattern in \
+      '.' '*'
+    do
+      before=`ls -a -- $target_dir`
+      zpty subshell $ZTST_testdir/../Src/zsh -f
+      [[ $PWD == */options.tmp ]] || return 1 # Sanity check before calling rm(1).
+      zpty -w subshell "rm $target_pattern"
+      zpty -w subshell 'n'
+      sleep 1
+      zpty -rt subshell REPLY # "${PS1} rm *"
+      zpty -rt subshell REPLY && print -r -- ${REPLY%%$'\r\n'}
+      zpty -d subshell
+      after=`ls -a -- $target_dir`
+      [[ $before == $after ]] || return 1
+    done
+  else
+    ZTST_skip="the zsh/zpty module is not available"
+  fi
+  BEL=$'\a'
+0q:RM_STAR_SILENT
+*>zsh: sure you want to delete all 15 files in ${PWD:h}/options.tmp \[yn\]\? ${BEL}
