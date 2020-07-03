@@ -1,5 +1,9 @@
 2020-07-05  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 46175/0002: Test/E01options.ztst: Add a regression test for
+	46169: the RM_STAR_SILENT logic processes the current directory
+	rather than the root directory.
+
 	* 46175/0001: Test/E01options.ztst: Add a unit test for the
 	RM_STAR_SILENT option.
 

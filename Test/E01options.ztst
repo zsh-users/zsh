@@ -1428,7 +1428,8 @@ F:If this test fails at the first unsetopt, refer to P01privileged.ztst.
 
   if zmodload -e zsh/zpty 2>/dev/null; then
     for target_dir target_pattern in \
-      '.' '*'
+      '.' '*' \
+      '/' '/*'
     do
       before=`ls -a -- $target_dir`
       zpty subshell $ZTST_testdir/../Src/zsh -f
@@ -1446,5 +1447,6 @@ F:If this test fails at the first unsetopt, refer to P01privileged.ztst.
     ZTST_skip="the zsh/zpty module is not available"
   fi
   BEL=$'\a'
-0q:RM_STAR_SILENT
+0qf:RM_STAR_SILENT
 *>zsh: sure you want to delete all 15 files in ${PWD:h}/options.tmp \[yn\]\? ${BEL}
+*>zsh: sure you want to delete all <-> files in / \[yn\]\? ${BEL}
