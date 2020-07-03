@@ -1447,6 +1447,6 @@ F:If this test fails at the first unsetopt, refer to P01privileged.ztst.
     ZTST_skip="the zsh/zpty module is not available"
   fi
   BEL=$'\a'
-0qf:RM_STAR_SILENT
+0q:RM_STAR_SILENT
 *>zsh: sure you want to delete all 15 files in ${PWD:h}/options.tmp \[yn\]\? ${BEL}
 *>zsh: sure you want to delete all <-> files in / \[yn\]\? ${BEL}

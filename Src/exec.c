@@ -3401,7 +3401,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		int rmall;
 
 		s[l - 2] = 0;
-		rmall = checkrmall(s);
+		rmall = checkrmall(l == 2 ? "/" : s);
 		s[l - 2] = t;
 
 		if (!rmall) {

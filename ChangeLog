@@ -1,5 +1,8 @@
 2020-07-05  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 46175/0003: Src/exec.c, Test/E01options.ztst: Fix the
+	RM_STAR_SILENT bug from the parent commit.
+
 	* 46175/0002: Test/E01options.ztst: Add a regression test for
 	46169: the RM_STAR_SILENT logic processes the current directory
 	rather than the root directory.
