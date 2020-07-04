@@ -1,3 +1,8 @@
+2020-07-03  Matthew Martin  <phy1729@gmail.com>
+
+	* 46168: Src/builtin.c, Test/B01cd.ztst: Update $PWD and call
+	chpwd hook after normalizing path.
+
 2020-07-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted (cf. users/24972, users/24978): Doc/Zsh/expn.yo:

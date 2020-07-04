@@ -841,7 +841,6 @@ int
 bin_cd(char *nam, char **argv, Options ops, int func)
 {
     LinkNode dir;
-    struct stat st1, st2;
 
     if (isset(RESTRICTED)) {
 	zwarnnam(nam, "restricted");
@@ -860,23 +859,6 @@ bin_cd(char *nam, char **argv, Options ops, int func)
     }
     cd_new_pwd(func, dir, OPT_ISSET(ops, 'q'));
 
-    if (stat(unmeta(pwd), &st1) < 0) {
-	setjobpwd();
-	zsfree(pwd);
-	pwd = NULL;
-	pwd = metafy(zgetcwd(), -1, META_DUP);
-    } else if (stat(".", &st2) < 0) {
-	if (chdir(unmeta(pwd)) < 0)
-	    zwarn("unable to chdir(%s): %e", pwd, errno);
-    } else if (st1.st_ino != st2.st_ino || st1.st_dev != st2.st_dev) {
-	if (chasinglinks) {
-	    setjobpwd();
-	    zsfree(pwd);
-	    pwd = NULL;
-	    pwd = metafy(zgetcwd(), -1, META_DUP);
-	} else if (chdir(unmeta(pwd)) < 0)
-	    zwarn("unable to chdir(%s): %e", pwd, errno);
-    }
     unqueue_signals();
     return 0;
 }
@@ -1210,6 +1192,7 @@ static void
 cd_new_pwd(int func, LinkNode dir, int quiet)
 {
     char *new_pwd, *s;
+    struct stat st1, st2;
     int dirstacksize;
 
     if (func == BIN_PUSHD)
@@ -1237,6 +1220,22 @@ cd_new_pwd(int func, LinkNode dir, int quiet)
 		break;
 	    }
 	}
+    }
+
+    if (stat(unmeta(new_pwd), &st1) < 0) {
+	zsfree(new_pwd);
+	new_pwd = NULL;
+	new_pwd = metafy(zgetcwd(), -1, META_DUP);
+    } else if (stat(".", &st2) < 0) {
+	if (chdir(unmeta(new_pwd)) < 0)
+	    zwarn("unable to chdir(%s): %e", new_pwd, errno);
+    } else if (st1.st_ino != st2.st_ino || st1.st_dev != st2.st_dev) {
+	if (chasinglinks) {
+	    zsfree(new_pwd);
+	    new_pwd = NULL;
+	    new_pwd = metafy(zgetcwd(), -1, META_DUP);
+	} else if (chdir(unmeta(new_pwd)) < 0)
+	    zwarn("unable to chdir(%s): %e", new_pwd, errno);
     }
 
     /* shift around the pwd variables, to make oldpwd and pwd relate to the

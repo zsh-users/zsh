@@ -33,7 +33,7 @@
 #
 # Tests should use subdirectories ending in `.tmp'.  These will be
 # removed with all the contents even if the test is aborted.
- mkdir cdtst.tmp cdtst.tmp/real cdtst.tmp/sub
+ mkdir cdtst.tmp cdtst.tmp/foo cdtst.tmp/real cdtst.tmp/sub
 
  ln -s ../real cdtst.tmp/sub/fake
 
@@ -148,6 +148,23 @@ F:something is broken.  But you already knew that.
  $ZTST_testdir/../Src/zsh -fc 'cd -P ////dev && pwd'
 -f:(workers/45367) cd -P squashes multiple leading slashes
 >/dev  
+
+ chpwd_hook() { hook_pwd=$PWD; }
+ chpwd_functions=(chpwd_hook)
+ cd $mydir/cdtst.tmp/foo &&
+ (cd $mydir && mv $mydir/cdtst.tmp/{foo,bar}) &&
+ print $PWD &&
+ print $hook_pwd &&
+ cd . &&
+ print $PWD &&
+ print $hook_pwd
+ chpwd_functions=()
+ unfunction chpwd_hook
+0q:cd . with moved PWD
+>$mydir/cdtst.tmp/foo
+>$mydir/cdtst.tmp/foo
+>$mydir/cdtst.tmp/bar
+>$mydir/cdtst.tmp/bar
 
 %clean
 # This optional section cleans up after the test, if necessary,
