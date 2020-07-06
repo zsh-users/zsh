@@ -4,13 +4,16 @@
 # key-based authentication with no passwords or a running ssh-agent to work.
 #
 # Usage:
-#   _remote_files [-/] [-g glob] [-h host] -- <cmd> [<cmd options>]
+#   _remote_files [-/] [-g glob] [-h host] [-W dir] -- <cmd> [<cmd options>]
 #
 # Options:
 # - -/: only complete directories
 # - -g: specify a pattern to match against files
 #       p, = and * glob qualifiers supported
 # - -h: specify the remote host, default is ${IPREFIX%:}
+# - -W: specify the parent directory to list files from,
+#       default is the home directory
+#
 #
 # Commands:
 # - ssh: Additional options for non-interactive use are automatically added
@@ -30,12 +33,12 @@
 # There should be coloring based on all the different ls -F classifiers.
 local expl rempat remfiles remdispf remdispd args cmd suf ret=1
 local -a args cmd_args
-local glob host
+local glob host dir dirprefix
 
 if zstyle -T ":completion:${curcontext}:files" remote-access; then
 
   # Parse options to _remote_files. Stops at the first "--".
-  zparseopts -D -E -a args / g:=glob h:=host
+  zparseopts -D -E -a args / g:=glob h:=host W:=dir
   (( $#host)) && shift host || host="${IPREFIX%:}"
 
   args=( ${argv[1,(i)--]} )
@@ -53,9 +56,13 @@ if zstyle -T ":completion:${curcontext}:files" remote-access; then
     cmd_args=( "$@" )
   fi
 
+  if (( $#dir )); then
+    dirprefix=${dir}/
+  fi
+
   if [[ -z $QIPREFIX ]]
-    then rempat="${PREFIX%%[^./][^/]#}\*"
-    else rempat="${(q)PREFIX%%[^./][^/]#}\*"
+    then rempat="${dirprefix}${PREFIX%%[^./][^/]#}\*"
+    else rempat="${dirprefix}${(q)PREFIX%%[^./][^/]#}\*"
   fi
 
   # remote filenames

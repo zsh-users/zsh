@@ -138,6 +138,11 @@
 	* github #54: davey hathorn: Completion/Unix/Command/_dig:
 	Fix dig completion error
 
+2020-04-20  insidewhy  <github@chilon.net>
+
+	* unposted: Completion/Unix/Type/_remote_files: allow
+	specifying directory name.
+
 2020-04-20  dana  <dana@dana.is>
 
 	* unposted: NEWS, README: Document zsh/system changes from
