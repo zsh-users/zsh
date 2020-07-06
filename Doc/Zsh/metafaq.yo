@@ -25,7 +25,6 @@ cindex(acquiring zsh by FTP)
 cindex(availability of zsh)
 nofill(uref(ftp://ftp.zsh.org/pub/)
 uref(https://www.zsh.org/pub/))
-)
 
 The up-to-date source code is available via Git from Sourceforge.  See
 uref(https://sourceforge.net/projects/zsh/) for details.  A summary of
