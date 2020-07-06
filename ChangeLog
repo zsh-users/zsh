@@ -1,3 +1,8 @@
+2020-07-08  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* github #53: James Pike: Completion/Unix/Type/_remote_files:
+	allow specifying directory name.
+
 2020-07-07  Bart Schaefer  <schaefer@brasslantern.com>
 
 	* 46189: Test/comptest: Ignore exit status of final zpty_flush
