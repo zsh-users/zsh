@@ -1,3 +1,8 @@
+2020-07-07  Nuri Jung  <jnooree@gmail.com>
+
+	* github #58: Doc/Zsh/mod_regex.yo: docs: Note that the zsh/regex
+	syntax is platform-dependent.
+
 2020-07-06  Pete Moore  <pmoore@mozilla.com>
 
 	* 46194: Doc/Zsh/metafaq.yo: docs: metafaq: Remove spurious

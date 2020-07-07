@@ -26,5 +26,17 @@ tt(-regex-match) operator.
 
 If tt(BASH_REMATCH) is set, then the array tt(BASH_REMATCH) will be set
 instead of tt(MATCH) and tt(match).
+
+Note that the tt(zsh/regex) module logic relies on the host system. The 
+same var(expr) and var(regex) pair could produce different results on different
+platforms if a var(regex) with non-standard syntax is given.
+
+For example, no syntax for matching a word boundary is defined in the POSIX
+extended regular expression standard. GNU tt(libc) and BSD tt(libc) both provide 
+such syntaxes as extensions (tt(\b) and tt([[:<:]])/tt([[:>:]]) respectively), 
+but neither of these syntaxes is supported by both of these implementations.
+
+Refer to the manref(regcomp)(3) and manref(re_format)(7) manual pages on your
+system for locally-supported syntax.
 )
 enditem()
