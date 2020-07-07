@@ -1,3 +1,7 @@
+2020-07-07  Bart Schaefer  <schaefer@brasslantern.com>
+
+	* 46189: Test/comptest: Ignore exit status of final zpty_flush
+
 2020-07-07  Nuri Jung  <jnooree@gmail.com>
 
 	* github #58: Doc/Zsh/mod_regex.yo: docs: Note that the zsh/regex

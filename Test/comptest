@@ -128,6 +128,7 @@ comptesteval () {
        return 1
      }
      zpty_flush After comptesteval
+     : Suppress error from zpty_flush
    } always {
      rm $tmp
    }
