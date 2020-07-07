@@ -1,5 +1,8 @@
 2020-07-08  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* github #60: Mathias Fredriksson: Completion/Unix/Type/_zfs_dataset:
+	Fix completion for a zfs dataset containing spaces
+
 	* gitlab !15: Doron Behar: Completion/Linux/Command/_modutils:
 	Fix FHS assumption
 
