@@ -1,5 +1,8 @@
 2020-07-08  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 46195: Completion/X/Type/_x_color: use showrgb command to get
+	colours if it is available
+
 	* github #50: SATOH Fumiyasu: Completion/Unix/Type/_ssh_hosts:
 	Complete hosts in "Match" directive
 

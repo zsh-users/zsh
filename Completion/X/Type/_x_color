@@ -10,25 +10,28 @@
 
 local expl
 
-if (( ! $+_color_cache )); then
+if (( ! $+_cache_x_colors )); then
+  typeset -ga _cache_x_colors
   local file
 
   # Cache of color names doesn't exist yet, create it.
 
   zstyle -s ":completion:${curcontext}:colors" path file
   if [[ -n "$file" ]]; then
-    _color_cache=( "${(@)${(@f)$(< $file)}[2,-1]##*		}" )
+    _cache_x_colors=( "${(@)${(@f)$(< $file)}[2,-1]##*		}" )
+  elif (( $+commands[showrgb] )); then
+    _cache_x_colors=( "${(@)${(@)${(@f)$(_call_program colors showrgb)}[2,-1]##*		}:#* *}" )
   else
     file=( /usr/{lib,{{X11R6,openwin},local{,/X11{,R6}}}/lib}/X11/rgb.txt(N) )
 
     (( $#file )) &&
-        _color_cache=( "${(@)${(@)${(@f)$(< $file[1])}[2,-1]##*		}:#* *}" )
+        _cache_x_colors=( "${(@)${(@)${(@f)$(< $file[1])}[2,-1]##*		}:#* *}" )
   fi
 
   # Stupid default value.
 
-  (( $#_color_cache )) || _color_cache=(white black gray red blue green)
+  (( $#_cache_x_colors )) || _cache_x_colors=(white black gray red blue green)
 fi
 
 _wanted colors expl 'color specification' compadd "$@" -M \
-    'm:{a-z}={A-Z} m:-=\  r:[^ A-Z0-9]||[ A-Z0-9]=* r:|=*' -a - _color_cache
+    'm:{a-z}={A-Z} m:-=\  r:[^ A-Z0-9]||[ A-Z0-9]=* r:|=*' -a - _cache_x_colors
