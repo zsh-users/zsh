@@ -44,7 +44,10 @@ Descriptions:
 
 Descriptions should not have a trailing full stop and initial capital
 letter. Though capitals are fine where you have an acronym which
-generally appears in uppercase. 
+generally appears in uppercase. Prefer the use of the imperative
+mood as it is shorter and more natural in the absence of an explicit
+subject for a sentence, e.g. "recurse subdirectories" instead of
+"recurses subdirectories", as if orders are being given.
 
 It is a good idea to copy descriptions from the command's man page or
 --help output. If you do this, be careful that the description still
@@ -121,7 +124,7 @@ supported. The functions are merely updated to reflect the latest stable
 version. Exceptions to this can be made where are particular version
 continues to be commonly distributed. Where there is more than one variant
 of the same command however (e.g., the command takes different options
-different platforms), the separate variants should be supported.
+on different platforms), the separate variants should be supported.
 
 Contexts, tags and all that
 ---------------------------
@@ -433,7 +436,7 @@ keep things consistent).
 Descriptions
 ------------
 
-Always use description. This is important. Really. *Always* use
+Always use descriptions. This is important. Really. *Always* use
 descriptions. If you have just written down a `compadd' without a
 "$expl[@]" (or equivalent), you have just made an error. Even in
 helper functions where you use a "$@": if you can't be sure that there 
@@ -486,6 +489,20 @@ is all you need to make your function work correctly with both tags
 and description at the same time.
 
 
+Caching
+-------
+
+Where generating matches takes a long time it can be useful to save
+the list for reuse in subsequent completion attempts.  If you use
+a global variable, prefix the name of it with `_cache_' and explicitly
+declare it with `typeset -g'.  In many cases this is sufficient but
+where generating matches takes especially long or the list is
+especially large, use the `_store_cache` mechanism to allow for a
+persistent cache.  When caching matches, also consider whether
+generated matches might be affected by style settings for limited
+contexts and adapt to allow such configuration to work.
+
+
 Misc. remarks
 -------------
 
@@ -513,7 +530,7 @@ Misc. remarks
 6)  When matches with a common prefix such as option names are generated,
     add them *with* the prefix (like `-', `+', or `--' for options).
     Then check the `prefix-needed' style to see if the matches are to be
-    added when the prefix is on the line and use the `prefix-hidden'
+    added when the prefix is not on the line and use the `prefix-hidden'
     style to see if the prefix should be listed or not.
 7)  If at all possible, completion code for a command or a suite of
     commands should go into only one file. If a command has sub-commands,

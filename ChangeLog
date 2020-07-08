@@ -1,5 +1,8 @@
 2020-07-08  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 46201 (tweaked per Daniel): Etc/completion-style-guide: add
+	guidelines for caching and use of imperative mood in descriptions
+
 	* 46195: Completion/X/Type/_x_color: use showrgb command to get
 	colours if it is available
 
