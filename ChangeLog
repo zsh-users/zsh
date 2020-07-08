@@ -1,5 +1,7 @@
 2020-07-08  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 46217: Completion/Unix/Command/_tmux: update options for tmux 3.1
+
 	* github #60: Mathias Fredriksson: Completion/Unix/Type/_zfs_dataset:
 	Fix completion for a zfs dataset containing spaces
 
