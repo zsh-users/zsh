@@ -1,7 +1,7 @@
 #compdef ansible ansible-config ansible-console ansible-doc ansible-galaxy ansible-inventory ansible-playbook ansible-pull ansible-vault -value-,ANSIBLE_STDOUT_CALLBACK,-default-
 
-local curcontext="$curcontext" plug plugvar ign ret=1
-local -a args state line
+local curcontext="$curcontext" plug plugvar subcmd ign ret=1
+local -a args state line expl gactions
 local -A opt_args
 
 case $service in
@@ -40,7 +40,7 @@ case $service in
       '!(-R --su-user -U --sudo-user)'{-R,-U,--su-user,--sudo-user}':user [root]:_users'
     )
   ;|
-  ansible|ansible-console|ansible-inventory|ansible-playbook|ansible-pull|ansible-vault)
+  ansible|ansible-console|ansible-inventory|ansible-playbook|ansible-pull)
     args+=(
       '--ask-vault-pass[ask for vault password]'
       '--vault-id=[specify vault identity to use]:vault identity'
@@ -72,7 +72,7 @@ case $service in
   ;|
   ansible-playbook|ansible-pull)
     args+=(
-      '(-t --tags)'{-t,--tags}'[only run plays and tasks tagged with these values]'
+      '(-t --tags)'{-t,--tags}'[only run plays and tasks tagged with these values]:tag:->tags'
       "--skip-tags[only run plays and tasks whose tags don't match]"
     )
   ;|
@@ -106,11 +106,12 @@ case $service in
   ;;
   ansible-doc)
     args+=(
-      '!(-l --list -F --list_files -s --snippet)'{-j,--json} # "internal testing only"
+      '!--metadata-dump' # "internal testing only"
+      '(-l --list -F --list_files -s --snippet)'{-j,--json}'[change output to json format]'
       '(-l --list -F --list_files -s --snippet)'{-l,--list}'[list available plugins]'
       '(-l --list -F --list_files -s --snippet)'{-F,--list_files}'[show plugin names and their source files without summaries]'
       '(-l --list -F --list_files -s --snippet)'{-s,--snippet}'[show playbook snippet for specified plugins]'
-      '(-t --type)'{-t+,--type=}'[choose plugin type]:plugin type [module]:(become cache callback cliconf connection httpapi inventory lookup shell module strategy vars)'
+      '(-t --type)'{-t+,--type=}'[choose plugin type]:plugin type [module]:(become cache callback cliconf connection httpapi inventory lookup netconf shell module strategy vars)'
       '*:plugin:->plugins'
     )
   ;;
@@ -127,12 +128,12 @@ case $service in
     )
   ;;
   ansible-galaxy)
-    args+=( -A "-*" $args
+    args=( -A "-*" $args
       '--list[list integrations]'
       '(-c --ignore-certs)'{-c,--ignore-certs}'[ignore SSL certificate validation errors]'
       '(-s --server)'{-s+,--server=}'[specify API server destination]:server destination'
       '--remove=[remove integration]:integration id'
-      '1:action:(delete import info init install list login remove search setup)'
+      '::type:(collection role)'
       '*::args:->galaxy'
     )
   ;;
@@ -154,7 +155,7 @@ case $service in
       '(-d --directory)'{-d+,--directory=}'[specify directory to checkout repository to]:directory:_directories'
       '--full[do a full instead of a shallow clone]'
       '(-m --module-name)'{-m+,--module-name=}'[specify repository module used for checking out repository]:module:(git subversion hg bzr)'
-      '--accept-host-key[adds the hostkey for the repo url if not already added]'
+      '--accept-host-key[add the hostkey for the repo url if not already added]'
       '--purge[purge checkout after playbook run]'
       '(-f --force)'{-f,--force}'[run the playbook even if the repository could not be updated]'
       '(-C --checkout)'{-C,--checkout}'[specify branch/tag/commit to checkout]:branch/tag/commit'
@@ -168,9 +169,7 @@ case $service in
   ;;
   ansible-vault)
     args=( -A "-*" $args
-      '::action:(create decrypt edit encrypt encrypt_string rekey view)'
-      '--new-vault-id=[specify new vault identity to use for rekey]:vault id'
-      '--new-vault-password-file=[specify new vault password file to use for rekey]:file:_files'
+      '::action:compadd -M "r:|_=* r:|=*" - create decrypt edit encrypt encrypt_string rekey view'
       '*::args:->vault'
     )
   ;;
@@ -232,27 +231,68 @@ case $state in
       _wanted plugins expl "${plug} plugin" compadd -a $plugvar && ret=0
     fi
   ;;
+  tags)
+    # The recursive glob here is questionable and perhaps there should be a style.
+    _sequence _wanted tags expl tag compadd - \
+        ${(s.,.)${(j.,.)${(M)${(f)"$(cat **/*.yml)"}:# #tags:*}#*: }} && ret=0
+  ;;
   galaxy)
     ign=''
-    curcontext="${curcontext%:*}-${line[1]}:"
-    (( $#words > 2 )) && ign='!'
+    gactions=( delete import info init install list login remove search setup )
+    case ${(j.:.)line[1,3]} in
+      (role|collection):*:*)
+        subcmd="${line[1]}-${line[2]}"
+      ;;
+      collection:*)
+        gactions=( init build publish install )
+        subcmd=collection
+      ;;
+      role:*) subcmd=role ;;
+      *:*) subcmd="role-${line[1]}" ;&
+      [^:]#)
+        words=( role "$words[@]" )
+        (( CURRENT++ ))
+      ;;
+    esac
+    curcontext="${curcontext%:*}-${subcmd}:"
+    (( $#words > 3 )) && ign='!'
     args=(
       "${ign}(-)"{-h,--help}'[display usage information]'
-      '(-c --ignore-certs)'{-c,--ignore-certs}'[ignore SSL certificate validation errors]'
-      '(-s --server)'{-s+,--server=}'[specify API server destination]:server:_hosts'
-      {-v,--verbose}'[verbose mode]'
+      '1: :{ _wanted actions expl action compadd -a gactions }'
     )
-    case $line[1] in
-      info|search|list|remove|install)
+    case $subcmd in
+      *-*)
+        args+=(
+          '(-c --ignore-certs)'{-c,--ignore-certs}'[ignore SSL certificate validation errors]'
+          '(-s --server)'{-s+,--server=}'[specify API server destination]:server:_hosts'
+          \*{-v,--verbose}'[verbose mode]'
+        )
+      ;|
+      collection-*)
+        args+=( '--api-key=[specify ansible galaxy API key]:api key' )
+      ;|
+      role-(info|search|list|remove|install))
 	args+=( '(-p --roles-path)'{-p,--roles-path}'[specify location of roles]:path:_directories' )
       ;|
-      info|init)
+      role-(info|init))
 	args+=( "--offline[don't query the galaxy API]" )
       ;|
-      init|install)
-	args+=( '(-f --force)'{-f,--force}'[force overwriting an existing role]' )
+      *-(init|build|install))
+	args+=( '(-f --force)'{-f,--force}'[force overwriting an existing role or collection]' )
       ;|
-      search)
+      *-install)
+	args+=(
+	  '(-i --ignore-errors)'{-i,--ignore-errors}'[ignore errors and continue with the next specified role/collection]'
+	  '(-n --no-deps)'{-n,--no-deps}"[don’t download roles/collections listed as dependencies]"
+	  "--force-with-deps[force overwriting an existing role/collection and it's dependencies]"
+        )
+      ;|
+      *-init)
+        args+=(
+          '--init-path=[specify path in which the skeleton will be created]:path:_directories'
+        )
+      ;|
+      role-search)
 	args+=(
            '--author=[specify GitHub username]:username'
            '--galaxy-tags=[specify list of galaxy tags to filter by]:galaxy tags'
@@ -260,29 +300,25 @@ case $state in
 	   '*: :_guard "^-*" "search term"'
 	)
       ;;
-      setup)
+      role-setup)
 	args+=(
 	  '--list[list integrations]'
 	  '--remove=[remove integration]:integration id'
 	)
       ;;
-      init)
+      role-init)
 	args+=(
-          '--init-path=[specify path in which the skeleton role will be created]:path:_directories'
-          '--role-skeleton=[specify path to a role skeleton that the new role should be based upon]'
+          '--role-skeleton=[specify path to a role skeleton that the new role should be based upon]:path:_files'
 	  '--type=[initialize using an alternate role type]:role type:(container apb network)'
 	)
       ;;
-      install)
+      role-install)
 	args+=(
-	  "--force-with-deps[force overwriting an existing role and it's dependencies]"
-	  '(-n --no-deps)'{-n,--no-deps}"[don’t download roles listed as dependencies]"
-	  '(-i --ignore-errors)'{-i,--ignore-errors}'[ignore errors and continue with the next specified role]'
 	  '(-g --keep-scm-meta)'{-g,--keep-scm-meta}'[use tar instead of the scm archive option when packaging the role]'
 	  '(-r --role-file)'{-r+,--role-file=}'[specify file containing a list of roles to be imported]:file:_files'
         )
       ;;
-      import)
+      role-import)
 	args+=(
            '--status[check the status of the most recent import request for given github_user/github_repo]'
            "--no-wait[don’t wait for import results]"
@@ -290,24 +326,54 @@ case $state in
            '--role-name=[specify name the role should have]:role'
         )
       ;;
-      login)
+      role-login)
 	args+=(
 	  '--github-token=[identify with github token rather than username and password]'
 	)
       ;;
+      collection-build)
+        args+=(
+          '--output-path=[specify path in which the collection is built to]:path [.]:_directories'
+        )
+      ;;
+      collection-init)
+	args+=(
+          '--collection-skeleton=[specify path to a collection skeleton that the new role should be based upon]:path:_files'
+	)
+      ;;
+      collection-publish)
+        args+=(
+          "--no-wait[don't wait for import validation results]"
+          '--import-timeout=[specify time to wait for import process]:time'
+        )
+      ;;
+      collection-install)
+        args+=(
+          '(-p --collections-path)'{-p+,--collections-path=}'[specify directory containing collections]:_directories'
+          '(-r --requirements-file)'{-r+,--requirements-file=}'[specify file containing a list of collections to install]:file:_files'
+        )
+      ;;
     esac
-    _arguments -s -S $args && ret=0
+    _arguments -s -S : $args && ret=0
   ;;
   vault)
+    ign=''
     curcontext="${curcontext%:*}-${line[1]}:"
-    args=()
+    (( $#words > 2 )) && ign='!'
+    args=(
+      "${ign}(-)"{-h,--help}'[display usage information]'
+      '--ask-vault-pass[ask for vault password]'
+      '--vault-id=[specify vault identity to use]:vault identity'
+      '--vault-password-file=[specify vault password file]:vault password file:_files'
+      \*{-v,--verbose}'[verbose mode]'
+    )
     case $line[1] in
-      encrypt*|edit|rekey)
+      create|encrypt*|edit|rekey)
 	args+=(
 	  '--encrypt-vault-id=[specify vault id to use to encrypt (required if more than one vault-id is provided)]:vault id'
 	)
       ;|
-      (de|en)crypt*) args=( '--output=[specify output file name]:file:_files' ) ;|
+      (de|en)crypt*) args+=( '--output=[specify output file name]:file:_files' ) ;|
       encrypt_string)
 	args+=(
 	  '(-p --prompt)'{-p,--prompt}'[prompt for the string to encrypt]'
@@ -316,7 +382,12 @@ case $state in
 	)
       ;|
       create|edit|rekey|view) args+=( ':file:_files' ) ;|
-      (en|de)crypt) args+=( '::file:_files' )
+      (en|de)crypt) args+=( '::file:_files' ) ;;
+      rekey)
+        args+=(
+          '--new-vault-id=[specify new vault identity to use]:vault identity'
+          '--new-vault-password-file=[specify new vault password file]:vault password file:_files'
+        )
       ;;
     esac
     _arguments -s -S $args && ret=0
