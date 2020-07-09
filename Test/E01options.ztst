@@ -1426,18 +1426,21 @@ F:If this test fails at the first unsetopt, refer to P01privileged.ztst.
   fi
 0:PRIVILEGED sanity check: default value is correct
 
-  if zmodload -e zsh/zpty 2>/dev/null; then
+  if [[ $OSTYPE == cygwin ]]; then
+    ZTST_skip='the zsh/zpty module does not work on Cygwin'
+  elif zmodload -e zsh/zpty 2>/dev/null; then
     for target_dir target_pattern in \
       '.' '*' \
       '/' '/*'
     do
       before=`ls -a -- $target_dir`
-      zpty subshell $ZTST_testdir/../Src/zsh -f
+      zpty subshell $ZTST_testdir/../Src/zsh -f +Z
       [[ $PWD == */options.tmp ]] || return 1 # Sanity check before calling rm(1).
+      zpty -w subshell 'PS1=PROMPT'
+      zpty -r -m subshell REPLY $'*PROMPT'
       zpty -w subshell "rm $target_pattern"
-      zpty -w subshell 'n'
+      zpty -w -n subshell 'n'
       sleep 1
-      zpty -rt subshell REPLY # "${PS1} rm *"
       zpty -rt subshell REPLY && print -r -- ${REPLY%%$'\r\n'}
       zpty -d subshell
       after=`ls -a -- $target_dir`
@@ -1448,5 +1451,5 @@ F:If this test fails at the first unsetopt, refer to P01privileged.ztst.
   fi
   BEL=$'\a'
 0q:RM_STAR_SILENT
-*>zsh: sure you want to delete all 15 files in ${PWD:h}/options.tmp \[yn\]\? ${BEL}
-*>zsh: sure you want to delete all <-> files in / \[yn\]\? ${BEL}
+*>zsh: sure you want to delete all 15 files in ${PWD:h}/options.tmp \[yn\]\? ${BEL}(|n)
+*>zsh: sure you want to delete all <-> files in / \[yn\]\? ${BEL}(|n)
