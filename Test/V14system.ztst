@@ -13,27 +13,26 @@
 %test
 
   (
-    zsystem flock -t 0.1 -i 0.000001 $tst_dir/file
+    zsystem flock -t 0 -i 0.000001 $tst_dir/file    &&
+    zsystem flock -t 0.1 -i 0.000001 $tst_dir/file  &&
+    zsystem flock -t 0.1 -i 0.0000001 $tst_dir/file &&
+    zsystem flock -t 1 -i 0.000001 $tst_dir/file
   )
 0:zsystem flock valid time arguments
 
   (
-    zsystem flock -t -1         $tst_dir/file ||
-    zsystem flock -t 0.49e-6    $tst_dir/file ||
     zsystem flock -t 1073741824 $tst_dir/file ||
     zsystem flock -t 1e100      $tst_dir/file ||
     zsystem flock -i -1         $tst_dir/file ||
-    zsystem flock -i 0.49e-6    $tst_dir/file ||
+    zsystem flock -i 0          $tst_dir/file ||
     zsystem flock -i 1e100      $tst_dir/file
   )
 1:zsystem flock invalid time arguments
-?(eval):zsystem:2: flock: invalid timeout value: '-1'
-?(eval):zsystem:3: flock: invalid timeout value: '0.49e-6'
-?(eval):zsystem:4: flock: invalid timeout value: '1073741824'
-?(eval):zsystem:5: flock: invalid timeout value: '1e100'
-?(eval):zsystem:6: flock: invalid interval value: '-1'
-?(eval):zsystem:7: flock: invalid interval value: '0.49e-6'
-?(eval):zsystem:8: flock: invalid interval value: '1e100'
+?(eval):zsystem:2: flock: invalid timeout value: '1073741824'
+?(eval):zsystem:3: flock: invalid timeout value: '1e100'
+?(eval):zsystem:4: flock: invalid interval value: '-1'
+?(eval):zsystem:5: flock: invalid interval value: '0'
+?(eval):zsystem:6: flock: invalid interval value: '1e100'
 
   (
     # Lock file for 1 second in the background.

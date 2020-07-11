@@ -1,3 +1,8 @@
+2020-07-11  dana  <dana@dana.is>
+
+	* Cedric Ware: 46152: Src/Modules/system.c, Test/V14system.ztst:
+	Re-allow '0' timeout in zsystem flock
+
 2020-07-09  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 46215 (w/ minor tweak): Test/E01options.ztst: make the test

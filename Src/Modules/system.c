@@ -597,7 +597,7 @@ bin_zsystem_flock(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		 * a 32-bit int and CLOCK_MONOTONIC is not supported, in which
 		 * case there is a Y2038 problem anyway.
 		 */
-		if (timeout < 1e-6 || timeout > 1073741823.) {
+		if (timeout > 1073741823.) {
 		    zwarnnam(nam, "flock: invalid timeout value: '%s'",
 			     optarg);
 		    return 1;
@@ -623,7 +623,7 @@ bin_zsystem_flock(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		    timeout_param.type = MN_FLOAT;
 		    timeout_param.u.d = (double)timeout_param.u.l;
 		}
-		timeout_param.u.d *= 1e6;
+		timeout_param.u.d = ceil(timeout_param.u.d * 1e6);
 		if (timeout_param.u.d < 1
 		    || timeout_param.u.d > 0.999 * LONG_MAX) {
 		    zwarnnam(nam, "flock: invalid interval value: '%s'",
@@ -704,7 +704,7 @@ bin_zsystem_flock(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	zgettime_monotonic_if_available(&now);
 	end.tv_sec = now.tv_sec;
 	end.tv_nsec = now.tv_nsec;
-	end.tv_nsec += modf(timeout, &timeout_s) * 1000000000L;
+	end.tv_nsec += ceil(modf(timeout, &timeout_s) * 1000000000L);
 	end.tv_sec += timeout_s;
 	if (end.tv_nsec >= 1000000000L) {
 	    end.tv_nsec -= 1000000000L;
