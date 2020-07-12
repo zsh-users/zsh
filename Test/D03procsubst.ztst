@@ -160,3 +160,12 @@
   $ZTST_testdir/../Src/zsh -df -o shfileexpansion -c 'cat =(echo hi)'
 0:EQUALS expansion followed by =(...) (sh ordering) should work
 >hi
+
+  () {
+    local TMPPREFIX=$PWD/tmp
+    command true =(true) =(true) | :
+    print -rC1 -- $TMPPREFIX*(N)
+  }
+0f:external command with =(...) on LHS of pipeline cleans up its tempfiles
+# (Expected result: no output.)
+

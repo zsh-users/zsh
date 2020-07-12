@@ -1,5 +1,8 @@
 2020-07-12  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 46183: Test/D03procsubst.ztst: New XFail test: external
+	command with =(...) on LHS of pipeline cleans up its tempfiles.
+
 	* unposted (cf. GitHub #11): Misc/vcs_info-examples: vcs_info
 	hg: docs: Change an example to not use a hex dump incantation
 	that may replace some bytes' values with asterisks.
