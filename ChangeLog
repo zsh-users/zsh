@@ -1,5 +1,9 @@
 2020-07-12  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* users/24985: Doc/Zsh/expn.yo: Clarify documentation of the
+	${(n)} and ${(-)} parameter expansion flags, and add a forward
+	compatibility hatch to the latter.
+
 	* 46204: Test/E01options.ztst: Fix new test case for the
 	theoretical case of having more than 100 files in the root
 	directory.

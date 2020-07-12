@@ -1092,15 +1092,18 @@ Convert all letters in the result to lower case.
 item(tt(n))(
 Sort decimal integers numerically; if the first differing
 characters of two test strings are not digits, sorting
-is lexical.   Integers with more initial zeroes
-are sorted before those with fewer or none.  Hence the array `tt(foo1 foo02
+is lexical.  `tt(+)' and `tt(-)' are not treated specially; they are treated as
+any other non-digit.  Integers with more initial zeroes
+are sorted before those with fewer or none.  Hence the array `tt(foo+24 foo1 foo02
 foo2 foo3 foo20 foo23)' is sorted into the order shown.
 May be combined with `tt(i)' or `tt(O)'.
 )
 item(tt(-))(
 As tt(n), but a leading minus sign indicates a negative decimal
-integer.  A `tt(-)' not followed by an integer does not trigger
+integer.  A leading minus sign not followed by an integer does not trigger
 numeric sorting.
+Note that `tt(+)' signs are not handled specially (this may change in the
+future).
 )
 item(tt(o))(
 Sort the resulting words in ascending order; if this appears on its
