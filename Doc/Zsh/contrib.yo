@@ -3560,7 +3560,8 @@ Calling tt(zsh-mime-setup) with the option
 tt(-v) causes verbose output to be shown during the setup operation.
 
 The system respects the tt(mailcap) flags tt(needsterminal) and
-tt(copiousoutput), see manref(mailcap)(4).
+tt(copiousoutput); see manref(mailcap)(4) or manref(mailcap)(5)
+(the man page's name varies across platforms).
 
 The functions use the following styles, which are defined with the
 tt(zstyle) builtin command (\
@@ -4465,7 +4466,7 @@ counts the number of arguments passed to each execution of var(command),
 em(including) any var(arg) list.  Also, any time tt(-i) or tt(-I) is used,
 each var(input) is processed separately as if by `tt(-L) tt(1)'.
 
-For details of the other tt(zargs) options, see zmanref(xargs) (but note
+For details of the other tt(zargs) options, see the manref(xargs)(1) man page (but note
 the difference in function between tt(zargs) and tt(xargs)) or run
 tt(zargs) with the tt(-)tt(-help) option.
 )

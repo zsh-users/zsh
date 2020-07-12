@@ -111,7 +111,7 @@ cindex(jobs, disowning)
 cindex(disowning jobs)
 findex(disown, use of)
 To avoid having the shell terminate the running jobs, either
-use the bf(nohup) command (see manref(nohup)(1))
+use the manref(nohup)(1) command
 or the tt(disown) builtin.
 sect(Signals)
 The tt(INT) and tt(QUIT) signals for an invoked

@@ -150,7 +150,7 @@ def(comment)(1)(\
 
 COMMENT(--- cross-references ---)
 
-def(manref)(2)(man page ARG1+LPAR()ARG2+RPAR())
+def(manref)(2)(ARG1+LPAR()ARG2+RPAR())
 def(zmanref)(1)(manref(ARG1)(1))
 def(noderef)(1)(\
   NOTRANS(@ref{)ARG1+NOTRANS(})\
