@@ -1,5 +1,9 @@
 2020-07-12  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 46204: Test/E01options.ztst: Fix new test case for the
+	theoretical case of having more than 100 files in the root
+	directory.
+
 	* unposted: .editorconfig: For Makefiles, make the indent size
 	equal to tab width.
 

@@ -1452,4 +1452,4 @@ F:If this test fails at the first unsetopt, refer to P01privileged.ztst.
   BEL=$'\a'
 0q:RM_STAR_SILENT
 *>zsh: sure you want to delete all 15 files in ${PWD:h}/options.tmp \[yn\]\? ${BEL}(|n)
-*>zsh: sure you want to delete all <-> files in / \[yn\]\? ${BEL}(|n)
+*>zsh: sure you want to delete (all <->|more than <->) files in / \[yn\]\? ${BEL}(|n)
