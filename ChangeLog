@@ -1,5 +1,9 @@
 2020-07-12  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted (cf. GitHub #11): Misc/vcs_info-examples: vcs_info
+	hg: docs: Change an example to not use a hex dump incantation
+	that may replace some bytes' values with asterisks.
+
 	* users/24985: Doc/Zsh/expn.yo: Clarify documentation of the
 	${(n)} and ${(-)} parameter expansion flags, and add a forward
 	compatibility hatch to the latter.
