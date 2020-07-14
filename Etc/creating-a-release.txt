@@ -72,6 +72,12 @@ To create a zsh release:
 	git clone git://git.code.sf.net/p/zsh/web
 	git clone ssh://git.code.sf.net/p/zsh/web
 
+- [one time step] Add your key to the Keys/ directory in the 'web' repository, using
+  `gpg --armor --export $YourPublicKeyFingerprint`.
+
+  TODO: cat Keys/*.asc into a zsh-keyring.asc, upload it along with the
+  tarballs, link to it from Arc/source.html and elsewhere
+
 - Upload to sf.net:
 
 	Test releases go to the "zsh-test" directory.
