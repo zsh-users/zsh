@@ -75,8 +75,9 @@ To create a zsh release:
 - [one time step] Add your key to the Keys/ directory in the 'web' repository, using
   `gpg --armor --export $YourPublicKeyFingerprint`.
 
-  TODO: cat Keys/*.asc into a zsh-keyring.asc, upload it along with the
-  tarballs, link to it from Arc/source.html and elsewhere
+- Create the keyring:
+
+        cat web.git/Keys/*.asc > zsh-keyring.asc
 
 - Upload to sf.net:
 
@@ -86,6 +87,22 @@ To create a zsh release:
 	under zsh/, press the 🛈 button ("View Details") to its right, and press
 	[Select All] next to "Default Download For:".  This should cause sf.net
 	to offer that artifact in the "Looking for the latest version?" line.
+
+  You should upload five files:
+
+        zsh-5.8.tar.xz
+        zsh-5.8.tar.xz.asc
+        zsh-doc-5.8.tar.xz
+        zsh-doc-5.8.tar.xz.asc
+        zsh-keyring.asc
+
+        (TODO: what about MD5SUM, FAQ, META-FAQ, all in www.zsh.org/pub/?)
+
+  Note that zsh-keyring.asc is fine to just overwrite, since it's only ever
+  appended to, and in any case the underlying Keys/*.asc files are in version
+  control.
+
+  TODO: link to zsh-keyring.asc from Arc/source.html and elsewhere
 
 - If the new release is a stable release, update zsh.sf.net:
 

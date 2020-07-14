@@ -1,5 +1,8 @@
 2020-07-14  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 46244 (cont.): Etc/creating-a-release.txt: Flesh out the TODO
+	from the previous commit.
+
 	* 46244: Etc/creating-a-release.txt: Start to introduce a
 	release managers keyring.
 
