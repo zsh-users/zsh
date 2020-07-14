@@ -6,7 +6,7 @@
 # If you specify a -g option with a pattern, the pattern will be used to
 # restrict the type of parameters matched.
 
-local expl pattern fakes faked tmp pfilt
+local expl pattern fakes faked tmp i pfilt
 
 if compset -P '*:'; then
   _history_modifiers p
