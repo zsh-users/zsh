@@ -1,3 +1,8 @@
+2020-07-15  oxiedi  <oxiedi@yandex.ru>
+
+	* github #62: Completion/Unix/Type/_date_formats: return proper
+	exit status
+
 2020-07-14  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 46244 (cont.): Etc/creating-a-release.txt: Flesh out the TODO
