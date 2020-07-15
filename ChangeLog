@@ -1,5 +1,8 @@
 2021-02-07  Oliver Kiddle  <opk@zsh.org>
 
+	* based on github #62: oxiedi@yandex.ru:
+	Completion/Unix/Type/_date_formats: return proper exit status
+
 	* github #66: DCsunset: Completion/Unix/Command/_todo.sh:
 	Add more commands to _todo.sh
 
