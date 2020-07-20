@@ -4,7 +4,7 @@ local subopts opt usecc garbage keep
 
 subopts=()
 zparseopts -D -a garbage s+:=keep S+:=keep w+=keep C=usecc O:=subopts \
-    M: J: V: 1 2 n F: X:
+    M: J: V: 1 2 o+: n F: X:
 
 (( $#subopts )) && subopts=( "${(@P)subopts[2]}" )
 

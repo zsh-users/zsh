@@ -216,6 +216,16 @@ F:regression test workers/31611
 >NO:{3pm}
 >NO:{10pm}
 
+  comptesteval "_tst() { _arguments ': :_values desc 3 2 1' }"
+  comptest $'tst \t'
+  comptesteval "zstyle -d ':completion:*:tst:*' sort"
+0:sorting disabled via the sort style for _values as an action to _arguments
+>line: {tst }{}
+>DESCRIPTION:{desc}
+>NO:{3}
+>NO:{2}
+>NO:{1}
+
   comptesteval "_tst() { _arguments ':desc:_sequence compadd - 1 2 3' }"
   comptesteval "zstyle ':completion:*:tst:*' ignored-patterns 2"
   comptest $'tst 1,\t'
