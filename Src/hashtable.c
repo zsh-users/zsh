@@ -28,25 +28,29 @@
  */
 
 #include "../config.h"
-
-#ifdef ZSH_HASH_DEBUG
-# define HASHTABLE_DEBUG_MEMBERS \
-    /* Members of struct hashtable used for debugging hash tables */ \
-    HashTable next, last;	/* linked list of all hash tables           */ \
-    char *tablename;		/* string containing name of the hash table */ \
-    PrintTableStats printinfo;	/* pointer to function to print table stats */
-#else /* !ZSH_HASH_DEBUG */
-# define HASHTABLE_DEBUG_MEMBERS
-#endif /* !ZSH_HASH_DEBUG */
-
-#define HASHTABLE_INTERNAL_MEMBERS \
-    ScanStatus scan;		/* status of a scan over this hashtable     */ \
-    HASHTABLE_DEBUG_MEMBERS
-
-typedef struct scanstatus *ScanStatus;
-
 #include "zsh.mdh"
 #include "hashtable.pro"
+
+typedef struct scanstatus *ScanStatus;
+typedef struct hashtableimpl* HashTableImpl;
+
+struct hashtableimpl {
+    /* Public part of hash table, accessible from outside of hashtable.c.   *
+     * Must be the first field to allow casting HashTable to HashTableImpl. */
+    struct hashtable pub;
+
+    /* HASHTABLE INTERNAL MEMBERS */
+    ScanStatus scan;		/* status of a scan over this hashtable     */
+
+#ifdef ZSH_HASH_DEBUG
+    /* HASHTABLE DEBUG MEMBERS */
+    HashTableImpl next, last;	/* linked list of all hash tables           */
+    char *tablename;		/* string containing name of the hash table */
+    PrintTableStats printinfo;	/* pointer to function to print table stats */
+#endif /* !ZSH_HASH_DEBUG */
+};
+
+static inline HashTableImpl impl(HashTable ht) { return (HashTableImpl)ht; }
 
 /* Structure for recording status of a hashtable scan in progress.  When a *
  * scan starts, the .scan member of the hashtable structure points to one  *
@@ -71,7 +75,8 @@ struct scanstatus {
 /********************************/
 
 #ifdef ZSH_HASH_DEBUG
-static HashTable firstht, lastht;
+static void printhashtabinfo(HashTable ht);
+static HashTableImpl firstht, lastht;
 #endif /* ZSH_HASH_DEBUG */
 
 /* Generic hash function */
@@ -94,9 +99,9 @@ hasher(const char *str)
 mod_export HashTable
 newhashtable(int size, UNUSED(char const *name), UNUSED(PrintTableStats printinfo))
 {
-    HashTable ht;
+    HashTableImpl ht;
 
-    ht = (HashTable) zshcalloc(sizeof *ht);
+    ht = (HashTableImpl) zshcalloc(sizeof *ht);
 #ifdef ZSH_HASH_DEBUG
     ht->next = NULL;
     if(!firstht)
@@ -108,12 +113,12 @@ newhashtable(int size, UNUSED(char const *name), UNUSED(PrintTableStats printinf
     ht->printinfo = printinfo ? printinfo : printhashtabinfo;
     ht->tablename = ztrdup(name);
 #endif /* ZSH_HASH_DEBUG */
-    ht->nodes = (HashNode *) zshcalloc(size * sizeof(HashNode));
-    ht->hsize = size;
-    ht->ct = 0;
+    ht->pub.nodes = (HashNode *) zshcalloc(size * sizeof(HashNode));
+    ht->pub.hsize = size;
+    ht->pub.ct = 0;
     ht->scan = NULL;
-    ht->scantab = NULL;
-    return ht;
+    ht->pub.scantab = NULL;
+    return &ht->pub;
 }
 
 /* Delete a hash table.  After this function has been used, any *
@@ -125,18 +130,18 @@ deletehashtable(HashTable ht)
 {
     ht->emptytable(ht);
 #ifdef ZSH_HASH_DEBUG
-    if(ht->next)
-	ht->next->last = ht->last;
+    if(impl(ht)->next)
+	impl(ht)->next->last = impl(ht)->last;
     else
-	lastht = ht->last;
-    if(ht->last)
-	ht->last->next = ht->next;
+	lastht = impl(ht)->last;
+    if(impl(ht)->last)
+	impl(ht)->last->next = impl(ht)->next;
     else
-	firstht = ht->next;
-    zsfree(ht->tablename);
+	firstht = impl(ht)->next;
+    zsfree(impl(ht)->tablename);
 #endif /* ZSH_HASH_DEBUG */
     zfree(ht->nodes, ht->hsize * sizeof(HashNode));
-    zfree(ht, sizeof(*ht));
+    zfree(ht, sizeof(struct hashtableimpl));
 }
 
 /* Add a node to a hash table.                          *
@@ -175,7 +180,7 @@ addhashnode2(HashTable ht, char *nam, void *nodeptr)
     if (!hp) {
 	hn->next = NULL;
 	ht->nodes[hashval] = hn;
-	if (++ht->ct >= ht->hsize * 2 && !ht->scan)
+	if (++ht->ct >= ht->hsize * 2 && !impl(ht)->scan)
 	    expandhashtable(ht);
 	return NULL;
     }
@@ -185,15 +190,15 @@ addhashnode2(HashTable ht, char *nam, void *nodeptr)
 	ht->nodes[hashval] = hn;
 	replacing:
 	hn->next = hp->next;
-	if(ht->scan) {
-	    if(ht->scan->sorted) {
-		HashNode *hashtab = ht->scan->u.s.hashtab;
+	if(impl(ht)->scan) {
+	    if(impl(ht)->scan->sorted) {
+		HashNode *hashtab = impl(ht)->scan->u.s.hashtab;
 		int i;
-		for(i = ht->scan->u.s.ct; i--; )
+		for(i = impl(ht)->scan->u.s.ct; i--; )
 		    if(hashtab[i] == hp)
 			hashtab[i] = hn;
-	    } else if(ht->scan->u.u == hp)
-		ht->scan->u.u = hn;
+	    } else if(impl(ht)->scan->u.u == hp)
+		impl(ht)->scan->u.u = hn;
 	}
 	return hp;
     }
@@ -211,7 +216,7 @@ addhashnode2(HashTable ht, char *nam, void *nodeptr)
     /* else just add it at the front of the list */
     hn->next = ht->nodes[hashval];
     ht->nodes[hashval] = hn;
-    if (++ht->ct >= ht->hsize * 2 && !ht->scan)
+    if (++ht->ct >= ht->hsize * 2 && !impl(ht)->scan)
         expandhashtable(ht);
     return NULL;
 }
@@ -284,15 +289,15 @@ removehashnode(HashTable ht, const char *nam)
 	ht->nodes[hashval] = hp->next;
 	gotit:
 	ht->ct--;
-	if(ht->scan) {
-	    if(ht->scan->sorted) {
-		HashNode *hashtab = ht->scan->u.s.hashtab;
+	if(impl(ht)->scan) {
+	    if(impl(ht)->scan->sorted) {
+		HashNode *hashtab = impl(ht)->scan->u.s.hashtab;
 		int i;
-		for(i = ht->scan->u.s.ct; i--; )
+		for(i = impl(ht)->scan->u.s.ct; i--; )
 		    if(hashtab[i] == hp)
 			hashtab[i] = NULL;
-	    } else if(ht->scan->u.u == hp)
-		ht->scan->u.u = hp->next;
+	    } else if(impl(ht)->scan->u.u == hp)
+		impl(ht)->scan->u.u = hp->next;
 	}
 	return hp;
     }
@@ -399,7 +404,7 @@ scanmatchtable(HashTable ht, Patprog pprog, int sorted,
 	st.sorted = 1;
 	st.u.s.hashtab = hnsorttab;
 	st.u.s.ct = ct;
-	ht->scan = &st;
+	impl(ht)->scan = &st;
 
 	for (htp = hnsorttab, i = 0; i < ct; i++, htp++) {
 	    if ((!flags1 || ((*htp)->flags & flags1)) &&
@@ -410,13 +415,13 @@ scanmatchtable(HashTable ht, Patprog pprog, int sorted,
 	    }
 	}
 
-	ht->scan = NULL;
+	impl(ht)->scan = NULL;
     } else {
 	int i, hsize = ht->hsize;
 	HashNode *nodes = ht->nodes;
 
 	st.sorted = 0;
-	ht->scan = &st;
+	impl(ht)->scan = &st;
 
 	for (i = 0; i < hsize; i++)
 	    for (st.u.u = nodes[i]; st.u.u; ) {
@@ -429,7 +434,7 @@ scanmatchtable(HashTable ht, Patprog pprog, int sorted,
 		}
 	    }
 
-	ht->scan = NULL;
+	impl(ht)->scan = NULL;
     }
 
     return match;
@@ -531,7 +536,7 @@ printhashtabinfo(HashTable ht)
     int chainlen[MAXDEPTH + 1];
     int i, tmpcount, total;
 
-    printf("name of table   : %s\n",   ht->tablename);
+    printf("name of table   : %s\n",   impl(ht)->tablename);
     printf("size of nodes[] : %d\n",   ht->hsize);
     printf("number of nodes : %d\n\n", ht->ct);
 
@@ -560,12 +565,12 @@ printhashtabinfo(HashTable ht)
 int
 bin_hashinfo(UNUSED(char *nam), UNUSED(char **args), UNUSED(Options ops), UNUSED(int func))
 {
-    HashTable ht;
+    HashTableImpl ht;
 
     printf("----------------------------------------------------\n");
     queue_signals();
     for(ht = firstht; ht; ht = ht->next) {
-	ht->printinfo(ht);
+	ht->printinfo(&ht->pub);
 	printf("----------------------------------------------------\n");
     }
     unqueue_signals();

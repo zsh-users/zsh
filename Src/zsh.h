@@ -1204,10 +1204,6 @@ struct hashtable {
     FreeNodeFunc freenode;	/* pointer to function to free a node         */
     ScanFunc printnode;		/* pointer to function to print a node        */
     ScanTabFunc scantab;	/* pointer to function to scan table          */
-
-#ifdef HASHTABLE_INTERNAL_MEMBERS
-    HASHTABLE_INTERNAL_MEMBERS	/* internal use in hashtable.c                */
-#endif
 };
 
 /* generic hash table node */
