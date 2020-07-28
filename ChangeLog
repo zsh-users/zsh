@@ -1,3 +1,9 @@
+2020-08-05  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 46280: Completion/compinit: add -w to explain why compdump runs
+
+	* unposted: Completion/compinit: add help text for -w
+
 2020-07-29  Roman Perepelitsa  <roman.perepelitsa@gmail.com>
 
 	* unposted: Src/zsh.h: comments explaining how hashtable must

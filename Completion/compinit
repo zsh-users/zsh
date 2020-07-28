@@ -60,6 +60,10 @@
 # the end).  This takes the dumpfile as an argument.  -d (with the
 # default dumpfile) is now the default; to turn off dumping use -D.
 
+# If the dumpfile is being regenerated and you don't know why, you can use
+# the -w flag to see if it was because -D was passed, zsh version mismatched,
+# or number of files in $fpath differed.
+
 # The -C flag bypasses both the check for rebuilding the dump file and the
 # usual call to compaudit; the -i flag causes insecure directories found by
 # compaudit to be ignored, and the -u flag causes all directories found by
@@ -71,9 +75,9 @@ emulate -L zsh
 setopt extendedglob
 
 typeset _i_dumpfile _i_files _i_line _i_done _i_dir _i_autodump=1
-typeset _i_tag _i_file _i_addfiles _i_fail=ask _i_check=yes _i_name
+typeset _i_tag _i_file _i_addfiles _i_fail=ask _i_check=yes _i_name _i_why
 
-while [[ $# -gt 0 && $1 = -[dDiuC] ]]; do
+while [[ $# -gt 0 && $1 = -[dDiuCw] ]]; do
   case "$1" in
   -d)
     _i_autodump=1
@@ -97,6 +101,10 @@ while [[ $# -gt 0 && $1 = -[dDiuC] ]]; do
     ;;
   -C)
     _i_check=
+    shift
+    ;;
+  -w)
+    _i_why=1
     shift
     ;;
   esac
@@ -484,11 +492,28 @@ if [[ -f "$_comp_dumpfile" ]]; then
     then
       builtin . "$_comp_dumpfile"
       _i_done=yes
+    elif [[ _i_why -eq 1 ]]; then
+      print -nu2 "Loading dump file skipped, regenerating"
+      local pre=" because: "
+      if [[ _i_autodump -ne 1 ]]; then
+        print -nu2 $pre"-D flag given"
+        pre=", "
+      fi
+      if [[ $_i_line[2] -ne $#_i_files ]]; then
+        print -nu2 $pre"number of files in dump $_i_line[2] differ from files found in \$fpath $#_i_files"
+        pre=", "
+      fi
+      if [[ $ZSH_VERSION != $_i_line[4] ]]; then
+        print -nu2 $pre"zsh version changed from $_i_line[4] to $ZSH_VERSION"
+      fi
+      print -u2
     fi
   else
     builtin . "$_comp_dumpfile"
     _i_done=yes
   fi
+elif [[ _i_why -eq 1 ]]; then
+  print -u2 "No existing compdump file found, regenerating"
 fi
 if [[ -z "$_i_done" ]]; then
   typeset -A _i_test
