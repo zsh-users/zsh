@@ -1180,7 +1180,10 @@ typedef void     (*ScanTabFunc)    _((HashTable, ScanFunc, int));
 
 typedef void (*PrintTableStats) _((HashTable));
 
-/* hash table for standard open hashing */
+/* Hash table for standard open hashing. Instances of struct hashtable can be *
+ * created only by newhashtable(). In fact, this function creates an instance *
+ * of struct hashtableimpl, which is made of struct hashtable (public part)   *
+ * and additional data members that are only accessible from hashtable.c.     */
 
 struct hashtable {
     /* HASHTABLE DATA */
