@@ -1,3 +1,16 @@
+2020-07-29  Roman Perepelitsa  <roman.perepelitsa@gmail.com>
+
+	* unposted: comments explaining how hashtable must be created
+
+2020-07-28  Roman Perepelitsa  <roman.perepelitsa@gmail.com>
+
+	* 46275: eliminate undefined behavior caused by redefinition of
+	hashtable
+
+2020-07-27  Roman Perepelitsa  <roman.perepelitsa@gmail.com>
+
+	* 46268: suppress a useless compiler warning around nice()
+
 2020-07-14  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 46244 (cont.): Etc/creating-a-release.txt: Flesh out the TODO
