@@ -143,6 +143,7 @@ styles=(
   cursor                 e:
   edit-buffer            e:bool
   edit-previous          e:bool
+  editor                 e:
   insert-kept            e:
   leave-cursor           e:bool
   match                  e:

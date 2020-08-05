@@ -2472,6 +2472,12 @@ item(tt(edit-command-line))(
 Edit the command line using your visual editor, as in tt(ksh).
 
 example(bindkey -M vicmd v edit-command-line)
+
+The editor to be used can also be specified using the tt(editor) style in
+the context of the widget. It is specified as an array of command and
+arguments:
+
+example(zstyle :zle:edit-command-line editor gvim -f)
 )
 tindex(expand-absolute-path)
 item(tt(expand-absolute-path))(

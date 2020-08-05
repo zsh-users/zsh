@@ -22,8 +22,12 @@ fi
   (( $+zle_bracketed_paste )) && print -r -n - $zle_bracketed_paste[2]
 
   # Open the editor, placing the cursor at the right place if we know how.
-  local editor=( "${(@Q)${(z)${VISUAL:-${EDITOR:-vi}}}}" )
-  case $editor in 
+  local -a editor
+  zstyle -a :zle:$WIDGET editor editor
+  if (( ! $#editor )); then
+    editor=( "${(@Q)${(z)${VISUAL:-${EDITOR:-vi}}}}" )
+  fi
+  case $editor in
     (*vim*)
       integer byteoffset=$(( $#PREBUFFER + $#LBUFFER + 1 ))
       "${(@)editor}" -c "normal! ${byteoffset}go" -- $1;;
