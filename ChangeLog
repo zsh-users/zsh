@@ -1,5 +1,8 @@
 2020-08-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Doc/Zsh/metafaq.yo, Etc/FAQ.yo: Update documentation
+	for the move to new hosting.
+
 	* 47296 (+ unposted additional tests and comments): Src/loop.c,
 	Test/A05execution.ztst: 'repeat' loops: Let the repeat count
 	use $?.

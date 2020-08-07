@@ -61,7 +61,7 @@ myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2010/02/15)
 COMMENT(-- the following are for Usenet and must appear first)\
 description(\
 mydit(Archive-Name:) unix-faq/shell/zsh
-mydit(Last-Modified:) 2020/05/06
+mydit(Last-Modified:) 2020/08/08
 mydit(Submitted-By:) email(coordinator@zsh.org (Peter Stephenson))
 mydit(Posting-Frequency:) Monthly
 mydit(Copyright:) (C) P.W. Stephenson, 1995--2020 (see end of document)
@@ -342,7 +342,7 @@ label(16)
   The coordinator of development is currently me; the alias
   email(coordinator@zsh.org) can be used to contact whoever is in the hot
   seat.  url(https://www.zsh.org/)(https://www.zsh.org/) is the official
-  archive site, currently in Australia.  Test versions are kept in the
+  archive site.  Test versions are kept in the
   `testing' subdirectory: such up-to-the-minute development versions should
   only be retrieved if you actually plan to help test the latest version of
   the shell.
@@ -2513,10 +2513,8 @@ label(62)
   you want someone to mail you directly, say so.  Most patches to zsh
   appear there first.
 
-  Note that this location has just changed (January 1999), and the
-  instructions to go with it are slightly different --- in particular,
-  if you are already subscribed, the instructions about how to
-  unsubscribe are different.
+  Note that this location changed in August 2020, and the
+  instructions to go with it are slightly different.
 
   Please note when reporting bugs that many exist only on certain
   architectures, which the developers may not have access to.  In
@@ -2548,16 +2546,15 @@ label(62)
     zsh-workers-subscribe@zsh.org
   )
   (the actual content is unimportant).  Replace tt(subscribe) with
-  tt(unsubscribe) to unsubscribe.  The mailing software (tt(ezmlm)) has
+  tt(unsubscribe) to unsubscribe.  The mailing software (tt(Sympa)) has
   various bells and whistles: you can retrieve archived messages.
-  Mail email(zsh-workers-help@zsh.org) for detailed information.
+  Mail email(sympa@zsh.org?subject=help) for detailed information.
   Administrative matters are best sent to
   email(zsh-workers-owner@zsh.org).
-  real name is email(Geoff Wing <gcw@zsh.org>).
   
   An archive of mailings for the last few years can be found at
     url(http://www.zsh.org/mla/)(http://www.zsh.org/mla/)
-  at the main zsh archive in Australia.
+  at the main zsh archive site.
 
   Of course, you can also post zsh queries to the Usenet group
   comp.unix.shell; if all else fails, you could even e-mail me.
