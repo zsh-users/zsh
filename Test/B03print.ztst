@@ -4,6 +4,7 @@
 #  Use of print -p to output to coprocess	A01grammar
 #  Prompt expansion with print -P		D01prompt
 #  -l, -r, -R and -n indirectly tested in various places
+#  multibyte tests in D07multibyte
 
 # Not yet tested:
 #  echo and pushln
