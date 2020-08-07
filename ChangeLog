@@ -1,3 +1,9 @@
+2020-08-08  Mikael Magnusson  <mikachu@gmail.com>
+
+	* unposted: Completion/BSD/Command/_kdump,
+	Completion/BSD/Type/_ktrace_points: fix syntax errors in
+	completers added in 45940
+
 2020-08-05  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 46280: Completion/compinit: add -w to explain why compdump runs

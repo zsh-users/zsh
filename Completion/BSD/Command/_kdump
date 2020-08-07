@@ -68,7 +68,7 @@ case $OSTYPE; in
       '-e[interpret system call maps using the specified emulation]:emulation:'
       '-N[suppress system call name translation]'
       '-X[Display GIO data in hex and ascii in groups of specified size]:size:(1 2 4 8 16)'
-      '-x[Display GIO data in hex and ascii]
+      '-x[Display GIO data in hex and ascii]'
       '1:dump file:_files'
     )
     ;;

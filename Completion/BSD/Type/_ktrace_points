@@ -45,6 +45,6 @@ case $OSTYPE in
       'X[trace environment in execve(2)]'
     )
     ;;
-easc
+esac
 
 _values -s '' 'ktrace point' $points
