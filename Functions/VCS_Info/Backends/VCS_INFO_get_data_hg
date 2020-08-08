@@ -217,12 +217,16 @@ if zstyle -T ":vcs_info:${vcs}:${usercontext}:${rrn}" get-mq \
     fi
 
     local -A extra_hook_com=( guards "${guards_string}"   guards-n ${#mqguards} )
-    local -a extra_zformats=( "g:${extra_hook_com[guards]}" "G:${#mqguards}" )
+
+    (( ${+functions[VCS_INFO_hg_extra_zformats]} )) || 
+    VCS_INFO_hg_extra_zformats() {
+        reply=( "g:${hook_com[guards]}" "G:${#mqguards}" )
+    }
 
     VCS_INFO_set-patch-format 'mqpatches' 'applied_string' \
                               'mqunapplied' 'unapplied_string' \
                               ":vcs_info:${vcs}:${usercontext}:${rrn}" hgmqstring \
-                              extra_hook_com extra_zformats
+                              extra_hook_com VCS_INFO_hg_extra_zformats
     hgmqstring=$REPLY
 fi
 

@@ -12,7 +12,7 @@
 # $6 - name of a parameter to store a patch-format format string in
 # $7 - name of an assoc parameter with extra $hook_com key-value pairs for the
 #      set-patch-format hook invocation, or '' for none
-# $8 - name of an array parameter with extra arguments for the patch-format zformat call, or '' for empty
+# $8 - name of a function that sets $reply to extra arguments for the patch-format zformat call, or '' for none
 #
 # The expanded patch-format string is returned in $REPLY.
 #
@@ -68,10 +68,12 @@
           hook_com[unapplied]=${hook_com[unapplied]//'%'/%%}
         fi
 
+        reply=()
+        [[ -n $8 ]] && "$8"
         zformat -f REPLY "${(P)6}" "p:${hook_com[applied]}" "u:${hook_com[unapplied]}" \
                                         "n:${hook_com[applied-n]}" "c:${hook_com[unapplied-n]}" \
                                         "a:${hook_com[all-n]}" \
-                                        ${8:+"${(@P)8}"}
+                                        "${reply[@]}"
     else
         unset applied_needs_escaping unapplied_needs_escaping # the hook deals with escaping
         REPLY=${hook_com[patch-replace]}

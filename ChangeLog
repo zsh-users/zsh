@@ -1,3 +1,10 @@
+2020-08-09  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 47303: Functions/VCS_Info/Backends/VCS_INFO_get_data_hg,
+	Functions/VCS_Info/VCS_INFO_set-patch-format: vcs_info hg:
+	Fix changing the expansion of %g (hook_com[guards]) in the
+	set-patch-format hook (regression from workers/40480).
+
 2020-08-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Doc/Zsh/metafaq.yo, Etc/FAQ.yo: Update documentation
