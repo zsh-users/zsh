@@ -1,5 +1,7 @@
 2020-08-10  Oliver Kiddle  <okiddle@yahoo.co.uk>
 
+	* 47294: Completion/Debian/Command/_aptitude: updates to options
+
 	* 47293: Completion/Unix/Command/_lp: lowercase descriptions
 
 2020-08-10  Daniel Shahaf  <d.s@daniel.shahaf.name>
