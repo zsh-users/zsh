@@ -1,3 +1,8 @@
+2020-08-16  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 47313: Doc/Zsh/expn.yo: docs: Document explicitly that the
+	:P modifier returns a symlink-less path.
+
 2020-08-13  Oliver Kiddle  <opk@zsh.org>
 
 	* Jörg Sommer: 47320: Completion/Linux/Command/_choom: Add

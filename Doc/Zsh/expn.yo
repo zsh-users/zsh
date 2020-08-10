@@ -287,8 +287,10 @@ expansion.
 )
 item(tt(P))(
 Turn a file name into an absolute path, like tt(realpath+LPAR()3+RPAR()).
-The resulting path will be absolute, have neither `tt(.)' nor `tt(..)' components,
-and refer to the same directory entry as the input filename.
+The resulting path will be absolute,
+will refer to the same directory entry as the input filename,
+and none of its components will be symbolic links or equal to
+`tt(.)' or `tt(..)'.
 
 Unlike tt(realpath+LPAR()3+RPAR()), non-existent trailing components are
 permitted and preserved.
