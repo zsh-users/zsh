@@ -1,5 +1,8 @@
 2020-08-13  Oliver Kiddle  <opk@zsh.org>
 
+	* Jörg Sommer: 47320: Completion/Linux/Command/_choom: Add
+	completion for Linux tool used to adjust process OOM score
+
 	* 47321: Completion/Linux/Command/_btrfs: update for btrfs 5.4
 
 	* 47319: Completion/Unix/Command/_imagemagick: complete more
