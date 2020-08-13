@@ -70,6 +70,7 @@ while (( $#state )); do
           args+=(
             '(-c --commit-after -C --commit-each)'{-c,--commit-after}'[wait for transaction commit at the end of the operation]'
             '(-c --commit-after -C --commit-each)'{-C,--commit-each}'[wait for transaction commit after deleting each subvolume]'
+            '(-i --subvolid)'{-i+,--subvolid=}'[specify id of subvolume to be removed]:subvolume id'
             '(-v --verbose)'{-v,--verbose}'[verbose output of operations]'
             '1:subvolume:_files -/'
           )
@@ -219,14 +220,14 @@ while (( $#state )); do
             '(-m -s)-d+[act on data chunks]:filter:->filters'
             '(-d -s)-m+[act on metadata chunks]:filter:->filters'
             '(-d -m)-s+[act on system chunks (only under -f)]:filters:->filters'
-            '-v[verbose mode]'
+	    '(-v --verbose)'{-v,--verbose}'[verbose mode]'
             '-f[force a reduction of metadata integrity]'
             "--full-balance[don't print warning and don't delay start]"
             '(--background --bg)'{--background,--bg}'[run balance operation asynchronously in the background]'
             '1:path:_files -/'
           )
         ;;
-        balance:status) args+=( '-v[verbose mode]' '1:path:_files -/' );;
+        balance:status) args+=( '(-v --verbose)'{-v,--verbose}'[verbose mode]' '1:path:_files -/' );;
         balance:(pause|cancel|resume)) args+=( '1:path:_files -/' );;
         property:set) args+=( '3:value' );&
         property:get) args+=( '2:property:(ro label compression)' );&
@@ -244,10 +245,14 @@ while (( $#state )); do
             '1:path:_files -/'
           )
         ;;
-        qgroup:(assign|remove)) args+=( '1:source path:_files -/'
-          '2:destination path:_files -/' '3:path:_files -/' );|
-        qgroup:assign) args+=( \!--rescan
-          "--no-rescan[don't do a rescan, even if the assignment will make the quotas inconsistent]" )
+        qgroup:(assign|remove))
+          args+=(
+            \!--rescan
+            "--no-rescan[don't do a rescan, even if the quotas may become inconsistent]"
+            '1:source path:_files -/'
+            '2:destination path:_files -/'
+            '3:path:_files -/'
+          )
         ;;
         qgroup:(create|destroy)) args+=( '1:qgroupid:' '2:path:_files -/' );;
         qgroup:show)
@@ -296,6 +301,9 @@ while (( $#state )); do
             '(-t --tree)'{-t,--tree}'[print only tree with the given id (string or number)]:tree id'
             '--follow[use with -b, to show all children tree blocks of the block]'
             "--noscan[don't scan devices from the filesystem, use only the listed ones]"
+	    '!(--dfs)--bfs'
+	    '--dfs[depth-first traversal of the trees]'
+            '--hide-names[hide filenames/subvolume/xattrs and other name references]'
           )
         ;;
         inspect*:dump-super)
@@ -313,6 +321,7 @@ while (( $#state )); do
           args+=(
             '-v[verbose mode]'
             '-P[skip the path resolving and print the inodes instead]'
+            '-o[ignore offsets when matching references]'
             '-s[specify buffer size]:buffer size [4096]'
             '1:logical address:_files'
             '2:filesystem path:_files -/'

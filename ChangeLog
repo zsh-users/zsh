@@ -1,5 +1,7 @@
 2020-08-13  Oliver Kiddle  <opk@zsh.org>
 
+	* 47321: Completion/Linux/Command/_btrfs: update for btrfs 5.4
+
 	* 47319: Completion/Unix/Command/_imagemagick: complete more
 	options to ImageMagick's convert command
 
