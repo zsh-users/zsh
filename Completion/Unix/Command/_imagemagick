@@ -262,7 +262,10 @@ case "$service" in
     _arguments -C -M 'm:{a-z}={A-Z}' \
       '-adjoin[join images]' \
       '-affine[drawing transform matrix]:matrix' \
+      '-alpha[set the alpha channel]:alpha' \
       '-antialias[remove pixel aliasing]' \
+      '-authenticate[decrypt image with specified password]:password' \
+      '-attenuate[lessen (or intensify) when adding noise to an image]:value' \
       '-append[append image sequence]' \
       '-average[average image sequence]' \
       '-background[specify background color]:color:_x_color' \
@@ -301,6 +304,7 @@ case "$service" in
       '(-endian)+endian' \
       '-enhance[enhance image]' \
       '-equalize[histogram equalization]' \
+      '-features[analyze image features (e.g. contrast, correlation)]:distance' \
       '-fill[specify color to use when filling a graphic primitive]:color:_x_color' \
       '-filter:filter type for resizing:(Point Box Triangle Hermite Hanning Hamming Blackman Gaussian Quadratic Cubic Catrom Mitchell Lanczos Bessel Sinc)' \
       '-flatten[flatten a sequence of images]' \
@@ -315,12 +319,14 @@ case "$service" in
       '-gravity:image gravity:(Center North NorthEast East SouthEast South SouthWest West NorthWest)' \
       '-implode:implosion factor (0.0 - 99.9%%)' \
       '-interlace:interlacing scheme:(None Line Plane Partition)' \
+      '-interpolative-resize[resize image using point sampled interpolation]:geometry' \
       '-label:label string' \
       '-layer:layer type:(Red Green Blue Matte)' \
       '-linewidth:line width' \
       '-loop:number of iterations (GIF animation)' \
       '-map[single image colormap file]:picture file for colors:_imagemagick' \
       '+map[all images colormap file]:picture file for colors:_imagemagick' \
+      '-mask[associate a mask with the image]:file:_files' \
       '-matte[store matte channel]' \
       '-modulate:<brightness>,<saturation>,<hue>' \
       '-monochrome[transform to black and white]' \
@@ -352,6 +358,7 @@ case "$service" in
       '-size:image size (<width>x<height>+<offset>)' \
       '-solarize:solarization threshold' \
       '-spread:neighborhood size' \
+      '-support[specify resize support]:support (>1.0 is blurry, < 1.0 is sharp)' \
       '-swirl:swirl tightness' \
       '-texture:background texture image:_imagemagick' \
       '-threshold:threshold for maximum intensity' \
