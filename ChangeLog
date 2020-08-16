@@ -1,3 +1,17 @@
+2020-08-16  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 47304: Completion/Zsh/Type/_globflags: support specifying more
+	than one flag where appropriate
+
+	* 47305: Functions/Zle/edit-command-line: when possible, set
+	$BUFFER directly
+
+	* 47306: Completion/Zsh/Command/_zstyle, Doc/Zsh/contrib.yo,
+	Functions/Zle/edit-command-line: add editor style
+
+	* 47307: Functions/Zle/edit-command-line: restrict editing to
+	region if it is active
+
 2020-08-16  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 47314 (+ extra test case): Test/Z01is-at-least.ztst: is-at-least
