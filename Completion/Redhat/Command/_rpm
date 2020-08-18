@@ -282,7 +282,7 @@ _rpm () {
     build_r) tmp=( '*:source package:_files -g "*.(#i)src.rpm(-.)"' ) ;|
     build_t) tmp=( '*:tar file:_files -g "*.(#i)tar(.*|)(-.)"' ) ;|
     build_?)
-      _arguments -s -C $buildopts $commonopts $pathopts \
+      _arguments -s -C $buildopts $commonopts $pathopts "${tmp[@]}" \
       ;;
     checksig)
       _arguments -s -C \!-K \
