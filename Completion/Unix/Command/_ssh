@@ -269,8 +269,8 @@ _ssh () {
       if compset -P 1 '*='; then
         case "${IPREFIX#-o}" in
           (#i)(ciphers|macs|kexalgorithms|hostkeyalgorithms|pubkeyacceptedkeytypes|hostbasedkeytypes)=)
-          if ! compset -P +; then
-            _wanted append expl 'append to default' compadd + && ret=0
+          if ! compset -P '[+-]'; then
+            _wanted prefix expl 'relative to default' compadd - + - && ret=0
           fi
           ;;
         esac
@@ -475,7 +475,7 @@ _ssh () {
       else
         # old options are after the empty "\"-line
         _wanted values expl 'configure file option' \
-            compadd -M 'm:{a-z}={A-Z}' -q -S '=' - \
+            compadd -M 'm:{a-z}={A-Z} r:[^A-Z]||[A-Z]=* r:|=*' -q -S '=' - \
                 AddKeysToAgent \
                 AddressFamily \
                 BatchMode \

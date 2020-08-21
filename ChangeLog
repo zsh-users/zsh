@@ -1,3 +1,8 @@
+2020-08-21  Oliver Kiddle  <opk@zsh.org>
+
+	* 47322: Completion/Unix/Command/_ssh: allow prefix with ssh
+	cipher completion and add matching control for options
+
 2020-08-18  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 47323: Completion/Redhat/Command/_rpm: _rpmbuild: Complete
