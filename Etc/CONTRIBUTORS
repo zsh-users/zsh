@@ -2,10 +2,10 @@
 ZSH CONTRIBUTORS
 ----------------
 
-Zsh was originally written by Paul Falstad <pf@zsh.org>.  Zsh is
-now maintained by the members of the zsh-workers mailing list
-<zsh-workers@zsh.org>.  The development is currently coordinated
-by Peter Stephenson <pws@zsh.org>.
+Zsh was originally written by Paul Falstad.  Zsh is now maintained
+by the members of the zsh-workers mailing list <zsh-workers@zsh.org>.
+The development is currently coordinated by Peter Stephenson
+<pws@zsh.org>.
 
 This file credits only the major contributors to the current release.
 See the ChangeLog files for a complete list of people who have submitted

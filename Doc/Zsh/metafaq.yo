@@ -10,12 +10,12 @@ endmenu()
 texinode(Author)(Availability)()(Introduction)
 sect(Author)
 cindex(author)
-Zsh was originally written by Paul Falstad tt(<pf@zsh.org>).
-Zsh is now maintained by the members of the zsh-workers mailing
-list tt(<zsh-workers@zsh.org>).  The development is currently
-coordinated by Peter Stephenson tt(<pws@zsh.org>).  The coordinator
-can be contacted at tt(<coordinator@zsh.org>), but matters relating to
-the code should generally go to the mailing list.
+Zsh was originally written by Paul Falstad.  Zsh is now maintained by
+the members of the zsh-workers mailing list tt(<zsh-workers@zsh.org>).
+The development is currently coordinated by Peter Stephenson
+tt(<pws@zsh.org>).  The coordinator can be contacted at
+tt(<coordinator@zsh.org>), but matters relating to the code should
+generally go to the mailing list.
 texinode(Availability)(Mailing Lists)(Author)(Introduction)
 sect(Availability)
 Zsh is available from the following HTTP and anonymous FTP site.
@@ -68,8 +68,7 @@ bf(zsh-users).  All submissions to bf(zsh-users) are automatically
 forwarded to bf(zsh-workers).
 
 If you have problems subscribing/unsubscribing to any of the mailing
-lists, send mail to tt(<listmaster@zsh.org>).  The mailing lists are
-maintained by Karsten Thygesen tt(<karthy@kom.auc.dk>).
+lists, send mail to tt(<listmaster@zsh.org>).
 
 The mailing lists are archived; the archives can be accessed via the
 administrative addresses listed above.  There is also a hypertext
@@ -85,8 +84,7 @@ uref(http://www.zsh.org/FAQ/).  The contact address for FAQ-related matters
 is tt(<faqmaster@zsh.org>).
 texinode(The Zsh Web Page)(The Zsh Userguide)(The Zsh FAQ)(Introduction)
 sect(The Zsh Web Page)
-Zsh has a web page which is located at uref(https://www.zsh.org/).  This is
-maintained by Karsten Thygesen tt(<karthy@zsh.org>), of SunSITE Denmark.
+Zsh has a web page which is located at uref(https://www.zsh.org/).
 The contact address for web-related matters is tt(<webmaster@zsh.org>).
 texinode(The Zsh Userguide)(See Also)(The Zsh Web Page)(Introduction)
 sect(The Zsh Userguide)

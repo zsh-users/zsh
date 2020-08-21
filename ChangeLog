@@ -1,5 +1,8 @@
 2020-08-21  Oliver Kiddle  <opk@zsh.org>
 
+	* 47328: Doc/Zsh/metafaq.yo, Etc/CONTRIBUTORS: remove references
+	to old zsh.org mail addresses
+
 	* 47322: Completion/Unix/Command/_ssh: allow prefix with ssh
 	cipher completion and add matching control for options
 
