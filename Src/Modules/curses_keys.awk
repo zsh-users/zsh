@@ -12,8 +12,13 @@ BEGIN {nkeydefs = 0}
 
 END {
     printf("static const struct zcurses_namenumberpair keypad_names[] = {\n")
-    for (i = 0; i < 0 + nkeydefs; i++)
+    for (i = 0; i < 0 + nkeydefs; i++) {
+        if (name[i] == "EVENT")
+            printf("#ifdef KEY_EVENT\n")
         printf("    {\"%s\", KEY_%s},\n", name[i], name[i])
+        if (name[i] == "EVENT")
+            printf("#endif\n")
+    }
     printf("    {NULL, 0}\n")
     printf("};\n")
 }

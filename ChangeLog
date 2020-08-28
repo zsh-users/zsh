@@ -1,3 +1,9 @@
+2020-08-28  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* github #64: Src/Modules/curses_keys.awk: Fix a build-time
+	error when building against ncurses that hadn't been built
+	with --enable-wgetch-events.  (Reported by Martin Liska.)
+
 2020-08-21  Oliver Kiddle  <opk@zsh.org>
 
 	* 47328: Doc/Zsh/metafaq.yo, Etc/CONTRIBUTORS: remove references
