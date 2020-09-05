@@ -1,3 +1,11 @@
+2020-09-05  Doug Kearns  <dougkearns@gmail.com>
+
+	* unposted: Completion/Unix/Command/_lp,
+	Completion/Unix/Command/_transmission, Completion/X/Command/_code,
+	Completion/X/Command/_kdeconnect, Completion/Zsh/Command/_zstyle:
+	Remove periods from completion descriptions as per the
+	completion-style-guide recommendations.
+
 2020-09-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 47350; Completion/Unix/Command/_dropbox: new completion.

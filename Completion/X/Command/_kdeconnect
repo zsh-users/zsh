@@ -10,7 +10,7 @@ _arguments \
   '--id-only[make --list-devices or --list-available print only the devices id, to ease scripting]' \
   '--refresh[search for devices in the network and re-establish connections]' \
   '(--pair --unpair)--pair[request pairing with the specified device]' \
-  '--ring[find the device by ringing it.]' \
+  '--ring[find the device by ringing it]' \
   '(--pair --unpair)--unpair[stop pairing to the specified device]' \
   '(--ping --ping-msg)--ping[send a ping to the device]' \
   '(--ping --ping-msg)--ping-msg[send a ping to the device with the specified message]:message' \

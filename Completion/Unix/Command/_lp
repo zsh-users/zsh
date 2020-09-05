@@ -230,7 +230,7 @@ _lp()
 	'-m[send an email on job completion]' \
 	'*-o:print job option:_lp_job_options' \
 	'-p[format with shaded header incl. date, time etc.]' \
-	'-q[hold job for printing.]' \
+	'-q[hold job for printing]' \
 	'-r[delete files after printing]' \
 	'*:PS/PDF file:_pspdf'
       ;;

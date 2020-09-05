@@ -97,7 +97,7 @@ local torrent_action_only_actions=(
   {-Bn,--bandwidth-normal}'[give this torrent the bandwidth left over by high priority torrents]'
   {-Bl,--bandwidth-low}'[give this torrent the bandwidth left over by high and normal priority torrents]'
   {-ph,--priority-high}'[try to download the specified file(s) first]:torrent_file:_transmission-remote_torrent_priority_not_high'
-  {-pn,--priority-normal}'[try to download the specified files normally.]:torrent_file:_transmission-remote_torrent_priority_not_normal'
+  {-pn,--priority-normal}'[try to download the specified files normally]:torrent_file:_transmission-remote_torrent_priority_not_normal'
   {-pl,--priority-low}'[try to download the specified files last]:torrent_file:_transmission-remote_torrent_priority_not_low'
   {-v,--verify}'[verify the current torrent(s)]'
 )

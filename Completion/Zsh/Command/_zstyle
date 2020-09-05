@@ -659,7 +659,7 @@ while (( $#state )); do
           'p[name of top-most patch (applied-string)]' \
           'u[number of unapplied patches (unapplied-string)]' \
           'n[number of applied patches]' \
-          'c[number of unapplied patches.]' \
+          'c[number of unapplied patches]' \
           'a[number of all patches]' \
           'g[names of active mq guards (hg backend)]' \
           'G[number of active mq guards (hg backend)]'

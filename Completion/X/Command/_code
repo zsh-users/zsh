@@ -4,7 +4,7 @@ local arguments
 
 arguments=(
   '(-d --diff)'{-d,--diff}'[compare two files with each other]:file to compare:_files:file to compare with:_files'
-  \*{-a,--add}'[add specified directory to the last active window.]:directory:_directories'
+  \*{-a,--add}'[add specified directory to the last active window]:directory:_directories'
   '(-g --goto)'{-g,--goto}'[open a file at the path on the specified line and column position]:file\:line[\:column]:_files -r \:'
   '(-n --new-window -r --reuse-window)'{-n,--new-window}'[open a new window]'
   '(-n --new-window -r --reuse-window)'{-r,--reuse-window}'[open a file or directory in the last active window]'
