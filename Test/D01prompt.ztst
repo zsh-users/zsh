@@ -229,3 +229,31 @@
   Ffoo=${(%):-'%F{foo}'} # Unrecognised
   [[ $f == $Fdefault && $Fdefault == $Freset && $Freset == $Ffoo ]]
 0:Regression test for workers/44029
+
+  if
+    zmodload zsh/terminfo >& /dev/null &&
+      (( terminfo[colors] >= 8 ))
+  then
+    F1=$(echoti setaf 2)
+    F2=${(%):-%2F}
+    F3=${(%):-%F{2}}
+    F4=${(%):-%F{green}}
+    [[ -n $F1 && $F1 = $F2 && $F2 = $F3 && $F3 = $F4 ]]
+  else
+    ZTST_skip='Missing terminfo module or non-colour terminal'
+  fi
+0:Equivalence of terminal colour settings (foreground colour)
+
+  if
+    zmodload zsh/terminfo >& /dev/null &&
+      (( terminfo[colors] >= 8 ))
+  then
+    K1=$(echoti setab 2)
+    K2=${(%):-%2K}
+    K3=${(%):-%K{2}}
+    K4=${(%):-%K{green}}
+    [[ -n $K1 && $K1 = $K2 && $K2 = $K3 && $K3 = $K4 ]]
+  else
+    ZTST_skip='Missing terminfo module or non-colour terminal'
+  fi
+0:Equivalence of terminal colour settings (background colour)

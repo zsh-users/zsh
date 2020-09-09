@@ -1,3 +1,8 @@
+2020-09-09  Stephane Chazelas  <stephane@chazelas.org>
+
+	* 47352 (+ extra test cases): Src/prompt.c, Test/D01prompt.ztst:
+	fix %<n>K prompt expansion (regression introduced in 5.0.3).
+
 2020-09-05  Doug Kearns  <dougkearns@gmail.com>
 
 	* unposted: Completion/Unix/Command/_lp,

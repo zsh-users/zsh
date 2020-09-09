@@ -258,7 +258,7 @@ parsecolorchar(zattr arg, int is_fg)
 		bv->fm--;
 	}
     } else
-	arg = match_colour(NULL, 1, arg);
+	arg = match_colour(NULL, is_fg, arg);
     return arg;
 }
 
