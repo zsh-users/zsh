@@ -792,6 +792,11 @@
 *>*/glob.tmp/(flip|flop)
 *>*/glob.tmp/(flip|flop)/trailing/components
 
+  unsetopt extendedglob
+  print -r -- ${(*)=${(@s.+.):-A+B}/(#b)(?)/-${(L)match[1]} ${match[1]}}
+0:the '*' qualfier enables extended_glob for pattern matching
+>-a A -b B
+
 %clean
 
  # Fix unreadable-directory permissions so ztst can clean up properly

@@ -1422,7 +1422,7 @@ error, and the flag itself has no effect.
 enditem()
 
 The following flags are meaningful with the tt(${)...tt(#)...tt(}) or
-tt(${)...tt(%)...tt(}) forms.  The tt(S) and tt(I) flags may also be
+tt(${)...tt(%)...tt(}) forms.  The tt(S), tt(I), and tt(*) flags may also be
 used with the tt(${)...tt(/)...tt(}) forms.
 
 startitem()
@@ -1487,6 +1487,10 @@ Ipswich)', `tt(witch for Ipswich)' and `tt(wich)'. The form using `tt(%)'
 will remove the same matches as for `tt(#)', but in reverse order, and the
 form using `tt(%%)' will remove the same matches as for `tt(##)' in reverse
 order.
+)
+item(tt(*))(
+Enable tt(EXTENDED_GLOB) for substitution via tt(${)...tt(/)...tt(}) or
+tt(${)...tt(//)...tt(}).
 )
 item(tt(B))(
 Include the index of the beginning of the match in the result.

@@ -142,6 +142,7 @@ if [[ $PREFIX = *'${('[^\)]# ]]; then
   flags+=(
     "#:evaluate as numeric expression"
     "@:prevent double-quoted joining of arrays"
+    "*:enable extended globs for pattern"
     "A:assign as an array parameter"
     "a:sort in array index order (with O to reverse)"
     "b:backslash quote pattern characters only"

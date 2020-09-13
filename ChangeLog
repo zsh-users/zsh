@@ -1,3 +1,11 @@
+2020-09-13  Bart Schaefer  <schaefer@zsh.org>
+
+	* Mikael Magnusson: 47382: Completion/Zsh/Context/_brace_parameter:
+	Completion for 47364
+
+	* 47364: Doc/Zsh/expn.yo, Src/subst.c, Src/zsh.h, Test/D02glob.ztst:
+	Enable extendedglob in pattern with ${(*)name/pattern/replacement}
+
 2020-09-09  Stephane Chazelas  <stephane@chazelas.org>
 
 	* 47352 (+ extra test cases): Src/prompt.c, Test/D01prompt.ztst:

@@ -1991,6 +1991,7 @@ struct tieddata {
 #define SUB_START	0x1000  /* force match at start with SUB_END
 				 * and no SUB_SUBSTR */
 #define SUB_LIST	0x2000  /* no substitution, return list of matches */
+#define SUB_EGLOB	0x4000	/* use extended globbing in patterns */
 
 /*
  * Structure recording multiple matches inside a test string.

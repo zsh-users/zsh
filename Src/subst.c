@@ -1708,7 +1708,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
     /*
      * This expressive name refers to the set of flags which
      * is applied to matching for #, %, / and their doubled variants:
-     * (M), (R), (B), (E), (N), (S).
+     * (M), (R), (B), (E), (N), (S), (*).
      */
     int flags = 0;
     /* Value from (I) flag, used for ditto. */
@@ -1929,6 +1929,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		    break;
 		case '@':
 		    nojoin = 2;	/* nojoin = 2 means force */
+		    break;
+		case '*':
+		case Star:
+		    flags |= SUB_EGLOB;
 		    break;
 		case 'M':
 		    flags |= SUB_MATCH;
@@ -2810,7 +2814,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		    c == '#' || c == Pound ||
 		    c == '?' || c == Quest ||
 		    c == '/')) {
-
+	int eglob = isset(EXTENDEDGLOB);
 	/*
 	 * Default index is 1 if no (I) or (I) gave zero.   But
 	 * why don't we set the default explicitly at the start
@@ -2832,9 +2836,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	    char *ptr;
 	    /*
 	     * previous flags are irrelevant, except for (S) which
-	     * indicates shortest substring; else look for longest.
+	     * indicates shortest substring; else look for longest,
+	     # and (*) which temporarily enables extended globbing.
 	     */
-	    flags = (flags & SUB_SUBSTR) ? 0 : SUB_LONG;
+	    flags = ((flags & SUB_SUBSTR) ? 0 : SUB_LONG)|(flags & SUB_EGLOB);
 	    if ((c = *s) == '/') {
 		/* doubled, so replace all occurrences */
 		flags |= SUB_GLOBAL;
@@ -3136,7 +3141,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		for (ap = aval; *ap; ap++) {
 		    untokenize(*ap);
 		}
+		if (flags & SUB_EGLOB)
+		    opts[EXTENDEDGLOB] = 1;
 		getmatcharr(&aval, s, flags, flnum, replstr);
+		opts[EXTENDEDGLOB] = eglob;
 	    } else {
 		if (vunset) {
 		    if (vunset > 0 && unset(UNSET)) {
@@ -3151,7 +3159,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		    copied = 1;
 		    untokenize(val);
 		}
+		if (flags & SUB_EGLOB)
+		    opts[EXTENDEDGLOB] = 1;
 		getmatch(&val, s, flags, flnum, replstr);
+		opts[EXTENDEDGLOB] = eglob;
 	    }
 	    break;
 	}
