@@ -2837,7 +2837,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	    /*
 	     * previous flags are irrelevant, except for (S) which
 	     * indicates shortest substring; else look for longest,
-	     # and (*) which temporarily enables extended globbing.
+	     * and (*) which temporarily enables extended globbing.
 	     */
 	    flags = ((flags & SUB_SUBSTR) ? 0 : SUB_LONG)|(flags & SUB_EGLOB);
 	    if ((c = *s) == '/') {
