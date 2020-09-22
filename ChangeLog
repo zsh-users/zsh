@@ -1,3 +1,8 @@
+2020-09-22  Jacob Menke  <linux.dev25@gmail.com>
+
+	* 47395: Completion/Base/Utility/_store_cache: Don't leak the
+	variable ${_cache_dir}.
+
 2020-09-13  Bart Schaefer  <schaefer@zsh.org>
 
 	* Mikael Magnusson: 47382: Completion/Zsh/Context/_brace_parameter:

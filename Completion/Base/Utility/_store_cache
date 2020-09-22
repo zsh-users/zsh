@@ -2,7 +2,7 @@
 #
 # Storage component of completions caching layer
 
-local _cache_ident _cache_ident_dir
+local _cache_ident _cache_ident_dir _cache_dir
 _cache_ident="$1"
 
 if zstyle -t ":completion:${curcontext}:" use-cache; then
