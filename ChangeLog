@@ -1,3 +1,9 @@
+2020-10-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* users/26088: Doc/Zsh/zle.yo: docs: zle -R: Clarify that it
+	needs not be called in the normal course of things, but only
+	when an immediate, interim redisplay is desired.
+
 2020-09-23  Meng Bo  <mengbo@lnu.edu.cn>
 
 	* github #65: Completion/Unix/Command/_nmap: Rename option flags

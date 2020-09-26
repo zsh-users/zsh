@@ -501,8 +501,7 @@ ifnzman(noderef(Completion Widgets))\
 .
 )
 item(tt(-R) [ tt(-c) ] [ var(display-string) ] [ var(string) ... ])(
-Redisplay the command line; this is to be called from within a user-defined
-widget to allow changes to become visible.  If a var(display-string) is
+Redisplay the command line.  If a var(display-string) is
 given and not empty, this is shown in the status line (immediately
 below the line being edited).
 
@@ -511,9 +510,9 @@ prompt in the same way as completion lists are printed. If no
 var(string)s are given but the tt(-c) option is used such a list is
 cleared.
 
-Note that this option is only useful for widgets that do not exit
-immediately after using it because the strings displayed will be erased 
-immediately after return from the widget.
+Note that immediately after returning from running widgets, the command line
+will be redisplayed and the strings displayed will be erased.  Therefore, this
+option is only useful for widgets that do not exit immediately after using it.
 
 This command can safely be called outside user defined widgets; if zle is
 active, the display will be refreshed, while if zle is not active, the
