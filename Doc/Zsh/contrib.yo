@@ -4559,7 +4559,7 @@ the same result, the destination was an existing regular file and tt(-f)
 was not given) causes the entire function to abort without doing
 anything.
 
-In addition to pattern replacement, the variable tt($f) can be referrred
+In addition to pattern replacement, the variable tt($f) can be referred
 to in the second (replacement) argument.  This makes it possible to
 use variable substitution to alter the argument; see examples below.
 

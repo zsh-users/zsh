@@ -1,3 +1,7 @@
+2020-10-18  Axel Beckert  <abe@deuxchevaux.org>
+
+	* 47468: Doc/Zsh/contrib.yo: Fix typo
+
 2020-10-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* users/26088: Doc/Zsh/zle.yo: docs: zle -R: Clarify that it
