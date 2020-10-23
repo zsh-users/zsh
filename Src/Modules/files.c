@@ -122,19 +122,29 @@ domkdir(char *nam, char *path, mode_t mode, int p)
 {
     int err;
     mode_t oumask;
+    struct stat st;
+    int n = 8;
     char const *rpath = unmeta(path);
 
-    if(p) {
-	struct stat st;
-
-	if(!stat(rpath, &st) && S_ISDIR(st.st_mode))
+    while(n-- > 0) {
+	oumask = umask(0);
+	err = mkdir(rpath, mode) ? errno : 0;
+	umask(oumask);
+	if (!err)
 	    return 0;
+	if(!p || err != EEXIST)
+	    break;
+	if(stat(rpath, &st)) {
+	    if(errno == ENOENT)
+		continue;
+	    err = errno;
+	    break;
+	}
+	if(S_ISDIR(st.st_mode))
+	    return 0;
+	break;
     }
-    oumask = umask(0);
-    err = mkdir(rpath, mode) ? errno : 0;
-    umask(oumask);
-    if(!err)
-	return 0;
+
     zwarnnam(nam, "cannot make directory `%s': %e", path, err);
     return 1;
 }
