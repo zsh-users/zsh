@@ -6,6 +6,10 @@
 	* 47302: Test/B03print.ztst, Test/D07multibyte.ztst: Test for
 	print -v fix
 
+	* 47494, 47495: Completion/Zsh/Command/_strftime,
+	Doc/Zsh/mod_datetime.yo, Src/Modules/datetime.c,
+	Test/V09datetime.ztst: Add -n option to strftime
+
 2020-10-18  Roman Perepelitsa  <roman.perepelitsa@gmail.com>
 
 	* 47476: Src/Modules/files.c: Fix a race condition in zf_mkdir -p

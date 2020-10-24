@@ -175,7 +175,8 @@ output_strftime(char *nam, char **argv, Options ops, UNUSED(int func))
 	setsparam(scalar, metafy(buffer, len, META_DUP));
     } else {
 	fwrite(buffer, 1, len, stdout);
-	putchar('\n');
+	if (!OPT_ISSET(ops,'n'))
+	    putchar('\n');
     }
     zfree(buffer, bufsize);
 
@@ -235,7 +236,7 @@ getcurrenttime(UNUSED(Param pm))
 }
 
 static struct builtin bintab[] = {
-    BUILTIN("strftime",    0, bin_strftime,    1,   3, 0, "qrs:", NULL),
+    BUILTIN("strftime",    0, bin_strftime,    1,   3, 0, "nqrs:", NULL),
 };
 
 static const struct gsu_integer epochseconds_gsu =
