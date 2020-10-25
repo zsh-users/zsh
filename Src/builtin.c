@@ -4862,7 +4862,7 @@ bin_print(char *name, char **args, Options ops, int func)
 
     /* normal output */
     if (!fmt) {
-	if (OPT_ISSET(ops, 'z') || OPT_ISSET(ops, 'v') ||
+	if (OPT_ISSET(ops, 'z') ||
 	    OPT_ISSET(ops, 's') || OPT_ISSET(ops, 'S')) {
 	    /*
 	     * We don't want the arguments unmetafied after all.

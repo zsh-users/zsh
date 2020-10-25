@@ -1,3 +1,8 @@
+2020-10-25  Mikael Magnusson  <mikachu@gmail.com>
+
+	* Jun-ichi Takimoto: 47301: Src/builtin.c: Fix print -v
+	metafication
+
 2020-10-18  Roman Perepelitsa  <roman.perepelitsa@gmail.com>
 
 	* 47476: Src/Modules/files.c: Fix a race condition in zf_mkdir -p
