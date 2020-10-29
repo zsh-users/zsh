@@ -1,3 +1,8 @@
+2020-10-29  Oliver Kiddle  <opk@zsh.org>
+
+	* users/26107: Completion/Unix/Command/_git: complete changed
+	files after git diff HEAD
+
 2020-10-25  Mikael Magnusson  <mikachu@gmail.com>
 
 	* Jun-ichi Takimoto: 47301: Src/builtin.c: Fix print -v

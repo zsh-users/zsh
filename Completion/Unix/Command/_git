@@ -806,11 +806,14 @@ _git-diff () {
             # Example: git diff branch1..branch2 <tab>
             __git_tree_files ${PREFIX:-.} $(__git_committish_range_last $line[1]) && ret=0
           elif __git_is_committish $line[1] || __git_is_treeish $line[1]; then
+            local files_alt='files::__git_tree_files ${PREFIX:-.} HEAD'
+            [[ $line[1] = (HEAD|@) ]] &&
+                files_alt='files::__git_changed_files'
             # Example: git diff branch1 <tab>
             _alternative \
               'commits::__git_commits' \
               'blobs-and-trees-in-treeish::__git_blobs_and_trees_in_treeish' \
-              'files::__git_tree_files ${PREFIX:-.} HEAD' && ret=0
+              $files_alt && ret=0
           elif __git_is_blob $line[1]; then
             _alternative \
               'files::__git_cached_files' \
@@ -831,6 +834,10 @@ _git-diff () {
               __git_is_treeish $line[2]; then
             # Example: git diff branch1 branch2 <tab>
             __git_tree_files ${PREFIX:-.} $line[2] && ret=0
+          elif [[ $line[1] = (HEAD|@) ]]; then
+            # Example: git diff @ file1 <tab>
+            # Example: git diff HEAD -- <tab>
+            __git_ignore_line __git_changed_files && ret=0
           elif __git_is_committish $line[1] || __git_is_treeish $line[1]; then
             # Example: git diff branch file1 <tab>
             # Example: git diff branch -- f<tab>
