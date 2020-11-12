@@ -2276,17 +2276,12 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    paramtab->printnode(&pm->node, PRINT_TYPESET|PRINT_WITH_NAMESPACE);
 	    return pm;
 	}
-	if (usepm == 2)		/* do not change the PM_UNSET flag */
-	    pm->node.flags = (pm->node.flags | (on & ~PM_READONLY)) & ~off;
-	else {
-	    /*
-	     * Keep unset if using readonly in POSIX mode.
-	     */
-	    if (!(on & PM_READONLY) || !isset(POSIXBUILTINS))
-		off |= PM_UNSET;
-	    pm->node.flags = (pm->node.flags |
-			      (on & ~PM_READONLY)) & ~off;
-	}
+	/*
+	 * Keep unset if using readonly in POSIX mode unless specified otherwise.
+	 */
+	if ((usepm != 2) && !((on & PM_READONLY) && isset(POSIXBUILTINS)))
+	    off |= PM_UNSET;
+	pm->node.flags = (pm->node.flags | (on & ~PM_READONLY)) & ~off;
 	if (on & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) {
 	    if (typeset_setwidth(cname, pm, ops, on, 0))
 		return NULL;

@@ -1,5 +1,7 @@
 2026-06-23  Oliver Kiddle  <opk@zsh.org>
 
+	* Felipe Contreras: 47546: Src/builtin.c: trivial cleanup
+
 	* 54844: Completion/Unix/Command/_configure,
 	Completion/Unix/Command/_gcc: complete variable assignments
 	with configure
