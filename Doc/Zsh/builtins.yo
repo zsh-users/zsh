@@ -1939,7 +1939,7 @@ a set of three normal command line arguments to tt(typeset) after
 expansion.  Hence it is not possible to assign to multiple arrays by
 this means.
 
-Note that each interface to any of the commands my be disabled
+Note that each interface to any of the commands may be disabled
 separately.  For example, `tt(disable -r typeset)' disables the reserved
 word interface to tt(typeset), exposing the builtin interface, while
 `tt(disable typeset)' disables the builtin.  Note that disabling the
