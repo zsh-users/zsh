@@ -1,3 +1,8 @@
+2020-11-16  ivan tkachenko  <me@ratijas.tk>
+
+	* 47547: Doc/Zsh/arith.yo: docs: Specify the exact kind of
+	quoting which is assumed when parsing arithmetic expressions
+
 2020-11-16  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 47560: configure.ac, aczsh.m4: add necessary includes or

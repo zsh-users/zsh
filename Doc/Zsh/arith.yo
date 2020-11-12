@@ -20,7 +20,7 @@ The tt(let) builtin command takes arithmetic expressions as arguments; each
 is evaluated separately.  Since many of the arithmetic operators, as well
 as spaces, require quoting, an alternative form is provided: for any
 command which begins with a `tt(LPAR()LPAR())', all the characters until a
-matching `tt(RPAR()RPAR())' are treated as a quoted expression and
+matching `tt(RPAR()RPAR())' are treated as a double-quoted expression and
 arithmetic expansion performed as for an argument of tt(let).  More
 precisely, `tt(LPAR()LPAR())var(...)tt(RPAR()RPAR())' is equivalent to
 `tt(let ")var(...)tt(")'.  The return status is 0 if the arithmetic value
