@@ -1,3 +1,8 @@
+2020-11-16  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 47560: configure.ac, aczsh.m4: add necessary includes or
+	prototypes for the tests in configure (fix errors in macOS 11)
+
 2020-10-29  Oliver Kiddle  <opk@zsh.org>
 
 	* users/26107: Completion/Unix/Command/_git: complete changed
