@@ -1394,6 +1394,10 @@ AH_TEMPLATE([TGETENT_ACCEPTS_NULL],
 AC_CACHE_CHECK(if tgetent accepts NULL,
 zsh_cv_func_tgetent_accepts_null,
 [AC_RUN_IFELSE([AC_LANG_SOURCE([[
+#include <fcntl.h>
+#include <stdlib.h>
+int tgetent(char *, char *);
+char *tgetstr(char *, char **);
 main()
 {
     char buf[4096];
@@ -1418,6 +1422,10 @@ fi
 AC_CACHE_CHECK(if tgetent returns 0 on success,
 zsh_cv_func_tgetent_zero_success,
 [AC_RUN_IFELSE([AC_LANG_SOURCE([[
+#include <fcntl.h>
+#include <stdlib.h>
+int tgetent(char *, char*);
+char *tgetstr(char *, char **);
 main()
 {
     char buf[4096];
@@ -1855,6 +1863,7 @@ zsh_cv_rlim_t_is_longer,
 #include <sys/time.h>
 #endif
 #include <sys/resource.h>
+#include <stdlib.h>
 main(){struct rlimit r;exit(sizeof(r.rlim_cur) <= sizeof(long));}]])],[zsh_cv_rlim_t_is_longer=yes],[zsh_cv_rlim_t_is_longer=no],[zsh_cv_rlim_t_is_longer=yes])])
 if test x$zsh_cv_rlim_t_is_longer = xyes; then
   AC_CACHE_CHECK(if rlim_t is a quad,
@@ -1865,6 +1874,7 @@ if test x$zsh_cv_rlim_t_is_longer = xyes; then
 #endif
 #include <stdio.h>
 #include <sys/resource.h>
+#include <stdlib.h>
 main() { 
   struct rlimit r;
   char buf[20];
@@ -1887,6 +1897,7 @@ else
 #include <sys/time.h>
 #endif
 #include <sys/resource.h>
+#include <stdlib.h>
   main(){struct rlimit r;r.rlim_cur=-1;exit(r.rlim_cur<0);}]])],[zsh_cv_type_rlim_t_is_unsigned=yes],[zsh_cv_type_rlim_t_is_unsigned=no],[zsh_cv_type_rlim_t_is_unsigned=no])])
   if test x$zsh_cv_type_rlim_t_is_unsigned = xyes; then
     AC_DEFINE(RLIM_T_IS_UNSIGNED)
@@ -2258,6 +2269,9 @@ zsh_cv_sys_fifo,
 [AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #include <fcntl.h>
 #include <signal.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <sys/stat.h>
 main()
 {
     char c;
@@ -2299,6 +2313,7 @@ zsh_cv_sys_link,
 [AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #include <unistd.h>
 #include <fcntl.h>
+#include <stdlib.h>
 main()
 {
     int ret;
@@ -2331,6 +2346,7 @@ zsh_cv_sys_killesrch,
 #include <unistd.h>
 #include <signal.h>
 #include <errno.h>
+#include <stdlib.h>
 main()
 {
     int pid = (getpid() + 10000) & 0xffffff;
@@ -2356,6 +2372,7 @@ if test x$signals_style = xPOSIX_SIGNALS; then
     [AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #include <signal.h>
 #include <unistd.h>
+#include <stdlib.h>
 int child=0;
 void handler(sig)
     int sig;
@@ -2407,6 +2424,7 @@ case "x$zsh_working_tcsetpgrp" in
 #include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <stdlib.h>
 main() {
     int fd;
     int ret;
@@ -2450,6 +2468,10 @@ if test x$ac_cv_func_getpwnam = xyes; then
     zsh_cv_sys_getpwnam_faked,
     [AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #include <pwd.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
 main() {
     struct passwd *pw1, *pw2;
     char buf[1024], name[1024];
@@ -2777,6 +2799,7 @@ elif test "x$dynamic" = xyes; then
    [AC_RUN_IFELSE([AC_LANG_SOURCE([[/* Test for whether ELF binaries are produced */
 #include <fcntl.h>
 #include <stdlib.h>
+#include <unistd.h>
 main(argc, argv)
 int argc;
 char *argv[];
@@ -2930,6 +2953,7 @@ EOM
     AC_TRY_COMMAND($DLLD $LDFLAGS $DLLDFLAGS -o conftest.$DL_EXT conftest.o 1>&AS_MESSAGE_LOG_FD) &&
     AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #include <stdio.h>
+#include <stdlib.h>
 #ifdef HPUX10DYNAMIC
 #include <dl.h>
 #define RTLD_LAZY BIND_DEFERRED

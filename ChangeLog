@@ -1,5 +1,9 @@
 2022-01-27  dana  <dana@dana.is>
 
+	* Jun-ichi Takimoto: 47560: configure.ac, aczsh.m4: add necessary
+	includes or prototypes for the tests in configure (fix errors in
+	macOS 11)
+
 	* unposted: Completion/Unix/Command/_git: Fix copy/paste error
 	in earlier commit that broke `git stash drop`
 
