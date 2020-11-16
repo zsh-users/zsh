@@ -1,3 +1,9 @@
+2021-09-26  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted: Doc/Zsh/contrib.yo, Doc/Zsh/mod_curses.yo,
+	Doc/Zsh/mod_zselect.yo, Test/A05execution.ztst,
+	Test/C04funcdef.ztst: Fix typos
+
 2021-09-22  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 49422: Src/Modules/parameter.c, Src/hashnameddir.c, Src/options.c,

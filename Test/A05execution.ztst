@@ -258,7 +258,7 @@ F:side of a pipe to block on write after the right side has exited
    print -u $ZTST_fd "Skipping pipe leak test, requires MONITOR option"
    print "[0] 0 0"
   fi
-0:Bug regression: piping to anonymous function; piping to backround function
+0:Bug regression: piping to anonymous function; piping to background function
 *>\[<->\] <-> <->
 F:This test checks for two different bugs, a parser segfault piping to an
 F:anonymous function, and a descriptor leak when backgrounding a pipeline

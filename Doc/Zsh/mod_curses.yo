@@ -157,7 +157,7 @@ input.  This is only available with the ncurses library; mouse handling
 can be detected by checking for the exit status of `tt(zcurses mouse)' with
 no arguments.  If a mouse
 button is clicked (or double- or triple-clicked, or pressed or released with
-a configurable delay from being clicked) then tt(kparam) is set to the string
+a configurable delay from being clicked) then var(kparam) is set to the string
 tt(MOUSE), and var(mparam) is set to an array consisting of the
 following elements:
 startitem()

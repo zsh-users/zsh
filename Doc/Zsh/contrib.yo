@@ -1941,7 +1941,7 @@ subsect(Installation)
 
 You should make sure all the functions from the tt(Functions/Prompts)
 directory of the source distribution are available; they all begin with
-the string `tt(prompt_)' except for the special function`tt(promptinit)'.
+the string `tt(prompt_)' except for the special function `tt(promptinit)'.
 You also need the `tt(colors)' and `tt(add-zsh-hook)' functions from
 tt(Functions/Misc).
 All these functions may already be installed on your system; if not,
