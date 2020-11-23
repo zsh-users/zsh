@@ -953,3 +953,11 @@ F:Note that the behaviour of 'exit' inside try-list inside a function is unspeci
 0:Comments should be handled in command subst in interactively sourced files
 >foo
 >bar
+
+ function 'ls,/' () {echo success}
+ {ls,/}
+0:workers/47599: current-shell blocks masquerading as brace expansion
+>success
+F:This test was written to ensure the behaviour doesn't change silently.
+F:If this test fails during development, it *might* be appropriate to change
+F:its expectations.
