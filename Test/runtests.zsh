@@ -7,7 +7,7 @@ emulate zsh
 # protect from catastrophic failure of an individual test.
 # We could probably do that with subshells instead.
 
-integer success failure skipped retval
+integer success=0 failure=0 skipped=0 retval
 for file in "${(f)ZTST_testlist}"; do
   $ZTST_exe +Z -f $ZTST_srcdir/ztst.zsh $file
   retval=$?

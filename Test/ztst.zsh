@@ -60,7 +60,7 @@ ZTST_mainopts=(${(kv)options})
 ZTST_testdir=$PWD
 ZTST_testname=$1
 
-integer ZTST_testfailed
+integer ZTST_testfailed=0
 
 # This is POSIX nonsense.  Because of the vague feeling someone, somewhere
 # may one day need to examine the arguments of "tail" using a standard
