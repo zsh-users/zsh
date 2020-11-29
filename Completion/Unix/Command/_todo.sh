@@ -55,21 +55,26 @@ case $state in
     "append:adds to item on line NUMBER the text TEXT."
     "archive:moves done items from todo.txt to done.txt."
     "command:run internal commands only"
+    "deduplicate:removes duplicate lines from todo.txt."
     "del:deletes the item on line NUMBER in todo.txt."
     "depri:remove prioritization from item"
+    "done:marks task(s) on line ITEM# as done in todo.txt"
     "do:marks item on line NUMBER as done in todo.txt."
     "help:display help"
     "list:displays all todo items containing TERM(s), sorted by priority."
     "listall:displays items including done ones containing TERM(s)"
+    "listaddons:lists all added and overridden actions in the actions directory."
     "listcon:list all contexts"
     "listfile:display all files in .todo directory"
     "listpri:displays all items prioritized at PRIORITY."
+    "listproj:lists all the projects in todo.txt."
     "move:move item between files"
     "prepend:adds to the beginning of the item on line NUMBER text TEXT."
     "pri:adds or replace in NUMBER the priority PRIORITY (upper case letter)."
     "replace:replace in NUMBER the TEXT."
     "remdup:remove exact duplicates from todo.txt."
     "report:adds the number of open and done items to report.txt."
+    "showhelp:list the one-line usage of all built-in and add-on actions."
   )
   _describe -t todo-commands 'todo.sh command' cmdlist
   ;;
@@ -98,7 +103,7 @@ case $state in
     fi
     ;;
 
-    (depri|do|dp)
+    (depri|do|dp|done)
     nextstate=item
     ;;
 
