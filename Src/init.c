@@ -1304,7 +1304,7 @@ run_init_scripts(void)
 	    source("/etc/profile");
 	if (unset(PRIVILEGED)) {
 	    if (islogin)
-		sourcehome(".profile");
+		sourcehome(".etc/zsh/profile");
 
 	    if (interact) {
 		noerrs = 2;
@@ -1339,7 +1339,7 @@ run_init_scripts(void)
 		}
 	    }
 
-	    sourcehome(".zshenv");
+	    sourcehome(".etc/zsh/zshenv");
 	}
 	if (islogin) {
 #ifdef GLOBAL_ZPROFILE
@@ -1347,7 +1347,7 @@ run_init_scripts(void)
 		    source(GLOBAL_ZPROFILE);
 #endif
 	    if (isset(RCS) && unset(PRIVILEGED))
-		sourcehome(".zprofile");
+		sourcehome(".etc/zsh/zprofile");
 	}
 	if (interact) {
 #ifdef GLOBAL_ZSHRC
@@ -1355,7 +1355,7 @@ run_init_scripts(void)
 		source(GLOBAL_ZSHRC);
 #endif
 	    if (isset(RCS) && unset(PRIVILEGED))
-		sourcehome(".zshrc");
+		sourcehome(".etc/zsh/zshrc");
 	}
 	if (islogin) {
 #ifdef GLOBAL_ZLOGIN
@@ -1363,7 +1363,7 @@ run_init_scripts(void)
 		source(GLOBAL_ZLOGIN);
 #endif
 	    if (isset(RCS) && unset(PRIVILEGED))
-		sourcehome(".zlogin");
+		sourcehome(".etc/zsh/zlogin");
 	}
     }
     noerrexit = 0;
