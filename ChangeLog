@@ -1,3 +1,7 @@
+2020-12-01  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: Etc/BUGS: Add users/26150 (multios + exec)
+
 2020-11-16  ivan tkachenko  <me@ratijas.tk>
 
 	* 47547: Doc/Zsh/arith.yo: docs: Specify the exact kind of
