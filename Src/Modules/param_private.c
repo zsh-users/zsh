@@ -171,6 +171,7 @@ bin_private(char *nam, char **args, LinkList assigns, Options ops, int func)
 {
     int from_typeset = 1;
     int ofake = fakelevel;	/* paranoia in case of recursive call */
+    int hasargs = *args != NULL || (assigns && firstnode(assigns));
     makeprivate_error = 0;
 
     if (!OPT_ISSET(ops, 'P')) {
@@ -190,6 +191,9 @@ bin_private(char *nam, char **args, LinkList assigns, Options ops, int func)
     }
 
     ops->ind['g'] = 2;	/* force bin_typeset() to behave as "local" */
+    if (OPT_ISSET(ops, 'p') || (!hasargs && OPT_ISSET(ops, '+'))) {
+	return bin_typeset("private", args, assigns, ops, func);
+    }
 
     queue_signals();
     fakelevel = locallevel;

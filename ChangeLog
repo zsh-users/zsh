@@ -1,3 +1,7 @@
+2020-12-02  Bart Schaefer  <schaefer@zsh.org>
+
+	* 47704: Src/Modules/param_private.c: fix scope for "private -p"
+
 2020-12-01  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Etc/BUGS: Add users/26150 (multios + exec)
