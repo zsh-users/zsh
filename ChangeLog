@@ -1,3 +1,7 @@
+2020-12-04  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 47716: Etc/BUGS: Add Alekxandr's vcs_info patch.
+
 2020-12-02  Bart Schaefer  <schaefer@zsh.org>
 
 	* 47704: Src/Modules/param_private.c: fix scope for "private -p"
