@@ -3659,6 +3659,8 @@ unsetparam_pm(Param pm, int altflag, int exp)
 	}
 
 	zsfree(altremove);
+	if (!(pm->node.flags & PM_SPECIAL))
+	    pm->gsu.s = &stdscalar_gsu;
     }
 
     /*
