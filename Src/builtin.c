@@ -2933,11 +2933,11 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	if (asg->value.array) {
 	    int flags = (asg->flags & ASG_KEY_VALUE) ? ASSPM_KEY_VALUE : 0;
 	    assignaparam(asg->name, zlinklist2array(asg->value.array, 1), flags);
-	} else if (oldval)
-	    assignsparam(asg0.name, oldval, 0);
-	else /*if (asg0.value.scalar)*/ {
+	} else /*if (asg0.value.scalar || oldval)*/ {
 	    /* We have to undo what we did wrong with asg2 */
 	    apm->node.flags &= ~PM_DECLAREDNULL;
+	    if (oldval)
+		assignsparam(asg0.name, oldval, 0);
 	}
 	unqueue_signals();
 
