@@ -5338,6 +5338,8 @@ match the privileges when calling programs to generate matches.
 )
 enditem()
 
+vindex(compprefuncs, use of)
+vindex(comppostfuncs, use of)
 Two more features are offered by the tt(_main_complete) function.  The
 arrays tt(compprefuncs) and tt(comppostfuncs) may contain
 names of functions that are to be called immediately before or after
