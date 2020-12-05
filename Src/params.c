@@ -4125,6 +4125,11 @@ tiedarrsetfn(Param pm, char *x)
 
     if (*dptr->arrptr)
 	freearray(*dptr->arrptr);
+    else if (pm->ename) {
+	Param altpm = (Param) paramtab->getnode(paramtab, pm->ename);
+	if (altpm)
+	    altpm->node.flags &= ~PM_DECLAREDNULL;
+    }
     if (x) {
 	char sepbuf[3];
 	if (imeta(dptr->joinchar))

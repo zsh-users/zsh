@@ -2837,7 +2837,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	    unqueue_signals();
 	    return 1;
 	} else if (pm) {
-	    if (!(pm->node.flags & PM_UNSET)
+	    if ((!(pm->node.flags & PM_UNSET) || pm->node.flags & PM_DECLARED)
 		&& (locallevel == pm->level || !(on & PM_LOCAL))) {
 		if (pm->node.flags & PM_TIED) {
 		    if (PM_TYPE(pm->node.flags) != PM_SCALAR) {
@@ -2933,7 +2933,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	if (asg->value.array) {
 	    int flags = (asg->flags & ASG_KEY_VALUE) ? ASSPM_KEY_VALUE : 0;
 	    assignaparam(asg->name, zlinklist2array(asg->value.array, 1), flags);
-	} else /*if (asg0.value.scalar || oldval)*/ {
+	} else if (asg0.value.scalar || oldval) {
 	    /* We have to undo what we did wrong with asg2 */
 	    apm->node.flags &= ~PM_DECLAREDNULL;
 	    if (oldval)
