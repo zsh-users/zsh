@@ -55,7 +55,7 @@ precmd() {
     # is (as with the other examples above too) just an example of a very
     # basic single-line prompt. See "man zshmisc" for details on how to
     # make this less readable. :-)
-    if [[ -n ${vcs_info_msg_0_} ]]; then
+    if [[ -z ${vcs_info_msg_0_} ]]; then
         # Oh hey, nothing from vcs_info, so we got more space.
         # Let's print a longer part of $PWD...
         PS1="%5~%# "
