@@ -4363,6 +4363,7 @@ directory.  These must be autoloaded, or placed as executable scripts in
 your search path, in order to be found and used by tt(run-help).
 
 startitem()
+findex(run-help-btrfs)
 findex(run-help-git)
 findex(run-help-ip)
 findex(run-help-openssl)
@@ -4370,14 +4371,16 @@ findex(run-help-p4)
 findex(run-help-sudo)
 findex(run-help-svk)
 findex(run-help-svn)
-xitem(run-help-git)
-xitem(run-help-ip)
-xitem(run-help-openssl)
-xitem(run-help-p4)
-xitem(run-help-sudo)
-xitem(run-help-svk)
+xitem(tt(run-help-btrfs))
+xitem(tt(run-help-git))
+xitem(tt(run-help-ip))
+xitem(tt(run-help-openssl))
+xitem(tt(run-help-p4))
+xitem(tt(run-help-sudo))
+xitem(tt(run-help-svk))
 item(tt(run-help-svn))(
 Assistant functions for the
+tt(btrfs),
 tt(git),
 tt(ip),
 tt(openssl),

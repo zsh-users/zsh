@@ -1,5 +1,9 @@
 2020-12-11  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* 47731 (+unposted): Functions/Misc/run-help-btrfs,
+	Doc/Zsh/contrib.yo: add run-help assistant for btrfs command.
+	(based on the patch by Samir Benmendil in 43947⁩)
+
 	* Samir Benmendil: 43946: Functions/Misc/run-help-sudo: call
 	run-help (instead of man) for the command given to sudo
 
