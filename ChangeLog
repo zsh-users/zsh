@@ -1,3 +1,8 @@
+2020-12-11  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* Samir Benmendil: 43946: Functions/Misc/run-help-sudo: call
+	run-help (instead of man) for the command given to sudo
+
 2020-12-05  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Doc/Zsh/compsys.yo: index compprefuncs and comppostfuncs
