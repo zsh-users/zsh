@@ -7,9 +7,28 @@ Note also the list of incompatibilities in the README file.
 Changes since 5.8
 -----------------
 
+The function command learnt a -T option to declare a function and enable
+tracing for it simultaneously.
+
+The option SHORT_REPEAT was added to enable the short syntax of
+SHORT_LOOPS for the repeat command only. It is disabled by default.
+
+The _arguments function now supports NUL-delimiting optargs in the
+opt_args array via the -0 option. Developers of completion functions
+should find this easier to handle reliably than the default
+colon-delimiting behaviour.
+
 The zsh/system module's `zsystem flock` command learnt an -i option to
 set the wait interval used with -t. Additionally, -t now supports
 fractional seconds.
+
+The option CLOBBER_EMPTY was added to enable the overwrite behaviour
+of CLOBBER for empty files only. It is disabled by default.
+
+The compinit function learnt a -w option to explain why compdump runs.
+
+The zsh/datetime module's strftime builtin learnt an -n option to omit
+the trailing newline when printing a formatted time.
 
 Changes from 5.7.1-test-3 to 5.8
 --------------------------------
