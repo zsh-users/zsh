@@ -1,5 +1,8 @@
 2021-05-16  Oliver Kiddle  <opk@zsh.org>
 
+	* Jörg Sommer: users/26649: Completion/Unix/Command/_rake:
+	add zstyle for rake targets without description
+
 	* 48783: Completion/Unix/Command/_ansible: update ansible
 	completion to 2.10.8
 

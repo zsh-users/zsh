@@ -37,7 +37,9 @@ case "$state" in
   ;;
   target)
     local -a targets
-    targets=( ${${(f)"$(_call_program targets $words[1] -sT $opt_args[(I)(-N|--nosearch)] ${(kv)opt_args[(I)(-f|--rakefile)]} 2>/dev/null)"}/(#b)rake ([^ ]##) ##\# (*)/${${match[1]}//:/\\:}:${match[2]:l}} )
+    local all
+    zstyle -t ":completion:${curcontext}:targets" extended && all=-A
+    targets=( ${${(f)"$(_call_program targets $words[1] $all -sT $opt_args[(I)(-N|--nosearch)] ${(kv)opt_args[(I)(-f|--rakefile)]} 2>/dev/null)"}/(#b)rake ([^ ]##) ##\# (*)/${${match[1]}//:/\\:}:${match[2]:l}} )
     if (( ! ${targets[(I)rake aborted!]} )) then
       _describe -t targets 'rake target' targets && ret=0
     else
