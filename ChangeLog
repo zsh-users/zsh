@@ -1,3 +1,8 @@
+2021-03-23  dana  <dana@dana.is>
+
+	* 47745: Stephane Chazelas: Src/utils.c: Fix [:IDENT:] vs
+	posixidentifiers
+
 2021-03-17  dana  <dana@dana.is>
 
 	* 48180: Marlon Richert: Completion/Base/Core/_main_complete,

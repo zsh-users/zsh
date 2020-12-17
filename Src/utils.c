@@ -4327,7 +4327,7 @@ wcsitype(wchar_t c, int itype)
     } else {
 	switch (itype) {
 	case IIDENT:
-	    if (!isset(POSIXIDENTIFIERS))
+	    if (isset(POSIXIDENTIFIERS))
 		return 0;
 	    return iswalnum(c);
 
