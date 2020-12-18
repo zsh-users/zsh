@@ -19,14 +19,14 @@
  () {
   print $scalar_test
   private scalar_test
-  print $+scalar_test
+  typeset +m scalar_test
   unset scalar_test
   print $+scalar_test
  }
  print $scalar_test
 0:basic scope hiding
 >toplevel
->1
+>local scalar_test
 >0
 >toplevel
 
@@ -45,14 +45,14 @@
  print $+unset_test
  () {
   private unset_test
-  print $+unset_test
+  typeset +m unset_test
   unset_test=setme
   print $unset_test
  }
  print $+unset_test
 0:variable defined only in scope
 >0
->1
+>local unset_test
 >setme
 >0
 
@@ -62,13 +62,13 @@
   local -Pa array_test=(in function)
   () {
    private array_test
-   print $+array_test
+   typeset +m array_test
   }
   print $array_test
  }
  print $array_test
 0:nested scope with different type, correctly restored
->1
+>local array_test
 >in function
 >top level
 

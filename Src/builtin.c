@@ -2491,7 +2491,8 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 		return NULL;
 	    }
 	}
-	pm->node.flags |= PM_DECLAREDNULL;
+	if (isset(POSIXBUILTINS))
+	    pm->node.flags |= PM_DECLAREDNULL;
     } else {
 	if (idigit(*pname))
 	    zerrnam(cname, "not an identifier: %s", pname);
@@ -2891,7 +2892,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	 * Don't attempt to set it yet, it's too early
 	 * to be exported properly.
 	 *
-	 * This creates the array with PM_DECLAREDNULL.
+	 * This may create the array with PM_DECLAREDNULL.
 	 */
 	asg2.name = asg->name;
 	asg2.flags = 0;
