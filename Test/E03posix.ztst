@@ -103,3 +103,17 @@
 >arg1 arg2
 >noktarg1
 >0 0
+
+  () {
+    local var
+    print ${(t)var}
+  }
+0:(t) returns correct type
+>scalar-local
+
+  () {
+    readonly var
+    typeset -p var
+  }
+0:readonly with typeset -p
+>typeset -g -r var

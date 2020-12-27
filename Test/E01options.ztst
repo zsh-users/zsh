@@ -1451,3 +1451,18 @@ F:If this test fails at the first unsetopt, refer to P01privileged.ztst.
 0q:RM_STAR_SILENT
 *>zsh: sure you want to delete all 15 files in ${PWD:h}/options.tmp \[yn\]\? ${BEL}(|n)
 *>zsh: sure you want to delete (all <->|more than <->) files in / \[yn\]\? ${BEL}(|n)
+
+  () {
+    local var
+    print ${(t)var}
+  }
+0:(t) returns correct type
+>scalar-local
+
+  () {
+    readonly var
+    typeset -p var
+  }
+0:readonly with typeset -p
+F:compare E03posix.ztst
+>typeset -r var=''

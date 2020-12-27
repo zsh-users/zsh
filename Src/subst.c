@@ -2563,7 +2563,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	     * Handle the (t) flag: value now becomes the type
 	     * information for the parameter.
 	     */
-	    if (v && v->pm && !(v->pm->node.flags & PM_UNSET)) {
+	    if (v && v->pm && ((v->pm->node.flags & PM_DECLARED) ||
+			       !(v->pm->node.flags & PM_UNSET))) {
 		int f = v->pm->node.flags;
 
 		switch (PM_TYPE(f)) {
