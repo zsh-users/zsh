@@ -1,5 +1,8 @@
 2021-04-09  Oliver Kiddle  <opk@zsh.org>
 
+	* Felipe Contreras: 47786: aclocal.m4, aczsh.m4: prepare for
+	autoconf 2.70
+
 	* Felipe Contreras: 47785: Src/Modules/files.c, Src/zsh_system.h,
 	Src/mem.c, configure.ac: remove deprecated autoconf functions
 

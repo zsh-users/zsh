@@ -35,14 +35,14 @@ ac_save_CFLAGS="$CFLAGS"
 for ac_arg in "" -qlanglvl=ansi -std1 -Ae "-Aa -D_HPUX_SOURCE" -Xc
 do
   CFLAGS="$ac_save_CFLAGS $ac_arg"
-  AC_TRY_COMPILE(
+  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
 [#ifndef __STDC__
 choke me
 #endif	
-], [int test (int i, double x);
+]], [[int test (int i, double x);
 struct s1 {int (*f) (int a);};
-struct s2 {int (*f) (double a);};],
-[fp_cv_prog_cc_stdc="$ac_arg"; break])
+struct s2 {int (*f) (double a);};]])],
+[fp_cv_prog_cc_stdc="$ac_arg"; break],[])
 done
 CFLAGS="$ac_save_CFLAGS"
 ])
