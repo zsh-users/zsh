@@ -1072,18 +1072,10 @@ zrealloc(void *ptr, size_t size)
 # endif
 #endif
 
-#if defined(_BSD) && !defined(STDC_HEADERS)
-# define FREE_RET_T   int
-# define FREE_ARG_T   char *
-# define FREE_DO_RET
-# define MALLOC_RET_T char *
-# define MALLOC_ARG_T size_t
-#else
-# define FREE_RET_T   void
-# define FREE_ARG_T   void *
-# define MALLOC_RET_T void *
-# define MALLOC_ARG_T size_t
-#endif
+#define FREE_RET_T   void
+#define FREE_ARG_T   void *
+#define MALLOC_RET_T void *
+#define MALLOC_ARG_T size_t
 
 /* structure for building free list in blocks holding small blocks */
 

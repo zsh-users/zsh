@@ -28,7 +28,7 @@ dnl
 AC_INIT
 AC_CONFIG_SRCDIR([Src/zsh.h])
 AC_PREREQ([2.69])
-AC_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS([config.h])
 
 dnl What version of zsh are we building ?
 . ${srcdir}/Config/version.mk
@@ -657,8 +657,6 @@ dnl ------------------
 dnl CHECK HEADER FILES
 dnl ------------------
 AC_HEADER_DIRENT
-AC_HEADER_STDC
-AC_HEADER_TIME
 AC_HEADER_STAT
 AC_HEADER_SYS_WAIT
 

@@ -1,3 +1,8 @@
+2021-04-09  Oliver Kiddle  <opk@zsh.org>
+
+	* Felipe Contreras: 47785: Src/Modules/files.c, Src/zsh_system.h,
+	Src/mem.c, configure.ac: remove deprecated autoconf functions
+
 2021-04-08  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 48416: Completion/Unix/Command/_gcore: support macOS, with

@@ -32,12 +32,6 @@
 typedef int (*MoveFunc) _((char const *, char const *));
 typedef int (*RecurseFunc) _((char *, char *, struct stat const *, void *));
 
-#ifndef STDC_HEADERS
-extern int link _((const char *, const char *));
-extern int symlink _((const char *, const char *));
-extern int rename _((const char *, const char *));
-#endif
-
 struct recursivecmd;
 
 #include "files.pro"

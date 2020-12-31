@@ -235,16 +235,8 @@ char *alloca _((size_t));
 # include <errno.h>
 #endif
 
-#ifdef TIME_WITH_SYS_TIME
-# include <sys/time.h>
-# include <time.h>
-#else
-# ifdef HAVE_SYS_TIME_H
-# include <sys/time.h>
-# else
-#  include <time.h>
-# endif
-#endif
+#include <sys/time.h>
+#include <time.h>
 
 /* This is needed by some old SCO unices */
 #if !defined(HAVE_STRUCT_TIMEZONE) && !defined(ZSH_OOT_MODULE)
@@ -279,16 +271,7 @@ struct timespec {
 # include <sys/times.h>
 #endif
 
-#if STDC_HEADERS || HAVE_STRING_H
 # include <string.h>
-/* An ANSI string.h and pre-ANSI memory.h might conflict.  */
-# if !STDC_HEADERS && HAVE_MEMORY_H
-#  include <memory.h>
-# endif /* not STDC_HEADERS and HAVE_MEMORY_H */
-#else   /* not STDC_HEADERS and not HAVE_STRING_H */
-# include <strings.h>
-/* memory.h and strings.h conflict on some systems.  */
-#endif /* not STDC_HEADERS and not HAVE_STRING_H */
 
 #ifdef HAVE_LOCALE_H
 # include <locale.h>
