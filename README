@@ -95,6 +95,10 @@ right thing, but this should be viewed as an unsupported hack.)
 The XTRACE option is now disabled while running user-defined completion
 widgets.  See NEWS.
 
+emulate sh: When zsh emulates sh, the final command in a pipeline is now run in
+a subshell.  This differs from the behavior in the native (zsh) mode, but is
+consistent with most other sh implementations.
+
 Incompatibilities between 5.7.1 and 5.8
 ---------------------------------------
 

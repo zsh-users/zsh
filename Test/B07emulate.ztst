@@ -276,3 +276,25 @@ F:Some reserved tokens are handled in alias expansion
 0:--emulate followed by other options
 >yes
 >no
+
+  emulate sh -c '
+  foo () {
+    VAR=foo &&
+    echo $VAR | bar &&
+    echo "$VAR"
+  }
+  bar () {
+    tr f b &&
+    VAR="$(echo bar | tr r z)" &&
+    echo "$VAR"
+  }
+  foo
+  '
+  emulate sh -c 'func() { echo | local def="abc"; echo $def;}; func'
+  emulate sh -c 'abc="def"; echo | abc="ghi"; echo $abc'
+0:emulate sh uses subshell for last pipe entry
+>boo
+>baz
+>foo
+>
+>def

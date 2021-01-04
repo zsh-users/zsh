@@ -5,6 +5,10 @@
 
 2021-04-10  dana  <dana@dana.is>
 
+	* brian m. carlson: 47794: README, Src/exec.c,
+	Test/B07emulate.ztst: exec: run final pipeline command in a
+	subshell in sh mode
+
 	* unposted (see 48415): README: Document incompatibility
 	caused by workers/43928
 
