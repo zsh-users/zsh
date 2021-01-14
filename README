@@ -40,7 +40,7 @@ not be built unless --enable-gdbm is passed explicitly.
 
 vcs_info quilt: The value of the 'quiltcommand' style used to be taken for the
 name of an external command.  Now it may also be a shell function.  Normal
-command word precedece rules apply, so if you have a function and a command
+command word precedence rules apply, so if you have a function and a command
 with the same name, the function will be used.
 
 The "function" reserved word, used to define functions, gained a new -T option.
@@ -206,7 +206,7 @@ been made an error.  (The option setting NO_MULTI_FUNC_DEF turned this
 case into an error, but did not help with other cases and is off by
 default.)  The alternative, of not expanding the alias, was rejected as
 it was more difficult to achieve in the parser and also would silently
-change the shell's behaviur between versions.  A new option,
+change the shell's behaviour between versions.  A new option,
 ALIAS_FUNC_DEF, has been added, which can be set to make the shell
 behave as in previous versions.  It is in any case recommended to use
 the "function" keyword, as aliases are not expanded afterwards.
@@ -410,19 +410,19 @@ This is also necessary in the unusual eventuality that the builtins are
 to be overridden by shell functions, since reserved words take
 precedence over functions.
 
-10) For compatilibity with other shells, the syntax
+10) For compatibility with other shells, the syntax
 
 array=([index]=value)
 
-can be used with both assoiative arrays and normal arrays.  In the
+can be used with both associative arrays and normal arrays.  In the
 unlikely event that you wish to create an array with an entry
 matching a file whose name consists of one of a range of characters
 matched as a [...] expression, followed by an equal sign, followed
 by arbitrary other characters, it is now necessary to quote the equals
 sign.
 
-Incompatibilites between 5.0.7 and 5.0.8
-----------------------------------------
+Incompatibilities between 5.0.7 and 5.0.8
+-----------------------------------------
 
 Various arithmetic operations have changed, in particular with respect
 to the choice of integer or floating point operations.  The new

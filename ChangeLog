@@ -1,3 +1,7 @@
+2021-02-16  Lawrence Velázquez  <vq@larryv.me>
+
+	* 47830: Doc/Zsh/contrib.yo, README: Fix some documentation typos
+
 2021-02-13  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted (Daniel): Completion/Unix/Command/_locale:

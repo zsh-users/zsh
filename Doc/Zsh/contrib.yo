@@ -465,7 +465,7 @@ allows you to edit the list of directories, one per line.  The
 list can be edited to any extent you like; no sanity checking is
 performed.  Completion is available.  No quoting is necessary (except for
 newlines, where I have in any case no sympathy); directories are in
-unabbreviated from and contain an absolute path, i.e. they start with tt(/).
+unabbreviated form and contain an absolute path, i.e. they start with tt(/).
 Usually the first entry should be left as the current directory.
 )
 item(tt(-p ')var(pattern)tt('))(
@@ -708,7 +708,7 @@ that the wrapper function gets.  This configuration is described below.
 
 Then arrange for the wrapper to be run as a zsh_directory_name hook:
 
-example(autoload -Uz add-zsh-hook zsh_diretory_name_generic zdn_mywrapper
+example(autoload -Uz add-zsh-hook zsh_directory_name_generic zdn_mywrapper
 add-zsh-hook -U zsh_directory_name zdn_mywrapper)
 
 subsect(Configuration)
