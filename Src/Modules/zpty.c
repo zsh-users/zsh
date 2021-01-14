@@ -30,6 +30,13 @@
 #include "zpty.mdh"
 #include "zpty.pro"
 
+#ifdef __CYGWIN__
+#include <cygwin/version.h>
+#if defined(CYGWIN_VERSION_DLL_MAJOR) && CYGWIN_VERSION_DLL_MAJOR<3002
+#define USE_CYGWIN_FIX 1
+#endif
+#endif
+
 /* The number of bytes we normally read when given no pattern and the
  * upper bound on the number of bytes we read (even if we are give a
  * pattern). */
@@ -428,6 +435,7 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 	mypid = 0; /* trick to ensure we _exit() */
 	zexit(lastval, ZEXIT_NORMAL);
     }
+#ifndef USE_CYGWIN_FIX
     master = movefd(master);
     if (master == -1) {
 	zerrnam(nam, "cannot duplicate fd %d: %e", master, errno);
@@ -435,6 +443,9 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 	ineval = oineval;
 	return 1;
     }
+#else
+    addmodulefd(master, FDT_INTERNAL);
+#endif
 
     p = (Ptycmd) zalloc(sizeof(*p));
 
