@@ -1,3 +1,8 @@
+2021-01-24  Paul Seyfert  <pseyfert.mathphys@gmail.com>
+
+	* github #71 (tweaked): Completion/X/Command/_xrandr: Complete
+	providers
+
 2021-01-23  Bart Schaefer  <schaefer@zsh.org>
 
 	* users/26406: Functions/Misc/zargs: preserve caller setopts

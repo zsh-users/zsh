@@ -1,6 +1,6 @@
 #compdef xrandr
 
-local curcontext="$curcontext" state line expl
+local curcontext="$curcontext" state line expl state_descr
 typeset -A opt_args
 
 _arguments -C \
@@ -47,8 +47,8 @@ _arguments -C \
   "*--addmode:output:->outputs:name" \
   "*--delmode:output:->outputs:name" \
   '--listproviders' \
-  '--setprovideroutputsource:provider: :source' \
-  '--setprovideroffloadsink:provider: :sink' \
+  '--setprovideroutputsource:provider:->providers:source:->providers' \
+  '--setprovideroffloadsink:provider:->providers:sink:->providers' \
   '--listmonitors' \
   '--listactivemonitors' \
   '--setmonitor:name' \
@@ -74,5 +74,9 @@ case $state in
   modes)
     _wanted modes expl mode compadd \
         ${(Mun)$(_call_program modes xrandr):#[0-9]##x[0-9]##} && return 0
+  ;;
+  providers)
+    local -a xrandr_providers=(${(f)"$(_call_program providers xrandr --listproviders)"})
+    _wanted xrandr-providers expl $state_descr compadd ${${xrandr_providers}[2,-1]##*:} && return 0
   ;;
 esac
