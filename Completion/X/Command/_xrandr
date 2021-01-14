@@ -3,6 +3,12 @@
 local curcontext="$curcontext" state line expl
 typeset -A opt_args
 
+__xrandrproviders() {
+  local -a provs
+  provs=(${${(f)"$(xrandr --listproviders | tail +2)"}##*:})
+  _describe -t xrandrproviders 'providers' provs
+}
+
 _arguments -C \
   '(-d -display)'{-d,-display}':X display:_x_display' \
   '-help[display help]' \
@@ -47,7 +53,7 @@ _arguments -C \
   "*--addmode:output:->outputs:name" \
   "*--delmode:output:->outputs:name" \
   '--listproviders' \
-  '--setprovideroutputsource:provider: :source' \
+  '--setprovideroutputsource:*:provider: __xrandrproviders' \
   '--setprovideroffloadsink:provider: :sink' \
   '--listmonitors' \
   '--listactivemonitors' \
