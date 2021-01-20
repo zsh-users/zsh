@@ -6,8 +6,6 @@
   if ! zmodload zsh/zpty 2>/dev/null
   then
     ZTST_unimplemented="the zsh/zpty module is not available"
-  elif [[ $OSTYPE = cygwin ]]; then
-    ZTST_unimplemented="the zsh/zpty module does not work on Cygwin"
   fi
 
 %test

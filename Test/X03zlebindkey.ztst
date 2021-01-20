@@ -12,9 +12,7 @@
       break;
     fi
   done
-  if [[ $OSTYPE = cygwin ]]; then
-    ZTST_unimplemented="the zsh/zpty module does not work on Cygwin"
-  elif ( zmodload zsh/zpty 2>/dev/null ); then
+  if ( zmodload zsh/zpty 2>/dev/null ); then
     . $ZTST_srcdir/comptest
     comptestinit -z $ZTST_testdir/../Src/zsh
   else

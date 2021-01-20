@@ -11,9 +11,7 @@
       break;
     fi
   done
-  if [[ $OSTYPE = cygwin ]]; then
-    ZTST_unimplemented="the zsh/zpty module does not work on Cygwin"
-  elif ( zmodload zsh/zpty 2>/dev/null ); then
+  if ( zmodload zsh/zpty 2>/dev/null ); then
     . $ZTST_srcdir/comptest
     mkdir comp.tmp
     cd comp.tmp
@@ -156,6 +154,9 @@ F:regression test workers/31611
 >line: {tst word:/}{}
 
 # Test for regression introduced by workers/41242, raised in workers/43842
+  if [[ $OSTYPE = cygwin ]]; then
+    ZTST_skip="\\ is equivalent to / in pathname on cygwin"
+  else
   {
     mkdir sortnobslash
     touch sortnobslash/{'!foo','#foo','\foo','|foo','~foo',Afoo,bfoo}
@@ -165,6 +166,7 @@ F:regression test workers/31611
     comptesteval 'LC_ALL=$old_LC_ALL'
     rm -rf sortnobslash
   }
+  fi
 0:ignore backslashes when sorting completion matches
 >line: {: sortnobslash/}{}
 >DESCRIPTION:{file}

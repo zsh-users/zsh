@@ -5,8 +5,6 @@
   export TERM=xterm-256color
   if [[ ${+termcap} != 1 || ${termcap[Co]} != <-> || ${termcap[Co]} -lt 256 ]]; then
     ZTST_unimplemented="no termcap module OR termcap doesn't support 256 or more colors"
-  elif [[ $OSTYPE == cygwin ]]; then
-    ZTST_unimplemented='the zsh/zpty module does not work on Cygwin'
   elif zmodload zsh/zpty 2> /dev/null; then
     zpty_start() {
       export PS1= PS2=

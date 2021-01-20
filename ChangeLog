@@ -1,5 +1,11 @@
 2021-01-20  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* 47849: Test/E01options.ztst, Test/V08zpty.ztst,
+	Test/W02jobs.ztst, Test/X02zlevi.ztst, Test/X03zlebindkey.ztst,
+	Test/X04zlehighlight.ztst, Test/Y01completion.ztst,
+	Test/Y02compmatch.ztst, Test/Y03arguments.ztst: do not skip
+	tests that require zpty on Cygwin
+
 	* Peiyuan Song: 47840: Src/Modules/zpty.c, configure.ac: make
 	zpty module work on Cygwin
 
