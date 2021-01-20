@@ -2460,7 +2460,7 @@ if test x$ac_cv_have_dev_ptmx = xyes -o x$ac_cv_func_posix_openpt = xyes && \
    test x$ac_cv_func_ptsname = xyes; then
    AC_CACHE_CHECK([if /dev/ptmx is usable],
    ac_cv_use_dev_ptmx,
-   [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#ifdef __linux
+   [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#if defined(__linux) || defined(__CYGWIN__)
 #define _GNU_SOURCE 1
 #endif
 #include <stdlib.h>

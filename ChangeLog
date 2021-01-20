@@ -1,3 +1,8 @@
+2021-01-20  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* Peiyuan Song: 47840: Src/Modules/zpty.c, configure.ac: make
+	zpty module work on Cygwin
+
 2020-12-12  dana  <dana@dana.is>
 
 	* unposted: NEWS: Catch up on new features
