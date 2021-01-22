@@ -1,5 +1,8 @@
 2021-02-07  Oliver Kiddle  <opk@zsh.org>
 
+	* github #72 (tweaked): Semnodime: Completion/Unix/Command/_lldb:
+	fix unix command lldb tab-completion, args are space separated
+
 	* gitlab !16: aaaz <i1460889@mvrht.net>:
 	Completion/Unix/Command/_transmission: allow spaces between short
 	options and their parameters in transmission completion
