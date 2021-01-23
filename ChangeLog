@@ -1,3 +1,7 @@
+2021-01-23  Bart Schaefer  <schaefer@zsh.org>
+
+	* users/26406: Functions/Misc/zargs: preserve caller setopts
+
 2021-01-20  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 47849: Test/E01options.ztst, Test/V08zpty.ztst,

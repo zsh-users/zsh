@@ -70,6 +70,19 @@
 #   this behavior, as do -l/-L, but when -i/-I appear anywhere then -l/-L
 #   are ignored (forced to 1).
 
+# First, capture the current setopts as "sticky emulation"
+if zmodload zsh/parameter
+then
+  emulate $(emulate -l) -c "\
+    _zarun() {
+      options=( ${(j: :kv)options[@]} monitor off zle off )"'
+      eval "$@"
+    }'
+else
+  # Warning?
+  emulate $(emulate -l) -c '_zarun() { eval "$@" }'
+fi
+
 emulate -L zsh || return 1
 local -a opts eof n s l P i
 
@@ -186,8 +199,8 @@ local execute='
     elif (( $opts[(I)-(-verbose|t)] ))
     then print -u2 -r -- "$call"
     fi
-    eval "{
-	\"\${(@)call}\"
+    _zarun "{
+	\"\${call[@]}\"
     } $bg"'
 local ret=0 analyze='
     case $? in
