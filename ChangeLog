@@ -1,3 +1,9 @@
+2021-02-16  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 47876: Justtine Tunney: Src/exec.c: Add more cases where
+	shell scripts can be recognised from the first line as
+	described by POSIX.
+
 2021-02-16  Lawrence Velázquez  <vq@larryv.me>
 
 	* 47830: Doc/Zsh/contrib.yo, README: Fix some documentation typos

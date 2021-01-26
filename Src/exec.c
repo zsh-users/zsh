@@ -547,10 +547,29 @@ zexecve(char *pth, char **argv, char **newenvp)
 			}
 		    }
 		} else if (eno == ENOEXEC) {
-		    for (t0 = 0; t0 != ct; t0++)
-			if (!execvebuf[t0])
-			    break;
-		    if (t0 == ct) {
+                    /* Perform binary safety check on classic shell    *
+                     * scripts (shebang wasn't introduced until UNIX   *
+                     * Seventh Edition). POSIX says we shall allow     *
+                     * execution of scripts with concatenated binary   *
+                     * and suggests checking a line exists before the  *
+                     * first NUL character with a lowercase letter or  *
+                     * expansion. This is consistent with FreeBSD sh.  */
+                    int isbinary, hasletter;
+                    if (!(ptr2 = memchr(execvebuf, '\0', ct))) {
+                        isbinary = 0;
+                    } else {
+                        isbinary = 1;
+                        hasletter = 0;
+                        for (ptr = execvebuf; ptr < ptr2; ptr++) {
+                            if (islower(*ptr) || *ptr == '$' || *ptr == '`')
+                                hasletter = 1;
+                            if (hasletter && *ptr == '\n') {
+                                isbinary = 0;
+                                break;
+                            }
+                        }
+                    }
+		    if (!isbinary) {
 			argv[-1] = "sh";
 			winch_unblock();
 			execve("/bin/sh", argv - 1, newenvp);
