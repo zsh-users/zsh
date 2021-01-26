@@ -1062,10 +1062,11 @@ redrawhook(void)
     Thingy initthingy;
     if ((initthingy = rthingy_nocreate("zle-line-pre-redraw"))) {
 	/* Duplicating most of zlecallhook() to save additional state */
-	int saverrflag = errflag, savretflag = retflag;
-	int lastcmd_prev = lastcmd;
-	int old_incompfunc = incompfunc;
-	int old_viinrepeat = viinrepeat;
+	int errflag_save = errflag;
+	int retflag_save = retflag;
+	int lastcmd_save = lastcmd;
+	int incompfunc_save = incompfunc;
+	int viinrepeat_save = viinrepeat;
 	char *args[2];
 	Thingy lbindk_save = lbindk, bindk_save = bindk;
 
@@ -1079,12 +1080,12 @@ redrawhook(void)
 	 */
 	incompfunc = 0;
 	execzlefunc(initthingy, args, 1, 0);
-	incompfunc = old_incompfunc;
-	viinrepeat = old_viinrepeat;
+	incompfunc = incompfunc_save;
+	viinrepeat = viinrepeat_save;
 
 	/* Restore errflag and retflag as zlecallhook() does */
-	errflag = saverrflag | (errflag & ERRFLAG_INT);
-	retflag = savretflag;
+	errflag = errflag_save | (errflag & ERRFLAG_INT);
+	retflag = retflag_save;
 
 	unrefthingy(initthingy);
 	unrefthingy(lbindk);
@@ -1095,7 +1096,7 @@ redrawhook(void)
 	/* we can't set ZLE_NOTCOMMAND since it's not a legit widget, so
 	 * restore lastcmd manually so that we don't mess up the global state
 	 */
-	lastcmd = lastcmd_prev;
+	lastcmd = lastcmd_save;
     }
 }
 
