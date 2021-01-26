@@ -71,7 +71,7 @@ This document contains a list of frequently-asked (or otherwise
 significant) questions concerning the Z-shell, a command interpreter
 for many UNIX systems which is freely available to anyone with FTP
 access.  Zsh is among the most powerful freely available Bourne-like
-shell for interactive use.
+shells for interactive use.
 
 If you have never heard of mytt(sh), mytt(csh) or mytt(ksh), then you are
 probably better off to start by reading a general introduction to UNIX

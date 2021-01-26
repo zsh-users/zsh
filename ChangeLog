@@ -1,3 +1,7 @@
+2021-01-26  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted: Etc/FAQ.yo: Fix a typo in the front matter.
+
 2021-01-24  Paul Seyfert  <pseyfert.mathphys@gmail.com>
 
 	* github #71 (tweaked): Completion/X/Command/_xrandr: Complete
