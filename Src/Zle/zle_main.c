@@ -1065,6 +1065,7 @@ redrawhook(void)
 	int saverrflag = errflag, savretflag = retflag;
 	int lastcmd_prev = lastcmd;
 	int old_incompfunc = incompfunc;
+	int old_viinrepeat = viinrepeat;
 	char *args[2];
 	Thingy lbindk_save = lbindk, bindk_save = bindk;
 
@@ -1079,6 +1080,7 @@ redrawhook(void)
 	incompfunc = 0;
 	execzlefunc(initthingy, args, 1, 0);
 	incompfunc = old_incompfunc;
+	viinrepeat = old_viinrepeat;
 
 	/* Restore errflag and retflag as zlecallhook() does */
 	errflag = saverrflag | (errflag & ERRFLAG_INT);

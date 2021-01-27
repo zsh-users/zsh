@@ -1,3 +1,8 @@
+2021-01-27  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* GammaFunction@vivaldi.net via Roman: 47744:
+	Src/Zle/zle_main.c: Fix vi-repeat-change when hooks are in use.
+
 2021-01-26  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Etc/FAQ.yo: Fix a typo in the front matter.
