@@ -1,5 +1,10 @@
 2021-01-27  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 47873: Completion/Base/Core/_main_complete,
+	Completion/Zsh/Context/_subscript,
+	Functions/Chpwd/zsh_directory_name_cdr: Improve completion
+	within dynamic directory names ~[<here>].
+
 	* GammaFunction@vivaldi.net via Roman: 47744:
 	Src/Zle/zle_main.c: Fix vi-repeat-change when hooks are in use.
 

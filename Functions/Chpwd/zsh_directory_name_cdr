@@ -16,8 +16,10 @@ elif [[ $1 = c ]]; then
     typeset -a keys values
     values=(${${(f)"$(cdr -l)"}/ ##/:})
     keys=(${values%%:*})
+    local addsuffix
+    [[ $ISUFFIX = *\]* ]] || addsuffix='-S]'
     _describe -t dir-index 'recent directory index' \
-      values -V unsorted -S']'
+      values -V unsorted $addsuffix
     return
   fi
 fi

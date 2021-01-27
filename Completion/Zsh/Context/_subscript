@@ -1,6 +1,8 @@
 #compdef -subscript-
 
-local expl ind osuf=']' flags sep
+local expl ind osuf flags sep
+
+[[ $ISUFFIX = *\]* ]] || osuf=\]
 
 if [[ "$1" = -q ]]; then
   compquote osuf
