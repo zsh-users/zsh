@@ -1,6 +1,6 @@
 #compdef awk gawk nawk
 
-# For gawk ver.3 and 4, in addition to POSIX.
+# For gawk ver.3 to 5, in addition to POSIX.
 #
 # gawk's options '-W ...' (such as '-W help') are not supported.
 # gawk3 has some synonyms for long options (e.g., --compat is a synonym
@@ -14,7 +14,7 @@ local variant curcontext="$curcontext" state state_descr line ret=1
 local -A opt_args
 local -a args
 
-_pick_variant -r variant gawk4='GNU Awk 4' gawk3='GNU Awk 3' posix --version
+_pick_variant -r variant gawk4='GNU Awk [45]' gawk3='GNU Awk 3' posix --version
 
 args=(
   {-F+,--field-separator}'[define input field separator by extended regex]:extended regular expression:'

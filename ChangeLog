@@ -1,3 +1,7 @@
+2021-01-20  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 47883: Completion/Unix/Command/_awk: support gawk ver.5
+
 2021-01-27  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 47873: Completion/Base/Core/_main_complete,
