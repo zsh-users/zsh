@@ -1874,9 +1874,9 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		if (!(d = sopts[STOUC(*o)])) {
 		    if (fail) {
 			if (*o != '-')
-			    zwarnnam(nam, "bad option: %c", *o);
+			    zwarnnam(nam, "bad option: -%c", *o);
 			else
-			    zwarnnam(nam, "bad option: %s", o);
+			    zwarnnam(nam, "bad option: -%s", o);
 			return 1;
 		    }
 		    o = NULL;
@@ -1889,7 +1889,7 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		    } else if (!(d->flags & ZOF_OPT) ||
 			       (pp[1] && pp[1][0] != '-')) {
 			if (!pp[1]) {
-			    zwarnnam(nam, "missing argument for option: %s",
+			    zwarnnam(nam, "missing argument for option: -%s",
 				    d->name);
 			    return 1;
 			}
@@ -1916,7 +1916,7 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		else if (!(d->flags & ZOF_OPT) ||
 			 (pp[1] && pp[1][0] != '-')) {
 		    if (!pp[1]) {
-			zwarnnam(nam, "missing argument for option: %s",
+			zwarnnam(nam, "missing argument for option: -%s",
 				d->name);
 			return 1;
 		    }

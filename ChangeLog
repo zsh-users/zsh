@@ -1,3 +1,9 @@
+2021-02-13  Oliver Kiddle  <opk@zsh.org>
+
+	* 47905: Joshua Krusell: Src/Modules/zutil.c,
+	Test/V12zparseopts.ztst: Add leading '-' to zparseopts option
+	parsing errors
+
 2021-02-11  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: NEWS, README: mention the effects of 47997.
