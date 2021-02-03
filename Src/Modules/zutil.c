@@ -1873,7 +1873,10 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    while (*++o) {
 		if (!(d = sopts[STOUC(*o)])) {
 		    if (fail) {
-			zwarnnam(nam, "bad option: %c", *o);
+			if (*o != '-')
+			    zwarnnam(nam, "bad option: %c", *o);
+			else
+			    zwarnnam(nam, "bad option: %s", o);
 			return 1;
 		    }
 		    o = NULL;

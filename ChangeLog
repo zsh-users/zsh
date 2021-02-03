@@ -1,3 +1,8 @@
+2021-02-03  Joshua Krusell <js.shirin@gmail.com>
+
+	* 47899: Src/Modules/zutil.c, Test/V12zparseopts.ztst: Improved
+	error message from zparseopts.
+
 2021-01-20  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 47883: Completion/Unix/Command/_awk: support gawk ver.5

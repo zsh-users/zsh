@@ -69,7 +69,7 @@
 >ret: 1, optv: , argv: -a -x -z
 ?(anon):zparseopts:2: bad option: x
 >ret: 1, optv: , argv: -ax -z
-?(anon):zparseopts:2: bad option: -
+?(anon):zparseopts:2: bad option: -x
 >ret: 1, optv: , argv: -a --x -z
 
   for 1 in '-a 1 2 3' '1 2 3'; do
