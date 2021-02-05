@@ -715,7 +715,8 @@ label(23)
   enumeration(
   myeit() If the csh alias references "parameters" (tt(\!:1), tt(\!*) etc.),
      then in zsh you need a function (referencing tt($1), tt($*) etc.).
-     Otherwise, you can use a zsh alias.
+     In recent versions of zsh this can be done by defining an anonymous
+     function within the alias.  Otherwise, a simple zsh alias suffices.
 
   myeit() If you use a zsh function, you need to refer _at_least_ to
      tt($*) in the body (inside the tt({ })).  Parameters don't magically
@@ -759,7 +760,7 @@ label(23)
      parameters. (E.g., in a csh alias, a reference to tt(\!:5) will
      cause an error if 4 or fewer arguments are given; in a zsh
      function, tt($5) is the empty string if there are 4 or fewer
-     parameters.)
+     parameters.  Force an error in this example by using tt(${5?}).)
 
   myeit() To begin a zsh alias with a - (dash, hyphen) character, use
      mytt(alias --):
@@ -780,9 +781,8 @@ label(23)
   )
   mytt(l) in the function definition is in command position and is expanded
   as an alias, defining mytt(/bin/ls) and mytt(-F) as functions which call
-  mytt(/bin/ls), which gets a bit recursive.  This can be avoided if you use
-  mytt(function) to define a function, which doesn't expand aliases.  It is
-  possible to argue for extra warnings somewhere in this mess.
+  mytt(/bin/ls), which gets a bit recursive.  Recent versions of zsh treat
+  this as an error, but older versions silently create the functions.
 
   One workaround for this is to use the "function" keyword instead:
   verb(

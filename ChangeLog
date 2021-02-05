@@ -1,3 +1,7 @@
+2021-02-04  Bart Schaefer  <schaefer@zsh.org>
+
+	* 47889: Etc/FAQ.yo: Update csh alias equivalences (section 2.3)
+
 2021-02-03  Joshua Krusell <js.shirin@gmail.com>
 
 	* 47899: Src/Modules/zutil.c, Test/V12zparseopts.ztst: Improved
