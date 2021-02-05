@@ -1511,7 +1511,9 @@ Include the unmatched portion in the result (the em(R)est).
 enditem()
 
 subsect(Rules)
-
+cindex(parameter expansion rules)
+cindex(rules, parameter expansion)
+cindex(substitution, parameter, rules)
 Here is a summary of the rules for substitution; this assumes that braces
 are present around the substitution, i.e. tt(${)var(...)tt(}).  Some particular
 examples are given below.  Note that the Zsh Development Group accepts
@@ -1709,6 +1711,7 @@ expression) and replaced with the corresponding value, with internal flags
 enditem()
 
 subsect(Examples)
+cindex(parameter expansion, examples)
 The flag tt(f) is useful to split a double-quoted substitution line by
 line.  For example, tt(${(f)"$LPAR()<)var(file)tt(RPAR()"})
 substitutes the contents of var(file) divided so that each line is
@@ -1890,7 +1893,6 @@ subsect(Dynamic named directories)
 cindex(directories, named, dynamic)
 cindex(named directories, dynamic)
 cindex(dynamic named directories)
-
 If the function tt(zsh_directory_name) exists, or the shell variable
 tt(zsh_directory_name_functions) exists and contains an array of
 function names, then the functions are used to implement dynamic
@@ -2016,7 +2018,7 @@ exists by that name, the word is replaced
 by the full pathname of the command.
 
 subsect(Notes)
-
+cindex(filename expansion, notes)
 Filename expansion is performed on the right hand side of a parameter
 assignment, including those appearing after commands of the
 tt(typeset) family.  In this case, the right hand side will be treated
@@ -2061,6 +2063,7 @@ No filename generation pattern
 matches the files `tt(.)' or `tt(..)'.  In other instances of pattern
 matching, the `tt(/)' and `tt(.)' are not treated specially.
 subsect(Glob Operators)
+cindex(glob operators)
 startitem()
 item(tt(*))(
 Matches any string, including the null string.
@@ -2291,6 +2294,8 @@ within `tt([[)...tt(]])'), a `tt(/)' is not special; and `tt(/)' is also
 not special after a `tt(~)' appearing outside parentheses in a filename
 pattern.
 subsect(Globbing Flags)
+cindex(globbing flags)
+cindex(glob flags)
 There are various flags which affect any text to their right up to the
 end of the enclosing group or to the end of the pattern; they require
 the tt(EXTENDED_GLOB) option. All take the form
@@ -2485,6 +2490,8 @@ searched for all files which match, so that a pattern of the form
 tt(LPAR()#i)tt(RPAR()/foo/bar/...) is potentially slow.
 
 subsect(Approximate Matching)
+cindex(approximate matching)
+cindex(matching, approximate)
 When matching approximately, the shell keeps a count of the errors found,
 which cannot exceed the number specified in the
 tt(LPAR()#a)var(num)tt(RPAR()) flags.  Four types of error are recognised:
@@ -2550,6 +2557,8 @@ approximate match.  It is best to place the tt((#a1)) after any path
 segments which are known to be correct.
 
 subsect(Recursive Globbing)
+cindex(recursive globbing)
+cindex(globbing, recursive)
 A pathname component of the form `tt(LPAR())var(foo)tt(/RPAR()#)'
 matches a path consisting of zero or more directories
 matching the pattern var(foo).

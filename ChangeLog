@@ -1,3 +1,7 @@
+2021-02-05  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: Doc/Zsh/expn.yo: Add cindex entries for subsections
+
 2021-02-04  Bart Schaefer  <schaefer@zsh.org>
 
 	* 47895: Src/builtin.c, Test/D02glob.ztst: Remove trailing spaces
