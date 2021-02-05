@@ -750,9 +750,9 @@
  done
  print -raC 2 -- glob.tmp/secret-*/* glob.tmp/secret-*/file
 0:names inside unreadable directories can be globbed if searchable
->glob.tmp/secret-d444/dir   glob.tmp/secret-d444/file  
->glob.tmp/secret-s444/dir   glob.tmp/secret-s444/file  
->glob.tmp/secret-d111/file  glob.tmp/secret-s111/file  
+>glob.tmp/secret-d444/dir   glob.tmp/secret-d444/file
+>glob.tmp/secret-s444/dir   glob.tmp/secret-s444/file
+>glob.tmp/secret-d111/file  glob.tmp/secret-s111/file
 
  print -rC 2 -- glob.tmp/secret-*/dir/*
 0:glob files in readable directories inside unreadable directories

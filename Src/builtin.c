@@ -4822,7 +4822,7 @@ bin_print(char *name, char **args, Options ops, int func)
 		{
 		    fwrite(args[n], len[n], 1, fout);
 		    l = widths[n];
-		    if (n < argc)
+		    if (n < argc && ic < nc - 1)
 			for (; l < sc; l++)
 			    fputc(' ', fout);
 		}

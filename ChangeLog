@@ -1,5 +1,8 @@
 2021-02-04  Bart Schaefer  <schaefer@zsh.org>
 
+	* 47895: Src/builtin.c, Test/D02glob.ztst: Remove trailing spaces
+	from "print -ac" output lines.
+
 	* 47865: Test/D02glob.ztst: More tests for restricted directories
 
 	* 47889: Etc/FAQ.yo: Update csh alias equivalences (section 2.3)
