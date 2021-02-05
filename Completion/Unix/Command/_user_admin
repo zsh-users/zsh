@@ -54,7 +54,7 @@ case ${service%???}:${(M)service%???}:$OSTYPE in
   ;|
   user:*:(net|open)bsd*)
     args+=(
-      '-L[specify login class]:login class'
+      '-L[specify login class]:login class:_login_classes'
       '-p+[specify encrypted password]:encrypted password'
     )
   ;|

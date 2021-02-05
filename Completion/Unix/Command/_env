@@ -1,6 +1,7 @@
 #compdef env genv
 
-local context state line variant args ign ret=1
+local context state line variant ign ret=1
+local -a args suf
 
 _pick_variant -r variant gnu=Free\ Soft $OSTYPE --version
 case $variant in
@@ -20,8 +21,15 @@ case $variant in
       "${ign}(- *)--version[display version information]"
     )
   ;;
-  freebsd*|darwin*)
+  freebsd*)
     args=(
+      '-0[use NUL, not newline after each variable in output]'
+      '-L[add variables from system login.conf(5)]: :->user-class'
+      '-U[add variables from user and system login.conf(5)]: :->user-class'
+    )
+  ;|
+  freebsd*|darwin*|dragonfly*)
+    args+=(
       '(-i)*-u+[remove variable from the environment]:env var to remove:_parameters -g "*export*"'
       '-P+[specify alternate executable search PATH]:path:_dir_list'
       '-S+[perform word splitting]:string to split'
@@ -44,11 +52,23 @@ _arguments $args \
   '*::arguments:->normal' && ret=0
 
 if [[ -n $state ]]; then
-  while [[ $words[1] = *=* ]]; do
-    shift words
-    (( CURRENT-- ))
-  done
-  _normal && ret=0
+  case $state in
+    normal)
+      while [[ $words[1] = *=* ]]; do
+        shift words
+        (( CURRENT-- ))
+      done
+      _normal && ret=0
+    ;;
+    user-class)
+      if compset -P 1 '*/'; then
+        _login_classes && ret=0
+      else
+        compset -S '/*' || suf=( -qS/ )
+        _users $suf && ret=0
+      fi
+    ;;
+  esac
 fi
 
 return ret

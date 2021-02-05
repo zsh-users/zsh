@@ -1,5 +1,11 @@
 2021-02-06  Oliver Kiddle  <opk@zsh.org>
 
+	* 47919: Completion/BSD/Type/_login_classes,
+	Completion/Unix/Command/_env, Completion/Unix/Command/_pgrep,
+	Completion/Unix/Command/_su, Completion/Unix/Command/_user_admin:
+	use common function for completing BSD login classes and update for
+	options to env
+
 	* 47918: Completion/Linux/Command/_nsenter,
 	Completion/Linux/Command/_unshare: new util-linux completions
 

@@ -5,7 +5,6 @@
 #   (which changed the behaviour of -f and added -a)
 # - We don't really need to keep pgopts and pkopts separate, but it seems like
 #   it should make things a bit easier to follow
-# - @todo We could complete log-in classes given to -c
 # - @todo We could complete routing tables given to -T
 
 local curcontext="$curcontext" state line ret=1 expl pgopts pkopts no
@@ -18,7 +17,7 @@ typeset -a arguments sig_arguments aopts
 # overridden below
 arguments=(
   '-a[include process ancestors in match list]'
-  '-c+[match only on specified login class]:login class'
+  '-c+[match only on specified login class]:login class:_login_classes'
   '(-F --pidfile)'{-F+,--pidfile=}'[match only processes in specified PID file]:PID file:_files'
   '(-f --full)'{-f,--full}'[match against full command line]'
   '(-G --group)'{-G+,--group=}'[match only on specified real group IDs]: :_sequence _groups'

@@ -35,7 +35,7 @@ case $OSTYPE in
   ;|
   *bsd*|dragonfly*)
     args+=(
-      '-c+[use settings from specified login class]:class'
+      '-c+[use settings from specified login class]:class:_login_classes'
     )
   ;|
   freebsd*) args+=( '-s[set the MAC label]' ) ;;
