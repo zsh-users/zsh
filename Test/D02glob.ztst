@@ -741,6 +741,23 @@
 >glob.tmp/secret-s111/  glob.tmp/secret-s111
 >glob.tmp/secret-s444/  glob.tmp/secret-s444
 
+ for 1 in 000 111 444 ; do
+  chmod 777 glob.tmp/secret-d$1
+  touch glob.tmp/secret-d$1/file
+  mkdir -m 777 glob.tmp/secret-d$1/dir
+  touch glob.tmp/secret-d$1/dir/file
+  chmod $1 glob.tmp/secret-d$1
+ done
+ print -raC 2 -- glob.tmp/secret-*/* glob.tmp/secret-*/file
+0:names inside unreadable directories can be globbed if searchable
+>glob.tmp/secret-d444/dir   glob.tmp/secret-d444/file  
+>glob.tmp/secret-s444/dir   glob.tmp/secret-s444/file  
+>glob.tmp/secret-d111/file  glob.tmp/secret-s111/file  
+
+ print -rC 2 -- glob.tmp/secret-*/dir/*
+0:glob files in readable directories inside unreadable directories
+>glob.tmp/secret-d111/dir/file  glob.tmp/secret-s111/dir/file
+
  # On macOS, stat(2) allows files to be treated as directories if the calling
  # process has super-user privileges. e.g., stat() on /my/regular/file/. will
  # succeed as root but (correctly) fail otherwise. This can produce strange

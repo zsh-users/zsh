@@ -1,5 +1,7 @@
 2021-02-04  Bart Schaefer  <schaefer@zsh.org>
 
+	* 47865: Test/D02glob.ztst: More tests for restricted directories
+
 	* 47889: Etc/FAQ.yo: Update csh alias equivalences (section 2.3)
 
 2021-02-03  Joshua Krusell <js.shirin@gmail.com>
