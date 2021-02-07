@@ -64,7 +64,6 @@ case $OSTYPE in
       '-I[do not display idle processes]'
       '-i[interactive mode]'
       '-n[non-interactive mode (identical to batch mode)]'
-      '-o+[sort process display by the specified field]:field:( $fields )'
       '-p+[filter by the specified pid]: :_pids'
       '-q[renice top to -20]'
       '-S[show system processes]'
@@ -80,6 +79,7 @@ case $OSTYPE in
       '-j[display the jail ID]'
       '-t[do not display the top process]'
       '-m+[specify statistic type]:type:(( cpu\:default io ))'
+      '-o+[sort process display by the specified field]:field:( $fields )'
       '-P[per-cpu CPU usage statistics]'
       '(1 -)-v[write version number and exit]'
       '-w[display approximate swap usage]'
@@ -89,10 +89,14 @@ case $OSTYPE in
     );;
   openbsd*)
     fields+=( command )
+    order=( '-:reverse order' )
     specs+=(
       '-1[combine CPU statistic into one line]'
+      '-t[show the routing table instead of the wait channel]'
       '-C[show command arguments as well as process name]'
       '-g+[filter processes by the specified string]:string'
+      '-o+[sort process display by the specified field]:field:->sortkey'
+      '-T+[filter processes by the specified routing table]:routing table'
       '-U+[filter processes by the specified user]: :_users -M "L\:|-="'
     );;
   darwin*)

@@ -45,6 +45,7 @@ case $OSTYPE in
       '-B[raw, non-interactive mode (two screen updates)]'
       '-b[raw, non-interactive mode (one screen update)]'
       '-d[exit after `count'\'' updates]:count'
+      '-h[human readable output]'
       '-i[interactive mode]'
       '-N[resolve network addresses to names]'
       '-n[do not resolve network addresses to names]'

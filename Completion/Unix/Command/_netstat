@@ -5,10 +5,10 @@ local lopt='[show only listening sockets]'
 local zopt='-z[reset statistic counters after displaying them]'
 local popt='(-f)-p+[filter by protocol]:protocol:compadd -a plist'
 local Iopt='(-i)-I+[show information about the specified interface]:interface:_net_interfaces'
-local set sel
+local set sel tblopt
 local -A sets
 local -a Mopts families flist plist args sockets extend interval verbose
-local -a {sel_,}{bpf,dhcp,groups,interfaces,masquerade,media,memory,multicast,pcb,queues,routing,statistics,wireless}
+local -a {sel_,}{bpf,dhcp,groups,interfaces,masquerade,media,memory,multicast,pcb,queues,rdomains,routing,statistics,wireless}
 
 case $OSTYPE in
   linux-gnu)
@@ -130,7 +130,7 @@ case $OSTYPE in
     )
     routing=( $families )
     sel_memory=( '-m[display statistics recorded by the memory management routines]' )
-    sel_interfaces+=( '(1 -a -f -i -p -s)-w+[display packet traffic at intervals]:interval (seconds)' )
+    sel_interfaces+=( '(1 -a -f -i -p -s -u)-w+[display packet traffic at intervals]:interval (seconds)' )
   ;|
   darwin*|dragonfly*|(net|free)bsd*)
     interfaces+=( '-a[show multicast addresses currently in use]' )
@@ -266,13 +266,15 @@ case $OSTYPE in
     )
   ;;
   openbsd*)
-    sets+=( wireless '-W*' )
+    sets+=( wireless '-W*' rdomains '-R' )
+    sel_rdomains=( '-R[show all rdomains with associated interfaces and routing tables]' )
     sel_wireless=( '-W+[display per-interface IEEE 802.11 wireless statistics]:interface' )
     flist+=( local mpls )
-    sockets+=( -l$lopt '-B[show buffer sizes for TCP sockets]' )
-    routing+=(
+    tblopt='-T+[select an alternate routing table to query]:routing table'
+    sockets+=( -l$lopt $tblopt '-B[show buffer sizes for TCP sockets]' )
+    routing+=( $Mopts $tblopt
+      '-A[show the internal addresses of the routing table]'
       '-F[only show routes with gateway in the same address family as the destination]'
-      '-T+[select an alternate routing table to query]:routing table'
     )
     interfaces+=(
       '-c+[show specified number of updates, then exit]:count'
@@ -280,7 +282,8 @@ case $OSTYPE in
       '-q[only show interfaces that have seen packets]'
       '-t[show current value of the watchdog timer function]'
     )
-    statistics+=( $popt )
+    statistics+=( $popt '-r[display routing statistics]' )
+    groups+=( -n$nopt )
     pcb+=( $Mopts $verbose )
   ;;
   netbsd*)

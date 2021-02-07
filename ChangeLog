@@ -1,5 +1,10 @@
 2021-02-07  Oliver Kiddle  <opk@zsh.org>
 
+	* 47931: Completion/BSD/Command/_signify,
+	Completion/BSD/Command/_systat, Completion/Unix/Command/_locale,
+	Completion/Unix/Command/_netstat, Completion/Unix/Command/_top:
+	update completions for OpenBSD base up to 6.8
+
 	* 47930: Completion/BSD/Command/_freebsd-update,
 	Completion/Unix/Command/_uniq, Completion/Unix/Type/_diff_options:
 	update completions for FreeBSD base up to 12.2

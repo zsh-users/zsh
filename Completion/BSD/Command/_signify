@@ -5,6 +5,7 @@ _arguments -s -S -A "-*" : \
   '-C[verify a signed checksum list and the checksum for each file]' \
   '-p+[public key]:public key:_files' \
   '-q[quiet mode]' \
+  '-t+[specify key type]:key type' \
   '-x+[specify signature file]:signature file:_files' \
   '*:file:_files' \
   - generate \
