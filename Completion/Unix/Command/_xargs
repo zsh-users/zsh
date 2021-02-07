@@ -25,7 +25,7 @@ case $variant in
       '-R[specify maximum arguments that -I will replace in]:replacements'
     )
   ;|
-  freebsd*|netbsd*)
+  freebsd*|netbsd*|dragonfly*)
     args+=(
       '-S[space that -I can use for replacements]:size (bytes) [255]'
     )

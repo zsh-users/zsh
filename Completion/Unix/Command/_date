@@ -61,9 +61,13 @@ else
     ;|
     freebsd*|dragonfly*|darwin*)
       args+=(
+	"*-v+[adjust and print (but don't set) date]:[+-]value[ymwdHMS]"
+      )
+    ;|
+    freebsd*|darwin*)
+      args+=(
 	'-d+:daylight saving time value'
 	'-t+:minutes west of GMT'
-	"*-v+[adjust and print (but don't set) date]:[+-]value[ymwdHMS]"
       )
     ;|
     freebsd*|dragonfly*)
