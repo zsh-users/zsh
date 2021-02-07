@@ -26,7 +26,7 @@ _arguments -s -S -C \
   '*:: :->restargs' && ret=0
 
 if [[ -n $state ]]; then
-  cmds=( ${${${(f)"$(_call_program commands $pkgin -h 2>&1)"}[3,-1]/ -  (#b)(?)/:$match:l}%.} )
+  cmds=( ${${${(f)"$(_call_program commands $pkgin -h 2>&1)"}[3,-1]/ - (#b)(?)/:$match:l}%.} )
   short=( ${${cmds#*\(}/ #\)/} )
   cmds=( ${cmds// #\(*\)/} )
   if [[ $state = subcommands && ! -prefix - ]]; then

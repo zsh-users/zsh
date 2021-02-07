@@ -75,9 +75,10 @@ case $OSTYPE in
     opts=(
       '-M[alternative source to extract values from]:core:_files'
       '-N[alternative source to extract the name list from]:system:_files'
-      '-n[do not resolve IP addresses]'
-      '-w[refresh interval]:refresh interval'
-      '-t[the amount of refreshes for each screen in '\''all'\'' display mode]:turns'
+      '(-t -w)-b[show the chosen display once and exit]'
+      "-n[don't resolve IP addresses]"
+      '(-b)-w[refresh interval]:refresh interval'
+      "(-b)-t[specify amount of refreshes for each screen in 'all' display mode]:turns"
     )
 esac
 

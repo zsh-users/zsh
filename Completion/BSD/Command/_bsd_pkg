@@ -144,6 +144,7 @@ _bsd_pkg() {
     netbsd*)
       flags+=(
         '(:)-a[delete all installed packages]'
+        '(:)-A[remove automatically installed packages that are no longer required]'
         "-D[don't execute deinstallation scripts]"
         '-F[specify each package by an installed file]'
         '-f[force deinstallation]'

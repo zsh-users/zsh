@@ -1,6 +1,6 @@
 #compdef dmesg
 
-local args
+local -a args
 
 case $OSTYPE in
   linux*) args=( -S --  ) ;;
@@ -27,6 +27,13 @@ case $OSTYPE in
       '-n[use specified kernel core]:number'
     )
   ;;
+  netbsd*)
+    args+=(
+      '-d[show timestamp deltas]'
+      '(-t)-T[format uptime timestamps in a human readable form]'
+      '(-T)-t[suppress printing uptime timestamps]'
+    )
+  ;;
 esac
 
-_arguments -s $args
+_arguments -s : $args
