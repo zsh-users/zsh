@@ -1,5 +1,9 @@
 2021-02-07  Oliver Kiddle  <opk@zsh.org>
 
+	* 47932: Completion/Linux/Command/_free, Completion/Unix/Command/_w,
+	Completion/Unix/Command/_pgrep, Completion/Unix/Command/_vmstat:
+	update completions for procps 3.3.16
+
 	* 47931: Completion/BSD/Command/_signify,
 	Completion/BSD/Command/_systat, Completion/Unix/Command/_locale,
 	Completion/Unix/Command/_netstat, Completion/Unix/Command/_top:

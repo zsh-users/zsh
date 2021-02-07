@@ -33,6 +33,7 @@ arguments=(
   '(-o -n --oldest --newest)'{-o,--oldest}'[match oldest process]'
   '(-P --parent)'{-P+,--parent=}'[match only on specified parent process IDs]: :->ppid'
   '(-l)-q[suppress normal output]'
+  '(-r --runstates)'{-r+,--runstates}'[match runstates]:run state:compadd -S "" D I R S T t W X Z'
   '-S[search also in system processes (kernel threads)]'
   '(-s --session)'{-s+,--session=}'[match only on specified process session IDs]: :->sid'
   # _signals is OK here - we do it differently below
@@ -61,7 +62,7 @@ arguments=(
 case $OSTYPE in
   linux*)
     # Note: We deliberately exclude -v but not --inverse from pkill
-    pgopts=acdFfGghLlnoPstUuVvwx-
+    pgopts=acdFfGghLlnoPrstUuVvwx-
     pkopts=ceFfGghLnoPstUuVx-
     arguments=(
       ${arguments:#((#s)|*\))(\*|)-[acl]*}

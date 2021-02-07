@@ -1,5 +1,4 @@
 #compdef free
-# based on procps-ng-3.3.15
 
 _arguments -s \
   '(-l --lohi)'{-l,--lohi}'[show detailed low and high memory statistics]' \
@@ -7,6 +6,7 @@ _arguments -s \
   '(-w --wide)'{-w,--wide}'[wide mode]' \
   '(-s --seconds)'{-s,--seconds}'[specify the delay between display]:seconds: ' \
   '(-c --count)'{-c+,--count=}'[specify the display count]:count: ' \
+  '(-C --full-cache)'{-C,--full-cache}'[add further cache lines to main cache]' \
   '--si[use power of 1000 instead of power of 1024]' \
   '(-)--help[print help and exit]' \
   '(-)'{-V,--version}'[print version information and exit]' \

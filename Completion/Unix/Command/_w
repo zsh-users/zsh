@@ -11,6 +11,7 @@ case $OSTYPE in
       '(H -o --old-style -s --short)'{-o,--old-style}'[old style output format]'
       '(H -s --short -o --old-style)'{-s,--short}'[use short output format]'
       '(H -u --no-current)'{-u,--no-current}'[ignore the username while figuring out the current process and cpu times]'
+      '(H -n --no-truncat)'{-n,--no-truncat}'[non-truncated listing (large)]'
       + H
       '(-)--help[display help information]'
       '(-)'{-V,--version}'[display version information]'

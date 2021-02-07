@@ -8,6 +8,7 @@ case $OSTYPE in
       '(-t --timestamp)'{-t,--timestamp}'[show timestamp]'
       '(-n --one-header)'{-n,--one-header}'[do not redisplay header]'
       '(-S --unit)'{-S+,--unit=}'[specify unit for displayed sizes]:unit prefix [K]:((k\:1000 K\:1024 m\:1000000 M\:1048576))'
+      '(-C --full-cache)'{-C,--full-cache}'[add further cache lines to main cache]'
       '1: :_guard "[0-9]#" "interval (seconds)"' '2:count'
       + '(action)' \
       '(- :)'{-h,--help}'[display help information]'
