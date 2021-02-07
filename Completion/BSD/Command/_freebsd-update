@@ -5,9 +5,11 @@ flags=(
   '(cron)fetch[fetch a compressed snapshot or update existing one]'
   '(fetch)cron[sleep rand(3600) seconds, and then fetch updates]'
   '(install rollback)upgrade[fetch files necessary for upgrading to a new release]'
+  'updatesready[check if there are fetched updates ready to install]'
   '(upgrade rollback)install[install the most recently fetched updates or upgrade]'
   '(upgrade install)rollback[uninstall the most recently installed updates]'
   'IDS[compare the system against an index of "known good" files]'
+  'showconfig[show configuration options after parsing conffile and command line options]'
 )
 
 _arguments \

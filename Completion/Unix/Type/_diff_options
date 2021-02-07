@@ -70,9 +70,7 @@ if _pick_variant -r variant -c $cmd gnu=GNU unix -v || [[ $OSTYPE = freebsd<12->
       '(-E --ignore-tab-expansion)'{-E,--ignore-tab-expansion}'[ignore changes due to tab expansion]'
       '(-Z --ignore-trailing-space)'{-Z,--ignore-trailing-space}'[ignore white space at line end]'
       "($ofwuc $oss -F --show-function-line)"{-F+,--show-function-line=}'[show the most recent line matching regex]:regex'
-      "($ofwy $ouc --width -W)"{--width=,-W+}'[set size of line]:number of characters per line'
       "($ofwy $ouc)--left-column[output only left column of common lines]"
-      "($ofwy $ouc)--suppress-common-lines[do not output common lines]"
       "($ofwg $ouc $oss)--old-group-format=[set old group format]:old group format"
       "($ofwg $ouc $oss)--new-group-format=[set new group format]:new group format"
       "($ofwl $ouc $oss)--unchanged-line-format=[set unchanged line format]:unchanged line format"
@@ -80,8 +78,6 @@ if _pick_variant -r variant -c $cmd gnu=GNU unix -v || [[ $OSTYPE = freebsd<12->
       '(--from-file)--to-file=[compare all operands to specified file]:to file:_files' \
       '--color=-[use colors in output]::when [auto]:(never always auto)'
       '--palette=[specify colors to use]:color:_diff_palette'
-      "($of $ouc)--side-by-side[output in two columns]"
-      "($of $ouc)-y[output in two columns]"
     )
   else
     args+=( '!--speed-large-files' )
@@ -128,6 +124,9 @@ if _pick_variant -r variant -c $cmd gnu=GNU unix -v || [[ $OSTYPE = freebsd<12->
     '(-S --starting-file)'{-S+,--starting-file=}'[set first file in comparison]:start with file:_files' \
     '--horizon-lines=[set number of lines to keep in prefix and suffix]:number of horizon lines' \
     '(-d --minimal)'{-d,--minimal}'[try to find a smaller set of changes]' \
+    "($of $ouc)"{-y,--side-by-side}'[output in two columns]' \
+    "($ofwy $ouc)--suppress-common-lines[don't output common lines]" \
+    "($ofwy $ouc --width -W)"{--width=,-W+}'[set size of line]:number of characters per line' \
     "$@"
 else
   of='-c -e -f'

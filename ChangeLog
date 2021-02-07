@@ -1,5 +1,9 @@
 2021-02-07  Oliver Kiddle  <opk@zsh.org>
 
+	* 47930: Completion/BSD/Command/_freebsd-update,
+	Completion/Unix/Command/_uniq, Completion/Unix/Type/_diff_options:
+	update completions for FreeBSD base up to 12.2
+
 	* 47929: Completion/Zsh/Command/_zstyle: complete newer
 	possible values for the sort style
 

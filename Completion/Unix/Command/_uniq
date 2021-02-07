@@ -23,8 +23,9 @@ args=(
 if ! _pick_variant gnu=Free\ Soft unix --version; then
   local optchars="cdufs"
   if [[ "$OSTYPE" == (darwin|dragonfly|freebsd|openbsd)* ]]; then
-    optchars="${optchars}i"
+    optchars+=i
   fi
+  [[ $OSTYPE = freebsd* ]] && optchars+=D
   args=( ${(M)args:#(|\*)(|\(*\))-[$optchars]*} )
 fi
 
