@@ -1,5 +1,9 @@
 2021-02-13  Oliver Kiddle  <opk@zsh.org>
 
+	* github #68: taiyu.len: Completion/Unix/Command/_man,
+	Completion/Zsh/Command/_zstyle, Doc/Zsh/compsys.yo:
+	support section suffix completion for man pages
+
 	* 47905: Joshua Krusell: Src/Modules/zutil.c,
 	Test/V12zparseopts.ztst: Add leading '-' to zparseopts option
 	parsing errors
