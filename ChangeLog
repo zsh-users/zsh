@@ -1,5 +1,8 @@
 2021-02-07  Oliver Kiddle  <opk@zsh.org>
 
+	* 47929: Completion/Zsh/Command/_zstyle: complete newer
+	possible values for the sort style
+
 	* based on github #62: oxiedi@yandex.ru:
 	Completion/Unix/Type/_date_formats: return proper exit status
 

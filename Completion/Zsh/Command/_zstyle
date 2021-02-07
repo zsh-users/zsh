@@ -111,7 +111,7 @@ styles=(
   show-ambiguity	 c:
   show-completer	 c:bool
   single-ignored         c:single-ignored
-  sort			 c:bool
+  sort			 c:sort-order
   special-dirs		 c:sdirs
   squeeze-slashes	 c:bool
   stop			 c:stop
@@ -569,6 +569,10 @@ while (( $#state )); do
 
     (separator)
       _message -e separators 'separator string'
+      ;;
+
+    (sort-order)
+      _wanted sort-orders expl 'sort order' compadd -F line - true false match nosort numeric reverse
       ;;
 
     (max-matches-width)
