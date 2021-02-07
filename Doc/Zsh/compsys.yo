@@ -1838,13 +1838,17 @@ user is longer than the common prefix to the corresponding IDs.
 kindex(insert-sections, completion style)
 item(tt(insert-sections))(
 This style is used with tags of the form `tt(manuals.)var(X)' when
-completing names of manual pages. If set to `true' and the var(X) in the
-tag name matches the section number of the page being completed, the
-section number is inserted along with the page name. For example, given
+completing names of manual pages. If set and the var(X) in the tag name matches
+the section number of the page being completed, the section number is inserted
+along with the page name. For example, given
 
 example(zstyle ':completion:*:manuals.*' insert-sections true)
 
 tt(man ssh_<TAB>) may be completed to tt(man 5 ssh_config).
+
+The value may also be set to one of `tt(prepend)', or `tt(suffix)'.
+`tt(prepend)' behaves the same as `true' as in the above example, while
+`tt(suffix)' would complete tt(man ssh_<TAB>) as tt(man ssh_config.5).
 
 This is especially useful in conjunction with tt(separate-sections), as
 it ensures that the page requested of tt(man) corresponds to the one

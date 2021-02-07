@@ -6,7 +6,6 @@
 # - We assume that Linux distributions are using either man-db or mandoc
 # - @todo Would be nice to support completing the initial operand as a section
 #   name (on non-Solaris systems)
-# - @todo We don't support the man-db syntax <name>.<section> (e.g., `ls.1`)
 # - @todo We don't support the man-db feature of 'sub-pages' — that is, treating
 #   pairs of operands like `git diff` as `git-diff`
 # - @todo Option exclusivity isn't super accurate
@@ -415,7 +414,7 @@ _man() {
 }
 
 _man_pages() {
-  local pages sopt
+  local pages sopt tmp
 
   # What files corresponding to manual pages can end in.
   local suf='.((?|<->*|ntcl)(|.gz|.bz2|.z|.Z|.lzma))'
@@ -444,13 +443,20 @@ _man_pages() {
   # `POSIX.1.5'.
 
   [[ $variant = solaris* ]] && sopt='-s '
-  if ((CURRENT > 1 || noinsert)) ||
-      ! zstyle -t ":completion:${curcontext}:manuals.$sect_dirname" insert-sections
-  then
-    compadd "$@" - ${pages%$~suf}
-  else
-    compadd "$@" -P "$sopt$sect_dirname " - ${pages%$~suf}
+  if ! ((CURRENT > 1 || noinsert)); then
+    zstyle -s ":completion:${curcontext}:manuals.$sect_dirname" insert-sections tmp
   fi
+  case "$tmp" in
+    prepend|true|on|yes|1)
+      compadd "$@" -P "$sopt$sect_dirname " - ${pages%$~suf}
+    ;;
+    suffix)
+      compadd "$@" -s ".$sect_dirname" - ${pages%$~suf}
+    ;;
+    *)
+      compadd "$@" - ${pages%$~suf}
+    ;;
+  esac
 }
 
 _man "$@"
