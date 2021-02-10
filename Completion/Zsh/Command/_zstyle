@@ -62,6 +62,7 @@ styles=(
   ignore-parents         c:ignorepar
   ignored-patterns	 c:
   insert-ids             c:insert-ids
+  insert-sections	 c:insert-sections
   insert-tab             c:bool
   insert-unambiguous	 c:insunambig
   keep-prefix		 c:keep-prefix
@@ -522,6 +523,11 @@ while (( $#state )); do
     (insert-ids)
       _wanted values expl 'when to insert process IDs' \
           compadd - menu single longer
+      ;;
+
+    (insert-sections)
+      _wanted values expl 'where to insert man page section' \
+          compadd - true false prepend suffix
       ;;
 
     (fake-files)
