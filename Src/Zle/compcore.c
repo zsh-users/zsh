@@ -821,6 +821,7 @@ callcompfunc(char *s, char *fn)
 	sfcontext = SFC_CWIDGET;
 	NEWHEAPS(compheap) {
 	    LinkList largs = NULL;
+	    int oxt = isset(XTRACE);
 
 	    if (*cfargs) {
 		char **p = cfargs;
@@ -830,7 +831,9 @@ callcompfunc(char *s, char *fn)
 		while (*p)
 		    addlinknode(largs, dupstring(*p++));
 	    }
+	    opts[XTRACE] = 0;
 	    cfret = doshfunc(shfunc, largs, 1);
+	    opts[XTRACE] = oxt;
 	} OLDHEAPS;
 	sfcontext = osc;
 	endparamscope();

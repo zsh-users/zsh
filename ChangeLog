@@ -1,3 +1,9 @@
+2021-02-11  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: NEWS, README: mention the effects of 47997.
+
+	* 47997: Src/Zle/compcore.c: disable xtrace around completions
+
 2021-02-07  Oliver Kiddle  <opk@zsh.org>
 
 	* 47944: Completion/BSD/Command/_bsd_pkg,

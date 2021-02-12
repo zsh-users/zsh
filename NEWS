@@ -30,6 +30,11 @@ The compinit function learnt a -w option to explain why compdump runs.
 The zsh/datetime module's strftime builtin learnt an -n option to omit
 the trailing newline when printing a formatted time.
 
+The XTRACE option is now disabled while running user-defined completion
+widgets.  This corresponds to long-standing behavior of other user ZLE
+widgets.  Use the _complete_debug widget to capture XTRACE output, or
+use "functions -T" to enable tracing of specific completion functions.
+
 Changes from 5.7.1-test-3 to 5.8
 --------------------------------
 

@@ -92,6 +92,9 @@ not set the new, fourth field will continue to work under both 5.8 and 5.9.
 (As it happens, adding a comma after "bold" will make both 5.8 and 5.9 do the
 right thing, but this should be viewed as an unsupported hack.)
 
+The XTRACE option is now disabled while running user-defined completion
+widgets.  See NEWS.
+
 Incompatibilities between 5.7.1 and 5.8
 ---------------------------------------
 
