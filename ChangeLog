@@ -1,5 +1,8 @@
 2021-02-13  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted (Daniel): Completion/Unix/Command/_locale:
+	add exclusion list missed in recent OpenBSD update
+
 	* github #68: taiyu.len: Completion/Unix/Command/_man,
 	Completion/Zsh/Command/_zstyle, Doc/Zsh/compsys.yo:
 	support section suffix completion for man pages

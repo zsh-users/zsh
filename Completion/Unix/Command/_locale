@@ -28,7 +28,7 @@ elif [[ $OSTYPE == openbsd* ]]; then
   specs=(
     '(-m)-a[list all available locales]'
     '(-a)-m[list all available charmaps]'
-    '1:name:(charmap)'
+    '(-a -m)1:name:(charmap)'
   )
 
 else
