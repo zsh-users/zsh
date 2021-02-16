@@ -71,7 +71,7 @@ static struct builtin builtins[] =
      * But that's actually not useful, so it's more consistent to
      * cause an error.
      */
-    BUILTIN("fc", 0, bin_fc, 0, -1, BIN_FC, "aAdDe:EfiIlLmnpPrRt:W", NULL),
+    BUILTIN("fc", 0, bin_fc, 0, -1, BIN_FC, "aAdDe:EfiIlLmnpPrRst:W", NULL),
     BUILTIN("fg", 0, bin_fg, 0, -1, BIN_FG, NULL, NULL),
     BUILTIN("float", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "E:%F:%HL:%R:%Z:%ghlp:%rtux", "E"),
     BUILTIN("functions", BINF_PLUSOPTS, bin_functions, 0, -1, 0, "ckmMstTuUWx:z", NULL),
@@ -1643,7 +1643,7 @@ bin_fc(char *nam, char **argv, Options ops, int func)
 	    if (!fclist(out, ops, first, last, asgf, pprog, 1)) {
 		char *editor;
 
-		if (func == BIN_R)
+		if (func == BIN_R || OPT_ISSET(ops, 's'))
 		    editor = "-";
 		else if (OPT_HASARG(ops, 'e'))
 		    editor = OPT_ARG(ops, 'e');

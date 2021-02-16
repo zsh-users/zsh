@@ -1,3 +1,8 @@
+2021-02-17  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 48073: Martijn Dekker: Doc/Zsh/builtins.yo, Src/builtin.c: fc
+	-s is POSIX version of fc -e -.
+
 2021-02-16  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 47876: Justtine Tunney: Src/exec.c: Add more cases where

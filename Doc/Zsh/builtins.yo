@@ -736,7 +736,7 @@ findex(fc)
 cindex(history, editing)
 cindex(editing history)
 redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ ))ifnztexi(      )))
-xitem(tt(fc) [ tt(-e) var(ename) ] [ tt(-LI) ] [ tt(-m) var(match) ] [ var(old)tt(=)var(new) ... ] [ var(first) [ var(last) ] ])
+xitem(tt(fc) [ tt(-e) var(ename) ] [ tt(-s) ] [ tt(-LI) ] [ tt(-m) var(match) ] [ var(old)tt(=)var(new) ... ] [ var(first) [ var(last) ] ])
 xitem(tt(fc -l )[ tt(-LI) ] [ tt(-nrdfEiD) ] [ tt(-t) var(timefmt) ] [ tt(-m) var(match) ])
 xitem(SPACES()[ var(old)tt(=)var(new) ... ] [ var(first) [ var(last) ] ])
 xitem(tt(fc -p )[ tt(-a) ] [ var(filename) [ var(histsize) [ var(savehistsize) ] ] ])
@@ -783,6 +783,7 @@ the parameter tt(EDITOR) is used; if that is not set a builtin default,
 usually `tt(vi)' is used.  If var(ename) is `tt(-)', no editor is invoked.
 When editing is complete, the edited command is executed.
 
+The flag `tt(-s)' is equivalent to `tt(-e -)'.
 The flag tt(-r) reverses the order of the events and the
 flag tt(-n) suppresses event numbers when listing.
 
