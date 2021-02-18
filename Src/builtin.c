@@ -1599,8 +1599,9 @@ bin_fc(char *nam, char **argv, Options ops, int func)
 	 * command line to avoid giving the user a nasty turn
 	 * if some helpful soul ran "print -s 'rm -rf /'".
 	 */
-	first = OPT_ISSET(ops,'l')? addhistnum(curhist,-16,0)
-			: addhistnum(curline.histnum,-1,0);
+	int xflags = OPT_ISSET(ops,'L') ? HIST_FOREIGN : 0;
+	first = OPT_ISSET(ops,'l')? addhistnum(curhist,-16,xflags)
+			: addhistnum(curline.histnum,-1,xflags);
 	if (first < 1)
 	    first = 1;
 	if (last < first)

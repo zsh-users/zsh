@@ -1,3 +1,8 @@
+2021-02-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/26509: Src/builtin.c: fc -L should ignore remote entries
+	rather than treat them as an error.
+
 2021-02-17  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 48073: Martijn Dekker: Doc/Zsh/builtins.yo, Src/builtin.c: fc
