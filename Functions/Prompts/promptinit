@@ -49,7 +49,7 @@ prompt_preview_safely() {
 
   # This handles all the stuff from the default :prompt-theme cleanup
   local +h PS1=$PS1 PS2=$PS2 PS3=$PS3 PS4=$PS4 RPS1=$RPS1 RPS2=$RPS2
-  local +h PROMPT=$PROMPT RPROMPT=$RPOMPT RPROMPT2=$RPROMPT2 PSVAR=$PSVAR
+  local +h PROMPT=$PROMPT RPROMPT=$RPROMPT RPROMPT2=$RPROMPT2 PSVAR=$PSVAR
   local -a precmd_functions preexec_functions prompt_preview_cleanup
   local -aLl +h zle_highlight
 
@@ -101,7 +101,7 @@ Use prompt -h <theme> for help on specific themes.'
       if [[ -z "$prompt_theme[1]" ]]; then
         # Not using a prompt theme; save settings
         local +h PS1=$PS1 PS2=$PS2 PS3=$PS3 PS4=$PS4 RPS1=$RPS1 RPS2=$RPS2
-        local +h PROMPT=$PROMPT RPROMPT=$RPOMPT RPROMPT2=$RPROMPT2 PSVAR=$PSVAR
+        local +h PROMPT=$PROMPT RPROMPT=$RPROMPT RPROMPT2=$RPROMPT2 PSVAR=$PSVAR
         local -a precmd_functions preexec_functions
       else
         trap 'prompt_${prompt_theme[1]}_setup "${(@)prompt_theme[2,-1]}"' 0
