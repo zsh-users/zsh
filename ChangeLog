@@ -1,3 +1,9 @@
+2021-02-22  Bart Schaefer  <schaefer@zsh.org>
+
+	* 48094: Arseny Maslennikov: Functions/Prompts/prompt_restore_setup,
+	Functions/Prompts/promptinit: apply cleanup commands of the current
+	theme on any theme change, including "prompt -[hp] $theme"
+
 2021-02-19  dana  <dana@dana.is>
 
 	* 47867: Arseny Maslennikov: Functions/Prompts/promptinit: Fix
