@@ -2071,17 +2071,23 @@ label(331)
   (By way of comparison, it's not a bug in Emacs that mytt(:q!) doesn't
   cause it to exit.)
 
-  Since the bash and zsh languages do have a common subset, it is
-  feasible to write non-trivial plugins that would run under either of
+  That being said, the bash and zsh languages do have a common subset, and it is
+  feasible to write non-trivial pieces of code that would run under either of
   them, if one is sufficiently familiar with both of them.  However,
   a difference between bash's behaviour and zsh's does not imply that
-  zsh has a bug.  It myem(might) be a bug in zsh, but it might also be
-  a bug in bash, or simply a difference that isn't a bug in either shell
+  zsh has a bug.  The difference might be a bug in zsh, a bug in bash, or
+  a bug in neither shell
   (see link(3.1)(31) for an example).
 
-  COMMENT(TODO: Move here the paragraph about "That's the answer for..." and reverse it)
+  The recommended way to deal with these differences depends on what kind
+  of piece of code is in question: a myem(script) or a myem(plugin).
+  
+  For em(scripts) emdash() external commands that
+  are located in tt($PATH), or located elsewhere and are executed by
+  giving their path explicitly (as in mytt(ls), mytt(/etc/rc.d/sshd),
+  and mytt(./configure)) emdash() the answer is simple:
 
-  So, don't run bash scripts under zsh.  If the scripts were written for
+  Don't run bash scripts under zsh.  If the scripts were written for
   bash, run them in bash.  There's absolutely no problem with having
   mytt(#!/usr/bin/env bash) scripts even if mytt(zsh) is your shell for
   interactive sessions.
@@ -2092,15 +2098,14 @@ label(331)
   learning curve.  Once you're used to zsh, you can decide for each
   script whether to port it to zsh or keep it as-is.
 
-  COMMENT(TODO: That's the paragraph the comment above refers to)
-  That's the answer for myem(scripts), i.e., for external commands that
-  are located in tt($PATH), or located elsewhere and are executed by
-  giving their path explicitly (as in mytt(ls), mytt(/etc/rc.d/sshd),
-  and mytt(./configure)).  For myem(plugins) emdash() code that is
-  executed within the shell itself, that's loaded via the mytt(.),
+  For myem(plugins) emdash() pieces of code
+  executed within the shell itself, loaded via the mytt(.),
   mytt(source), or mytt(autoload) builtins, added to mytt(.zshrc), or
-  pasted interactively at the shell prompt emdash() the answer is
-  different.
+  pasted interactively at the shell prompt emdash() one may consider it
+  worthwhile to invest the effort to make them runnable under either shell.
+  However, as mentioned above, doing so requires one to be familiar with both
+  shells, and either steer clear of their differences or handle them explicitly
+  with conditional code (such as mytt(if test -n "$ZSH_VERSION")).
 
   In summary,
   if you'd like to run a bash script or plugin under zsh, you must port the script or plugin
