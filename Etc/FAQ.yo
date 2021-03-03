@@ -2056,6 +2056,9 @@ sect(Why doesn't the expansion mytt(*.{tex,aux,pdf}) do what I expect?)
 sect(Why does my bash script report an error when I run it under zsh?)
 label(331)
 
+  em(tl;dr:) bash is not the reference implementation of zsh, and zsh is not
+  a bug-for-bug compatible reimplementation of bash.
+
   bash and zsh are different programming languages.  They are not
   interchangeable; programs written for either of these languages will,
   in general, not run under the other.  (The situation is similar with
