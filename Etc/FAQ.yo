@@ -2065,6 +2065,22 @@ label(331)
   many other pairs of closely-related languages, such as Python 2 and
   Python 3; C and C++; and even C89 and C11.)
 
+  When bash and zsh behave differently on the same input, whether zsh's
+  behaviour is a bug does not depend on what bash does on the same
+  input; rather, it depends on what zsh's user manual specifies.
+  (By way of comparison, it's not a bug in Emacs that mytt(:q!) doesn't
+  cause it to exit.)
+
+  Since the bash and zsh languages do have a common subset, it is
+  feasible to write non-trivial plugins that would run under either of
+  them, if one is sufficiently familiar with both of them.  However,
+  a difference between bash's behaviour and zsh's does not imply that
+  zsh has a bug.  It myem(might) be a bug in zsh, but it might also be
+  a bug in bash, or simply a difference that isn't a bug in either shell
+  (see link(3.1)(31) for an example).
+
+  COMMENT(TODO: Move here the paragraph about "That's the answer for..." and reverse it)
+
   So, don't run bash scripts under zsh.  If the scripts were written for
   bash, run them in bash.  There's absolutely no problem with having
   mytt(#!/usr/bin/env bash) scripts even if mytt(zsh) is your shell for
@@ -2076,6 +2092,7 @@ label(331)
   learning curve.  Once you're used to zsh, you can decide for each
   script whether to port it to zsh or keep it as-is.
 
+  COMMENT(TODO: That's the paragraph the comment above refers to)
   That's the answer for myem(scripts), i.e., for external commands that
   are located in tt($PATH), or located elsewhere and are executed by
   giving their path explicitly (as in mytt(ls), mytt(/etc/rc.d/sshd),
@@ -2084,20 +2101,6 @@ label(331)
   mytt(source), or mytt(autoload) builtins, added to mytt(.zshrc), or
   pasted interactively at the shell prompt emdash() the answer is
   different.
-
-  Since the bash and zsh languages do have a common subset, it is
-  feasible to write non-trivial plugins that would run under either of
-  them, if one is sufficiently familiar with both of them.  However,
-  a difference between bash's behaviour and zsh's does not imply that
-  zsh has a bug.  It myem(might) be a bug in zsh, but it might also be
-  a bug in bash, or simply a difference that isn't a bug in either shell
-  (see link(3.1)(31) for an example).
-
-  When bash and zsh behave differently on the same input, whether zsh's
-  behaviour is a bug does not depend on what bash does on the same
-  input; rather, it depends on what zsh's user manual specifies.
-  (By way of comparison, it's not a bug in Emacs that mytt(:q!) doesn't
-  cause it to exit.)
 
   In summary,
   if you'd like to run a bash script or plugin under zsh, you must port the script or plugin
