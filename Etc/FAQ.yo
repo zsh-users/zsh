@@ -2099,9 +2099,10 @@ label(331)
   (By way of comparison, it's not a bug in Emacs that mytt(:q!) doesn't
   cause it to exit.)
 
-  If you'd like to run a bash script under zsh, you must port the script
+  In summary,
+  if you'd like to run a bash script or plugin under zsh, you must port the script or plugin
   properly, reviewing it line by line for differences between the two
-  languages and adjusting the script accordingly, just like you would
+  languages and adjusting it accordingly, just like you would
   when translating a book from American English to British English.
 
 
