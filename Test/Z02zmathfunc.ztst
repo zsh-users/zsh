@@ -15,7 +15,7 @@
   (set -e; echo $(( min(0,   42) )))
   (set -e; echo $(( max(0,  -42) )))
   (set -e; echo $(( sum(42, -42) )))
--f:regression test for ERR_EXIT 
+0:regression test for ERR_EXIT 
 >0
 >0
 >0

@@ -1,5 +1,9 @@
 2021-03-07  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 48147/0002: Functions/Math/zmathfunc, Test/Z02zmathfunc.ztst:
+	zmathfunc: Fix bug where the exit code would be non-zero if
+	the expression evaluted to zero.
+
 	* 48147/0001: Test/Z02zmathfunc.ztst: tests: Add a unit test for
 	zmathfunc and a regression test for workers/48146 affecting it.
 
