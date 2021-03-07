@@ -1,0 +1,23 @@
+%prep
+  autoload -Uz zmathfunc && zmathfunc
+
+%test
+
+  echo $(( min(42, 43) )) $(( max(42, 43) )) $(( sum(42, 43) ))
+  echo $(( min(42) )) $(( max(42) )) $(( sum(42) ))
+  echo $(( sum() ))
+0:basic functionality test
+>42 43 85
+>42 42 42
+>0
+
+
+  (set -e; echo $(( min(0,   42) )))
+  (set -e; echo $(( max(0,  -42) )))
+  (set -e; echo $(( sum(42, -42) )))
+-f:regression test for ERR_EXIT 
+>0
+>0
+>0
+
+%clean
