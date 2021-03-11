@@ -1,5 +1,8 @@
 2021-03-28  Oliver Kiddle  <opk@zsh.org>
 
+	* Jacob Gelbman: 48166: Completion/Unix/Command/_ctags:
+	add completion for language options
+
 	* Arseny Maslennikov: 48210, 48211:
 	Completion/Linux/Command/_setpriv: new completion for setpriv(1)
 
@@ -53,8 +56,8 @@
 
 2021-02-24  Peter Stephenson  <p.stephenson@samsung.com>
 
-	*  48105: Jacob Gelbman:Completion/Unix/Command/_ctags: update and
-	fix formatting nad import.
+	*  48105: Jacob Gelbman: Completion/Unix/Command/_ctags: update and
+	fix formatting and import.
 
 2021-02-23  Peter Stephenson  <p.stephenson@samsung.com>
 
