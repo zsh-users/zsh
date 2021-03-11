@@ -1,5 +1,8 @@
 2021-04-06  Oliver Kiddle  <opk@zsh.org>
 
+	* Marc Chantreux: users/26579: Completion/Unix/Command/_surfraw:
+	changes from review including parameter expansion to replace awk
+
 	* 48414: Completion/Unix/Type/_bpf_filters: quote closing bracket
 	to adapt for change in 43928
 

@@ -430,19 +430,23 @@ case $state in
     esac
   ;;
   elvi)
-    local -UT XDG_CONFIG_DIRS xcd
-    # as it starts with a space, the header becomes an empty
-    # string removed by the list expansion
-    _wanted elvi expl elvi compadd \
-        ${${(f)"$(surfraw -elvi)"}%%[[:space:]]*} $(
-          # extract the keys of all bookmarks (should be in surfraw itself)
-          awk '{keys[$1]=1} END {for (k in keys) print k}' \
-          $^xcd/surfraw/bookmarks(Nr) \
-          /etc/xdg/surfraw/bookmarks(Nr) \
-          /etc/surfraw.bookmarks(Nr) \
-          ${XDG_CONFIG_HOME-${HOME?homeless}/.config}/surfraw/bookmarks(Nr) \
-          ${HOME?homeless}/.surfraw.bookmarks(Nr)
-        ) && ret=0
+    local -UT XDG_CONFIG_DIRS xdg_config_dirs
+    local it
+    # list the applets
+    set -- ${${(f)"$(_call_program elvi surfraw -elvi)"}%%[[:space:]]##-- *}
+    shift # the first line is an header: remove it
+    # then list the bookmarks
+    for it in \
+      $^xdg_config_dirs/surfraw/bookmarks(Nr) \
+      /etc/xdg/surfraw/bookmarks(Nr) \
+      /etc/surfraw.bookmarks(Nr) \
+      ${XDG_CONFIG_HOME-$HOME/.config}/surfraw/bookmarks(Nr) \
+      $HOME/.surfraw.bookmarks(Nr)
+    do
+      read -d'\0' it < $it
+      set -- "$@" ${${(f)it}%%[[:space:]]*}
+    done
+    _wanted elvi expl elvi compadd "$@" && ret=0
   ;;
 esac
 
