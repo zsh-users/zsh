@@ -304,15 +304,16 @@
  foo=$'one\ttwo\tthree\tfour\n'
  foo+=$'\tone\ttwo\tthree\tfour\n'
  foo+=$'\t\tone\t\ttwo\t\tthree\t\tfour'
- print -x4 $foo
- print -X4 $foo
+ foo+='\0' # regression test for multibyte tab expand
+ print -x4 $foo | tr '\0' Z # avoid raw nul byte in expected output below
+ print -X4 $foo | tr '\0' Z
 0:Tab expansion by print
 >one	two	three	four
 >    one	two	three	four
->        one		two		three		four
+>        one		two		three		fourZ
 >one two three   four
 >    one two three   four
->        one     two     three       four
+>        one     two     three       fourZ
 
  unset foo
  print -v foo once more

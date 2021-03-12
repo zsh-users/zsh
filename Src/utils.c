@@ -5912,8 +5912,11 @@ zexpandtabs(const char *s, int len, int width, int startpos, FILE *fout,
 		memset(&mbs, 0, sizeof(mbs));
 		s++;
 		len--;
-	    } else if (ret == MB_INCOMPLETE) {
+	    } else if (ret == MB_INCOMPLETE ||
 		/* incomplete at end --- assume likewise, best we've got */
+	               ret == 0) {
+		/* NUL character returns 0, which would loop infinitely, so advance
+		 * one byte in this case too */
 		s++;
 		len--;
 	    } else {

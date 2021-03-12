@@ -1,3 +1,9 @@
+2021-04-01  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 48202 (+ 48366 test fix from Jun): Src/utils.c,
+	Test/B03print.ztst: Fix handling of NUL bytes in zexpandtabs
+	multibyte version
+
 2021-03-31  Oliver Kiddle  <opk@zsh.org>
 
 	* github #74: Caleb Maclennan: Completion/Unix/Command/_vcsh:
