@@ -244,7 +244,7 @@ if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
 
   _menu_style=( "$_menu_style[@]" "$_def_menu_style[@]" )
 
-  if [[ "$compstate[list]" = *list && tmp -gt LINES &&
+  if [[ "$compstate[list]" = *list(| *) && tmp -gt LINES &&
         ( -n "$_menu_style[(r)select=long-list]" ||
           -n "$_menu_style[(r)(yes|true|on|1)=long-list]" ) ]]; then
     compstate[insert]=menu

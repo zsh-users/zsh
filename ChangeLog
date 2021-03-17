@@ -1,3 +1,9 @@
+2021-03-17  dana  <dana@dana.is>
+
+	* 48180: Marlon Richert: Completion/Base/Core/_main_complete,
+	Test/Y01completion.ztst: Start menu selection with
+	select=long-list in menu style
+
 2021-03-07  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 48147/0002: Functions/Math/zmathfunc, Test/Z02zmathfunc.ztst:

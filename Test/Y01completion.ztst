@@ -237,6 +237,40 @@ F:regression test workers/31611
 >FI:{file1}
 >FI:{file2}
 
+  comptesteval '_tst() { local disp=( {a..z} ); compadd -ld disp $disp[@]; comppostfuncs=( _pst ) }'
+  comptesteval '_pst() { local disp=( "<INSERT>$compstate[insert]</INSERT>" ); compadd -Qld disp $disp }'
+  comptesteval "zstyle ':completion:*' menu select=long-list"
+  comptest $'tst \C-d'
+0: menu select=long-list starts menu selection for list widgets
+>NO:{<INSERT>menu</INSERT>}
+>NO:{a}
+>NO:{b}
+>NO:{c}
+>NO:{d}
+>NO:{e}
+>NO:{f}
+>NO:{g}
+>NO:{h}
+>NO:{i}
+>NO:{j}
+>NO:{k}
+>NO:{l}
+>NO:{m}
+>NO:{n}
+>NO:{o}
+>NO:{p}
+>NO:{q}
+>NO:{r}
+>NO:{s}
+>NO:{t}
+>NO:{u}
+>NO:{v}
+>NO:{w}
+>NO:{x}
+>NO:{y}
+>NO:{z}
+
+
 %clean
 
   zmodload -ui zsh/zpty
