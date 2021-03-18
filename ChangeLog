@@ -1,5 +1,8 @@
 2021-03-31  Oliver Kiddle  <opk@zsh.org>
 
+	* Christian K: 48192: Completion/Unix/Command/_openstack:
+	Fix openstack completion for new style clients
+
 	* Marc Chantreux: users/26557: Completion/Unix/Command/_surfraw:
 	add bookmarks support and remove the header from the final list
 
