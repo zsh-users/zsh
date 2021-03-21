@@ -44,6 +44,25 @@
 >line: {: dir1/}{}
 >line: {: dir2/}{}
 
+  comptest $': *\t\t\t\t\t\t\t'
+0:_expand shows file types
+>line: {: dir1/}{}
+>DESCRIPTION:{expansions}
+>DI:{dir1}
+>DI:{dir2}
+>FI:{file1}
+>FI:{file2}
+>DESCRIPTION:{all expansions}
+>NO:{dir1 dir2 file1 file2}
+>DESCRIPTION:{original}
+>NO:{*}
+>line: {: dir1/}{}
+>line: {: dir2/}{}
+>line: {: file1 }{}
+>line: {: file2 }{}
+>line: {: dir1 dir2 file1 file2 }{}
+>line: {: *}{}
+
   comptesteval '_users () { compadd user1 user2 }'
   comptest $': ~\t\t\t\t\t'
 0:tilde

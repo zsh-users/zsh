@@ -11,7 +11,7 @@ setopt localoptions nonomatch
 
 [[ _matcher_num -gt 1 ]] && return 1
 
-local exp word sort expr expl subd suf=" " force opt asp tmp opre pre epre
+local exp word sort expr expl subd pref suf=" " force opt asp tmp opre pre epre
 local continue=0
 
 (( $# )) &&
@@ -214,9 +214,10 @@ else
 	normal=( "$normal[@]" "$i" )
       fi
     done
-    (( $#dir ))    && compadd "$expl[@]" -UQ -qS/ -a dir
-    (( $#space ))  && compadd "$expl[@]" -UQ -qS " " -a space
-    (( $#normal )) && compadd "$expl[@]" -UQ -qS "" -a normal
+    pref="${${word:#[~/]*}:+$PWD}/"
+    (( $#dir ))    && compadd "$expl[@]" -fW "$pref" -UQ -qS/ -a dir
+    (( $#space ))  && compadd "$expl[@]" -fW "$pref" -UQ -qS " " -a space
+    (( $#normal )) && compadd "$expl[@]" -fW "$pref" -UQ -qS "" -a normal
   fi
   if _requested all-expansions; then
     local disp dstr

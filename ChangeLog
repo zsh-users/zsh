@@ -1,5 +1,9 @@
 2021-03-31  Oliver Kiddle  <opk@zsh.org>
 
+	* Marlon Richert: 48214: Completion/Base/Completer/_expand,
+	Test/Y01completion.ztst: add file types to _expand completions,
+	so they can be colored through complist
+
 	* Christian K: 48192: Completion/Unix/Command/_openstack:
 	Fix openstack completion for new style clients
 
