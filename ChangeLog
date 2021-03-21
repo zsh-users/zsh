@@ -1,5 +1,8 @@
 2021-03-28  Oliver Kiddle  <opk@zsh.org>
 
+	* Arseny Maslennikov: 48210, 48211:
+	Completion/Linux/Command/_setpriv: new completion for setpriv(1)
+
 	* Arseny Maslennikov: 48212: Completion/Linux/Type/_capabilities:
 	Introduce new completion for Linux task capabilities
 
