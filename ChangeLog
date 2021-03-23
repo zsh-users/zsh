@@ -1,5 +1,8 @@
 2021-03-28  Oliver Kiddle  <opk@zsh.org>
 
+	* Štěpán Němec: 48231: Completion/Unix/Command/_git:
+	add missing --pretty formats and improve descriptions
+
 	* 48230, 48233 (Jun T): Completion/Solaris/Command/_dtrace:
 	completion of dtrace probes and runtime options
 

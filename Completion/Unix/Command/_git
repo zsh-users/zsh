@@ -7573,13 +7573,15 @@ __git_setup_diff_stage_options () {
 __git_format_placeholders() {
   local sep
   local -a disp names placeholders expl
-  _describe -t formats format '( oneline:"commit-ids and subject of messages"
-    short:"few headers and only subject of messages"
-    medium:"most parts of messages"
-    full:"all parts of commit messages"
-    fuller:"like full and includes dates"
-    email:"use email headers like From and Subject"
-    raw:"the raw commits" )' -- '( format:"specify own format" )' -S ':' && return
+  _describe -t formats format '( oneline:"<hash> <title>"
+    short:"commit hash plus author and title headers"
+    medium:"like short plus author date header and full message"
+    full:"like medium with committer header instead of date"
+    fuller:"like full plus author and commit date headers"
+    reference:"<abbrev hash> (<title>, <short author date>)"
+    email:"email patch format"
+    mboxrd:"like email with From lines in message quoted with >"
+    raw:"entire commit object" )' -- '( format:"specify own format" )' -S ':' && return
   compset -P 'format:'
     compset -P '(%[^acgCG]|%?[^%]|[^%])#'
     if compset -P '%C'; then
