@@ -178,6 +178,13 @@
 >3
 ?(eval):1: command not found: hähä=3
 
+  expr='[[ é = [[:IDENT:]] ]]'
+  ( unsetopt posix_identifiers; eval $expr && echo ok unset )
+  ( setopt posix_identifiers;   eval $expr || echo ok set )
+0:Regression test for workers/47745
+>ok unset
+>ok set
+
   foo="Ølaf«Ødd«øpénëd«ån«àpple"
   print -l ${(s.«.)foo}
   ioh="Ἐν ἀρχῇ ἦν ὁ λόγος, καὶ ὁ λόγος ἦν πρὸς τὸν θεόν, καὶ θεὸς ἦν ὁ λόγος."

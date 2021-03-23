@@ -1,5 +1,8 @@
 2021-03-23  dana  <dana@dana.is>
 
+	* unposted: Doc/Zsh/expn.yo, Test/D07multibyte.ztst: Improve
+	documentation and add regression test for workers/47745
+
 	* 47745: Stephane Chazelas: Src/utils.c: Fix [:IDENT:] vs
 	posixidentifiers
 

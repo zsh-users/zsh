@@ -2134,7 +2134,8 @@ is not sensitive to the locale:
 startitem()
 item(tt([:IDENT:]))(
 The character is allowed to form part of a shell identifier, such
-as a parameter name
+as a parameter name; this test respects the tt(POSIX_IDENTIFIERS)
+option
 )
 item(tt([:IFS:]))(
 The character is used as an input field separator, i.e. is contained in the
