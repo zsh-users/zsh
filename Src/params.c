@@ -3056,7 +3056,7 @@ assignsparam(char *s, char *val, int flags)
 	     * Don't warn about anything.
 	     */
 	    flags &= ~ASSPM_WARN;
-	    v->pm->node.flags &= ~PM_DECLAREDNULL;
+	    v->pm->node.flags &= ~PM_DEFAULTED;
 	}
 	*ss = '[';
 	v = NULL;
@@ -3082,7 +3082,7 @@ assignsparam(char *s, char *val, int flags)
     }
     if (flags & ASSPM_WARN)
 	check_warn_pm(v->pm, "scalar", created, 1);
-    v->pm->node.flags &= ~PM_DECLAREDNULL;
+    v->pm->node.flags &= ~PM_DEFAULTED;
     if (flags & ASSPM_AUGMENT) {
 	if (v->start == 0 && v->end == -1) {
 	    switch (PM_TYPE(v->pm->node.flags)) {
@@ -3235,7 +3235,7 @@ assignaparam(char *s, char **val, int flags)
 
     if (flags & ASSPM_WARN)
 	check_warn_pm(v->pm, "array", created, may_warn_about_nested_vars);
-    v->pm->node.flags &= ~PM_DECLAREDNULL;
+    v->pm->node.flags &= ~PM_DEFAULTED;
 
     /*
      * At this point, we may have array entries consisting of
@@ -3448,7 +3448,7 @@ sethparam(char *s, char **val)
 	    return NULL;
 	}
     check_warn_pm(v->pm, "associative array", checkcreate, 1);
-    v->pm->node.flags &= ~PM_DECLAREDNULL;
+    v->pm->node.flags &= ~PM_DEFAULTED;
     setarrvalue(v, val);
     unqueue_signals();
     return v->pm;
@@ -3520,7 +3520,7 @@ assignnparam(char *s, mnumber val, int flags)
 	if (flags & ASSPM_WARN)
 	    check_warn_pm(v->pm, "numeric", 0, 1);
     }
-    v->pm->node.flags &= ~PM_DECLAREDNULL;
+    v->pm->node.flags &= ~PM_DEFAULTED;
     setnumvalue(v, val);
     unqueue_signals();
     return v->pm;
@@ -4128,7 +4128,7 @@ tiedarrsetfn(Param pm, char *x)
     else if (pm->ename) {
 	Param altpm = (Param) paramtab->getnode(paramtab, pm->ename);
 	if (altpm)
-	    altpm->node.flags &= ~PM_DECLAREDNULL;
+	    altpm->node.flags &= ~PM_DEFAULTED;
     }
     if (x) {
 	char sepbuf[3];
@@ -5049,7 +5049,7 @@ arrfixenv(char *s, char **t)
 
     if (isset(ALLEXPORT))
 	pm->node.flags |= PM_EXPORTED;
-    pm->node.flags &= ~PM_DECLAREDNULL;
+    pm->node.flags &= ~PM_DEFAULTED;
 
     /*
      * Do not "fix" parameters that were not exported
@@ -5856,7 +5856,7 @@ printparamnode(HashNode hn, int printflags)
     if (p->node.flags & PM_UNSET) {
 	if ((printflags & (PRINT_POSIX_READONLY|PRINT_POSIX_EXPORT) &&
 	     p->node.flags & (PM_READONLY|PM_EXPORTED)) ||
-	    (p->node.flags & PM_DECLAREDNULL) == PM_DECLAREDNULL) {
+	    (p->node.flags & PM_DEFAULTED) == PM_DEFAULTED) {
 	    /*
 	     * Special POSIX rules: show the parameter as readonly/exported
 	     * even though it's unset, but with no value.
