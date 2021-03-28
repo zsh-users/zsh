@@ -240,7 +240,10 @@ F:regression test workers/31611
   comptesteval '_tst() { local disp=( {a..z} ); compadd -ld disp $disp[@]; comppostfuncs=( _pst ) }'
   comptesteval '_pst() { local disp=( "<INSERT>$compstate[insert]</INSERT>" ); compadd -Qld disp $disp }'
   comptesteval "zstyle ':completion:*' menu select=long-list"
+  # This test is sensitive to sorting differences across platforms
+  comptesteval 'export LC_ALL=C'
   comptest $'tst \C-d'
+  comptesteval "export LC_ALL=${(q)ZSH_TEST_LANG}"
 0: menu select=long-list starts menu selection for list widgets
 >NO:{<INSERT>menu</INSERT>}
 >NO:{a}
