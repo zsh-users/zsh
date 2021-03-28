@@ -1,3 +1,8 @@
+2021-03-28  Oliver Kiddle  <opk@zsh.org>
+
+	* 48230, 48233 (Jun T): Completion/Solaris/Command/_dtrace:
+	completion of dtrace probes and runtime options
+
 2021-03-28  dana  <dana@dana.is>
 
 	* 48216: Test/Y01completion.ztst: Fix broken test from
