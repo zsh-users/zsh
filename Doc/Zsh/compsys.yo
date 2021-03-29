@@ -4274,7 +4274,7 @@ The last two descriptions say what should be completed as
 arguments.  The first describes the first argument as a
 `var(postscript file)' and makes files ending in `tt(ps)' or `tt(eps)' 
 be completed.  The last description gives all other arguments the
-description `var(page numbers)' but does not offer completions.
+description `var(page number)' but does not offer completions.
 )
 findex(_cache_invalid)
 item(tt(_cache_invalid) var(cache_identifier))(
