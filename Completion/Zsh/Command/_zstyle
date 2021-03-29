@@ -218,7 +218,7 @@ taglist=(
 )
 
 # Be careful with the context arguments here.  They like to masquerade.
-_arguments -C \
+_arguments -C -A '-*' \
   '(: -)-L[output in form of zstyle commands]:pattern for context patterns:->metapatterns:style:->metastyles' \
   '(: -)-d[delete style definitions]:verbatim context pattern:->patterns:*:styles:->pstyles' \
   '(: -)-e[value is evaluated when style is looked up]:context pattern:->contexts:style:->styles:*:command:_cmdstring' \
@@ -229,7 +229,7 @@ _arguments -C \
   '(: -)-t[test a style, returning false if it'\''s undefined]:context name:->contexts:style:->styles:*:strings to test presence of: ' \
   '(: -)-T[test a style, returning true if it'\''s undefined]:context name:->contexts:style:->styles:*:strings to test presence of: ' \
   '(: -)-m[pattern-match values of a style]:context name:->contexts:style:->styles:pattern: ' \
-  '(-):context pattern:->contexts' '(-):style:->styles' '(-)*:argument:->style-arg'
+  ':context pattern:->contexts' ':style:->styles' '*:argument:->style-arg'
 
 while (( $#state )); do
   case "$state[1]" in
