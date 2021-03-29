@@ -1,5 +1,8 @@
 2021-03-29  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: ChangeLog: Fix X-Seq numbers for the 39657, 39658,
+	39659 patch series.
+
 	* unposted: Doc/Zsh/compsys.yo: docs: _arguments: Fix a typo
 	in the example.
 
@@ -7493,10 +7496,10 @@ g
 	Baptiste Daroussin) Better support bmake, FreeBSD's default
 	make(1) implementation.
 
-	* 39657: Completion/Zsh/Command/_zstyle: Complete the -g,
+	* 39659: Completion/Zsh/Command/_zstyle: Complete the -g,
 	-s,-b,-a, -t,-T, -m options.
 
-	* 39657: Completion/Zsh/Command/_zstyle: When completing a
+	* 39658: Completion/Zsh/Command/_zstyle: When completing a
 	style for an unrecognised context, complete all known styles.
 
 	* 39657: Completion/Zsh/Command/_zstyle,
