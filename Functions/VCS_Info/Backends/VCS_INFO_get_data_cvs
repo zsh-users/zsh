@@ -5,17 +5,8 @@
 setopt localoptions NO_shwordsplit
 local cvsbranch cvsbase
 
-# Look for the most distant parent that still has a CVS subdirectory.
+cvsbase="${vcs_comm[basedir]}"
 # VCS_INFO_detect_cvs ensured that ./CVS/Repository exists.
-cvsbase="."
-cvsbase=${cvsbase:P}
-while [[ -d "${cvsbase:h}/CVS" ]]; do
-    cvsbase="${cvsbase:h}"
-    if [[ $cvsbase == '/' ]]; then
-        break
-    fi
-done
-
 cvsbranch=$(< ./CVS/Repository)
 rrn=${cvsbase:t}
 cvsbranch=${cvsbranch##${rrn}/}

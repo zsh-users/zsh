@@ -138,7 +138,7 @@ VCS_INFO_git_handle_patches () {
 
 gitdir=${vcs_comm[gitdir]}
 VCS_INFO_git_getbranch ${gitdir}
-gitbase=$( ${vcs_comm[cmd]} rev-parse --show-toplevel 2> /dev/null )
+gitbase=${vcs_comm[basedir]}
 if [[ -z ${gitbase} ]]; then
     # Bare repository
     gitbase=${gitdir:P}
