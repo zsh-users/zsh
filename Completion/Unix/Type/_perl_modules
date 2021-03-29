@@ -60,10 +60,11 @@ _perl_modules () {
     with_pod=_with_pod
   fi
 
-  local perl=${words[1]%doc} perl_modules
-  if whence $perl >/dev/null; then
+  local perl perl_modules
+  if [[ $service == (perl|perldoc) ]] && whence -- ${${(Q)words[1]}%doc} >/dev/null; then
+    perl=$_
     perl_modules=_${${perl//[^[:alnum:]]/_}#_}_modules$with_pod
-  elif (( ${+commands[perl]} )); then
+  elif whence perl > /dev/null; then
     perl=perl
     perl_modules=_perl_modules$with_pod
   else
@@ -81,8 +82,8 @@ _perl_modules () {
     else
       local inc libdir new_pms
 
-      if [[ ${+perl} -eq 1 ]]; then
-        inc=( $( $perl -e 'print "@INC"' ) )
+      if [[ -n $perl ]]; then
+        inc=( $( _call_program perl-inc ${(q)perl}$' -e \'print "@INC"\'' ) )
       else
         # If perl isn't there, one wonders why the user's trying to
         # complete Perl modules.  Maybe her $path is wrong?
