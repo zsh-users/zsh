@@ -1,5 +1,8 @@
 2021-03-31  Oliver Kiddle  <opk@zsh.org>
 
+	* github #74: Caleb Maclennan: Completion/Unix/Command/_vcsh:
+	Drop vcsh completions, maintained upstream
+
 	* Marlon Richert: 48214: Completion/Base/Completer/_expand,
 	Test/Y01completion.ztst: add file types to _expand completions,
 	so they can be colored through complist
