@@ -959,6 +959,9 @@ As tt(l), tt(L), tt(b) and tt(B), with the difference that the command
 line and trial completion patterns are anchored on the right side.
 Here an empty var(ranchor) and the tt(e) and tt(E) forms force the
 match to the end of the command line or trial completion string.
+
+In the form where var(lanchor) is given, the var(lanchor) only needs
+to match the trial completion string.
 )
 item(tt(x:))(
 This form is used to mark the end of matching specifications:
@@ -1022,8 +1025,10 @@ any number of characters in the trial completion. In this case the
 pattern must be anchored (on either side); in the case of a single
 star, the var(anchor) then determines how much of the trial completion
 is to be included DASH()- only the characters up to the next appearance of
-the anchor will be matched. With two stars, substrings matched by the
-anchor can be matched, too.
+the anchor will be matched. With two stars, substrings matched by
+the anchor can be matched, too. In the forms that include two
+anchors, `tt(*)' can match characters from the additional anchor
+DASH()- var(lanchor) with tt(r) or var(ranchor) with tt(l).
 
 Examples:
 

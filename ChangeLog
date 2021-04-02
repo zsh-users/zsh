@@ -1,3 +1,8 @@
+2021-04-02  Oliver Kiddle  <opk@zsh.org>
+
+	* 48356: Doc/Zsh/compwid.yo: clarify (the intended)
+	behaviour for the two anchor forms of matching control
+
 2021-04-01  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Etc/BUGS: Add 39319, a named-file process
