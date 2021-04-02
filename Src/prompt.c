@@ -1696,28 +1696,11 @@ match_colour(const char **teststrp, int is_fg, int colour)
 		return TXT_ERROR;
 	}
     }
-    /*
-     * Try termcap for numbered characters if possible.
-     * Don't for named characters, since our best bet
-     * of getting the names right is with ANSI sequences.
-     */
-    if (!named && tccan(tc)) {
-	if (tccolours >= 0 && colour >= tccolours) {
-	    /*
-	     * Out of range of termcap colours.
-	     * Can we assume ANSI colours work?
-	     */
-	    if (colour > 7)
-		return TXT_ERROR; /* No. */
-	} else {
-	    /*
-	     * We can handle termcap colours and the number
-	     * is in range, so use termcap.
-	     */
-	    on |= is_fg ? TXT_ATTR_FG_TERMCAP :
-		TXT_ATTR_BG_TERMCAP;
-	}
-    }
+
+    /* Out of range of termcap colours and basic ANSI set. */
+    if (tccan(tc) && colour > 7 && colour >= tccolours)
+	return TXT_ERROR;
+
     return on | (zattr)colour << shft;
 }
 
@@ -1781,7 +1764,7 @@ match_highlight(const char *teststr, zattr *on_var)
  */
 
 static int
-output_colour(int colour, int fg_bg, int use_tc, int truecol, char *buf)
+output_colour(int colour, int fg_bg, int truecol, char *buf)
 {
     int atrlen = 3, len;
     char *ptr = buf;
@@ -1799,7 +1782,7 @@ output_colour(int colour, int fg_bg, int use_tc, int truecol, char *buf)
      * used instead of termcap even for colour > 7. Here this just emits the
      * color number, so it works fine for both zle_highlight and tercap cases
      */
-    } else if (use_tc || colour > 7) {
+    } else if (colour > 7) {
 	char digbuf[DIGBUFSIZE];
 	sprintf(digbuf, "%d", colour);
 	len = strlen(digbuf);
@@ -1836,7 +1819,6 @@ output_highlight(zattr atr, char *buf)
     if (atr & TXTFGCOLOUR) {
 	len = output_colour(txtchangeget(atr, TXT_ATTR_FG_COL),
 			    COL_SEQ_FG,
-			    (atr & TXT_ATTR_FG_TERMCAP),
 			    (atr & TXT_ATTR_FG_24BIT),
 			    ptr);
 	atrlen += len;
@@ -1853,7 +1835,6 @@ output_highlight(zattr atr, char *buf)
 	}
 	len = output_colour(txtchangeget(atr, TXT_ATTR_BG_COL),
 			    COL_SEQ_BG,
-			    (atr & TXT_ATTR_BG_TERMCAP),
 			    (atr & TXT_ATTR_BG_24BIT),
 			    ptr);
 	atrlen += len;
@@ -2018,7 +1999,6 @@ free_colour_buffer(void)
  * fg_bg indicates if we're changing the foreground or background.
  * tc indicates the termcap code to use, if appropriate.
  * def indicates if we're resetting the default colour.
- * use_termcap indicates if we should use termcap to output colours.
  * flags is either 0 or TSC_PROMPT.
  */
 
@@ -2028,7 +2008,7 @@ set_colour_attribute(zattr atr, int fg_bg, int flags)
 {
     char *ptr;
     int do_free, is_prompt = (flags & TSC_PROMPT) ? 1 : 0;
-    int colour, tc, def, use_termcap, use_truecolor;
+    int colour, tc, def, use_truecolor;
     int is_default_zle_highlight = 1;
 
     if (fg_bg == COL_SEQ_FG) {
@@ -2036,13 +2016,11 @@ set_colour_attribute(zattr atr, int fg_bg, int flags)
 	tc = TCFGCOLOUR;
 	def = txtchangeisset(atr, TXTNOFGCOLOUR);
 	use_truecolor = txtchangeisset(atr, TXT_ATTR_FG_24BIT);
-	use_termcap = txtchangeisset(atr, TXT_ATTR_FG_TERMCAP);
     } else {
 	colour = txtchangeget(atr, TXT_ATTR_BG_COL);
 	tc = TCBGCOLOUR;
 	def = txtchangeisset(atr, TXTNOBGCOLOUR);
 	use_truecolor = txtchangeisset(atr, TXT_ATTR_BG_24BIT);
-	use_termcap = txtchangeisset(atr, TXT_ATTR_BG_TERMCAP);
     }
 
     /* Test if current zle_highlight settings are customized, or
@@ -2057,17 +2035,14 @@ set_colour_attribute(zattr atr, int fg_bg, int flags)
     }
 
     /*
-     * If we're not restoring the default, and either have a
-     * colour value that is too large for ANSI, or have been told
-     * to use the termcap sequence, try to use the termcap sequence.
-     * True color is not covered by termcap.
+     * If we're not restoring the default or applying true color,
+     * try to use the termcap sequence.
      *
      * We have already sanitised the values we allow from the
      * highlighting variables, so much of this shouldn't be
      * necessary at this point, but we might as well be safe.
      */
-    if (!def && !use_truecolor &&
-	(is_default_zle_highlight && (colour > 7 || use_termcap)))
+    if (!def && !use_truecolor && is_default_zle_highlight)
     {
 	/*
 	 * We can if it's available, and either we couldn't get

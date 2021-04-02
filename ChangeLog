@@ -1,5 +1,8 @@
 2021-04-02  Oliver Kiddle  <opk@zsh.org>
 
+	* 47510: Src/prompt.c, Src/zsh.h: drop code that avoided
+	termcap for named colours
+
 	* 48356: Doc/Zsh/compwid.yo: clarify (the intended)
 	behaviour for the two anchor forms of matching control
 
