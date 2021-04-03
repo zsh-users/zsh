@@ -2259,9 +2259,31 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		    break;
 
 		default:
-		  flagerr:
-		    zerr("error in flags");
-		    return NULL;
+		flagerr:
+		    {
+			/* 
+			 * We're trying to output the string that failed to
+			 * parse and the offset of the parse error within that.
+			 *
+			 * The string is *str.  It hasn't been changed since
+			 * entry to this function, I think, except that the
+			 * first non-variable-declaration line in this function
+			 * (currently the 238th line in this function)
+			 * writes a NUL to the first place in *str, so we'll
+			 * compensate by outputting the dollar sign manually.
+			 */
+			char *str_copy_for_output = dupstring(*str + 1);
+
+			/* 
+			 * Convert to a 1-based offset, because the shell
+			 * language is 1-based by default.
+			 */
+			zlong offset = s - *str + 1;
+
+			untokenize(str_copy_for_output);
+			zerr("error in flags near position %z in '$%s'", offset, str_copy_for_output);
+			return NULL;
+		    }
 		}
 	    }
 	    s++;

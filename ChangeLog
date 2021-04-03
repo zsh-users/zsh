@@ -1,5 +1,9 @@
 2021-04-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 48379: Src/subst.c, Test/D04parameter.ztst: Make the parameter
+	expansion subscript flags parse error message, "error in flags",
+	identify the location of the parse error.
+
 	* 48321 (tweaked per thread): Completion/Unix/Type/_perl_modules:
 	Don't assume ${words[1]} to be either "perl" or "perldoc"
 

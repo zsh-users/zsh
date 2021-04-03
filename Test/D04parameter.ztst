@@ -2691,3 +2691,8 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
   eval 'echo $(\*)'
 0:Backslash character other than newline is normal after $(
 >What a star
+
+ : ${(zZ+x+):-}
+1:parameter expansion flags parsing error gives a clue
+?(eval):1: error in flags near position 7 in '${(zZ+x+):-}'
+
