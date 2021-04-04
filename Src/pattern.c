@@ -1250,7 +1250,7 @@ patcomppiece(int *flagp, int paren)
     int hash, count;
     union upat up;
     char *nptr, *str0, *ptr, *patprev;
-    zrange_t from, to;
+    zrange_t from = 0, to;
     char *charstart;
 
     flags = 0;

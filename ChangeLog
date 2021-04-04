@@ -1,5 +1,8 @@
 2021-04-04  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* Felipe Contreras: 47784: Src/pattern.c: silence compiler
+	warning -Wmaybe-uninitialized
+
 	* Jacob Gelbman: 48218 (+ 48354): Completion/Unix/Command/_gcc:
 	various improvements for _gcc
 
