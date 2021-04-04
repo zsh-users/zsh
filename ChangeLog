@@ -1,3 +1,8 @@
+2021-04-04  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* Jacob Gelbman: 48218 (+ 48354): Completion/Unix/Command/_gcc:
+	various improvements for _gcc
+
 2021-04-02  Oliver Kiddle  <opk@zsh.org>
 
 	* 47510: Src/prompt.c, Src/zsh.h: drop code that avoided
