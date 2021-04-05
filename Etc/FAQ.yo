@@ -2542,6 +2542,11 @@ label(62)
   )
   (posting to the last one is currently restricted).
 
+  Finally, there is a private mailing list (the general public cannot subscribe
+  to it) for discussing bug reports with security implications, i.e., potential
+  vulnerabilities: mytt(zsh-security@zsh.org).  If you find a security problem
+  in zsh itself, please mail this address.
+
   Note that you should only join one of these lists:  people on
   zsh-workers receive all the lists, and people on zsh-users will
   also receive the announcements list.

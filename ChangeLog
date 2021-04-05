@@ -1,5 +1,8 @@
 2021-04-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 48410: Doc/Zsh/metafaq.yo, Etc/FAQ.yo: FAQ, METAFAQ: Mention
+	zsh-security@.
+
 	* 48379: Src/subst.c, Test/D04parameter.ztst: Make the parameter
 	expansion subscript flags parse error message, "error in flags",
 	identify the location of the parse error.

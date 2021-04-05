@@ -34,7 +34,7 @@ uref(http://zsh.sourceforge.net/).
 texinode(Mailing Lists)(The Zsh FAQ)(Availability)(Introduction)
 sect(Mailing Lists)
 cindex(mailing lists)
-Zsh has 3 mailing lists:
+Zsh has several mailing lists:
 
 startitem()
 item(tt(<zsh-announce@zsh.org>))(
@@ -46,6 +46,12 @@ User discussions.
 )
 item(tt(<zsh-workers@zsh.org>))(
 Hacking, development, bug reports and patches.
+)
+item(tt(<zsh-security@zsh.org>))(
+Private mailing list (the general public cannot subscribe to it) for discussing
+bug reports with security implications, i.e., potential vulnerabilities.
+
+If you find a security problem in zsh itself, please mail this address.
 )
 enditem()
 
