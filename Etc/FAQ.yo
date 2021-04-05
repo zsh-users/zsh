@@ -2525,9 +2525,6 @@ label(62)
   you want someone to mail you directly, say so.  Most patches to zsh
   appear there first.
 
-  Note that this location changed in August 2020, and the
-  instructions to go with it are slightly different.
-
   Please note when reporting bugs that many exist only on certain
   architectures, which the developers may not have access to.  In
   this case debugging information, as detailed as possible, is
@@ -2564,6 +2561,9 @@ label(62)
   Administrative matters are best sent to
   email(zsh-workers-owner@zsh.org).
   
+  Note that this location changed in August 2020, and the
+  instructions to go with it are slightly different.
+
   An archive of mailings for the last few years can be found at
     url(http://www.zsh.org/mla/)(http://www.zsh.org/mla/)
   at the main zsh archive site.
