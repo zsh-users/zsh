@@ -12,6 +12,8 @@ the nonomatch and nullglob options.
 ------------------------------------------------------------------------
 It is currently impossible to time builtins.
 ------------------------------------------------------------------------
+38754: unwanted scrolling of the terminal
+------------------------------------------------------------------------
 40106: The comp* completion-related builtins (compadd, compset, etc) are
 run with $_comp_options in effect, rather than the user's options.
 ------------------------------------------------------------------------
@@ -25,6 +27,8 @@ skipped when STTY=... is set for that command
 ------------------------------------------------------------------------
 41203 and others: Make it easier to maintain C modules out of tree.
 (May require defining a stable API for modules, see 41254)
+------------------------------------------------------------------------
+42609: :|: =(hang)
 ------------------------------------------------------------------------
 44007 - Martijn - exit in trap executes rest of function
 See test case in Test/C03traps.ztst.
@@ -47,7 +51,7 @@ analysis in workers/45657
 users/24765 -direct terminals. Not a bug as such but we may need to do
   something if -direct values in TERM are ever common
 ------------------------------------------------------------------------
-
+44850: zle -M doesn't work properly if the command line fills the screen
 ------------------------------------------------------------------------
 45393/45396 [PATCH] avoid lseek(2) calls.
 45768 is similar.
@@ -82,4 +86,6 @@ causes a script to hang.
 47561: [PATCH v4] vcs_info: choose backend by basedir
 ------------------------------------------------------------------------
 39319: () { exit } =(:) doesn't clean up the tempfile
+------------------------------------------------------------------------
+48091: Bug in compdescribe with matcher 'b:-=+'
 ------------------------------------------------------------------------
