@@ -1583,7 +1583,7 @@ calclist(int showall)
                             nlines += 1 + printfmt(m->disp, 0, 0, 0);
                             g->flags |= CGF_HASDL;
                         } else {
-                            l = ZMB_nicewidth(m->disp);
+                            l = ZMB_nicewidth(m->disp) + !!m->modec;
                             ndisp++;
                             if (l > glong)
                                 glong = l;

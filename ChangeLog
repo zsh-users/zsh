@@ -1,5 +1,8 @@
 2021-04-06  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* 48391: Src/Zle/compresult.c: correctly calculate display string
+	width in completion list to fix display problem in menu-complete
+
 	* 48389: Src/math.c, Src/utils.c: getkeystring(GETKEY_SINGLE_CHAR)
 	should not return a pointer to a local variable
 
