@@ -63,7 +63,7 @@ compquote suf
 # protocol or field: it is one, the other or both but not neither
 
 _regex_arguments _bpf /$'[^\0]#\0'/ \( \
-  /$'(not[ \0]#|![ \0]#|(\\\\|)\\([ \0]#)'/ ':operators:operator:(not ()' \# \
+  /$'(not[ \0]#|![ \0]#|(\\\\|)\\([ \0]#)'/ ':operators:operator:(not \()' \# \
   \(\
     \(\
       \(\
