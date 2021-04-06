@@ -840,13 +840,18 @@ zzlex(void)
 	    if (*ptr == '#') {
 		if (*++ptr == '\\' || *ptr == '#') {
 		    int v;
+		    char *optr = ptr;
 
 		    ptr++;
 		    if (!*ptr) {
 			zerr("bad math expression: character missing after ##");
 			return EOI;
 		    }
-		    ptr = getkeystring(ptr, NULL, GETKEYS_MATH, &v);
+		    if(!(ptr = getkeystring(ptr, NULL, GETKEYS_MATH, &v))) {
+			zerr("bad math expression: bad character after ##");
+			ptr = optr;
+			return EOI;
+		    }
 		    yyval.u.l = v;
 		    return NUM;
 		}

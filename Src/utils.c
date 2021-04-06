@@ -6697,13 +6697,21 @@ ucs4toutf8(char *dest, unsigned int wval)
  *
  * The return value is unmetafied unless GETKEY_DOLLAR_QUOTE is
  * in use.
+ *
+ * If GETKEY_SINGLE_CHAR is set in how, a next character in the given
+ * string is parsed, and the character code for it is returned in misc.
+ * The return value of the function is a pointer to the byte in the
+ * given string from where the next parsing should start. If the next
+ * character can't be found then NULL is returned.
+ * CAUTION: Currently, GETKEY_SINGLE_CHAR can be used only via
+ *          GETKEYS_MATH. Other use of it may cause trouble.
  */
 
 /**/
 mod_export char *
 getkeystring(char *s, int *len, int how, int *misc)
 {
-    char *buf, tmp[1];
+    char *buf = NULL, tmp[1];
     char *t, *tdest = NULL, *u = NULL, *sstart = s, *tbuf = NULL;
     char svchar = '\0';
     int meta = 0, control = 0, ignoring = 0;
@@ -6729,9 +6737,11 @@ getkeystring(char *s, int *len, int how, int *misc)
     DPUTS((how & (GETKEY_DOLLAR_QUOTE|GETKEY_SINGLE_CHAR)) ==
 	  (GETKEY_DOLLAR_QUOTE|GETKEY_SINGLE_CHAR),
 	  "BUG: incompatible options in getkeystring");
+    DPUTS((how & GETKEY_SINGLE_CHAR) && (how != GETKEYS_MATH),
+	  "BUG: unsupported options in getkeystring");
 
     if (how & GETKEY_SINGLE_CHAR)
-	t = buf = tmp;
+	t = tmp;
     else {
 	/* Length including terminating NULL */
 	int maxlen = 1;
@@ -7165,13 +7175,20 @@ getkeystring(char *s, int *len, int how, int *misc)
      */
     DPUTS((how & (GETKEY_DOLLAR_QUOTE|GETKEY_UPDATE_OFFSET)) ==
 	  GETKEY_DOLLAR_QUOTE, "BUG: unterminated $' substitution");
-    *t = '\0';
-    if (how & GETKEY_DOLLAR_QUOTE)
-	*tdest = '\0';
-    if (how & GETKEY_SINGLE_CHAR)
+
+    if (how & GETKEY_SINGLE_CHAR) {
+	/* couldn't find a character */
 	*misc = 0;
-    else
-	*len = ((how & GETKEY_DOLLAR_QUOTE) ? tdest : t) - buf;
+	return NULL;
+    }
+    if (how & GETKEY_DOLLAR_QUOTE) {
+	*tdest = '\0';
+	*len = tdest - buf;
+    }
+    else {
+	*t = '\0';
+	*len = t - buf;
+    }
     return buf;
 }
 
