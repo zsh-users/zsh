@@ -1,5 +1,8 @@
 2021-04-06  Oliver Kiddle  <opk@zsh.org>
 
+	* Marlon Richert: 48413: Test/comptest, Test/Y01completion.ztst:
+	Fix _expand completion test
+
 	* unposted: Etc/BUGS: add several references to old list posts
 
 2021-04-05  Daniel Shahaf  <d.s@daniel.shahaf.name>

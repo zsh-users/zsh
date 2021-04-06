@@ -40,6 +40,7 @@ KEYTIMEOUT=1
 setopt zle
 autoload -U compinit
 compinit -u
+zstyle ":completion:*" completer _expand _complete _ignored
 zstyle ":completion:*:default" list-colors "no=<NO>" "fi=<FI>" "di=<DI>" "ln=<LN>" "pi=<PI>" "so=<SO>" "bd=<BD>" "cd=<CD>" "ex=<EX>" "mi=<MI>" "tc=<TC>" "sp=<SP>" "lc=<LC>" "ec=<EC>\n" "rc=<RC>"
 zstyle ":completion:*" group-name ""
 zstyle ":completion:*:messages" format "<MESSAGE>%d</MESSAGE>
@@ -50,9 +51,9 @@ zstyle ":completion:*:options" verbose yes
 zstyle ":completion:*:values" verbose yes
 setopt noalwayslastprompt listrowsfirst completeinword
 zmodload zsh/complist
-expand-or-complete-with-report () {
-  print -lr "<WIDGET><expand-or-complete>"
-  zle expand-or-complete
+complete-word-with-report () {
+  print -lr "<WIDGET><complete-word>"
+  zle complete-word
   print -lr - "<LBUFFER>$LBUFFER</LBUFFER>" "<RBUFFER>$RBUFFER</RBUFFER>"
   zle clear-screen
   zle -R
@@ -80,11 +81,11 @@ zle-finish () {
   (( $+mark )) && print -lr "MARK: $mark"
   zle accept-line
 }
-zle -N expand-or-complete-with-report
+zle -N complete-word-with-report
 zle -N list-choices-with-report
 zle -N comp-finish
 zle -N zle-finish
-bindkey "^I" expand-or-complete-with-report
+bindkey "^I" complete-word-with-report
 bindkey "^D" list-choices-with-report
 bindkey "^Z" comp-finish
 bindkey "^X" zle-finish
