@@ -49,7 +49,7 @@ if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" get-revision ; then
         # Settling for a short (but unique!) hash because getting the full
         # 40-char hash in addition to all the other info we want isn't
         # available in a single hg invocation
-        hgid_args=( id -i -n -b )
+        hgid_args=( id -i -n )
 
         # Looking for changes is a tad bit slower since the dirstate cache must
         # first be refreshed before being read
@@ -58,12 +58,12 @@ if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" get-revision ; then
 
         local HGPLAIN
         HGPLAIN=1 ${vcs_comm[cmd]} ${(z)hgid_args} 2> /dev/null \
-            | read -r r_csetid r_lrev r_branch
+            | read -r r_csetid r_lrev
     fi
 fi
 
 # If the user doesn't opt to invoke hg we can still get the current branch
-if [[ -z ${r_branch} && -r ${branchfile} ]] ; then
+if [[ -r ${branchfile} ]] ; then
     r_branch=$(< ${branchfile})
 fi
 

@@ -1,3 +1,10 @@
+2021-04-21  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* users/26635 (tweaked):
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_hg: vcs_info hg:
+	Compute the branch name correctly when get-revision is set and
+	check-for-changes is not
+
 2021-04-20  Bart Schaefer  <schaefer@zsh.org>
 
 	* 48638: NEWS: mention TYPESET_TO_UNSET
