@@ -1,3 +1,8 @@
+2021-04-07  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 48425: Test/V05styles.ztst: Add an XFail test for a 'zstyle
+	-L' escaping bug (workers/48424).
+
 2021-04-06  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 48391: Src/Zle/compresult.c: correctly calculate display string
