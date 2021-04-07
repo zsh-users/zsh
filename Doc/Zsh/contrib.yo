@@ -1652,9 +1652,16 @@ Called in the tt(git) (with tt(stgit) or during rebase or merge), and tt(hg)
 is generated; the tt(use-quilt) zstyle must be true for tt(quilt) (the tt(mq)
 and tt(stgit) backends are active by default).
 
-This hook gets the names of all applied patches which tt(vcs_info) collected
-so far in the opposite order, which means that the first argument is the
+The arguments to this hook describe applied patches 
+in the opposite order, which means that the first argument is the
 top-most patch and so forth.
+
+When the patches' log messages can be extracted, those are embedded
+within each argument after a space, so each argument is of the form
+`var(patch-name) var(first line of the log message)', where var(patch-name)
+contains no whitespace. The tt(mq) backend passes arguments of
+the form `var(patch name)', with possible embedded spaces, but without
+extracting the patch's log message.
 
 When setting tt(ret) to non-zero, the string in
 tt(${hook_com[applied-string]}) will be
@@ -1669,8 +1676,10 @@ tt(mq)) backend and in tt(quilt) support when the tt(unapplied-string) is
 generated; the tt(get-unapplied) style must be true.
 
 This hook gets the names of all unapplied patches which tt(vcs_info)
-collected so far in order, which means that the first argument is
+in order, which means that the first argument is
 the patch next-in-line to be applied and so forth.
+
+The format of each argument is as for tt(gen-applied-string), above.
 
 When setting tt(ret) to non-zero, the string in
 tt(${hook_com[unapplied-string]}) will be available as tt(%u) in the

@@ -285,6 +285,54 @@ function +vi-hg-branchhead() {
 }
 
 
+### Show information about patch series
+# This is used with with hg mq, quilt, and git rebases and conflicts.
+#
+# All these cases have a notion of a "series of patches/commits" that is being
+# applied.  The following shows the information about the most recent patch to
+# have been applied:
+zstyle ':vcs_info:*+gen-applied-string:*' hooks gen-applied-string
+function +vi-gen-applied-string() {
+  # Separate the patch id from the patch log message.
+  if [[ $1 == *\ * ]]; then
+    local patch_name_or_filename="${1%% *}"
+    local patch_description="${1#* }"
+  else
+    local patch_name_or_filename="$1"
+    local patch_description=""
+  fi
+
+  # Apply escaping; see `Oddities' in the manual.
+  patch_name_or_filename=${patch_name_or_filename//'%'/%%}
+  patch_description=${patch_description//'%'/%%}
+
+  # Apply different colouring to the patch description.
+  if [[ -n ${patch_description} ]]; then
+    patch_description="%F{yellow}${patch_description}%f"
+  fi
+
+  # Re-assemble $1, escaped and coloured.
+  hook_com[applied-string]="${patch_name_or_filename} ${patch_description}"
+  ret=1
+}
+# The value of hook_com[applied-string] is incorporated into the %m expando
+# (see the 'patch-format' style for details), which is not included in the
+# 'formats' and 'actionformats' style by default, so to actually use this,
+# you'll need to add %m (or %Q under quilt in add-on mode) to your 'formats'
+# and 'actionformats' styles, as in:
+# 
+#     zstyle ':vcs_info:*' actionformats ' (%s)-[%b|%a]%u%c- %m'
+#     zstyle ':vcs_info:*' formats ' (%s)-[%b]%u%c- %m'
+# 
+# Or you could add it as a new word, as in:
+#
+#     zstyle ':vcs_info:*' actionformats ' (%s)-[%b|%a]%u%c-' '%m'
+#     zstyle ':vcs_info:*' formats ' (%s)-[%b]%u%c-' '%m'
+#
+# In the latter case, you will need to arrange to print ${vcs_info_msg_1_} in
+# addition to ${vcs_info_msg_0_}; see the top of this file for details.
+
+
 ### Run vcs_info selectively to increase speed in large repos ################
 
 # The following example shows a possible setup for vcs_info which displays
@@ -546,6 +594,9 @@ function +vi-set-quilt-patches() {
 
 # This would take care of all the dedicated-patches-directory-in-${HOME}
 # from earlier examples, too.
+
+# Finally, the "Show information about patch series" example above this section
+# may also be useful.
 
 
 ### Using vcs_info from CVS ##################################################

@@ -1,5 +1,9 @@
 2021-04-20  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 48435 (tweaked): Doc/Zsh/contrib.yo, Misc/vcs_info-examples:
+	vcs_info docs: applied-string/unapplied-string: Correct an
+	omission in the documentation and add an example.
+
 	* 48528/0002: Misc/vcs_info-examples: vcs_info git docs:
 	ahead/behind commits: Reduce the number of forks
 
