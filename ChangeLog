@@ -1,5 +1,8 @@
 2021-04-09  Oliver Kiddle  <opk@zsh.org>
 
+	* 48378: Completion/Zsh/Command/_compadd: complete compadd
+	options for other completion functions
+
 	* 48437: Completion/Unix/Command/_gdb: fix pid completion when
 	cursor is in the middle of the line
 
