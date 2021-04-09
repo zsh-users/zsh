@@ -171,5 +171,5 @@
   a=( ${(M)a:#*con*text*ke*y*val*u*e} )
   print -r -- "$a"
  )
--f:zstyle -L escapes the key (regression: workers/48424)
+0:zstyle -L escapes the key (regression: workers/48424)
 >zstyle $'con\C-@text' $'ke\C-@y' $'val\C-@u' e

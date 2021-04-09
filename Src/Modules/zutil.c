@@ -200,7 +200,8 @@ printstylenode(HashNode hn, int printflags)
 	else {
 	    printf("zstyle %s", (p->eval ? "-e " : ""));
 	    quotedzputs(p->pat, stdout);
-	    printf(" %s", s->node.nam);
+	    putchar(' ');
+	    quotedzputs(s->node.nam, stdout);
 	}
 	for (v = p->vals; *v; v++) {
 	    putchar(' ');

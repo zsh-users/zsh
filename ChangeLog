@@ -1,3 +1,9 @@
+2021-04-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 48432 (plus test change): Src/Modules/zutil.c,
+	Test/V05styles.ztst: Fix quoting of zstyle -L output for
+	-e styles, and enable test.
+
 2021-04-09  Oliver Kiddle  <opk@zsh.org>
 
 	* 48378: Completion/Zsh/Command/_compadd: complete compadd
