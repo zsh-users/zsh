@@ -1,5 +1,8 @@
 2021-04-11  Oliver Kiddle  <opk@zsh.org>
 
+	* Marc Chantreux: 48445: Completion/Unix/Command/_surfraw:
+	pluralize tags in _surfraw
+
 	* Marc Chantreux: users/26645: Completion/X/Command/_gv:
 	update options in gv completion
 

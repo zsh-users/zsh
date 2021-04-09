@@ -20,11 +20,11 @@ case $state in
   subcmd)
     args=(
       '-help[display help information]'
-      '*:string:_guard "^-*" "search string"'
+      '*: :_guard "^-*" "search string"'
     )
     case "$words[1]" in
       ask|cia|cnn|deblogs|excite|filesearching|foldoc|happypenguin|slashdot|slinuxdoc|sundocs|sunsolve|xxx)
-        _message -e string 'search string'
+        _message -e strings 'search string'
       ;;
       alioth)
         _arguments $args \
@@ -164,7 +164,7 @@ case $state in
           '-doc[view PTS documentation]' && ret=0
       ;;
       debsec)
-        _message -e string 'package name, bug number or CVE ID'
+        _message -e strings 'package name, bug number or CVE ID'
       ;; 
       deja)
         _arguments $args \
@@ -261,9 +261,9 @@ case $state in
           '-head=:display headlines:(on off)' \
           '-grid=:show results in grid:(on off)' \
           '-spell=:spelling tolerance:(off standard force)' \
-          '*:dictionary word:->dictword' && ret=0
+          '*:dictionary word:->words' && ret=0
 
-        [[ "$state" = dictword ]] && _wanted words expl 'dictionary word' \
+        [[ "$state" = words ]] && _wanted words expl 'dictionary word' \
             compadd $(look "${PREFIX}") && ret=0
       ;;
       netbsd|openbsd)
@@ -422,10 +422,10 @@ case $state in
           '-results=-[specify number of results to return]:number' && ret=0
       ;;
       yubnub)
-        _message -e command 'Yubnub Command'
+        _message -e commands 'Yubnub Command'
       ;;
       *)
-        _message -e string 'search string'
+        _message -e strings 'search string'
       ;;
     esac
   ;;
@@ -434,7 +434,7 @@ case $state in
     local it
     # list the applets
     set -- ${${(f)"$(_call_program elvi surfraw -elvi)"}%%[[:space:]]##-- *}
-    shift # the first line is an header: remove it
+    shift # the first line is a header: remove it
     # then list the bookmarks
     for it in \
       $^xdg_config_dirs/surfraw/bookmarks(Nr) \
