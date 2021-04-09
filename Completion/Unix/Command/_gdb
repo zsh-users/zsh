@@ -40,9 +40,9 @@ else
   (-b)     _baudrates && return 0 ;;
   esac
 
-  w=( "${(@)words[2,-1]}" )
+  w=( "${(@)words[2,CURRENT-1]}" )
   while [[ "$w[1]" = -* ]]; do
-    [[ "$w[1]" = -[decsxb] ]] && shift 1 w
+    [[ "$w[1]" = -(cd|se|tty|[decsxb]) ]] && shift 1 w
     shift 1 w
   done
 

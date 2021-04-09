@@ -1,5 +1,8 @@
 2021-04-09  Oliver Kiddle  <opk@zsh.org>
 
+	* 48437: Completion/Unix/Command/_gdb: fix pid completion when
+	cursor is in the middle of the line
+
 	* Felipe Contreras: 47786: aclocal.m4, aczsh.m4: prepare for
 	autoconf 2.70
 
