@@ -7155,11 +7155,16 @@ __git_files () {
   local pref=${(Q)${~PREFIX}}
   [[ $pref[1] == '/' ]] || pref=$gittoplevel$gitprefix$pref
 
-  # First allow ls-files to pattern-match in case of remote repository
-  files=(${(0)"$(_call_program files git ls-files -z --exclude-standard ${(q)opts} -- ${(q)${pref:+$pref\*}:-.} 2>/dev/null)"})
+  # First allow ls-files to pattern-match in case of remote repository. Use the
+  # icase pathspec magic word to ensure that we support case-insensitive path
+  # completion for users with the appropriate matcher configuration
+  files=(${(0)"$(_call_program files git ls-files -z --exclude-standard ${(q)opts} -- ${(q)${pref:+:\(icase\)$pref\*}:-.} 2>/dev/null)"})
   __git_command_successful $pipestatus || return
 
-  # If ls-files succeeded but returned nothing, try again with no pattern
+  # If ls-files succeeded but returned nothing, try again with no pattern. Note
+  # that ls-files defaults to the CWD if not given a path, so if the file we
+  # were trying to add is in an *adjacent* directory, this won't return anything
+  # helpful either
   if [[ -z "$files" && -n "$pref" ]]; then
     files=(${(0)"$(_call_program files git ls-files -z --exclude-standard ${(q)opts} -- 2>/dev/null)"})
     __git_command_successful $pipestatus || return
