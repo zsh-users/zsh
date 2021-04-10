@@ -144,6 +144,10 @@ reverse order, from last applied to first applied.
 variables without a preceding '$' sign in shell arithmetic expansion
 and in the double-parentheses and 'let' arithmetic commands.
 
+3) _alternative now correctly handles the same (...) action syntax as
+_arguments; this may necessitate quoting/escaping in calls to _alternative
+and _regex_arguments that wasn't previously required.
+
 Incompatibilities between 5.5.1 and 5.6.2
 ------------------------------------------
 

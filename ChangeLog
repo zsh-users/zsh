@@ -1,5 +1,8 @@
 2021-04-10  dana  <dana@dana.is>
 
+	* unposted (see 48415): README: Document incompatibility
+	caused by workers/43928
+
 	* 48338: Completion/Unix/Command/_git: Support case-insensitive
 	path matching
 
