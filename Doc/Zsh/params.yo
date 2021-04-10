@@ -393,6 +393,11 @@ is compared to the pattern, and the first matching key found is the
 result.  On failure substitutes the length of the array plus one, as
 discussed under the description of `tt(r)', or the empty string for an
 associative array.
+
+Note: Although `tt(i)' may be applied to a scalar substitution to find
+the offset of a substring, the results are likely to be misleading when
+searching within substitutions that yield an empty string, or when
+searching for the empty substring.
 )
 item(tt(I))(
 Like `tt(i)', but gives the index of the last match, or all possible
