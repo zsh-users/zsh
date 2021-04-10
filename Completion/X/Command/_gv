@@ -28,8 +28,11 @@ _arguments \
   '(--portrait --seascape --upsidedown)--landscape' \
   '(--portrait --landscape --upsidedown)--seascape' \
   '(--portrait --landscape --seascape)--upsidedown' \
-  --{help,spartan} \
   -{h,v} \
+  -{,-}{help,version} \
+  -{,-}{spartan,widgetless,presentation,fullscreen} \
+  -{,-}{infoSilent,infoErrors,infoAll} \
+  -{,-}'password=:password:' \
   '--arguments=:ghostscript arguments:' \
   '--page=:label of first page:' \
   '--media=:page size:(Letter Legal Statement Tabloid Ledger Folio Quarto 10x14 Executive A3 A4 A5 B4 B5)' \

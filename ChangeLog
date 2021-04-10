@@ -1,3 +1,8 @@
+2021-04-11  Oliver Kiddle  <opk@zsh.org>
+
+	* Marc Chantreux: users/26645: Completion/X/Command/_gv:
+	update options in gv completion
+
 2021-04-10  Bart Schaefer  <schaefer@zsh.org>
 
 	* 47913: Doc/Zsh/options.yo, Src/options.c, Src/pattern.c, Src/zsh.h:
