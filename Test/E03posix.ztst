@@ -4,7 +4,7 @@
 #
 
 %prep
- setopt POSIX_BUILTINS
+ setopt POSIX_BUILTINS TYPESET_DOES_NOT_SET
 
 %test
 

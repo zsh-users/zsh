@@ -2491,7 +2491,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 		return NULL;
 	    }
 	}
-	if (isset(POSIXBUILTINS))
+	if (isset(TYPESETDOESNOTSET))
 	    pm->node.flags |= PM_DEFAULTED;
     } else {
 	if (idigit(*pname))

@@ -257,6 +257,7 @@ static struct optname optns[] = {
 {{NULL, "sunkeyboardhack",    0},			 SUNKEYBOARDHACK},
 {{NULL, "transientrprompt",   0},			 TRANSIENTRPROMPT},
 {{NULL, "trapsasync",	      0},			 TRAPSASYNC},
+{{NULL, "typesetdoesnotset",  OPT_EMULATE|OPT_BOURNE},	 TYPESETDOESNOTSET},
 {{NULL, "typesetsilent",      OPT_EMULATE|OPT_BOURNE},	 TYPESETSILENT},
 {{NULL, "unset",	      OPT_EMULATE|OPT_BSHELL},	 UNSET},
 {{NULL, "verbose",	      0},			 VERBOSE},
