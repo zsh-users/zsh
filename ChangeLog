@@ -1,5 +1,8 @@
 2021-04-11  Oliver Kiddle  <opk@zsh.org>
 
+	* Marc Chantreux: 48466: Completion/Unix/Command/_surfraw:
+	correct indentation and remove tabs and trailing spaces
+
 	* Marc Chantreux: 48445: Completion/Unix/Command/_surfraw:
 	pluralize tags in _surfraw
 

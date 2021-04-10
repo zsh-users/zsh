@@ -64,10 +64,10 @@ case $state in
           '*:search string' && ret=0
       ;;
       ctan)
-	_arguments $args \
-	'-name[search by filename]' \
-	'-desc[search descriptions (default)]'\
-	'-doc[search documentation]'
+        _arguments $args \
+          '-name[search by filename]' \
+          '-desc[search descriptions (default)]'\
+          '-doc[search documentation]'
       ;;
       currency)
         _arguments \
@@ -165,7 +165,7 @@ case $state in
       ;;
       debsec)
         _message -e strings 'package name, bug number or CVE ID'
-      ;; 
+      ;;
       deja)
         _arguments $args \
           '-results=-:[number of results to return]' \
@@ -183,7 +183,7 @@ case $state in
       ;;
       ebay)
         _arguments $args \
-          '-country=-:country:(com de uk fr)' \ 
+          '-country=-:country:(com de uk fr)' \
           '-results=-:[number of results to return]:number' && ret=0
       ;;
       etym)
@@ -220,7 +220,7 @@ case $state in
         _deb_packages avail && ret=0
       ;;
       fsfdir)
-	_arguments $args
+        _arguments $args
       ;;
       google)
         _arguments $args \
@@ -229,19 +229,19 @@ case $state in
           '-search=-:topic:(bsd linux mac unclesam)' && ret=0
       ;;
       gutenberg)
-	_arguments $args \
-	  '-title[search titles (default)]'
-	  '-author[search authors]'
-	  '-num[search etext numbers]'
-      ;;       
+        _arguments $args \
+          '-title[search titles (default)]'
+          '-author[search authors]'
+          '-num[search etext numbers]'
+      ;;
       imdb)
         _arguments $args \
           '-category=-:category:(All Titles MyMovies People Characters Quotes Bios Plots)' && ret=0
       ;;
       ixquick)
-	_arguments $args \
-	  '-search=-:search type:(web pics)' \
-	  '-lang=-:language:(english dansk deutsch espanol francais italiano nederlands norsk polski portugues suomi svenska turkce jiantizhongwen nihongo fantizhengwen hangul)'
+        _arguments $args \
+          '-search=-:search type:(web pics)' \
+          '-lang=-:language:(english dansk deutsch espanol francais italiano nederlands norsk polski portugues suomi svenska turkce jiantizhongwen nihongo fantizhengwen hangul)'
       ;;
       jake)
         _arguments $args \
@@ -386,20 +386,20 @@ case $state in
           :URL:_urls && ret=0
       ;;
       wayback)
-	_arguments $args \
-	  '-syear=-[start search from this year]:year' \
-	  '-smonth=-:[start search from this month]:month:(jan feb mar apr may jun jul aug sep oct nov dec)' \
-	  '-sday=-[start search from this day]:number' \
-	  '-eyear=-[end search in this year]:year' \
-	  '-emonth=-[end search in this month]:month:(jan feb mar apr may jun jul aug sep oct nov dec)' \
-	  '-eday=-[end search in this day]:number' \
-	  '-list[list all pages that match search criteria]' \
-	  '-dups[show dups]' \
-	  '-compare[compare pages]' \
-	  '-pdf[show as PDF]' \
-	  '-alias=-[how to handle site aliases]:alias:(merge show hide)' \
-	  '-redir=-[how to handle redirections]:redir:(hide flag show)' \
-	  '-type=-[file type to search for]:type:(image audio video binary text pdf)'
+        _arguments $args \
+          '-syear=-[start search from this year]:year' \
+          '-smonth=-:[start search from this month]:month:(jan feb mar apr may jun jul aug sep oct nov dec)' \
+          '-sday=-[start search from this day]:number' \
+          '-eyear=-[end search in this year]:year' \
+          '-emonth=-[end search in this month]:month:(jan feb mar apr may jun jul aug sep oct nov dec)' \
+          '-eday=-[end search in this day]:number' \
+          '-list[list all pages that match search criteria]' \
+          '-dups[show dups]' \
+          '-compare[compare pages]' \
+          '-pdf[show as PDF]' \
+          '-alias=-[how to handle site aliases]:alias:(merge show hide)' \
+          '-redir=-[how to handle redirections]:redir:(hide flag show)' \
+          '-type=-[file type to search for]:type:(image audio video binary text pdf)'
       ;;
       wetandwild)
         _arguments \
