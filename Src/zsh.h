@@ -2387,6 +2387,7 @@ enum {
     BSDECHO,
     CASEGLOB,
     CASEMATCH,
+    CASEPATHS,
     CBASES,
     CDABLEVARS,
     CDSILENT,

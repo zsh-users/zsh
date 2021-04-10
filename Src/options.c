@@ -105,6 +105,7 @@ static struct optname optns[] = {
 {{NULL, "bsdecho",	      OPT_EMULATE|OPT_SH},	 BSDECHO},
 {{NULL, "caseglob",	      OPT_ALL},			 CASEGLOB},
 {{NULL, "casematch",	      OPT_ALL},			 CASEMATCH},
+{{NULL, "casepaths",	      0},			 CASEPATHS},
 {{NULL, "cbases",	      0},			 CBASES},
 {{NULL, "cprecedences",	      OPT_EMULATE|OPT_NONZSH},	 CPRECEDENCES},
 {{NULL, "cdablevars",	      OPT_EMULATE},		 CDABLEVARS},

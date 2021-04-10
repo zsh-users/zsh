@@ -474,6 +474,22 @@ item(tt(CASE_MATCH) <D>)(
 Make regular expressions using the tt(zsh/regex) module (including
 matches with tt(=~)) sensitive to case.
 )
+pindex(CASE_PATHS)
+pindex(NO_CASE_PATHS)
+pindex(CASEPATHS)
+pindex(NOCASEPATHS)
+cindex(case-sensitive globbing, option)
+item(tt(CASE_PATHS))(
+If tt(CASE_PATHS) is not set (the default), tt(CASE_GLOB) affects the
+interpretation of em(every) path component, whenever a special
+character appears in em(any) component.  When tt(CASE_PATHS) is set,
+file path components that do em(not) contain special filename
+generation characters are always sensitive to case, thus restricting
+tt(NO_CASE_GLOB) to components that contain globbing characters.
+
+Note that if the filesystem itself is not sensitive to case, then
+tt(CASE_PATHS) has no effect.
+)
 pindex(CSH_NULL_GLOB)
 pindex(NO_CSH_NULL_GLOB)
 pindex(CSHNULLGLOB)

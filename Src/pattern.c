@@ -509,7 +509,7 @@ void
 patcompstart(void)
 {
     patcompcharsset();
-    if (isset(CASEGLOB))
+    if (isset(CASEGLOB) || isset(CASEPATHS))
 	patglobflags = 0;
     else
 	patglobflags = GF_IGNCASE;
@@ -631,6 +631,13 @@ patcompile(char *exp, int inflags, char **endexp)
     p->size = patsize;
     p->patmlen = len;
     p->patnpar = patnpar-1;
+
+#ifndef __CYGWIN__  /* The filesystem itself is case-insensitive on Cygwin */
+    if ((patflags & PAT_FILE) && !isset(CASEGLOB) && !(patflags & PAT_PURES)) {
+	p->globflags |= GF_IGNCASE;
+	p->globend |= GF_IGNCASE;
+    }
+#endif
 
     if (!strp) {
 	pscan = (Upat)(patout + startoff);

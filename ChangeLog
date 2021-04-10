@@ -1,3 +1,8 @@
+2021-04-10  Bart Schaefer  <schaefer@zsh.org>
+
+	* 47913: Doc/Zsh/options.yo, Src/options.c, Src/pattern.c, Src/zsh.h:
+	implement CASE_PATHS option to make NO_CASE_GLOB more sensible
+
 2021-04-10  dana  <dana@dana.is>
 
 	* unposted (see 48415): README: Document incompatibility
