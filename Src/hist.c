@@ -2664,7 +2664,7 @@ readhistfile(char *fn, int err, int readflags)
 	pushheap();
 	if (readflags & HFILE_FAST && lasthist.text) {
 	    if (lasthist.fpos < lasthist.fsiz) {
-		fseek(in, lasthist.fpos, 0);
+		fseek(in, lasthist.fpos, SEEK_SET);
 		searching = 1;
 	    }
 	    else {
@@ -2741,7 +2741,7 @@ readhistfile(char *fn, int err, int readflags)
 		     && histstrcmp(pt, lasthist.text) == 0)
 			searching = 0;
 		    else {
-			fseek(in, 0, 0);
+			fseek(in, 0, SEEK_SET);
 			histfile_linect = 0;
 			searching = -1;
 		    }

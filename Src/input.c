@@ -495,9 +495,9 @@ stuff(char *fn)
 	zerr("can't open %s", fn);
 	return 1;
     }
-    fseek(in, 0, 2);
+    fseek(in, 0, SEEK_END);
     len = ftell(in);
-    fseek(in, 0, 0);
+    fseek(in, 0, SEEK_SET);
     buf = (char *)zalloc(len + 1);
     if (!(fread(buf, len, 1, in))) {
 	zerr("read error on %s", fn);

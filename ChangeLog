@@ -1,5 +1,11 @@
 2021-04-11  Oliver Kiddle  <opk@zsh.org>
 
+	* 48504: Src/hist.c, Src/input.c, Src/watch.c:
+	use SEEK_ macros in fseek() calls
+
+	* Michael Stapelberg: 45396: Src/hist.c: readhistfile:
+	avoid thousands of lseek(2) syscalls via ftell()
+
 	* Marc Chantreux: 48466: Completion/Unix/Command/_surfraw:
 	correct indentation and remove tabs and trailing spaces
 

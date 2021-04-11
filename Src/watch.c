@@ -169,9 +169,9 @@ getlogtime(WATCH_STRUCT_UTMP *u, int inout)
 	return u->ut_time;
     if (!(in = fopen(WATCH_WTMP_FILE, "r")))
 	return time(NULL);
-    fseek(in, 0, 2);
+    fseek(in, 0, SEEK_END);
     do {
-	if (fseek(in, ((first) ? -1 : -2) * sizeof(WATCH_STRUCT_UTMP), 1)) {
+	if (fseek(in, ((first) ? -1 : -2) * sizeof(WATCH_STRUCT_UTMP), SEEK_CUR)) {
 	    fclose(in);
 	    return time(NULL);
 	}
