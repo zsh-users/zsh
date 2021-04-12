@@ -1,3 +1,7 @@
+2021-04-12  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 48439: Src/mem.c: remove macros that became unnecessary by 47785
+
 2021-04-11  Oliver Kiddle  <opk@zsh.org>
 
 	* 48504: Src/hist.c, Src/input.c, Src/watch.c:
