@@ -149,7 +149,8 @@ F:This may also need to apply to multibyte whitespace
 ><1>
 
   ARGV0=sh $ZTST_testdir/../Src/zsh -c 'inf=42; echo $((inf))'
-0f:The math constant Inf is case-sensitive, with capital I
+0f:All identifiers are variable references in POSIX arithmetic
+F:POSIX has neither math functions nor floating point
 >42
 
   ARGV0=sh $ZTST_testdir/../Src/zsh -c 'EUID=10; echo "$EUID"'
