@@ -1926,6 +1926,16 @@ If the option is set, they will only be shown when parameters are selected
 with the `tt(-m)' option.  The option `tt(-p)' is available whether or not
 the option is set.
 )
+pindex(TYPESET_TO_UNSET)
+pindex(NO_TYPESET_TO_UNSET)
+pindex(TYPESETTOUNSET)
+pindex(NOTYPESETTOUNSET)
+item(tt(TYPESET_TO_UNSET) <K> <S>)(
+When declaring a new parameter with any of the `tt(typeset)' family of
+related commands, the parameter remains unset unless and until a
+value is explicity assigned to it, either in the `tt(typeset)' command
+itself or as a later assignment statement.
+)
 pindex(VERBOSE)
 pindex(NO_VERBOSE)
 pindex(NOVERBOSE)

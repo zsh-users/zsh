@@ -4,7 +4,7 @@
 #
 
 %prep
- setopt POSIX_BUILTINS TYPESET_DOES_NOT_SET
+ setopt POSIX_BUILTINS TYPESET_TO_UNSET
 
 %test
 
@@ -117,3 +117,46 @@
   }
 0:readonly with typeset -p
 >typeset -g -r var
+
+# Tests expected to fail
+
+  echo -
+0f:A single "-" for echo does not end the arguments
+F:POSIX requires a solitary "-" to be a plain argument
+>-
+
+  ARGV0=sh $ZTST_testdir/../Src/zsh -c 'foreach() { true; }'
+-f:"foreach" is not a reserved word
+
+  ARGV0=sh $ZTST_testdir/../Src/zsh -c 'end() { true; }
+-f:"end" is not a reserved word
+
+  a='a:b:' ARGV0=sh $ZTST_testdir/../Src/zsh -c 'IFS=:; printf "<%s>\n" $a'
+0f:IFS is a separator, not a delimiter
+><a>
+><b>
+
+  a=$'\ra\r\rb' ARGV0=sh $ZTST_testdir/../Src/zsh -c 'IFS=:; printf "<%s>\n" $a'
+0f:All whitespace characters are "IFS whitespace"
+F:isspace('\r') is true so \r should behave like space, \t, \n
+F:This may also need to apply to multibyte whitespace
+><a>
+><b>
+
+  ARGV0=sh $ZTST_testdir/../Src/zsh -c 'IFS=2; printf "<%s>\n" $((11*11))'
+0f:IFS applies to math results (numbers treated as strings)
+><1>
+><1>
+
+  ARGV0=sh $ZTST_testdir/../Src/zsh -c 'inf=42; echo $((inf))'
+0f:The math constant Inf is case-sensitive, with capital I
+>42
+
+  ARGV0=sh $ZTST_testdir/../Src/zsh -c 'EUID=10; echo "$EUID"'
+-f:EUID is not a special variable
+>10
+
+  ARGV0=sh $ZTST_testdir/../Src/zsh -c "printf '<%10s>\n' St$'\M-C\M-)'phane"
+0f:Width of %s is computed in bytes not characters
+F:This is considered a bugfix in zsh
+><  Stéphane>
