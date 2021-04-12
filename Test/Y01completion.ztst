@@ -240,7 +240,7 @@ F:regression test workers/31611
   comptesteval "zstyle ':completion:*:tst:*' ignored-patterns 2"
   comptest $'tst 1,\t'
   comptesteval "zstyle -d ':completion:*:tst:*' ignored-patterns"
-0:-F doesn't break _sequence
+0:-F does not break _sequence
 >line: {tst 1,}{}
 >DESCRIPTION:{desc}
 >NO:{2}
@@ -254,6 +254,33 @@ F:regression test workers/31611
 >DI:{dir2}
 >FI:{file1}
 >FI:{file2}
+
+  comptesteval "bar=({$'\\0'..$'\\C-?'}); baz=\$bar"
+  comptesteval 'zstyle ":completion:*:parameters" extra-verbose yes'
+  comptesteval 'zstyle ":completion:*" fake-parameters bar baz:array'
+  comptest $': $ba\t'
+0:extra-verbose shows parameter values
+>line: {: $ba}{}
+>DESCRIPTION:{parameter}
+>NO:{bar  -- '^@' '^A' '^B' '^C' '^D' '^E' '^F' '^G' '^H' '\t' '\n' '^K' '^L' '^M}
+>NO:{baz  -- '^@ ^A ^B ^C ^D ^E ^F ^G ^H \t \n ^K ^L ^M ^N ^O ^P ^Q ^R ^S ^T ^U ^}
+
+  comptesteval "path=( $ZTST_srcdir:A )"
+  comptesteval 'typeset -H paths=HIDDEN'
+  comptest $': $path\t'
+0:extra-verbose doesn't show special or hidden parameter values
+>line: {: $path}{}
+>DESCRIPTION:{parameter}
+>NO:{path}
+>NO:{paths}
+
+  comptesteval 'zstyle -d ":completion:*:parameters" extra-verbose'
+  comptest $': $ba\t'
+0:parameter values not shown without extra-verbose
+>line: {: $ba}{}
+>DESCRIPTION:{parameter}
+>NO:{bar}
+>NO:{baz}
 
   comptesteval '_tst() { local disp=( {a..z} ); compadd -ld disp $disp[@]; comppostfuncs=( _pst ) }'
   comptesteval '_pst() { local disp=( "<INSERT>$compstate[insert]</INSERT>" ); compadd -Qld disp $disp }'

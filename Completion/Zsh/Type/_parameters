@@ -6,18 +6,39 @@
 # If you specify a -g option with a pattern, the pattern will be used to
 # restrict the type of parameters matched.
 
-local expl pattern fakes faked tmp i pfilt
-
 if compset -P '*:'; then
   _history_modifiers p
   return
 fi
 
-pattern=(-g \*)
+local MATCH i pfilt
+local -i MBEGIN MEND nm=$compstate[nmatches]
+local -a expl pattern=(-g \*) normal described verbose faked fakes tmp
+
+zstyle -t ":completion:${curcontext}:parameters" prefix-needed &&
+    [[ $PREFIX != [_.]* ]] &&
+        pfilt='[^_.]'
+_description parameters expl parameter
 zparseopts -D -K -E g:=pattern
 
-fakes=()
-faked=()
+if zstyle -t ":completion:${curcontext}:parameters" extra-verbose; then
+  described=(
+      "${(@M)${(@k)parameters[(R)$~pattern[2]~*(hideval|local|special)*]}:#$~pfilt*}"
+  )
+  compadd "$@" "$expl[@]" -D described -a - described
+  if (( $#described )); then
+    verbose=(
+        ${described[@]:/(#m)*/"${MATCH}:${(@q+)${(Pkv@q+)MATCH}//\\/\\\\}"} )
+    _describe -t parameters parameter verbose "$@" "$expl[@]"
+  fi
+
+  normal=(
+      "${(@M)${(@k)parameters[(R)$~pattern[2]~^(*(hideval|special)*)~*local*]}:#$~pfilt*}"
+  )
+else
+  normal=( "${(@M)${(@k)parameters[(R)$~pattern[2]~*local*]}:#$~pfilt*}" )
+fi
+
 if zstyle -a ":completion:${curcontext}:" fake-parameters tmp; then
   for i in "$tmp[@]"; do
     if [[ "$i" = *:* ]]; then
@@ -27,13 +48,8 @@ if zstyle -a ":completion:${curcontext}:" fake-parameters tmp; then
     fi
   done
 fi
+compadd "$@" "$expl[@]" - "$normal[@]" "${(@)fakes:|described}" \
+    "${(@)${(@)${(@M)faked:#${~pattern[2]}}%%:*}:|described}"
 
-zstyle -t ":completion:${curcontext}:parameters" prefix-needed && \
- [[ $PREFIX != [_.]* ]] && \
- pfilt='[^_.]'
-
-_wanted parameters expl parameter \
-    compadd "$@" -Q - \
-        "${(@M)${(@k)parameters[(R)${pattern[2]}~*local*]}:#${~pfilt}*}" \
-        "$fakes[@]" \
-        "${(@)${(@M)faked:#${~pattern[2]}}%%:*}"
+(( compstate[nmatches] > nm ))
+return 0

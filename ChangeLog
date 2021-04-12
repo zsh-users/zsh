@@ -1,5 +1,9 @@
 2021-04-16  Oliver Kiddle  <opk@zsh.org>
 
+	* Marlon Richert: 48513: Completion/Zsh/Type/_parameters,
+	Test/Y01completion.ztst: Let extra-verbose completion
+	show parameter values
+
 	* unposted: Etc/BUGS: update on bug list
 
 	* 48556: Completion/BSD/Command/_ipfw: new completion
