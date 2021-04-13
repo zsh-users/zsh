@@ -179,6 +179,9 @@ function +vi-git-st() {
     local ahead behind
     local -a gitstatus
 
+    # Exit early in case the worktree is on a detached HEAD
+    git rev-parse ${hook_com[branch]}@{upstream} >/dev/null 2>&1 || return 0
+
     ahead=$(git rev-list --count ${hook_com[branch]}@{upstream}..HEAD 2>/dev/null)
     (( $ahead )) && gitstatus+=( "+${ahead}" )
 
