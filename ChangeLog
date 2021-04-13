@@ -1,3 +1,8 @@
+2021-04-13  Tim Lee  <progscriptclone@gmail.com>
+
+	* 48525: Misc/vcs_info-examples: vcs_info git docs: ahead/behind
+	commits: Run fewer external programs
+
 2021-04-12  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 48439: Src/mem.c: remove macros that became unnecessary by 47785
