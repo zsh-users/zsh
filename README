@@ -150,7 +150,9 @@ and in the double-parentheses and 'let' arithmetic commands.
 
 3) _alternative now correctly handles the same (...) action syntax as
 _arguments; this may necessitate quoting/escaping in calls to _alternative
-and _regex_arguments that wasn't previously required.
+and _regex_arguments that wasn't previously required.  See
+https://zsh.org/workers/48414 (commit zsh-5.8-348-g2c000ee7b) for details
+and an example.
 
 Incompatibilities between 5.5.1 and 5.6.2
 ------------------------------------------
