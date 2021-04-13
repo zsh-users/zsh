@@ -1,5 +1,8 @@
 2021-04-20  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 48528/0002: Misc/vcs_info-examples: vcs_info git docs:
+	ahead/behind commits: Reduce the number of forks
+
 	* 48528/0001: Misc/vcs_info-examples: vcs_info git docs:
 	ahead/behind commits: Don't run rev-list when that would fail
 

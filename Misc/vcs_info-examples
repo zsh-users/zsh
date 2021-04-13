@@ -182,10 +182,14 @@ function +vi-git-st() {
     # Exit early in case the worktree is on a detached HEAD
     git rev-parse ${hook_com[branch]}@{upstream} >/dev/null 2>&1 || return 0
 
-    ahead=$(git rev-list --count ${hook_com[branch]}@{upstream}..HEAD 2>/dev/null)
-    (( $ahead )) && gitstatus+=( "+${ahead}" )
+    local -a ahead_and_behind=(
+        $(git rev-list --left-right --count HEAD...${hook_com[branch]}@{upstream} 2>/dev/null)
+    )
 
-    behind=$(git rev-list --count HEAD..${hook_com[branch]}@{upstream} 2>/dev/null)
+    ahead=${ahead_and_behind[1]}
+    behind=${ahead_and_behind[2]}
+
+    (( $ahead )) && gitstatus+=( "+${ahead}" )
     (( $behind )) && gitstatus+=( "-${behind}" )
 
     hook_com[misc]+=${(j:/:)gitstatus}
