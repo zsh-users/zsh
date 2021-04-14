@@ -259,6 +259,7 @@ static struct optname optns[] = {
 {{NULL, "transientrprompt",   0},			 TRANSIENTRPROMPT},
 {{NULL, "trapsasync",	      0},			 TRAPSASYNC},
 {{NULL, "typesetsilent",      OPT_EMULATE|OPT_BOURNE},	 TYPESETSILENT},
+{{NULL, "typesettounset",     OPT_EMULATE|OPT_BOURNE},	 TYPESETTOUNSET},
 {{NULL, "unset",	      OPT_EMULATE|OPT_BSHELL},	 UNSET},
 {{NULL, "verbose",	      0},			 VERBOSE},
 {{NULL, "vi",		      0},			 VIMODE},

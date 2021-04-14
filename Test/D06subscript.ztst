@@ -289,3 +289,8 @@ F:Regression test for workers/42297
 >14 24
 >b b
 >b?rbaz foob?r
+
+  i=1,3
+  [[ ${a[$i]} = ${a[i]} ]]
+0f:Math evaluation of commas in array subscripts
+F:In math, (($i)) should be the same as ((i)), see workers/47748.
