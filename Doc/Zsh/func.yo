@@ -206,7 +206,8 @@ findex(hook functions)
 For the functions below, it is possible to define an array that has the
 same name as the function with `tt(_functions)' appended.  Any element in
 such an array is taken as the name of a function to execute; it is executed
-in the same context and with the same arguments as the basic function.  For
+in the same context and with the same arguments and same initial value of tt($?)
+as the basic function.  For
 example, if tt($chpwd_functions) is an array containing the values
 `tt(mychpwd)', `tt(chpwd_save_dirstack)', then the shell attempts to
 execute the functions `tt(chpwd)', `tt(mychpwd)' and

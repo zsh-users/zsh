@@ -1,5 +1,8 @@
 2021-04-15  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 45583/0004: Doc/Zsh/func.yo: docs: Document that hook functions
+	may rely on $? (see workers/48570).
+
 	* 45583/0003: Doc/Zsh/contrib.yo: docs: Fix rendering in the
 	man page output
 
