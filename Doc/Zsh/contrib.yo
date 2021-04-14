@@ -1845,10 +1845,10 @@ Make sure you enclose the color codes in tt(%{)var(...)tt(%})
 if you want to use the string provided by tt(vcs_info) in prompts.
 
 Here is how to print the VCS information as a command (not in a prompt):
-example(alias vcsi='vcs_info command; vcs_info_lastmsg')
+example(alias vcsi='vcs_info interactive; vcs_info_lastmsg')
 
 This way, you can even define different formats for output via
-tt(vcs_info_lastmsg) in the 'tt(:vcs_info:*:command:*)' namespace.
+tt(vcs_info_lastmsg) in the 'tt(:vcs_info:*:interactive:*)' namespace.
 
 Now as promised, some code that uses hooks:
 say, you'd like to replace the string `svn' by `subversion' in
