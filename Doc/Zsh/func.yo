@@ -212,7 +212,7 @@ example, if tt($chpwd_functions) is an array containing the values
 execute the functions `tt(chpwd)', `tt(mychpwd)' and
 `tt(chpwd_save_dirstack)', in that order.  Any function that does not exist
 is silently ignored.  A function found by this mechanism is referred to
-elsewhere as a `hook function'.  An error in any function causes subsequent
+elsewhere as a em(hook function).  An error in any function causes subsequent
 functions not to be run.  Note further that an error in a tt(precmd) hook
 causes an immediately following tt(periodic) function not to run (though
 it may run at the next opportunity).
