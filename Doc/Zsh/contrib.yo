@@ -1827,9 +1827,21 @@ If you do use tt(use-simple), please report if it does `the-right-thing[tm]'.
 
 Display the revision number in yellow for tt(bzr) and tt(svn):
 example(zstyle ':vcs_info:(svn|bzr):*' \ 
+       branchformat '%b%%F{yellow}:%r')
+
+The doubled percent sign is explained in
+ifzman(the bf(Oddities) section)ifnzman(noderef(vcs_info Oddities)).
+
+Alternatively, one can use the raw colour codes directly:
+
+example(zstyle ':vcs_info:(svn|bzr):*' \ 
        branchformat '%b%{'${fg[yellow]}'%}:%r')
 
-If you want colors, make sure you enclose the color codes in tt(%{)var(...)tt(%})
+Normally when a variable is interpolated into a format string, the variable
+needs to be tt(%)-escaped. In this example we skipped that because we assume
+the value of tt(${fg[yellow]}) doesn't contain any tt(%) signs.
+
+Make sure you enclose the color codes in tt(%{)var(...)tt(%})
 if you want to use the string provided by tt(vcs_info) in prompts.
 
 Here is how to print the VCS information as a command (not in a prompt):
