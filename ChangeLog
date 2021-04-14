@@ -1,5 +1,8 @@
 2021-04-15  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 45583/0002 (tweaked): Doc/Zsh/contrib.yo: docs: Fix rendering
+	of an example in the man page output
+
 	* 45583/0001: Doc/Zsh/func.yo: docs: Minor markup tweak
 
 2021-04-13  dana  <dana@dana.is>

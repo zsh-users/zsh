@@ -2028,7 +2028,9 @@ disabled.
 item(Declare cleanup)(
 If your function makes any other changes that should be undone when the
 theme is disabled, your setup function may call
+
 example(prompt_cleanup var(command))
+
 where var(command) should be suitably quoted.  If your theme is ever
 disabled or replaced by another, var(command) is executed with tt(eval).
 You may declare more than one such cleanup hook.
