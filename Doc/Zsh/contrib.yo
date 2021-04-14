@@ -2036,13 +2036,13 @@ disabled or replaced by another, var(command) is executed with tt(eval).
 You may declare more than one such cleanup hook.
 )
 item(Define preview)(
-Define or autoload a function tt(prompt_var(name)_preview) to display
+Define or autoload a function tt(prompt_)var(name)tt(_preview) to display
 a simulated version of your prompt.  A simple default previewer is
 defined by tt(promptinit) for themes that do not define their own.
 This preview function is called by `tt(prompt -p)'.
 )
 item(Provide help)(
-Define or autoload a function tt(prompt_var(name)_help) to display
+Define or autoload a function tt(prompt_)var(name)tt(_help) to display
 documentation or help text for your theme.
 This help function is called by `tt(prompt -h)'.
 )
