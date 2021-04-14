@@ -1510,7 +1510,7 @@ below for details.
 )
 findex(vcs_info_lastmsg)
 item(tt(vcs_info_lastmsg))(
-Outputs the last tt(${vcs_info_msg_*_}) value.
+Outputs the current values of tt(${vcs_info_msg_*_}).
 Takes into account the value of the tt(use-prompt-escapes) style in
 tt(':vcs_info:formats:command:-all-'). It also only prints tt(max-exports)
 values.

@@ -1,5 +1,8 @@
 2021-04-15  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 45583/0007: Doc/Zsh/contrib.yo: vcs_info docs:
+	vcs_info_lastmsg: Correct an ambiguous/wrong description.
+
 	* 45583/0006: Doc/Zsh/contrib.yo: vcs_info docs: Change
 	user-context name in an example, to avoid confusion with the
 	special-casing of the value `command' in vcs_info_lastmsg.
