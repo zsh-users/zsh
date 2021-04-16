@@ -1,5 +1,8 @@
 2021-05-18  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 48601/0001: Doc/Zsh/builtins.yo: docs: functions -M: Move an
+	example to be near the specification of the relevant flag
+
 	* 48594 (plus an "F:" line corresponding to the question there):
 	Test/E02xtrace.ztst: New tests for functions -t / functions -T
 

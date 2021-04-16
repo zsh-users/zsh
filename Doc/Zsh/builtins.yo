@@ -924,6 +924,12 @@ opening and matching closing parenthesis is passed to the function as a
 single argument, even if it includes commas or white space.  The minimum
 and maximum argument specifiers must therefore be 1 if given.  An empty
 argument list is passed as a zero-length string.
+Thus, the following string function takes a single argument, including
+the commas, and prints 11:
+
+example(stringfn+LPAR()RPAR() { (( $#1 )) }
+functions -Ms stringfn
+print $(( stringfn+LPAR()foo,bar,rod+RPAR() )))
 
 tt(functions -M) with no arguments lists all such user-defined functions in
 the same form as a definition.  With the additional option tt(-m) and
@@ -941,13 +947,6 @@ For example, the following prints the cube of 3:
 example(zmath_cube+LPAR()RPAR() { (( $1 * $1 * $1 )) }
 functions -M cube 1 1 zmath_cube
 print $(( cube+LPAR()3+RPAR() )))
-
-The following string function takes a single argument, including
-the commas, so prints 11:
-
-example(stringfn+LPAR()RPAR() { (( $#1 )) }
-functions -Ms stringfn
-print $(( stringfn+LPAR()foo,bar,rod+RPAR() )))
 )
 module(getcap)(zsh/cap)
 findex(getln)
