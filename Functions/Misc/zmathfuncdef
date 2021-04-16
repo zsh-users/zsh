@@ -78,7 +78,7 @@ if ! zmodload -e zsh/mathfunc; then
 fi
 
 {
-  eval "$fname() { (( $body )) }"
+  eval "$fname() { (( $body )); true }"
 } always {
   # Remove math function if shell function definition failed.
   if (( TRY_BLOCK_ERROR )); then
