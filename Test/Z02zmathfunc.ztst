@@ -20,4 +20,28 @@
 >0
 >0
 
+ echo $(( min(42, 43, 44) ))
+ echo $(( min(44, 42, 43) ))
+ echo $(( min(43, 44, 42) ))
+ #
+ echo $(( max(42, 43, 44) ))
+ echo $(( max(44, 42, 43) ))
+ echo $(( max(43, 44, 42) ))
+0:min() and max() with three arguments
+>42
+>42
+>42
+>44
+>44
+>44
+
+ echo $(( min() ))
+1:error test for min()
+?(eval):1: wrong number of arguments: min()
+
+ echo $(( max() ))
+1:error test for max()
+?(eval):1: wrong number of arguments: max()
+
+
 %clean
