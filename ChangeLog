@@ -1,5 +1,8 @@
 2021-05-18  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 48601/0004: Doc/Zsh/builtins.yo: docs: return: Give examples
+	of using arithmetic evaluation.
+
 	* 48601/0003: Doc/Zsh/builtins.yo: docs: functions -M: Add a
 	subheading and index entries.
 

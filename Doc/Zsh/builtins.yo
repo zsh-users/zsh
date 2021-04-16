@@ -1627,7 +1627,13 @@ cindex(functions, returning from)
 item(tt(return) [ var(n) ])(
 Causes a shell function or `tt(.)' script to return to
 the invoking script with the return status specified by
-an arithmetic expression var(n). If var(n)
+an arithmetic expression var(n).  
+For example, the following prints `tt(42)':
+
+example(() { integer foo=40; return "foo + 2" }
+echo $?)
+
+If var(n)
 is omitted, the return status is that of the last command
 executed.
 
@@ -1638,7 +1644,7 @@ will return to whatever it was previously processing; with a non-zero
 status, the shell will behave as interrupted except that the return
 status of the trap is retained.  Note that the numeric value of the signal
 which caused the trap is passed as the first argument, so the statement
-`tt(return $((128PLUS()$1)))' will return the same status as if the signal
+`tt(return "128PLUS()$1")' will return the same status as if the signal
 had not been trapped.
 )
 module(sched)(zsh/sched)
