@@ -1,5 +1,7 @@
 2021-04-16  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Etc/BUGS: update on bug list
+
 	* 48556: Completion/BSD/Command/_ipfw: new completion
 
 2021-04-16  Daniel Shahaf  <d.s@daniel.shahaf.name>
