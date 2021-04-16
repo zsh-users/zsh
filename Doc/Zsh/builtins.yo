@@ -914,9 +914,53 @@ expressions.  The name of the function in tt($0) is var(mathfn) (not
 var(shellfn) as would usually be the case), provided the option
 tt(FUNCTION_ARGZERO) is in effect.  The positional parameters in the shell
 function correspond to the arguments of the mathematical function call.
-The result of the last arithmetical expression evaluated
-inside the shell function (even if it is a form that normally only returns
-a status) gives the result of the mathematical function.
+
+The result of the last arithmetical expression evaluated inside the shell
+function gives the result of the mathematical function.  This is not limited to
+arithmetic substitutions of the form tt($+LPAR()+LPAR())var(...)tt(+RPAR()+RPAR()),
+but also includes arithmetical expressions evaluated in any other way, including
+by the tt(let) builtin,
+by tt(+LPAR()+LPAR())var(...)tt(+RPAR()+RPAR()) statements,
+and even
+by the tt(return) builtin
+and
+by array subscripts.
+Therefore, care must be taken not to use syntactical constructs that perform
+arithmetic evaluation after evaluating what is to be the result of the function.
+For example:
+
+example(# WRONG
+zmath_cube+LPAR()+RPAR() {
+  (( $1 * $1 * $1 ))
+  return 0
+}
+functions -M cube 1 1 zmath_cube
+print $(( cube+LPAR()3+RPAR() )))
+
+This will print `tt(0)' because of the tt(return).
+
+Commenting the tt(return) out would lead to a different problem: the
+tt(+LPAR()+LPAR())var(...)tt(+RPAR()+RPAR()) statement would become
+the last statement in the function, so the em(return status) (tt($?)) of the
+function would be non-zero (indicating failure) whenever the em(arithmetic
+result) of the function would happen to be zero (numerically):
+
+example(# WRONG
+zmath_cube+LPAR()+RPAR() {
+  (( $1 * $1 * $1 ))
+}
+functions -M cube 1 1 zmath_cube
+print $(( cube+LPAR()0+RPAR() )))
+
+Instead, the tt(true) builtin can be used:
+
+example(# RIGHT
+zmath_cube+LPAR()+RPAR() {
+  (( $1 * $1 * $1 ))
+  true
+}
+functions -M cube 1 1 zmath_cube
+print $(( cube+LPAR()3+RPAR() )))
 
 If the additional option tt(-s) is given to tt(functions -M), the
 argument to the function is a single string: anything between the
@@ -927,7 +971,7 @@ argument list is passed as a zero-length string.
 Thus, the following string function takes a single argument, including
 the commas, and prints 11:
 
-example(stringfn+LPAR()RPAR() { (( $#1 )) }
+example(stringfn+LPAR()RPAR() { (( $#1 )); true }
 functions -Ms stringfn
 print $(( stringfn+LPAR()foo,bar,rod+RPAR() )))
 
@@ -941,12 +985,6 @@ additional option tt(-m) the arguments are treated as patterns and
 all functions whose var(mathfn) matches the pattern are removed.  Note
 that the shell function implementing the behaviour is not removed
 (regardless of whether its name coincides with var(mathfn)).
-
-For example, the following prints the cube of 3:
-
-example(zmath_cube+LPAR()RPAR() { (( $1 * $1 * $1 )) }
-functions -M cube 1 1 zmath_cube
-print $(( cube+LPAR()3+RPAR() )))
 )
 module(getcap)(zsh/cap)
 findex(getln)
