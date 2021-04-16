@@ -1,5 +1,8 @@
 2021-05-18  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 48601/0003: Doc/Zsh/builtins.yo: docs: functions -M: Add a
+	subheading and index entries.
+
 	* 48601/0002: Doc/Zsh/builtins.yo: docs: functions -M: Document
 	the return status / result interdependency gotchas (cf. 48147).
 

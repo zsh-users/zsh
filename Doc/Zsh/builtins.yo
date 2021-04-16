@@ -893,6 +893,10 @@ without affecting the other.  A typical idiom is that var(oldfn) is the
 name of a library shell function which is then redefined to call
 tt(newfn), thereby installing a modified version of the function.
 
+em(The )tt(-M)em( and )tt(+M)em( flags)
+cindex(defining mathematical functions)
+cindex(functions, defining mathematical)
+
 Use of the tt(-M) option may not be combined with any of the options
 handled by tt(typeset -f).
 
@@ -929,6 +933,8 @@ Therefore, care must be taken not to use syntactical constructs that perform
 arithmetic evaluation after evaluating what is to be the result of the function.
 For example:
 
+findex(zmath_cube)
+findex(cube)
 example(# WRONG
 zmath_cube+LPAR()+RPAR() {
   (( $1 * $1 * $1 ))
