@@ -620,7 +620,7 @@
    print ${+pbro} >&2
    (typeset -g pbro=3)
    (pbro=4)
-   readonly -p pbro >&2   # shows up as "readonly" although unset
+   readonly -p >&2        # shows up as "readonly" although unset
    typeset -gr pbro       # idempotent (no error)...
    print ${+pbro} >&2     # ...so still readonly...
    typeset -g +r pbro     # ...can't turn it off
@@ -1050,23 +1050,21 @@
 
  $ZTST_testdir/../Src/zsh --emulate sh -f -c '
  PATH=/bin; export PATH; readonly PATH
- export -p PATH
+ export -p PATH		# Should be a no-op, -p ignored
  typeset -p PATH
  readonly -p'
 0: readonly/export output for exported+readonly+special when started as sh
->export PATH=/bin
 >export -r PATH=/bin
 >readonly PATH=/bin
 
  function {
  emulate -L sh
  MANPATH=/bin; export MANPATH; readonly MANPATH
- export -p MANPATH
+ export -p MANPATH	# Should be a no-op, -p ignored
  typeset -p MANPATH
  readonly -p
  }
 0: readonly/export output for exported+readonly+tied+special after switching to sh emulation
->export MANPATH=/bin
 >export -rT MANPATH manpath=( /bin )
 >readonly MANPATH=/bin
 

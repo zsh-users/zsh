@@ -5883,8 +5883,12 @@ printparamnode(HashNode hn, int printflags)
 	 * don't.
 	 */
 	if (printflags & PRINT_POSIX_EXPORT) {
+	    if (!(p->node.flags & PM_EXPORTED))
+		return;
 	    printf("export ");
 	} else if (printflags & PRINT_POSIX_READONLY) {
+	    if (!(p->node.flags & PM_READONLY))
+		return;
 	    printf("readonly ");
 	} else if (locallevel && p->level >= locallevel) {
 	    printf("typeset ");	    /* printf("local "); */

@@ -2615,7 +2615,12 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
     int on = 0, off = 0, roff, bit = PM_ARRAY;
     int i;
     int returnval = 0, printflags = 0;
-    int hasargs;
+    int hasargs = *argv != NULL || (assigns && firstnode(assigns));
+
+    /* POSIXBUILTINS is set for bash/ksh and both ignore -p with args */
+    if ((func == BIN_READONLY || func == BIN_EXPORT) &&
+	isset(POSIXBUILTINS) && hasargs)
+	ops->ind['p'] = 0;
 
     /* hash -f is really the builtin `functions' */
     if (OPT_ISSET(ops,'f'))
@@ -2695,7 +2700,6 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	    /* -p0 treated as -p for consistency */
 	}
     }
-    hasargs = *argv != NULL || (assigns && firstnode(assigns));
     if (!hasargs) {
 	int exclude = 0;
 	if (!OPT_ISSET(ops,'p')) {

@@ -1,5 +1,9 @@
 2021-04-18  Bart Schaefer  <schaefer@zsh.org>
 
+	* 47704: Src/builtin.c, Src/params.c, Test/B02typeset.ztst:
+	POSIX export and readonly ignore the "-p" option when parameter
+	names are also present.
+
 	* 48560: Completion/compinit, Doc/Zsh/builtins.yo,
 	Doc/Zsh/options.yo, Doc/Zsh/params.yo, Src/builtin.c,
 	Src/options.c, Src/params.c, Src/subst.c, Src/zsh.h,
