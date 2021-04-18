@@ -2491,6 +2491,8 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 		return NULL;
 	    }
 	}
+	if (isset(TYPESETTOUNSET))
+	    pm->node.flags |= PM_DEFAULTED;
     } else {
 	if (idigit(*pname))
 	    zerrnam(cname, "not an identifier: %s", pname);
@@ -2836,7 +2838,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	    unqueue_signals();
 	    return 1;
 	} else if (pm) {
-	    if (!(pm->node.flags & PM_UNSET)
+	    if ((!(pm->node.flags & PM_UNSET) || pm->node.flags & PM_DECLARED)
 		&& (locallevel == pm->level || !(on & PM_LOCAL))) {
 		if (pm->node.flags & PM_TIED) {
 		    if (PM_TYPE(pm->node.flags) != PM_SCALAR) {
@@ -2889,6 +2891,8 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	 *
 	 * Don't attempt to set it yet, it's too early
 	 * to be exported properly.
+	 *
+	 * This may create the array with PM_DEFAULTED.
 	 */
 	asg2.name = asg->name;
 	asg2.flags = 0;
@@ -2930,8 +2934,12 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	if (asg->value.array) {
 	    int flags = (asg->flags & ASG_KEY_VALUE) ? ASSPM_KEY_VALUE : 0;
 	    assignaparam(asg->name, zlinklist2array(asg->value.array, 1), flags);
-	} else if (oldval)
-	    assignsparam(asg0.name, oldval, 0);
+	} else if (asg0.value.scalar || oldval) {
+	    /* We have to undo what we did wrong with asg2 */
+	    apm->node.flags &= ~PM_DEFAULTED;
+	    if (oldval)
+		assignsparam(asg0.name, oldval, 0);
+	}
 	unqueue_signals();
 
 	return 0;

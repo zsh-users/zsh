@@ -1,3 +1,18 @@
+2021-04-18  Bart Schaefer  <schaefer@zsh.org>
+
+	* 48560: Completion/compinit, Doc/Zsh/builtins.yo,
+	Doc/Zsh/options.yo, Doc/Zsh/params.yo, Src/builtin.c,
+	Src/options.c, Src/params.c, Src/subst.c, Src/zsh.h,
+	Test/D06subscript.ztst, Test/E01options.ztst, Test/E03posix.ztst,
+	Test/V10private.ztst, Test/runtests.zsh, Test/ztst.zsh: add
+	TYPESET_TO_UNSET option, which removes initialization of newly
+	declared parameters such that ${newparam-notset} yields "notset"
+	and "typeset -p newparam" does not show an assignment to the
+	parameter.  This is similar to the default behavior of bash and
+	ksh, with minor differences in typeset output.  Also add tests for
+	some POSIX incompatibilities plus minor changes for test harness
+	robustness.
+
 2021-04-18  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* unposted: Etc/BUGS: remove a bug fixed by 47301
@@ -2909,7 +2924,7 @@ g
 
 2019-02-14  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* see 44062: back off change to ZLE per-line initiialisation,
+	* see 44062: back off change to ZLE per-line initialisation,
 	causing problems after failed reads and apparently not needed
 	for the intended fix of interrupt handling (40305 / 34656ec2).
 
@@ -15632,7 +15647,7 @@ g
 
 	* 32338: Doc/Makefile.in: create Doc/help.txt as an empty file
 	when Util/helpfiles fails, so that the rest of the build does not
-	yeild a spurious error
+	yield a spurious error
 
 	* 32337: Src/params.c: initialize several special parameters to
 	unset for better compatibility in emulation modes; for the same

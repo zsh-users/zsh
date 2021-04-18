@@ -165,6 +165,7 @@ _comp_options=(
     NO_posixidentifiers
     NO_shwordsplit
     NO_shglob
+    NO_typesettounset
     NO_warnnestedvar
     NO_warncreateglobal
 )
