@@ -1,3 +1,7 @@
+2021-04-18  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* unposted: Etc/BUGS: remove a bug fixed by 47301
+
 2021-04-17  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 48361 (+ 48368 review comments):
