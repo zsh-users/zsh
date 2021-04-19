@@ -1,5 +1,8 @@
 2021-04-19  Bart Schaefer  <schaefer@zsh.org>
 
+	* 48617: Completion/Base/Widget/_complete_debug: fix misuse of
+	IGNORE_BRACES when initializing debug_indent
+
 	* 47489: Functions/Misc/colors: rename standout as italic
 
 2021-04-19  Oliver Kiddle  <opk@zsh.org>
