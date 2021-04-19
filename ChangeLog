@@ -1,5 +1,8 @@
 2021-04-19  Oliver Kiddle  <opk@zsh.org>
 
+	* André Kugland: github/zsh-completions #792:
+	Completion/Unix/Command/_opustools: new opus-tools completion
+
 	* 48619: Completion/Unix/Command/_ansible: complete inventory
 	plugins in assignments to ANSIBLE_INVENTORY_ENABLED
 
