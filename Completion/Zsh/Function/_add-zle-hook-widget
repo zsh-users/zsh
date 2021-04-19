@@ -26,9 +26,12 @@ _add-zle-hook-widget() {
   local context state state_descr line
   typeset -A opt_args
   _arguments -s -w -S : \
-    '(-D)-d[remove HOOK from the array]' \
-    '(-d)-D[interpret HOOK as pattern to remove from the array]' \
-    {-U,-z,-k}"[passed to 'autoload']" \
+    "(-d -D -U -z -k)-L[output in form of 'zstyle' commands]" \
+    '(-L -D -U -z -k)-d[remove HOOK from the array]' \
+    '(-L -d -U -z -k)-D[interpret HOOK as pattern to remove from the array]' \
+    '(-L -d -D)-U[suppress alias expansion for functions]' \
+    '(-L -d -D -k)-z[mark function for zsh-style autoloading]' \
+    '(-L -d -D -z)-k[mark function for ksh-style autoloading]' \
     ':hook type:_add-zle-hook-widget_types' \
     ':widget:_add-zle-hook-widget_widgets'
 }

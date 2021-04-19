@@ -1,5 +1,9 @@
 2021-04-19  Oliver Kiddle  <opk@zsh.org>
 
+	* Marlon Richert: 48621: Completion/Zsh/Function/_add-zsh-hook,
+	Completion/Zsh/Function/_add-zle-hook-widget: Add -L to
+	add-(zsh|zle)-hook[-widget] completion
+
 	* André Kugland: github/zsh-completions #792:
 	Completion/Unix/Command/_opustools: new opus-tools completion
 
