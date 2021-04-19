@@ -1,4 +1,4 @@
-#compdef ansible ansible-config ansible-console ansible-doc ansible-galaxy ansible-inventory ansible-playbook ansible-pull ansible-vault -value-,ANSIBLE_STDOUT_CALLBACK,-default-
+#compdef ansible ansible-config ansible-console ansible-doc ansible-galaxy ansible-inventory ansible-playbook ansible-pull ansible-vault -value-,ANSIBLE_STDOUT_CALLBACK,-default- -value-,ANSIBLE_INVENTORY_ENABLED,-default-
 
 local curcontext="$curcontext" plug plugvar subcmd ign ret=1
 local -a args state line expl gactions
@@ -7,6 +7,10 @@ local -A opt_args
 case $service in
   *,ANSIBLE_STDOUT_CALLBACK,*)
     plug=callback
+    state=plugins
+  ;;
+  *,ANSIBLE_INVENTORY_ENABLED,*)
+    plug=inventory
     state=plugins
   ;;
   ansible|ansible-console|ansible-doc|ansible-playbook)
@@ -125,6 +129,7 @@ case $service in
       '(-y --yaml --vars --graph)--toml[use TOML format instead of JSON]'
       '(-y --yaml)--vars[add variables to the graph display]'
       '(-y --yaml --toml --vars --graph)'{-y,--yaml}'[use YAML format instead of JSON]'
+      ':host or group:->hosts'
     )
   ;;
   ansible-galaxy)
@@ -238,7 +243,7 @@ case $state in
   ;;
   galaxy)
     ign=''
-    gactions=( delete import info init install list login remove search setup )
+    gactions=( delete import info init install list remove search setup )
     case ${(j.:.)line[1,3]} in
       (role|collection):*:*)
         subcmd="${line[1]}-${line[2]}"
@@ -325,11 +330,6 @@ case $state in
            '--branch=[specify branch to import]:branch'
            '--role-name=[specify name the role should have]:role'
         )
-      ;;
-      role-login)
-	args+=(
-	  '--github-token=[identify with github token rather than username and password]'
-	)
       ;;
       collection-build)
         args+=(

@@ -1,5 +1,8 @@
 2021-04-19  Oliver Kiddle  <opk@zsh.org>
 
+	* 48619: Completion/Unix/Command/_ansible: complete inventory
+	plugins in assignments to ANSIBLE_INVENTORY_ENABLED
+
 	* 48618: Completion/Unix/Command/_date,
 	Completion/Unix/Command/_grep, Completion/Unix/Command/_netstat,
 	Completion/Unix/Command/_ping, Completion/Unix/Command/_readelf,
