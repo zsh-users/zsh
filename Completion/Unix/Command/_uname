@@ -68,6 +68,9 @@ else
 	'-K[print FreeBSD kernel version]'
 	'-U[print FreeBSD user environment version]'
       )
+    ;|
+    freebsd<13->.*)
+      args+=( "-b[print kernel's linker-generated build-id]" )
     ;;
     solaris*)
       args+=(

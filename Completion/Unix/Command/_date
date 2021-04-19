@@ -64,7 +64,7 @@ else
 	"*-v+[adjust and print (but don't set) date]:[+-]value[ymwdHMS]"
       )
     ;|
-    freebsd*|darwin*)
+    freebsd<-12>.*|darwin*)
       args+=(
 	'-d+:daylight saving time value'
 	'-t+:minutes west of GMT'

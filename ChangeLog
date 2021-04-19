@@ -1,3 +1,10 @@
+2021-04-19  Oliver Kiddle  <opk@zsh.org>
+
+	* 48618: Completion/Unix/Command/_date,
+	Completion/Unix/Command/_grep, Completion/Unix/Command/_netstat,
+	Completion/Unix/Command/_ping, Completion/Unix/Command/_readelf,
+	Completion/Unix/Command/_uname: update completions for FreeBSD 13
+
 2021-04-18  Bart Schaefer  <schaefer@zsh.org>
 
 	* 47704: Src/builtin.c, Src/params.c, Test/B02typeset.ztst:

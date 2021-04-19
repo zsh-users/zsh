@@ -43,6 +43,11 @@ case $variant in
       '--dyn-syms[show dynamic symbol table]'
     )
   ;|
+  elfutils|elftoolchain)
+    args+=(
+      '(-z --decompress)'{-z,--decompress}'[show compression information; decompress before dumping data]'
+    )
+  ;|
   binutils)
     args+=(
       \*{-R,--relocated-dump=}"[dump contents of specified section as relocated bytes]:section:($sections)"
@@ -60,7 +65,6 @@ case $variant in
       '--elf-section[used specified section as ELF input data]::section'
       '(-e --exception)'{-e,--exception}'[show sections for exception handling]'
       '(-N --numeric-addresses)'{-N,--numeric-addresses}"[don't find symbol names for addresses in DWARF data]"
-      '(-z --decompress)'{-z,--decompress}'[show compression information; decompress before dumping data]'
       '(--symbols)-s[show symbol table]'
       '(-s)--symbols=-[show symbol table]::section:(.dynsym .symtab)'
       '(--notes)-n[show core notes (if present)]'

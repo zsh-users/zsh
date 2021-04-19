@@ -11,7 +11,6 @@ case ${variant}:${${service#ping}:-4} in
     args+=(
       '-d[set SO_DEBUG on the socket]'
       '-n[show network addresses as numbers]'
-      '-M+[define mtu discovery]:mtu discovery:(do dont want)'
       '-v[verbose output]'
     )
   ;|
@@ -35,7 +34,7 @@ case ${variant}:${${service#ping}:-4} in
   iputils:*|solaris:*|((free|net)bsd|darwin|dragonfly)*:4)
     args+=( '-r[bypass normal routing tables]' )
   ;|
-  iputils:*|((free|net)bsd|darwin|dragonfly)*:4)
+  (iputils|freebsd<13->.*):*|(freebsd<-12>.|netbsd|darwin|dragonfly)*:4)
     args+=( '-a[audible bell for each packet]' )
   ;|
   iputils:*|netbsd*:4|openbsd*)
@@ -49,6 +48,9 @@ case ${variant}:${${service#ping}:-4} in
   (*bsd|darwin|dragonfly)*)
     args+=( '-I+[specify source interface for multicast packets]:interface:_net_interfaces' )
   ;|
+  freebsd<13->.*|openbsd*)
+    args+=( '-H[try reverse-lookups of addresses]' )
+  ;|
   freebsd*|darwin*|dragonfly*|netbsd*:6)
     args+=( '-S+[specify source address]:source address' )
   ;|
@@ -58,10 +60,13 @@ case ${variant}:${${service#ping}:-4} in
   (*bsd|darwin|dragonfly)*:4)
     args+=( "-D[set the don't fragment bit]" )
   ;|
+  (freebsd|openbsd|darwin)*:6)
+    args+=( '-D[disable IPv6 fragmentation]' )
+  ;|
   ((free|net)bsd|darwin|dragonfly)*:4)
     args+=( '-Q[somewhat quiet]')
   ;|
-  freebsd*:6|darwin*:6|solaris*|netbsd*)
+  freebsd<-12>.*:6|darwin*:6|solaris*|netbsd*)
     args+=(
       '*-g+[specify gateway to use as the next hop to the destination]:gateway:_hosts'
     )
@@ -71,10 +76,14 @@ case ${variant}:${${service#ping}:-4} in
   ;|
   ((free|net)bsd|darwin|dragonfly)*:6)
     args+=(
-      '-a+[generate ICMPv6 Node Information Node Addresses query]:address type:(a c g s l A)'
       '-b+[set socket buffer size]:buffer size'
-      '-H[try reverse-lookups of IPv6 addresses]'
       '-N[probe node information multicast group address]'
+    )
+  ;|
+  (freebsd<-12>.|netbsd|darwin|dragonfly)*:6)
+    args+=(
+      '-a+[generate ICMPv6 Node Information Node Addresses query]:address type:(a c g s l A)'
+      '-H[try reverse-lookups of IPv6 addresses]'
       '(-s)-t[generate ICMPv6 Node Information supported query types query]'
       '(-s)-w[generate ICMPv6 Node Information DNS Name query]' '!(-s)-W'
     )
@@ -91,30 +100,54 @@ case ${variant}:${${service#ping}:-4} in
       '-N+[specify a next-hop router that the probe packet should go through]:router:_hosts'
     )
   ;|
-  (freebsd|darwin|dragonfly)*:4)
+  freebsd<13->.*:6|(freebsd|darwin|dragonfly)*:4)
     args+=(
       '-A[audible bell for no packet]'
+      '-t+[specify timeout after which ping exits]:deadline (seconds)'
+      '-W+[specify time to wait for a response]:wait time (ms)'
+    )
+  ;|
+  (freebsd|darwin|dragonfly)*:4)
+    args+=(
       '-G+[specify maximum size for ICMP payload for sweeping pings]:size'
       '-g+[specify minimum size for ICMP payload for sweeping pings]:size [0]'
       '-h+[specify size increment for ICMP payload for sweeping pings]:size [1]'
       '-M+[use ICMP_MASKREQ or ICMP_TSTAMP instead of ICMP_ECHO]:ICMP:(mask time)'
       '-m+[set IP Time to Live for outgoing packets]:ttl'
       '-T+[set IP Time to Live for multicasted packets]:ttl'
-      '-t+[specify timeout after which ping exits]:deadline (seconds)'
-      '-W+[specify time to wait for a response]:wait time (ms)'
       '-z+[specify type of service]:type of service'
     )
   ;|
-  (freebsd|openbsd|darwin)*:6)
-    args+=( '-D[disable IPv6 fragmentation]' )
-  ;|
-  (freebsd|darwin)*:6)
+  (freebsd<-12>.*|darwin*):6)
     args+=(
       '-R[audible bell for no packet]'
       '-r[audible bell for each packet]'
     )
   ;|
-  freebsd*:6)
+  (iputils|freebsd<13->.*):4)
+    args+=(
+      '(-F -N)-4[use IPv4 only]'
+      '-6[use IPv6 only]'
+    )
+  ;|
+  freebsd<13->.*:4)
+    args+=(
+      '-C+[add an 802.1p Ethernet Priority Code Point when sending a packet]:pcp:(-1 0 1 2 3 4 5 6 7)'
+    )
+  ;|
+  freebsd<13->.*:6)
+    args+=(
+      '*-e+[specify gateway to use as the next hop to the destination]:gateway:_hosts'
+      '-k+[generate ICMPv6 Node Information Node Addresses query]:address type:(a c g s l A)'
+      '(-s)-O[generate ICMPv6 Node Information supported query types query]'
+      '*-u[suppress fragmentation to minimum MTU]'
+      '(-s)-Y[generate ICMPv6 Node Information DNS Name query with old packet format]'
+      '(-s)-y[generate ICMPv6 Node Information DNS Name query]'
+      '-E[enable transport-mode IPsec encapsulated security payload]'
+      '-Z[enables transport-mode IPsec authentication header]'
+    )
+  ;|
+  freebsd<-12>.*:6)
     args+=(
       '-x+[specify time to wait for a response]:wait time (ms)'
       '-X+[specify timeout after which ping exits]:deadline (seconds)'
@@ -154,19 +187,12 @@ case ${variant}:${${service#ping}:-4} in
   ;;
   openbsd*)
     args+=(
-      '-H[try reverse-lookups of addresses]'
       '-E[audible bell for no packet]'
       '-e[audible bell for each packet]'
       '-T+[change TOS value]:TOS value:(critical inetcontrol lowdelay netcontrol throughput reliability ef af cs)'
       '-V+[specify routing table to be used]:routing table'
     )
   ;;
-  iputils:4)
-    args+=(
-      '(-F -N)-4[use IPv4 only]'
-      '-6[use IPv6 only]'
-    )
-  ;|
   iputils:*)
     args+=(
       '-A[adaptive]'
