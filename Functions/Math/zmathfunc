@@ -6,7 +6,12 @@ zsh_math_func_min() {
   shift
   local arg
   for arg ; do
-    (( $arg < result )) && result=$arg
+    (( arg < result ))
+    case $? in
+      (0) (( result = arg ));;
+      (1) ;;
+      (*) return $?;;
+    esac
   done
   (( result ))
   true # Careful here: `return 0` evaluates an arithmetic expression
@@ -19,7 +24,12 @@ zsh_math_func_max() {
   shift
   local arg
   for arg ; do
-    (( $arg > result )) && result=$arg
+    (( arg > result ))
+    case $? in
+      (0) (( result = arg ));;
+      (1) ;;
+      (*) return $?;;
+    esac
   done
   (( result ))
   true # Careful here: `return 0` evaluates an arithmetic expression
@@ -31,7 +41,7 @@ zsh_math_func_sum() {
   local sum
   local arg
   for arg ; do
-    (( sum += $arg ))
+    (( sum += arg ))
   done
   (( sum ))
   true # Careful here: `return 0` evaluates an arithmetic expression

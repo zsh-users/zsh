@@ -1,5 +1,9 @@
 2021-04-21  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 48606 + 48607 + unposted test: Functions/Math/zmathfunc,
+	Test/Z02zmathfunc.ztst: zmathfunc: Force arguments to be numbers
+	and catch errors.
+
 	* unposted (cf. 48156): Test/Z02zmathfunc.ztst: New test.
 
 	* users/26635 (tweaked):
