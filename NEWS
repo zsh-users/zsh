@@ -35,6 +35,12 @@ widgets.  This corresponds to long-standing behavior of other user ZLE
 widgets.  Use the _complete_debug widget to capture XTRACE output, or
 use "functions -T" to enable tracing of specific completion functions.
 
+With the new TYPESET_TO_UNSET option set, "typeset foo" leaves foo unset,
+in contrast to the default behavior which assigns foo="".  Any parameter
+attributes such as numeric type, sorting, and padding are retained until
+the parameter is explicitly unset or a conflicting value is assigned.
+This is similar to default behavior of bash and ksh.
+
 Changes from 5.7.1-test-3 to 5.8
 --------------------------------
 
