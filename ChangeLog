@@ -1,5 +1,7 @@
 2021-04-21  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted (cf. 48156): Test/Z02zmathfunc.ztst: New test.
+
 	* users/26635 (tweaked):
 	Functions/VCS_Info/Backends/VCS_INFO_get_data_hg: vcs_info hg:
 	Compute the branch name correctly when get-revision is set and

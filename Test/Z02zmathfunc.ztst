@@ -43,5 +43,10 @@
 1:error test for max()
 ?(eval):1: wrong number of arguments: max()
 
+ zsh_math_func_min "foo bar" x y z
+2dDf:check errors from an unsupported use-case (workers/48156)
+F:Calling zsh_math_func_min directly isn't a supported use-case, but if it
+F:returns zero, something's probably wrong.
+
 
 %clean
