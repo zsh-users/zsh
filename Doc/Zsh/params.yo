@@ -845,8 +845,9 @@ will be the value that was assigned plus the number of seconds
 since the assignment.
 
 Unlike other special parameters, the type of the tt(SECONDS) parameter can
-be changed using the tt(typeset) command.  Only integer and one of the
-floating point types are allowed.  For example, `tt(typeset -F SECONDS)'
+be changed using the tt(typeset) command.  The type may be changed only
+to one of the floating point types or back to integer.  For example,
+`tt(typeset -F SECONDS)'
 causes the value to be reported as a floating point number.  The
 value is available to microsecond accuracy, although the shell may
 show more or fewer digits depending on the use of tt(typeset).  See
