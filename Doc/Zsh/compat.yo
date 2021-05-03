@@ -74,3 +74,9 @@ tt(PROMPT_SUBST)
 and
 tt(SINGLE_LINE_ZLE)
 options are set if zsh is invoked as tt(ksh).
+
+Please note that, whilst reasonable efforts are taken to address
+incompatibilities when they arise, zsh does not guarantee complete
+emulation of other shells, nor POSIX compliance. For more information on
+the differences between zsh and other shells, please refer to chapter 2
+of the shell FAQ, uref(https://www.zsh.org/FAQ/).

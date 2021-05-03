@@ -1,5 +1,8 @@
 2021-05-03  dana  <dana@dana.is>
 
+	* 48551 (tweaked per 48565, 48629): Doc/Zsh/compat.yo: Add
+	disclaimer about POSIX compliance and emulation of other shells
+
 	* 48614 (tweaked per 48630): Doc/Zsh/builtins.yo,
 	Doc/Zsh/options.yo, README, Src/builtin.c, Test/B10getopts.ztst:
 	Calculate OPTIND according to POSIX_BUILTINS
