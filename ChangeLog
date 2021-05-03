@@ -1,5 +1,7 @@
 2021-05-03  dana  <dana@dana.is>
 
+	* unposted (see 48613): Etc/FAQ.yo: Move section 3.31 to 2.8
+
 	* unposted (see 48613): Doc/Zsh/metafaq.yo, Doc/Zsh/roadmap.yo:
 	Update http:// FAQ links to https://
 

@@ -103,6 +103,7 @@ Chapter 2:  How does zsh differ from...?
 2.5. bash?
 2.6. Shouldn't zsh be more/less like ksh/(t)csh?
 2.7. What is zsh's support for Unicode/UTF-8?
+2.8. Why does my bash script report an error when I run it under zsh?
 
 Chapter 3:  How to get various things to work
 3.1. Why does `$var' where `var="foo bar"' not do what I expect?
@@ -135,7 +136,6 @@ Chapter 3:  How to get various things to work
 3.28. How do I edit the input buffer in $EDITOR?
 3.29. Why does `which' output for missing commands go to stdout?
 3.30. Why doesn't the expansion mytt(*.{tex,aux,pdf}) do what I expect?
-3.31. Why does my bash script report an error when I run it under zsh?
 
 Chapter 4:  The mysteries of completion
 4.1. What is completion?
@@ -936,6 +936,67 @@ sect(What is zsh's support for Unicode/UTF-8?)
   fully below, see `Multibyte input and output'.
 
 
+sect(Why does my bash script report an error when I run it under zsh?)
+label(28)
+
+  em(tl;dr:) bash is not the reference implementation of zsh, and zsh is not
+  a bug-for-bug compatible reimplementation of bash.
+
+  bash and zsh are different programming languages.  They are not
+  interchangeable; programs written for either of these languages will,
+  in general, not run under the other.  (The situation is similar with
+  many other pairs of closely-related languages, such as Python 2 and
+  Python 3; C and C++; and even C89 and C11.)
+
+  When bash and zsh behave differently on the same input, whether zsh's
+  behaviour is a bug does not depend on what bash does on the same
+  input; rather, it depends on what zsh's user manual specifies.
+  (By way of comparison, it's not a bug in Emacs that mytt(:q!) doesn't
+  cause it to exit.)
+
+  That being said, the bash and zsh languages do have a common subset, and it is
+  feasible to write non-trivial pieces of code that would run under either of
+  them, if one is sufficiently familiar with both of them.  However,
+  a difference between bash's behaviour and zsh's does not imply that
+  zsh has a bug.  The difference might be a bug in zsh, a bug in bash, or
+  a bug in neither shell
+  (see link(3.1)(31) for an example).
+
+  The recommended way to deal with these differences depends on what kind
+  of piece of code is in question: a myem(script) or a myem(plugin).
+  
+  For em(scripts) emdash() external commands that
+  are located in tt($PATH), or located elsewhere and are executed by
+  giving their path explicitly (as in mytt(ls), mytt(/etc/rc.d/sshd),
+  and mytt(./configure)) emdash() the answer is simple:
+
+  Don't run bash scripts under zsh.  If the scripts were written for
+  bash, run them in bash.  There's absolutely no problem with having
+  mytt(#!/usr/bin/env bash) scripts even if mytt(zsh) is your shell for
+  interactive sessions.
+  
+  In fact, if you've recently changed to zsh, we myem(recommend) that
+  you keep your scripts as mytt(#!/usr/bin/env bash), at least for
+  a while: this would make the change more gradual and flatten your
+  learning curve.  Once you're used to zsh, you can decide for each
+  script whether to port it to zsh or keep it as-is.
+
+  For myem(plugins) emdash() pieces of code
+  executed within the shell itself, loaded via the mytt(.),
+  mytt(source), or mytt(autoload) builtins, added to mytt(.zshrc), or
+  pasted interactively at the shell prompt emdash() one may consider it
+  worthwhile to invest the effort to make them runnable under either shell.
+  However, as mentioned above, doing so requires one to be familiar with both
+  shells, and either steer clear of their differences or handle them explicitly
+  with conditional code (such as mytt(if test -n "$ZSH_VERSION")).
+
+  In summary,
+  if you'd like to run a bash script or plugin under zsh, you must port the script or plugin
+  properly, reviewing it line by line for differences between the two
+  languages and adjusting it accordingly, just like you would
+  when translating a book from American English to British English.
+
+
 chapter(How to get various things to work)
 
 sect(Why does mytt($var) where mytt(var="foo bar") not do what I expect?)
@@ -969,7 +1030,7 @@ label(31)
   whether you really want this behaviour, as it can produce unexpected
   effects for variables with entirely innocuous embedded spaces.  This
   can cause horrendous quoting problems when invoking scripts written
-  for other shells (see link(3.31)(331)).  The natural way to produce
+  for other shells (see link(2.8)(28)).  The natural way to produce
   word-splitting behaviour in zsh is via arrays.  For example,
   verb(
     set -A array one two three twenty
@@ -2051,67 +2112,6 @@ sect(Why doesn't the expansion mytt(*.{tex,aux,pdf}) do what I expect?)
   parentheses: again, see link(2.1)(21), and search for mytt(@+LPAR()).
   This is harder for the user to remember but easier for the shell to
   parse!
-
-
-sect(Why does my bash script report an error when I run it under zsh?)
-label(331)
-
-  em(tl;dr:) bash is not the reference implementation of zsh, and zsh is not
-  a bug-for-bug compatible reimplementation of bash.
-
-  bash and zsh are different programming languages.  They are not
-  interchangeable; programs written for either of these languages will,
-  in general, not run under the other.  (The situation is similar with
-  many other pairs of closely-related languages, such as Python 2 and
-  Python 3; C and C++; and even C89 and C11.)
-
-  When bash and zsh behave differently on the same input, whether zsh's
-  behaviour is a bug does not depend on what bash does on the same
-  input; rather, it depends on what zsh's user manual specifies.
-  (By way of comparison, it's not a bug in Emacs that mytt(:q!) doesn't
-  cause it to exit.)
-
-  That being said, the bash and zsh languages do have a common subset, and it is
-  feasible to write non-trivial pieces of code that would run under either of
-  them, if one is sufficiently familiar with both of them.  However,
-  a difference between bash's behaviour and zsh's does not imply that
-  zsh has a bug.  The difference might be a bug in zsh, a bug in bash, or
-  a bug in neither shell
-  (see link(3.1)(31) for an example).
-
-  The recommended way to deal with these differences depends on what kind
-  of piece of code is in question: a myem(script) or a myem(plugin).
-  
-  For em(scripts) emdash() external commands that
-  are located in tt($PATH), or located elsewhere and are executed by
-  giving their path explicitly (as in mytt(ls), mytt(/etc/rc.d/sshd),
-  and mytt(./configure)) emdash() the answer is simple:
-
-  Don't run bash scripts under zsh.  If the scripts were written for
-  bash, run them in bash.  There's absolutely no problem with having
-  mytt(#!/usr/bin/env bash) scripts even if mytt(zsh) is your shell for
-  interactive sessions.
-  
-  In fact, if you've recently changed to zsh, we myem(recommend) that
-  you keep your scripts as mytt(#!/usr/bin/env bash), at least for
-  a while: this would make the change more gradual and flatten your
-  learning curve.  Once you're used to zsh, you can decide for each
-  script whether to port it to zsh or keep it as-is.
-
-  For myem(plugins) emdash() pieces of code
-  executed within the shell itself, loaded via the mytt(.),
-  mytt(source), or mytt(autoload) builtins, added to mytt(.zshrc), or
-  pasted interactively at the shell prompt emdash() one may consider it
-  worthwhile to invest the effort to make them runnable under either shell.
-  However, as mentioned above, doing so requires one to be familiar with both
-  shells, and either steer clear of their differences or handle them explicitly
-  with conditional code (such as mytt(if test -n "$ZSH_VERSION")).
-
-  In summary,
-  if you'd like to run a bash script or plugin under zsh, you must port the script or plugin
-  properly, reviewing it line by line for differences between the two
-  languages and adjusting it accordingly, just like you would
-  when translating a book from American English to British English.
 
 
 chapter(The mysteries of completion)
