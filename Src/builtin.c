@@ -5568,6 +5568,11 @@ bin_getopts(UNUSED(char *name), char **argv, UNUSED(Options ops), UNUSED(int fun
     /* check for legality */
     if(opch == ':' || !(p = memchr(optstr, opch, lenoptstr))) {
 	p = "?";
+	/* Keep OPTIND correct if the user doesn't return after the error */
+	if (isset(POSIXBUILTINS)) {
+	    optcind = 0;
+	    zoptind++;
+	}
 	zsfree(zoptarg);
 	setsparam(var, ztrdup(p));
 	if(quiet) {
@@ -5584,6 +5589,11 @@ bin_getopts(UNUSED(char *name), char **argv, UNUSED(Options ops), UNUSED(int fun
     if(p[1] == ':') {
 	if(optcind == lenstr) {
 	    if(!args[zoptind]) {
+		/* Fix OPTIND as above */
+		if (isset(POSIXBUILTINS)) {
+		    optcind = 0;
+		    zoptind++;
+		}
 		zsfree(zoptarg);
 		if(quiet) {
 		    setsparam(var, ztrdup(":"));

@@ -96,3 +96,32 @@
   done
 0:missing option-argument (quiet mode)
 >:,x
+
+  # This function is written so it can be easily referenced against other shells
+  t() {
+    local o i=0 n=$1
+    shift
+    while [ $i -lt $n ]; do
+      i=$(( i + 1 ))
+      getopts a: o "$@" 2> /dev/null
+    done
+    printf '<%d>' "$OPTIND"
+  }
+  # Try all these the native way, then the POSIX_BUILTINS way
+  for 1 in no_posix_builtins posix_builtins; do (
+    setopt $1
+    print -rn - "$1: "
+    t 1
+    t 1 foo
+    t 1 -- foo
+    t 1 -a
+    t 1 -b
+    t 2 -a -b
+    t 4 -a -b -c -d -a
+    t 5 -a -b -c -a -b -c
+    t 5 -a -b -c -d -ax -a
+    print
+  ); done
+0:OPTIND calculation with and without POSIX_BUILTINS (workers/42248)
+>no_posix_builtins: <1><1><2><1><1><3><5><7><6>
+>posix_builtins: <1><1><2><2><2><3><6><7><7>

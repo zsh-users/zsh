@@ -2249,7 +2249,8 @@ command found in the path.
 
 Furthermore, the tt(getopts) builtin behaves in a POSIX-compatible
 fashion in that the associated variable tt(OPTIND) is not made
-local to functions.
+local to functions, and its value is calculated differently to match
+other shells.
 
 Moreover, the warning and special exit code from
 tt([[ -o )var(non_existent_option)tt( ]]) are suppressed.

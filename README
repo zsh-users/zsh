@@ -99,6 +99,9 @@ emulate sh: When zsh emulates sh, the final command in a pipeline is now run in
 a subshell.  This differs from the behavior in the native (zsh) mode, but is
 consistent with most other sh implementations.
 
+getopts now calculates OPTIND in a similar manner to other shells when the
+POSIX_BUILTINS option is enabled.
+
 Incompatibilities between 5.7.1 and 5.8
 ---------------------------------------
 

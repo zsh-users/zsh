@@ -982,7 +982,8 @@ vindex(OPTARG, use of)
 The first option to be examined may be changed by explicitly assigning
 to tt(OPTIND).  tt(OPTIND) has an initial value of tt(1), and is
 normally set to tt(1) upon entry to a shell function and restored
-upon exit (this is disabled by the tt(POSIX_BUILTINS) option).  tt(OPTARG)
+upon exit.  (The tt(POSIX_BUILTINS) option disables this, and also changes
+the way the value is calculated to match other shells.)  tt(OPTARG)
 is not reset and retains its value from the most recent call to
 tt(getopts).  If either of tt(OPTIND) or tt(OPTARG) is explicitly
 unset, it remains unset, and the index or option argument is not

@@ -1,3 +1,9 @@
+2021-05-03  dana  <dana@dana.is>
+
+	* 48614 (tweaked per 48630): Doc/Zsh/builtins.yo,
+	Doc/Zsh/options.yo, README, Src/builtin.c, Test/B10getopts.ztst:
+	Calculate OPTIND according to POSIX_BUILTINS
+
 2021-05-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 48767: Doc/Zsh/params.yo: docs: $SECONDS: Clarify what types
