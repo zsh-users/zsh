@@ -1,5 +1,8 @@
 2021-05-03  dana  <dana@dana.is>
 
+	* unposted (see 48613): Doc/Zsh/metafaq.yo, Doc/Zsh/roadmap.yo:
+	Update http:// FAQ links to https://
+
 	* 48551 (tweaked per 48565, 48629): Doc/Zsh/compat.yo: Add
 	disclaimer about POSIX compliance and emulation of other shells
 

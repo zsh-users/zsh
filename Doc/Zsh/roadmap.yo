@@ -49,7 +49,7 @@ The shell now supports the UTF-8 character set (and also others if
 supported by the operating system).  This is (mostly) handled transparently
 by the shell, but the degree of support in terminal emulators is variable.
 There is some discussion of this in the shell FAQ,
-uref(http://www.zsh.org/FAQ/).  Note in particular that for combining
+uref(https://www.zsh.org/FAQ/).  Note in particular that for combining
 characters to be handled the option tt(COMBINING_CHARS) needs to be set.
 Because the shell is now more sensitive to the definition of the
 character set, note that if you are upgrading from an older version of

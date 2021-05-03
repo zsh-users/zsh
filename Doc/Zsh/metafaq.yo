@@ -86,7 +86,7 @@ Zsh has a list of Frequently Asked Questions (FAQ), maintained by
 Peter Stephenson tt(<pws@zsh.org>).  It is regularly posted to the
 newsgroup bf(comp.unix.shell) and the bf(zsh-announce) mailing list.
 The latest version can be found at any of the Zsh FTP sites, or at
-uref(http://www.zsh.org/FAQ/).  The contact address for FAQ-related matters
+uref(https://www.zsh.org/FAQ/).  The contact address for FAQ-related matters
 is tt(<faqmaster@zsh.org>).
 texinode(The Zsh Web Page)(The Zsh Userguide)(The Zsh FAQ)(Introduction)
 sect(The Zsh Web Page)
