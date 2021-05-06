@@ -1,3 +1,8 @@
+2021-05-06  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 48787: Src/loop.c, Test/A01grammar.ztst: status was incorrect
+	on hard error flagged by condition in "if" without "else".
+
 2021-05-03  dana  <dana@dana.is>
 
 	* unposted (see 48613): Etc/FAQ.yo: Move section 3.31 to 2.8

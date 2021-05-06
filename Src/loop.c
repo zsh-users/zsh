@@ -583,7 +583,7 @@ execif(Estate state, int do_exec)
 	cmdpop();
     } else {
 	noerrexit = olderrexit;
-	if (!retflag)
+	if (!retflag && !errflag)
 	    lastval = 0;
     }
     state->pc = end;

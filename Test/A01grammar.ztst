@@ -939,3 +939,8 @@ F:Note that the behaviour of 'exit' inside try-list inside a function is unspeci
  $ZTST_testdir/../Src/zsh -fc '{ ( ) } always { echo foo }'
 0:exec last command optimization inhibited for try/always
 >foo
+
+ a='${'
+ if : ${(e)a}; then echo x; fi
+1:Status on bad substitution in if without else
+?(eval):2: bad substitution
