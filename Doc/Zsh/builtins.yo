@@ -1493,7 +1493,7 @@ findex(read)
 vindex(IFS, use of)
 redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ ))ifnztexi(     )))
 xitem(tt(read )[ tt(-rszpqAclneE) ] [ tt(-t) [ var(num) ] ] [ tt(-k) [ var(num) ] ] [ tt(-d) var(delim) ])
-item(SPACES()[ tt(-u) var(n) ] [ var(name)[tt(?)var(prompt)] ] [ var(name) ...  ])(
+item(SPACES()[ tt(-u) var(n) ] [ [var(name)][tt(?)var(prompt)] ] [ var(name) ...  ])(
 vindex(REPLY, use of)
 vindex(reply, use of)
 Read one line and break it into fields using the characters
