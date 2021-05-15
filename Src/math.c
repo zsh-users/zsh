@@ -864,13 +864,17 @@ zzlex(void)
 		p = ptr;
 		ptr = ie;
 		if (ie - p == 3) {
-		    if (strncasecmp(p, "NaN", 3) == 0) {
+		    if ((p[0] == 'N' || p[0] == 'n') &&
+			(p[1] == 'A' || p[1] == 'a') &&
+			(p[2] == 'N' || p[2] == 'n')) {
 			yyval.type = MN_FLOAT;
 			yyval.u.d = 0.0;
 			yyval.u.d /= yyval.u.d;
 			return NUM;
 		    }
-		    else if (strncasecmp(p, "Inf", 3) == 0) {
+		    else if ((p[0] == 'I' || p[0] == 'i') &&
+			     (p[1] == 'N' || p[1] == 'n') &&
+			     (p[2] == 'F' || p[2] == 'f')) {
 			yyval.type = MN_FLOAT;
 			yyval.u.d = 0.0;
 			yyval.u.d = 1.0 / yyval.u.d;

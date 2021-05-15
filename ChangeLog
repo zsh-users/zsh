@@ -1,5 +1,8 @@
 2021-05-15  Bart Schaefer  <schaefer@zsh.org>
 
+	* Vincent Lefevre: 48723: Src/math.c: locale-safe recognition of
+	"Inf" and "NaN" constants
+
 	* Peter Stephenson: users/26742: Src/builtin.c: break out of
 	surrounding shell loops when "exit" is called from an exit hook
 
