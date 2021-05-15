@@ -1,5 +1,8 @@
 2021-05-15  Bart Schaefer  <schaefer@zsh.org>
 
+	* Peter Stephenson: users/26742: Src/builtin.c: break out of
+	surrounding shell loops when "exit" is called from an exit hook
+
 	* users/26736: Src/Zle/zle_main.c: avoid infinite loop in getbyte
 	when read -q is called from exit hook
 

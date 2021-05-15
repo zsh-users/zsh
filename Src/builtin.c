@@ -5828,8 +5828,11 @@ zexit(int val, enum zexit_t from_where)
      * a later value always overrides an earlier.
      */
     exit_val = val;
-    if (shell_exiting == -1)
+    if (shell_exiting == -1) {
+	retflag = 1;
+	breaks = loops;
 	return;
+    }
 
     if (isset(MONITOR) && !stopmsg && from_where != ZEXIT_SIGNAL) {
 	scanjobs();    /* check if jobs need printing           */
