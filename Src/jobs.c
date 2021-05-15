@@ -2270,6 +2270,13 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	memcpy(hackzero, *argv, len);
 	memset(hackzero + len, 0, hackspace - len);
 #endif
+
+#ifdef HAVE_PRCTL
+	/* try to change /proc/$$/comm which will *
+	 * be used when checking with "ps -e"  */
+#include <sys/prctl.h>
+	prctl(PR_SET_NAME, *argv);
+#endif
 	unqueue_signals();
 	return 0;
     }

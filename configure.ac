@@ -2065,6 +2065,12 @@ AH_TEMPLATE([HAVE_SETPROCTITLE],
 AC_CHECK_FUNC(setproctitle,AC_DEFINE(HAVE_SETPROCTITLE),
 AC_SEARCH_LIBS(setproctitle,util,AC_DEFINE(HAVE_SETPROCTITLE)))
 
+dnl CHECK FOR prctl() FOR jobs -Z / ARGV0 when checking with ps -e
+AH_TEMPLATE([HAVE_PRCTL],
+[Define to 1 if the system supports `prctl' to change process name])
+AC_CHECK_FUNC(prctl,AC_DEFINE(HAVE_PRCTL),
+AC_SEARCH_LIBS(prctl,c,AC_DEFINE(HAVE_PRCTL)))
+
 dnl -------------
 dnl CHECK FOR NIS
 dnl -------------
