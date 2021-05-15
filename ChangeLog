@@ -1,5 +1,9 @@
 2021-05-15  Bart Schaefer  <schaefer@zsh.org>
 
+	* 48710: Completion/Zsh/Command/_zed, Doc/Zsh/contrib.yo,
+	Functions/Misc/zed: add "zed -h" aka "histed", update doc and
+	completion; improve compatibility with SH_WORD_SPLIT
+
 	* 48709: Completion/Base/Widget/_complete_help: suppress error
 	messages from comptry
 

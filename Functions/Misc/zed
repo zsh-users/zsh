@@ -5,16 +5,18 @@
 # Edit small files with the command line editor.
 # Use ^X^W to save (or ZZ in vicmd mode), ^C to abort.
 # Option -f: edit shell functions.  (Also if called as fned.)
+# Option -h: edit shell history.  (Also if called as histed.)
 
 setopt localoptions noksharrays
 
 local var opts zed_file_name
 # We do not want timeout while we are editing a file
-integer TMOUT=0 okargs=1 fun bind
+integer TMOUT=0 okargs=1 fun hist bind
 local -a expand
 
-zparseopts -D -A opts f b x:
+zparseopts -D -A opts f h b x:
 fun=$+opts[-f]
+hist=$+opts[-h]
 bind=$+opts[-b]
 if [[ $opts[-x] == <-> ]]; then
   expand=(-x $opts[-x])
@@ -24,23 +26,28 @@ elif (( $+opts[-x] )); then
 fi
 
 [[ $0 = fned ]] && fun=1
+[[ $0 = histed ]] && hist=1
+(( hist && $# <= 2 )) && okargs=$#
 (( bind )) && okargs=0
 
-if (( $# != okargs )); then
+if (( $# != okargs || bind + fun + hist > 1 )); then
     echo 'Usage:
 zed filename
 zed -f [ -x N ] function
+zed -h [ filename [ size ] ]
 zed -b' >&2
     return 1
 fi
 
 local curcontext=zed:::
 
-# Matching used in zstyle -m: hide result from caller.
-# Variables not used directly here.
-local -a match mbegin mend
-zstyle -m ":completion:zed:*" insert-tab '*' ||
-    zstyle ":completion:zed:*" insert-tab yes
+() {
+    # Matching used in zstyle -m: hide result from caller.
+    # Variables not used directly here.
+    local -a match mbegin mend
+    zstyle -m ":completion:zed:*" insert-tab '*' ||
+	zstyle ":completion:zed:*" insert-tab yes
+}
 
 zmodload zsh/terminfo 2>/dev/null
 
@@ -124,22 +131,51 @@ fi
 setopt localoptions nobanghist
 
 if ((fun)) then
-  var="$(functions $expand -- $1)"
+  var="$(functions $expand -- "$1")"
   # If function is undefined but autoloadable, load it
   if [[ $var = *\#\ undefined* ]] then
-    var="$(autoload +X $1; functions -- $1)"
+    var="$(autoload +X "$1"; functions -- "$1")"
   elif [[ -z $var ]] then
     var="${(q-)1} () {
 }"
   fi
   vared -M zed -m zed-vicmd -i __zed_init var && eval function "$var"
+elif ((hist)) then
+  if [[ -n $1 ]]; then
+    { fc -p -a "$1" ${2:-$({ wc -l <"$1" } 2>/dev/null)} || return }
+    let HISTSIZE++  
+    print -s ""		# Work around fc -p limitation
+  fi
+  # When editing the current shell history, the "zed -h" command is not
+  # itself included because the current event is not added to the ring
+  # until the next prompt is printed.  This means "zed -h" is prepended
+  # to the result of the edit, because of the way "print -s" is defined.
+  var=( "${(@Oav)history}" )
+  IFS=$'\n' vared -M zed -m zed-vicmd -i __zed_init var
+  if (( ? )); then
+    [[ -n $1 ]] && unset HISTFILE
+  else
+    local HISTSIZE=0 savehist=$#var
+    fc -R /dev/null	# Remove entries other than those added here
+    HISTSIZE=$savehist	# Resets on function exit because local
+    [[ -n $1 ]] && SAVEHIST=$savehist	# Resets via foregoing fc -a
+    for (( hist=1; hist <= savehist; hist++ ))
+    do print -rs -- "$var[hist]"
+    done
+    if [[ -n $zed_file_name ]]; then
+      fc -W "$zed_file_name"
+      [[ -n $1 ]] && unset HISTFILE
+    fi
+    # Note prepend effect when global HISTSIZE greater than $savehist.
+    # This does not affect file editing.
+  fi
 else
-  zed_file_name=$1
-  [[ -f $1 ]] && var="$(<$1)"
+  zed_file_name="$1"
+  [[ -f $1 ]] && var="$(<"$1")"
   while vared -M zed -m zed-vicmd -i __zed_init var
   do
     {
-      print -r -- "$var" >| $zed_file_name
+      print -r -- "$var" >| "$zed_file_name"
     } always {
       (( TRY_BLOCK_ERROR = 0 ))
     } && break

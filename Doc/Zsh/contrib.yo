@@ -4295,6 +4295,12 @@ Same as tt(zed -f).  This function does not appear in the zsh
 distribution, but can be created by linking tt(zed) to the name tt(fned)
 in some directory in your tt(fpath).
 )
+findex(histed)
+item(tt(histed) [ [ var(name) ] var(size) ])(
+Same as tt(zed -h).  This function does not appear in the zsh
+distribution, but can be created by linking tt(zed) to the name tt(histed)
+in some directory in your tt(fpath).
+)
 findex(is-at-least)
 item(tt(is-at-least) var(needed) [ var(present) ])(
 Perform a greater-than-or-equal-to comparison of two strings having the
@@ -4504,6 +4510,7 @@ tt(zargs) with the tt(-)tt(-help) option.
 )
 findex(zed)
 xitem(tt(zed) [ tt(-f) [ tt(-x) var(num) ] ] var(name))
+xitem(tt(zed) [ tt(-h) [ var(name) ] var(size) ])
 item(tt(zed -b))(
 This function uses the ZLE editor to edit a file or function.
 
@@ -4518,7 +4525,14 @@ the given number of spaces; `tt(-x 2)' is consistent with the layout
 of functions distributed with the shell.
 
 Without tt(-f), var(name) is the path name of the file to edit, which need
-not exist; it is created on write, if necessary.
+not exist; it is created on write, if necessary.  With tt(-h), the file is
+presumed to contain history events.
+
+When no file name is provided for tt(-h) the current shell history is edited
+in place.  The history is renumbered when zed exits successfully.
+
+When editing history, multi-line events must have a trailing backslash on
+every line before the last.
 
 While editing, the function sets the main keymap to tt(zed) and the
 vi command keymap to tt(zed-vicmd).  These will be copied from the existing
@@ -4544,7 +4558,10 @@ bound to a key in either of the tt(zed) or tt(zed-vicmd) keymaps after
 a new name for the file being edited.  When zed exits the file will be
 written under that name and the original file will be left alone.  The
 widget has no effect when invoked from `tt(zed -f)'.  The completion
-context is changed to `tt(:completion:zed-set-file-name:)'.
+context is changed to `tt(:completion:zed-set-file-name:)'.  When editing
+the current history with `tt(zed -h)', the history is first updated and
+then the file is written, but the global setting of tt(HISTFILE) is not
+altered.
 
 While tt(zed-set-file-name) is running, zed uses the keymap
 tt(zed-normal-keymap), which is linked from the main keymap in effect
