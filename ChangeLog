@@ -1,5 +1,7 @@
 2021-05-15  Bart Schaefer  <schaefer@zsh.org>
 
+	* 48810: Test/C04funcdef.ztst: name clash in test for autoloading
+
 	* 48790: Src/Zle/compcore.c: COMPLETE_IN_WORD inside brace-param
 
 	* 48710: Completion/Zsh/Command/_zed, Doc/Zsh/contrib.yo,

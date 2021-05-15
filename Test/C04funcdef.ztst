@@ -508,7 +508,8 @@
 
   # keep spec from getting loaded in parent shell for simplicity
   (
-    if whence spec; then print spec already loaded >&2; exit 1; fi
+    if [[ $(whence -v spec) = 'spec is a shell function from '$PWD/* ]]
+    then print spec already loaded >&2; exit 1; fi
     autoload -Uz $PWD/spec
     autoload -Uz $PWD/extra/spec
     spec
@@ -517,7 +518,8 @@
 >I have been loaded by explicit path.
 
   (
-    if whence spec; then print spec already loaded >&2; exit 1; fi
+    if [[ $(whence -v spec) = 'spec is a shell function from '$PWD/* ]]
+    then print spec already loaded >&2; exit 1; fi
     autoload -Uz $PWD/extra/spec
     autoload spec
     spec
