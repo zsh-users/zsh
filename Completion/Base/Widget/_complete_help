@@ -84,7 +84,7 @@ _help_sort_tags() {
     [[ "$help_funcs[$curcontext]" != *${f}* ]] &&
         help_funcs[$curcontext]+=$'\0'"${f}"
     help_tags[${curcontext}${f}]+=",${argv}:${f}"
-    comptry "$@"
+    comptry "$@" 2>/dev/null
   fi
 }
 
