@@ -4534,16 +4534,17 @@ suitable for putting into a startup file.  Note that, if rerun,
 this will overwrite the existing tt(zed) and tt(zed-vicmd) keymaps.
 
 Completion is available, and styles may be set with the context prefix
-`tt(:completion:zed)'.
+`tt(:completion:zed:)'.
 
-A zle widget tt(zed-set-file-name) is available.  This can be called by
-name from within zed using `tt(\ex zed-set-file-name)' (note, however, that
-because of zed's rebindings you will have to type tt(^j) at the end instead
-of the return key), or can be bound to a key in either of the tt(zed) or
-tt(zed-vicmd) keymaps after `tt(zed -b)' has been run.  When the widget is
-called, it prompts for a new name for the file being edited.  When zed
-exits the file will be written under that name and the original file will
-be left alone.  The widget has no effect with `tt(zed -f)'.
+findex(zed-set-file-name)
+A zle widget tt(zed-set-file-name) is available.  This can be called
+by name from within zed using `tt(\ex zed-set-file-name)' or can be
+bound to a key in either of the tt(zed) or tt(zed-vicmd) keymaps after
+`tt(zed -b)' has been run.  When the widget is called, it prompts for
+a new name for the file being edited.  When zed exits the file will be
+written under that name and the original file will be left alone.  The
+widget has no effect when invoked from `tt(zed -f)'.  The completion
+context is changed to `tt(:completion:zed-set-file-name:)'.
 
 While tt(zed-set-file-name) is running, zed uses the keymap
 tt(zed-normal-keymap), which is linked from the main keymap in effect
