@@ -906,6 +906,8 @@ getbyte(long do_keytmout, int *timeout, int full)
 		    continue;
 		stopmsg = 1;
 		zexit(1, ZEXIT_NORMAL);
+		/* If called from an exit hook, zexit() returns, so: */
+		break;
 	    }
 	    icnt = 0;
 	    if (errno == EINTR) {
@@ -929,6 +931,8 @@ getbyte(long do_keytmout, int *timeout, int full)
 		zerr("error on TTY read: %e", errno);
 		stopmsg = 1;
 		zexit(1, ZEXIT_NORMAL);
+		/* If called from an exit hook, zexit() returns, so: */
+		break;
 	    }
 	}
 	if (cc == '\r')		/* undo the exchange of \n and \r determined by */
