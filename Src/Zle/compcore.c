@@ -1125,6 +1125,18 @@ check_param(char *s, int set, int test)
      *
      * TODO: passing s as a parameter while we get some mysterious
      * offset "offs" into it via a global sucks badly.
+     *
+     * From ../lex.c we know:
+     * wb is the beginning position of the current word in the line
+     * we is the position of the end of the current word in the line
+     * From zle_tricky.c we know:
+     * offs is position within the word where we are completing
+     *
+     * So wb + offs is the current cursor position if COMPLETE_IN_WORD
+     * is set, otherwise it is the end of the word (same as we).
+     * 
+     * Note below we are thus stepping backward from our completion
+     * position to find a '$' in the current word (if any).
      */ 
     for (p = s + offs; ; p--) {
 	if (*p == String || *p == Qstring) {
@@ -1171,13 +1183,13 @@ check_param(char *s, int set, int test)
 	    char *tb = b;
 
 	    /* If this is a ${...}, see if we are before the '}'. */
-	    if (!skipparens(Inbrace, Outbrace, &tb))
+	    if (!skipparens(Inbrace, Outbrace, &tb) && tb - s <= offs)
 		return NULL;
 
 	    /* Ignore the possible (...) flags. */
-	    b++, br++;
-	    if ((qstring ? skipparens('(', ')', &b) :
-		 skipparens(Inpar, Outpar, &b)) > 0) {
+	    tb = ++b, br++;
+	    if ((qstring ? skipparens('(', ')', &tb) :
+		 skipparens(Inpar, Outpar, &tb)) > 0 || tb - s >= offs) {
 		/*
 		 * We are still within the parameter flags.  There's no
 		 * point trying to do anything clever here with
@@ -1188,6 +1200,14 @@ check_param(char *s, int set, int test)
 		ispar = 2;
 		return NULL;
 	    }
+	    if ((qstring ? '(' : Inpar) == *b) {
+		/*
+		 * We are inside the braces but on the opening paren.
+		 * There is nothing useful to complete here?
+		 */
+		return NULL;
+	    } else
+		b = tb;	/* Skip over the flags */
 
 	    for (tb = p - 1; tb > s && *tb != Outbrace && *tb != Inbrace; tb--);
 	    if (tb > s && *tb == Inbrace && (tb[-1] == String || *tb == Qstring))

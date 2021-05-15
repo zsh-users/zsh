@@ -1,5 +1,7 @@
 2021-05-15  Bart Schaefer  <schaefer@zsh.org>
 
+	* 48790: Src/Zle/compcore.c: COMPLETE_IN_WORD inside brace-param
+
 	* 48710: Completion/Zsh/Command/_zed, Doc/Zsh/contrib.yo,
 	Functions/Misc/zed: add "zed -h" aka "histed", update doc and
 	completion; improve compatibility with SH_WORD_SPLIT
