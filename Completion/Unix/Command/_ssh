@@ -4,12 +4,13 @@
 
 _ssh () {
   local curcontext="$curcontext" state line expl suf arg ret=1
-  local args sigargs common common_transfer algopt tmp p1 file cmn cmds sdesc tdesc
+  local args sigargs common common_transfer options algopt tmp p1 file cmn cmds sdesc tdesc
   typeset -A opt_args
 
   common=(
     '(-6)-4[force ssh to use IPv4 addresses only]'
     '(-4)-6[force ssh to use IPv6 addresses only]'
+    '-A[enable forwarding of the authentication agent connection]'
     '-C[compress data]'
     '-c+[select encryption cipher]:encryption cipher:->ciphers'
     '-F+[specify alternate config file]:config file:_files'
@@ -32,7 +33,6 @@ _ssh () {
   ssh)
     (( $+words[(r)-[^-]#t*] )) && tdesc=' even if there is no controlling tty'
     _arguments -C -s \
-      '(-a)-A[enable forwarding of the authentication agent connection]' \
       '(-A)-a[disable forwarding of authentication agent connection]' \
       '-B+[bind to specified interface before attempting to connect]:interface:_net_interfaces' \
       '(-P)-b+[specify interface to transmit on]:bind address:_bind_addresses' \
@@ -92,14 +92,16 @@ _ssh () {
       $algopt \
       '-e+[remove keys provided by the PKCS#11 shared library]:library:_files -g "*.(so|dylib)(|.<->)(-.)"' \
       '-k[load plain private keys only and skip certificates]' \
+      '-K[load resident keys from a FIDO authenticator]' \
       '-L[list public key parameters of all identities in the agent]'\
       '-l[list all identities]' \
       '-m+[specify minimum remaining signatures before maximum is changed]:number' \
       '-M+[specify maximum number of signatures]:number' \
+      '-S+[use specified library when adding FIDO authenticator-hosted keys]:library:_files' \
       '-s+[add keys provided by the PKCS#11 shared library]:library:_files -g "*.(so|dylib)(|.<->)(-.)"' \
       '-t+[set maximum lifetime for identity]:maximum lifetime (in seconds or time format):' \
       "-T[test usability of identity files' private keys]:*:public key file:_files -g '*.pub(-.)'" \
-      '-v[verbose mode]' \
+      '*-v[verbose mode]' \
       '-q[be quiet after a successful operation]' \
       '-X[unlock the agent]' \
       '-x[lock the agent with a password]' \
@@ -125,13 +127,42 @@ _ssh () {
     # options can be in any order but use ! to limit those shown for the first argument
     (( CURRENT == 2 )) && p1='!'
     args=( '!-z:number' )
+    options=(
+      application
+      'challenge\:path\:_files'
+      device
+      no-touch-required
+      resident
+      user
+      verify-required
+      'write-attestation\:path\:_files'
+    )
     sdesc='certify keys with CA key'
-    (( $+words[(r)-I] )) && args=( '-z[specify serial number]:serial number' )
+    if (( $+words[(r)-[IhUDnV]*] )); then
+      args=( '-z[specify serial number]:serial number' )
+      options=(
+        clear critical\:name extension\:name force-command\:command\:_cmdstring
+        no-agent-forwarding no-port-forwarding no-pty no-user-rc no-x11-forwarding
+        permit-agent-forwarding permit-port-forwarding permit-pty permit-user-rc
+        permit-x11-forwarding source-address\:source\ address
+      )
+    fi
     (( $+words[(r)-[ku]] )) && args=( '-z[specify version number]:version number' ) &&
         sdesc='specify CA public key file'
     file=key
     (( $+words[(r)-[FHR]] )) && file=known_hosts
-    (( $+words[(r)-T] )) && file=input
+    if (( $+words[(r)-M*] )); then
+      file=input
+      args+=( '*:output file:_files' )
+      options=(
+        lines:number
+        'start-line\:line number'
+        checkpoint\:file:_files
+        'memory\:size (mbytes)'
+        'start\:start point (hex-value)'
+        generator\:value
+      )
+    fi
     (( $+words[(r)-A] )) && file='prefix for host key'
     if (( $+words[(r)-[kIQ]] )); then
       file=krl
@@ -139,8 +170,9 @@ _ssh () {
     fi
     if (( arg = $words[(I)-Y*] )); then
       [[ $words[arg] = -Y?* ]] || (( arg++ ))
-      case $words[arg] in
-	check*|verify)
+      case ${words[arg]#-Y} in
+        ^find-*) sigargs+=( "$p1-n+[specify namespace]:namespace" ) ;|
+	check*|find*|verify)
 	  sigargs+=( "$p1-s+[specify signature file]:signature file:-files" )
 	;|
 	sign) sigargs+=( '*:file:_files' ) ;;
@@ -153,51 +185,55 @@ _ssh () {
 	;;
       esac
     fi
-    cmds=( -p -i -e -y -c -l -B -D -F -H -R -r -G -T -s -L -A -k -Q -Y ) # basic commands
-    cmn=( -b -P -N -C -l -m -v ) # options common to many basic commands (except -f which is common to most)
-    cms=( -E -q -t -g -M -S -a -J -j -K -W -I -h -n -O -V -u -U ) # options specific to one basic command
+    cmds=( -p -i -e -y -c -l -B -D -F -H -K -R -r -M -s -L -A -k -Q -Y ) # basic commands
+    cmn=( -a -b -P -N -C -l -m -O -v -w -Z ) # options common to many basic commands (except -f which is common to most)
+    cms=( -E -q -t -g -M -I -h -n -V -u -U ) # options specific to one basic command
     _arguments -s $args \
-      "(${${(@)cmds:#-G}} -P ${${(@)cms:#-[MS]}})-b+[specify number of bits in key]:bits in key" \
+      "${p1}(${${(@)cmds:#-[pcKAO]}} ${${(@)cms:#-[t]}} -O)-a+[specify number of rounds]:rounds" \
+      "(${${(@)cmds:#-M}} -P ${${(@)cms:#-[MS]}})-b+[specify number of bits in key]:bits in key" \
       "$p1(${${(@)cmds:#-[pc]}} -b $cms)-P+[provide old passphrase]:old passphrase" \
       "(${${(@)cmds:#-p}} -v ${${(@)cms:#-[qt]}})-N+[provide new passphrase]:new passphrase" \
       "(${${(@)cmds:#-c}} -v $cms)-C+[provide new comment]:new comment" \
-      "(-D -G -M -S -I -h -n -O -V -A)-f+[$file file]:$file file:_files" \
+      "(-D -I -h -n -V -A)-f+[$file file]:$file file:_files" \
       "$p1(${${(@)cmds:#-[FE]}} ${${(@)cmn:#-v}} ${${(@)cms:#-E}})-l[show fingerprint of key file]" \
       "$p1(${${(@)cmds:#-[iep]}} $cms)-m+[specify conversion format]:format [RFC4716]:(PEM PKCS8 RFC4716)" \
+      "$p1*-O+[specify a key/value option]: : _values 'option' $options" \
       "(${${(@)cmds:#-[lGT]}} ${${(@)cmn:#-[bv]}} -f)*-v[verbose mode]" \
+      "$p1(${${(@)cmds:#-K}} -P ${${(@)cms:#-[qt]}})-w+[specify library used when creating FISO authenticator-hosted keys]:library:_files -g '*.(so|dylib)(|.<->)(-.)'" \
+      "$p1(${${(@)cmds:#-p}} -l ${${(@)cms:#-[qt]}})-Z+[specify encryption cipher to use when writing a private key file]:cipher:compadd - $(_call_program ciphers ssh -Q cipher)" \
       - '(commands)' \
-      "(-b -l -C -v)-p[change passphrase of private key file]" \
-      '(-b -l -P -N -C -v)-i[import key to OpenSSH format]' \
-      '(-b -l -P -N -C -v)-e[export key to SECSH file format]' \
+      "(-b -l -C -O -v -w)-p[change passphrase of private key file]" \
+      "(${${(@)cmn:#-m}})-i[import key to OpenSSH format]" \
+      "(${${(@)cmn:#-m}})-e[export key to SECSH file format]" \
       "($cmn)-y[get public key from private key]" \
-      '(-b -l -N -m -v)-c[change comment in private and public key files]' \
+      "(${${(@)cmn:#-[aCP]}})-c[change comment in private and public key files]" \
       "($cmn)-B[show the bubblebabble digest of key]" \
       "(-)-D+[download key stored in smartcard reader]:reader" \
       "(${${(@)cmn:#-[lv]}})-F+[search for host in known_hosts file]:host:_ssh_hosts" \
       "($cmn)-H[hash names in known_hosts file]" \
+      "(${${(@)cmn:#-[aw]}} -f)-K[download resident keys from a FIDO authenticator]" \
       "($cmn)-R+[remove host from known_hosts file]:host:_ssh_hosts" \
+      "(${${(@)cmn:#-O}})-M+[moduli generation]:action:((
+          generate\:generate\ candidates\ for\ DH-GEX\ moduli
+          screen\:screen\ candidates\ for\ DH-GEX\ moduli
+      ))" \
       "($cmn)-L[print the contents of a certificate]" \
-      "($cmn -l)-A[generate host keys for all key types]" \
+      "(${${(@)cmn:#-a}})-A[generate host keys for all key types]" \
       "($cmn)-Q[test whether keys have been revoked in a KRL]" \
+      "($cmn)-Y+[signature action]:action:((
+        find-principals\:find\ the\ principal\ associated\ with\ the\ public\ key\ of\ a\ signature
+        sign\:sign\ a\ file\ using\ SSH\ key
+        verify\:verify\ a\ signature\ generated\ using\ the\ sign\ option
+        check-novalidate\:check\ signature\ structure
+      ))" \
       - finger \
       "$p1($cmn)$algopt" \
       - create \
       '(-P -l)-q[silence ssh-keygen]' \
-      "(-P -l)-t+[specify the type of the key to create]:key type:(rsa dsa ecdsa ed25519)" \
+      "(-P -l)-t+[specify the type of the key to create]:key type:(rsa dsa ecdsa ed25519 ecdsa-sk ed25519-sk)" \
       - dns \
       "($cmn)-r[print DNS resource record]:hostname:_hosts" \
       "$p1($cmn)-g[use generic DNS format]" \
-      - primes \
-      "(-P -N -C -l -m -f)-G+[generate candidates for DH-GEX moduli]:output file:_files" \
-      "$p1(-P -N -C -l -m -f)-M+[specify amount of memory to use for generating DH-GEX moduli]:memory (MB)" \
-      "$p1(-P -N -C -l -m -f)-S+[specify start point]:start point (hex)" \
-      - screen \
-      "(${${(@)cmn:#-v}})-T+[screen candidates for DH-GEX moduli]:output file:_files" \
-      "${p1}(${${(@)cmn:#-v}})-a+[specify number of rounds]:rounds" \
-      "${p1}(${${(@)cmn:#-v}})-J[exit after screening specified number of lines]" \
-      "${p1}(${${(@)cmn:#-v}})-j+[start screening at the specified line number]:line number" \
-      "${p1}(${${(@)cmn:#-v}})-K+[write the last line processed to file]:file:_files" \
-      "${p1}(${${(@)cmn:#-v}})-W[specify desired generator]:generator" \
       - certify \
       "($cmn)-s[$sdesc]:CA key:_files" \
       "$p1($cmn -f -k -u)-I+[specify key identifier to include in certificate]:key id" \
@@ -205,21 +241,10 @@ _ssh () {
       "$p1($cmn -f -k -u -D)-U[indicate that CA key is held by ssh-agent]" \
       "$p1($cmn -f -k -u -U)-D+[indicate the CA key is stored in a PKCS#11 token]:PKCS11 shared library:_files -g '*.(so|dylib)(|.<->)(-.)'" \
       "$p1($cmn -f -k -u)-n+[specify user/host principal names to include in certificate]:principals" \
-      "$p1($cmn -f -k -u)*-O+[specify a certificate option]: : _values 'option'
-        clear critical\:name extension\:name force-command\:command\:_cmdstring
-	no-agent-forwarding no-port-forwarding no-pty no-user-rc no-x11-forwarding
-	permit-agent-forwarding permit-port-forwarding permit-pty permit-user-rc
-	permit-x11-forwarding source-address\:source\ address" \
       "$p1($cmn -f -u)-V+[specify certificate validity interval]:interval" \
       "($cmn -I -h -n -D -O -U -V)-k[generate a KRL file]" \
       "$p1($cmn -I -h -n -D -O -U -V)-u[update a KRL]" \
       - signature \
-      "($cmn)-Y+[signature action]:action:((
-	sign\:sign\ a\ file\ using\ SSH\ key
-	verify\:verify\ a\ signature\ generated\ using\ the\ sign\ option
-	check-novalidate\:check\ signature\ structure
-      ))" \
-      "$p1-n+[specify namespace]:namespace" \
       $sigargs
     return
   ;;
@@ -244,6 +269,7 @@ _ssh () {
       '-b+[specify batch file to read]:batch file:_files' \
       '-D+[connect directly to a local sftp server]:sftp server path' \
       '-f[request that files be flushed immediately after transfer]' \
+      '-N[disable implicit quiet mode set by -b]' \
       '-R+[specify number of outstanding requests]:number of requests [64]' \
       '-s+[specify SSH2 subsystem or path to sftp server on the remote host]:subsystem/path' \
       '1:file:->rfile' '*:file:->file' "$common[@]" "$common_transfer[@]" && ret=0
