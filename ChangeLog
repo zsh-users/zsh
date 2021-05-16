@@ -1,3 +1,7 @@
+2021-05-16  Mikael Magnusson  <mikachu@gmail.com>
+
+	* unposted: Completion/Unix/Command/_timeout: Fix wrong syntax
+
 2021-05-15  Bart Schaefer  <schaefer@zsh.org>
 
 	* Han Pingtian: 33465 (very belatedly): use prctl() for "jobs -Z"
