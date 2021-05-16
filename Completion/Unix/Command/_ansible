@@ -46,9 +46,9 @@ case $service in
   ;|
   ansible|ansible-console|ansible-inventory|ansible-playbook|ansible-pull)
     args+=(
-      '--ask-vault-pass[ask for vault password]'
+      --ask-vault-pass{,word}'[ask for vault password]'
       '--vault-id=[specify vault identity to use]:vault identity'
-      '--vault-password-file=[specify vault password file]:vault password file:_files'
+      --vault-pass{,word}-file='[specify vault password file]:vault password file:_files'
     )
   ;|
   ansible|ansible-console|ansible-inventory|ansible-playbook|ansible-pull)
@@ -229,11 +229,11 @@ case $state in
     if zstyle -T ":completion:${curcontext}:plugins" verbose; then
       (( ${(P)#plugvar} )) || set -A ${plugvar} \
 	  ${${(f)"$(_call_program plugins ansible-doc -t $plug -l)"}/ ##/:}
-      _describe -t plugins "${plug} plugin" $plugvar && ret=0
+      _describe -t plugins "${plug} plugin" $plugvar -M 'r:|.=* r:|=*' && ret=0
     else
       (( ${(P)#plugvar} )) || set -A ${plugvar} \
 	  ${${(f)"$(_call_program plugins ansible-doc -t $plug -F)"}%% *}
-      _wanted plugins expl "${plug} plugin" compadd -a $plugvar && ret=0
+      _wanted plugins expl "${plug} plugin" compadd -M 'r:|.=* r:|=*' -a $plugvar && ret=0
     fi
   ;;
   tags)
@@ -270,12 +270,19 @@ case $state in
         args+=(
           '(-c --ignore-certs)'{-c,--ignore-certs}'[ignore SSL certificate validation errors]'
           '(-s --server)'{-s+,--server=}'[specify API server destination]:server:_hosts'
+          --{token,api-key}='[specify ansible galaxy API key]:api key'
           \*{-v,--verbose}'[verbose mode]'
         )
       ;|
-      collection-*)
-        args+=( '--api-key=[specify ansible galaxy API key]:api key' )
+      role-setup) # order important here, source comes before github args
+        args+=( ': :_guard "^-*" "source"' '*:secret' )
       ;|
+      role-(delete|import|setup))
+        args+=( ': :_guard "^-*" "github username"' ':github repository' )
+      ;|
+      role-(info|init|install|list|remove))
+        args+=( '*: :_guard "^-*" "role name"' )
+      ;;
       role-(info|search|list|remove|install))
 	args+=( '(-p --roles-path)'{-p,--roles-path}'[specify location of roles]:path:_directories' )
       ;|
@@ -334,23 +341,28 @@ case $state in
       collection-build)
         args+=(
           '--output-path=[specify path in which the collection is built to]:path [.]:_directories'
+          '*:collection directory to build:_directories'
         )
       ;;
       collection-init)
 	args+=(
           '--collection-skeleton=[specify path to a collection skeleton that the new role should be based upon]:path:_files'
+          ': :_guard "^-*" "collection name"'
 	)
       ;;
       collection-publish)
         args+=(
           "--no-wait[don't wait for import validation results]"
           '--import-timeout=[specify time to wait for import process]:time'
+          ':collection tarball:_files'
         )
       ;;
       collection-install)
         args+=(
           '(-p --collections-path)'{-p+,--collections-path=}'[specify directory containing collections]:_directories'
-          '(-r --requirements-file)'{-r+,--requirements-file=}'[specify file containing a list of collections to install]:file:_files'
+          '(-r --requirements-file *)'{-r+,--requirements-file=}'[specify file containing a list of collections to install]:file:_files'
+          '--pre[include pre-release versions]'
+          '*:collecion name:_files'
         )
       ;;
     esac
@@ -362,13 +374,13 @@ case $state in
     (( $#words > 2 )) && ign='!'
     args=(
       "${ign}(-)"{-h,--help}'[display usage information]'
-      '--ask-vault-pass[ask for vault password]'
+      --ask-vault-pass{,word}'[ask for vault password]'
       '--vault-id=[specify vault identity to use]:vault identity'
-      '--vault-password-file=[specify vault password file]:vault password file:_files'
+      --vault-pass{,word}-file='[specify vault password file]:vault password file:_files'
       \*{-v,--verbose}'[verbose mode]'
     )
     case $line[1] in
-      create|encrypt*|edit|rekey)
+      create|(de|en)crypt*|edit|rekey)
 	args+=(
 	  '--encrypt-vault-id=[specify vault id to use to encrypt (required if more than one vault-id is provided)]:vault id'
 	)
@@ -382,13 +394,13 @@ case $state in
 	)
       ;|
       create|edit|rekey|view) args+=( ':file:_files' ) ;|
-      (en|de)crypt) args+=( '::file:_files' ) ;;
-      rekey)
+      decrypt|rekey)
         args+=(
           '--new-vault-id=[specify new vault identity to use]:vault identity'
           '--new-vault-password-file=[specify new vault password file]:vault password file:_files'
         )
-      ;;
+      ;|
+      (en|de)crypt) args+=( '::file:_files' ) ;;
     esac
     _arguments -s -S $args && ret=0
   ;;
