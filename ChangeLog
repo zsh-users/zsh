@@ -1,3 +1,8 @@
+2021-05-21  Oliver Kiddle  <opk@zsh.org>
+
+	* Marlon Richert: 48864: Completion/Zsh/Type/_parameters: Improve
+	extra-verbose completion display strings for array parameter values
+
 2021-05-18  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 48601/0005: Functions/Misc/zmathfuncdef: Fix the workers/48147

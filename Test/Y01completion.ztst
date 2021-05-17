@@ -255,15 +255,18 @@ F:regression test workers/31611
 >FI:{file1}
 >FI:{file2}
 
-  comptesteval "bar=({$'\\0'..$'\\C-?'}); baz=\$bar"
+  comptesteval "typeset -a bar=({$'\\0'..$'\\C-?'})"
+  comptesteval 'typeset -A bat=( "$bar[@]" )'
+  comptesteval 'typeset bay="$bar"'
   comptesteval 'zstyle ":completion:*:parameters" extra-verbose yes'
-  comptesteval 'zstyle ":completion:*" fake-parameters bar baz:array'
+  comptesteval 'zstyle ":completion:*" fake-parameters bar bat bay'
   comptest $': $ba\t'
 0:extra-verbose shows parameter values
 >line: {: $ba}{}
 >DESCRIPTION:{parameter}
->NO:{bar  -- '^@' '^A' '^B' '^C' '^D' '^E' '^F' '^G' '^H' '\t' '\n' '^K' '^L' '^M}
->NO:{baz  -- '^@ ^A ^B ^C ^D ^E ^F ^G ^H \t \n ^K ^L ^M ^N ^O ^P ^Q ^R ^S ^T ^U ^}
+>NO:{bar  -- ( '^@' '^A' '^B' '^C' '^D' '^E' '^F' '^G' '^H' '\t' '\n' '^K' '^L' '}
+>NO:{bat  -- ( [' ']='!' ['"']='#' ['$']=% ['&']=\' ['(']=')' ['*']=+ [,]=- [.]=/}
+>NO:{bay  -- '^@ ^A ^B ^C ^D ^E ^F ^G ^H \t \n ^K ^L ^M ^N ^O ^P ^Q ^R ^S ^T ^U ^}
 
   comptesteval "path=( $ZTST_srcdir:A )"
   comptesteval 'typeset -H paths=HIDDEN'
@@ -280,7 +283,8 @@ F:regression test workers/31611
 >line: {: $ba}{}
 >DESCRIPTION:{parameter}
 >NO:{bar}
->NO:{baz}
+>NO:{bat}
+>NO:{bay}
 
   comptesteval '_tst() { local disp=( {a..z} ); compadd -ld disp $disp[@]; comppostfuncs=( _pst ) }'
   comptesteval '_pst() { local disp=( "<INSERT>$compstate[insert]</INSERT>" ); compadd -Qld disp $disp }'
