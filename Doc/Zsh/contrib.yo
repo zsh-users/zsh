@@ -2041,10 +2041,12 @@ setopts (tt(promptbang), etc.) are turned on, all other prompt-related
 options are turned off.  The tt(prompt_opts) array preserves setopts even
 beyond the scope of tt(localoptions), should your function need that.
 )
-item(Modify precmd and preexec)(
-Use of tt(add-zsh-hook) is recommended.  The tt(precmd) and tt(preexec)
-hooks are automatically adjusted if the prompt theme changes or is
-disabled.
+item(Modify hooks)(
+Use of tt(add-zsh-hook) and tt(add-zle-hook-widget) is recommended (see
+ifzman(the bf(Manipulating Hook Functions) section above)\
+ifnzman(noderef(Manipulating Hook Functions))\
+). All hooks that follow the naming pattern tt(prompt_)var(theme)tt(_)var(hook)
+are automatically removed when the prompt theme changes or is disabled.
 )
 item(Declare cleanup)(
 If your function makes any other changes that should be undone when the

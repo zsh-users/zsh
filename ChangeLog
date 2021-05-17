@@ -1,5 +1,9 @@
 2021-05-16  Bart Schaefer  <schaefer@zsh.org>
 
+	* Marlon Richert: 48853: Doc/Zsh/contrib.yo,
+	Functions/Prompts/promptinit: improved handling of theme resets
+	when changing prompt themes, especially for theme preview
+
 	* 48860: Etc/BUGS: remove mention of bugs that were fixed
 
 	* 48857: Src/builtin.c, Src/exec.c, Src/loop.c, Src/makepro.awk,
