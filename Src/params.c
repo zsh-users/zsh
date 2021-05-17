@@ -98,8 +98,10 @@ char *ifs,		/* $IFS         */
      *pwd;		/* $PWD         */
 
 /**/
-mod_export
-zlong lastval,		/* $?           */
+mod_export volatile zlong
+     lastval;		/* $?           */
+/**/
+mod_export zlong
      mypid,		/* $$           */
      lastpid,		/* $!           */
      zterm_columns,	/* $COLUMNS     */

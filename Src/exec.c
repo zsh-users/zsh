@@ -84,7 +84,7 @@ int nohistsave;
 /* error flag: bits from enum errflag_bits */
 
 /**/
-mod_export int errflag;
+mod_export volatile int errflag;
 
 /*
  * State of trap return value.  Value is from enum trap_state.
@@ -122,7 +122,7 @@ int subsh;
 /* != 0 if we have a return pending */
 
 /**/
-mod_export int retflag;
+mod_export volatile int retflag;
 
 /**/
 long lastval2;
@@ -1268,7 +1268,9 @@ execsimple(Estate state)
     } else {
 	int q = queue_signal_level();
 	dont_queue_signals();
-	if (code == WC_FUNCDEF)
+	if (errflag)
+	    lv = errflag;
+	else if (code == WC_FUNCDEF)
 	    lv = execfuncdef(state, NULL);
 	else
 	    lv = (execfuncs[code - WC_CURSH])(state, 0);

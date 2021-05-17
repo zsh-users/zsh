@@ -5635,13 +5635,16 @@ bin_getopts(UNUSED(char *name), char **argv, UNUSED(Options ops), UNUSED(int fun
  */
 
 /**/
-mod_export int
-exit_pending;
+mod_export volatile int exit_pending;
 
 /* Shell level at which we exit if exit_pending */
 /**/
-mod_export int
-exit_level;
+mod_export volatile int exit_level;
+
+/* we have printed a 'you have stopped (running) jobs.' message */
+
+/**/
+mod_export volatile int stopmsg;
 
 /* break, bye, continue, exit, logout, return -- most of these take   *
  * one numeric argument, and the other (logout) is related to return. *
@@ -5732,11 +5735,6 @@ bin_break(char *name, char **argv, UNUSED(Options ops), int func)
     }
     return 0;
 }
-
-/* we have printed a 'you have stopped (running) jobs.' message */
-
-/**/
-mod_export int stopmsg;
 
 /* check to see if user has jobs running/stopped */
 
