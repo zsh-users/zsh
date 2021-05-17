@@ -1,5 +1,7 @@
 2021-05-16  Bart Schaefer  <schaefer@zsh.org>
 
+	* 48860: Etc/BUGS: remove mention of bugs that were fixed
+
 	* 48857: Src/builtin.c, Src/exec.c, Src/loop.c, Src/makepro.awk,
 	Src/params.c, Src/signals.c: declare as "volatile" all globals
 	that may be modified by signal handlers; recognize in makepro.awk
