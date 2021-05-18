@@ -225,3 +225,39 @@
 >the definition didn't execute it
 >runs
 
+ f() g
+ g() :
+ functions -t f
+ f
+0:functions -t smoke test #1
+?+f:4> g
+?+g:4> :
+F:The `4' on the second line is incorrect; see workers/48594.
+
+ f() g
+ g() { () : }
+ functions -t f
+ f
+0:functions -t smoke test #2
+?+f:4> g
+?+g:0> '(anon)'
+?+(anon):0> :
+
+ f() g
+ g() :
+ (
+  functions -T f
+  functions -t f
+  f
+ )
+ (
+  functions -t f
+  functions -T f
+  f
+ )
+0:ensure the behaviour  of 'functions -Tt f' doesn't change surreptitiously
+?+f:6> g
+?+f:11> g
+F:If this test fails, the new behaviour may be 
+F:workers/48591.
+
