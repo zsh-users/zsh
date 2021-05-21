@@ -1,5 +1,8 @@
 2021-05-21  Oliver Kiddle  <opk@zsh.org>
 
+	* Marlon Richert: 48891: Completion/Unix/Command/_pgrep:
+	Fix pgrep/pkill -f completion
+
 	* Marlon Richert: 48864: Completion/Zsh/Type/_parameters: Improve
 	extra-verbose completion display strings for array parameter values
 

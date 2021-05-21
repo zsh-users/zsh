@@ -166,8 +166,15 @@ case $state in
       ispat=""
     fi
     if (( ${+opt_args[-f]} )); then
-      _wanted process-args expl $ispat'process command line' \
-	compadd ${${(f)"$(_call_program process-args ps -A -o args=)"}% *}
+      local -a matches=( ${(f)"$(
+              _call_program process-args pgrep -lf ${${:-$PREFIX$SUFFIX}:-.\*}
+          )"} )
+      local -a displ=( "${${matches[@]//':'/'\:'}[@]/ /:}" )
+      matches=( "${matches[@]##<-> }" )
+
+      local desc=$ispat'process command line'
+      _description process-args expl "$desc"
+      _describe -t process-args "$desc" displ matches "$@" -U "$expl[@]"
     else
       _wanted processes-names expl $ispat'process name' _process_names -a -t
     fi
