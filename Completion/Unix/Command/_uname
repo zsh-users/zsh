@@ -62,13 +62,19 @@ else
     '-v[print detailed operating system version]'
   )
   case $OSTYPE in
-    freebsd*|dragonfly*) args+=( '-i[print kernel ident]' ) ;|
-    freebsd<10->.*)
+    freebsd*|dragonfly*)
       args+=(
-	'-K[print FreeBSD kernel version]'
-	'-U[print FreeBSD user environment version]'
+        '-i[print kernel ident]'
+        '-K[print kernel version]'
+        '-U[print user environment version]'
       )
     ;|
+    dragonfly*)
+      args+=(
+        '-P[write ABI string for dports / pkgng, including odd-to-even version-munging]'
+        '-PP[write ABI string for dports / pkgng, without version-munging]'
+      )
+    ;;
     freebsd<13->.*)
       args+=( "-b[print kernel's linker-generated build-id]" )
     ;;

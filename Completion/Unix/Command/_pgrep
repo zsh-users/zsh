@@ -125,6 +125,10 @@ else
   fi
 fi
 
+if [[ $OSTYPE = dragonfly* ]]; then
+  arguments+=( '(-t)-T[match only processes associated with the current terminal]' )
+fi
+
 arguments+=( $sig_arguments + o '*: :->pname' )
 
 [[ $OSTYPE == linux* ]] || aopts+=( -A '*-' )

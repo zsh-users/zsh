@@ -43,7 +43,7 @@ else
 	'(-v)-q[never output headers giving file names]'
       )
       ;|
-    (netbsd*)
+    (dragonfly*|netbsd*)
       args+=( '(-q)-v[always output headers giving file names]' )
       ;;
   esac

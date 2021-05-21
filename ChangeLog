@@ -1,5 +1,11 @@
 2021-05-21  Oliver Kiddle  <opk@zsh.org>
 
+	* 48897: Completion/Unix/Command/_sed, Completion/Unix/Command/_head,
+	Completion/Unix/Command/_dhclient, Completion/Unix/Command/_pgrep,
+	Completion/Unix/Command/_ping, Completion/Unix/Command/_tail,
+	Completion/Unix/Command/_timeout, Completion/Unix/Command/_uname:
+	completion updates for DragonFly 6.0 and OpenBSD 6.9
+
 	* Marlon Richert: 48891: Completion/Unix/Command/_pgrep:
 	Fix pgrep/pkill -f completion
 

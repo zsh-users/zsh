@@ -18,7 +18,13 @@ else
   case $OSTYPE in
     (freebsd*|darwin*|dragonfly*|netbsd*)
       args+=( '(-n)-c+[display the first specified bytes]:number of bytes' )
-      ;;
+    ;|
+    dragonfly*|netbsd*)
+      args+=(
+        '(-v)-q[never print headers giving file names]'
+        '(-q)-v[always print headers giving file names]'
+      )
+    ;;
   esac
 fi
 

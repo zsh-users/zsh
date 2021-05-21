@@ -109,10 +109,10 @@ else
       )
     ;|
     openbsd*|freebsd*|netbsd*|dragonfly*) args+=( '(-r -E)'-r$extended ) ;|
-    darwin*|freebsd*|netbsd*|openbsd*) args+=( '-i+'$inplace ) ;|
-    darwin*|freebsd*|netbsd*) args+=( '-l[make output line buffered]' ) ;|
-    freebsd*) args+=( '-u[disable data buffering]' ) ;|
-    freebsd*|netbsd*)
+    darwin*|freebsd*|netbsd*|openbsd*|dragonfly*) args+=( '-i+'$inplace ) ;|
+    darwin*|freebsd*|netbsd*|dragonfly*) args+=( '-l[make output line buffered]' ) ;|
+    freebsd*|dragonfly*) args+=( '-u[disable data buffering]' ) ;|
+    freebsd*|netbsd*|dragonfly*)
       args+=(
         '-I+[edit files in-place, treating all files as a single input stream]:: :_guard "^(*[@/; \\\]*|?(#c6,)|-*)" "suffix for backup"'
       )

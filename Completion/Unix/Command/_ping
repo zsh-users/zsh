@@ -189,6 +189,7 @@ case ${variant}:${${service#ping}:-4} in
     args+=(
       '-E[audible bell for no packet]'
       '-e[audible bell for each packet]'
+      '-g[provide a visual display of packets received and lost]'
       '-T+[change TOS value]:TOS value:(critical inetcontrol lowdelay netcontrol throughput reliability ef af cs)'
       '-V+[specify routing table to be used]:routing table'
     )

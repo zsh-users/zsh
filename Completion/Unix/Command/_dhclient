@@ -20,7 +20,6 @@ case $OSTYPE in
   openbsd*)
     args+=(
       '-i+[ignore values provided by leases for specified options]:options'
-      '-L+[specify file to write option data too]:file:_files'
       "-n[don't configure any interfaces]"
       '-r[release the current lease back to the server it came from]'
       '-v[verbose log messages]'
