@@ -8,6 +8,7 @@
 
 emulate -L zsh
 local left right prebuffer buffer=$BUFFER lbuffer=$LBUFFER
+local TMPSUFFIX=.zsh
 # set up parameters depending on which context we are called from,
 # see below comment for more details
 if (( REGION_ACTIVE )); then

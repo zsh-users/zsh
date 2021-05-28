@@ -1,5 +1,8 @@
 2021-06-02  Oliver Kiddle  <opk@zsh.org>
 
+	* Akinori MUSHA: 48942: Functions/Zle/edit-command-line:
+	Let EDITOR invoked by edit-command-line know it's a zsh script
+
 	* 48954: Src/Zle/complist.c: avoid crash in reverse-menu-complete
 	from menuselect without 'menu' in $compstate[insert]
 
