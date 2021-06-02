@@ -1,3 +1,7 @@
+2021-06-02  Oliver Kiddle  <opk@zsh.org>
+
+	* 48939: Completion/Unix/Command/_rsync: update for rsync 3.2.3
+
 2021-05-21  Oliver Kiddle  <opk@zsh.org>
 
 	* 48897: Completion/Unix/Command/_sed, Completion/Unix/Command/_head,
