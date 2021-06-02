@@ -1,5 +1,8 @@
 2021-06-02  Oliver Kiddle  <opk@zsh.org>
 
+	* 48954: Src/Zle/complist.c: avoid crash in reverse-menu-complete
+	from menuselect without 'menu' in $compstate[insert]
+
 	* 48952: Completion/Unix/Command/_perl: expand octal codes for
 	record separators in perl completion
 

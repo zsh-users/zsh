@@ -3277,9 +3277,8 @@ domenuselect(Hookdef dummy, Chdata dat)
 		   !strcmp(cmd->nam, "reverse-menu-complete")) {
             mode = 0;
 	    comprecursive = 1;
-	    unmetafy_line();
-	    reversemenucomplete(zlenoargs);
-	    metafy_line();
+	    zmult = -zmult;
+	    do_menucmp(0);
 	    mselect = (*(minfo.cur))->gnum;
 	    setwish = 1;
 	    mline = -1;
