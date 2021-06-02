@@ -41,6 +41,3 @@ case "$service" in
       "$gtk_opts[@]"
   ;;
 esac
-
-
-# vim:autoindent expandtab shiftwidth=2 tabstop=2 softtabstop=2 filetype=zsh

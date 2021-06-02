@@ -1,6 +1,6 @@
 #compdef pandoc
 
-# {{{ input or output formats with optional extensions
+# input or output formats with optional extensions
 # required option: -T (input|output)
 (( $+functions[_pandoc_format] )) ||
 _pandoc_format() {
@@ -16,8 +16,8 @@ _pandoc_format() {
     _wanted formats expl 'format' compadd -S '+' -r '-+ ' -a formats
   fi
 }
-# }}}
-# {{{ all supported formats
+
+# all supported formats
 (( $+functions[_pandoc_all_formats] )) ||
 _pandoc_all_formats(){
   local -a expl
@@ -25,16 +25,16 @@ _pandoc_all_formats(){
   formats=( $(pandoc --list-input-formats) $(pandoc --list-output-formats) )
   _wanted formats expl 'format' compadd -a formats
 }
-# }}}
-# {{{ pdf engine choice
+
+# pdf engine choice
 (( $+functions[_pandoc_pdf_engine] )) ||
 _pandoc_pdf_engine(){
   _alternative \
     'engines:engine:(pdflatex lualatex xelatex latexmk tectonic wkhtmltopdf weasyprint prince context pdfroff)' \
     'engine-executables:engine executable:_files -g "*(#q*)"'
 }
-# }}}
-# {{{ options to pass to --pdf-engine command
+
+# options to pass to --pdf-engine command
 (( $+functions[_pandoc_pdf_engine_opts] )) ||
 _pandoc_pdf_engine_opts(){
   local pdf_engine=${opt_args[--pdf-engine]}
@@ -47,8 +47,8 @@ _pandoc_pdf_engine_opts(){
       ;;
   esac
 }
-# }}}
-# {{{ data-dir specified by --data-dir option, or the default dir
+
+# data-dir specified by --data-dir option, or the default dir
 _pandoc_default_dir() {
   if (( $+opt_args[--data-dir] )); then
     echo ${opt_args[--data-dir]:a}
@@ -59,7 +59,8 @@ _pandoc_default_dir() {
     pandoc --version | sed -ne 's/.*[Uu]ser data directory: \([^ ]*\).*/\1/p'
   fi
 }
-# {{{ template file in $PWD or data-dir/templates/, or URL
+
+# template file in $PWD or data-dir/templates/, or URL
 (( $+functions[_pandoc_template] )) ||
 _pandoc_template(){
   # find output format from '-t format' or '-o xxx.format'
@@ -73,16 +74,16 @@ _pandoc_template(){
     "data-dir-templates:template in data-dir:_files -W $template_dir -g $pat" \
     'urls: :_urls'
 }
-# }}}
-# {{{ choose highlight-style
+
+# choose highlight-style
 (( $+functions[_pandoc_highlight_style] )) ||
 _pandoc_highlight_style(){
   _alternative \
     'styles:style:( $(pandoc --list-highlight-styles) )' \
     'style-files:style file:_files -g "*.theme"'
 }
-# }}}
-# {{{ filter file in $PWD, data-dir/filters/ or $PATH
+
+# filter file in $PWD, data-dir/filters/ or $PATH
 (( $+functions[_pandoc_filter] )) ||
 _pandoc_filter(){
   local filters_dir=$(_pandoc_default_dir)/filters
@@ -91,8 +92,8 @@ _pandoc_filter(){
     'data-dir-filters:filter in data-dir:_files -W filters_dir' \
     'commands: : _command_names -e'
 }
-# }}}
-# {{{ lua filter in $PWD or data-dir/filters/
+
+# lua filter in $PWD or data-dir/filters/
 (( $+functions[_pandoc_lua_filter] )) ||
 _pandoc_lua_filter(){
   local filters_dir=$(_pandoc_default_dir)/filters
@@ -100,8 +101,8 @@ _pandoc_lua_filter(){
     'local-filters:local filter:_files -g "*.lua"' \
     'data-dir-filters:filter in data-dir:_files -W filters_dir -g "*.lua"'
 }
-# }}}
-# {{{ default file in $PWD or data-dir/defaults/
+
+# default file in $PWD or data-dir/defaults/
 (( $+functions[_pandoc_defaults_file] )) ||
 _pandoc_defaults_file() {
   local defaults_dir=$(_pandoc_default_dir)/defaults
@@ -109,8 +110,8 @@ _pandoc_defaults_file() {
     'local-defaults:default file:_files -g "*.yaml"' \
     'data-dir-defaults:default in data-dir:_files -W defaults_dir -g "*.yaml"'
 }
-# }}}
-# {{{ choose reference location
+
+# choose reference location
 (( $+functions[_pandoc_reference_location] )) ||
 _pandoc_reference_location(){
   local -a policies
@@ -121,14 +122,14 @@ _pandoc_reference_location(){
   )
   _describe 'location' policies
 }
-# }}}
-# {{{ choose top level division
+
+# choose top level division
 (( $+functions[_pandoc_top_level_division] )) ||
 _pandoc_top_level_division(){
   _values 'top level division' default section chapter part
 }
-# }}}
-# {{{ choose email obfusication
+
+# choose email obfusication
 (( $+functions[_pandoc_email_obfusication] )) ||
 _pandoc_email_obfusication(){
   local -a policies
@@ -139,8 +140,8 @@ _pandoc_email_obfusication(){
   )
   _describe 'obfusication' policies
 }
-# }}}
-# {{{ choose wrapping policy
+
+# choose wrapping policy
 (( $+functions[_pandoc_wrap] )) ||
 _pandoc_wrap() {
   local -a policies
@@ -151,8 +152,8 @@ _pandoc_wrap() {
   )
   _describe 'policy' policies
 }
-# }}}
-# {{{ choose eol policy
+
+# choose eol policy
 (( $+functions[_pandoc_eol] )) ||
 _pandoc_eol() {
   local -a policies
@@ -163,8 +164,8 @@ _pandoc_eol() {
   )
   _describe 'policy' policies
 }
-# }}}
-# {{{ choose changes tracking policy
+
+# choose changes tracking policy
 (( $+functions[_pandoc_track_changes] )) ||
 _pandoc_track_changes() {
   local -a policies
@@ -175,7 +176,6 @@ _pandoc_track_changes() {
   )
   _describe 'policy' policies
 }
-# }}}
 
 # The real thing
 _arguments -s \

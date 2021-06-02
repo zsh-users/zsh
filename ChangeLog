@@ -1,5 +1,8 @@
 2021-06-02  Oliver Kiddle  <opk@zsh.org>
 
+	* 48938 (minus _cdrdao changes): Completion/Unix/Command/_pandoc,
+	Completion/Unix/Command/_bpython: remove vim fold and option markers
+
 	* 48939: Completion/Unix/Command/_rsync: update for rsync 3.2.3
 
 2021-05-21  Oliver Kiddle  <opk@zsh.org>
