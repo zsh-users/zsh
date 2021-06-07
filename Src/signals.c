@@ -810,6 +810,7 @@ killjb(Job jn, int sig)
 	    err = killpg(jn->gleader, sig);
 	    if (sig == SIGCONT && err != -1)
 		makerunning(jn);
+	    return err;
 	}
     }
     for (pn = jn->procs; pn; pn = pn->next) {

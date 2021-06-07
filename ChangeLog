@@ -1,5 +1,8 @@
 2021-07-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Erik Paulson: 49029: Src/signals.c: Remove additional copies
+	of signals sent by zsh with MONITOR enabled.
+
 	* 49182: Src/hist.c, Src/lex.c: Interactive word correction
 	doesn't work inside command substitution, so don't try to do it.
 
