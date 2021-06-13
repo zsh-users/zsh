@@ -7,6 +7,18 @@ Note also the list of incompatibilities in the README file.
 Changes since 5.8
 -----------------
 
+When unsetting a hash element, the string enclosed in square brackets is
+interpreted literally after any normal command-line-argument expansions.
+Thus
+  unset "hash[$key]"
+first expands $key as usual for a double-quoted string, and then interprets
+that result as the exact hash element to unset.  This differs from previous
+versions of the shell, which would also remove a leading backslash for an
+unusual subset of characters in the expansion of $key.  Note this also
+means, for example, that
+  unset 'hash[ab]cd]'
+unsets the element with key "ab]cd" rather than silently doing nothing.
+
 The function command learnt a -T option to declare a function and enable
 tracing for it simultaneously.
 

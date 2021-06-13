@@ -3724,14 +3724,12 @@ bin_unset(char *name, char **argv, Options ops, int func)
     while ((s = *argv++)) {
 	char *ss = strchr(s, '['), *subscript = 0;
 	if (ss) {
-	    char *sse;
+	    char *sse = ss + strlen(ss)-1;
 	    *ss = 0;
-	    if ((sse = parse_subscript(ss+1, 1, ']'))) {
+	    if (*sse == ']') {
 		*sse = 0;
 		subscript = dupstring(ss+1);
 		*sse = ']';
-		remnulargs(subscript);
-		untokenize(subscript);
 	    }
 	}
 	if ((ss && !subscript) || !isident(s)) {
