@@ -2043,9 +2043,8 @@ beyond the scope of tt(localoptions), should your function need that.
 )
 item(Modify hooks)(
 Use of tt(add-zsh-hook) and tt(add-zle-hook-widget) is recommended (see
-ifzman(the bf(Manipulating Hook Functions) section above)\
-ifnzman(noderef(Manipulating Hook Functions))\
-). All hooks that follow the naming pattern tt(prompt_)var(theme)tt(_)var(hook)
+the bf(Manipulating Hook Functions) section above).
+All hooks that follow the naming pattern tt(prompt_)var(theme)tt(_)var(hook)
 are automatically removed when the prompt theme changes or is disabled.
 )
 item(Declare cleanup)(
