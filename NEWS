@@ -15,7 +15,7 @@ first expands $key as usual for a double-quoted string, and then interprets
 that result as the exact hash element to unset.  This differs from previous
 versions of the shell, which would also remove a leading backslash for an
 unusual subset of characters in the expansion of $key.  Note this also
-means, for example, that
+means, for example, that now
   unset 'hash[ab]cd]'
 unsets the element with key "ab]cd" rather than silently doing nothing.
 
