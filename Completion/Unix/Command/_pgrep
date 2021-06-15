@@ -170,10 +170,13 @@ case $state in
       ispat+="full "
     fi
     if (( ${+opt_args[-f]} )); then
+      local -a opts=( -lf )
+      [[ $OSTYPE == linux* ]] && opts=( -a )
       local -a matches=( ${(f)"$(
-              _call_program process-args pgrep -lf ${${:-$PREFIX$SUFFIX}:-.\*}
+              _call_program process-args pgrep ${(@q)opts} -- \
+                  ${(q)${${:-$PREFIX$SUFFIX}:-.\*}}
           )"} )
-      local -a displ=( "${${matches[@]//':'/'\:'}[@]/ /:}" )
+      local -a displ=( "${${matches[@]//:/\:}[@]/ /:}" )
       matches=( "${matches[@]##<-> }" )
 
       local desc=$ispat'process command line'

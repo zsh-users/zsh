@@ -1,5 +1,8 @@
 2021-06-14  dana  <dana@dana.is>
 
+	* 48920: Completion/Unix/Command/_pgrep: Address issues related to
+	-f completion
+
 	* 48920: Completion/Unix/Command/_pgrep: Clarify -x description
 
 2021-06-13  Bart Schaefer  <schaefer@zsh.org>
