@@ -167,7 +167,7 @@ case $state in
   (pname)
     local ispat="pattern matching "
     if (( ${+opt_args[-x]} )); then
-      ispat=""
+      ispat+="full "
     fi
     if (( ${+opt_args[-f]} )); then
       local -a matches=( ${(f)"$(
