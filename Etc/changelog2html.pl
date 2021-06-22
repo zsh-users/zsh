@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 # This programme turns the ChangeLog into changelog.html for display
-# on the website.  That lives at http://zsh.sourceforge.net/Etc/changelog.html.
+# on the website.  That lives at https://zsh.sourceforge.io/Etc/changelog.html.
 
 my $out = "changelog.html";
 

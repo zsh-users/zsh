@@ -29,7 +29,7 @@ uref(https://www.zsh.org/pub/))
 The up-to-date source code is available via Git from Sourceforge.  See
 uref(https://sourceforge.net/projects/zsh/) for details.  A summary of
 instructions for the archive can be found at
-uref(http://zsh.sourceforge.net/).
+uref(https://zsh.sourceforge.io/).
 
 texinode(Mailing Lists)(The Zsh FAQ)(Availability)(Introduction)
 sect(Mailing Lists)
@@ -98,6 +98,6 @@ A userguide is currently in preparation.  It is intended to complement the
 manual, with explanations and hints on issues where the manual can be
 cabbalistic, hierographic, or downright mystifying (for example, the word
 `hierographic' does not exist).  It can be viewed in its current state at
-uref(http://zsh.sourceforge.net/Guide/).  At the time of writing, chapters
+uref(https://zsh.sourceforge.io/Guide/).  At the time of writing, chapters
 dealing with startup files and their contents and the new completion system
 were essentially complete.

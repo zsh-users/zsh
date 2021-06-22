@@ -171,20 +171,20 @@ sect(Sources of information)
 label(11)
 
   Information on zsh is available via the World Wide Web.  The URL
-  is url(http://zsh.sourceforge.net/)(http://zsh.sourceforge.net/) .
+  is url(https://zsh.sourceforge.io/)(https://zsh.sourceforge.io/) .
   The server provides this FAQ and much else and is
   now maintained by the zsh workers (email email(zsh-workers@zsh.org)).
   The FAQ is at \
-url(http://zsh.sourceforge.net/FAQ/)(http://zsh.sourceforge.net/FAQ/) .
+url(https://zsh.sourceforge.io/FAQ/)(https://zsh.sourceforge.io/FAQ/) .
   The site also contains some contributed zsh scripts and functions;
   we are delighted to add more, or simply links to your own collection.
 
   This document was originally written in YODL, allowing it to be converted
   easily into various other formats.  The master source file lives at
-  url(http://zsh.sourceforge.net/FAQ/zshfaq.yo)
-(http://zsh.sourceforge.net/FAQ/zshfaq.yo) and the plain text version
-  can be found at url(http://zsh.sourceforge.net/FAQ/zshfaq.txt)
-(http://zsh.sourceforge.net/FAQ/zshfaq.txt) .
+  url(https://zsh.sourceforge.io/FAQ/zshfaq.yo)
+(https://zsh.sourceforge.io/FAQ/zshfaq.yo) and the plain text version
+  can be found at url(https://zsh.sourceforge.io/FAQ/zshfaq.txt)
+(https://zsh.sourceforge.io/FAQ/zshfaq.txt) .
 
   Another useful source of information is the collection of FAQ articles
   posted frequently to the Usenet news groups comp.unix.questions,
@@ -213,7 +213,7 @@ email(mail-server@rtfm.mit.edu)
   I have put together a user guide to complement the manual by
   explaining the most useful features of zsh in a more easy to read way.
   This can be found at the zsh web site:
-    url(http://zsh.sourceforge.net/Guide/)(http://zsh.sourceforge.net/Guide/)
+    url(https://zsh.sourceforge.io/Guide/)(https://zsh.sourceforge.io/Guide/)
 
   (As a method of reading the following in Emacs, you can type tt(\M-2
   \C-x $) to make all the indented text vanish, then tt(\M-0 \C-x $)
@@ -367,8 +367,8 @@ label(16)
   link(1.1)(11)) at:
 
   description(
-    mydit()        url(http://zsh.sourceforge.net/Patches/)
-(http://zsh.sourceforge.net/Patches/)
+    mydit()        url(https://zsh.sourceforge.io/Patches/)
+(https://zsh.sourceforge.io/Patches/)
   )
 
 sect(I don't have root access: how do I make zsh my login shell?)
@@ -2727,4 +2727,4 @@ notice appears in all copies of this documentation.  Remember,
 however, that this document changes monthly and it may be more useful
 to provide a pointer to it rather than the entire text.  A suitable
 pointer is "information on the Z-shell can be obtained on the World
-Wide Web at URL http://zsh.sourceforge.net/".
+Wide Web at URL https://zsh.sourceforge.io/".

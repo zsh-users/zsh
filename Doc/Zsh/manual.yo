@@ -196,7 +196,7 @@ produce a nicely formatted printed manual.
 item(The HTML manual)(
 An HTML version of this manual is available at the Zsh web site via:
 
-uref(http://zsh.sourceforge.net/Doc/).
+uref(https://zsh.sourceforge.io/Doc/).
 
 (The HTML version is produced with bf(texi2html), which may be obtained
 from uref(http://www.nongnu.org/texi2html/). The command is

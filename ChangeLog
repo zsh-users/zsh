@@ -1,3 +1,9 @@
+2021-06-22  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 48906: Doc/Zsh/manual.yo, Doc/Zsh/metafaq.yo, Etc/FAQ.yo,
+	Etc/changelog2html.pl: Update Sourceforge links to
+	https://zsh.sourceforge.io/.
+
 2021-06-14  dana  <dana@dana.is>
 
 	* 48920: Completion/Unix/Command/_pgrep: Address issues related to
