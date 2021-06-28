@@ -765,7 +765,7 @@ filesubstr(char **namptr, int assign)
 		*namptr = dyncat(res, ptr2+1);
 		return 1;
 	    }
-	    if (isset(NOMATCH))
+	    if (isset(NOMATCH) && isset(EXECOPT))
 		zerr("no directory expansion: ~[%s]", tmp);
 	    return 0;
 	} else if (!inblank(str[1]) && isend(*ptr) &&

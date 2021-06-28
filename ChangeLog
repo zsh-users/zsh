@@ -1,3 +1,8 @@
+2021-06-28  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 49102: Src/subst.c: Dynamic directory expansion failure is
+	ignored if NO_EXEC is set.
+
 2021-06-22  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 48906: Doc/Zsh/manual.yo, Doc/Zsh/metafaq.yo, Etc/FAQ.yo,
