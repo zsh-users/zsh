@@ -85,7 +85,7 @@ _module_available_modules()
 {
   if [[ -n $MODULEPATH ]] && [[ ${+_available_modules} -eq 0 ]]
   then
-    _available_modules=(${$(find -L ${(e)=MODULEPATH//:/ } -type f -print 2>/dev/null | grep -v \\.version | sed -e 's,\('${${(e)=MODULEPATH//:/\/\\\|}%\\\|}'\),,g' -e 's,^/*,,g'):#*\~})
+    _available_modules=(${$(find -L ${(e)=MODULEPATH//:/ } -type f -print 2>/dev/null | grep -v \\.version | sed -e 's,\('${${(e)=MODULEPATH//:/\/\\\|}%\\\|}'\),,g' -e 's,^/*,,g' -e 's,\.lua$,,g'):#*\~})
   fi
 }
 

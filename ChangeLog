@@ -1,3 +1,9 @@
+2021-07-08  Oliver Kiddle  <opk@zsh.org>
+
+	* Max Voit: 49153: Completion/Unix/Command/_module:
+	cut off .lua extension from module files that occurs
+	when using lmod for module
+
 2021-07-06  Suraj N. Kurapati  <sunaku@riseup.net>
 
 	* 49128 (github #76): Misc/vcs_info-examples: optimize
