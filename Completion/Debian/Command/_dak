@@ -27,7 +27,7 @@ case $cmd in
   '(-G --greaterthan)'{-G,--greaterthan}
   '(-r --regex)'{-r,--regex}
   '(-s --suite)'{-s,--suite=}':suite:_values -s , "suite list" oldstable stable testing unstable experimental'
-  '(-S, --source-and-binary)'{-S,--source-and-binary}
+  '(-S --source-and-binary)'{-S,--source-and-binary}
   '*:package:_deb_packages avail'
         )
     ;;
@@ -75,7 +75,7 @@ case $cmd in
   '(-p --partial)'{-p,--partial}'[do not affect override files]'
   '(-R --rdep-check)'{-R,--rdep-check}'[check reverse dependencies]'
   '(-s --suite)'{-s,--suite=}':suite:_values -s , "suite list" oldstable stable testing unstable experimental'
-  '(-S, --source-only)'{-S,--source-only}'[remove source only]'
+  '(-S --source-only)'{-S,--source-only}'[remove source only]'
   '*:package:_deb_packages avail'
     )
     ;;
@@ -155,10 +155,10 @@ case $cmd in
   '(-c --component)'{-c,--component=}':component:(main contrib non-free)'
   '(-s --suite)'{-s,--suite=}':suite:(oldstable stable testing unstable experimental)'
   '(-t --type)'{-t,--type=}':type:(deb dsc udeb)'
-  '(-a, --add)'{-a,--add}'[add overrides]'
-  '(-S, --set)'{-S,--set}'[set overrides]'
-  '(-l, --list)'{-l,--list}'[list overrides]'
-  '(-q, --quiet)'{-q,--quiet}'[be less verbose]'
+  '(-a --add)'{-a,--add}'[add overrides]'
+  '(-S --set)'{-S,--set}'[set overrides]'
+  '(-l --list)'{-l,--list}'[list overrides]'
+  '(-q --quiet)'{-q,--quiet}'[be less verbose]'
         )
     ;;
 

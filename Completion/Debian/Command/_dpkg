@@ -86,7 +86,7 @@ _dpkg_deb_and_query_only_options=(
 _dpkg_query_actions=(
       '(--status -s)'{--status,-s}'[display package status]:*:packages:->status'
       '(--print-avail -p)'{--print-avail,-p}'[display available details]:packages:_deb_packages avail'
-      '(--listfiles, -L)'{--listfiles,-L}'[list owned files]:*:packages:->listfiles'
+      '(--listfiles -L)'{--listfiles,-L}'[list owned files]:*:packages:->listfiles'
       '(--list -l)'{--list,-l}'[list packages]:*:packages:->list'
       '(--search -S)'{--search,-S}'[search for file owner]:*:pattern:->search'
       '--admindir=[data directory]:directory:_files -/'

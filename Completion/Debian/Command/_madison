@@ -9,6 +9,6 @@ _arguments \
   '(-h --help)'{-h,--help} \
   '(-r --regex)'{-r,--regex} \
   '(-s --suite)'{-s,--suite=}':suite:_values -s , "suite list" oldstable stable testing unstable' \
-  '(-S, --source-and-binary)'{-S,--source-and-binary} \
+  '(-S --source-and-binary)'{-S,--source-and-binary} \
   '*:package:_deb_packages avail'
 

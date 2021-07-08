@@ -20,7 +20,7 @@ _arguments -C -s -S \
   \*{-c,--command=}'[execute a command after reading the recipe]:aap command:' \
   '(-k --continue)'{-k,--continue}'[continue building after an error]' \
   '(-S --stop)'{-S,--stop}'[stop building at first error (default)]' \
-  '(-N,--nofetch-recipe -R --fetch-recipe)'{-R,--fetch-recipe}'[fetch recipe file and child recipes]' \
+  '(-N --nofetch-recipe -R --fetch-recipe)'{-R,--fetch-recipe}'[fetch recipe file and child recipes]' \
   '(-R --fetch-recipe -N --nofetch-recipe)'{-N,--nofetch-recipe}'[do not fetch recipes for "fetch" target]' \
   '(-a --nocache)'{-a,--nocache}"[always download files, don't use the cache]" \
   '(-l --local)'{-l,--local}'[do not recurse into subdirectories]' \

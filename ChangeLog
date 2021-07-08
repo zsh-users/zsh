@@ -1,5 +1,11 @@
 2021-07-08  Oliver Kiddle  <opk@zsh.org>
 
+	* 49151: Completion/Debian/Command/_madison,
+	Completion/Debian/Command/_dak, Completion/Debian/Command/_dpkg,
+	Completion/Unix/Command/_aap, Completion/Unix/Command/_samba,
+	Completion/Unix/Command/_setfacl, Completion/Zsh/Function/_zargs:
+	remove commas erroneously included in _arguments exclusion lists
+
 	* 49150: Completion/...: consistently use singular form for
 	headings on completion match groups
 

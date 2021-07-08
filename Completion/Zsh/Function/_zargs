@@ -18,17 +18,17 @@ case $numeofs in
     #zargs arguments
     arguments=(
       '(--eof -e)'{--eof=,-e+}'[change the end-of-input-args string from "--" to eof-str]'
-      '(--exit, -x)'{--exit,-x}'[exit if the size (see --max-chars) is exceeded]'
+      '(--exit -x)'{--exit,-x}'[exit if the size (see --max-chars) is exceeded]'
       '--help[print summary and exit]'
-      '(--interactive, -p)'{--interactive,-p}'[prompt before executing each command line]'
-      '(--max-args, -n)'{--max-args=,-n+}'[use at most max-args arguments per command line]'
-      '(--max-chars, -s)'{--max-chars=,-s+}'[use at most max-chars characters per command line]'
-      '(--max-lines, -l)'{--max-lines=,-l+}'[use at most max-lines of the input-args per command line]'
-      '(--max-procs, -P)'{--max-procs=,-P+}'[run up to max-procs command lines in the background at once]'
-      '(--no-run-if-empty, -r)'{--no-run-if-empty,-r}'[do nothing if there are no input arguments before the eof-str]'
-      '(--null, -0)'{--null,-0}'[split each input-arg at null bytes, for xargs compatibility]'
-      '(--replace, -i)'{--replace=,-i}'[substitute replace-str in the initial-args by each initial-arg]'
-      '(--verbose, -t)'{--verbose,-t}'[print each command line to stderr before executing it]'
+      '(--interactive -p)'{--interactive,-p}'[prompt before executing each command line]'
+      '(--max-args -n)'{--max-args=,-n+}'[use at most max-args arguments per command line]'
+      '(--max-chars -s)'{--max-chars=,-s+}'[use at most max-chars characters per command line]'
+      '(--max-lines -l)'{--max-lines=,-l+}'[use at most max-lines of the input-args per command line]'
+      '(--max-procs -P)'{--max-procs=,-P+}'[run up to max-procs command lines in the background at once]'
+      '(--no-run-if-empty -r)'{--no-run-if-empty,-r}'[do nothing if there are no input arguments before the eof-str]'
+      '(--null -0)'{--null,-0}'[split each input-arg at null bytes, for xargs compatibility]'
+      '(--replace -i)'{--replace=,-i}'[substitute replace-str in the initial-args by each initial-arg]'
+      '(--verbose -t)'{--verbose,-t}'[print each command line to stderr before executing it]'
       '--version[print the version number of zargs and exit]'
     )
     _arguments -S -s $arguments[@] && ret=0

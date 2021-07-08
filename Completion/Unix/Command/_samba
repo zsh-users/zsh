@@ -96,7 +96,7 @@ case $service in
   smbstatus)
     _arguments -s -S $args \
       {-b,--brief}'[brief output]' \
-      '(-v --verbose)'(-v,--verbose)'[be verbose]' \
+      '(-v --verbose)'{-v,--verbose}'[be verbose]' \
       '(-d --debuglevel)'{-d+,--debuglevel=}'[specify debug level]:debug level:(0 1 2 3 4 5 6 7 8 9 10)' \
       '(-u --user)'{-u+,--user=}'[specify user to restrict information to]:user:_users' \
       '(-B --byterange)'{-B,--byterange}'[include byte range locks]' \
