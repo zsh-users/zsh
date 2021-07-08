@@ -6,7 +6,7 @@ typeset -A opt_args
 _arguments \
     '-auto[automatically accept default (nonconflicting) actions]' \
     '-batch[batch mode\: ask no questions at all]' \
-    '-doc[show documentation]:topics:(about people lists status copying ack install tutorial basics failures running ssh news all topics)' \
+    '-doc[show documentation]:topic:(about people lists status copying ack install tutorial basics failures running ssh news all topics)' \
     '-follow[add a pattern to the follow list]:pattern:' \
     '-force[force changes from this replica to the other]:replica:' \
     '-group[synchronize group attributes]' \

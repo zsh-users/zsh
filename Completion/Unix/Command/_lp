@@ -83,7 +83,7 @@ _lp_job_options()
 	  "DuplexTumble:flip short side"
 	  "DuplexNoTumble:flip long side"
 	  "None")
-	_describe "duplex options" desc_opts
+	_describe "duplex option" desc_opts
 	;;
 
       (*)
@@ -103,11 +103,11 @@ _lp_job_options()
       eq_suffix=(-S '=')
     fi
 
-    _description lpopts expl "generic printer options"
+    _description lpopts expl "generic printer option"
     compadd "$expl[@]" $eq_suffix $lopts_with_args
     compadd "$expl[@]" $lopts_no_args
 
-    _description printeropts expl "printer specific options"
+    _description printeropts expl "printer specific option"
     compadd "$expl[@]" $eq_suffix \
       $(_call_program list-printer-options \
 	lpoptions $printer -l | cut -d/ -f1)

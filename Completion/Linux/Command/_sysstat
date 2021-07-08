@@ -96,12 +96,12 @@ _sar() {
     '(--human -p)-h[make output easier to read: implies --human and -p]' \
     '(- 1 2)--help[display usage information]' \
     '--human[print sizes in human readable format]' \
-    '*-I[report statistics for interrupts]:interrupts: _values -s "," interrupts 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 SUM ALL XALL' \
+    '*-I[report statistics for interrupts]: : _values -s "," interrupt 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 SUM ALL XALL' \
     '-i[select records as close as possible to interval]:interval' \
     '--iface=-[specify network interfaces for which statistics are to be displayed]:network interface:_sequence _net_interfaces' \
     '-j[display persistent device names]:type:(ID LABEL PATH UUID)' \
-    '-m[report power management statistics]:keywords: _values -s "," keywords CPU FAN FREQ IN TEMP USB ALL' \
-    '-n[report network statistics]:keywords: _values -s "," keywords DEV EDEV NFS NFSD SOCK IP EIP ICMP EICMP TCP ETCP UDP SOCK6 IP6 EIP6 ICMP6 EICMP6 UDP6 FC SOFT ALL' \
+    '-m[report power management statistics]:keyword:_sequence compadd - CPU FAN FREQ IN TEMP USB ALL' \
+    '-n[report network statistics]:keyword:_sequence compadd - DEV EDEV NFS NFSD SOCK IP EIP ICMP EICMP TCP ETCP UDP SOCK6 IP6 EIP6 ICMP6 EICMP6 UDP6 FC SOFT ALL' \
     '-o[save readings to file in binary form]:file:_files' \
     '-P[report per-processor statistics]:processor: _values -s "," processors ALL' \
     '-p[pretty-print device names]' \

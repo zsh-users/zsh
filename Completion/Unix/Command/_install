@@ -106,7 +106,7 @@ case $state in
       'a[symlinks use absolute path]'
       'r[symlinks use relative path]'
     )
-    _values -S '' 'link flags' $tmp && ret=0
+    _values -S '' 'link flag' $tmp && ret=0
     ;;
 esac
 

@@ -196,7 +196,7 @@ else
     '(-q --hide-control-chars)--show-control-chars'
     '(- :)--help[display help information]'
     '(- :)--version[display version information]'
-    '*:files:_files'
+    '*:file:_files'
   )
   if [[ $OSTYPE = linux* ]]; then
     arguments+=(

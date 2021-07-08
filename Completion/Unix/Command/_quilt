@@ -36,7 +36,7 @@ _quilt_unapplied() {
 
 _arguments $help \
   '--trace[run the command in bash trace mode]' \
-  '--quiltrc=[use the specified configuration file]:files:_files' \
+  '--quiltrc=[use the specified configuration file]:file:_files' \
   '--version[print the version number and exit]' \
   ':quilt command:->cmd' \
   '*:: :->subcmd' && return
@@ -116,12 +116,12 @@ case $words[1] in
   add)
     _arguments -S $help \
       '-P+[specify patch to add files to]:patch:_quilt_applied' \
-      '*:files:_files' && return
+      '*:file:_files' && return
   ;;
   annotate)
     _arguments $help \
       '-P[stop checking for changes at the specified rather than the topmost patch]:patch:_quilt_series' \
-      ':files:_files' && return
+      ':file:_files' && return
   ;;
   applied) _arguments $help ':quilt series:_quilt_series' && return ;;
   delete)
@@ -142,9 +142,9 @@ case $words[1] in
       '(-P -z)--snapshot[diff against snapshot]' \
       '--diff=[use the specified utility for generating the diff]:diff utility:_command_names -e' \
       '--sort[sort files by name]' \
-      '*:files:_files' && return
+      '*:file:_files' && return
   ;;
-  edit) _arguments $help '*:files:_files' && return ;;
+  edit) _arguments $help '*:file:_files' && return ;;
   files)
     _arguments -s $help $verbose \
       '-a[list all files in all applied patches]' \
@@ -187,14 +187,14 @@ case $words[1] in
       '-P+[patch filename to use inside quilt]:quilt select patch filename: ' \
       '-f[overwrite/update existing patches]' \
       '-d+[header resolution when overwriting in existing patch]:resolution:((a\:all\ headers n\:new\ headers o\:old\ headers))' \
-      '*:files:_files' && return
+      '*:file:_files' && return
   ;;
   mail)
     _arguments $help \
       '(-h -M)-m[introduction text to use]:introduction text' \
       '(-h -m)-M[read introduction text from file]:file:_files' \
       '--prefix=[use an alternate prefix in the bracketed part of the subjects generated]:quilt select prefix: ' \
-      '--mbox=[store all messages in the specified file in mbox format]:files:_files' \
+      '--mbox=[store all messages in the specified file in mbox format]:file:_files' \
       '--send[send the messages directly]' \
       '--sender=[specify envelope sender address to use]:sender:_email_addresses -c' \
       '--from=[from header]:address:_email_addresses' \
@@ -202,13 +202,13 @@ case $words[1] in
       '*--to=[append a recipient to the To header]:recipient:_email_addresses' \
       '*--cc=[append a recipient to the Cc header]:recipient:_email_addresses' \
       '*--bcc=[append a recipient to the Bcc header]:recipient:_email_addresses' \
-      '--signature=[append specified signature file to messages]:files:_files' \
+      '--signature=[append specified signature file to messages]:file:_files' \
       '--reply-to=[add reply address to message]:address:_email_addresses' \
       '*:patch:_quilt_series' && return
   ;;
   new) _arguments $help $pstyle ':patch name' && return ;;
   next) _arguments $help ':patch:_quilt_series' && return ;;
-  patches) _arguments -S $help $verbose $color '*:files:_files' && return ;;
+  patches) _arguments -S $help $verbose $color '*:file:_files' && return ;;
   pop)
     _arguments -s $help $verbose \
       '-a[remove all applied patches]' \
@@ -253,7 +253,7 @@ case $words[1] in
   revert)
     _arguments $help \
       '-P[revert changes in the named patch]:patch:_quilt_series' \
-      '*:files:_files' && return
+      '*:file:_files' && return
   ;;
   series) _arguments $help $verbose $color && return ;;
   setup)
@@ -261,7 +261,7 @@ case $words[1] in
       '-d[specify path prefix for resulting source tree]:prefix:_files -W / -P /' \
       '--sourcedir[specify location of package sources]:directory:_directories' \
       '--fuzz=[set the maximum fuzz factor]:factor' \
-      ':files:_files' && return
+      ':file:_files' && return
   ;;
   snapshot) _arguments $help '-d[only remove current snapshot]' && return ;;
   unapplied) _arguments $help ':patch:_quilt_series' && return ;;

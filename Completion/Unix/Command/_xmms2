@@ -43,7 +43,7 @@ _xmms2_command() {
 	)
 
     if (( CURRENT == 1 )); then
-	_describe -t command "xmms2 commands" xmms2_cmds
+	_describe -t command "xmms2 command" xmms2_cmds
     else
 	local curcontext="$curcontext"
     fi
@@ -63,7 +63,7 @@ _xmms2_command() {
 	 fi
      done
      
-     _values -s ' ' 'playlist items' ${(On)playlistitems}
+     _values -s ' ' 'playlist item' ${(On)playlistitems}
 
 }
 
@@ -84,7 +84,7 @@ _xmms2_mlib() {
 
 	)
     if (( CURRENT == 2 )); then
-	_describe -t command "xmms2 mlib commands" mlib_cmds
+	_describe -t command "xmms2 mlib command" mlib_cmds
     else
 	local curcontext="$curcontext"
     fi
@@ -107,7 +107,7 @@ _xmms2_playlist() {
 	remove:"Remove a playlist"
 	)
     if (( CURRENT == 2 )); then
-	_describe -t command "xmms2 playlist commands" playlist_cmds
+	_describe -t command "xmms2 playlist command" playlist_cmds
     else
 	local curcontext="$curcontext"
     fi
@@ -121,14 +121,14 @@ _xmms2_playlist() {
 _xmms2_playlist_load() {
     local list
     list=($(xmms2 playlist list))
-    _describe -t command "xmms2 playlists" list
+    _describe -t command "xmms2 playlist" list
 }
 
 
 _xmms2_playlist_remove() {
     local list
     list=($(xmms2 playlist list))
-    _describe -t command "xmms2 playlists" list
+    _describe -t command "xmms2 playlist" list
 }
 
 
@@ -146,7 +146,7 @@ _xmms2_coll() {
 	attr:"Get/set an attribute for a saved collection"
 	)
     if (( CURRENT == 2 )); then
-	_describe -t command "xmms2 collection commands" coll_cmds
+	_describe -t command "xmms2 collection command" coll_cmds
     else
 	local curcontext="$curcontext"
     fi
@@ -160,7 +160,7 @@ _xmms2_coll() {
 _xmms2_coll_helper() {
     local list
     list=($(xmms2 coll list))
-    _describe -t command "xmms2 playlists" list
+    _describe -t command "xmms2 playlist" list
 }
 
 _xmms2_coll_rename() {

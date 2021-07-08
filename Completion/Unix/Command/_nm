@@ -66,7 +66,7 @@ if _pick_variant -r variant binutils=GNU elftoolchain=elftoolchain elfutils=elfu
 	'--plugin[load specified plugin]:plugin'
 	'--special-syms[include special symbols in the output]'
 	'--synthetic[display synthetic symbols as well]'
-	"--target=[target object format]:targets:(${${(@M)${(f)$(_call_program targets nm --help)}:#*supported targets:*}##*: })"
+	"--target=[target object format]:target:(${${(@M)${(f)$(_call_program targets nm --help)}:#*supported targets:*}##*: })"
 	'--with-symbol-versions[display version strings after symbol names]'
       )
     ;;

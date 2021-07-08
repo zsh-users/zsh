@@ -84,7 +84,7 @@ case "$state" in
     _alternative \
       'files:file:_files -g "*.x#html(-.)"' \
       'urls:URL:_urls' \
-      'bookmarks:bookmarks:compadd -a bookmarks' \
+      'bookmarks:bookmark:compadd -a bookmarks' \
       'history:history:compadd -a w3mhistory' && ret=0
   ;;
   option)

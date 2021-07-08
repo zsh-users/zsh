@@ -236,8 +236,8 @@ else
   [[ -z "$state" ]] && return ret
 fi
 
-_values -s '' -S ' ' 'options' $bsd && ret=0
-_values -S ' ' 'options' $bsdarg && ret=0
+_values -s '' -S ' ' 'option' $bsd && ret=0
+_values -S ' ' 'option' $bsdarg && ret=0
 if [[ -z $pids ]]; then
   _pids && ret=0
 fi

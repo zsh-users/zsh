@@ -45,7 +45,7 @@ case $service in
       '--encoding[the input document character encoding]:encoding:(${encoding[@]})' \
       '*--param[pass a parameter,value pair]:name::value (xpath expression)' \
       '*--stringparam[pass a parameter]:name::value' \
-      '--path[provide a set of paths for resources]:paths:_files -/' \
+      '--path[provide a set of paths for resources]:path:_dir_list' \
       '--nonet[refuse to fetch DTDs or entities over network]' \
       '--nowrite[refuse to write to any file or resource]' \
       '--nomkdir[refuse to create directories]' \
@@ -70,7 +70,7 @@ case $service in
       '--noent[substitute entity references by their value]' \
       '--noenc[ignore any encoding specified inside the document]' \
       "(--output -o)--noout[don't output the result tree]" \
-      '--path[provide a set of paths for resources]:paths:_files -/' \
+      '--path[provide a set of paths for resources]:path:_dir_list' \
       '--load-trace[print trace of all external entities loaded]' \
       '--nonet[refuse to fetch DTDs or entities over network]' \
       '--nocompact[do not generate compact text nodes]' \

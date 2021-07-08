@@ -1114,7 +1114,7 @@ function __tmux-buffers() {
     fi
 
     buffers=( ${${(f)"$(command tmux 2> /dev/null list-buffers "${bopts[@]}")"}/:[ $'\t']##/:} )
-    _describe -t buffers 'buffers' buffers
+    _describe -t buffers 'buffer' buffers
 }
 
 function __tmux-bound-keys() {
@@ -1122,14 +1122,14 @@ function __tmux-bound-keys() {
     local -a keys
 
     keys=( ${${${${(f)"$(command tmux 2> /dev/null list-keys "$@")"}/:[ $'\t']##/:}/(#s)[ $'\t']##/}/(#s):/\\:} )
-    _describe -t keys 'keys' keys
+    _describe -t keys 'key' keys
 }
 
 function __tmux-clients() {
     local expl
     local -a clients
     clients=( ${${(f)"$(command tmux 2> /dev/null list-clients)"}/:[ $'\t']##/:} )
-    _describe -t clients 'clients' clients
+    _describe -t clients 'client' clients
 }
 
 function __tmux-environment-variables() {
@@ -1165,7 +1165,7 @@ function __tmux-environment-variables() {
                 descriptions+=( "${k//:/\\:}:$v" )
             done
             # TODO: this if/else is because '_describe ${hint:+"-x"}' prints the "No matches" error in addition to the message.
-            local msg="${dash_g[1]:+"global "}environment variables${hint}"
+            local msg="${dash_g[1]:+"global "}environment variable${hint}"
             if _describe -t parameters $msg descriptions; then
                 :
             elif [[ -n $hint ]]; then
@@ -1621,9 +1621,9 @@ function __tmux-panes() {
     command tmux 2> /dev/null list-panes "${opts[@]}" | while IFS= read -r line; do
         panes+=( $(( num++ )):${line//:/} )
     done
-    _describe -t panes 'panes' panes "$@"
+    _describe -t panes 'pane' panes "$@"
     if [[ ${IPREFIX} != *. ]]; then
-        _wanted windows expl 'windows' __tmux-windows -S.
+        _wanted windows expl 'window' __tmux-windows -S.
     fi
 }
 
@@ -1648,14 +1648,14 @@ function __tmux-server-options() {
 function __tmux-sessions() {
     local -a sessions
     sessions=( ${${(f)"$(command tmux 2> /dev/null list-sessions)"}/:[ $'\t']##/:} )
-    _describe -t sessions 'sessions' sessions "$@"
+    _describe -t sessions 'session' sessions "$@"
 }
 
 function __tmux-sessions-attached() {
     local -a sessions
     sessions=( ${${(f)"$(command tmux 2> /dev/null list-sessions)"}/:[ $'\t']##/:} )
     sessions=( ${(M)sessions:#*"(attached)"} )
-    _describe -t sessions 'attached sessions' sessions "$@"
+    _describe -t sessions 'attached session' sessions "$@"
 }
 
 # Complete attached-sessions and detached-sessions as separate tags.
@@ -1671,8 +1671,8 @@ function __tmux-sessions-separately() {
     _tags detached-sessions attached-sessions
     # Placing detached before attached means the default behaviour of this
     # function better suits its only current caller, _tmux-attach-session().
-    _requested detached-sessions && _describe -t detached-sessions 'detached sessions' detached_sessions "$@" && ret=0
-    _requested attached-sessions && _describe -t attached-sessions 'attached sessions' attached_sessions "$@" && ret=0
+    _requested detached-sessions && _describe -t detached-sessions 'detached session' detached_sessions "$@" && ret=0
+    _requested attached-sessions && _describe -t attached-sessions 'attached session' attached_sessions "$@" && ret=0
 
     return ret
 }
@@ -1744,9 +1744,9 @@ function __tmux-windows() {
         opts=( )
     fi
     wins=( ${${(M)${(f)"$(command tmux 2> /dev/null list-windows "${opts[@]}")"}:#<->*}/:[ $'\t']##/:} )
-    _describe -t windows 'windows' wins "$@"
+    _describe -t windows 'window' wins "$@"
     if [[ ${IPREFIX} != *: ]]; then
-        _wanted sessions expl 'sessions' __tmux-sessions -S:
+        _wanted sessions expl 'session' __tmux-sessions -S:
     fi
 }
 
@@ -1775,11 +1775,11 @@ _tmux() {
   if (( CURRENT == 1 )); then
     zstyle -s ":completion:${curcontext}:subcommands" mode mode || mode='both'
     if [[ ${mode} == 'commands' ]]; then
-      _describe -t subcommands 'tmux commands' _tmux_commands && ret=0
+      _describe -t subcommands 'tmux command' _tmux_commands && ret=0
     elif [[ ${mode} == 'aliases' ]]; then
-      _describe -t subcommands 'tmux aliases' _tmux_aliases && ret=0
+      _describe -t subcommands 'tmux alias' _tmux_aliases && ret=0
     else
-      _describe -t subcommands 'tmux commands and aliases' _tmux_commands -- _tmux_aliases && ret=0
+      _describe -t subcommands 'tmux command or alias' _tmux_commands -- _tmux_aliases && ret=0
     fi
   else
     tmuxcommand="${words[1]}"

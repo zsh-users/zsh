@@ -52,7 +52,7 @@ if [[ "$state" = "remote" ]]; then
     ;;
     *)
       compset -S '(|\\)\(*' || suf="${${QIPREFIX:+(}:-\(}"
-      _wanted commands expl 'remote commands' \
+      _wanted commands expl 'remote command' \
           compadd -qS "$suf" -M 'm:{a-zA-Z}={A-Za-z}' -a \
                   remote_commands && ret=0
     ;;

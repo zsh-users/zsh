@@ -14,5 +14,5 @@ esac
 _arguments : \
   $args - set3 \
   '(-S -V)-T+[terminal type]:terminal type:_terminals' \
-  '1:terminal capabilities:( init reset longname ${(k)terminfo} )' \
+  '1:terminal capability:( init reset longname ${(k)terminfo} )' \
   '*:capability parameters:{ [[ $words[1] != (init|reset|longname) ]] && _message parameter }'

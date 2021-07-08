@@ -1354,7 +1354,7 @@ _perforce_fstat_fields() {
     ${${${${(M)${(f)"$(_perforce_call_p4 help-fstat help fstat)"}:#[[:blank:]]#[a-zA-Z]##(|\#)[[:blank:]]##--*}##[[:blank:]]#}:#fstat *}//[[:blank:]]##--[[:blank:]]##/:}
   )
   compset -P '*[,[:blank:]]'
-  _describe -t fstat-fields 'Perforce fstat fields' values -S, -q
+  _describe -t fstat-fields 'Perforce fstat field' values -S, -q
 }
 
 

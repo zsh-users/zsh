@@ -50,13 +50,13 @@ if [[ -f $c_path$c_Tagsfile ]]; then
         -e '/^[a-zA-Z_].*/p' $c_path$c_Tagsfile))
 #  c_tags_array=($(perl -ne '/([a-zA-Z_0-9]+)[ \t:;,\(]*\x7f/ &&
 #                  print "$1\n"' $c_path$c_Tagsfile))
-  _main_complete - '' _wanted etags expl 'emacs tags' \
+  _main_complete - '' _wanted etags expl 'emacs tag' \
       compadd -a c_tags_array
 elif [[ -f $c_path$c_tagsfile ]]; then
   # tags doesn't have as much in, but the tag is easy to find.
   # we can use awk here.
   c_tags_array=($(awk '{ print $1 }' $c_path$c_tagsfile))
-  _main_complete - '' _wanted vtags expl 'vi tags' compadd -a c_tags_array
+  _main_complete - '' _wanted vtags expl 'vi tag' compadd -a c_tags_array
 else
   return 1
 fi

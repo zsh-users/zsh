@@ -65,17 +65,17 @@ _zypper() {
 _all_repos() {
     local -a repos
     repos=( $(zypper -q lr | tail -n +3 | cut -d'|' -f 2) )
-    _describe -t repos 'Available repositories' repos && return
+    _describe -t repos 'available repository' repos && return
 }
 
 _enabled_repos() {
     repos=( $(zypper -x lr | grep 'enabled="1"' | cut -d\" -f 2) )
-    _describe -t repos 'Available repositories' repos && return
+    _describe -t repos 'available repository' repos && return
 }
 
 _disabled_repos() {
     repos=( $(zypper -x lr | grep 'enabled="0"' | cut -d\" -f 2) )
-    _describe -t repos 'Available repositories' repos && return
+    _describe -t repos 'available repository' repos && return
 }
 
 _zypper_cmd_do() {
@@ -107,7 +107,7 @@ _zypper_cmd_do() {
         case ${words[CURRENT - 1]} in
             --from)
                 repos=( $(zypper -x lr | grep 'enabled="1"' | cut -d\" -f 2) )
-                _describe -t repos 'Available repositories' repos && return
+                _describe -t repos 'available repository' repos && return
                ;;
             (--enable|-e)
                 case $cmd in
@@ -128,7 +128,7 @@ _zypper_cmd_do() {
                 case $cmd in
                     (if|info|se|search|in|install) 
                         types=( pattern srcpackage package patch )
-                        _describe -t types 'Package types' types && return
+                        _describe -t types 'package type' types && return
                     ;;
                 esac
                 ;;
@@ -143,7 +143,7 @@ _zypper_cmd_do() {
                 ;;
             (in|install)
                 local expl
-                _description files expl 'RPM files' 
+                _description files expl 'RPM file'
                 _files "$expl[@]" -g '*.(#i)rpm(.)'
                 ;;
         esac

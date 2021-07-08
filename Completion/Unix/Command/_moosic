@@ -216,7 +216,7 @@ _moosic_cmd_version() {
 _moosic_song_files()
 {
     _arguments -A '-*' $main_opts $filelist_opts $auto_opts \
-               '*:song files:_files'
+               '*:song file:_files'
 }
 
 _moosic_cmd_append() {
@@ -282,7 +282,7 @@ _moosic_cmd_stagger-merge() {
 _moosic_cmd_interval-add() {
     _arguments -A '-*' $main_opts $filelist_opts \
                   '1:interval:' \
-                  '*:song files:_files'
+                  '*:song file:_files'
 }
 
 ### REMOVING COMMANDS

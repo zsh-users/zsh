@@ -23,7 +23,7 @@ _arguments -n -C -S -s \
   '(-e -u)-L[output in the form of calls to zmodload]' \
   '(-b -c -d -I -f -F -P -l -m -A -R)-p[autoload module for parameters]' \
   '(-u -b -c -d -p -f -A -R)-P[array param for features]:array name:_parameters' \
-  '(-)*:params:->params' && ret=0
+  '(-)*:param:->params' && ret=0
 
 [[ $state = params ]] || return ret
 
@@ -66,7 +66,7 @@ else
   while _tags; do
     _requested builtins expl 'builtin command' \
       compadd "$@" -k builtins && ret=0
-    _requested loadedmodules expl 'loaded modules' \
+    _requested loadedmodules expl 'loaded module' \
       compadd -k 'modules[(R)loaded]' && ret=0
     _requested files expl 'module file' \
       _files -W module_path -g '*.(dll|s[ol]|bundle)(:r)' && ret=0

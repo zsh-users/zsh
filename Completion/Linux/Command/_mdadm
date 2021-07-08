@@ -156,7 +156,7 @@ _mds () {
 	  return 1
 	fi
 	vals=( ${${${(M)${(f)"$(< $mdadm_conf)"}##ARRAY *}//ARRAY /}%%[[:blank:]]*} )
-	_describe -t mds "RAID devices" vals
+	_describe -t mds "RAID device" vals
 	_arguments \
 		"(-h --help)"{-h,--help}'[display a mode specific help message]'
 }

@@ -137,7 +137,7 @@ _arguments -C -s \
   '(--reject -R)'{--reject=,-R+}'[specify rejected extensions]:extensions' \
   --{accept,reject}-regex=:regex '--regex-type=:regex type:(posix pcre)' \
   '(--domains -D)'{--domains=,-D+}'[specify accepted domains]:domains:_domains' \
-  '--exclude-domains=:rejected domains:_domains' \
+  '--exclude-domains=:rejected domain:_sequence _domains' \
   '--follow-ftp' \
   '--follow-tags=:HTML tags:' \
   '--ignore-tags=[specify ignored HTML tags]:HTML tags' \

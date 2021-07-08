@@ -19,7 +19,7 @@ _sv_commands() {
     'kill':'send SIGKILL if service is running'
     'exit':'send SIGTERM and SIGCONT if service is running. Do not restart service.'
   )
-  _describe -t commands "sv commands" sv_ary -V sv_commands
+  _describe -t commands "sv command" sv_ary -V sv_commands
 }
 
 _sv_lsb() {
@@ -41,7 +41,7 @@ _sv_lsb() {
 }
 
 _sv_additional() {
-  _describe -t additional-commands "sv additional commands" '("check:check status of service")' -V sv_addl_comm
+  _describe -t additional-commands "sv additional command" '("check:check status of service")' -V sv_addl_comm
 }
 
 local curcontext="$curcontext" state line
@@ -68,6 +68,6 @@ case $state in
     )
 
     sv_services=( ${sv_services#$svdir/} )
-    _describe -t services "sv services" sv_services
+    _describe -t services "sv service" sv_services
   ;;
 esac

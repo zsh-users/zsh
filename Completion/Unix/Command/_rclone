@@ -79,7 +79,7 @@ _arguments -C \
   '--dump-bodies[dump HTTP headers and bodies - may contain sensitive info]' \
   '--dump-headers[dump HTTP headers - may contain sensitive info]' \
   '--exclude[exclude files matching pattern]:stringArray' \
-  '--exclude-from[read exclude patterns from file]:files:_files' \
+  '--exclude-from[read exclude patterns from file]:file:_files' \
   '--exclude-if-present[exclude directories if filename is present]:string' \
   '--fast-list[use recursive list if available]' \
   '--files-from[read list of source-file names from file]:file:_files' \
@@ -339,8 +339,8 @@ _arguments -C \
 if [[ $state == 'files_or_remotes' ]]; then
   remotes=( $(_call_program rclone-remotes rclone listremotes) )
   _alternative \
-    "remote:rclone-remotes:compadd -a remotes" \
-    "file:files:_files" && ret=0
+    "rclone-remotes:remote:compadd -a remotes" \
+    "files:file:_files" && ret=0
 fi
 
 return ret

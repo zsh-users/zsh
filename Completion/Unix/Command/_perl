@@ -31,7 +31,7 @@ _perl () {
     "-u[dump core after parsing script]" \
     "-U[allow unsafe operations]" \
     "-v[print version, patchlevel and license]" \
-    "-V-[print perl configuration information]:configuration keys:_perl_config_vars" \
+    "-V-[print perl configuration information]:configuration key:_perl_config_vars" \
     '(   -W -X)-w[turn warnings on for compilation of your script (recommended)]' \
     "(-w    -X)-W[enable all warnings (ignores 'no warnings')]" \
     "(-w -W   )-X[disable all warnings (ignores 'use warnings')]" \
@@ -96,7 +96,7 @@ _perl_config_vars () {
 }
 
 _perl_unicode_flags () {
-  _values -s '' 'unicode bitmask or flags' \
+  _values -s '' 'unicode bitmask or flag' \
     '(S)I[  1 STDIN is assumed to be in UTF-8]' \
     '(S)O[  2 STDOUT will be in UTF-8]' \
     '(S)E[  4 STDERR will be in UTF-8]' \

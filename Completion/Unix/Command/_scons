@@ -19,7 +19,7 @@ _arguments -s -S \
   '(-)-'{h,-help}'[display defined usage information]' \
   '(-)-'{H,-help-options}'[display usage information]' \
   '(-i -ignore-errors)-'{i,-ignore-errors}'[ignore errors from build actions]' \
-  \*{-I,--include-dir=}'[add directory to search Python modules]:directories:_directories' \
+  \*{-I,--include-dir=}'[add directory to search Python modules]:directory:_directories' \
   '(--implicit-deps-changed --implicit-deps-unchanged)--implicit-cache[cache scanned dependencies]' \
   '(--implicit-cache --implicit-deps-changed)--implicit-deps-changed[rescan dependencies]' \
   '(--implicit-cache --implicit-deps-unchanged)--implicit-deps-unchanged[ignore changes to scanned dependencies]' \

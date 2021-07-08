@@ -531,7 +531,7 @@ _apt-cache () {
     --installed:bool \
     -- \
     /$'help\0'/ \| \
-    /$'add\0'/ /$'[^\0]#\0'/ ':files:index files:_files' \# \| \
+    /$'add\0'/ /$'[^\0]#\0'/ ':files:index file:_files' \# \| \
     /$'gencaches\0'/ \| \
     /$'showpkg\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'showsrc\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \

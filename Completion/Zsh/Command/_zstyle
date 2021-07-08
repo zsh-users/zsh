@@ -491,7 +491,7 @@ while (( $#state )); do
       elif compset -P '*:'; then
         _message -e tags tag
       else
-        _message -e patterns 'glob patterns'
+        _message -e patterns 'glob pattern'
       fi
       ;;
 

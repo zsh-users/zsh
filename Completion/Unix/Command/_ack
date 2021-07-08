@@ -72,7 +72,7 @@ _arguments -C -s -S \
   '(1)-g[print files where the relative path + filename matches the given pattern]:pattern to match against filenames' \
   '--sort-files[sorts the found files lexically]' \
   '--show-types[print the file types that ack associates with each file]' \
-  '(--files-from -x)--files-from=[read the list of files to search from specified file]:files:_files' \
+  '(--files-from -x)--files-from=[read the list of files to search from specified file]:file:_files' \
   '(-x --files-from)-x[read the list of files to search from standard input]' \
   '*--ignore-dir'{,ectory}'=[ignore directory]:directory:_directories' \
   '*--noignore-dir'{,ectory}'=[remove directory from ignored list]:directory:_directories' \
@@ -86,7 +86,7 @@ _arguments -C -s -S \
   '*--type-'{add,set}'=[files with the given extensions are recognized as being of the given type]:type-def:->type-defs' \
   '*--type-del=[remove all filters associated with specified file type]: :->file-types' \
   '(--env)--noenv[ignore environment variables and global ackrc files]' '!(--noenv)--env)' \
-  '--ackrc=[specify an ackrc file to use]:files:_files' \
+  '--ackrc=[specify an ackrc file to use]:file:_files' \
   '--ignore-ack-defaults[ignore default definitions included with ack]' \
   "${ign}(- 1 *)--create-ackrc[output an ackrc based on customizations]" \
   "${ign}(- 1 *)"{-\?,--help}'[display usage information]' \

@@ -8,11 +8,11 @@ _portmaster_ports() {
   local expl ret=1 _fbsd_ports _fbsd_cat
    _fbsd_cat=(${PORTSDIR:-/usr/ports}/[a-z]*(/:t))
    if [[ $PREFIX != */* ]] ; then
-     _wanted cat_packages expl 'category/ports' compadd -S '/' $_fbsd_cat
+     _wanted cat_packages expl 'category/port' compadd -S '/' $_fbsd_cat
    else
      compset -P '*/'
      _fbsd_ports=(${PORTSDIR:-/usr/ports}/$IPREFIX/*(/:t))
-     _wanted cat_packages expl 'category/ports' compadd $_fbsd_ports
+     _wanted cat_packages expl 'category/port' compadd $_fbsd_ports
    fi
   return ret
 }
@@ -77,7 +77,7 @@ _portmaster() {
       _arguments -s \
       $standalone_args \
       $common_args \
-      '*:packages and ports:_portmaster_pkgs_and_ports'
+        '*:package or port:_portmaster_pkgs_and_ports'
     else 
       case "$words[2]" in
 	--clean-distfiles|--clean-distfiles-all|--check-depends|--check-port-dbdir|--version|-help|-h)
@@ -86,14 +86,14 @@ _portmaster() {
 	*)
 	if (( $words[(I)-(e|r)] ));then
 	  _arguments -s \
-	  '*:packages:_portmaster_pkgs'
+            '*:package:_portmaster_pkgs'
 	elif (( kid=$words[(I)-o] ));then
 	  if (( CURRENT == $kid + 1 ));then
 	    _arguments -s \
-	    '*:ports replacing:_portmaster_ports'
+              '*:replacement port:_portmaster_ports'
 	  elif (( CURRENT == $kid + 2 )); then
 	    _arguments -s \
-	    '*:package to replace:_portmaster_pkgs'
+              '*:package to replace:_portmaster_pkgs'
 	  else 
 	    return 0
 	  fi
@@ -102,7 +102,7 @@ _portmaster() {
 	else
 	  _arguments -s \
 	  $common_args \
-	  '*:packages and ports:_portmaster_pkgs_and_ports'
+            '*:package or port:_portmaster_pkgs_and_ports'
 	fi
 	;;
       esac

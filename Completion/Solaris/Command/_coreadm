@@ -40,6 +40,6 @@ _arguments -s \
   - set2 \
   '-p[PID-specific per-process core file name pattern]:' \
   '-P[PID-specific per-process core file content]:content:_values -s + "content" $content' \
-  '*:pids:_pids' \
+  '*:pid:_pids' \
   - set3 \
   '-u[update options from coreadm.conf]'

@@ -24,7 +24,7 @@ case $words[CURRENT-1] in
     (allow)
 	#_description permissions expl "permission"
 	#compadd $expl \
-	_values -s , permissions \
+	_values -s , permission \
 	    Printing DegradedPrinting ModifyContents Assembly CopyContents \
 	    ScreenReaders ModifyAnnotations FillIn AllFeatures
 	;;
@@ -34,12 +34,12 @@ case $words[CURRENT-1] in
 	;;
 
     (fill_form)
-	_description files expl 'FDF and XFDF files'
+	_description files expl 'FDF and XFDF file'
 	_files "$@" $expl -g '(#i)*.(fdf|xfdf)'
 	;;
 
     ((multibackground|background|stamp|multistamp|output))
-	_description files expl 'PDF files'
+	_description files expl 'PDF file'
 	_files "$@" $expl -g '(#i)*.pdf'
 	;;
 
@@ -53,11 +53,11 @@ case $words[CURRENT-1] in
 esac && return 0
 
 if [[ -n $words[(r)(${(j:|:)operations})] ]]; then
-    _description options expl "options"
+    _description options expl "option"
     compadd $@ $expl $opts
 else
     _tags files operations
     _alternative \
-	'files:PDF files:_pdfwithhandle' \
-	"operations:operations:($operations)"
+	'files:PDF file:_pdfwithhandle' \
+	"operations:operation:($operations)"
 fi

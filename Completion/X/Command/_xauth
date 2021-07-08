@@ -41,7 +41,7 @@ while [[ -n "$state" ]]; do
 	  group) _message -e ids 'group-id';;
 	  data) _message -e values 'hexdata';;
 	  *) 
-	    _wanted options expl 'xauth generate options' \
+	    _wanted options expl 'xauth generate option' \
 	      compadd trusted untrusted timeout group data && ret=0
 	    ;;
 	  esac

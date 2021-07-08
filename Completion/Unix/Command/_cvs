@@ -371,10 +371,10 @@ _cvs_log() {
     '-R[print the name of RCS file in the repository]' \
     '-N[don'\''t list tags]' \
     '(-h)-t[header with descriptive text]' \
-    '-d+[specify dates]:dates' \
+    '-d+[specify dates]:date range' \
     '-r-[specify revisions]:revisions' \
-    '-s+[specify states]:states:(Exp Stab Rel dead)' \
-    '-w-[specify logins]:logins' \
+    '-s+[specify states]:state:_sequence compadd - Exp Stab Rel dead' \
+    '-w-[specify logins]:login list' \
     '*:file:_cvs_files'
 }
 
@@ -388,10 +388,10 @@ _cvs_rlog() {
     '(-l)-R[recursive]' \
     '-N[don'\''t list tags]' \
     '(-h)-t[header with descriptive text]' \
-    '-d+[specify dates]:dates' \
+    '-d+[specify dates]:date range' \
     '-r-[specify revisions]:revisions' \
-    '-s+[specify states]:states:(Exp Stab Rel dead)' \
-    '-w-[specify logins]:logins' \
+    '-s+[specify states]:state:_sequence compadd - Exp Stab Rel dead' \
+    '-w-[specify logins]:login list' \
     '*:file:_cvs_modules'
 }
 

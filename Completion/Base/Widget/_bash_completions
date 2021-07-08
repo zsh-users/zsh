@@ -32,7 +32,7 @@ local key=$KEYS[-1] expl
 case $key in
   '!') _main_complete _command_names
        ;;
-  '$') _main_complete - parameters _wanted parameters expl 'exported parameters' \
+  '$') _main_complete - parameters _wanted parameters expl 'exported parameter' \
                                        _parameters -g '*export*'
        ;;
   '@') _main_complete _hosts

@@ -131,13 +131,13 @@ case "$state" in
   ;;
   audio-drivers)
     vals=( help ${${${(f)"$(_call_program audio-drivers mplayer -ao help 2>/dev/null)"}[(r)	*,-1]#?}/	/:} )
-    _describe -t audio-drivers 'audio drivers' vals && ret=0
+    _describe -t audio-drivers 'audio driver' vals && ret=0
   ;;
   audio-codec-families)
     compset -P '*,'
     compset -S ',*'
     vals=( help ${${${(f)"$(_call_program audio-codec-families mplayer -afm help 2>/dev/null)"}[(r) [^:]#,-1]## ##}/ ##/:} )
-    _describe -t audio-codec-families 'audio drivers' vals && ret=0
+    _describe -t audio-codec-families 'audio driver' vals && ret=0
   ;;
   audio-plugins)
     _values -s : 'audio output plugin' \
@@ -154,7 +154,7 @@ case "$state" in
   ;;
   video-drivers)
     vals=( help ${${${(f)"$(_call_program video-drivers mplayer -vo help 2>/dev/null)"}[(r)	*,-1]#?}/	/:} )
-    _describe -t video-drivers 'video drivers' vals && ret=0
+    _describe -t video-drivers 'video driver' vals && ret=0
   ;;
   video-output-plugins)
     vals=( help ${${${${(f)"$(_call_program video-output-plugins mplayer -vop help 2>/dev/null)"}[(r)	*,-1]}/	/}/ #: /:} )

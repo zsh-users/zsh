@@ -103,7 +103,7 @@ case "$scheme" in
   bookmark)
     if [[ -f "$urls/$scheme/${(Q)PREFIX}${(Q)SUFFIX}" &&
 	  -s "$urls/$scheme/${(Q)PREFIX}${(Q)SUFFIX}" ]]; then
-      _wanted -C bookmark bookmarks expl bookmarks \
+      _wanted -C bookmark bookmarks expl bookmark \
           compadd "$@" -U - \
               "$ipre$(<"$urls/$scheme/${(Q)PREFIX}${(Q)SUFFIX}")" && ret=0
     else

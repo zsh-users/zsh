@@ -204,7 +204,7 @@ _make() {
     ;;
 
     (debug)
-    _values -s , 'debug options' \
+    _values -s , 'debug option' \
       '(b v i j m)a[all debugging output]' \
       'b[basic debugging output]' \
       '(b)v[one level above basic]' \

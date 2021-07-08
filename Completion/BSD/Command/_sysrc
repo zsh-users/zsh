@@ -29,7 +29,7 @@ _sysrc() {
     '(- *)-h[print short usage message]' \
     '(- *)--help[print full usage message]' \
     '-i[ignore unknown variables]' \
-    '-j+[jail to operate within]:jails:_jails' \
+    '-j+[jail to operate within]:jail:_jails' \
     '-n[print only variable values]' \
     '-N[print only variable names]' \
     '-R+[specify an alternative root]:alternative root:_files -/' \

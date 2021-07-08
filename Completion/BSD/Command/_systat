@@ -84,7 +84,7 @@ esac
 
 if (( $#screens )); then
   _arguments -M 'r:|.=* r:|=*' : $opts \
-    '1:systat(1) displays:(( ${pre}$^screens ))' \
+    '1:systat(1) display:(( ${pre}$^screens ))' \
     '2:refresh interval'
   return
 fi

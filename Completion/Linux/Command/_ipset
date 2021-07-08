@@ -25,7 +25,7 @@ _set_types () {
 _ipsets () {
 	local -a vals
 	vals=( ${${(M)${(f)"$(_call_program ipsets ipset -L)"}%Name: *}#Name: } )
-	_describe -t ipsets "IP sets" vals
+	_describe -t ipsets "IP set" vals
 }
 _sets () {
 	_ipsets
@@ -118,7 +118,7 @@ _ips () {
 			if (( $ips )); then vals1+=$i; else bindings+=${i/ ->/:}; fi
 		done
 		_describe -t ips "IPs from $words[offset+3] set" vals1
-		_describe -t special_values "special values" vals2
+		_describe -t special_values "special value" vals2
 	fi
 }
 

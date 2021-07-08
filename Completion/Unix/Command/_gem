@@ -46,7 +46,7 @@ if [[ $state = command ]]; then
         'gem_dependencies:gem dependencies file guide'
         'platforms:show information about platforms'
       )
-      _describe -t topics 'help topics' helptopics -- && ret=0
+      _describe -t topics 'help topic' helptopics -- && ret=0
     ;&
     subcommands)
       cmds=( ${${${(M)${(f)"$(_call_program commands gem help commands)"}:#    [^ ]*}## #}/ ##/:} )

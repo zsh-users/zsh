@@ -10,7 +10,7 @@ _hdiutil_disk() {
       disk_desc+=( "$disk_name:${${(M)REPLY%	*}#?}" )
     fi
   done
-  _describe -t devices disks disk_desc
+  _describe -t devices disk disk_desc
 }
 
 _hdiutil_device() {
@@ -143,7 +143,7 @@ _hdiutil(){
   _arguments -C '*:: :->subcmds'
 
   if (( CURRENT == 1 )); then
-    _describe -t commands "hdiutil subcommands" _1st_arguments
+    _describe -t commands "hdiutil subcommand" _1st_arguments
     return
   fi
 

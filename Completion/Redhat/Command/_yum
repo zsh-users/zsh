@@ -167,7 +167,7 @@ _yumdb() {
 
       if [ "$cmd" = "help" ]; then
         if (( CURRENT == 2 )); then
-          _describe -t commands 'yum commands' _yum_cmds && ret=0
+          _describe -t commands 'yum command' _yum_cmds && ret=0
         else
           # help takes one argument
           _message 'no more arguments'

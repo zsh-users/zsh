@@ -127,7 +127,7 @@ if [[ "$state" = vars_eq ]]; then
 	[[ $PREFIX != [_.]* ]]; then
 	args=(${args:#_*})
       fi
-      _wanted functions expl 'shell functions' compadd -a args
+      _wanted functions expl 'shell function' compadd -a args
     else
       _functions
     fi

@@ -184,7 +184,7 @@ case "$state" in
         ${=${(M)${(f)"$(_call_program targets objdump --help)"}##* supported architectures:*}##*: } && ret=0
   ;;
   disassembler_options)
-    _values -s , "disassembler options" "${(@)${(@)${(@M)${(f)${(ps.-M switch.)$(_call_program targets objdump --help)}[2]}:#  [^ ]*}#  }%% *}" && ret=0
+    _values -s , "disassembler option" "${(@)${(@)${(@M)${(f)${(ps.-M switch.)$(_call_program targets objdump --help)}[2]}:#  [^ ]*}#  }%% *}" && ret=0
   ;;
   llvm_targets)
     _values "target architecture" "${(z)${(@)${(f)$(_call_program targets

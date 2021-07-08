@@ -66,18 +66,18 @@ _svcs_fmri() {
 		# _wanted fmri expl "full or unambiguously abbreviated FMRIs" \
 		# 	_multi_parts -i / fmri_abbrevs
 
-		_wanted fmri expl "full or unambiguously abbreviated FMRIs" \
+		_wanted fmri expl "full or unambiguously abbreviated FMRI" \
 			compadd $fmri_abbrevs
 		;;
 
 	(-m)
-		_wanted fmri expl "milestone FMRIs" \
+		_wanted fmri expl "milestone FMRI" \
 			compadd $(svcs -H -o fmri svc:/milestone/\*) all
 		;;
 
 	(-r)
 		# TODO: need some way to pick out only restarters
-		_wanted fmri expl "restarter FMRIs" \
+		_wanted fmri expl "restarter FMRI" \
 			compadd master reset svc:/network/inetd:default
 		;;
 

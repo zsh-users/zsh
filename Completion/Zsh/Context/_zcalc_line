@@ -16,7 +16,7 @@ _zcalc_line_escapes() {
     "function:define math function (also \:func or \:f)"
   )
   cmds=("\:"${^cmds})
-  _describe -t command-escapes "command escapes" cmds -Q
+  _describe -t command-escapes "command escape" cmds -Q
 }
 
 _zcalc_line() {

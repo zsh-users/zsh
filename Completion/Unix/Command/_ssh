@@ -397,7 +397,7 @@ _ssh () {
           state=dynforward
           ;;
         (#i)kbdinteractivedevices=*)
-          _values -s , 'keyboard-interactive authentication methods' \
+          _values -s , 'keyboard-interactive authentication method' \
               'bsdauth' 'pam' 'skey' && ret=0
           ;;
         (#i)(kexalgorithms|gssapikexalgorithms)=*)

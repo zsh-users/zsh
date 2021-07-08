@@ -187,7 +187,7 @@ _mysqladmin() {
 	  _wanted databases expl "MySQL database" _mysql_databases && ret=0
 	;;
 	kill)
-	  _message -e ids 'thread ids'
+	  _message -e ids 'thread id'
 	;;
 	password)
 	  _message -e passwords 'new password'

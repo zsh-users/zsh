@@ -47,7 +47,7 @@ fvals=(
 [[ -n $cvalsvar ]] && set -- "$@" ${(P)cvalsvar}
 
 if [[ $# -eq 0 ]]; then
-  set -- 'mount options' $fvals
+  set -- 'mount option' $fvals
 else
   set -- "$@" $fvals
 fi

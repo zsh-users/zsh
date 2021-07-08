@@ -36,4 +36,4 @@ _arguments \
   '-linums[display line numbers before each line]' \
   '-rdonly[make file read-only]' \
   '-keymap[use an alternate section of joerc for keybindings]:keymap name' \
-  '*:files:_files'
+  '*:file:_files'

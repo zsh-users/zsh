@@ -45,8 +45,8 @@ _tla_revisions () { _arch_namespace tla 4 "$argv[@]" }
 (( $+functions[_tla_local_revisions] )) ||
 _tla_local_revisions () {
   local expl1 expl2 tree_version=`$TLA tree-version`
-  _description -V applied-patches expl1 "patches from this version"
-  _description -V other-patches expl2 "patches from other versions"
+  _description -V applied-patches expl1 "patch from this version"
+  _description -V other-patches expl2 "patch from other versions"
   compadd "$expl1[@]" `$TLA logs`
   compadd "$expl2[@]" `$TLA logs --full $($TLA log-versions | grep -v $tree_version)`
   # This is incredibly slow.
@@ -90,7 +90,7 @@ _tla_limit () { #presently only does push-mirror style limits
   if [ $archive ]; then
 
     if [[ $PREFIX != *--* ]]; then
-      _description -V categories expl "categories in $archive"
+      _description -V categories expl "category in $archive"
       compadd -q -S -- "$expl[@]" `$TLA categories -A $archive`
     else
       _tla_namespace_branches 3
@@ -107,7 +107,7 @@ _tla_tree_or_rev () {
 _tla_libraries () {
   local libraries expl
   libraries=($(_call_program tla $TLA my-revision-library))
-  _description -V libraries expl "revision libraries"
+  _description -V libraries expl "revision library"
   compadd "$expl[@]" -a libraries
 }
 
@@ -128,7 +128,7 @@ _tla_log_versions () {
   else
     logs=($(_call_program tla $TLA logs))
   fi
-  _description -V versions expl "log versions"
+  _description -V versions expl "log version"
   compadd "$expl[@]" -a logs
 }
 
@@ -278,12 +278,12 @@ methods=(
 cmd_tagging_method=($cmd_id_tagging_method)
 
 local cmd_add cmd_add_id cmd_add_tag
-cmd_add=('*:files to add:_files')
+cmd_add=('*:file to add:_files')
 cmd_add_id=($cmd_add)
 cmd_add_tag=($cmd_add)
 
 local cmd_delete cmd_delete_id cmd_delete_tag
-cmd_delete=('*:files to delete:_files')
+cmd_delete=('*:file to delete:_files')
 cmd_delete_id=($cmd_delete)
 cmd_delete_tag=($cmd_delete)
 
@@ -312,7 +312,7 @@ cmd_changeset=(
   ':ORIG:_files -/'
   ':MOD:_files -/'
   ':DEST:_files -/'
-  '*:files:_files'
+  '*:file:_files'
 )
 cmd_mkpatch=("$cmd_changeset[@]")
 
@@ -328,7 +328,7 @@ local cmd_make_archive
 cmd_make_archive=('::name:' ':location:_files -/')
 
 local cmd_archive_setup
-cmd_archive_setup=('*:versions:_tla_branches --trailing-dashes')
+cmd_archive_setup=('*:version:_tla_branches --trailing-dashes')
 
 local cmd_make_category
 cmd_make_category=(':category:_tla_archives -S /')
@@ -344,7 +344,7 @@ cmd_import=('::version:_tla_versions')
 cmd_imprev=($cmd_import)
 
 local cmd_commit cmd_cmtrev
-cmd_commit=('::version:_tla_versions' ':separator:(--)' '*:files:_files')
+cmd_commit=('::version:_tla_versions' ':separator:(--)' '*:file:_files')
 cmd_cmtrev=($cmd_commit)
 
 local cmd_get cmd_getrev
@@ -619,7 +619,7 @@ _tla_main () {
     local -U cmds
     help=(${(f)"$($TLA help)"})
     cmds=(${${${${(M)help:#* :*}/ #: #/:}%% ##}## #})
-    arguments=(':commands:(($cmds))')
+    arguments=(':command:(($cmds))')
   fi
   _arguments -S -A '-*' \
     {"${hide_short}(: -)-V",'(: -)--version'}'[display version]' \

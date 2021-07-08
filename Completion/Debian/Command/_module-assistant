@@ -33,5 +33,5 @@ _arguments -A \
   '(-k --kernel-dir)'{-k,--kernel-dir}'[list of kernel headers/source directories, comma separated]:list of dirs:_files -/' \
   '(-t --text-mode)'{-t,--text-mode}'[no progress bars]' \
   '1:list of commands:_values -s , subcommands "${_module_assistant_commands[@]}"' \
-  '*:packages: compadd /usr/src/modass/var_cache_modass/*.avail_version(N:t:r) /var/cache/modass/*.avail_version(N:t:r)'
+  '*:package: compadd /usr/src/modass/var_cache_modass/*.avail_version(N:t:r) /var/cache/modass/*.avail_version(N:t:r)'
 

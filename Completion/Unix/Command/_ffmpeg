@@ -6,7 +6,7 @@ typeset -A opt_args
 (( $+functions[_ffmpeg_presets] )) || _ffmpeg_presets() {
     local presets
     presets=(~/.ffmpeg/*.ffpreset(:t:r) "$FFMPEG_DATADIR"/*.ffpreset(:t:r))
-    _wanted ffmpeg-presets expl 'select preset' compadd -a presets
+    _wanted ffmpeg-presets expl 'preset' compadd -a presets
 }
 
 (( $+functions[_ffmpeg_acodecs] )) || _ffmpeg_acodecs() {
@@ -49,7 +49,7 @@ typeset -A _ffmpeg_flags
 
 (( $+functions[_ffmpeg_flag_options] )) || _ffmpeg_flag_options() {
     local expl
-    _wanted options expl 'select flags' compadd -S '' -- {-,+}${^flag_options}
+    _wanted options expl 'flag' compadd -S '' -- {-,+}${^flag_options}
 }
 
 (( $+functions[_ffmpeg_more_flag_options] )) || _ffmpeg_more_flag_options() {
@@ -177,7 +177,7 @@ _arguments -C -S \
     && return
 
 [[ "$state" == "vfilters" ]] &&
-    _values -s , -S = 'video filters' \
+    _values -s , -S = 'video filter' \
     'aspect:set aspect ratio (rational number X\:Y or decimal number):' \
     'crop:crop input video (x\:y\:width\:height):' \
     'format: :_sequence -s : _ffmpeg_pix_fmts' \

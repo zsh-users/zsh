@@ -50,7 +50,7 @@ case $variant in
     )
     argf=( '*:name: _alternative "files:file:_files" "services:service:_fuser_services"' )
     [[ -prefix -  && -z ${${words[1,CURRENT-1]}[(r)-[A-Z][A-Z]*]} ]] &&
-        argf[1]+=' "signal:signals:_signals -P-"'
+        argf[1]+=' "signals:signal:_signals -P-"'
   ;;
   freebsd*|openbsd*|solaris2.<9->)
     args+=(

@@ -1,5 +1,8 @@
 2021-07-08  Oliver Kiddle  <opk@zsh.org>
 
+	* 49150: Completion/...: consistently use singular form for
+	headings on completion match groups
+
 	* 49149: Completion/Unix/Command/_ssh: add specific values
 	in completion after ssh-keygen -b depending on the key type
 

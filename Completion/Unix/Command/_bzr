@@ -65,7 +65,7 @@ case $cmd in
 	'--no-recurse[do not recurse into subdirectories]'
 	'(-q --quiet -v --verbose)'{--quiet,-q}'[be quiet]'
 	'(-v --verbose -q --quiet)'{--verbose,-v}'[display more information]'
-	'*:unknown files:_bzr_unknownFiles'
+	'*:unknown file:_bzr_unknownFiles'
 	)
     ;;
 
@@ -74,7 +74,7 @@ case $cmd in
 	'--all[show annotations on all lines]'
 	'--long[show date in annotations]'
 	'(-r --revision)'{--revision=,-r}'[the revision to show]:rev:'
-	'*:files:_bzr_versionedFiles'
+	'*:file:_bzr_versionedFiles'
 	)
     ;;
 
@@ -100,7 +100,7 @@ case $cmd in
 
 (rename|move|mv)
     if (( CURRENT == 2 )); then
-	args+=( '*:files:_bzr_versionedFiles' )
+	args+=( '*:file:_bzr_versionedFiles' )
     else
 	args=( '*:destination dir:_files -/' )
     fi
@@ -218,7 +218,7 @@ case $cmd in
 	'--unchanged[include unchanged files]'
 	'(-q --quiet -v --verbose)'{--quiet,-q}'[be quiet]'
 	'(-v --verbose -q --quiet)'{--verbose,-v}'[display more information]'
-	'*:modified files:_bzr_modifiedFiles'
+	'*:modified file:_bzr_modifiedFiles'
 	)
     ;;
 
@@ -229,7 +229,7 @@ case $cmd in
 	'--all[shelve all changes]'
 	'(-q --quiet)'{--quiet,-q}'[be quiet]'
 	'(-v --verbose)'{--verbose,-v}'[display more information]'
-	'*:modified files:_bzr_modifiedFiles'
+	'*:modified file:_bzr_modifiedFiles'
 	)
     ;;
 
@@ -279,7 +279,7 @@ case $cmd in
 	'(-r --revision)'{--revision=,-r}'[revision]:revision:'
 	'--diff-options=[options to pass to gdiff]:diff options:'
 	'(-p --prefix)'{--prefix,-p}'[set prefix added to old and new filenames]'
-	'*:files:_files'
+	'*:file:_files'
 	)
     ;;
 
@@ -376,7 +376,7 @@ case $cmd in
     args+=(
 	'--all[show annotations on all lines]'
 	"--plain[don't highlight annotation lines]"
-	'*:files:_bzr_versionedFiles'
+	'*:file:_bzr_versionedFiles'
 	)
     ;;
 

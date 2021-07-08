@@ -10,7 +10,7 @@ if [[ CURRENT -eq 2 ]]; then
     else
       disp=()
     fi
-    [[ -z $lines ]] || _wanted jobs expl 'scheduled jobs' \
+    [[ -z $lines ]] || _wanted jobs expl 'scheduled job' \
                            compadd "$disp[@]" - {1..$#lines}
     return
   else

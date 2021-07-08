@@ -10,7 +10,7 @@ _arguments \
   '*:args:->args' && return 0
 
 if (( CURRENT == 2 )); then
-  _wanted tag expl 'axi-cache commands' \
+  _wanted tag expl 'axi-cache command' \
     compadd help search more last show again info \
     rdetails depends madison policy showpkg showsrc
 else

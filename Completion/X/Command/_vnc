@@ -86,7 +86,7 @@ case $service in
   ;;
   *vncviewer) 
     _xt_arguments -shared -viewonly -fullscreen -bgr233 -owncmap -truecolour \
-      '-encodings:encodings:_values -s " " encoding copyrect hextile corre rre raw' \
+      '-encodings: :_values -s " " encoding copyrect hextile corre rre raw' \
       '-depth:depth' \
       '-passwd:file:_files' \
       '(1)-listen:display number' \

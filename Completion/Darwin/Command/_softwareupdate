@@ -55,7 +55,7 @@ _softwareupdate() {
       ignored_subcmd=(add remove)
 
       if (( CURRENT == 1 )); then
-        _describe -t commands "subcommands" ignored_subcmd && return 0
+        _describe -t commands "subcommand" ignored_subcmd && return 0
       fi
       case $words[1] in
         add)

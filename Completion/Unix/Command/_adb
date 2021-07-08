@@ -85,7 +85,7 @@ _adb() {
 	'-s[serial]: :_adb_device_serial' \
 	'(   -e)-d[device]' \
 	'(-d   )-e[emulator]' \
-	'1:options:_adb_options_handler' \
+	'1:option:_adb_options_handler' \
 	'*: : _default'
       
       return
@@ -141,7 +141,7 @@ _adb_dispatch_command () {
 	'(-d -e)-s[serial]: :_adb_device_serial' \
 	'(-s -e)-d[device]' \
 	'(-d -s)-e[emulator]' \
-	'*:options:_adb_options_handler'
+	'*:option:_adb_options_handler'
       ;;
   esac
 }
@@ -392,7 +392,7 @@ _adb_check_log_redirect () {
 
 (( $+functions[_adb_trace_opts] )) ||
 _adb_trace_opts() {
-  _values -s , 'adb trace options' \
+  _values -s , 'adb trace option' \
 	'(1 adb sockets packets rwx usb sync sysdeps transport jdwp)all' \
 	'(all adb sockets packets rwx usb sync sysdeps transport jdwp)1' \
 	'adb' \
@@ -418,7 +418,7 @@ _adb_device_serial() {
       devices[(i)${device%:*}:*]=$device
     fi
   done
-  _describe -t dev_serial 'available devices' devices
+  _describe -t dev_serial 'available device' devices
 }
 
 (( $+functions[_adb_logcat_filter_specification] )) ||
@@ -459,13 +459,13 @@ _adb_dispatch_logcat() {
 (( $+functions[_adb_options_handler] )) ||
 _adb_options_handler() {
   local expl
-  _wanted adb_options expl 'adb options' compadd "${ALL_ADB_COMMANDS[@]}"
+  _wanted adb_options expl 'adb option' compadd "${ALL_ADB_COMMANDS[@]}"
 }
 
 (( $+functions[_adb_shell_commands_handler] )) ||
 _adb_shell_commands_handler() {
   local expl
-  _wanted adb_shell_commands expl 'adb shell commands' compadd ls pm am mkdir rmdir rm cat 
+  _wanted adb_shell_commands expl 'adb shell command' compadd ls pm am mkdir rmdir rm cat
 }
 
 (( $+functions[_adb_device_available] )) ||
@@ -514,7 +514,7 @@ _adb_installed_packages() {
 _adb_users() {
   local -a users
   users=( ${${${(M)${(f)"$(adb shell pm list users)"}:#*UserInfo*}#*UserInfo\{}%:*} )
-  _describe -t users 'users' users
+  _describe -t users 'user' users
 }
 
 (( $+functions[_adb_cache_policy_single_command] )) ||

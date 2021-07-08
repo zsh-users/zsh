@@ -76,8 +76,8 @@ _git-add () {
       declare -a ignored_files_alternatives
       if [[ -n ${opt_args[(I)-f|--force]} ]]; then
         ignored_files_alternatives=(
-          'ignored-modified-files:ignored modified files:__git_ignore_line_inside_arguments __git_modified_files --ignored'
-          'ignored-other-files:ignored other files:__git_ignore_line_inside_arguments __git_other_files --ignored')
+          'ignored-modified-files:ignored modified file:__git_ignore_line_inside_arguments __git_modified_files --ignored'
+          'ignored-other-files:ignored other file:__git_ignore_line_inside_arguments __git_other_files --ignored')
       fi
 
       _alternative \
@@ -330,7 +330,7 @@ _git-branch () {
     "($l $m $d -f --force)"{-f,--force}'[force the creation of a new branch]' \
     "($l $m $d -t --track)"{-t,--track}'[setup configuration so that pull merges from the start point]' \
     "($l $m $d)--no-track[override the branch.autosetupmerge configuration variable]" \
-    "($l $m $d -u --set-upstream --set-upstream-to --unset-upstream)"{-u+,--set-upstream-to=}'[set up configuration so that pull merges]:remote-branches:__git_remote_branch_names' \
+    "($l $m $d -u --set-upstream --set-upstream-to --unset-upstream)"{-u+,--set-upstream-to=}'[set up configuration so that pull merges]:remote branch:__git_remote_branch_names' \
     "($l $m $d -u --set-upstream --set-upstream-to --unset-upstream)--unset-upstream[remove upstream configuration]" \
     "($l $m $d)*--contains=[only list branches that contain the specified commit]: :__git_committishs" \
     "($l $m $d)*--no-contains=[only list branches that don't contain the specified commit]: :__git_committishs" \
@@ -3138,7 +3138,7 @@ __git_config_option-or-value () {
             ;;
           (*.)
             local -a existing_subsections=( ${${${(M)git_present_options:#${IPREFIX}*.*}#${IPREFIX}}%.*} )
-            _describe -t existing-subsections "existing subsections" existing_subsections -S . && ret=0
+            _describe -t existing-subsections "existing subsection" existing_subsections -S . && ret=0
             ;;
         esac
       else
@@ -4070,7 +4070,7 @@ _git-help () {
     '(-a --all -g --guides -c --config -i --info -m --man)'{-w,--web}'[display manual for the command in HTML format]' \
     '(-g --guides -c --config -i --info -m --man -w --web)'{-g,--guides}'[prints a list of useful guides on the standard output]' \
     '(-v --verbose)'{-v,--verbose}'[print command descriptions]' \
-    ': : _alternative commands:command:_git_commands "guides:git guides:(attributes cli core-tutorial cvs-migration diffcore everyday glossary hooks ignore modules namespaces repository-layout revisions tutorial tutorial-2 workflows)"'
+    ': : _alternative commands:command:_git_commands "guides:git guide:(attributes cli core-tutorial cvs-migration diffcore everyday glossary hooks ignore modules namespaces repository-layout revisions tutorial tutorial-2 workflows)"'
 }
 
 (( $+functions[_git-instaweb] )) ||
@@ -5381,7 +5381,7 @@ _git-pack-redundant () {
     '(:)--all[process all packs]' \
     '--alt-odb[do not require objects to be present in local packs]' \
     '--verbose[output some statistics to standard error]' \
-    '(--all)*::packs:_files -g "*.pack(-.)"'
+    '(--all)*::pack:_files -g "*.pack(-.)"'
 }
 
 (( $+functions[_git-rev-list] )) ||
@@ -7317,7 +7317,7 @@ __git_repositories () {
 __git_local_repositories () {
   local expl
 
-  _wanted local-repositories expl 'local repositories' _directories
+  _wanted local-repositories expl 'local repository' _directories
 }
 
 (( $+functions[__git_repositories_or_urls] )) ||

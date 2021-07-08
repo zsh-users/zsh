@@ -3,7 +3,7 @@
 local curcontext="$curcontext" state line expl args ret=1
 typeset -A opt_args
 
-args=( '*:Perl pod pages:->perl-pods' )
+args=( '*:Perl pod page:->perl-pods' )
 
 if [[ $service = *PERLDOC* ]]; then
   compset -q
@@ -46,7 +46,7 @@ case  $state in
 
   perl-pods)
     if (( $+opt_args[-F] )); then
-      _wanted files expl 'Perl modules and .pods' \
+      _wanted files expl 'Perl module or .pod' \
           _files -g "*.(pod|pm)(-.)" && ret=0
     else
       _alternative \

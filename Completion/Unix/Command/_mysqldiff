@@ -20,8 +20,8 @@ _mysqldiff () {
 
 _mysql_db_or_file () {
   _alternative \
-    'databases:MySQL databases:_mysql_databases' \
-    'files:MySQL database definition files:_files -g "*.(my|)sql(-.)"'
+    'databases:MySQL database:_mysql_databases' \
+    'files:MySQL database definition file:_files -g "*.(my|)sql(-.)"'
 }
 
 _mysql_utils

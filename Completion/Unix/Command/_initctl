@@ -51,14 +51,14 @@ _initctl_known_events()
 _initctl_multiple_known_events()
 {
   [[ ${#_initctl_events_list} -eq 0 ]] && _initctl_fillarray_events_args
-  _values -s "," "Events" "$_initctl_events_list[@]"
+  _values -s "," "event" "$_initctl_events_list[@]"
 }
 
 # list KEY= arguments, generate array if necessary
 _initctl_known_eventargs()
 {
   [[ ${#_initctl_eventargs_list} -eq 0 ]] && _initctl_fillarray_events_args
-  _values "Argument Keys" "$_initctl_eventargs_list[@]"
+  _values "argument key" "$_initctl_eventargs_list[@]"
 }
 
 # describe and offer commands for initctl, then call matching completion function
@@ -82,7 +82,7 @@ _initctl_command()
     )
 
     if (( CURRENT == 1 )); then
-        _describe -t command "initctl Commands" cmds
+        _describe -t command "initctl command" cmds
     fi
 
     local cmd=$words[1]
@@ -97,8 +97,8 @@ _initctl_startstop()
     _arguments \
         '--no-wait[do not wait for operation to complete before exiting]' \
         "${common_args[@]}" \
-        ':Upstart Jobs:_initctl_helper_jobs' \
-        '*::Argument Keys:_initctl_known_eventargs'
+        ':upstart job:_initctl_helper_jobs' \
+        '*::argument key:_initctl_known_eventargs'
 }
 
 # completion for anything that takes one job
@@ -106,7 +106,7 @@ _initctl_argjob()
 {
     _arguments \
         "${common_args[@]}" \
-        ':Upstart Jobs:_initctl_helper_jobs' \
+        ':upstart job:_initctl_helper_jobs' \
         '*::'
 }
 
@@ -116,8 +116,8 @@ _initctl_emit()
     _arguments \
         '--no-wait[do not wait for event to finish before exiting]' \
         "${common_args[@]}" \
-        ':Events:_initctl_known_events' \
-        '*::Argument Keys:_initctl_known_eventargs'
+        ':event:_initctl_known_events' \
+        '*::argument key:_initctl_known_eventargs'
 }
 
 # the fallback, just the options
@@ -133,7 +133,7 @@ _initctl_show-config()
     _arguments \
       "(-e --enumerate)"{-e,--enumerate}"[enumerate emit lines]" \
         "${common_args[@]}" \
-        '::Upstart Jobs:_initctl_helper_jobs' \
+        '::upstart job:_initctl_helper_jobs' \
         '*::'
 }
 
@@ -144,7 +144,7 @@ _initctl_check-config()
       "(-i --ignore-events)"{-i,--ignore-events}"[list of comma-separated events to ignore]:Events:_initctl_multiple_known_events" \
       "(-w --warn)"{-w,--warn}"[treat any unknown jobs or events as error]" \
         "${common_args[@]}" \
-        '::Upstart Jobs:_initctl_helper_jobs' \
+        '::upstart job:_initctl_helper_jobs' \
         '*::'
 }
 
@@ -172,7 +172,7 @@ _initctl()
   # depending on which command was used, call different completion functions
   case $service in
     initctl)
-      _arguments "${common_args[@]}" '*::Initctl Commands:_initctl_command'
+      _arguments "${common_args[@]}" '*::initctl command:_initctl_command'
     ;;
     start|stop|restart|reload|status)
       _call_function ret _initctl_${cmd_completion_funcs[${service}]-${cmd_completion_default}}

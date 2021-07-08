@@ -95,18 +95,18 @@ if [[ $words[CURRENT] != -* ]]; then
                 _tags gradle_group gradle_all
                 while _tags; do
                     # Offer main tasks and secondary tasks in different tags.
-                    _requested gradle_group && _describe 'group tasks' gradle_group_tasks && ret=0
-                    _requested gradle_all && _describe 'secondary tasks' gradle_all_tasks && ret=0
+                    _requested gradle_group && _describe 'group task' gradle_group_tasks && ret=0
+                    _requested gradle_all && _describe 'secondary task' gradle_all_tasks && ret=0
                     (( ret )) || break
                 done
             elif [[ $state == alltask ]]; then
                 # After '--exclude-task', we don't make a distinction between main tasks and
                 # secondary tasks.
-                _describe 'all tasks' gradle_group_tasks -- gradle_all_tasks && ret=0
+                _describe 'task' gradle_group_tasks -- gradle_all_tasks && ret=0
             fi
         fi
     else
-        _describe 'built-in tasks' '(
+        _describe 'built-in task' '(
             "dependencies:Displays all dependencies declared in root project."
             "dependencyInsight:Displays the insight into a specific dependency in root project."
             "help:Displays a help message."

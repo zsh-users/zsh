@@ -102,9 +102,9 @@ case $state in
     elif compset -P '*,*,'; then
       _message 'sampling rate'
     elif compset -P '*,'; then
-      _message 'channels'
+      _message 'channel'
     else
-      _values 'sampling parameters' \
+      _values 'sampling parameter' \
         'u8[unsigned 8-bit]' \
 	's16_le[signed 16-bit little endian]' \
 	's16_be[signed 16-bit big endian]' \

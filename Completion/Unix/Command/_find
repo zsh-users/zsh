@@ -89,7 +89,7 @@ case $variant in
       '-X[warn if filename contains characters special to xargs]'
       '-f[specify file hierarchy to traverse]:path:_directories'
       "-x[don't span filesystems]"
-      '*-flags:flags:_chflags'
+      '*-flags:flag:_chflags'
     )
   ;|
   freebsd*|dragonfly*) args+=( '*-sparse' ) ;|

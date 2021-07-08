@@ -42,7 +42,7 @@ _defaults(){
       _arguments \
         "(1)-app:application:_mac_applications" \
         "(-app)1:domain:_defaults_domains" \
-        "2:keys:_defaults_keys"
+        "2:key:_defaults_keys"
       ;;
     write)
       _arguments \

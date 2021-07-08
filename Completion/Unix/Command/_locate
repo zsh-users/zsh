@@ -44,7 +44,7 @@ case $variant in
       -u'[create slocate database starting at path /]'
       -U'[create slocate database starting at given path]:directory:_files -/'
       -c'[parse GNU locate updatedb with -u, -U]'
-      -e'[exclude directories with -u, -U]:directories:_files -/'
+      -e'[exclude directories with -u, -U]: : _dir_list -s,'
       -f'[exclude file system types from db with -u, -U]:file system:_file_systems'
       -l'[security level]:level:(0 1)'
       -q'[quiet mode]'

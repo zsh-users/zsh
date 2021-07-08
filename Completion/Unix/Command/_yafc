@@ -32,7 +32,7 @@ _yafc_bookmarks() {
     if [[ -f $bkmfile ]]; then
         local -a bkms expl
         bkms=(${${${(M)"${(f)$(<$bkmfile)}":#machine*alias ##\'*\' #}##machine*alias ##\'}%%\' #}) #" vim syntax goes crazy
-        _wanted bookmarks expl 'bookmarks' compadd "$@" -a - bkms
+        _wanted bookmarks expl 'bookmark' compadd "$@" -a - bkms
     fi
 }
 
