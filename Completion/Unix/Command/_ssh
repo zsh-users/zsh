@@ -5,7 +5,7 @@
 _ssh () {
   local curcontext="$curcontext" state line expl suf arg ret=1
   local args sigargs common common_transfer options algopt tmp p1 file cmn cmds sdesc tdesc
-  typeset -A opt_args
+  typeset -A opt_args tsizes
 
   common=(
     '(-6)-4[force ssh to use IPv4 addresses only]'
@@ -188,9 +188,14 @@ _ssh () {
     cmds=( -p -i -e -y -c -l -B -D -F -H -K -R -r -M -s -L -A -k -Q -Y ) # basic commands
     cmn=( -a -b -P -N -C -l -m -O -v -w -Z ) # options common to many basic commands (except -f which is common to most)
     cms=( -E -q -t -g -M -I -h -n -V -u -U ) # options specific to one basic command
+    tsizes=(
+      dsa 1024
+      ecdsa '256 384 521' # values appear in key names as listed with ssh -Q key - 521 really is correct
+      rsa '1024 2048 4096'
+    )
     _arguments -s $args \
-      "${p1}(${${(@)cmds:#-[pcKAO]}} ${${(@)cms:#-[t]}} -O)-a+[specify number of rounds]:rounds" \
-      "(${${(@)cmds:#-M}} -P ${${(@)cms:#-[MS]}})-b+[specify number of bits in key]:bits in key" \
+      "${p1}(${${(@)cmds:#-[pcKAO]}} ${${(@)cms:#-[t]}} -O)-a+[specify number of rounds]:rounds [16]" \
+      "(${${(@)cmds:#-M}} -P ${${(@)cms:#-[MS]}})-b+[specify number of bits in key]:bits in key [2048]:"'compadd ${expl\:/-X/-x} ${_comp_mesg\:=-} ${=tsizes[${opt_args[create--t]\:-rsa}]}' \
       "$p1(${${(@)cmds:#-[pc]}} -b $cms)-P+[provide old passphrase]:old passphrase" \
       "(${${(@)cmds:#-p}} -v ${${(@)cms:#-[qt]}})-N+[provide new passphrase]:new passphrase" \
       "(${${(@)cmds:#-c}} -v $cms)-C+[provide new comment]:new comment" \
