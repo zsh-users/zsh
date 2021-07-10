@@ -1,5 +1,15 @@
 2021-07-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 49158: Completion/Debian/Command/_dscverify,
+	Completion/Solaris/Command/_dhcpinfo,
+	Completion/Solaris/Command/_inetadm,
+	Completion/Solaris/Command/_prstat,
+	Completion/Solaris/Command/_svcadm,
+	Completion/Solaris/Command/_svcprop,
+	Completion/Solaris/Command/_zlogin,
+	Completion/Unix/Command/_pkginfo, Completion/Unix/Command/_pkgrm:
+	remove superfluous function definitions
+
 	* 49157: Completion/Linux/Command/_valgrind,
 	Completion/Unix/Command/_baz, Completion/Unix/Command/_opustools,
 	Completion/Unix/Command/_tla: fix uses of literal % characters in
