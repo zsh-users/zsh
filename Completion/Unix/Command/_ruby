@@ -21,7 +21,7 @@ common=(
 )
 
 opts=(
-  '-0-[specify record separator]:input record separator in octal [default \0]'
+  '-0-[specify record separator]:input record separator in octal [\0]'
   '-a[autosplit mode with -n or -p (splits $_ into $F)]'
   '-c[check syntax only]'
   '-C+[cd to directory before executing your script]:directory:_files -/'

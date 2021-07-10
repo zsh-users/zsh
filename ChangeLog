@@ -1,3 +1,20 @@
+2021-07-10  Oliver Kiddle  <opk@zsh.org>
+
+	* 49156: Completion/Cygwin/Command/_cygserver,
+	Completion/Debian/Command/_git-buildpackage,
+	Completion/Linux/Command/_alsa-utils, Completion/Unix/Command/_adb,
+	Completion/Linux/Command/_ipset, Completion/Unix/Command/_django,
+	Completion/Solaris/Command/_dtrace, Completion/Unix/Command/_ant,
+	Completion/Solaris/Command/_prstat, Completion/Unix/Command/_gcc,
+	Completion/Unix/Command/_dtruss, Completion/Unix/Command/_gnupod,
+	Completion/Unix/Command/_initctl, Completion/Unix/Command/_pandoc,
+	Completion/Unix/Command/_mysqldiff, Completion/Unix/Command/_pbm,
+	Completion/Unix/Command/_perforce, Completion/Unix/Command/_qemu,
+	Completion/Unix/Command/_ruby, Completion/Unix/Command/_tidy,
+	Completion/Unix/Command/_w3m, Completion/X/Command/_vnc,
+	Completion/X/Command/_xdvi: make wider use of the convention of
+	square brackets for defaults
+
 2021-07-08  Oliver Kiddle  <opk@zsh.org>
 
 	* 49151: Completion/Debian/Command/_madison,

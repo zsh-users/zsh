@@ -446,8 +446,8 @@ _adb_dispatch_logcat() {
    _arguments \
      '(-c -g)-s[set default filter to silent]' \
      '(-c -g)-f[log output to file (defaults to stdout)]:logfile:_files' \
-     '(-c -g -d)-r[rotate log every kbytes (default 16, requires -f)]:logsize:_guard "[0-9]#" "numeric value"' \
-     '(-c -g -d)-n[max number of rotated logs (default 4)]:number :_guard "[0-9]#" "numeric value"' \
+     '(-c -g -d)-r[rotate log at specified size, requires -f]:log size (kbytes) [16]' \
+     '(-c -g -d)-n[specify max number of rotated logs]:number [4]' \
      '(-c -g -d)-v[log format]:format: _values "format" brief process tag thread raw time threadtime long' \
      '(-d -t -g)-c[clear log]' \
      '(-c -g)-d[dump log]' \

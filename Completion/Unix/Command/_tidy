@@ -12,7 +12,7 @@ opts=( ${(M)opts:#*:*} )
 
 _arguments -s -A "-*" --$^opts \
   '(-indent -i)'{-indent,-i}'[indent element content]' \
-  '-wrap[wrap text at the specified <column> (default is 68)]:column:' \
+  '-wrap[wrap text at the specified column]:column [68]' \
   '(-upper -u)'{-upper,-u}'[force tags to upper case (default is lower case)]' \
   '(-clean -c)'{-clean,-c}'[replace FONT, NOBR and CENTER tags by CSS]' \
   '(-bare -b)'{-bare,-b}'[strip out smart quotes and em dashes, etc.]' \

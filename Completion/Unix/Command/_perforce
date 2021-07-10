@@ -2551,7 +2551,7 @@ _perforce_cmd_logstat() {
 (( $+functions[_perforce_cmd_logtail] )) ||
 _perforce_cmd_logtail() {
   _arguments -s : \
-    '-b[specify block size, default 8192]:block size: ' \
+    '-b[specify block size]:block size [8192]' \
     '-s[specify start offset]:offset: ' \
     '-m[specify max blocks]:max blocks: '
 }

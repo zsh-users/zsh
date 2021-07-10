@@ -134,11 +134,11 @@ _pandoc_top_level_division(){
 _pandoc_email_obfusication(){
   local -a policies
   policies=(
-    'none:(default) leaves mailto: links as they are'
+    'none:leave mailto: links as they are'
     'javascript:obfuscates them using JavaScript'
     'references:obfuscates them by printing their letters as decimal or hexadecimal character references'
   )
-  _describe 'obfusication' policies
+  _describe 'obfuscation policy [none]' policies
 }
 
 # choose wrapping policy
@@ -146,11 +146,11 @@ _pandoc_email_obfusication(){
 _pandoc_wrap() {
   local -a policies
   policies=(
-    'auto:(default) wrap lines to the column width specified by --columns (default 72)'
+    'auto:wrap lines to the column width specified by --columns (default 72)'
     "none:don't wrap lines at all"
     'preserve:attempt to preserve the wrapping from the source document'
   )
-  _describe 'policy' policies
+  _describe 'policy [auto]' policies
 }
 
 # choose eol policy
@@ -170,11 +170,11 @@ _pandoc_eol() {
 _pandoc_track_changes() {
   local -a policies
   policies=(
-    'accept:(default) inserts all insertions, and ignores all deletions'
+    'accept:insert all insertions, and ignore all deletions'
     'reject:inserts all deletions and ignores insertions'
     'all:puts in insertions, deletions, and comments, wrapped in spans with insertion, deletion, comment-start, and comment-end classes, respectively'
   )
-  _describe 'policy' policies
+  _describe 'policy [accept]' policies
 }
 
 # The real thing
@@ -185,7 +185,7 @@ _arguments -s \
   '--data-dir=[specify the user data directory to search for pandoc data files]:data directory:_files -/' \
   {-d+,--defauls=}'[read default from YAMAL file]: :_pandoc_defaults_file' \
   '--shift-heading-level-by=[shift heading levels by specified number]:positive or negative integer: ' \
-  '!--base-header-level=[(deprecated) specify the base level for headers]:number (default 1):(1 2 3 4 5)' \
+  '!--base-header-level=:number [1]:(1 2 3 4 5)' \
   '!--strip-empty-paragraphs[deprecated. Use the +empty_paragraphs extension instead]' \
   '--indented-code-classes=[classes to use for indented code blocks]:class:{_message "Classes separated with ,"}' \
   '--default-image-extension=[specify a default extension to use when image paths/URLs have no extension]:extension: ' \
@@ -195,7 +195,7 @@ _arguments -s \
   {\*-M+,\*--metadata=}'[set the metadata field KEY to the value VALUE]:key\:value: ' \
   '*--metadata_file=[read metadata from file]:YAML or JSON file:_files' \
   {-p,--preserve-tabs}'[preserve tabs instead of converting them to spaces]' \
-  '--tab-stop=[specify the number of spaces per tab (default is 4)]:number:{_message -r "choose a number equals to or greater then 1"}' \
+  '--tab-stop=[specify the number of spaces per tab]:spaces [4]' \
   '--track-changes=[specifies what to do with insertions, deletions, and comments produced by the MS Word "Track Changes" feature]: :_pandoc_track_changes' \
   '--extract-media=[extract media in source document to specified directory]:directory:_files -/' \
   '--abbreviations=[specifies a custom abbreviations file]:file:_files ' \
@@ -207,7 +207,7 @@ _arguments -s \
   '--eol=[manually specify line endings (crlf|lf|native)]: :_pandoc_eol' \
   '--dpi=[specify the dpi (dots per inch) value for conversion from pixels to inch/centimeters and vice versa]:number: ' \
   '--wrap=[determine how text is wrapped in the output (the source code, not the rendered version)]: :_pandoc_wrap ' \
-  '--columns=[specify length of lines in characters (default 72)]:number: ' \
+  '--columns=[specify length of lines in characters]:length [72]' \
   {--toc,--table-of-contents}'[include an automatically generated table of contents]' \
   '--toc-depth=[specify the number of section levels to include in the table of contents]:number:{_message -r "choose a number equals to or greater then 1"}' \
   '--strip-comments[strip out HTML comments in the Markdown or Textile source]' \
@@ -226,11 +226,11 @@ _arguments -s \
   '--ascii[use only ASCII characters in output, supported only for HTML and DocBook output]' \
   '--reference-links[use reference-style links, rather than inline links]' \
   '--reference-location=[specify where footnotes (and references, if reference-links is set) are placed (block|section|document)]: :_pandoc_reference_location' \
-  '--markdown-headings[specify style for level1 and 2 headings in markdown output]:style (default atx):(setext atx)' \
+  '--markdown-headings[specify style for level1 and 2 headings in markdown output]:style [atx]:(setext atx)' \
   '!--atx-headers[use ATX-style headers in Markdown and AsciiDoc output]' \
   '--top-level-division=[treat top-level headers as the given division type in LaTeX, ConTeXt, DocBook, and TEI output]: :_pandoc_top_level_division' \
   {-N,--number-sections}'[number section headings in LaTeX, ConTeXt, HTML, or EPUB output]' \
-  '--number-offset=[offset for section headings in HTML output (ignored in other output formats)]:number[number,...] (default 0): ' \
+  '--number-offset=[offset for section headings in HTML output (ignored in other output formats)]:number[number,...] [0]' \
   '--listings[use the listings package for LaTeX code blocks]' \
   {-i,--incremental}'[make list items in slide shows display incrementally (one by one)]' \
   '--slide-level=[specifies that headers with the specified level create slides (for beamer, s5, slidy, slideous, dzslides)]:slide level:(1 2 3 4 5 6)' \

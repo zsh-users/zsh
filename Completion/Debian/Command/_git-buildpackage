@@ -13,14 +13,14 @@ _arguments \
   '--git-sign-tags[sign tags]' \
   '--git-no-sign-tags[negates --git-sign-tags]' \
   '--git-keyid=-[GPG keyid to sign tags with]:GPG key:' \
-  '--git-debian-tag=-[format string for debian tags]:default is debian/%(version)s:' \
-  '--git-upstream-tag=-[format string for upstream tags]:default is upstream/%(version)s:' \
+  '--git-debian-tag=-[format string for debian tags]:format string [debian/%%(version)s]' \
+  '--git-upstream-tag=-[format string for upstream tags]:format string [upstream/%%(version)s]' \
   '--git-pristine-tar[use pristine-tar to create .orig.tar.gz]' \
   '--git-no-pristine-tar[negates --git-pristine-tar]' \
   '--git-force-create[force creation of orig.tar.gz]' \
   '--git-no-create-orig[do not create orig.tar.gz]' \
   '--git-tarball-dir=-[location to look for external tarballs]:tarball directory:_files -/' \
-  '--git-compression=-[compression type]:compression:(auto gzip bzip2 lzma xz)' \
+  '--git-compression=-[compression type]:compression type [auto]:(auto gzip bzip2 lzma xz)' \
   '--git-compression-level=-[set compression level]:level:(1 2 3 4 5 6 7 8 9)' \
   '--git-upstream-branch=-[upstream branch]::' \
   '--git-debian-branch=-[branch the Debian package is being developed on]::' \

@@ -740,7 +740,7 @@ ppmtomitsu)
   _arguments \
     '-sharpness:sharpness:(1 2 3 4)' \
     '-enlarge:enlargement factor:(1 2 3)' \
-    '-media:output media (default\: 1184x1350):((A\:1216x1350 A4\:1184x1452 AS\:1216x1650 A4S\:1184x1754))' \
+    '-media:output media [1184x1350]:((A\:1216x1350 A4\:1184x1452 AS\:1216x1650 A4S\:1184x1754))' \
     '-copy:number of copies:(1 2 3 4 5 6 7 8 9)' \
     -{dpi300,tiny} ':file:_pbm'
   ;;

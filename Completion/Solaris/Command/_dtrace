@@ -12,7 +12,7 @@ case $OSTYPE in
       '-X+[specify ISO C conformance settings for preprocessor]:ISO C conformance:((a\:"ISO plus K&R extensions (default)" c\:"Strictly conformant ISO C" s\:"K&R C only" t\:"ISO plus K&R extensions"))'
     )
     xopts=(
-      'errexit[exit on error with specified status code (default 1)]::status'
+      'errexit[exit on error with specified status code]::status [1]'
       'noresolve[do not perform user address symbol resolution]'
       'uresolve[specify resolution of user addresses]:how:(no symbol basename absolute)'
     )

@@ -65,10 +65,10 @@ case $service in
 	'-rfbauth[use authentication on RFB protocol]:passwd-file:_files' \
 	'-httpd[serve files via HTTP from here]:dir:_files -/' \
 	'-httpport[port for HTTP]:port:' \
-	'-deferupdate[time in ms to defer updates (default 40)]:time (ms):' \
+	'-deferupdate[specify time to defer updates by]:time (ms) [40]' \
 	'-economictranslate[less memory-hungry translation]' \
 	'-lazytight[disable "gradient" filter in tight encoding]' \
-	'-desktop[VNC desktop name (default x11)]:name:' \
+	'-desktop[specify VNC desktop name]:name [x11]' \
 	'-alwaysshared[always treat new clients as shared]' \
 	'-nevershared[never treat new clients as shared]' \
 	"-dontdisconnect[don't disconnect existing clients for new non-shared connections]" \

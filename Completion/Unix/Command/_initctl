@@ -157,7 +157,7 @@ _initctl()
     '--system[talk via DBUS system bus instead of socket]'
     '(-q --quiet)'{-q,--quiet}'[reduce output to errors only]'
     '(-v --verbose)'{-v,--verbose}'[increase output to include informational messages]'
-    '--dest=[D-Bus name for init, defaults to com.ubuntu.Upstart]'
+    '--dest=[specify D-Bus name for init]:D-Bus name [com.ubuntu.Upstart]'
     '--help[display help and exit]'
     '--version[output version information and exit]'
   )

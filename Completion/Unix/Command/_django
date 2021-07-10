@@ -146,9 +146,9 @@ case $state in
         args+=(
           $locale
           $verbosity
-          {-d,--domain=}'[domain of the message files (default: "django")]:domain'
+          {-d,--domain=}'[domain of the message files]:domain [django]:(django djangojs)'
           {-a,--all}'[re-examine all code and templates]'
-          {-e,--extensions=}'[file extension(s) to examine (default: ".html")]:extension'
+          {-e,--extensions=}'[file extension(s) to examine]:extension [html]'
         )
         ;;
 

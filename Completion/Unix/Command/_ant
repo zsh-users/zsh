@@ -56,7 +56,7 @@ _arguments -C \
   '-propertyfile[load all properties from specified file with -D properties taking precedence]:property file:_files -g "*.properties(-.)"' \
   '-inputhandler[specify class which will handle input requests]:class:->class' \
   '(-s -find -f -file -buildfile)'{-s,-find}'[search for specified build file towards the root of filesystem]:build file:(build.xml)' \
-  '-nice[specify a niceness value for the main thread]:niceness value (default 5):({1..10})' \
+  '-nice[specify a niceness value for the main thread]:niceness value [5]:({1..10})' \
   '-nouserlib[run ant without using the jar files from ${user.home}/.ant/lib]' \
   '-noclasspath[run ant without using CLASSPATH]' \
   '-autoproxy[Java1.5+: use the OS proxy settings]' \

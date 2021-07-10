@@ -8,7 +8,7 @@ typeset -A opt_args
 _arguments -C \
   '-t[set tab width]:tab width:' \
   '-r[ignore backspace effect]' \
-  '-l[specify number of preserved lines]:number of lines (default 10000):' \
+  '-l[specify number of preserved lines]:number of lines [10000]' \
   '-I[document charset]:charset:->charset' \
   '-O[display/output charset]:charset:->charset' \
   '(   -s -j)-e[EUC-JP]' \

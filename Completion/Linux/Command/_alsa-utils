@@ -38,7 +38,7 @@ opts=(
   --disable-format'[disable automatic format conversions]'
   --disable-softvol'[disable software volume control (softvol)]'
   --test-position'[test ring buffer position]'
-  --test-coef='[test coefficient for ring buffer position (default 8)]'
+  --test-coef='[test coefficient for ring buffer position]:coefficient [8]'
   --test-nowait'[do not wait for ring buffer - eats whole CPU]'
   --max-file-time='[start another output file when the old file has recorded]'
   --process-id-file='[write the process ID here]'

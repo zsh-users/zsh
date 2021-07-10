@@ -30,8 +30,8 @@ case "$service" in
     '(-b --set-bookmarkable)'{-b,--set-bookmarkable}'[set this song as bookmarkable (= Remember position)]'
     --set-shuffleskip'[exclude this file in shuffle-mode]'
     --set-compilation'[mark songs as being part of a compilation]'
-    --min-vol-adj='[minimum volume adjustment allowed by ID3v2.4 RVA2 tag (range -100 to 100, default 0)]'
-    --max-vol-adj='[maximum volume adjustment allowed by ID3v2.4 RVA2 tag (range -100 to 100, default 0)]'
+    --min-vol-adj='[minimum volume adjustment allowed by ID3v2.4 RVA2 tag]:adjustment (-100..100) [0]'
+    --max-vol-adj='[maximum volume adjustment allowed by ID3v2.4 RVA2 tag]:adjustment (-100..100) [0]'
     --artwork='[use FILE as album cover]:artwork:_files'
     '*:file to add:_files'
 )

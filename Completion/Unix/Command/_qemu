@@ -19,8 +19,8 @@ _arguments \
   '-boot[specify which image to boot from]:boot device:((a\:floppy\ image\ a c\:hard\ disk d\:cdrom))' \
   '-snapshot[write to temporary files instead of disk image files]' \
   '-no-fd-bootchk[disable boot sig checking for floppies in Bochs BIOS]' \
-  '-m[virtual RAM size (default=128)]:megs:' \
-  '-smp[set the number of CPUs (default=1)]:number of CPUs:' \
+  '-m[specify virtual RAM size]:size (MB) [128]' \
+  '-smp[set the number of CPUs]:number of CPUs [1]' \
   '-nographic[disable graphical output]' \
   '-vnc[listen on VNC display]:display:' \
   '-k[use keyboard layout]:keyboard layout language:(ar de-ch es fo fr-ca hu ja mk no pt-br sv da en-gb et fr fr-ch is lt nl pl ru th de en-us fi fr-be hr it lv nl-be pt sl tr)' \

@@ -9,7 +9,7 @@ _prstat()
 	)
 
 	sort_key=(
-		"cpu"\:"process CPU usage (default)"
+		"cpu"\:"process CPU usage"
 		"pri"\:"process priority"
 		"rss"\:"resident set size"
 		"size"\:"size of process image"
@@ -32,8 +32,8 @@ _prstat()
 		'-p[only processes whose process ID is in the list]:PID list' \
 		'-P[only processes or lwps which have most recently executed on a CPU in the list]:CPU list' \
 		'-R[Put prstat in the real time scheduling class]' \
-		'-s[Sort key (descending)]:key:(($sort_key))' \
-		'-S[Sort key (ascending)]:key:(($sort_key))' \
+		'-s[sort key (descending)]:sort key [cpu]:(($sort_key))' \
+		'-S[sort key (ascending)]:sort key [cpu]:(($sort_key))' \
 		'-t[total usage summary for each user]' \
 		'-T[information about processes and tasks]' \
 		'-u[only processes whose effective user ID is in the list]:UID:_users' \

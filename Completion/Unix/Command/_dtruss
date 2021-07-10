@@ -2,7 +2,7 @@
 
 _arguments -s : \
   '-a[print all details]' \
-  '-b+[specify dynamic variable buffer size]:buffer size (default 4m)' \
+  '-b+[specify dynamic variable buffer size]:buffer size [4m]' \
   '-c[print system call counts]' \
   '-d[print relative timestamps]' \
   '-e[print elapsed times]' \
