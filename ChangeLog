@@ -1,5 +1,10 @@
 2021-07-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 49157: Completion/Linux/Command/_valgrind,
+	Completion/Unix/Command/_baz, Completion/Unix/Command/_opustools,
+	Completion/Unix/Command/_tla: fix uses of literal % characters in
+	completion descriptions
+
 	* 49156: Completion/Cygwin/Command/_cygserver,
 	Completion/Debian/Command/_git-buildpackage,
 	Completion/Linux/Command/_alsa-utils, Completion/Unix/Command/_adb,

@@ -64,7 +64,7 @@ _baz_config () {
 
   if [[ -d "$root/configs" ]]; then
     configdir=("$root/configs")
-    _description files expl '%Bconfig file%b'
+    _description files expl 'config file'
     _files -W configdir "$expl[@]" && ret=0
   else
     _message -e messages "No configs/ directory in tree whose root is $root"

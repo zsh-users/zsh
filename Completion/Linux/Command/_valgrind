@@ -20,7 +20,7 @@ common_own_malloc=(
   '--alignment=-[set minimum alignment of heap allocations]:number [16]'
   '--redzone-size=-[set minimum size of redzones added before/after heap blocks]:size (bytes) [16]'
   '--xtree-memory=-[profile heap memory in an xtree [none]:(none allocs full)'
-  '--xtree-memory-file=-[specify xtree memory report file]:file [xtmemory.kcg.%p]:_files'
+  '--xtree-memory-file=-[specify xtree memory report file]:file [xtmemory.kcg.%%p]:_files'
 )
 
 common_read_varinfo=(
@@ -67,7 +67,7 @@ args_addrcheck=(
   '(--show-leak-kinds)--show-reachable=-[show reachable blocks in leak check]:enable:(yes no)'
   '(--show-leak-kinds)--show-possibly-lost=-:enable:(yes no)'
   '--xtree-leak=-[output leak result in xtree format]:enable [no]:(yes no)'
-  '--xtree-leak-file=-[specify xtree leak report file]:file [xtleak.kcg.%p]:_files'
+  '--xtree-leak-file=-[specify xtree leak report file]:file [xtleak.kcg.%%p]:_files'
   '--undef-value-errors=-[check for undefined value errors]:enable [yes]:(yes no)'
   '--track-origins=-[show origins of undefined values]:enable [no]:(yes no)'
   $common_partial
@@ -123,7 +123,7 @@ args_cachegrind=(
   '--LL=-[set LL cache manually]:size,assoc,line_size'
   '--cache-sim=-[collect cache stats]:enable [yes]:(yes no)'
   '--branch-sim=-[collect branch prediction stats]:enable [no]:(yes no)'
-  '--cachegrind-out-file=-[specify output file name]:file name [cachegrind.out.%p]:_files'
+  '--cachegrind-out-file=-[specify output file name]:file name [cachegrind.out.%%p]:_files'
 )
 
 args_helgrind=(
@@ -169,7 +169,7 @@ args_massif=(
   ))"
   '--detailed-freq=-[every Nth snapshot should be detailed]:snapshot interval [10]'
   '--max-snapshots=-[specofy maximum number of snapshots recorded]:maximum [100]'
-  '--massif-out-file=-[specify output file name]:filename [massif.out.%p]:_files'
+  '--massif-out-file=-[specify output file name]:filename [massif.out.%%p]:_files'
 )
 
 args_exp_bbv=(
