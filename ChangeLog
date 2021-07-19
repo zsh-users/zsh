@@ -1,3 +1,8 @@
+2021-07-19  Eric Cook  <llua@gmx.com>
+
+	* 49147: Completion/Linux/Command/_modutils: fix the completion
+	linux kernel modules
+
 2021-07-19  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 49166: Src/subst.c, Test/D04parameter.ztst: fix coredump in

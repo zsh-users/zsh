@@ -132,7 +132,7 @@ _modutils() {
 	_store_cache modules-$kver modules modaliases
       fi
 
-      if (( ${+opt_args[(k)(-R|--resolve-alias)]} )); then
+      if [[ -v opt_args[(i)(-R|--resolve-alias)] ]]; then
 	_tags module-aliases
       else
 	_tags files modules module-aliases
