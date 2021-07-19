@@ -3362,13 +3362,15 @@ colonsubscript:
 		    return NULL;
 		}
 		if (*check_offset2) {
+		    char *nextp;
 		    check_offset = check_colon_subscript(check_offset2 + 1,
-							 &check_offset2);
-		    if (*check_offset2 && *check_offset2 != ':') {
-			zerr("invalid length: %s", check_offset);
-			return NULL;
-		    }
+							 &nextp);
 		    if (check_offset) {
+			check_offset2 = nextp;
+			if (*check_offset2 && *check_offset2 != ':') {
+			    zerr("invalid length: %s", check_offset);
+			    return NULL;
+			}
 			length = mathevali(check_offset);
 			length_set = 1;
 			if (errflag)

@@ -2664,10 +2664,9 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 >3: pw
 >4: pw
 
- # Using a subshell because it segfaults.
- ("${: :${{{\"{{lorem ipsum dolor sit amet}}")
--f:regression test for workers/45843#1
-?(eval):1: bad substitution
+ : "${foo:0:${\"}}"
+1:broken length in ${name:offset:length} (workers/45843#1)
+?(eval):1: unrecognized modifier `$'
 
  $ZTST_testdir/../Src/zsh -fc $'$\\\n('
 1:regression test for workers/45843#2: escaped newline in command substitution start token
