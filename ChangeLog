@@ -1,3 +1,8 @@
+2021-07-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 49182: Src/hist.c, Src/lex.c: Interactive word correction
+	doesn't work inside command substitution, so don't try to do it.
+
 2021-07-19  Eric Cook  <llua@gmx.com>
 
 	* 49147: Completion/Linux/Command/_modutils: fix the completion

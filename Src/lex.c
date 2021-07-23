@@ -1889,6 +1889,7 @@ exalias(void)
     hwend();
     if (interact && isset(SHINSTDIN) && !strin && incasepat <= 0 &&
 	tok == STRING && !nocorrect && !(inbufflags & INP_ALIAS) &&
+	!hist_is_in_word()  &&
 	(isset(CORRECTALL) || (isset(CORRECT) && incmdpos)))
 	spckword(&tokstr, 1, incmdpos, 1);
 

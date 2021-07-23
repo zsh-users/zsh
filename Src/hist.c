@@ -339,6 +339,13 @@ hist_in_word(int yesno)
 	histactive &= ~HA_INWORD;
 }
 
+/**/
+int
+hist_is_in_word(void)
+{
+    return (histactive & HA_INWORD) ? 1 : 0;
+}
+
 /* add a character to the current history word */
 
 static void
