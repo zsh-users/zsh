@@ -1,7 +1,7 @@
 #compdef -P python[0-9.]#
 
 # Python 2.7
-# Python 3.4
+# Python 3.9
 
 local curcontext="$curcontext" state state_descr line
 typeset -A opt_args
@@ -11,7 +11,9 @@ if _pick_variant python3=Python\ 3 python2 --version; then
   args=(
     '(-bb)-b[issue warnings about str(bytes_instance), str(bytearray_instance) and comparing bytes/bytearray with str]'
     '(-b)-bb[issue errors about str(bytes_instance), str(bytearray_instance) and comparing bytes/bytearray with str]'
+    '--check-hash-based-pycs[configure how Python evaluates up-to-dateness of hash-based .pyc files]:mode:(always default never)'
     "-I[isolate Python from the user's environment]"
+    '-q[do not print version and copyright messages]'
     '-X[set implementation-specific option]:option'
   )
 else
@@ -37,7 +39,8 @@ _arguments -C -s -S "$args[@]" \
   "-s[don't add user site directory to sys.path]" \
   "-S[don't imply 'import site' on initialization]" \
   '-u[unbuffered binary stdout and stderr]' \
-  '-v[verbose (trace import statements)]' \
+  '(-vv)-v[trace module initialization and cleanup]' \
+  '(-v)-vv[in addition to -v, trace all files checked when searching for a module]' \
   '(1 * -)-V[display version information]' \
   '-W+[warning control]:warning filter (action\:message\:category\:module\:lineno):(default always ignore module once error)' \
   '-x[skip first line of source, allowing use of non-Unix forms of #!cmd]' \

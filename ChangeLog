@@ -1,3 +1,8 @@
+2021-08-27  Oliver Kiddle  <opk@zsh.org>
+
+	* Štěpán Němec: 49234: Completion/Unix/Command/_python:
+	add missing options in python completion
+
 2021-08-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 49307 with documentation updated: Src/exec,
