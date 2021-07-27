@@ -1,3 +1,8 @@
+2021-07-30  dana  <dana@dana.is>
+
+	* github #77: Stavros Ntentos: Completion/X/Command/_sublimetext:
+	Improve subl completions for Sublime Text v4
+
 2021-07-30  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 49211: Completion/Zsh/Command/_typeset: correctly set return value
