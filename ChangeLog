@@ -1,3 +1,7 @@
+2021-07-30  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 49211: Completion/Zsh/Command/_typeset: correctly set return value
+
 2021-07-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Erik Paulson: 49029: Src/signals.c: Remove additional copies

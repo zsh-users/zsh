@@ -1,6 +1,6 @@
 #compdef autoload declare export functions integer float local readonly typeset
 
-local expl state line func i use curcontext="$curcontext"
+local expl state state_descr line func i use curcontext="$curcontext" ret=1
 local fopts="-f -k -z +k +z"
 local popts="-A -E -F -L -R -T -Z -a -g -h -H -i -l -r -x"
 local -A allargs opt_args
@@ -79,38 +79,38 @@ esac
 # This function uses whacky features of _arguments which means we
 # need to look for options to the command beforehand.
 local onopts offopts
-onopts=${(j..)${${words[1,CURRENT-1]:#^-*}##-}}
+onopts=${(j..)${${words[1,CURRENT-1]:#^-[^-]*}##-}}
 offopts=${(j..)${${words[1,CURRENT-1]:#^+*}##+}}
 
 for ((i=1;i<=$#use;++i)); do
   args+=( ${allargs[${use[$i]}${${(s::)use[$i]}[(r)[dUurRtT]]:+$func}]} )
 done
 
-_arguments -C -s -A "-*" -S "${args[@]}" '*::vars:= ->vars_eq'
+_arguments -C -s -A "-*" -S "${args[@]}" '*::vars:= ->vars_eq' && ret=0
 
 if [[ "$state" = vars_eq ]]; then
   if [[ $func = f ]]; then
     if (( $+opt_args[+M] || ( $+opt_args[-M] && $+opt_args[-m] ) )); then
       _wanted functions expl 'math function' compadd -F line - \
-          ${${${(f)"$(functions -M)"}##*-M }%% *}
+          ${${${(f)"$(functions -M)"}##*-M }%% *} && ret=0
     elif (( $+opt_args[-M] )); then
       _arguments ':new math function:_functions' \
 	":minimum arguments${(k)opt_args[-s]:+:(1)}" \
 	":maximum arguments${(k)opt_args[-s]:+:(1)}" \
-	':shell function:_functions'
+	':shell function:_functions' && ret=0
     elif (( $+opt_args[-w] )); then
-      _wanted files expl 'zwc file' _files -g '*.zwc(-.)'
+      _wanted files expl 'zwc file' _files -g '*.zwc(-.)' && ret=0
     elif [[ $service = autoload || -n $opt_args[(i)-[uU]] ]]; then
       if [[ $PREFIX[1] = [/~] ]]; then
 	# Autoload by absolute path
-	_files
+	_files && ret=0
       else
 	  args=(${^fpath}/*(-.:t))
 	  # Filter out functions already loaded or marked for autoload.
 	  local -a funckeys
 	  funckeys=(${(k)functions})
 	  args=(${args:|funckeys})
-	  _wanted functions expl 'shell function' compadd -a args
+	  _wanted functions expl 'shell function' compadd -a args && ret=0
       fi
     elif [[ -n $onopts$offopts ]]; then
       if [[ -n $offopts ]]; then
@@ -127,22 +127,23 @@ if [[ "$state" = vars_eq ]]; then
 	[[ $PREFIX != [_.]* ]]; then
 	args=(${args:#_*})
       fi
-      _wanted functions expl 'shell function' compadd -a args
+      _wanted functions expl 'shell function' compadd -a args && ret=0
     else
-      _functions
+      _functions && ret=0
     fi
   elif [[ "$PREFIX" = *\=* ]]; then
     compstate[parameter]="${PREFIX%%\=*}"
     compset -P 1 '*='
-    _value
+    _value && ret=0
   elif (( $+opt_args[-a] || $+opt_args[-A] )); then
-    _parameters -q
+    _parameters -q && ret=0
   elif (( $+opt_args[-T] )); then
     _arguments \
       ':scalar parameter:_parameters -g "*scalar*" -q -S "="' \
       ':array parameter:_parameters -g "*array*"' \
-      ':separator character'
+      ':separator character' && ret=0
   else
-    _parameters -q -S '='
+    _parameters -q -S '=' && ret=0
   fi
 fi
+return ret
