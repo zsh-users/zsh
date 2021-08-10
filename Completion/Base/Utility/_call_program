@@ -1,5 +1,6 @@
 #autoload +X
 
+local -xi COLUMNS=999
 local curcontext="${curcontext}" tmp err_fd=-1 clocale='_comp_locale;'
 local -a prefix
 
