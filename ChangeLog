@@ -1,3 +1,9 @@
+2021-08-10  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 49269: Src/parse.c, Test/C02cond.ztst: "[ ! -o ]" should
+	detect "-o" as a non-empty string and return status 1.  Update
+	test to reflect this.
+
 2021-07-30  dana  <dana@dana.is>
 
 	* github #77: Stavros Ntentos: Completion/X/Command/_sublimetext:

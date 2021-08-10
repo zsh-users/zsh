@@ -2509,7 +2509,7 @@ par_cond_2(void)
 	 * In "test" compatibility mode, "! -a ..." and "! -o ..."
 	 * are treated as "[string] [and] ..." and "[string] [or] ...".
 	 */
-	if (!(n_testargs > 1 && (check_cond(*testargs, "a") ||
+	if (!(n_testargs > 2 && (check_cond(*testargs, "a") ||
 				 check_cond(*testargs, "o"))))
 	{
 	    condlex();
