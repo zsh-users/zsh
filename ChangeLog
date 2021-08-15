@@ -1,5 +1,8 @@
 2021-08-16  Oliver Kiddle  <opk@zsh.org>
 
+	* 49268: Completion/Unix/Command/_texinfo: use an empty string search
+	to find matches for info --index-search= completion
+
 	* 49160: Completion/Unix/Command/_xmlsoft: fix quoting for
 	xmllint --pretty completion
 

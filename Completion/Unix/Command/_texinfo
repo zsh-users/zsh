@@ -36,14 +36,14 @@ local -A opt_args infodirs
 case $service in
   info)
     cmd=${words[1]}
-    _arguments -C -s \
+    _arguments -C -s -S \
       '(-a --all)'{-a,--all}'[use all matching manuals]' \
       '(: -)'{-k+,--apropos=}'[look up string in indices]:search string: ' \
       \*{-d+,--directory=}'[add directory to infopath]:info dir:_files -/' \
       '--dribble=[record keystrokes]:file with keystrokes:_files' \
       '(-f --file 1)'{-f+,--file=}'[specify Info manual to visit]:info manual:->infofiles' \
       '(: - -h --help)'{-h,--help}'[display usage]' \
-      '(-o --output -O)--index-search=[go directly to node if found]:search string: ' \
+      '(-o --output -O)--index-search=[search for matching index entry]:search string:->index-entries' \
       '(--index-search -o --output -O)'{-o+,--output=}'[dump selected nodes to filename]:filename:_files -g "*(-.)"' \
       '--init-file=[specify initialisation file]:file:_files' \
       '(-n --node)'{-n+,--node=}'[specify nodes in first visited Info file]:node:->nodes' \
@@ -301,6 +301,13 @@ if [[ -n $state ]]; then
       tags+=( info-nodes )
     fi
     items=( ${${${(M)${(f)"$(_call_program menu-items info -o- $file)"}:#(#s)\* *::*}%%::*}#??} )
+  elif [[ $state = index-entries ]]; then
+    if [[ -n $file ]]; then
+      tags=( index-entries )
+      items=( ${${${(M)${(f)"$(_call_program index-entries info -o- --all --index-search= $file)"}:#(#s)\* *:*}%%:*}#??} )
+    else
+      _message -e index-entries $state_descr
+    fi
   fi
 
   _tags $tags
@@ -308,6 +315,7 @@ if [[ -n $state ]]; then
   while _tags; do
     _requested info-files expl 'info file' compadd $suf -M 'm:{a-zA-Z}={A-Za-z}' -a files && ret=0
     _requested menu-items expl 'menu item' compadd -M 'm:{a-zA-Z}={A-Za-z}' -a items && ret=0
+    _requested -x index-entries expl 'index entry' compadd -M 'm:{a-zA-Z}={A-Za-z}' -a items && ret=0
     _requested info-nodes expl 'node' compadd -M 'm:{a-zA-Z}={A-Za-z}' ${nodes#*:} && ret=0
 
     (( ret )) || break
