@@ -1,3 +1,8 @@
+2021-08-16  Oliver Kiddle  <opk@zsh.org>
+
+	* 49160: Completion/Unix/Command/_xmlsoft: fix quoting for
+	xmllint --pretty completion
+
 2021-08-14  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* users/26734: Doc/Zsh/builtins.yo: docs: read: Notate the

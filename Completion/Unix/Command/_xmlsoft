@@ -98,7 +98,7 @@ case $service in
       '--format[reformat/reindent the input]' \
       '--encode[output in the given encoding]:encoding:(${encoding[@]})' \
       '--dropdtd[remove the DOCTYPE of the input docs]' \
-      "--pretty[pretty-print in a particular style]:style:((0\:don't\ pretty\ print 1\:reformat 2\:add\ whitespace))" \
+      "--pretty[pretty-print in a particular style]:style:((0\:don\'t\ pretty\ print 1\:reformat 2\:add\ whitespace))" \
       '--c14n[save in W3C canonical format]' \
       '--c14n11[save in W3C canonical format v1.1 (with comments)]' \
       '--exc-c14n[save in W3C exclusive canonical format]' \
