@@ -183,7 +183,7 @@ _arguments -s \
   {-t+,-w+,--to=,--write=}'[specify output format]: :_pandoc_format -T output' \
   {-o+,--output=}'[write output to FILE instead of stdout]:file:_files' \
   '--data-dir=[specify the user data directory to search for pandoc data files]:data directory:_files -/' \
-  {-d+,--defauls=}'[read default from YAMAL file]: :_pandoc_defaults_file' \
+  {-d+,--defaults=}'[read default from YAML file]: :_pandoc_defaults_file' \
   '--shift-heading-level-by=[shift heading levels by specified number]:positive or negative integer: ' \
   '!--base-header-level=:number [1]:(1 2 3 4 5)' \
   '!--strip-empty-paragraphs[deprecated. Use the +empty_paragraphs extension instead]' \
@@ -193,7 +193,7 @@ _arguments -s \
   {\*-F+,\*--filter=}'[specify an executable to be used as a filter transforming the pandoc AST after the input is parsed and before the output is written]: :_pandoc_filter' \
   {\*-L+,\*--lua-filter=}"[transform the document by using pandoc's built-in lua filtering system]: :_pandoc_lua_filter" \
   {\*-M+,\*--metadata=}'[set the metadata field KEY to the value VALUE]:key\:value: ' \
-  '*--metadata_file=[read metadata from file]:YAML or JSON file:_files' \
+  '*--metadata-file=[read metadata from file]:YAML or JSON file:_files' \
   {-p,--preserve-tabs}'[preserve tabs instead of converting them to spaces]' \
   '--tab-stop=[specify the number of spaces per tab]:spaces [4]' \
   '--track-changes=[specifies what to do with insertions, deletions, and comments produced by the MS Word "Track Changes" feature]: :_pandoc_track_changes' \
@@ -264,7 +264,7 @@ _arguments -s \
   '--verbose[give verbose debugging output]' \
   '--quiet[suppress warning messages]' \
   '--fail-if-warnings[exit with error status if there are any warnings]' \
-  '--log=[write log messages in machine-readable JSON format to FILE]:file:_file' \
+  '--log=[write log messages in machine-readable JSON format to FILE]:file:_files' \
   '(- :)--bash-completion[generate a bash completion script]' \
   '(- :)--list-input-formats[list supported input formats, one per line]' \
   '(- :)--list-output-formats[list supported output formats, one per line]' \
