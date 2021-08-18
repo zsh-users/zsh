@@ -1,3 +1,8 @@
+2021-08-24  dana  <dana@dana.is>
+
+	* github #78: DCsunset: Completion/Unix/Command/_pandoc: Fix
+	completions in _pandoc
+
 2021-08-16  Oliver Kiddle  <opk@zsh.org>
 
 	* 49268: Completion/Unix/Command/_texinfo: use an empty string search
