@@ -346,7 +346,13 @@ domove(char *nam, MoveFunc movefn, char *p, char *q, int flags)
 	    unlink(qbuf);
     }
     if(movefn(pbuf, qbuf)) {
-	zwarnnam(nam, "%s: %e", p, errno);
+	int ferrno = errno;
+	char *errfile = p;
+	if (ferrno == ENOENT && !lstat(pbuf, &st)) {
+	    /* p *does* exist, so error is in q */
+	    errfile = q;
+	}
+	zwarnnam(nam, "`%s': %e", errfile, ferrno);
 	zsfree(pbuf);
 	return 1;
     }

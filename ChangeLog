@@ -1,3 +1,8 @@
+2021-08-24  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 49297 with quoting updated: Src/Modules/files.c: check
+	which files is in error when ENOENT on link etc.
+
 2021-08-24  dana  <dana@dana.is>
 
 	* github #78: DCsunset: Completion/Unix/Command/_pandoc: Fix
