@@ -46,14 +46,14 @@
  *
  */
 
+#include "zsh.mdh"
+#include "openssh_bsd_setres_id.pro"
 
 #include <sys/types.h>
 
 #include <stdarg.h>
 #include <unistd.h>
 #include <string.h>
-
-#include "zsh.mdh"
 
 #if defined(ZSH_IMPLEMENT_SETRESGID) || defined(BROKEN_SETRESGID)
 int
