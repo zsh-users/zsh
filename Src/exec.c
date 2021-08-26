@@ -1033,7 +1033,8 @@ entersubsh(int flags, struct entersubsh_ret *retp)
 
     if (!(flags & ESUB_KEEPTRAP))
 	for (sig = 0; sig < SIGCOUNT; sig++)
-	    if (!(sigtrapped[sig] & ZSIG_FUNC))
+	    if (!(sigtrapped[sig] & ZSIG_FUNC) &&
+		!(isset(POSIXTRAPS) && (sigtrapped[sig] & ZSIG_IGNORED)))
 		unsettrap(sig);
     monitor = isset(MONITOR);
     job_control_ok = monitor && (flags & ESUB_JOB_CONTROL) && isset(POSIXJOBS);

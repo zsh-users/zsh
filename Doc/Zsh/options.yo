@@ -2330,10 +2330,15 @@ When this option is set, the usual zsh behaviour of executing
 traps for tt(EXIT) on exit from shell functions is suppressed.
 In that case, manipulating tt(EXIT) traps always alters the global
 trap for exiting the shell; the tt(LOCAL_TRAPS) option is
-ignored for the tt(EXIT) trap.  Furthermore, a tt(return) statement
-executed in a trap with no argument passes back from the function the
-value from the surrounding context, not from code executed within the
-trap.
+ignored for the tt(EXIT) trap.
+
+Also, a tt(return) statement executed in a trap with no argument passes
+back from the function the value from the surrounding context, not from
+code executed within the trap.
+
+Furthermore, if a trap is set to be ignored, this state persists when
+a subshell is entered.  Without the option, the trap would be reset to
+its default state at this point.
 )
 pindex(SH_FILE_EXPANSION)
 pindex(NO_SH_FILE_EXPANSION)

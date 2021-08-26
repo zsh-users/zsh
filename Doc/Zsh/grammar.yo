@@ -288,7 +288,9 @@ for each selection until a break or end-of-file is encountered.
 cindex(subshell)
 item(tt(LPAR()) var(list) tt(RPAR()))(
 Execute var(list) in a subshell.  Traps set by the tt(trap) builtin
-are reset to their default values while executing var(list).
+are reset to their default values while executing var(list); an
+exception is that ignored signals will continue to be ignored
+if the option tt(POSIXTRAPS) is set.
 )
 item(tt({) var(list) tt(}))(
 Execute var(list).

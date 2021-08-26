@@ -1,3 +1,9 @@
+2021-08-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 49307 with documentation updated: Src/exec,
+	Doc/Zsh/grammar.yo, Doc/Zsh/options.yo: With POSIX_TRAPS,
+	ignored signals stay that way in subshell.
+
 2021-08-24  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 49297 with quoting updated: Src/Modules/files.c: check
