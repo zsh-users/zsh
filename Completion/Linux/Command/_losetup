@@ -33,14 +33,15 @@ _arguments -s -S \
   {-D,--detach-all}'[detach all associated loop devices]' \
   - 'create' \
   '--direct-io[open backing file with O_DIRECT]::enable:(on off)' \
-  '(-f --find 2)'{-f,--find}'[find the first unused loop device]' \
+  '(-f --find 1)'{-f,--find}'[find the first unused loop device]' \
   '(-L --nooverlap)'{-L,--nooverlap}'[avoid possible conflict between devices]' \
   '(-P --partscan)'{-P,--partscan}'[scan the partition table of newly created loop devices]' \
   '--sizelimit[limit device to specified size]:size (bytes)' \
   '(-b --sector-size)'{-b+,--sector-size=}'[set logical sector size of loop device]:size (bytes)' \
   '--show[print device name after setup]' \
   '(-r --read-only)'{-r,--read-only}'[set up a read-only loop device]' \
-  '1:file:_files' \
+  "(-f)$device" \
+  '2:file:_files' \
   - 'assoc' \
   '(-j --associated)'{-j,--associated}'[show the status of all loop devices associated with an file]:associated file:_files' \
   "(-f)$device"
