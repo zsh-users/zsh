@@ -1,50 +1,66 @@
 #compdef strace strace64
 
-local curcontext="$curcontext" state line root expl ret=1
+local curcontext="$curcontext" root
+local -i prec=1 form=1 ret=1
+local -a state line expl alts suf
 typeset -A opt_args
 
-(( EUID )) && root='!'
+(( EUID && ! $+_comp_priv_prefix )) && root='!'
 
 _arguments -C -s \
-  '-a+[align return values in a specific column]:column number [40]' \
-  '(-c)-i[print instruction pointer at time of syscall]' \
-  '-o+[write the trace output to the file]:output file:->file-pipe' \
-  '-q[suppress messages about attaching, detaching etc.]' \
-  '(-q)-qq[suppress messages about process exit status]' \
-  '(-c)-r[print a relative timestamp upon entry to each system call]' \
-  '-s+[specify the maximum string size to print]:maximum string size [32]' \
-  '(-c -ttt)-t[prefix each line of the trace with the time of day]' \
-  '(-c -ttt -tt)-tt[prefix each line of the trace with the time of day including the microseconds]' \
-  '(-c -tt -t)-ttt[prefix each line of the trace with the number of seconds and microseconds since the epoch]' \
-  '(-c)-T[show the time spent in system calls]' \
-  '(-xx)-x[print all non-ASCII strings in hexadecimal string format]' \
-  '(-x)-xx[print all strings in hexadecimal string format]' \
-  '-X+[set the format for printing of named constants and flags]:format:(raw abbrev verbose)' \
-  '(-c -yy)-y[print paths associated with file descriptor arguments]' \
-  '(-c -y)-yy[print protocol specific information associated with socket file descriptors]' \
-  '(-C -i -k -r -ff -t -tt -ttt -T -y -yy)-c[count time, calls, and errors for each system call and report a summary]' \
-  '(-c)-C[count time, calls, and errors for each system call and report a summary in addition to regular output]' \
-  '-O+[overhead for tracing system calls]:overhead (microseconds)' \
-  '-S+[sort the output of the histogram (-c option) by the specified criterion]:sort criterion [time]:(time calls errors name nothing)' \
-  '-w[summarise syscall latency]' \
-  '*-e+[select events to trace or how to trace]:system call:->expressions' \
-  '*-P+[trace only system calls accessing given path]:path:_files' \
-  '(-Z)-z[trace only system calls that return success]' \
-  '(-z)-Z[trace only system calls that return an error]' \
-  '-b+[detach from process on specified syscall]:syscall:(execve)' \
-  '-f[trace child processes as they are created by currently traced processes]' \
-  '(-c -C)-ff[write each process trace to <filename>.<pid> (when using -o <filename>]' \
-  '-D[run tracer as detached grandchild, keeping traced process as direct child of calling process]' \
-  '-I+[when strace can be interrupted by signals]:interruptible:((1\:"no signals are blocked" 2\:"fatal signals are blocked while decoding syscall (default)" 3\:"fatal signals are always blocked (default with -o)" 4\:"fatal signals and SIGTSTP are always blocked"))' \
-  '*-E+[set or remove exported environment variable]:variable:->envars' \
-  "${root}-u+[run as specified user]:user:_users" \
-  '(:)*-p+[attach to the process with specified process ID and begin tracing]:process ID:_pids' \
+  \*{-E+,--env=}'[set or remove exported environment variable]:variable:->envars' \
+  '(:)*'{-p+,--attach=}'[attach to the process with specified process ID and begin tracing]:process ID:_pids' \
+  "${root}(-u --user)"{-u+,--user=}'[run as specified user]:user:_users' \
+  '(-b --detach-on)'{-b+,--detach-on=}'[detach from process on specified syscall]:syscall:(execve)' \
+  '(--daemonize)-D[run tracer as detached grandchild, keeping traced process as direct child of calling process]' \
+  '(-D)--daemonize=-[specify how to run tracer process]::method:(grandchild pgroup session)' \
+  '(-f --follow-forks)'{-f,--follow-forks}'[trace child processes as they are created by currently traced processes]' \
+  '(-I --interruptible)'{-I+,--interruptible=}'[specify when strace can be interrupted by signals]:interruptible:((1\:"no signals are blocked" 2\:"fatal signals are blocked while decoding syscall (default)" 3\:"fatal signals are always blocked (default with -o)" 4\:"fatal signals and SIGTSTP are always blocked"))' \
+  \*{-e+,--trace=}'[select events to trace or how to trace]:system call:->expressions' \
+  \*{-P+,--path=}'[trace only system calls accessing given path]:path:_files' \
+  '(-z -Z --successful-only --failed-only)'{-z,--successful-only}'[trace only system calls that return success]' \
+  '(-z -Z --successful-only --failed-only)'{-Z,--failed-only}'[trace only system calls that return an error]' \
+  '(-a --columns)'{-a+,--columns=}'[align return values in a specific column]:column number [40]' \
+  '(-i --instruction-pointer -c --summary-only)'{-i,--instruction-pointer}'[print instruction pointer at time of syscall]' \
+  '(-c --summary-only -k --stack-traces)'{-k,--stack-traces}'[obtain stack trace between each syscall]' \
+  '(-n --syscall-number)'{-n,--syscall-number}'[print syscall number]' \
+  '(-o --output)'{-o+,--output=}'[send trace output to the specified file]:output file:->file-pipe' \
+  '(-A --output-append-mode)'{-A,--output-append-mode}'[open the file provided with the -o option in append mode]' \
+  '--output-separately[output to separate files for child processes (by appending pid to file names)]' \
+  '(--quiet)-q[suppress messages about attaching, detaching etc]' \
+  '(-q --quiet)-qq[suppress messages about process exit status]' \
+  '(-q -qq --quiet)-qqq[suppress all suppressible messages]' \
+  '(-q -qq -qqq)--quiet=[suppress messages about attaching, detaching etc]:suppression:_sequence compadd - attach personality exit all' \
+  '(--relative-timestamps -c --summary-only)-r[print a relative timestamp upon entry to each system call]' \
+  '(-r -c --summary-only)--relative-timestamps=-[print a relative timestamp upon entry to each system call]:precision [us]:compadd -o nosort s ms us ns' \
+  '(--absolute-timestamps)-t[prefix each line of the trace with the wall clock time]' \
+  '(-t)--absolute-timestamps=-[prefix each line of the trace with the wall clock time]:: :->time-formats' \
+  '!(-t --absolute-timestamps)--timestamps=-:: :->time-formats' \
+  '(-s --string-limit)'{-s+,--string-limit=}'[specify the maximum string size to print]:maximum string size [32]' \
+  '(-c --summary-only -ttt)-t[prefix each line of the trace with the time of day]' \
+  '(-c --summary-only -ttt -tt)-tt[prefix each line of the trace with the time of day including the microseconds]' \
+  '(-c --summary-only -tt -t)-ttt[prefix each line of the trace with the number of seconds and microseconds since the epoch]' \
+  '(--syscall-times -c --summary-only)-T[show the time spent in system calls]' \
+  '(-T -c --summary-only)--syscall-times=-[show the time spent in system calls]::precision [us]:compadd -o nosort s ms us ns' \
+  '(-v --no-abbrev)'{-v,--no-abbrev}'[print unabbreviated versions of environment, stat, termios, etc. calls]' \
+  '(-xx --strings-in-hex)-x[print all non-ASCII strings in hexadecimal string format]' \
+  '(-x --strings-in-hex)-xx[print all strings in hexadecimal string format]' \
+  '(-x -xx)--strings-in-hex=[specify strings to print in hexadecimal format]:string type:(all non-ascii)' \
+  '(-X --const-print-style)'{-X+,--const-print-style=}'[set the format for printing of named constants and flags]:format:(raw abbrev verbose)' \
+  '(-c --summary-only -yy --decode-fds)-y[print paths associated with file descriptor arguments]' \
+  '(-c --summary-only -y --decode-fds)-yy[print protocol specific information associated with socket file descriptors]' \
+  '(-c --summary-only -y -yy)--decode-fds=-[print information associated with file descriptors]::information [none]:_sequence compadd - none all path socket dev pidfd' \
+  '(-c --summary-only -C --summary -i --instruction-pointer -k --stack-traces -r --relative-timestamps -ff -t -tt -ttt --absolute-timestamps -T --syscall-times -y -yy --decode-fds)'{-c,--summary-only}'[count time, calls, and errors for each system call and report a summary]' \
+  '(-c --summary-only -C --summary)'{-C,--summary}'[count time, calls, and errors for each system call and report a summary in addition to regular output]' \
+  '(-O --summary-syscall-overhead)'{-O+,--summary-syscall-overhead=}'[specify overhead for tracing system calls]:overhead (microseconds)' \
+  '(-S --summary-sort-by)'{-S+,--summary-sort-by=}'[sort the output of the histogram (-c option) by the specified criterion]:sort criterion [time]:(time min-time max-time avg-time calls errors name nothing)' \
+  '(-U --summary-columns)'{-U+,--summary-columns=}'[show specific columns in the summary report]:column:_sequence compadd - time-percent total-time min-time max-time avg-time calls errors name' \
+  '(-w --summary-wall-clock)'{-w,--summary-wall-clock}'[summarise syscall latency]' \
+  '(-c --summary-only -C)-ff[write each process trace to <filename>.<pid> (when using -o <filename>]' \
+  '(-d --debug)'{-d,--debug}'[show debug output of strace itself on standard error]' \
+  '(- 1 *)'{-h,--help}'[display help information]' \
   '--seccomp-bpf[enable seccomp-bpf filtering]' \
-  '-d[show debug output of strace itself on standard error]' \
-  '-v[print unabbreviated versions of environment, stat, termios, etc. calls]' \
-  '(- 1 *)-h[display help information]' \
-  '(- 1 *)-V[display version information]' \
-  '(-c)-k[obtain stack trace between each syscall]' \
+  '(- 1 *)'{-V,--version}'[display version information]' \
   '(-):command name: _command_names -e' \
   '*::arguments:_normal' && ret=0
 
@@ -61,7 +77,9 @@ case $state in
       'fault[perform syscall fault injection]:system call:_sys_calls -a -n' \
       'inject[perform syscall tampering]:system call:_sys_calls -a -n' \
       'status[trace system calls with given return status]:status:->status' \
-      'kvm[print the exit reason of kvm vcpu]: :(vcpu)' && ret=0
+      'quiet[suppress various information messages]:message [none]:_sequence compadd - none attach exit path-resolution personality thread-execve superseded' \
+      'kvm[print the exit reason of kvm vcpu]: :(vcpu)' \
+      'decode-fds[print information associated with file descriptors]:information [none]:_sequence compadd - none all path socket dev pidfd' && ret=0
     if [[ $state = status ]]; then
       _values -s , 'return status [all]' \
         all successful failed \
@@ -69,15 +87,17 @@ case $state in
         'unavailable[system calls that return but strace fails to fetch the error]' \
         'detached[system calls where strace detaches before the return]' && ret=0
     elif [[ $words[CURRENT] != *=* || $state = syscalls ]]; then
-      local dedup sets suf="-qS,"
+      local dedup sets
       compset -P '!'
       dedup=( ${(Ms.,.)PREFIX##*,} ${(Ms.,.)SUFFIX%%,*} )
-      compset -S ',*' || suf=""
+      compset -S ',*' || suf=( "-qS," )
       compset -P '*,'
       if compset -P /; then
         _wanted syscalls expl "system call (regex)" _sys_calls -a -n $suf -F dedup && ret=0
       else
         sets=(
+          '%clock:trace system calls that read or modify system clocks'
+          '%creds:trace system calls that read or modify user and group identifiers or capability sets'
           {%,}'file:trace all system calls which take a file name as an argument'
           {%,}'process:trace all system calls which involve process management'
           {%net,{%,}network}':trace all the network related system calls'
@@ -121,6 +141,22 @@ case $state in
     else
       _parameters -qS= -g "*export*" && ret=0
     fi
+  ;;
+  time-formats)
+    alts=()
+    compset -P '(precision:*|s|ms|us|ns),' && prec=0
+    compset -P '(format:*|none|time|unix),' && form=0
+    compset -S ',*' || (( !prec + !form )) || suf=( -S , )
+    if compset -P 'precision:'; then
+      form=0
+    elif compset -P 'format:'; then
+      prec=0
+    else
+      alts=( 'prefixes:prefix:compadd -S ":" ${${(s. .):-format x}[form]} ${${(s. .):-precision x}[prec]}' )
+    fi
+    (( prec )) && alts+=( 'precisions:precision [s]:compadd -o nosort $suf s ms us ns' )
+    (( form )) && alts+=( 'formats:format [time]:compadd $suf none time unix' )
+    _alternative $alts && ret=0
   ;;
 esac
 
