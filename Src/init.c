@@ -1229,7 +1229,7 @@ setupshin(char *runscript)
     /*
      * Finish setting up SHIN and its relatives.
      */
-    bshin = SHIN ? fdopen(SHIN, "r") : stdin;
+    shinbufalloc();
     if (isset(SHINSTDIN) && !SHIN && unset(INTERACTIVE)) {
 #ifdef _IONBF
 	setvbuf(stdin, NULL, _IONBF, 0);
@@ -1384,9 +1384,9 @@ init_misc(char *cmd, char *zsh_name)
 	dosetopt(RESTRICTED, 1, 0, opts);
     if (cmd) {
 	if (SHIN >= 10)
-	    fclose(bshin);
+	    close(SHIN);
 	SHIN = movefd(open("/dev/null", O_RDONLY | O_NOCTTY));
-	bshin = fdopen(SHIN, "r");
+	shinbufreset();
 	execstring(cmd, 0, 1, "cmdarg");
 	stopmsg = 1;
 	zexit((exit_pending || shell_exiting) ? exit_val : lastval, ZEXIT_NORMAL);
@@ -1409,7 +1409,6 @@ source(char *s)
     int tempfd = -1, fd, cj;
     zlong oldlineno;
     int oldshst, osubsh, oloops;
-    FILE *obshin;
     char *old_scriptname = scriptname, *us;
     char *old_scriptfilename = scriptfilename;
     unsigned char *ocs;
@@ -1426,7 +1425,6 @@ source(char *s)
 
     /* save the current shell state */
     fd        = SHIN;            /* store the shell input fd                  */
-    obshin    = bshin;          /* store file handle for buffered shell input */
     osubsh    = subsh;           /* store whether we are in a subshell        */
     cj        = thisjob;         /* store our current job number              */
     oldlineno = lineno;          /* store our current lineno                  */
@@ -1439,7 +1437,7 @@ source(char *s)
 
     if (!prog) {
 	SHIN = tempfd;
-	bshin = fdopen(SHIN, "r");
+	shinbufsave();
     }
     subsh  = 0;
     lineno = 1;
@@ -1507,10 +1505,10 @@ source(char *s)
     if (prog)
 	freeeprog(prog);
     else {
-	fclose(bshin);
+	close(SHIN);
 	fdtable[SHIN] = FDT_UNUSED;
 	SHIN = fd;		     /* the shell input fd                   */
-	bshin = obshin;		     /* file handle for buffered shell input */
+	shinbufrestore();
     }
     subsh = osubsh;                  /* whether we are in a subshell         */
     thisjob = cj;                    /* current job number                   */
