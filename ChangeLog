@@ -1,5 +1,9 @@
 2022-01-27  dana  <dana@dana.is>
 
+	* Peter Stephenson: 49290: Src/init.c, Src/input.c: Replace
+	stdio for buffered shell input to avoid memory management
+	interacting with signal handlers.
+
 	* Jun-ichi Takimoto: 49377: Src/Zle/zle_keymap.c,
 	Test/X03zlebindkey.ztst: fix segfault by 'bindkey -d' with
 	reordered keymapnamtab
