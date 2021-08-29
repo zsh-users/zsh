@@ -36,6 +36,7 @@ _arguments -C \
   '*--set:property:(Backlight scaling\ mode):value:->value' \
   '*--scale:output scaling:' \
   '*--transform:transformation matrix:' \
+  '*--filter:mode:(nearest bilinear)' \
   '*--off[disable the output]' \
   '*--crtc:crtc to use:' \
   '*--panning:panning:' \

@@ -67,7 +67,8 @@ case $variant in
       '(-z --disassemble-zeroes)'{-z,--disassemble-zeroes}"[don't skip blocks of zeroes when disassembling]"
 
       '--start-address=[only process data whose address is >= ADDR]:address'
-      '--stop-address=[only process data whose address is <= ADDR]:address'
+      '--stop-address=[only process data whose address is < ADDR]:address'
+      "--no-addresses[don't print address alongside disassembly]"
       '--prefix-addresses[print complete address alongside disassembly]'
       '(--show-raw-insn --no-show-raw-insn)'--{,no-}show-raw-insn'[display hex alongside symbolic disassembly]'
       '--insn-width=[display specified number of bytes on a single line with -d]:width (bytes)'
@@ -80,6 +81,7 @@ case $variant in
       '--dwarf-start=[display DIEs at specified or deeper depth]:depth'
       '--dwarf-check[perform additional dwarf internal consistency checks]'
       '--ctf-parent=[use specified section as the CTF parent]:section'
+      '--visualize-jumps=-[visualize jumps by drawing ASCII art lines]::color:(color extended-color off)'
     )
   ;;
   elfutils)
@@ -165,6 +167,7 @@ case "$state" in
     _values -s "" "dwarf section" \
         "l[rawline]" "L[decodedline]" "i[info]" "a[abbrev]" "p[pubnames]" \
         "r[aranges]" "m[macro]" "f[frames]" "F[frames-interp]" "s[str]" \
+        'O[str-offsets]' \
         "o[loc]" "R[ranges]" "t[pubtypes]" "U[trace_info]" "u[trace_abbrev]" \
         "T[trace_aranges]" "g[gdb_index]" "A[addr]" "c[cu_index]" "k[links]" \
         "K[follow-links]" && ret=0
@@ -172,7 +175,7 @@ case "$state" in
   dwarf-names)
     _sequence _wanted dwarf-sections expl "dwarf section" compadd - \
         rawline decodedline info abbrev pubnames aranges macro frames \
-        frames-interp str loc Ranges pubtypes gdb_index trace_info \
+        frames-interp str str-offsets loc Ranges pubtypes gdb_index trace_info \
         trace_abbrev trace_aranges addr cu_index links follow-links && ret=0
   ;;
   bfdnames)

@@ -244,7 +244,7 @@ _nm_device_wifi() {
   local curcontext="$curcontext" state line
 
   _arguments -C \
-    "1:command:(list connect hotspot rescan)" \
+    "1:command:(list connect hotspot rescan show-password)" \
     "*::arg:->args"
 
   case $line[1] in
@@ -252,6 +252,7 @@ _nm_device_wifi() {
     c*)  _nm_device_wifi_connect ;;
     ho*) _nm_device_wifi_hotspot ;;
     r*)  _nm_device_wifi_rescan ;;
+    s*)  _nm_device_wifi_show-password ;;
   esac
 }
 
@@ -360,6 +361,12 @@ _nm_device_wifi_rescan() {
     "2:interface:_nm_device_ifnames" \
     "3: :(ssid)" \
     "4:ssid:_nm_device_wifi_ssids"
+}
+
+_nm_device_wifi_show-password() {
+  _arguments \
+    "1: :(ifname)" \
+    "2:interface:_nm_device_ifnames"
 }
 
 _nm_device_wifi_bssids() {

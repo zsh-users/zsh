@@ -39,6 +39,7 @@ arguments=(
   {-g+,-groupsize}'[specify the number of octets per group]: :_guard "[0-9]#" "number of octets per group"'
   {-l+,-len}'[specify number of octets to output]: :_guard "[0-9]#" "number of octets to output"'
   {-o+,-offset}'[add specified offset to displayed file position]:offset'
+  '-d[show offset in decimal instead of hex]'
   {-s,-skip,-seek}'[specify file offset to dump from]: :_guard "[0-9]#" "file offset to dump from (absolute or relative)"'
 
   ': :_files'

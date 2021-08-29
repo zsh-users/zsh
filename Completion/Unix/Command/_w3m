@@ -1,7 +1,5 @@
 #compdef w3m
 
-# w3m version w3m/0.5.1
-
 local curcontext="$curcontext" state line expl ret=1
 typeset -A opt_args
 
@@ -21,7 +19,7 @@ _arguments -C \
   '(-B *)-v[visual startup mode]' \
   '-M[monochrome display]' \
   '-N[open URL of command line on each new tab]' \
-  '-F[automatically render frame]' \
+  '-F[automatically render frames]' \
   '-cols[specify column width (used with -dump)]:column width' \
   '-ppc[specify the number of pixels per character (4.0...32.0)]:number of pixels (4.0...32.0):' \
   '-ppl[specify the number of pixels per line (4.0...64.0)]:number of pixels (4.0...64.0):' \
@@ -34,17 +32,17 @@ _arguments -C \
   '-header[insert string as a header]:header:' \
   '+-[goto specified line]:line number:_guard "[0-9]#" "line number"' \
   '-num[show line number]' \
+  '-session[use specified session]:id' \
   "-no-proxy[don't use proxy]" \
   '(-6)-4[IPv4 only (-o dns_order=4)]' \
   '(-4)-6[IPv6 only (-o dns_order=6)]' \
   "-no-mouse[don't use mouse]" \
   '(-no-cookie)-cookie[use cookie]' \
   "(-cookie)-no-cookie[don't use cookie]" \
-  '-pauth[proxy authentication]:user\:pass:->pauth' \
-  '(-no-graph)-graph[use graphic character]' \
-  "(-graph)-no-graph[don't use graphic character]" \
+  '(-no-graph)-graph[use DEC special graphics for border of table and menu]' \
+  '(-graph)-no-graph[use ASCII character for border of table and menu]' \
   '-S[squeeze multiple blank lines]' \
-  '-W[toggle wrap search mode]' \
+  '-W[toggle search wrap mode]' \
   "-X[don't use termcap init/deinit]" \
   '-title=[set buffer name to terminal title string]:terminal:_terminals' \
   '*-o[assign value to config option]:option=value:->option' \
@@ -95,14 +93,6 @@ case "$state" in
     else
       compset -S '=*' || suf=( -S '=' )
       _describe -t options 'option' options "$suf[@]" && ret=0
-    fi
-  ;;
-  pauth)
-    if compset -P 1 '*:'; then
-      _message -e passwords 'password'
-    else
-      compset -S ':*' || suf=( -S ':' )
-      _users "$suf[@]" && ret=0
     fi
   ;;
 esac

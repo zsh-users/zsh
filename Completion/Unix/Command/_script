@@ -4,14 +4,19 @@ local args hlp="-h --help -V --version"
 
 if [[ $service = scriptreplay ]]; then
   _arguments -S -s \
-    "(1 -t --timing $hlp)"{-t+,--timing=}'[specify file containing timing output]:timing file:_files' \
-    "(2 -s --typescript $hlp)"{-s+,--typescript=}'[specify file containing terminal output]:typescript file:_files' \
+    "(1 -t --timing -T --log-timing $hlp)"{-t+,-T+,--timing=,--log-timing=}'[specify file containing timing output]:timing file:_files' \
+    "(-I --log-in -B --log-io $hlp)"{-I+,--log-in=}'[specify file containing terminal input]:file:_files' \
+    "(2 -s --typescript -B --log-io $hlp)"{-s+,-O+,--typescript=,--log-out=}'[specify file containing terminal output]:typescript file:_files' \
+    "(-B --log-io -I --log-in -s -O --typescript --log-out $hlp)"{-B,--log-io}'[specify file containing terminal input and output]' \
+    "($hlp)--summary[display overview about recorded session and exit]" \
     "(3 -d --divisor $hlp)"{-d+,--divisor=}'[speed up replay]:factor' \
     "(-m --maxdelay $hlp)"{-m+,--maxdelay=}'[set maximum delay between updates]:delay (seconds)' \
+    "(-x --stream $hlp)"{-x+,--stream=}'[specify stream type]:name:(out in signal or info)' \
+    "(-c --cr-mode $hlp)"{-c+,--cr-mode=}'[specify CR char mode]:mode:(auto never always)' \
     '(- *)'{-h,--help}'[display help information]' \
     '(- *)'{-V,--version}'[display version information]' \
     "(-t --timing $hlp):timing file:_files" \
-    "(-s --typescript $hlp):typescript file:_files" \
+    "(-s --typescript -O --log-out $hlp):typescript file:_files" \
     "(-d --divisor $hlp): :_guard '[0-9.]#' 'timing divisor'"
   return
 fi
@@ -19,12 +24,18 @@ fi
 case $OSTYPE in
   linux*)
     args=( -S
-      "(-a --append $hlp)"{-a,--append}'[append output]'
+      "(-I --log-in $hlp)"{-I,--log-in}'[log stdin to file]:file:_files'
+      "(-O --log-out $hlp)"{-O,--log-out}'[log stdout to file]:file:_files'
+      "(-B --log-io $hlp)"{-B,--log-io}'[log stdin and stdout to file]:file:_files'
+      "(-T --log-timing -t --timing $hlp)"{-T+,--log-timing=}'[log timing information to file]:file:_files'
+      "(-m --logging-format $hlp)"{-m+,--logging-format=}'[specify log file format]:format:(classic advanced)'
+      "(-a --append $hlp)"{-a,--append}'[append to the log file]'
       "(-c --command $hlp)"{-c,--command=}'[run specified command instead of a shell]:command:_cmdstring'
       "(-e --return $hlp)"{-e,--return}'[return exit status of the child process]'
       "(-f --flush $hlp)"{-f,--flush}'[flush output after each write]'
+      "(-E --echo $hlp)"{-E+,--echo=}'[echo input]:when:(auto always never)'
       "($hlp)--force[use output file even when it is a link]"
-      '(-o --output-limit)'{-o+,--output-limit=}'[terminate if output files exceed specified size]:size (bytes)'
+      "(-o --output-limit $hlp)"{-o+,--output-limit=}'[terminate if output files exceed specified size]:size (bytes)'
       "(-q --quiet $hlp)"{-q,--quiet}'[be quiet]'
       "(-t --timing $hlp)"{-t-,--timing=-}'[output timing data]::timing file:_files'
       '(- 1)'{-h,--help}'[display help information]'

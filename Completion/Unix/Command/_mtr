@@ -4,6 +4,7 @@ _arguments -s -S \
   '(H -F --filename)'{-F,--filename}'[read hostnames from a file]' \
   '(H -6)-4[use IPv4 only]' \
   '(H -4)-6[use IPv6 only]' \
+  '(H -I --interface)'{-I+,--interface=}'[use named network interface]: :_net_interfaces' \
   '(H -a --address)'{-a+,--address=}'[bind outgoing packets to specific interface]:source IP:_hosts' \
   '(H -f --first-ttl)'{-f+,--first-ttl=}'[specify TTL to start]:TTL [1]' \
   '(H -m --max-ttl)'{-m+,--max-ttl=}'[specify maximum number of hops to probe]:hops [30]' \
@@ -17,7 +18,6 @@ _arguments -s -S \
   '(H -Q --tos)'{-Q+,--tos=}'[specify type of service for IP header]:tos (0-255)' \
   '(H -e --mpls)'{-e,--mpls}'[display ICMP MPLS information]' \
   '(H -Z --timeout)'{-Z+,--timeout=}'[specify how long to keep probe sockets open before giving up on the connection]:timeout (seconds)' \
-  '(H -M --mark)'{-M+,--mark=}'[mark each sent packet]:mark' \
   '(H -r --report)'{-r,--report}'[report mode]' \
   '(H -w --report-wide)'{-w,--report-wide}"[wide report mode\: don't truncate hostnames]" \
   '(H -c --report-cycles)'{-c+,--report-cycles=}'[report cycles]:number of pings' \

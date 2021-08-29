@@ -80,6 +80,7 @@ case $service in
       '(--dtdvalid --relaxng --schema)--postvalid[do a posteriori validation, i.e after parsing]' \
       '(--postvalid --relaxng --schema --dtdvalidfpi)--dtdvalid[do a posteriori validation against a given DTD]:DTD:_webbrowser' \
       '(--postvalid --relaxng --schema --dtdvalid)--dtdvalidfpi[as --dtdvalid but specify DTD with public identifier]:DTD identifier' \
+      '--quiet[be quiet when successful]' \
       '--timing[print some timings]' \
       '(--noout --output -o)'{--output,-o}'[save to a given file]:output file:_files' \
       '--repeat[repeat 100 times, for timing or profiling]' \

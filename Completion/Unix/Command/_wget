@@ -34,6 +34,8 @@ _arguments -C -s \
   '(--server-response -S)'{--server-response,-S}'[print server response]' \
   "--spider[don't download anything]" \
   '(--timeout -T)'{--timeout=,-T+}'[set all timeout values]:timeout (seconds)' \
+  '--dns-servers=[specify DNS servers to query]:DNS server:_sequence _hosts' \
+  '--bind-dns-address=[bind DNS resolver to specified address]:hostname or IP on local host' \
   '(--timeout -T)--dns-timeout=[set the DNS lookup timeout]:DNS lookup timeout (seconds)' \
   '(--timeout -T)--connect-timeout=[set the connect timeout]:connect timeout (seconds)' \
   '(--timeout -T)--read-timeout=[set the read timeout]:read timeout (seconds)' \
@@ -107,7 +109,7 @@ _arguments -C -s \
   "--ca-directory=[specify dir where hash list of CA's are stored]:directory:_directories" \
   '--crl-file=[specify file with bundle of CRLs]:file:_files' \
   '--pinnedpubkey=:file:_files' \
-  '!--random-file=:file:_files' \
+  '--random-file[specify file with random data for seeding generator]:file:_files' \
   '--egd-file=[specify filename of EGD socket]:file:_files' \
   '--ciphers=[set the priority string (GnuTLS) or cipher list string (OpenSSL) directly]:string' \
   '--no-hsts[disable HSTS]' \

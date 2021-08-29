@@ -5,16 +5,21 @@ local -a state line expl cmds
 local -A opt_args
 
 _arguments -C \
+  '--debug[turn on debugging messages]:mask:((1\:parser\ information))' \
+  '--json[output results in JSON]' \
+  '(-I --include-statistics)'{-I,--include-statistics}'[include command-related statistics in the output]' \
+  '(cmds)'{-Q,--per-queue}'[apply per-queue command]: :(queue_mask):queue mask' \
   "1:interface:_net_interfaces" \
-  '*: :->args' \
+  '*:: :->args' \
+  + '(cmdc)' \
+  '(cmds)'{-c,--show-coalesce}'[query the specified ethernet device for coalescing information]' \
+  '(cmds)'{-C,--coalesce}'[change the coalescing settings of the specified ethernet device]' \
   + '(cmds)' \
   '(1)'{-h,--help}'[display help information]' \
   '(1)--version[display version information]' \
   {-s,--change}'[allow changing some or all settings of the specified ethernet device]' \
   {-a,--show-pause}'[query the specified ethernet device for pause parameter information]' \
   {-A,--pause}'[change the pause parameters of the specified ethernet device]' \
-  {-c,--show-coalesce}'[query the specified ethernet device for coalescing information]' \
-  {-C,--coalesce}'[change the coalescing settings of the specified ethernet device]' \
   {-g,--show-ring}'[query the specified ethernet device for RX/TX ring parameter information]' \
   {-G,--set-ring}'[change the RX/TX ring parameters of the specified ethernet device]' \
   {-k,--show-features,--show-offload}'[query the specified ethernet device for offload information]' \
@@ -46,10 +51,21 @@ _arguments -C \
   '--set-eee[set EEE settings]' \
   '--set-phy-tunable[set PHY tunable]' \
   '--get-phy-tunable[get PHY tunable]' \
+  '--get-tunable[get tunable parameters]' \
+  "--set-tunable[set driver's tunable parameters]" \
   '--reset[reset hardware components]' \
   '--show-fec[query device for forward error correction support]' \
   '--set-fec[configure forward error correction for device]' \
-  {-Q,--per-queue}'[apply per-queue command]' && return
+  '--cable-test[perform cable test and report the results]' \
+  '--cable-test-tdr[perform cable test and report Time Domain Reflectometer data]' \
+  '--show-tunnels[show tunnel-related device capabilities and state]' \
+  '--monitor[listen to netlink notifications and displays them]::command:(
+    --all -s --change -k --show-features --show-offload -K
+    --features --offload  --show-priv-flags --set-priv-flags -g --show-ring
+    -G --set-ring -l --show-channels -L --set-channels -c --show-coalesce
+    -C --coalesce -a --show-pause -A --pause --show-eee --set-eee
+    --cable-test --cable-test-tdr
+  )' && return
 
 if [[ -n $state ]]; then
   case $words[CURRENT-1] in
@@ -62,7 +78,8 @@ if [[ -n $state ]]; then
       _wanted onoff expl 'enabled' compadd off on
     fi
   ;;
-  autoneg|adaptive-[rt]x|raw|hex|sg|tso|ufo|gso|lro|eee|tx-lpi|downshift|fast-link-down)
+  autoneg|adaptive-[rt]x|raw|hex|sg|tso|ufo|gso|lro|eee|tx-lpi|downshift) ;&
+  fast-link-down|energy-detect-power-down|mode)
     _wanted onoff expl 'enabled' compadd off on
   ;;
   rx-usecs|rx-frames|rx-usecs-irq|rx-frames-irq|tx-usecs|tx-frames) ;&
@@ -71,6 +88,8 @@ if [[ -n $state ]]; then
   rx-frames-high|tx-usecs-high|tx-frames-high|sample-interval|dmac|rx-mini) ;&
   rx-jumbo|offset|length|magic|value|phyad|proto|tos|tclass|l4proto|src-port) ;&
   dst-port|spi|l4data|vlan-etype|vlan|user-def|action|vf|queue|loc) ;&
+  page|bank|i2c|first|last|step|pair|lanes) ;&
+  rx-copybreak|tx-copybreak|pfc-prevention-tout) ;&
   other|combined|tx-timer|count|msecs)
     _message -e numbers 'number'
   ;;
@@ -81,7 +100,10 @@ if [[ -n $state ]]; then
     _wanted duplex expl 'duplex mode' compadd half full
   ;;
   port)
-    _wanted port expl 'device port' compadd tp aui bnc mii fibre
+    _wanted port expl 'device port' compadd tp aui bnc mii fibre da
+  ;;
+  master-slave)
+    _wanted roles expl role compadd {preferred,forced}-{master,slave}
   ;;
   advertise)
     _values 'hexadecimal value (or a combination of the following)' \
@@ -93,7 +115,8 @@ if [[ -n $state ]]; then
       '0x020[1000 full]' \
       '0x8000[2500 full(not supported by IEEE standards)]' \
       '0x800[10000 full]' \
-      '0x03F[auto]'
+      '0x03F[auto]' \
+      'mode[set mode]'
   ;;
   xcvr)
     _wanted xcvr expl 'transceiver type' compadd internal external
@@ -144,7 +167,7 @@ if [[ -n $state ]]; then
     _message -e contexts 'RSS context'
   ;;
   *)
-    case $words[2] in
+    case ${${(Mk)opt_args:#cmd?*}[1]#cmd?-} in
     -A|--pause)
       _values -S ' ' -w 'pause parameter' \
         'autoneg[specify if pause autonegotiation is enabled]' \
@@ -192,6 +215,9 @@ if [[ -n $state ]]; then
     -p|--identify)
       (( CURRENT = 4 )) && _message -e length 'duration (seconds)'
     ;;
+    -S|--statistics)
+      _arguments '(-)--all-groups' '(-)--groups:eth-phy: :eth-mac: :eth-ctrl: :rmon'
+    ;;
     -t|--test)
       _values -S ' ' -w 'test mode' \
         '(online)offline:perform full set of tests possibly causing normal operation interruption (default)]' \
@@ -202,8 +228,10 @@ if [[ -n $state ]]; then
       if (( ! $words[(I)msglvl] )); then
         _values -S ' ' -w 'generic option' \
           'speed[set speed in Mb/s]' \
+          'lanes[set number of lanes]' \
           'duplex[set full or half duplex mode]' \
           'port[select device port]' \
+          'master-slave[configure interface role]' \
           'autoneg[specify if autonegotiation is enabled]' \
           'advertise[set the speed and duplex advertised by autonegotiation]' \
           'phyad[PHY address]' \
@@ -274,16 +302,23 @@ if [[ -n $state ]]; then
       fi
     ;;
     -m|--dump-module-eeprom|--module-info)
-      _wanted options expl option compadd -F line - raw hex offset length
+      _wanted options expl option compadd -F line - raw hex offset \
+          length page bank i2c
     ;;
     --set-eee)
       _wanted behaviours expl behaviour compadd -F line - eee advertise tx-lpi tx-timer
     ;;
     --set-phy-tunable)
-      _wanted options expl tunable compadd -F line - downshift count fast-link-down msecs
+      _wanted options expl tunable compadd -F line - downshift count \
+	  fast-link-down msecs energy-detect-power-down
     ;;
     --get-phy-tunable)
-      _wanted options expl tunable compadd downshift fast-link-down
+      _wanted options expl tunable compadd downshift fast-link-down \
+	  energy-detect-power-down
+    ;;
+    --[gs]et-tunable)
+      _wanted options expl tunable compadd rx-copybreak tx-copybreak \
+          pfc-prevention-tout
     ;;
     --reset)
       _wanted components expl component compadd flags dedicated all \
@@ -302,6 +337,9 @@ if [[ -n $state ]]; then
       elif (( CURRENT == 6)); then
         _wanted options expl option compadd -c --show-coalescing -C --coalesce
       fi
+    ;;
+    --cable-test-tdr)
+      _wanted options expl 'distance options' compadd first last step pair
     ;;
     esac
   ;;

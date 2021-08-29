@@ -20,11 +20,12 @@ cmds=(
   'info:show global power parameters'
   'set:set global power parameters'
   'monitor:report frequency and idle statistics'
+  'powercap-info:show powercapping related kernel and hardware configurations'
   'help:print usage information'
 )
 case $state in
   cmds)
-    _describe command cmds && ret=0
+    _describe command cmds -M 'r:|-=* r:|=*' && ret=0
   ;;
   args)
     curcontext="${curcontext%:*}-$words[1]"

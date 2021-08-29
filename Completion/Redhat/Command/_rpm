@@ -129,6 +129,7 @@ _rpm () {
     '--scm=[select the SCM to use with %autosetup]:scm [patch]:(patch gendiff git quilt)'
     '*--buildpolicy=[set buildroot policy]:policy:->brp_policies'
     '!--sign'
+    '--trace[trace macro expansion]'
     "--nodebuginfo[don't generate debuginfo for this package]"
   )
 

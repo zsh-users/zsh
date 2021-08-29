@@ -31,6 +31,7 @@ arguments=(
   '(-M)-N+[extract name list from specified system]:system file:_files'
   '(-o -n --oldest --newest)'{-n,--newest}'[match newest process]'
   '(-o -n --oldest --newest)'{-o,--oldest}'[match oldest process]'
+  '(-O --older)'{-O+,--older=}'[select where older than specified age]:age (seconds)'
   '(-P --parent)'{-P+,--parent=}'[match only on specified parent process IDs]: :->ppid'
   '(-l)-q[suppress normal output]'
   '(-r --runstates)'{-r+,--runstates}'[match runstates]:run state:compadd -S "" D I R S T t W X Z'
@@ -62,8 +63,8 @@ arguments=(
 case $OSTYPE in
   linux*)
     # Note: We deliberately exclude -v but not --inverse from pkill
-    pgopts=acdFfGghLlnoPrstUuVvwx-
-    pkopts=ceFfGghLnoPstUuVx-
+    pgopts=acdFfGghLlnoOPrstUuVvwx-
+    pkopts=ceFfGghLnoOPstUuVx-
     arguments=(
       ${arguments:#((#s)|*\))(\*|)-[acl]*}
       '(-c --count)'{-c,--count}'[display count of matching processes]'

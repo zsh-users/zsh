@@ -205,6 +205,7 @@ _arguments -C ${(P)args} $cmd \
   '(--version)--tool=-[specify valgrind tool]:valgrind tool:->tools' \
   '(-h --help)'{-h,--help}'[show help information]' \
   '--help-debug[show help info including debugging options]' \
+  '--help-dyn-options[show the dynamically changeable options]' \
   '(-)--version[show version]' \
   '(-q --quiet)'{-q,--quiet}'[run silently; only print error msgs]' \
   '(-v --verbose)'{-v,--verbose}'[be more verbose]' \

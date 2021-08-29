@@ -15,7 +15,7 @@ all=(
 common=(
   '*-I+[specify $LOAD_PATH directory (may be used more than once)]:library directory:_files -/'
   '-w[turn warnings on for your script]'
-  '-W-[set warning level]:warning level:((0\:silent 1\:medium 2\:verbose))'
+  '-W-[set warning level]:warning level:((0\:silent 1\:medium 2\:verbose \\\:deprecated \\\:experimental))'
   '(-)1:ruby script:_files -g "*.rb(-.)"'
   '*::script argument:= ->normal'
 )
@@ -35,7 +35,7 @@ opts=(
   '(-n)-p[assume loop like -n but print line also like sed]'
   '-s[enable some switch parsing for switches after script name]'
   '-S[look for the script using PATH environment variable]'
-  '-T-[turn on tainting checks]::taint level [1]:((0\:strings\ from\ streams/environment/ARGV\ are\ tainted 1\:no\ dangerous\ operation\ by\ tainted\ value 2\:process/file\ operations\ prohibited 3\:all\ generated\ objects\ are\ tainted 4\:no\ global\ \(non-tainted\)\ variable\ modification/no\ direct\ output))'
+  '!-T-[turn on tainting checks]::taint level [1]:((0\:strings\ from\ streams/environment/ARGV\ are\ tainted 1\:no\ dangerous\ operation\ by\ tainted\ value 2\:process/file\ operations\ prohibited 3\:all\ generated\ objects\ are\ tainted 4\:no\ global\ \(non-tainted\)\ variable\ modification/no\ direct\ output))'
   '(--verbose)-v[print version number, then turn on verbose mode]'
   '(-v)--verbose[turn on verbose mode and disable script from stdin]'
   '-x-[strip off text before #!ruby line and perhaps cd to directory]:directory:_files -/'
@@ -49,11 +49,11 @@ opts=(
   '--jit[enable jit with default options]'
   '--jit-warnings[enable printing JIT warnings]'
   '--jit-debug[enable JIT debugging (very slow)]'
-  '--jit-wait[wait until JIT compilation is finished every time (for testing)]'
+  '--jit-wait[wait until JIT compilation finishes every time (for testing)]'
   '--jit-save-temps[save JIT temporary files]'
   '--jit-verbose=-[print JIT logs of level num or less to stderr]:maximum log level [0]'
-  '--jit-max-cache=-[specify max number of methods to be JIT-ed in a cache]:number [1000]'
-  '--jit-min-calls=-[specify number of calls to trigger JIT]:calls [5]'
+  '--jit-max-cache=-[specify max number of methods to be JIT-ed in a cache]:number [100]'
+  '--jit-min-calls=-[specify number of calls to trigger JIT]:calls [10000]'
 )
 
 irb=(

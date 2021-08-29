@@ -4,6 +4,8 @@ local common expl
 
 common=(
   '-ad[append archive name to destination path]'
+  '-ad1[create a separate folder for files unpacked from each archive]'
+  "-ad2[like -ad1 but use archives' own folders]"
   '-ap[set path inside archive]'
   '-av\-[disable authenticity verification check]'
   '-c\-[disable comments show]'
@@ -13,6 +15,7 @@ common=(
   '-dh[open shared files]'
   '-ep[exclude paths from name]'
   '-f[freshen files]'
+  '-idn[hide archived names]'
   '-idp[disable percentage display]'
   '-ierr[send all messages to stderr]'
   '-inul[disable all messages]'
@@ -27,6 +30,7 @@ common=(
   '-tb+[process files modified before a date]:date (YYYYMMDDHHMMSS)'
   '-tn+[process files newer than a specified time]:time'
   '-to+[process files older than a specified time]:time'
+  '-ts-[save or restore time]:time:((m\:modification c\:change a\:access p\:preserve))'
   '-u[update files]'
   '-v[create volumes with size autodetection or list all volumes]'
   '-ver[file version control]'

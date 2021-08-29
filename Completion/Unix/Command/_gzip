@@ -9,10 +9,14 @@ files=( '*:files:->files' )
 case "$service" in
 unpigz|pigz)
   pigz=(
-    '(-K --zip)'{-K,--zip}'[compress to PKWare zip format]'
+    '(-A --alias)'{-A+,--alias=}'[specify filename to use in zip entry for stdin]:filename'
+    '(-C --comment)'{-C+,--comment=}'[put specified comment in the gzip or zip header]'
+    '(-H --huffman -U --rle)'{-H,--huffman}'[use only Huffman coding for compression]'
+    '(-U --rle -H --huffman)'{-U,--rle}'[use run-length encoding for compression]'
+    '(-K --zip -z --zlib)'{-K,--zip}'[compress to PKWare zip format]'
     '(-b --blocksize)'{-b+,--blocksize}'[set compression block size]:size (KiB)'
     '(-p --processes)'{-p,--processes}'[specify number of processes to use]'
-    '(-z --zlib)'{-z,--zlib}'[compress to zlib (.zz) format]'
+    '(-z --zlib -K --zip)'{-z,--zlib}'[compress to zlib (.zz) format]'
     '(-m --no-time)'{-m,--no-time}"[don't store/restore modification time in/from header]"
     '(-M --time)'{-M,--time}"[store/restore modification time in/from header]"
     '(--synchronous)-Y[force output file write to permanent storage]'

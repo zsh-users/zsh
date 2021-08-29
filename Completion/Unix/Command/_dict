@@ -21,6 +21,8 @@ _arguments -C -S \
   '(--key -k)'{--key=,-k+}'[specify key for authentication]:shared secret:' \
   '(-)'{--version,-V}'[display program version]' \
   '(-)'{--license,-L}'[display program license]' \
+  '(-6)-4[force use of IPv4 addresses only]' \
+  '(-4)-6[force use of IPv6 addresses only]' \
   '(-)--help[display usage info]' \
   '(--verbose -v)'{--verbose,-v}'[verbose output]' \
   '(--raw -r)'{--raw,-r}'[be very verbose]' \

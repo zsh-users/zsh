@@ -11,6 +11,7 @@ _mpstat() {
     '--dec=-[specify the number of decimal places to use]:decimal places [2]:(0 1 2)' \
     '-o[display statistics in JSON]:format:(JSON)' \
     '(-A)-P[specify processor number]:processor: _values -s "," processor ALL {0..$(_call_program processors getconf _NPROCESSORS_ONLN)}' \
+    '-T[display topology elements in the CPU report]' \
     '-u[report CPU utilization]' \
     '(- 1 2)-V[display version information]' \
     '1: : _guard "^-*" interval' \
@@ -26,6 +27,7 @@ _cifsiostat() {
     '-t[print timestamp for each report]' \
     '(- 1 2)-V[print version number]' \
     '--human[print sizes in human readable format]' \
+    '--pretty[make the CIFS report easier to read by a human]' \
     '1: : _guard "^-*" interval' \
     '2: : _guard "^-*" count'
 }
@@ -49,7 +51,7 @@ _sadf() {
       '-H[display only the header of the report]' \
       '(-g -j -p -r -x)-h[print on a single line when used with -d]' \
       '-O[specify output options]: : _values -s , option
-        autoscale height\:value oneday packed showidle showinfo skipempty showhints' \
+        autoscale bwcol customcol height\:value oneday packed showidle showinfo showtoc skipempty hz\:value pcparchive\:name\:_files debug' \
       '-P[restrict processor dependant statistics]:processor number(zero indexed) or ALL:(ALL)' \
       '--dev=-[specify block devices for which statistics are to be displayed]:block device:_files -g "*(-%)"' \
       '--fs=-[specify filesystems for which statistics are to be displayed]:file system:_dir_list -s ,' \
@@ -66,6 +68,7 @@ _sadf() {
       '-d[output file in SQL format]' \
       '-g[print data in SVG format]' \
       '-j[output file in JSON]' \
+      '-l[export the contents of the data file to a PCP (Performance Co-Pilot) archive]' \
       '-p[print in format parsable by tools like awk]' \
       '-r[print raw contents of data file]' \
       '-x[output file in XML]' \
@@ -105,7 +108,7 @@ _sar() {
     '-o[save readings to file in binary form]:file:_files' \
     '-P[report per-processor statistics]:processor: _values -s "," processors ALL' \
     '-p[pretty-print device names]' \
-    '-q[report queue length and load averages]' \
+    '-q[report queue length and load averages]::keyword:(CPU IO LOAD MEM PSI ALL)' \
     '-R[report memory statistics]' \
     '-r[report memory utilization statistics]:: :(ALL)' \
     '-S[report swap space utilization]' \

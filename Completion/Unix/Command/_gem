@@ -196,7 +196,7 @@ if [[ $state = command ]]; then
       )
     ;;
     environment)
-      args+=( '1:information:(packageversion gemdir gempath version remotesources platform)' )
+      args+=( '1:information:(gemdir gempath version remotesources platform)' )
     ;;
     fetch)
       def=( both \! local \! remote \! )
@@ -298,6 +298,9 @@ if [[ $state = command ]]; then
         '(-g --gems-first)'{-g,--gems-first}'[search gems before non-gems]'
         '*:file:_files'
       )
+    ;;
+    yank)
+      args+=( '--otp=[specify code for multifactor authentication]:code' )
     ;;
   esac
   _arguments -C ${args:-'*: :_default'} \

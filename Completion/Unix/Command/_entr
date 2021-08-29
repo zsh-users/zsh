@@ -11,6 +11,7 @@ _arguments -s -S \
   '-p[postpone first execution of the utility]' \
   '(-a)-r[reload a persistent child process]' \
   '(*)-s[evaluate the first argument using interpreter specified by $SHELL]' \
+  '-z[exit after the utility completes]' \
   '(-): :->command' \
   '*::arguments:_normal' && ret=0
 

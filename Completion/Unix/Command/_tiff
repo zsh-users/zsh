@@ -59,6 +59,7 @@ tiff2pdf)
     '-s+[set document subject, overrides image image description default]:subject' \
     '-k+[set document keywords]:keywords' \
     '-b[set PDF "Interpolate" user preference]' \
+    '-m+[set memory allocation limit]:limit (MiB)' \
     '(- :)-h[display usage information]' \
     ':input file:_files -g "*.(#i)tif(|f)(-.)"'
   ;;
@@ -83,6 +84,7 @@ tiff2ps)
     '-i+[enable/disable (Nz/0) pixel interpolation]:state [enabled]:((0\:disable 1\:enable))' \
     '-l+[set the left margin]:margin (inches)' \
     '-m[use "imagemask" operator instead of "image"]' \
+    '-M+[set memory allocation limit]:limit (MiB)' \
     '-o+[set initial TIFF directory (file offset)]:file offset (bytes)' \
     '(-e)-p[generate non-Encapsulated PostScript]' \
     '-O+[specify output file]:output file:_files -g "*.(#i)(|e)ps(-.)"' \
@@ -121,6 +123,7 @@ tiffcp)
     '-i[ignore read errors]' \
     '-b+[specify bias (dark) monochrome image to be subtracted from all others]:file:_files' \
     '-,=-[specify substitute character for image indices]:character [,]' \
+    '-m+[set memory allocation limit]:limit (MiB)' \
     '-r+[specify rows per strip]:rows per strip' \
     '-w+[specify output tile width]:output tile width' \
     '-l+[specify output tile length]:output tile length' \

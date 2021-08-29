@@ -1,5 +1,7 @@
 2021-08-29  Oliver Kiddle  <opk@zsh.org>
 
+	* 49319: Completion/...: completion options update
+
 	* 49317: Completion/Unix/Command/_transmission,
 	Completion/Unix/Command/_gcore, Completion/Unix/Command/_pandoc,
 	Completion/Unix/Command/_luarocks: cleanup inappropriate use

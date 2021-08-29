@@ -21,6 +21,7 @@ _arguments -s \
   '--new-keyfile-offset=[specify number of bytes to skip in newly added keyfile]:offset (bytes)' \
   '(-S --key-slot)'{-S+,--key-slot=}'[select key slot]:key slot' \
   '(-b --size)'{-b+,--size=}'[force device size]:sectors' \
+  '--device-size=[use only specified device size (ignore rest of device)]:size (bytes)' \
   '(-o --offset)'{-o+,--offset=}'[set start offset]:sectors' \
   '(-p --skip)'{-p+,--skip=}'[data to skip at beginning]:sectors' \
   '(-r --readonly)'{-r,--readonly}'[create a read-only mapping]' \
@@ -44,10 +45,12 @@ _arguments -s \
   '--veracrypt[scan also for VeraCrypt compatible device]' \
   '--veracrypt-pim=[specify personal iteration multiplier for VeraCrypt compatible device]:multiplier' \
   '--veracrypt-query-pim[query personal iteration multiplier for VeraCrypt compatible device]' \
-  '(-M --type)'{-M+,--type=}'[specify type of device metadata]:type:(luks plain loopaes tcrypt)' \
+  '(-M --type)'{-M+,--type=}'[specify type of device metadata]:type:(luks luks1 luks2 plain loopaes tcrypt bitlk)' \
   '--force-password[disable password quality check (if enabled)]' \
   '--perf-same_cpu_crypt[use dm-crypt same_cpu_crypt performance compatibility option]' \
   '--perf-submit_from_crypt_cpus[use dm-crypt submit_from_crypt_cpus performance compatibility option]' \
+  '--perf-no_read_workqueue[bypass dm-crypt workqueue and process read requests synchronously]' \
+  '--perf-no_write_workqueue[bypass dm-crypt workqueue and process write requests synchronously]' \
   '--deferred[device removal is deferred until the last user closes it]' \
   '--serialize-memory-hard-pbkdf[use global lock to serialize memory]' \
   '--pbkdf=[specify PBKDF algorithm for LUKS2]:algorithm:(argon2i argon2id pbkdf2)' \
@@ -60,14 +63,16 @@ _arguments -s \
   '(-I --integrity)'{-I+,--integrity=}'[specify data integrity algorithm (LUKS2 only)]:algorithm' \
   '--integrity-no-journal[disable journal for integrity device]' \
   "--integrity-no-wipe[don't wipe device after format]" \
+  '--integrity-legacy-padding[use inefficient legacy padding (old kernels)]' \
   "--token-only[don't ask for passphrase if activation by token fails]" \
   '--token-id=[specify token number]:number [any]' \
   '--key-description=[specify key description]:description' \
   '--sector-size=[specify encryption sector size]:size [512 bytes]' \
+  '--iv-large-sectors[use IV counted in sector size (not in 512 bytes)]' \
   '--persistent[set activation flags persistent for device]' \
   '--label=[set label for the LUKS2 device]:label' \
   '--subsystem=[set subsystem label for the LUKS2 device]:subsystem' \
-  '--unbound[create unbound (no assigned data segment) LUKS2 keyslot]' \
+  '--unbound[create or dump unbound (no assigned data segment) LUKS2 keyslot]' \
   '--json-file=[read or write token to json file]:json file:_files -g "*.json(-.)"' \
   '--luks2-metadata-size=[specify LUKS2 header metadata area size]:size (bytes)' \
   '--luks2-keyslots-size=[specify LUKS2 header keyslots area size]:size (bytes)' \
@@ -77,12 +82,13 @@ _arguments -s \
   '--encrypt[Encrypt LUKS2 device (in-place encryption)]' \
   '--decrypt[decrypt LUKS2 device (remove encryption)]' \
   '--init-only[initialize LUKS2 reencryption in metadata only]' \
+  '--resume-only[resume initialized LUKS2 reencryption only]' \
   '--reduce-device-size=[reduce data device size (move data offset)]:size (bytes)' \
   '--hotzone-size=[specify maximal reencryption hotzone size]:size (bytes)' \
   '--resilience=[specify reencryption hotzone resilience type]:resilience type:(checksum journal none)' \
   '--resilience-hash=[specify reencryption hotzone checksums hash]:string' \
   '--active-name=[override device autodetection of dm device to be reencrypted]:string' \
-  "${ign}(- : *)--version[show version information]" \
+  "${ign}(- : *)"{-V,--version}'[show version information]' \
   "${ign}(- : *)"{-\?,--help}'[display help information]' \
   "${ign}(- : *)--usage[display brief usage]" \
   ':action:->actions' \
@@ -111,6 +117,7 @@ case $state in
       'isLuks:check if device is a LUKS partition'
       'luksDump:dump header information'
       'tcryptDump:dump TCRYPT device information'
+      'bitlkDump:dump BITLK device information'
       'luksSuspend:suspend LUKS device and wipe key'
       'luksResume:resume suspended LUKS device'
       'luksHeaderBackup:store binary backup of headers'

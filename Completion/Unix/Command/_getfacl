@@ -22,6 +22,7 @@ _arguments -s -S \
   '(-P --physical)'{-P,--physical}"[physical walk, don't follow symbolic links]" \
   '(-t --tabular)'{-t,--tabular}'[use tabular output format]' \
   '(-n --numeric)'{-n,--numeric}'[print numeric user/group identifiers]' \
+  '--one-file-system[skip files on different filesystems]' \
   '(-p --absolute-names)'{-p,--absolute-names}"[don't strip leading '/' in pathnames]" \
   '(- *)'{-v,--version}'[display version information]' \
   '(- *)'{-h,--help}'[display help information]' \

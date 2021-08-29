@@ -22,7 +22,7 @@ options+=(
 )
 
 output_modes=( column HTML line list )
-(( $+sqlite3 )) && output_modes+=( ascii csv quote )
+(( $+sqlite3 )) && output_modes+=( ascii box csv json markdown quote table tabs )
 exclusive=( $^dashes-${^output_modes:l} )
 for display_opt in $output_modes ; do
   # finagle the description to match the way SQLite's -help formats them
@@ -54,6 +54,7 @@ options+=(
   $^dashes'-memtrace[trace all memory allocations and deallocations]'
   $^dashes'-mmap[set default mmap size]:size'
   $^dashes'-newline[set output row separator]:separator [\n]'
+  $^dashes'-nofollow[refuse to open symbolic links to database files]'
   $^dashes'-pagecache[specify size and number of slots for page cache memory]:size (bytes): :slots'
   $^dashes'-readonly[open the database read-only]'
   $^dashes'-stats[print memory stats before each finalize]'

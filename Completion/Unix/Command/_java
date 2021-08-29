@@ -24,18 +24,24 @@ javac)
     '(-cp -classpath)'{-cp,-classpath}'[specify where to find user class files]:class path:->classpath' \
     '-sourcepath[specify where to find input source files]:source path:->sourcepath' \
     '-bootclasspath[override location of bootstrap class files]:bootstrap class path:->bootstrapclasspath' \
+    '-endorseddirs[override location of endorsed standards path]:path:->extdirs' \
     '-extdirs[override location of installed extensions]:extensions directories:->extdirs' \
     '-d[specify where to place generated class files]:directory:_files -/' \
     '-encoding[specify character encoding used by source files]:encoding:->encoding' \
     '-proc\:-[control annotation processing]:annotation processing:(none only)' \
     '-processor[specify annotation processors to run]:class:_files' \
     '-processorpath[specify where to find annotation processors]:directory:_directories' \
+    '-parameters[generate metadata for reflection on method parameters]' \
     '-s[specify directory for generated source files]:directory:_directories' \
+    '-h[specify where to place generated native header files]:directory:_directories' \
     '-source[provide source compatibility with specified release]:release:(1.{2..8} {5..8})' \
     '-target[specify VM version]:release:(1.{1..5})' \
+    '-profile[check that API used is available in the specified profile]:profile' \
     '(-)-help[print a synopsis of standard options]' \
     '(-)-version[print version information]' \
     '(-)-X[display information about non-standard options]' \
+    '-J-[pass flag directly to the runtime system]:flag' \
+    '-Werror[terminate compilation if warnings occur]' \
     '*:java source file:_files -g \*.java\(-.\)' && return 0
   ;;
 
@@ -75,6 +81,7 @@ java)
     '(- 1)-'{\?,help}'[print help message]' \
     '(- 1)-X-[non-standard java option]:option' \
     '(- 1)-jar[specify a program encapsulated as jar]:jar:_files -g \*.jar\(-.\)' \
+    '-splash\:-[show splash screen with specified image]:image:_files' \
     '(-):class:_java_class -m main ${(kv)opt_args[(i)(-classpath|-cp)]}' \
     '*::args:= _normal' \
      && return 0
@@ -90,15 +97,20 @@ javadoc)
     '-help[print help message]' \
     '-doclet[specify a doclet]:doclet:_java_class -t doclet ${(kv)opt_args[(i)-classpath]}' \
     '-docletpath[specify a path to search doclet]:doclet path:->docletpath' \
-    '-1.1[Javadoc 1.1 compatible output]' \
     '-sourcepath[specify path for source files]:source path:->sourcepath' \
-    '-classpath[specify path for user class files]:class path:->classpath' \
+    {-cp,-classpath}'[specify path for user class files]:class path:->classpath' \
+    '-exclude[specify a list of packages to exclude]:package list' \
+    '-subpackages[specify subpackages to recursively load]:subpackage list' \
+    '-breakiterator[compute first sentence with BreakIterator]' \
     '-bootclasspath[specify path for bootstrap class files]:bootstrap class path:->bootstrapclasspath' \
+    '-source[provide source compatibility with specified release]:release' \
     '-extdirs[specify directories for extensions]:extensions directories:->extdirs' \
     '-verbose[print verbose messages]' \
     '-locale[specify locale]:language_country_variant:' \
     '-encoding[specify character encoding for source files]:encoding:->encoding' \
+    "-quiet[don't display status messages]" \
     '-J-[specify java option]:java option:' \
+    '-X[print a synopsis of nonstandard options and exit]' \
     '-d[specify destination directory]:destination directory:_files -/' \
     '-use[display pages for use]' \
     '-version[include @version text]' \
@@ -111,15 +123,27 @@ javadoc)
     '-bottom[specify bottom text]:bottom text:' \
     '-link[generate a link to external reference classes]:document URL:' \
     '-linkoffline[generate a link for external reference class names]:document URL::package list URL:' \
+    '-excludedocfilessubdir[exclude any doc-files subdirectories with given name]:name:_directories' \
     '-group[generate tables for each group]:group heading::package patterns:' \
-    '-nodeprecated[do not document deprecated API]' \
-    '-nodeprecatedlist[do not generate deprecated API list]' \
-    '-notree[do not generate class and interface hierarchy]' \
-    '-noindex[do not generate index]' \
-    '-nohelp[do not generate help link]' \
-    '-nonavbar[do not generate navigation bar]' \
+    "-nodeprecated[don't include @deprecated information]" \
+    '-noqualifier[exclude the list of qualifiers from the output]:qualifier list' \
+    "-nosince[don't include @since information]" \
+    "-notimestamp[don't include hidden time stamp]" \
+    "-nodeprecatedlist[don't generate deprecated API list]" \
+    "-notree[don't generate class and interface hierarchy]" \
+    "-noindex[don't generate index]" \
+    "-nohelp[don't generate help link]" \
+    "-nonavbar[don't generate navigation bar]" \
+    '-serialwarn[generate warning about @serial tag]' \
+    '*-tag[specify single argument custom tag]:tag' \
+    '-taglet[specify fully qualified name of Taglet to register]:taglet' \
+    '-tagletpath[specify path to Taglets]:path:_directories' \
+    '-charset[specify charset of generated documentation]:charset:->encoding' \
     '-helpfile[specify alternative help link]:helpfile path/filename:' \
-    '-stylesheet[specify alternative HTML style sheet]:stylesheet path/filename:' \
+    '-linksource[generate source in HTML]' \
+    '-sourcetab[specify the number of spaces each tab takes up in the source]:spaces' \
+    '-keywords[include HTML meta tags with package, class and member info]' \
+    '-stylesheetfile[specify alternative HTML style sheet]:stylesheet path/filename:_directories' \
     '-docencoding[specify character encoding for output HTML files]:encoding:->encoding' \
     '*:package name, source file or @list:->docsrc' && ret=0
   ;;
@@ -143,9 +167,11 @@ jar)
       'f[specify archive file]' \
       'v[verbose mode]' \
       '(e)m[specify manifest file]' \
+      'n[perform Pack200 normalization after creating a new archive]' \
       '(m)e[specify class of for application entry point]' \
       '0[store only without using ZIP compression]' \
-      'M[do not create manifest file]' \
+      "M[don't create manifest file]" \
+      "P[preserve leading / and .. components on file names]" \
       'i[generate index information for specified jar files]' && return
   else
     jar_cmd="${words[2]#-}"
@@ -171,7 +197,7 @@ javah|javah_g)
     '-help[print help message]' \
     '-version[print version]' \
     '-jni[JNI-style native method function prototypes]' \
-    '-classpath[specify path for user class files]:class path:->classpath' \
+    {-cp,-classpath}'[specify path for user class files]:class path:->classpath' \
     '-bootclasspath[specify path for bootstrap class files]:bootstrap class path:->bootstrapclasspath' \
     '-old[generate old JDK1.0-style header files]' \
     '-force[force output]' \
@@ -182,17 +208,19 @@ javah|javah_g)
 javap)
   _arguments -C \
     '-help[print help message]' \
+    '-version[print version information]' \
+    {-v,-verbose}'[print additional information]' \
     '-l[line and local variable tables]' \
-    '-b[backward compatible to JDK1.1]' \
-    '-public[only public classes and members]' \
-    '-protected[only protected and public classes and members]' \
-    '-package[only package, protected and public classes and members (default)]' \
-    '-private[all classes and members]' \
+    '(-protected -package -p -private)-public[show only public classes and members]' \
+    '(-public -package -p -private)-protected[show only protected/public classes and members]' \
+    '(-public -protected -p -private)-package[show only package/protected/public classes and members (default)]' \
+    '(-public -package -protected -p -private)'{-p,-private}'[show all classes and members]' \
     '-J-[specify java option]:java option:' \
-    '-s[internal type signatures]' \
     '-c[disassemble code]' \
-    '-verbose[stack size, number of locals and args for methods]' \
-    '-classpath[specify path for user class files]:class path:->classpath' \
+    '-s[print internal type signatures]' \
+    '-sysinfo[show system info (path, size, date, MD5 hash) of class being processed]' \
+    '-constants[show final constants]' \
+    {-cp,-classpath}'[specify path for user class files]:class path:->classpath' \
     '-bootclasspath[specify path for bootstrap class files]:bootstrap class path:->bootstrapclasspath' \
     '-extdirs[specify directories for extensions]:extensions directories:->extdirs' \
     '*:class:_java_class ${(kv)opt_args[(i)-classpath]}' && return 0

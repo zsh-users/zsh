@@ -8,6 +8,7 @@ subcmds=(
   'add:add a module/version combination to the tree for builds and installs'
   'remove:remove a module from the tree'
   'build:compile a module for a kernel'
+  'unbuild:undoes the build of a module'
   "install:install a build module for it's corresponding kernel"
   'uninstall:uninstall a module for a kernel'
   'match:install every module that is installed for a template kernel for another kernel'
@@ -17,6 +18,7 @@ subcmds=(
   'mkrpm:create an RPM package for a module'
   'mkdeb:create a debian binary package for a module'
   'mkdsc:create a debian source package for a module'
+  'mkbmdeb:create a debian package containing just binary modules'
   'mkkmp:create a Kernel Module Package source RPM for a module'
   'status:display the current status of modules, versions and kernels within the tree'
   'autoinstall:try to install the latest revision of all modules that have been installed for other kernel revisions'
@@ -32,6 +34,7 @@ args=(
   '--installtree=:path:_directories'
   '--sourcetree=:path:_directories'
   '--dkmsframework=:path:_directories'
+  '--force-version-override'
   '1: : _describe -t commands command subcmds'
 )
 
@@ -44,7 +47,7 @@ else
     '(remove|build|install|uninstall|match|status|mk(^kmp))' 'k' \
     '(add|remove)' '-rpm_safe_upgrade' \
     'mk(driverdisk|kmp)' '-spec' \
-    'mk(deb|dsc|rpm)' '-legacy-postinst' \
+    'mk(deb|dsc|bmdeb|rpm)' '-legacy-postinst' \
     'mk(tarball|rpm|deb|dsc)' '-(source|binary)-only' \
     '(match|build|mkkmp)' '(k|-no-(prepare|clean)-kernel|-kernelsourcedir)' \
     '(|un)install' '-no-(depmod|initrd)' \
@@ -67,7 +70,7 @@ case $cmd in
   remove|build|install|uninstall|mk*|status)
     args+=( ': :->modules' )
   ;|
-  |remove|build|install|uninstall|match|status|mk(^kmp))
+  |remove|(un|)build|install|uninstall|match|status|mk(^kmp))
     args+=( '(--all)*-k[specify kernel version]:kernel:->kernels' )
   ;|
   |add|remove) args+=( "${ign}--rpm_safe_upgrade" ) ;|
@@ -77,7 +80,7 @@ case $cmd in
   |(mk|ld)tarball)
     args+=( "${ign}--archive=:tarball:_files -g '*.tar(-.)'" )
   ;|
-  |mk(deb|dsc|rpm))
+  |mk(deb|dsc|bmdeb|rpm))
     args+=( "${ign}--legacy-postinst=:value [1]:(0 1)" )
   ;|
   |mk(tarball|rpm|deb|dsc)) args+=( "${ign}(--source-only --binaries-only)--"{source,binaries}-only ) ;|
@@ -100,7 +103,7 @@ case $cmd in
       '-c[specify location of dkms.conf file]:location:_files'
     )
   ;|
-  |remove|build|install|status|mk(^kmp))
+  |remove|(un|)build|install|status|mk(^kmp))
     args+=( '(-a --arch -k)--all[specify all relevant kernels/arches]' )
   ;|
   |build)

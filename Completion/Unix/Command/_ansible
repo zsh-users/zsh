@@ -22,6 +22,8 @@ case $service in
     args+=(
       '(-K --ask-become-pass)'{-K,--ask-become-pass}'[ask for privilege escalation password]'
       '(-k --ask-pass)'{-k,--ask-pass}'[ask for connection password]'
+      '--list-hosts[output list of matching hosts]'
+      '(-l --limit)'{-l+,--limit=}'[further limit hosts to an additional pattern]:host subset:->hosts'
       '(-T --timeout)'{-T+,--timeout=}'[override the connection timeout]:timeout (seconds) [10]'
       '(-c --connection)'{-c+,--connection=}'[specify connection type]:connection type [smart]:->connect-types'
       '(-u --user)'{-u+,--user=}'[specify remote user for connection]:remote user:_users'
@@ -47,26 +49,12 @@ case $service in
   ansible|ansible-console|ansible-inventory|ansible-playbook|ansible-pull)
     args+=(
       --ask-vault-pass{,word}'[ask for vault password]'
+      '(-e --extra-vars)'{-e+,--extra-vars=}'[set additional variables]:key=value or YAML/JSON'
       '--vault-id=[specify vault identity to use]:vault identity'
       --vault-pass{,word}-file='[specify vault password file]:vault password file:_files'
-    )
-  ;|
-  ansible|ansible-console|ansible-inventory|ansible-playbook|ansible-pull)
-    args+=(
       \*{-i+,--inventory=}'[specify inventory host file or host list]: : _alternative "files\:inventory file\:_files"
 	"hosts\:host\: _sequence _hosts"'
       '!(-i --inventory)--inventory-file=:inventory file:_files'
-    )
-  ;|
-  ansible|ansible-console|ansible-playbook|ansible-pull)
-    args+=(
-      '--list-hosts[output list of matching hosts]'
-      '(-l --limit)'{-l+,--limit=}'[further limit hosts to an additional pattern]:host subset:->hosts'
-    )
-  ;|
-  ansible|ansible-playbook|ansible-pull)
-    args+=(
-      '(-e --extra-vars)'{-e+,--extra-vars=}'[set additional variables]:key=value or YAML/JSON'
     )
   ;|
   ansible|ansible-console|ansible-inventory)
@@ -80,11 +68,16 @@ case $service in
       "--skip-tags[only run plays and tasks whose tags don't match]"
     )
   ;|
+  ansible|ansible-console)
+    args+=(
+      '--task-timeout[set the task timeout limit]:timeout (seconds)'
+    )
+  ;|
   ansible)
     args+=(
       '(-a --args)'{-a+,--args=}'[specify command or module arguments]:arguments:->args'
       '(-B --background)'{-B+,--background=}'[run asynchronously, failing after specified time]:fail timeout (seconds)'
-      '(-m --module-name)'{-m+,--module-name=}'[specify module]:module:->plugins'
+      '(-m --module-name)'{-m+,--module-name=}'[specify action to execute]: :->plugins'
       '(-o --one-line)'{-o,--one-line}'[condense output]'
       '(-P --poll)'{-P+,--poll=}'[specify the poll interval if using -B]:interval (seconds) [15]'
       '(-t --tree)'{-t+,--tree=}'[specify directory for log output]:directory:_directories'
@@ -111,11 +104,14 @@ case $service in
   ansible-doc)
     args+=(
       '!--metadata-dump' # "internal testing only"
-      '(-l --list -F --list_files -s --snippet)'{-j,--json}'[change output to json format]'
-      '(-l --list -F --list_files -s --snippet)'{-l,--list}'[list available plugins]'
-      '(-l --list -F --list_files -s --snippet)'{-F,--list_files}'[show plugin names and their source files without summaries]'
-      '(-l --list -F --list_files -s --snippet)'{-s,--snippet}'[show playbook snippet for specified plugins]'
-      '(-t --type)'{-t+,--type=}'[choose plugin type]:plugin type [module]:(become cache callback cliconf connection httpapi inventory lookup netconf shell module strategy vars)'
+      '(-l --list -F --list_files -s --snippet --metadata-dump -e --entry-point)'{-j,--json}'[change output to json format]'
+      '(-l --list -F --list_files -s --snippet --metadata-dump -e --entry-point)'{-l,--list}'[list available plugins]'
+      '(-l --list -F --list_files -s --snippet --metadata-dump -e --entry-point)'{-F,--list_files}'[show plugin names and their source files without summaries]'
+      '(-l --list -F --list_files -s --snippet --metadata-dump -e --entry-point)'{-s,--snippet}'[show playbook snippet for specified plugins]'
+      '(-l --list -F --list_files -s --snippet -e --entry-point)--metadata-dump[dump json metadata for all plugins]'
+      '(-l --list -F --list_files -s --snippet --metadata-dump -e --entry-point)'{-e+,--entry-point=}'[select the entry point for roles]:entry point'
+      '(-t --type)'{-t+,--type=}'[choose plugin type]:plugin type [module]:(become cache callback cliconf connection httpapi inventory lookup netconf shell vars module strategy role keyword)'
+      '(-r --roles-path)'{-r+,--roles-path=}'[specify directory containing roles]:directory:_directories'
       '*:plugin:->plugins'
     )
   ;;
@@ -389,6 +385,7 @@ case $state in
       encrypt_string)
 	args+=(
 	  '(-p --prompt)'{-p,--prompt}'[prompt for the string to encrypt]'
+          "--show-input[don't hide input when prompted for the string to encrypt]"
 	  '(-n --name)'{-n+,--name=}'[specify the variable name]:variable'
 	  '--stdin-name=[specify the variable name for stdin]:variable'
 	)

@@ -32,6 +32,7 @@ if _pick_variant gnu=GNU solaris --version; then
     "--no-merge-notes[don't attempt to remove redundant notes]"
     '*'{-K+,--keep-symbol=}'[keep given symbol]:symbol name'
     '*'{-N+,--strip-symbol=}'[strip given symbol]:symbol name'
+    "*--keep-section=[don't strip given section]:section"
     '(*)-o+[output file]:output file:_files'
     '(-p --preserve-dates)'{-p,--preserve-dates}'[preserve access and modification dates]'
     '(-w --wildcard)'{-w,--wildcard}'[permit wildcards in symbol names]'

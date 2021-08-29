@@ -6,25 +6,28 @@ typeset -A opt_args
 _arguments -C \
   '(- *)'{-h,--help}'[print help information and exit]' \
   '(- *)'{-v,--version}'[display the version of ri]' \
-  '*'{-d,--doc-dir}'[directory to search for documentation]:ri doc directory:_files -/' \
-  '(-f --fmt --format)'{-f,--fmt,--format}'[format to use when displaying output]:output format:(ansi bs html plain simple)' \
+  '*'{-d+,--doc-dir=}'[directory to search for documentation]:ri doc directory:_directories' \
+  '(-f --format)'{-f+,--format=}'[format to use when displaying output]:output format [bs]:(ansi bs markdown rdoc)' \
   '(-T --no-pager)'{-T,--no-pager}'[send output directly to stdout]' \
-  '(-i, --interactive)'{-i,--interactive}'[interactive mode]' \
+  '(-i --interactive)'{-i,--interactive}'[interactive mode]' \
+  '(-a --all)'{-a,--all}'[show all documentation for a class or module]' \
+  '(-l --list)'{-l,--list}'[list classes ri knows about]' \
   '--list-doc-dirs[list the directories from which ri will source documentation]' \
-  '(-w --width)'{-w,--width}'[set the width of the output]:output width:' \
-  '--no-standard-docs[do not include documentation from the Ruby standard library, site_lib, installed gems, or ~/.rdoc]' \
-  '(--no-use-cache --use-cache)--'{no-,}'use-cache[whether or not to use ri'\''s cache]' \
-  '(--no-system --system)--'{no-,}'system[include documentation from Ruby'\''s standard library]' \
+  '(-w --width)'{-w+,--width=}'[set the width of the output]:output width [72]' \
+  '(-l --list)--server=-[run RDoc server on the given port]::port [8214]:_ports' \
+  "--no-standard-docs[don't include documentation from the Ruby standard library, site_lib, installed gems, or ~/.rdoc]" \
+  '(--no-use-cache --use-cache)--'{no-,}"use-cache[whether or not to use ri's cache]" \
+  '(--no-system --system)--'{no-,}"system[include documentation from Ruby's standard library]" \
   '(--no-site --site)--'{no-,}'site[include documentation from libraries installed in site_lib]' \
   '(--no-gems --gems)--'{no-,}'gems[include documentation from RubyGems]' \
   '(--no-home --home)--'{no-,}'home[include documentation stored in ~/.rdoc]' \
-  '*:ri name:->ri-name' && ret=0
+  '--profile[run with the Ruby profiler]' \
+  '--dump=[dump data from an ri cache or data file]:cache:_files' \
+  '*:ri name:->ri-name' && return
 
 if [[ "$state" = ri-name ]]; then
   local -a ri_dirs ri_ext ri_names ri_wants ri_names
   local class_dir esc_name dir curtag tag descr expl
-
-  ret=1
 
   if "ruby${words[1]#ri}" -rrdoc/ri/ri_options -e 1 >/dev/null 2>&1; then
     # Old-style Ruby 1.8.x RI

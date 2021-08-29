@@ -27,9 +27,8 @@ arguments=(
   '-D[debugging mode]'
   '-n[no swap file (memory only)]'
   {-r,-L}'[list swap files and exit or recover from a swap file]::swap file:_vim_files -g "*.sw?(-.)"'
-  '(   -H -F)-A[start in Arabic mode]'
-  '(-A    -F)-H[start in Hebrew mode]'
-  '(-A -H   )-F[start in Farsi mode]'
+  '(-H)-A[start in Arabic mode]'
+  '(-A)-H[start in Hebrew mode]'
   '-u[use given vimrc file instead of default .vimrc]:config:->config'
   "--noplugin[don't load plugin scripts]"
   '-o-[number of windows to open (default: one for each file)]::window count: '
@@ -99,8 +98,11 @@ fi
 [[ $service != *view ]] && arguments+='-R[readonly mode]'
 [[ $service = *g* ]] || (( ${words[(I)-g]} )) && arguments+=(
   '(--nofork -f)'{--nofork,-f}'[do not detach the GUI version from the shell]'
+  '(-background -bg)'{-background,-bg}'[use specified color for the background]:color:_x_color'
+  '(-foreground -fg)'{-foreground,-fg}'[use specified color for normal text]:color:_x_color'
   '-font:font:_xft_fonts'
   '-geometry:geometry:_x_geometry'
+  '-iconic[start vim iconified]'
   '(-rv -reverse)'{-rv,-reverse}'[use reverse video]'
   '-display:display:_x_display'
   '--role[set unique role to identify main window]:role'

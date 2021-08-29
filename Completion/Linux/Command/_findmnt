@@ -22,9 +22,12 @@ _arguments -s -C \
   '(H -M --mountpoint :)'{-M+,--mountpoint=}'[specify the mountpoint]: :->targets' \
   '(H -n --noheadings)'{-n,--noheadings}'[do not print a header line]' \
   '(H -O --options)'{-O+,--options=}'[only print the filesystems with the specified options]:list of options: ' \
-  '(H -o --output)'{-o+,--output=}'[specify output columns]: :->columns' \
+  '(H -o --output --output-all)'{-o+,--output=}'[specify output columns]: :->columns' \
+  '(H -o --output)--output-all[output all available columns]' \
   '(H -p --poll)'{-p+,--poll=}'[monitor changes in /proc/self/mountinfo]::action:(mount umount remount move)' \
+  '(H --real)--pseudo[print only pseudo-filesystems]' \
   '(H -R --submounts)'{-R,--submounts}'[print recursively all submounts]' \
+  '(H --pseudo)--real[print only real filesystems]' \
   '(H -S --source :)'{-S+,--source=}'[specify the mount source]: :->sources' \
   '(H -T --target :)'{-T+,--target=}'[specify the mount target]:target:_files' \
   '(H -t --types)'{-t+,--types=}'[specify the type of filesystems]:filesystem types:_sequence -s , _file_systems' \
@@ -39,7 +42,7 @@ _arguments -s -C \
   '(H)2:: :->targets' \
   + '(format)' \
   '(H)'{-D,--df}'[imitate the output of df command]' \
-  '(H)'{-J,--json}'[use JASON output format]' \
+  '(H)'{-J,--json}'[use JSON output format]' \
   '(H)'{-l,--list}'[use list output format]' \
   '(H)'{-P,--pairs}'[use key="value" output format]' \
   '(H)'{-r,--raw}'[use raw output format]' \
@@ -101,7 +104,7 @@ case $state in
 	'prefixes:prefix:compadd -S "" LABEL= UUID= PARTLABEL= PARTUUID='
       )
       [[ $state = sources_targets ]] &&
-	alts+=( 'mount-points:moutpoint:__findmnt_mountpoints' )
+	alts+=( 'mount-points:mountpoint:__findmnt_mountpoints' )
       _alternative $alts && ret=0
     fi
     ;;

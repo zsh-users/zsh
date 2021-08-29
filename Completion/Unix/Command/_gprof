@@ -3,8 +3,8 @@
 local curcontext="$curcontext" state line ret=1
 typeset -A opt_args
 
-_arguments -C -s -{a,b,c,D,h,i,l,L,s,T,v,w,x,y,z} \
-           -{A,C,e,E,f,F,J,n,N,O,p,P,q,Q,Z}:'function name:->funcs' \
+_arguments -C -s -{a,b,c,D,h,i,l,L,r,s,T,v,w,x,y,z} \
+           -{A,C,e,E,f,F,J,n,N,O,p,P,q,Q,R,S,t,Z}:'function name:->funcs' \
 	   '-I:directory:_dir_list' \
 	   '-d-:debug level:' '-k:function names:->pair' \
 	   '-m:minimum execution count:' \

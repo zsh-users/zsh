@@ -85,6 +85,7 @@ case $service in
       '(-H --with-filename -h --no-filename)'{-h,--no-filename}"[don't print the name of the patch file containing each patch]"
       '(-f --file)'{-f+,--file=}'[read regular expressions from file]:file:_files'
       '--output-matching=[display the matching hunk- or file-level diffs]:level:(hunk file)'
+      '--only-match=[restrict regex to matching removals, additions or modifications]:limit:(rem removals add additions mod modifications all)'
     )
   ;;
   splitdiff)

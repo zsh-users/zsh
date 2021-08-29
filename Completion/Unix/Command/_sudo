@@ -14,7 +14,9 @@ done
 
 args=(
   '(-A --askpass)'{-A,--askpass}'[use a helper program for password prompting]'
+  '(-B --bell)'{-B,--bell}'[ring bell when prompting]'
   '(-C --close-from)'{-C+,--close-from=}'[close file descriptors]:lowest fd to close'
+  '(-D --chdir)'{-D+,--chdir=}'[change the working directory before running command]:directory:_directories'
   '(-g --group)'{-g+,--group=}'[run command as the specified group name or ID]:group:_groups'
   '(-)'{-h,--help}'[display help message and exit]'
   '(-h --host)'{-h+,--host=}'[run command on host]:host:_hosts'
@@ -23,6 +25,7 @@ args=(
   \*{-l,--list}"[list user's privileges or check a specific command]"
   '(-n --non-interactive)'{-n,--non-interactive}'[non-interactive mode, no prompts are used]'
   '(-p --prompt)'{-p+,--prompt=}'[use the specified password prompt]:prompt'
+  '(-R --chroot)'{-R+,--chroot=}'[change the root directory before running command]:directory:_directories'
   '(-r --role)'{-r+,--role=}'[create SELinux security context with specified role]: :_selinux_roles'
   '(-S --stdin)'{-S,--stdin}'[read password from standard input]'
   '(-t --type)'{-t+,--type=}'[create SELinux security context with specified type]: :_selinux_types'

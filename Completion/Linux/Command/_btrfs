@@ -17,11 +17,14 @@ cmds_7=( get set list )
 cmds_8=( enable disable rescan help )
 cmds_9=( assign remove create destroy show limit help )
 cmds_10=( start status cancel help )
-cmds_11=( chunk-recover fix-device-size super-recover zero-log )
+cmds_11=( chunk-recover fix-device-size super-recover zero-log create-control-device )
 
 _arguments -C -A "-*" "$args[@]" \
   '(- *)--help[print help information]' \
   '(- *)--version[print version information]' \
+  '(-v --verbose -q --quiet --help --version)'{-v,--verbose}'[verbose output of operation]' \
+  '(-v --verbose -q --quiet --help --version)'{-q,--quiet}'[suppress all messages except errors]' \
+  '(--help --version)--format=[specify output format]:format:(text json)' \
   '(--version)1: :->groups' \
   '2: :->cmds' \
   '*:: :->args' && ret=0
@@ -60,6 +63,11 @@ while (( $#state )); do
       fi
       args=( '(-)--help[print help information]' )
       case ${cont} in
+        (balance|replace):start|device:(add|delete|remove)|filesystem:resize)
+          args+=(
+            "--enqueue[wait if there's another exclusive operation running, otherwise continue]"
+          )
+        ;|
         subvolume:create)
           args+=(
             '*-i[add the newly created subvolume to a qgroup]:qgroup'
@@ -67,11 +75,10 @@ while (( $#state )); do
           )
         ;;
         subvolume:delete)
-          args+=(
+          args+=( '!-v' '!--verbose'
             '(-c --commit-after -C --commit-each)'{-c,--commit-after}'[wait for transaction commit at the end of the operation]'
             '(-c --commit-after -C --commit-each)'{-C,--commit-each}'[wait for transaction commit after deleting each subvolume]'
             '(-i --subvolid)'{-i+,--subvolid=}'[specify id of subvolume to be removed]:subvolume id'
-            '(-v --verbose)'{-v,--verbose}'[verbose output of operations]'
             '1:subvolume:_files -/'
           )
         ;;
@@ -113,7 +120,7 @@ while (( $#state )); do
         ;|
         subvolume:sync) args+=( '-s[sleep between checks]:delay (seconds) [1]' );;
         subvolume:find-new) args+=( '1:subvol:_files -/' '2:lastgen: _message "last gen"' );;
-        (device|filesystem|qgroup|subvolume):(df|du|show|usage))
+        (device|filesystem|qgroup|subvolume):(df|du|show|usage)|scrub:status)
           args+=(
             '--iec[use 1024 as a base]'
             '--si[use 1000 as a base]'
@@ -130,7 +137,7 @@ while (( $#state )); do
             '(-t --tbytes)'{-t,--tbytes}'[show sizes in TiB, or TB with --si]'
           )
         ;|
-        (filesystem|qgroup):(du|show))
+        (filesystem|qgroup|scrub):(du|show|status))
           args+=(
             '--raw[output raw numbers in bytes]'
             '--human-readable[output human friendly numbers, base 1024]'
@@ -142,8 +149,7 @@ while (( $#state )); do
         ;|
         filesystem:resize) args+=( '1:size:_guard "(|+|-)[0-9]#[GKM]"' '2:path:->mounts' );;
         filesystem:defragment)
-          args+=(
-            '-v[verbose]'
+          args+=( '!-v'
             '-r[defragment files recursively]'
             '-c+[compress files while defragmenting]::compression algorithm:(zlib lzo zstd)'
             '-r[defragment files recursively]'
@@ -193,10 +199,9 @@ while (( $#state )); do
         ;;
         device:ready) args+=( '1:device: _files -g "*(-%)"' );;
         scrub:(start|resume))
-          args+=(
+          args+=( '!-q'
             "-B[don't background and print statistics at end]"
             '-d[print separate statistics for each device]'
-            '-q[omit error message and statistics]'
             '-r[read only mode]'
             '-R[raw print mode]'
             '-c[set ioprio class]:class:(( 0\:none 1\:realtime 2\:best-effort 3\:idle))'
@@ -216,18 +221,17 @@ while (( $#state )); do
           )
         ;;
         balance:start)
-          args+=(
+          args+=( '!-v' '!--verbose'
             '(-m -s)-d+[act on data chunks]:filter:->filters'
             '(-d -s)-m+[act on metadata chunks]:filter:->filters'
             '(-d -m)-s+[act on system chunks (only under -f)]:filters:->filters'
-	    '(-v --verbose)'{-v,--verbose}'[verbose mode]'
             '-f[force a reduction of metadata integrity]'
             "--full-balance[don't print warning and don't delay start]"
             '(--background --bg)'{--background,--bg}'[run balance operation asynchronously in the background]'
             '1:path:_files -/'
           )
         ;;
-        balance:status) args+=( '(-v --verbose)'{-v,--verbose}'[verbose mode]' '1:path:_files -/' );;
+        balance:status) args+=( '!-v' '!--verbose' '1:path:_files -/' );;
         balance:(pause|cancel|resume)) args+=( '1:path:_files -/' );;
         property:set) args+=( '3:value' );&
         property:get) args+=( '2:property:(ro label compression)' );&
@@ -304,6 +308,8 @@ while (( $#state )); do
 	    '!(--dfs)--bfs'
 	    '--dfs[depth-first traversal of the trees]'
             '--hide-names[hide filenames/subvolume/xattrs and other name references]'
+            '--csum-headers[print node checksums stored in headers (metadata)]'
+            '--csum-items[print checksums stored in checksum items (data)]'
           )
         ;;
         inspect*:dump-super)
@@ -315,11 +321,10 @@ while (( $#state )); do
             '--bytenr[specify alternate superblock offset]:offset'
           )
         ;;
-        inspect*:inode*) args+=( '-v[verbose mode]' '1:inode:_files' '2:path:_files -/' );;
-        inspect*:subvol*) args+=( '-v[verbose mode]' '1:subvolid:_guard "[0-9]#" subvolume id' '2:path:_files -/' );;
+        inspect*:inode*) args+=( '!-v' '1:inode:_files' '2:path:_files -/' );;
+        inspect*:subvol*) args+=( '!-v' '1:subvolid:_guard "[0-9]#" subvolume id' '2:path:_files -/' );;
         inspect*:logical*)
-          args+=(
-            '-v[verbose mode]'
+          args+=( '!-v'
             '-P[skip the path resolving and print the inodes instead]'
             '-o[ignore offsets when matching references]'
             '-s[specify buffer size]:buffer size [4096]'
@@ -331,9 +336,8 @@ while (( $#state )); do
         inspect*:rootid) args+=( '1:path:_files -/' );;
         inspect*:tree*) args+=( '-b[print raw numbers in bytes]' );;
         rescue:(chunk|super)-recover)
-          args+=(
+          args+=( '!-v'
             '-y[assume yes to every question]'
-            '-v[verbose mode]'
             '1:device:_files'
           )
           [[ ${${(P)group}[cmd]} == chunk-recover ]] && args+=('(-)-h[display help]')
@@ -361,12 +365,11 @@ while (( $#state )); do
           )
         ;;
         restore)
-          args+=(
+          args+=( '!-v' '!--verbose'
             '(-s --snapshots)'{-s,--snapshots}'[get snapshots]'
             '(-x --xattr)'{-x,--xattr}'[restore extended attributes]'
             '(-m --metadata)'{-m,--metadata}'[restore owner, mode and times]'
             '(-S --symlink)'{-S,--symlink}'[restore symbolic links]'
-            '(-v --verbose)'{-v,--verbose}'[be verbose and output what is restored]'
             '(-i --ignore-errors)'{-i,--ignore-errors}'[ignore errors]'
             '(-o --overwrite)'{-o,--overwrite}'[overwrite directories and files]'
             '-t[specify tree location]:tree root'
@@ -383,23 +386,20 @@ while (( $#state )); do
           )
         ;;
         send|receive)
-          args+=( '(-q --quiet)'{-q,--quiet}'[suppress all messages except errors]' )
+          args+=( '!-q' '!--quiet' )
         ;|
         send)
-          args+=(
-            '*-v[verbose mode]'
+          args+=( '!-v'
             '-e[if sending multiple subvolumes at once, use the new format]'
             '-p[send incremental stream]:parent:_files -/'
             '*-c[use snapshot as clone source]:clone:_files -/'
             '-f[specify output file]:file:_files'
             '--no-data[send in NO_FILE_DATA mode]'
-            '(-v --verbose)'{-v,--verbose}'[enable verbose output]'
             '1:subvolume:_files -/'
           )
         ;;
         receive)
-          args+=(
-            '*-v[verbose mode]'
+          args+=( '!-v'
             '-f[input file]:file: _files'
             '-e[terminate after <end cmd>]'
             '(-C --chroot)'{-C,--chroot}'[confine the process to destination path using chroot(1)]'
