@@ -187,7 +187,7 @@ _arguments -s \
   '--shift-heading-level-by=[shift heading levels by specified number]:positive or negative integer: ' \
   '!--base-header-level=:number [1]:(1 2 3 4 5)' \
   '!--strip-empty-paragraphs[deprecated. Use the +empty_paragraphs extension instead]' \
-  '--indented-code-classes=[classes to use for indented code blocks]:class:{_message "Classes separated with ,"}' \
+  '--indented-code-classes=[classes to use for indented code blocks]:class list (comma-separated)' \
   '--default-image-extension=[specify a default extension to use when image paths/URLs have no extension]:extension: ' \
   '--file-scope[parse each file individually before combining for multifile documents]' \
   {\*-F+,\*--filter=}'[specify an executable to be used as a filter transforming the pandoc AST after the input is parsed and before the output is written]: :_pandoc_filter' \
@@ -209,7 +209,7 @@ _arguments -s \
   '--wrap=[determine how text is wrapped in the output (the source code, not the rendered version)]: :_pandoc_wrap ' \
   '--columns=[specify length of lines in characters]:length [72]' \
   {--toc,--table-of-contents}'[include an automatically generated table of contents]' \
-  '--toc-depth=[specify the number of section levels to include in the table of contents]:number:{_message -r "choose a number equals to or greater then 1"}' \
+  '--toc-depth=[specify the number of section levels to include in the table of contents]:number' \
   '--strip-comments[strip out HTML comments in the Markdown or Textile source]' \
   '--no-highlight[disables syntax highlighting for code blocks and inlines]' \
   '--highlight-style=[specifies the coloring style to be used in highlighted source code]:style|file:_pandoc_highlight_style' \

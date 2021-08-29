@@ -65,9 +65,9 @@ local global_only_actions=(
 )
 # `torrent_add_options`: *options* that can be used only when *adding* a torrent
 local torrent_add_options=(
-  '(-C --no-incomplete-dir)'{-c+,--incomplete-dir=}'[when adding new torrents, store their contents in directory until the torrent is done]:dir:{_files -/}'
+  '(-C --no-incomplete-dir)'{-c+,--incomplete-dir=}'[when adding new torrents, store their contents in directory until the torrent is done]:directory:_directories'
   '(-c --incomplete-dir)'{-C,--no-incomplete-dir}'[don'"'"'t store incomplete torrents in a different directory]'
-  {-w+,--download-dir=}'[when used in conjunction with --add, set the new torrent'"'"'s download folder]:dir:{_files -/}'
+  {-w+,--download-dir=}"[when used in conjunction with --add, set the new torrent's download directory]:directory:_directories"
 )
 # `torrent_action_only_actions`: *actions* that can be specified only when explicitly selecting a specific set of torrents
 local torrent_action_only_actions=(
@@ -88,7 +88,7 @@ local torrent_action_only_actions=(
   {-r,--remove}'[remove the current torrent(s) without deleting the downloaded data]'
   {-rad,--remove-and-delete}'[remove the current torrent(s) and delete the downloaded data]'
   '--reannounce[reannounce the current torrent(s)]'
-  '--move[move the current torrents'"'"' data from their current locations to the specified directory]:{_files -/}'
+  "--move[move the current torrents' data from their current locations to the specified directory]:directory:_directories"
   {-sr+,--seedratio=}'[let the current torrent(s) seed until a specific ratio]:ratio'
   {-SR,--no-seedratio}'[let the current torrent(s) use the global seedratio settings]'
   {-hl,--honor-session}'[make the current torrent(s) honor the session limits]'

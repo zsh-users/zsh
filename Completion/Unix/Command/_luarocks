@@ -34,8 +34,8 @@ local option_deps_modes='--deps-mode=[specify how to handle dependencies]:mode:_
 
 local rockspec_options=(
   '--license=[specify a license string]:license (e.g. "MIT/X11" or "GNU GPL v3")'
-  '--summary=[a short one-line description summary]:summary:{_message -e "short summary of the rock"}'
-  '--detailed=[a longer description string]:detailed_text:{_message -e "detailed description of the rock"}'
+  '--summary=[a short one-line description summary]:summary'
+  '--detailed=[a longer description string]:detailed description'
   '--homepage=[project homepage]:URL:_urls'
   '--lua-versions=[specify supported Lua versions]:lua version:_sequence compadd - 5.{1,2,3,4}'
   '--rockspec-format=[rockspec format version, such as "1.0" or "1.1"]:VER: '
@@ -321,7 +321,7 @@ __luarocks_rock(){
         continue
         ;;
       (rockpack)
-        alts+=(':rock file:{_files -g "*.src.rock(-.)"}')
+        alts+=( ':rock file:_files -g "*.src.rock(-.)"' )
         shift 1
         continue
         ;;
@@ -332,7 +332,7 @@ __luarocks_rock(){
         ;;
       (installed)
         tree="$2"
-        alts+=(":local rock:{__luarocks_installed_rocks ${tree}}")
+        alts+=(":local rock: __luarocks_installed_rocks ${tree}")
         if [[ -z "${tree}" ]]; then
           shift
         else
@@ -364,7 +364,7 @@ __luarocks_git_tags(){
 local make_command_options=(
   '--pack-binary-rock[produce a .rock file with the contents of compilation inside the current directory instead of installing it]'
   '--keep[do not remove previously installed versions of the rock after building a new one]'
-  '--branch=[override the `source.branch` field in the loaded rockspec]:NAME:{_message "branch name"}'
+  '--branch=[override the `source.branch` field in the loaded rockspec]:branch name'
 )
 local build_command_options=(
   "${make_command_options[@]}"
@@ -375,8 +375,8 @@ local build_command_options=(
 _luarocks_build(){
   _arguments -A "-*" \
     "${build_command_options[@]}" \
-    '1: :{__luarocks_rock "rockspec" "external"}' \
-    '2:: :{__luarocks_rock_version "external_or_local"}'
+    '1: : __luarocks_rock "rockspec" "external"' \
+    '2:: : __luarocks_rock_version "external_or_local"'
 }
 # arguments:
 # - must: option
@@ -402,7 +402,7 @@ local doc_command_options=(
 _luarocks_doc(){
   _arguments \
     "${doc_command_options[@]}" \
-    "1: :{__luarocks_rock installed ${opt_args[--tree]}}"
+    "1: : __luarocks_rock installed ${opt_args[--tree]}"
 }
 # arguments:
 # - must: external only rockspec
@@ -416,14 +416,14 @@ local download_command_options=(
 _luarocks_download(){
   _arguments -A "-*" \
     "${download_command_options[@]}" \
-    '1: :{__luarocks_rock "external"}' \
-    '2:: :{__luarocks_rock_version "external_or_local"}'
+    '1: : __luarocks_rock "external"' \
+    '2:: : __luarocks_rock_version "external_or_local"'
 }
 # arguments:
 # must: luarocks sub command
 (( $+functions[_luarocks_help] )) ||
 _luarocks_help(){
-  _arguments '1: :__luarocks_command'
+  _arguments '1: : __luarocks_command'
 }
 
 (( $+functions[_luarocks_init] )) ||
@@ -446,7 +446,7 @@ _luarocks_install(){
 # - must: rockspec file (first and last)
 (( $+functions[_luarocks_lint] )) ||
 _luarocks_lint(){
-  _arguments '1:: :{__luarocks_rock "rockspec"}'
+  _arguments '1:: : __luarocks_rock "rockspec"'
 }
 # arguments:
 # NOTE: receives only options
@@ -463,7 +463,7 @@ _luarocks_list(){
 # NOTE: it's options were already described above.
 (( $+functions[_luarocks_make] )) ||
 _luarocks_make(){
-  _arguments '1:: :{__luarocks_rock "rockspec"}'
+  _arguments '1:: : __luarocks_rock "rockspec"'
 }
 # arguments:
 # - optional: .rockspec file / external rock
@@ -476,8 +476,8 @@ local new_version_command_options=(
 _luarocks_new_version(){
   _arguments -A "-*" \
     "${new_version_command_options[@]}" \
-    '1:: :{__luarocks_rock "external" "rockspec"}' \
-    '2:: :{__luarocks_rock_version "external_or_local"}' \
+    '1:: : __luarocks_rock "external" "rockspec"' \
+    '2:: : __luarocks_rock_version "external_or_local"' \
     '3:: :_urls'
 }
 # arguments:
@@ -524,8 +524,8 @@ local remove_command_options=(
 _luarocks_remove(){
   _arguments -A "-*" \
     "${remove_command_options[@]}" \
-    "1: :{__luarocks_rock installed ${opt_args[--tree]}}" \
-    "2:: :{__luarocks_rock_version installed ${opt_args[--tree]}}"
+    "1: : __luarocks_rock installed ${opt_args[--tree]}" \
+    "2:: : __luarocks_rock_version installed ${opt_args[--tree]}"
 }
 # arguments:
 # - must: string as a search query
@@ -558,8 +558,8 @@ local show_command_options=(
 _luarocks_show(){
   _arguments \
     "${show_command_options[@]}" \
-    "1: :{__luarocks_rock installed "${opt_args[--tree]}"}" \
-    "2:: :{__luarocks_rock_version installed ${opt_args[--tree]}}"
+    "1: : __luarocks_rock installed "${opt_args[--tree]}"" \
+    "2:: : __luarocks_rock_version installed ${opt_args[--tree]}"
 }
 
 (( $+functions[_luarocks_test] )) ||
@@ -567,7 +567,7 @@ _luarocks_test(){
   _arguments $option_deps_modes \
     '--test-type=[specify the test suite type manually]:test suite type' \
     '--reset[regenerate files if they already exist]' \
-    '1:rockspec:__luarocks_rock' \
+    '1: : __luarocks_rock' \
     '*:arg'
 }
 
@@ -581,7 +581,7 @@ local unpack_command_options=(
 _luarocks_unpack(){
   _arguments \
     "${unpack_command_options[@]}" \
-    '1: :{__luarocks_rock "rockpack" "external"}'
+    '1: : __luarocks_rock "rockpack" "external"'
 }
 # arguments:
 # - must: rockspec file
@@ -595,7 +595,7 @@ local upload_command_options=(
 _luarocks_upload(){
   _arguments \
     "${upload_command_options[@]}" \
-    '1: :{__luarocks_rock "rockspec"}'
+    '1: : __luarocks_rock "rockspec"'
 }
 
 (( $+functions[_luarocks_which] )) ||
@@ -609,8 +609,8 @@ _luarocks_write_rockspec(){
     "${rockspec_options[@]}" \
     '--output=[write the rockspec with the given file]:file:_files' \
     '--tag=[specify tag to use. Will attempt to extract version number from it]:tag:__git_tag' \
-    '1:: :{_message "new rock name"}' \
-    '2:: :{__luarocks_rock_version "new_rock"}' \
+    '1::new rock name' \
+    '2:: : __luarocks_rock_version "new_rock"' \
     '3:: :_urls'
 }
 

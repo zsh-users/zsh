@@ -55,7 +55,7 @@ case $OSTYPE in
       '-v[report progress on the dump as it proceeds]' \
       '-b+[specify maximum size of core file]:size (MiB): ' \
       '(-c)-o+[write core file to specified file]:file:_files' \
-      '(-o)-c+[specify format of core file name]:format:{_message "%%N\:program name, %%U\:uid, %%P\:pid, %%T\:time stamp"}' \
+      '(-o)-c+[specify format of core file name]:format (%%N\:program name, %%U\:uid, %%P\:pid, %%T\:time stamp)' \
       '1:pid:_pids'
   ;;
   *)
