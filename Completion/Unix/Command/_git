@@ -641,6 +641,7 @@ _git-clone () {
     '(-4 --ipv4 -6 --ipv6)'{-6,--ipv6}'[use IPv6 addresses only]' \
     '--filter=[object filtering]:filter:_git_rev-list_filters' \
     '--remote-submodules[any cloned submodules will use their remote-tracking branch]' \
+    '--sparse[initialize the sparse-checkout file to start with only the top-level files]' \
     ': :->repository' \
     ': :_directories' && ret=0
 
@@ -1215,6 +1216,46 @@ _git-log () {
   return ret
 }
 
+(( $+functions[_git-maintenance] )) ||
+_git-maintenance() {
+  local curcontext="$curcontext" state state_descr line ret=1
+  local -A opt_args
+
+  _arguments -C \
+    ': :->command' \
+    '*::: := ->option-or-argument' && ret=0
+
+  case $state in
+    (command)
+      local -a commands
+
+      commands=(
+        register:'initialize config values to run maintenance on this repository'
+        run:'run one or more maintenance tasks'
+        start:'start running maintenance on the current repository'
+        stop:'halt the background maintenance schedule'
+        unregister:'remove the current repository from background maintenance'
+      )
+
+      _describe -t commands command commands && ret=0
+    ;;
+    (option-or-argument)
+      curcontext=${curcontext%:*}-$line[1]:
+      case $line[1] in
+        (run)
+          _arguments -S $endopt \
+            '--auto[run tasks based on the state of the repository]' \
+            '--schedule=[run tasks based on frequency]:frequency (seconds)' \
+            "--quiet[don't report progress or other information to stderr]" \
+            '*--task=[run a specific task]:task:(gc commit-graph prefetch loose-objects incremental-repack pack-refs)' && ret=0
+        ;;
+      esac
+    ;;
+  esac
+
+  return ret
+}
+
 (( $+functions[_git-merge] )) ||
 _git-merge () {
   local -a merge_options
@@ -1727,6 +1768,50 @@ _git-show () {
         'trees::__git_trees' \
         'blobs::__git_blobs' && ret=0
       ;;
+  esac
+
+  return ret
+}
+
+(( $+functions[_git-sparse-checkout] )) ||
+_git-sparse-checkout() {
+  local curcontext="$curcontext" state state_descr line ret=1
+  local -A opt_args
+
+  _arguments -C \
+    ': :->command' \
+    '*::: := ->option-or-argument' && ret=0
+
+  case $state in
+    (command)
+      local -a commands
+
+      commands=(
+        list:'describe the patterns in the sparse-checkout file'
+        init:'enable the core.sparseCheckout setting'
+        set:'write a set of patterns to the sparse-checkout file'
+        add:'update the sparse-checkout file to include additional patterns'
+        reapply:'reapply the sparsity pattern rules to paths in the working tree'
+        disable:'disable the config setting, and restore all files in the working directory'
+      )
+
+      _describe -t commands command commands && ret=0
+    ;;
+    (option-or-argument)
+      curcontext=${curcontext%:*}-$line[1]:
+      case $line[1] in
+        init)
+          _arguments \
+            '--cone[allow for better performance with a limited set of patterns]' \
+            '--no-sparse-index[rewrite index to not be sparse]'
+        ;;
+        set|add)
+          _arguments -S \
+            '--stdin[read patterns from input]' \
+            '*:pattern:_files' && ret=0
+        ;;
+      esac
+    ;;
   esac
 
   return ret
@@ -4001,6 +4086,13 @@ _git-blame () {
   return ret
 }
 
+(( $+functions[_git-bugreport] )) ||
+_git-bugreport() {
+  _arguments \
+    '(-o --output-directory)'{-o+,--output-directory=}'[specify a destination for the bugreport file]:directory:_directories' \
+    '(-s --suffix)'{-s+,--suffix=}'[specify a strftime format suffix for the filename]:format:_date_formats'
+}
+
 (( $+functions[_git-cherry] )) ||
 _git-cherry () {
   # TODO: --abbrev is undocumented.
@@ -4916,7 +5008,7 @@ _git-merge-index () {
 
 (( $+functions[_git-mktag] )) ||
 _git-mktag () {
-  _message 'no arguments allowed; only accepts tags on standard input'
+  _arguments --no-strict
 }
 
 (( $+functions[_git-mktree] )) ||
@@ -5262,6 +5354,14 @@ _git-for-each-ref () {
     '(-s --shell -p --perl          --tcl)'--python'[use string literals suitable for Python]' \
     '(-s --shell -p --perl --python      )'--tcl'[use string literals suitable for Tcl]' \
     ':: :_guard "([^-]?#|)" pattern'
+}
+
+(( $+functions[_git-for-each-repo] )) ||
+_git-for-each-repo() {
+  _arguments -S \
+    '(-C --config)'{-C,--config=}'[specify config variable for list of paths]:config variable' \
+    ':git command:_git_commands' \
+    '*:: := _git'
 }
 
 (( $+functions[_git-ls-files] )) ||
@@ -5965,6 +6065,7 @@ _git_commands () {
     gui:'run portable graphical interface to git'
     init:'create empty git repository or re-initialize an existing one'
     log:'show commit logs'
+    maintenance:'run tasks to optimize Git repository data'
     merge:'join two or more development histories together'
     mv:'move or rename file, directory, or symlink'
     notes:'add or inspect object notes'
@@ -5978,6 +6079,7 @@ _git_commands () {
     rm:'remove files from the working tree and from the index'
     shortlog:'summarize git log output'
     show:'show various types of objects'
+    sparse-checkout:'initialize and modify the sparse-checkout'
     stash:'stash away changes to dirty working directory'
     status:'show working-tree status'
     submodule:'initialize, update, or inspect submodules'
@@ -6001,6 +6103,7 @@ _git_commands () {
 
   ancillary_interrogator_commands=(
     blame:'show what revision and author last modified each line of a file'
+    bugreport:'collect information for user to file a bug report'
     count-objects:'count unpacked objects and display their disk consumption'
     difftool:'show changes using common diff tools'
     fsck:'verify connectivity and validity of objects in database'
@@ -6035,7 +6138,7 @@ _git_commands () {
     index-pack:'build pack index file for an existing packed archive'
     merge-file:'run a three-way file merge'
     merge-index:'run merge for files needing merging'
-    mktag:'create tag object'
+    mktag:'create tag object with extra validation'
     mktree:'build tree-object from git ls-tree formatted text'
     multi-pack-index:'write and verify multi-pack-indexes'
     pack-objects:'create packed archive of objects'
@@ -6054,6 +6157,7 @@ _git_commands () {
     diff-index:'compare content and mode of blobs between index and repository'
     diff-tree:'compare content and mode of blobs found via two tree objects'
     for-each-ref:'output information on each ref'
+    for-each-repo:'run a git command on a list of repositories'
     get-tar-commit-id:'extract commit ID from an archive created using git archive'
     ls-files:'information about files in index/working directory'
     ls-remote:'show references in a remote repository'

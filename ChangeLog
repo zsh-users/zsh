@@ -1,5 +1,8 @@
 2021-08-29  Oliver Kiddle  <opk@zsh.org>
 
+	* 49327: Completion/Unix/Command/_git: complete for new git
+	maintenance, for-each-repo, sparse-checkout and bugreport commands
+
 	* 49319: Completion/...: completion options update
 
 	* 49317: Completion/Unix/Command/_transmission,
