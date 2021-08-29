@@ -1,5 +1,10 @@
 2021-08-29  Oliver Kiddle  <opk@zsh.org>
 
+	* 49316: Completion/Unix/Command/_transmission,
+	Completion/Unix/Command/_bittorrent, Completion/Unix/Command/_go,
+	Completion/Unix/Command/_pandoc, Completion/X/Command/_pdftk:
+	add (-.) glob qualifier to globs where only files are applicable
+
 	* 49315: Completion/Unix/Command/_transmission,
 	Completion/Debian/Command/_dak, Completion/Linux/Command/_tpb,
 	Completion/Mandriva/Command/_urpmi, Completion/Unix/Command/_cpio,

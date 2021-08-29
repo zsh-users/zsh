@@ -34,13 +34,11 @@ case $words[CURRENT-1] in
 	;;
 
     (fill_form)
-	_description files expl 'FDF and XFDF file'
-	_files "$@" $expl -g '(#i)*.(fdf|xfdf)'
+        _wanted files expl 'FDF or XFDF file' _files -g '(#i)*.(fdf|xfdf)(-.)'
 	;;
 
     ((multibackground|background|stamp|multistamp|output))
-	_description files expl 'PDF file'
-	_files "$@" $expl -g '(#i)*.pdf'
+	_pdf
 	;;
 
     (update_info)

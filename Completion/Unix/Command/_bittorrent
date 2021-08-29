@@ -69,7 +69,7 @@ case $service in
       '--piece_size_pow2+[specify power of 2 to set the piece size to]:power:' \
       "--comment+[specify human-readable comment to put in .torrent]:comment:"\
       "--target+[specify target file for the torrent]:file:_files"\
-      ':file:_files -g "*"'
+      ':file:_files'
     return
   ;;
 

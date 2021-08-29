@@ -67,7 +67,7 @@ _pandoc_template(){
   local format=${${(v)opt_args[(i)(-t|--to|-w|--write)]}%%(+|-)*}
   [[ -z $format ]] && format=${(v)opt_args[(i)(-o|--output)]:e}
   local pat="'*'"   # or '*.*' ?
-  [[ -n $format ]] && pat="'*.$format'"
+  [[ -n $format ]] && pat="'*.$format(-.)'"
   local template_dir=$(_pandoc_default_dir)/templates
   _alternative \
     "local-templates:local template:_files -g $pat" \
@@ -80,7 +80,7 @@ _pandoc_template(){
 _pandoc_highlight_style(){
   _alternative \
     'styles:style:( $(pandoc --list-highlight-styles) )' \
-    'style-files:style file:_files -g "*.theme"'
+    'style-files:style file:_files -g "*.theme(-.)"'
 }
 
 # filter file in $PWD, data-dir/filters/ or $PATH
@@ -98,8 +98,8 @@ _pandoc_filter(){
 _pandoc_lua_filter(){
   local filters_dir=$(_pandoc_default_dir)/filters
   _alternative \
-    'local-filters:local filter:_files -g "*.lua"' \
-    'data-dir-filters:filter in data-dir:_files -W filters_dir -g "*.lua"'
+    'local-filters:local filter:_files -g "*.lua(-.)"' \
+    'data-dir-filters:filter in data-dir:_files -W filters_dir -g "*.lua(-.)"'
 }
 
 # default file in $PWD or data-dir/defaults/
@@ -107,8 +107,8 @@ _pandoc_lua_filter(){
 _pandoc_defaults_file() {
   local defaults_dir=$(_pandoc_default_dir)/defaults
   _alternative \
-    'local-defaults:default file:_files -g "*.yaml"' \
-    'data-dir-defaults:default in data-dir:_files -W defaults_dir -g "*.yaml"'
+    'local-defaults:default file:_files -g "*.yaml(-.)"' \
+    'data-dir-defaults:default in data-dir:_files -W defaults_dir -g "*.yaml(-.)"'
 }
 
 # choose reference location
@@ -214,7 +214,7 @@ _arguments -s \
   '--no-highlight[disables syntax highlighting for code blocks and inlines]' \
   '--highlight-style=[specifies the coloring style to be used in highlighted source code]:style|file:_pandoc_highlight_style' \
   '(- :)--print-highlight-style=[prints a JSON version of a highlighting style]: :_pandoc_highlight_style' \
-  '--syntax-definition=[load a KDE XML syntax definition file]:file:{_files -g "*.xml"}' \
+  '--syntax-definition=[load a KDE XML syntax definition file]:file:_files -g "*.xml(-.)"' \
   {\*-H+,\*--include-in-header=}'[include contents of FILE, verbatim, at the end of the header, implies --standalone]:file:_files' \
   {\*-B+,\*--include-before-body=}'[include contents of FILE, verbatim, at the beginning of the document body, implies --standalone]:file:_files' \
   {\*-A+,\*--include-end-body=}'[include contents of FILE, verbatim, at the end of the document body, implies --standalone]:file:_files' \
@@ -242,14 +242,14 @@ _arguments -s \
   '--reference-doc=[use the specified file as a style reference in producing a docx or ODT file]:file: ' \
   '--epub-subdirectory=[specify the subdirectory in the OCF container that is to hold the EPUB-specific contents]:directory:_files -/' \
   '--epub-cover-image=[use the specified image as the EPUB cover]:file:_files' \
-  '--epub-metadata=[look in the specified XML file for metadata for the EPUB]:file:{_files -g "*.xml"}' \
+  '--epub-metadata=[look in the specified XML file for metadata for the EPUB]:file:_files -g "*.xml(-.)"' \
   '*--epub-embed-font=[embed the specified font in the EPUB]:file:_files ' \
   '--epub-chapter-level=[specify the header level at which to split the EPUB into separate "chapter" files]:number:(1 2 3 4 5 6)' \
   '--ipynb-output=[specify how to tread ipynb output cells]:method:(all none best)' \
   '--pdf-engine=[use the specified engine when producing PDF output]:program:_pandoc_pdf_engine' \
   '*--pdf-engine-opt=[use the given string as a command-line argument to the pdf-engine]:string:_pandoc_pdf_engine_opts' \
-  '*--bibliography=[set the bibliography field in the document'"'"'s metadata to FILE]:file:{_files -g "*.(bib|bibtex|copac|json|yaml|enl|xml|wos|medline|mods|ris)"}' \
-  '--csl=[set the csl field in the document'"'"'s metadata to FILE]:file:{_files -g "*.csl"}' \
+  "*--bibliography=[set the bibliography field in the document's metadata to specified file]:file:_files -g '*.(bib|bibtex|copac|json|yaml|enl|xml|wos|medline|mods|ris)(-.)'" \
+  "--csl=[set the csl field in the document's metadata to specified file]:file:_files -g '*.csl(-.)'" \
   '--citation-abbreviations=[set the citation-abbreviations field in the document'"'"'s metadata to FILE]:file:_files' \
   '--natbib[use natbib for citations in LaTeX output]' \
   '--biblatex[use biblatex for citations in LaTeX output]' \

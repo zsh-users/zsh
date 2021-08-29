@@ -15,4 +15,4 @@ case $service in
   ;;
 esac
 
-_wanted files expl "input file" _files -g "$pat"
+_wanted files expl "input file" _files -g "$pat(-.)"

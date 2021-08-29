@@ -114,7 +114,7 @@ _transmission-remote_days(){
 (( $+functions[_transmission-remote_add] )) ||
 _transmission-remote_add(){
 _alternative \
-    'args:torrent:_files -g ".torrent"' \
+    'args:torrent:_files -g ".torrent(-.)"' \
     'args:url:_urls'
 }
 # complete torrents
