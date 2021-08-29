@@ -43,8 +43,8 @@ _x_arguments \
   '-sl:save lines' \
   '-embed:window id to embed terminal in:_x_window' \
   '-pty-fd:file descriptor of pty to use' \
-  '-w:external border in pixels' \
-  '-b:internal border in pixels' \
+  {-bw,-w}':external border (pixels)' \
+  '-b:internal border (pixels)' \
   '-lsp:number of extra pixels between rows' \
   '-letsp:letter spacing adjustment' \
   '-mod:meta modifier:_x_modifier' \

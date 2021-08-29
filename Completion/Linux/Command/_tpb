@@ -9,7 +9,7 @@ _arguments \
   '(-x --xevents)'{-x,--xevents=}':state:(on off)' \
   '(-m --mixer)'{-m,--mixer=}':state:(on off)' \
   '(-o --osd)'{-o,--osd=}':state:(on off)' \
-  '(-p --poll)'{-p,--poll=}':delay in microseconds:' \
+  '(-p --poll)'{-p,--poll=}':delay (microseconds)' \
   '(-t --thinkpad)'{-t,--thinkpad=}':command to execute:_command_names' \
   '(-H --home)'{-H,--home=}':command to execute:_command_names' \
   '(-S --search)'{-S,--search=}':command to execute:_command_names' \

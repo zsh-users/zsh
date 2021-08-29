@@ -1,3 +1,14 @@
+2021-08-29  Oliver Kiddle  <opk@zsh.org>
+
+	* 49315: Completion/Unix/Command/_transmission,
+	Completion/Debian/Command/_dak, Completion/Linux/Command/_tpb,
+	Completion/Mandriva/Command/_urpmi, Completion/Unix/Command/_cpio,
+	Completion/Unix/Command/_dropbox, Completion/X/Command/_urxvt,
+	Completion/Unix/Command/_growisofs,
+	Completion/Unix/Command/_perforce,
+	Completion/Unix/Command/_mysql_utils:
+	list units in brackets at the end of group descriptions
+
 2021-08-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Peter A. Castro: users/26982 (subset as most of this already

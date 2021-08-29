@@ -220,8 +220,8 @@ _mysql_utils() {
   )
 
   _mysql_variables_opts=(
-    '--max_allowed_packet[maximum allowed packet size]:packet size in bytes'
-    '--net_buffer_length[network buffer length]:buffer length in bytes'
+    '--max_allowed_packet[maximum allowed packet size]:packet size (bytes)'
+    '--net_buffer_length[network buffer length]:buffer length (bytes)'
     '--connect_timeout:timeout'
     '--select_limit:limit'
     '--max_join_size:size'

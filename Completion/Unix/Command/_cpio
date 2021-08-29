@@ -25,15 +25,15 @@ else
 	   '--message=:message at end of volume:'
 	   '--null' '--reset-access-time'
 	   '--verbose' '--dot' '--append'
-	   '--block-size=:block size in 512 byte units:'
+           '--block-size=:block size (512 byte units)'
 	   '--dereference'
-	   '--io-size=:block size in bytes'
+           '--io-size=:block size (bytes)'
 	   '--quiet' '--force-local'  '--help'   '--version')
     fi
     args+=(
 	  '-A[append files to archive]'
 	  '-B[block size 5120 bytes with special file]'
-	  '-C[set block size per record]:block size in bytes:(8192)'
+          '-C[set block size per record]:block size (bytes)'
 	  '-F[set archive file to use]:archive file:->afile'
 	  '(-H)-c[read/write header in ASCII]'
 	  "(-c)-H[set format type for archive header]:$fmts"
@@ -49,7 +49,7 @@ else
             '--preserve-modification-time' '--numeric'
 	    '--rename' '--list' '--swap-bytes' '--swap-halfwords'
 	    '--dot' '--unconditional' '--verbose'
-	    '--block-size=:block size in 512 byte units:'
+            '--block-size=:block size (512 byte units)'
 	    '--swap-halfwords'
 	    '--io-size=:block size in bytes:'
 	    '--pattern-file=:file with list of patterns:_files'
@@ -63,7 +63,7 @@ else
 	  '-b[reverse bytes in word]'
 	  '-B[block size 5120 bytes with special file]'
 	  '-d[create directories as needed]'
-	  '-C[set block size per record]:block size in bytes:(8192)'
+          '-C[set block size per record]:block size (bytes)'
 	  '-E[read filenames from file]:file name for list of files:_files'
 	  '-f[only copy files not matching patterns]'
 	  '-F[set archive file to use]:archive file:->afile'

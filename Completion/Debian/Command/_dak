@@ -207,7 +207,7 @@ case $cmd in
 
 (poolize)
     args+=(
-  '(-l --limit)'{-l,--limit=}'[only migrate amount of packages]:amount in kb:'
+  '(-l --limit)'{-l,--limit=}'[only migrate amount of packages]:amount (kb)'
   '(-n --no-action)'{-n,--no-action}'[do not do anything]'
   '(-v --verbose)'{-v,--verbose}'[explain what is being done]'
     )

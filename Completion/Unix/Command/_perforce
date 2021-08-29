@@ -2668,12 +2668,12 @@ _perforce_cmd_passwd() {
 _perforce_cmd_ping() {
   _arguments -s : \
     '-c[specify count of messages]:count of messages: ' \
-    '-t[specify total time of test]:time in seconds: ' \
+    '-t[specify total time of test]:time (seconds)' \
     '-i[specify iterations for test]:number of iterations: ' \
     '-f[transmit continuously without waiting for responses]' \
-    '-p[specify pause between tests]:pause in seconds: ' \
-    '-s[specify send size]:send size in octets: ' \
-    '-r[specify receive size]:receive size in octets: '
+    '-p[specify pause between tests]:pause (seconds)' \
+    '-s[specify send size]:send size (octets)' \
+    '-r[specify receive size]:receive size (octets)'
 }
 
 
@@ -2942,7 +2942,7 @@ _perforce_cmd_status() {
 _perforce_cmd_sizes() {
   _arguments -s : \
     '-a[list all revisions in range]' \
-    '-b[specify blocksize]:blocksize in bytes: ' \
+    '-b[specify blocksize]:blocksize (bytes)' \
     '(-H)-h[print sizes in human-readable form (GiB)]' \
     '(-h)-H[print sizes in human-readable form (GB)]' \
     '-m[limit max files]:max files: ' \

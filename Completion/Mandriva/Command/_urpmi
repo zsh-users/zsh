@@ -73,7 +73,7 @@ _urpmi() {
 
   opts_net=(
     "($help --wget)--curl[use curl to retrieve distant files]"
-    "($help)--limit-rate[limit the download speed (b/s)]:download speed in b/s: "
+    "($help)--limit-rate[limit the download speed]:download speed (b/s)"
     "($help)--proxy:proxy host:_hosts"
     "($help)--proxy-user:proxy user:_users"
     "($help --curl)--wget[use wget to retrieve distant files]"

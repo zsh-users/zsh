@@ -55,8 +55,8 @@ else
 
     (throttle)
     _arguments \
-      '2:download limit in KB/s:(unlimited)' \
-      '3:upload limit in KB/s:(unlimited)'
+      '2:download limit (KB/s):(unlimited)' \
+      '3:upload limit (KB/s):(unlimited)'
     ;;
 
     (*)

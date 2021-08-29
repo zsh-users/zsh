@@ -270,7 +270,7 @@ else
     '-sort[sort files on the image based on weights defined in the given file]:sort-weighting file:_files' \
     '-sparc-label[set the sun disk-label-name used for the -sparc-boot option]:label' \
     '-split-output[split the output image into several files ~1GiB in size]' \
-    '-stream-media-size[enable streaming operation and set media size to given number of sectors]:media size in sectors' \
+    '-stream-media-size[enable streaming operation and set media size to given number of sectors]:media size (sectors)' \
     '-stream-file-name[reserved for future use]:name' \
     '-sunx86-boot[specify a comma-separated list of file-system images needed to make a bootable Solaris-x86-CD]:list' \
     '-sunx86-label[specify the SVr4 disk-label-name for the SVr4 disk-label created with the -sunx86-boot option]:label' \
