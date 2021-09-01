@@ -45,6 +45,9 @@ args+=(
   '(sum -w --status --warn)'{-w,--warn}'[warn about each improperly formatted checksum line]'
 )
 # Operands
-args+=( '*: :_files' )
+args+=(
+  + operand
+  '*: :_files'
+)
 
 _arguments -s -S : $args

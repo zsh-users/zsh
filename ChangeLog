@@ -1,5 +1,8 @@
 2021-09-04  Oliver Kiddle  <opk@zsh.org>
 
+	* Shohei YOSHIDA: 49343: Completion/Unix/Command/_md5sum:
+	Fix file name completion of GNU digest utilities
+
 	* 49345: Completion/Unix/Command/_git: fix git file completion
 	for paths starting with ../
 
