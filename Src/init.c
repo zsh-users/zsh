@@ -435,8 +435,14 @@ parseopts(char *nam, char ***argvp, char *new_opts, char **cmdp,
 		/* GNU-style long options */
 		++*argv;
 		if (!strcmp(*argv, "version")) {
+#ifdef CUSTOM_PATCHLEVEL
+		    printf("zsh %s (%s-%s-%s/%s)\n",
+			    ZSH_VERSION, MACHTYPE, VENDOR, OSTYPE, CUSTOM_PATCHLEVEL);
+#else
 		    printf("zsh %s (%s-%s-%s)\n",
 			    ZSH_VERSION, MACHTYPE, VENDOR, OSTYPE);
+#endif
+
 		    LAST_OPTION(0);
 		}
 		if (!strcmp(*argv, "help")) {
