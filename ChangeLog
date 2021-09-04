@@ -1,3 +1,8 @@
+2021-09-04  Oliver Kiddle  <opk@zsh.org>
+
+	* 49345: Completion/Unix/Command/_git: fix git file completion
+	for paths starting with ../
+
 2021-08-29  Oliver Kiddle  <opk@zsh.org>
 
 	* 49327: Completion/Unix/Command/_git: complete for new git

@@ -7370,7 +7370,6 @@ __git_changed_files () {
 # which case it is relative to the repository root.
 (( $+functions[__git_tree_files] )) ||
 __git_tree_files () {
-  local multi_parts_opts
   local tree Path
   integer at_least_one_tree_added
   local -a tree_files compadd_opts
@@ -7383,11 +7382,12 @@ __git_tree_files () {
 
   zparseopts -D -E -a compadd_opts V+: J+: 1 2 o+: n f x+: X+: M+: P: S: r: R: q F:
 
-  [[ "$1" == */ ]] && Path="$1" || Path="${1:h}/"
+  Path=${(M)1##(../)#}
+  [[ ${1##(../)#} = */* ]] && extra_args+=( -r )
   shift
   (( at_least_one_tree_added = 0 ))
-  for tree in $*; do
-    tree_files+=(${(ps:\0:)"$(_call_program tree-files git ls-tree -r ${(q)extra_args} --name-only -z ${(q)tree} 2>/dev/null)"})
+  for tree; do
+    tree_files+=(${(ps:\0:)"$(_call_program tree-files git ls-tree $extra_args --name-only -z ${(q)tree} $Path 2>/dev/null)"})
     __git_command_successful $pipestatus && (( at_least_one_tree_added = 1 ))
   done
 
