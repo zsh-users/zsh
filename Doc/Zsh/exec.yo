@@ -14,9 +14,20 @@ a shell builtin by that name, the builtin is invoked.
 
 vindex(path, use of)
 Otherwise, the shell searches each element of tt($path) for a
-directory containing an executable file by that name.  If the
-search is unsuccessful, the shell prints an error message and returns
-a nonzero exit status.
+directory containing an executable file by that name.
+
+If execution fails: an error message is printed, and one of the
+following values is returned.
+
+startsitem()
+sitem(127)(The search was unsuccessful.  The error message is
+`tt(command not found:) var(cmd)'.)
+sitem(126)(The executable file has insufficient permissions, is a
+directory or special file, or is not a script and is in a format
+unrecognized by the operating system.  The exact conditions and error
+message are operating system-dependent; see
+manref(execve)(2).)
+endsitem()
 
 If execution fails because the file is not in executable format,
 and the file is not a directory, it is assumed to be a shell
@@ -29,10 +40,6 @@ not handle this executable format in the kernel.
 If no external command is found but a function tt(command_not_found_handler)
 exists the shell executes this function with all
 command line arguments.  The return status of the function becomes the
-status of the command.  If the function wishes to mimic the
-behaviour of the shell when the command is not found, it should
-print the message `tt(command not found:) var(cmd)' to standard error
-and return status 127.  Note that the handler is executed in a
+status of the command.  Note that the handler is executed in a
 subshell forked to execute an external command, hence changes to
 directories, shell parameters, etc. have no effect on the main shell.
-
