@@ -1,5 +1,7 @@
 2021-09-06  Bart Schaefer  <schaefer@zsh.org>
 
+	* 49282: set $0 correctly when calling functions from hooks
+
 	* 49266: fix segfault on metacharacters in long job texts
 
 	* Marlon Richert: 49218: Functions/Misc/run-help,
