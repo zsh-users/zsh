@@ -1498,7 +1498,7 @@ time_t lastwatch;
 
 /*
  * Call a function given by "name" with optional arguments
- * "lnklist".  If these are present the first argument is the function name.
+ * "lnklst".  If these are present the first argument is the function name.
  *
  * If "arrayp" is not zero, we also look through
  * the array "name"_functions and execute functions found there.
@@ -1527,6 +1527,10 @@ callhookfunc(char *name, LinkList lnklst, int arrayp, int *retval)
     incompfunc = 0;
 
     if ((shfunc = getshfunc(name))) {
+	if (!lnklst) {
+	    lnklst = newlinklist();
+	    addlinknode(lnklst, name);
+	}
 	ret = doshfunc(shfunc, lnklst, 1);
 	stat = 0;
     }
@@ -1539,10 +1543,16 @@ callhookfunc(char *name, LinkList lnklst, int arrayp, int *retval)
 	memcpy(arrnam + namlen, HOOK_SUFFIX, HOOK_SUFFIX_LEN);
 
 	if ((arrptr = getaparam(arrnam))) {
+	    char **argarr = lnklst ? hlinklist2array(lnklst, 0) : NULL;
 	    arrptr = arrdup(arrptr);
 	    for (; *arrptr; arrptr++) {
 		if ((shfunc = getshfunc(*arrptr))) {
-		    int newret = doshfunc(shfunc, lnklst, 1);
+		    int newret, i = 1;
+		    LinkList arg0 = newlinklist();
+		    addlinknode(arg0, *arrptr);
+		    while (argarr && argarr[i])
+			addlinknode(arg0, argarr[i++]);
+		    newret = doshfunc(shfunc, arg0, 1);
 		    if (!ret)
 			ret = newret;
 		    stat = 0;
