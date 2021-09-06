@@ -603,6 +603,16 @@ zcoff(void)
 	zcputs(NULL, COL_NO);
 }
 
+/* Clear to end of line, if possible and necessary. */
+static void
+cleareol()
+{
+    if (mlbeg >= 0 && tccan(TCCLEAREOL)) {
+        if (*last_cap)
+            zcoff();    /* If we used colors, prevent them from bleeding. */
+        tcout(TCCLEAREOL);
+    }
+}
 
 static void
 initiscol(void)
@@ -670,8 +680,7 @@ clprintfmt(char *p, int ml)
 	doiscol(i++);
 	cc++;
 	if (*p == '\n') {
-	    if (mlbeg >= 0 && tccan(TCCLEAREOL))
-		tcout(TCCLEAREOL);
+	    cleareol();
 	    cc = 0;
 	}
 	if (ml == mlend - 1 && (cc % zterm_columns) == zterm_columns - 1)
@@ -693,8 +702,7 @@ clprintfmt(char *p, int ml)
 	    !--mrestlines && (ask = asklistscroll(ml)))
 	    return ask;
     }
-    if (mlbeg >= 0 && tccan(TCCLEAREOL))
-	tcout(TCCLEAREOL);
+    cleareol();
     return 0;
 }
 
@@ -1047,8 +1055,7 @@ compprintnl(int ml)
 {
     int ask;
 
-    if (mlbeg >= 0 && tccan(TCCLEAREOL))
-	tcout(TCCLEAREOL);
+    cleareol();
     putc('\n', shout);
 
     if (mscroll && !--mrestlines && (ask = asklistscroll(ml)))
@@ -1263,8 +1270,8 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 	    if ((cc >= zterm_columns - 2 || cchar == ZWC('\n')) && stat)
 		dopr = 2;
 	    if (cchar == ZWC('\n')) {
-		if (dopr == 1 && mlbeg >= 0 && tccan(TCCLEAREOL))
-		    tcout(TCCLEAREOL);
+		if (dopr == 1)
+		    cleareol();
 		l += 1 + ((cc - 1) / zterm_columns);
 		cc = 0;
 	    }
@@ -1306,8 +1313,7 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
     if (dopr) {
         if (!(cc % zterm_columns))
             fputs(" \010", shout);
-        if (mlbeg >= 0 && tccan(TCCLEAREOL))
-            tcout(TCCLEAREOL);
+        cleareol();
     }
     if (stat && n)
 	mfirstl = -1;
@@ -1338,8 +1344,8 @@ compzputs(char const *s, int ml)
 	    c = *s;
 	s++;
 	putc(c, shout);
-	if (c == '\n' && mlbeg >= 0 && tccan(TCCLEAREOL))
-	    tcout(TCCLEAREOL);
+	if (c == '\n')
+	    cleareol();
 	if (mscroll && (++col == zterm_columns || c == '\n')) {
 	    ml++;
 	    if (!--mrestlines && (ask = asklistscroll(ml)))
@@ -1692,8 +1698,7 @@ compprintlist(int showall)
 
 	    lastlistlen = listdat.nlines;
 	} else if ((nl = listdat.nlines + nlnct - 1) < zterm_lines) {
-	    if (mlbeg >= 0 && tccan(TCCLEAREOL))
-		tcout(TCCLEAREOL);
+	    cleareol();
 	    tcmultout(TCUP, TCMULTUP, nl);
 	    showinglist = -1;
 

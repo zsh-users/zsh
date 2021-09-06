@@ -3,6 +3,9 @@
 	* Marlon Richert: 49378: Src/parse.c: skip check for collision
 	of aliases and functions when NO_EXEC
 
+	* Marlon Richert: 49292: Src/Zle/complist.c: turn off colors
+	before clearing to end of line
+
 	* 49282: set $0 correctly when calling functions from hooks
 
 	* 49266: fix segfault on metacharacters in long job texts
