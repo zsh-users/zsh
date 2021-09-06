@@ -1,5 +1,10 @@
 2021-09-06  Bart Schaefer  <schaefer@zsh.org>
 
+	* Stephane Chazelas: 45180: Doc/Zsh/contrib.yo,
+	Functions/Example/zpgrep, Functions/Misc/regexp-replace: clarify
+	doc for POSIX EREs, fix an issue with PCRE when the replacement
+	was empty or generated more than one element
+
 	* zeurkous: 49154: Doc/Zsh/exec.yo: clarify status on exec failure
 
 	* Marlon Richert: 49378: Src/parse.c: skip check for collision

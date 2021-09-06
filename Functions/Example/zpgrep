@@ -2,24 +2,31 @@
 #
 
 zpgrep() {
-local file pattern
+local file pattern ret
 
 pattern=$1
 shift
+ret=1
 
 if ((! ARGC)) then
 	set -- -
 fi
 
-pcre_compile $pattern
+zmodload zsh/pcre || return
+pcre_compile -- "$pattern"
 pcre_study
 
 for file
 do
 	if [[ "$file" == - ]] then
-		while read -u0 buf; do pcre_match $buf && print $buf; done
+		while IFS= read -ru0 buf; do
+			pcre_match -- "$buf" && ret=0 && print -r -- "$buf"
+		done
 	else
-		while read -u0 buf; do pcre_match $buf && print $buf; done < "$file"
+		while IFS= read -ru0 buf; do
+			pcre_match -- "$buf" && ret=0 && print -r -- "$buf"
+		done < "$file"
 	fi
 done
+return "$ret"
 }

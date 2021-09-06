@@ -4335,7 +4335,7 @@ See also the tt(pager), tt(prompt) and tt(rprompt) styles below.
 findex(regexp-replace)
 item(tt(regexp-replace) var(var) var(regexp) var(replace))(
 Use regular expressions to perform a global search and replace operation
-on a variable.  POSIX extended regular expressions are used,
+on a variable.  POSIX extended regular expressions (ERE) are used,
 unless the option tt(RE_MATCH_PCRE) has been set, in which case
 Perl-compatible regular expressions are used
 (this requires the shell to be linked against the tt(pcre)
@@ -4353,6 +4353,9 @@ and arithmetic expressions which will be replaced:  in particular, a
 reference to tt($MATCH) will be replaced by the text matched by the pattern.
 
 The return status is 0 if at least one match was performed, else 1.
+
+Note that if using POSIX EREs, the tt(^) or word boundary operators
+(where available) may not work properly.
 )
 findex(run-help)
 item(tt(run-help) var(cmd))(
