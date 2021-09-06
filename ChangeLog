@@ -1,5 +1,8 @@
 2021-09-06  Bart Schaefer  <schaefer@zsh.org>
 
+	* unposted (cf. 49202 and 49217): Src/Zle/zle_hist.c: insertlastword
+	ignores blank/missing history entries when repeating
+
 	* 49196: Src/Modules/db_gdbm.c: gdbm keys not present in the
 	database appear unset in tied hashes
 

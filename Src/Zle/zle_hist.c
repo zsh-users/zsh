@@ -683,8 +683,13 @@ insertlastword(char **args)
 	}
 	nwords = countlinknodes(l);
     } else {
-	/* Some stored line. */
-	if (!(he = quietgethist(evhist)) || !he->nwords) {
+	/* Some stored line.  By default, search for a non-empty line. */
+	while ((he = quietgethist(evhist)) && histstep == -1 && !*args) {
+	    if (he->nwords)
+		break;
+	    evhist = addhistnum(evhist, histstep, HIST_FOREIGN);
+	}
+	if (!he || !he->nwords) {
 	    unmetafy_line();
 	    return 1;
 	}
