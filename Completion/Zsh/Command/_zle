@@ -51,11 +51,11 @@ case "$state[1]" in
     ;;
   (widget*)
     _wanted -C "$context[1]" widgets expl "${state_descr[1]:-widget}" _widgets && ret=0
-    ;&
-  (function)
-    [[ $state[1] != *function ]] ||	# Handle fall-through
+    ;|
+  (*function)
     _wanted -C "$context[1]" functions expl 'widget shell function' \
-      compadd -M 'r:|-=* r:|=*' -k functions && ret=0
+        compadd -M 'r:|-=* r:|=*' -k functions && 
+        ret=0
     ;;
   (comp-widget)
     _wanted -C "$context[1]" widgets expl 'completion widget' \
