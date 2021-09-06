@@ -335,6 +335,8 @@ getjobtext(Eprog prog, Wordcode c)
     tlim = tptr + JOBTEXTSIZE - 1;
     tjob = 1;
     gettext2(&s);
+    if (tptr[-1] == Meta)
+	--tptr;
     *tptr = '\0';
     freeeprog(prog);		/* mark as unused */
     untokenize(jbuf);
