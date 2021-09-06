@@ -2052,7 +2052,7 @@ par_simple(int *cmplx, int nr)
 	    /* Error if preceding assignments */
 	    if (assignments || postassigns)
 		YYERROR(oecused);
-	    if (hasalias && !isset(ALIASFUNCDEF) && argc &&
+	    if (isset(EXECOPT) && hasalias && !isset(ALIASFUNCDEF) && argc &&
 		hasalias != input_hasalias()) {
 		zwarn("defining function based on alias `%s'", hasalias);
 		YYERROR(oecused);

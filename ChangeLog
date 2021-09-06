@@ -1,5 +1,8 @@
 2021-09-06  Bart Schaefer  <schaefer@zsh.org>
 
+	* Marlon Richert: 49378: Src/parse.c: skip check for collision
+	of aliases and functions when NO_EXEC
+
 	* 49282: set $0 correctly when calling functions from hooks
 
 	* 49266: fix segfault on metacharacters in long job texts
