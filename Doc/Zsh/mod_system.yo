@@ -263,9 +263,9 @@ tt($$), which returns the process ID of the main shell process.
 )
 item(tt(ppid))(
 vindex(ppid, sysparams)
-Returns the process ID of the parent of the current process, even in
-subshells.  Compare tt($PPID), which returns the process ID of the parent
-of the main shell process.
+Returns the current process ID of the parent of the current process, even
+in subshells.  Compare tt($PPID), which returns the process ID of the
+initial parent of the main shell process.
 )
 item(tt(procsubstpid))(
 Returns the process ID of the last process started for process

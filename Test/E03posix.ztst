@@ -161,3 +161,6 @@ F:POSIX has neither math functions nor floating point
 0f:Width of %s is computed in bytes not characters
 F:This is considered a bugfix in zsh
 ><  Stéphane>
+
+  PPID=foo
+-f:PPID is not a readonly variable
