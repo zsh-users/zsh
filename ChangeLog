@@ -1,5 +1,11 @@
 2021-09-06  Bart Schaefer  <schaefer@zsh.org>
 
+	* Marlon Richert: 49218: Functions/Misc/run-help,
+	Functions/Misc/run-help-btrfs, Functions/Misc/run-help-git,
+	Functions/Misc/run-help-ip, Functions/Misc/run-help-p4,
+	Functions/Misc/run-help-svk, Functions/Misc/run-help-svn:
+	run-help filters cmd_args before calling run-help-<command>
+
 	* unposted (cf. 49202 and 49217): Src/Zle/zle_hist.c: insertlastword
 	ignores blank/missing history entries when repeating
 

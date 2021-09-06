@@ -1,1 +1,1 @@
-svk help ${${@:#-*}[1]} | ${=PAGER:-more}
+svk help $1 | ${=PAGER:-more}

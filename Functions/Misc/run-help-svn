@@ -1,1 +1,1 @@
-svn help ${${@:#-*}[1]} | ${=PAGER:-more}
+svn help $1 | ${=PAGER:-more}

@@ -14,10 +14,6 @@ if ! man -w ip-address >/dev/null 2>&1; then
     return
 fi
 
-while [[ $# != 0 && $1 == -* ]]; do
-    shift
-done
-
 case $1 in
     (addrl*) man ip-addrlabel ;;
     (a*) man ip-address ;;
