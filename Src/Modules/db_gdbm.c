@@ -332,6 +332,8 @@ gdbmgetfn(Param pm)
 
         /* Can return pointer, correctly saved inside hash */
         return pm->u.str;
+    } else {
+      pm->node.flags |= PM_DEFAULTED;
     }
 
     /* Free key */

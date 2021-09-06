@@ -1,5 +1,8 @@
 2021-09-06  Bart Schaefer  <schaefer@zsh.org>
 
+	* 49196: Src/Modules/db_gdbm.c: gdbm keys not present in the
+	database appear unset in tied hashes
+
 	* Marlon Richert: 48969: fix for "zle -N" completion
 
 	* 48888: Doc/Zsh/mod_system.yo, Doc/Zsh/params.yo, Test/E03posix.ztst:
