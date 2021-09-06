@@ -1,3 +1,7 @@
+2021-09-06  Bart Schaefer  <schaefer@zsh.org>
+
+	* 48832: Completion/Unix/Type/_urls: try _gnu_generic first
+
 2021-09-04  Oliver Kiddle  <opk@zsh.org>
 
 	* Shohei YOSHIDA: 49343: Completion/Unix/Command/_md5sum:

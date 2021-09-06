@@ -4,4 +4,4 @@
 # definition is provided as a fallback, and should be installed later
 # in $fpath than the curl-provided definition of _curl.
 
-_urls "$@"
+_gnu_generic || _urls "$@"
