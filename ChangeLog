@@ -1,5 +1,8 @@
 2022-01-27  dana  <dana@dana.is>
 
+	* Jun-ichi Takimoto: unposted: Src/input.c: add 'static' to
+	shinsavestack
+
 	* Peter Stephenson: 49290: Src/init.c, Src/input.c: Replace
 	stdio for buffered shell input to avoid memory management
 	interacting with signal handlers.
