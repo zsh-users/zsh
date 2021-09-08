@@ -1508,9 +1508,6 @@ static struct suffixset *suffixlist;
 /**/
 static char *suffixfunc;
 
-/* Length associated with the suffix function */
-static int suffixfunclen;
-
 /* Whether to remove suffix on uninsertable characters */
 /**/
 int suffixnoinsrem;
@@ -1611,7 +1608,7 @@ makesuffixstr(char *f, char *s, int n)
     if (f) {
 	zsfree(suffixfunc);
 	suffixfunc = ztrdup(f);
-	suffixfunclen = n;
+	suffixlen = n;
     } else if (s) {
 	int inv, i, z = 0;
 	ZLE_STRING_T ws, lasts, wptr;
@@ -1685,7 +1682,7 @@ iremovesuffix(ZLE_INT_T c, int keep)
 		unmetafy_line();
 	    }
 
-	    sprintf(buf, "%d", suffixfunclen);
+	    sprintf(buf, "%d", suffixlen);
 	    addlinknode(args, suffixfunc);
 	    addlinknode(args, buf);
 
@@ -1800,5 +1797,5 @@ fixsuffix(void)
 	suffixlist = next;
     }
 
-    suffixfunclen = suffixnoinsrem = suffixlen = 0;
+    suffixnoinsrem = suffixlen = 0;
 }
