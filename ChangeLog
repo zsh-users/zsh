@@ -1,5 +1,7 @@
 2021-09-08  Bart Schaefer  <schaefer@zsh.org>
 
+	* 49391: Doc/Zsh/zle.yo: document default bracketed-paste bindings
+
 	* 49389: Completion/Zsh/Command/_typeset: leading variables in
 	autoload file completion
 
