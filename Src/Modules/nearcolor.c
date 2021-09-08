@@ -188,7 +188,7 @@ enables_(Module m, int **enables)
 
 /**/
 int
-boot_(Module m)
+boot_(UNUSED(Module m))
 {
     addhookfunc("get_color_attr", (Hookfn) getnearestcolor);
     return 0;

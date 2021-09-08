@@ -1,5 +1,9 @@
 2021-09-08  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* unposted: Src/Modules/db_gdbm.c, Src/Modules/files.c,
+	Src/Modules/nearcolor.c, Src/Zle/complete.c, Src/builtin.c:
+	add/remove UNUSED() for some funtion parameters
+
 	* unposted: Src/input.c: add 'static' to shinsavestack
 
 	* 49377: Src/Zle/zle_keymap.c, Test/X03zlebindkey.ztst: fix

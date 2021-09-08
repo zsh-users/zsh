@@ -2024,7 +2024,7 @@ typeset_setwidth(const char * name, Param pm, Options ops, int on, int always)
 
 /**/
 static Param
-typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
+typeset_single(char *cname, char *pname, Param pm, int func,
 	       int on, int off, int roff, Asgment asg, Param altpm,
 	       Options ops, int joinchar)
 {

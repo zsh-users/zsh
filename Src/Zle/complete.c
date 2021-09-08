@@ -1343,7 +1343,7 @@ get_compstate(Param pm)
 
 /**/
 static void
-set_compstate(UNUSED(Param pm), HashTable ht)
+set_compstate(Param pm, HashTable ht)
 {
     struct compparam *cp;
     Param *pp;

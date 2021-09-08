@@ -233,7 +233,7 @@ bin_zuntie(char *nam, char **args, Options ops, UNUSED(int func))
 
 /**/
 static int
-bin_zgdbmpath(char *nam, char **args, Options ops, UNUSED(int func))
+bin_zgdbmpath(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     Param pm;
     char *pmname;

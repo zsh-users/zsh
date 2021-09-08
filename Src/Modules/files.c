@@ -652,7 +652,7 @@ chmod_dochmod(char *arg, char *rp, UNUSED(struct stat const *sp), void *magic)
 
 /**/
 static int
-bin_chmod(char *nam, char **args, Options ops, int func)
+bin_chmod(char *nam, char **args, Options ops, UNUSED(int func))
 {
     struct chmodmagic chm;
     char *str = args[0], *ptr;
