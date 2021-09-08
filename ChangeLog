@@ -1,3 +1,7 @@
+2021-09-08  Bart Schaefer  <schaefer@zsh.org>
+
+	* 49386: Test/Z03run-help.ztst: handle separate source/build trees
+
 2021-09-08  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* unposted: Src/Modules/db_gdbm.c, Src/Modules/files.c,

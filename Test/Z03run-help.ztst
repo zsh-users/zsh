@@ -1,7 +1,7 @@
 %prep
   PAGER=cat
   unalias run-help
-  autoload +X -Uz $PWD/../Functions/Misc/run-help*
+  autoload +X -Uz ${^fpath}/run-help*(N)
   builtin() {
     case "$1 $2" in
       ( 'getln cmd_args' )
