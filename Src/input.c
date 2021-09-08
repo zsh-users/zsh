@@ -150,7 +150,7 @@ struct shinsaveentry {
 };
 
 /* SHIN buffer save stack */
-struct shinsaveentry *shinsavestack;
+static struct shinsaveentry *shinsavestack;
 
 /* Reset the input buffer for SHIN, discarding any pending input */
 

@@ -1,5 +1,7 @@
 2021-09-08  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* unposted: Src/input.c: add 'static' to shinsavestack
+
 	* 49377: Src/Zle/zle_keymap.c, Test/X03zlebindkey.ztst: fix
 	segfalut by 'bindkey -d' with reordered keymapnamtab
 
