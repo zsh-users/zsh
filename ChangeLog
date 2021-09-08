@@ -1,5 +1,8 @@
 2021-09-08  Bart Schaefer  <schaefer@zsh.org>
 
+	* 49389: Completion/Zsh/Command/_typeset: leading variables in
+	autoload file completion
+
 	* 49387: Src/Zle/zle_misc.c: suffix highlight with "compadd -R"
 
 	* 49386: Test/Z03run-help.ztst: handle separate source/build trees

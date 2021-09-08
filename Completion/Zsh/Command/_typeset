@@ -101,9 +101,9 @@ if [[ "$state" = vars_eq ]]; then
     elif (( $+opt_args[-w] )); then
       _wanted files expl 'zwc file' _files -g '*.zwc(-.)' && ret=0
     elif [[ $service = autoload || -n $opt_args[(i)-[uU]] ]]; then
-      if [[ $PREFIX[1] = [/~] ]]; then
+      if [[ ${"${(e)PREFIX}"[1]} = [/~] ]] && _files; then
 	# Autoload by absolute path
-	_files && ret=0
+	ret=0
       else
 	  args=(${^fpath}/*(-.:t))
 	  # Filter out functions already loaded or marked for autoload.
