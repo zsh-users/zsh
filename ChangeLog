@@ -1,3 +1,8 @@
+2021-09-08  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 49377: Src/Zle/zle_keymap.c, Test/X03zlebindkey.ztst: fix
+	segfalut by 'bindkey -d' with reordered keymapnamtab
+
 2021-09-06  Bart Schaefer  <schaefer@zsh.org>
 
 	* Stephane Chazelas: 45180: Doc/Zsh/contrib.yo,

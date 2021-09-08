@@ -141,3 +141,18 @@
 >CURSOR: 18
 >BUFFER: echo $(( ##x ) ##x ) y
 >CURSOR: 22
+
+  bindkey -d
+  for name in a b c d e; bindkey -N $name
+  bindkey -d
+  bindkey -l
+0:delete all keymaps after expanding keymapnamtab
+>.safe
+>command
+>emacs
+>isearch
+>main
+>vicmd
+>viins
+>viopp
+>visual
