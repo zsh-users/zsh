@@ -18,7 +18,7 @@
 	* unposted: Src/input.c: add 'static' to shinsavestack
 
 	* 49377: Src/Zle/zle_keymap.c, Test/X03zlebindkey.ztst: fix
-	segfalut by 'bindkey -d' with reordered keymapnamtab
+	segfault by 'bindkey -d' with reordered keymapnamtab
 
 2021-09-06  Bart Schaefer  <schaefer@zsh.org>
 
