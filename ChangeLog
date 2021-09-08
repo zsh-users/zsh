@@ -1,5 +1,9 @@
 2022-01-27  dana  <dana@dana.is>
 
+	* Jun-ichi Takimoto: 49377: Src/Zle/zle_keymap.c,
+	Test/X03zlebindkey.ztst: fix segfault by 'bindkey -d' with
+	reordered keymapnamtab
+
 	* Jun-ichi Takimoto: 47560: configure.ac, aczsh.m4: add necessary
 	includes or prototypes for the tests in configure (fix errors in
 	macOS 11)
