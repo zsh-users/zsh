@@ -1,3 +1,8 @@
+2021-09-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 49353: Src/exe.c, Test/A01grammar.ztst: In sourced file,
+	always parse comments normally, ignoring INTERACTIVE_COMMENTS.
+
 2021-09-08  Bart Schaefer  <schaefer@zsh.org>
 
 	* 49391: Doc/Zsh/zle.yo: document default bracketed-paste bindings

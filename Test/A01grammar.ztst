@@ -944,3 +944,12 @@ F:Note that the behaviour of 'exit' inside try-list inside a function is unspeci
  if : ${(e)a}; then echo x; fi
 1:Status on bad substitution in if without else
 ?(eval):2: bad substitution
+
+ echo 'echo foo # comment
+  echo $(
+  echo bar # comment
+ )' >source_comments.zsh
+ $ZTST_testdir/../Src/zsh -f -o extendedglob -is -c '. ./source_comments.zsh'
+0:Comments should be handled in command subst in interactively sourced files
+>foo
+>bar

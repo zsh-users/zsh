@@ -4622,7 +4622,7 @@ getoutput(char *cmd, int qt)
     char *s;
 
     int onc = nocomments;
-    nocomments = (interact && unset(INTERACTIVECOMMENTS));
+    nocomments = (interact && !sourcelevel && unset(INTERACTIVECOMMENTS));
     prog = parse_string(cmd, 0);
     nocomments = onc;
 
