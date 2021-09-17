@@ -1,5 +1,8 @@
 2021-09-28  Oliver Kiddle  <opk@zsh.org>
 
+	* Marlon Richert: 49423: Completion/Unix/Command/_gradle:
+	Add support for multi-project builds
+
 	* 49454: Completion/compdump: open dump file once only instead
 	of reopening it for appends
 

@@ -1,9 +1,9 @@
 #compdef gradle gradlew
 
 local curcontext="$curcontext" ret=1 state state_descr line
-local gradle_inspect=yes cache_policy tag_order
+local gradle_inspect=yes cache_policy tag_order filter=
 local -A opt_args
-local -a gradle_group_tasks gradle_all_tasks
+local -aU gradle_group_tasks gradle_all_tasks tasks
 
 # Set the caching policy to invalidate cache if the build file is newer than the cache.
 _gradle_caching_policy() {
@@ -78,31 +78,53 @@ if [[ $words[CURRENT] != -* ]]; then
                 local -a match mbegin mend
                 # Run gradle/gradlew and retrieve possible tasks.
                 for outputline in ${(f)"$($service --build-file $gradle_buildfile -q tasks --all)"}; do
-                    if [[ $outputline == [[:blank:]]#(#b)([[:alnum:]]##)' - '(*) ]]; then
+                    # Subproject tasks are prefixed with one or more instances of [[:alnum:]]##\:
+                    # Leaving out the prefix runs the task in all subprojects where it exists.
+                    if [[ $outputline ==
+                            [[:blank:]]#(#b)([[:alnum:]]##\:)#([[:alnum:]]##)' - '(*) ]]; then
                         # The descriptions of main tasks start at beginning of line, descriptions of
                         # secondary tasks are indented.
                         if [[ $outputline == [[:alnum:]]* ]]; then
-                            gradle_group_tasks+=( "$match[1]:$match[2]" )
+                            gradle_group_tasks+=(
+                                    "$match[-2]:$match[-1]"
+                                    "${${(j::)match[1,-2]}//:/\:}:$match[-1]"
+                            )
                         else
-                            gradle_all_tasks+=( "$match[1]:$match[2]" )
+                            gradle_all_tasks+=(
+                                    "${${(j::)match[1,-2]}//:/\:}:$match[-1]"
+                            )
                         fi
                     fi
                 done
                 _store_cache $cache_name gradle_group_tasks gradle_all_tasks
             fi
 
+            filter=
+            zstyle -T ":completion:${curcontext}:tasks" prefix-needed &&
+                    [[ $PREFIX != ([[:alnum:]]##\:)## ]] &&
+                            filter+="*\:*"
             if [[ $state == task ]]; then
                 _tags gradle_group gradle_all
                 while _tags; do
                     # Offer main tasks and secondary tasks in different tags.
-                    _requested gradle_group && _describe 'group task' gradle_group_tasks && ret=0
-                    _requested gradle_all && _describe 'secondary task' gradle_all_tasks && ret=0
+                    if _requested gradle_group; then
+                        tasks=( ${gradle_group_tasks:#$~filter} )
+                        _describe -t tasks 'group task' tasks &&
+                                ret=0
+                    fi
+                    if _requested gradle_all; then
+                        tasks=( ${gradle_all_tasks:#$~filter} )
+                        _describe -t tasks 'secondary task' tasks &&
+                                ret=0
+                    fi
                     (( ret )) || break
                 done
             elif [[ $state == alltask ]]; then
                 # After '--exclude-task', we don't make a distinction between main tasks and
                 # secondary tasks.
-                _describe 'task' gradle_group_tasks -- gradle_all_tasks && ret=0
+                tasks=( ${gradle_group_tasks:#$~filter} ${gradle_all_tasks:#$~filter} )
+                _describe -t tasks 'task' tasks &&
+                        ret=0
             fi
         fi
     else
