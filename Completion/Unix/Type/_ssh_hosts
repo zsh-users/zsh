@@ -20,8 +20,9 @@ if [[ -r $config ]]; then
   local key line host
   local -a lines=("${(@f)$(<"$config")}") 2>/dev/null
   local -a match_args
-  while (($#lines)); do
-    IFS=$'=\t ' read -r key line <<<"${lines[1]}"
+  local idx=1
+  while (( idx <= $#lines )); do
+    IFS=$'=\t ' read -r key line <<<"${lines[idx]}"
     if [[ "$key" == ((#i)match) ]]; then
       match_args=(${(z)line})
       while [[ $#match_args -ge 2 ]]; do
@@ -35,7 +36,7 @@ if [[ -r $config ]]; then
     fi
     case "$key" in
     ((#i)include)
-      lines[1]=("${(@f)$(cd $HOME/.ssh; cat ${(z)~line})}") 2>/dev/null;;
+      lines[idx]=("${(@f)$(cd $HOME/.ssh; cat ${(z)~line})}") 2>/dev/null;;
     ((#i)host(|name))
       for host in ${(z)line}; do
 	case $host in
@@ -43,7 +44,7 @@ if [[ -r $config ]]; then
 	(*) config_hosts+=("$host") ;;
 	esac
       done ;&
-    (*) shift lines;;
+    (*) (( ++idx ));;
     esac
   done
   if (( ${#config_hosts} )); then

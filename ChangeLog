@@ -1,5 +1,8 @@
 2021-10-26  Oliver Kiddle  <opk@zsh.org>
 
+	* Peter Palfrader: 49431 (tweaked, c.f. Bart: 49434):
+	Completion/Unix/Type/_ssh_hosts: Faster ~/.ssh/config processing
+
 	* Marlon: 49521: Doc/Zsh/compwid.yo, Test/Y02compmatch.ztst:
 	Define correct behavior of || completion matchers
 
