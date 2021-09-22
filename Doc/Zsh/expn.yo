@@ -84,7 +84,7 @@ vindex(histchars, use of)
 A history expansion begins with the first character of the tt(histchars)
 parameter, which is `tt(!)' by default, and may occur anywhere on the
 command line, including inside double quotes (but not inside single quotes
-tt('...') or C-style quotes tt($'...') nor when escaped with a backslash).  
+tt('...') or C-style quotes tt($'...') nor when escaped with a backslash).
 
 The first character is followed by an optional event designator
 (ifzman(see )noderef(Event Designators)) and then an optional word
@@ -496,7 +496,7 @@ which treats var(arg) as a file name and replaces it with the file's
 contents.
 
 The tt(=) form is useful as both the tt(/dev/fd) and the named pipe
-implementation of tt(<LPAR())var(...)tt(RPAR()) have drawbacks.  In 
+implementation of tt(<LPAR())var(...)tt(RPAR()) have drawbacks.  In
 the former case, some programmes may automatically close the file
 descriptor in question before examining the file on the command line,
 particularly if this is necessary for security reasons such as when the
@@ -511,7 +511,7 @@ information using a pipe, so that programmes that expect to lseek
 Also note that the previous example can be more compactly and
 efficiently written (provided the tt(MULTIOS) option is set) as:
 
-example(tt(paste <LPAR()cut -f1) var(file1)tt(RPAR() <LPAR()cut -f3) var(file2)tt(RPAR()) ifzman(\ 
+example(tt(paste <LPAR()cut -f1) var(file1)tt(RPAR() <LPAR()cut -f3) var(file2)tt(RPAR()) ifzman(\
 )tt(> >LPAR())var(process1)tt(RPAR() > >LPAR())var(process2)tt(RPAR()))
 
 The shell uses pipes instead of FIFOs to implement the latter
@@ -974,7 +974,7 @@ If the tt(MULTIBYTE) option is set and the number is greater than 127
 )
 item(tt(%))(
 Expand all tt(%) escapes in the resulting words in the same way as in
-prompts (see 
+prompts (see
 ifzman(EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
 ifnzman(noderef(Prompt Expansion))). If this flag is given twice,
 full prompt expansion is done on the resulting words, depending on the
@@ -1729,7 +1729,7 @@ This produces the result tt(b).  First, the inner substitution
 tt("${foo}"), which has no array (tt(@)) flag, produces a single word
 result tt("bar baz").  The outer substitution tt("${(@)...[1]}") detects
 that this is a scalar, so that (despite the `tt((@))' flag) the subscript
-picks the first character. 
+picks the first character.
 )
 item(tt("${${(@)foo}[1]}"))(
 This produces the result `tt(bar)'.  In this case, the inner substitution
@@ -1763,7 +1763,7 @@ sect(Command Substitution)
 cindex(command substitution)
 cindex(substitution, command)
 A command enclosed in parentheses preceded by a dollar sign, like
-`tt($LPAR())...tt(RPAR())', or quoted with grave 
+`tt($LPAR())...tt(RPAR())', or quoted with grave
 accents, like `tt(`)...tt(`)', is replaced with its standard output, with
 any trailing newlines deleted.
 If the substitution is not enclosed in double quotes, the
@@ -2461,7 +2461,7 @@ qualifiers are also not applied in ordinary pattern matching.
 )
 item(tt(u))(
 Respect the current locale in determining the presence of multibyte
-characters in a pattern, provided the shell was compiled with 
+characters in a pattern, provided the shell was compiled with
 tt(MULTIBYTE_SUPPORT).  This overrides the tt(MULTIBYTE)
 option; the default behaviour is taken from the option.  Compare tt(U).
 (Mnemonic: typically multibyte characters are from Unicode in the UTF-8
@@ -2712,18 +2712,18 @@ expected, if combined with a `tt(=)', the value given must match the
 file-modes exactly, with a `tt(PLUS())', at least the bits in the
 given number must be set in the file-modes, and with a `tt(-)', the
 bits in the number must not be set. Giving a `tt(?)' instead of a
-octal digit anywhere in the number ensures that the corresponding bits 
+octal digit anywhere in the number ensures that the corresponding bits
 in the file-modes are not checked, this is only useful in combination
 with `tt(=)'.
 
 If the qualifier `tt(f)' is followed by any other character anything
-up to the next matching character (`tt([)', `tt({)', and `tt(<)' match 
+up to the next matching character (`tt([)', `tt({)', and `tt(<)' match
 `tt(])', `tt(})', and `tt(>)' respectively, any other character
 matches itself) is taken as a list of comma-separated
 var(sub-spec)s. Each var(sub-spec) may be either an octal number as
 described above or a list of any of the characters `tt(u)', `tt(g)',
 `tt(o)', and `tt(a)', followed by a `tt(=)', a `tt(PLUS())', or a
-`tt(-)', followed by a list of any of the characters `tt(r)', `tt(w)', 
+`tt(-)', followed by a list of any of the characters `tt(r)', `tt(w)',
 `tt(x)', `tt(s)', and `tt(t)', or an octal digit. The first list of
 characters specify which access rights are to be checked. If a `tt(u)'
 is given, those for the owner of the file are used, if a `tt(g)' is
@@ -2732,7 +2732,7 @@ of other users, and the `tt(a)' says to test all three groups. The
 `tt(=)', `tt(PLUS())', and `tt(-)' again says how the modes are to be
 checked and have the same meaning as described for the first form
 above. The second list of characters finally says which access rights
-are to be expected: `tt(r)' for read access, `tt(w)' for write access, 
+are to be expected: `tt(r)' for read access, `tt(w)' for write access,
 `tt(x)' for the right to execute the file (or to search a directory),
 `tt(s)' for the setuid and setgid bits, and `tt(t)' for the sticky
 bit.
@@ -2741,7 +2741,7 @@ Thus, `tt(*(f70?))' gives the files for which the owner has read,
 write, and execute permission, and for which other group members have
 no rights, independent of the permissions for other users. The pattern
 `tt(*(f-100))' gives all files for which the owner does not have
-execute permission, and `tt(*(f:gu+w,o-rx:))' gives the files for which 
+execute permission, and `tt(*(f:gu+w,o-rx:))' gives the files for which
 the owner and the other members of the group have at least write
 permission, and for which other users don't have read or execute
 permission.
@@ -2942,7 +2942,7 @@ item(tt([)var(beg)[tt(,)var(end)]tt(]))(
 specifies which of the matched filenames should be included in the
 returned list. The syntax is the same as for array
 subscripts. var(beg) and the optional var(end) may be mathematical
-expressions. As in parameter subscripting they may be negative to make 
+expressions. As in parameter subscripting they may be negative to make
 them count from the last match backward. E.g.: `tt(*(-OL[1,3]))'
 gives a list of the names of the three largest files.
 )
