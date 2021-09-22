@@ -1119,7 +1119,7 @@ char *cached_username;
 char *
 get_username(void)
 {
-#ifdef HAVE_GETPWUID
+#ifdef USE_GETPWUID
     struct passwd *pswd;
     uid_t current_uid;
 
@@ -1132,9 +1132,9 @@ get_username(void)
 	else
 	    cached_username = ztrdup("");
     }
-#else /* !HAVE_GETPWUID */
+#else /* !USE_GETPWUID */
     cached_uid = getuid();
-#endif /* !HAVE_GETPWUID */
+#endif /* !USE_GETPWUID */
     return cached_username;
 }
 
@@ -1310,7 +1310,7 @@ getnameddir(char *name)
 	return str;
     }
 
-#ifdef HAVE_GETPWNAM
+#ifdef USE_GETPWNAM
     {
 	/* Retrieve an entry from the password table/database for this user. */
 	struct passwd *pw;
@@ -1326,7 +1326,7 @@ getnameddir(char *name)
 		return dupstring(pw->pw_dir);
 	}
     }
-#endif /* HAVE_GETPWNAM */
+#endif /* USE_GETPWNAM */
 
     /* There are no more possible sources of directory names, so give up. */
     return NULL;

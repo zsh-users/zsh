@@ -2011,6 +2011,9 @@ scanpmdissaliases(HashTable ht, ScanFunc func, int flags)
 /**/
 static Groupset get_all_groups(void)
 {
+#ifdef DISABLE_DYNAMIC_NSS
+    return NULL;
+#else
     Groupset gs = zhalloc(sizeof(*gs));
     Groupmap gaptr;
     gid_t *list, *lptr, egid;
@@ -2063,6 +2066,7 @@ static Groupset get_all_groups(void)
     }
 
     return gs;
+#endif /* DISABLE_DYNAMIC_NSS */
 }
 
 /* Standard hash element lookup. */
@@ -2081,7 +2085,11 @@ getpmusergroups(UNUSED(HashTable ht), const char *name)
     pm->gsu.s = &nullsetscalar_gsu;
 
     if (!gs) {
+#ifdef DISABLE_DYNAMIC_NSS
+	zerr("parameter 'usergroups' not available: NSS is disabled");
+#else
 	zerr("failed to retrieve groups for user: %e", errno);
+#endif
 	pm->u.str = dupstring("");
 	pm->node.flags |= (PM_UNSET|PM_SPECIAL);
 	return &pm->node;
@@ -2113,7 +2121,11 @@ scanpmusergroups(UNUSED(HashTable ht), ScanFunc func, int flags)
     Groupmap gaptr;
 
     if (!gs) {
+#ifdef DISABLE_DYNAMIC_NSS
+	zerr("parameter 'usergroups' not available: NSS is disabled");
+#else
 	zerr("failed to retrieve groups for user: %e", errno);
+#endif
 	return;
     }
 

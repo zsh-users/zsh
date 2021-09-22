@@ -811,7 +811,7 @@ dosetopt(int optno, int value, int force, char *new_opts)
 	    return -1;
 	}
 
-# ifdef HAVE_INITGROUPS
+# ifdef USE_INITGROUPS
 	/* Set the supplementary groups list.
 	 *
 	 * Note that on macOS, FreeBSD, and possibly some other platforms,

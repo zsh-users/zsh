@@ -843,9 +843,12 @@ createparamtable(void)
     setsparam("HOST", ztrdup_metafy(hostnam));
     zfree(hostnam, 256);
 
-    setsparam("LOGNAME",
-	      ztrdup_metafy((str = getlogin()) && *str ?
-			    str : cached_username));
+    setsparam("LOGNAME", ztrdup_metafy(
+#ifndef DISABLE_DYNAMIC_NSS
+			(str = getlogin()) && *str ?  str :
+#endif
+				cached_username
+			));
 
 #if !defined(HAVE_PUTENV) && !defined(USE_SET_UNSET_ENV)
     /* Copy the environment variables we are inheriting to dynamic *
@@ -4430,7 +4433,7 @@ usernamegetfn(UNUSED(Param pm))
 void
 usernamesetfn(UNUSED(Param pm), char *x)
 {
-#if defined(HAVE_SETUID) && defined(HAVE_GETPWNAM)
+#if defined(HAVE_SETUID) && defined(USE_GETPWNAM)
     struct passwd *pswd;
 
     if (x && (pswd = getpwnam(x)) && (pswd->pw_uid != cached_uid)) {
@@ -4447,7 +4450,7 @@ usernamesetfn(UNUSED(Param pm), char *x)
 	    cached_uid = pswd->pw_uid;
 	}
     }
-#endif /* HAVE_SETUID && HAVE_GETPWNAM */
+#endif /* HAVE_SETUID && USE_GETPWNAM */
     zsfree(x);
 }
 

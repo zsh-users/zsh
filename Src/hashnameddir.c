@@ -178,7 +178,7 @@ fillnameddirtable(UNUSED(HashTable ht))
 	    /* Using NIS or NIS+ didn't add any user directories. This seems
 	     * fishy, so we fall back to using getpwent(). If we don't have
 	     * that, we only use the passwd file. */
-#ifdef HAVE_GETPWENT
+#ifdef USE_GETPWENT
 	    struct passwd *pw;
 
 	    setpwent();
@@ -190,7 +190,7 @@ fillnameddirtable(UNUSED(HashTable ht))
 
 	    endpwent();
 	    usepwf = 0;
-#endif /* HAVE_GETPWENT */
+#endif /* USE_GETPWENT */
 	}
 	if (usepwf) {
 	    /* Don't forget the non-NIS matches from the flat passwd file */
@@ -229,7 +229,7 @@ fillnameddirtable(UNUSED(HashTable ht))
 	    adduserdir(pw->pw_name, pw->pw_dir, ND_USERNAME, 1);
 
 	endpwent();
-#endif /* HAVE_GETPWENT */
+#endif /* USE_GETPWENT */
 #endif
 	allusersadded = 1;
     }

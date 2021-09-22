@@ -1,3 +1,8 @@
+2021-09-22  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 49422: Src/Modules/parameter.c, Src/hashnameddir.c, Src/options.c,
+	Src/params.c, Src/utils.c: improve support of --disable-dynamic-nss
+
 2021-09-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 49353: Src/exe.c, Test/A01grammar.ztst: In sourced file,
