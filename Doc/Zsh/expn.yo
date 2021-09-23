@@ -872,7 +872,8 @@ of the string tt($-) and the array tt($*) respectively.  If
 tt(POSIX_IDENTIFIERS) is set, then braces are required for
 the tt(#) to be treated in this fashion.
 )
-item(tt(${^)var(spec)tt(}))(
+xitem(tt(${^)var(spec)tt(}))
+item(tt(${^^)var(spec)tt(}))(
 pindex(RC_EXPAND_PARAM, toggle)
 cindex(array expansion style, rc)
 cindex(rc, array expansion style)
@@ -895,7 +896,8 @@ happening later.  If word splitting is also in effect the
 tt($var[)var(N)tt(]) may themselves be split into different list
 elements.
 )
-item(tt(${=)var(spec)tt(}))(
+xitem(tt(${=)var(spec)tt(}))
+item(tt(${==)var(spec)tt(}))(
 pindex(SH_WORD_SPLIT, toggle)
 cindex(field splitting, sh style, parameter)
 cindex(sh, field splitting style, parameter)
@@ -911,7 +913,8 @@ Note that splitting is applied to var(word) in the assignment forms
 of var(spec) em(before) the assignment to var(name) is performed.
 This affects the result of array assignments with the tt(A) flag.
 )
-item(tt(${~)var(spec)tt(}))(
+xitem(tt(${~)var(spec)tt(}))
+item(tt(${~~)var(spec)tt(}))(
 pindex(GLOB_SUBST, toggle)
 Turn on the tt(GLOB_SUBST) option for the evaluation of
 var(spec); if the `tt(~)' is doubled, turn it off.  When this option is

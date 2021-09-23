@@ -1,5 +1,8 @@
 2021-09-28  Oliver Kiddle  <opk@zsh.org>
 
+	* ivan tkachenko: 49440: Doc/Zsh/expn.yo: Make double-flag
+	parameter expansion syntax more discoverable in docs
+
 	* ivan tkachenko: 49435: Doc/Zsh/expn.yo: Remove trailing whitespace
 
 	* Alex Xu: 49444: Completion/Unix/Type/_tar_archive:
