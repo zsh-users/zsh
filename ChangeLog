@@ -1,5 +1,8 @@
 2021-09-28  Oliver Kiddle  <opk@zsh.org>
 
+	* Alex Xu: 49444: Completion/Unix/Type/_tar_archive:
+	libarchive tar can actually extract much more formats
+
 	* Marlon Richert: 49423: Completion/Unix/Command/_gradle:
 	Add support for multi-project builds
 
