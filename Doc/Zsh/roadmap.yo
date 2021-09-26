@@ -20,7 +20,7 @@ The function is designed to be self-explanatory.  You can run it by hand
 with `tt(autoload -Uz zsh-newuser-install; zsh-newuser-install -f)'.
 See also
 ifnzman(noderef(User Configuration Functions))\
-ifzman(the section User Configuration Functions in zmanref(zshcontrib)).
+ifzman(the section `User Configuration Functions' in zmanref(zshcontrib)).
 
 
 sect(Interactive Use)

@@ -44,4 +44,4 @@ even if the tt(zsh/newuser) module is disabled.  Note, however, that
 if the module is not installed the function will not be installed either.
 The function is documented in
 ifnzman(noderef(User Configuration Functions))\
-ifzman(the section User Configuration Functions in zmanref(zshcontrib)).
+ifzman(the section `User Configuration Functions' in zmanref(zshcontrib)).

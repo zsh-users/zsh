@@ -50,7 +50,7 @@ argument causes the next command entered to be repeated the specified
 number of times, unless otherwise noted below; this is implemented
 by the tt(digit-argument) widget. See also
 ifzman(the em(Arguments) subsection of the em(Widgets) section )\
-ifnzman(noderef(Arguments) )\
+ifnzman(noderef(Arguments))\
 for some other ways the numeric argument can be modified.
 
 startmenu()

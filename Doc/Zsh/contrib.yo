@@ -2341,7 +2341,7 @@ directly.
 )
 tindex(bracketed-paste-magic)
 item(tt(bracketed-paste-magic))(
-The tt(bracketed-paste) widget (see ifzman(subsection Miscellaneous in
+The tt(bracketed-paste) widget (see ifzman(the subsection `Miscellaneous' in
 zmanref(zshzle))ifnzman(noderef(Miscellaneous) in noderef(Zle Widgets)))
 inserts pasted text literally into the editor buffer rather than interpret
 it as keystrokes.  This disables some common usages where the self-insert
@@ -3190,7 +3190,7 @@ investigate the command word found.  The default is tt(whence -c).
 tindex(zcalc-auto-insert)
 item(tt(zcalc-auto-insert))(
 This function is useful together with the tt(zcalc) function described in
-ifzman(the section Mathematical Functions)\
+ifzman(the section `Mathematical Functions')\
 ifnzman(noderef(Mathematical Functions)).
 It should be bound to a key representing a binary operator such
 as `tt(PLUS())', `tt(-)', `tt(*)' or `tt(/)'.  When running in zcalc,
@@ -3664,7 +3664,7 @@ types even if they are executable.  As this example shows, the complete
 file name is matched against the pattern, regardless of how the file
 was passed to the handler.  The file is resolved to a full path using
 the tt(:P) modifier described in
-ifzman(the subsection Modifiers in zmanref(zshexpn))\
+ifzman(the subsection `Modifiers' in zmanref(zshexpn))\
 ifnzman(noderef(Modifiers));
 this means that symbolic links are resolved where possible, so that
 links into other file systems behave in the correct fashion.

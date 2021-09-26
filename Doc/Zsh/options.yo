@@ -602,7 +602,7 @@ Substitutions using the tt(:s) and tt(:&) history modifiers are performed
 with pattern matching instead of string matching.  This occurs wherever
 history modifiers are valid, including glob qualifiers and parameters.
 See
-ifzman(the section Modifiers in zmanref(zshexpn))\
+ifzman(the section `Modifiers' in zmanref(zshexpn))\
 ifnzman(noderef(Modifiers)).
 )
 pindex(IGNORE_BRACES)
@@ -1483,7 +1483,7 @@ The check is omitted if the commands run from the previous command line
 included a `tt(jobs)' command, since it is assumed the user is aware that
 there are background or suspended jobs.  A `tt(jobs)' command run from one
 of the hook functions defined in
-ifnzman(the section Special Functions in noderef(Functions))\
+ifnzman(the section `Special Functions' in noderef(Functions))\
 ifzman(the section SPECIAL FUNCTIONS in zmanref(zshmisc))
 is not counted for this purpose.
 )

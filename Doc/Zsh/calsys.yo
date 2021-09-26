@@ -478,7 +478,7 @@ item(tt(calendar_add) [ tt(-BL) ] var(event) ...)(
 Adds a single event to the calendar in the appropriate location.
 The event can contain multiple lines, as described in
 ifnzman(noderef(Calendar File and Date Formats))\
-ifzman(the section Calendar File Format above).
+ifzman(the section `Calendar File Format' above).
 Using this function ensures that the calendar file is sorted in date
 and time order.  It also makes special arrangements for locking
 the file while it is altered.  The old calendar is left in a file

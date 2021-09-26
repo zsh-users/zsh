@@ -1857,7 +1857,7 @@ has similar effects.
 
 To combine brace expansion with array expansion, see the
 tt(${^)var(spec)tt(}) form described
-ifzman(in the section Parameter Expansion)\
+ifzman(in the section `Parameter Expansion')\
 ifnzman(in noderef(Parameter Expansion))
 above.
 

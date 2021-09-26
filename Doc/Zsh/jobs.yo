@@ -135,4 +135,4 @@ ifzman(the section PROCESS SUBSTITUTION in the zmanref(zshexpn) manual page)\
 ifnzman(noderef(Process Substitution)), and the handler processes for
 multios, see
 ifzman(the section MULTIOS in the zmanref(zshmisc) manual page)\
-ifnzman(the section Multios in noderef(Redirection)).
+ifnzman(the section em(Multios) in noderef(Redirection)).

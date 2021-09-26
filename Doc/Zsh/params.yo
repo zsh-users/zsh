@@ -106,7 +106,7 @@ may be in any order.  Note that this syntax is strict: tt([) and tt(]=) must
 not be quoted, and var(key) may not consist of the unquoted string
 tt(]=), but is otherwise treated as a simple string.  The enhanced forms
 of subscript expression that may be used when directly subscripting a
-variable name, described in the section Array Subscripts below, are not
+variable name, described in the section `Array Subscripts' below, are not
 available.
 
 The syntaxes with and without the explicit key may be mixed.  An implicit
