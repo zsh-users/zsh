@@ -1,5 +1,8 @@
 2021-11-26  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 49447: Doc/Zsh/compsys.yo: docs: _wanted: Clarify the example
+	and point to another one.
+
 	* 49446: Doc/Zsh/expn.yo: docs: Add texinode()s, so the next
 	commit can link directly to a subsection.
 
