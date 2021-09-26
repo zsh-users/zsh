@@ -1,5 +1,8 @@
 2021-11-26  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 49446: Doc/Zsh/expn.yo: docs: Add texinode()s, so the next
+	commit can link directly to a subsection.
+
 	* 49445: Doc/Zsh/calsys.yo, Doc/Zsh/contrib.yo, Doc/Zsh/expn.yo,
 	Doc/Zsh/intro.yo, Doc/Zsh/jobs.yo, Doc/Zsh/mod_newuser.yo,
 	Doc/Zsh/options.yo, Doc/Zsh/params.yo, Doc/Zsh/roadmap.yo,

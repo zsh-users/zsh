@@ -1892,6 +1892,7 @@ The tt(PUSHD_MINUS)
 option exchanges the effects of `tt(~PLUS())' and `tt(~-)' where they are
 followed by a number.
 
+texinode(Dynamic named directories)(Static named directories)()(Filename Expansion)
 subsect(Dynamic named directories)
 cindex(directories, named, dynamic)
 cindex(named directories, dynamic)
@@ -1985,6 +1986,7 @@ example(zsh_directory_name+LPAR()RPAR() {
   return 0
 })
 
+texinode(Static named directories)(`=' expansion)(Dynamic named directories)(Filename Expansion)
 subsect(Static named directories)
 cindex(directories, named, static)
 cindex(named directories, static)
@@ -2011,6 +2013,7 @@ i.e. either the directory name or the full path; the name is used
 if they are the same length.
 The parameters tt($PWD) and tt($OLDPWD) are never abbreviated in this fashion.
 
+texinode(`=' expansion)(Notes)(Static named directories)(Filename Expansion)
 subsect(`=' expansion)
 
 If a word begins with an unquoted `tt(=)'
@@ -2020,6 +2023,7 @@ name of a command.  If a command
 exists by that name, the word is replaced
 by the full pathname of the command.
 
+texinode(Notes)()(`=' expansion)(Filename Expansion)
 subsect(Notes)
 cindex(filename expansion, notes)
 Filename expansion is performed on the right hand side of a parameter
