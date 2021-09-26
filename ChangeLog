@@ -1,5 +1,9 @@
 2021-11-26  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 49448: Doc/Zsh/contrib.yo, Doc/Zsh/zle.yo: docs: Fix pointers
+	to the `Widgets', `User-defined Widgets', and `Standard Widgets'
+	sections.
+
 	* 49447: Doc/Zsh/compsys.yo: docs: _wanted: Clarify the example
 	and point to another one.
 

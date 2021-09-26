@@ -728,7 +728,7 @@ enditem()
 )
 enditem()
 
-texinode(Zle Widgets)(Character Highlighting)(Zle Builtins)(Zsh Line Editor)
+texinode(Zle Widgets)(User-Defined Widgets)(Zle Builtins)(Zsh Line Editor)
 sect(Widgets)
 cindex(widgets)
 All actions in the editor are performed by `widgets'.  A widget's job is
@@ -736,7 +736,9 @@ simply to perform some small action.  The ZLE commands that key sequences
 in keymaps are bound to are in fact widgets.  Widgets can be user-defined
 or built in.
 
-The standard widgets built into ZLE are listed in Standard Widgets below.
+The standard widgets built into ZLE are listed in
+ifzman(the section `Standard Widgets' below)\
+ifnzman(noderef(Standard Widgets)).
 Other built-in widgets can be defined by other modules (see
 ifzman(zmanref(zshmodules))\
 ifnzman(noderef(Zsh Modules))\
@@ -750,6 +752,7 @@ as shell functions.  When the widget is executed, the corresponding
 shell function is executed, and can perform editing (or other) actions.
 It is recommended that user-defined widgets should not have names
 starting with `tt(.)'.
+texinode(User-Defined Widgets)(Standard Widgets)(Zle Widgets)(Zsh Line Editor)
 sect(User-Defined Widgets)
 cindex(widgets, user-defined)
 User-defined widgets, being implemented as shell functions,
@@ -1206,6 +1209,7 @@ This can be used for detecting switches between the vi command
 )
 enditem()
 
+texinode(Standard Widgets)(Character Highlighting)(User-Defined Widgets)(Zsh Line Editor)
 sect(Standard Widgets)
 cindex(widgets, standard)
 The following is a list of all the standard widgets,
@@ -1231,7 +1235,7 @@ menu(Completion)
 menu(Miscellaneous)
 menu(Text Objects)
 endmenu()
-texinode(Movement)(History Control)()(Zle Widgets)
+texinode(Movement)(History Control)()(Standard Widgets)
 subsect(Movement)
 startitem()
 tindex(vi-backward-blank-word)
@@ -1378,7 +1382,7 @@ item(tt(up-line) (unbound) (unbound) (unbound))(
 Move up a line in the buffer.
 )
 enditem()
-texinode(History Control)(Modifying Text)(Movement)(Zle Widgets)
+texinode(History Control)(Modifying Text)(Movement)(Standard Widgets)
 subsect(History Control)
 startitem()
 tindex(beginning-of-buffer-or-history)
@@ -1726,7 +1730,7 @@ the numeric argument. Zero for both local and imported lines and nonzero for
 only local lines.
 )
 enditem()
-texinode(Modifying Text)(Arguments)(History Control)(Zle Widgets)
+texinode(Modifying Text)(Arguments)(History Control)(Standard Widgets)
 subsect(Modifying Text)
 startitem()
 tindex(vi-add-eol)
@@ -2052,7 +2056,7 @@ into the kill buffer.
 Arguably, this is what Y should do in vi, but it isn't what it actually does.
 )
 enditem()
-texinode(Arguments)(Completion)(Modifying Text)(Zle Widgets)
+texinode(Arguments)(Completion)(Modifying Text)(Standard Widgets)
 subsect(Arguments)
 startitem()
 tindex(digit-argument)
@@ -2100,7 +2104,7 @@ example(zle argument-base 16
 zle universal-argument)
 )
 enditem()
-texinode(Completion)(Miscellaneous)(Arguments)(Zle Widgets)
+texinode(Completion)(Miscellaneous)(Arguments)(Standard Widgets)
 subsect(Completion)
 startitem()
 tindex(accept-and-menu-complete)
@@ -2175,7 +2179,7 @@ When a previous completion displayed a list below the prompt, this
 widget can be used to move the prompt below the list.
 )
 enditem()
-texinode(Miscellaneous)(Text Objects)(Completion)(Zle Widgets)
+texinode(Miscellaneous)(Text Objects)(Completion)(Standard Widgets)
 subsect(Miscellaneous)
 startitem()
 tindex(accept-and-hold)
@@ -2573,7 +2577,7 @@ If the last command executed was a digit as part of an argument,
 continue the argument.  Otherwise, execute vi-beginning-of-line.
 )
 enditem()
-texinode(Text Objects)()(Miscellaneous)(Zle Widgets)
+texinode(Text Objects)()(Miscellaneous)(Standard Widgets)
 subsect(Text Objects)
 cindex(text objects)
 Text objects are commands that can be used to select a block of text

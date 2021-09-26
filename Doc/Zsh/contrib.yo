@@ -2342,7 +2342,7 @@ directly.
 tindex(bracketed-paste-magic)
 item(tt(bracketed-paste-magic))(
 The tt(bracketed-paste) widget (see ifzman(the subsection `Miscellaneous' in
-zmanref(zshzle))ifnzman(noderef(Miscellaneous) in noderef(Zle Widgets)))
+zmanref(zshzle))ifnzman(noderef(Miscellaneous) in noderef(Standard Widgets)))
 inserts pasted text literally into the editor buffer rather than interpret
 it as keystrokes.  This disables some common usages where the self-insert
 widget is replaced in order to accomplish some extra processing.  An
