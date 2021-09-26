@@ -1,5 +1,8 @@
 2021-11-26  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 49449: Completion/Unix/Command/_stat: _zstat: Don't offer -o
+	after -s, since -s is ignored when both -s and -o are specified.
+
 	* 47599 (tweaked): New test for '{foo,bar}' in command position
 
 2021-11-24  Oliver Kiddle  <opk@zsh.org>

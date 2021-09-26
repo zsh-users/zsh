@@ -29,7 +29,7 @@ case $variant in
       '(-n)-N[never show names of files]'
       '-o[print file modes in octal rather than decimal]'
       '-r[print raw data]'
-      '-s[print mode, UID, GID, and times as strings]'
+      '(-o)-s[print mode, UID, GID, and times as strings]'
       '(-T)-t[always show type names]'
       '(-t)-T[never show type names]'
       '*: :_files'
