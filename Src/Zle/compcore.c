@@ -2120,7 +2120,7 @@ addmatches(Cadata dat, char **argv)
             curexpl->always = !!dat->mesg;
             curexpl->count = curexpl->fcount = 0;
             curexpl->str = dupstring(dat->mesg ? dat->mesg : dat->exp);
-            if (dat->mesg)
+            if (dat->mesg && !dat->dpar && !dat->opar && !dat->apar)
                 addexpl(1);
         } else
             curexpl = NULL;
