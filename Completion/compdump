@@ -16,7 +16,7 @@
 emulate -L zsh
 setopt extendedglob noshglob
 
-typeset _d_file _d_f _d_bks _d_line _d_als _d_files _d_name _d_tmp
+typeset _d_file _d_f _d_fd _d_bks _d_line _d_als _d_files _d_name _d_tmp
 
 _d_file=${_comp_dumpfile-${0:h}/compinit.dump}.$HOST.$$
 [[ $_d_file = //* ]] && _d_file=${_d_file[2,-1]}
@@ -33,44 +33,45 @@ if [[ -n "$_comp_secure" ]]; then
   (( $#_d_wdirs ))  && _d_files=( "${(@)_d_files:#(${(j:|:)_d_wdirs})/*}" )
 fi
 
-print "#files: $#_d_files\tversion: $ZSH_VERSION" > $_d_file
+exec {_d_fd}>$_d_file
+print "#files: $#_d_files\tversion: $ZSH_VERSION" >& $_d_fd
 
 # Dump the arrays _comps, _services and _patcomps.  The quoting
 # hieroglyphics ensure that a single quote inside a variable is itself
 # correctly quoted.
 
-print "\n_comps=(" >> $_d_file
+print "\n_comps=(" >& $_d_fd
 for _d_f in ${(ok)_comps}; do
   print -r - "${(qq)_d_f}" "${(qq)_comps[$_d_f]}"
-done >> $_d_file
-print ")" >> $_d_file
+done >& $_d_fd
+print ")" >& $_d_fd
 
-print "\n_services=(" >> $_d_file
+print "\n_services=(" >& $_d_fd
 for _d_f in ${(ok)_services}; do
   print -r - "${(qq)_d_f}" "${(qq)_services[$_d_f]}"
-done >> $_d_file
-print ")" >> $_d_file
+done >& $_d_fd
+print ")" >& $_d_fd
 
-print "\n_patcomps=(" >> $_d_file
+print "\n_patcomps=(" >& $_d_fd
 for _d_f in ${(ok)_patcomps}; do
   print -r - "${(qq)_d_f}" "${(qq)_patcomps[$_d_f]}"
-done >> $_d_file
-print ")" >> $_d_file
+done >& $_d_fd
+print ")" >& $_d_fd
 
 _d_tmp="_postpatcomps"
-print "\n_postpatcomps=(" >> $_d_file
+print "\n_postpatcomps=(" >& $_d_fd
 for _d_f in ${(ok)_postpatcomps}; do
   print -r - "${(qq)_d_f}" "${(qq)_postpatcomps[$_d_f]}"
-done >> $_d_file
-print ")" >> $_d_file
+done >& $_d_fd
+print ")" >& $_d_fd
 
-print "\n_compautos=(" >> $_d_file
+print "\n_compautos=(" >& $_d_fd
 for _d_f in "${(ok@)_compautos}"; do
   print -r - "${(qq)_d_f}" "${(qq)_compautos[$_d_f]}"
-done >> $_d_file
-print ")" >> $_d_file
+done >& $_d_fd
+print ")" >& $_d_fd
 
-print >> $_d_file
+print >& $_d_fd
 
 # Now dump the key bindings. We dump all bindings for zle widgets
 # whose names start with a underscore.
@@ -90,15 +91,15 @@ zle -lL |
       print -r - ${_d_line}
       _d_bks+=(${_d_line[3]})
     fi
-  done >> $_d_file
+  done >& $_d_fd
 bindkey |
   while read -rA _d_line; do
     if [[ ${_d_line[2]} = (${(j.|.)~_d_bks}) ]]; then
       print -r "bindkey '${_d_line[1][2,-2]}' ${_d_line[2]}"
     fi
-  done >> $_d_file
+  done >& $_d_fd
 
-print >> $_d_file
+print >& $_d_fd
 
 
 # Autoloads: look for all defined functions beginning with `_' (that also
@@ -109,7 +110,7 @@ _d_als=($^fpath/(${(o~j.|.)$(typeset +fm '_*')})(N:t))
 # print them out:  about five to a line looks neat
 
 integer _i=5
-print -n autoload -Uz >> $_d_file
+print -n autoload -Uz >& $_d_fd
 while (( $#_d_als )); do
   if (( ! $+_compautos[$_d_als[1]] )); then
     print -n " $_d_als[1]"
@@ -119,19 +120,20 @@ while (( $#_d_als )); do
     fi
   fi
   shift _d_als
-done >> $_d_file
+done >& $_d_fd
 
-print >> $_d_file
+print >& $_d_fd
 
 local _c
 for _c in "${(ok@)_compautos}"; do
-  print "autoload -Uz $_compautos[$_c] $_c" >> $_d_file
+  print "autoload -Uz $_compautos[$_c] $_c" >& $_d_fd
 done
 
-print >> $_d_file
+print >& $_d_fd
 
-print "typeset -gUa _comp_assocs" >> $_d_file
-print "_comp_assocs=( ${(qq)_comp_assocs} )" >> $_d_file
+print "typeset -gUa _comp_assocs" >& $_d_fd
+print "_comp_assocs=( ${(qq)_comp_assocs} )" >& $_d_fd
+exec {_d_fd}>&-
 
 mv -f $_d_file ${_d_file%.$HOST.$$}
 

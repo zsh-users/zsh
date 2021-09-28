@@ -1,5 +1,8 @@
 2021-09-28  Oliver Kiddle  <opk@zsh.org>
 
+	* 49454: Completion/compdump: open dump file once only instead
+	of reopening it for appends
+
 	* 49450: Src/Zle/compcore.c: don't display explanation with
 	compadd -x if any of -D, -A or -O are also used
 
