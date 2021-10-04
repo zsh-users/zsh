@@ -1013,6 +1013,11 @@ createparam(char *name, int flags)
 		(oldpm->node.flags & PM_SPECIAL) ||
 		/* POSIXBUILTINS horror: we need to retain 'export' flags */
 		(isset(POSIXBUILTINS) && (oldpm->node.flags & PM_EXPORTED))) {
+		if (oldpm->node.flags & PM_RO_BY_DESIGN) {
+		    zerr("%s: can't change parameter attribute",
+			 name);
+		    return NULL;
+		}
 		oldpm->node.flags &= ~PM_UNSET;
 		if ((oldpm->node.flags & PM_SPECIAL) && oldpm->ename) {
 		    Param altpm =

@@ -10,11 +10,15 @@ ifnzman()
 startitem()
 findex(private)
 cindex(private parameter, creating)
-item(tt(private) [ {tt(PLUS())|tt(-)}tt(AHUahlprtux) ] \
+item(tt(private) [ {tt(PLUS())|tt(-)}tt(AHUahlmrtux) ] \
 [ {tt(PLUS())|tt(-)}tt(EFLRZi) [ var(n) ] ] [ var(name)[tt(=)var(value)] ... ])(
 The tt(private) builtin accepts all the same options and arguments as tt(local)
 (ifzman(zmanref(zshbuiltins))ifnzman(noderef(Shell Builtin Commands))) except
 for the `tt(-)tt(T)' option.  Tied parameters may not be made private.
+
+The `tt(-)tt(p)' option is presently a no-op because the state of
+private parameters cannot reliably be reloaded.  This also applies
+to printing private parameters with `tt(typeset -p)'.
 
 If used at the top level (outside a function scope), tt(private) creates a
 normal parameter in the same manner as tt(declare) or tt(typeset).  A
@@ -75,7 +79,8 @@ itemiz(Within any other function called by the declaring function, the
 private parameter does em(NOT) hide other parameters of the same name, so
 for example a global parameter of the same name is visible and may be
 assigned or unset.  This includes calls to anonymous functions, although
-that may also change in the future.)
+that may also change in the future.  However, the private name may not be
+created outside the local scope when it was not previously declared.)
 itemiz(An exported private remains in the environment of inner scopes but
 appears unset for the current shell in those scopes.  Generally, exporting
 private parameters should be avoided.)

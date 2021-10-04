@@ -1,3 +1,9 @@
+2021-10-04  Bart Schaefer  <schaefer@zsh.org>
+
+	* 49456: Doc/Zsh/mod_private.yo, Doc/Zsh/params.yo,
+	Src/Modules/param_private.c, Src/params.c, Test/V10private.ztst:
+	clean up detection of private params in nested scopes, update doc
+
 2021-09-28  Oliver Kiddle  <opk@zsh.org>
 
 	* ivan tkachenko: 49440: Doc/Zsh/expn.yo: Make double-flag

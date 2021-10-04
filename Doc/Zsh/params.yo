@@ -632,6 +632,14 @@ In the parameter lists that follow, the mark `<S>' indicates that the
 parameter is special.  `<Z>' indicates that the parameter does not exist
 when the shell initializes in tt(sh) or tt(ksh) emulation mode.
 
+The parameters `tt(!)', `tt(#)', `tt(*)', `tt(-)', `tt(?)', `tt(@)',
+`tt($)', `tt(ARGC)', `tt(HISTCMD)', `tt(LINENO)', `tt(PPID)',
+`tt(status)', `tt(TTYIDLE)', `tt(zsh_eval_context)',
+`tt(ZSH_EVAL_CONTEXT)', and `tt(ZSH_SUBSHELL)' are read-only and thus
+cannot be restored by the user, so they are not output by
+`tt(typeset -p)'.  This also applies to many read-only parameters loaded
+from modules.
+
 The following parameters are automatically set by the shell:
 
 startitem()
