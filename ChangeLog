@@ -1,3 +1,8 @@
+2021-10-05  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 49433: Src/parse.c: Assuming EPROG references are bounded by
+	function depth is incorrect as we have efficient function copy.
+
 2021-10-04  Bart Schaefer  <schaefer@zsh.org>
 
 	* 49456: Doc/Zsh/mod_private.yo, Doc/Zsh/params.yo,

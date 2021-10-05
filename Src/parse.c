@@ -2811,10 +2811,6 @@ freeeprog(Eprog p)
 	DPUTS(p->nref > 0 && (p->flags & EF_HEAP), "Heap EPROG has nref > 0");
 	DPUTS(p->nref < 0 && !(p->flags & EF_HEAP), "Real EPROG has nref < 0");
 	DPUTS(p->nref < -1, "Uninitialised EPROG nref");
-#ifdef MAX_FUNCTION_DEPTH
-	DPUTS(zsh_funcnest >=0 && p->nref > zsh_funcnest + 10,
-	      "Overlarge EPROG nref");
-#endif
 	if (p->nref > 0 && !--p->nref) {
 	    for (i = p->npats, pp = p->pats; i--; pp++)
 		freepatprog(*pp);
