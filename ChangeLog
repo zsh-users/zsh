@@ -1,3 +1,7 @@
+2021-10-11  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 49464: Completion/Linux/Command/_basenc: new completion
+
 2021-10-05  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 49433: Src/parse.c: Assuming EPROG references are bounded by
