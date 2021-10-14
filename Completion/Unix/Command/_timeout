@@ -2,8 +2,8 @@
 
 local args
 
-if [[ $service = g* || $OSTYPE != *(freebsd|netbsd)* ]]; then
-  # GNU coreutils or DFly as opposed to Free/NetBSD implementation
+if [[ $service = g* || $OSTYPE != *(freebsd|netbsd|openbsd)* ]]; then
+  # GNU coreutils or DFly as opposed to Free/Net/OpenBSD implementation
   args=(
     '(-v --verbose)'{-v,--verbose}'[indicate when signal is sent upon timeout]'
     '(- *)--help[display usage information]'

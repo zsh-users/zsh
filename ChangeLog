@@ -1,3 +1,7 @@
+2021-10-13  Matthew Martin  <phy1729@gmail.com>
+
+	* 49441: Completion/Unix/Command/_timeout: Add OpenBSD.
+
 2021-10-11  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 49464: Completion/Linux/Command/_basenc: new completion
