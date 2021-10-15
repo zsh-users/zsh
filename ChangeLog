@@ -1,3 +1,9 @@
+2021-10-16  dana  <dana@dana.is>
+
+	* github #79 (tweaked): Xavier Hsinyuan:
+	Completion/Unix/Command/_ssh: update options in apple's version
+	of ssh-add
+
 2021-10-13  Matthew Martin  <phy1729@gmail.com>
 
 	* 49441: Completion/Unix/Command/_timeout: Add OpenBSD.
