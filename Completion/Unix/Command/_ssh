@@ -81,18 +81,20 @@ _ssh () {
       '*:file:->file' "$common[@]" "$common_transfer[@]" && ret=0
     ;;
   ssh-add)
-    args=(
-      '-K[load resident keys from a FIDO authenticator]'
-    )
-    if [[ $OSTYPE == darwin* ]]; then 
-      [[ $APPLE_SSH_ADD_BEHAVIOR == "macos" ]] && args=(
+    if [[ $OSTYPE != darwin* || $APPLE_SSH_ADD_BEHAVIOR == openssh ]]; then
+      args=(
+        '-K[load resident keys from a FIDO authenticator]'
+      )
+    else
+      [[ ${APPLE_SSH_ADD_BEHAVIOR:-macos} == macos ]] && args=(
         '-A[add identities from keychain]'
         '-K[update keychain when adding/removing identities]'
-      ) || args+=(
-        '--apple-load-keychain[add identities from keychain]'
-        '--apple-use-keychain[update keychain when adding/removing identities]'
       )
-   fi
+    fi
+    [[ $OSTYPE == darwin* ]] && args+=(
+      '--apple-load-keychain[add identities from keychain]'
+      '--apple-use-keychain[update keychain when adding/removing identities]'
+    )
     _arguments -s : $args \
       '-c[identity is subject to confirmation via SSH_ASKPASS]' \
       '-D[delete all identities]' \
