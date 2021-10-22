@@ -1035,7 +1035,7 @@ freecadef(Cadef d)
 	freecaargs(d->rest);
 	zsfree(d->nonarg);
 	if (d->single)
-	    zfree(d->single, 256 * sizeof(Caopt));
+	    zfree(d->single, 188 * sizeof(Caopt));
 	zfree(d, sizeof(*d));
 	d = s;
     }
@@ -1077,6 +1077,21 @@ bslashcolon(char *s)
     *p = '\0';
 
     return r;
+}
+
+/* Get an index into the single array used in struct cadef
+ * opt is the option letter and pre is either - or +
+ * we only keep an array for the 94 ASCII characters from ! to ~ so
+ * with - and + prefixes, the array is double that at 188 elements
+ * returns -1 if opt is out-of-range
+ */
+static int
+single_index(char pre, char opt)
+{
+    if (opt <= 20 || opt > 0x7e)
+	return -1;
+
+    return opt + (pre == '-' ? -21 : 94 - 21);
 }
 
 /* Parse an argument definition. */
@@ -1151,8 +1166,8 @@ alloc_cadef(char **args, int single, char *match, char *nonarg, int flags)
     ret->lastt = time(0);
     ret->set = NULL;
     if (single) {
-	ret->single = (Caopt *) zalloc(256 * sizeof(Caopt));
-	memset(ret->single, 0, 256 * sizeof(Caopt));
+	ret->single = (Caopt *) zalloc(188 * sizeof(Caopt));
+	memset(ret->single, 0, 188 * sizeof(Caopt));
     } else
 	ret->single = NULL;
     ret->match = ztrdup(match);
@@ -1558,9 +1573,10 @@ parse_cadef(char *nam, char **args)
 	     * pointer for the definition in the array for fast lookup.
 	     * But don't treat '--' as a single option called '-' */
 
-
-	    if (single && name[1] && !name[2] && name[1] != '-')
-		ret->single[STOUC(name[1])] = opt;
+	    if (single && name[1] && !name[2] && name[1] != '-') {
+		int sidx = single_index(*name, name[1]);
+		if (sidx >= 0) ret->single[sidx] = opt;
+	    }
 
 	    if (again == 1) {
 		/* Do it all again for `*-...'. */
@@ -1738,11 +1754,12 @@ ca_get_sopt(Cadef d, char *line, char **end, LinkList *lp)
     Caopt p, pp = NULL;
     char pre = *line++;
     LinkList l = NULL;
+    int sidx;
 
     *lp = NULL;
     for (p = NULL; *line; line++) {
-	if ((p = d->single[STOUC(*line)]) && p->active &&
-	    p->args && p->name[0] == pre) {
+	if ((sidx = single_index(pre, *line)) != -1 &&
+	    (p = d->single[sidx]) && p->active && p->args) {
 	    if (p->type == CAO_NEXT) {
 		if (!l)
 		    *lp = l = newlinklist();
@@ -1813,7 +1830,7 @@ ca_get_arg(Cadef d, int n)
 /* Mark options as inactive.
  *   d: option definitions for a set
  *   pass either:
- *     xor: a list if exclusions
+ *     xor: a list of exclusions
  *     opts: if set, all options excluded leaving only nornal/rest arguments */
 
 static void
@@ -2195,6 +2212,7 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
 
 	    char *p;
 	    Caopt tmpopt;
+	    int sidx;
 
 	    if (cur != compcurrent && sopts && nonempty(sopts))
 		state.curopt = (Caopt) uremnode(sopts, firstnode(sopts));
@@ -2212,7 +2230,8 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
 	    state.singles = (!pe || !*pe);
 
 	    for (p = line + 1; p < pe; p++) {
-		if ((tmpopt = d->single[STOUC(*p)])) {
+		if ((sidx = single_index(*line, *p)) != -1 &&
+		    (tmpopt = d->single[sidx])) {
 		    if (!state.oargs[tmpopt->num])
 			state.oargs[tmpopt->num] = znewlinklist();
 

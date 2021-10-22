@@ -1,3 +1,8 @@
+2021-12-14  Oliver Kiddle  <opk@zsh.org>
+
+	* 49518: Src/Zle/computil.c, Etc/BUGS, Test/Y03arguments.ztst:
+	fix exclusions for mixed - and + stacked options
+
 2021-12-13  Oliver Kiddle  <opk@zsh.org>
 
 	* 49646: Doc/Zsh/mod_watch.yo, Src/Modules/watch.c, Src/prompt.c:

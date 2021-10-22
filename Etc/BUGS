@@ -37,8 +37,6 @@ See test case in Test/C03traps.ztst.
 ------------------------------------------------------------------------
 44850 terminal issues with continuation markers
 ------------------------------------------------------------------------
-45422 _arguments !-x !+x
-------------------------------------------------------------------------
 users/24765 -direct terminals. Not a bug as such but we may need to do
   something if -direct values in TERM are ever common
 ------------------------------------------------------------------------

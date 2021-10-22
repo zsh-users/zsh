@@ -102,6 +102,28 @@
 >NO:{+o}
 >NO:{-o}
 
+ tst_arguments -s -{a,b,c} \!-{d,e,f} \!+{d,e,f}
+ comptest $'tst -ad\t\024\t\bef\t'
+0:mix of + and - and exclusion of stacked options
+>line: {tst -ad}{}
+>DESCRIPTION:{option}
+>NO:{-b}
+>NO:{-c}
+>line: {tst -da}{}
+>DESCRIPTION:{option}
+>NO:{-b}
+>NO:{-c}
+>line: {tst -def}{}
+>DESCRIPTION:{option}
+>NO:{-a}
+>NO:{-b}
+>NO:{-c}
+
+ tst_arguments -s -{a,b,c} +{a,b,c}
+ comptest $'tst -a +b +c\t'
+0:mix of + and - and exclusion of stacked options
+>line: {tst -a +b +ca}{}
+
  tst_arguments '-o:1:(a):2:(b)'
  comptest $'tst \t\t\t'
 0:two option arguments
