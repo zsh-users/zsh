@@ -359,6 +359,12 @@
 0:allowed option before --
 >line: {tst -x }{ --}
 
+ tst_arguments -S '1:one' '2:two'
+ comptest $'tst -- -- \t'
+0:only first of duplicate -- is ignored
+>line: {tst -- -- }{}
+>DESCRIPTION:{two}
+
  tst_arguments -x :word
  comptest $'tst word -\t'
 0:option after a word
@@ -389,6 +395,25 @@
  comptest $'tst -a -x m\t'
 0:continue completion after rest argument that looks like an option
 >line: {tst -a -x more }{}
+
+ tst_arguments -A '-*' -a -b '*: :(words)'
+ comptest $'tst -x -\t'
+0:word matching -A pattern doesn't exclude options
+>line: {tst -x -}{}
+>DESCRIPTION:{option}
+>NO:{-a}
+>NO:{-b}
+
+ tst_arguments -A '-*' -a -b '1:word:(word)'
+ comptest $'tst -x \t'
+0:unrecognised word matching -A pattern not treated as a rest argument
+>line: {tst -x word }{}
+
+ tst_arguments -A "-*" '(3)-a' '1:one' '2:two' '3:three' '4:four' '*:extra'
+ comptest $'tst x -a \t'
+0:exclusion from option following word matching -A pattern should not apply
+>line: {tst x -a }{}
+>DESCRIPTION:{three}
 
  tst_arguments '*-v'
  comptest $'tst -v -\t'
@@ -477,6 +502,16 @@
 >NO:{-a}
 >NO:{-b}
 >NO:{-v}
+
+ tst_arguments -a -b -c '(-a)1:one' '(-b)2:two' '(-c)*:extra'
+ comptest $'tst  x y z\e6\C-b-\t'
+0:exclude option from normal argument to the right of the cursor
+>line: {tst -}{ x y z}
+>DESCRIPTION:{one}
+>DESCRIPTION:{option}
+>NO:{-a}
+>NO:{-b}
+>NO:{-c}
 
  tst_arguments -a - set1 -d - set2 '(set2)-m' -n -o ':arg:(x)' - set2 -x
  comptest $'tst -m \t'

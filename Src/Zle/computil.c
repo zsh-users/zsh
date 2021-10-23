@@ -2031,9 +2031,9 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
     state.def = state.ddef = NULL;
     state.curopt = state.dopt = NULL;
     state.argbeg = state.optbeg = state.nargbeg = state.restbeg = state.actopts =
-	state.nth = state.inopt = state.inarg = state.opt = state.arg = 1;
+	state.nth = state.inarg = state.opt = state.arg = 1;
     state.argend = argend = arrlen(compwords) - 1;
-    state.singles = state.oopt = 0;
+    state.inopt = state.singles = state.oopt = 0;
     state.curpos = compcurrent;
     state.args = znewlinklist();
     state.oargs = (LinkList *) zalloc(d->nopts * sizeof(LinkList));
@@ -2080,9 +2080,14 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
         remnulargs(line);
         untokenize(line);
 
-	ca_inactive(d, argxor, cur - 1, 0);
-	if ((d->flags & CDF_SEP) && cur != compcurrent && !strcmp(line, "--")) {
+	if (argxor) {
+	    ca_inactive(d, argxor, cur - 1, 0);
+	    argxor = NULL;
+	}
+	if ((d->flags & CDF_SEP) && cur != compcurrent && state.actopts &&
+		!strcmp(line, "--")) {
 	    ca_inactive(d, NULL, cur, 1);
+	    state.actopts = 0;
 	    continue;
 	}
 
@@ -2235,11 +2240,17 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
 	} else if (multi && (*line == '-' || *line == '+') && cur != compcurrent
 		&& (ca_foreign_opt(d, all, line)))
 	    return 1;
-	else if (state.arg &&
-		 (!napat || cur <= compcurrent || !pattry(napat, line))) {
+	else if (state.arg && cur <= compcurrent) {
 	    /* Otherwise it's a normal argument. */
-	    if (napat && cur <= compcurrent)
+
+	    /* test pattern passed to -A. if it matches treat this as an unknown
+	     * option and continue to the next word */
+	    if (napat && cur < compcurrent && state.actopts) {
+		if (pattry(napat, line))
+		    continue;
 		ca_inactive(d, NULL, cur + 1, 1);
+		state.actopts = 0;
+	    }
 
 	    arglast = 1;
 	    /* if this is the first normal arg after an option, may have been
@@ -2293,7 +2304,7 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
             if (adef)
                 state.oopt = adef->num - state.nth;
 
-	    if (state.def)
+	    if (state.def && cur != compcurrent)
 		argxor = state.def->xor;
 
 	    if (state.def && state.def->type != CAA_NORMAL &&
