@@ -132,8 +132,8 @@ if (( long )); then
 	 # variant syntax seen in fetchmail:
 	 # --[fetch]all  means --fetchall or --all.
 	 # maybe needs to be more general
-	 if [[ $start = (#b)(*)\[(*)\](*) ]]; then
-	   tmp+=("${match[1]}${match[2]}${match[3]}" "${match[1]}${match[3]}")
+	 if [[ $start = (#b)--\[(*)\](*) ]]; then
+	   tmp+=("--${match[1]}${match[2]}" "--${match[2]}")
 	 else
 	   tmp+=($start)
 	 fi

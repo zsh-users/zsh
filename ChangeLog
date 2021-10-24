@@ -1,3 +1,8 @@
+2021-10-24  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 49493: Completion/Base/Utility/_arguments: fix handling of
+	optional argument of long option in help text
+
 2021-10-23  Oliver Kiddle  <opk@zsh.org>
 
 	* 49499 based on 49496 by Jun T.: Src/Zle/computil.c
