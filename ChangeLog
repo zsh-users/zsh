@@ -1,5 +1,7 @@
 2021-10-24  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* 49520: Etc/completion-style-guide: document $_args_cache_cmd
+
 	* 49493: Completion/Base/Utility/_arguments: fix handling of
 	optional argument of long option in help text
 

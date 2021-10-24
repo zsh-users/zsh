@@ -570,3 +570,13 @@ Misc. remarks
       data derived from another command's output to the helper. Consider
       using some variation of the `q` expansion flag to deal with this:
       `_call_program vals $words[1] ${(q-)myfile}'
+10) If you are going to create a new completion function '_cmd' for a
+    command 'cmd', and if the 'cmd' supports the --help option, then you
+    may try
+      compdef _gnu_generic cmd
+      cmd -<TAB>
+    _gnu_generic may not work sufficiently well for 'cmd', but the specs
+    for _arguments generated from the help text are cached in a variable
+    '_args_cache_cmd', and you can save them in a file '_cmd' by
+      print -r -- ${(F)${(@qqq)_args_cache_cmd}} > _cmd
+    and use the file as a draft of the new completion function.
