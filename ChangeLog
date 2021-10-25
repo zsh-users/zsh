@@ -1,5 +1,8 @@
 2021-10-26  Oliver Kiddle  <opk@zsh.org>
 
+	* Marlon: 49521: Doc/Zsh/compwid.yo, Test/Y02compmatch.ztst:
+	Define correct behavior of || completion matchers
+
 	* 49519: Completion/Base/Utility/_arguments,
 	Completion/Darwin/Command/_qtplay, Completion/Unix/Command/_less,
 	Completion/Unix/Command/_nm, Completion/Unix/Command/_php,

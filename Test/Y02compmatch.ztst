@@ -378,15 +378,26 @@
   comp.graphics.rendering.misc comp.graphics.rendering.raytracing
   comp.graphics.rendering.renderman)
  test_code $example4_matcher example4_list
- comptest $'tst c.s.u\t'
-0:Documentation example using input c.s.u
+ comptest $'tst .s.u\t'
+0:r:|.=* should complete .s.u
+>line: {tst comp.sources.unix }{}
+>COMPADD:{}
+>INSERT_POSITIONS:{21}
+
+  example4b_matcher='r:[^.]||.=* r:|=*'
+ test_code $example4b_matcher example4_list
+ comptest $'tst .s.u\t^[bc\t'
+0f:r:[^.]||.=* should not complete .s.u, but should complete c.s.u
+>line: {tst .s.u}{}
+>COMPADD:{}
+>INSERT_POSITIONS:{}
 >line: {tst comp.sources.unix }{}
 >COMPADD:{}
 >INSERT_POSITIONS:{21}
 
  test_code $example4_matcher example4_list
- comptest $'tst c.g.\ta\t.\tp\ta\tg\t'
-0:Documentation example using input c.g.\ta\t.\tp\ta\tg\t
+ comptest $'tst .g.\ta\t.\tp\ta\tg\t'
+0f:r:|.=* should complete .g.
 >line: {tst comp.graphics.}{}
 >COMPADD:{}
 >INSERT_POSITIONS:{18}
@@ -424,9 +435,32 @@
 >COMPADD:{}
 >INSERT_POSITIONS:{32}
 
+ test_code $example4b_matcher example4_list
+ comptest $'tst .g.\t^[bc\t'
+0f:r:[^.]||.=* should not complete .g., but should complete c.g.
+>line: {tst .g.}{}
+>COMPADD:{}
+>INSERT_POSITIONS:{}
+>line: {tst comp.graphics.}{}
+>COMPADD:{}
+>INSERT_POSITIONS:{18}
+
  test_code $example4_matcher example4_list
- comptest $'tst c...pag\t'
-0:Documentation example using input c...pag\t
+ comptest $'tst ...pag\t'
+0:r:|.=* should complete ...pag
+>line: {tst comp.graphics.apps.pagemaker }{}
+>COMPADD:{}
+>INSERT_POSITIONS:{32}
+
+ test_code $example4b_matcher example4_list
+ comptest $'tst ...pag\t^[bc\t^Fg^F^Fa\t'
+0f:r:[^.]||.=* should not complete ...pag or c...pag, but should complete c.g.a.p
+>line: {tst ...pag}{}
+>COMPADD:{}
+>INSERT_POSITIONS:{}
+>line: {tst c...pag}{}
+>COMPADD:{}
+>INSERT_POSITIONS:{}
 >line: {tst comp.graphics.apps.pagemaker }{}
 >COMPADD:{}
 >INSERT_POSITIONS:{32}
@@ -444,11 +478,28 @@
  example5_matcher='r:|[.,_-]=* r:|=*'
  example5_list=(veryverylongfile.c veryverylongheader.h)
  test_code $example5_matcher example5_list
- comptest $'tst  v.c\tv.h\t'
-0:Documentation example using input v.c\t
+ comptest $'tst  .c\t.h\t'
+0:r:|[.,_-]=* should complete .c and .h
 >line: {tst  veryverylongfile.c }{}
 >COMPADD:{}
 >INSERT_POSITIONS:{23}
+>line: {tst  veryverylongfile.c veryverylongheader.h }{}
+>COMPADD:{}
+>INSERT_POSITIONS:{44}
+
+ example5b_matcher='r:[^.,_-]||[.,_-]=* r:|=*'
+ test_code $example5b_matcher example5_list
+ comptest $'tst  .c\t^[bv\t.h\t^[bv\t'
+0f:r:[^.,_-]||[.,_-]=* should not complete .c or .h, but should complete v.c and v.h
+>line: {tst  .c}{}
+>COMPADD:{}
+>INSERT_POSITIONS:{}
+>line: {tst  veryverylongfile.c }{}
+>COMPADD:{}
+>INSERT_POSITIONS:{23}
+>line: {tst  veryverylongfile.c .h}{}
+>COMPADD:{}
+>INSERT_POSITIONS:{}
 >line: {tst  veryverylongfile.c veryverylongheader.h }{}
 >COMPADD:{}
 >INSERT_POSITIONS:{44}
@@ -493,14 +544,55 @@
  example7_matcher="r:[^A-Z0-9]||[A-Z0-9]=** r:|=*"
  example7_list=($example6_list)
  test_code $example7_matcher example7_list
- comptest $'tst H\t2\t'
-0:Documentation example using "r:[^A-Z0-9]||[A-Z0-9]=** r:|=*"
+ comptest $'tst H\t^BF\to\t2\t^B5\tb\t'
+0f:r:[^A-Z0-9]||[A-Z0-9]=** should not complete H, FH, 2 or 52, but should complete FoH and 5b2.
+>line: {tst H}{}
+>COMPADD:{}
+>INSERT_POSITIONS:{}
+>line: {tst F}{H}
+>COMPADD:{}
+>INSERT_POSITIONS:{}
 >line: {tst FooHoo }{}
 >COMPADD:{}
 >INSERT_POSITIONS:{10}
+>line: {tst FooHoo 2}{}
+>COMPADD:{}
+>INSERT_POSITIONS:{}
+>line: {tst FooHoo 5}{2}
+>COMPADD:{}
+>INSERT_POSITIONS:{}
 >line: {tst FooHoo 5bar234 }{}
 >COMPADD:{}
 >INSERT_POSITIONS:{18}
+
+ example7b_matcher="r:?||[A-Z0-9]=* r:|=*"
+ test_code $example7b_matcher example7_list
+ comptest $'tst H\t^BF2\t^B5\t'
+0f:r:?||[A-Z0-9]=* r:|=* should not complete H or 2, but should complete FH and 52.
+>line: {tst H}{}
+>COMPADD:{}
+>INSERT_POSITIONS:{}
+>line: {tst FooHoo }{}
+>COMPADD:{}
+>INSERT_POSITIONS:{10}
+>line: {tst FooHoo 2}{}
+>COMPADD:{}
+>INSERT_POSITIONS:{}
+>line: {tst FooHoo 5bar234 }{}
+>COMPADD:{}
+>INSERT_POSITIONS:{18}
+
+
+ example8_list=(passwd.byname)
+ test_code 'r:[^.]||.=* l:.||[^.]=*'
+ comptest $'tst .^B\tpass^Fname\t'
+0f:r:[^.]||.=* and l:.||[^.]=* should work symmetrically.
+>line: {tst }{.}
+>COMPADD:{}
+>INSERT_POSITIONS:{}
+>line: {tst passwd.byname }{}
+>COMPADD:{}
+>INSERT_POSITIONS:{17}
 
 
  workers_7311_matcher="m:{a-z}={A-Z} r:|[.,_-]=* r:|=*"
@@ -537,11 +629,11 @@
 >COMPADD:{}
 >INSERT_POSITIONS:{5}
 
- workers_11081_matcher='m:{a-zA-Z}={A-Za-z} r:|[.,_-]=* r:[^A-Z0-9]||[A-Z0-9]=* r:[A-Z0-9]||[^A-Z0-9]=* r:[^0-9]||[0-9]=* r:|=*'
+ workers_11081_matcher='m:{a-zA-Z}={A-Za-z} r:|[.,_-]=* r:|=*'
  workers_11081_list=(build.out build.out1 build.out2)
  test_code $workers_11081_matcher workers_11081_list
  comptest $'tst bui\t\t\t'
-0:Bug from workers 11081
+0:Erratic completion bug from workers 11081: bui > build.out[] > build[.]out > build.out[] > build.out1[] > build.out2[]
 >line: {tst build.out}{}
 >COMPADD:{}
 >INSERT_POSITIONS:{13}
@@ -578,7 +670,7 @@
  workers_11586_list=(c00.abc c01.abc.def.00.0)
  test_code $workers_11586_matcher workers_11586_list
  comptest $'tst c00\t.\ta\t'
-0:Bug from workers 11586
+0:Disappearing characters bug from workers 11586: c00\t -> c0[], c00\t -> c0.abc[], c00.\t -> c0.abc[]
 >line: {tst c00}{}
 >COMPADD:{}
 >INSERT_POSITIONS:{6}
@@ -611,12 +703,12 @@
 >COMPADD:{}
 >INSERT_POSITIONS:{22}
 
- workers_13320_matcher='r:|[.,_-]=** r:[^0-9]||[0-9]=**'
+ workers_13320_matcher='r:|[.,_-]=**'
  workers_13320_list=(glibc-2.1.94-3.i386.rpm glibc-devel-2.1.94-3.i386.rpm)
  workers_13320_list=($workers_13320_list  glibc-profile-2.1.94-3.i386.rpm)
  test_code $workers_13320_matcher workers_13320_list
  comptest $'tst glibc-2.1\t'
-0:Test from workers 13320
+0:Incorrect cursor position bug from workers 13320: glibc-2.1\t -> glibc-2[.]1.94-3.i386.rpm
 >line: {tst glibc}{-2.1.94-3.i386.rpm}
 >COMPADD:{}
 >INSERT_POSITIONS:{9:27}
@@ -641,11 +733,11 @@
 >NO:{A.C}
 
 
- workers_13345b_matcher='r:|[.,_-]=** r:[^0-9]||[0-9]=**'
+ workers_13345b_matcher='r:|[.,_-]=** r:|[0-9]=**'
  workers_13345b_list=(a-b_1_2_2  a-b_2_0.gz a-b_2_0.zip)
  test_code $workers_13345b_matcher workers_13345b_list
  comptest $'tst a-b_2\t'
-0:Second test from workers 13345
+0:Disappearing character bug from workers 13345: a-b_2\t -> a-b__
 >line: {tst a-b_2_}{}
 >COMPADD:{}
 >INSERT_POSITIONS:{8:10}
