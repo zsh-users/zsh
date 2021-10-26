@@ -80,9 +80,9 @@ _arguments -S -s -A "[-+]*"  \
   '--no-keypad[disable use of keypad terminal init string]' \
   '(-y --max-forw-scroll)'{-y,--max-forw-scroll}'[specify forward scroll limit]' \
   '(-z --window)'{-z+,--window=}'[specify scrolling window size]:lines' \
-  '(-\" --quotes)'{-\"+,--quotes=}'[change quoting character]:quoting characters' \
+  '(-" --quotes)'{-\"+,--quotes=}'[change quoting character]:quoting characters' \
   '(-~ --tilde)'{-~,--tilde}"[don't display tildes after end of file]" \
-  '(-\# --shift)'{-\#+,--shift=}"[specify amount to move when scrolling horizontally]:number" \
+  '(-# --shift)'{-\#+,--shift=}"[specify amount to move when scrolling horizontally]:number" \
   '--file-size[automatically determine the size of the input file]' \
   '--incsearch[search file as each pattern character is typed in]' \
   '--line-num-width=[set the width of line number field]:width [7]' \

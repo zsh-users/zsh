@@ -115,7 +115,7 @@ case $service in
       '(-U)-UU[ignore any Unicode fields]' \
       '-W[modify pattern matching so only ** matches /]' \
       '-\:[allow extraction outside of extraction base directory]' \
-      '-\\\^[allow control characters in extracted entries]' \
+      '-^[allow control characters in extracted entries]' \
       '-i[include the following names]:*-*:pattern' \
       '-x[exclude the following names]:*-*:pattern' \
       "(-p -f -u -l -t -z -n -o -j -C -X -q -qq -a -aa -v -L -M)1:zip file:_files -g '(#i)*.(zip|xpi|[ejw]ar)(-.)'" \

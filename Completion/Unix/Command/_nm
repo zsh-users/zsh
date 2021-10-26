@@ -53,7 +53,7 @@ if _pick_variant -r variant binutils=GNU elftoolchain=elftoolchain elfutils=elfu
 	'(-C)--demangle[decode symbol names]'
 	'(--format -P)-f+[specify output format]:format:(bsd sysv posix)'
 	'(- *)--usage[give a short usage message]'
-	'(- *)-\\?[display help information]'
+	'(- *)-?[display help information]'
       )
     ;;
     binutils)

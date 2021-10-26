@@ -513,8 +513,8 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
 	    tmp2=( "${PREFIX}${(@M)^${(@)${(@)tmp1%%:*}#[-+]}:#?}" )
 
             _describe -O option \
-                      tmp1 tmp2 -Q -S '' -- \
-		      tmp3 -Q
+                tmp1 tmp2 -S '' -- \
+                tmp3
 
             [[ -n "$optarg" && "$single" = next && nm -eq $compstate[nmatches] ]] &&
                 _all_labels options expl option \
@@ -525,9 +525,9 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
         else
           next+=( "$odirect[@]" )
           _describe -O option \
-                    next -Q -M "$matcher" -- \
-                    direct -QS '' -M "$matcher" -- \
-                    equal -QqS= -M "$matcher"
+              next -M "$matcher" -- \
+              direct -S '' -M "$matcher" -- \
+              equal -qS= -M "$matcher"
         fi
 	PREFIX="$prevpre"
 	IPREFIX="$previpre"

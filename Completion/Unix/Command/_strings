@@ -45,7 +45,7 @@ if _pick_variant -r variant binutils=GNU elftoolchain=elftoolchain elfutils=elfu
     elfutils)
       args+=(
 	'(- *)--usage[display a short usage message]'
-	'(- *)-\\?[display help information]'
+	'(- *)-?[display help information]'
       )
     ;;
   esac

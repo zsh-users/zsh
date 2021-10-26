@@ -15,6 +15,6 @@ _arguments -S \
   '-t[specify update time]:update time (seconds)' \
   '-T[kill time]:ticks' \
   '-V[volume]:percentage of normal volume' \
-  '(-)'{-?,--help,-h}'[display help information]' \
+  '(-)'{-\?,--help,-h}'[display help information]' \
   '(-)*:quicktime file:_files'
 

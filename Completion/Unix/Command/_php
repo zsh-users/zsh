@@ -93,7 +93,7 @@ _php() {
     + '(hv)' # Help/version options; kept separate by convention
     '(- 1 *)'{-h,--help}'[display help information]'
     '(- 1 *)'{-v,--version}'[display version information]'
-    '!(- 1 *)'{-\?,-\\\?,--usage}
+    '!(- 1 *)'{-\?,--usage}
 
     + '(im)' # Info/module options (exclusive with everything but -c/-n)
     '(fi mc pb pf rf rn sc sv *)'{-i,--info}'[display configuration information (phpinfo())]'

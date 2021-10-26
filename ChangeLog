@@ -1,5 +1,12 @@
 2021-10-26  Oliver Kiddle  <opk@zsh.org>
 
+	* 49519: Completion/Base/Utility/_arguments,
+	Completion/Darwin/Command/_qtplay, Completion/Unix/Command/_less,
+	Completion/Unix/Command/_nm, Completion/Unix/Command/_php,
+	Completion/Unix/Command/_strings, Completion/Unix/Command/_zip,
+	Completion/X/Command/_gnome-gv: quote completed options as needed
+	and remove the now superfluous quotes from option specifications
+
 	* 49516: Src/Zle/compmatch.c: bail out early from matching
 	control if command line content is too short for the coanchor
 
@@ -12,7 +19,7 @@
 
 2021-10-23  Oliver Kiddle  <opk@zsh.org>
 
-	* 49499 based on 49496 by Jun T.: Src/Zle/computil.c
+	* 49499 based on 49496 by Jun T.: Src/Zle/computil.c,
 	Test/Y03arguments.ztst: fixes to option -A of _arguments
 
 	* 49500: Completion/Linux/Command/_lsns: new completion
