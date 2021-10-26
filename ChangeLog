@@ -1,3 +1,8 @@
+2021-10-26  Oliver Kiddle  <opk@zsh.org>
+
+	* 49516: Src/Zle/compmatch.c: bail out early from matching
+	control if command line content is too short for the coanchor
+
 2021-10-24  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 49520: Etc/completion-style-guide: document $_args_cache_cmd

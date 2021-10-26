@@ -693,8 +693,9 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 			alen = mp->ralen; aol = mp->lalen;
 		    }
 		    /* Give up if we don't have enough characters for the
-		     * line-string and the anchor. */
-		    if (ll < llen + alen || lw < alen)
+		     * line-string and the anchor, or for both anchors in
+		     * the case of the trial completion word. */
+		    if (ll < llen + alen || lw < alen + aol)
 			continue;
 
 		    if (mp->flags & CMF_LEFT) {
