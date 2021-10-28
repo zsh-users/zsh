@@ -1,3 +1,8 @@
+2021-10-27  Matthew Martin  <phy1729@gmail.com>
+
+	* 49529: Completion/BSD/Command/_rcctl: Add rogue and
+	descriptions to _rcctl ls.
+
 2021-10-26  Oliver Kiddle  <opk@zsh.org>
 
 	* Peter Palfrader: 49431 (tweaked, c.f. Bart: 49434):

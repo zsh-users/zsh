@@ -1,11 +1,20 @@
 #compdef rcctl
 
 local context state line
-local -a actions subcmds variables
+local -a actions lsarg subcmds variables
 
 actions=(check reload restart start stop)
 subcmds=(disable enable get getdef ls order set)
 variables=(class flags status timeout user)
+lsarg=(
+  'all:all services and daemons'
+  'failed:enabled but stopped daemons'
+  'off:disabled services and daemons'
+  'on:enabled services and daemons'
+  'rogue:daemons which are disabled but currently running'
+  'started:running daemons'
+  'stopped:stopped daemons'
+)
 
 if [[ $service == "rcctl" ]]; then
   _arguments -C \
@@ -23,7 +32,7 @@ case $service in
       ':variable:compadd -a variables'
     ;;
   ls)
-     _arguments ':display a list of services and daemons matching:(all failed off on started stopped)'
+    _arguments ':display a list of services and daemons matching:(($lsarg))'
     ;;
   order)
     _arguments \
