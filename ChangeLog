@@ -1,5 +1,8 @@
 2021-10-30  Oliver Kiddle  <opk@zsh.org>
 
+	* 49533: Src/utils.c: add null check for preprompt functions list
+	that could occur following an error when loading a module
+
 	* 49528: Src/Zle/comp.h, Src/Zle/compcore.c, Src/Zle/complete.c,
 	Completion/X/Command/_xinput, Completion/Zsh/Command/_compadd,
 	Doc/Zsh/compwid.yo: allow multiple -D options to compadd

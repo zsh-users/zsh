@@ -1378,6 +1378,9 @@ delprepromptfn(voidvoidfnptr_t func)
 {
     LinkNode ln;
 
+    if (!prepromptfns)
+	return;
+
     for (ln = firstnode(prepromptfns); ln; ln = nextnode(ln)) {
 	Prepromptfn ppdat = (Prepromptfn)getdata(ln);
 	if (ppdat->func == func) {
