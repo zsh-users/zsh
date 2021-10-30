@@ -397,7 +397,7 @@
 
  test_code $example4_matcher example4_list
  comptest $'tst .g.\ta\t.\tp\ta\tg\t'
-0f:r:|.=* should complete .g.
+0:r:|.=* should complete .g.
 >line: {tst comp.graphics.}{}
 >COMPADD:{}
 >INSERT_POSITIONS:{18}
