@@ -1,5 +1,9 @@
 2021-10-30  Oliver Kiddle  <opk@zsh.org>
 
+	* 49528: Src/Zle/comp.h, Src/Zle/compcore.c, Src/Zle/complete.c,
+	Completion/X/Command/_xinput, Completion/Zsh/Command/_compadd,
+	Doc/Zsh/compwid.yo: allow multiple -D options to compadd
+
 	* unposted (c.f. Bart: 49531): Test/Y02compmatch.ztst: fix test
 
 2021-10-27  Matthew Martin  <phy1729@gmail.com>

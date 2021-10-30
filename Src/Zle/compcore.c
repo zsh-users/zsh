@@ -2081,10 +2081,10 @@ addmatches(Cadata dat, char **argv)
     /* ms: "match string" - string to use as completion.
      * Overloaded at one place as a temporary. */
     char *s, *ms, *lipre = NULL, *lisuf = NULL, *lpre = NULL, *lsuf = NULL;
-    char **aign = NULL, **dparr = NULL, *oaq = autoq, *oppre = dat->ppre;
+    char **aign = NULL, ***dparr = NULL, *oaq = autoq, *oppre = dat->ppre;
     char *oqp = qipre, *oqs = qisuf, qc, **disp = NULL, *ibuf = NULL;
     char **arrays = NULL;
-    int lpl, lsl, bcp = 0, bcs = 0, bpadd = 0, bsadd = 0;
+    int dind, lpl, lsl, bcp = 0, bcs = 0, bpadd = 0, bsadd = 0;
     int ppl = 0, psl = 0, ilen = 0;
     int llpl = 0, llsl = 0, nm = mnum, gflags = 0, ohp = haspattern;
     int isexact, doadd, ois = instring, oib = inbackt;
@@ -2092,7 +2092,7 @@ addmatches(Cadata dat, char **argv)
     struct cmlist mst;
     Cmlist oms = mstack;
     Patprog cp = NULL, *pign = NULL;
-    LinkList aparl = NULL, oparl = NULL, dparl = NULL;
+    LinkList aparl = NULL, oparl = NULL, *dparl = NULL;
     Brinfo bp, bpl = brbeg, obpl, bsl = brend, obsl;
     Heap oldheap;
 
@@ -2186,11 +2186,24 @@ addmatches(Cadata dat, char **argv)
 	if (dat->opar)
 	    oparl = newlinklist();
 	if (dat->dpar) {
-	    if (*(dat->dpar) == '(')
-		dparr = NULL;
-	    else if ((dparr = get_user_var(dat->dpar)) && !*dparr)
-		dparr = NULL;
-	    dparl = newlinklist();
+	    int darr = 0, dparlen = arrlen(dat->dpar);
+	    char **tail = dat->dpar + dparlen;
+
+	    dparr = (char ***)hcalloc((1 + dparlen) * sizeof(char **));
+	    dparl = (LinkList *)hcalloc((1 + dparlen) * sizeof(LinkList));
+	    queue_signals();
+	    while (darr < dparlen) {
+		if ((dparr[darr] = getaparam(dat->dpar[darr])) && *dparr[darr]) {
+		    dparr[darr] = arrdup(dparr[darr]);
+		    dparl[darr++] = newlinklist();
+		} else {
+		    /* swap in the last -D argument if we didn't get a non-empty array */
+		    dat->dpar[darr] = *--tail;
+		    *tail = NULL;
+		    --dparlen;
+	        }
+	    }
+	    unqueue_signals();
 	}
 	/* Store the matcher in our stack of matchers. */
 	if (dat->match) {
@@ -2507,8 +2520,10 @@ addmatches(Cadata dat, char **argv)
 		}
 		if (!addit) {
 		    compignored++;
-		    if (dparr && !*++dparr)
-			dparr = NULL;
+		    for (dind = 0; dparl && dparl[dind]; dind++) {
+			if (dparr[dind] && !*++dparr[dind])
+			    dparr[dind] = NULL;
+		    }
 		    goto next_array;
 		}
 	    }
@@ -2525,8 +2540,10 @@ addmatches(Cadata dat, char **argv)
 					   !(dat->flags & CMF_FILE) ? 1 : 2) : 0),
 					 &bpl, bcp, &bsl, bcs,
 					 &isexact))) {
-		if (dparr && !*++dparr)
-		    dparr = NULL;
+		for (dind = 0; dparl && dparl[dind]; dind++) {
+		    if (dparr[dind] && !*++dparr[dind])
+			dparr[dind] = NULL;
+		}
 		goto next_array;
 	    }
 	    if (doadd) {
@@ -2553,10 +2570,14 @@ addmatches(Cadata dat, char **argv)
 		    addlinknode(aparl, ms);
 		if (dat->opar)
 		    addlinknode(oparl, s);
-		if (dat->dpar && dparr) {
-		    addlinknode(dparl, *dparr);
-		    if (!*++dparr)
-			dparr = NULL;
+		if (dat->dpar) {
+		    for (dind = 0; dparl[dind]; dind++) {
+			if (dparr[dind]) {
+			    addlinknode(dparl[dind], *dparr[dind]);
+			    if (!*++dparr[dind])
+				dparr[dind] = NULL;
+			}
+		    }
 		}
 		free_cline(lc);
 	    }
@@ -2584,8 +2605,10 @@ addmatches(Cadata dat, char **argv)
 	    set_list_array(dat->apar, aparl);
 	if (dat->opar)
 	    set_list_array(dat->opar, oparl);
-	if (dat->dpar)
-	    set_list_array(dat->dpar, dparl);
+	if (dat->dpar) {
+	    for (dind = 0; dparl[dind]; dind++)
+		set_list_array(dat->dpar[dind], dparl[dind]);
+	}
 	if (dat->exp)
 	    addexpl(0);
 	if (!hasallmatch && (dat->aflags & CAF_ALL)) {

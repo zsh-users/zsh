@@ -31,7 +31,7 @@ args=(
   '-n[hide matches in completion listing]'
   '-O+[populate array with matches instead of adding them]:array:_parameters -g "*array*"'
   '-A+[populate array with expanded matches instead of adding them]:array:_parameters -g "*array*"'
-  '-D+[delete elements from array corresponding to non-matching candidates]:array:_parameters -g "*array*"'
+  '*-D+[delete elements from array corresponding to non-matching candidates]:array:_parameters -g "*array*"'
 )
 
 case $service in

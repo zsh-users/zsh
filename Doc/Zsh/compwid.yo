@@ -725,6 +725,8 @@ As with tt(-O), the var(completions) are not added to the set of matches.
 Instead, whenever the var(n)th var(completion) does not
 match, the var(n)th element of the var(array) is removed.  Elements
 for which the corresponding var(completion) matches are retained.
+This option can be used more than once to remove elements from multiple
+arrays.
 )
 item(tt(-C))(
 This option adds a special match which expands to all other matches

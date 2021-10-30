@@ -607,6 +607,7 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     char *oarg = NULL; /* argument of -o option */
     int added; /* return value */
     Cmatcher match = NULL;
+    size_t dparlen = 0, dparsize = 0; /* no. of -D options and array size */
 
     if (incompfunc != 1) {
 	zwarnnam(name, "can only be called from completion function");
@@ -614,7 +615,8 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     }
     dat.ipre = dat.isuf = dat.ppre = dat.psuf = dat.prpre = dat.mesg =
 	dat.pre = dat.suf = dat.group = dat.rems = dat.remf = dat.disp =
-	dat.ign = dat.exp = dat.apar = dat.opar = dat.dpar = NULL;
+	dat.ign = dat.exp = dat.apar = dat.opar = NULL;
+    dat.dpar = NULL;
     dat.match = NULL;
     dat.flags = 0;
     dat.aflags = CAF_MATCH;
@@ -741,7 +743,12 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		e = "parameter name expected after -%c";
 		break;
 	    case 'D':
-		sp = &(dat.dpar);
+		if (dparsize <= dparlen + 1) {
+		    dparsize = (dparsize + 1) * 2;
+		    dat.dpar = (char **)zrealloc(dat.dpar, sizeof(char *) * dparsize);
+		}
+		sp = dat.dpar + dparlen++;
+		*sp = dat.dpar[dparlen] = NULL;
 		e = "parameter name expected after -%c";
 		break;
 	    case 'd':
@@ -768,11 +775,13 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
                 } else {
                     zwarnnam(name, "number expected after -%c", *p);
 		    zsfree(mstr);
+		    zfree(dat.dpar, dparsize);
                     return 1;
                 }
                 if (dat.dummies < 0) {
                     zwarnnam(name, "invalid number: %d", dat.dummies);
 		    zsfree(mstr);
+		    zfree(dat.dpar, dparsize);
                     return 1;
                 }
 		break;
@@ -782,6 +791,7 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    default:
 		zwarnnam(name, "bad option: -%c", *p);
 		zsfree(mstr);
+		zfree(dat.dpar, dparsize);
 		return 1;
 	    }
 	    if (sp) {
@@ -802,6 +812,7 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		    /* Missing argument: argv[N] == "-X", argv[N+1] == NULL. */
 		    zwarnnam(name, e, *p);
 		    zsfree(mstr);
+		    zfree(dat.dpar, dparsize);
 		    return 1;
 		}
 		if (m) {
@@ -820,17 +831,21 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 
     if (mstr && (match = parse_cmatcher(name, mstr)) == pcm_err) {
 	zsfree(mstr);
+	zfree(dat.dpar, dparsize);
 	return 1;
     }
     zsfree(mstr);
 
     if (!*argv && !dat.group && !dat.mesg &&
-	!(dat.aflags & (CAF_NOSORT|CAF_UNIQALL|CAF_UNIQCON|CAF_ALL)))
+	!(dat.aflags & (CAF_NOSORT|CAF_UNIQALL|CAF_UNIQCON|CAF_ALL))) {
+	zfree(dat.dpar, dparsize);
 	return 1;
+    }
 
     dat.match = match = cpcmatcher(match);
     added = addmatches(&dat, argv);
     freecmatcher(match);
+    zfree(dat.dpar, dparsize);
 
     return added;
 }

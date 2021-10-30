@@ -106,8 +106,7 @@ case $state in
 
     if [[ $PREFIX$SUFFIX = [^-]*[^0-9]* ]]; then
       # match based on the names but insert IDs
-      compadd "$expl[@]" -M 'b:=* m:{[:lower:]}={[:upper:]}' -D ids -a names
-      compadd "$expl[@]" -M 'b:=* m:{[:lower:]}={[:upper:]}' -D disp -a names
+      compadd "$expl[@]" -M 'b:=* m:{[:lower:]}={[:upper:]}' -D ids -D disp -a names
       compadd "$expl[@]" -U -ld disp -a ids && ret=0
 
       zstyle -s ":completion:${curcontext}:input-devices" insert-ids out || out=menu
