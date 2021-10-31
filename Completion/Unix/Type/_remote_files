@@ -85,12 +85,15 @@ if zstyle -T ":completion:${curcontext}:files" remote-access; then
     remdispf=( ${(M)remdispf:#${~glob[2]}} )
   fi
 
+  local -a autoremove
+  [[ -o autoremoveslash ]] && autoremove=(-r "/ \t\n\-")
+
   _tags remote-files
   while _tags; do
     while _next_label remote-files expl ${suf:-remote directory}; do
       [[ -n $suf ]] &&
           compadd "$args[@]" "$expl[@]" -d remdispf -- ${(q)remdispf%[*=|]} && ret=0
-      compadd ${suf:+-S/} -r "/ \t\n\-" "$args[@]" "$expl[@]" -d remdispd \
+      compadd ${suf:+-S/} $autoremove "$args[@]" "$expl[@]" -d remdispd \
 	-- ${(q)remdispd%/} && ret=0
     done
     (( ret )) || return 0

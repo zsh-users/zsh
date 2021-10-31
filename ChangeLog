@@ -1,3 +1,8 @@
+2021-10-31  Bart Schaefer  <schaefer@zsh.org>
+
+	* users/27302: Completion/Unix/Type/_remote_files: respect setting
+	of AUTO_REMOVE_SLASH option
+
 2021-10-30  Oliver Kiddle  <opk@zsh.org>
 
 	* 49533: Src/utils.c: add null check for preprompt functions list
