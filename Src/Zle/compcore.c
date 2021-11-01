@@ -1187,9 +1187,9 @@ check_param(char *s, int set, int test)
 		return NULL;
 
 	    /* Ignore the possible (...) flags. */
-	    tb = ++b, br++;
-	    if ((qstring ? skipparens('(', ')', &tb) :
-		 skipparens(Inpar, Outpar, &tb)) > 0 || tb - s >= offs) {
+	    b++, br++;
+	    if ((qstring ? skipparens('(', ')', &b) :
+		 skipparens(Inpar, Outpar, &b)) > 0 || b - s > offs) {
 		/*
 		 * We are still within the parameter flags.  There's no
 		 * point trying to do anything clever here with
@@ -1200,14 +1200,6 @@ check_param(char *s, int set, int test)
 		ispar = 2;
 		return NULL;
 	    }
-	    if ((qstring ? '(' : Inpar) == *b) {
-		/*
-		 * We are inside the braces but on the opening paren.
-		 * There is nothing useful to complete here?
-		 */
-		return NULL;
-	    } else
-		b = tb;	/* Skip over the flags */
 
 	    for (tb = p - 1; tb > s && *tb != Outbrace && *tb != Inbrace; tb--);
 	    if (tb > s && *tb == Inbrace && (tb[-1] == String || *tb == Qstring))

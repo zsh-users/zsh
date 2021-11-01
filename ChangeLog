@@ -1,3 +1,8 @@
+2021-11-01  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 49535: Src/Zle/compcore.c: fix completion of parameter names
+	for ${<TAB> and ${(a)<TAB>
+
 2021-10-31  Bart Schaefer  <schaefer@zsh.org>
 
 	* users/27302: Completion/Unix/Type/_remote_files: respect setting
