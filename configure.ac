@@ -2108,7 +2108,7 @@ dnl CHECK FOR LOCATION OF {U,W}TMP{,X} FILES
 dnl ----------------------------------------
 zsh_PATH_UTMP(utmp)
 zsh_PATH_UTMP(wtmp)
-zsh_PATH_UTMP(utmpx)
+zsh_PATH_UTMP(utmpx,utx.active)
 zsh_PATH_UTMP(wtmpx)
 
 dnl -------------------

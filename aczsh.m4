@@ -544,9 +544,9 @@ dnl
 AC_DEFUN(zsh_PATH_UTMP,
 [AC_CACHE_CHECK([for $1 file], [zsh_cv_path_$1],
 [for dir in /etc /usr/etc /var/adm /usr/adm /var/run /var/log ./conftest; do
-  zsh_cv_path_$1=${dir}/$1
+  m4_foreach([file],[$@],[zsh_cv_path_$1=${dir}/file
   test -f $zsh_cv_path_$1 && break
-  zsh_cv_path_$1=no
+  ])zsh_cv_path_$1=no
 done
 ])
 AH_TEMPLATE([PATH_]translit($1, [a-z], [A-Z])[_FILE],

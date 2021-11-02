@@ -1,3 +1,7 @@
+2021-11-02  Oliver Kiddle  <opk@zsh.org>
+
+	* 49537: aczsh.m4, configure.ac: fix finding utmpx file on FreeBSD
+
 2021-11-01  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 49535: Src/Zle/compcore.c: fix completion of parameter names
