@@ -1235,14 +1235,6 @@ Same as tt(typeset), except that the options tt(-g), and
 tt(-f) are not permitted.  In this case the tt(-x) option does not force
 the use of tt(-g), i.e. exported variables will be local to functions.
 )
-findex(log)
-vindex(watch, use of)
-cindex(watching users)
-cindex(users, watching)
-item(tt(log))(
-List all users currently logged in who are affected by
-the current setting of the tt(watch) parameter.
-)
 findex(logout)
 item(tt(logout) [ var(n) ])(
 Same as tt(exit), except that it only works in a login shell.

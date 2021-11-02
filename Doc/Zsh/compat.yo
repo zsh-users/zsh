@@ -30,8 +30,7 @@ tt(PROMPT2),
 tt(PROMPT3),
 tt(PROMPT4),
 tt(psvar),
-tt(status),
-tt(watch).
+tt(status).
 
 vindex(ENV, use of)
 The usual zsh startup/shutdown scripts are not executed.  Login shells

@@ -63,7 +63,6 @@ char **pparams,		/* $argv        */
      **mailpath,	/* $mailpath    */
      **manpath,		/* $manpath     */
      **psvar,		/* $psvar       */
-     **watch,		/* $watch       */
      **zsh_eval_context; /* $zsh_eval_context */
 /**/
 mod_export
@@ -194,6 +193,10 @@ mod_export const struct gsu_hash stdhash_gsu =
 mod_export const struct gsu_hash nullsethash_gsu =
 { hashgetfn, nullsethashfn, nullunsetfn };
 
+/**/
+mod_export const struct gsu_scalar colonarr_gsu =
+{ colonarrgetfn, colonarrsetfn, stdunsetfn };
+
 
 /* Non standard methods (not exported) */
 static const struct gsu_integer pound_gsu =
@@ -258,9 +261,6 @@ static const struct gsu_integer varint_readonly_gsu =
 { intvargetfn, nullintsetfn, stdunsetfn };
 static const struct gsu_integer zlevar_gsu =
 { intvargetfn, zlevarsetfn, stdunsetfn };
-
-static const struct gsu_scalar colonarr_gsu =
-{ colonarrgetfn, colonarrsetfn, stdunsetfn };
 
 static const struct gsu_integer argc_gsu =
 { poundgetfn, nullintsetfn, stdunsetfn };
@@ -398,7 +398,6 @@ IPDEF8("CDPATH", &cdpath, "cdpath", PM_TIED),
 IPDEF8("FIGNORE", &fignore, "fignore", PM_TIED),
 IPDEF8("FPATH", &fpath, "fpath", PM_TIED),
 IPDEF8("MAILPATH", &mailpath, "mailpath", PM_TIED),
-IPDEF8("WATCH", &watch, "watch", PM_TIED),
 IPDEF8("PATH", &path, "path", PM_RESTRICTED|PM_TIED),
 IPDEF8("PSVAR", &psvar, "psvar", PM_TIED),
 IPDEF8("ZSH_EVAL_CONTEXT", &zsh_eval_context, "zsh_eval_context", PM_READONLY_SPECIAL|PM_TIED),
@@ -430,7 +429,6 @@ IPDEF9("fpath", &fpath, "FPATH", PM_TIED),
 IPDEF9("mailpath", &mailpath, "MAILPATH", PM_TIED),
 IPDEF9("manpath", &manpath, "MANPATH", PM_TIED),
 IPDEF9("psvar", &psvar, "PSVAR", PM_TIED),
-IPDEF9("watch", &watch, "WATCH", PM_TIED),
 
 IPDEF9("zsh_eval_context", &zsh_eval_context, "ZSH_EVAL_CONTEXT", PM_TIED|PM_READONLY_SPECIAL),
 
@@ -453,7 +451,6 @@ IPDEF8("CDPATH", &cdpath, NULL, 0),
 IPDEF8("FIGNORE", &fignore, NULL, 0),
 IPDEF8("FPATH", &fpath, NULL, 0),
 IPDEF8("MAILPATH", &mailpath, NULL, 0),
-IPDEF8("WATCH", &watch, NULL, 0),
 IPDEF8("PATH", &path, NULL, PM_RESTRICTED),
 IPDEF8("PSVAR", &psvar, NULL, 0),
 IPDEF8("ZSH_EVAL_CONTEXT", &zsh_eval_context, NULL, PM_READONLY_SPECIAL),
@@ -836,7 +833,6 @@ createparamtable(void)
      */
     setsparam("TMPPREFIX", ztrdup_metafy(DEFAULT_TMPPREFIX));
     setsparam("TIMEFMT", ztrdup_metafy(DEFAULT_TIMEFMT));
-    setsparam("WATCHFMT", ztrdup_metafy(default_watchfmt));
 
     hostnam = (char *)zalloc(256);
     gethostname(hostnam, 256);
@@ -4093,7 +4089,7 @@ arrvarsetfn(Param pm, char **x)
 }
 
 /**/
-char *
+mod_export char *
 colonarrgetfn(Param pm)
 {
     char ***dptr = (char ***)pm->u.data;
@@ -4101,7 +4097,7 @@ colonarrgetfn(Param pm)
 }
 
 /**/
-void
+mod_export void
 colonarrsetfn(Param pm, char *x)
 {
     char ***dptr = (char ***)pm->u.data;

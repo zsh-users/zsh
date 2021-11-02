@@ -1,5 +1,11 @@
 2021-11-02  Oliver Kiddle  <opk@zsh.org>
 
+	* 49534, 49539: Doc/Makefile.in, Doc/Zsh/builtins.yo,
+	Doc/Zsh/compat.yo, Doc/Zsh/mod_watch.yo, Doc/Zsh/params.yo,
+	Src/Modules/watch.mdd, Src/builtin.c, Src/init.c, Src/params.c,
+	Src/utils.c, Src/Modules/watch.c, Src/zsh.mdd: separate watch/log
+	functionality out into a module
+
 	* 49537: aczsh.m4, configure.ac: fix finding utmpx file on FreeBSD
 
 2021-11-01  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>

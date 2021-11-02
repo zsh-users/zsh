@@ -1042,7 +1042,6 @@ setupvals(char *cmd, char *runscript, char *zsh_name)
 #endif /* FPATH_NEEDS_INIT */
 
     mailpath = mkarray(NULL);
-    watch    = mkarray(NULL);
     psvar    = mkarray(NULL);
     module_path = mkarray(ztrdup(MODULE_DIR));
     modulestab = newmoduletable(17, "modules");

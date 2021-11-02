@@ -1494,11 +1494,6 @@ deltimedfn(voidvoidfnptr_t func)
 /**/
 time_t lastmailcheck;
 
-/* the last time we checked the people in the WATCH variable */
-
-/**/
-time_t lastwatch;
-
 /*
  * Call a function given by "name" with optional arguments
  * "lnklst".  If these are present the first argument is the function name.
@@ -1634,17 +1629,6 @@ preprompt(void)
     if (period && ((zlong)time(NULL) > (zlong)lastperiodic + period) &&
 	!callhookfunc("periodic", NULL, 1, NULL))
 	lastperiodic = time(NULL);
-    if (errflag)
-	return;
-
-    /* If WATCH is set, then check for the *
-     * specified login/logout events.      */
-    if (watch) {
-	if ((int) difftime(time(NULL), lastwatch) > getiparam("LOGCHECK")) {
-	    dowatch();
-	    lastwatch = time(NULL);
-	}
-    }
     if (errflag)
 	return;
 

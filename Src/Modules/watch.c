@@ -27,7 +27,7 @@
  *
  */
 
-#include "zsh.mdh"
+#include "watch.mdh"
 
 /* Headers for utmp/utmpx structures */
 #ifdef HAVE_UTMP_H
@@ -139,9 +139,6 @@
 # define DEFAULT_WATCHFMT "%n has %a %l."
 #endif /* !WATCH_UTMP_UT_HOST */
 
-/**/
-char const * const default_watchfmt = DEFAULT_WATCHFMT;
-
 #ifdef WATCH_STRUCT_UTMP
 
 # include "watch.pro"
@@ -152,11 +149,14 @@ char const * const default_watchfmt = DEFAULT_WATCHFMT;
 
 static int wtabsz = 0;
 static WATCH_STRUCT_UTMP *wtab = NULL;
+
+/* the last time we checked the people in the WATCH variable */
+static time_t lastwatch;
+
 static time_t lastutmpcheck = 0;
 
 /* get the time of login/logout for WATCH */
 
-/**/
 static time_t
 getlogtime(WATCH_STRUCT_UTMP *u, int inout)
 {
@@ -202,7 +202,6 @@ getlogtime(WATCH_STRUCT_UTMP *u, int inout)
 # define BEGIN3 '('
 # define END3 ')'
 
-/**/
 static char *
 watch3ary(int inout, WATCH_STRUCT_UTMP *u, char *fmt, int prnt)
 {
@@ -407,7 +406,6 @@ watchlog_match(char *teststr, char *actual, int len)
 
 /* check the List for login/logouts */
 
-/**/
 static void
 watchlog(int inout, WATCH_STRUCT_UTMP *u, char **w, char *fmt)
 {
@@ -470,7 +468,6 @@ watchlog(int inout, WATCH_STRUCT_UTMP *u, char **w, char *fmt)
 
 /* compare 2 utmp entries */
 
-/**/
 static int
 ucmp(WATCH_STRUCT_UTMP *u, WATCH_STRUCT_UTMP *v)
 {
@@ -481,7 +478,6 @@ ucmp(WATCH_STRUCT_UTMP *u, WATCH_STRUCT_UTMP *v)
 
 /* initialize the user List */
 
-/**/
 static int
 readwtab(WATCH_STRUCT_UTMP **head, int initial_sz)
 {
@@ -592,10 +588,19 @@ dowatch(void)
     wtab = utab;
     wtabsz = utabsz;
     fflush(stdout);
+    lastwatch = time(NULL);
+}
+
+static void
+checksched(void)
+{
+    /* Do nothing if WATCH is not set, or LOGCHECK has not elapsed */
+    if (watch && (int) difftime(time(NULL), lastwatch) > getiparam("LOGCHECK"))
+	dowatch();
 }
 
 /**/
-int
+static int
 bin_log(UNUSED(char *nam), UNUSED(char **argv), UNUSED(Options ops), UNUSED(int func))
 {
     if (!watch)
@@ -611,16 +616,101 @@ bin_log(UNUSED(char *nam), UNUSED(char **argv), UNUSED(Options ops), UNUSED(int 
 
 #else /* !WATCH_STRUCT_UTMP */
 
-/**/
-void dowatch(void)
+static void
+checksched(void)
 {
 }
 
 /**/
-int
+static int
 bin_log(char *nam, char **argv, Options ops, int func)
 {
     return bin_notavail(nam, argv, ops, func);
 }
 
 #endif /* !WATCH_STRUCT_UTMP */
+
+/**/
+static char **watch; /* $watch */
+
+/* module setup */
+
+static struct builtin bintab[] = {
+    BUILTIN("log", 0, bin_log, 0, 0, 0, NULL, NULL),
+};
+
+static struct paramdef partab[] = {
+    PARAMDEF("WATCH", PM_TIED|PM_SCALAR|PM_SPECIAL, &watch, &colonarr_gsu),
+    PARAMDEF("watch", PM_TIED|PM_ARRAY|PM_SPECIAL, &watch, &vararray_gsu),
+};
+
+static struct features module_features = {
+    bintab, sizeof(bintab)/sizeof(*bintab),
+    NULL, 0,
+    NULL, 0,
+    partab, sizeof(partab)/sizeof(*partab),
+    0
+};
+
+/**/
+int
+setup_(UNUSED(Module m))
+{
+    return 0;
+}
+
+/**/
+int
+features_(Module m, char ***features)
+{
+    *features = featuresarray(m, &module_features);
+    return 0;
+}
+
+/**/
+int
+enables_(Module m, int **enables)
+{
+    return handlefeatures(m, &module_features, enables);
+}
+
+/**/
+int
+boot_(UNUSED(Module m))
+{
+    static char const * const default_watchfmt = DEFAULT_WATCHFMT;
+    Param pm;
+
+    if ((pm = (Param) paramtab->getnode(paramtab, "watch")))
+	pm->ename = "WATCH";
+    if ((pm = (Param) paramtab->getnode(paramtab, "WATCH")))
+	pm->ename = "watch";
+    watch = mkarray(NULL);
+
+    /* These two parameters are only set to defaults if not set.
+     * So setting them in .zshrc will not be enough to load the
+     * module. It's useless until the watch array is set anyway. */
+    if (!paramtab->getnode(paramtab, "WATCHFMT"))
+	setsparam("WATCHFMT", ztrdup_metafy(default_watchfmt));
+    if (!paramtab->getnode(paramtab, "LOGCHECK"))
+	setiparam("LOGCHECK", 60);
+
+    addprepromptfn(&checksched);
+
+    return 0;
+}
+
+/**/
+int
+cleanup_(Module m)
+{
+    delprepromptfn(&checksched);
+    return setfeatureenables(m, &module_features, NULL);
+}
+
+/**/
+int
+finish_(UNUSED(Module m))
+{
+    return 0;
+}

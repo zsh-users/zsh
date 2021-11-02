@@ -69,6 +69,7 @@ Zsh/mod_parameter.yo Zsh/mod_pcre.yo Zsh/mod_private.yo \
 Zsh/mod_regex.yo Zsh/mod_sched.yo Zsh/mod_socket.yo \
 Zsh/mod_stat.yo  Zsh/mod_system.yo Zsh/mod_tcp.yo \
 Zsh/mod_termcap.yo Zsh/mod_terminfo.yo \
+Zsh/mod_watch.yo \
 Zsh/mod_zftp.yo Zsh/mod_zle.yo Zsh/mod_zleparameter.yo \
 Zsh/mod_zprof.yo Zsh/mod_zpty.yo Zsh/mod_zselect.yo \
 Zsh/mod_zutil.yo
