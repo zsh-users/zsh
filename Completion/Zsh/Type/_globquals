@@ -127,15 +127,15 @@ while [[ -n $PREFIX ]]; do
 	alts+=( "time-specifiers:time specifier:compadd -E 0 -d tdisp -S '' -a tmatch" )
       fi
       if ! compset -P '[-+]' && [[ -z $PREFIX ]]; then
-	sdisp=( before exactly since )
+	sdisp=( since exactly before )
 	smatch=( - '' + )
 	if zstyle -t ":completion:${curcontext}:senses" verbose; then
 	  zstyle -s ":completion:${curcontext}:senses" list-separator sep || sep=--
 	  default=" [default exactly]"
-	  sdisp=( "- $sep before" "+ $sep since" )
+	  sdisp=( "- $sep since" "+ $sep before" )
 	  smatch=( - + )
 	else
-	  sdisp=( before exactly since )
+	  sdisp=( since exactly before )
 	  smatch=( - '' + )
 	fi
         alts+=( "senses:sense${default}:compadd -E 0 -d sdisp -S '' -a smatch" )
