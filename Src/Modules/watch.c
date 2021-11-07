@@ -640,8 +640,8 @@ static struct builtin bintab[] = {
 };
 
 static struct paramdef partab[] = {
-    PARAMDEF("WATCH", PM_TIED|PM_SCALAR|PM_SPECIAL, &watch, &colonarr_gsu),
-    PARAMDEF("watch", PM_TIED|PM_ARRAY|PM_SPECIAL, &watch, &vararray_gsu),
+    PARAMDEF("WATCH", PM_SCALAR|PM_SPECIAL, &watch, &colonarr_gsu),
+    PARAMDEF("watch", PM_ARRAY|PM_SPECIAL, &watch, &vararray_gsu),
 };
 
 static struct features module_features = {
@@ -679,12 +679,16 @@ int
 boot_(UNUSED(Module m))
 {
     static char const * const default_watchfmt = DEFAULT_WATCHFMT;
-    Param pm;
 
-    if ((pm = (Param) paramtab->getnode(paramtab, "watch")))
-	pm->ename = "WATCH";
-    if ((pm = (Param) paramtab->getnode(paramtab, "WATCH")))
-	pm->ename = "watch";
+    Param pma = (Param) paramtab->getnode(paramtab, "watch");
+    Param pms = (Param) paramtab->getnode(paramtab, "WATCH");
+    if (pma && pms && pma->u.arr == watch && pms->u.arr == watch) {
+	/* only tie the two parameters if both were added */
+	pma->ename = "WATCH";
+	pms->ename = "watch";
+	pma->node.flags |= PM_TIED;
+	pms->node.flags |= PM_TIED;
+    }
     watch = mkarray(NULL);
 
     /* These two parameters are only set to defaults if not set.

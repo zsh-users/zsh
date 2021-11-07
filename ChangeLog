@@ -1,3 +1,8 @@
+2021-11-07  Oliver Kiddle  <opk@zsh.org>
+
+	* 49544: Src/Modules/watch.c: only tie watch/WATCH if both come
+	from the module
+
 2021-11-02  Oliver Kiddle  <opk@zsh.org>
 
 	* 49534, 49539: Doc/Makefile.in, Doc/Zsh/builtins.yo,
