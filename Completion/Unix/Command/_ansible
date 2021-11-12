@@ -278,7 +278,7 @@ case $state in
       ;|
       role-(info|init|install|list|remove))
         args+=( '*: :_guard "^-*" "role name"' )
-      ;;
+      ;|
       role-(info|search|list|remove|install))
 	args+=( '(-p --roles-path)'{-p,--roles-path}'[specify location of roles]:path:_directories' )
       ;|
