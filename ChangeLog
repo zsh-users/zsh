@@ -1,5 +1,9 @@
 2021-11-12  Oliver Kiddle  <opk@zsh.org>
 
+	* 49564: Completion/Unix/Type/_files, Doc/Zsh/compsys.yo: always
+	use descriptions included in the file-patterns style and allow
+	the recursive-files style to also work in those cases
+
 	* 49562: Doc/Zsh/compsys.yo: remove old documentation for
 	other-files tag that was removed in 36165
 

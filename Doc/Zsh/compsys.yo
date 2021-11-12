@@ -1524,9 +1524,10 @@ If no `tt(:)var(tag)' is given the `tt(files)' tag will be used.
 The var(tag) may also be followed by an optional second colon and a
 description, which will be used for the `tt(%d)' in the value of
 the tt(format) style (if that is set) instead of the default
-description supplied by the completion function.  If the description
-given here contains itself a `tt(%d)', that is replaced with the
-description supplied by the completion function.
+description supplied by the completion function.  The inclusion
+of a description also gives precedence to associated options such as
+for completion grouping so it can be used where files should be
+separated.
 
 For example, to make the tt(rm) command first complete only names of
 object files and then the names of all files if there is no matching
@@ -1547,6 +1548,15 @@ This works even where there is no special pattern: tt(_files) matches
 all files using the pattern `tt(*)' at the first step and stops when it
 sees this pattern.  Note also it will never try a pattern more than once
 for a single completion attempt.
+
+To separate directories into a separate group from the files but still
+complete them at the first attempt, a description needs to be given.
+Note that directories need to be explicitly excluded from the
+globbed-files because `tt(*)' will match directories. For grouping, it
+is also necessary to set the tt(group-name) style.
+
+example(zstyle ':completion:*' file-patterns \ 
+    '%p+LPAR()^-/RPAR():globbed-files *(-/):directories:location')
 
 During the execution of completion functions, the tt(EXTENDED_GLOB)
 option is in effect, so the characters `tt(#)', `tt(~)' and `tt(^)' have
@@ -1971,9 +1981,10 @@ obtained by setting the style to an empty string (i.e. tt('')).
 )
 kindex(list-dirs-first, completion style)
 item(tt(list-dirs-first))(
-This is used by file completion.  If set, directories to be completed
-are listed separately from and before completion for other files,
-regardless of tag ordering.
+This is used by file completion and corresponds to a particular
+setting of the tt(file-patterns) style.
+If set, the default directories to be completed
+are listed separately from and before completion for other files.
 )
 kindex(list-grouped, completion style)
 item(tt(list-grouped))(

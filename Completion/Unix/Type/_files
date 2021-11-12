@@ -92,7 +92,10 @@ for def in "$pats[@]"; do
     pat="${${sdef%%:${tag}*}//\\:/:}"
 
     if [[ "$sdef" = *:${tag}:* ]]; then
+      # If the file-patterns spec includes a description, use it and give the
+      # group/description options from it precedence over passed in parameters.
       descr="${(Q)sdef#*:${tag}:}"
+      end=
     else
       if (( $opts[(I)-X] )); then
         descr=
@@ -108,26 +111,30 @@ for def in "$pats[@]"; do
       while _next_label "$tag" expl "$descr"; do
         _comp_ignore=( $_comp_ignore $ign )
         if [[ -n "$end" ]]; then
-          if _path_files -g "$pat" "$opts[@]" "$expl[@]"; then
-	    ret=0
-	  elif [[ $PREFIX$SUFFIX != */* ]] && zstyle -a ":completion:${curcontext}:$tag" recursive-files rfiles; then
-	    for rfile in $rfiles; do
-	      if [[ $PWD/ = ${~rfile} ]]; then
-		if [[ -z $subtree ]]; then
-		  subtree=( **/*(/) )
-		fi
-		for prepath in $subtree; do
-		  oprefix=$PREFIX
-		  PREFIX=$prepath/$PREFIX
-		  _path_files -g "$pat" "$opts[@]" "$expl[@]" && ret=0
-		  PREFIX=$oprefix
-		done
-		break
-	      fi
-	    done
-	  fi
+          expl=( "$opts[@]" "$expl[@]" )
         else
-          _path_files "$expl[@]" -g "$pat" "$opts[@]" && ret=0
+          expl+=( "$opts[@]" )
+        fi
+
+        if _path_files -g "$pat" "$expl[@]"; then
+          ret=0
+        elif [[ $PREFIX$SUFFIX != */* ]] && \
+            zstyle -a ":completion:${curcontext}:$tag" recursive-files rfiles
+        then
+          for rfile in $rfiles; do
+            if [[ $PWD/ = ${~rfile} ]]; then
+              if [[ -z $subtree ]]; then
+                subtree=( **/*(/) )
+              fi
+              for prepath in $subtree; do
+                oprefix=$PREFIX
+                PREFIX=$prepath/$PREFIX
+                _path_files -g "$pat" "$expl[@]" && ret=0
+                PREFIX=$oprefix
+              done
+              break
+            fi
+          done
         fi
       done
       (( ret )) || break
