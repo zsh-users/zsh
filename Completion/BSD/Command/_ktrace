@@ -4,7 +4,7 @@ local args=(
   '-a[append to the trace file]'
   '(*)-C[disable tracing on all user owned processes or all processes if executed by root]'
   '-c[clear the trace points]'
-  '-d[trace current decendants]'
+  '-d[trace current descendants]'
   '-f+[log trace to specified file]:trace file:_files'
   '(-p *)-g+[enable/disable tracing on specified process group]:pgid:_pgids'
   '-i[inherit trace flags on future children]'

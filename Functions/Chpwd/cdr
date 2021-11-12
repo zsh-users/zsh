@@ -55,7 +55,7 @@
 # pattern from the directory list.  The match is against the fully
 # expanded directory path and the full string must match (use wildcards
 # at the ends if needed).  If output is going to a terminal, the
-# function will print the new list for the user to confrim; this can be
+# function will print the new list for the user to confirm; this can be
 # skipped by giving -P instead of -p.
 #
 # Details of directory handling

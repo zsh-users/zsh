@@ -345,7 +345,7 @@ _dnf_command() {
         ;;
       clean)
         tmp=(
-          'dbcache:remove chache files generated from the repository metadata'
+          'dbcache:remove cache files generated from the repository metadata'
           'expire-cache:mark the repository metadata expired'
           'metadata:remove the repository metadata'
           'packages:remove any cached packages'

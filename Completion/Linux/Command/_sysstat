@@ -52,7 +52,7 @@ _sadf() {
       '(-g -j -p -r -x)-h[print on a single line when used with -d]' \
       '-O[specify output options]: : _values -s , option
         autoscale bwcol customcol height\:value oneday packed showidle showinfo showtoc skipempty hz\:value pcparchive\:name\:_files debug' \
-      '-P[restrict processor dependant statistics]:processor number(zero indexed) or ALL:(ALL)' \
+      '-P[restrict processor dependent statistics]:processor number(zero indexed) or ALL:(ALL)' \
       '--dev=-[specify block devices for which statistics are to be displayed]:block device:_files -g "*(-%)"' \
       '--fs=-[specify filesystems for which statistics are to be displayed]:file system:_dir_list -s ,' \
       '--iface=-[specify network interfaces for which statistics are to be displayed]:network interface:_sequence _net_interfaces' \

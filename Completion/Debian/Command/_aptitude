@@ -15,7 +15,7 @@ _arguments -C \
   '(-F --display-format)'{-F,--display-format}'[specify output format for search command]:format:->format-strings' \
   '--group-by=[control how the versions command groups its output]:grouping:(archive auto none package source-package source-version)' \
   '--log-file=[specify output log file]:file:_files' \
-  '*--log-level=[specify mimimum message level to log]:level:compadd -o nosort off fatal error warn info debug trace' \
+  '*--log-level=[specify minimum message level to log]:level:compadd -o nosort off fatal error warn info debug trace' \
   '--log-resolver[set some standard log levels related to the resolver]' \
   '(--allow-new-installs)--no-new-installs[prevent safe-upgrade from installing any new packages]' \
   '(--allow-new-upgrades)--no-new-upgrades[prevent safe-upgrade from upgrading packages regardless]' \

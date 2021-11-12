@@ -30,7 +30,7 @@ local args=(
   '-f+[use the specified file (- for stdin)]:dump file:_files'
   '-l[loop reading the trace file]'
   '-m+[maximum I/O bytes to display]:max data bytes:'
-  '-n[supress ad hoc translations]'
+  '-n[suppress ad hoc translations]'
   '-p+[show output only for the specified pid]: :_kdump_pid'
   '(-E    -T)-R[display relative timestamps]'
   '(-E -R   )-T[display absolute timestamps]'
