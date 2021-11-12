@@ -1,5 +1,7 @@
 2021-11-12  Oliver Kiddle  <opk@zsh.org>
 
+	* 49566: Doc/Zsh/compsys.yo: document the _default function
+
 	* 49564: Completion/Unix/Type/_files, Doc/Zsh/compsys.yo: always
 	use descriptions included in the file-patterns style and allow
 	the recursive-files style to also work in those cases

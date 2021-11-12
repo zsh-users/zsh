@@ -4404,6 +4404,15 @@ Include the leading underscore (`tt(_)') in the matches.
 )
 enditem()
 )
+findex(_default)
+item(tt(_default))(
+This function corresponds to the tt(-default-) special context which is
+applied where no completion is defined.  It is useful to call it under
+certain error conditions such as completion after an unrecognised
+subcommand.  This applies the concept of graceful degradation to the
+completion system, allowing it to fallback on basic completion of
+commonly useful things like filenames.
+)
 findex(_describe)
 redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ @ @ @ @ ))ifnztexi(          )))
 xitem(tt(_describe )[tt(-12JVx)] [ tt(-oO) | tt(-t) var(tag) ] var(descr) var(name1) [ var(name2) ] [ var(opt) ... ])
