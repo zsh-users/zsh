@@ -40,7 +40,7 @@ if (( $4 )); then
     # append offsets and computed replacement to the array
     # we need to perform the evaluation in a scalar assignment so that if
     # it generates an array, the elements are converted to string (by
-    # joining with the first chararacter of $IFS as usual)
+    # joining with the first character of $IFS as usual)
     5=${(e)3}
     argv+=(${(s: :)ZPCRE_OP} "$5")
 

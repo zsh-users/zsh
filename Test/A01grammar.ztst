@@ -922,7 +922,7 @@ F:Note that the behaviour of 'exit' inside try-list inside a function is unspeci
   x=1
   x=2 | echo $x
   echo $x
-0:Assignment-only current shell commands in LHS of pipelin
+0:Assignment-only current shell commands in LHS of pipeline
 >1
 >1
 

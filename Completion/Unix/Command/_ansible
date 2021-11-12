@@ -358,7 +358,7 @@ case $state in
           '(-p --collections-path)'{-p+,--collections-path=}'[specify directory containing collections]:_directories'
           '(-r --requirements-file *)'{-r+,--requirements-file=}'[specify file containing a list of collections to install]:file:_files'
           '--pre[include pre-release versions]'
-          '*:collecion name:_files'
+          '*:collection name:_files'
         )
       ;;
     esac

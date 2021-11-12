@@ -571,7 +571,7 @@ Here is a summary of the most significant changes:
 - The zshroadmap manual page provides a slightly more helpful
   introduction to the shell manual than was previously available.
 
-- There have been some notable enhancements to POSIX comptability
+- There have been some notable enhancements to POSIX compatibility
   when the shell is in a corresponding emulation (e.g. "emulate sh").
 
 Expansion (parameters, globbing, etc.) and redirection

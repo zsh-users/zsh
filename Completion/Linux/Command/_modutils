@@ -105,7 +105,7 @@ _modutils() {
     loaded-modules|loadable-modules)
       if [[ -r /proc/modules ]]; then
 	loaded_modules=(${${(f)"$(</proc/modules)"}%% *})
-      # For compatibilty with old systems. Kernels nowadays provide
+      # For compatibility with old systems. Kernels nowadays provide
       # `/proc/modules` which is more reliable and faster for us.
       elif [[ -x /sbin/lsmod ]]; then
 	loaded_modules=(${${(f)"$(_call_program loaded-modules /sbin/lsmod)"}[2,-1]%% *})

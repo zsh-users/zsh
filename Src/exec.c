@@ -3954,7 +3954,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 	    if (type == WC_AUTOFN) {
 		/*
 		 * We pre-loaded this to get any redirs.
-		 * So we execuate a simplified function here.
+		 * So we execute a simplified function here.
 		 */
 		lastval =  execautofn_basic(state, do_exec);
 	    } else

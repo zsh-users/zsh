@@ -627,7 +627,7 @@ Type:
 }
 
 
-# Print and despatch a submenu.
+# Print and dispatch a submenu.
 # The first argument is the title.  The remaining arguments
 # are pairs of descriptions and functions to execute.
 # There shouldn't be more than 9 entries.

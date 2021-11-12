@@ -1,5 +1,16 @@
 2021-11-12  Oliver Kiddle  <opk@zsh.org>
 
+	* github #82: Dimitris Apostolou: Completion/BSD/Command/_kdump,
+	Completion/Redhat/Command/_dnf, Completion/BSD/Command/_ktrace,
+	Completion/Linux/Command/_modutils, Test/A01grammar.ztst,
+	Completion/Linux/Command/_sysstat, Functions/Chpwd/cdr,
+	Completion/Unix/Command/_ansible, Completion/Unix/Command/_gcc,
+	Completion/Mandriva/Command/_urpmi, Etc/NEWS-4.3,
+	Completion/Debian/Command/_aptitude, Etc/FAQ.yo,
+	Functions/Newuser/zsh-newuser-install, NEWS,
+	Functions/Misc/regexp-replace, Src/Zle/compmatch.c,
+	Src/exec.c, Src/math.c, Test/B12limit.ztst: fix typos
+
 	* Marlon: 49572: Completion/Base/Completer/_expand,
 	Test/Y01completion.ztst: Let _expand preserve array form w/out
 	zstyle glob

@@ -1438,7 +1438,7 @@ pattern_match_restrict(Cpattern p, Cpattern wp, convchar_t *wsc, int wsclen,
 
 	/*
 	 * If either is "?", they match each other; no further tests.
-	 * Apply this even if the character wasn't convertable;
+	 * Apply this even if the character wasn't convertible;
 	 * there's no point trying to be clever in that case.
 	 */
 	if (p->tp != CPAT_ANY || wp->tp != CPAT_ANY)
@@ -1496,7 +1496,7 @@ pattern_match_restrict(Cpattern p, Cpattern wp, convchar_t *wsc, int wsclen,
 		 * characters.  We're matching two patterns against
 		 * one another to generate a character to insert.
 		 * This is a bit too psychedelic, so I'm going to
-		 * bale out now.  See you on the ground.
+		 * bail out now.  See you on the ground.
 		 */
 		return 0;
 	    }
@@ -1564,7 +1564,7 @@ pattern_match(Cpattern p, char *s, Cpattern wp, char *ws)
 	c = unmeta_one(s, &len);
 	/*
 	 * If either is "?", they match each other; no further tests.
-	 * Apply this even if the character wasn't convertable;
+	 * Apply this even if the character wasn't convertible;
 	 * there's no point trying to be clever in that case.
 	 */
 	if (p->tp != CPAT_ANY || wp->tp != CPAT_ANY)
@@ -1934,7 +1934,7 @@ bld_line(Cmatcher mp, ZLE_STRING_T line, char *mword, char *word,
 		 * This is the nightmare case: we have line and
 		 * and word matchers and some pattern which restricts
 		 * the value on the line without us knowing exactly
-		 * what it is.  Despatch to the special function
+		 * what it is.  Dispatch to the special function
 		 * for that.
 		 */
 		if (mp && !mp->flags && mp->wlen <= wlen &&

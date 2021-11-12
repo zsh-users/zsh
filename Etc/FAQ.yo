@@ -333,7 +333,7 @@ sect(What's the latest version?)
   Changes of this kind are almost always forced by an awkward or
   unnecessary feature in the original design (as perceived by current
   users), or to enhance compatibility with other Bourne shell
-  derivatives, or (mostly in the 3.0 series) to provide POSIX compliancy.
+  derivatives, or (mostly in the 3.0 series) to provide POSIX compliance.
 
 
 sect(Where do I get it?)
@@ -871,7 +871,7 @@ label(25)
   the most obvious difference from zsh is that it does not attempt to
   emulate the Korn shell.  Since both shells are under active
   development it is probably not sensible to be too specific here.
-  Broadly, bash has paid more attention to standards compliancy
+  Broadly, bash has paid more attention to standards compliance
   (i.e. POSIX) for longer, and has so far avoided the more abstruse
   interactive features (programmable completion, etc.) that zsh has.
 

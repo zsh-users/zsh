@@ -162,7 +162,7 @@ static int unary = 1;
 #define TOKCOUNT 53
 
 /*
- * Opeator recedences: in reverse order, i.e. lower number, high precedence.
+ * Operator precedences: in reverse order, i.e. lower number, high precedence.
  * These are the C precedences.
  *
  * 0   Non-operators: NUM (numeric constant), ID (identifier),
@@ -219,7 +219,7 @@ static int c_prec[TOKCOUNT] =
 };
 
 /*
- * Opeator recedences: in reverse order, i.e. lower number, high precedence.
+ * Operator precedences: in reverse order, i.e. lower number, high precedence.
  * These are the default zsh precedences.
  *
  * 0   Non-operators: NUM (numeric constant), ID (identifier),

@@ -131,7 +131,7 @@ _urpmi() {
 	"($help --no-probe --probe-hdlist)--probe-synthesis[try to find and use synthesis file]" \
 	"($help)--update[mark as update media]" \
 	"($help)--version[use specified distribution version]:Mandrake version: " \
-	"($help)--virtual[create virtual media wich are always up-to-date]" \
+	"($help)--virtual[create virtual media which are always up-to-date]" \
 	"($help)-c[clean headers cache directory]" \
 	"($help)-f[force generation of hdlist files]" \
 	"($help --distrib):name of media: " \
