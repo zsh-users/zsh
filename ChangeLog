@@ -1,3 +1,8 @@
+2021-11-19  Oliver Kiddle  <opk@zsh.org>
+
+	* Arseny Maslennikov: 49575: Doc/Zsh/compsys.yo:
+	clarify _alternative's action syntax
+
 2021-11-15  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 49563: Src/Modules/watch.c: fix build problem of watch module

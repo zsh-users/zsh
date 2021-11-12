@@ -3620,8 +3620,18 @@ described using the var(spec)s which are of the form:
 `var(tag)tt(:)var(descr)tt(:)var(action)'.  The var(tag)s are offered using
 tt(_tags) and if the tag is requested, the var(action) is executed with the
 given description var(descr).  The var(action)s are those accepted
-by the tt(_arguments) function (described below), excluding the
-`tt(->)var(state)' and `tt(=)var(...)' forms.
+by the tt(_arguments) function (described below), with the following
+exceptions:
+startitemize()
+itemiz(\
+The `tt(->)var(state)' and `tt(=)var(...)' forms are not supported.
+)
+itemiz(\
+The `tt(LPAR()LPAR()a\:bar b\:baz)tt(RPAR()RPAR())' form does not need
+the colon to be escaped, since the var(spec)s have no colon-separated fields
+after the var(action).
+)
+enditemize()
 
 For example, the var(action) may be a simple function call:
 
