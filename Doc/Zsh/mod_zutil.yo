@@ -150,8 +150,9 @@ enditem()
 )
 findex(zformat)
 xitem(tt(zformat -f) var(param) var(format) var(spec) ...)
+xitem(tt(zformat -F) var(param) var(format) var(spec) ...)
 item(tt(zformat -a) var(array) var(sep) var(spec) ...)(
-This builtin provides two different forms of formatting. The first form 
+This builtin provides different forms of formatting. The first form
 is selected with the tt(-f) option. In this case the var(format)
 string will be modified by replacing sequences starting with a percent 
 sign in it with strings from the var(spec)s.  Each var(spec) should be
@@ -195,7 +196,13 @@ outputs "The answer is 'yes'." to tt(REPLY) since the value for the format
 specifier tt(c) is 3, agreeing with the digit argument to the ternary
 expression.
 
-The second form, using the tt(-a) option, can be used for aligning
+With tt(-F) instead of tt(-f), ternary expressions choose between the
+`true' or `false' text on the basis of whether the format specifier is
+present and non-empty.  A test number indicates a minimum width for the
+value given in the format specifier. Negative numbers reverse this,
+so the test is for whether the value exceeds a maximum width.
+
+The form, using the tt(-a) option, can be used for aligning
 strings.  Here, the var(spec)s are of the form
 `var(left)tt(:)var(right)' where `var(left)' and `var(right)' are
 arbitrary strings.  These strings are modified by replacing the colons

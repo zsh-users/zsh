@@ -1,3 +1,11 @@
+2021-11-12  Oliver Kiddle  <opk@zsh.org>
+
+	* 49561: Src/Modules/zutil.c, Doc/Zsh/mod_zutil.yo,
+	Completion/Base/Core/_description, Completion/Base/Core/_message,
+	Test/V13zformat.ztst: Add zformat -F option, similar to -f but
+	ternary expressions check for existence instead of doing math
+	evaluation. Make use it with the format style.
+
 2021-11-07  Oliver Kiddle  <opk@zsh.org>
 
 	* 49544: Src/Modules/watch.c: only tie watch/WATCH if both come

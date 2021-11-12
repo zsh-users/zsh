@@ -78,7 +78,7 @@ shift 2
 if [[ -z "$1" && $# -eq 1 ]]; then
   format=
 elif [[ -n "$format" ]]; then
-  zformat -f format "$format" "d:$1" "${(@)argv[2,-1]}"
+  zformat -F format "$format" "d:$1" "${(@)argv[2,-1]}"
 fi
 
 if [[ -n "$gname" ]]; then

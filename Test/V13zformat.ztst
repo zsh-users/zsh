@@ -58,6 +58,30 @@
 0:nested conditionals test
 >yes
 
+ () {
+   zformat -f 1 '%(w.zero.fail) %(x.fail.present) %(y.empty.fail) %(z.missing.fail)' w:0 x:1 y:
+   zformat -F 2 '%(w.zero.fail) %(x.present.fail) %(y.fail.empty) %(z.fail.missing)' w:0 x:1 y:
+   echo $1
+   echo $2
+ }
+0:conditionals with empty and missing values
+>zero present empty missing
+>zero present empty missing
+
+ () {
+   local l
+   for l in 0 1 2 3; do
+     zformat -F 1 "%$l(a.a.A)%$l(b.b.B)%$l(c.c.C)%$l(d.d.D)" a: b:1 c:12 d:123
+     zformat -F 2 "%-$l(a.a.A)%-$l(b.b.B)%-$l(c.c.C)%-$l(d.d.D)" a: b:1 c:12 d:123
+     print - $1 $2
+   done
+ }
+0:minimum and maximum widths
+>Abcd aBCD
+>ABcd abCD
+>ABCd abcD
+>ABCD abcd
+
  zformat -a argv . foo:lorem ipsum:bar bazbaz '\\esc\:ape'
  print -rl -- "$@"
 0:basic -a test

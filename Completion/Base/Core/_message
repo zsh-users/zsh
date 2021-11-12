@@ -39,7 +39,7 @@ else
 fi
 
 if [[ -n "$format$raw" ]]; then
-  [[ -z "$raw" ]] && zformat -f format "$format" "d:$1" "${(@)argv[2,-1]}"
+  [[ -z "$raw" ]] && zformat -F format "$format" "d:$1" "${(@)argv[2,-1]}"
   builtin compadd "$gopt[@]" -x "$format"
   _comp_mesg=yes
 fi
