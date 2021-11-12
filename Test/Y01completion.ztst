@@ -62,6 +62,17 @@
 >line: {: dir1 dir2 file1 file2 }{}
 >line: {: *}{}
 
+  comptesteval $'zstyle \'*\' glob no'
+  comptesteval $'typeset -g tst=(*)'
+  comptest $': $tst\C-D'
+0:_expand preserves array form
+>DESCRIPTION:{expansions}
+>NO:{dir1}
+>NO:{dir2}
+>NO:{file1}
+>NO:{file2}
+
+  comptesteval $'zstyle -d \'*\' glob'
   comptesteval '_users () { compadd user1 user2 }'
   comptest $': ~\t\t\t\t\t'
 0:tilde

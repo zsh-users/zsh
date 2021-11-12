@@ -1,5 +1,9 @@
 2021-11-12  Oliver Kiddle  <opk@zsh.org>
 
+	* Marlon: 49572: Completion/Base/Completer/_expand,
+	Test/Y01completion.ztst: Let _expand preserve array form w/out
+	zstyle glob
+
 	* unposted: Completion/Unix/Command/_ansible: fix case statement
 	fall-through for ansible-galaxy role completion
 

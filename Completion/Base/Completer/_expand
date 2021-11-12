@@ -105,7 +105,7 @@ subd=("$exp[@]")
 
 # We need to come out of this with consistent quoting, by hook or by crook.
 integer done_quote
-local orig_exp=$exp
+local -a orig_exp=( $exp )
 if [[ "$force" = *g* ]] || zstyle -T ":completion:${curcontext}:" glob; then
   eval 'exp=( ${~exp//(#b)\\([ 	\"'"\'"'
 ])/$match[1]} ); exp=( ${(q)exp} )' 2>/dev/null && (( $#exp )) && done_quote=1
