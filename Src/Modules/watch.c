@@ -640,8 +640,8 @@ static struct builtin bintab[] = {
 };
 
 static struct paramdef partab[] = {
-    PARAMDEF("WATCH", PM_SCALAR|PM_SPECIAL, &watch, &colonarr_gsu),
-    PARAMDEF("watch", PM_ARRAY|PM_SPECIAL, &watch, &vararray_gsu),
+    PARAMDEF("WATCH", PM_SCALAR|PM_SPECIAL, &watch, NULL),
+    PARAMDEF("watch", PM_ARRAY|PM_SPECIAL, &watch, NULL),
 };
 
 static struct features module_features = {
@@ -656,6 +656,10 @@ static struct features module_features = {
 int
 setup_(UNUSED(Module m))
 {
+    /* On Cygwin, colonarr_gsu exists in libzsh.dll and we can't
+     * use &colonarr_gsu in the initialization of partab[] above */
+    partab[0].gsu = (void *)&colonarr_gsu;
+    partab[1].gsu = (void *)&vararray_gsu;
     return 0;
 }
 
