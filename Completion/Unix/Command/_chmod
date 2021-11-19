@@ -1,7 +1,10 @@
 #compdef chmod gchmod zf_chmod
 
 local curcontext="$curcontext" state line expl ret=1 variant
-local -a args privs aopts=( -A '-*' )
+local -a args privs aopts
+
+# usual -* pattern picks up valid non-options, e.g. -x which is like a-x
+aopts=( -A '-[^gorstuwxX]*' )
 
 args=( '*: :->files' '1: :_file_modes' )
 

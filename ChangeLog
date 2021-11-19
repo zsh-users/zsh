@@ -1,5 +1,8 @@
 2021-11-19  Oliver Kiddle  <opk@zsh.org>
 
+	* 49594: Completion/Unix/Command/_chmod: adapt to changes in 49499
+	to ensure file modes starting with dash aren't taken to be flags
+
 	* 49584: Completion/Unix/Command/_gem: allow for build options
 	in gem install completion
 
