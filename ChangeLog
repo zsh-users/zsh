@@ -1,5 +1,8 @@
 2021-11-19  Oliver Kiddle  <opk@zsh.org>
 
+	* 49584: Completion/Unix/Command/_gem: allow for build options
+	in gem install completion
+
 	* Arseny Maslennikov: 49575: Doc/Zsh/compsys.yo:
 	clarify _alternative's action syntax
 

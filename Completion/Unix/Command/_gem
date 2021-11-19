@@ -56,6 +56,11 @@ if [[ $state = command ]]; then
     check|cleanup|contents|dependency|list|open|pristine|rdoc|uninstall|unpack|update)
       args+=( '(--all --skip)*:installed gem:->gems-local' )
     ;|
+    install)
+      (( ${(M)#line:#[^-]*} > 1 )) && args+=(
+        '(*)--[specify build options]:*:build option:_default'
+      )
+    ;|
     fetch|install|lock|owner|search|yank)
       args+=( '*:gem:->gems-remote' )
     ;|
