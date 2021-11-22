@@ -1861,7 +1861,11 @@ chabspath(char **junkptr)
 	return 1;
 
     if (**junkptr != '/') {
-	*junkptr = zhtricat(metafy(zgetcwd(), -1, META_HEAPDUP), "/", *junkptr);
+	char *here = zgetcwd();
+	if (here[strlen(here)-1] != '/')
+	    *junkptr = zhtricat(metafy(here, -1, META_HEAPDUP), "/", *junkptr);
+	else
+	    *junkptr = dyncat(here, *junkptr);
     }
 
     current = *junkptr;

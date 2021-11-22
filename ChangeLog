@@ -1,3 +1,8 @@
+2021-11-22  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 49586: Src/hist.c: fix :a and :A modifiers (with PWD="/") on
+	Cygwin
+
 2021-11-19  Oliver Kiddle  <opk@zsh.org>
 
 	* 49594: Completion/Unix/Command/_chmod: adapt to changes in 49499
