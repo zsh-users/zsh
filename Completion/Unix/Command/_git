@@ -1465,7 +1465,7 @@ _git-push () {
     '(--no-signed --sign)--signed[GPG sign the push]' \
     "(--sign --signed)--no-signed[don't GPG sign the push]" \
     '--atomic[request atomic transaction on remote side]' \
-    '(-o --push-option)'{-o+,--push-option=}'[transmit string to server to pass to pre/post-receive hooks]:string' \
+    '*'{-o+,--push-option=}'[transmit string to server to pass to pre/post-receive hooks]:string' \
     '(-4 --ipv4 -6 --ipv6)'{-4,--ipv4}'[use IPv4 addresses only]' \
     '(-4 --ipv4 -6 --ipv6)'{-6,--ipv6}'[use IPv6 addresses only]' \
     ': :__git_any_repositories' \
