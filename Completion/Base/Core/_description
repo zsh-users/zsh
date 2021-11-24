@@ -2,6 +2,7 @@
 
 local name nopt xopt format gname hidden hide match opts tag
 local -a ign gropt sort
+local -a match mbegin mend
 
 opts=()
 
@@ -78,6 +79,13 @@ shift 2
 if [[ -z "$1" && $# -eq 1 ]]; then
   format=
 elif [[ -n "$format" ]]; then
+  if [[ -z $2 ]]; then
+    argv+=( h:${1%%( ##\((#b)([^\)]#[^0-9-][^\)]#)(#B)\)|)( ##\((#b)([0-9-]##)(#B)\)|)( ##\[(#b)([^\]]##)(#B)\]|)} )
+    [[ -n $match[1] ]] && argv+=( m:$match[1] )
+    [[ -n $match[2] ]] && argv+=( r:$match[2] )
+    [[ -n $match[3] ]] && argv+=( o:$match[3] )
+  fi
+
   zformat -F format "$format" "d:$1" "${(@)argv[2,-1]}"
 fi
 

@@ -99,7 +99,7 @@ _rsync() {
   _arguments -s \
     '*'{-v,--verbose}'[increase verbosity]' \
     {--no-v,--no-verbose}'[turn off --verbose]' \
-    '--bwlimit=[limit I/O bandwidth]:limit (KiB per second)' \
+    '--bwlimit=[limit I/O bandwidth]: :_numbers -f -u "KiB per second" -d 1g limit B K M G T P' \
     '--outbuf=[set output buffering]:buffering:(none line block)' \
     '--port=[specify alternate port number]:port:(873)' \
     '--address=[bind to the specified address]:bind address:_bind_addresses' \
@@ -181,7 +181,7 @@ _rsync() {
     {--no-W,--no-whole-file}'[turn off --whole-file]' \
     '(--cc --checksum-choice)'{--cc,--checksum-choice}'=[choose the checksum algorithms]:algorithm:_sequence -n 2 compadd - auto md4 md5 none' \
     '(-x --one-file-system)'{-x,--one-file-system}"[don't cross filesystem boundaries]" \
-    '(-B --block-size)'{-B+,--block-size=}'[force a fixed checksum block-size]:block size (bytes)' \
+    '(-B --block-size)'{-B+,--block-size=}'[force a fixed checksum block-size]: :_numbers -f -u bytes -d 1g "block size" B K M G T P' \
     '(-e --rsh)'{-e+,--rsh=}'[specify the remote shell to use]:remote-shell command:(rsh ssh)' \
     '--rsync-path=[specify path to rsync on the remote machine]:remote command' \
     '--ignore-existing[ignore files that already exist on receiving side]' \
@@ -199,10 +199,10 @@ _rsync() {
     '--force-change[affect user-/system-immutable files/dirs]' \
     '--force-uchange[affect user-immutable files/dirs]' \
     '--force-schange[affect system-immutable files/dirs]' \
-    '--max-delete=[do not delete more than NUM files]:number' \
-    '--max-size=[do not transfer any file larger than specified size]:number' \
+    "--max-delete=[don't delete more than NUM files]: :_numbers -f -u bytes size B K M G T P" \
+    "--max-size=[don't transfer any file larger than specified size]: :_numbers -f -u bytes size B K M G T P" \
     '--min-size=[do not transfer any file smaller than specified size]:number' \
-    '--max-alloc=[set limit to individual memory allocation]:size (bytes) [1g]' \
+    '--max-alloc=[set limit to individual memory allocation]: :_numbers -f -u bytes -d 1g size B K M G T P' \
     '(-P)--partial[keep partially transferred files]' \
     '--no-partial[turn off --partial]' \
     '--partial-dir=[put a partially transferred file into specified directory]:directory:_directories' \

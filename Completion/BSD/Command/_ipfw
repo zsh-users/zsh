@@ -249,8 +249,8 @@ actions=(
     $'/(pipe|queue|sched)[ \t\0]/' -'pqs=${match%?}' ':dummynet-commands:dummynet configuration:$ca pipe queue sched'
     $word ': _message -e numbers number'
     $word ':options:config:$ca config'
-    \( $'/bw[ \t\0]/' \( $'/<->/' ': _guard "[0-9]#" bandwidth'
-         $word ':units:unit:compadd -M "m:{a-z}={A-Z}" {K,M,G}{bit,Byte}/s'
+    \( $'/bw[ \t\0]/'
+      \( $word ':bandwidths: :_numbers -M "m:{a-z}={A-Z}" bandwidth {K,M,G}{bit,Byte}/s'
       \| $word ':devices:device:_net_interfaces -qS " "' \)
     \| $'/delay[ \t\0]/' $word ': _message -e numbers "propagation delay (ms)"'
     \| $'/burst[ \t\0]/' $word ': _message -e numbers "size (bytes)"'

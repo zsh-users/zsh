@@ -7,7 +7,9 @@ short=( -e -i -o )
 long=( --error --input --output )
 buf=( err in out )
 
-opt='[set initial buffering for std${buf[i]}]:mode or size:((0\:unbuffered L\:line\ buffered'
+opt='[set initial buffering for std${buf[i]}]: : _alternative
+  "sizes\: \: _numbers -u bytes size k M G"
+  "modes\:mode\:((0\:unbuffered L\:line\ buffered'
 if _pick_variant gnu=GNU freebsd --version; then
   gnu=1
   args=(
@@ -17,7 +19,7 @@ if _pick_variant gnu=GNU freebsd --version; then
 else
   opt+=' B\:fully\ buffered'
 fi
-opt+='))'
+opt+='))"'
 
 for ((i=1;i<=3;i++)); do
   args+=( "(${long[i]})${short[i]}+${(e)opt}" )

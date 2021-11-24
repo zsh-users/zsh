@@ -162,12 +162,20 @@ _zfs() {
 		"multilevel:value:(on off)"
 		"nbmand:value:(on off)"
 		"primarycache:value:(all none metadata)"
-		"quota:number or 'none':{if [[ -prefix [0-9]## ]]; then _message -e 'number'; elif [[ $PREFIX == quota= ]]; then _wanted none expl 'number or none' compadd none; else _wanted none expl 'quota' compadd none; fi}"
+		"quota: : _alternative \
+				'sizes: :_numbers -M "m\:{a-zA-Z}={A-Za-z}" -u bytes size :B {k,M,G,T,P,E,Z}{,B}' \
+				'properties:property:(none)'"
 		"readonly:value:(on off)"
 		"recordsize:value:(512 1K 2K 4K 8K 16K 32K 64K 128K 256K 512K 1M)"
-		"refquota:number or 'none':{if [[ -prefix [0-9]## ]]; then _message -e 'number'; elif [[ $PREFIX == refquota= ]]; then _wanted none expl 'number or none' compadd none; else _wanted none expl 'refquota' compadd none; fi}"
-		"refreservation:number or 'none':{if [[ -prefix [0-9]## ]]; then _message -e 'number'; elif [[ $PREFIX == refreservation= ]]; then _wanted none expl 'number or none' compadd none; else _wanted none expl 'refreservation' compadd none; fi}"
-		"reservation:value:{if [[ -prefix [0-9]## ]]; then _message -e 'number'; elif [[ $PREFIX == reservation= ]]; then _wanted none expl 'number or none' compadd none; else _wanted none expl 'reservation' compadd none; fi}"
+		"refquota: : _alternative \
+				'sizes: :_numbers -M "m\:{a-zA-Z}={A-Za-z}" -u bytes size :B {k,M,G,T,P,E,Z}{,B}' \
+				'properties:property:(none)'"
+		"refreservation: : _alternative \
+				'sizes: :_numbers -M "m\:{a-zA-Z}={A-Za-z}" -u bytes size :B {k,M,G,T,P,E,Z}{,B}' \
+				'properties:property:(auto none)'"
+		"reservation: : _alternative \
+				'sizes: :_numbers -M "m\:{a-zA-Z}={A-Za-z}" -u bytes size :B {k,M,G,T,P,E,Z}{,B}' \
+				'properties:property:(none)'"
 		"rstchown:value:(on off)"
 		"secondarycache:value:(all none metadata)"
 		"setuid:value:(on off)"
@@ -238,8 +246,8 @@ _zfs() {
 			':filesystem:_zfs_dataset -t fs -e "parent dataset"' \
 			- set2 \
 			'-s[Create sparse volume]' \
-			'-b[Set volblocksize]:blocksize:' \
-			'-V[Set size]:size:' \
+			'-b+[set volblocksize]: :_numbers -M "m\:{a-zA-Z}={A-Za-z}" -u bytes blocksize :B {k,M,G,T,P,E,Z}{,B}' \
+			'-V+[set size]: :_numbers -M "m\:{a-zA-Z}={A-Za-z}" -u bytes size :B {k,M,G,T,P,E,Z}{,B}' \
 			':volume:_zfs_dataset -t fs -e "parent dataset"'
 		;;
 

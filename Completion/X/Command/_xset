@@ -91,8 +91,8 @@ _regex_arguments _xset_parse \
     \( "/(blank|noblank|expose|noexpose|default|on|activate|reset)$nul/" \
        ':option-s:screen saver:(blank noblank expose noexpose default on activate reset off)' \
     \| "/off$nul/" \( "/off$nul/" ':option-s-off-period:period off:(off)' \| \) \
-    \| "/[0-9]##$nul/" ':option-s-timeout:length:' \
-      \( "/[0-9]##$nul/" ':option-s-period:period:' \
+    \| "/[0-9]##$nul/" ':option-s-timeout: :_numbers -u seconds length' \
+      \( "/[0-9]##$nul/" ':option-s-period: :_numbers -u seconds period' \
       \| \) \
     \| \) \
   \| "/-r$nul/" "$guard" \

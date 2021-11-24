@@ -1,3 +1,17 @@
+2021-11-24  Oliver Kiddle  <opk@zsh.org>
+
+	* 49597: Completion/Base/Core/_description, Doc/Zsh/compsys.yo,
+	Completion/Base/Utility/_numbers, Completion/BSD/Command/_ipfw,
+	Completion/Linux/Command/_btrfs, Completion/Unix/Command/_dd,
+	Completion/Unix/Command/_git, Completion/Unix/Command/_head,
+	Completion/Unix/Command/_killall, Completion/Unix/Command/_pv,
+	Completion/Unix/Command/_rclone, Completion/Unix/Command/_rsync,
+	Completion/Unix/Command/_stdbuf, Completion/Unix/Command/_tail,
+	Completion/Unix/Command/_timeout, Completion/Unix/Command/_zfs,
+	Completion/X/Command/_xset: add a helper for completing numbers
+	with unit suffixes and separate out defaults, ranges and units
+	in completion descriptions
+
 2021-11-22  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 49586: Src/hist.c: fix :a and :A modifiers (with PWD="/") on

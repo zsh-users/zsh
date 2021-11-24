@@ -1,18 +1,19 @@
 #compdef dd gdd
 
-local -a vals conv flags
+local -a vals conv flags units
 local variant
 
+units=( w:word b:block k:1024 m g t )
 _pick_variant -r variant gnu=GNU $OSTYPE --version
 
 vals=(
-  '(ibs obs)bs[block size]:block size (bytes)'
-  'cbs[conversion buffer size]:buffer size (bytes)'
+  '(ibs obs)bs[block size]: :_numbers -u bytes "block size" $units'
+  'cbs[conversion buffer size]: :_numbers -u bytes "buffer size" $units'
   'conv[specify conversions to apply]: :_values -s , conversion $conv'
   'count[number of input blocks to copy]:blocks'
-  '(bs)ibs[input block size]:block size (bytes)'
+  '(bs)ibs[input block size]: :_numbers -u bytes -d 512 "block size" $units'
   'if[specify input file]:input file:_tilde_files'
-  '(bs)obs[output block size]:block size (bytes)'
+  '(bs)obs[output block size]: :_numbers -u bytes -d 512 "block size" $units'
   'of[specify output file]:output file:_tilde_files'
   'seek[output blocks initially skipped]:blocks'
   'skip[input blocks initially skipped]:blocks'
@@ -63,7 +64,7 @@ case $variant in
   freebsd*)
     vals+=(
       'fillchar[specify padding character]:character'
-      'speed[limit copying speed]:speed (bytes/second)'
+      'speed[limit copying speed]: :_numbers -u bytes/second speed $units'
     )
     conv+=(
       '(pareven parnone parodd parset)'{pareven,parnone,parodd,parset}
@@ -75,6 +76,7 @@ case $variant in
     )
     flags+=( fullblock noatime nocache count_bytes skip_bytes seek_bytes )
     conv+=( excl nocreat fdatasync fsync )
+    units=( c:1 w:2 b:512 kB:1000 K:1024 MB:1000^2 M:1024\^2 GB G TB T PB P EB E ZB Z YB Y )
   ;;
   netbsd*)
     vals+=(

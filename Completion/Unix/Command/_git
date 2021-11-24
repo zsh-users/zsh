@@ -3720,8 +3720,8 @@ _git-fast-import () {
                                                            now\:"use current time and timezone"' \
     '--done[terminate with error if there is no "done" command at the end of the stream]' \
     '--force[force updating modified existing branches]' \
-    '--max-pack-size=-[maximum size of each packfile]: : __git_guard_bytes' \
-    '--big-file-threshold=-[maximum size of blob to create deltas for]: : __git_guard_bytes' \
+    '--max-pack-size=-[maximum size of each packfile]: : __git_guard_bytes -d unlimited size' \
+    '--big-file-threshold=-[maximum size of blob to create deltas for]: : __git_guard_bytes -d 512m size' \
     '--depth=-[maximum delta depth for blob and tree deltification]: :__git_guard_number "maximum delta depth"' \
     '--active-branches=-[maximum number of branches to maintain active at once]: :__git_guard_number "maximum number of branches"' \
     '--export-marks=-[dump internal marks table when complete]: :_files' \
@@ -7506,7 +7506,7 @@ __git_guard_number () {
 
 (( $+functions[__git_guard_bytes] )) ||
 __git_guard_bytes () {
-  _guard '[[:digit:]]#([kKmMgG]|)' ${*:-size}
+  _numbers -u bytes ${*:-size} k m g
 }
 
 (( $+functions[__git_datetimes] )) ||

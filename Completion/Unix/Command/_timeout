@@ -16,5 +16,5 @@ _arguments -S -A "-" $args \
   "--foreground[don't propagate timeout to the command children]" \
   '(-s --signal)'{-s,--signal}'[specify the signal to send on timeout]:signal:_signals' \
   '(-k --kill-after)'{-k,--kill-after}'[followup first signal with SIGKILL if command persists after specified time]:time' \
-  '1: :_guard "[0-9.]#([smhd]|)" duration' \
+  '1: :_numbers -f -u seconds duration :s:seconds m:minutes h:hours d:days' \
   '*:::command:_normal'

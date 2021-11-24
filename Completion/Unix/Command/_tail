@@ -53,20 +53,14 @@ _arguments -C -s -S $opts : $args '*:file:_files' && return
 
 case $state in
   (number)
-    local mlt sign digit
-    mlt='multipliers:multiplier:((b\:512 K\:1024 KB\:1000 M\:1024\^2'
-    mlt+=' MB\:1000\^2 G\:1024\^3 GB\:1000\^3 T\:1024\^4 TB\:1000\^4))'
-    sign='signs:sign:((+\:"start at the specified byte/line"'
-    sign+=' -\:"output the last specified bytes/lines (default)"))'
-    digit='digits:digit:(0 1 2 3 4 5 6 7 8 9)'
-    if compset -P '(-|+|)[0-9]##'; then
-      _alternative $mlt $digit && ret=0
-    elif [[ -z $PREFIX ]]; then
-      _alternative $sign $digit && ret=0
-    elif compset -P '(+|-)'; then
-      _alternative $digit && ret=0
-    fi
-    ;;
+    local alts
+    [[ -z $PREFIX ]] && alts=(
+      'sign:sign:((-\:"print all but the last specified bytes/lines" +\:"print the first specified bytes/lines (default)"))'
+    )
+    compset -P '+'
+    alts+=( 'numbers: :_numbers -N $state_descr b\:512 K\:1024 KB\:1000 M\:1024\^2 MB\:1000\^2 G\:1024\^3 GB\:1000\^3 T\:1024\^4 TB\:1000\^4' )
+    _alternative $alts && ret=0
+  ;;
 esac
 
 return ret

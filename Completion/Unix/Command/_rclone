@@ -62,7 +62,7 @@ _arguments -C \
   '--backup-dir[make backups into hierarchy based at specified directory]:directory:_directories' \
   '--bind[specify socal address to bind to for outgoing connections]:IPv4, IPv6 or name' \
   '--buffer-size[specify in memory buffer size when reading files for each --transfer]:size [16M]' \
-  '--bwlimit[specify bandwidth limit]:BwTimetable (kBytes/s or b|k|M|G suffix)' \
+  '--bwlimit[specify bandwidth limit]: :_numbers -u kBytes/s limit b k M G' \
   '--cache-dir[specify directory rclone will use for caching]:directory [~/.cache/rclone]:_directories' \
   '--checkers[specify number of checkers to run in parallel]:number [8]': \
   '(-c --checksum)'{-c,--checksum}'[skip based on checksum & size, not mod-time & size]' \
@@ -99,15 +99,15 @@ _arguments -C \
   '--log-format[specify comma separated list of log format options]:string ["date,time"]' \
   '--log-level[specify log level]:string [NOTICE]:(DEBUG INFO NOTICE ERROR)'  \
   '--low-level-retries[number of low level retries to do]:int [10]' \
-  '--max-age[only transfer files younger than this in s or suffix ms|s|m|h|d|w|M|y]:duration [default off]' \
+  '--max-age[only transfer files younger than specified age]: :_numbers -u seconds age ms\:milliseconds \:s\:seconds m\:minutes h\:hours d\:days w\:weeks M\:months y\:years' \
   '--max-backlog[maximum number of objects in sync or check backlog]:int [10000]' \
   '--max-delete[when synchronizing, limit the number of deletes]:delete limit [-1]' \
   '--max-depth[limit the recursion depth]:depth [-1]' \
-  '--max-size[only transfer files smaller than this in k or suffix b|k|M|G]:int [default off]' \
+  '--max-size[only transfer files smaller than specified size]: :_numbers -u kBytes size \:k M G' \
   '--max-transfer[maximum size of data to transfer]:int [default off]' \
   '--memprofile[write memory profile to file]:file:_files' \
-  '--min-age[only transfer files older than this in s or suffix ms|s|m|h|d|w|M|y]:duration [default off]' \
-  '--min-size[only transfer files bigger than this in k or suffix b|k|M|G]:int [default off]' \
+  '--min-age[only transfer files older than specified age]: :_numbers -u seconds age ms\:milliseconds \:s\:seconds m\:minutes h\:hours d\:days w\:weeks M\:months y\:years' \
+  '--min-size[only transfer files bigger than specified size]: :_numbers -u kBytes size \:k M G' \
   '--modify-window[specify max time delta to be considered the same]:duration [1ns]' \
   '--multi-thread-cutoff[use multi-threaded downloads for files above specified size]:size (250M)' \
   '--multi-thread-streams[specify max number of streams to use for multi-threaded downloads]:number (4)' \

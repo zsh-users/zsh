@@ -4496,8 +4496,22 @@ not contain an explanation string to be displayed above the matches.
 If tt(_description) is called with more than three arguments,
 the additional var(spec)s should be of the form `var(char)tt(:)var(str)'.
 These supply escape sequence replacements for the tt(format) style:
-every appearance of `tt(%)var(char)' will be
-replaced by var(string).
+every appearance of `tt(%)var(char)' will be replaced by var(string).
+If no additional var(spec)s are given but the description in var(descr)
+conforms to a common form then further escape sequences are set for
+elements of that description.  These elements correspond to a default
+value (`tt(%o)'), the units (`tt(%m)') range of acceptable values
+(`tt(%r)') and the remaining initial part of the description (`tt(%h)').
+The form the description takes consists of specifying the units and
+range in parentheses and the default value in square brackets, for
+example:
+
+example(_description times expl 'timeout (seconds) (0-60) [20]')
+
+It is possible to use tt(zformat) conditional expressions when styling
+these elements. So, for example, to add `tt(default:)' as a tag but only
+when there is a default value to show, the tt(format) style might
+include `tt(%(o.default: %o.))'.
 
 If the tt(-x) option is given, the description will be passed to
 tt(compadd) using the tt(-x) option instead of the default tt(-X).  This
@@ -4773,6 +4787,69 @@ checked.  If it is set completion is terminated at that point even if
 no matches have been found.  This is the same effect as in the
 tt(-first-) context.
 )
+findex(_numbers)
+item(tt(_numbers) [ var(option) ... ] [ var(description) ] [ var(suffix) ... ])(
+This can be used where a number is followed by a suffix to indicate the units.
+The unit suffixes are completed and can also be included in the description
+used when completion is invoked for the preceding number.
+
+In addition to common tt(compadd) options, tt(_numbers) accepts the following
+options:
+
+startitem()
+item(tt(-t) var(tag))(
+Specify a tag to use instead of the default of tt(numbers).
+)
+item(tt(-u) var(units))(
+Indicate the default units for the number, e.g. tt(bytes).
+)
+item(tt(-l) var(min))(
+Specify the lowest possible value for the number.
+)
+item(tt(-m) var(max))(
+Specify the highest possible value for the number.
+)
+item(tt(-d) var(default))(
+Specify the default value.
+)
+item(tt(-N))(
+Allow negative numbers.  This is implied if the range includes a negative.
+)
+item(tt(-f))(
+Allow decimal numbers.
+)
+enditem()
+
+Where a particular suffix represents the default units for a number, it
+should be prefixed with a colon.  Additionally, suffixes can be followed
+by a colon and a description.  So for example, the following allows the
+age of something to be specified, either in seconds or with an optional
+suffix with a longer unit of time:
+
+example(_numbers -u seconds age :s:seconds m:minutes h:hours d:days)
+
+It is typically helpful for units to be presented in order of magnitude
+when completed.  To facilitate this, the order in which they are given
+is preserved.
+
+When the tt(format) style is looked up with the tt(descriptions) tag or
+the tag specified with tt(-t), the list of suffixes is available as a
+`tt(%x)' escape sequence. This is in addition to the usual sequences
+documented under the tt(format) style. The form this list takes can also
+be configured. To this end, the tt(format) style is first looked up with
+the tag tt(unit-suffixes). The retrieved format is applied to each
+suffix in turn and the results are then concatenated to form the
+completed list. For the tt(unit-suffixes) format, `tt(%x)' expands to
+the individual suffix and `tt(%X)' to its description. tt(%d)' indicates
+a default suffix and can be used in a condition. The index and reverse
+index are set in `tt(%i)' and `tt(%r)' respectively and are useful for
+text included only with the first and last suffixes in the list. So for
+example, the following joins the suffixes together as a comma-separated
+list:
+
+example(zstyle ':completion:*:unit-suffixes' format '%x%(r::,)')
+)
+
 findex(_options)
 item(tt(_options))(
 This can be used to complete the names of shell options.  It provides a

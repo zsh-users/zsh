@@ -38,15 +38,9 @@ if _pick_variant psmisc=PSmisc unix --version; then
 
   case $state in
     (time)
-      local -a units=( 's:seconds' 'm:minutes' 'h:hours' 'd:days'
-			'w:weeks' 'M:months' 'y:years' )
-      if compset -P '[0-9]##(|.[0-9]#)'; then
-	_alternative 'float-numbers:: _message "float number"' \
-		    'units:: _describe unit units' && ret=0
-      else
-	_message 'float number and unit' && ret=0
-      fi
-      ;;
+      _numbers -fN age 's:seconds' 'm:minutes' 'h:hours' 'd:days' \
+          'w:weeks' 'M:months' 'y:years'
+    ;;
   esac
 
   return ret
