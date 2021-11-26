@@ -1,3 +1,8 @@
+2021-11-26  Paul Seyfert  <Paul.Seyfert@sevensense.ch>
+
+	* github #83: Completion/Unix/Command/_git: _git-push,
+	_git-send-pack: Make --push-option repeatable.
+
 2021-11-26  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 49448: Doc/Zsh/contrib.yo, Doc/Zsh/zle.yo: docs: Fix pointers
