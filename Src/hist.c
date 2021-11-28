@@ -2619,12 +2619,19 @@ readhistline(int start, char **bufp, int *bufsiz, FILE *in, int *readbytes)
 	    }
 	}
 	else {
+	    int spc;
 	    buf[len - 1] = '\0';
 	    if (len > 1 && buf[len - 2] == '\\') {
 		buf[--len - 1] = '\n';
 		if (!feof(in))
 		    return readhistline(len, bufp, bufsiz, in, readbytes);
 	    }
+
+	    spc = len - 2;
+	    while (spc >= 0 && buf[spc] == ' ')
+		spc--;
+	    if (spc != len - 2 && buf[spc] == '\\')
+		buf[--len - 1] = '\0';
 	}
 	return len;
     }
@@ -2988,7 +2995,7 @@ savehistfile(char *fn, int err, int writeflags)
 
 	ret = 0;
 	for (; he && he->histnum <= xcurhist; he = down_histent(he)) {
-	    int count_backslashes = 0;
+	    int end_backslashes = 0;
 
 	    if ((writeflags & HFILE_SKIPDUPS && he->node.flags & HIST_DUP)
 	     || (writeflags & HFILE_SKIPFOREIGN && he->node.flags & HIST_FOREIGN)
@@ -3021,18 +3028,14 @@ savehistfile(char *fn, int err, int writeflags)
 		if (*t == '\n')
 		    if ((ret = fputc('\\', out)) < 0)
 			break;
-		if (*t == '\\')
-		    count_backslashes++;
-		else
-		    count_backslashes = 0;
+		end_backslashes = (*t == '\\' || (end_backslashes && *t == ' '));
 		if ((ret = fputc(*t, out)) < 0)
 		    break;
 	    }
 	    if (ret < 0)
 	    	break;
-	    if (count_backslashes && (count_backslashes % 2 == 0))
-		if ((ret = fputc(' ', out)) < 0)
-		    break;
+	    if (end_backslashes)
+		ret = fputc(' ', out);
 	    if (ret < 0 || (ret = fputc('\n', out)) < 0)
 		break;
 	}

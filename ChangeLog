@@ -1,3 +1,8 @@
+2021-11-28  Oliver Kiddle  <opk@zsh.org>
+
+	* 49601: Src/hist.c, Test/W01history.ztst: don't create
+	ambiguous history file entries for lines ending with a backslash
+
 2021-11-26  Paul Seyfert  <Paul.Seyfert@sevensense.ch>
 
 	* github #83: Completion/Unix/Command/_git: _git-push,
@@ -93,7 +98,7 @@
 	Completion/Base/Core/_description, Completion/Base/Core/_message,
 	Test/V13zformat.ztst: Add zformat -F option, similar to -f but
 	ternary expressions check for existence instead of doing math
-	evaluation. Make use it with the format style.
+	evaluation. Make use of it with the format style.
 
 2021-11-07  Oliver Kiddle  <opk@zsh.org>
 

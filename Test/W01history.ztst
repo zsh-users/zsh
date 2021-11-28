@@ -88,3 +88,25 @@ F:Check that a history bug introduced by workers/34160 is working again.
 0:Modifier :P
 >/my/path/for/testing
 >/my/path/for/testing
+
+ $ZTST_testdir/../Src/zsh -fgis <<<'
+ SAVEHIST=7
+ print -rs "one\\"
+ print -rs "two\\\\"
+ print -rs "three\\\\\\"
+ print -rs "four\\\\\\\\"
+ print -rs "five\\\\\\\\\\"
+ print -s  "while false\ndo\ntrue\\\\\n && break\ndone"
+ print -s  "echo one\\\\\ntwo"
+ fc -W hist
+ fc -p -R hist
+ fc -l
+ rm hist' 2>/dev/null
+0:Lines ending in backslash saved and restored to history
+>    1  one\
+>    2  two\\
+>    3  three\\\
+>    4  four\\\\
+>    5  five\\\\\
+>    6  while false\ndo\ntrue\\n && break\ndone
+>    7  echo one\\ntwo
