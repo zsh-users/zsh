@@ -2071,38 +2071,6 @@ AH_TEMPLATE([HAVE_PRCTL],
 AC_CHECK_FUNC(prctl,AC_DEFINE(HAVE_PRCTL),
 AC_SEARCH_LIBS(prctl,c,AC_DEFINE(HAVE_PRCTL)))
 
-dnl -------------
-dnl CHECK FOR NIS
-dnl -------------
-AH_TEMPLATE([HAVE_NIS],
-[Define to 1 if you have NIS.])
-AC_CACHE_CHECK(for NIS, zsh_cv_sys_nis,
-[test -f /usr/bin/ypcat && /usr/bin/ypcat passwd.byname > /dev/null 2>&1 && \
-zsh_cv_sys_nis=yes || zsh_cv_sys_nis=no])
-if test x$zsh_cv_sys_nis = xyes; then
-  AC_DEFINE(HAVE_NIS)
-dnl RPC is removed from glibc-2.26 and replaced by libtirpc
-  AC_CHECK_HEADER(rpc/rpc.h, [],
-  [test -f /usr/include/tirpc/rpc/rpc.h && \
-   CPPFLAGS="$CPPFLAGS -I/usr/include/tirpc"])
-dnl Some systems (Solaris 2.x, Linux Redhat 5.x) require
-dnl libnsl (Network Services Library) to find yp_all
-  AC_SEARCH_LIBS(yp_all, nsl)
-fi
-
-dnl -----------------
-dnl CHECK FOR NISPLUS
-dnl -----------------
-AH_TEMPLATE([HAVE_NIS_PLUS],
-[Define to 1 if you have NISPLUS.])
-AC_CACHE_CHECK(for NIS+, zsh_cv_sys_nis_plus,
-[test x$ac_cv_func_nis_list = xyes && test -f /usr/bin/nisls && \
- /usr/bin/nisls > /dev/null 2>&1 && \
-zsh_cv_sys_nis_plus=yes || zsh_cv_sys_nis_plus=no])
-if test x$zsh_cv_sys_nis_plus = xyes; then
-  AC_DEFINE(HAVE_NIS_PLUS)
-fi
-
 dnl ----------------------------------------
 dnl CHECK FOR LOCATION OF {U,W}TMP{,X} FILES
 dnl ----------------------------------------

@@ -1108,7 +1108,7 @@ substnamedir(char *s)
 
 /* Returns the current username.  It caches the username *
  * and uid to try to avoid requerying the password files *
- * or NIS/NIS+ database.                                 */
+ * or other source.                                      */
 
 /**/
 uid_t cached_uid;

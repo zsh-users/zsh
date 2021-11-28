@@ -1,5 +1,8 @@
 2021-11-28  Oliver Kiddle  <opk@zsh.org>
 
+	* 49606: Src/hashnameddir.c, Src/utils.c, configure.ac: remove old
+	NIS-specific code for retrieving user data
+
 	* 49602: Src/params.c: only set LOGCHECK from the watch module
 
 	* 49601: Src/hist.c, Test/W01history.ztst: don't create
