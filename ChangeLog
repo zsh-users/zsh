@@ -1,5 +1,7 @@
 2021-11-28  Oliver Kiddle  <opk@zsh.org>
 
+	* 49602: Src/params.c: only set LOGCHECK from the watch module
+
 	* 49601: Src/hist.c, Test/W01history.ztst: don't create
 	ambiguous history file entries for lines ending with a backslash
 

@@ -758,7 +758,7 @@ split_env_string(char *env, char **name, char **value)
  */
 static int dontimport(int flags)
 {
-    /* If explicitly marked as don't export */
+    /* If explicitly marked as don't import */
     if (flags & PM_DONTIMPORT)
 	return 1;
     /* If value already exported */
@@ -818,7 +818,6 @@ createparamtable(void)
      * given them in the environment.                           */
     opts[ALLEXPORT] = 0;
     setiparam("MAILCHECK", 60);
-    setiparam("LOGCHECK", 60);
     setiparam("KEYTIMEOUT", 40);
     setiparam("LISTMAX", 100);
     /*
