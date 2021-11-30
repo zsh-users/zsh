@@ -1,5 +1,8 @@
 2021-11-30  Oliver Kiddle  <opk@zsh.org>
 
+	* 49612: Src/module.c: avoid startup error with clashing non-local
+	module parameter name
+
 	* 49611 based on 49590 (Martijn Dekker): Src/math.c: disable Inf
 	and NaN in math expressions for sh emulation
 

@@ -1039,7 +1039,7 @@ checkaddparam(const char *nam, int opt_i)
 	 * non-autoloadable parameter already there.  This
 	 * is consistent with the way add_auto* functions work.
 	 */
-	if (!opt_i || !pm->level) {
+	if (!opt_i || pm->level) {
 	    zwarn("Can't add module parameter `%s': %s",
 		  nam, pm->level ?
 		  "local parameter exists" :
