@@ -1,3 +1,8 @@
+2021-11-30  Oliver Kiddle  <opk@zsh.org>
+
+	* 49611 based on 49590 (Martijn Dekker): Src/math.c: disable Inf
+	and NaN in math expressions for sh emulation
+
 2021-11-28  Oliver Kiddle  <opk@zsh.org>
 
 	* 49606: Src/hashnameddir.c, Src/utils.c, configure.ac: remove old

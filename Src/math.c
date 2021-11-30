@@ -863,7 +863,7 @@ zzlex(void)
 
 		p = ptr;
 		ptr = ie;
-		if (ie - p == 3) {
+		if (ie - p == 3 && !EMULATION(EMULATE_SH)) {
 		    if ((p[0] == 'N' || p[0] == 'n') &&
 			(p[1] == 'A' || p[1] == 'a') &&
 			(p[2] == 'N' || p[2] == 'n')) {
