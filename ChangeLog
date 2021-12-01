@@ -1,5 +1,8 @@
 2021-12-01  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 49628: Test/D01prompt.ztst: Add an xfail test for RPS1/RPROMPT
+	equivalence.
+
 	* 49624: Test/E03posix.ztst: Expect the test 'All identifiers
 	are variable references in POSIX arithmetic' to pass, as it
 	has been passing since 49611.

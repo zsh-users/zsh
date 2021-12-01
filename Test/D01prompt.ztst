@@ -257,3 +257,9 @@
     ZTST_skip='Missing terminfo module or non-colour terminal'
   fi
 0:Equivalence of terminal colour settings (background colour)
+
+ (RPS1=foo; echo $RPS1 $RPROMPT)
+ (RPS2=bar; echo $RPS2 $RPROMPT2)
+-fD:RPS1 and RPROMPT are aliases (regression from 5.0.6) (workers/49600)
+>foo foo
+>bar bar
