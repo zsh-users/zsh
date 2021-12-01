@@ -57,6 +57,8 @@ startmenu()
 menu(Keymaps)
 menu(Zle Builtins)
 menu(Zle Widgets)
+menu(User-Defined Widgets)
+menu(Standard Widgets)
 menu(Character Highlighting)
 endmenu()
 
