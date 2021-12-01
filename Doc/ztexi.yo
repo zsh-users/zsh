@@ -110,6 +110,7 @@ def(texiauthor)(1)(\
   NOTRANS(@author )ARG1\
 )
 
+COMMENT(Arguments are node identifiers: this, next, previous, up)
 def(texinode)(4)(\
   NOTRANS(@node )ARG1, ARG2, ARG3, ARG4\
 )

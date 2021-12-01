@@ -109,6 +109,7 @@ In the `tt(.safe)' keymap, each single key is bound to tt(self-insert),
 except for ^J (line feed) and ^M (return) which are bound to tt(accept-line).
 This is deliberately not pleasant to use; if you are using it, it
 means you deleted the main keymap, and you should put it back.
+
 subsect(Reading Commands)
 When ZLE is reading a command from the terminal, it may read a sequence
 that is bound to some command and is also a prefix of a longer bound string.
@@ -139,6 +140,7 @@ in user-defined widgets with the tt(read-command) widget, described in
 ifzman(the subsection `Miscellaneous' of the section `Standard Widgets' below)\
 ifnzman(noderef(Miscellaneous) below)\
 .
+
 subsect(Local Keymaps)
 cindex(local keymaps)
 While for normal editing a single keymap is used exclusively, in many
@@ -754,6 +756,7 @@ as shell functions.  When the widget is executed, the corresponding
 shell function is executed, and can perform editing (or other) actions.
 It is recommended that user-defined widgets should not have names
 starting with `tt(.)'.
+
 texinode(User-Defined Widgets)(Standard Widgets)(Zle Widgets)(Zsh Line Editor)
 sect(User-Defined Widgets)
 cindex(widgets, user-defined)
