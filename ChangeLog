@@ -1,5 +1,9 @@
 2021-12-01  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 49624: Test/E03posix.ztst: Expect the test 'All identifiers
+	are variable references in POSIX arithmetic' to pass, as it
+	has been passing since 49611.
+
 	* unposted: Doc/Zsh/zle.yo, Doc/ztexi.yo: Add whitespace and
 	comments.  No functional change.
 
