@@ -1,5 +1,7 @@
 2021-12-02  Oliver Kiddle  <opk@zsh.org>
 
+	* 49631: Completion/Unix/Command/_logger: new logger completion
+
 	* 49629: Completion/Linux/Command/_perf: new Linux perf completion
 
 2021-12-01  Daniel Shahaf  <d.s@daniel.shahaf.name>
