@@ -24,9 +24,10 @@ _bash_complete() {
     if [[ ${argv[${argv[(I)filenames]:-0}-1]} = -o ]]; then
       compset -P '*/' && matches=( ${matches##*/} )
       compset -S '/*' && matches=( ${matches%%/*} )
-      compadd -Q -f "${suf[@]}" -a matches && ret=0
+      compadd -f "${suf[@]}" -a matches && ret=0
     else
-      compadd -Q "${suf[@]}" -a matches && ret=0
+      compadd "${suf[@]}" - "${(@)${(Q@)matches}:#*\ }" && ret=0
+      compadd -S ' ' - ${${(M)${(Q)matches}:#*\ }% } && ret=0
     fi
   fi
 
