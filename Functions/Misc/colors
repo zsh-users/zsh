@@ -82,10 +82,13 @@ for k in ${(k)color}; do color[${color[$k]}]=$k; done
 for k in ${color[(I)3?]}; do color[fg-${color[$k]}]=$k; done
 
 # This is inaccurate, but the prompt theme system needs it.
+# Note: "gray" is US spelling.
 
-color[grey]=${color[black]}
-color[fg-grey]=${color[grey]}
-color[bg-grey]=${color[bg-black]}
+for k in grey gray; do
+  color[$k]=${color[black]}
+  color[fg-$k]=${color[grey]}
+  color[bg-$k]=${color[bg-black]}
+done
 
 # Assistance for the color-blind.
 
