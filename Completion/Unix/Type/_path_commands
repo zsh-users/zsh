@@ -87,18 +87,19 @@ fi
 # 'if' block move up to the "_command_names -" branch of _command_names?
 if [[ -o path_dirs ]]; then
   local -a path_dirs
-  path_dirs=(${^path}/*(/N:t))
-  (( ${#path_dirs} )) &&
-  _wanted path-dirs expl 'directory in path' compadd "$@" -a path_dirs && ret=0
 
   if [[ $PREFIX$SUFFIX = */* ]]; then
+    path_dirs=( ${path:#.} )
     # Find command from path, not hashed
-    _wanted commands expl 'external command' _path_files -W path -g '*(*)' &&
-    ret=0
+    _wanted commands expl 'external command' _path_files -W path_dirs -g '*(-*)' && ret=0
+  else
+    path_dirs=(${^path}/*(/N:t))
+    (( ${#path_dirs} )) &&
+        _wanted path-dirs expl 'directory in path' compadd "$@" -S / -a path_dirs && ret=0
   fi
 fi
 
-return $ret
+return ret
 }
 
 _path_commands "$@"

@@ -1,5 +1,8 @@
 2021-12-13  Oliver Kiddle  <opk@zsh.org>
 
+	* 49645: Completion/Unix/Type/_path_commands: when completing for
+	the path_dirs option, add a / suffix and follow symlinks
+
 	* 49643: Completion/Zsh/Type/_command_names: facilitate use
 	of the fake style by always calling _description with the
 	executables tag
