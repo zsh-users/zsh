@@ -1,5 +1,9 @@
 2021-12-13  Oliver Kiddle  <opk@zsh.org>
 
+	* 49643: Completion/Zsh/Type/_command_names: facilitate use
+	of the fake style by always calling _description with the
+	executables tag
+
 	* 49634, reported by Claes Nästén: configure.ac: revert 28989,
 	defining _POSIX_C_SOURCE caused issues on Solaris 10 but
 	doesn't seem to be needed for musl anymore

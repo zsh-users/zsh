@@ -4,7 +4,7 @@
 # complete only external commands and executable files. This and a
 # `-' as the first argument is then removed from the arguments.
 
-local args defs ffilt
+local args defs expl ffilt
 
 zstyle -t ":completion:${curcontext}:commands" rehash && rehash
 
@@ -16,8 +16,12 @@ defs=(
   'commands:external command:_path_commands'
 )
 
-[[ -n "$path[(r).]" || $PREFIX = */* ]] &&
-    defs+=( 'executables:executable file:_files -g \*\(-\*\)' )
+if [[ -n "$path[(r).]" || $PREFIX = */* ]]; then
+  defs+=( 'executables:executable file:_files -g \*\(-\*\)' )
+else
+  # this is ignored but exists to facilitate the use of the fake style
+  _description executables expl 'executable file'
+fi
 
 if [[ "$1" = -e ]]; then
   shift
@@ -58,7 +62,7 @@ fi
 if (( $#cmdpath )); then
   local -a +h path
   local -A +h commands
-  path=( $cmdpath )
+  path=( $cmdpath:A )
 fi
 
 _alternative -O args "$defs[@]"
