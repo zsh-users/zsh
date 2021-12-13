@@ -1,5 +1,8 @@
 2021-12-13  Oliver Kiddle  <opk@zsh.org>
 
+	* 49646: Doc/Zsh/mod_watch.yo, Src/Modules/watch.c, Src/prompt.c:
+	allow colors in WATCHFMT with %F/%K
+
 	* 49645: Completion/Unix/Type/_path_commands: when completing for
 	the path_dirs option, add a / suffix and follow symlinks
 

@@ -246,6 +246,7 @@ watchlog2(int inout, WATCH_STRUCT_UTMP *u, char *fmt, int prnt, int fini)
     struct tm *tm;
     char *fm2;
     int len;
+    zattr atr;
 # ifdef WATCH_UTMP_UT_HOST
     char *p;
     int i;
@@ -346,6 +347,40 @@ watchlog2(int inout, WATCH_STRUCT_UTMP *u, char *fmt, int prnt, int fini)
 		    break;
 		case '%':
 		    putchar('%');
+		    break;
+		case 'F':
+		    if (*fmt == '{') {
+			fmt++;
+			atr = match_colour((const char**)&fmt, 1, 0);
+			if (*fmt == '}')
+			    fmt++;
+			if (!(atr & (TXT_ERROR | TXTNOFGCOLOUR))) {
+			    txtunset(TXT_ATTR_FG_COL_MASK);
+			    txtset(atr & TXT_ATTR_FG_ON_MASK);
+			    set_colour_attribute(atr, COL_SEQ_FG, TSC_RAW);
+			}
+		    }
+		    break;
+		case 'f':
+		    txtunset(TXT_ATTR_FG_ON_MASK);
+		    set_colour_attribute(TXTNOFGCOLOUR, COL_SEQ_FG, TSC_RAW);
+		    break;
+		case 'K':
+		    if (*fmt == '{') {
+			fmt++;
+			atr = match_colour((const char**)&fmt, 0, 0);
+			if (*fmt == '}')
+			    fmt++;
+			if (!(atr & (TXT_ERROR | TXTNOBGCOLOUR))) {
+			    txtunset(TXT_ATTR_BG_COL_MASK);
+			    txtset(atr & TXT_ATTR_BG_ON_MASK);
+			    set_colour_attribute(atr, COL_SEQ_BG, TSC_RAW);
+			}
+		    }
+		    break;
+		case 'k':
+		    txtunset(TXT_ATTR_BG_ON_MASK);
+		    set_colour_attribute(TXTNOBGCOLOUR, COL_SEQ_BG, TSC_RAW);
 		    break;
 		case 'S':
 		    txtset(TXTSTANDOUT);

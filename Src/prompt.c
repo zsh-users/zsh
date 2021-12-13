@@ -1045,9 +1045,9 @@ tsetcap(int cap, int flags)
 	    if (txtisset(TXTUNDERLINE))
 		tsetcap(TCUNDERLINEBEG, flags);
 	    if (txtisset(TXTFGCOLOUR))
-		set_colour_attribute(txtattrmask, COL_SEQ_FG, TSC_PROMPT);
+		set_colour_attribute(txtattrmask, COL_SEQ_FG, flags);
 	    if (txtisset(TXTBGCOLOUR))
-		set_colour_attribute(txtattrmask, COL_SEQ_BG, TSC_PROMPT);
+		set_colour_attribute(txtattrmask, COL_SEQ_BG, flags);
 	}
     }
 }
@@ -2062,7 +2062,8 @@ set_colour_attribute(zattr atr, int fg_bg, int flags)
 		    *bv->bp++ = Outpar;
 		}
 	    } else {
-		tputs(tgoto(tcstr[tc], colour, colour), 1, putshout);
+		tputs(tgoto(tcstr[tc], colour, colour), 1,
+			(flags & TSC_RAW) ? putraw : putshout);
 	    }
 	    /* That worked. */
 	    return;
@@ -2121,7 +2122,7 @@ set_colour_attribute(zattr atr, int fg_bg, int flags)
 	    *bv->bp++ = Outpar;
 	}
     } else
-	tputs(colseq_buf, 1, putshout);
+	tputs(colseq_buf, 1, (flags & TSC_RAW) ? putraw : putshout);
 
     if (do_free)
 	free_colour_buffer();

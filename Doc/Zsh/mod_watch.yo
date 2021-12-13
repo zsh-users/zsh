@@ -65,6 +65,12 @@ The `tt(%m)' and `tt(%M)' escapes will work only if there is a host name
 field in the utmp on your machine.  Otherwise they are
 treated as ordinary strings.
 )
+item(tt(%F{)var(color)tt(}) LPAR()tt(%f)RPAR())(
+Start (stop) using a different foreground color.
+)
+item(tt(%K{)var(color)tt(}) LPAR()tt(%k)RPAR())(
+Start (stop) using a different background color.
+)
 item(tt(%S) LPAR()tt(%s)RPAR())(
 Start (stop) standout mode.
 )
