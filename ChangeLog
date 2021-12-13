@@ -1,3 +1,9 @@
+2021-12-13  Oliver Kiddle  <opk@zsh.org>
+
+	* 49634, reported by Claes Nästén: configure.ac: revert 28989,
+	defining _POSIX_C_SOURCE caused issues on Solaris 10 but
+	doesn't seem to be needed for musl anymore
+
 2021-12-07  Oliver Kiddle  <opk@zsh.org>
 
 	* 49633: Completion/Unix/Command/_git: update options for git 2.34
