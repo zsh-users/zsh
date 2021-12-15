@@ -1,3 +1,8 @@
+2022-02-12  dana  <dana@dana.is>
+
+	* Oliver Kiddle: security/41: Src/prompt.c: Prevent recursive
+	PROMPT_SUBST
+
 2022-02-04  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 49730: Completion/Unix/Command/_csplit,
