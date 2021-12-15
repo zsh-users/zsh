@@ -244,6 +244,12 @@ parsecolorchar(zattr arg, int is_fg)
 	bv->fm += 2; /* skip over F{ */
 	if ((ep = strchr(bv->fm, '}'))) {
 	    char oc = *ep, *col, *coll;
+	    int ops = opts[PROMPTSUBST], opb = opts[PROMPTBANG];
+	    int opp = opts[PROMPTPERCENT];
+
+	    opts[PROMPTPERCENT] = 1;
+	    opts[PROMPTSUBST] = opts[PROMPTBANG] = 0;
+
 	    *ep = '\0';
 	    /* expand the contents of the argument so you can use
 	     * %v for example */
@@ -252,6 +258,10 @@ parsecolorchar(zattr arg, int is_fg)
 	    arg = match_colour((const char **)&coll, is_fg, 0);
 	    free(col);
 	    bv->fm = ep;
+
+	    opts[PROMPTSUBST] = ops;
+	    opts[PROMPTBANG] = opb;
+	    opts[PROMPTPERCENT] = opp;
 	} else {
 	    arg = match_colour((const char **)&bv->fm, is_fg, 0);
 	    if (*bv->fm != '}')

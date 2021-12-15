@@ -1,3 +1,8 @@
+2022-01-27  dana  <dana@dana.is>
+
+	* Oliver Kiddle: security/41: Src/prompt.c: Prevent recursive
+	PROMPT_SUBST
+
 2020-02-14  dana  <dana@dana.is>
 
 	* unposted: Config/version.mk: Update for 5.8
