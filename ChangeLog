@@ -1,3 +1,9 @@
+2021-12-16  Oliver Kiddle  <opk@zsh.org>
+
+	* 49648 based on github #80 (Vincent Bernat):
+	Completion/Unix/Command/_find, Completion/Zsh/Type/_globquals:
+	invert before/since for date glob qualifiers completion
+
 2021-12-14  Oliver Kiddle  <opk@zsh.org>
 
 	* 49518: Src/Zle/computil.c, Etc/BUGS, Test/Y03arguments.ztst:

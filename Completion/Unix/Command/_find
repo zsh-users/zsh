@@ -156,11 +156,11 @@ if [[ $state = times ]]; then
     if zstyle -t ":completion:${curcontext}:senses" verbose; then
       zstyle -s ":completion:${curcontext}:senses" list-separator sep || sep=--
       default=" [default exactly]"
-      disp=( "- $sep before" "+ $sep since" )
+      disp=( "+ $sep before (older files)" "- $sep since (newer files)" )
       smatch=( - + )
     else
       disp=( before exactly since )
-      smatch=( - '' + )
+      smatch=( + '' - )
     fi
     alts=( "senses:sense${default}:compadd -V times -S '' -d disp -a smatch" )
   fi
