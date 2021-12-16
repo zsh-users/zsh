@@ -1,5 +1,8 @@
 2021-12-16  Oliver Kiddle  <opk@zsh.org>
 
+	* 49653: Src/Zle/computil.c: fix array indexing issue introduced
+	with 49518 due to using decimal rather than hex 20
+
 	* 49648 based on github #80 (Vincent Bernat):
 	Completion/Unix/Command/_find, Completion/Zsh/Type/_globquals:
 	invert before/since for date glob qualifiers completion

@@ -1088,10 +1088,10 @@ bslashcolon(char *s)
 static int
 single_index(char pre, char opt)
 {
-    if (opt <= 20 || opt > 0x7e)
+    if (opt <= 0x20 || opt > 0x7e)
 	return -1;
 
-    return opt + (pre == '-' ? -21 : 94 - 21);
+    return opt + (pre == '-' ? -0x21 : 94 - 0x21);
 }
 
 /* Parse an argument definition. */
@@ -2158,7 +2158,8 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
 
 	/* See if it's an option. */
 
-	if (state.opt == 2 && (state.curopt = ca_get_opt(d, line, 0, &pe)) &&
+	if (state.opt == 2 && (*line == '-' || *line == '+') &&
+	    (state.curopt = ca_get_opt(d, line, 0, &pe)) &&
 	    (state.curopt->type == CAO_OEQUAL ?
 	     (compwords[cur] || pe[-1] == '=') :
 	     (state.curopt->type == CAO_EQUAL ?
@@ -2206,6 +2207,7 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
 		state.curopt = NULL;
 	    }
 	} else if (state.opt == 2 && d->single &&
+		   (*line == '-' || *line == '+') &&
 		   ((state.curopt = ca_get_sopt(d, line, &pe, &sopts)) ||
 		    (cur != compcurrent && sopts && nonempty(sopts)))) {
 	    /* Or maybe it's a single-letter option? */
