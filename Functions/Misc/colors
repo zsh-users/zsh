@@ -85,7 +85,7 @@ for k in ${color[(I)3?]}; do color[fg-${color[$k]}]=$k; done
 
 for k in grey gray; do
   color[$k]=${color[black]}
-  color[fg-$k]=${color[grey]}
+  color[fg-$k]=${color[$k]}
   color[bg-$k]=${color[bg-black]}
 done
 
