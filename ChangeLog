@@ -1,5 +1,7 @@
 2022-02-12  dana  <dana@dana.is>
 
+	* CVE-2021-45444: NEWS, README: Document preceding two changes
+
 	* Marc Cornellà: security/89:
 	Etc/CVE-2021-45444-VCS_Info-workaround.patch: Add patch which
 	can optionally be used to work around recursive PROMPT_SUBST

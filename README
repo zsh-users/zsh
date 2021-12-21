@@ -34,6 +34,9 @@ details, see the documentation.
 Incompatibilities since 5.8
 ---------------------------
 
+PROMPT_SUBST expansion is no longer performed on arguments to prompt-
+expansion sequences such as %F.
+
 Build-time change: The default value of the --enable-gdbm configure
 argument has changed from "yes" to "no".  Thus, the zsh/db/gdbm module will
 not be built unless --enable-gdbm is passed explicitly.
