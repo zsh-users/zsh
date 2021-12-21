@@ -1,3 +1,8 @@
+2021-12-21  Oliver Kiddle  <opk@zsh.org>
+
+	* 49655 based on 34928 (Daniel Hahler):
+	Completion/Unix/Command/_pip: new pip completion
+
 2021-12-16  Oliver Kiddle  <opk@zsh.org>
 
 	* 49653: Src/Zle/computil.c: fix array indexing issue introduced
