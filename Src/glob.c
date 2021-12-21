@@ -2549,7 +2549,7 @@ get_match_ret(Imatchdata imd, int b, int e)
     e += add;
 
     /* Everything now refers to metafied lengths. */
-    if (replstr || (fl & SUB_LIST)) {
+    if (replstr) {
 	if (fl & SUB_DOSUBST) {
 	    replstr = dupstring(replstr);
 	    singsub(&replstr);
