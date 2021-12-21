@@ -31,6 +31,12 @@ Zsh is a shell with lots of features.  For a list of some of these, see the
 file FEATURES, and for the latest changes see NEWS.  For more
 details, see the documentation.
 
+Incompatibilities since 5.8
+---------------------------
+
+PROMPT_SUBST expansion is no longer performed on arguments to prompt-
+expansion sequences such as %F.
+
 Incompatibilities since 5.7.1
 -----------------------------
 

@@ -4,6 +4,26 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
+Changes since 5.8
+-----------------
+
+CVE-2021-45444: Some prompt expansion sequences, such as %F, support
+'arguments' which are themselves expanded in case they contain colour
+values, etc. This additional expansion would trigger PROMPT_SUBST
+evaluation, if enabled. This could be abused to execute code the user
+didn't expect. e.g., given a certain prompt configuration, an attacker
+could trick a user into executing arbitrary code by having them check
+out a Git branch with a specially crafted name.
+
+This is fixed in the shell itself by no longer performing PROMPT_SUBST
+evaluation on these prompt-expansion arguments.
+
+Users who are concerned about an exploit but unable to update their
+binaries may apply the partial work-around described in the file
+Etc/CVE-2021-45444-VCS_Info-workaround.patch included with the shell
+source. [ Reported by RyotaK <security@ryotak.me>. Additional thanks to
+Marc Cornellà <hello@mcornella.com>. ]
+
 Changes since 5.7.1-test-3
 --------------------------
 
