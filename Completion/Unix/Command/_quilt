@@ -261,6 +261,8 @@ case $words[1] in
       '-d[specify path prefix for resulting source tree]:prefix:_files -W / -P /' \
       '--sourcedir[specify location of package sources]:directory:_directories' \
       '--fuzz=[set the maximum fuzz factor]:factor' \
+      '(--fast)--slow[use the original, slow method to process the spec file]' \
+      '(--slow)--fast[use an alternative, faster method to process the spec file]' \
       ':file:_files' && return
   ;;
   snapshot) _arguments $help '-d[only remove current snapshot]' && return ;;

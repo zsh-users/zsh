@@ -1,3 +1,8 @@
+2022-01-23  Andreas Schneider  <asn@cryptomilk.org>
+
+	* gitlab !17: Completion/Unix/Command/_quilt: Add missing
+	options for quilt setup command
+
 2022-01-01  Bart Schaefer  <schaefer@zsh.org>
 
 	* Matt Alexander: 49667: Functions/Misc/colors: include "gray"
