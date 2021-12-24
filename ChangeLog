@@ -1,5 +1,8 @@
 2021-12-29  Oliver Kiddle  <opk@zsh.org>
 
+	* Aaron Schrab: 49664: Completion/Unix/Command/_git:
+	Use associative array for third-party completion
+
 	* 49668: Completion/Unix/Command/_zfs,
 	Completion/Unix/Type/_zfs_dataset: update zfs completion
 

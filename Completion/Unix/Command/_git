@@ -6267,8 +6267,8 @@ _git_commands () {
   zstyle -a :completion:$curcontext: user-commands user_commands
 
   local command
-  for command in $_git_third_party_commands; do
-    (( $+commands[git-${command%%:*}] )) && third_party_commands+=$command
+  for command in ${(k)_git_third_party_commands}; do
+    (( $+commands[git-${command}] )) && third_party_commands+=$command$_git_third_party_commands[$command]
   done
 
   local -a aliases
@@ -8475,7 +8475,7 @@ _git() {
 }
 
 # Load any _git-* definitions so that they may be completed as commands.
-declare -gUa _git_third_party_commands
+declare -gA _git_third_party_commands
 _git_third_party_commands=()
 
 local file input
@@ -8497,7 +8497,7 @@ for file in ${^fpath}/_git-*~(*~|*.zwc)(-.N); do
     (( i++ ))
   done < $file
 
-  _git_third_party_commands+=$name$desc
+  _git_third_party_commands+=([$name]=$desc)
 done
 
 _git
