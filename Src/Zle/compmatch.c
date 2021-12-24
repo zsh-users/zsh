@@ -1319,7 +1319,7 @@ pattern_match_equivalence(Cpattern lp, convchar_t wind, int wmtp,
     convchar_t lchr;
     int lmtp;
 
-    if (!PATMATCHINDEX(lp->u.str, wind-1, &lchr, &lmtp)) {
+    if (!PATMATCHINDEX(lp->u.str, wind, &lchr, &lmtp)) {
 	/*
 	 * No equivalent.  No possible match; give up.
 	 */

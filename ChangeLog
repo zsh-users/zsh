@@ -1,3 +1,8 @@
+ 2021-12-24  Bart Schaefer  <schaefer@zsh.org>
+
+	* m0viefreak: 38150: Src/Zle/compmatch.c: fix off-by-one error
+	in matcher spec parsing
+
 2021-12-21  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 49658: Src/glob.c: Remove erroneous use of NULL pointer for
