@@ -291,7 +291,7 @@ do
 	args=( "${(@)argv[1,end]}" )
 	shift $((end > ARGC ? ARGC : end))
 	if (( $#i ))
-	then call=( "${(@)command/$i/$args}" )
+	then call=( "${(@)command//$i/$args}" )
 	else call=( "${(@)command}" "${(@)args}" )
 	fi
 	if (( ${(c)#call} > s ))
