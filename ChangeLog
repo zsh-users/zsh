@@ -1,4 +1,9 @@
- 2021-12-24  Bart Schaefer  <schaefer@zsh.org>
+2021-12-29  Oliver Kiddle  <opk@zsh.org>
+
+	* 49668: Completion/Unix/Command/_zfs,
+	Completion/Unix/Type/_zfs_dataset: update zfs completion
+
+2021-12-24  Bart Schaefer  <schaefer@zsh.org>
 
 	* m0viefreak: 38150: Src/Zle/compmatch.c: fix off-by-one error
 	in matcher spec parsing

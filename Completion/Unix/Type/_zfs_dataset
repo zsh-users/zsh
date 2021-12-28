@@ -11,10 +11,12 @@ local expl_type
 # -t takes arguments (what kinds of datasets) and can appear multiple times
 zparseopts -D -E e:=expl_type_arr p=paths_allowed r1=rsrc r2=rdst t+:=type
 
-[[ -n $type[(r)fs] ]]    && typearg=( filesystem )
-[[ -n $type[(r)vol] ]]   && typearg=( $typearg volume )
-[[ -n $type[(r)snap] ]]  && typearg=( $typearg snapshot )
-[[ -n $type[(r)share] ]]  && typearg=( $typearg share )
+[[ -n $type[(r)fs] ]] && typearg=( filesystem )
+[[ -n $type[(r)vol] ]] && typearg+=( volume )
+[[ -n $type[(r)snap] ]] && typearg+=( snapshot )
+[[ -n $type[(r)share] && $implementation = solaris ]] && typearg+=( share )
+[[ -n $type[(r)bookmark] && $implementation = openzfs ]] &&
+    typearg+=( bookmark )
 if [[ -n $typearg ]]; then
 	typearg=( -t ${(j:,:)typearg} )
 # We know we're in zfs list if paths_allowed is non-empty.
@@ -58,7 +60,7 @@ if [[ ${#rdst} -gt 0 ]]; then
 fi
 
 if [[ -n $type[(r)clone] ]]; then
-	datasetlist=( ${(f)"$(zfs list -H -o name,origin -t filesystem 2>/dev/null | awk -F $'\t' "\$2 != \"-\" {print \$1}")":#no cloned filesystems available} )
+  datasetlist=( ${(f)"$(zfs list -H -o name,origin -t filesystem 2>/dev/null | awk -F$'\t' "\$2 != \"-\" {print \$1}")":#no cloned filesystems available} )
 else
 	datasetlist=( ${(f)"$(zfs list -H -o name $typearg 2>/dev/null)":#no datasets available} )
 fi
@@ -74,4 +76,5 @@ if [[ -n $expl_type_arr[2] ]]; then
 	expl_type=$expl_type_arr[2]
 fi
 
-_wanted dataset expl "$expl_type" _multi_parts "$@" -q / datasetlist
+_description datasets expl "$expl_type"
+_multi_parts "$@" "$expl[@]" -q / datasetlist
