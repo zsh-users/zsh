@@ -1,3 +1,7 @@
+2022-01-01  Bart Schaefer  <schaefer@zsh.org>
+
+	* Matt Alexander: 49667: Functions/Misc/colors: include "gray"
+
 2021-12-29  Oliver Kiddle  <opk@zsh.org>
 
 	* Aaron Schrab: 49664: Completion/Unix/Command/_git:
