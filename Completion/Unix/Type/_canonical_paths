@@ -42,7 +42,13 @@ _canonical_paths_add_paths () {
     # ### Ideally, this codepath would do what the 'if' above does,
     # ### but telling compadd to pretend the "word on the command line"
     # ### is ${"the word on the command line"/$origpref/$canpref}.
-    matches+=(${${(M)files:#$canpref*}/$canpref/$origpref})
+    () {
+      local -a tmp_buffer tmp_buffer2
+      tmp_buffer=(${${(M)files:#$canpref*}/$canpref/$origpref})
+      compadd -A tmp_buffer2 "$__gopts[@]" -a tmp_buffer
+      matches+=($tmp_buffer2)
+    }
+    # matches+=(${${(M)files:#$canpref*}/$canpref/$origpref})
   fi
 
   for subdir in $expref?*(@); do
