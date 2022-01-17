@@ -1,5 +1,9 @@
 2022-01-27  dana  <dana@dana.is>
 
+	* Marc Cornellà: security/82 (tweaked):
+	Functions/VCS_Info/VCS_INFO_formats: Fix typo in
+	hook_com[base-name_orig] assignment
+
 	* CVE-2021-45444: NEWS, README: Document preceding two changes
 
 	* Marc Cornellà: security/89:
