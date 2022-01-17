@@ -28,7 +28,7 @@ hook_com=(
     vcs_orig      "${vcs}"
 )
 hook_com[base-name]="${${hook_com[base]}:t}"
-hook_com[base-name_orig]="${hook_com[base_name]}"
+hook_com[base-name_orig]="${hook_com[base-name]}"
 hook_com[subdir]="$(VCS_INFO_reposub ${hook_com[base]})"
 hook_com[subdir_orig]="${hook_com[subdir]}"
 
