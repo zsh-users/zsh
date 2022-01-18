@@ -1885,7 +1885,8 @@ unfreezing the tty does not guarantee settings made on the
 command line are preserved.  Strings of commands run between
 editing the command line will see a consistent tty state.
 See also the shell variable tt(STTY) for a means of initialising
-the tty before running external commands.
+the tty before running external commands and/or freezing the tty
+around a single command.
 )
 findex(type)
 item(tt(type) [ tt(-wfpamsS) ] var(name) ...)(

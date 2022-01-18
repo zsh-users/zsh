@@ -1,3 +1,8 @@
+2022-01-30  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 49694 + doc: Doc/Zsh/builtins.yo, Doc/Zsh/params.yo, Src/exec.c:
+	Allow using empty STTY= to freeze tty for a single command
+
 2022-01-29  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Functions/VCS_Info/test-repo-git-rebase-apply,

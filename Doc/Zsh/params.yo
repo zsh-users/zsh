@@ -1570,6 +1570,11 @@ if it is in the environment of the shell but not explicitly assigned to in
 the input line. This avoids running stty at every external command by
 accidentally exporting it. Also note that tt(STTY) should not be used for
 window size specifications; these will not be local to the command.
+
+If the parameter is set and empty, all of the above applies except
+that tt(stty) is not run. This can be useful as a way to freeze the tty
+around a single command, blocking its changes to tty settings,
+similar to the tt(ttyctl) builtin.
 )
 vindex(TERM)
 item(tt(TERM) <S>)(

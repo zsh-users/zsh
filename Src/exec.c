@@ -684,8 +684,10 @@ execute(LinkList args, int flags, int defpath)
 
     /* If the parameter STTY is set in the command's environment, *
      * we first run the stty command with the value of this       *
-     * parameter as it arguments.                                 */
-    if ((s = STTYval) && isatty(0) && (GETPGRP() == getpid())) {
+     * parameter as it arguments. If the parameter is empty, we   *
+     * do nothing, but this causes the terminal settings to be    *
+     * restored later which can be useful.                        */
+    if ((s = STTYval) && *s && isatty(0) && (GETPGRP() == getpid())) {
 	char *t = tricat("stty", " ", s);
 
 	STTYval = 0;	/* this prevents infinite recursion */
