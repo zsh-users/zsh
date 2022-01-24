@@ -1,5 +1,10 @@
 2022-01-27  dana  <dana@dana.is>
 
+	* Marc Cornellà: security/89:
+	Etc/CVE-2021-45444-VCS_Info-workaround.patch: Add patch which
+	can optionally be used to work around recursive PROMPT_SUBST
+	issue in VCS_Info
+
 	* Oliver Kiddle: security/41: Src/prompt.c: Prevent recursive
 	PROMPT_SUBST
 
