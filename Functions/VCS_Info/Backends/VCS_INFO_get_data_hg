@@ -56,7 +56,6 @@ if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" get-revision ; then
         zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" \
             "check-for-changes" || hgid_args+=( -r. )
 
-        local HGPLAIN
         HGPLAIN=1 ${vcs_comm[cmd]} ${(z)hgid_args} 2> /dev/null \
             | read -r r_csetid r_lrev
     fi
