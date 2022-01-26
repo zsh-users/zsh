@@ -122,7 +122,7 @@ _svn () {
         case $cmd in;
           (add)
             args+=(
-              '*:file:_files -g "*(e:_svn_uncontrolled:)"'
+              '*:file: _svn_modified "addable"'
             )
           ;;
           (auth)
@@ -350,17 +350,11 @@ _svn_controlled() {
   # because 1.6 has been deprecated for 8 years and EOL for 6 years, we opt to DTRT
   # for >=1.7.  Therefore:
 
-  # TODO: Reimplement this function and _svn_uncontrolled for svn>=1.7.
+  # TODO: Reimplement this function for svn>=1.7.
   # (Use 'svn st' or 'svn info', not 'svn ls')
   return 0
 }
 
-
-(( $+functions[_svn_uncontrolled] )) ||
-_svn_uncontrolled() {
-  # TODO: See comments in _svn_controlled
-  return 0
-}
 
 (( $+functions[_svn_conflicts] )) ||
 _svn_conflicts() {
@@ -375,7 +369,7 @@ _svn_conflicts() {
 _svn_modified() {
   setopt localoptions extendedglob
 
-  local depth dir expl partial_word space=' '
+  local depth dir expl maybe_quiet partial_word space=' '
 
   local svn_context=$1
 
@@ -394,9 +388,15 @@ _svn_modified() {
     depth=immediates
   fi
 
+  if [[ $svn_context = addable ]]; then
+    maybe_quiet=""
+  else
+    maybe_quiet="-q"
+  fi
+
   local -a status_lines
   # Run 'status'
-  status_lines=( ${(f)"$(_call_program modified-files "svn status -q --depth=${(q)depth} -- ${(q)dir}")"} )
+  status_lines=( ${(f)"$(_call_program modified-files "svn status $maybe_quiet --depth=${(q)depth} -- ${(q)dir}")"} )
   # Filter to only the right set of statuses
   case $svn_context in
     (committable)
@@ -404,6 +404,10 @@ _svn_modified() {
       ;;
     (revertable)
       status_lines=( ${(M)status_lines:#(#s)([ACDMR~!]?|?[CM])${space}????${space}*} )
+      ;;
+    (addable)
+      # The 'D' is just in case there's an unversioned file of the same name as the deleted file
+      status_lines=( ${(M)status_lines:#(#s)[?ID]${space}${space}???${space}${space}*} )
       ;;
   esac
   # Strip the 7 status-letter columns and the column of spaces
