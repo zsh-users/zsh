@@ -390,7 +390,7 @@ _svn_status() {
   local mtime="$(zstat +mtime $dir/.svn/entries)"
 
   if (( ! $+_cache_svn_status[$key] || _cache_svn_mtime[$key] != mtime )); then
-    _cache_svn_status[$key]="$(_call_program files svn status -N $dir)"
+    _cache_svn_status[$key]="$(_call_program files svn status -q -N -- $dir)"
     _cache_svn_mtime[$key]="$mtime"
   fi
 
