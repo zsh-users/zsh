@@ -364,7 +364,11 @@ _svn_uncontrolled() {
 
 (( $+functions[_svn_conflicts] )) ||
 _svn_conflicts() {
-  () { (( $# > 0 )) } $REPLY.(mine|r<->)(NY1)
+  # ### These strings are actually translatable
+  #
+  # The asterisks are to support an optional extension; see
+  # "preserved-conflict-file-exts" in ~/.subversion/config.
+  () { (( $# > 0 )) } $REPLY.(mine|r<->|working*|merge-left*|merge-right*)(NY1)
 }
 
 (( $+functions[_svn_modified] )) ||
