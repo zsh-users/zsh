@@ -146,7 +146,7 @@ _svn () {
           ;;
           (delete)
             args+=(
-              '*:file:_files -g ".svn(/e:_svn_deletedfiles:)"'
+              '*:file:_files -g "*(e:_svn_controlled:)"'
             )
           ;;
           (diff)
