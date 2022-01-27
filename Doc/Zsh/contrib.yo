@@ -1404,7 +1404,7 @@ a directory that holds quilt's patches needs to be found. That directory is
 configurable via the `tt(QUILT_PATCHES)' environment variable. If that
 variable exists its value is used, otherwise the value `tt(patches)' is
 assumed. The value from tt($QUILT_PATCHES) can be overwritten using the
-`tt(quilt-patches)' style. (Note: you can use tt(vcs_info) to keep the value
+`tt(quilt-patch-dir)' style. (Note: you can use tt(vcs_info) to keep the value
 of tt($QUILT_PATCHES) correct all the time via the tt(post-quilt) hook).
 
 When the directory in question is found, quilt is assumed to be active. To
