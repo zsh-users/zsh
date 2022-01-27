@@ -1,3 +1,8 @@
+2022-01-27  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted: Functions/VCS_Info/VCS_INFO_quilt: vcs_info quilt:
+	Remove a no-op variable assignment
+
 2022-01-25  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 49709: Functions/VCS_Info/Backends/VCS_INFO_get_data_hg:
