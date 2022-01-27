@@ -92,7 +92,7 @@ function VCS_INFO_quilt-patch2subject() {
     emulate -L zsh
     setopt extendedglob
     local mode="$1"
-    local patches pc tmp qstring root
+    local patches pc qstring root
     local -i ret
     local context
     local -a applied unapplied applied_string unapplied_string quiltcommand quilt_env
@@ -135,12 +135,13 @@ function VCS_INFO_quilt-patch2subject() {
         zstyle -s "${context}" quiltcommand quiltcommand || quiltcommand='quilt'
         if [ -z "$patches" ]; then
             zstyle -s "${context}" quilt-patch-dir patches || patches="${QUILT_PATCHES}"
+            : ${patches:="patches"}
             if [[ "${patches}" != /* ]]; then
-                tmp=${patches:-patches}
-                VCS_INFO_quilt-dirfind "${tmp}"
-                ret=$? patches=$REPLY
-                (( ret )) && return ${ret}
-                patches=${patches}/${tmp}
+                if VCS_INFO_quilt-dirfind "${patches}"; then
+                    patches="$REPLY/${patches}"
+                else
+                    return $?
+                fi
             else
                 [[ -d ${patches} ]] || return 1
             fi
