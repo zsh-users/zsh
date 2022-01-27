@@ -113,9 +113,12 @@ function VCS_INFO_quilt-patch2subject() {
         ;;
     esac
 
-    VCS_INFO_quilt-dirfind .pc .version
-    ret=$? pc=$REPLY
-    if (( ret == 0 )); then
+    # Look for the patches directory.
+    #
+    # 1. Check if there's a .pc/.version file in a parent dir.  If so, use the
+    # patches dir from the corresponding .pc/.quilt_patches.
+    if VCS_INFO_quilt-dirfind .pc .version; then
+        pc=$REPLY
         [[ ${quiltmode} == 'standalone' ]] && root=${pc}
         pc=${pc}/.pc
         if [[ -e ${pc}/applied-patches ]]; then
@@ -128,25 +131,27 @@ function VCS_INFO_quilt-patch2subject() {
         fi
         patches=$(<$pc/.quilt_patches)
         patches=`builtin cd -q "${pc:h}" && print -r - ${patches:P}`
+    # 2. Else, locate a patches dir using the style settings.
+    else
+        zstyle -s "${context}" quilt-patch-dir patches || patches="${QUILT_PATCHES}"
+        : ${patches:="patches"}
+        if [[ "${patches}" != /* ]]; then
+            if VCS_INFO_quilt-dirfind "${patches}"; then
+                patches=$REPLY/$patches
+            else
+                return $?
+            fi
+        else
+            [[ -d ${patches} ]] || return 1
+        fi
+        quilt_env+=(QUILT_PATCHES="$patches")
     fi
+    # At this point, $patches is set and points to an existing directory.
+
     if zstyle -t "${context}" get-unapplied; then
         # This zstyle call needs to be moved further up if `quilt' needs
         # to be run in more places than this one.
         zstyle -s "${context}" quiltcommand quiltcommand || quiltcommand='quilt'
-        if [ -z "$patches" ]; then
-            zstyle -s "${context}" quilt-patch-dir patches || patches="${QUILT_PATCHES}"
-            : ${patches:="patches"}
-            if [[ "${patches}" != /* ]]; then
-                if VCS_INFO_quilt-dirfind "${patches}"; then
-                    patches="$REPLY/${patches}"
-                else
-                    return $?
-                fi
-            else
-                [[ -d ${patches} ]] || return 1
-            fi
-            quilt_env+=(QUILT_PATCHES="$patches")
-        fi
         unapplied=( ${(f)"$(if (( $+quilt_env[1] )); then export ${quilt_env[@]}; fi
                             $quiltcommand --quiltrc /dev/null unapplied 2> /dev/null)"} )
         unapplied=( ${unapplied:#} )
@@ -154,8 +159,7 @@ function VCS_INFO_quilt-patch2subject() {
         unapplied=()
     fi
 
-    if [[ -n $patches ]]; then
-      () {
+    {
         local i
         for ((i=1; i<=$#applied; i++)); do
           if VCS_INFO_quilt-patch2subject "$patches/$applied[$i]" && (( $+REPLY ))
@@ -173,8 +177,7 @@ function VCS_INFO_quilt-patch2subject() {
             unapplied[$i]+=" ?"
           fi
         done
-      }
-    fi
+    }
 
     VCS_INFO_set-patch-format 'applied' 'applied_string' \
                               'unapplied' 'unapplied_string' \

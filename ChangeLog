@@ -1,5 +1,9 @@
 2022-01-29  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 49723: Functions/VCS_Info/VCS_INFO_quilt: vcs_info quilt:
+	Use quilt-patch-dir and ${QUILT_PATCHES} even when get-unapplied
+	hasn't been set
+
 	* 49722: Functions/VCS_Info/VCS_INFO_quilt: vcs_info quilt:
 	Refactor for readability. No functional change.
 
