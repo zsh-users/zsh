@@ -1,3 +1,5 @@
+## vim:ft=zsh
+#
 # A collection of vcs_info usage examples
 
 ### Running vcs_info #########################################################

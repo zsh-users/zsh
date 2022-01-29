@@ -1,3 +1,5 @@
+## vim:ft=zsh
+#
 # This function takes as an argument a filename of a patch and sets $REPLY to
 # a single-line "subject", or unsets it if no subject could be extracted.
 {

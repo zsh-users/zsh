@@ -1,5 +1,10 @@
 2022-01-29  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Functions/VCS_Info/VCS_INFO_patch2subject,
+	Functions/VCS_Info/VCS_INFO_set-branch-format,
+	Functions/VCS_Info/VCS_INFO_set-patch-format: vcs_info: Add
+	Vim modelines
+
 	* 49723: Functions/VCS_Info/VCS_INFO_quilt: vcs_info quilt:
 	Use quilt-patch-dir and ${QUILT_PATCHES} even when get-unapplied
 	hasn't been set

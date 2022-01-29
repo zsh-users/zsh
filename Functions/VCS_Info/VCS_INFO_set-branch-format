@@ -1,3 +1,5 @@
+## vim:ft=zsh
+#
 # A function for calling the branch-format hook
 #
 # Return the value to use in REPLY

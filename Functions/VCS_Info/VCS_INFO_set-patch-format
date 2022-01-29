@@ -1,3 +1,5 @@
+## vim:ft=zsh
+#
 # This function is the common guts of the gen-applied-string /
 # gen-unapplied-string / set-patch-format dance of several backends.
 #
