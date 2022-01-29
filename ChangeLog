@@ -1,6 +1,9 @@
 2022-01-29  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	vcs_info git: Add a missing guard against redefining a function.
+
+	* unposted: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
 	vcs_info git: Deconfuse $EDITOR
 
 	* unposted: Functions/VCS_Info/VCS_INFO_patch2subject,

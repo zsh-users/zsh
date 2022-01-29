@@ -196,6 +196,7 @@ elif [[ -d "${gitdir}/rebase-merge" ]]; then
     # 'git rebase -i'
     patchdir="${gitdir}/rebase-merge"
     local p
+    (( ${+functions[VCS_INFO_git_map_rebase_line_to_hash_and_subject]} )) ||
     VCS_INFO_git_map_rebase_line_to_hash_and_subject() {
         local p=$1
         unset REPLY
