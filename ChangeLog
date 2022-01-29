@@ -1,5 +1,9 @@
 2022-02-20  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 49728: Functions/VCS_Info/Backends/VCS_INFO_get_data_hg:
+	vcs_info hg mq: Don't include applied patches in the unapplied
+	patches
+
 	* 49727 (+ comment): Doc/Zsh/contrib.yo,
 	Functions/VCS_Info/Backends/VCS_INFO_get_data_git,
 	Functions/VCS_Info/Backends/VCS_INFO_get_data_hg,

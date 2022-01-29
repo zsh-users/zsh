@@ -183,6 +183,9 @@ if zstyle -T ":vcs_info:${vcs}:${usercontext}:${rrn}" get-mq \
             # Skip commented lines
             [[ ${i_patch} == [[:space:]]#"#"* ]] && continue
 
+            # Skip applied patches
+            (( ${+mqpatches[(re)${i_patch}]} )) && continue
+
             # Separate negative and positive guards to more easily find the
             # intersection of active guards with patch guards
             i_patchguards=( ${(s: :)i_patchguards} )
