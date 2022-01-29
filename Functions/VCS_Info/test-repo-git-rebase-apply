@@ -44,6 +44,16 @@ append_lines 7 8 9
 # Specify a rebase that would create the history [1,3,4,5,6,7,8,9].
 # This will conflict because r7 depends on r2 which is not included.
 git checkout -b myref
-git rebase --onto=rebase_onto_this rebase_from_this myref
+case $0:P in
+    (*/test-repo-git-rebase-apply)
+        git rebase --onto=rebase_onto_this rebase_from_this myref
+        ;;
+    (*/test-repo-git-rebase-merge)
+        git -c core.editor=true rebase -i --onto=rebase_onto_this rebase_from_this myref
+        ;;
+    (*)
+        echo >&2 "$0: unrecognized basename"
+        ;;
+esac
 
 
