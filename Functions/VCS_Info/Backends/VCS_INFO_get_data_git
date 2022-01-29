@@ -132,7 +132,7 @@ VCS_INFO_git_handle_patches () {
     VCS_INFO_set-patch-format 'git_patches_applied' 'git_applied_s' \
                               'git_patches_unapplied' 'git_unapplied_s' \
                               ":vcs_info:${vcs}:${usercontext}:${rrn}" gitmsg \
-                              '' ''
+                              '' '' ''
     gitmisc=$REPLY
 }
 

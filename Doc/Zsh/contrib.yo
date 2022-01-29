@@ -1669,6 +1669,11 @@ available as tt(%p) in the tt(patch-format) and tt(nopatch-format) styles.
 This hook is, in concert with tt(set-patch-format), responsible for
 tt(%)-escaping that value for use in the prompt.
 (See ifzman(the bf(Oddities) section)ifnzman(noderef(vcs_info Oddities)).)
+
+COMMENT(This paragraph is repeated above/below)\
+The tt(quilt) backend passes to this hook the inputs
+tt(${hook_com[quilt-patches-dir]}) and, if it has been
+determined, tt(${hook_com[quilt-pc-dir]}).
 )
 item(tt(gen-unapplied-string))(
 Called in the tt(git) (with tt(stgit) or during rebase), and tt(hg) (with
@@ -1687,6 +1692,11 @@ tt(patch-format) and tt(nopatch-format) styles.
 This hook is, in concert with tt(set-patch-format), responsible for
 tt(%)-escaping that value for use in the prompt.
 (See ifzman(the bf(Oddities) section)ifnzman(noderef(vcs_info Oddities)).)
+
+COMMENT(This paragraph is repeated above/below)\
+The tt(quilt) backend passes to this hook the inputs
+tt(${hook_com[quilt-patches-dir]}) and, if it has been
+determined, tt(${hook_com[quilt-pc-dir]}).
 )
 item(tt(gen-mqguards-string))(
 Called in the tt(hg) backend when tt(guards-string) is generated; the
@@ -1769,6 +1779,11 @@ This hook is, in concert with the tt(gen-applied-string) or
 tt(gen-unapplied-string) hooks if they are defined, responsible for
 tt(%)-escaping the final tt(patch-format) value for use in the prompt.
 (See ifzman(the bf(Oddities) section)ifnzman(noderef(vcs_info Oddities)).)
+
+COMMENT(This paragraph is repeated above/below)\
+The tt(quilt) backend passes to this hook the inputs
+tt(${hook_com[quilt-patches-dir]}) and, if it has been
+determined, tt(${hook_com[quilt-pc-dir]}).
 )
 item(tt(set-message))(
 Called each time before a `tt(vcs_info_msg_)var(N)tt(_)' message is set.

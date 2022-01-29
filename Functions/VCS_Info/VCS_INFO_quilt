@@ -179,10 +179,15 @@ function VCS_INFO_quilt-patch2subject() {
         done
     }
 
+    typeset -A quilt_extra_info=(
+        quilt-patches-dir ${patches}
+        ${pc:+"quilt-pc-dir"} $pc
+    )
+
     VCS_INFO_set-patch-format 'applied' 'applied_string' \
                               'unapplied' 'unapplied_string' \
                               ${context} qstring \
-                              '' ''
+                              quilt_extra_info '' quilt_extra_info
     qstring=$REPLY
 
     case ${mode} in

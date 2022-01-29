@@ -225,7 +225,7 @@ if zstyle -T ":vcs_info:${vcs}:${usercontext}:${rrn}" get-mq \
     VCS_INFO_set-patch-format 'mqpatches' 'applied_string' \
                               'mqunapplied' 'unapplied_string' \
                               ":vcs_info:${vcs}:${usercontext}:${rrn}" hgmqstring \
-                              extra_hook_com VCS_INFO_hg_extra_zformats
+                              extra_hook_com VCS_INFO_hg_extra_zformats ''
     hgmqstring=$REPLY
 fi
 

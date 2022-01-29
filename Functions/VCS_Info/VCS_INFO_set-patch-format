@@ -15,6 +15,8 @@
 # $7 - name of an assoc parameter with extra $hook_com key-value pairs for the
 #      set-patch-format hook invocation, or '' for none
 # $8 - name of a function that sets $reply to extra arguments for the patch-format zformat call, or '' for none
+# $9 - name of an assoc parameter with extra $hook_com key-value pairs for the
+#      gen-applied-string & gen-unapplied-string hook invocations, or '' for none
 #
 # The expanded patch-format string is returned in $REPLY.
 #
@@ -22,8 +24,10 @@
 # - $hook_com is overwritten and the keys 'applied', 'applied-n',
 #   'unapplied', 'unapplied-n', 'all-n' are set.
 {
+    hook_com=()
+
     local applied_needs_escaping='unknown'
-    local unapplied_needs_escaping='unknown'
+    hook_com+=( ${9:+"${(@kvP)9}"} )
     if VCS_INFO_hook 'gen-applied-string' "${(@P)1}"; then
         if (( ${(P)#1} )); then
             REPLY=${(P)1[1]}
@@ -37,6 +41,8 @@
     : ${(P)2::=$REPLY}
     hook_com=()
 
+    local unapplied_needs_escaping='unknown'
+    hook_com+=( ${9:+"${(@kvP)9}"} )
     if VCS_INFO_hook 'gen-unapplied-string' "${(@P)3}"; then
         REPLY=${(P)#3}
         unapplied_needs_escaping='yes'
