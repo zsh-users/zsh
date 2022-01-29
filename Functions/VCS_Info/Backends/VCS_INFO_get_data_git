@@ -207,7 +207,7 @@ elif [[ -d "${gitdir}/rebase-merge" ]]; then
                 # Comment line.  Skip.
                 return 0
                 ;; 
-            ((p|pick|e|edit|r|reword|f|fixup|s|squash)' '*)
+            (''(p|pick|e|edit|r|reword|f|fixup|s|squash)' '*)
                 # The line is of the form "pick $hash $subject".
                 # Just strip the verb and we're good to go.
                 p=${p#* }
@@ -230,7 +230,7 @@ elif [[ -d "${gitdir}/rebase-merge" ]]; then
                         p="${p%% *} ?"
                 fi
                 ;;
-            ((x|exec) *)
+            (''(x|exec) *)
                 # The line is of the form 'exec foo bar baz' where 'foo bar
                 # baz' is a shell command.  There's no way to map _that_ to
                 # "$hash $subject", but I hope this counts as making an effort.
