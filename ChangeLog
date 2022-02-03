@@ -1,3 +1,10 @@
+2022-02-02  Matthew Martin  <phy1729@gmail.com>
+
+	* 49731: Completion/BSD/Command/_sysclean,
+	Completion/BSD/Command/_sysmerge,
+	Completion/BSD/Command/_syspatch,
+	Completion/BSD/Command/_sysupgrade: Add completers
+
 2022-01-30  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 49694 + doc: Doc/Zsh/builtins.yo, Doc/Zsh/params.yo, Src/exec.c:
