@@ -1,3 +1,9 @@
+2022-02-04  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 49730: Completion/Unix/Command/_csplit,
+	Completion/Unix/Command/_pr, Completion/Unix/Command/_ptx,
+	Completion/Unix/Command/_truncate: New completers
+
 2022-02-02  Matthew Martin  <phy1729@gmail.com>
 
 	* 49731: Completion/BSD/Command/_sysclean,
