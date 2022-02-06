@@ -1,3 +1,8 @@
+2022-02-22  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 49769: Doc/Zsh/mod_stat.yo: Mention how to show nanosecond
+	precision
+
 2022-02-20  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 49728: Functions/VCS_Info/Backends/VCS_INFO_get_data_hg:

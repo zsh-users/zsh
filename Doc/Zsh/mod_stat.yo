@@ -118,6 +118,8 @@ formatting of the time elements.  The format string supports all of the
 zsh extensions described in
 ifzman(the section EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
 ifnzman(noderef(Prompt Expansion)).
+In particular, tt(-F %s.%N) can be used to show timestamps with nanosecond
+precision if supported by the system.
 The tt(-s) option is implied.
 )
 item(tt(-g))(
