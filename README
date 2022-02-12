@@ -5,12 +5,11 @@ THE Z SHELL (ZSH)
 Version
 -------
 
-This is version 5.8 of the shell.  This is a security and feature release.
-There are a few visible improvements since 5.7, as well as many bugfixes.
+This is version 5.8.1 of the shell.  This is a security and bugfix release.
 All zsh installations are encouraged to upgrade as soon as possible.
 
 Note in particular the changes highlighted under "Incompatibilities since
-5.7.1" below.  See NEWS for more information.
+5.8" below.  See NEWS for more information.
 
 Installing Zsh
 --------------

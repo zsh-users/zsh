@@ -1,5 +1,8 @@
 2022-02-12  dana  <dana@dana.is>
 
+	* unposted: Config/version.mk, Etc/FAQ.yo, README: Update
+	for 5.8.1
+
 	* Marc Cornellà: security/82 (tweaked):
 	Functions/VCS_Info/VCS_INFO_formats: Fix typo in
 	hook_com[base-name_orig] assignment
