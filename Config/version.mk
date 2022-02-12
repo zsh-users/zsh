@@ -27,5 +27,5 @@
 # This must also serve as a shell script, so do not add spaces around the
 # `=' signs.
 
-VERSION=5.8
-VERSION_DATE='February 14, 2020'
+VERSION=5.8.1
+VERSION_DATE='February 12, 2022'
