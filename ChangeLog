@@ -1,5 +1,7 @@
 2022-02-12  dana  <dana@dana.is>
 
+	* unposted: Config/version.mk: Post-release version bump
+
 	* unposted: Config/version.mk, Etc/FAQ.yo, README: Update
 	for 5.8.1
 
