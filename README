@@ -160,7 +160,7 @@ https://zsh.org/workers/48414 (commit zsh-5.8-348-g2c000ee7b) for details
 and an example.
 
 Incompatibilities between 5.5.1 and 5.6.2
-------------------------------------------
+-----------------------------------------
 
 The completion helper _remote_files, typically used after a hostname
 with scp-style completion, now uses remote-files instead of files as a

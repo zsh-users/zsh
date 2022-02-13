@@ -1,3 +1,8 @@
+2022-02-13  Axel Beckert  <abe@deuxchevaux.org>
+
+	* unposted: README: Fix underline length of "Incompatibilities
+	between 5.5.1 and 5.6.2" headline. (Cosmetic fix)
+
 2022-02-12  dana  <dana@dana.is>
 
 	* unposted: Config/version.mk: Post-release version bump
