@@ -1,3 +1,8 @@
+2022-02-15  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 49756 + 49758 (Daniel): Etc/FAQ.yo, Util/zyodl.vim: replace
+	yodl macro LPAR() in FAQ.yo by SUBST(_LPAR_)
+
 2022-02-13  Axel Beckert  <abe@deuxchevaux.org>
 
 	* unposted: README: Fix underline length of "Incompatibilities

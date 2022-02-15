@@ -82,6 +82,8 @@ syn keyword zyodlBullet  itemiz      conceal cchar=•
 syn match   zyodlSpecial "\<DASH()-" conceal cchar=—
 syn match   zyodlSpecial "+\?LPAR()" conceal cchar=(
 syn match   zyodlSpecial "+\?RPAR()" conceal cchar=)
+syn match   zyodlSpecial "+\?_LPAR_" conceal cchar=(
+syn match   zyodlSpecial "+\?_RPAR_" conceal cchar=)
 syn match   zyodlSpecial "+\?PLUS()" conceal cchar=+
 syn match   zyodlFAQDash "+\?\<emdash()" conceal cchar=—
  

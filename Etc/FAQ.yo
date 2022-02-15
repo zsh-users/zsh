@@ -55,8 +55,8 @@ def(emdash)(0)(\
     whenhtml(---)\
     whenman(--)whenms(--)whensgml(--)\
     whentxt(--))\
-def(LPAR)(0)(CHAR(40))\
-def(RPAR)(1)(CHAR(41))
+SUBST(_LPAR_)(CHAR(40))\
+SUBST(_RPAR_)(CHAR(41))
 myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2010/02/15)
 COMMENT(-- the following are for Usenet and must appear first)\
 description(\
@@ -706,7 +706,7 @@ label(23)
     cd() { builtin cd "$@"; print -D $PWD; }
   )
   (which converts your home directory to a tt(~)).  In fact, this problem is
-  better solved by defining the special function chpwd+LPAR()RPAR() (see
+  better solved by defining the special function chpwd+_LPAR__RPAR_ (see
   the manual). Note also that the mytt(;) at the end of the function is
   optional in zsh, but not in ksh or sh (for sh's where it exists).
 
@@ -790,7 +790,7 @@ label(23)
     function l { /bin/ls -la "$@" | more }
   )
   The mytt(l) after mytt(function) is not expanded.  Note you don't need
-  the mytt(LPAR()RPAR()) in this case, although it's harmless.
+  the mytt(_LPAR__RPAR_) in this case, although it's harmless.
 
   You need to be careful if you are defining a function with multiple
   names; most people don't need to do this, so it's an unusual problem,
@@ -803,7 +803,7 @@ label(23)
   This oddity was fixed in version 5.1.
 
   The rest of this item assumes you use the (more common,
-  but equivalent) mytt(LPAR()RPAR()) definitions.
+  but equivalent) mytt(_LPAR__RPAR_) definitions.
 
   Bart Schaefer's rule is:  Define first those aliases you expect to
   use in the body of a function, but define the function first if the
@@ -1986,7 +1986,7 @@ label(327)
   mytt(something) mustn't contain tt(/) if the pattern is being used for
   globbing.
 
-  Likewise, mytt(abc+LPAR()<->~<10-100>RPAR().txt) matches a file consisting of
+  Likewise, mytt(abc+_LPAR_<->~<10-100>_RPAR_.txt) matches a file consisting of
   tt(abc), then some digits, then tt(.txt), unless the digits happen to
   match a number from 10 to 100 inclusive (remember the handy mytt(<->)
   pattern for matching integers with optional limits to the range).  So
@@ -2109,7 +2109,7 @@ sect(Why doesn't the expansion mytt(*.{tex,aux,pdf}) do what I expect?)
 
   This use of parentheses is special to zsh.  Modern Bourne-like shells
   have a syntax like this, too, but with an mytt(@) in front of the
-  parentheses: again, see link(2.1)(21), and search for mytt(@+LPAR()).
+  parentheses: again, see link(2.1)(21), and search for mytt(@_LPAR_).
   This is harder for the user to remember but easier for the shell to
   parse!
 
