@@ -26,4 +26,4 @@ _arguments : \
     '-8bit[make all characters printable by default]' \
     '-help[display this help and exit]' \
     '-version[output version information and exit]' \
-    '*:TeX or LaTeX file:_files -g "*.(tex|TEX|texinfo|texi)(-.)"'
+    '*:TeX or LaTeX file:_files -g "*.(tex|TEX|texinfo|texi|dtx)(-.)"'

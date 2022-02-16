@@ -1,3 +1,8 @@
+2022-02-16  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 49757 (sourceforge #1): samcarter: Completion/Unix/Command/_tex:
+	offer *.dtx as TeX input files
+
 2022-02-15  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 49756 + 49758 (Daniel): Etc/FAQ.yo, Util/zyodl.vim: replace
