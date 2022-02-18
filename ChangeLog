@@ -1,5 +1,8 @@
 2022-11-17  Oliver Kiddle  <opk@zsh.org>
 
+	* github #87: Matt Koscica: Completion/Unix/Command/_tmux:
+	update options tmux 3.4
+
 	* github #95: Wu Zhenyu: Completion/Unix/Command/_mutt:
 	Add completions for neomutt
 

@@ -130,6 +130,8 @@ _tmux_aliasmap=(
     popup       display-popup
 
     # buffers
+    clearphist  clear-prompt-history
+    showphist   show-prompt-history
     clearhist   clear-history
     deleteb     delete-buffer
     lsb         list-buffers
@@ -267,6 +269,11 @@ _tmux-clear-history() {
   _arguments '-t+[specify target pane]:pane:__tmux-panes'
 }
 
+_tmux-clear-prompt-history() {
+  [[ -n ${tmux_describe} ]] && print "remove history of values for command line prompts" && return
+  _arguments '-T+[specify prompt type]:prompt type:(command search target window-target)'
+}
+
 _tmux-clock-mode() {
   [[ -n ${tmux_describe} ]] && print "enter clock mode" && return
   _arguments '-t+[specify target pane]:pane:__tmux-panes'
@@ -282,8 +289,7 @@ _tmux-command-prompt() {
     '-I+[specify list of initial inputs]:initial-text (comma-separated list)' \
     '-p+[specify list of prompts]:prompts (comma-separated list)' \
     '-t+[specify target client]:client:__tmux-clients' \
-    '(-W)-T[prompt is for a target - tab complete as appropriate]' \
-    '(-T)-W[prompt is for a window - tab complete as appropriate]' \
+    '-T+[specify prompt type]:prompt type:(command search target window-target)' \
     '*:::template:= _tmux'
 }
 
@@ -388,13 +394,19 @@ _tmux-display-panes() {
 _tmux-display-popup() {
   [[ -n ${tmux_describe} ]] && print "display a popup box over a pane" && return
   _arguments -s \
+    "-B[don't surround the popup by a border]" \
     '-C[close any popup on the client]' \
     '-c+[specify target client]:client:__tmux-clients' \
     '-d+[specify working directory for the command]:directory:_directories' \
+    '*-e[specify environment variable]:environment variable:_parameters -g "*export*" -qS=' \
     '-E[close the popup when the command exits]' \
+    '(-E)-EE[only close the popup when the command exits successfully]' \
     '-w+[specify width]:width' \
     '-h+[specify height]:height' \
+    '-s+[specify the style for the popup]:style:__tmux-style' \
+    '-S+[specify the style for the popup border]:style:__tmux-style' \
     '-t+[specify target pane]:pane:__tmux-panes' \
+    '-T+[specify popup title (supports formats)]:format:__tmux-formats' \
     '-x+[specify horizontal position]:position' \
     '-y+[specify vertical position]:position' \
     ':shell command:_cmdstring'
@@ -865,6 +877,10 @@ _tmux-send-prefix() {
     '-t+[specify target pane]:pane:__tmux-panes'
 }
 
+# NOTE: this is actually an alias for "show-messages -JT", but until the
+# aliasmap system in check-tmux-state can properly handle aliases which are
+# more complex than a single word, it's best to leave this here.
+
 _tmux-server-info() {
   [[ -n ${tmux_describe} ]] && print "show server information" && return
   __tmux-nothing-else
@@ -1039,6 +1055,11 @@ _tmux-show-options() {
   fi
   __tmux-options-complete ${mode} ${state} && ret=0
   return ret
+}
+
+_tmux-show-prompt-history() {
+  [[ -n ${tmux_describe} ]] && print "show status prompt history" && return
+  _arguments '-T+[specify prompt type]:prompt type:(command search target window-target)'
 }
 
 _tmux-show-window-options() {
@@ -1530,7 +1551,6 @@ function __tmux-option-guard() {
             'status-right-style:__tmux-style'
             'status-style:__tmux-style'
             'update-environment:MSG:string listing env. variables'
-            'user-keys:MSG:key'
             'visual-activity:DESC:on off'
             'visual-bell:DESC:on off'
             'visual-silence:DESC:on off'
@@ -1549,6 +1569,7 @@ function __tmux-option-guard() {
             'message-limit:'${int_guard}
             'set-clipboard:DESC:on off'
             'terminal-overrides:MSG:overrides string'
+            'user-keys:MSG:key'
         )
     else
         options=(
@@ -1643,6 +1664,8 @@ function __tmux-session-options() {
         'set-titles-string:format used by set-titles'
         'silence-action:set action on window silence when monitor-silence is on'
         'status:show or hide the status bar'
+        'status-bg:set the background style used by the status bar'
+        'status-fg:set the foreground style used by the status bar'
         'status-format:specify the format to be used for each line of the status line'
         'status-interval:interval (in seconds) for status bar updates'
         'status-justify:position of the window list in status bar'
@@ -1656,7 +1679,6 @@ function __tmux-session-options() {
         'status-right-style:style of right part of status line'
         'status-style:style status line'
         "update-environment:list of variables to be copied to a session's environment"
-        'user-keys:set list of user-defined key escape sequences'
         'visual-activity:display status line messages upon activity'
         'visual-bell:use visual bell instead of audible'
         'visual-silence:print a message if monitor-silence is on'
@@ -1701,20 +1723,28 @@ function __tmux-panes() {
     fi
 }
 
+
 function __tmux-server-options() {
     local -a tmux_server_options
     tmux_server_options=(
+        'backspace:set key sent by tmux for backspace'
         'buffer-limit:number of buffers kept per session'
         'command-alias:custom command aliases'
+        'copy-command:specify the default command when "copy-pipe" is called without arguments'
         'default-terminal:default terminal definition string'
         'escape-time:set timeout to detect single escape characters (in msecs)'
+        'editor:specify the command used when tmux runs an editor'
         'exit-unattached:make server exit if it has no attached clients'
         'exit-empty:exit when there are no active sessions'
+        'extended-keys:control whether tmux will send extended keys through to the terminal'
         'focus-events:request focus events from terminal'
         'history-file:tmux command history file name'
         'message-limit:set size of message log per client'
+        'prompt-history-limit:set the number of history items to save in the history file'
         'set-clipboard:use esc sequences to set terminal clipboard'
+        'terminal-features:set terminal features not detected by terminfo'
         'terminal-overrides:override terminal descriptions'
+        'user-keys:set list of user-defined key escape sequences'
     )
     _describe -t tmux-server-options 'tmux server option' tmux_server_options
 }
@@ -1770,10 +1800,15 @@ function __tmux-window-options() {
         'aggressive-resize:aggressively resize windows'
         'allow-rename:allow programs to change window titles'
         'alternate-screen:allow alternate screen feature to be used'
-        'automatic-rename:attempt to automatically rename windows'
         'automatic-rename-format:format for automatic renames'
+        'automatic-rename:attempt to automatically rename windows'
         'clock-mode-colour:set clock colour'
         'clock-mode-style:set clock hour format (12/24)'
+        'copy-mode-current-match-style:set the style of the current search match in copy mode'
+        'copy-mode-mark-style:set the style of the line containing the mark in copy mode'
+        'copy-mode-match-style:set the style of search matches in copy mode'
+        'cursor-colour:set the colour of the cursor'
+        'cursor-style:set the style of the cursor'
         'main-pane-height:set height for main-* layouts'
         'main-pane-width:set width for main-* layouts'
         'mode-keys:mode to use in copy and choice modes (vi/emacs)'
@@ -1786,11 +1821,18 @@ function __tmux-window-options() {
         'pane-active-border-style:style of border of active pane'
         'pane-base-index:integer at which to start indexing panes'
         'pane-border-format:set pane border format string'
+        'pane-border-indicators:set the indicator style for the active pane in a two pane split'
+        'pane-border-lines:set the type of characters used for drawing pane borders'
         'pane-border-status:turn border status off or set its position'
         'pane-border-style:style of border pane'
+        "pane-colours:an array used to configure tmux's colour palette"
+        'popup-border-lines:set the type of line used to draw popup borders'
+        "popup-border-style:set the style for the popup's border"
+        'popup-style:set the popup style'
         "remain-on-exit:don't destroy windows after the program exits"
         'synchronize-panes:send input to all panes of a window'
         'window-active-style:style of active window'
+        'window-size:indicate how to automatically size windows'
         'window-status-activity-style:style of status bar activity tag'
         'window-status-bell-style:style of status bar bell tag'
         'window-status-current-format:set status line format for active window'
@@ -1799,7 +1841,6 @@ function __tmux-window-options() {
         'window-status-last-style:style of last window in status bar'
         'window-status-separator:separator drawn between windows in status line'
         'window-status-style:general status bar style'
-        'window-size:indicate how to automatically size windows'
         'window-style:style of window'
         'wrap-search:search wrap around at the end of a pane'
         'xterm-keys:generate xterm-style function key sequences'

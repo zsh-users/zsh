@@ -74,18 +74,18 @@ available_aliases=( $( $tmux list-commands |
 # Gather information about options:
 typeset -a supported_session_options
 supported_session_options=( ${"${tmux_session_options[@]}"%%:*} )
-typeset -a available_session_options
-available_session_options=( $( $tmux show-options -g | cut -f1 -d' ' ) )
+typeset -aU available_session_options
+available_session_options=( ${${${(f)"$($tmux show-options -g)"}:#@*}%%(\[<->\])# *} )
 
-typeset -a available_server_options
-supported_server_options=( ${"${tmux_server_options[@]}"%%:*} )
 typeset -a supported_server_options
-available_server_options=( $( $tmux show-options -s -g | cut -f1 -d' ' ) )
+supported_server_options=( ${"${tmux_server_options[@]}"%%:*} )
+typeset -aU available_server_options
+available_server_options=( ${${${(f)"$($tmux show-options -s -g)"}:#@*}%%(\[<->\])# *} )
 
 typeset -a supported_window_options
 supported_window_options=( ${"${tmux_window_options[@]}"%%:*} )
-typeset -a available_window_options
-available_window_options=( $( $tmux show-options -w -g | cut -f1 -d' ' ) )
+typeset -aU available_window_options
+available_window_options=( ${${${(f)"$($tmux show-options -w -g)"}:#@*}%%(\[<->\])# *} )
 
 typeset -a supported available
 
