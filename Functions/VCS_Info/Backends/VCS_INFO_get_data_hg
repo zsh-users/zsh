@@ -14,7 +14,7 @@ local hgbase bmfile branchfile topicfile rebasefile dirstatefile mqseriesfile \
 
 local -a hgid_args defrevformat defbranchformat \
     hgbmarks mqpatches mqguards mqunapplied hgmisc \
-    i_patchguards i_negguards i_posguards
+    i_patch i_patchguards i_negguards i_posguards
 
 local -A hook_com
 
