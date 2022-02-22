@@ -1159,7 +1159,7 @@ This is used by the Perforce backend (tt(p4)) to decide if it should
 contact the Perforce server to find out if a directory is managed
 by Perforce.  This is the only reliable way of doing this, but runs
 the risk of a delay if the server name cannot be found.  If the
-server (more specifically, the tt(host)tt(:)tt(port) pair describing the
+server (more specifically, the var(host)tt(:)var(port) pair describing the
 server) cannot be contacted, its name is put into the associative array
 tt(vcs_info_p4_dead_servers) and is not contacted again during the session
 until it is removed by hand.  If you do not set this style, the tt(p4)
@@ -1318,7 +1318,7 @@ tt(%Q) expando.
 item(tt(%Q))(
 Quilt series information.
 When quilt is used (either in `addon' mode or as a `standalone' backend),
-this expando is set to quilt series' tt(patch-format) string.
+this expando is set to the quilt series' tt(patch-format) string.
 The tt(set-patch-format) hook and tt(nopatch-format) style are honoured.
 
 See ifzman(tt(Quilt Support))ifnzman(noderef(vcs_info Quilt Support)) below for details.

@@ -103,7 +103,10 @@ wcs_ztrdup(const wchar_t *s)
 #endif /* MULTIBYTE_SUPPORT */
 
 
-/* concatenate s1, s2, and s3 in dynamically allocated buffer */
+/* Concatenate s1, s2, and s3 into dynamically allocated buffer.
+ *
+ * To concatenate four or more strings, see zjoin().
+ */
 
 /**/
 mod_export char *

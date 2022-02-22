@@ -1448,7 +1448,7 @@ struct builtin {
     int minargs;		/* minimum number of arguments                        */
     int maxargs;		/* maximum number of arguments, or -1 for no limit    */
     int funcid;			/* xbins (see above) for overloaded handlerfuncs      */
-    char *optstr;		/* string of legal options                            */
+    char *optstr;		/* string of legal options (see execbuiltin())        */
     char *defopts;		/* options set by default for overloaded handlerfuncs */
 };
 

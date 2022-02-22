@@ -592,7 +592,7 @@ getpmfunction_source(HashTable ht, const char *name)
     return getfunction_source(ht, name, 0);
 }
 
-/* Param table entry for retrieving ds_functions_source element */
+/* Param table entry for retrieving dis_functions_source element */
 
 /**/
 static HashNode
