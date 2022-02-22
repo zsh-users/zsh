@@ -1,3 +1,8 @@
+2022-02-22  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 49672: Doc/Zsh/expn.yo: document "tied" output in parameter
+	(t) output.
+
 2022-02-22  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 49769: Doc/Zsh/mod_stat.yo: Mention how to show nanosecond

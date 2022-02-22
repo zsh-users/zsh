@@ -1205,6 +1205,11 @@ for readonly parameters
 item(tt(tag))(
 for tagged parameters
 )
+item(tt(tied))(
+for parameters tied to another parameter in the manner of tt(PATH)
+(colon-separated list) and tt(path) (array), whether these are
+special parameters or user-defined with `tt(typeset -T)'
+)
 item(tt(export))(
 for exported parameters
 )
