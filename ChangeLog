@@ -1,3 +1,8 @@
+2022-03-08  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 49773: Functions/Prompts/promptinit: promptinit: only exclude
+	current theme from preview if no arguments are given
+
 2022-03-06  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 49802 (+ 49804:Daniel): Test/W03jobparameters.ztst: pass

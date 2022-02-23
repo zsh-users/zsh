@@ -73,7 +73,7 @@ set_prompt() {
 Options:
     -c              Show currently selected theme and parameters
     -l              List currently available prompt themes
-    -p [<themes>]   Preview given themes (defaults to all)
+    -p [<themes>]   Preview given themes (defaults to all except current theme)
     -h [<theme>]    Display help (for given theme)
     -s <theme>      Set and save theme
     <theme>         Switch to new theme immediately (changes not saved)
@@ -120,10 +120,9 @@ Use prompt -h <theme> for help on specific themes.'
        print $prompt_themes
        return
        ;;
-    p) preview=( $prompt_themes )
+    p) preview=( ${prompt_themes:#$prompt_theme} )
        (( $#* > 1 )) && preview=( "$@[2,-1]" )
        for theme in $preview; do
-         [[ "$theme" == "$prompt_theme[*]" ]] && continue
          prompt_preview_safely "$=theme"
        done
        print -P "%b%f%k"
