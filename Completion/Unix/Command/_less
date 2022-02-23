@@ -39,7 +39,7 @@ _arguments -S -s -A "[-+]*"  \
   '(-C --CLEAR-SCREEN -c --clear-screen)'{-c,--clear-screen}'[repaint screen instead of scrolling]' \
   '!(-c --clear-screen)'{-C,--CLEAR-SCREEN} \
   '(-d --dumb)'{-d,--dumb}'[suppress error message if terminal is dumb]' \
-  '*-D+[set screen colors]: :->colors' \
+  '*'{-D+,--color=}'[set screen colors]: :->colors' \
   '(-e -E --quit-at-eof --QUIT-AT-EOF)'{-e,--quit-at-eof}'[exit the second time end-of-file is reached]' \
   '(-e -E --quit-at-eof --QUIT-AT-EOF)'{-E,--QUIT-AT-EOF}'[exit when end-of-file is reached]' \
   '(-f --force)'{-f,--force}'[force opening of non-regular files]' \
@@ -104,7 +104,7 @@ if [[ -n "$state" ]]; then
       if compset -P 1 \?; then
         [[ $IPREFIX[-1] != [a-z] ]] || compset -P 1 + || _describe 'color application' '( +:add\ to\ existing\ attribute )'
         suf=( -S '' )
-        compset -P 1 '([a-zA-Z]|*.)' && fgbg=background && suf=()
+        compset -P 1 '([-a-zA-Z]|*.)' && fgbg=background && suf=()
         basic=( B:blue C:cyan G:green K:black M:magenta R:red W:white Y:yellow )
         _describe -t colors "$fgbg color" \
             "( -:default ${(j. .)${(@)basic/:/:light\ }} ${(Lj. .)basic} )" "$suf[@]"  && ret=0
