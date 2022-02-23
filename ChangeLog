@@ -1,5 +1,7 @@
 2022-02-23  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* 49766: Completion/Unix/Command/_less: add quotes to -" and -#
+
 	* 49765: Completion/Unix/Command/_less: add option --color
 	as synonym for -D
 
