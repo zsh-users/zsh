@@ -1244,19 +1244,19 @@ histwgetfn(UNUSED(Param pm))
 
 /**/
 static char *
-pmjobtext(int job)
+pmjobtext(Job jtab, int job)
 {
     Process pn;
     int len = 1;
     char *ret;
 
-    for (pn = jobtab[job].procs; pn; pn = pn->next)
+    for (pn = jtab[job].procs; pn; pn = pn->next)
 	len += strlen(pn->text) + 3;
 
     ret = (char *) zhalloc(len);
     ret[0] = '\0';
 
-    for (pn = jobtab[job].procs; pn; pn = pn->next) {
+    for (pn = jtab[job].procs; pn; pn = pn->next) {
 	strcat(ret, pn->text);
 	if (pn->next)
 	    strcat(ret, " | ");
@@ -1269,22 +1269,25 @@ static HashNode
 getpmjobtext(UNUSED(HashTable ht), const char *name)
 {
     Param pm = NULL;
-    int job;
+    int job, jmax;
     char *pend;
+    Job jtab;
 
     pm = (Param) hcalloc(sizeof(struct param));
     pm->node.nam = dupstring(name);
     pm->node.flags = PM_SCALAR | PM_READONLY;
     pm->gsu.s = &nullsetscalar_gsu;
 
+    selectjobtab(&jtab, &jmax);
+
     job = strtod(name, &pend);
     /* Non-numeric keys are looked up by job name */
     if (*pend)
 	job = getjob(name, NULL);
-    if (job >= 1 && job <= maxjob &&
-	jobtab[job].stat && jobtab[job].procs &&
-	!(jobtab[job].stat & STAT_NOPRINT))
-	pm->u.str = pmjobtext(job);
+    if (job >= 1 && job <= jmax &&
+	jtab[job].stat && jtab[job].procs &&
+	!(jtab[job].stat & STAT_NOPRINT))
+	pm->u.str = pmjobtext(jtab, job);
     else {
 	pm->u.str = dupstring("");
 	pm->node.flags |= (PM_UNSET|PM_SPECIAL);
@@ -1297,22 +1300,25 @@ static void
 scanpmjobtexts(UNUSED(HashTable ht), ScanFunc func, int flags)
 {
     struct param pm;
-    int job;
+    int job, jmax;
     char buf[40];
+    Job jtab;
 
     memset((void *)&pm, 0, sizeof(struct param));
     pm.node.flags = PM_SCALAR | PM_READONLY;
     pm.gsu.s = &nullsetscalar_gsu;
 
-    for (job = 1; job <= maxjob; job++) {
-	if (jobtab[job].stat && jobtab[job].procs &&
-	    !(jobtab[job].stat & STAT_NOPRINT)) {
+    selectjobtab(&jtab, &jmax);
+
+    for (job = 1; job <= jmax; job++) {
+	if (jtab[job].stat && jtab[job].procs &&
+	    !(jtab[job].stat & STAT_NOPRINT)) {
 	    if (func != scancountparams) {
 		sprintf(buf, "%d", job);
 		pm.node.nam = dupstring(buf);
 		if ((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
 		    !(flags & SCANPM_WANTKEYS))
-		    pm.u.str = pmjobtext(job);
+		    pm.u.str = pmjobtext(jtab, job);
 	    }
 	    func(&pm.node, flags);
 	}
@@ -1323,7 +1329,7 @@ scanpmjobtexts(UNUSED(HashTable ht), ScanFunc func, int flags)
 
 /**/
 static char *
-pmjobstate(int job)
+pmjobstate(Job jtab, int job)
 {
     Process pn;
     char buf[256], buf2[128], *ret, *state, *cp;
@@ -1335,14 +1341,14 @@ pmjobstate(int job)
     else
 	cp = ":";
 
-    if (jobtab[job].stat & STAT_DONE)
+    if (jtab[job].stat & STAT_DONE)
 	ret = dyncat("done", cp);
-    else if (jobtab[job].stat & STAT_STOPPED)
+    else if (jtab[job].stat & STAT_STOPPED)
 	ret = dyncat("suspended", cp);
     else
 	ret = dyncat("running", cp);
 
-    for (pn = jobtab[job].procs; pn; pn = pn->next) {
+    for (pn = jtab[job].procs; pn; pn = pn->next) {
 
 	if (pn->status == SP_RUNNING)
 	    state = "running";
@@ -1371,21 +1377,24 @@ static HashNode
 getpmjobstate(UNUSED(HashTable ht), const char *name)
 {
     Param pm = NULL;
-    int job;
+    int job, jmax;
     char *pend;
+    Job jtab;
 
     pm = (Param) hcalloc(sizeof(struct param));
     pm->node.nam = dupstring(name);
     pm->node.flags = PM_SCALAR | PM_READONLY;
     pm->gsu.s = &nullsetscalar_gsu;
 
+    selectjobtab(&jtab, &jmax);
+
     job = strtod(name, &pend);
     if (*pend)
 	job = getjob(name, NULL);
-    if (job >= 1 && job <= maxjob &&
-	jobtab[job].stat && jobtab[job].procs &&
-	!(jobtab[job].stat & STAT_NOPRINT))
-	pm->u.str = pmjobstate(job);
+    if (job >= 1 && job <= jmax &&
+	jtab[job].stat && jtab[job].procs &&
+	!(jtab[job].stat & STAT_NOPRINT))
+	pm->u.str = pmjobstate(jtab, job);
     else {
 	pm->u.str = dupstring("");
 	pm->node.flags |= (PM_UNSET|PM_SPECIAL);
@@ -1398,22 +1407,25 @@ static void
 scanpmjobstates(UNUSED(HashTable ht), ScanFunc func, int flags)
 {
     struct param pm;
-    int job;
+    int job, jmax;
+    Job jtab;
     char buf[40];
+
+    selectjobtab(&jtab, &jmax);
 
     memset((void *)&pm, 0, sizeof(struct param));
     pm.node.flags = PM_SCALAR | PM_READONLY;
     pm.gsu.s = &nullsetscalar_gsu;
 
-    for (job = 1; job <= maxjob; job++) {
-	if (jobtab[job].stat && jobtab[job].procs &&
-	    !(jobtab[job].stat & STAT_NOPRINT)) {
+    for (job = 1; job <= jmax; job++) {
+	if (jtab[job].stat && jtab[job].procs &&
+	    !(jtab[job].stat & STAT_NOPRINT)) {
 	    if (func != scancountparams) {
 		sprintf(buf, "%d", job);
 		pm.node.nam = dupstring(buf);
 		if ((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
 		    !(flags & SCANPM_WANTKEYS))
-		    pm.u.str = pmjobstate(job);
+		    pm.u.str = pmjobstate(jtab, job);
 	    }
 	    func(&pm.node, flags);
 	}
@@ -1424,11 +1436,11 @@ scanpmjobstates(UNUSED(HashTable ht), ScanFunc func, int flags)
 
 /**/
 static char *
-pmjobdir(int job)
+pmjobdir(Job jtab, int job)
 {
     char *ret;
 
-    ret = dupstring(jobtab[job].pwd ? jobtab[job].pwd : pwd);
+    ret = dupstring(jtab[job].pwd ? jtab[job].pwd : pwd);
     return ret;
 }
 
@@ -1437,21 +1449,24 @@ static HashNode
 getpmjobdir(UNUSED(HashTable ht), const char *name)
 {
     Param pm = NULL;
-    int job;
+    int job, jmax;
     char *pend;
+    Job jtab;
 
     pm = (Param) hcalloc(sizeof(struct param));
     pm->node.nam = dupstring(name);
     pm->node.flags = PM_SCALAR | PM_READONLY;
     pm->gsu.s = &nullsetscalar_gsu;
 
+    selectjobtab(&jtab, &jmax);
+
     job = strtod(name, &pend);
     if (*pend)
 	job = getjob(name, NULL);
-    if (job >= 1 && job <= maxjob &&
-	jobtab[job].stat && jobtab[job].procs &&
-	!(jobtab[job].stat & STAT_NOPRINT))
-	pm->u.str = pmjobdir(job);
+    if (job >= 1 && job <= jmax &&
+	jtab[job].stat && jtab[job].procs &&
+	!(jtab[job].stat & STAT_NOPRINT))
+	pm->u.str = pmjobdir(jtab, job);
     else {
 	pm->u.str = dupstring("");
 	pm->node.flags |= (PM_UNSET|PM_SPECIAL);
@@ -1464,22 +1479,25 @@ static void
 scanpmjobdirs(UNUSED(HashTable ht), ScanFunc func, int flags)
 {
     struct param pm;
-    int job;
+    int job, jmax;
     char buf[40];
+    Job jtab;
 
     memset((void *)&pm, 0, sizeof(struct param));
     pm.node.flags = PM_SCALAR | PM_READONLY;
     pm.gsu.s = &nullsetscalar_gsu;
 
-    for (job = 1; job <= maxjob; job++) {
-       if (jobtab[job].stat && jobtab[job].procs &&
-           !(jobtab[job].stat & STAT_NOPRINT)) {
+    selectjobtab(&jtab, &jmax);
+
+    for (job = 1; job <= jmax; job++) {
+       if (jtab[job].stat && jtab[job].procs &&
+           !(jtab[job].stat & STAT_NOPRINT)) {
            if (func != scancountparams) {
 	       sprintf(buf, "%d", job);
 	       pm.node.nam = dupstring(buf);
                if ((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
 		   !(flags & SCANPM_WANTKEYS))
-		   pm.u.str = pmjobdir(job);
+		   pm.u.str = pmjobdir(jtab, job);
 	   }
            func(&pm.node, flags);
        }

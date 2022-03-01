@@ -1,5 +1,8 @@
 2022-03-01  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 49783: Src/jobs.c, Src/Modules/parameter.c: Consistently use
+	old job table in parmaeter module.
+
 	* users/27536: Doc/Zsh/builtins.yo: Clarify interaction of
 	history matching and numeric indices.
 

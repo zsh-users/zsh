@@ -98,10 +98,12 @@ mod_export int jobtabsize;
 mod_export int maxjob;
 
 /* If we have entered a subshell, the original shell's job table. */
-static struct job *oldjobtab;
+/**/
+mod_export struct job *oldjobtab;
 
 /* The size of that. */
-static int oldmaxjob;
+/**/
+mod_export int oldmaxjob;
 
 /* shell timings */
  
@@ -1894,6 +1896,26 @@ setcurjob(void)
     }
 }
 
+/* Find the job table for reporting jobs */
+
+/**/
+mod_export void
+selectjobtab(Job *jtabp, int *jmaxp)
+{
+    if (oldjobtab)
+    {
+	/* In subshell --- use saved job table to report */
+	*jtabp = oldjobtab;
+	*jmaxp = oldmaxjob;
+    }
+    else
+    {
+	/* Use main job table */
+	*jtabp = jobtab;
+	*jmaxp = maxjob;
+    }
+}
+
 /* Convert a job specifier ("%%", "%1", "%foo", "%?bar?", etc.) *
  * to a job number.                                             */
 
@@ -1904,13 +1926,7 @@ getjob(const char *s, const char *prog)
     int jobnum, returnval, mymaxjob;
     Job myjobtab;
 
-    if (oldjobtab) {
-	myjobtab = oldjobtab;
-	mymaxjob = oldmaxjob;
-    } else {
-	myjobtab= jobtab;
-	mymaxjob = maxjob;
-    }
+    selectjobtab(&myjobtab, &mymaxjob);
 
     /* if there is no %, treat as a name */
     if (*s != '%')
