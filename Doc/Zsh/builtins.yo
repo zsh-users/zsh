@@ -756,15 +756,16 @@ specifies the most recent event beginning with the given string.  All
 substitutions var(old)tt(=)var(new), if any, are then performed on the
 text of the events.
 
-In addition to the number range,
+The range of events selected by numbers can be narrowed further by the
+following flags.
 startsitem()
 sitem(tt(-I))(restricts to only internal events (not from tt($HISTFILE)))
 sitem(tt(-L))(restricts to only local events (not from other shells, see
 tt(SHARE_HISTORY) in ifzman(zmanref(zshoptions))\
 ifnzman(noderef(Description of Options)) -- note that tt($HISTFILE) is
 considered local when read at startup))
-sitem(tt(-m))(takes the first argument as a pattern (should be quoted) and
-only the history events matching this pattern are considered)
+sitem(tt(-m))(takes the first argument as a pattern (which should be
+quoted) and only the history events matching this pattern are considered)
 endsitem()
 
 If var(first) is not specified, it will be set to -1 (the most recent

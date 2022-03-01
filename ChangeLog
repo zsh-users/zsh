@@ -1,3 +1,8 @@
+2022-03-01  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* users/27536: Doc/Zsh/builtins.yo: Clarify interaction of
+	history matching and numeric indices.
+
 2022-02-23  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 49766: Completion/Unix/Command/_less: add quotes to -" and -#
