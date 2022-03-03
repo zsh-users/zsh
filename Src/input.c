@@ -223,13 +223,20 @@ shingetchar(void)
 	return STOUC(*shinbufptr++);
 
     shinbufreset();
-    do {
-	errno = 0;
-	nread = read(SHIN, shinbuffer, SHINBUFSIZE);
-    } while (nread < 0 && errno == EINTR);
-    if (nread <= 0)
-	return -1;
-    shinbufendptr = shinbuffer + nread;
+    for (;;) {
+       errno = 0;
+       nread = read(SHIN, shinbufendptr, 1);
+       if (nread > 0) {
+           /* Use line buffering (POSIX requirement) */
+           if (*shinbufendptr++ == '\n')
+               break;
+           if (shinbufendptr == shinbuffer + SHINBUFSIZE)
+               break;
+       } else if (nread == 0 || errno != EINTR)
+           break;
+    }
+    if (shinbufendptr == shinbuffer)
+        return -1;
     return STOUC(*shinbufptr++);
 }
 

@@ -961,3 +961,12 @@ F:Note that the behaviour of 'exit' inside try-list inside a function is unspeci
 F:This test was written to ensure the behaviour doesn't change silently.
 F:If this test fails during development, it *might* be appropriate to change
 F:its expectations.
+
+ (
+   export VALUE=first
+   print -l 'echo Value is $VALUE' 'VALUE=second sh' 'echo Value is $VALUE' |
+   $ZTST_testdir/../Src/zsh -f
+ )
+0:Non-interactive shell command input is line buffered
+>Value is first
+>Value is second

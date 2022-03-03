@@ -1,5 +1,8 @@
 2022-03-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 49792: Src/input.c, Test/A01grammar.ztst: Use line buffering
+	for non-interactive input.
+
 	* 49787: Test/W02jobs.ztst, Test/W03jobparameters.ztst: test for
 	jobs fix in 49783.
 
