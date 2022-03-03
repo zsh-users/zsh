@@ -1,3 +1,8 @@
+2022-03-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 49787: Test/W02jobs.ztst, Test/W03jobparameters.ztst: test for
+	jobs fix in 49783.
+
 2022-03-01  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 49783: Src/jobs.c, Src/Modules/parameter.c: Consistently use

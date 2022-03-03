@@ -144,11 +144,13 @@
   zpty_start
   zpty_input 'sleep 3 &'
   zpty_input 'jobs -r'
+  zpty_input '(jobs -r)'
   zpty_input 'print -- -'
   zpty_input 'jobs -s'
   zpty_stop
 0:`jobs -r` and `jobs -s` with running job
 *>\[1] [0-9]##
+*>\[1]  + running*sleep*
 *>\[1]  + running*sleep*
 *>-
 *>zsh:*SIGHUPed*
