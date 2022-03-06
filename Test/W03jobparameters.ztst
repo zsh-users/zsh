@@ -37,6 +37,7 @@
 %test
 
   zpty_start
+  zpty_input "MODULE_PATH=${(q)MODULE_PATH}"
   zpty_input 'sleep 3 &'
   zpty_input 'print $jobstates'
   zpty_input '(print $jobstates)'

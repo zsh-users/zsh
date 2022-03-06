@@ -1,3 +1,8 @@
+2022-03-06  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 49802 (+ 49804:Daniel): Test/W03jobparameters.ztst: pass
+	MODULE_PATH to the zsh started by zpty
+
 2022-03-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 49792: Src/input.c, Test/A01grammar.ztst: Use line buffering
