@@ -1,5 +1,7 @@
 2025-04-28  dana  <dana@dana.is>
 
+	* unposted: README: add missed note about <<< redirection
+
 	* 53527: Doc/Zsh/contrib.yo, Functions/Misc/zgetopt, NEWS,
 	Test/Z04zgetopt.ztst: remove zgetopt (feature not ready)
 

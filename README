@@ -217,6 +217,11 @@ The ${name:offset:length} expansion syntax now behaves more similarly to
 other shells in that the offset and length are applied as array indices
 prior to scalar conversion in e.g. "${*:0:2}".
 
+The optimization for the =(<<<foo) construct with no command, which
+creates a temporary file with contents "foo", now adds a newline byte
+after "foo" for consistency with the behaviour of the <<< redirection
+everywhere else.
+
 Incompatibilities between 5.7.1 and 5.8.1
 -----------------------------------------
 
