@@ -15,6 +15,9 @@
 
 	* 49870: Src/glob.c: Fix NULL reference in match code more
 
+	* 49813: Doc/Zsh/redirect.yo, Src/exec.c: <<<: Document newline
+	behavior and fix optimization
+
 2022-03-29  Bart Schaefer  <schaefer@zsh.org>
 
 	* 49918: NEWS, README: Update for 49917 and 49911.

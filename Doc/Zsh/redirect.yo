@@ -86,7 +86,8 @@ item(tt(<<<) var(word))(
 Perform shell expansion on var(word) and pass the result
 to standard input.  This is known as a em(here-string).
 Compare the use of var(word) in here-documents above, where var(word)
-does not undergo shell expansion.
+does not undergo shell expansion.  The result will have a trailing newline
+after it.
 )
 xitem(tt(<&) var(number))
 item(tt(>&) var(number))(

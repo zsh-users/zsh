@@ -4836,8 +4836,10 @@ getoutputfile(char *cmd, char **eptr)
 	singsub(&s);
 	if (errflag)
 	    s = NULL;
-	else
+	else {
 	    untokenize(s);
+	    s = dyncat(s, "\n");
+	}
     }
 
     if (!s)             /* Unclear why we need to do this before open() */
