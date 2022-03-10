@@ -612,9 +612,10 @@ instmatch(Cmatch m, int *scs)
 	int pcs = zlemetacs;
 
 	l = 0;
-	for (bp = brbeg, brpos = m->brpl,
-		 bradd = (m->pre ? strlen(m->pre) : 0);
-	     bp; bp = bp->next, brpos++) {
+	bradd = (m->pre ? strlen(m->pre) : 0);
+	for (bp = brbeg, brpos = m->brpl;
+	     bp && brpos;
+	     bp = bp->next, brpos++) {
 	    zlemetacs = a + *brpos + bradd;
 	    pcs = zlemetacs;
 	    l = strlen(bp->str);

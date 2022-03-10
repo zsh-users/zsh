@@ -1,10 +1,3 @@
-2022-03-30  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
-
-	* 49910: Test/D07multibyte.ztst, Test/E03posix.ztst: move
-	multibyte-related incompatibility with POSIX from E03 to D07
-
-	* 49908: Test/ztst.zsh: reset LC_CTYPE to C during tests.
-
 2022-03-30  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 49893: Src/Zle/comp.h, Src/Zle/compcore.c: Fix comments for
@@ -17,6 +10,16 @@
 
 	* 49813: Doc/Zsh/redirect.yo, Src/exec.c: <<<: Document newline
 	behavior and fix optimization
+
+	* 49820: Src/Zle/compresult.c: Fix a crash when completing with
+	combination of -Q and braces
+
+2022-03-30  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 49910: Test/D07multibyte.ztst, Test/E03posix.ztst: move
+	multibyte-related incompatibility with POSIX from E03 to D07
+
+	* 49908: Test/ztst.zsh: reset LC_CTYPE to C during tests.
 
 2022-03-29  Bart Schaefer  <schaefer@zsh.org>
 
