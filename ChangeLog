@@ -1,3 +1,8 @@
+2022-03-13  Bart Schaefer  <schaefer@zsh.org>
+
+	* 49844: Doc/Zsh/expn.yo, Doc/Zsh/zle.yo: Fix node reference
+	errors from 49446 and 49448.
+
 2022-03-08  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 49773: Functions/Prompts/promptinit: promptinit: only exclude

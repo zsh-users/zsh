@@ -733,7 +733,7 @@ enditem()
 enditem()
 
 texinode(Zle Widgets)(User-Defined Widgets)(Zle Builtins)(Zsh Line Editor)
-sect(Widgets)
+sect(Zle Widgets)
 cindex(widgets)
 All actions in the editor are performed by `widgets'.  A widget's job is
 simply to perform some small action.  The ZLE commands that key sequences
@@ -2627,7 +2627,7 @@ argument, multiple words will be selected.
 )
 enditem()
 
-texinode(Character Highlighting)()(Zle Widgets)(Zsh Line Editor)
+texinode(Character Highlighting)()(Standard Widgets)(Zsh Line Editor)
 sect(Character Highlighting)
 
 vindex(zle_highlight, setting)

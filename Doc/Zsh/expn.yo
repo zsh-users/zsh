@@ -1897,6 +1897,13 @@ The tt(PUSHD_MINUS)
 option exchanges the effects of `tt(~PLUS())' and `tt(~-)' where they are
 followed by a number.
 
+startmenu()
+menu(Dynamic named directories)
+menu(Static named directories)
+menu(`=' expansion)
+menu(Notes)
+endmenu()
+
 texinode(Dynamic named directories)(Static named directories)()(Filename Expansion)
 subsect(Dynamic named directories)
 cindex(directories, named, dynamic)
