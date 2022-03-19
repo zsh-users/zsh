@@ -135,7 +135,7 @@ case $OSTYPE in
   openbsd*)
     subcmds+=( exec 'execute a command with alternate routing table' )
     args+=(
-      '-T+[select specified alternate routing table]:table id'
+      '-T+[select specified alternate routing table]:routing table:_routing_tables'
     )
     modifiers+=(
       -sa

@@ -61,7 +61,7 @@ case $OSTYPE in
   openbsd*)
     args+=(
       '(-a -d -W)-F[overwrite existing entries]'
-      '(-W)-V+[select the routing domain]:routing domain'
+      '(-W)-V+[select the routing domain]:routing domain:_routing_domains'
     )
     cmds+=(
       '(- 1)-W[send the wake on LAN frame]'

@@ -96,7 +96,7 @@ case $OSTYPE in
       '-C[show command arguments as well as process name]'
       '-g+[filter processes by the specified string]:string'
       '-o+[sort process display by the specified field]:field:->sortkey'
-      '-T+[filter processes by the specified routing table]:routing table'
+      '-T+[filter processes by the specified routing table]:routing table:_routing_tables'
       '-U+[filter processes by the specified user]: :_users -M "L\:|-="'
     );;
   darwin*)

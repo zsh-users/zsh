@@ -1,5 +1,13 @@
 2022-03-18  Matthew Martin  <phy1729@gmail.com>
 
+	* 49852: Completion/BSD/Command/_pfctl,
+	Completion/BSD/Type/_routing_domains,
+	Completion/BSD/Type/_routing_tables,
+	Completion/Unix/Command/_arp, Completion/Unix/Command/_netstat,
+	Completion/Unix/Command/_pgrep, Completion/Unix/Command/_ping,
+	Completion/Unix/Command/_route, Completion/Unix/Command/_top:
+	Add _routing_domains and _routing_tables types.
+
 	* 49851: Completion/BSD/Type/_login_classes: Complete
 	login.conf.d classes.
 

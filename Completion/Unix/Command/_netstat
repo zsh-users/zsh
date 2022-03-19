@@ -270,7 +270,7 @@ case $OSTYPE in
     sel_rdomains=( '-R[show all rdomains with associated interfaces and routing tables]' )
     sel_wireless=( '-W+[display per-interface IEEE 802.11 wireless statistics]:interface' )
     flist+=( local mpls )
-    tblopt='-T+[select an alternate routing table to query]:routing table'
+    tblopt='-T+[select an alternate routing table to query]:routing table:_routing_tables'
     sockets+=( -l$lopt $tblopt '-B[show buffer sizes for TCP sockets]' )
     routing+=( $Mopts $tblopt
       '-A[show the internal addresses of the routing table]'

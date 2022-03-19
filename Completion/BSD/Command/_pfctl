@@ -66,7 +66,7 @@ case $OSTYPE in
       "-N[don't perform domain name resolution]"
       '-P[display ports using service names]'
       '-S+[store pf state table in the specified file]:file:_files'
-      '-V+[select routing domain to be used to kill states]:routing domain'
+      '-V+[select routing domain to be used to kill states]:routing domain:_routing_domains'
     )
   ;;
   (free|net)bsd*)
