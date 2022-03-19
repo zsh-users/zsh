@@ -13,6 +13,8 @@
 	* 49915: Src/Zle/comp.h, Src/Zle/compcore.c: Efficient dedup
 	for unsorted completions
 
+	* 49870: Src/glob.c: Fix NULL reference in match code more
+
 2022-03-29  Bart Schaefer  <schaefer@zsh.org>
 
 	* 49918: NEWS, README: Update for 49917 and 49911.

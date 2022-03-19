@@ -2549,7 +2549,7 @@ get_match_ret(Imatchdata imd, int b, int e)
     e += add;
 
     /* Everything now refers to metafied lengths. */
-    if (replstr) {
+    if (replstr || (fl & SUB_LIST)) {
 	if (fl & SUB_DOSUBST) {
 	    replstr = dupstring(replstr);
 	    singsub(&replstr);
@@ -2568,7 +2568,8 @@ get_match_ret(Imatchdata imd, int b, int e)
 		addlinknode(imd->repllist, rd);
 	    return imd->mstr;
 	}
-	ll += strlen(replstr);
+	if (replstr)
+	    ll += strlen(replstr);
     }
     if (fl & SUB_MATCH)			/* matched portion */
 	ll += 1 + (e - b);
@@ -2593,6 +2594,9 @@ get_match_ret(Imatchdata imd, int b, int e)
     }
     if (bl)
 	buf[bl - 1] = '\0';
+
+    if (ll == 0)
+	return NULL;
 
     rr = r = (char *) hcalloc(ll);
 
