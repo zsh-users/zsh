@@ -1,3 +1,8 @@
+2022-03-18  Matthew Martin  <phy1729@gmail.com>
+
+	* 49851: Completion/BSD/Type/_login_classes: Complete
+	login.conf.d classes.
+
 2022-03-13  Bart Schaefer  <schaefer@zsh.org>
 
 	* 49844: Doc/Zsh/expn.yo, Doc/Zsh/zle.yo: Fix node reference
