@@ -41,7 +41,7 @@ case $service in
       '(: -)'{-k+,--apropos=}'[look up string in indices]:search string: ' \
       \*{-d+,--directory=}'[add directory to infopath]:info dir:_files -/' \
       '--dribble=[record keystrokes]:file with keystrokes:_files' \
-      '(-f --file 1)'{-f+,--file=}'[specify Info manual to visit]:info manual:->infofiles' \
+      '(-f --file 1)'{-f+,--file=}'[specify Info manual to visit]:info manual:->infofiles+' \
       '(: - -h --help)'{-h,--help}'[display usage]' \
       '(-o --output -O)--index-search=[search for matching index entry]:search string:->index-entries' \
       '(--index-search -o --output -O)'{-o+,--output=}'[dump selected nodes to filename]:filename:_files -g "*(-.)"' \
@@ -289,7 +289,11 @@ if [[ -n $state ]]; then
     items=( ${${${(M)${(f)"$(_call_program menu-items info -o-)"}:#(#s)\* *: \(*}#??}%%\)*} )
     files+=( ${items##*\(} )
     tags=( info-files )
-    if [[ $state != infofiles ]]; then
+    if [[ $state = infofiles+ && $PREFIX$SUFFX = */* ]]; then
+      # local files allowed
+      tags+=(files)
+    fi
+    if [[ $state != infofiles* ]]; then
       tags+=( menu-items )
       items=( ${items%:*} )
     fi
@@ -317,6 +321,7 @@ if [[ -n $state ]]; then
     _requested menu-items expl 'menu item' compadd -M 'm:{a-zA-Z}={A-Za-z}' -a items && ret=0
     _requested -x index-entries expl 'index entry' compadd -M 'm:{a-zA-Z}={A-Za-z}' -a items && ret=0
     _requested info-nodes expl 'node' compadd -M 'm:{a-zA-Z}={A-Za-z}' ${nodes#*:} && ret=0
+    _requested files expl 'file' && _files -g '*.info(|.gz|.bz2)'
 
     (( ret )) || break
   done

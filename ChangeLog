@@ -1,5 +1,9 @@
 2022-03-24  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 49875: Completion/Unix/Command/_texinfo: info -f completes
+	both info pages by search and (if there's a slash present) local
+	files.  Not all versions of info seem to need the slash, however.
+
 	* 49845: Doc/Zsh/options.yo: clarify that options can be local
 	in function scope.
 
