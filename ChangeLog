@@ -1,5 +1,7 @@
 2022-03-31  Matthew Martin  <phy1729@gmail.com>
 
+	* github #88: elig0n: Doc/Zsh/func.yo: Fix typo.
+
 	* 49933: Doc/Zsh/mod_system.yo, Src/Modules/system.c: Add
 	nonblock to sysopen.
 
