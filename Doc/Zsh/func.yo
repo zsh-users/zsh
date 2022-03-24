@@ -276,7 +276,7 @@ the history file.  In case of a conflict, the first non-zero status
 value is taken.
 
 A hook function may call `tt(fc -p) var(...)' to switch the history
-context so that the history is saved in a different file from the
+context so that the history is saved in a different file from
 that in the global tt(HISTFILE) parameter.  This is handled specially:
 the history context is automatically restored after the processing
 of the history line is finished.
