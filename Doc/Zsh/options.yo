@@ -41,6 +41,9 @@ will be treated just as `tt(-f)', but the string `tt(-f i)' is an error.
 This is because many systems which implement the `tt(#!)' mechanism for
 calling scripts do not strip trailing whitespace.
 
+It is possible for options to be set within a function scope.  See the
+description of the option tt(LOCAL_OPTIONS) below.
+
 texinode(Description of Options)(Option Aliases)(Specifying Options)(Options)
 sect(Description of Options)
 cindex(options, description)

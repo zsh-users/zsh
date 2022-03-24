@@ -1,3 +1,8 @@
+2022-03-24  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 49845: Doc/Zsh/options.yo: clarify that options can be local
+	in function scope.
+
 2022-03-18  Matthew Martin  <phy1729@gmail.com>
 
 	* 49852: Completion/BSD/Command/_pfctl,
