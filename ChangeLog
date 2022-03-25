@@ -5,6 +5,11 @@
 
 	* 49908: Test/ztst.zsh: reset LC_CTYPE to C during tests.
 
+2022-03-30  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 49893: Src/Zle/comp.h, Src/Zle/compcore.c: Fix comments for
+	UNIQCON/ALL
+
 2022-03-29  Bart Schaefer  <schaefer@zsh.org>
 
 	* 49918: NEWS, README: Update for 49917 and 49911.

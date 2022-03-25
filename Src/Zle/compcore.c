@@ -3254,10 +3254,13 @@ makearray(LinkList l, int type, int flags, int *np, int *nlp, int *llp)
 	    qsort((void *) rp, n, sizeof(Cmatch),
 		  (int (*) _((const void *, const void *)))matchcmp);
 
+	    /* since the matches are sorted and the default is to remove
+	     * all duplicates, -1 (remove only consecutive dupes) is a no-op,
+	     * so this condition only checks for -2 */
 	    if (!(flags & CGF_UNIQCON)) {
 		int dup;
 
-		/* And delete the ones that occur more than once. */
+		/* we did not pass -2 so go ahead and remove those dupes */
 		for (ap = cp = rp; *ap; ap++) {
 		    *cp++ = *ap;
 		    for (bp = ap; bp[1] && matcheq(*ap, bp[1]); bp++, n--);
@@ -3279,7 +3282,9 @@ makearray(LinkList l, int type, int flags, int *np, int *nlp, int *llp)
 		if ((*ap)->flags & (CMF_NOLIST | CMF_MULT))
 		    nl++;
 	    }
+	/* used -O nosort or -V, don't sort */
 	} else {
+	    /* didn't use -1 or -2, so remove all duplicates (inefficient) */
 	    if (!(flags & CGF_UNIQALL) && !(flags & CGF_UNIQCON)) {
                 int dup;
 
@@ -3303,6 +3308,7 @@ makearray(LinkList l, int type, int flags, int *np, int *nlp, int *llp)
                             (*ap)->flags |= CMF_FMULT;
                     }
 		}
+	    /* passed -1 but not -2, so remove consecutive duplicates (efficient) */
 	    } else if (!(flags & CGF_UNIQCON)) {
 		int dup;
 
