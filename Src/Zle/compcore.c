@@ -3284,30 +3284,44 @@ makearray(LinkList l, int type, int flags, int *np, int *nlp, int *llp)
 	    }
 	/* used -O nosort or -V, don't sort */
 	} else {
-	    /* didn't use -1 or -2, so remove all duplicates (inefficient) */
+	    /* didn't use -1 or -2, so remove all duplicates (efficient) */
 	    if (!(flags & CGF_UNIQALL) && !(flags & CGF_UNIQCON)) {
-                int dup;
+                int dup, i, del = 0;
 
-		for (ap = rp; *ap; ap++) {
-		    for (bp = cp = ap + 1; *bp; bp++) {
-			if (!matcheq(*ap, *bp))
-			    *cp++ = *bp;
-			else
-			    n--;
+		/* To avoid O(n^2) here, sort a copy of the list, then remove marked elements */
+		matchorder = flags;
+		Cmatch *sp, *asp;
+		sp = (Cmatch *) zhalloc((n + 1) * sizeof(Cmatch));
+		memcpy(sp, rp, (n + 1) * sizeof(Cmatch));
+		qsort((void *) sp, n, sizeof(Cmatch),
+		      (int (*) _((const void *, const void *)))matchcmp);
+		for (asp = sp + 1; *asp; asp++) {
+		    Cmatch *ap = asp - 1, *bp = asp;
+		    if (matcheq(*ap, *bp)) {
+			bp[0]->flags = CMF_DELETE;
+			del = 1;
+		    } else if (!ap[0]->disp) {
+			/* Mark those, that would show the same string in the list. */
+			for (dup = 0; bp[0] && !(bp[0])->disp &&
+				 !strcmp((*ap)->str, (bp[0])->str); bp = ++sp) {
+			    (bp[0])->flags |= CMF_MULT;
+			    dup = 1;
+			}
+			if (dup)
+			    (*ap)->flags |= CMF_FMULT;
 		    }
-		    *cp = NULL;
-                    if (!(*ap)->disp) {
-                        for (dup = 0, bp = ap + 1; *bp; bp++)
-                            if (!(*bp)->disp &&
-                                !((*bp)->flags & CMF_MULT) &&
-                                !strcmp((*ap)->str, (*bp)->str)) {
-                                (*bp)->flags |= CMF_MULT;
-                                dup = 1;
-                            }
-                        if (dup)
-                            (*ap)->flags |= CMF_FMULT;
-                    }
 		}
+		if (del) {
+		    int n_orig = n;
+		    for (bp = rp, ap = rp; bp < rp + n_orig; ap++, bp++) {
+			while (bp[0]->flags & CMF_DELETE) {
+			    bp++;
+			    n--;
+			}
+			*ap = *bp;
+		    }
+		}
+		*ap = NULL;
 	    /* passed -1 but not -2, so remove consecutive duplicates (efficient) */
 	    } else if (!(flags & CGF_UNIQCON)) {
 		int dup;

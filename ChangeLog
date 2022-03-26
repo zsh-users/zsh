@@ -10,6 +10,9 @@
 	* 49893: Src/Zle/comp.h, Src/Zle/compcore.c: Fix comments for
 	UNIQCON/ALL
 
+	* 49915: Src/Zle/comp.h, Src/Zle/compcore.c: Efficient dedup
+	for unsorted completions
+
 2022-03-29  Bart Schaefer  <schaefer@zsh.org>
 
 	* 49918: NEWS, README: Update for 49917 and 49911.

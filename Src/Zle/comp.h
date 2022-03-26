@@ -140,6 +140,7 @@ struct cmatch {
 #define CMF_ALL      (1<<13)	/* a match representing all other matches */
 #define CMF_DUMMY    (1<<14)	/* unselectable dummy match */
 #define CMF_MORDER   (1<<15)    /* order by matches, not display strings */
+#define CMF_DELETE   (1<<16)    /* used for deduplication of unsorted matches, don't set */
 
 /* Stuff for completion matcher control. */
 
