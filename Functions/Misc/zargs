@@ -43,14 +43,12 @@
 # than 127 for "command not found" so this function incorrectly returns
 # 123 in that case if used with zsh 4.0.x.
 #
-# With the --max-procs option, zargs may not correctly capture the exit
-# status of the backgrounded jobs, because of limitations of the "wait"
-# builtin.  If the zsh/parameter module is not available, the status is
-# NEVER correctly returned, otherwise the status of the longest-running
-# job in each batch is captured.
+# Because of "wait" limitations, --max-procs spawns max-procs jobs, then
+# waits for all of those, then spawns another batch, etc.
 #
-# Also because of "wait" limitations, --max-procs spawns max-procs jobs,
-# then waits for all of those, then spawns another batch, etc.
+# The maximum number of parallel jobs for which exit status is available
+# is determined by the sysconf CHILD_MAX parameter, which can't be read
+# or changed from within the shell.
 #
 # Differences from POSIX xargs:
 #
@@ -69,6 +67,9 @@
 #   -I/-L and implementations reportedly differ.)  In zargs, -i/-I have
 #   this behavior, as do -l/-L, but when -i/-I appear anywhere then -l/-L
 #   are ignored (forced to 1).
+#
+# * The use of SIGUSR1 and SIGUSR2 to change the number of parallel jobs
+#   is not supported.
 
 # First, capture the current setopts as "sticky emulation"
 if zmodload zsh/parameter
@@ -86,7 +87,7 @@ fi
 emulate -L zsh || return 1
 local -a opts eof n s l P i
 
-local ZARGS_VERSION="1.5"
+local ZARGS_VERSION="1.7"
 
 if zparseopts -a opts -D -- \
 	-eof::=eof e::=eof \
@@ -264,17 +265,19 @@ if (( P != 1 && ARGC > 1 ))
 then
     # These setopts are necessary for "wait" on multiple jobs to work.
     setopt nonotify nomonitor
-    bg='&'
-    if zmodload -i zsh/parameter 2>/dev/null
-    then
-	wait='wait ${${jobstates[(R)running:*]/#*:/}/%=*/}'
-    else
-	wait='wait'
-    fi
+    local -a _zajobs
+    local j
+    bg='& _zajobs+=( $! )'
+    wait='wait'
+    analyze='
+    for j in $_zajobs; do
+      wait $j
+      '"$analyze"'
+    done; _zajobs=()'
 fi
 
-# Everything has to be in a subshell just in case of backgrounding jobs,
-# so that we don't unintentionally "wait" for jobs of the parent shell.
+# Everything has to be in a subshell so that we don't "wait" for any
+# unrelated jobs of the parent shell.
 (
 
 while ((ARGC))
