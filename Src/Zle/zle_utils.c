@@ -1530,7 +1530,7 @@ mkundoent(void)
     struct change *ch;
 
     UNMETACHECK();
-    if(lastll == zlell && !ZS_memcmp(lastline, zleline, zlell)) {
+    if(lastll == zlell && lastlinesz >= zlell && !ZS_memcmp(lastline, zleline, zlell)) {
 	lastcs = zlecs;
 	return;
     }
