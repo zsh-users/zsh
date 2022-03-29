@@ -190,7 +190,7 @@ tt(compinit) will ask if the completion system should really be used.  To
 avoid these tests and make all files found be used without asking, use the
 option tt(-u), and to make tt(compinit) silently ignore all insecure files
 and directories use the option tt(-i).  This security check is skipped
-entirely when the tt(-C) option is given.
+entirely when the tt(-C) option is given, provided the dumpfile exists.
 
 findex(compaudit)
 The security check can be retried at any time by running the function

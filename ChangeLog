@@ -1,3 +1,9 @@
+2022-03-29  Bart Schaefer  <schaefer@zsh.org>
+
+	* 49917: Completion/compinit, Doc/Zsh/compsys.yo: change sense
+	of "Ignore insecure ..." answer to ignore the files rather than
+	ignore the problem.  Use "autoload -r" for autoload paths.
+
 2022-03-29  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 49853 + 49882/49883: Src/subst.c, Test/D04parameter.ztst: make

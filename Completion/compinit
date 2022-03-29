@@ -329,7 +329,7 @@ compdef() {
     # and probably do autoloading.
 
     func="$1"
-    [[ -n "$autol" ]] && autoload -Uz "$func"
+    [[ -n "$autol" ]] && autoload -rUz "$func"
     shift
 
     case "$type" in
@@ -451,7 +451,7 @@ typeset _i_wdirs _i_wfiles
 _i_wdirs=()
 _i_wfiles=()
 
-autoload -Uz compaudit
+autoload -RUz compaudit
 if [[ -n "$_i_check" ]]; then
   typeset _i_q
   if ! eval compaudit; then
@@ -467,19 +467,17 @@ Ignore insecure $_i_q and continue [y] or abort compinit [n]? "; then
 
           return 1
         fi
-        _i_wfiles=()
-	_i_wdirs=()
-      else
-        (( $#_i_wfiles )) && _i_files=( "${(@)_i_files:#(${(j:|:)_i_wfiles%.zwc})}"  )
-        (( $#_i_wdirs ))  && _i_files=( "${(@)_i_files:#(${(j:|:)_i_wdirs%.zwc})/*}" )
       fi
+      fpath=(${fpath:|_i_wdirs})
+      (( $#_i_wfiles )) && _i_files=( "${(@)_i_files:#(${(j:|:)_i_wfiles%.zwc})}"  )
+      (( $#_i_wdirs ))  && _i_files=( "${(@)_i_files:#(${(j:|:)_i_wdirs%.zwc})/*}" )
     fi
     typeset -g _comp_secure=yes
   fi
 fi
 
 # Make sure compdump is available, even if we aren't going to use it.
-autoload -Uz compdump compinstall
+autoload -RUz compdump compinstall
 
 # If we have a dump file, load it.
 
@@ -538,7 +536,7 @@ if [[ -z "$_i_done" ]]; then
 	fi
 	;;
       (\#autoload)
-	autoload -Uz "$_i_line[@]" ${_i_name}
+	autoload -rUz "$_i_line[@]" ${_i_name}
 	[[ "$_i_line" != \ # ]] && _compautos[${_i_name}]="$_i_line"
 	;;
       esac
@@ -570,6 +568,6 @@ if [[ ${_i_line[2]} = expand-or-complete ]] &&
 fi
 
 unfunction compinit compaudit
-autoload -Uz compinit compaudit
+autoload -RUz compinit compaudit
 
 return 0
