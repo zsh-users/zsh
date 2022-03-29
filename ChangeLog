@@ -1,3 +1,8 @@
+2022-03-29  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 49853 + 49882/49883: Src/subst.c, Test/D04parameter.ztst: make
+	"${array[*]:offset:length}" compatible with ksh/bash
+
 2022-03-28  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 49890: Src/Zle/zle_utils.c: best not to look at unallocated

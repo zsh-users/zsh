@@ -1693,6 +1693,38 @@
 >b
 >c
 
+   () {
+     emulate -L sh
+     local a=( one two three )
+     printf '<%s><%s>\n' ${a[*]:0:2}
+     printf '<%s><%s>\n' "${a[*]:0:2}"
+     printf '<%s><%s>\n' ${a[@]:0:2}
+     printf '<%s><%s>\n' "${a[@]:0:2}"
+     printf '<%s><%s>\n' "${a:0:2}"
+     printf '<%s><%s>\n' ${*:1:2}
+     printf '<%s><%s>\n' "${*:1:2}"
+     printf '<%s><%s>\n' ${@:1:2}
+     printf '<%s><%s>\n' "${@:1:2}"
+     printf '<%s><%s>\n' ${*:0:2}
+     printf '<%s><%s>\n' "${*:0:2}"
+     printf '<%s><%s>\n' ${@:0:2}
+     printf '<%s><%s>\n' "${@:0:2}"
+   } one two three
+0:Bash-style offsets, quoted array
+><one><two>
+><one two><>
+><one><two>
+><one><two>
+><on><>
+><one><two>
+><one two><>
+><one><two>
+><one><two>
+><(anon)><one>
+><(anon) one><>
+><(anon)><one>
+><(anon)><one>
+
    printf "%n" '[0]'
 1:Regression test for identifier test
 ?(eval):1: not an identifier: [0]

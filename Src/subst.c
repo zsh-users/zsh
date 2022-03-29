@@ -1854,6 +1854,12 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
      * nested (P) flags.
      */
     int fetch_needed;
+    /*
+     * If an array parameter is quoted but has :offset:length (as in
+     * "${array:off:len}"), we apply :off:len as array index before
+     * joining the array into a string (for compatibility with ksh/bash).
+     */
+    int quoted_array_with_offset = 0;
 
     *s++ = '\0';
     /*
@@ -3377,7 +3383,16 @@ colonsubscript:
 			    return NULL;
 		    }
 		}
-		if (isarr) {
+		/*
+		 * We've got :OFFSET (and :LENGTH).
+		 * If aval is non-NULL but isarr is 0, PARAM is (probably)
+		 * an array but quoted like "${PARAM:OFFSET}". We apply
+		 * :OFFSET as array index (as if it is not quoted). We will
+		 * join them later (search for quoted_array_with_offset).
+		 */
+		if (aval && !isarr)
+		    quoted_array_with_offset = 1;
+		if (isarr || quoted_array_with_offset) {
 		    int alen, count;
 		    char **srcptr, **dstptr, **newarr;
 
@@ -3622,9 +3637,9 @@ colonsubscript:
      * exception is that ${name:-word} and ${name:+word} will have already
      * done any requested splitting of the word value with quoting preserved.
      */
-    if (ssub || spbreak || spsep || sep) {
+    if (ssub || spbreak || spsep || sep || quoted_array_with_offset) {
 	int force_split = !ssub && (spbreak || spsep);
-	if (isarr) {
+	if (isarr || quoted_array_with_offset) {
 	    /* sep non-null here means F or j flag, force join */
 	    if (nojoin == 0 || sep) {
 		val = sepjoin(aval, sep, 1);
