@@ -3,6 +3,11 @@
 	* 49853 + 49882/49883: Src/subst.c, Test/D04parameter.ztst: make
 	"${array[*]:offset:length}" compatible with ksh/bash
 
+2022-03-28  Bart Schaefer  <schaefer@zsh.org>
+
+	* 49897: Functions/Misc/zargs: Eliminate reliance on $jobstates
+	parameter, fix -P exit status check.
+
 2022-03-28  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 49890: Src/Zle/zle_utils.c: best not to look at unallocated
