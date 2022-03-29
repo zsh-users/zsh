@@ -33,6 +33,10 @@ details, see the documentation.
 Incompatibilities since 5.8
 ---------------------------
 
+compinit: A "y" response to the "Ignore ... and continue?" prompt removes
+insecure elements from the set of completion functions, where previously
+it ignored the compaudit result and included all elements.
+
 PROMPT_SUBST expansion is no longer performed on arguments to prompt-
 expansion sequences such as %F.
 

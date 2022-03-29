@@ -1,5 +1,7 @@
 2022-03-29  Bart Schaefer  <schaefer@zsh.org>
 
+	* 49918: NEWS, README: Update for 49917 and 49911.
+
 	* 49917: Completion/compinit, Doc/Zsh/compsys.yo: change sense
 	of "Ignore insecure ..." answer to ignore the files rather than
 	ignore the problem.  Use "autoload -r" for autoload paths.
