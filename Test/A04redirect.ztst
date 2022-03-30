@@ -440,7 +440,7 @@
 # This tests the here-string to filename optimisation; we can't
 # test that it's actually being optimised, but we can test that it
 # still works.
-  cat =(<<<$'This string has been replaced\nby a file containing it.\n')
+  cat =(<<<$'This string has been replaced\nby a file containing it.')
 0:Optimised here-string to filename
 >This string has been replaced
 >by a file containing it.
