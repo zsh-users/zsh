@@ -25,6 +25,7 @@ emulate -R zsh
 # Ensure the locale does not screw up sorting.  Don't supply a locale
 # unless there's one set, to minimise problems.
 [[ -n $LC_ALL ]] && LC_ALL=C
+[[ -n $LC_CTYPE ]] && LC_CTYPE=C
 [[ -n $LC_COLLATE ]] && LC_COLLATE=C
 [[ -n $LC_NUMERIC ]] && LC_NUMERIC=C
 [[ -n $LC_MESSAGES ]] && LC_MESSAGES=C
@@ -36,8 +37,6 @@ typeset +x WORDCHARS
 # Set the module load path to correspond to this build of zsh.
 # This Modules directory should have been created by "make check".
 [[ -d Modules/zsh ]] && module_path=( $PWD/Modules )
-# Allow this to be passed down.
-export MODULE_PATH
 
 # We need to be able to save and restore the options used in the test.
 # We use the $options variable of the parameter module for this.
