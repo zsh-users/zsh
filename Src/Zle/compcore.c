@@ -3286,7 +3286,7 @@ makearray(LinkList l, int type, int flags, int *np, int *nlp, int *llp)
 	} else {
 	    /* didn't use -1 or -2, so remove all duplicates (efficient) */
 	    if (!(flags & CGF_UNIQALL) && !(flags & CGF_UNIQCON)) {
-                int dup, i, del = 0;
+                int dup, del = 0;
 
 		/* To avoid O(n^2) here, sort a copy of the list, then remove marked elements */
 		matchorder = flags;
