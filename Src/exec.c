@@ -1689,6 +1689,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
     execpline2(state, code, how, opipe[0], ipipe[1], last1);
     pline_level--;
     if (how & Z_ASYNC) {
+	clearoldjobtab();
 	lastwj = newjob;
 
         if (thisjob == list_pipe_job)

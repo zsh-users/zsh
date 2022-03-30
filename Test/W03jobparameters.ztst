@@ -48,3 +48,31 @@
 *>running:+:*=running
 *>running:+:*=running
 *>zsh:*SIGHUPed*
+
+# $jobstates refers to a job started in the main shell unless
+# one has been started in the subshell.  In the latter case,
+# the subshell has no job control so the job is not marked as current.
+  zpty_start
+  zpty_input "MODULE_PATH=${(q)MODULE_PATH}"
+  zpty_input 'sleep 3 &'
+  zpty_input '(print main; print $jobstates; sleep 2& print sub; print $jobstates)'
+  zpty_input 'jobs -s'
+  zpty_stop
+0:$jobstate shows one job started in main shell or one started in subshell
+*>\[1] [0-9]##
+>main
+*>running:+:*=running
+>sub
+*>running::*=running
+*>zsh:*SIGHUPed*
+
+# output from zpty removes empty lines
+  zpty_start
+  zpty_input "MODULE_PATH=${(q)MODULE_PATH}"
+  zpty_input '(print main; print $jobstates; sleep 2& print sub; print $jobstates)'
+  zpty_input 'jobs -s'
+  zpty_stop
+0:$jobstate shows no job started in main shell but one started in subshell
+>main
+>sub
+*>running::*=running

@@ -1114,6 +1114,24 @@ The tt(-Z) option replaces the shell's argument and environment space with
 the given string, truncated if necessary to fit.  This will normally be
 visible in tt(ps) (manref(ps)(1)) listings.  This feature is typically
 used by daemons, to indicate their state.
+
+Full job control is only available in the top-level interactive shell,
+not in commands run in the left hand side of pipelines or within
+the tt(LPAR())var(...)tt(RPAR()) construct.  However, a snapshot
+of the job state at that point is taken, so it is still possible
+to use the tt(jobs) builtin, or any parameter providing job information.
+This gives information about the state of jobs at the point the subshell
+was created.  If background processes are created within the subshell,
+then instead information about those processes is provided.
+
+For example,
+
+example(sleep 10 &    # Job in background
+LPAR()             # Shell forks
+jobs          # Shows information about "sleep 10 &"
+sleep 5 &     # Process in background (no job control)
+jobs          # Shows information about "sleep 5 &"
+RPAR())
 )
 findex(kill)
 cindex(killing jobs)

@@ -1,3 +1,11 @@
+2022-03-30  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 49906 (Bart), 49911: Doc/Zsh/builtins.yo,
+	Doc/Zsh/mod_parameter.yo, Src/exec.c, Src/jobs.c,
+	Test/W03jobparameters.ztst: Fix querying jobs in subshell.
+	Don't uery invalid job at end, if background job started in
+	subshell query jobs in subshell instead of main shell.
+
 2022-03-30  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 49893: Src/Zle/comp.h, Src/Zle/compcore.c: Fix comments for

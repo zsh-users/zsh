@@ -165,6 +165,8 @@ The keys of the associative arrays are usually valid job numbers,
 and these are the values output with, for example, tt(${(k)jobdirs}).
 Non-numeric job references may be used when looking up a value;
 for example, tt(${jobdirs[%+]}) refers to the current job.
+
+See the tt(jobs) builtin for how job information is provided in a subshell.
 )
 vindex(jobtexts)
 item(tt(jobtexts))(
@@ -173,6 +175,8 @@ that were used to start the jobs.
 
 Handling of the keys of the associative array is as described for
 tt(jobdirs) above.
+
+See the tt(jobs) builtin for how job information is provided in a subshell.
 )
 vindex(jobstates)
 item(tt(jobstates))(
@@ -189,6 +193,8 @@ the var(state) describes the state of that process.
 
 Handling of the keys of the associative array is as described for
 tt(jobdirs) above.
+
+See the tt(jobs) builtin for how job information is provided in a subshell.
 )
 vindex(nameddirs)
 item(tt(nameddirs))(

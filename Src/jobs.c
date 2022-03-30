@@ -1718,7 +1718,14 @@ clearjobtab(int monitor)
 	/* Don't report any job we're part of */
 	if (thisjob != -1 && thisjob < oldmaxjob)
 	    memset(oldjobtab+thisjob, 0, sizeof(struct job));
+
+	/* oldmaxjob is now the size of the table, but outside
+	 * this function, it's used as a job number, which must
+	 * be the largest index available in the table.
+	 */
+	--oldmaxjob;
     }
+
 
     memset(jobtab, 0, jobtabsize * sizeof(struct job)); /* zero out table */
     maxjob = 0;
@@ -1731,6 +1738,18 @@ clearjobtab(int monitor)
      * of problems with the job table size here).
      */
     thisjob = initjob();
+}
+
+/* In a subshell, decide we want our own job table after all. */
+
+/**/
+mod_export void
+clearoldjobtab(void)
+{
+    if (oldjobtab)
+	free(oldjobtab);
+    oldjobtab = NULL;
+    oldmaxjob = 0;
 }
 
 static int initnewjob(int i)
@@ -2449,6 +2468,7 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	case BIN_BG:
 	case BIN_WAIT:
 	    if (func == BIN_BG) {
+		clearoldjobtab();
 		jobtab[job].stat |= STAT_NOSTTY;
 		jobtab[job].stat &= ~STAT_CURSH;
 	    }
