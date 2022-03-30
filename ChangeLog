@@ -1,5 +1,8 @@
 2022-03-30  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* 49910: Test/D07multibyte.ztst, Test/E03posix.ztst: move
+	multibyte-related incompatibility with POSIX from E03 to D07
+
 	* 49908: Test/ztst.zsh: reset LC_CTYPE to C during tests.
 
 2022-03-29  Bart Schaefer  <schaefer@zsh.org>

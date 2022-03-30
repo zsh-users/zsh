@@ -347,6 +347,18 @@
 0:Multibyte characters in printf widths
 > főo
 
+# TODO?: POSIX requires that printf should always compute width and
+# precision of '%s' conversion in bytes, while zsh computes them in
+# characters if multi-byte locale is in use.
+  ARGV0=sh $ZTST_testdir/../Src/zsh -c "printf '<%10s>\n' St$'\M-C\M-)'phane"
+0f:POSIX: width in %s should be computed in bytes, not in characters
+F:This is considered a bugfix in zsh
+>< Stéphane>
+
+  ARGV0=sh $ZTST_testdir/../Src/zsh -c "printf '<%7.5s>\n' St$'\M-C\M-)'phane"
+0f:POSIX: precision should also be computed in bytes, not in characers
+><  Stép>
+
 # We ask for case-insensitive sorting here (and supply upper case
 # characters) so that we exercise the logic in the shell that lowers the
 # case of the string for case-insensitive sorting.
