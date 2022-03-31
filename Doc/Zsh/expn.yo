@@ -968,9 +968,10 @@ following flags are supported:
 
 startitem()
 item(tt(#))(
-Evaluate the resulting words as numeric expressions and output the
-characters corresponding to the resulting integer.  Note that this form is
-entirely distinct from use of the tt(#) without parentheses.
+Evaluate the resulting words as numeric expressions and interpret
+these as character codes.  Output the corresponding characters.  Note
+that this form is entirely distinct from use of the tt(#) without
+parentheses.
 
 If the tt(MULTIBYTE) option is set and the number is greater than 127
 (i.e. not an ASCII character) it is treated as a Unicode character.
