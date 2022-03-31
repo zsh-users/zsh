@@ -1,3 +1,8 @@
+2022-03-31  Matthew Martin  <phy1729@gmail.com>
+
+	* 49907: Etc/completion-style-guide: Mention _numbers in
+	completion guide.
+
 2022-03-31  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 27639: Doc/Zsh/expn.yo: clarify that ${(#)...} deals with

@@ -75,6 +75,8 @@ but use:
 To indicate a default value, use square brackets:
   '--timeout[specify connection timeout]:timeout (ms) [5000]'
 These two conventions can be used together or individually as appropriate.
+Alternatively the `_numbers' function may be used:
+  '--timeout[specify connection timeout]: :_numbers -u ms -d 5000 timeout'
 
 Group descriptions should be singular because only one thing is being
 completed even though many may be listed. This applies even where you
