@@ -140,7 +140,7 @@ if [[ $PREFIX = *'${('[^\)]# ]]; then
     flags+=("m:count number of character code points in padding calculation")
   fi
   flags+=(
-    "#:evaluate as numeric expression"
+    "#:interpret numeric expression as character code"
     "@:prevent double-quoted joining of arrays"
     "*:enable extended globs for pattern"
     "A:assign as an array parameter"

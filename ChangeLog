@@ -1,5 +1,8 @@
 2022-03-31  Matthew Martin  <phy1729@gmail.com>
 
+	* 49932: Completion/Zsh/Context/_brace_parameter: Update
+	_brace_parameter # description.
+
 	* 49931: Completion/BSD/Command/_bsd_pkg: Update _bsd_pkg.
 
 	* 49907: Etc/completion-style-guide: Mention _numbers in
