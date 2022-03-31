@@ -1,5 +1,8 @@
 2022-03-31  Matthew Martin  <phy1729@gmail.com>
 
+	* 49933: Doc/Zsh/mod_system.yo, Src/Modules/system.c: Add
+	nonblock to sysopen.
+
 	* 49932: Completion/Zsh/Context/_brace_parameter: Update
 	_brace_parameter # description.
 

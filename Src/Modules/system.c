@@ -280,7 +280,7 @@ bin_syswrite(char *nam, char **args, Options ops, UNUSED(int func))
 }
 
 
-static struct { char *name; int oflag; } openopts[] = {
+static struct { const char *name; int oflag; } openopts[] = {
 #ifdef O_CLOEXEC
     { "cloexec", O_CLOEXEC },
 #else
@@ -296,6 +296,9 @@ static struct { char *name; int oflag; } openopts[] = {
 #endif
 #ifdef O_NOATIME
     { "noatime", O_NOATIME },
+#endif
+#ifdef O_NONBLOCK
+    { "nonblock", O_NONBLOCK},
 #endif
     { "excl", O_EXCL | O_CREAT },
     { "creat", O_CREAT },

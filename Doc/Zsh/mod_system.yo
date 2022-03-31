@@ -62,6 +62,9 @@ suppress updating of the file atime
 item(tt(nofollow))(
 fail if var(file) is a symbolic link
 )
+item(tt(nonblock))(
+the file is opened in nonblocking mode
+)
 item(tt(sync))(
 request that writes wait until data has been physically written
 )
