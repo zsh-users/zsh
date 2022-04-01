@@ -36,7 +36,7 @@ case $service in
     ;;
   order)
     _arguments \
-      ':service to start first:_services'
+      ':service to start first:_services' \
       '*:service to start next:_services'
     ;;
   set)
