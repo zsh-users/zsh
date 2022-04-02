@@ -1,3 +1,8 @@
+2022-04-02  dana  <dana@dana.is>
+
+	* unposted (see security/107): Etc/creating-a-release.txt:
+	Normalise white space, clarify some steps
+
 2022-04-01  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 49943: Completion/Unix/Type/_time_zone: offer only filenames

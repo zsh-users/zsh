@@ -7,9 +7,9 @@ To create a zsh release:
 
 	Config/version.mk to today's date
 	Config/version.mk version number
-	Etc/FAQ.yo
-	README
-	NEWS
+	Etc/FAQ.yo ('latest version' section)
+	README (first two paragraphs, 'incompatibilities since' sections)
+	NEWS ('changes since' sections)
 
   The version-number sequence is as follows:
 
@@ -31,7 +31,9 @@ To create a zsh release:
 
   README should document compatibility-breaking changes. Generally, NEWS should
   document new features and major bug fixes (but not routine fixes or changes to
-  completion/contrib functions).
+  completion/contrib functions). Historically, these documents have often been
+  missed at the time the changes were actually committed, so it may be a good
+  idea to scan back through the history and fill in any blanks before release.
 
   For -test releases, you may update the FAQ, README, etc., to refer to the
   upcoming stable version number.
@@ -77,7 +79,7 @@ To create a zsh release:
 
 - Create the keyring:
 
-        cat web.git/Keys/*.asc > zsh-keyring.asc
+	cat web.git/Keys/*.asc > zsh-keyring.asc
 
 - Upload to sf.net:
 
@@ -90,13 +92,13 @@ To create a zsh release:
 
   You should upload five files:
 
-        zsh-5.8.tar.xz
-        zsh-5.8.tar.xz.asc
-        zsh-doc-5.8.tar.xz
-        zsh-doc-5.8.tar.xz.asc
-        zsh-keyring.asc
+	zsh-5.8.tar.xz
+	zsh-5.8.tar.xz.asc
+	zsh-doc-5.8.tar.xz
+	zsh-doc-5.8.tar.xz.asc
+	zsh-keyring.asc
 
-        (TODO: what about MD5SUM, FAQ, META-FAQ, all in www.zsh.org/pub/?)
+	(TODO: what about MD5SUM, FAQ, META-FAQ, all in www.zsh.org/pub/?)
 
   Note that zsh-keyring.asc is fine to just overwrite, since it's only ever
   appended to, and in any case the underlying Keys/*.asc files are in version
@@ -142,8 +144,14 @@ To create a zsh release:
 	# several minutes to appear afterwards
 	rsync ...
 
-- For stable releases, upload the build artefacts to zsh.org/pub; you may need
-  assistance from another dev if you don't have access to do this.
+- For stable releases, upload the build artefacts to zsh.org/pub, making sure to
+  move the previous ones to old/. For example (assuming the new artefacts are in
+  the CWD):
+
+	mv /usr/local/www/ftp/pub/zsh-*.*(.) /usr/local/www/ftp/pub/old/
+	mv zsh-*.*(.) /usr/local/www/ftp/pub/
+
+  You may need assistance from another dev if you don't have access to do this.
 
 - Post to -workers@
 
