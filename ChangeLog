@@ -3,6 +3,8 @@
 	* 49959: Completion/Zsh/Context/_brace_parameter:
 	_brace_parameter: add (-)
 
+	* 49957: Src/Zle/compcore.c: Brown paper bag for 49915
+
 2022-04-02  dana  <dana@dana.is>
 
 	* unposted (see 48073): Completion/Zsh/Command/_fc: Complete

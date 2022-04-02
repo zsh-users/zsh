@@ -3247,7 +3247,7 @@ makearray(LinkList l, int type, int flags, int *np, int *nlp, int *llp)
 	    }
 	    *cp = NULL;
 	}
-    } else {
+    } else if (n > 0) {
 	if (!(flags & CGF_NOSORT)) {
 	    /* Now sort the array (it contains matches). */
 	    matchorder = flags;
@@ -3320,8 +3320,8 @@ makearray(LinkList l, int type, int flags, int *np, int *nlp, int *llp)
 			}
 			*ap = *bp;
 		    }
+		    *ap = NULL;
 		}
-		*ap = NULL;
 	    /* passed -1 but not -2, so remove consecutive duplicates (efficient) */
 	    } else if (!(flags & CGF_UNIQCON)) {
 		int dup;
