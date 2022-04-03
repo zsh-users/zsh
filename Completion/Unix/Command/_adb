@@ -336,9 +336,57 @@ _adb_cmd_handler () {
 
 (( $+functions[_adb_dumpsys_handler] )) ||
 _adb_dumpsys_handler () {
-  local -a services
-  services=(${${${(f)"$(adb ${ADB_DEVICE_SPECIFICATION} exec-out dumpsys -l)"}[2,-1]}##[[:space:]]##})
-  _wanted dumpsys expl 'dumpsys service' compadd ${services%$'\r'}
+  if [[ $CURRENT -eq 3 ]]; then
+    local -a services
+    services=(${${${(f)"$(adb ${ADB_DEVICE_SPECIFICATION} exec-out dumpsys -l)"}[2,-1]}##[[:space:]]##})
+    _wanted dumpsys expl 'dumpsys service' compadd - ${services%$'\r'}
+  elif [[ $CURRENT -ge 4 && $words[3] == SurfaceFlinger ]]; then
+    (( CURRENT -= 2 ))
+    shift 2 words
+    typeset -A opt_args
+    local context state state_descr line
+    _arguments -R \
+      '--file[start/stop continuous dumpsys to file]' \
+      '--no-limit[disable wrapping around continuous dumpsys at ~20MB]' \
+      '--full-dump[set fullDump = true]' \
+      '--allocated_buffers[show allocated buffers dump]' \
+      '--display-id[show display id dump]' \
+      '--dispsync[show dispsync dump]' \
+      '--edid[raw edid dump for specified hwc display (binary output)]:*:hwc display:->hwcdisplay' \
+      '--latency[show latency stats]:*:layer:->layer' \
+      '--latency-clear[clear latency stats]:*:layer:->layer' \
+      '--list[list all layers]' \
+      '--planner[pass planner dump arguments]:*:planner arguments:->planner' \
+      '--static-screen[show static screen stats]' \
+      '--timestats[pass time stats arguments]:*:timestats arguments:->timestats' \
+      '--vsync[show vsync dump]' \
+      '--wide-color[show wide color info]' \
+      '--frametimeline[pass frametimeline arguments]:*:frametimeline arguments:->frametimeline' \
+      '--mini[show mini dump]'
+    if [[ $? == 300 ]]; then
+      case $state in
+        layer)
+          typeset -a layers
+          layers=(${${(f)"$(adb ${ADB_DEVICE_SPECIFICATION} exec-out dumpsys SurfaceFlinger --list)"}[2,-1]})
+          _wanted dumpsys expl 'layers' compadd - ${layers%$'\r'}
+          ;;
+        planner)
+          _arguments \
+            {--compare,-c}'[compare predictions of two hashes]:left: :right: :' \
+            {--describe,-d}'[describe hash]:hash: :' \
+            {--help,-h}'[help]' \
+            {--similar,-s}'[show similar stacks matching given plan]:plan: :' \
+            {--layers,-l}'[show current layers]'
+          ;;
+        timestats)
+          _arguments -disable -enable -clear -dump -maxlayers'[only with -dump]:int:'
+          ;;
+        frametimeline)
+          _arguments -jank -all
+          ;;
+      esac
+    fi
+  fi
 }
 
 (( $+functions[_adb_startstop] )) ||
