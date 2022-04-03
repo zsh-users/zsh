@@ -43,6 +43,7 @@ _adb() {
           "disconnect"
           "emu"
           "enable-verity"
+          "exec-out"
           "forward"
           "get-devpath"
           "get-serialno"
@@ -109,7 +110,7 @@ _adb_dispatch_command () {
   fi
 
   case ${curcontext} in
-    (*:adb-shell:)
+    (*:adb-shell:|*:adb-exec-out:)
       (( $+functions[_adb_dispatch_shell] )) && _adb_dispatch_shell
       ;;
     (*:adb-backup:)

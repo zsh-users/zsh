@@ -5,6 +5,9 @@
 
 	* 49957: Src/Zle/compcore.c: Brown paper bag for 49915
 
+	* 49961: Completion/Unix/Command/_adb: _adb: handle exec-out
+	like shell
+
 2022-04-02  dana  <dana@dana.is>
 
 	* unposted (see 48073): Completion/Zsh/Command/_fc: Complete
