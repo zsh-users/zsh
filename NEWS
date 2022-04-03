@@ -7,6 +7,12 @@ Note also the list of incompatibilities in the README file.
 Changes since 5.8.1
 -------------------
 
+zsh 5.9 is dedicated in memory of Sven Guckes, who was, amongst other
+things, a long-time zsh advocate.
+
+  https://linuxnews.de/2022/02/sven-guckes-verstorben/
+  https://groups.google.com/g/vim_announce/c/MJBKVd-xrEE/m/joVNaDgAAgAJ
+
 When unsetting a hash element, the string enclosed in square brackets is
 interpreted literally after any normal command-line-argument expansions.
 Thus

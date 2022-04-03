@@ -1,5 +1,7 @@
 2022-04-09  dana  <dana@dana.is>
 
+	* 49958: NEWS: Dedicate zsh 5.9 to Sven Guckes
+
 	* 49958, (tweaked per 50019): NEWS, README: Add missing
 	changes, update for zsh 5.9
 
