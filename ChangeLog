@@ -1,5 +1,8 @@
 2022-04-02  dana  <dana@dana.is>
 
+	* unposted (see 48073): Completion/Zsh/Command/_fc: Complete
+	new -s option
+
 	* unposted (see security/107): Etc/creating-a-release.txt:
 	Normalise white space, clarify some steps
 

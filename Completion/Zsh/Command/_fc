@@ -59,7 +59,8 @@ case $service in
   ;;
   *)
     _arguments "$fc_common[@]" "$fc_hist[@]" "$fc_r" \
-      '(-A -R -W -a -l -n -d -f -E -i -r -t -D -p -P)-e+[specify editor to invoke]:editor to invoke:_command_names -e' \
+      '(-A -R -W -a -l -n -d -f -E -i -r -t -D -p -P -s)-e+[specify editor to invoke]:editor to invoke:_command_names -e' \
+      '(-A -R -W -a -l -n -d -f -E -i -r -t -D -p -P -e)-s[re-execute command without invoking editor (like -e-)]' \
       '(-a -l -L -m -e -r -n -d -f -t -E -i -R -D -A -W -p -P *)-'{\
 'R[read history from file]',\
 'A[append history to file]',\
