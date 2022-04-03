@@ -176,7 +176,7 @@ _adb_device_specification () {
 
 (( $+functions[_adb_dispatch_shell] )) ||
 _adb_dispatch_shell () {
-  if [[ ${#words} -le 2 ]]
+  if [[ $CURRENT -le 2 ]]
   then
     (( $+functions[_adb_shell_commands_handler] )) && _adb_shell_commands_handler
     return
@@ -272,7 +272,7 @@ _adb_intent_handler () {
 
 (( $+functions[_adb_activity_manager_handler] )) ||
 _adb_activity_manager_handler () {
-  if [[ ${#words} -le 3 ]]
+  if [[ $CURRENT -le 3 ]]
   then
     _wanted am_argument expl 'am argument' compadd start startservice broadcast instrument profile
     return
@@ -379,12 +379,12 @@ _adb_dispatch_install () {
 
 (( $+functions[_adb_dispatch_push] )) ||
 _adb_dispatch_push () {
-  if [[ ${#words} -gt 3 ]] 
+  if [[ $CURRENT -gt 3 ]] 
   then
     _message -r "Notice: you can only push a single item at a time"
     return
   fi 
-  if [[ ${#words} -gt 2 ]]
+  if [[ $CURRENT -gt 2 ]]
   then
     _arguments '*: :_adb_remote_folder'
   else
@@ -394,12 +394,12 @@ _adb_dispatch_push () {
 
 (( $+functions[_adb_dispatch_pull] )) ||
 _adb_dispatch_pull () {
-  if [[ ${#words} -gt 3 ]] 
+  if [[ $CURRENT -gt 3 ]] 
   then
     _message -r "Notice: you can only pull a single item at a time"
     return
   fi 
-  if [[ ${#words} -gt 2 ]]
+  if [[ $CURRENT -gt 2 ]]
   then
     _arguments '*:local file/folder:_files'
   else
