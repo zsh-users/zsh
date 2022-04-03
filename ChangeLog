@@ -1,3 +1,8 @@
+2022-04-03  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 49959: Completion/Zsh/Context/_brace_parameter:
+	_brace_parameter: add (-)
+
 2022-04-02  dana  <dana@dana.is>
 
 	* unposted (see 48073): Completion/Zsh/Command/_fc: Complete
