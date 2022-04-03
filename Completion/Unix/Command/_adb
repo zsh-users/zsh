@@ -432,7 +432,7 @@ _adb_device_serial() {
   local expl
   local -a devices device_desc
   local device
-  devices=( $(adb devices -l | sed -n 's/^\([^[:space:]]*\)[[:space:]]*.*product:\([^[:space:]]*\).*$/\1:\2/p') )
+  devices=( $(adb devices -l | sed -n -e 's/:/\\:/' -e 's/^\([^[:space:]]*\)[[:space:]]*.*product:\([^[:space:]]*\).*$/\1:\2/p') )
   zstyle -a :completion:${curcontext} device-names device_desc
   for device in $device_desc; do
     if [[ -n $devices[(r)${device%:*}:*] ]]; then

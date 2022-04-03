@@ -11,6 +11,9 @@
 	* 49962: Completion/Unix/Command/_adb: _adb: Add dumpsys and
 	cmd completion
 
+	* 49963: Completion/Unix/Command/_adb: _adb: Fix device serial
+	completion for hostname:port syntax
+
 2022-04-02  dana  <dana@dana.is>
 
 	* unposted (see 48073): Completion/Zsh/Command/_fc: Complete
