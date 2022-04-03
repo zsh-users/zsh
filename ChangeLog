@@ -26,6 +26,9 @@
 	* 49967: Completion/Unix/Command/_adb: _adb: Handle dumpsys
 	SurfaceFlinger arguments
 
+	* 49968: Completion/Unix/Command/_adb: _adb: also replace model
+	names, since device names aren't sent on wifi listing
+
 2022-04-02  dana  <dana@dana.is>
 
 	* unposted (see 48073): Completion/Zsh/Command/_fc: Complete

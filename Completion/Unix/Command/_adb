@@ -498,6 +498,8 @@ _adb_device_serial() {
   for device in $device_desc; do
     if [[ -n $devices[(r)${device%:*}:*] ]]; then
       devices[(i)${device%:*}:*]=$device
+    elif [[ -n $devices[(r)*:${device%:*}] ]]; then
+      devices[(i)*:${device%:*}]=${${devices[(r)*:${device%:*}]}%:*}:${device#*:}
     fi
   done
   _describe -t dev_serial 'available device' devices
