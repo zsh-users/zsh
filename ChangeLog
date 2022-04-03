@@ -1,3 +1,8 @@
+2022-04-09  dana  <dana@dana.is>
+
+	* 49958, (tweaked per 50019): NEWS, README: Add missing
+	changes, update for zsh 5.9
+
 2022-04-06  Matthew Martin  <phy1729@gmail.com>
 
 	* 49960: Doc/Zsh/compsys.yo: Sort lists in zshcompsys.

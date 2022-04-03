@@ -5,11 +5,12 @@ THE Z SHELL (ZSH)
 Version
 -------
 
-This is version 5.8.1 of the shell.  This is a security and bugfix release.
+This is version 5.9 of the shell.  This is a security and feature release.
+There are several visible improvements since 5.8.1, as well as bug fixes.
 All zsh installations are encouraged to upgrade as soon as possible.
 
 Note in particular the changes highlighted under "Incompatibilities since
-5.8" below.  See NEWS for more information.
+5.8.1" below.  See NEWS for more information.
 
 Installing Zsh
 --------------
@@ -30,15 +31,12 @@ Zsh is a shell with lots of features.  For a list of some of these, see the
 file FEATURES, and for the latest changes see NEWS.  For more
 details, see the documentation.
 
-Incompatibilities since 5.8
----------------------------
+Incompatibilities since 5.8.1
+-----------------------------
 
 compinit: A "y" response to the "Ignore ... and continue?" prompt removes
 insecure elements from the set of completion functions, where previously
 it ignored the compaudit result and included all elements.
-
-PROMPT_SUBST expansion is no longer performed on arguments to prompt-
-expansion sequences such as %F.
 
 Build-time change: The default value of the --enable-gdbm configure
 argument has changed from "yes" to "no".  Thus, the zsh/db/gdbm module will
@@ -105,11 +103,25 @@ emulate sh: When zsh emulates sh, the final command in a pipeline is now run in
 a subshell.  This differs from the behavior in the native (zsh) mode, but is
 consistent with most other sh implementations.
 
+The export and readonly builtins now ignore the -p option when there are
+operands given and POSIX_BUILTINS is enabled. This more closely matches the
+behaviour of bash and ksh.
+
 getopts now calculates OPTIND in a similar manner to other shells when the
 POSIX_BUILTINS option is enabled.
 
-Incompatibilities between 5.7.1 and 5.8
----------------------------------------
+Ignored-signal traps are now inherited by subshells when the POSIX_TRAPS
+option is enabled.
+
+emulate sh: Inf and NaN are now treated as parameter names in arithmetic
+context when zsh is emulating sh.
+
+The ${name:offset:length} expansion syntax now behaves more similarly to
+other shells in that the offset and length are applied as array indices
+prior to scalar conversion in e.g. "${*:0:2}".
+
+Incompatibilities between 5.7.1 and 5.8.1
+-----------------------------------------
 
 The history expansion !:1:t2 used to be interpreted such that the 2
 was a separate character added after the history expansion.  Now
@@ -139,6 +151,9 @@ message) on some older and uncommon platforms due to library dependency
 changes made in the course of fixing CVE-2019-20044.  Please report this
 to the zsh-workers mailing list if your system is affected.  See NEWS for
 more.
+
+PROMPT_SUBST expansion is no longer performed on arguments to prompt-
+expansion sequences such as %F.
 
 Incompatibilities between 5.6.2 and 5.7.1
 -----------------------------------------

@@ -4,25 +4,8 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
-Changes since 5.8
------------------
-
-CVE-2021-45444: Some prompt expansion sequences, such as %F, support
-'arguments' which are themselves expanded in case they contain colour
-values, etc. This additional expansion would trigger PROMPT_SUBST
-evaluation, if enabled. This could be abused to execute code the user
-didn't expect. e.g., given a certain prompt configuration, an attacker
-could trick a user into executing arbitrary code by having them check
-out a Git branch with a specially crafted name.
-
-This is fixed in the shell itself by no longer performing PROMPT_SUBST
-evaluation on these prompt-expansion arguments.
-
-Users who are concerned about an exploit but unable to update their
-binaries may apply the partial work-around described in the file
-Etc/CVE-2021-45444-VCS_Info-workaround.patch included with the shell
-source. [ Reported by RyotaK <security@ryotak.me>. Additional thanks to
-Marc Cornellà <hello@mcornella.com>. ]
+Changes since 5.8.1
+-------------------
 
 When unsetting a hash element, the string enclosed in square brackets is
 interpreted literally after any normal command-line-argument expansions.
@@ -54,6 +37,9 @@ fractional seconds.
 The option CLOBBER_EMPTY was added to enable the overwrite behaviour
 of CLOBBER for empty files only. It is disabled by default.
 
+A (-) expansion flag was added. It works like (n) but correctly sorts
+negative numbers.
+
 The compinit function learnt a -w option to explain why compdump runs.
 When run without the -i or -u options and compaudit discovers security
 issues, answering "y" to the "Ignore insecure ..." prompt removes the
@@ -69,17 +55,76 @@ widgets.  This corresponds to long-standing behavior of other user ZLE
 widgets.  Use the _complete_debug widget to capture XTRACE output, or
 use "functions -T" to enable tracing of specific completion functions.
 
+The fc builtin learnt an -s option which is a POSIX equivalent to the
+`fc -e-` method of re-executing a command without invoking an editor.
+
+The option CASE_PATHS was added to control how NO_CASE_GLOB behaves.
+NO_CASE_GLOB + NO_CASE_PATHS is equivalent to the current NO_CASE_GLOB
+behaviour. NO_CASE_GLOB + CASE_PATHS treats only path components that
+contain globbing characters as case-insensitive; this behaviour may
+yield more predictable results on case-sensitive file systems.
+NO_CASE_PATHS is the default.
+
 With the new TYPESET_TO_UNSET option set, "typeset foo" leaves foo unset,
 in contrast to the default behavior which assigns foo="".  Any parameter
 attributes such as numeric type, sorting, and padding are retained until
 the parameter is explicitly unset or a conflicting value is assigned.
-This is similar to default behavior of bash and ksh.
+This is similar to default behavior of bash and ksh.  This option is
+disabled by default.
+
+The compadd builtin's -D option can now be specified more than once.
+
+The zsh/zutil module's zformat builtin learnt an -F option which behaves
+like -f except that ternary expressions check for existence instead of
+doing math evaluation.
+
+The conventional syntax used to indicate units, ranges, and default values
+in completion descriptions (e.g. `timeout (seconds) (0-60) [20]`) is now
+recognised by the completion system itself. These components are parsed
+out of the description and can be individually styled. A _numbers helper
+function has been added to help function authors offer rich completion
+for these values.
+
+The log builtin, WATCH parameter, et al., have been broken out into a
+separate module, zsh/watch. The module is enabled by default.
+
+The zsh/watch module's WATCHFMT parameter now supports colours via the
+%F and %K escapes.
+
+The STTY parameter can now be set to an empty string before running a
+command to automatically restore terminal settings after the command
+finishes.
 
 The "jobs" command and "$jobstates" and related parameters can report on
 parent shell jobs even in subshells.  This is a snapshot of the parent
 state, frozen at the point the subshell started.  However, if a subshell
 starts its own background jobs, the parent state is discarded in order
 to report on those new jobs.
+
+Changes from 5.8 to 5.8.1
+-------------------------
+
+CVE-2021-45444: Some prompt expansion sequences, such as %F, support
+'arguments' which are themselves expanded in case they contain colour
+values, etc. This additional expansion would trigger PROMPT_SUBST
+evaluation, if enabled. This could be abused to execute code the user
+didn't expect. e.g., given a certain prompt configuration, an attacker
+could trick a user into executing arbitrary code by having them check
+out a Git branch with a specially crafted name.
+
+This is fixed in the shell itself by no longer performing PROMPT_SUBST
+evaluation on these prompt-expansion arguments.
+
+Users who are concerned about an exploit but unable to update their
+binaries may apply the partial work-around described in the file
+Etc/CVE-2021-45444-VCS_Info-workaround.patch included with the shell
+source. [ Reported by RyotaK <security@ryotak.me>. Additional thanks to
+Marc Cornellà <hello@mcornella.com>. ]
+
+A regression was introduced in 5.8.1 in which, when reading a script
+from standard input, zsh itself would consume lines that should otherwise
+have been consumed by commands executed earlier in the script. This was
+not intentional and has been fixed in subsequent versions.
 
 Changes from 5.7.1-test-3 to 5.8
 --------------------------------
