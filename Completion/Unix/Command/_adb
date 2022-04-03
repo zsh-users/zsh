@@ -195,6 +195,9 @@ _adb_dispatch_shell () {
     (dumpsys)
       (( $+functions[_adb_dumpsys_handler] )) && _adb_dumpsys_handler
       ;;
+    (start|stop)
+      (( $+functions[_adb_startstop] )) && _adb_startstop ${words[2]}
+      ;;
     (*)
       _arguments '*: :_adb_remote_folder'
       ;;
@@ -337,6 +340,17 @@ _adb_dumpsys_handler () {
   local -a services
   services=(${${${(f)"$(adb ${ADB_DEVICE_SPECIFICATION} exec-out dumpsys -l)"}[2,-1]}##[[:space:]]##})
   _wanted dumpsys expl 'dumpsys service' compadd ${services%$'\r'}
+}
+
+(( $+functions[_adb_startstop] )) ||
+_adb_startstop () {
+  local -a services
+  local -A service_status
+  services=(${(f)"$(adb ${ADB_DEVICE_SPECIFICATION} exec-out getprop)"})
+  service_status=( ${(s,: ,)${(j,: ,)${(M)services:#\[init.svc.*}}} )
+  local -A map=(start stopped stop running)
+  services=( ${(k)service_status[(R)*$map[$1]*]} )
+  _wanted services expl "$map[$1] services" compadd - ${${${services#\[}%\]}#init.svc.}
 }
 
 (( $+functions[_adb_dispatch_uninstall] )) ||
@@ -486,7 +500,7 @@ _adb_options_handler() {
 (( $+functions[_adb_shell_commands_handler] )) ||
 _adb_shell_commands_handler() {
   local expl
-  _wanted adb_shell_commands expl 'adb shell command' compadd ls pm am mkdir rmdir rm cat cmd dumpsys
+  _wanted adb_shell_commands expl 'adb shell command' compadd ls pm am mkdir rmdir rm cat cmd dumpsys start stop
 }
 
 (( $+functions[_adb_device_available] )) ||
