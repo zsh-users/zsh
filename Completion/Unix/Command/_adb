@@ -82,6 +82,7 @@ _adb() {
   if ! adb ${ADB_DEVICE_SPECIFICATION} shell exit 2>/dev/null; then
       # early bail-out until a single valid device/emulator is specified and up-and-running
       [[ $words[CURRENT-1] = -s ]] || _message -r "No (started) device specified, completions do not yet work"
+      #TODO handle -t transport-id
       _arguments \
 	'-s[serial]: :_adb_device_serial' \
 	'(   -e)-d[device]' \
@@ -165,13 +166,11 @@ _adb_sanitize_context () {
 
 (( $+functions[_adb_device_specification] )) ||
 _adb_device_specification () {
-  local -a word
-  word=($words[(R)-[des]])
-  if [[ $words[(R)-s] == -s ]]; then
-    local i=$words[(I)-s]
-    word=($words[i,i+1])
+  if [[ $words[2] == -[de] ]]; then
+    ADB_DEVICE_SPECIFICATION=($words[2])
+  elif [[ $words[2] == -[st] ]]; then
+    ADB_DEVICE_SPECIFICATION=($words[2,3])
   fi
-  ADB_DEVICE_SPECIFICATION=($word)
 }
 
 (( $+functions[_adb_dispatch_shell] )) ||

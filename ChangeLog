@@ -20,6 +20,9 @@
 	* 49965: Completion/Unix/Command/_adb: _adb: use $CURRENT instead
 	of $#words
 
+	* 49966: Completion/Unix/Command/_adb: _adb: Parse device spec
+	correctly
+
 2022-04-02  dana  <dana@dana.is>
 
 	* unposted (see 48073): Completion/Zsh/Command/_fc: Complete
