@@ -189,6 +189,12 @@ _adb_dispatch_shell () {
     (pm)
       (( $+functions[_adb_package_manager_handler] )) && _adb_package_manager_handler
       ;;
+    (cmd)
+      (( $+functions[_adb_cmd_handler] )) && _adb_cmd_handler
+      ;;
+    (dumpsys)
+      (( $+functions[_adb_dumpsys_handler] )) && _adb_dumpsys_handler
+      ;;
     (*)
       _arguments '*: :_adb_remote_folder'
       ;;
@@ -317,6 +323,20 @@ _adb_package_manager_handler () {
       _wanted pm_argument expl 'pm argument' compadd list path install uninstall enable disable setInstallLocation getInstallLocation
       ;;
   esac
+}
+
+(( $+functions[_adb_cmd_handler] )) ||
+_adb_cmd_handler () {
+  local -a cmds
+  cmds=(${${${(f)"$(adb ${ADB_DEVICE_SPECIFICATION} exec-out cmd -l)"}[2,-1]}##[[:space:]]##})
+  _wanted dumpsys expl 'cmd command' compadd ${cmds%$'\r'}
+}
+
+(( $+functions[_adb_dumpsys_handler] )) ||
+_adb_dumpsys_handler () {
+  local -a services
+  services=(${${${(f)"$(adb ${ADB_DEVICE_SPECIFICATION} exec-out dumpsys -l)"}[2,-1]}##[[:space:]]##})
+  _wanted dumpsys expl 'dumpsys service' compadd ${services%$'\r'}
 }
 
 (( $+functions[_adb_dispatch_uninstall] )) ||
@@ -466,7 +486,7 @@ _adb_options_handler() {
 (( $+functions[_adb_shell_commands_handler] )) ||
 _adb_shell_commands_handler() {
   local expl
-  _wanted adb_shell_commands expl 'adb shell command' compadd ls pm am mkdir rmdir rm cat
+  _wanted adb_shell_commands expl 'adb shell command' compadd ls pm am mkdir rmdir rm cat cmd dumpsys
 }
 
 (( $+functions[_adb_device_available] )) ||

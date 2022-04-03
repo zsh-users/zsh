@@ -8,6 +8,9 @@
 	* 49961: Completion/Unix/Command/_adb: _adb: handle exec-out
 	like shell
 
+	* 49962: Completion/Unix/Command/_adb: _adb: Add dumpsys and
+	cmd completion
+
 2022-04-02  dana  <dana@dana.is>
 
 	* unposted (see 48073): Completion/Zsh/Command/_fc: Complete
