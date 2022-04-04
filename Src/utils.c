@@ -438,7 +438,6 @@ putshout(int c)
     return 0;
 }
 
-#ifdef MULTIBYTE_SUPPORT
 /*
  * Turn a character into a visible representation thereof.  The visible
  * string is put together in a static buffer, and this function returns
@@ -523,67 +522,6 @@ nicechar(int c)
 {
     return nicechar_sel(c, 0);
 }
-
-#else /* MULTIBYTE_SUPPORT */
-
-/**/
-mod_export char *
-nicechar(int c)
-{
-    static char buf[10];
-    char *s = buf;
-    c &= 0xff;
-    if (ZISPRINT(c))
-	goto done;
-    if (c & 0x80) {
-	if (isset(PRINTEIGHTBIT))
-	    goto done;
-	*s++ = '\\';
-	*s++ = 'M';
-	*s++ = '-';
-	c &= 0x7f;
-	if(ZISPRINT(c))
-	    goto done;
-    }
-    if (c == 0x7f) {
-	*s++ = '\\';
-	*s++ = 'C';
-	*s++ = '-';
-	c = '?';
-    } else if (c == '\n') {
-	*s++ = '\\';
-	c = 'n';
-    } else if (c == '\t') {
-	*s++ = '\\';
-	c = 't';
-    } else if (c < 0x20) {
-      /*
-	if (quotable) {
-	    *s++ = '\\';
-	    *s++ = 'C';
-	    *s++ = '-';
-	} else
-      */
-	    *s++ = '^';
-	c += 0x40;
-    }
-    done:
-    /*
-     * The resulting string is still metafied, so check if
-     * we are returning a character in the range that needs metafication.
-     * This can't happen if the character is printed "nicely", so
-     * this results in a maximum of two bytes total (plus the null).
-     */
-    if (imeta(c)) {
-	*s++ = Meta;
-	*s++ = c ^ 32;
-    } else
-	*s++ = c;
-    *s = 0;
-    return buf;
-}
-
-#endif /* MULTIBYTE_SUPPORT */
 
 /*
  * Return 1 if nicechar() would reformat this character.
