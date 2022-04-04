@@ -1,3 +1,8 @@
+2022-04-05  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 49989:  Src/Zle/compresult.c, Src/utils.c, Src/zsh.h: Align
+	"nice" printing for single byte compilation with multibyte.
+
 2022-04-04  Bart Schaefer  <schaefer@zsh.org>
 
 	* 49992: Src/utils.c: further unify single- and multi-byte

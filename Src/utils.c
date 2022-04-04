@@ -5196,26 +5196,11 @@ zputs(char const *s, FILE *stream)
 mod_export char *
 nicedup(char const *s, int heap)
 {
-    int c, len = strlen(s) * 5 + 1;
-    VARARR(char, buf, len);
-    char *p = buf, *n;
+    char *retstr;
 
-    while ((c = *s++)) {
-	if (itok(c)) {
-	    if (c <= Comma)
-		c = ztokens[c - Pound];
-	    else
-		continue;
-	}
-	if (c == Meta)
-	    c = *s++ ^ 32;
-	/* The result here is metafied */
-	n = nicechar(c);
-	while(*n)
-	    *p++ = *n++;
-    }
-    *p = '\0';
-    return heap ? dupstring(buf) : ztrdup(buf);
+    (void)sb_niceformat(s, NULL, &retstr, heap ? NICEFLAG_HEAP : 0);
+
+    return retstr;
 }
 #endif
 
@@ -5234,20 +5219,7 @@ nicedupstring(char const *s)
 mod_export int
 nicezputs(char const *s, FILE *stream)
 {
-    int c;
-
-    while ((c = *s++)) {
-	if (itok(c)) {
-	    if (c <= Comma)
-		c = ztokens[c - Pound];
-	    else
-		continue;
-	}
-	if (c == Meta)
-	    c = *s++ ^ 32;
-	if(zputs(nicechar(c), stream) < 0)
-	    return EOF;
-    }
+    sb_niceformat(s, stream, NULL, 0);
     return 0;
 }
 
@@ -5736,7 +5708,7 @@ mb_charlenconv(const char *s, int slen, wint_t *wcp)
 }
 
 /**/
-#else
+#else /* MULTIBYTE_SUPPORT */
 
 /* Simple replacement for mb_metacharlenconv */
 
@@ -5774,6 +5746,121 @@ charlenconv(const char *x, int len, int *c)
     if (c)
 	*c = (char)*x;
     return 1;
+}
+
+/*
+ * Non-multibyte version of mb_niceformat() above.  Same basic interface.
+ */
+
+/**/
+mod_export size_t
+sb_niceformat(const char *s, FILE *stream, char **outstrp, int flags)
+{
+    size_t l = 0, newl;
+    int umlen, outalloc, outleft;
+    char *ums, *ptr, *eptr, *fmt, *outstr, *outptr;
+
+    if (outstrp) {
+	outleft = outalloc = 2 * strlen(s);
+	outptr = outstr = zalloc(outalloc);
+    } else {
+	outleft = outalloc = 0;
+	outptr = outstr = NULL;
+    }
+
+    ums = ztrdup(s);
+    /*
+     * is this necessary at this point? niceztrlen does this
+     * but it's used in lots of places.  however, one day this may
+     * be, too.
+     */
+    untokenize(ums);
+    ptr = unmetafy(ums, &umlen);
+    eptr = ptr + umlen;
+
+    while (ptr < eptr) {
+	int c = STOUC(*ptr);
+	if (c == '\'' && (flags & NICEFLAG_QUOTE)) {
+	    fmt = "\\'";
+	    newl = 2;
+	}
+	else if (c == '\\' && (flags & NICEFLAG_QUOTE)) {
+	    fmt = "\\\\";
+	    newl = 2;
+	}
+	else {
+	    fmt = nicechar_sel(c, flags & NICEFLAG_QUOTE);
+	    newl = 1;
+	}
+
+	++ptr;
+	l += newl;
+
+	if (stream)
+	    zputs(fmt, stream);
+	if (outstr) {
+	    /* Append to output string */
+	    int outlen = strlen(fmt);
+	    if (outlen >= outleft) {
+		/* Reallocate to twice the length */
+		int outoffset = outptr - outstr;
+
+		outleft += outalloc;
+		outalloc *= 2;
+		outstr = zrealloc(outstr, outalloc);
+		outptr = outstr + outoffset;
+	    }
+	    memcpy(outptr, fmt, outlen);
+	    /* Update start position */
+	    outptr += outlen;
+	    /* Update available bytes */
+	    outleft -= outlen;
+	}
+    }
+
+    free(ums);
+    if (outstrp) {
+	*outptr = '\0';
+	/* Use more efficient storage for returned string */
+	if (flags & NICEFLAG_NODUP)
+	    *outstrp = outstr;
+	else {
+	    *outstrp = (flags & NICEFLAG_HEAP) ? dupstring(outstr) :
+		ztrdup(outstr);
+	    free(outstr);
+	}
+    }
+
+    return l;
+}
+
+/*
+ * Return 1 if sb_niceformat() would reformat this string, else 0.
+ */
+
+/**/
+mod_export int
+is_sb_niceformat(const char *s)
+{
+    int umlen, ret = 0;
+    char *ums, *ptr, *eptr;
+
+    ums = ztrdup(s);
+    untokenize(ums);
+    ptr = unmetafy(ums, &umlen);
+    eptr = ptr + umlen;
+
+    while (ptr < eptr) {
+	if (is_nicechar(*ptr))  {
+	    ret = 1;
+	    break;
+	}
+	++ptr;
+    }
+
+    free(ums);
+
+    return ret;
 }
 
 /**/
@@ -6303,6 +6390,22 @@ quotedzputs(char const *s, FILE *stream)
 	} else {
 	    char *substr;
 	    mb_niceformat(s, NULL, &substr, NICEFLAG_QUOTE|NICEFLAG_NODUP);
+	    outstr = (char *)zhalloc(4 + strlen(substr));
+	    sprintf(outstr, "$'%s'", substr);
+	    free(substr);
+	    return outstr;
+	}
+    }
+#else
+    if (is_sb_niceformat(s)){
+	if (stream) {
+	    fputs("$'", stream);
+	    sb_niceformat(s, stream, NULL, NICEFLAG_QUOTE);
+	    fputc('\'', stream);
+	    return NULL;
+	} else {
+	    char *substr;
+	    sb_niceformat(s, NULL, &substr, NICEFLAG_QUOTE|NICEFLAG_NODUP);
 	    outstr = (char *)zhalloc(4 + strlen(substr));
 	    sprintf(outstr, "$'%s'", substr);
 	    free(substr);

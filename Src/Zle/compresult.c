@@ -2248,15 +2248,13 @@ iprintm(Cmgroup g, Cmatch *mp, UNUSED(int mc), UNUSED(int ml), int lastc, int wi
 #ifdef MULTIBYTE_SUPPORT
 	len = mb_niceformat(m->disp, shout, NULL, 0);
 #else
-	nicezputs(m->disp, shout);
-	len = niceztrlen(m->disp);
+	len = sb_niceformat(m->disp, shout, NULL, 0);
 #endif
     } else {
 #ifdef MULTIBYTE_SUPPORT
 	len = mb_niceformat(m->str, shout, NULL, 0);
 #else
-	nicezputs(m->str, shout);
-	len = niceztrlen(m->str);
+	len = sb_niceformat(m->str, shout, NULL, 0);
 #endif
 
 	if ((g->flags & CGF_FILES) && m->modec) {
