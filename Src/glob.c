@@ -3286,6 +3286,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 	return 1;
     }
     if (matched) {
+        /* Default is to match at the start; see comment in MULTIBYTE above */
 	switch (fl & (SUB_END|SUB_LONG|SUB_SUBSTR)) {
 	case 0:
 	case SUB_LONG:
@@ -3355,7 +3356,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 	    /* longest or smallest at start with substrings */
 	    t = s;
 	    if (fl & SUB_GLOBAL) {
-		imd.repllist = newlinklist();
+		imd.repllist = (fl & SUB_LIST) ? znewlinklist() : newlinklist();
 		if (repllistp)
 		    *repllistp = imd.repllist;
 	    }
@@ -3405,6 +3406,8 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 			 * which is already marked for replacement.
 			 */
 			matched = 1;
+			if (t == send)
+			    break;
 			while (t < mpos) {
 			    ioff++;
 			    umlen--;
@@ -3412,8 +3415,10 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 			}
 			break;
 		    }
+		    if (t == send)
+			break;
 		}
-	    } while (matched);
+	    } while (matched && t < send);
 	    /*
 	     * check if we can match a blank string, if so do it
 	     * at the start.  Goodness knows if this is a good idea
@@ -3485,6 +3490,8 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 	 * Results from get_match_ret in repllist are all metafied.
 	 */
 	s = *sp;
+	if (fl & SUB_LIST)
+	    return 1;
 	i = 0;			/* start of last chunk we got from *sp */
 	for (nd = firstnode(imd.repllist); nd; incnode(nd)) {
 	    rd = (Repldata) getdata(nd);
@@ -3514,7 +3521,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
     imd.replstr = NULL;
     imd.repllist = NULL;
     *sp = get_match_ret(&imd, 0, 0);
-    return 1;
+    return (fl & SUB_RETFAIL) ? 0 : 1;
 }
 
 /**/

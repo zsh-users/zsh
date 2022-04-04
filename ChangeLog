@@ -1,3 +1,9 @@
+2022-04-03  Bart Schaefer  <schaefer@zsh.org>
+
+	* 49955 (with thanks to Madhu <enometh@meer.net>): Src/glob.c:
+	fix bad free in incremental-pattern-search matching (observed
+	only when compiled without MULTIBYTE support)
+
 2022-04-03  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 49959: Completion/Zsh/Context/_brace_parameter:
