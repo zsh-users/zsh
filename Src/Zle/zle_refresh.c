@@ -255,7 +255,7 @@ int cost;
 #endif
 
 static const REFRESH_ELEMENT zr_cr = { ZWC('\r'), 0 };
-#ifdef MULTIBYTE_support
+#ifdef MULTIBYTE_SUPPORT
 static const REFRESH_ELEMENT zr_dt = { ZWC('.'), 0 };
 #endif
 static const REFRESH_ELEMENT zr_nl = { ZWC('\n'), 0 };
