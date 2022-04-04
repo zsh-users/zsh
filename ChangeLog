@@ -1,3 +1,8 @@
+2022-04-04  Bart Schaefer  <schaefer@zsh.org>
+
+	* 49990: Src/hist.c: in single-byte, like multibyte, casemodify()
+	avoids metafying characters that it otherwise did not touch
+
 2022-04-03  Bart Schaefer  <schaefer@zsh.org>
 
 	* 49955 (with thanks to Madhu <enometh@meer.net>): Src/glob.c:

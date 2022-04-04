@@ -2252,6 +2252,7 @@ casemodify(char *str, int how)
 #endif
 	while (*str) {
 	    int c;
+	    int mod = 0;
 	    if (*str == Meta) {
 		c = str[1] ^ 32;
 		str += 2;
@@ -2259,13 +2260,17 @@ casemodify(char *str, int how)
 		c = *str++;
 	    switch (how) {
 	    case CASMOD_LOWER:
-		if (isupper(c))
+		if (isupper(c)) {
 		    c = tolower(c);
+		    mod = 1;
+		}
 		break;
 
 	    case CASMOD_UPPER:
-		if (islower(c))
+		if (islower(c)) {
 		    c = toupper(c);
+		    mod = 1;
+		}
 		break;
 
 	    case CASMOD_CAPS:
@@ -2273,14 +2278,18 @@ casemodify(char *str, int how)
 		if (!ialnum(c))
 		    nextupper = 1;
 		else if (nextupper) {
-		    if (islower(c))
+		    if (islower(c)) {
 			c = toupper(c);
+			mod = 1;
+		    }
 		    nextupper = 0;
-		} else if (isupper(c))
+		} else if (isupper(c)) {
 		    c = tolower(c);
+		    mod = 1;
+		}
 		break;
 	    }
-	    if (imeta(c)) {
+	    if (mod && imeta(c)) {
 		*ptr2++ = Meta;
 		*ptr2++ = c ^ 32;
 	    } else
