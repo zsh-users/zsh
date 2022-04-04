@@ -1,5 +1,8 @@
 2022-04-04  Bart Schaefer  <schaefer@zsh.org>
 
+	* 49991: Src/glob.c, Src/utils.c: single-byte brace expansion
+	handles $'\0' and control character output aligns with multibyte
+
 	* 49990: Src/hist.c: in single-byte, like multibyte, casemodify()
 	avoids metafying characters that it otherwise did not touch
 

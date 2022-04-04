@@ -2220,7 +2220,7 @@ bracechardots(char *str, convchar_t *c1p, convchar_t *c2p)
 #ifdef MULTIBYTE_SUPPORT
 	cstart == WEOF ||
 #else
-	!cstart ||
+	!*pconv ||
 #endif
 	pnext[0] != '.' || pnext[1] != '.')
 	return 0;
@@ -2241,7 +2241,7 @@ bracechardots(char *str, convchar_t *c1p, convchar_t *c2p)
 #ifdef MULTIBYTE_SUPPORT
 	cend == WEOF ||
 #else
-	!cend ||
+	!*pconv ||
 #endif
 	*pnext != Outbrace)
 	return 0;
@@ -2305,22 +2305,19 @@ xpandbraces(LinkList list, LinkNode *np)
 	    strp = str - str3;
 	    lenalloc = strp + strlen(str2+1) + 1;
 	    do {
-#ifdef MULTIBYTE_SUPPORT
 		char *ncptr;
 		int nclen;
+#ifdef MULTIBYTE_SUPPORT
 		mb_charinit();
 		ncptr = wcs_nicechar(cend, NULL, NULL);
+#else
+		ncptr = nicechar(cend);
+#endif
 		nclen = strlen(ncptr);
 		p = zhalloc(lenalloc + nclen);
 		memcpy(p, str3, strp);
 		memcpy(p + strp, ncptr, nclen);
 		strcpy(p + strp + nclen, str2 + 1);
-#else
-		p = zhalloc(lenalloc + 1);
-		memcpy(p, str3, strp);
-		sprintf(p + strp, "%c", cend);
-		strcat(p + strp, str2 + 1);
-#endif
 		insertlinknode(list, last, p);
 		if (rev)	/* decreasing:  add in reverse order. */
 		    last = nextnode(last);
