@@ -3331,7 +3331,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 	    /* Largest possible match at tail of string:       *
 	     * move forward along string until we get a match. *
 	     * Again there's no optimisation.                  */
-	    for (ioff = 0, t = s, umlen = uml; t < send;
+	    for (ioff = 0, t = s, umlen = uml; t <= send;
 		 ioff++, t++, umlen--) {
 		set_pat_start(p, t-s);
 		if (pattrylen(p, t, send - t, umlen, &patstralloc, ioff)) {
@@ -3362,7 +3362,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 	    do {
 		/* loop over all matches for global substitution */
 		matched = 0;
-		for (; t < send; t++, ioff++, umlen--) {
+		for (; t <= send; t++, ioff++, umlen--) {
 		    /* Find the longest match from this position. */
 		    set_pat_start(p, t-s);
 		    if (pattrylen(p, t, send - t, umlen, &patstralloc, ioff)) {
