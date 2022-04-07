@@ -322,14 +322,14 @@ item(tt(-array-value-))(
 The right hand side of an array-assignment
 (`var(name)tt(=LPAR())var(...)tt(RPAR())')
 )
-kindex(-brace-parameter-, completion context)
-item(tt(-brace-parameter-))(
-The name of a parameter expansion within braces (`tt(${)var(...)tt(})')
-)
 kindex(-assign-parameter-, completion context)
 item(tt(-assign-parameter-))(
 The name of a parameter in an assignment, i.e. on the left hand side of
 an `tt(=)'
+)
+kindex(-brace-parameter-, completion context)
+item(tt(-brace-parameter-))(
+The name of a parameter expansion within braces (`tt(${)var(...)tt(})')
 )
 kindex(-command-, completion context)
 item(tt(-command-))(
@@ -891,13 +891,13 @@ kindex(indexes, completion tag)
 item(tt(indexes))(
 for array indexes
 )
-kindex(jobs, completion tag)
-item(tt(jobs))(
-for jobs (as listed by the `tt(jobs)' builtin)
-)
 kindex(interfaces, completion tag)
 item(tt(interfaces))(
 for network interfaces
+)
+kindex(jobs, completion tag)
+item(tt(jobs))(
+for jobs (as listed by the `tt(jobs)' builtin)
 )
 kindex(keymaps, completion tag)
 item(tt(keymaps))(
@@ -922,13 +922,13 @@ directory when completing arguments of tt(cd) and related builtin
 commands (compare tt(path-directories)) DASH()- when the tt(cdpath)
 array is unset, tt(directories) is used instead
 )
-kindex(manuals, completion tag)
-item(tt(manuals))(
-for names of manual pages
-)
 kindex(mailboxes, completion tag)
 item(tt(mailboxes))(
 for e-mail folders
+)
+kindex(manuals, completion tag)
+item(tt(manuals))(
+for names of manual pages
 )
 kindex(maps, completion tag)
 item(tt(maps))(
@@ -1389,6 +1389,12 @@ components after the first ambiguous one will also be added.  This means
 that the resulting string is the longest unambiguous string possible.
 However, menu completion can be used to cycle through all matches.
 )
+kindex(extra-verbose, completion style)
+item(tt(extra-verbose))(
+If set, the completion listing is more verbose at the cost of
+a probable decrease in completion speed.  Completion performance
+will suffer if this style is set to `true'.
+)
 kindex(fake, completion style)
 item(tt(fake))(
 This style may be set for any completion context.  It
@@ -1652,6 +1658,15 @@ ifzman(zmanref(zshmodules))\
 ifnzman(noderef(The zsh/zutil Module))\
 .
 )
+kindex(gain-privileges, completion style)
+item(tt(gain-privileges))(
+If set to tt(true), this style enables the use of commands like tt(sudo)
+or tt(doas) to gain extra privileges when retrieving information for
+completion. This is only done when a command such as tt(sudo) appears on
+the command-line. To force the use of, e.g. tt(sudo) or to override any
+prefix that might be added due to tt(gain-privileges), the tt(command)
+style can be used with a value that begins with a hyphen.
+)
 kindex(glob, completion style)
 item(tt(glob))(
 This is used by the tt(_expand) completer.  If
@@ -1798,12 +1813,6 @@ Excluded values act in a similar fashion to values of the
 tt(ignored-patterns) style, so they can be restored to consideration by
 the tt(_ignored) completer.
 )
-kindex(extra-verbose, completion style)
-item(tt(extra-verbose))(
-If set, the completion listing is more verbose at the cost of
-a probable decrease in completion speed.  Completion performance
-will suffer if this style is set to `true'.
-)
 kindex(ignored-patterns, completion style)
 item(tt(ignored-patterns))(
 A list of patterns; any trial completion matching one of the patterns
@@ -1900,15 +1909,6 @@ In the case of the tt(_match) completer, the style may also be set to
 the string `tt(pattern)'.  Then the pattern on the line is left
 unchanged if it does not match unambiguously.
 )
-kindex(gain-privileges, completion style)
-item(tt(gain-privileges))(
-If set to tt(true), this style enables the use of commands like tt(sudo)
-or tt(doas) to gain extra privileges when retrieving information for
-completion. This is only done when a command such as tt(sudo) appears on
-the command-line. To force the use of, e.g. tt(sudo) or to override any
-prefix that might be added due to tt(gain-privileges), the tt(command)
-style can be used with a value that begins with a hyphen.
-)
 kindex(keep-prefix, completion style)
 item(tt(keep-prefix))(
 This style is used by the tt(_expand) completer.  If it is `true', the
@@ -1924,6 +1924,13 @@ The behaviour of tt(_expand) when this style is `true' is to cause tt(_expand)
 to give up when a single expansion with the restored prefix is the same
 as the original; hence any remaining completers may be called.
 )
+kindex(known-hosts-files)
+item(tt(known-hosts-files))(
+This style should contain a list of files to search for host names and
+(if the tt(use-ip) style is set) IP addresses in a format compatible with
+ssh tt(known_hosts) files.  If it is not set, the files
+tt(/etc/ssh/ssh_known_hosts) and tt(~/.ssh/known_hosts) are used.
+)
 kindex(last-prompt, completion style)
 item(tt(last-prompt))(
 This is a more flexible form of the tt(ALWAYS_LAST_PROMPT) option.
@@ -1934,13 +1941,6 @@ tt(default) tag.  The cursor will be moved back to the
 previous line if this style is `true' for all types of match.  Note
 that unlike the tt(ALWAYS_LAST_PROMPT) option this is independent of the
 numeric argument.
-)
-kindex(known-hosts-files)
-item(tt(known-hosts-files))(
-This style should contain a list of files to search for host names and
-(if the tt(use-ip) style is set) IP addresses in a format compatible with
-ssh tt(known_hosts) files.  If it is not set, the files
-tt(/etc/ssh/ssh_known_hosts) and tt(~/.ssh/known_hosts) are used.
 )
 kindex(list, completion style)
 item(tt(list))(
@@ -2039,18 +2039,18 @@ This style is tested in the same way as the tt(list-packed) style and
 determines whether matches are to be listed in a rows-first fashion as
 if the tt(LIST_ROWS_FIRST) option were set.
 )
+kindex(list-separator, completion style)
+item(tt(list-separator))(
+The value of this style is used in completion listing to separate the
+string to complete from a description when possible (e.g. when
+completing options).  It defaults to `tt(-)tt(-)' (two hyphens).
+)
 kindex(list-suffixes, completion style)
 item(tt(list-suffixes))(
 This style is used by the function that completes filenames.  If it is
 `true', and completion is attempted on a string containing multiple partially
 typed pathname components, all ambiguous components will be shown.
 Otherwise, completion stops at the first ambiguous component.
-)
-kindex(list-separator, completion style)
-item(tt(list-separator))(
-The value of this style is used in completion listing to separate the
-string to complete from a description when possible (e.g. when
-completing options).  It defaults to `tt(-)tt(-)' (two hyphens).
 )
 kindex(local, completion style)
 item(tt(local))(

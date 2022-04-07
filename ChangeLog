@@ -1,3 +1,7 @@
+2022-04-06  Matthew Martin  <phy1729@gmail.com>
+
+	* 49960: Doc/Zsh/compsys.yo: Sort lists in zshcompsys.
+
 2022-04-05  Bart Schaefer  <schaefer@toltec-ubuntu>
 
 	* 49994: Src/glob.c: Single-byte equivalence of users/22601 and
