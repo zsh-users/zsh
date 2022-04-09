@@ -1,5 +1,8 @@
 2022-04-09  dana  <dana@dana.is>
 
+	* unposted: Config/version.mk, Etc/FAQ.yo: Update for
+	5.8.1.2-test (5.9)
+
 	* 49958: NEWS: Dedicate zsh 5.9 to Sven Guckes
 
 	* 49958, (tweaked per 50019): NEWS, README: Add missing
