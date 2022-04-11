@@ -3314,7 +3314,7 @@ makearray(LinkList l, int type, int flags, int *np, int *nlp, int *llp)
 		if (del) {
 		    int n_orig = n;
 		    for (bp = rp, ap = rp; bp < rp + n_orig; ap++, bp++) {
-			while (bp[0]->flags & CMF_DELETE) {
+			while (bp < rp + n_orig && (bp[0]->flags & CMF_DELETE)) {
 			    bp++;
 			    n--;
 			}

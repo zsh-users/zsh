@@ -1,3 +1,7 @@
+2022-04-11  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 50042: Src/Zle/compcore.c: Another fix for 49915
+
 2022-04-10  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: NEWS: Improve flow between the paragraph and
