@@ -1,3 +1,8 @@
+2022-04-11  Bart Schaefer  <schaefer@zsh.org>
+
+	* 50043: Test/D02glob.ztst, Test/E03posix.ztst: for root user,
+	skip glob tests	that rely on limited privilege and fix EUID test
+
 2022-04-11  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 50042: Src/Zle/compcore.c: Another fix for 49915
