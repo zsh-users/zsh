@@ -1666,7 +1666,7 @@ match_colour(const char **teststrp, int is_fg, int colour)
 	tc = TCBGCOLOUR;
     }
     if (teststrp) {
-	if (**teststrp == '#' && isxdigit((*teststrp)[1])) {
+	if (**teststrp == '#' && isxdigit(STOUC((*teststrp)[1]))) {
 	    struct color_rgb color;
 	    char *end;
 	    zlong col = zstrtol(*teststrp+1, &end, 16);

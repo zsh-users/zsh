@@ -1,3 +1,9 @@
+2022-04-12  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 50049: Src/exec.c, Src/prompt.c: care with signed character
+	indices on the few remaining systems such as Cygwin that aren't
+	otherwise protected.
+
 2022-04-20  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 50081: Src/pattern.c, Src/params.c: reset global mbstate_t
