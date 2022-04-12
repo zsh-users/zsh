@@ -20,6 +20,13 @@ more information about the tests being performed with
   ZTST_verbose=1 make check
 (`test' is equivalent to `check') or change 1 to 2 for even more detail.
 
+A test file is usually aborted on the first error.  To continue to the
+end, run with
+  ZTST_continue=1 make check
+This can usefully be combined with ZTST_verbose.  The test is always
+aborted on a syntax error as in that case it is not obvoius how to
+continue.
+
 Individual or groups of tests can be performed with
   make TESTNUM=C02 check
 or

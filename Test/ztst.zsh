@@ -17,6 +17,9 @@
 # Defined in such a way that any value from the environment is used.
 : ${ZTST_verbose:=0}
 
+# If non-zero, continue the tests even after a test fails.
+: ${ZTST_continue:=0}
+
 # We require all options to be reset, not just emulation options.
 # Unfortunately, due to the crud which may be in /etc/zshenv this might
 # still not be good enough.  Maybe we should trick it somehow.
@@ -143,6 +146,10 @@ ZTST_testfailed() {
 $ZTST_failmsg"
   fi
   ZTST_testfailed=1
+  # if called from within ZTST_Test() this will increment ZTST_Test's local
+  # ZTST_failures. Otherwise global ZTST_failures will be incremented
+  # (but currently its value is not used).
+  (( ++ZTST_failures ))
   return 1
 }
 ZTST_testxpassed() {
@@ -156,6 +163,7 @@ ZTST_testxpassed() {
 $ZTST_failmsg"
   fi
   ZTST_testfailed=1
+  (( ++ZTST_failures ))
   return 1
 }
 
@@ -373,12 +381,12 @@ ZTST_diff() {
 
   return "$diff_ret"
 }
-    
+
 ZTST_test() {
   local last match mbegin mend found substlines
   local diff_out diff_err
   local ZTST_skip
-  integer expected_to_fail
+  integer expected_to_fail ZTST_failures
 
   while true; do
     rm -f $ZTST_in $ZTST_out $ZTST_err
@@ -492,7 +500,7 @@ $ZTST_curline"
 $ZTST_code${$(<$ZTST_terr):+
 Error output:
 $(<$ZTST_terr)}"
-	return 1
+        if (( ZTST_continue ));then continue; else return 1; fi
       fi
 
       ZTST_verbose 2 "ZTST_test: test produced standard output:
@@ -515,7 +523,7 @@ $(<$ZTST_terr)"
 $ZTST_code${$(<$ZTST_terr):+
 Error output:
 $(<$ZTST_terr)}"
-	return 1
+        if (( ZTST_continue ));then continue; else return 1; fi
       fi
       if [[ $ZTST_flags = *q* && -s $ZTST_err ]]; then
 	substlines="$(<$ZTST_err)"
@@ -529,21 +537,27 @@ $(<$ZTST_terr)}"
         fi
 	ZTST_testfailed "error output differs from expected as shown above for:
 $ZTST_code"
-	return 1
+        if (( ZTST_continue ));then continue; else return 1; fi
       fi
       if (( expected_to_fail )); then
         ZTST_testxpassed
-        return 1
+        if (( ZTST_continue ));then continue; else return 1; fi
       fi
     fi
     ZTST_verbose 1 "Test successful."
     [[ -n $last ]] && break
   done
 
-  ZTST_verbose 2 "ZTST_test: all tests successful"
+  if (( ZTST_failures )); then
+    ZTST_verbose 1 "ZTST_test: $ZTST_failures test(s) failed"
+  else
+    ZTST_verbose 2 "ZTST_test: all tests successful"
+  fi
 
   # reset message to keep ZTST_testfailed output correct
   ZTST_message=''
+
+  return ZTST_failures
 }
 
 
