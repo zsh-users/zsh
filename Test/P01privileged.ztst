@@ -26,23 +26,23 @@
 
 %prep
 
-  # Mind your empty lines here. The logic in this %prep section is somewhat
-  # complex compared to most others; to avoid lots of nested/duplicated
-  # conditions we need to make sure that this all gets executed as a single
-  # function from which we can return early
+  # If ZTST_unimplemented is set to non-null in a chunk then all the
+  # remaining chunks (and all of %test and %clean sections) will be skipped.
   [[ $EUID == 0 || -n $ZSH_TEST_UNPRIVILEGED_UID$ZSH_TEST_UNPRIVILEGED_GID ]] || {
     ZTST_unimplemented='PRIVILEGED tests require super-user privileges (or env var)'
-    return 1
+    return 0
   }
+
   (( $+commands[perl] )) || { # @todo Eliminate this dependency with a C wrapper?
     ZTST_unimplemented='PRIVILEGED tests require Perl'
-    return 1
+    return 0
   }
+
   grep -qE '#define HAVE_SETRES?UID' $ZTST_testdir/../config.h || {
     ZTST_unimplemented='PRIVILEGED tests require setreuid()/setresuid()'
-    return 1
+    return 0
   }
-  #
+
   ruid= euid= rgid= egid=
   #
   if [[ -n $ZSH_TEST_UNPRIVILEGED_UID ]]; then
@@ -76,13 +76,14 @@
   #
   [[ -n $ruid && -n $euid ]] || {
     ZTST_unimplemented='PRIVILEGED tests require unprivileged UID:EUID'
-    return 1
+    return 0
   }
+
   [[ -n $rgid || -n $egid ]] || {
     ZTST_unimplemented='PRIVILEGED tests require unprivileged GID:EGID'
-    return 1
+    return 0
   }
-  #
+
   print -ru$ZTST_fd \
     "Using unprivileged UID $ruid, EUID $euid, GID $rgid, EGID $egid"
   #

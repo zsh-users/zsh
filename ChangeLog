@@ -1,5 +1,8 @@
 2022-04-12  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* 50013: Test/P01privileged.ztst, Test/ztst.zsh: skip %test if
+	a chunk in %prep returns nonzero
+
 	* 49996 (Peter) + 50012: Test/README, Test/ztst.zsh: add
 	ZTST_continue to continue tests after a failure
 

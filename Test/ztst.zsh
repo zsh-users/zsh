@@ -299,16 +299,18 @@ ZTST_execchunk() {
 }
 
 # Functions for preparation and cleaning.
-# When cleaning up (non-zero string argument), we ignore status.
-ZTST_prepclean() {
-  # Execute indented code chunks.
-  while ZTST_getchunk; do
-    ZTST_execchunk >/dev/null || [[ -n $1 ]] || {
-      [[ -n "$ZTST_unimplemented" ]] ||
+ZTST_prep ZTST_clean () {
+  # Execute indented code chunks. If ZTST_unimplemented is set
+  # in any chunk then we will skip the remaining chunks.
+  # We ignore return status of chunks when cleaning up.
+  while [[ -z "$ZTST_unimplemented" ]] && ZTST_getchunk; do
+    ZTST_execchunk >/dev/null || [[ $0 = ZTST_clean ]] || {
       ZTST_testfailed "non-zero status from preparation code:
-$ZTST_code" && return 0
+$ZTST_code"
+      return 1
     }
   done
+  return 0
 }
 
 # diff wrapper
@@ -577,27 +579,29 @@ while [[ -z "$ZTST_unimplemented" ]] && ZTST_getsect $ZTST_skipok; do
     (prep) if (( ${ZTST_sects[prep]} + ${ZTST_sects[test]} + \
 	        ${ZTST_sects[clean]} )); then
 	    ZTST_testfailed "\`prep' section must come first"
-            exit 1
+	    break   # skip %test and %clean sections, but run ZTST_cleanup
 	  fi
-	  ZTST_prepclean
+	  ZTST_prep || ZTST_skipok=1
 	  ZTST_sects[prep]=1
 	  ;;
     (test)
 	  if (( ${ZTST_sects[test]} + ${ZTST_sects[clean]} )); then
 	    ZTST_testfailed "bad placement of \`test' section"
-	    exit 1
+	    break   # skip %clean section, but run ZTST_cleanup
 	  fi
-	  # careful here: we can't execute ZTST_test before || or &&
-	  # because that affects the behaviour of traps in the tests.
-	  ZTST_test
-	  (( $? )) && ZTST_skipok=1
+          if [[ -z "$ZTST_skipok" ]]; then  # if no error in %prep
+            # careful here: we can't execute ZTST_test before || or &&
+            # because that affects the behaviour of traps in the tests.
+            ZTST_test
+            (( $? )) && ZTST_skipok=1
+          fi
 	  ZTST_sects[test]=1
 	  ;;
     (clean)
 	   if (( ${ZTST_sects[test]} == 0 || ${ZTST_sects[clean]} )); then
 	     ZTST_testfailed "bad use of \`clean' section"
 	   else
-	     ZTST_prepclean 1
+	     ZTST_clean
 	     ZTST_sects[clean]=1
 	   fi
 	   ZTST_skipok=
