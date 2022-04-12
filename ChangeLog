@@ -1,3 +1,8 @@
+2022-04-12  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 50017: Completion/Unix/Type/_time_zone: allow lowercase to
+	match with uppercase
+
 2022-04-11  Bart Schaefer  <schaefer@zsh.org>
 
 	* 50043: Test/D02glob.ztst, Test/E03posix.ztst: for root user,
