@@ -1,3 +1,10 @@
+2022-04-14  Bart Schaefer  <schaefer@Macadamia>
+
+	* 50069: Test/C03traps.ztst: fix test description
+
+	* 50068: Etc/BUGS, Src/builtin.c, Test/C03traps.ztst: 'exit' in
+	trap causes calling function to return (fixes workers/44007)
+
 2022-04-14  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 50052: Test/V14system.ztst: do nothing when skipping the test

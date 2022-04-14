@@ -901,7 +901,7 @@ F:Must be tested with a top-level script rather than source or function
  fn trap1 trap2
  echo out2
  '
--:(workers/44007) function execution continues after 'exit' in trap
+-:'exit' in trap causes calling function to return
 >out1
 >fn1
 >trap1
