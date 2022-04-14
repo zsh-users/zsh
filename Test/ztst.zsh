@@ -33,6 +33,9 @@ emulate -R zsh
 [[ -n $LC_NUMERIC ]] && LC_NUMERIC=C
 [[ -n $LC_MESSAGES ]] && LC_MESSAGES=C
 [[ -n $LANG ]] && LANG=C
+# Test file may (or may not) set LANG to other locales. In either case,
+# LANG must be passed to child zsh.
+export LANG
 
 # Don't propagate variables that are set by default in the shell.
 typeset +x WORDCHARS
