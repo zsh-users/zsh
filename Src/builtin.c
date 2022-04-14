@@ -5720,6 +5720,8 @@ bin_break(char *name, char **argv, UNUSED(Options ops), int func)
 	     * a bad job.
 	     */
 	    if (stopmsg || (zexit(0, ZEXIT_DEFERRED), !stopmsg)) {
+		if (trap_state) 
+		    trap_state = TRAP_STATE_FORCE_RETURN;
 		retflag = 1;
 		breaks = loops;
 		exit_pending = 1;

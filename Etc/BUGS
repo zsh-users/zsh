@@ -30,9 +30,6 @@ skipped when STTY=... is set for that command
 ------------------------------------------------------------------------
 42609: :|: =(hang)
 ------------------------------------------------------------------------
-44007 - Martijn - exit in trap executes rest of function
-See test case in Test/C03traps.ztst.
-------------------------------------------------------------------------
 44133 debian #924736 (partial patch in 44134) three setopts following `    #`
 ------------------------------------------------------------------------
 44850 terminal issues with continuation markers
