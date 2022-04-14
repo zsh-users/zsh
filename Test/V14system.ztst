@@ -5,10 +5,10 @@
   if zmodload -s zsh/system && zmodload -s zsh/zselect; then
     tst_dir=V14.tmp
     mkdir -p -- $tst_dir
+    : > $tst_dir/file # File on which to acquire flock.
   else
     ZTST_unimplemented='the zsh/system and zsh/zselect modules are not available'
   fi
-  : > $tst_dir/file # File on which to acquire flock.
 
 %test
 

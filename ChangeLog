@@ -1,5 +1,7 @@
 2022-04-14  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* 50052: Test/V14system.ztst: do nothing when skipping the test
+
 	* 50046: Test/ztst.zsh: export LANG to child zsh
 
 2022-04-12  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
