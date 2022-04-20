@@ -2254,10 +2254,10 @@ casemodify(char *str, int how)
 	    int c;
 	    int mod = 0;
 	    if (*str == Meta) {
-		c = str[1] ^ 32;
+		c = STOUC(str[1] ^ 32);
 		str += 2;
 	    } else
-		c = *str++;
+		c = STOUC(*str++);
 	    switch (how) {
 	    case CASMOD_LOWER:
 		if (isupper(c)) {
