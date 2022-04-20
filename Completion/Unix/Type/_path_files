@@ -734,7 +734,7 @@ for prepath in "$prepaths[@]"; do
 	      compadd "$tmp4[@]" -s "${Uopt:+$ISUFFIX}" $listopts - "$tmpdisp"
 	    done
           else
-            [[ -n "$compstate[pattern_match]" ]] && SUFFIX="${SUFFIX:s./.*/}*"
+            [[ -n "$compstate[pattern_match]" ]] && SUFFIX="${SUFFIX:gs./.*/}*"
 
             for i in "$tmp1[@]"; do
 	      _list_files i "$prepath$realpath$testpath"

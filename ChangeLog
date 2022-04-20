@@ -1,4 +1,9 @@
-2022-04-14  Bart Schaefer  <schaefer@Macadamia>
+2022-04-19  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted (cf. users/27656 (Tomasz Pala), users/27660):
+	Completion/Unix/Type/_path_files: fix $SUFFIX when GLOB_COMPLETE
+
+2022-04-14  Bart Schaefer  <schaefer@zsh.org>
 
 	* 50069: Test/C03traps.ztst: fix test description
 
