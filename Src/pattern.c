@@ -320,6 +320,14 @@ typedef wint_t patint_t;
  */
 static mbstate_t shiftstate;
 
+/* See clear_mbstate() in params.c for the use of clear_shiftstate() */
+
+/**/
+mod_export void
+clear_shiftstate(void) {
+    memset(&shiftstate, 0, sizeof(shiftstate));
+}
+
 /*
  * Multibyte version: it's (almost) as easy to return the
  * value as not, so do so since we sometimes need it..
@@ -1999,6 +2007,8 @@ charsub(char *x, char *y)
 
 	if (ret == MB_INVALID || ret == MB_INCOMPLETE) {
 	    /* Error.  Treat remainder as single characters */
+	    /* Reset the shift state for next time. */
+	    memset(&shiftstate, 0, sizeof(shiftstate));
 	    return res + (y - x);
 	}
 

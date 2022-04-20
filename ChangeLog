@@ -1,5 +1,8 @@
 2022-04-20  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* 50081: Src/pattern.c, Src/params.c: reset global mbstate_t
+	variables when LC_CTYPE changes
+
 	* 50080: Src/hist.c: add missing STOUC() in casemodify()
 
 2022-04-19  Bart Schaefer  <schaefer@zsh.org>

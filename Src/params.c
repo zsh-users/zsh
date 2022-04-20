@@ -4594,6 +4594,19 @@ static struct localename {
     {NULL, 0}
 };
 
+/* On some systems (at least on NetBSD-9), when LC_CTYPE changes,
+ * global variables (type mbstate_t) used by mbrtowc() etc. need be
+ * reset by clear_mbstate() */
+
+/**/
+static void
+clear_mbstate(void) {
+#ifdef MULTIBYTE_SUPPORT
+    mb_charinit();	/* utils.c */
+    clear_shiftstate();	/* pattern.c */
+#endif
+}
+
 /**/
 static void
 setlang(char *x)
@@ -4616,6 +4629,7 @@ setlang(char *x)
      * that case.
      */
     setlocale(LC_ALL, x ? unmeta(x) : "");
+    clear_mbstate();
     queue_signals();
     for (ln = lc_names; ln->name; ln++)
 	if ((x = getsparam_u(ln->name)) && *x)
@@ -4641,8 +4655,10 @@ lc_allsetfn(Param pm, char *x)
 	    unqueue_signals();
 	}
     }
-    else
+    else {
 	setlocale(LC_ALL, unmeta(x));
+	clear_mbstate();
+    }
 }
 
 /**/
@@ -4679,6 +4695,7 @@ lcsetfn(Param pm, char *x)
 		setlocale(ln->category, unmeta(x));
     }
     unqueue_signals();
+    clear_mbstate();	/* LC_CTYPE may have changed */
 }
 #endif /* USE_LOCALE */
 
@@ -5627,6 +5644,7 @@ endparamscope(void)
 		    setlocale(ln->category, val);
 	    }
 	}
+	clear_mbstate();    /* LC_CTYPE may have changed */
     }
 #endif /* USE_LOCALE */
     unqueue_signals();
