@@ -1,3 +1,7 @@
+2022-04-26  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 50089: Test/X03zlebindkey.ztst: unset LC_* for multibyte tests
+
 2022-04-12  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 50049: Src/exec.c, Src/prompt.c: care with signed character
