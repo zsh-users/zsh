@@ -1,5 +1,8 @@
 2022-04-26  dana  <dana@dana.is>
 
+	* unposted: Completion/Unix/Command/_getopt: Fix util-linux
+	variant detection
+
 	* unposted: NEWS: Adjust dedication wording
 
 2022-04-26  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>

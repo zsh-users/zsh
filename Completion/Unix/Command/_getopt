@@ -2,9 +2,10 @@
 
 local -a args aopts
 
-# Note: BusyBox getopt is borrowed straight from util-linux, so they're
-# basically identical
-if _pick_variant busybox=BusyBox util-linux='getopt*enhanced' unix --version; then
+# @todo BusyBox getopt is borrowed straight from util-linux, so they're nearly
+# identical, but not quite: BusyBox doesn't have -h and -V and often doesn't
+# support long options. So possibly this could be more accurate
+if _pick_variant busybox=BusyBox util-linux='(enhanced|util-linux)' unix --version; then
   args=(
     '(-a --alternative)'{-a,--alternative}'[allow long options with single -]'
     '(: -)'{-h,--help}'[display help information]'
