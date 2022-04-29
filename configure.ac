@@ -2210,6 +2210,65 @@ if test x$zsh_cv_sys_fifo = xyes; then
 fi
 
 dnl -----------
+dnl check that lseek() correctly reports seekability.
+dnl -----------
+AC_CACHE_CHECK(if lseek() correctly reports seekability,
+zsh_cv_sys_lseek,
+[AC_RUN_IFELSE([AC_LANG_SOURCE([[
+#include <stdio.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <sys/stat.h>
+int main() {
+    int pipefd[2], fd;
+    off_t ret;
+    char* tmpfile = "seekfiletest.tmp";
+    if ((fd = open(tmpfile, O_CREAT, S_IRUSR)) < 0) {
+	fprintf(stderr, "creating file failed\n");
+	return 1;
+    }
+    ret = lseek(fd, 0, SEEK_CUR);
+    close(fd);
+    unlink(tmpfile);
+    if (ret == (off_t)-1) {
+	fprintf(stderr, "lseek on regular file failed\n");
+	return 1;
+    }
+    if (pipe(pipefd) < 0) {
+	fprintf(stderr, "creating pipe failed\n");
+	return 1;
+    }
+    write(pipefd[1], "abcdefgh", 8);
+    ret = lseek(pipefd[0], 0, SEEK_CUR);
+    close(pipefd[0]);
+    close(pipefd[1]);
+    if (ret != (off_t)-1) {
+	fprintf(stderr, "lseek on pipe succeeded\n");
+	return 1;
+    }
+    if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
+	fprintf(stderr, "creating UNIX domain socket failed\n");
+	return 1;
+    }
+    ret = lseek(fd, 0, SEEK_CUR);
+    close(fd);
+    if (ret != (off_t)-1) {
+	fprintf(stderr, "lseek on UNIX domain socket succeeded\n");
+	return 1;
+    }
+    return 0;
+}
+]])],[zsh_cv_sys_lseek=yes],[zsh_cv_sys_lseek=no],[zsh_cv_sys_lseek=yes])
+])
+AH_TEMPLATE([USE_LSEEK],
+[Define to 1 if lseek() can be used for SHIN.])
+if test x$zsh_cv_sys_lseek = xyes; then
+  AC_DEFINE(USE_LSEEK)
+fi
+
+dnl -----------
 dnl test for whether link() works
 dnl for instance, BeOS R4.51 doesn't support hard links yet
 dnl -----------

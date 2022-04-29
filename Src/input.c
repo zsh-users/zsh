@@ -217,12 +217,34 @@ shinbufrestore(void)
 static int
 shingetchar(void)
 {
-    int nread;
+    int nread, rsize = isset(SHINSTDIN) ? 1 : SHINBUFSIZE;
 
     if (shinbufptr < shinbufendptr)
 	return STOUC(*shinbufptr++);
 
     shinbufreset();
+#ifdef USE_LSEEK
+    if (rsize == 1 && lseek(SHIN, 0, SEEK_CUR) != (off_t)-1)
+	rsize = SHINBUFSIZE;
+    if (rsize > 1) {
+	do {
+	    errno = 0;
+	    nread = read(SHIN, shinbuffer, rsize);
+	} while (nread < 0 && errno == EINTR);
+	if (nread <= 0)
+	    return -1;
+	if (isset(SHINSTDIN) &&
+	    (shinbufendptr = memchr(shinbuffer, '\n', nread))) {
+	    shinbufendptr++;
+	    rsize = (shinbufendptr - shinbuffer);
+	    if (nread > rsize &&
+		lseek(SHIN, -(nread - rsize), SEEK_CUR) < 0)
+		zerr("lseek(%d, %d): %e", SHIN, -(nread - rsize), errno);
+	} else
+	    shinbufendptr = shinbuffer + nread;
+	return STOUC(*shinbufptr++);
+    }
+#endif
     for (;;) {
        errno = 0;
        nread = read(SHIN, shinbufendptr, 1);
