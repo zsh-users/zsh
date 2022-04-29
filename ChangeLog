@@ -1,6 +1,8 @@
-2022-04-28  Bart Schaefer  <schaefer@Macadamia>
+2022-04-28  Bart Schaefer  <schaefer@zsh.org>
 
 	* 50126: Etc/BUGS, Src/exec.c: Fix multios in current-shell "exec"
+
+	* 50101: Src/Modules/system.c: sysread -o with param matches doc
 
 2022-04-26  dana  <dana@dana.is>
 

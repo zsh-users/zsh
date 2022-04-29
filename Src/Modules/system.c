@@ -83,10 +83,6 @@ bin_sysread(char *nam, char **args, Options ops, UNUSED(int func))
 
     /* -o: output file descriptor, else store in REPLY */
     if (OPT_ISSET(ops, 'o')) {
-	if (*args) {
-	    zwarnnam(nam, "no argument allowed with -o");
-	    return 1;
-	}
 	outfd = getposint(OPT_ARG(ops, 'o'), nam);
 	if (outfd < 0)
 	    return 1;
