@@ -750,6 +750,9 @@ as set by the most recently failed system call.
 This value is system dependent and is intended for debugging
 purposes.  It is also useful with the tt(zsh/system) module which
 allows the number to be turned into a name or message.
+
+To use this parameter, it must first be assigned a value (typically
+0 (zero)).  It is initially unset for scripting compatibility.
 )
 vindex(FUNCNEST)
 item(tt(FUNCNEST) <S>)(

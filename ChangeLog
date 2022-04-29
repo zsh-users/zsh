@@ -1,5 +1,7 @@
 2022-04-28  Bart Schaefer  <schaefer@zsh.org>
 
+	* 50138: Doc/Zsh/params.yo:  Note ERRNO must be set before use.
+
 	* 50133 (Bart, PWS, Jun-ichi): Src/input.c, configure.ac: when
 	lseek(2) is available, use it to check for and rewind read-ahead
 	for more efficient line-buffered input.
