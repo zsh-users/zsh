@@ -46,12 +46,6 @@ interactive and the subshell is the foreground job.  The USEZLE option is
 always turned off in subshells, for reasons lost to history.  There is a
 related, probably obsolete, vared special case for $TERM set to "emacs".
 ------------------------------------------------------------------------
-users/26150: MULTIOS does not work with "exec":
-
-exec 3>/tmp/test1 3>/tmp/test2
-
-causes a script to hang.
-------------------------------------------------------------------------
 47561: [PATCH v4] vcs_info: choose backend by basedir
 ------------------------------------------------------------------------
 39319: () { exit } =(:) doesn't clean up the tempfile

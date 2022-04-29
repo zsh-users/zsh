@@ -3898,6 +3898,10 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 	    for (i = 0; i < 10; i++)
 		if (save[i] != -2)
 		    zclose(save[i]);
+	    /*
+	     * We're done with this job, no need to wait for it.
+	     */
+	    jobtab[thisjob].stat |= STAT_DONE;
 	    goto done;
 	}
 	if (isset(XTRACE)) {

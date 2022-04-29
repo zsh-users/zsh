@@ -1,3 +1,7 @@
+2022-04-28  Bart Schaefer  <schaefer@Macadamia>
+
+	* 50126: Etc/BUGS, Src/exec.c: Fix multios in current-shell "exec"
+
 2022-04-26  dana  <dana@dana.is>
 
 	* unposted: Completion/Unix/Command/_getopt: Fix util-linux
