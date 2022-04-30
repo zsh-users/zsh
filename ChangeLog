@@ -1,6 +1,6 @@
 2022-04-30  Bart Schaefer  <schaefer@zsh.org>
 
-	* unposted: Doc/Zsh/expn.yo, Etc/NEWS: Details about ${(*)...}
+	* unposted: Doc/Zsh/expn.yo, NEWS: Details about ${(*)...}
 
 	* 50150: Src/Modules/stat.c: Filenames need unmetafy for printing
 
