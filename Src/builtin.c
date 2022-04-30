@@ -5860,6 +5860,7 @@ zexit(int val, enum zexit_t from_where)
 	/* send SIGHUP to any jobs left running  */
 	killrunjobs(from_where == ZEXIT_SIGNAL);
     }
+    cleanfilelists();
     if (isset(RCS) && interact) {
 	if (!nohistsave) {
 	    int writeflags = HFILE_USE_OPTIONS;

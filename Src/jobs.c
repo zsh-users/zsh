@@ -1368,6 +1368,18 @@ deletefilelist(LinkList file_list, int disowning)
 
 /**/
 void
+cleanfilelists(void)
+{
+    int i;
+
+    DPUTS(shell_exiting >= 0, "BUG: cleanfilelists() before exit");
+ 
+    for (i = 1; i <= maxjob; i++)
+	deletefilelist(jobtab[i].filelist, 0);
+}
+
+/**/
+void
 freejob(Job jn, int deleting)
 {
     struct process *pn, *nx;
