@@ -23,7 +23,9 @@ the underlying VCS but not whether quilt is used.
 Workaround: test (( ${+funcstack[(r)VCS_INFO_quilt]} )).
 ------------------------------------------------------------------------
 41184: 'exec' optimization for last command in a subshell should be
-skipped when STTY=... is set for that command
+skipped when STTY=... is set for that command.  This is complicated
+because the decision to (not) fork is made in execcmd_exec() before
+the prefix parameter assignments are examined in execute().
 ------------------------------------------------------------------------
 41203 and others: Make it easier to maintain C modules out of tree.
 (May require defining a stable API for modules, see 41254)
@@ -52,5 +54,5 @@ related, probably obsolete, vared special case for $TERM set to "emacs".
 ------------------------------------------------------------------------
 48091: Bug in compdescribe with matcher 'b:-=+'
 ------------------------------------------------------------------------
-users/26071: Strange behavior about option completion of `git push
+users/26071: Strange behavior about option completion of `git push        #`
 ------------------------------------------------------------------------
