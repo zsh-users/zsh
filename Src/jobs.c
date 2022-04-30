@@ -1476,7 +1476,10 @@ addproc(pid_t pid, char *text, int aux, struct timeval *bgtime,
 	 * set it for that, too.
 	 */
 	if (gleader != -1) {
-	    jobtab[thisjob].gleader = gleader;
+	    if (jobtab[thisjob].stat & STAT_CURSH)
+		jobtab[thisjob].gleader = gleader;
+	    else
+		jobtab[thisjob].gleader = pid;
 	    if (list_pipe_job_used != -1)
 		jobtab[list_pipe_job_used].gleader = gleader;
 	    /*

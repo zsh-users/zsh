@@ -1,4 +1,7 @@
-2022-04-29  Bart Schaefer  <schaefer@Macadamia>
+2022-04-29  Bart Schaefer  <schaefer@zsh.org>
+
+	* 50134: Src/jobs.c: Tweak process group handling (workers/43409)
+	to avoid creating "unkillable" pipelines that ignore signals
 
 	* unposted: Etc/BUGS: Details about STTY; consistency nit
 
