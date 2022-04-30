@@ -4883,13 +4883,9 @@ getoutputfile(char *cmd, char **eptr)
 	child_unblock();
 	return nam;
     } else if (pid) {
-	int os;
-
 	close(fd);
-	os = jobtab[thisjob].stat;
 	waitforpid(pid, 0);
 	cmdoutval = 0;
-	jobtab[thisjob].stat = os;
 	return nam;
     }
 

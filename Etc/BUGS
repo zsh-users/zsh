@@ -30,8 +30,6 @@ the prefix parameter assignments are examined in execute().
 41203 and others: Make it easier to maintain C modules out of tree.
 (May require defining a stable API for modules, see 41254)
 ------------------------------------------------------------------------
-42609: :|: =(hang)
-------------------------------------------------------------------------
 44133 debian #924736 (partial patch in 44134) three setopts following `    #`
 ------------------------------------------------------------------------
 44850 terminal issues with continuation markers
