@@ -1,5 +1,7 @@
 2022-04-30  Bart Schaefer  <schaefer@zsh.org>
 
+	* 50150: Src/Modules/stat.c: Filenames need unmetafy for printing
+
 	* 50149: Etc/BUGS, Src/builtin.c, Src/jobs.c: Remove all =(...)
 	files at shell exit
 

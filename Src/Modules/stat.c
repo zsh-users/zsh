@@ -503,8 +503,10 @@ bin_stat(char *name, char **args, Options ops, UNUSED(int func))
     if (OPT_ISSET(ops,'f'))
 	nargs = 1;
     else
-	for (aptr = args; *aptr; aptr++)
+	for (aptr = args; *aptr; aptr++) {
+	    unmetafy(*aptr, NULL);
 	    nargs++;
+	}
 
     if (OPT_ISSET(ops,'g')) {
 	flags |= STF_GMT;
@@ -555,8 +557,8 @@ bin_stat(char *name, char **args, Options ops, UNUSED(int func))
     for (; OPT_ISSET(ops,'f') || *args; args++) {
 	char outbuf[PATH_MAX + 9]; /* "link   " + link name + NULL */
 	int rval = OPT_ISSET(ops,'f') ? fstat(fd, &statbuf) :
-	    OPT_ISSET(ops,'L') ? lstat(unmeta(*args), &statbuf) :
-	    stat(unmeta(*args), &statbuf);
+	    OPT_ISSET(ops,'L') ? lstat(*args, &statbuf) :
+	    stat(*args, &statbuf);
 	if (rval) {
 	    if (OPT_ISSET(ops,'f'))
 		sprintf(outbuf, "%d", fd);
@@ -571,10 +573,10 @@ bin_stat(char *name, char **args, Options ops, UNUSED(int func))
 
 	if (flags & STF_FILE) {
 	    if (arrnam)
-		*arrptr++ = ztrdup(*args);
+		*arrptr++ = ztrdup_metafy(*args);
 	    else if (hashnam) {
 	    	*hashptr++ = ztrdup(HNAMEKEY);
-		*hashptr++ = ztrdup(*args);
+		*hashptr++ = ztrdup_metafy(*args);
 	    } else
 		printf("%s%s", *args, (flags & STF_PICK) ? " " : ":\n");
 	}
