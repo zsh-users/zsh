@@ -1498,8 +1498,9 @@ form using `tt(%%)' will remove the same matches as for `tt(##)' in reverse
 order.
 )
 item(tt(*))(
+pindex(EXTENDED_GLOB, enable)
 Enable tt(EXTENDED_GLOB) for substitution via tt(${)...tt(/)...tt(}) or
-tt(${)...tt(//)...tt(}).
+tt(${)...tt(//)...tt(}).  Note that `tt(**)' does not disable extendedglob.
 )
 item(tt(B))(
 Include the index of the beginning of the match in the result.

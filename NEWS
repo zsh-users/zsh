@@ -46,6 +46,12 @@ of CLOBBER for empty files only. It is disabled by default.
 A (-) expansion flag was added. It works like (n) but correctly sorts
 negative numbers.
 
+The (*) expansion flag enables EXTENDED_GLOB for pattern matching.
+For example, ${(*)sample/(#b)*(pat)*/${match[1]}} uses backreferences
+even if EXTENDED_GLOB is not otherwise set.  However, this does not
+descend into nested exapansions, and doubling as (**) does not disable
+EXTENDED_GLOB.
+
 The compinit function learnt a -w option to explain why compdump runs.
 When run without the -i or -u options and compaudit discovers security
 issues, answering "y" to the "Ignore insecure ..." prompt removes the
