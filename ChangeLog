@@ -1,3 +1,8 @@
+2022-04-30  Bart Schaefer  <schaefer@zsh.org>
+
+	* 50149: Etc/BUGS, Src/builtin.c, Src/jobs.c: Remove all =(...)
+	files at shell exit
+
 2022-04-29  Bart Schaefer  <schaefer@zsh.org>
 
 	* 50136: Etc/BUGS, Src/exec.c: Fix =(nosuchcommand) race/deadlock
