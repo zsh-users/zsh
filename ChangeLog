@@ -1,8 +1,11 @@
 2022-05-01  Bart Schaefer  <schaefer@zsh.org>
 
+	* 50160: Test/D03procsubst.ztst, Test/E01options.ztst: Regression
+	tests for 50126, 50136, and 50149
+
 	* 50159: Test/V14system.ztst: Tests for sysread
 
-	* 50157(Daniel Shahaf): Test/D07multibyte.ztst: Test for 50150
+	* 50157 (Daniel Shahaf): Test/D07multibyte.ztst: Test for 50150
 
 2022-04-30  Bart Schaefer  <schaefer@zsh.org>
 

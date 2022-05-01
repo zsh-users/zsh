@@ -167,5 +167,25 @@
     print -rC1 -- $TMPPREFIX*(N)
   }
 0f:external command with =(...) on LHS of pipeline cleans up its tempfiles
+F:subshells including pipe LHS do not pass through zexit()
 # (Expected result: no output.)
 
+# Confirm tempfile exists in the function, but not after exit
+  () {
+    local -x TMPPREFIX=$PWD/exit
+    $ZTST_testdir/../Src/zsh -fc '
+     () {
+       print -rC1 -- $TMPPREFIX*
+       exit
+     } =(sleep 5)
+    '
+    print -rC1 -- $TMPPREFIX*(N)
+  }
+0:regression test: exit in shell function cleans up tempfiles
+F:see preceding test
+*>*.tmp/exit*
+
+  print -u $ZTST_fd 'This test hangs the shell when it fails...'
+  true | false =(nosuchcommand$$)
+1:regression test: race condition with pipe and procsubst
+*?\(eval\):2: command not found: nosuchcommand*

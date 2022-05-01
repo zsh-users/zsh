@@ -752,6 +752,12 @@
 >These are the contents of the file
 >These are the contents of the file
 
+# Subshell to shield nullexec redirections
+  ( exec 3>&1 3>&2; print -u 3 some words )
+0:regression test: multios with nullexec
+>some words
+?some words
+
 # tried this with other things, but not on its own, so much.
   unsetopt nomatch
   print with nonomatch: flooble*
