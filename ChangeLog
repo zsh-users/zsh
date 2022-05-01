@@ -7,6 +7,10 @@
 
 	* 50157 (Daniel Shahaf): Test/D07multibyte.ztst: Test for 50150
 
+2022-05-01  dana  <dana@dana.is>
+
+	* unposted: Etc/creating-a-release.txt: Mention #zsh topic
+
 2022-04-30  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Etc/BUGS: remove debian #924736, fixed since 5.8 by
