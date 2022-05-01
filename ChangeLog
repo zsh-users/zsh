@@ -1,5 +1,8 @@
 2022-04-30  Bart Schaefer  <schaefer@zsh.org>
 
+	* unposted: Etc/BUGS: remove debian #924736, fixed since 5.8 by
+	workers/44142; correct misguided edit from earlier commit
+
 	* unposted: Doc/Zsh/expn.yo, NEWS: Details about ${(*)...}
 
 	* 50150: Src/Modules/stat.c: Filenames need unmetafy for printing
