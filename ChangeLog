@@ -2,6 +2,8 @@
 
 	* 50159: Test/V14system.ztst: Tests for sysread
 
+	* 50157(Daniel Shahaf): Test/D07multibyte.ztst: Test for 50150
+
 2022-04-30  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Etc/BUGS: remove debian #924736, fixed since 5.8 by

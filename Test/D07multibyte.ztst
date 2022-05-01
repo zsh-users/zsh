@@ -627,3 +627,14 @@ F:support character sets outside the portable 7-bit range.
 0:locale gets restored when locale parameters go out of scope (regression test for 45772)
 >❯
 >❯
+
+  # Subshell for zmodload isolation
+  (
+    zmodload zsh/stat
+    touch 50150-é 50150-Ą
+    # Using +size solely in order to make it easier to write the expectations
+    zstat +size -nor -- 50150-*
+  )
+0:(workers/50150) zsh/stat with Unicode and metafication
+>50150-Ą 0
+>50150-é 0
