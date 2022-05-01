@@ -153,7 +153,8 @@ To create a zsh release:
 
   You may need assistance from another dev if you don't have access to do this.
 
-- Post to -workers@
+- Post to -workers@. You may also wish to (ask someone to) update the #zsh
+  channel topic on IRC.
 
 - After a day or so post to:
 
