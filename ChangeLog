@@ -1,3 +1,12 @@
+2022-05-02  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted (cf. Jun-ichi 50164): Test/E01options.ztst: add sleep
+	after nullexec test to allow background process to flush writes
+	(observed only on MacOS Monterey 12).
+
+	* 50162: Test/D07multibyte.ztst: Tweak 50150 test to check proper
+	metafication of array elements and to ignore collation variances
+
 2022-05-01  Bart Schaefer  <schaefer@zsh.org>
 
 	* 50160: Test/D03procsubst.ztst, Test/E01options.ztst: Regression

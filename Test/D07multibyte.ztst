@@ -631,9 +631,12 @@ F:support character sets outside the portable 7-bit range.
   # Subshell for zmodload isolation
   (
     zmodload zsh/stat
+    typeset -A sizes
     touch 50150-é 50150-Ą
     # Using +size solely in order to make it easier to write the expectations
-    zstat +size -nor -- 50150-*
+    zstat +size -A sizes -nor -- 50150-*
+    print -r -- 50150-Ą $sizes[50150-Ą]
+    print -r -- 50150-é $sizes[50150-é]
   )
 0:(workers/50150) zsh/stat with Unicode and metafication
 >50150-Ą 0
