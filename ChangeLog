@@ -1,3 +1,8 @@
+2022-05-07  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: Doc/Zsh/builtins.yo: cross-reference "typeset -f" for
+	"functions -[Tt]"
+
 2022-05-02  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted (cf. Jun-ichi 50164): Test/E01options.ztst: add sleep

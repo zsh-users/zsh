@@ -874,7 +874,8 @@ xitem(tt(functions -M) [ tt(-m) var(pattern) ... ])
 item(tt(functions +M) [ tt(-m) ] var(mathfn) ... )(
 Equivalent to tt(typeset -f), with the exception of the tt(-c), tt(-x),
 tt(-M) and tt(-W) options.  For tt(functions -u) and tt(functions -U),
-see tt(autoload), which provides additional options.
+see tt(autoload), which provides additional options.  For tt(functions -t)
+and tt(functions -T), see tt(typeset -f).
 
 The tt(-x) option indicates that any functions output will have
 each leading tab for indentation, added by the shell to show syntactic
