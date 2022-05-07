@@ -1,5 +1,8 @@
 2022-05-07  Bart Schaefer  <schaefer@zsh.org>
 
+	* 50184: Completion/Base/Utility/_values: fix inclusion of -S
+	separator in -r options passed to compadd through _describe
+
 	* Marlon Richert: 49954: Completion/Unix/Command/_gradle: improve
 	handling of task names, subprojects, completion tags, and caching
 
