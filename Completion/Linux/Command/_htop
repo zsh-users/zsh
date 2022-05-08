@@ -1,11 +1,55 @@
-#compdef htop
+#compdef htop pcp-htop
 
-_arguments -S : \
-  '(-d --delay)'{-d+,--delay=}'[update frequency]:duration (tenths of seconds)' \
-  '(-C --no-color --no-colour)'{-C,--no-colo{,u}r}'[monochrome mode]' \
-  '(-)'{-h,--help}'[display usage information]' \
-  \*{-p+,--pid=}'[show given pids]: : _sequence -n ${$(</proc/sys/kernel/pid_max)\:-32768} _pids' \
-  '(-s --sort-key)'{-s+,--sort-key=}'[sort by key]:key:( ${(f)"$(_call_program sort-keys $words[1] --sort-key help)"} )' \
-  '(-t --tree)'{-t,--tree}'[show tree view of processes]' \
-  '(-u --user)'{-u+,--user=}'[show processes of user]: : _users' \
-  '(-)'{-v,--version}'[display version information]'
+# Notes:
+# - htop allows long options to be passed with a single dash; we don't account
+#   for this
+# - htop parses optional arguments to -H and -u 'cleverly' by allowing the next
+#   word to be the optarg if it doesn't begin with a '-'; this should work here
+# - There is a special version of htop designed to be used with PCP (Performance
+#   CoPilot); we don't fully account for this
+# - Some of the ranges and defaults listed here had to be found in the source
+
+local MATCH MBEGIN MEND ret=1
+local -a context line state state_descr args tmp
+
+args=(
+  '(-d --delay)'{-d+,--delay=}'[specify update frequency]:delay (tenths of seconds) (1-100) [15]'
+  '(-C --no-color --no-colour)'{-C,--no-colo{,u}r}'[use monochrome colour scheme]'
+  '(-F --filter)'{-F+,--filter=}'[show only commands matching specified filter]:case-insensitive command-line sub-string:_process_names -a'
+  '(-)'{-h,--help}'[display usage information]'
+  '(-H --highlight-changes)'{-H+,--highlight-changes=}'[highlight new and old processes (optionally specify delay)]::delay (seconds) (1-86400) [5]'
+  '(-M --no-mouse)'{-M,--no-mouse}'[disable mouse]'
+  \*{-p+,--pid=}'[show only specified PIDs]: : _sequence _pids'
+  '--readonly[disable all system and process changing features]'
+  '(-s --sort-key)'{-s+,--sort-key=}'[sort by specified column]: :->sort-keys'
+  '(-t --tree)'{-t,--tree}'[show tree view of processes]'
+  '(-u --user)'{-u+,--user=}'[show only processes of current or specified user]:: : _users'
+  '(-U --no-unicode)'{-U,--no-unicode}'[disable Unicode]'
+  '(-)'{-V,--version}'[display version information]'
+)
+
+[[ $OSTYPE == linux* ]] &&
+(( ! EUID || $+_comp_priv_prefix )) &&
+_pick_variant libcap=drop-capabilities $OSTYPE --help &&
+args+=(
+  '--drop-capabilities=-[drop specified capabilities]::mode [basic]:((
+    off\:"do not drop capabilities"
+    basic\:"drop capabilities not needed for standard functionality (retains kill, renice, etc.)"
+    strict\:"drop capabilities not needed for core functionality"
+  ))'
+)
+
+_arguments -s -S : $args && ret=0
+
+case $state in
+  sort-keys)
+    tmp=( ${(f)"$(_call_program sort-keys $words[1] --sort-key help)"} )
+    tmp=( ${tmp/#[[:space:]]##} )
+    tmp=( ${tmp//:/\\:} )
+    tmp=( ${tmp/[[:space:]]##/:} )
+    tmp=( ${tmp/(#m):[A-Z]/${(L)MATCH}} )
+    _describe -t sort-keys 'column (key)' tmp && ret=0
+    ;;
+esac
+
+return ret
