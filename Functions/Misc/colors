@@ -63,6 +63,16 @@ color=(
 # 63 double-overline-or-left
 # 64 stress
 # 65 no-ideogram-marking
+
+# Strong color codes
+  90 strong-gray            100 bg-strong-gray
+  91 strong-red             101 bg-strong-red
+  92 strong-green           102 bg-strong-green
+  93 strong-yellow          103 bg-strong-yellow
+  94 strong-blue            104 bg-strong-blue
+  95 strong-magenta         105 bg-strong-magenta
+  96 strong-cyan            106 bg-strong-cyan
+  97 strong-white           107 bg-strong-white
 )
 
 # A word about black and white:  The "normal" shade of white is really a
@@ -80,6 +90,7 @@ for k in ${(k)color}; do color[${color[$k]}]=$k; done
 # Add "fg-" keys for all the text colors, for clarity.
 
 for k in ${color[(I)3?]}; do color[fg-${color[$k]}]=$k; done
+for k in ${color[(I)9?]}; do color[fg-${color[$k]}]=$k; done
 
 # This is inaccurate, but the prompt theme system needs it.
 
