@@ -1,3 +1,8 @@
+2022-05-11  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 50192: Src/openssh_bsd_setres_id.c: use set{u,g}id() instead of
+	setre{u,g}id() for dropping privilege on NetBSD
+
 2022-05-08  dana  <dana@dana.is>
 
 	* 50176 (with xpufx, tweaked): Completion/Linux/Command/_htop:
