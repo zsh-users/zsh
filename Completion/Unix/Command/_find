@@ -37,6 +37,8 @@ case $variant in
     args+=(
       '*-Bmin:birth time (minutes)'
       '*-Bnewer:file to compare (birth time):_files'
+      '*-newer'{a,B,c,m}{a,B,c,m}'[succeed if timestamp 1 is newer than timestamp 2 of the given file]:reference file:_files'
+      '*-newer'{a,B,c,m}t'[succeed if timestamp of given file is newer than timestamp]:timestamp: '
       '*-Btime:birth time (hours)'
     )
   ;|
@@ -46,7 +48,7 @@ case $variant in
       '*-anewer:file to compare (access time):_files'
       '*-cnewer:file to compare (inode change time):_files'
       '*-empty'
-      '*-execdir:program: _command_names -e:*\;::program arguments: _normal'
+      '*-execdir:program: _command_names -e:*(\;|+)::program arguments: _normal'
       '*-maxdepth:maximum search depth'
       '*-mindepth:minimum search depth'
       '*-path:path pattern to search:'
@@ -110,6 +112,7 @@ case $variant in
       '*-readable'
       '*-writable'
       '*-xtype:file type:((b\:block\ special\ file c\:character\ special\ file d\:directory p\:named\ pipe f\:normal\ file l\:symbolic\ link s\:socket))'
+      '-files0-from[search NUL separated paths from FILE]:file:_path'
       '*-fls:output file:_files'
       '*-fprint:output file:_files'
       '*-fprint0:output file:_files'
@@ -126,7 +129,7 @@ _arguments -C $args \
   '*-atime:access time (days):->times' \
   '*-ctime:inode change time (days):->times' \
   '*-depth' \
-  '*-exec:program: _command_names -e:*\;::program arguments: _normal' \
+  '*-exec:program: _command_names -e:*(\;|+)::program arguments: _normal' \
   '*-follow' \
   '*-fstype:file system type:_file_systems' \
   '*-group:group:_groups' \
@@ -147,7 +150,7 @@ _arguments -C $args \
   '*-user:user:_users' \
   '*-xdev' \
   '*-a' '*-o' \
-  '(-D -E -H -L -O -P -f -s -x --help --version)*:directory:_files -/' \
+  '(-D -E -H -L -O -P -f -s -x -files0-from --help --version)*:directory:_files -/' \
 && ret=0
 
 if [[ $state = times ]]; then
