@@ -1,3 +1,8 @@
+2022-05-15  Axel Beckert  <abe@deuxchevaux.org>
+
+	* 50220: Doc/Zsh/{builtins,options}.yo: Fix typos found by
+	Debian's Lintian tool.
+
 2022-05-14  dana  <dana@dana.is>
 
 	* unposted: Config/version.mk: Post-release version bump

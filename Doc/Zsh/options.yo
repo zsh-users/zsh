@@ -1952,7 +1952,7 @@ pindex(NOTYPESETTOUNSET)
 item(tt(TYPESET_TO_UNSET) <K> <S>)(
 When declaring a new parameter with any of the `tt(typeset)' family of
 related commands, the parameter remains unset unless and until a
-value is explicity assigned to it, either in the `tt(typeset)' command
+value is explicitly assigned to it, either in the `tt(typeset)' command
 itself or as a later assignment statement.
 )
 pindex(VERBOSE)

@@ -1936,7 +1936,7 @@ retain their special attributes when made local.
 
 For each var(name)tt(=)var(value) assignment, the parameter
 var(name) is set to var(value).  If the assignment is omitted and var(name)
-does em(not) refer to an existing parameter, a new parameter is intialized
+does em(not) refer to an existing parameter, a new parameter is initialized
 to empty string, zero, or empty array (as appropriate), em(unless) the
 shell option tt(TYPESET_TO_UNSET) is set.  When that option is set,
 the parameter attributes are recorded but the parameter remains unset.
