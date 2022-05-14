@@ -1,3 +1,7 @@
+2022-05-14  dana  <dana@dana.is>
+
+	* unposted: Config/version.mk: Update for 5.9
+
 2022-05-11  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 50192: Src/openssh_bsd_setres_id.c: use set{u,g}id() instead of
