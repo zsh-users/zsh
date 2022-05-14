@@ -38,7 +38,10 @@ case $variant in
       '*-Bmin:birth time (minutes)'
       '*-Bnewer:file to compare (birth time):_files'
       '*-newer'{a,B,c,m}{a,B,c,m}'[if [aBcm\]time is newer than [aBcm\]time of given file]:reference file:_files'
-      '*-newer'{a,B,c,m}t'[succeed if timestamp of given file is newer than timestamp]:timestamp: '
+      '*-newerat[if access time is newer than given timestamp]:timestamp: '
+      '*-newerBt[if birth time is newer than given timestamp]:timestamp: '
+      '*-newerct[if creation time is newer than given timestamp]:timestamp: '
+      '*-newermt[if modification time is newer than given timestamp]:timestamp: '
       '*-Btime:birth time (hours)'
     )
   ;|
