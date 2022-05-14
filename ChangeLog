@@ -1,5 +1,7 @@
 2022-05-14  dana  <dana@dana.is>
 
+	* unposted: Config/version.mk: Post-release version bump
+
 	* unposted: Config/version.mk: Update for 5.9
 
 2022-05-11  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
