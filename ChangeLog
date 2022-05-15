@@ -1,5 +1,7 @@
 2022-05-14  Bart Schaefer  <schaefer@zsh.org>
 
+	* 50229: NEWS: Typo
+
 	* Jan Brieg: 50212 (and discussion): Functions/Misc/colors: Add
 	"bright" color variants
 

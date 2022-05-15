@@ -49,7 +49,7 @@ negative numbers.
 The (*) expansion flag enables EXTENDED_GLOB for pattern matching.
 For example, ${(*)sample/(#b)*(pat)*/${match[1]}} uses backreferences
 even if EXTENDED_GLOB is not otherwise set.  However, this does not
-descend into nested exapansions, and doubling as (**) does not disable
+descend into nested expansions, and doubling as (**) does not disable
 EXTENDED_GLOB.
 
 The compinit function learnt a -w option to explain why compdump runs.
