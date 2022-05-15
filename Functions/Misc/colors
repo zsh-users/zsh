@@ -63,6 +63,16 @@ color=(
 # 63 double-overline-or-left
 # 64 stress
 # 65 no-ideogram-marking
+
+# Bright color codes (xterm extension)
+  90 bright-gray            100 bg-bright-gray
+  91 bright-red             101 bg-bright-red
+  92 bright-green           102 bg-bright-green
+  93 bright-yellow          103 bg-bright-yellow
+  94 bright-blue            104 bg-bright-blue
+  95 bright-magenta         105 bg-bright-magenta
+  96 bright-cyan            106 bg-bright-cyan
+  97 bright-white           107 bg-bright-white
 )
 
 # A word about black and white:  The "normal" shade of white is really a
@@ -79,7 +89,7 @@ for k in ${(k)color}; do color[${color[$k]}]=$k; done
 
 # Add "fg-" keys for all the text colors, for clarity.
 
-for k in ${color[(I)3?]}; do color[fg-${color[$k]}]=$k; done
+for k in ${color[(I)[39]?]}; do color[fg-${color[$k]}]=$k; done
 
 # This is inaccurate, but the prompt theme system needs it.
 
@@ -89,7 +99,11 @@ for k in grey gray; do
   color[bg-$k]=${color[bg-black]}
 done
 
-# Assistance for the color-blind.
+# Assistance for the colo(u)r-blind.
+
+for k in '' fg- bg-; do
+  color[${k}bright-grey]=${color[${k}bright-gray]}
+done
 
 colour=(${(kv)color})	# A case where ksh namerefs would be useful ...
 

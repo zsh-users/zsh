@@ -1,3 +1,8 @@
+2022-05-14  Bart Schaefer  <schaefer@zsh.org>
+
+	* Jan Brieg: 50212 (and discussion): Functions/Misc/colors: Add
+	"bright" color variants
+
 2022-05-15  Axel Beckert  <abe@deuxchevaux.org>
 
 	* 50220: Doc/Zsh/{builtins,options}.yo: Fix typos found by
