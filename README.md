@@ -1,4 +1,5 @@
-# THE Z SHELL (ZSH)
+
+# <img src="https://www.zsh.org/color_vertical_icon.png" alt="ZSH" width="50"/> THE Z SHELL (ZSH) 
 
 ## Version
 
@@ -79,20 +80,20 @@ unaliased before loading the `run-help` function.  After that this function
 will be executed by the `run-help` ZLE function which is by default bound
 to `ESC-h` in emacs mode.
 
-## Examples
+### Examples
 
 Examples of zsh startup files are located in the subdirectory
 [StartupFiles](StartupFiles).  Examples of zsh functions and scripts are located in
 the subdirectory [Functions](Functions).  Examples of completion control commands
 (compctl) are located in the file [Misc/compctl-examples](Misc/compctl-examples).
 
-## Zsh FTP Sites, Web Pages, and Mailing Lists
+### Zsh FTP Sites, Web Pages, and Mailing Lists
 
 The current list of zsh FTP sites, web pages, and mailing lists can be
 found in the [META-FAQ](https://www.zsh.org/pub/META-FAQ).  A copy is included in this distribution and is
 available separately at any of the zsh FTP sites.
 
-## Common Problems and Frequently Asked Questions
+### Common Problems and Frequently Asked Questions
 
 Zsh has a list of [Frequently Asked Questions (FAQ)](https://zsh.sourceforge.io/FAQ/) maintained by Peter
 Stephenson <pws@zsh.org>.  It covers many common problems encountered
