@@ -83,8 +83,8 @@ to `ESC-h` in emacs mode.
 ### Examples
 
 Examples of zsh startup files are located in the subdirectory
-[StartupFiles](StartupFiles).  Examples of zsh functions and scripts are located in
-the subdirectory [Functions](Functions).  Examples of completion control commands
+[StartupFiles](StartupFiles/).  Examples of zsh functions and scripts are located in
+the subdirectory [Functions](Functions/).  Examples of completion control commands
 (compctl) are located in the file [Misc/compctl-examples](Misc/compctl-examples).
 
 ### Zsh FTP Sites, Web Pages, and Mailing Lists
@@ -98,7 +98,7 @@ available separately at any of the zsh FTP sites.
 Zsh has a list of [Frequently Asked Questions (FAQ)](https://zsh.sourceforge.io/FAQ/) maintained by Peter
 Stephenson <pws@zsh.org>.  It covers many common problems encountered
 when building, installing, and using zsh.  A copy is included in this
-distribution in [Etc/FAQ](Etc/FAQ) and is available separately at any of the zsh
+distribution in [Etc/FAQ](Etc/FAQ.yo) and is available separately at any of the zsh
 ftp sites.
 
 ## Zsh Maintenance and Bug Reports
