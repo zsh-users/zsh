@@ -1,7 +1,7 @@
 
 # <img src="https://www.zsh.org/color_vertical_icon.png" alt="ZSH" width="50"/> THE Z SHELL (ZSH) 
 
-## Version
+## [![Version](https://img.shields.io/badge/dynamic/json?color=blue&label=Version&query=%24%5B0%5D%5B%27name%27%5D&url=https%3A%2F%2Fapi.github.com%2Frepos%2Fzsh-users%2Fzsh%2Ftags)](https://github.com/zsh-users/zsh/tags)
 
 This is version 5.9 of the shell. This is a security and feature release.
 There are several visible improvements since 5.8.1, as well as bug fixes.
