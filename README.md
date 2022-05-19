@@ -1,5 +1,5 @@
 
-# <img src="https://www.zsh.org/color_vertical_icon.png" alt="ZSH" width="50"/> THE Z SHELL (ZSH) 
+# ![ZSH](https://www.zsh.org/color_vertical_icon.png) THE Z SHELL (ZSH) 
 
 ## [![Version](https://img.shields.io/badge/dynamic/json?color=blue&label=Version&query=%24%5B0%5D%5B%27name%27%5D&url=https%3A%2F%2Fapi.github.com%2Frepos%2Fzsh-users%2Fzsh%2Ftags)](https://github.com/zsh-users/zsh/tags)
 
