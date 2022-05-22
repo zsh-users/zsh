@@ -16,7 +16,7 @@
 _man() {
   local dirs expl mrd awk variant noinsert
   local -a context line state state_descr args modes
-  local -aU sects
+  local -aU sects _manpath
   local -A opt_args val_args sect_descs
 
   if [[ $service == man ]]; then
@@ -168,28 +168,39 @@ _man() {
   _arguments -s -S : $args '*::: :->man' && return 0
   [[ -n $state ]] || return 1
 
-  if (( ! $#_manpath )); then
-    local mp
-    mp=( ${(s.:.)$(manpath 2>/dev/null)} )
-    [[ "$mp" == *:* ]] && mp=( ${(s.:.)mp} )
-    if (( $#mp )); then
-      _manpath=( $mp )
-    elif (( $#manpath )); then
-      _manpath=( $manpath )
-    fi
-  fi
-
-  (( $#_manpath )) ||
-      _manpath=( /usr/man(-/) /(opt|usr)/(pkg|dt|share|X11R6|local)/(cat|)man(-/) )
-
   # Override man path
   [[ -n ${opt_args[-M]} ]] &&
   _manpath=( ${(s<:>)opt_args[-M]} )
 
+  # Restore cached man path to avoid $(manpath) if we can
+  if (( ! $#_manpath )); then
+    if (( ! $+_manpath_cache )); then
+      typeset -gHA _manpath_cache
+    fi
+    if [[ -z $_manpath_cache[$MANPATH] ]]; then
+      local mp
+      mp=( ${(s.:.)$({ command man -w || manpath } 2>/dev/null)} )
+      [[ "$mp" == *:* ]] && mp=( ${(s.:.)mp} )
+      if (( $#mp )); then
+        _manpath_cache[$MANPATH]=${(j.:.)mp}
+      elif (( $#manpath )); then
+        _manpath_cache[$MANPATH]=$MANPATH
+      fi
+    fi
+    _manpath=( ${(s.:.)_manpath_cache[$MANPATH]} )
+  fi
+
   # Augment man path
-  [[ $variant == (netbsd|openbsd)* ]] &&
-  [[ -n ${opt_args[-m]} ]] &&
-  _manpath+=( ${(s<:>)opt_args[-m]} )
+  if [[ -n ${opt_args[-m]} ]]; then
+    [[ $variant == (netbsd|openbsd)* ]] &&
+    _manpath+=( ${(s<:>)opt_args[-m]} )
+  elif [[ $variant == aix* ]]; then
+    # _manpath declared -U so no need to test
+    _manpath+=( /usr/share/man )
+  fi
+
+  (( $#_manpath )) ||
+      _manpath=( /usr/man(-/) /(opt|usr)/(pkg|dt|share|X11R6|local)/(cat|)man(-/) )
 
   # `sman' is the SGML manual directory for Solaris 7.
   # 1M is system administrator commands on SVR4
