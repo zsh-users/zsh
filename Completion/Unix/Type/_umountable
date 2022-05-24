@@ -3,7 +3,12 @@ local tmp
 local dev_tmp dpath_tmp mp_tmp mline
 
 case "$OSTYPE" in
-linux*|irix*)
+linux*)
+  tmp=( "${(@f)$(< /proc/self/mounts)}" )
+  dev_tmp=( "${(@)${(@)tmp%% *}:#none}" )
+  mp_tmp=( "${(@)${(@)tmp#* }%% *}" )
+  ;;
+irix*)
   tmp=( "${(@f)$(< /etc/mtab)}" )
   dev_tmp=( "${(@)${(@)tmp%% *}:#none}" )
   mp_tmp=( "${(@)${(@)tmp#* }%% *}" )
