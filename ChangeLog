@@ -1,3 +1,10 @@
+2022-05-25  Norbert Lange  <nolange79@gmail.com>
+
+	* github #93: Completion/Linux/Command/_btrfs,
+	Completion/Linux/Command/_fusermount,
+	Completion/Unix/Type/_umountable: Replace /etc/mtab with
+	/proc/self/mounts for Linux.
+
 2022-05-22  Bart Schaefer  <schaefer@zsh.org>
 
 	* 50278: Completion/Unix/Command/_man: use `man -w` in preference
