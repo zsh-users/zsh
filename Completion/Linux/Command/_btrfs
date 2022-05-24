@@ -424,7 +424,7 @@ while (( $#state )); do
     ;;
     mounts)
       _wanted mount-points expl 'mount point' compadd \
-          ${${${(M)${(f)"$(</etc/mtab)"}:#*btrfs*}#* }%% *} && ret=0
+          ${${${(M)${(f)"$(</proc/self/mounts)"}:#*btrfs*}#* }%% *} && ret=0
     ;;
     filters)
       state=()

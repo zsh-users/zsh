@@ -19,7 +19,7 @@ case "$state" in
   if [[ $+opt_args[-u] -eq 0 ]]; then
     _files -/
   else
-    mtpts=(${${${"${(f)$(< /etc/mtab)}"}#* }%% *})
+    mtpts=(${${${"${(f)$(< /proc/self/mounts)}"}#* }%% *})
     _canonical_paths mounted 'mounted filesystem' "${(@g::)mtpts}"
   fi
   ;;
