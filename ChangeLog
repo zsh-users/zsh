@@ -1,5 +1,8 @@
 2022-05-25  Norbert Lange  <nolange79@gmail.com>
 
+	* github #94: Completion/Linux/Command/_modutils: Support .zst
+	kernel modules with modutils.
+
 	* github #93: Completion/Linux/Command/_btrfs,
 	Completion/Linux/Command/_fusermount,
 	Completion/Unix/Type/_umountable: Replace /etc/mtab with

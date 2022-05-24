@@ -127,7 +127,7 @@ _modutils() {
       fi
       if _cache_invalid modules-$kver || ! _retrieve_cache modules-$kver;
       then
-	modules=( $modules_dir/$kver/(*~(source|build))/**/*.(o|ko|ko.gz|ko.xz)(.:t:r:r) )
+	modules=( $modules_dir/$kver/(*~(source|build))/**/*.(o|ko|ko.gz|ko.xz|ko.zst)(.:t:r:r) )
 	modaliases=( ${${${(M)${(f)"$(<$modules_dir/$kver/modules.alias)"}:#alias*}#alias }%% *} )
 	_store_cache modules-$kver modules modaliases
       fi
