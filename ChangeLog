@@ -1,5 +1,8 @@
 2022-05-26  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 50287: configure.ac: Turn on use of getcwd by default.  Leave
+	the ability to turn it off per OS configuration.
+
 	* 50286: Functions/Misc/zed: avoid error if nounset is in effect.
 
 2022-05-25  Norbert Lange  <nolange79@gmail.com>
