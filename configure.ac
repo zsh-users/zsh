@@ -2021,11 +2021,15 @@ if test x$zsh_cv_sys_superroot = xyes; then
 fi
 
 dnl CHECK FOR SYSTEMS REQUIRING GETCWD
+dnl This is now turned on by default, as we expect modern getcwd
+dnl implementations to work correctly.  Any exceptions should be added
+dnl to the first case.  Currently there are none, hence it is forced
+dnl not to match.
 AC_CACHE_CHECK(whether we should use the native getcwd,
 zsh_cv_use_getcwd,
 [case "${host_cpu}-${host_vendor}-${host_os}" in
-    *QNX*) zsh_cv_use_getcwd=yes ;;
-    *) zsh_cv_use_getcwd=no ;;
+    *NOMATCH*) zsh_cv_use_getcwd=no ;;
+    *) zsh_cv_use_getcwd=yes ;;
  esac])
 AH_TEMPLATE([USE_GETCWD],
 [Define to 1 if you need to use the native getcwd.])
