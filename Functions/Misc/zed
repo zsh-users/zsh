@@ -14,15 +14,17 @@ local var opts zed_file_name
 integer TMOUT=0 okargs=1 fun hist bind
 local -a expand
 
-zparseopts -D -A opts f h b x:
+zparseopts -D -A opts f h b x: || return 1
 fun=$+opts[-f]
 hist=$+opts[-h]
 bind=$+opts[-b]
-if [[ $opts[-x] == <-> ]]; then
-  expand=(-x $opts[-x])
-elif (( $+opts[-x] )); then
-  print -r "Integer expected after -x: $opts[-x]" >&2
-  return 1
+if (( $+opts[-x] )); then
+  if [[ $opts[-x] == <-> ]]; then
+    expand=(-x $opts[-x])
+  else
+    print -r "Integer expected after -x: $opts[-x]" >&2
+    return 1
+  fi
 fi
 
 [[ $0 = fned ]] && fun=1

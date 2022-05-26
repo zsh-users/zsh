@@ -1,3 +1,7 @@
+2022-05-26  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 50286: Functions/Misc/zed: avoid error if nounset is in effect.
+
 2022-05-25  Norbert Lange  <nolange79@gmail.com>
 
 	* github #94: Completion/Linux/Command/_modutils: Support .zst
