@@ -1,3 +1,9 @@
+2022-05-30  Bart Schaefer  <schaefer@zsh.org>
+
+	* Marlon Richert: 50307 (cf. PWS 50205):
+	Completion/Zsh/Type/_suffix_alias_files: suffix aliases should not
+	collide	with directory names when completing
+
 2022-05-26  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 50287: configure.ac: Turn on use of getcwd by default.  Leave

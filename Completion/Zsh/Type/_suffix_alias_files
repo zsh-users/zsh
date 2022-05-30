@@ -16,6 +16,7 @@ else
     tmpa=(${(kq)saliases})
     pat="*.(${(kj.|.)tmpa})"
 fi
+[[ -o autocd ]] || pat+='(#q^/)'
 
 # _wanted is called for us by _command_names
 _path_files "$@" -g $pat
