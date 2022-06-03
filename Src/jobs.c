@@ -414,7 +414,7 @@ storepipestats(Job jn, int inforeground, int fixlastval)
 	jpipestats[i] = (WIFSIGNALED(p->status) ?
 			 0200 | WTERMSIG(p->status) :
 			 (WIFSTOPPED(p->status) ?
-			  0200 | WEXITSTATUS(p->status) :
+			  0200 | WSTOPSIG(p->status) :
 			  WEXITSTATUS(p->status)));
 	if (jpipestats[i])
 	    pipefail = jpipestats[i];
@@ -471,7 +471,7 @@ update_job(Job jn)
 	    val = (WIFSIGNALED(pn->status) ?
 		   0200 | WTERMSIG(pn->status) :
 		   (WIFSTOPPED(pn->status) ?
-		    0200 | WEXITSTATUS(pn->status) :
+		    0200 | WSTOPSIG(pn->status) :
 		    WEXITSTATUS(pn->status)));
 	    signalled = WIFSIGNALED(pn->status);
 	}
@@ -2221,6 +2221,7 @@ addbgstatus(pid_t pid, int status)
 {
     static long child_max;
     Bgstatus bgstatus_entry;
+    LinkNode node;
 
     if (!child_max) {
 #ifdef _SC_CHILD_MAX
@@ -2244,6 +2245,21 @@ addbgstatus(pid_t pid, int status)
 	if (!bgstatus_list)
 	    return;
     }
+#ifdef DEBUG
+    /* See if an entry already exists for the pid */
+    for (node = firstnode(bgstatus_list); node; incnode(node)) {
+	bgstatus_entry = (Bgstatus)getdata(node);
+	if (bgstatus_entry->pid == pid) {
+	    /* In theory this should not happen because addbgstatus() is
+	     * called only once when the process exits or gets killed. */
+	    dputs("addbgstatus called again: pid %d: status %d -> %d",
+		    pid, bgstatus_entry->status, status);
+	    bgstatus_entry->status = status;
+	    return;
+	}
+    }
+#endif
+    /* Add an entry for the pid */
     if (bgstatus_count == child_max) {
 	/* Overflow.  List is in order, remove first */
 	rembgstatus(firstnode(bgstatus_list));
