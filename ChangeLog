@@ -1,3 +1,8 @@
+2022-06-03  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 50306: Src/jobs.c, Src/signals.c, Test/A05execution.ztst: fix
+	wait builtin for child that has been stopped and continued.
+
 2022-05-30  Bart Schaefer  <schaefer@zsh.org>
 
 	* Marlon Richert: 50307 (cf. PWS 50205):

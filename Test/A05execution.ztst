@@ -396,6 +396,13 @@ F:anonymous function, and a descriptor leak when backgrounding a pipeline
 # TBD: the 0 above is believed to be bogus and should also be turned
 # into 127 when the ccorresponding bug is fixed in the main shell.
 
+  sleep 1 & pid=$!
+  kill -STOP $pid
+  sleep 1
+  kill -CONT $pid
+  wait $pid
+0:wait for stopped and continued process
+
 # Without the outer subshell, the test harness reports the pre-46060 behaviour
 # as "skipped" rather than "failed".
  (( exit 130 ) | { sleep 1; echo hello })

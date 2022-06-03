@@ -576,12 +576,10 @@ wait_for_processes(void)
 	 */
 	if (jn && !(jn->stat & (STAT_CURSH|STAT_BUILTIN)) &&
 	    jn - jobtab != thisjob) {
-	    int val = (WIFSIGNALED(status) ?
-		   0200 | WTERMSIG(status) :
-		   (WIFSTOPPED(status) ?
-		    0200 | WEXITSTATUS(status) :
-		    WEXITSTATUS(status)));
-	    addbgstatus(pid, val);
+	    if (WIFEXITED(status))
+		addbgstatus(pid, WEXITSTATUS(status));
+	    else if (WIFSIGNALED(status))
+		addbgstatus(pid, 0200 | WTERMSIG(status));
 	}
 
 	unqueue_signals();
