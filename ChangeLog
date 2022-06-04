@@ -1,3 +1,10 @@
+2022-06-04  Bart Schaefer  <schaefer@zsh.org>
+
+	* 50323: Completion/Base/Utility/_shadow (new file),
+	Completion/Base/Widget/_complete_help, Functions/Zle/keeper:
+	create helper for shadowing builtins or existing functions and
+	use it when redefining compadd et al.
+
 2022-06-03  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 50306: Src/jobs.c, Src/signals.c, Test/A05execution.ztst: fix

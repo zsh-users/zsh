@@ -10,6 +10,7 @@ _complete_help() {
   local -H _help_filter_funcstack="alternative|call_function|describe|dispatch|wanted|requested|all_labels|next_label"
 
   {
+    _shadow compadd compcall zstyle
     compadd() { return 1 }
     compcall() { _help_sort_tags use-compctl }
     zstyle() {
@@ -43,7 +44,7 @@ _complete_help() {
 
     ${1:-_main_complete}
   } always {
-    unfunction compadd compcall zstyle
+    _unshadow compadd compcall zstyle
   }
 
   for i in "${(@ok)help_funcs}"; do
