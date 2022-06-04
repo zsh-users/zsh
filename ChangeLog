@@ -3,6 +3,11 @@
 	* 50306: Src/jobs.c, Src/signals.c, Test/A05execution.ztst: fix
 	wait builtin for child that has been stopped and continued.
 
+2022-06-02  Bart Schaefer  <schaefer@zsh.org>
+
+	* 50325: Src/Zle/compmatch.c, Src/Zle/computil.c: revert 38150 and
+	fix in calling function cfp_matcher_range() instead
+
 2022-05-30  Bart Schaefer  <schaefer@zsh.org>
 
 	* Marlon Richert: 50307 (cf. PWS 50205):

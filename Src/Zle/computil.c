@@ -4383,7 +4383,7 @@ cfp_matcher_range(Cmatcher *ms, char *add)
 			 * word pattern.
 			 */
 			if ((ind = pattern_match_equivalence
-			     (m->word, ind, mt, addc)) != CHR_INVALID) {
+			     (m->word, ind+1, mt, addc)) != CHR_INVALID) {
 			    if (ret) {
 				if (imeta(ind)) {
 				    *p++ = Meta;
