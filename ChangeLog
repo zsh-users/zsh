@@ -6,6 +6,8 @@
 	* 51490: Src/Zle/computil.c: Use time_t for lastt which stores
 	result of time(0)
 
+	* 52222: Doc/Zsh/contrib.yo: Document bracketed-paste-url-magic
+
 2023-10-15  Bart Schaefer  <schaefer@zsh.org>
 
 	* 52218: Etc/BUGS, NEWS, README: notes since 5.9 release

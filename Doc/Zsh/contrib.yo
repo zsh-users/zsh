@@ -2448,6 +2448,33 @@ history is restricted, so cursor motions, etc., may not pass outside of
 the pasted content.  Text assigned to tt(BUFFER) by the active widgets
 is copied back into tt(PASTED) before tt(paste-finish).
 )
+tindex(bracketed-paste-url-magic)
+item(tt(bracketed-paste-url-magic))(
+This widget is a simpler version of using tt(bracketed-paste-magic)
+to enable tt(quote-url-magic). Rather than re-interpreting everything as
+keystrokes, it simply handles quoting of pasted urls itself, and all other
+text is handled like the default bracketed-paste widget.
+
+It limits the quoting to pastes that consist of a single url, but you
+can also enable or disable quoting explicitly for a paste by setting
+NUMERIC to 1 or 2 respectively (ie, by pressing alt-1 or alt-2 before
+pasting).
+
+It is also possible to customize the list of schemas used to
+decide if something is a url by setting the tt(schema) style in the
+tt(:bracketed-paste-url-magic) context, for example:
+ifzman()
+example(zstyle :bracketed-paste-url-magic schema http:// myspecialschema:)
+
+The default list of schemas is tt(http:// https:// ftp:// ftps:// file:// \
+                                  ssh:// sftp:// magnet:).
+
+The widget itself is installed in a similar way as
+tt(bracketed-paste-magic) above, by
+ifzman()
+example(autoload -Uz bracketed-paste-url-magic
+zle -N bracketed-paste bracketed-paste-url-magic)
+)
 tindex(copy-earlier-word)
 item(tt(copy-earlier-word))(
 This widget works like a combination of tt(insert-last-word) and
