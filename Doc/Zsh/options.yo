@@ -1884,6 +1884,11 @@ fn2)var(...)tt(LPAR()RPAR())'; if the option is not set, this causes
 a parse error.  Definition of multiple functions with the tt(function)
 keyword is always allowed.  Multiple function definitions are not often
 used and can cause obscure errors.
+
+Note that no error is raised if multiple functions are defined as a
+result of a set of names that were originally read as a single word on
+the command line, for example `tt(TRAP{INT,QUIT})'.  Although there are
+no plans to change this behaviour at present, it is not guaranteed.
 )
 pindex(MULTIOS)
 pindex(NO_MULTIOS)

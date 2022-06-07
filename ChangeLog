@@ -1,3 +1,9 @@
+2022-06-07  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 50339: Doc/Zsh/options.yo, Src/text.c, Test/C04funcdef.ztst:
+	Make multiple function output safer with NO_MULTI_FUNC_DEF and
+	document exceptions to errors raised by MULTI_FUNC_DEF.
+
 2022-06-04  Bart Schaefer  <schaefer@zsh.org>
 
 	* 50323: Completion/Base/Utility/_shadow (new file),

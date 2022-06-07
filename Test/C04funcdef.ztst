@@ -53,6 +53,26 @@
 >b: redirection
 >a: redirection
 
+  define_multiple() {
+    fn1 fn2 fn3() {
+      print This is $0
+    }
+  }
+  which -x2 define_multiple
+  define_multiple
+  fn1
+  fn2
+  fn3
+0: Safe output of multiple function definitions
+>define_multiple () {
+>  function fn1 fn2 fn3 {
+>    print This is $0
+>  }
+>}
+>This is fn1
+>This is fn2
+>This is fn3
+
   functions -M m1
   m1() { (( $# )) }
   print $(( m1() ))

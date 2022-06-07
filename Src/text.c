@@ -578,11 +578,16 @@ gettext2(Estate state)
 		Wordcode end = p + WC_FUNCDEF_SKIP(code);
 		int nargs = *state->pc++;
 
+		if (nargs > 1)
+		    taddstr("function ");
 		taddlist(state, nargs);
 		if (nargs)
 		    taddstr(" ");
 		if (tjob) {
-		    taddstr("() { ... }");
+		    if (nargs > 1)
+			taddstr("{ ... }");
+		    else
+			taddstr("() { ... }");
 		    state->pc = end;
 		    if (!nargs) {
 			/*
@@ -594,7 +599,10 @@ gettext2(Estate state)
 		    }
 		    stack = 1;
 		} else {
-		    taddstr("() {");
+		    if (nargs > 1)
+			taddstr("{");
+		    else
+			taddstr("() {");
 		    tindent++;
 		    taddnl(1);
 		    n = tpush(code, 1);
