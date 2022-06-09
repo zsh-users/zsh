@@ -1,3 +1,7 @@
+2022-06-09  Matthew Martin <phy1729@gmail.com>
+
+	* 50359: Src/builtin.c: fix bad sticky-emulation in "functions -c"
+
 2022-06-09  Bart Schaefer  <schaefer@zsh.org>
 
 	* 50351: Src/builtin.c: "functions -c" can set signal traps

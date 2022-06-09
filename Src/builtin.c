@@ -3305,7 +3305,7 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	if (newsh->redir)
 	    newsh->redir->nref++;
 	if (shf->sticky)
-	    newsh->sticky = sticky_emulation_dup(sticky, 0);
+	    newsh->sticky = sticky_emulation_dup(shf->sticky, 0);
 	/* is newsh a signal trap? (adapted from exec.c) */
 	if (!strncmp(s, "TRAP", 4)) {
 	    int signum = getsignum(s + 4);
