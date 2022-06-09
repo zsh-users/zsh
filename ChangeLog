@@ -1,5 +1,7 @@
 2022-06-08  Bart Schaefer  <schaefer@zsh.org>
 
+	* 50341: Src/parse.c: disallow here-doc markers containing newline
+
 	* 50335: Functions/Misc/zargs: simplify "wait" usage, fix signal
 	handling for functions used as the command.
 

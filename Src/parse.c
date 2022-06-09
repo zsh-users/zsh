@@ -2248,6 +2248,9 @@ par_redir(int *rp, char *idstring)
 	struct heredocs **hd;
 	int htype = type;
 
+	if (strchr(tokstr, '\n'))
+	    YYERROR(ecused);
+
 	/*
 	 * Add two here for the string to remember the HERE
 	 * terminator in raw and munged form.
