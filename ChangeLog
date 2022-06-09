@@ -5,6 +5,9 @@
 
 2022-06-09  Bart Schaefer  <schaefer@zsh.org>
 
+	* 50363: Src/Modules/param_private.c: avoid use of heap memory
+	that depends on parameter scoping
+
 	* 50351: Src/builtin.c: "functions -c" can set signal traps
 
 2022-06-09  Matthew Martin <phy1729@gmail.com>
