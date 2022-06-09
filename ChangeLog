@@ -1,3 +1,8 @@
+2022-06-09  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 50342: Src/jobs.c, Test/A05execution.ztst: fix test added by
+	50306
+
 2022-06-08  Bart Schaefer  <schaefer@zsh.org>
 
 	* 50341: Src/parse.c: disallow here-doc markers containing newline
