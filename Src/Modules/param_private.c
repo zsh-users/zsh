@@ -92,7 +92,7 @@ makeprivate(HashNode hn, UNUSED(int flags))
 	    makeprivate_error = 1;
 	    return;
 	}
-	struct gsu_closure *gsu = zhalloc(sizeof(struct gsu_closure));
+	struct gsu_closure *gsu = zalloc(sizeof(struct gsu_closure));
 	switch (PM_TYPE(pm->node.flags)) {
 	case PM_SCALAR:
 	    gsu->g = (void *)(pm->gsu.s);
@@ -269,6 +269,8 @@ pps_unsetfn(Param pm, int explicit)
 	gsu->unsetfn(pm, explicit);
     if (explicit)
 	pm->gsu.s = (GsuScalar)c;
+    else
+	zfree(c, sizeof(struct gsu_closure));
 }
 
 /**/
@@ -306,6 +308,8 @@ ppi_unsetfn(Param pm, int explicit)
 	gsu->unsetfn(pm, explicit);
     if (explicit)
 	pm->gsu.i = (GsuInteger)c;
+    else
+	zfree(c, sizeof(struct gsu_closure));
 }
 
 /**/
@@ -343,6 +347,8 @@ ppf_unsetfn(Param pm, int explicit)
 	gsu->unsetfn(pm, explicit);
     if (explicit)
 	pm->gsu.f = (GsuFloat)c;
+    else
+	zfree(c, sizeof(struct gsu_closure));
 }
 
 /**/
@@ -381,6 +387,8 @@ ppa_unsetfn(Param pm, int explicit)
 	gsu->unsetfn(pm, explicit);
     if (explicit)
 	pm->gsu.a = (GsuArray)c;
+    else
+	zfree(c, sizeof(struct gsu_closure));
 }
 
 static HashTable emptytable;
@@ -420,6 +428,8 @@ pph_unsetfn(Param pm, int explicit)
 	gsu->unsetfn(pm, explicit);
     if (explicit)
 	pm->gsu.h = (GsuHash)c;
+    else
+	zfree(c, sizeof(struct gsu_closure));
 }
 
 /*
