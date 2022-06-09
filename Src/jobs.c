@@ -2221,7 +2221,9 @@ addbgstatus(pid_t pid, int status)
 {
     static long child_max;
     Bgstatus bgstatus_entry;
+#ifdef DEBUG
     LinkNode node;
+#endif
 
     if (!child_max) {
 #ifdef _SC_CHILD_MAX
