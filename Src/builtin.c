@@ -3274,6 +3274,7 @@ bin_functions(char *name, char **argv, Options ops, int func)
 
     if (OPT_ISSET(ops,'c')) {
 	Shfunc newsh;
+	char *s = argv[1];
 	if (!*argv || !argv[1] || argv[2]) {
 	    zwarnnam(name, "-c: requires two arguments");
 	    return 1;
@@ -3305,7 +3306,21 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	    newsh->redir->nref++;
 	if (shf->sticky)
 	    newsh->sticky = sticky_emulation_dup(sticky, 0);
-	shfunctab->addnode(shfunctab, ztrdup(argv[1]), &newsh->node);
+	/* is newsh a signal trap? (adapted from exec.c) */
+	if (!strncmp(s, "TRAP", 4)) {
+	    int signum = getsignum(s + 4);
+	    if (signum != -1) {
+		if (settrap(signum, NULL, ZSIG_FUNC)) {
+		    freeeprog(newsh->funcdef);
+		    dircache_set(&newsh->filename, NULL);
+		    zfree(newsh, sizeof(*newsh));
+		    return 1;
+		}
+		/* Remove any old node explicitly */
+		removetrapnode(signum);
+	    }
+	}
+	shfunctab->addnode(shfunctab, ztrdup(s), &newsh->node);
 	return 0;
     }
 
