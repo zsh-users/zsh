@@ -1,3 +1,8 @@
+2022-06-08  Bart Schaefer  <schaefer@zsh.org>
+
+	* 50335: Functions/Misc/zargs: simplify "wait" usage, fix signal
+	handling for functions used as the command.
+
 2022-06-07  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 50339: Doc/Zsh/options.yo, Src/text.c, Test/C04funcdef.ztst:

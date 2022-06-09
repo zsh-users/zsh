@@ -39,9 +39,14 @@
 #
 # "Killed by a signal" is determined by the usual shell rule that $? is
 # the signal number plus 128, so zargs can be fooled by a command that
-# explicitly exits with 129+.  Also, zsh prior to 4.1.x returns 1 rather
-# than 127 for "command not found" so this function incorrectly returns
-# 123 in that case if used with zsh 4.0.x.
+# explicitly exits with 129+.  If the command passed to zargs is a shell
+# function which uses "exit" instead of "return", zsh interprets 129+ as
+# a signal sent to the process group and may terminate zargs with that
+# status.  This is avoided when running zargs -P 2 or greater.
+#
+# ZARGS_VERSION 1.5 is the last to support zsh 4.x.  Also, zsh prior to
+# 4.1.x returns 1 rather than 127 for "command not found" so zargs
+# incorrectly returned 123 in that case if used with zsh 4.0.x.
 #
 # Because of "wait" limitations, --max-procs spawns max-procs jobs, then
 # waits for all of those, then spawns another batch, etc.
@@ -71,6 +76,10 @@
 # * The use of SIGUSR1 and SIGUSR2 to change the number of parallel jobs
 #   is not supported.
 
+{ # Begin "always" block to reset locally defined functions
+
+local ZARGS_VERSION="1.8"
+
 # First, capture the current setopts as "sticky emulation"
 if zmodload zsh/parameter
 then
@@ -84,10 +93,19 @@ else
   emulate $(emulate -l) -c '_zarun() { eval "$@" }'
 fi
 
+local _zaTRAPS="$(trap)"
+_zatraps() {
+  # In children, these traps may be reset to default behavior, even
+  # if the calling shell has traps.  Restore to surrounding context,
+  # but assure that if zargs itself is signaled, children will exit.
+  [[ -o interactive ]] &&
+    function TRAP{HUP,INT,QUIT,TERM} { exit $((128 + $1)) }
+  [[ -n "$_zaTRAPS" ]] && eval "$_zaTRAPS"
+  unset _zaTRAPS
+}
+
 emulate -L zsh || return 1
 local -a opts eof n s l P i
-
-local ZARGS_VERSION="1.7"
 
 if zparseopts -a opts -D -- \
 	-eof::=eof e::=eof \
@@ -193,14 +211,14 @@ then (( c = $#command - 1 ))
 else command=( print -r -- )
 fi
 
-local wait bg
-local execute='
+local bg execute='
     if (( $opts[(I)-(-interactive|p)] ))
     then read -q "?$call?..." || continue
     elif (( $opts[(I)-(-verbose|t)] ))
     then print -u2 -r -- "$call"
     fi
     _zarun "{
+	_zatraps
 	\"\${call[@]}\"
     } $bg"'
 local ret=0 analyze='
@@ -263,12 +281,10 @@ fi
 
 if (( P != 1 && ARGC > 1 ))
 then
-    # These setopts are necessary for "wait" on multiple jobs to work.
-    setopt nonotify nomonitor
+    setopt nonotify	# Do not report each exiting job
     local -a _zajobs
     local j
     bg='& _zajobs+=( $! )'
-    wait='wait'
     analyze='
     for j in $_zajobs; do
       wait $j
@@ -315,5 +331,9 @@ done
 return $ret
 
 )
+
+} always {
+  builtin unfunction _zarun _zatraps
+}
 
 # }
