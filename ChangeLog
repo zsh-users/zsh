@@ -1,3 +1,7 @@
+2022-06-11  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 50356: Etc/FAQ.yo: work around a yodl bug (mishandling of \'e)
+
 2022-06-09  Bart Schaefer  <schaefer@zsh.org>
 
 	* 50363: Src/Modules/param_private.c: avoid use of heap memory
