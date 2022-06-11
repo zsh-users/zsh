@@ -1055,8 +1055,9 @@ label(31)
 
   Other ways of causing word splitting include a judicious use of
   `eval':
+  COMMENT(CHAR(39) is a workaround for a bug in some versions of yodl)\
   verb(
-    sentence="Longtemps, je me suis couch\\'e de bonne heure."
+    sentence="Longtemps, je me suis couch\\CHAR(39)e de bonne heure."
     eval "words=($sentence)"
   )
   after which $words is an array with the words of $sentence (note
