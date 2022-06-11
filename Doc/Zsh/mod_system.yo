@@ -74,6 +74,11 @@ truncate file to size 0
 )
 enditem()
 
+A return status of 0 indicates the descriptor was successfully opened,
+otherwise an error message is printed, and 1 is returned for an error
+in the parameters to the command, or 2 is returned for a system error.
+The parameter tt(ERRNO) is nonzero for system errors.
+
 To close the file, use one of the following:
 
 example(tt(exec {)var(fd)tt(}<&-)
@@ -123,11 +128,11 @@ error for which a message is printed to standard error.
 )
 item(2)(
 There was an error on the read, or on polling the input file descriptor
-for a timeout.  The parameter tt(ERRNO) gives the error.
+for a timeout.  The parameter tt(ERRNO) identifies the error.
 )
 item(3)(
 Data were successfully read, but there was an error writing them
-to var(outfd).  The parameter tt(ERRNO) gives the error.
+to var(outfd).  The parameter tt(ERRNO) identifies the error.
 )
 item(4)(
 The attempt to read timed out.  Note this does not set tt(ERRNO) as this
@@ -147,6 +152,11 @@ expression. The tt(-u) option allows the file descriptor to be specified. By
 default the offset is specified relative to the start or the file but, with the
 tt(-w) option, it is possible to specify that the offset should be relative to
 the current position or the end of the file.
+
+The return status may be 0 for success, 1 for an error in the parameters
+to the command, or 2 for an error on the seek; no error message is
+printed in the last case, but the parameter tt(ERRNO) reflects
+the error that occurred.
 )
 item(tt(syswrite) [ tt(-c) var(countvar) ] [ tt(-o) var(outfd) ] var(data))(
 The data (a single string of bytes) are written to the file descriptor
@@ -166,7 +176,7 @@ returning early.
 
 The return status may be 0 for success, 1 for an error in the parameters
 to the command, or 2 for an error on the write; no error message is
-printed in the last case, but the parameter tt(ERRNO) will reflect
+printed in the last case, but the parameter tt(ERRNO) reflects
 the error that occurred.
 )
 xitem(tt(zsystem flock) [ tt(-t) var(timeout) ] [ tt(-i) var(interval) ] [ tt(-f) var(var) ] [tt(-er)] var(file))

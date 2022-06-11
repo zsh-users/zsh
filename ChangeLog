@@ -1,3 +1,9 @@
+2022-06-11  Bart Schaefer  <schaefer@zsh.org>
+
+	* 50355: Doc/Zsh/mod_system.yo, Src/Modules/system.c: make return
+	status values of sysopen consistent with other sys* functions,
+	make ERRNO values consistent for all, and update documentation
+
 2022-06-11  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 50356: Etc/FAQ.yo: work around a yodl bug (mishandling of \'e)

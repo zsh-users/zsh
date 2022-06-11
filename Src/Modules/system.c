@@ -74,6 +74,8 @@ bin_sysread(char *nam, char **args, Options ops, UNUSED(int func))
     int infd = 0, outfd = -1, bufsize = SYSREAD_BUFSIZE, count;
     char *outvar = NULL, *countvar = NULL, *inbuf;
 
+    errno = 0;	/* Distinguish non-system errors */
+
     /* -i: input file descriptor if not stdin */
     if (OPT_ISSET(ops, 'i')) {
 	infd = getposint(OPT_ARG(ops, 'i'), nam);
@@ -238,6 +240,8 @@ bin_syswrite(char *nam, char **args, Options ops, UNUSED(int func))
     int outfd = 1, len, count, totcount;
     char *countvar = NULL;
 
+    errno = 0;	/* Distinguish non-system errors */
+
     /* -o: output file descriptor if not stdout */
     if (OPT_ISSET(ops, 'o')) {
 	outfd = getposint(OPT_ARG(ops, 'o'), nam);
@@ -303,6 +307,13 @@ static struct { const char *name; int oflag; } openopts[] = {
     { "trunc", O_TRUNC }
 };
 
+/*
+ * Return values of bin_sysopen:
+ *	0	Success
+ *	1	Error in parameters to command
+ *	2	Error on open, ERRNO set by system
+ */
+
 /**/
 static int
 bin_sysopen(char *nam, char **args, Options ops, UNUSED(int func))
@@ -318,6 +329,8 @@ bin_sysopen(char *nam, char **args, Options ops, UNUSED(int func))
 #if defined(FD_CLOEXEC) && !defined(O_CLOEXEC)
     int fdflags = 0;
 #endif
+
+    errno = 0;	/* Distinguish non-system errors */
 
     if (!OPT_ISSET(ops, 'u')) {
 	zwarnnam(nam, "file descriptor not specified");
@@ -374,12 +387,12 @@ bin_sysopen(char *nam, char **args, Options ops, UNUSED(int func))
 
     if (fd == -1) {
 	zwarnnam(nam, "can't open file %s: %e", *args, errno);
-	return 1;
+	return 2;
     }
     moved_fd = (explicit > -1) ? redup(fd, explicit) : movefd(fd);
     if (moved_fd == -1) {
 	zwarnnam(nam, "can't open file %s", *args);
-	return 1;
+	return 2;
     }
 
 #ifdef FD_CLOEXEC
@@ -422,6 +435,8 @@ bin_sysseek(char *nam, char **args, Options ops, UNUSED(int func))
     int w = SEEK_SET, fd = 0;
     char *whence;
     off_t pos;
+
+    errno = 0;	/* Distinguish non-system errors */
 
     /* -u:  file descriptor if not stdin */
     if (OPT_ISSET(ops, 'u')) {
