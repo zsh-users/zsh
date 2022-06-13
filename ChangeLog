@@ -1,3 +1,7 @@
+2022-06-14  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 50365: Etc/FAQ.yo: fix indent in FAQ (text version)
+
 2022-06-11  Bart Schaefer  <schaefer@zsh.org>
 
 	* 50355: Doc/Zsh/mod_system.yo, Src/Modules/system.c: make return
