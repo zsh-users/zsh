@@ -35,7 +35,7 @@ def(myeit)(0)(\
 def(myeitd)(0)(\
     whenlatex(eit())whenhtml(eit())whenman(eit())whenms(eit())whensgml(eit())\
     whentxt(.))\
-COMMENT(-- don't want headers for text, USENET headers must come first --)\
+COMMENT(-- don't want headers for text --)\
 def(myreport)(3)(\
 whentxt(report()()())\
 whenhtml(report(ARG1)(ARG2)(ARG3))\
@@ -63,14 +63,6 @@ IFDEF(txt)(\
   PUSHMACRO(PARAGRAPH)(0)(SYMBOLVALUE(XXparagraph))\
 )()
 myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2010/02/15)
-COMMENT(-- the following are for Usenet and must appear first)\
-description(\
-mydit(Archive-Name:) unix-faq/shell/zsh
-mydit(Last-Modified:) 2020/08/08
-mydit(Submitted-By:) email(coordinator@zsh.org (Peter Stephenson))
-mydit(Posting-Frequency:) Monthly
-mydit(Copyright:) (C) P.W. Stephenson, 1995--2020 (see end of document)
-)
 
 This document contains a list of frequently-asked (or otherwise
 significant) questions concerning the Z-shell, a command interpreter
@@ -190,23 +182,6 @@ url(https://zsh.sourceforge.io/FAQ/)(https://zsh.sourceforge.io/FAQ/) .
 (https://zsh.sourceforge.io/FAQ/zshfaq.yo) and the plain text version
   can be found at url(https://zsh.sourceforge.io/FAQ/zshfaq.txt)
 (https://zsh.sourceforge.io/FAQ/zshfaq.txt) .
-
-  Another useful source of information is the collection of FAQ articles
-  posted frequently to the Usenet news groups comp.unix.questions,
-  comp.unix.shells and comp.answers with answers to general questions
-  about UNIX.  The fifth of the seven articles deals with shells,
-  including zsh, with a brief description of differences.  There is
-  also a separate FAQ on shell differences and how to change your
-  shell.  Usenet FAQs are available via FTP from rtfm.mit.edu and
-  mirrors and also on the World Wide Web; see
-  description(
-    mydit(USA)         url(http://www.cis.ohio-state.edu/hypertext/faq/usenet/top.html)
-    (http://www.cis.ohio-state.edu/hypertext/faq/usenet/top.html)
-    mydit(UK)          url(http://www.lib.ox.ac.uk/internet/news/faq/comp.unix.shell.html)
-    (http://www.lib.ox.ac.uk/internet/news/faq/comp.unix.shell.html)
-    mydit(Netherlands) url(http://www.cs.uu.nl/wais/html/na-dir/unix-faq/shell/.html)
-    (http://www.cs.uu.nl/wais/html/na-dir/unix-faq/shell/.html)
-  )
 
   You can also get it via email by emailing \
 email(mail-server@rtfm.mit.edu)
@@ -439,8 +414,7 @@ chapter(How does zsh differ from...?)
 
 As has already been mentioned, zsh is most similar to ksh, while many
 of the additions are to please csh users.  Here are some more detailed
-notes.  See also the article `UNIX shell differences and how to change
-your shell' posted frequently to the USENET group comp.unix.shell.
+notes.
 
 sect(Differences from sh and ksh)
 label(21)
@@ -898,10 +872,7 @@ sect(Shouldn't zsh be more/less like ksh/(t)csh?)
   tt(CSH_JUNKIE) options.  This argument still holds.  On the other hand,
   the arguments for having what is close to a plug-in replacement for ksh
   are, if anything, even more powerful:  the deficiencies of csh as a
-  programming language are well known (look in any Usenet FAQ archive, e.g.
-    url(http://www.cis.ohio-state.edu/hypertext/faq/usenet/unix-faq/\ 
-        shell/csh-whynot/faq.html)
-(http://www.cis.ohio-state.edu/hypertext/faq/usenet/unix-faq/shell/csh-whynot/faq.html)
+  programming language are well known (search for tt(csh-whynot)
   if you are in any doubt) and zsh is able to run many standard
   scripts such as /etc/rc.
 
@@ -2517,16 +2488,13 @@ label(62)
   Mail email(sympa@zsh.org?subject=help) for detailed information.
   Administrative matters are best sent to
   email(zsh-workers-owner@zsh.org).
-  
+
   Note that this location changed in August 2020, and the
   instructions to go with it are slightly different.
 
   An archive of mailings for the last few years can be found at
     url(http://www.zsh.org/mla/)(http://www.zsh.org/mla/)
   at the main zsh archive site.
-
-  Of course, you can also post zsh queries to the Usenet group
-  comp.unix.shell; if all else fails, you could even e-mail me.
 
 sect(What's on the wish-list?)
 
