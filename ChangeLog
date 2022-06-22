@@ -1,5 +1,8 @@
 2022-06-21  Bart Schaefer  <schaefer@zsh.org>
 
+	* 50379 (tweaked per 50380): Src/jobs.c: fix off-by-one
+	side-effect of workers/49906 that broke $(jobs -l)
+
 	* 50368: Src/Modules/db_gdbm.c: adjust bitflags so local copies of
 	variables cannot mess with database file contents
 
