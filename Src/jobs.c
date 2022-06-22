@@ -2402,7 +2402,7 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	    int curmaxjob, ignorejob;
 	    if (unset(MONITOR) && oldmaxjob) {
 		jobptr = oldjobtab;
-		curmaxjob = oldmaxjob ? oldmaxjob - 1 : 0;
+		curmaxjob = oldmaxjob;
 		ignorejob = 0;
 	    } else {
 		jobptr = jobtab;
