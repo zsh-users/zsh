@@ -34,8 +34,8 @@
 #include "db_gdbm.mdh"
 #include "db_gdbm.pro"
 
-#ifndef PM_UPTODATE
-#define PM_UPTODATE     (1<<19) /* Parameter has up-to-date data (e.g. loaded from DB) */
+#ifndef PM_UPTODATE /* Parameter has up-to-date data (e.g. loaded from DB) */
+#define PM_UPTODATE     PM_DONTIMPORT_SUID	/* Safe PM_ bit to re-use */
 #endif
 
 static Param createhash( char *name, int flags );
@@ -111,7 +111,7 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
     struct gsu_scalar_ext *dbf_carrier;
     char *resource_name, *pmname;
     GDBM_FILE dbf = NULL;
-    int read_write = GDBM_SYNC, pmflags = PM_REMOVABLE;
+    int read_write = GDBM_SYNC, pmflags = PM_REMOVABLE|PM_SINGLE;
     Param tied_param;
 
     if(!OPT_ISSET(ops,'d')) {
