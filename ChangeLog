@@ -1,3 +1,8 @@
+2022-07-16  Bart Schaefer  <schaefer@Macadamia>
+
+	* users/27852: Completion/Unix/Command/_python: Make a local copy
+	of $_compskip to avoid propagating outward any changes by _normal
+
 2022-06-21  Bart Schaefer  <schaefer@zsh.org>
 
 	* 50379 (tweaked per 50380): Src/jobs.c: fix off-by-one
