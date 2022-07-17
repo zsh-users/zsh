@@ -3,7 +3,7 @@
 # Python 2.7
 # Python 3.9
 
-local curcontext="$curcontext" state state_descr line
+local curcontext="$curcontext" state state_descr line _compskip="$_compskip"
 typeset -A opt_args
 local -a args
 
