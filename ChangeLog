@@ -1,5 +1,8 @@
 2022-07-24  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* 50421: Completion/Zsh/Context/_redirect: add missing context
+	as the 1st argument to _dispatch
+
 	* 50418: Src/zsh_system.h, configure.ac: use setenv(3)/getenv(3)
 	on newer macOS
 

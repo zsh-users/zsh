@@ -15,4 +15,5 @@ if [[ "$CURRENT" != "1" ]]; then
   fi
 fi
 
-_dispatch -redirect-,{${compstate[redirect]},-default-},${^strs}
+_dispatch -redirect-,${compstate[redirect]},$_comp_command \
+	  -redirect-,{${compstate[redirect]},-default-},${^strs}
