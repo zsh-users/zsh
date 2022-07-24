@@ -1,3 +1,8 @@
+2022-07-24  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 50418: Src/zsh_system.h, configure.ac: use setenv(3)/getenv(3)
+	on newer macOS
+
 2022-07-16  Bart Schaefer  <schaefer@Macadamia>
 
 	* users/27852: Completion/Unix/Command/_python: Make a local copy

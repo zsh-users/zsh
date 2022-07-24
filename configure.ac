@@ -1515,6 +1515,14 @@ else
 zsh_cv_use_xattr=no
 fi])
 
+dnl We don't want to use setenv(3) on El Capitan or older OS X because it
+dnl removes a leading '=' from the value of the environment variable
+AH_TEMPLATE([SETENV_MANGLES_EQUAL],
+[Define to 1 if setenv removes a leading =])
+case $host_os in
+  darwin1[0-5]*) AC_DEFINE(SETENV_MANGLES_EQUAL) ;;
+esac
+
 dnl -------------
 dnl CHECK SIGNALS
 dnl -------------
