@@ -1,3 +1,9 @@
+2022-08-05  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* Felipe Contreras: 50435+50436 (+50444):
+	Completion/Unix/Command/_make: do not actually build anything.
+	Also include some performance improvements.
+
 2022-07-24  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 50418: Src/zsh_system.h, configure.ac: use setenv(3)/getenv(3)

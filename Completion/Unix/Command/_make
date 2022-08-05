@@ -118,10 +118,34 @@ _make-parseMakefile () {
   done
 }
 
+_make-parseDataBase () {
+  local input var TAB=$'\t' IFS= skip=0
+
+  while read input
+  do
+    if [[ $skip = 1 ]]; then
+      skip=0
+      continue
+    fi
+    case "$input " in
+      (\# Not a target*|\# environment*)
+        skip=1  # skip next line
+        ;;
+      ([[:alnum:]][[:alnum:]_]#[" "$TAB]#(\?|:|::|)=*)
+        var=${input%%[ $TAB]#(\?|:|::|)=*}
+        VARIABLES[$var]=1
+        ;;
+      ([[*?[:alnum:]$][^$TAB:=%]#:[^=]*)
+        TARGETS+=( ${input%%:*} )
+        ;;
+    esac
+  done
+}
+
 _make() {
 
   local prev="$words[CURRENT-1]" file expl tmp is_gnu incl match basedir nul=$'\0'
-  local context state state_descr line
+  local curcontext=$curcontext state state_descr line
   local -a option_specs
   local -A VARIABLES VAR_ARGS opt_args
   local -aU TARGETS keys
@@ -185,7 +209,7 @@ _make() {
     )
   fi
 
-  _arguments -s $option_specs \
+  _arguments -C -S -s $option_specs \
     '*:make target:->target' && ret=0
 
   [[ $state = cdir ]] && cdir=-2
@@ -214,6 +238,10 @@ _make() {
     ;;
 
     (target)
+    # target name starting with '-' is allowed only after '--'
+    if [[ $words[CURRENT] = -* ]] && (( ${words[(i)--]} > CURRENT )); then
+      return ret
+    fi
     file=${(v)opt_args[(I)(-f|--file|--makefile)]}
     if [[ -n $file ]]
     then
@@ -239,7 +267,7 @@ _make() {
       if [[ $is_gnu == gnu ]] 
       then
         if zstyle -t ":completion:${curcontext}:targets" call-command; then
-          _make-parseMakefile < <(_call_program targets "$words[1]" -nsp --no-print-directory -f "$file" --always-make 2> /dev/null)
+          _make-parseDataBase < <(_call_program targets "$words[1]" -nqp --no-print-directory -f "$file" .DEFAULT 2> /dev/null)
         else
           _make-parseMakefile < $file
         fi
