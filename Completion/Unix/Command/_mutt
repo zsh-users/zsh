@@ -1,4 +1,4 @@
-#compdef mutt
+#compdef mutt neomutt
 
 _arguments -s -S \
   '::recipient:_email_addresses -n mutt' \

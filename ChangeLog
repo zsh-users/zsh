@@ -1,5 +1,8 @@
 2022-11-17  Oliver Kiddle  <opk@zsh.org>
 
+	* github #95: Wu Zhenyu: Completion/Unix/Command/_mutt:
+	Add completions for neomutt
+
 	* unposted (c.f. Denis Bitouzé: users/28405):
 	Completion/Unix/Command/_tex: handle also lualatex
 
