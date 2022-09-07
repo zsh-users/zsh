@@ -343,7 +343,7 @@ function +vi-gen-applied-string() {
 
 
 # Allow substitutions and expansions in the prompt, necessary for
-# using a single-quoted $vcs_info_msg_0_ in PS1, RPOMPT (as used here) and
+# using a single-quoted $vcs_info_msg_0_ in PS1, RPROMPT (as used here) and
 # similar. Other ways of using the information are described above.
 setopt promptsubst
 # Load vcs_info to display information about version control repositories.
