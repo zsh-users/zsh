@@ -6,20 +6,8 @@
     return 0
   fi
   setopt rematch_pcre
-# Find a UTF-8 locale.
-  setopt multibyte
-# Don't let LC_* override our choice of locale.
-  unset -m LC_\*
-  mb_ok=
-  langs=(en_{US,GB}.{UTF-,utf}8 en.UTF-8
-	 $(locale -a 2>/dev/null | egrep 'utf8|UTF-8'))
-  for LANG in $langs; do
-    if [[ é = ? ]]; then
-      mb_ok=1
-      break;
-    fi
-  done
-  if [[ -z $mb_ok ]]; then
+  LANG=$(ZTST_find_UTF8)
+  if [[ -z $LANG ]]; then
     ZTST_unimplemented="no UTF-8 locale or multibyte mode is not implemented"
   else
     print -u $ZTST_fd Testing PCRE multibyte with locale $LANG
