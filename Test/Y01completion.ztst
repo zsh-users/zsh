@@ -1,16 +1,7 @@
 # Tests for completion system.
 
 %prep
-  unset -m LC_\*
-  ZSH_TEST_LANG=
-  langs=(en_{US,GB}.{UTF-,utf}8 en.UTF-8
-         $(locale -a 2>/dev/null | egrep 'utf8|UTF-8'))
-  for LANG in $langs; do
-    if [[ é = ? ]]; then
-      ZSH_TEST_LANG=$LANG
-      break;
-    fi
-  done
+  ZSH_TEST_LANG=$(ZTST_find_UTF8)
   if ( zmodload zsh/zpty 2>/dev/null ); then
     . $ZTST_srcdir/comptest
     mkdir comp.tmp

@@ -37,6 +37,21 @@ emulate -R zsh
 # LANG must be passed to child zsh.
 export LANG
 
+# find UTF-8 locale
+ZTST_find_UTF8 () {
+  setopt multibyte
+  # Don't let LC_* override our choice of locale.
+  unset -m LC_\*
+  local langs=(en_{US,GB}.{UTF-,utf}8 en.UTF-8
+               ${(M)$(locale -a 2>/dev/null):#*.(utf8|UTF-8)})
+  for LANG in $langs; do
+    if [[ é = ? ]]; then
+      echo $LANG
+      return
+    fi
+  done
+}
+
 # Don't propagate variables that are set by default in the shell.
 typeset +x WORDCHARS
 

@@ -651,7 +651,7 @@
 >noktarg1
 >0 1
 
-  showopt() { setopt | egrep 'localoptions|ksharrays'; }
+  showopt() { echo ${(FM)${(@f)"$(setopt)"}:#(localoptions|ksharrays)*} }
   f1() { setopt localoptions ksharrays; showopt }
   f2() { setopt ksharrays; showopt }
   setopt kshoptionprint
