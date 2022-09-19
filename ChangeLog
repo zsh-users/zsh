@@ -1,3 +1,8 @@
+2022-09-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 50648: Functions/Misc/zcalc: Julian Prein: Use ZCALC_HISTFILE
+	where defined for zcalc history.
+
 2022-09-21  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* Nicholas Vinson: 50641: aczsh.m4, configure.ac: use 'int main()'

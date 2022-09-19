@@ -3972,8 +3972,11 @@ calculation is stored.  For example, the result of the calculation on the
 line preceded by `tt(4> )' is available as tt($4).  The last value
 calculated is available as tt(ans).  Full command line editing, including
 the history of previous calculations, is available; the history is saved in
-the file tt(~/.zcalc_history).  To exit, enter a blank line or type `tt(:q)'
-on its own (`tt(q)' is allowed for historical compatibility).
+the file tt($ZCALC_HISTFILE).  If tt($ZCALC_HISTFILE) is unset,
+tt($ZDOTDIR/.zcalc_history) is used instead, which in turn falls backs to
+tt($HOME/.zcalc_history) if tt($ZDOTDIR) is unset.  To exit, enter a blank
+line or type `tt(:q)' on its own (`tt(q)' is allowed for historical
+compatibility).
 
 A line ending with a single backslash is treated in the same fashion
 as it is in command line editing:  the backslash is removed, the
