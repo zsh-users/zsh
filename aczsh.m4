@@ -44,6 +44,7 @@ AC_DEFUN(zsh_64_BIT_TYPE,
 #include <sys/types.h>
 #endif
 
+int
 main()
 {
   $1 foo = 0; 
@@ -118,7 +119,6 @@ AC_TRY_COMMAND($DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS conftest1.o $LIBS 
 AC_TRY_COMMAND($CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest2.c 1>&AS_MESSAGE_LOG_FD) &&
 AC_TRY_COMMAND($DLLD -o conftest2.$DL_EXT $LDFLAGS $DLLDFLAGS conftest2.o $LIBS 1>&AS_MESSAGE_LOG_FD); then
     AC_RUN_IFELSE([AC_LANG_SOURCE([[
-#include <stdlib.h>
 #ifdef HPUX10DYNAMIC
 #include <dl.h>
 #define RTLD_LAZY BIND_DEFERRED
@@ -146,29 +146,30 @@ char *zsh_gl_sym_addr ;
 #define RTLD_GLOBAL 0
 #endif
 
+int
 main()
 {
     void *handle1, *handle2;
     void *(*zsh_getaddr1)(), *(*zsh_getaddr2)();
     void *sym1, *sym2;
     handle1 = dlopen("./conftest1.$DL_EXT", RTLD_LAZY | RTLD_GLOBAL);
-    if(!handle1) exit(1);
+    if(!handle1) return(1);
     handle2 = dlopen("./conftest2.$DL_EXT", RTLD_LAZY | RTLD_GLOBAL);
-    if(!handle2) exit(1);
+    if(!handle2) return(1);
     zsh_getaddr1 = (void *(*)()) dlsym(handle1, "${us}zsh_getaddr1");
     zsh_getaddr2 = (void *(*)()) dlsym(handle2, "${us}zsh_getaddr2");
     sym1 = zsh_getaddr1();
     sym2 = zsh_getaddr2();
-    if(!sym1 || !sym2) exit(1);
-    if(sym1 != sym2) exit(1);
+    if(!sym1 || !sym2) return(1);
+    if(sym1 != sym2) return(1);
     dlclose(handle1);
     handle1 = dlopen("./conftest1.$DL_EXT", RTLD_LAZY | RTLD_GLOBAL);
-    if(!handle1) exit(1);
+    if(!handle1) return(1);
     zsh_getaddr1 = (void *(*)()) dlsym(handle1, "${us}zsh_getaddr1");
     sym1 = zsh_getaddr1();
-    if(!sym1) exit(1);
-    if(sym1 != sym2) exit(1);
-    exit(0);
+    if(!sym1) return(1);
+    if(sym1 != sym2) return(1);
+    return(0);
 }
 ]])],[zsh_cv_shared_$1=yes],
 [zsh_cv_shared_$1=no],
@@ -200,7 +201,6 @@ AC_TRY_COMMAND($DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS conftest1.o $LIBS 
 AC_TRY_COMMAND($CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest2.c 1>&AS_MESSAGE_LOG_FD) &&
 AC_TRY_COMMAND($DLLD -o conftest2.$DL_EXT $LDFLAGS $DLLDFLAGS conftest2.o $LIBS 1>&AS_MESSAGE_LOG_FD); then
     AC_RUN_IFELSE([AC_LANG_SOURCE([[
-#include <stdlib.h>
 #ifdef HPUX10DYNAMIC
 #include <dl.h>
 #define RTLD_LAZY BIND_DEFERRED
@@ -228,19 +228,19 @@ char *zsh_gl_sym_addr ;
 #define RTLD_GLOBAL 0
 #endif
 
-
+int
 main()
 {
     void *handle1, *handle2;
     int (*fred1)(), (*fred2)();
     handle1 = dlopen("./conftest1.$DL_EXT", RTLD_LAZY | RTLD_GLOBAL);
-    if(!handle1) exit(1);
+    if(!handle1) return(1);
     handle2 = dlopen("./conftest2.$DL_EXT", RTLD_LAZY | RTLD_GLOBAL);
-    if(!handle2) exit(1);
+    if(!handle2) return(1);
     fred1 = (int (*)()) dlsym(handle1, "${us}fred");
     fred2 = (int (*)()) dlsym(handle2, "${us}fred");
-    if(!fred1 || !fred2) exit(1);
-    exit((*fred1)() != 42 || (*fred2)() != 69);
+    if(!fred1 || !fred2) return(1);
+    return((*fred1)() != 42 || (*fred2)() != 69);
 }
 ]])],[zsh_cv_sys_dynamic_clash_ok=yes],
 [zsh_cv_sys_dynamic_clash_ok=no],
@@ -276,7 +276,6 @@ AC_TRY_COMMAND($DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS conftest1.o $LIBS 
 AC_TRY_COMMAND($CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest2.c 1>&AS_MESSAGE_LOG_FD) &&
 AC_TRY_COMMAND($DLLD -o conftest2.$DL_EXT $LDFLAGS $DLLDFLAGS conftest2.o $LIBS 1>&AS_MESSAGE_LOG_FD); then
     AC_RUN_IFELSE([AC_LANG_SOURCE([[
-#include <stdlib.h>
 #ifdef HPUX10DYNAMIC
 #include <dl.h>
 #define RTLD_LAZY BIND_DEFERRED
@@ -304,17 +303,18 @@ char *zsh_gl_sym_addr ;
 #define RTLD_GLOBAL 0
 #endif
 
+int
 main()
 {
     void *handle;
     int (*barneysym)();
     handle = dlopen("./conftest1.$DL_EXT", RTLD_LAZY | RTLD_GLOBAL);
-    if(!handle) exit(1);
+    if(!handle) return(1);
     handle = dlopen("./conftest2.$DL_EXT", RTLD_LAZY | RTLD_GLOBAL);
-    if(!handle) exit(1);
+    if(!handle) return(1);
     barneysym = (int (*)()) dlsym(handle, "${us}barney");
-    if(!barneysym) exit(1);
-    exit((*barneysym)() != 69);
+    if(!barneysym) return(1);
+    return((*barneysym)() != 69);
 }
 ]])],[zsh_cv_sys_dynamic_rtld_global=yes],
 [zsh_cv_sys_dynamic_rtld_global=no],
@@ -346,7 +346,6 @@ AC_TRY_COMMAND($DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS conftest1.o $LIBS 
     save_ldflags=$LDFLAGS
     LDFLAGS="$LDFLAGS $EXTRA_LDFLAGS"
     AC_RUN_IFELSE([AC_LANG_SOURCE([[
-#include <stdlib.h>
 #ifdef HPUX10DYNAMIC
 #include <dl.h>
 #define RTLD_LAZY BIND_DEFERRED
@@ -374,15 +373,16 @@ char *zsh_gl_sym_addr ;
 #define RTLD_GLOBAL 0
 #endif
 
+int
 main()
 {
     void *handle;
     int (*barneysym)();
     handle = dlopen("./conftest1.$DL_EXT", RTLD_LAZY | RTLD_GLOBAL);
-    if(!handle) exit(1);
+    if(!handle) return(1);
     barneysym = (int (*)()) dlsym(handle, "${us}barney");
-    if(!barneysym) exit(1);
-    exit((*barneysym)() != 69);
+    if(!barneysym) return(1);
+    return((*barneysym)() != 69);
 }
 
 int fred () { return 42; }
@@ -420,7 +420,6 @@ elif
     save_ldflags=$LDFLAGS
     LDFLAGS="$LDFLAGS $EXTRA_LDFLAGS -s"
     AC_RUN_IFELSE([AC_LANG_SOURCE([[
-#include <stdlib.h>
 #ifdef HPUX10DYNAMIC
 #include <dl.h>
 #define RTLD_LAZY BIND_DEFERRED
@@ -448,15 +447,16 @@ char *zsh_gl_sym_addr ;
 #define RTLD_GLOBAL 0
 #endif
 
+int
 main()
 {
     void *handle;
     int (*barneysym)();
     handle = dlopen("./conftest1.$DL_EXT", RTLD_LAZY | RTLD_GLOBAL);
-    if(!handle) exit(1);
+    if(!handle) return(1);
     barneysym = (int (*)()) dlsym(handle, "${us}barney");
-    if(!barneysym) exit(1);
-    exit((*barneysym)() != 69);
+    if(!barneysym) return(1);
+    return((*barneysym)() != 69);
 }
 
 int fred () { return 42; }
@@ -488,7 +488,6 @@ echo 'int fred () { return 42; }' > conftest1.c
 if AC_TRY_COMMAND($CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest1.c 1>&AS_MESSAGE_LOG_FD) &&
 AC_TRY_COMMAND($DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS -s conftest1.o $LIBS 1>&AS_MESSAGE_LOG_FD); then
     AC_RUN_IFELSE([AC_LANG_SOURCE([[
-#include <stdlib.h>
 #ifdef HPUX10DYNAMIC
 #include <dl.h>
 #define RTLD_LAZY BIND_DEFERRED
@@ -516,15 +515,16 @@ char *zsh_gl_sym_addr ;
 #define RTLD_GLOBAL 0
 #endif
 
+int
 main()
 {
     void *handle;
     int (*fredsym)();
     handle = dlopen("./conftest1.$DL_EXT", RTLD_LAZY | RTLD_GLOBAL);
-    if(!handle) exit(1);
+    if(!handle) return(1);
     fredsym = (int (*)()) dlsym(handle, "${us}fred");
-    if(!fredsym) exit(1);
-    exit((*fredsym)() != 42);
+    if(!fredsym) return(1);
+    return((*fredsym)() != 42);
 }
 ]])],[zsh_cv_sys_dynamic_strip_lib=yes],
 [zsh_cv_sys_dynamic_strip_lib=no],
