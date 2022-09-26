@@ -1,5 +1,7 @@
 2022-09-26  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* 50662: Test/ztst.zsh: unset LC_* for all the tests
+
 	* 50658 + test: Src/Modules/pcre.c, Test/V07pcre.ztst: Enable to
 	switch between C/UTF-8 locales in PCRE
 

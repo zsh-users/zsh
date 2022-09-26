@@ -25,23 +25,13 @@
 # still not be good enough.  Maybe we should trick it somehow.
 emulate -R zsh
 
-# Ensure the locale does not screw up sorting.  Don't supply a locale
-# unless there's one set, to minimise problems.
-[[ -n $LC_ALL ]] && LC_ALL=C
-[[ -n $LC_CTYPE ]] && LC_CTYPE=C
-[[ -n $LC_COLLATE ]] && LC_COLLATE=C
-[[ -n $LC_NUMERIC ]] && LC_NUMERIC=C
-[[ -n $LC_MESSAGES ]] && LC_MESSAGES=C
-[[ -n $LANG ]] && LANG=C
-# Test file may (or may not) set LANG to other locales. In either case,
-# LANG must be passed to child zsh.
-export LANG
+# By default tests are run in C locale. LANG must be passed to child zsh.
+unset -m LC_\*
+export LANG=C
 
 # find UTF-8 locale
 ZTST_find_UTF8 () {
   setopt multibyte
-  # Don't let LC_* override our choice of locale.
-  unset -m LC_\*
   local langs=(en_{US,GB}.{UTF-,utf}8 en.UTF-8
                ${(M)$(locale -a 2>/dev/null):#*.(utf8|UTF-8)})
   for LANG in $langs; do
