@@ -47,8 +47,6 @@ zpcre_utf8_enabled(void)
 #if defined(MULTIBYTE_SUPPORT) && defined(HAVE_NL_LANGINFO) && defined(CODESET)
     static int have_utf8_pcre = -1;
 
-    /* value can toggle based on MULTIBYTE, so don't
-     * be too eager with caching */
     if (have_utf8_pcre < -1)
 	return 0;
 
@@ -56,15 +54,11 @@ zpcre_utf8_enabled(void)
 	return 0;
 
     if ((have_utf8_pcre == -1) &&
-        (!strcmp(nl_langinfo(CODESET), "UTF-8"))) {
-
-	if (pcre_config(PCRE_CONFIG_UTF8, &have_utf8_pcre))
+	(pcre_config(PCRE_CONFIG_UTF8, &have_utf8_pcre))) {
 	    have_utf8_pcre = -2; /* erk, failed to ask */
     }
 
-    if (have_utf8_pcre < 0)
-	return 0;
-    return have_utf8_pcre;
+    return (have_utf8_pcre == 1) && (!strcmp(nl_langinfo(CODESET), "UTF-8"));
 
 #else
     return 0;
