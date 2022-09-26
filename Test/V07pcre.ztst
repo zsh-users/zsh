@@ -162,3 +162,14 @@
     echo $match[2] )
 0:regression for segmentation fault, workers/38307
 >test
+
+  LANG_SAVE=$LANG
+  [[ é =~ '^.\z' ]]; echo $?
+  LANG=C
+  [[ é =~ '^..\z' ]]; echo $?
+  LANG=$LANG_SAVE
+  [[ é =~ '^.\z' ]]; echo $?
+0:swich between C/UTF-8 locales
+>0
+>0
+>0
