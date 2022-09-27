@@ -5519,7 +5519,7 @@ mb_metacharlenconv(const char *s, wint_t *wcp)
     if (!isset(MULTIBYTE) || STOUC(*s) <= 0x7f) {
 	/* treat as single byte, possibly metafied */
 	if (wcp)
-	    *wcp = (wint_t)(*s == Meta ? s[1] ^ 32 : *s);
+	    *wcp = (wint_t)STOUC(*s == Meta ? s[1] ^ 32 : *s);
 	return 1 + (*s == Meta);
     }
     /*

@@ -1,3 +1,8 @@
+2022-09-27  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 50668: Src/utils.c, Test/D09brace.ztst: treat 8bit characters
+	in charcter range correctly when multibyte is unset
+
 2022-09-26  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 50662: Test/ztst.zsh: unset LC_* for all the tests
