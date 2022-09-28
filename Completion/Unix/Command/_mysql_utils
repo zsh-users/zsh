@@ -210,6 +210,7 @@ _mysql_utils() {
     "--no-defaults[don't read default options from any options file]"
     '--defaults-file=[read defaults from the given file]:file:_files'
     '--defaults-extra-file=[read specified file after the global files]:defaults file:_files'
+    '--protocol=[connection protocol to use for connecting to the server]:protocol:(tcp socket pipe memory)'
     '(-S --socket)'{-S+,--socket=}'[specify socket file to use for connection]:server socket file:_files'
     '(-h --host)'{-h+,--host=}'[specify server hostname]:hostname:_mysql_hosts'
     '(-P --port)'{-P+,--port=}'[specify port number for connection]:server port:_mysql_ports'

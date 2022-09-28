@@ -2,6 +2,9 @@
 	* Bart Schaefer: 50399: Completion/Base/Widget/_complete_debug
 	Properly local scope PS4 change
 
+	* 50695: Completion/Unix/Command/_mysql_utils add --protocol
+	option
+
 2022-09-27  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 50668: Src/utils.c, Test/D09brace.ztst: treat 8bit characters
