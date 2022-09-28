@@ -1,3 +1,8 @@
+2022-09-28  Eric Cook  <llua@gmx.com>
+
+	* 50695: Completion/Unix/Command/_mysql_utils add --protocol
+	option
+
 2022-09-27  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 50668: Src/utils.c, Test/D09brace.ztst: treat 8bit characters
