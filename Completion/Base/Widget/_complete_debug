@@ -19,7 +19,7 @@ integer debug_fd=-1
     setopt localoptions no_ignorebraces
     debug_indent=( '%'{3..20}'(e. .)' )
   }
-  local PROMPT4 PS4="${(j::)debug_indent}+%N:%i> "
+  local PROMPT4="$PROMPT4" PS4="${(j::)debug_indent}+%N:%i> "
   setopt xtrace
   : $ZSH_NAME $ZSH_VERSION
   ${1:-_main_complete}
