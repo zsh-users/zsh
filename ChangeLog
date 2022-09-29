@@ -1,3 +1,7 @@
+2022-09-29  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 50671: Util/ztst-syntax.vim: enable spell check in *.ztst
+
 2022-09-28  Eric Cook  <llua@gmx.com>
 	* Bart Schaefer: 50399: Completion/Base/Widget/_complete_debug
 	Properly local scope PS4 change

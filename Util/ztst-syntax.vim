@@ -36,7 +36,7 @@ syn match  ztstPayload             /^\s.*/ contains=@zsh
 syn match  ztstExitCode            /^\d\+\|^-/                nextgroup=ztstFlags
 syn match  ztstFlags               /[.dDqf]*:/      contained nextgroup=ztstTestName contains=ztstColon
 syn match  ztstColon               /:.\@=/          contained
-syn region ztstTestName            start=// end=/$/ contained 
+syn region ztstTestName            start=// end=/$/ contained contains=@Spell
 
 syn match  ztstInputMarker         /^<.\@=/                   nextgroup=ztstInput
 syn region ztstInput               start=// end=/$/ contained
@@ -54,7 +54,7 @@ syn match  ztstErrputLiteral       /^[?].\@=/                 nextgroup=ztstErrp
 syn region ztstErrput              start=// end=/$/ contained
 
 syn match  ztstFrequentExplanationMarker /^F:/                nextgroup=ztstFrequentExplanation
-syn region ztstFrequentExplanation start=// end=/$/ contained
+syn region ztstFrequentExplanation start=// end=/$/ contained contains=@Spell
 
 syn match  ztstDirective           /^%.*/
 
