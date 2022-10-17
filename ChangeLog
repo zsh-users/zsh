@@ -1,3 +1,8 @@
+2022-10-17  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* Wesley Schwengle: 50736: Src/Zle/compmatch.c: silence
+	use-after-free waring (gcc-12.2)
+
 2022-09-29  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 50671: Util/ztst-syntax.vim: enable spell check in *.ztst
