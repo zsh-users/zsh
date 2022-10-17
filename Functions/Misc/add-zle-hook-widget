@@ -39,7 +39,7 @@ zstyle zle-hook types ${hooktypes#zle-}
 
 # Relying on multifuncdef option here
 function azhw:${^hooktypes} {
-    local -a hook_widgets
+    local -a hook_widgets match mbegin mend
     local hook
     # Values of these styles look like number:name
     # and we run them in number order
@@ -58,7 +58,7 @@ function azhw:${^hooktypes} {
 # Redefine ourself with the setup left out
 
 function add-zle-hook-widget {
-    local -a hooktypes
+    local -a hooktypes match mbegin mend
     zstyle -a zle-hook types hooktypes
 
     # This part copied from add-zsh-hook
