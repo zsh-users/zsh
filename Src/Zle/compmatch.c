@@ -2045,12 +2045,12 @@ join_strs(int la, char *sa, int lb, char *sb)
 				zlelineasstring(line, mp->llen, 0, &convlen,
 						NULL, 0);
 			    if (rr <= convlen) {
-				char *or = rs;
+				ptrdiff_t diff = rp - rs;
 				int alloclen = (convlen > 20) ? convlen : 20;
 
 				rs = realloc(rs, (rl += alloclen));
 				rr += alloclen;
-				rp += rs - or;
+				rp = rs + diff;
 			    }
 			    memcpy(rp, convstr, convlen);
 			    rp += convlen;
@@ -2073,11 +2073,11 @@ join_strs(int la, char *sa, int lb, char *sb)
 	} else {
 	    /* Same character, just take it. */
 	    if (rr <= 1 /* HERE charlen */) {
-		char *or = rs;
+		ptrdiff_t diff = rp - rs;
 
 		rs = realloc(rs, (rl += 20));
 		rr += 20;
-		rp += rs - or;
+		rp = rs + diff;
 	    }
 	    /* HERE: multibyte char */
 	    *rp++ = *sa;

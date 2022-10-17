@@ -1636,6 +1636,11 @@
 	* 50714: Completion/Unix/Command/_git (_git-diff): also complete
 	in the 2nd argument position anything that could be in the 1st.
 
+2022-10-17  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* Wesley Schwengle: 50736: Src/Zle/compmatch.c: silence
+	use-after-free waring (gcc-12.2)
+
 2022-09-28  Eric Cook  <llua@gmx.com>
 
 	* 50695: Completion/Unix/Command/_mysql_utils add --protocol
