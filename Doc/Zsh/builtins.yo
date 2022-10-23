@@ -2047,8 +2047,9 @@ startitem()
 item(tt(PLUS()))(
 If `tt(PLUS())' appears by itself in a separate word as the last option,
 then the names of all parameters (functions with tt(-f)) are printed, but
-the values (function bodies) are not.  No var(name) arguments may appear,
-and it is an error for any other options to follow `tt(PLUS())'.  The
+the values (function bodies) are not.  If var(name) arguments appear,
+both those names and their values are printed in the form of assignments.
+It is an error for any other options to follow `tt(PLUS())', but the
 effect of `tt(PLUS())' is as if all attribute flags which precede it were
 given with a `tt(PLUS())' prefix.  For example, `tt(typeset -U PLUS())' is
 equivalent to `tt(typeset +U)' and displays the names of all arrays having
@@ -2081,7 +2082,8 @@ Except when assignments are made with var(name)tt(=)var(value), using
 tt(+m) forces the matching parameters and their attributes to be printed,
 even inside a function.  Note that tt(-m) is ignored if no patterns are
 given, so `tt(typeset -m)' displays attributes but `tt(typeset -a +m)'
-does not.
+does not.  Ordinary scalar string parameters have no attributes, so for
+those tt(+m) prints only the names.
 )
 item(tt(-p) [ var(n) ])(
 If the tt(-p) option is given, parameters and values are printed in the
