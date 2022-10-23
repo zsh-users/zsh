@@ -1,3 +1,8 @@
+2022-10-22  Bart Schaefer  <schaefer@Macadamia>
+
+	* 50714: Completion/Unix/Command/_git (_git-diff): also complete
+	in the 2nd argument position anything that could be in the 1st.
+
 2022-10-17  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 50786: Functions/Misc/add-zle-hook-widget: make match

@@ -808,18 +808,6 @@ _git-diff () {
 
       # Otherwise, more complex conditions need to be checked.
       case $CURRENT in
-        (1)
-          local files_alt='files::__git_changed-in-working-tree_files'
-          if [[ -n ${opt_args[(I)--cached|--staged]} ]]; then
-            files_alt='files::__git_changed-in-index_files'
-          fi
-
-          _alternative \
-            'commit-ranges::__git_commit_ranges' \
-            'blobs-and-trees-in-treeish::__git_blobs_and_trees_in_treeish' \
-            $files_alt \
-            'blobs::__git_blobs ' && ret=0
-          ;;
         (2)
           # Check if first argument is something special. In case of committish ranges and committishs offer a full list compatible completions.
           if __git_is_committish_range $line[1]; then
@@ -841,10 +829,19 @@ _git-diff () {
           elif [[ -n ${opt_args[(I)--cached|--staged]} ]]; then
             # Example: git diff --cached file1 <tab>
             __git_changed-in-index_files && ret=0
-          else
-            # Example: git diff file1 <tab>
-            __git_changed-in-working-tree_files && ret=0
           fi
+          ;&
+        (1)
+          local files_alt='files::__git_changed-in-working-tree_files'
+          if [[ -n ${opt_args[(I)--cached|--staged]} ]]; then
+            files_alt='files::__git_changed-in-index_files'
+          fi
+
+          _alternative \
+            'commit-ranges::__git_commit_ranges' \
+            'blobs-and-trees-in-treeish::__git_blobs_and_trees_in_treeish' \
+            $files_alt \
+            'blobs::__git_blobs ' && ret=0
           ;;
         (*)
           if __git_is_committish_range $line[1]; then
