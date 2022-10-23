@@ -120,7 +120,7 @@ struct heredocs *hdocs;
  *     - if not (type & Z_END), followed by next WC_LIST
  *
  *   WC_SUBLIST
- *     - data contains type (&&, ||, END) and flags (coprog, not)
+ *     - data contains type (&&, ||, END) and flags (coproc, not)
  *     - followed by code for sublist
  *     - if not (type == END), followed by next WC_SUBLIST
  *
