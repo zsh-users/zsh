@@ -536,7 +536,7 @@ itemiz(Errors creating command or process substitutions)
 itemiz(Syntax errors in glob qualifiers)
 itemiz(File generation errors where not caught by the option tt(BAD_PATTERN))
 itemiz(All bad patterns used for matching within case statements)
-itemiz(File generation failures where not caused by tt(NO_MATCH) or
+itemiz(File generation failures where not caused by tt(NOMATCH) or
 similar options)
 itemiz(All file generation errors where the pattern was used to create a
 multio)
