@@ -1,3 +1,8 @@
+2022-10-31  Bart Schaefer  <schaefer@BartMAC2015.local>
+
+	* 50855: Doc/Zsh/builtins.yo, Doc/Zsh/params.yo: Clarify how
+	commands are hashed, and searched-for by "whence".
+
 2022-10-31  Peter Grayson  <pete@jpgrayson.net>
 
 	* 50844: Completion/Unix/Command/_stgit: Remove _stgit completion
