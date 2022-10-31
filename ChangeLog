@@ -3,6 +3,11 @@
 	* 50844: Completion/Unix/Command/_stgit: Remove _stgit completion
 	script
 
+2022-10-31  Bart Schaefer  <schaefer@BartMAC2015.local>
+
+	* 50855: Doc/Zsh/builtins.yo, Doc/Zsh/params.yo: Clarify how
+	commands are hashed, and searched-for by "whence".
+
 2022-10-25  Axel Beckert  <abe@deuxchevaux.org.org>
 
 	* 50840: Doc/Zsh/grammar.yo: Correct NO_MATCH to NOMATCH.

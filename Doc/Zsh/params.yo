@@ -1414,6 +1414,7 @@ An array (colon-separated list)
 of directories to search for commands.
 When this parameter is set, each directory is scanned
 and all files found are put in a hash table.
+Directories named by relative path are not scanned for hashing.
 )
 vindex(POSTEDIT)
 item(tt(POSTEDIT) <S>)(
