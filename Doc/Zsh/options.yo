@@ -2550,10 +2550,12 @@ pindex(NO_EMACS)
 pindex(NOEMACS)
 item(tt(EMACS))(
 If ZLE is loaded, turning on this option has the equivalent effect
-of `tt(bindkey -e)'.  In addition, the VI option is unset.
+of `tt(bindkey -e)'.  In addition, the tt(VI) option is unset.
 Turning it off has no effect.  The option setting is
-not guaranteed to reflect the current keymap.  This option is
-provided for compatibility; tt(bindkey) is the recommended interface.
+not guaranteed to reflect the current keymap, and the tt(LOCALOPTIONS)
+option does not work correctly. This option is provided only for
+compatibility, and its use is highly discouraged.  tt(bindkey) is the
+recommended interface.
 )
 pindex(OVERSTRIKE)
 pindex(NO_OVERSTRIKE)
@@ -2582,10 +2584,12 @@ pindex(NO_VI)
 pindex(NOVI)
 item(tt(VI))(
 If ZLE is loaded, turning on this option has the equivalent effect
-of `tt(bindkey -v)'.  In addition, the EMACS option is unset.
+of `tt(bindkey -v)'.  In addition, the tt(EMACS) option is unset.
 Turning it off has no effect.  The option setting is
-not guaranteed to reflect the current keymap.  This option is
-provided for compatibility; tt(bindkey) is the recommended interface.
+not guaranteed to reflect the current keymap, and the tt(LOCALOPTIONS)
+option does not work correctly. This option is provided only for
+compatibility, and its use is highly discouraged.  tt(bindkey) is the
+recommended interface.
 )
 pindex(ZLE)
 pindex(NO_ZLE)

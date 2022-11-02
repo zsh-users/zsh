@@ -5961,11 +5961,23 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	    emulation = funcsave->emulation;
 	    sticky = funcsave->sticky;
 	} else if (isset(LOCALOPTIONS)) {
+	    /* we need to call inittyptab() if these options change */
+	    int init_typtab =
+#ifdef MULTIBYTE_SUPPORT
+			funcsave->opts[MULTIBYTE] != opts[MULTIBYTE] ||
+#endif
+			funcsave->opts[BANGHIST] != opts[BANGHIST] ||
+			funcsave->opts[SHINSTDIN] != opts[SHINSTDIN];
+	    /* take care of SUNKEYBOARDHACK but not of EMACS/VI */
+	    if (funcsave->opts[SUNKEYBOARDHACK] != opts[SUNKEYBOARDHACK])
+		keyboardhackchar = funcsave->opts[SUNKEYBOARDHACK] ? '`' : '\0';
 	    /* restore all shell options except PRIVILEGED and RESTRICTED */
 	    funcsave->opts[PRIVILEGED] = opts[PRIVILEGED];
 	    funcsave->opts[RESTRICTED] = opts[RESTRICTED];
 	    memcpy(opts, funcsave->opts, sizeof(opts));
 	    emulation = funcsave->emulation;
+	    if (init_typtab)
+		inittyptab();
 	} else {
 	    /* just restore a couple. */
 	    opts[XTRACE] = funcsave->opts[XTRACE];

@@ -904,7 +904,11 @@ dosetopt(int optno, int value, int force, char *new_opts)
 	keyboardhackchar = (value ? '`' : '\0');
     }
     new_opts[optno] = value;
-    if (optno == BANGHIST || optno == SHINSTDIN)
+    if (
+#ifdef MULTIBYTE_SUPPORT
+	optno == MULTIBYTE ||
+#endif
+	optno == BANGHIST || optno == SHINSTDIN)
 	inittyptab();
     return 0;
 }
