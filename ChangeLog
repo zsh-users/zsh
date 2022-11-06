@@ -1657,6 +1657,11 @@
 	* users/28338: Src/lex.c, Test/D08cmdsubst.ztst: edge case of an
 	edge case in command expansion of alias.
 
+2022-11-06  Bart Schaefer  <schaefer@zsh.org>
+
+	* 50874: Src/jobs.c: fix handling of tty signals for jobs in
+	the current shell when waiting for the right side of a pipeline.
+
 2022-10-31  Peter Grayson  <pete@jpgrayson.net>
 
 	* 50844: Completion/Unix/Command/_stgit: Remove _stgit completion
