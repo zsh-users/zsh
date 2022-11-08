@@ -177,3 +177,11 @@
 0:Alias expansion needed in parsing substitutions
 >hi
 >bye
+
+# This should silently print a blank line; the original problem was
+# a parse error as the last character of the unexpanded alias
+# was erased, symptom: "command not found: W"
+  alias WI='while {false}'
+  eval 'echo $(WI blah)'
+0:Aliases with braces in command substitution can cause havoc
+>

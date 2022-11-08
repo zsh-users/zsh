@@ -1429,10 +1429,18 @@ gettokstr(int c, int sub)
 	       peek == STRING && lexbuf.ptr[-1] == '}' &&
 	       lexbuf.ptr[-2] != Bnull) {
 	/* hack to get {foo} command syntax work */
+	/*
+	 * Alias expansion when parsing command substitution means that
+	 * the case for raw lexical analysis may not be the same.
+	 * (Just go with it, OK?)
+	 */
+	int lar = lex_add_raw;
+	lex_add_raw = lexbuf_raw.len > 0 && lexbuf_raw.ptr[-1] == '}';
 	lexbuf.ptr--;
 	lexbuf.len--;
 	lexstop = 0;
 	hungetc('}');
+	lex_add_raw = lar;
     }
     *lexbuf.ptr = '\0';
     DPUTS(cmdsp != ocmdsp, "BUG: gettok: cmdstack changed.");
