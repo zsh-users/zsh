@@ -1,3 +1,8 @@
+2022-11-08  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* users/28338: Src/lex.c, Test/D08cmdsubst.ztst: edge case of an
+	edge case in command expansion of alias.
+
 2022-10-31  Peter Grayson  <pete@jpgrayson.net>
 
 	* 50844: Completion/Unix/Command/_stgit: Remove _stgit completion
