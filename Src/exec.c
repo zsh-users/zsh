@@ -451,7 +451,7 @@ execcursh(Estate state, int do_exec)
     cmdpop();
 
     state->pc = end;
-    this_noerrexit = 1;
+    this_noerrexit = (WC_SUBLIST_TYPE(*end) != WC_SUBLIST_END);
 
     return lastval;
 }

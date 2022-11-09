@@ -1,3 +1,8 @@
+2022-11-08  Bart Schaefer  <schaefer@zsh.org>
+
+	* 50897: Src/exec.c, Src/loop.c: nonzero status of complex
+	commands should trigger ERR_EXIT
+
 2022-11-08  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* users/28338: Src/lex.c, Test/D08cmdsubst.ztst: edge case of an
