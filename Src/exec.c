@@ -1442,7 +1442,7 @@ execlist(Estate state, int dont_change_job, int exiting)
 		    execsimple(state);
 		else
 		    execpline(state, code, ltype, (ltype & Z_END) && exiting);
-		if (unset(ERRRETURN))
+		if (!locallevel || unset(ERRRETURN))
 		    this_noerrexit = noerrexit;
 		state->pc = next;
 		goto sublist_done;

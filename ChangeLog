@@ -1,5 +1,7 @@
 2022-11-09  Bart Schaefer  <schaefer@zsh.org>
 
+	* 50929: Src/exec.c: fix handling of ERR_RETURN bent by 50928.
+
 	* 50928: News, Src/exec.c, Test/C03traps.ztst: fix tests for 50897,
 	mention behavior change in NEWS
 
