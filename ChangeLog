@@ -1652,6 +1652,12 @@
 	* unposted (c.f. Denis Bitouzé: users/28405):
 	Completion/Unix/Command/_tex: handle also lualatex
 
+2022-11-09  Bart Schaefer  <schaefer@zsh.org>
+
+	* 50922: Src/exec.c, Src/jobs.c: fix additional cases of signals
+	for current shell jobs on the right of a pipeline.  Backs out
+	part of 50874.
+
 2022-11-08  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* users/28338: Src/lex.c, Test/D08cmdsubst.ztst: edge case of an
