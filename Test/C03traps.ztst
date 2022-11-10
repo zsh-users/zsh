@@ -713,7 +713,7 @@ F:Must be tested with a top-level script rather than source or function
     fi
   }
   fn() {
-    setopt err_return
+    setopt localoptions err_return
     fn2 || true
   }
   fn
@@ -726,8 +726,7 @@ F:Must be tested with a top-level script rather than source or function
   done
   print OK
   )
-0:ERR_EXIT not triggered by status 1 at end of for
->OK
+1:ERR_EXIT triggered by status 1 at end of for
 
   (setopt err_exit
   integer x=0
@@ -736,8 +735,7 @@ F:Must be tested with a top-level script rather than source or function
   done
   print OK
   )
-0:ERR_EXIT not triggered by status 1 at end of while
->OK
+1:ERR_EXIT triggered by status 1 at end of while
 
   (setopt err_exit
   repeat 1; do
@@ -745,8 +743,7 @@ F:Must be tested with a top-level script rather than source or function
   done
   print OK
   )
-0:ERR_EXIT not triggered by status 1 at end of repeat
->OK
+1:ERR_EXIT triggered by status 1 at end of repeat
 
   (setopt err_exit
   if true; then
@@ -754,8 +751,7 @@ F:Must be tested with a top-level script rather than source or function
   fi
   print OK
   )
-0:ERR_EXIT not triggered by status 1 at end of if
->OK
+1:ERR_EXIT triggered by status 1 at end of if
 
   (setopt err_exit
   {
@@ -763,8 +759,7 @@ F:Must be tested with a top-level script rather than source or function
   }
   print OK
   )
-0:ERR_EXIT not triggered by status 1 at end of { }
->OK
+1:ERR_EXIT triggered by status 1 at end of { }
 
   unsetopt err_exit err_return
   (setopt err_exit

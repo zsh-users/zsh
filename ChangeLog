@@ -1,5 +1,8 @@
 2022-11-09  Bart Schaefer  <schaefer@zsh.org>
 
+	* 50928: News, Src/exec.c, Test/C03traps.ztst: fix tests for 50897,
+	mention behavior change in NEWS
+
 	* 50922: Src/exec.c, Src/jobs.c: fix additional cases of signals
 	for current shell jobs on the right of a pipeline.  Backs out
 	part of 50874.
