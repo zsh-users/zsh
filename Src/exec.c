@@ -1899,8 +1899,12 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 			break;
 		    }
 		}
-		else if (subsh && jn->stat & STAT_STOPPED)
-		    thisjob = newjob;
+		else if (subsh && jn->stat & STAT_STOPPED) {
+		    if (thisjob == newjob)
+			makerunning(jn);
+		    else
+			thisjob = newjob;
+		}
 		else
 		    break;
 	    }

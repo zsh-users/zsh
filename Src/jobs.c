@@ -564,12 +564,6 @@ update_job(Job jn)
 		     * when the job is finally deleted.
 		     */
 		    jn->stat |= STAT_ATTACH;
-		    /*
-		     * If we're in shell jobs on the right side of a pipeline
-		     * we should treat it like a job in the current shell.
-		     */
-		    if (inforeground == 2)
-			inforeground = 1;
 		}
 		/* If we have `foo|while true; (( x++ )); done', and hit
 		 * ^C, we have to stop the loop, too. */
