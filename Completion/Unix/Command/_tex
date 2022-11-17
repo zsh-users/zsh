@@ -1,4 +1,4 @@
-#compdef tex latex slitex pdftex pdflatex jadetex pdfjadetex xetex=tex xelatex=latex latexmk
+#compdef tex latex slitex pdftex pdflatex jadetex pdfjadetex xetex=tex xelatex=latex latexmk lualatex
 
 _arguments : \
     '-enc[enable encTeX extensions]' \
