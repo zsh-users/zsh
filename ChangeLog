@@ -1,5 +1,8 @@
 2022-11-17  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted (c.f. Denis Bitouzé: users/28405):
+	Completion/Unix/Command/_tex: handle also lualatex
+
 	* 50934: Doc/Zsh/zle.yo, Src/Zle/zle.h, Src/Zle/zle_utils.c,
 	Src/Zle/zle_vi.c: use OSC 52 escape sequence when copying to
 	"* or "+ vi buffers
