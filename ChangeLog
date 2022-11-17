@@ -1,5 +1,8 @@
 2022-11-17  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted (c.f. Norikatsu Shigemura: github #96):
+	Completion/Unix/Command/_cut: add missing local declaration
+
 	* github #87: Matt Koscica: Completion/Unix/Command/_tmux:
 	update options tmux 3.4
 
