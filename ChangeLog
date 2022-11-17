@@ -1,3 +1,9 @@
+2022-11-17  Oliver Kiddle  <opk@zsh.org>
+
+	* 50934: Doc/Zsh/zle.yo, Src/Zle/zle.h, Src/Zle/zle_utils.c,
+	Src/Zle/zle_vi.c: use OSC 52 escape sequence when copying to
+	"* or "+ vi buffers
+
 2022-11-09  Bart Schaefer  <schaefer@zsh.org>
 
 	* 50929: Src/exec.c: fix handling of ERR_RETURN bent by 50928.

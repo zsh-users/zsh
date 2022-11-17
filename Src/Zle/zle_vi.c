@@ -1014,6 +1014,9 @@ int
 visetbuffer(char **args)
 {
     ZLE_INT_T ch;
+    ZLE_CHAR_T *match = ZWS("_*+");
+    int registermod[] = { MOD_NULL, MOD_PRI, MOD_CLIP };
+    ZLE_CHAR_T *found;
 
     if (*args) {
 	ch = **args;
@@ -1022,12 +1025,12 @@ visetbuffer(char **args)
     } else {
 	ch = getfullchar(0);
     }
-    if (ch == ZWC('_')) {
-	zmod.flags |= MOD_NULL;
+    if ((found = ZS_strchr(match, ch))) {
+	zmod.flags |= registermod[found - match];
 	prefixflag = 1;
 	return 0;
     } else
-	zmod.flags &= ~MOD_NULL;
+	zmod.flags &= ~(MOD_NULL | MOD_OSSEL);
     if ((ch < ZWC('0') || ch > ZWC('9')) &&
 	 (ch < ZWC('a') || ch > ZWC('z')) &&
 	 (ch < ZWC('A') || ch > ZWC('Z')))

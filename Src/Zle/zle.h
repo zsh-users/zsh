@@ -258,6 +258,9 @@ struct modifier {
 #define MOD_NULL  (1<<5)   /* throw away text for the vi cut buffer */
 #define MOD_CHAR  (1<<6)   /* force character-wise movement */
 #define MOD_LINE  (1<<7)   /* force line-wise movement */
+#define MOD_PRI   (1<<8)   /* OS primary selection for the vi cut buffer */
+#define MOD_CLIP  (1<<9)   /* OS clipboard for the vi cut buffer */
+#define MOD_OSSEL (MOD_PRI | MOD_CLIP)  /* either system selection */
 
 /* current modifier status */
 

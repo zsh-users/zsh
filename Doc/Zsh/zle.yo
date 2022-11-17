@@ -2470,10 +2470,11 @@ command.  tt(run-help) is normally aliased to tt(man).
 tindex(vi-set-buffer)
 item(tt(vi-set-buffer) (unbound) (tt(")) (unbound))(
 Specify a buffer to be used in the following command.
-There are 37 buffers that can be specified:
+There are 39 buffers that can be specified:
 the 26 `named' buffers tt("a) to tt("z), the `yank' buffer tt("0),
-the nine `queued' buffers tt("1) to tt("9) and the `black hole' buffer
-tt("_).  The named buffers can also be specified as tt("A) to tt("Z).
+the nine `queued' buffers tt("1) to tt("9), the `black hole' buffer
+tt("_) and the system selection tt("*) and clipboard tt("+).
+The named buffers can also be specified as tt("A) to tt("Z).
 
 When a buffer is specified for a cut, change or yank command, the text
 concerned replaces the previous contents of the specified buffer. If
@@ -2481,6 +2482,10 @@ a named buffer is specified using a capital, the newly cut text is
 appended to the buffer instead of overwriting it. When using the tt("_)
 buffer, nothing happens. This can be useful for deleting text without
 affecting any buffers.
+
+Updating the system clipboard relies on specific support from the terminal.
+Reading it is not possible so a paste command with tt("*) or tt("+) will do
+nothing.
 
 If no buffer is specified for a cut or change command, tt("1) is used, and
 the contents of tt("1) to tt("8) are each shifted along one buffer;
