@@ -251,6 +251,14 @@
 >5000
 >255
 
+ set -- {101..120}
+ _10=42
+ echo $_10 : $1_0
+ echo $(( _10 )) : $(( 1_0 ))
+0:underscores in front of a numeric identifier is not a math constant
+>42 : 101_0
+>42 : 10
+
   # Force floating point.
   for expr in "3/4" "0x100/0x200" "0x30/0x10"; do
     print $(( $expr ))
