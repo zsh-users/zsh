@@ -1262,7 +1262,6 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
     /* first parse any subscription flags */
     if (v->pm && (*s == '(' || *s == Inpar)) {
 	int escapes = 0;
-	int waste;
 	for (s++; *s != ')' && *s != Outpar && s != *str; s++) {
 	    switch (*s) {
 	    case 'r':
@@ -1339,8 +1338,13 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 		sav = *t;
 		*t = '\0';
 		s += arglen;
-		sep = escapes ? getkeystring(s, &waste, GETKEYS_SEP, NULL)
-		    : dupstring(s);
+		if (escapes) {
+		    int len;
+		    sep = getkeystring(s, &len, GETKEYS_SEP, NULL);
+		    sep = metafy(sep, len, META_HREALLOC);
+		}
+		else
+		    sep = dupstring(s);
 		*t = sav;
 		s = t + arglen - 1;
 		break;
