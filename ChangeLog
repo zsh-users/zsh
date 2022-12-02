@@ -1,5 +1,8 @@
 2022-12-02  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* 51080: Src/glob.c: allow multibyte characters in glob qualifier
+	(u:uname:)
+
 	* 51079: Src/params.c, Test/D06subscript.ztst: metafy sep in the
 	array subscript flag (s:sep:) so that sep can contain \0 etc.
 

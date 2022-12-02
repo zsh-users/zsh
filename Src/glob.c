@@ -1481,7 +1481,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 			    sav = *tt;
 			    *tt = '\0';
 
-			    if ((pw = getpwnam(s + arglen)))
+			    if ((pw = getpwnam(unmeta(s + arglen))))
 				data = pw->pw_uid;
 			    else {
 				zerr("unknown username '%s'", s + arglen);
