@@ -294,3 +294,8 @@ F:Regression test for workers/42297
   [[ ${a[$i]} = ${a[i]} ]]
 0f:Math evaluation of commas in array subscripts
 F:In math, (($i)) should be the same as ((i)), see workers/47748.
+
+  string=$'foo\0bar'
+  echo ${string[(pws:\0:)1]}
+0:Word splitting by NUL
+>foo
