@@ -1,3 +1,9 @@
+2022-12-03  Bart Schaefer  <schaefer@zsh.org>
+
+	* Philippe Altherr: 51001: Src/exec.c, Src/loop.c,
+	Test/C03traps.ztst: adjust handling of ERR_EXIT to more closely
+	align with POSIX and with other shells; add corresponding tests
+
 2022-12-02  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 51080: Src/glob.c: allow multibyte characters in glob qualifier
