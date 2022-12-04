@@ -56,7 +56,17 @@ struct funcsave {
 typedef struct funcsave *Funcsave;
 
 /*
- * used to suppress ERREXIT and trapping of SIGZERR, SIGEXIT.
+ * Used to suppress ERREXIT and trapping of SIGZERR, SIGEXIT in the
+ * evaluation of sub-commands of the command under evaluation. The
+ * variable must be updated before the evaluation of the sub-commands
+ * starts and restored to its previous state right after that
+ * evaluation ends. The variable is read and acted upon in execlist.
+ *
+ * A good usage example can be found in execwhile in loop.c, which
+ * evaluates while statements. The variable is updated to disable
+ * ERREXIT just before evaluating the while's condition and restored
+ * to its previous state right after the evaluation of the condition.
+ *
  * Bits from noerrexit_bits.
  */
 
@@ -64,7 +74,36 @@ typedef struct funcsave *Funcsave;
 int noerrexit;
 
 /*
- * used to suppress ERREXIT and ERRRETURN for the command under evaluation.
+ * Used to suppress ERREXIT and ERRRETURN for the command under
+ * evaluation.  The variable must be enabled (set to 1) at the very
+ * end of the evaluation of the command. It must come after the
+ * evaluation of any sub-commands of the command under evaluation. The
+ * variable is read and acted upon in execlist, which also takes care
+ * of initialising and resetting it to 0.
+ *
+ * Unlike the variable noerrexit, whose state applies to the
+ * evaluation of whole sub-commands (and their direct and indirect
+ * sub-commands), the scope of the variable this_noerrexit is much
+ * more localized. ERREXIT and ERRRETURN are triggered at the end of
+ * the function execlist after the evaluation of some or all of the
+ * list's sub-commands. The role of the variable this_noerrexit is to
+ * give to the functions evaluating the list's sub-commands the
+ * possibility to tell the calling execlist not to trigger ERREXIT and
+ * ERRRETURN. In other words, the variable acts as an additional
+ * return value between the called evaluation functions and the
+ * calling execlist. For that reason the variable must always be set
+ * as late as possible and in particular after any sub-command
+ * evaluation. If the variable is set before the evaluation of a
+ * sub-command, if may affect the wrong execlist, if the sub-command
+ * evaluation involves another execlist call, and/or the variable may
+ * get modified by the sub-command evaluation and thus wouldn't return
+ * the desired value to the calling execlist.
+ *
+ * Good usage examples can be found in the exec functions in loop.c,
+ * which evaluate compound commands. The variable is enabled right
+ * before returning from the functions, after all the sub-commands of
+ * the compound commands have already been evaluated.
+ *
  * 0 or 1
  */
 
@@ -1427,6 +1466,7 @@ execlist(Estate state, int dont_change_job, int exiting)
 	    goto sublist_done;
 	}
 	while (wc_code(code) == WC_SUBLIST) {
+	    this_noerrexit = 0;
 	    int isandor = WC_SUBLIST_TYPE(code) != WC_SUBLIST_END;
 	    int isnot = WC_SUBLIST_FLAGS(code) & WC_SUBLIST_NOT;
 	    next = state->pc + WC_SUBLIST_SKIP(code);
@@ -1582,6 +1622,7 @@ sublist_done:
 	    break;
 	code = *state->pc++;
     }
+    this_noerrexit = 0;
     pline_level = old_pline_level;
     list_pipe = old_list_pipe;
     list_pipe_job = old_list_pipe_job;
@@ -5999,7 +6040,6 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	    trap_return++;
 	ret = lastval;
 	noerrexit = funcsave->noerrexit;
-	this_noerrexit = 0;
 	if (noreturnval) {
 	    lastval = funcsave->lastval;
 	    numpipestats = funcsave->numpipestats;

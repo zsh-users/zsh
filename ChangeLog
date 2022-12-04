@@ -1,5 +1,8 @@
 2022-12-03  Bart Schaefer  <schaefer@zsh.org>
 
+	* Philippe Altherr: 51076: Src/exec.c, Test/C03traps.ztst: fix
+	ERR_EXIT when used with "eval" or "source"; documentary comments
+
 	* Philippe Altherr: 51071: Src/exec.c, Test/C03traps.ztst: fix
 	ERR_RETURN when a function using && / || is called within another
 	statement using && / ||

@@ -954,6 +954,47 @@ F:Must be tested with a top-level script rather than source or function
 1:ERR_EXIT triggered by status 1 at end of anon func
 >Still functioning
 
+  (setopt err_exit
+  loop=true; while print loop $? >&2; $loop; do loop=false; false && true; done
+  print done $? >&2
+  )
+0: ERR_EXIT neither triggered inside loop nor triggered by while statement
+?loop 0
+?loop 1
+?done 1
+
+  (setopt err_exit
+  { loop=true; while print loop $? >&2; $loop; do loop=false; false && true; done } || false
+  print done $? >&2
+  )
+1: ERR_EXIT not triggered inside loop but triggered by rhs of ||
+?loop 0
+?loop 1
+
+  (setopt err_exit
+  eval 'loop=true; while print loop $? >&2; $loop; do loop=false; false && true; done'
+  print done $? >&2
+  )
+1: ERR_EXIT not triggered inside loop but triggered by eval
+?loop 0
+?loop 1
+
+  (setopt err_exit
+  source <(echo 'loop=true; while print loop $? >&2; $loop; do loop=false; false && true; done')
+  print done $? >&2
+  )
+1: ERR_EXIT not triggered inside loop but triggered by source
+?loop 0
+?loop 1
+
+  (setopt err_exit
+  v=$(loop=true; while print loop $? >&2; $loop; do loop=false; false && true; done)
+  print done $? >&2
+  )
+1: ERR_EXIT not triggered inside loop but triggered by command substitution
+?loop 0
+?loop 1
+
   if zmodload zsh/system 2>/dev/null; then
   (
     trap 'echo TERM; exit 2' TERM
