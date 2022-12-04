@@ -743,6 +743,15 @@ F:Must be tested with a top-level script rather than source or function
 >OK
 
   (setopt err_exit
+  fn() {
+    false && true
+  }
+  fn
+  print OK
+  )
+1:ERR_EXIT not triggered by "false && true" but by return from fn
+
+  (setopt err_exit
   for x in y; do
     false && true
   done
@@ -750,6 +759,17 @@ F:Must be tested with a top-level script rather than source or function
   )
 0:ERR_EXIT not triggered by status 1 at end of for
 >OK
+
+  (setopt err_exit
+  fn() {
+    for x in y; do
+      false && true
+    done
+  }
+  fn
+  print OK
+  )
+1:ERR_EXIT not triggered by status 1 at end of for but by return from fn
 
   (setopt err_exit
   repeat 1; do
@@ -761,6 +781,17 @@ F:Must be tested with a top-level script rather than source or function
 >OK
 
   (setopt err_exit
+  fn() {
+    repeat 1; do
+      false && true
+    done
+  }
+  fn
+  print OK
+  )
+1:ERR_EXIT not triggered by status 1 at end of repeat but by return from fn
+
+  (setopt err_exit
   if true; then
     false && true
   fi
@@ -768,6 +799,17 @@ F:Must be tested with a top-level script rather than source or function
   )
 0:ERR_EXIT not triggered by status 1 at end of if
 >OK
+
+  (setopt err_exit
+  fn() {
+    if true; then
+      false && true
+    fi
+  }
+  fn
+  print OK
+  )
+1:ERR_EXIT not triggered by status 1 at end of if but by return from fn
 
   (setopt err_exit
   loop=true
@@ -783,6 +825,21 @@ F:Must be tested with a top-level script rather than source or function
 >OK
 
   (setopt err_exit
+  fn() {
+    loop=true
+    while print COND; $loop; do
+      loop=false
+      false && true
+    done
+  }
+  fn
+  print OK
+  )
+1:ERR_EXIT not triggered by status 1 at end of while but by return from fn
+>COND
+>COND
+
+  (setopt err_exit
   {
     false && true
   } always {
@@ -795,6 +852,20 @@ F:Must be tested with a top-level script rather than source or function
 >OK
 
   (setopt err_exit
+  fn() {
+    {
+      false && true
+    } always {
+      print ALWAYS
+    }
+  }
+  fn
+  print OK
+  )
+1:ERR_EXIT not triggered by status 1 at end of always but by return from fn
+>ALWAYS
+
+  (setopt err_exit
   {
     false && true
   }
@@ -802,6 +873,17 @@ F:Must be tested with a top-level script rather than source or function
   )
 0:ERR_EXIT not triggered by status 1 at end of { }
 >OK
+
+  (setopt err_exit
+  fn() {
+    {
+      false && true
+    }
+  }
+  fn
+  print OK
+  )
+1:ERR_EXIT not triggered by status 1 at end of { } but by return from fn
 
   unsetopt err_exit err_return
   (setopt err_exit

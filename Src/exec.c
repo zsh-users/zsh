@@ -5932,15 +5932,6 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	     * This function is forced to return.
 	     */
 	    retflag = 0;
-	    /*
-	     * The calling function isn't necessarily forced to return,
-	     * but it should be made sensitive to ERR_EXIT and
-	     * ERR_RETURN as the assumptions we made at the end of
-	     * constructs within this function no longer apply.  If
-	     * there are cases where this is not true, they need adding
-	     * to C03traps.ztst.
-	     */
-	    this_noerrexit = 0;
 	    breaks = funcsave->breaks;
 	}
 	freearray(pparams);
@@ -6010,6 +6001,7 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	    trap_return++;
 	ret = lastval;
 	noerrexit = funcsave->noerrexit;
+	this_noerrexit = 0;
 	if (noreturnval) {
 	    lastval = funcsave->lastval;
 	    numpipestats = funcsave->numpipestats;
