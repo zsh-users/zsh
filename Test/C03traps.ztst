@@ -721,22 +721,19 @@ F:Must be tested with a top-level script rather than source or function
 >Good
 
   (setopt err_exit
+  false && true
+  print OK
+  )
+0:ERR_EXIT not triggered by "false && true"
+>OK
+
+  (setopt err_exit
   for x in y; do
     false && true
   done
   print OK
   )
 0:ERR_EXIT not triggered by status 1 at end of for
->OK
-
-  (setopt err_exit
-  integer x=0
-  while (( ! x++ )); do
-    false && true
-  done
-  print OK
-  )
-0:ERR_EXIT not triggered by status 1 at end of while
 >OK
 
   (setopt err_exit
@@ -755,6 +752,31 @@ F:Must be tested with a top-level script rather than source or function
   print OK
   )
 0:ERR_EXIT not triggered by status 1 at end of if
+>OK
+
+  (setopt err_exit
+  loop=true
+  while print COND; $loop; do
+    loop=false
+    false && true
+  done
+  print OK
+  )
+0:ERR_EXIT not triggered by status 1 at end of while
+>COND
+>COND
+>OK
+
+  (setopt err_exit
+  {
+    false && true
+  } always {
+    print ALWAYS
+  }
+  print OK
+  )
+0:ERR_EXIT not triggered by status 1 at end of always
+>ALWAYS
 >OK
 
   (setopt err_exit

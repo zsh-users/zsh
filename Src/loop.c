@@ -793,6 +793,7 @@ exectry(Estate state, int do_exec)
     cmdpop();
     popheap();
     state->pc = end;
+    this_noerrexit = 1;
 
     return endval;
 }
