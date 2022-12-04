@@ -721,6 +721,21 @@ F:Must be tested with a top-level script rather than source or function
 >Good
 
   (setopt err_exit
+  ! true
+  print OK
+  )
+0:ERR_EXIT not triggered by "! true"
+>OK
+
+  (setopt err_exit
+  fn() { true }
+  ! fn
+  print OK
+  )
+0:ERR_EXIT not triggered by "! fn"
+>OK
+
+  (setopt err_exit
   false && true
   print OK
   )

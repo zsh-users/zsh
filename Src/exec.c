@@ -63,7 +63,10 @@ typedef struct funcsave *Funcsave;
 /**/
 int noerrexit;
 
-/* used to suppress ERREXIT or ERRRETURN for one occurrence: 0 or 1 */
+/*
+ * used to suppress ERREXIT and ERRRETURN for the command under evaluation.
+ * 0 or 1
+ */
 
 /**/
 int this_noerrexit;
@@ -1429,10 +1432,7 @@ execlist(Estate state, int dont_change_job, int exiting)
 	    if (!oldnoerrexit)
 		noerrexit = isend ? 0 : NOERREXIT_EXIT | NOERREXIT_RETURN;
 	    if (WC_SUBLIST_FLAGS(code) & WC_SUBLIST_NOT) {
-		/* suppress errexit for "! this_command" */
-		if (isend)
-		    this_noerrexit = 1;
-		/* suppress errexit for ! <list-of-shell-commands> */
+		/* suppress errexit for the commands in ! <list-of-commands> */
 		noerrexit = NOERREXIT_EXIT | NOERREXIT_RETURN;
 	    }
 	    switch (WC_SUBLIST_TYPE(code)) {
@@ -1443,6 +1443,9 @@ execlist(Estate state, int dont_change_job, int exiting)
 		else
 		    execpline(state, code, ltype, (ltype & Z_END) && exiting);
 		state->pc = next;
+		/* suppress errexit for the command "! ..." */
+		if (WC_SUBLIST_FLAGS(code) & WC_SUBLIST_NOT)
+		  this_noerrexit = 1;
 		goto sublist_done;
 		break;
 	    case WC_SUBLIST_AND:
