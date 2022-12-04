@@ -670,6 +670,22 @@ F:Must be tested with a top-level script rather than source or function
 >before-out
 >before-in
 
+  (set -o err_return
+    fn() {
+      print before-in
+      { false; true } && true
+      print after-in
+    }
+    print before-out
+    fn && true
+    print after-out
+  )
+0:ERR_RETURN not triggered on LHS of "&&" in function on LHS of "&&" (regression test)
+>before-out
+>before-in
+>after-in
+>after-out
+
   mkdir -p zdotdir
   print >zdotdir/.zshenv '
   setopt norcs errreturn

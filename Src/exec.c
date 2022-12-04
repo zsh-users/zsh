@@ -1427,14 +1427,12 @@ execlist(Estate state, int dont_change_job, int exiting)
 	    goto sublist_done;
 	}
 	while (wc_code(code) == WC_SUBLIST) {
-	    int isend = (WC_SUBLIST_TYPE(code) == WC_SUBLIST_END);
+	    int isandor = WC_SUBLIST_TYPE(code) != WC_SUBLIST_END;
+	    int isnot = WC_SUBLIST_FLAGS(code) & WC_SUBLIST_NOT;
 	    next = state->pc + WC_SUBLIST_SKIP(code);
-	    if (!oldnoerrexit)
-		noerrexit = isend ? 0 : NOERREXIT_EXIT | NOERREXIT_RETURN;
-	    if (WC_SUBLIST_FLAGS(code) & WC_SUBLIST_NOT) {
-		/* suppress errexit for the commands in ! <list-of-commands> */
+	    /* suppress errexit for commands before && and || and after ! */
+	    if (isandor || isnot)
 		noerrexit = NOERREXIT_EXIT | NOERREXIT_RETURN;
-	    }
 	    switch (WC_SUBLIST_TYPE(code)) {
 	    case WC_SUBLIST_END:
 		/* End of sublist; just execute, ignoring status. */
@@ -1444,7 +1442,7 @@ execlist(Estate state, int dont_change_job, int exiting)
 		    execpline(state, code, ltype, (ltype & Z_END) && exiting);
 		state->pc = next;
 		/* suppress errexit for the command "! ..." */
-		if (WC_SUBLIST_FLAGS(code) & WC_SUBLIST_NOT)
+		if (isnot)
 		  this_noerrexit = 1;
 		goto sublist_done;
 		break;
