@@ -4,15 +4,6 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
-Changes since 5.9
------------------
-
-Handling of ERR_EXIT is corrected when the final status of a structured
-command (for, select, while, repeat, if, case, or a list in braces) is
-nonzero.  To be compatible with other shells, "zsh -e" now exits in
-those circumstances, whereas previous versions did not.  This does not
-affect the handling of nonzero status within conditional statements.
-
 Changes since 5.8.1
 -------------------
 

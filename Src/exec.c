@@ -451,7 +451,7 @@ execcursh(Estate state, int do_exec)
     cmdpop();
 
     state->pc = end;
-    this_noerrexit = (WC_SUBLIST_TYPE(*end) != WC_SUBLIST_END);
+    this_noerrexit = 1;
 
     return lastval;
 }
@@ -1442,8 +1442,6 @@ execlist(Estate state, int dont_change_job, int exiting)
 		    execsimple(state);
 		else
 		    execpline(state, code, ltype, (ltype & Z_END) && exiting);
-		if (!locallevel || unset(ERRRETURN))
-		    this_noerrexit = noerrexit;
 		state->pc = next;
 		goto sublist_done;
 		break;

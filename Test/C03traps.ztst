@@ -726,7 +726,8 @@ F:Must be tested with a top-level script rather than source or function
   done
   print OK
   )
-1:ERR_EXIT triggered by status 1 at end of for
+0:ERR_EXIT not triggered by status 1 at end of for
+>OK
 
   (setopt err_exit
   integer x=0
@@ -735,7 +736,8 @@ F:Must be tested with a top-level script rather than source or function
   done
   print OK
   )
-1:ERR_EXIT triggered by status 1 at end of while
+0:ERR_EXIT not triggered by status 1 at end of while
+>OK
 
   (setopt err_exit
   repeat 1; do
@@ -743,7 +745,8 @@ F:Must be tested with a top-level script rather than source or function
   done
   print OK
   )
-1:ERR_EXIT triggered by status 1 at end of repeat
+0:ERR_EXIT not triggered by status 1 at end of repeat
+>OK
 
   (setopt err_exit
   if true; then
@@ -751,7 +754,8 @@ F:Must be tested with a top-level script rather than source or function
   fi
   print OK
   )
-1:ERR_EXIT triggered by status 1 at end of if
+0:ERR_EXIT not triggered by status 1 at end of if
+>OK
 
   (setopt err_exit
   {
@@ -759,7 +763,8 @@ F:Must be tested with a top-level script rather than source or function
   }
   print OK
   )
-1:ERR_EXIT triggered by status 1 at end of { }
+0:ERR_EXIT not triggered by status 1 at end of { }
+>OK
 
   unsetopt err_exit err_return
   (setopt err_exit
