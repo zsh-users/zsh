@@ -569,23 +569,14 @@ execif(Estate state, int do_exec)
 	s = 1;
 	state->pc = next;
     }
+    noerrexit = olderrexit;
 
     if (run) {
-	/* we need to ignore lastval until we reach execcmd() */
-	if (olderrexit || run == 2)
-	    noerrexit = olderrexit;
-	else if (lastval)
-	    noerrexit |= NOERREXIT_EXIT | NOERREXIT_RETURN | NOERREXIT_UNTIL_EXEC;
-	else
-	    noerrexit &= ~ (NOERREXIT_EXIT | NOERREXIT_RETURN);
 	cmdpush(run == 2 ? CS_ELSE : (s ? CS_ELIFTHEN : CS_IFTHEN));
 	execlist(state, 1, do_exec);
 	cmdpop();
-    } else {
-	noerrexit = olderrexit;
-	if (!retflag && !errflag)
-	    lastval = 0;
-    }
+    } else if (!retflag && !errflag)
+	lastval = 0;
     state->pc = end;
     this_noerrexit = 1;
 

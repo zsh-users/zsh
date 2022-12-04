@@ -2220,8 +2220,6 @@ enum noerrexit_bits {
     NOERREXIT_EXIT = 1,
     /* Suppress ERR_RETURN: per function call */
     NOERREXIT_RETURN = 2,
-    /* NOERREXIT only needed on way down */
-    NOERREXIT_UNTIL_EXEC = 4,
     /* Force exit on SIGINT */
     NOERREXIT_SIGNAL = 8
 };

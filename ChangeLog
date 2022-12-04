@@ -1,5 +1,8 @@
 2022-12-03  Bart Schaefer  <schaefer@zsh.org>
 
+	* Philippe Altherr: 51098: Src/exec.c, Src/loop.c, Src/zsh.h:
+	remove unreachable NOERREXIT_UNTIL_EXEC code and effects
+
 	* Philippe Altherr: 51076: Src/exec.c, Test/C03traps.ztst: fix
 	ERR_EXIT when used with "eval" or "source"; documentary comments
 

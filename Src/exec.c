@@ -1559,14 +1559,7 @@ execlist(Estate state, int dont_change_job, int exiting)
 	state->pc--;
 sublist_done:
 
-	/*
-	 * See hairy code near the end of execif() for the
-	 * following.  "noerrexit " only applies until
-	 * we hit execcmd on the way down.  We're now
-	 * on the way back up, so don't restore it.
-	 */
-	if (!(oldnoerrexit & NOERREXIT_UNTIL_EXEC))
-	    noerrexit = oldnoerrexit;
+	noerrexit = oldnoerrexit;
 
 	if (sigtrapped[SIGDEBUG] && !isset(DEBUGBEFORECMD) && !donedebug) {
 	    /*
@@ -3245,10 +3238,6 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 	}
     } else
 	preargs = NULL;
-
-    /* if we get this far, it is OK to pay attention to lastval again */
-    if (noerrexit & NOERREXIT_UNTIL_EXEC)
-	noerrexit = 0;
 
     /* Do prefork substitutions.
      *
