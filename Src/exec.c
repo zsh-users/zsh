@@ -1415,7 +1415,7 @@ execlist(Estate state, int dont_change_job, int exiting)
 	    int oerrexit_opt = opts[ERREXIT];
 	    Param pm;
 	    opts[ERREXIT] = 0;
-	    noerrexit = NOERREXIT_EXIT | NOERREXIT_RETURN;
+	    noerrexit |= NOERREXIT_EXIT | NOERREXIT_RETURN;
 	    if (ltype & Z_SIMPLE) /* skip the line number */
 		pc2++;
 	    pm = assignsparam("ZSH_DEBUG_CMD",
@@ -1472,7 +1472,7 @@ execlist(Estate state, int dont_change_job, int exiting)
 	    next = state->pc + WC_SUBLIST_SKIP(code);
 	    /* suppress errexit for commands before && and || and after ! */
 	    if (isandor || isnot)
-		noerrexit = NOERREXIT_EXIT | NOERREXIT_RETURN;
+		noerrexit |= NOERREXIT_EXIT | NOERREXIT_RETURN;
 	    switch (WC_SUBLIST_TYPE(code)) {
 	    case WC_SUBLIST_END:
 		/* End of sublist; just execute, ignoring status. */
@@ -1568,7 +1568,7 @@ sublist_done:
 	     */
 	    int oerrexit_opt = opts[ERREXIT];
 	    opts[ERREXIT] = 0;
-	    noerrexit = NOERREXIT_EXIT | NOERREXIT_RETURN;
+	    noerrexit |= NOERREXIT_EXIT | NOERREXIT_RETURN;
 	    exiting = donetrap;
 	    ret = lastval;
 	    dotrap(SIGDEBUG);
