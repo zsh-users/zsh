@@ -1,5 +1,8 @@
 2022-12-06  Bart Schaefer  <schaefer@zsh.org>
 
+	* Shohei YOSHIDA: 51108: Completion/Unix/Command/_nkf: single
+	letter forms of Shift-JIS / EUC-JP options were reversed
+
 	* Atte Peltomäki: 51088: Functions/Misc/colors: typo in comment
 
 2022-12-03  Bart Schaefer  <schaefer@zsh.org>
