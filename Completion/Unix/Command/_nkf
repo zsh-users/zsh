@@ -10,8 +10,8 @@ _arguments -s \
   '(-u)-b[Output is buffered]' \
   '(-b)-u[Output is unbuffered]' \
   '($outputs)'{-j,--jis}'[Output is JIS 7 bit]' \
-  '($outputs)'{-e,--sjis}'[Output is Shift JIS]' \
-  '($outputs)'{-s,--euc}'[Output is EUC-JP]' \
+  '($outputs)'{-s,--sjis}'[Output is Shift JIS]' \
+  '($outputs)'{-e,--euc}'[Output is EUC-JP]' \
   '($outputs)'{-w,--utf8}'[Output is UTF-8 (No BOM)]' \
   '($outputs)-w8[Output is UTF-8 (BOM)]' \
   '($outputs)'{-w16,-w16b0,--utf16}'[Output is UTF-16 (BigEndian; No BOM)]' \
@@ -23,8 +23,8 @@ _arguments -s \
   '($outputs)--mac[Output is for Mac]' \
   '($outputs)--windows[Output is for Windows]' \
   '($inputs)-J[Input assumption is JIS 7 bit]' \
-  '($inputs)-E[Input assumption is Shift JIS]' \
-  '($inputs)-S[Input assumption is EUC-JP]' \
+  '($inputs)-S[Input assumption is Shift JIS]' \
+  '($inputs)-E[Input assumption is EUC-JP]' \
   '($inputs)-W[Input assumption is UTF-8 (No BOM)]' \
   '($inputs)-W8[Input assumption is UTF-8 (BOM)]' \
   '($inputs)-W16[Input assumption is UTF-16 (BigEndian; No BOM)]' \
