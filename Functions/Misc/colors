@@ -44,7 +44,7 @@ color=(
   35 magenta                45 bg-magenta
   36 cyan                   46 bg-cyan
   37 white                  47 bg-white
-# 38 iso-8316-6           # 48 bg-iso-8316-6
+# 38 iso-8613-6           # 48 bg-iso-8613-6
   39 default                49 bg-default
 
 # Other codes:
