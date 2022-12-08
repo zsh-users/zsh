@@ -1,3 +1,8 @@
+2022-12-08  Peter Grayson  <pete@jpgrayson.net>
+
+	* 51138: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	Updated StGit patch detection in vcs_info
+
 2022-12-06  Bart Schaefer  <schaefer@zsh.org>
 
 	* Shohei YOSHIDA: 51108: Completion/Unix/Command/_nkf: single

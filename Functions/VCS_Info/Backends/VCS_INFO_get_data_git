@@ -184,15 +184,8 @@ fi
 VCS_INFO_adjust
 VCS_INFO_git_getaction ${gitdir}
 
-local patchdir=${gitdir}/patches/${gitbranch}
-if [[ -d $patchdir ]] && [[ -f $patchdir/applied ]] \
-   && [[ -f $patchdir/unapplied ]]
-then
-    # stgit
-    git_patches_applied=(${(f)"$(< "${patchdir}/applied")"})
-    git_patches_unapplied=(${(f)"$(< "${patchdir}/unapplied")"})
-    VCS_INFO_git_handle_patches
-elif [[ -d "${gitdir}/rebase-merge" ]]; then
+local patchdir
+if [[ -d "${gitdir}/rebase-merge" ]]; then
     # 'git rebase -i'
     patchdir="${gitdir}/rebase-merge"
     local p
@@ -387,6 +380,31 @@ elif [[ -f "${gitdir}/CHERRY_PICK_HEAD" ]]; then
         git_patches_unapplied[1]=()
     else
         git_patches_unapplied=()
+    fi
+    VCS_INFO_git_handle_patches
+elif command -v stg >/dev/null &&
+        ${vcs_comm[cmd]} show-ref --quiet refs/stacks/${gitbranch} refs/heads/${gitbranch}.stgit 2>/dev/null &&
+        git_patches_applied=(${(f)"$(stg series --noprefix --applied 2>/dev/null)"})
+then
+    # Testing for StGit patches is done after testing for all git-proper
+    # patches/states. If a StGit user's repo is in one of those states, they
+    # will want to see that instead of the StGit patch info.
+
+    # Performance note: testing for the stg executable is done first because it
+    # is extremely cheap and there is nothing else to do if it isn't present.
+    # Using git to test whether a StGit stack is initialized is cheaper than
+    # running stg itself; especially for versions of StGit <= 2.0. Thus getting
+    # StGit patch info should only have a material runtime cost if StGit is
+    # installed and in-use for the current branch.
+
+    # In StGit >=1.2, the existence of refs/stacks/<branch> indicates StGit is
+    # initialized. In StGit >=0.15, it is refs/heads/<branch>.stgit.
+
+    # N.B. the "--noprefix" option is available in StGit 2.x as an alias for
+    # --no-prefix.  The former is compatible with StGit versions going back to
+    # 2008.
+    if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" get-unapplied; then
+        git_patches_unapplied=(${(f)"$(stg series --noprefix --unapplied 2>/dev/null)"})
     fi
     VCS_INFO_git_handle_patches
 else
