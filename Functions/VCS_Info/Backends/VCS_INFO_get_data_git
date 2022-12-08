@@ -244,7 +244,9 @@ if [[ -d "${gitdir}/rebase-merge" ]]; then
             (( $+REPLY )) && git_patches_applied+=( "$REPLY" )
         done
     fi
-    if [[ -f "${patchdir}/git-rebase-todo" ]] ; then
+    if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" get-unapplied &&
+       [[ -f "${patchdir}/git-rebase-todo" ]]
+    then
         for p in ${(f)"$(< "${patchdir}/git-rebase-todo")"}; do
             VCS_INFO_git_map_rebase_line_to_hash_and_subject "$p"
             (( $+REPLY )) && git_patches_unapplied+=( "$REPLY" )
@@ -374,7 +376,9 @@ elif [[ -f "${gitdir}/CHERRY_PICK_HEAD" ]]; then
     # TODO: maybe read up to the first blank line
     IFS='' read -r subject < "${gitdir}/MERGE_MSG"
     git_patches_applied=( "$(<${gitdir}/CHERRY_PICK_HEAD) ${subject}" )
-    if [[ -f "${gitdir}/sequencer/todo" ]]; then
+    if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" get-unapplied &&
+       [[ -f "${gitdir}/sequencer/todo" ]]
+    then
         # Get the next patches, and remove the one that's in CHERRY_PICK_HEAD.
         git_patches_unapplied=( ${${(M)${(f)"$(<"${gitdir}/sequencer/todo")"}:#pick *}#pick } )
         git_patches_unapplied[1]=()
