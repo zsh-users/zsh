@@ -1,3 +1,9 @@
+2022-12-09  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 51144, 51146:
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_git: vcs_info git:
+	stg: Extract patch descriptions
+
 2022-12-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 51142: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:

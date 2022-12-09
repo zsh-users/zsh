@@ -388,7 +388,7 @@ elif [[ -f "${gitdir}/CHERRY_PICK_HEAD" ]]; then
     VCS_INFO_git_handle_patches
 elif command -v stg >/dev/null &&
         ${vcs_comm[cmd]} show-ref --quiet refs/stacks/${gitbranch} refs/heads/${gitbranch}.stgit 2>/dev/null &&
-        git_patches_applied=(${(f)"$(stg series --noprefix --applied 2>/dev/null)"})
+        git_patches_applied=(${${(f)"$(stg series --noprefix --applied --description 2>/dev/null)"}/ #[#]})
 then
     # Testing for StGit patches is done after testing for all git-proper
     # patches/states. If a StGit user's repo is in one of those states, they
@@ -408,7 +408,7 @@ then
     # --no-prefix.  The former is compatible with StGit versions going back to
     # 2008.
     if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" get-unapplied; then
-        git_patches_unapplied=(${(f)"$(stg series --noprefix --unapplied 2>/dev/null)"})
+        git_patches_unapplied=(${${(f)"$(stg series --noprefix --unapplied --description 2>/dev/null)"}/ #[#]})
     fi
     VCS_INFO_git_handle_patches
 else
