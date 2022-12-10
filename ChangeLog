@@ -1,5 +1,7 @@
 2022-12-09  Bart Schaefer  <schaefer@zsh.org>
 
+	* 51161: Src/exec.c: correct errno after closing xtrace FD
+
 	* Shohei YOSHIDA: 51111: Completion/Unix/Command/_global:
 	update completion for global to version 6.6.8
 

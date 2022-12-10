@@ -4336,10 +4336,13 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 	}
     }
     if (newxtrerr) {
+	int eno = errno;
 	fil = fileno(newxtrerr);
 	fclose(newxtrerr);
 	xtrerr = oxtrerr;
+	/* Call zclose() to clean up internal tables, ignore EBADF */
 	zclose(fil);
+	errno = eno;
     }
 
     zsfree(STTYval);
