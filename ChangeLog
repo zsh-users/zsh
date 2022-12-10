@@ -1,3 +1,8 @@
+2022-12-09  Bart Schaefer  <schaefer@zsh.org>
+
+	* 51047: Completion/Unix/Type/_canonical_paths: fix quoting
+	of completion matches when _canonical_paths -N option is used
+
 2022-12-09  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 51144, 51146:
@@ -187,7 +192,7 @@
 	* 50418: Src/zsh_system.h, configure.ac: use setenv(3)/getenv(3)
 	on newer macOS
 
-2022-07-16  Bart Schaefer  <schaefer@Macadamia>
+2022-07-16  Bart Schaefer  <schaefer@zsh.org>
 
 	* users/27852: Completion/Unix/Command/_python: Make a local copy
 	of $_compskip to avoid propagating outward any changes by _normal
