@@ -1,5 +1,8 @@
 2022-12-09  Bart Schaefer  <schaefer@zsh.org>
 
+	* Shohei YOSHIDA: 51111: Completion/Unix/Command/_global:
+	update completion for global to version 6.6.8
+
 	* 51047: Completion/Unix/Type/_canonical_paths: fix quoting
 	of completion matches when _canonical_paths -N option is used
 
