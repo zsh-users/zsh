@@ -1,3 +1,8 @@
+2022-12-09  Bart Schaefer  <schaefer@zsh.org>
+
+	* 51047: Completion/Unix/Type/_canonical_paths: fix quoting
+	of completion matches when _canonical_paths -N option is used
+
 2022-12-06  Bart Schaefer  <schaefer@zsh.org>
 
 	* Shohei YOSHIDA: 51108: Completion/Unix/Command/_nkf: single

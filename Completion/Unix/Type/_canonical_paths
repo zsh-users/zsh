@@ -42,7 +42,8 @@ _canonical_paths_add_paths () {
     # ### Ideally, this codepath would do what the 'if' above does,
     # ### but telling compadd to pretend the "word on the command line"
     # ### is ${"the word on the command line"/$origpref/$canpref}.
-    matches+=(${${(M)files:#$canpref*}/$canpref/$origpref})
+    # ### The following approximates that.
+    matches+=(${(q)${(M)files:#$canpref*}/$canpref/$origpref})
   fi
 
   for subdir in $expref?*(@); do
