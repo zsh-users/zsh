@@ -1,3 +1,8 @@
+2022-12-12  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 51134: Doc/Zsh/options.yo: document interactions between
+	ERR_EXIT and ERR_RETURN and interactive shells.
+
 2022-12-09  Bart Schaefer  <schaefer@zsh.org>
 
 	* 51161: Src/exec.c: correct errno after closing xtrace FD

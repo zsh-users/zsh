@@ -1744,6 +1744,9 @@ Exiting due to tt(ERR_EXIT) has certain interactions with asynchronous
 jobs noted in
 ifzman(the section JOBS in zmanref(zshmisc))\
 ifnzman(noderef(Jobs & Signals)).
+
+Note this behaviour is not disabled in interactive shells ---
+a non-zero status on the command line causes the shell to exit.
 )
 pindex(ERR_RETURN)
 pindex(NO_ERR_RETURN)
@@ -1756,7 +1759,10 @@ If a command has a non-zero exit status, return immediately from the
 enclosing function.  The logic is similar to that for tt(ERR_EXIT),
 except that an implicit tt(return) statement is executed instead of an
 tt(exit).  This will trigger an exit at the outermost level of a
-non-interactive script.
+non-interactive script.  At the top level of an interactive shell,
+it will trigger a return to the command prompt; in other
+words, the sequence of commands typed by the user may be
+thought of as a function for this purpose.
 
 Normally this option inherits the behaviour of tt(ERR_EXIT) that
 code followed by `tt(&&)' `tt(||)' does not trigger a return.  Hence
