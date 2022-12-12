@@ -970,3 +970,15 @@ F:its expectations.
 0:Non-interactive shell command input is line buffered
 >Value is first
 >Value is second
+
+ fn() {
+   ! false
+ }
+0:! inverts the status of implicit return
+
+ fn () {
+   false
+   ! return
+ }
+ fn
+1:! does not affect return status of explicit return

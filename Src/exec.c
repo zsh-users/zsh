@@ -1961,7 +1961,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 	}
 	else
 	    unqueue_signals();
-	if ((slflags & WC_SUBLIST_NOT) && !errflag)
+	if ((slflags & WC_SUBLIST_NOT) && !errflag && !retflag)
 	    lastval = !lastval;
     }
     if (!pline_level)
