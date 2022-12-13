@@ -6286,7 +6286,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
     char *laststart;
     size_t ret;
 #else
-    char delim = '\n';
+    int delim = '\n';
 #endif
 
     if (OPT_HASARG(ops,c='k')) {
@@ -6413,10 +6413,11 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 	if (wi != WEOF)
 	    delim = (wchar_t)wi;
 	else
-	    delim = (wchar_t)((delimstr[0] == Meta) ?
+	    delim = (wchar_t) (unsigned char) ((delimstr[0] == Meta) ?
 			      delimstr[1] ^ 32 : delimstr[0]);
 #else
-        delim = (delimstr[0] == Meta) ? delimstr[1] ^ 32 : delimstr[0];
+        delim = (unsigned char) ((delimstr[0] == Meta) ?
+			delimstr[1] ^ 32 : delimstr[0]);
 #endif
 	if (SHTTY != -1) {
 	    struct ttyinfo ti;

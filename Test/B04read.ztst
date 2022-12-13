@@ -82,6 +82,12 @@
 >Testing the
 >null hypothesis
 
+ print -n $'first line\x80second line\x80' |
+ while read -d $'\x80' line; do print $line; done
+0:read with a delimiter >= 0x80
+>first line
+>second line
+
 # Note that trailing NULLs are not stripped even if they are in
 # $IFS; only whitespace characters contained in $IFS are stripped.
  print -n $'Aaargh, I hate nulls.\0\0\0' | read line

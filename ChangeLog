@@ -1,5 +1,8 @@
 2022-12-16  Oliver Kiddle  <opk@zsh.org>
 
+	* Jun T.: 51207: Src/builtin.c, Test/B04read.ztst:
+	fix for read -d when the delimiter is a byte >= 0x80
+
 	* 51212: Etc/zsh-development-guide, Src/Modules/curses.c,
 	Src/Modules/stat.c, Src/Modules/zftp.c, Src/Modules/zpty.c,
 	Src/Modules/zutil.c, Src/Zle/compcore.c, Src/Zle/complete.c,
