@@ -1723,22 +1723,30 @@ pindex(NOERREXIT)
 cindex(exit status, trapping)
 item(tt(ERR_EXIT) (tt(-e), ksh: tt(-e)))(
 If a command has a non-zero exit status, execute the tt(ZERR)
-trap, if set, and exit.  This is disabled while running initialization
-scripts.
+trap, if set, and exit.
 
-The behaviour is also disabled inside tt(DEBUG) traps.  In this
-case the option is handled specially: it is unset on entry to
-the trap.  If the option tt(DEBUG_BEFORE_CMD) is set,
-as it is by default, and the option tt(ERR_EXIT) is found to have been set
-on exit, then the command for which the tt(DEBUG) trap is being executed is
-skipped.  The option is restored after the trap exits.
+The option is ignored when executing the commands following tt(while),
+tt(until), tt(if), or tt(elif), a pipeline beginning with tt(!), or
+any command other than the last in command list containing tt(&&) or
+tt(||).  Hence neither `tt(if foo; then true; fi)', nor `tt(foo &&
+true)' trigger exit when tt(foo) returns with a non-zero exit status.
+Note that if tt(foo) is a function, the option is also ignored during
+its whole execution.
 
-Non-zero status in a command list containing tt(&&) or tt(||) is ignored
-for commands not at the end of the list.  Hence
+The option is also ignored when executing a complex command (tt(if),
+tt(for), tt(while), tt(until), tt(repeat), tt(case), tt(select),
+tt(always), or a list in braces) if its exit status comes from a
+command executed while the option is ignored. Hence, the tt(if)
+command in `tt(if true; then false && true; fi)' does not trigger
+exit.
 
-example(false && true)
-
-does not trigger exit.
+Finally, the option is also ignored while running initialization
+scripts and inside tt(DEBUG) traps.  In the latter case, the option is
+handled specially: it is unset on entry to the trap.  If the option
+tt(DEBUG_BEFORE_CMD) is set, as it is by default, and the option
+tt(ERR_EXIT) is found to have been set on exit, then the command for
+which the tt(DEBUG) trap is being executed is skipped.  The option is
+restored after the trap exits.
 
 Exiting due to tt(ERR_EXIT) has certain interactions with asynchronous
 jobs noted in
@@ -1755,29 +1763,29 @@ pindex(NOERRRETURN)
 cindex(function return, on error)
 cindex(return from function, on error)
 item(tt(ERR_RETURN))(
+
 If a command has a non-zero exit status, return immediately from the
-enclosing function.  The logic is similar to that for tt(ERR_EXIT),
-except that an implicit tt(return) statement is executed instead of an
-tt(exit).  This will trigger an exit at the outermost level of a
-non-interactive script.  At the top level of an interactive shell,
-it will trigger a return to the command prompt; in other
-words, the sequence of commands typed by the user may be
-thought of as a function for this purpose.
+enclosing function. Except as explained below, an implicit tt(return)
+statement is executed following the same logic described for
+tt(ERR_EXIT). This will trigger an exit at the outermost level of a
+non-interactive script.  At the top level of an interactive shell, it
+will trigger a return to the command prompt; in other words, the
+sequence of commands typed by the user may be thought of as a function
+for this purpose.
 
-Normally this option inherits the behaviour of tt(ERR_EXIT) that
-code followed by `tt(&&)' `tt(||)' does not trigger a return.  Hence
-in the following:
+Unlike for tt(ERR_EXIT), when a function is called while the option is
+being ignored, the option is NOT ignored during the execution of the
+function.  Hence, if tt(foo) in `tt(foo && true)' is a function, code
+inside it is considered separately: it may force a return from tt(foo)
+(assuming the option remains set within tt(foo)).
 
-example(summit || true)
+Like for tt(ERR_EXIT), the option is ignored inside tt(DEBUG) traps
+but it's not unset on entry to the trap and setting or unsetting it
+inside the trap has no special effect.
 
-no return is forced as the combined effect always has a zero return
-status.
-
-Note. however, that if tt(summit) in the above example is itself a
-function, code inside it is considered separately: it may force a return
-from tt(summit) (assuming the option remains set within tt(summit)), but
-not from the enclosing context.  This behaviour is different from
-tt(ERR_EXIT) which is unaffected by function scope.
+If tt(ERR_RETURN) and tt(ERR_EXIT) are both set, it may happen that
+both exit and return should be triggered. In that case only exit is
+triggered.
 )
 pindex(EVAL_LINENO)
 pindex(NO_EVAL_LINENO)
