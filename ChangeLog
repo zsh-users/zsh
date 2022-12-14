@@ -1,3 +1,7 @@
+2022-12-13  Bart Schaefer  <schaefer@zsh.org>
+
+	* Philippe Altherr: 51193: NEWS, README: Discuss ERR_EXIT changes
+
 2022-12-12  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 51134: Doc/Zsh/options.yo: document interactions between

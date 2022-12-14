@@ -4,6 +4,14 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
+Changes since 5.9
+-----------------
+
+The ERR_EXIT and ERR_RETURN options were refined to be more self-
+consistent and better aligned with the POSIX-2017 specification of
+`set -e`. For details on what exactly changed, see the list of
+incompatibilities in the README file.
+
 Changes since 5.8.1
 -------------------
 
