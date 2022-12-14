@@ -1598,6 +1598,7 @@ sublist_done:
 			       (isset(ERRRETURN) && !errreturn)) &&
 		    !(noerrexit & NOERREXIT_EXIT);
 		if (errexit) {
+		    errflag = 0;
 		    if (sigtrapped[SIGEXIT])
 			dotrap(SIGEXIT);
 		    if (mypid != getpid())
@@ -1630,9 +1631,12 @@ sublist_done:
 	thisjob = cj;
 
     if (exiting && sigtrapped[SIGEXIT]) {
+	int eflag = errflag;
+	errflag = 0;	/* Clear the context for trap */
 	dotrap(SIGEXIT);
 	/* Make sure this doesn't get executed again. */
 	sigtrapped[SIGEXIT] = 0;
+	errflag = eflag;
     }
 
     unqueue_signals();

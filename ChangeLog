@@ -1,5 +1,8 @@
 2022-12-13  Bart Schaefer  <schaefer@zsh.org>
 
+	* 51210: Src/exec.c: Clear errflag before calling EXIT trap,
+	otherwise the trap is skipped for special-case errors in builtins
+
 	* Philippe Altherr: 51198: Doc/Zsh/options.yo: Clarify and expand
 	ERR_EXIT and ERR_RETURN documentation to include updated behavior
 
