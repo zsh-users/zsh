@@ -1,3 +1,8 @@
+2022-12-15  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted: Src/zsh.h: lextok: Add an explanatory comment with
+	a cross-reference.
+
 2022-12-13  Bart Schaefer  <schaefer@zsh.org>
 
 	* 51210: Src/exec.c: Clear errflag before calling EXIT trap,
