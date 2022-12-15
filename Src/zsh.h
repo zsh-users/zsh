@@ -311,7 +311,7 @@ enum {
  * appear in strings and don't necessarily represent a single character.
  *
  * See Src/lex.c:tokstrings[] for hints on what these mean.  Note that
- * SEPER or SEMI are both stringified as ";"./
+ * SEPER or SEMI are both stringified as ";".
  */
 
 enum lextok {
