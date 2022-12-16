@@ -732,7 +732,7 @@ split_env_string(char *env, char **name, char **value)
 
     tenv = strcpy(zhalloc(strlen(env) + 1), env);
     for (str = tenv; *str && *str != '='; str++) {
-	if (STOUC(*str) >= 128) {
+	if ((unsigned char) *str >= 128) {
 	    /*
 	     * We'll ignore environment variables with names not
 	     * from the portable character set since we don't
@@ -4123,7 +4123,8 @@ char *
 tiedarrgetfn(Param pm)
 {
     struct tieddata *dptr = (struct tieddata *)pm->u.data;
-    return *dptr->arrptr ? zjoin(*dptr->arrptr, STOUC(dptr->joinchar), 1) : "";
+    return *dptr->arrptr ?
+	    zjoin(*dptr->arrptr, (unsigned char) dptr->joinchar, 1) : "";
 }
 
 /**/
@@ -4819,12 +4820,12 @@ keyboardhacksetfn(UNUSED(Param pm), char *x)
 	    zwarn("Only one KEYBOARD_HACK character can be defined");  /* could be changed if needed */
 	}
 	for (i = 0; i < len; i++) {
-	    if (!isascii(STOUC(x[i]))) {
+	    if (!isascii((unsigned char) x[i])) {
 		zwarn("KEYBOARD_HACK can only contain ASCII characters");
 		return;
 	    }
 	}
-	keyboardhackchar = len ? STOUC(x[0]) : '\0';
+	keyboardhackchar = len ? (unsigned char) x[0] : '\0';
 	free(x);
     } else
 	keyboardhackchar = '\0';
@@ -4858,14 +4859,14 @@ histcharssetfn(UNUSED(Param pm), char *x)
 	if (len > 3)
 	    len = 3;
 	for (i = 0; i < len; i++) {
-	    if (!isascii(STOUC(x[i]))) {
+	    if (!isascii((unsigned char) x[i])) {
 		zwarn("HISTCHARS can only contain ASCII characters");
 		return;
 	    }
 	}
-	bangchar = len ? STOUC(x[0]) : '\0';
-	hatchar =  len > 1 ? STOUC(x[1]) : '\0';
-	hashchar = len > 2 ? STOUC(x[2]) : '\0';
+	bangchar = len ? (unsigned char) x[0] : '\0';
+	hatchar =  len > 1 ? (unsigned char) x[1] : '\0';
+	hashchar = len > 2 ? (unsigned char) x[2] : '\0';
 	free(x);
     } else {
 	bangchar = '!';
@@ -5087,7 +5088,7 @@ arrfixenv(char *s, char **t)
     if (pm->node.flags & PM_SPECIAL)
 	joinchar = ':';
     else
-	joinchar = STOUC(((struct tieddata *)pm->u.data)->joinchar);
+	joinchar = (unsigned char) ((struct tieddata *)pm->u.data)->joinchar;
 
     addenv(pm, t ? zjoin(t, joinchar, 1) : "");
 }
@@ -5109,9 +5110,9 @@ zputenv(char *str)
     char *ptr;
     int ret;
 
-    for (ptr = str; *ptr && STOUC(*ptr) < 128 && *ptr != '='; ptr++)
+    for (ptr = str; *ptr && (unsigned char) *ptr < 128 && *ptr != '='; ptr++)
 	;
-    if (STOUC(*ptr) >= 128) {
+    if ((unsigned char) *ptr >= 128) {
 	/*
 	 * Environment variables not in the portable character
 	 * set are non-standard and we don't really know of
@@ -6022,7 +6023,7 @@ printparamnode(HashNode hn, int printflags)
 	 * append the join char for tied parameters if different from colon
 	 * for typeset -p output.
 	 */
-	unsigned char joinchar = STOUC(((struct tieddata *)peer->u.data)->joinchar);
+	unsigned char joinchar = (unsigned char) ((struct tieddata *)peer->u.data)->joinchar;
 	if (joinchar != ':') {
 	    char buf[2];
 	    buf[0] = joinchar;

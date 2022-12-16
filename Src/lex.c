@@ -423,7 +423,7 @@ initlextabs(void)
     for (t0 = 0; lx2[t0]; t0++)
 	lexact2[(int)lx2[t0]] = t0;
     lexact2['&'] = LX2_BREAK;
-    lexact2[STOUC(Meta)] = LX2_META;
+    lexact2[(unsigned char) Meta] = LX2_META;
     lextok2['*'] = Star;
     lextok2['?'] = Quest;
     lextok2['{'] = Inbrace;
@@ -722,7 +722,7 @@ gettok(void)
 	}
 	return peek;
     }
-    switch (lexact1[STOUC(c)]) {
+    switch (lexact1[(unsigned char) c]) {
     case LX1_BKSLASH:
 	d = hgetc();
 	if (d == '\n')
@@ -960,8 +960,8 @@ gettokstr(int c, int sub)
 	if (inbl && !in_brace_param && !pct)
 	    act = LX2_BREAK;
 	else {
-	    act = lexact2[STOUC(c)];
-	    c = lextok2[STOUC(c)];
+	    act = lexact2[(unsigned char) c];
+	    c = lextok2[(unsigned char) c];
 	}
 	switch (act) {
 	case LX2_BREAK:
@@ -1263,7 +1263,7 @@ gettokstr(int c, int sub)
 		    continue;
 	    } else {
 		add(Bnull);
-		if (c == STOUC(Meta)) {
+		if (c == (unsigned char) Meta) {
 		    c = hgetc();
 #ifdef DEBUG
 		    if (lexstop) {

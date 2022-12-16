@@ -2634,7 +2634,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
      * these flags are defined in zsh.h         */
     for (; *optstr; optstr++, bit <<= 1)
     {
-	int optval = STOUC(*optstr);
+	int optval = (unsigned char) *optstr;
 	if (OPT_MINUS(ops,optval))
 	    on |= bit;
 	else if (OPT_PLUS(ops,optval))
@@ -4752,7 +4752,7 @@ bin_print(char *name, char **args, Options ops, int func)
 		     */
 		    if (*aptr == '\033' || *aptr == '\233') {
 			for (aptr++, l--;
-			     l && !isalpha(STOUC(*aptr));
+			     l && !isalpha((unsigned char) (*aptr));
 			     aptr++, l--)
 			    ;
 			aptr++;
@@ -5313,9 +5313,9 @@ bin_print(char *name, char **args, Options ops, int func)
 		    else
 			cc = WEOF;
 		    if (cc == WEOF)
-			cc = (curlen > 1) ? STOUC(curarg[1]) : 0;
+			cc = (curlen > 1) ? (unsigned char) (curarg[1]) : 0;
 #else
-		    cc = (curlen > 1) ? STOUC(curarg[1]) : 0;
+		    cc = (curlen > 1) ? (unsigned char) (curarg[1]) : 0;
 #endif
 		    if (type == 2) {
 			doubleval = cc;
@@ -6685,7 +6685,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 		    continue;
 		first = 0;
 	    }
-	    if (imeta(STOUC(*bptr))) {
+	    if (imeta((unsigned char) *bptr)) {
 		bptr[1] = bptr[0] ^ 32;
 		bptr[0] = Meta;
 		bptr += 2;
@@ -6878,7 +6878,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 		if (bslash)
 		    continue;
 	    }
-	    if (imeta(STOUC(*bptr))) {
+	    if (imeta((unsigned char) *bptr)) {
 		bptr[1] = bptr[0] ^ 32;
 		bptr[0] = Meta;
 		bptr += 2;
@@ -7000,14 +7000,14 @@ zread(int izle, int *readchar, long izle_timeout)
 	   buffer.  This may be a null byte to indicate EOF.  If reading from the
 	   buffer, move on the buffer pointer. */
 	if (*zbuf == Meta)
-	    return zbuf++, STOUC(*zbuf++ ^ 32);
+	    return zbuf++, (unsigned char) (*zbuf++ ^ 32);
 	else
-	    return (*zbuf) ? STOUC(*zbuf++) : EOF;
+	    return (*zbuf) ? (unsigned char) *zbuf++ : EOF;
     }
     if (*readchar >= 0) {
 	cc = *readchar;
 	*readchar = -1;
-	return STOUC(cc);
+	return (unsigned char) cc;
     }
     for (;;) {
 	/* read a character from readfd */
@@ -7015,7 +7015,7 @@ zread(int izle, int *readchar, long izle_timeout)
 	switch (ret) {
 	case 1:
 	    /* return the character read */
-	    return STOUC(cc);
+	    return (unsigned char) cc;
 	case -1:
 #if defined(EAGAIN) || defined(EWOULDBLOCK)
 	    if (!retry && readfd == 0 && (

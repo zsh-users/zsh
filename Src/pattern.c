@@ -239,7 +239,7 @@ typedef unsigned long zrange_t;
  * a bit tricky...
  */
 #define WCHAR_INVALID(ch)			\
-    ((wchar_t) (0xDC00 + STOUC(ch)))
+    ((wchar_t) (0xDC00 + (unsigned char) ch))
 #endif /* MULTIBYTE_SUPPORT */
 
 /*
@@ -346,7 +346,7 @@ metacharinc(char **x)
      * set doesn't have the property that all bytes with the 8th
      * bit clear are single characters then we are stuffed.
      */
-    if (!(patglobflags & GF_MULTIBYTE) || !(STOUC(*inptr) & 0x80))
+    if (!(patglobflags & GF_MULTIBYTE) || !((unsigned char) *inptr & 0x80))
     {
 	if (itok(*inptr))
 	    inchar = ztokens[*inptr++ - Pound];
@@ -357,7 +357,7 @@ metacharinc(char **x)
 	    inchar = *inptr++;
 	}
 	*x = inptr;
-	return (wchar_t)STOUC(inchar);
+	return (wchar_t)(unsigned char) inchar;
     }
 
     while (*inptr) {
@@ -1181,8 +1181,8 @@ pattern_range_to_string(char *rangestr, char *outstr)
     int len = 0;
 
     while (*rangestr) {
-	if (imeta(STOUC(*rangestr))) {
-	    int swtype = STOUC(*rangestr) - STOUC(Meta);
+	if (imeta((unsigned char) *rangestr)) {
+	    int swtype = (unsigned char) *rangestr - (unsigned char) Meta;
 
 	    if (swtype == 0) {
 		/* Ordindary metafied character */
@@ -1278,17 +1278,17 @@ patcomppiece(int *flagp, int paren)
 	kshchar = '\0';
 	if (*patparse && patparse[1] == Inpar) {
 	    if (*patparse == zpc_special[ZPC_KSH_PLUS])
-		kshchar = STOUC('+');
+		kshchar = (unsigned char) '+';
 	    else if (*patparse == zpc_special[ZPC_KSH_BANG])
-		kshchar = STOUC('!');
+		kshchar = (unsigned char) '!';
 	    else if (*patparse == zpc_special[ZPC_KSH_BANG2])
-		kshchar = STOUC('!');
+		kshchar = (unsigned char) '!';
 	    else if (*patparse == zpc_special[ZPC_KSH_AT])
-		kshchar = STOUC('@');
+		kshchar = (unsigned char) '@';
 	    else if (*patparse == zpc_special[ZPC_KSH_STAR])
-		kshchar = STOUC('*');
+		kshchar = (unsigned char) '*';
 	    else if (*patparse == zpc_special[ZPC_KSH_QUEST])
-		kshchar = STOUC('?');
+		kshchar = (unsigned char) '?';
 	}
 
 	/*
@@ -1468,7 +1468,8 @@ patcomppiece(int *flagp, int paren)
 			ch = range_type(patparse, len);
 			patparse = nptr + 2;
 			if (ch != PP_UNKWN)
-			    patadd(NULL, STOUC(Meta) + ch, 1, PA_NOALIGN);
+			    patadd(NULL, (unsigned char) Meta + ch, 1,
+				PA_NOALIGN);
 			continue;
 		}
 		charstart = patparse;
@@ -1476,10 +1477,10 @@ patcomppiece(int *flagp, int paren)
 
 		if (*patparse == Dash && patparse[1] &&
 		    patparse[1] != Outbrack) {
-		    patadd(NULL, STOUC(Meta)+PP_RANGE, 1, PA_NOALIGN);
+		    patadd(NULL, (unsigned char) Meta+PP_RANGE, 1, PA_NOALIGN);
 		    if (itok(*charstart)) {
-			patadd(0, STOUC(ztokens[*charstart - Pound]), 1,
-			       PA_NOALIGN);
+			patadd(0, (unsigned char) ztokens[*charstart - Pound],
+			       1, PA_NOALIGN);
 		    } else {
 			patadd(charstart, 0, patparse-charstart, PA_NOALIGN);
 		    }
@@ -1487,7 +1488,7 @@ patcomppiece(int *flagp, int paren)
 		    METACHARINC(patparse);
 		}
 		if (itok(*charstart)) {
-		    patadd(0, STOUC(ztokens[*charstart - Pound]), 1,
+		    patadd(0, (unsigned char) ztokens[*charstart - Pound], 1,
 			   PA_NOALIGN);
 		} else {
 		    patadd(charstart, 0, patparse-charstart, PA_NOALIGN);
@@ -1910,8 +1911,8 @@ charref(char *x, char *y, int *zmb_ind)
     wchar_t wc;
     size_t ret;
 
-    if (!(patglobflags & GF_MULTIBYTE) || !(STOUC(*x) & 0x80))
-	return (wchar_t) STOUC(*x);
+    if (!(patglobflags & GF_MULTIBYTE) || !((unsigned char) *x & 0x80))
+	return (wchar_t) (unsigned char) *x;
 
     ret = mbrtowc(&wc, x, y-x, &shiftstate);
 
@@ -1937,7 +1938,7 @@ charnext(char *x, char *y)
     wchar_t wc;
     size_t ret;
 
-    if (!(patglobflags & GF_MULTIBYTE) || !(STOUC(*x) & 0x80))
+    if (!(patglobflags & GF_MULTIBYTE) || !((unsigned char) *x & 0x80))
 	return x + 1;
 
     ret = mbrtowc(&wc, x, y-x, &shiftstate);
@@ -1965,8 +1966,8 @@ charrefinc(char **x, char *y, int *z)
     wchar_t wc;
     size_t ret;
 
-    if (!(patglobflags & GF_MULTIBYTE) || !(STOUC(**x) & 0x80))
-	return (wchar_t) STOUC(*(*x)++);
+    if (!(patglobflags & GF_MULTIBYTE) || !((unsigned char) **x & 0x80))
+	return (wchar_t) (unsigned char) *(*x)++;
 
     ret = mbrtowc(&wc, *x, y-*x, &shiftstate);
 
@@ -2025,13 +2026,13 @@ charsub(char *x, char *y)
 #else /* no MULTIBYTE_SUPPORT */
 
 /* Get a character from the start point in a string */
-#define CHARREF(x, y)	(STOUC(*(x)))
+#define CHARREF(x, y)	((unsigned char) (*(x)))
 /* Get  a pointer to the next character */
 #define CHARNEXT(x, y)	((x)+1)
 /* Increment a pointer past the current character. */
 #define CHARINC(x, y)	((x)++)
 /* Get a character and increment */
-#define CHARREFINC(x, y, z)	(STOUC(*(x)++))
+#define CHARREFINC(x, y, z)	((unsigned char) (*(x)++))
 /* Counter the number of characters between two pointers, smaller first */
 #define CHARSUB(x,y)	((y) - (x))
 
@@ -2890,7 +2891,7 @@ patmatch(Upat prog)
 		}
 		if (!no && P_OP(next) == P_EXACTLY &&
 		    (!P_LS_LEN(next) ||
-		     !idigit(STOUC(*P_LS_STR(next)))) &&
+		     !idigit((unsigned char) (*P_LS_STR(next)))) &&
 		    !(patglobflags & 0xff))
 		    return 0;
 		patinput = --save;
@@ -3600,8 +3601,8 @@ mb_patmatchrange(char *range, wchar_t ch, int zmb_ind, wint_t *indptr, int *mtp)
      * ranges specially.
      */
     while (*range) {
-	if (imeta(STOUC(*range))) {
-	    int swtype = STOUC(*range++) - STOUC(Meta);
+	if (imeta((unsigned char) *range)) {
+	    int swtype = (unsigned char) *range++ - (unsigned char) Meta;
 	    if (mtp)
 		*mtp = swtype;
 	    switch (swtype) {
@@ -3753,8 +3754,8 @@ mb_patmatchindex(char *range, wint_t ind, wint_t *chr, int *mtp)
     *mtp = 0;
 
     while (*range) {
-	if (imeta(STOUC(*range))) {
-	    int swtype = STOUC(*range++) - STOUC(Meta);
+	if (imeta((unsigned char) *range)) {
+	    int swtype = (unsigned char) *range++ - (unsigned char) Meta;
 	    switch (swtype) {
 	    case 0:
 		range--;
@@ -3845,13 +3846,13 @@ patmatchrange(char *range, int ch, int *indptr, int *mtp)
      * ranges specially.
      */
     for (; *range; range++) {
-	if (imeta(STOUC(*range))) {
-	    int swtype = STOUC(*range) - STOUC(Meta);
+	if (imeta((unsigned char) *range)) {
+	    int swtype = (unsigned char) *range - (unsigned char) Meta;
 	    if (mtp)
 		*mtp = swtype;
 	    switch (swtype) {
 	    case 0:
-		if (STOUC(*++range ^ 32) == ch)
+		if ((unsigned char) (*++range ^ 32) == ch)
 		    return 1;
 		break;
 	    case PP_ALPHA:
@@ -3931,9 +3932,9 @@ patmatchrange(char *range, int ch, int *indptr, int *mtp)
 		break;
 	    case PP_RANGE:
 		range++;
-		r1 = STOUC(UNMETA(range));
+		r1 = (unsigned char) UNMETA(range);
 		METACHARINC(range);
-		r2 = STOUC(UNMETA(range));
+		r2 = (unsigned char) UNMETA(range);
 		if (*range == Meta)
 		    range++;
 		if (r1 <= ch && ch <= r2) {
@@ -3955,7 +3956,7 @@ patmatchrange(char *range, int ch, int *indptr, int *mtp)
 		DPUTS(1, "BUG: unknown metacharacter in range.");
 		break;
 	    }
-	} else if (STOUC(*range) == ch) {
+	} else if ((unsigned char) *range == ch) {
 	    if (mtp)
 		*mtp = 0;
 	    return 1;
@@ -3989,12 +3990,12 @@ patmatchindex(char *range, int ind, int *chr, int *mtp)
     *mtp = 0;
 
     for (; *range; range++) {
-	if (imeta(STOUC(*range))) {
-	    int swtype = STOUC(*range) - STOUC(Meta);
+	if (imeta((unsigned char) *range)) {
+	    int swtype = (unsigned char) *range - (unsigned char) Meta;
 	    switch (swtype) {
 	    case 0:
 		/* ordinary metafied character */
-		rchr = STOUC(*++range) ^ 32;
+		rchr = (unsigned char) *++range ^ 32;
 		if (!ind) {
 		    *chr = rchr;
 		    return 1;
@@ -4028,9 +4029,9 @@ patmatchindex(char *range, int ind, int *chr, int *mtp)
 
 	    case PP_RANGE:
 		range++;
-		r1 = STOUC(UNMETA(range));
+		r1 = (unsigned char) UNMETA(range);
 		METACHARINC(range);
-		r2 = STOUC(UNMETA(range));
+		r2 = (unsigned char) UNMETA(range);
 		if (*range == Meta)
 		    range++;
 		rdiff = r2 - r1; 
@@ -4050,7 +4051,7 @@ patmatchindex(char *range, int ind, int *chr, int *mtp)
 	    }
 	} else {
 	    if (!ind) {
-		*chr = STOUC(*range);
+		*chr = (unsigned char) *range;
 		return 1;
 	    }
 	}

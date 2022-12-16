@@ -518,7 +518,7 @@ parse_class(Cpattern p, char *iptr)
 	    ch = range_type((char *)iptr, nptr-iptr);
 	    iptr = nptr + 2;
 	    if (ch != PP_UNKWN)
-		*optr++ = STOUC(Meta) + ch;
+		*optr++ = (unsigned char) Meta + ch;
 	} else {
 	    /* characters stay metafied */
 	    char *ptr1 = iptr;

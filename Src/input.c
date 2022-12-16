@@ -220,7 +220,7 @@ shingetchar(void)
     int nread, rsize = isset(SHINSTDIN) ? 1 : SHINBUFSIZE;
 
     if (shinbufptr < shinbufendptr)
-	return STOUC(*shinbufptr++);
+	return (unsigned char) *shinbufptr++;
 
     shinbufreset();
 #ifdef USE_LSEEK
@@ -242,7 +242,7 @@ shingetchar(void)
 		zerr("lseek(%d, %d): %e", SHIN, -(nread - rsize), errno);
 	} else
 	    shinbufendptr = shinbuffer + nread;
-	return STOUC(*shinbufptr++);
+	return (unsigned char) *shinbufptr++;
     }
 #endif
     for (;;) {
@@ -259,7 +259,7 @@ shingetchar(void)
     }
     if (shinbufendptr == shinbuffer)
         return -1;
-    return STOUC(*shinbufptr++);
+    return (unsigned char) *shinbufptr++;
 }
 
 /* Read a line from SHIN.  Convert tokens and   *
@@ -328,7 +328,7 @@ ingetc(void)
 	if (inbufleft) {
 	    inbufleft--;
 	    inbufct--;
-	    if (itok(lastc = STOUC(*inbufptr++)))
+	    if (itok(lastc = (unsigned char) *inbufptr++))
 		continue;
 	    if (((inbufflags & INP_LINENO) || !strin) && lastc == '\n')
 		lineno++;

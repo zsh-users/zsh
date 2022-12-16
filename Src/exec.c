@@ -603,7 +603,7 @@ zexecve(char *pth, char **argv, char **newenvp)
                         isbinary = 1;
                         hasletter = 0;
                         for (ptr = execvebuf; ptr < ptr2; ptr++) {
-                            if (islower(STOUC(*ptr)) || *ptr == '$' || *ptr == '`')
+			    if (islower((unsigned char) *ptr) || *ptr == '$' || *ptr == '`')
                                 hasletter = 1;
                             if (hasletter && *ptr == '\n') {
                                 isbinary = 0;

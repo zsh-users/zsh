@@ -1,5 +1,17 @@
 2022-12-16  Oliver Kiddle  <opk@zsh.org>
 
+	* 51212: Etc/zsh-development-guide, Src/Modules/curses.c,
+	Src/Modules/stat.c, Src/Modules/zftp.c, Src/Modules/zpty.c,
+	Src/Modules/zutil.c, Src/Zle/compcore.c, Src/Zle/complete.c,
+	Src/Zle/complist.c, Src/Zle/zle.h, Src/Zle/zle_keymap.c,
+	Src/Zle/zle_main.c, Src/Zle/zle_thingy.c, Src/Zle/zle_utils.c,
+	Src/builtin.c, Src/exec.c, Src/glob.c, Src/hist.c, Src/init.c,
+	Src/input.c, Src/lex.c, Src/math.c, Src/module.c, Src/params.c,
+	Src/parse.c, Src/pattern.c, Src/prompt.c, Src/sort.c, Src/subst.c,
+	Src/utils.c, Src/zsh.h, Src/ztype.h, configure.ac: remove STOUC()
+	macro which served as a workaround for ancient compilers where
+	casts to unsigned char were broken
+
 	* 51215: Src/Zle/zle_keymap.c, Test/X03zlebindkey.ztst,
 	Test/X02zlevi.ztst: consume whole CSI sequences from the input
 	even where they aren't explicitly bound

@@ -556,7 +556,7 @@ multsub(char **s, int pf_flags, char ***a, int *isarr, char *sep,
 	for ( ; *x; x += l) {
 	    char c = (l = *x == Meta) ? x[1] ^ 32 : *x;
 	    l++;
-	    if (!iwsep(STOUC(c)))
+	    if (!iwsep((unsigned char) c))
 		break;
 	    *ms_flags |= MULTSUB_WS_AT_START;
 	}
@@ -573,7 +573,7 @@ multsub(char **s, int pf_flags, char ***a, int *isarr, char *sep,
 	    convchar_t c;
 	    if (*x == Dash)
 		*x = '-';
-	    if (itok(STOUC(*x))) {
+	    if (itok((unsigned char) *x)) {
 		/* token, can't be separator, must be single byte */
 		rawc = *x;
 		l = 1;
@@ -582,7 +582,7 @@ multsub(char **s, int pf_flags, char ***a, int *isarr, char *sep,
 		if (!inq && !inp && WC_ZISTYPE(c, ISEP)) {
 		    *x = '\0';
 		    for (x += l; *x; x += l) {
-			if (itok(STOUC(*x))) {
+			if (itok((unsigned char) *x)) {
 			    /* as above */
 			    rawc = *x;
 			    l = 1;

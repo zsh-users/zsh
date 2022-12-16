@@ -291,12 +291,12 @@ getcolval(char *s, int multi)
 	    case '?': *p = '\177'; break;
 	    default:
 		if (*s >= '0' && *s <= '7') {
-		    int i = STOUC(*s);
+		    int i = (unsigned char) *s;
 
 		    if (*++s >= '0' && *s <= '7') {
-			i = (i * 8) + STOUC(*s);
+			i = (i * 8) + (unsigned char) *s;
 			if (*++s >= '0' && *s <= '7')
-			    i = (i * 8) + STOUC(*s);
+			    i = (i * 8) + (unsigned char) *s;
 		    }
 		    *p = (char) i;
 		} else
@@ -305,7 +305,7 @@ getcolval(char *s, int multi)
 	} else if (*s == '^') {
 	    if ((s[1] >= '@' && s[1] <= '_') ||
 		(s[1] >= 'a' && s[1] <= 'z'))
-		*p = (char) (STOUC(*s) & ~0x60);
+		*p = (char) ((unsigned char) *s & ~0x60);
 	    else if (s[1] == '?')
 		*p = '\177';
 	    else {
@@ -794,7 +794,7 @@ clnicezputs(int do_colors, char *s, int ml)
 	 */
 	for (t = sptr; *t; t++) {
 	    /* Input is metafied... */
-	    int nc = (*t == Meta) ? STOUC(*++t ^ 32) : STOUC(*t);
+	    int nc = (*t == Meta) ? (unsigned char) (*++t ^ 32) : (unsigned char) *t;
 	    /* Is the screen full? */
 	    if (ml == mlend - 1 && col == zterm_columns - 1) {
 		mlprinted = ml - oml;
@@ -852,7 +852,7 @@ clnicezputs(int do_colors, char *s, int ml)
 	    cc = *s++ ^ 32;
 
 	for (t = nicechar(cc); *t; t++) {
-	    int nc = (*t == Meta) ? STOUC(*++t ^ 32) : STOUC(*t);
+	    int nc = (*t == Meta) ? (unsigned char) (*++t ^ 32) : (unsigned char) *t;
 	    if (ml == mlend - 1 && col == zterm_columns - 1) {
 		mlprinted = ml - oml;
 		return 0;

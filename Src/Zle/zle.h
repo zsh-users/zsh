@@ -526,7 +526,7 @@ typedef REFRESH_ELEMENT *REFRESH_STRING;
     ((int)((unsigned)(x) - ZSH_INVALID_WCHAR_BASE))
 /* Turn a single byte character into a private wide character */
 #define ZSH_CHAR_TO_INVALID_WCHAR(x)			\
-    ((wchar_t)(STOUC(x) + ZSH_INVALID_WCHAR_BASE))
+    ((wchar_t)((unsigned char) x + ZSH_INVALID_WCHAR_BASE))
 #endif
 
 

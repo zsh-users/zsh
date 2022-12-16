@@ -406,7 +406,7 @@ bin_stat(char *name, char **args, Options ops, UNUSED(int func))
 	} else {
 	    for (; *arg; arg++) {
 		if (strchr("glLnNorstT", *arg))
-		    ops->ind[STOUC(*arg)] = 1;
+		    ops->ind[(unsigned char) *arg] = 1;
 		else if (*arg == 'A') {
 		    if (arg[1]) {
 			arrnam = arg+1;

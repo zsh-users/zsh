@@ -955,7 +955,7 @@ getcvar(char *s)
 	    }
 	}
 #endif
-	mn.u.l = STOUC(*t == Meta ? t[1] ^ 32 : *t);
+	mn.u.l = (unsigned char) (*t == Meta ? t[1] ^ 32 : *t);
     }
     unqueue_signals();
     return mn;

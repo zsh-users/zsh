@@ -366,10 +366,10 @@ bin_zle(char *name, char **args, Options ops, UNUSED(int func))
     int n;
 
     /* select operation and ensure no clashing arguments */
-    for(op = opns; op->o && !OPT_ISSET(ops,STOUC(op->o)); op++) ;
+    for(op = opns; op->o && !OPT_ISSET(ops, (unsigned char) op->o); op++) ;
     if(op->o)
 	for(opp = op; (++opp)->o; )
-	    if(OPT_ISSET(ops,STOUC(opp->o))) {
+	    if(OPT_ISSET(ops, (unsigned char) opp->o)) {
 		zwarnnam(name, "incompatible operation selection options");
 		return 1;
 	    }

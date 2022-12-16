@@ -2898,9 +2898,9 @@ add_match_data(int alt, char *str, char *orig, Cline line,
 		*t++ = '$';
 		*t++ = '\'';
 		*t++ = '\\';
-		*t++ = '0' + ((STOUC(curchar) >> 6) & 7);
-		*t++ = '0' + ((STOUC(curchar) >> 3) & 7);
-		*t++ = '0' + (STOUC(curchar) & 7);
+		*t++ = '0' + (((unsigned char) curchar >> 6) & 7);
+		*t++ = '0' + (((unsigned char) curchar >> 3) & 7);
+		*t++ = '0' + ((unsigned char) curchar & 7);
 		*t++ = '\'';
 	    } while (cnt == MB_INCOMPLETE && fs < fe);
 	    /* Scanning restarts from the spot after the char we skipped. */
