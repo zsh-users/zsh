@@ -212,6 +212,20 @@
 >first
 >second
 
+  read -ed £
+0:read with multibyte delimiter where bytes of delimiter also occur in input
+<one¤twoãthree£four
+>one¤twoãthree
+
+  read -ed $'\xa0' <<<$'first\xa0second'
+0:read delimited by a byte that isn't a valid multibyte character
+>first
+
+  read -ed $'\xc2'
+0:read delimited by a single byte terminates if the byte is part of a multibyte character
+<one£two
+>one
+
   (IFS=«
   read -d » -A array
   print -l $array)

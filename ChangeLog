@@ -1,5 +1,9 @@
 2022-12-16  Oliver Kiddle  <opk@zsh.org>
 
+	* 51214: Doc/Zsh/builtins.yo, Src/builtin.c, Test/B04read.ztst,
+	Test/D07multibyte.ztst: with read -d and a delimiter that can't be
+	decoded into a character terminate input at the raw byte value
+
 	* Jun T.: 51207: Src/builtin.c, Test/B04read.ztst:
 	fix for read -d when the delimiter is a byte >= 0x80
 

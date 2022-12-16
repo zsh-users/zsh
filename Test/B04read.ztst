@@ -82,6 +82,10 @@
 >Testing the
 >null hypothesis
 
+ read -ed '' <<<$'one\0two'
+0:empty delimiter terminates at nulls
+>one
+
  print -n $'first line\x80second line\x80' |
  while read -d $'\x80' line; do print $line; done
 0:read with a delimiter >= 0x80

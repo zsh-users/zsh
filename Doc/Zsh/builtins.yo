@@ -1589,7 +1589,8 @@ Input is read from the coprocess.
 )
 item(tt(-d) var(delim))(
 Input is terminated by the first character of var(delim) instead of
-by newline.
+by newline.  For compatibility with other shells, if var(delim) is an
+empty string, input is terminated at the first NUL.
 )
 item(tt(-t) [ var(num) ])(
 Test if input is available before attempting to read.  If var(num)

@@ -6282,6 +6282,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
     long izle_timeout = 0;
 #ifdef MULTIBYTE_SUPPORT
     wchar_t delim = L'\n', wc;
+    int rawbyte = 0;
     mbstate_t mbs;
     char *laststart;
     size_t ret;
@@ -6412,9 +6413,11 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 	    wi = WEOF;
 	if (wi != WEOF)
 	    delim = (wchar_t)wi;
-	else
+	else {
 	    delim = (wchar_t) (unsigned char) ((delimstr[0] == Meta) ?
 			      delimstr[1] ^ 32 : delimstr[0]);
+	    rawbyte = 1;
+	}
 #else
         delim = (unsigned char) ((delimstr[0] == Meta) ?
 			delimstr[1] ^ 32 : delimstr[0]);
@@ -6842,7 +6845,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 		break;
 	    }
 	    *bptr = (char)c;
-	    if (isset(MULTIBYTE)) {
+	    if (isset(MULTIBYTE) && !rawbyte) {
 		ret = mbrtowc(&wc, bptr, 1, &mbs);
 		if (!ret)	/* NULL */
 		    ret = 1;
