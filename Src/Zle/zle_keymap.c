@@ -1586,7 +1586,7 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
     Thingy func = t_undefinedkey;
     char *str = NULL;
     int lastlen = 0, lastc = lastchar;
-    int timeout = 0;
+    int timeout = 0, csi = 0, startcsi;
 
     keybuflen = 0;
     keybuf[0] = 0;
@@ -1636,7 +1636,30 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
 	    }
 #endif
 	}
-	if (!ispfx)
+
+	/* CSI key sequences have a well defined structure so if we currently
+	 * have an incomplete one, loop so the rest of it will be included in
+	 * the key sequence if that arrives within the timeout. */
+	if (keybuflen >= 3 && !csi) {
+	    startcsi = keybuflen - 3;
+	    csi = keybuf[startcsi] == '\033' && keybuf[keybuflen - 2] == '[';
+	}
+	if (csi) {
+	    csi = keybuf[keybuflen - 2] != Meta && keybuf[keybuflen - 1] >= 0x20
+		&& keybuf[keybuflen - 1] <= 0x3f;
+	    /* If we reach the end of a valid CSI sequence and the matched key
+	     * binding is for part of the CSI introduction, select instead the
+	     * undefined-key widget and consume the full sequence from the
+	     * input buffer. */
+	    if (!csi && keybuf[keybuflen - 1] >= 0x40 &&
+		    keybuf[keybuflen - 1] <= 0x7e && lastlen > startcsi &&
+		    lastlen <= startcsi + 2) {
+		func = t_undefinedkey;
+		lastlen = keybuflen;
+	    }
+	}
+
+	if (!ispfx && !csi)
 	    break;
     }
     if(!lastlen && keybuflen)

@@ -596,6 +596,13 @@
 >BUFFER: 1ls `2`  $(3) "4" $'5' ${6}
 >CURSOR: 0
 
+  zpty_run 'bindkey -s -a "cw" "dwi"'
+  zletest $'one two\e0cwyksi'
+  zpty_run 'bindkey -r -a "cw"'
+0:for a vi command, wait to allow a longer binding to be used
+>BUFFER: yksitwo
+>CURSOR: 4
+
 %clean
 
   zmodload -ui zsh/zpty

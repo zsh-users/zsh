@@ -37,6 +37,28 @@
 >"^Xy" "bar"
 >"^Xy" undefined-key
 
+  zpty_run 'bindkey -s "\e[" altbracket'
+  zletest $'$\C-A\e[17~'
+  zpty_run 'bindkey -r "\e["'
+0:binding to CSI introduction is not used if a full sequence arrives
+>BUFFER: $
+>CURSOR: 0
+
+  zpty_run 'bindkey -s "\e[1" altbracketone'
+  zletest $'$\C-A\e[17~'
+  zpty_run 'bindkey -r "\e[1"'
+0:binding to longer prefix of a CSI sequence is used
+# we assume the user knows what they're doing
+>BUFFER: altbracketone7~$
+>CURSOR: 15
+
+  zpty_run 'bindkey -s "\e[" altbracket'
+  zletest $'$\C-A\e[177'
+  zpty_run 'bindkey -r "\e["'
+0:use prefix binding where we don't have a CSI sequence
+>BUFFER: altbracket177$
+>CURSOR: 13
+
 # As we're only looking at definitions here, we don't
 # bother using the pseudo-terminal; just test in the normal fashion.
   bindkey -e
