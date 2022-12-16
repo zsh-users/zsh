@@ -18,6 +18,10 @@
 
 2022-12-12  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 51134: Src/exec.c, Test/A01grammar.ztst: ! return doesn't
+	affect return status, only the (now irrelevant) local status
+	within the returning function.
+
 	* 51134: Doc/Zsh/options.yo: document interactions between
 	ERR_EXIT and ERR_RETURN and interactive shells.
 
