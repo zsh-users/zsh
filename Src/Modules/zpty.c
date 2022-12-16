@@ -638,7 +638,7 @@ ptyread(char *nam, Ptycmd cmd, char **args, int noblock, int mustmatch)
 		readchar = cmd->read;
 		cmd->read = -1;
 	    } else
-		readchar = STOUC(buf[used]);
+		readchar = (unsigned char) buf[used];
 	    if (imeta(readchar)) {
 		buf[used++] = Meta;
 		buf[used++] = (char) (readchar ^ 32);

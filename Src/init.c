@@ -500,10 +500,10 @@ parseopts(char *nam, char ***argvp, char *new_opts, char **cmdp,
 		    }
 		}
               break;
-	    } else if (isspace(STOUC(**argv))) {
+	    } else if (isspace((unsigned char) **argv)) {
 		/* zsh's typtab not yet set, have to use ctype */
 		while (*++*argv)
-		    if (!isspace(STOUC(**argv))) {
+		    if (!isspace((unsigned char) **argv)) {
 		     badoptionstring:
 			WARN_OPTION("bad option string: '%s'", args);
 			return 1;
@@ -1724,9 +1724,9 @@ zsh_main(UNUSED(int argc), char **argv)
      * interactive
      */
     typtab['\0'] |= IMETA;
-    typtab[STOUC(Meta)  ] |= IMETA;
-    typtab[STOUC(Marker)] |= IMETA;
-    for (t0 = (int)STOUC(Pound); t0 <= (int)STOUC(Nularg); t0++)
+    typtab[(unsigned char) Meta  ] |= IMETA;
+    typtab[(unsigned char) Marker] |= IMETA;
+    for (t0 = (int) (unsigned char) Pound; t0 <= (int) (unsigned char) Nularg; t0++)
 	typtab[t0] |= ITOK | IMETA;
 
     for (t = argv; *t; *t = metafy(*t, -1, META_ALLOC), t++);

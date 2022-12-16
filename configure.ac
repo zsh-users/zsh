@@ -582,16 +582,6 @@ if test x$zsh_cv_c_have_union_init = xyes; then
   AC_DEFINE(HAVE_UNION_INIT)
 fi
 
-dnl  Checking if compiler correctly cast signed to unsigned.
-AC_CACHE_CHECK(if signed to unsigned casting is broken,
-zsh_cv_c_broken_signed_to_unsigned_casting,
-[AC_RUN_IFELSE([AC_LANG_SOURCE([[int main(){return((int)(unsigned char)((char) -1) == 255);}]])],[zsh_cv_c_broken_signed_to_unsigned_casting=yes],[zsh_cv_c_broken_signed_to_unsigned_casting=no],[zsh_cv_c_broken_signed_to_unsigned_casting=no])])
-AH_TEMPLATE([BROKEN_SIGNED_TO_UNSIGNED_CASTING],
-[Define to 1 if compiler incorrectly cast signed to unsigned.])
-if test x$zsh_cv_c_broken_signed_to_unsigned_casting = xyes; then
-  AC_DEFINE(BROKEN_SIGNED_TO_UNSIGNED_CASTING)
-fi
-
 dnl Checking if the compiler supports variable-length arrays
 AC_CACHE_CHECK(if the compiler supports variable-length arrays,
 zsh_cv_c_variable_length_arrays,

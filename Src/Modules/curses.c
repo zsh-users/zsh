@@ -1426,10 +1426,10 @@ zccmd_querychar(const char *nam, char **args)
     inc &= A_CHARTEXT;
     if (imeta(inc)) {
 	instr[0] = Meta;
-	instr[1] = STOUC(inc ^ 32);
+	instr[1] = (unsigned char) (inc ^ 32);
 	instr[2] = '\0';
     } else {
-	instr[0] = STOUC(inc);
+  	instr[0] = (unsigned char) inc;
 	instr[1] = '\0';
     }
     attrs = inc;

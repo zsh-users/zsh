@@ -138,7 +138,7 @@ eltpcmp(const void *a, const void *b)
 	int mul = 0;
 	for (; *as == *bs && *as; as++, bs++);
 #ifndef HAVE_STRCOLL
-	cmp = (int)STOUC(*as) - (int)STOUC(*bs);
+	cmp = (int) (unsigned char) *as - (int) (unsigned char) *bs;
 #endif
 	if (sortnumeric < 0) {
 	    if (*as == '-' && idigit(as[1]) && idigit(*bs)) {
@@ -159,7 +159,7 @@ eltpcmp(const void *a, const void *b)
 		    bs++;
 		for (; idigit(*as) && *as == *bs; as++, bs++);
 		if (idigit(*as) || idigit(*bs)) {
-		    cmp = mul * ((int)STOUC(*as) - (int)STOUC(*bs));
+		    cmp = mul * ((int) (unsigned char) *as - (int) (unsigned char) *bs);
 		    while (idigit(*as) && idigit(*bs))
 			as++, bs++;
 		    if (idigit(*as) && !idigit(*bs))

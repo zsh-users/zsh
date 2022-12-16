@@ -223,9 +223,6 @@ C coding style
 * Do not use space between the function name and the opening parenthesis.
   Use space after if/for/while.  Use space after type casts.
 
-* Do not use (unsigned char) casts since some compilers do not handle
-  them properly.  Use the provided STOUC(X) macro instead.
-
 * If you use emacs 19.30 or newer you can put the following line to your
   ~/.emacs file to make these formatting rules the default:
 

@@ -404,7 +404,7 @@ static void
 scankeys(HashNode hn, UNUSED(int flags))
 {
     Key k = (Key) hn;
-    int f = k->nam[0] == Meta ? STOUC(k->nam[1])^32 : STOUC(k->nam[0]);
+    int f = k->nam[0] == Meta ? (unsigned char) k->nam[1]^32 : (unsigned char) k->nam[0];
     char m[3];
 
     while(skm_last < f) {
@@ -566,7 +566,7 @@ mod_export int
 bindkey(Keymap km, const char *seq, Thingy bind, char *str)
 {
     Key k;
-    int f = seq[0] == Meta ? STOUC(seq[1])^32 : STOUC(seq[0]);
+    int f = seq[0] == Meta ? (unsigned char) seq[1]^32 : (unsigned char) seq[0];
     char *buf, *ptr;
 
     if(km->flags & KM_IMMUTABLE)
@@ -661,7 +661,7 @@ keybind(Keymap km, char *seq, char **strp)
     Key k;
 
     if(ztrlen(seq) == 1) {
-	int f = seq[0] == Meta ? STOUC(seq[1])^32 : STOUC(seq[0]);
+	int f = seq[0] == Meta ? (unsigned char) seq[1]^32 : (unsigned char) seq[0];
 	Thingy bind = km->first[f];
 
 	if(bind)
@@ -687,7 +687,7 @@ keyisprefix(Keymap km, char *seq)
     if(!*seq)
 	return 1;
     if(ztrlen(seq) == 1) {
-	int f = seq[0] == Meta ? STOUC(seq[1])^32 : STOUC(seq[0]);
+	int f = seq[0] == Meta ? (unsigned char) seq[1]^32 : (unsigned char) seq[0];
 
 	if(km->first[f])
 	    return 0;
@@ -764,10 +764,10 @@ bin_bindkey(char *name, char **argv, Options ops, UNUSED(int func))
     int n;
 
     /* select operation and ensure no clashing arguments */
-    for(op = opns; op->o && !OPT_ISSET(ops,STOUC(op->o)); op++) ;
+    for(op = opns; op->o && !OPT_ISSET(ops,(unsigned char) op->o); op++) ;
     if(op->o)
 	for(opp = op; (++opp)->o; )
-	    if(OPT_ISSET(ops,STOUC(opp->o))) {
+	    if(OPT_ISSET(ops,(unsigned char) opp->o)) {
 		zwarnnam(name, "incompatible operation selection options");
 		return 1;
 	    }
@@ -1049,7 +1049,7 @@ bin_bindkey_bind(char *name, char *kmname, Keymap km, char **argv, Options ops, 
 	    char m[3];
 
 	    if(len < 2 || len > 2 + (bseq[1] == '-') ||
-	       (first = STOUC(bseq[0])) > (last = STOUC(bseq[len - 1]))) {
+	       (first = (unsigned char) bseq[0]) > (last = (unsigned char) bseq[len - 1])) {
 		zwarnnam(name, "malformed key range `%s'", useq);
 		ret = 1;
 	    } else {
@@ -1149,8 +1149,8 @@ scanbindlist(char *seq, Thingy bind, char *str, void *magic)
     if(bind == bs->bind && (bind || !strcmp(str, bs->str)) &&
        ztrlen(seq) == 1 && ztrlen(bs->lastseq) == 1) {
 	int l = bs->lastseq[1] ?
-	    STOUC(bs->lastseq[1]) ^ 32 : STOUC(bs->lastseq[0]);
-	int t = seq[1] ? STOUC(seq[1]) ^ 32 : STOUC(seq[0]);
+	    (unsigned char) bs->lastseq[1] ^ 32 : (unsigned char) bs->lastseq[0];
+	int t = seq[1] ? (unsigned char) seq[1] ^ 32 : (unsigned char) seq[0];
 
 	if(t == l + 1) {
 	    zsfree(bs->lastseq);
@@ -1526,10 +1526,10 @@ getrestchar_keybuf(void)
      */
     while (1) {
 	if (bufind < buflen) {
-	    c = STOUC(keybuf[bufind++]);
+	    c = (unsigned char) keybuf[bufind++];
 	    if (c == Meta) {
 		DPUTS(bufind == buflen, "Meta at end of keybuf");
-		c = STOUC(keybuf[bufind++]) ^ 32;
+		c = (unsigned char) keybuf[bufind++] ^ 32;
 	    }
 	} else {
 	    /*

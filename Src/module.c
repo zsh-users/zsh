@@ -2474,7 +2474,7 @@ bin_zmodload(char *nam, char **args, Options ops, UNUSED(int func))
 	return 1;
     }
     for (fp = fonly; *fp; fp++) {
-	if (OPT_ISSET(ops,STOUC(*fp)) && !OPT_ISSET(ops,'F')) {
+	if (OPT_ISSET(ops,(unsigned char) *fp) && !OPT_ISSET(ops,'F')) {
 	    zwarnnam(nam, "-%c is only allowed with -F", *fp);
 	    return 1;
 	}

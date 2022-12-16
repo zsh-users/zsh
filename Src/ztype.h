@@ -43,7 +43,7 @@
 #define IWSEP    (1 << 13)
 #define INULL    (1 << 14)
 #define IPATTERN (1 << 15)
-#define zistype(X,Y) (typtab[STOUC(X)] & Y)
+#define zistype(X,Y) (typtab[(unsigned char) (X)] & Y)
 #define idigit(X) zistype(X,IDIGIT)
 #define ialnum(X) zistype(X,IALNUM)
 #define iblank(X) zistype(X,IBLANK)	/* blank, not including \n */

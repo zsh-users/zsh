@@ -795,11 +795,11 @@ static char *zformat_substring(char* instr, char **specs, char **outp,
 
 	    if (idigit(*s)) {
 		for (min = 0; idigit(*s); s++)
-		    min = (min * 10) + (int) STOUC(*s) - '0';
+		    min = (min * 10) + (int) (unsigned char) *s - '0';
 	    }
 
 	    /* Ternary expressions */
-	    testit = (STOUC(*s) == '(');
+	    testit = ((unsigned char) *s == '(');
 	    if (testit && s[1] == '-')
 	    {
 		/* Allow %(-1... etc. */
@@ -808,25 +808,25 @@ static char *zformat_substring(char* instr, char **specs, char **outp,
 	    }
 	    if ((*s == '.' || testit) && idigit(s[1])) {
 		for (max = 0, s++; idigit(*s); s++)
-		    max = (max * 10) + (int) STOUC(*s) - '0';
+		    max = (max * 10) + (int) (unsigned char) *s - '0';
 	    } else if (*s == '.' || testit)
 		s++;
 
-	    if (testit && STOUC(*s)) {
+	    if (testit && (unsigned char) *s) {
 		int actval, testval, endcharl;
 
 		/* Only one number is useful for ternary expressions. */
 		testval = (min >= 0) ? min : (max >= 0) ? max : 0;
 
-		if (specs[STOUC(*s)] && *specs[STOUC(*s)]) {
+		if (specs[(unsigned char) *s] && *specs[(unsigned char) *s]) {
 		    if (presence) {
 			if (testval)
 #ifdef MULTIBYTE_SUPPORT
 			    if (isset(MULTIBYTE))
-				actval = MB_METASTRWIDTH(specs[STOUC(*s)]);
+				actval = MB_METASTRWIDTH(specs[(unsigned char) *s]);
 			    else
 #endif
-				actval = strlen(specs[STOUC(*s)]);
+				actval = strlen(specs[(unsigned char) *s]);
 		        else
 			    actval = 1;
 			actval = right ? (testval < actval) : (testval >= actval);
@@ -834,7 +834,7 @@ static char *zformat_substring(char* instr, char **specs, char **outp,
 			if (right) /* put the sign back */
 			    testval *= -1;
 			/* zero means values are equal, i.e. true */
-			actval = (int)mathevali(specs[STOUC(*s)]) - testval;
+			actval = (int) mathevali(specs[(unsigned char) *s]) - testval;
 		    }
 		} else
 		    actval = presence ? !right : testval;
@@ -855,7 +855,7 @@ static char *zformat_substring(char* instr, char **specs, char **outp,
 		    return NULL;
 	    } else if (skip) {
 		continue;
-	    } else if ((spec = specs[STOUC(*s)])) {
+	    } else if ((spec = specs[(unsigned char) *s])) {
 		int len;
 
 		if ((len = strlen(spec)) > max && max >= 0)
@@ -950,7 +950,7 @@ bin_zformat(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		    zwarnnam(nam, "invalid argument: %s", *ap);
 		    return 1;
 		}
-		specs[STOUC(ap[0][0])] = ap[0] + 2;
+		specs[(unsigned char) ap[0][0]] = ap[0] + 2;
 	    }
 	    out = (char *) zhalloc(olen = 128);
 
@@ -1864,7 +1864,7 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	d->vals = d->last = NULL;
 	opt_descs = d;
 	if (!o[1])
-	    sopts[STOUC(*o)] = d;
+	    sopts[(unsigned char) *o] = d;
 	if ((flags & ZOF_MAP) && !map_opt_desc(d)) {
 	    zwarnnam(nam, "cyclic option mapping: %s", args[-1]);
 	    return 1;
@@ -1888,7 +1888,7 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	}
 	if (!(d = lookup_opt(o + 1))) {
 	    while (*++o) {
-		if (!(d = sopts[STOUC(*o)])) {
+		if (!(d = sopts[(unsigned char) *o])) {
 		    if (fail) {
 			if (*o != '-')
 			    zwarnnam(nam, "bad option: -%c", *o);

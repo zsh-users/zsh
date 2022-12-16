@@ -876,7 +876,7 @@ getbyte(long do_keytmout, int *timeout, int full)
 #endif
 
     if (kungetct)
-	ret = STOUC(kungetbuf[--kungetct]);
+	ret = (unsigned char) kungetbuf[--kungetct];
     else {
 	for (;;) {
 	    int q = queue_signal_level();
@@ -940,7 +940,7 @@ getbyte(long do_keytmout, int *timeout, int full)
 	else if (cc == '\n')
 	    cc = '\r';
 
-	ret = STOUC(cc);
+	ret = (unsigned char) cc;
     }
     /*
      * curvichg.buf is raw bytes, not wide characters, so is dealt

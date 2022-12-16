@@ -433,9 +433,9 @@ ecstrcode(char *s)
 	t = has_token(s);
 	wordcode c = (t ? 3 : 2);
 	switch (l) {
-	case 4: c |= ((wordcode) STOUC(s[2])) << 19;
-	case 3: c |= ((wordcode) STOUC(s[1])) << 11;
-	case 2: c |= ((wordcode) STOUC(s[0])) <<  3; break;
+	case 4: c |= ((wordcode) (unsigned char) s[2]) << 19;
+	case 3: c |= ((wordcode) (unsigned char) s[1]) << 11;
+	case 2: c |= ((wordcode) (unsigned char) s[0]) <<  3; break;
 	case 1: c = (t ? 7 : 6); break;
 	}
 	return c;

@@ -2235,7 +2235,7 @@ casemodify(char *str, int how)
 		char *mbptr;
 
 		for (mbptr = mbstr; mbptr < mbstr + len2; mbptr++) {
-		    if (imeta(STOUC(*mbptr))) {
+		    if (imeta((unsigned char) *mbptr)) {
 			*ptr2++ = Meta;
 			*ptr2++ = *mbptr ^ 32;
 		    } else
@@ -2254,10 +2254,10 @@ casemodify(char *str, int how)
 	    int c;
 	    int mod = 0;
 	    if (*str == Meta) {
-		c = STOUC(str[1] ^ 32);
+		c = (unsigned char) (str[1] ^ 32);
 		str += 2;
 	    } else
-		c = STOUC(*str++);
+		c = (unsigned char) *str++;
 	    switch (how) {
 	    case CASMOD_LOWER:
 		if (isupper(c)) {

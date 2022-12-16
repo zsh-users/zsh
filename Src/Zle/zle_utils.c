@@ -1235,7 +1235,7 @@ bindztrdup(char *str)
     char *buf, *ptr, *ret;
 
     for(ptr = str; *ptr; ptr++) {
-	c = *ptr == Meta ? STOUC(*++ptr) ^ 32 : STOUC(*ptr);
+	c = *ptr == Meta ? (unsigned char) *++ptr ^ 32 : (unsigned char) *ptr;
 	if(c & 0x80) {
 	    len += 3;
 	    c &= 0x7f;
@@ -1249,7 +1249,7 @@ bindztrdup(char *str)
     }
     ptr = buf = zalloc(len);
     for(; *str; str++) {
-	c = *str == Meta ? STOUC(*++str) ^ 32 : STOUC(*str);
+	c = *str == Meta ? (unsigned char) *++str ^ 32 : (unsigned char) *str;
 	if(c & 0x80) {
 	    *ptr++ = '\\';
 	    *ptr++ = 'M';

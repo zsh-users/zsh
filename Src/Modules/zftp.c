@@ -944,9 +944,9 @@ zfopendata(char *name, union tcp_sockaddr *zdsockp, int *is_passivep)
 		return 1;
 	    }
 	    for (i = 0; i < 4; i++)
-		iaddr[i] = STOUC(nums[i]);
-	    iport[0] = STOUC(nums[4]);
-	    iport[1] = STOUC(nums[5]);
+		iaddr[i] = (unsigned char) nums[i];
+	    iport[0] = (unsigned char) nums[4];
+	    iport[1] = (unsigned char) nums[5];
 
 	    memcpy(&zdsockp->in.sin_addr, iaddr, sizeof(iaddr));
 	    memcpy(&zdsockp->in.sin_port, iport, sizeof(iport));
@@ -2438,7 +2438,7 @@ zftp_type(char *name, char **args, int flags)
 	fflush(stdout);
 	return 0;
     } else {
-	nt = toupper(STOUC(*str));
+	nt = toupper((unsigned char) *str);
 	/*
 	 * RFC959 specifies other types, but these are the only
 	 * ones we know what to do with.
@@ -2472,7 +2472,7 @@ zftp_mode(char *name, char **args, UNUSED(int flags))
 	fflush(stdout);
 	return 0;
     }
-    nt = str[0] = toupper(STOUC(*str));
+    nt = str[0] = toupper((unsigned char) *str);
     if (str[1] || (nt != 'S' && nt != 'B')) {
 	zwarnnam(name, "transfer mode %s not recognised", str);
 	return 1;
@@ -3075,7 +3075,7 @@ bin_zftp(char *name, char **args, UNUSED(Options ops), UNUSED(int func))
     if ((prefs = getsparam_u("ZFTP_PREFS"))) {
 	zfprefs = 0;
 	for (ptr = prefs; *ptr; ptr++) {
-	    switch (toupper(STOUC(*ptr))) {
+	    switch (toupper((unsigned char) *ptr)) {
 	    case 'S':
 		/* sendport */
 		zfprefs |= ZFPF_SNDP;

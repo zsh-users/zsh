@@ -135,19 +135,6 @@ struct mathfunc {
 #define STRMATHFUNC(name, func, id) \
     { NULL, name, MFF_STR, NULL, func, NULL, 0, 0, id }
 
-/* Character tokens are sometimes casted to (unsigned char)'s.         * 
- * Unfortunately, some compilers don't correctly cast signed to        * 
- * unsigned promotions; i.e. (int)(unsigned char)((char) -1) evaluates * 
- * to -1, instead of 255 like it should.  We circumvent the troubles   * 
- * of such shameful delinquency by casting to a larger unsigned type   * 
- * then back down to unsigned char.                                    */
-
-#ifdef BROKEN_SIGNED_TO_UNSIGNED_CASTING
-# define STOUC(X)	((unsigned char)(unsigned short)(X))
-#else
-# define STOUC(X)	((unsigned char)(X))
-#endif
-
 /* Meta together with the character following Meta denotes the character *
  * which is the exclusive or of 32 and the character following Meta.     *
  * This is used to represent characters which otherwise has special      *
