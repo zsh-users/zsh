@@ -1318,11 +1318,13 @@ fi
 
 local -a sanitizers
 sanitizers=(
-  address alignment bool bounds enum float-cast-overflow float-divide-by-zero
-  integer-divide-by-zero memory nonnull-attribute null nullability-arg
-  nullability-assign nullability-return object-size pointer-overflow return
-  unsigned-integer-overflow returns-nonnull-attribute shift signed-integer-overflow
-  unreachable vla-bound vptr
+  address alignment bool bounds bounds-strict enum builtin float-cast-overflow
+  float-divide-by-zero hwaddress integer-divide-by-zero kernel-address
+  kernel-hwaddress leak memory nonnull-attribute null nullability-arg nullability-assign
+  nullability-return object-size pointer-compare pointer-overflow pointer-subtract return
+  returns-nonnull-attribute shadow-call-stack shift shift-base shift-exponent
+  signed-integer-overflow thread undefined unsigned-integer-overflow unreachable
+  vla-bound vptr
 )
 
 local -a languages
