@@ -39,7 +39,7 @@ allargs=(
   tf '(-t +t -T +T)-+t[turn on execution tracing for functions]'
   tp '(-T -n +n)-+t[tag parameters]'
   u '-u[convert the value to uppercase or mark function for autoloading]'
-  uf '-u[mark function for autoloadling]'
+  uf '-u[mark function for autoloading]'
   up '(-u +u)-+u[convert the value to uppercase]'
   w '(-k -z)-w[specify that arguments refer to files compiled with zcompile]'
   W '-+W[turn on WARN_NESTED_VAR for function]'
