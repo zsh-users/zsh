@@ -158,7 +158,7 @@ elif [[ ( "$_tar_cmd" = *[xt]* || -n $del ) && -n "$tf" ]]; then
   fi
 
   if [[ $tf != $_tar_cache_name && -f $tf ]]; then
-    _tar_cache_list=("${(@f)$($words[1] $largs $tf)}")
+    _tar_cache_list=("${(@f)$($words[1] ${words[(r)--force-local]} $largs $tf)}")
     _tar_cache_name=$tf
   fi
 
