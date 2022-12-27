@@ -890,6 +890,7 @@ _git-fetch () {
     '(--all -m --multiple)'{-m,--multiple}'[fetch from multiple remotes]' \
     '(-n --no-tags -t --tags)'{-n,--no-tags}'[disable automatic tag following]' \
     '--prefetch[modify the refspec to place all refs within refs/prefetch/]' \
+    '--refetch[fetch all objects as a fresh clone would]' \
     '(-P --prune-tags)'{-P,--prune-tags}'[prune local tags no longer on remote and clobber changed tags]' \
     '--write-fetch-head[write fetched references to the FETCH_HEAD file]' \
     "--negotiate-only[don't fetch a packfile; instead, print ancestors of negotiation tips]" \
