@@ -69,16 +69,28 @@ irb=(
   $opts[(r)*-d\[*]
   '(--noinspect)--inspect[use inspect for output]'
   "(--inspect)--noinspect[don't use inspect for output]"
-  '(--noreadline)--readline[use readline extension]'
-  "(--readline)--noreadline[don't use readline extension]"
   '(--prompt --prompt-mode --inf-ruby-mode --simple-prompt --noprompt)'{--prompt,--prompt-mode}'[switch prompt mode]:prompt mode:(default simple xmp inf-ruby)'
   '(--prompt --prompt-mode --inf-ruby-mode --simple-prompt --noprompt)'{--inf-ruby-mode,--simple-prompt,--noprompt}
   '--tracer[display trace for each command execution]'
   '--back-trace-limit[set limit for backtraces]:limit [16]:'
   '!--irb_debug:level'
   '--context-mode:n'
+  '--extra-doc-dir[add an extra doc dir for the doc dialog]'
   '(--noecho)--echo[show result]'
   "(--echo)--noecho[don't show result]"
+  '(--noecho-on-assignment)--echo-on-assignment[show result on assignment]'
+  "(--echo-on-assignment)--noecho-on-assignment[don't show result on assignment]"
+  '--truncate-echo-on-assignment[show truncated result on assignment]'
+  '(--nomultiline)--multiline[use multiline editor module]'
+  "(--multiline)--nomultiline[don't use multiline editor module]"
+  '(--nosingleline)--singleline[use single line editor module]'
+  "(--singleline)--nosingleline[don't use single line editor module]"
+  '(--nocolorize)--colorize[use color-highlighting]'
+  "(--colorize)--nocolorize[don't use color-highlighting]"
+  '(--noautocomplete)--autocomplete[use auto-completion]'
+  "(--autocomplete)--noautocomplete[don't use auto-completion]"
+  '(--noscript)--script[script mode]'
+  '(--script)--noscript[no script mode]'
   '--single-irb[share self with sub-irb]'
   '(--noverbose)--verbose[show details]'
   "(--verbose)--noverbose[don't show details]"
