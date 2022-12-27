@@ -1,5 +1,8 @@
 2022-12-31  Oliver Kiddle  <opk@zsh.org>
 
+	* Shohei YOSHIDA: 51253: Completion/Unix/Command/_ruby:
+	Update ruby completion for version 3.2.0
+
 	* Shohei YOSHIDA: 51233: Completion/Unix/Command/_gcc:
 	Update sanitizer list to GCC 12
 
