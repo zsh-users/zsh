@@ -100,8 +100,9 @@ erb=(
   "-P[don't evaluate lines which start with %]"
   '-T[specify trim mode]:mode [0]:((0\:EOL\ remains 1\:EOL\ removed\ if\ line\ ends\ with\ %\> 2\:EOL\ removed\ if\ line\ starts\ with\ \<%\ and\ ends\ with\ %\> -\:EOL\ is\ removed\ if\ line\ ends\ with\ -%\>,\ leading\ whitespace\ removed\ after\ \<%-))'
   '(-d --debug)'{-d,--debug}'[set debugging flags (set $DEBUG to true)]'
-  '-n[used with -x, prepends line number to output]'
-  '-x[convert eRuby to Ruby]'
+  '-n[print ruby script with line number]'
+  '-x[print ruby script]'
+  '-v[enable verbose mode]'
 )
 
 case "$service" in
