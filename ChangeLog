@@ -1,5 +1,8 @@
 2023-01-11  Oliver Kiddle  <opk@zsh.org>
 
+	* Jörg Sommer: 51256: Completion/Unix/Command/_git:
+	Add --refetch to completions of git-fetch
+
 	* unposted: NEWS, Src/zsh.h, Completion/Zsh/Type/_ps1234: mention
 	attributes changes, fix renumbering mistake and allow completion
 	to offer prompt escapes for PROMPT_EOL_MARK
