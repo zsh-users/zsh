@@ -14,7 +14,7 @@ cindex(zshenv)
 Commands are first read from tt(zshenv()); this cannot be overridden.
 Subsequent behaviour is modified by the tt(RCS) and
 tt(GLOBAL_RCS) options; the former affects all startup files, while the
-second only affects global startup files (those shown here with an
+second only affects global startup files (those shown here with a
 path starting with a tt(/)).  If one of the options
 is unset at any point, any subsequent startup file+LPAR()s+RPAR()
 of the corresponding
