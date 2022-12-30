@@ -1,5 +1,7 @@
 2022-12-31  Oliver Kiddle  <opk@zsh.org>
 
+	* Max Coplan: 51263: Doc/Zsh/files.yo: fix typo, an -> a
+
 	* Shohei YOSHIDA: 51255: Completion/Unix/Command/_ruby:
 	Update erb completion for version 4.0.2
 
