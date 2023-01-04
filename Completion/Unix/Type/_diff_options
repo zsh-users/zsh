@@ -133,33 +133,44 @@ else
   case $OSTYPE in
     openbsd*|solaris2.<9->)
       of+=' -u -U'
+    ;|
+    openbsd*|solaris*)
+      of+=' -n -C -D'
+    ;|
+    solaris*)
+      of+=' -h'
+    ;|
+    openbsd*)
+      of+=' -q'
+    ;|
+    # modifications to "$of" should be done above this line so that it is
+    # uniformly defined while constructing $args
+    openbsd*|solaris2.<9->)
       args+=(
-	"($of)-u[output a unified diff]"
-	"($of)-U+[output a unified diff]:lines of context"
+        "($of)-u[output a unified diff]"
+        "($of)-U+[output a unified diff]:lines of context"
       )
     ;|
     openbsd*|solaris*)
       args+=(
-	"($of)-C+[output a context diff]:lines of context"
-	"($of)-D+[output merged file with preprocessor directives]:preprocessor symbol"
-	'-i[case insensitive]'
-	'-l[long output format (paginate with pr(1))]'
-	'-s[report on identical files]'
-	'-t[expand tabs in output lines]'
+        "($of)-C+[output a context diff]:lines of context"
+        "($of)-D+[output merged file with preprocessor directives]:preprocessor symbol"
+        '-i[case insensitive]'
+        '-s[report on identical files]'
+        '-t[expand tabs in output lines]'
       )
     ;|
     solaris*)
-      of+=' -h -n'
       args+=(
-	'-w[ignore all white space]'
-	"($of)-h[do a fast, half-hearted job]"
-	"($of)-n[output a reversed ed script]"
+        '-w[ignore all white space]'
+        "($of)-h[do a fast, half-hearted job]"
+        "($of)-n[output a reversed ed script]"
         '-S+[set first file in comparison]:start with file:_files'
+        '-l[long output format (paginate with pr(1))]'
       )
     ;;
     openbsd*)
-      of+=' -n -q -u -C -D -U'
-      args=(
+      args+=(
         "($of)-n[output an rcsdiff(1)-compatible diff]"
         "($of)-q[only print a line when the files differ; does not produce a list of changes]"
         '-a[treat all files as ASCII text]'
@@ -173,7 +184,7 @@ else
         '-P[treat absent files in the second directory as if they were empty]'
         '-S[start a directory diff from a file name]:file name:_files'
         '*-X[exclude files and subdirectories whose basenames match lines in a file]:file name:_files'
-        '-x[exclude files and subdirectories whose basenames match a pattern]:pattern'
+        '*-x[exclude files and subdirectories whose basenames match a pattern]:pattern'
       )
     ;;
   esac
