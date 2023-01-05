@@ -604,7 +604,6 @@ _tla_main () {
         #excludes matching short options too :-)
       end
 
-
       # generate arguments to _arguments ;-)
       # make long and short options mutually exclusive
       [ $short[i] ] && arguments=("$arguments[@]"

@@ -52,4 +52,3 @@ _arguments \
   '-loadvm[start right away with a saved state]:file:_files' \
   '-g[set initial graphic mode]:graphic mode:' \
   ':disk image:_files'
-

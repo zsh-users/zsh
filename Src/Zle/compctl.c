@@ -3995,7 +3995,6 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	haspattern = ohp;
 }
 
-
 static struct builtin bintab[] = {
     BUILTIN("compcall", 0, bin_compcall, 0, 0, 0, "TD", NULL),
     BUILTIN("compctl", 0, bin_compctl, 0, -1, 0, NULL, NULL),

@@ -30,7 +30,6 @@
 #include "complist.mdh"
 #include "complist.pro"
 
-
 /* Information about the list shown. */
 
 /*
@@ -147,11 +146,9 @@ static int curiscol;
 
 static char *last_cap;
 
-
 /* We use the parameters ZLS_COLORS and ZLS_COLOURS in the same way as
  * the color ls does. It's just that we don't support the `or' file
  * type. */
-
 
 /*
  * menu-select widget: used to test if it's already loaded.

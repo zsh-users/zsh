@@ -206,7 +206,6 @@ setpmcommands(Param pm, HashTable ht)
 static const struct gsu_scalar pmcommand_gsu =
 { strgetfn, setpmcommand, unsetpmcommand };
 
-
 /**/
 static HashNode
 getpmcommand(UNUSED(HashTable ht), const char *name)
@@ -2019,7 +2018,6 @@ scanpmdissaliases(HashTable ht, ScanFunc func, int flags)
     scanaliases(sufaliastab, ht, func, flags, ALIAS_SUFFIX|DISABLED);
 }
 
-
 /* Functions for the usergroups special parameter */
 
 /*
@@ -2164,7 +2162,6 @@ scanpmusergroups(UNUSED(HashTable ht), ScanFunc func, int flags)
 	func(&pm.node, flags);
     }
 }
-
 
 /* Table for defined parameters. */
 

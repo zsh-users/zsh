@@ -1378,7 +1378,6 @@ ctokenize(char *p)
     return r;
 }
 
-
 /*
  * This function reconstructs the full completion argument in
  * heap memory by concatenating and, if untok is non-zero, untokenizing

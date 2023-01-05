@@ -10,4 +10,3 @@ _arguments \
   '-r:config to remove:(dhcp totd resolv all)' \
   - set3 \
   '-h[help]'
-

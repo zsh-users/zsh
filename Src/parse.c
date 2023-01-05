@@ -95,7 +95,6 @@ struct heredocs *hdocs;
 	YYERROR(ecused)				\
 	    } while(0)
 
-
 /* 
  * Word code.
  *
@@ -481,7 +480,6 @@ ecstrcode(char *s)
         par_list1(C); \
         if (eu == ecused) ecadd(WCB_END()); \
     } while (0)
-
 
 /**/
 mod_export void
@@ -2780,7 +2778,6 @@ dupeprog(Eprog p, int heap)
 
     return r;
 }
-
 
 /*
  * Pair of functions to mark an Eprog as in use, and to delete it

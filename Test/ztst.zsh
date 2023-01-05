@@ -570,7 +570,6 @@ $ZTST_code"
   return ZTST_failures
 }
 
-
 # Remember which sections we've done.
 typeset -A ZTST_sects
 ZTST_sects=(prep 0 test 0 clean 0)

@@ -126,7 +126,6 @@ statmodeprint(mode_t mode, char *outbuf, int flags)
     }
 }
 
-
 /**/
 static void
 statuidprint(uid_t uid, char *outbuf, int flags)
@@ -154,7 +153,6 @@ statuidprint(uid_t uid, char *outbuf, int flags)
 	    strcat(outbuf, ")");
     }
 }
-
 
 /**/
 static void
@@ -205,14 +203,12 @@ stattimeprint(time_t tim, long nsecs, char *outbuf, int flags)
     }
 }
 
-
 /**/
 static void
 statulprint(unsigned long num, char *outbuf)
 {
     sprintf(outbuf, "%lu", num);
 }
-
 
 /**/
 static void
@@ -227,7 +223,6 @@ statlinkprint(struct stat *sbuf, char *outbuf, char *fname)
 	outbuf[num] = '\0';
     }
 }
-
 
 /**/
 static void
@@ -328,7 +323,6 @@ statprint(struct stat *sbuf, char *outbuf, char *fname, int iwhich, int flags)
 	break;
     }
 }
-
 
 /*
  *

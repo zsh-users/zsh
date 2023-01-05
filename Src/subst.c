@@ -1331,7 +1331,6 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
     return ret;
 }
 
-
 /*
  * Look for a delimited portion of a string.  The first (possibly
  * multibyte) character at s is the delimiter.  Various forms
@@ -2810,7 +2809,6 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
      */
     if ((colf = *s == ':'))
 	s++;
-
 
     /* fstr is to be the text following the substitution.  If we have *
      * braces, we look for it here, else we infer it later on.        */

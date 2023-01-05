@@ -28,4 +28,3 @@ if zstyle -t ":completion:${curcontext}:" use-cache; then
 else
   return 1
 fi
-

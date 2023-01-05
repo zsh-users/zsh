@@ -341,7 +341,6 @@ zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outllp,
 #endif
 }
 
-
 /*
  * Input a NULL-terminated metafied string instr.
  * Output a line in internal zle format, together with its length
@@ -555,7 +554,6 @@ zlegetline(int *ll, int *cs)
     *ll = *cs = 0;
     return ztrdup("");
 }
-
 
 /*
  * free() the 'memo' elements of region_highlights.

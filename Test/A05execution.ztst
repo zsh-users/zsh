@@ -421,4 +421,3 @@ F:anonymous function, and a descriptor leak when backgrounding a pipeline
 
  (exit 4); repeat 0 do done
 0:'repeat 0' resets lastval
-

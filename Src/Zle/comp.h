@@ -81,7 +81,6 @@ struct cmgroup {
 #endif
 };
 
-
 #define CGF_NOSORT   1		/* don't sort this group */
 #define CGF_LINES    2		/* these are to be printed on different lines */
 #define CGF_HASDL    4		/* has display strings printed on separate lines */
@@ -385,7 +384,6 @@ typedef void (*CLPrintFunc)(Cmgroup, Cmatch *, int, int, int, int);
 #define CP_REALPARAMS  10
 #define CP_ALLREALS    ((unsigned int) 0x3ff)
 
-
 #define CPN_NMATCHES   0
 #define CP_NMATCHES    (1 << CPN_NMATCHES)
 #define CPN_CONTEXT    1
@@ -472,4 +470,3 @@ struct chdata {
 /* The number of columns to leave empty between rows of matches. */
 
 #define CM_SPACE  2
-

@@ -16,4 +16,3 @@ _arguments \
   '(-L --lightweight -s --show)'{-L,--lightweight}'[remove SOME metadata]' \
   '(-s --show -L --lightweight)'{-s,--show}'[list harmful metadata detectable by mat2 without removing them]' \
   '*:file:_files -g "*.(epub|pdf|odc|odf|odg|odi|odp|ods|odt|pptx|xlsx|docx|torrent|ncx|tar|xhtml|xhtm|xht|zip|mp3|mpga|mp1|mp2|oga|opus|ogg|spx|flac|wav|gif|jpg|jpe|jfif|jpeg|png|svgz|svg|tiff|tif|bmp|ppm|css|htm|html|cxx|text|log|txt|hh|hxx|el|conf|cc|pm|f90|mpg4|m4v|mp4|wmv|avi)"'
-

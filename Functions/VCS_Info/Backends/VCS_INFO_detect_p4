@@ -15,7 +15,6 @@
 # foolproof; in fact it relies on you using the particular working practice
 # of having such files in all client root directories and nowhere above.
 
-
 (( ${+functions[VCS_INFO_p4_get_server]} )) ||
 VCS_INFO_p4_get_server() {
   emulate -L zsh
@@ -42,7 +41,6 @@ VCS_INFO_p4_get_server() {
     ;;
   esac
 }
-
 
 VCS_INFO_detect_p4() {
   local serverport p4where

@@ -14,7 +14,6 @@ date text, and current working directory respectively.  The default
 colors are blue, white, white, and yellow.  This theme works best with
 a dark background.
 
-
 Recommended fonts for this theme: either UTF-8, or nexus or vga or similar.
 If you don't have any of these, the 8-bit characters will probably look
 stupid.

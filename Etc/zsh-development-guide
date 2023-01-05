@@ -274,7 +274,6 @@ C coding style
   control settings. Information about text editor plugins and this file
   can be found at <http://editorconfig.org/>.
 
-
 Modules
 -------
 
@@ -473,7 +472,6 @@ like:
 
 The functions shown take the name of the module, the set of features,
 
-
 To de-register builtins, pass the features structure to
 setfeatureenables with a NULL final value:
 
@@ -484,7 +482,6 @@ setfeatureenables with a NULL final value:
     setfeatureenables(m->nam, &module_features, NULL);
     ...
   }
-
 
 Builtins
 --------
@@ -1018,7 +1015,6 @@ x_*                   reserved for private experimental use
 zsh                   The Zsh Development Group (contact: <coordinator@zsh.org>)
 
 Below the top level, naming authority is delegated.
-
 
 Distribution of files
 ---------------------

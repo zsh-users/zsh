@@ -8,7 +8,6 @@ a description of various additional configuration options.  You should
 have a look at the items in the second and third parts before following the
 instructions in the first.
 
-
 =====================
 MAKING AND INSTALLING
 =====================
@@ -261,7 +260,6 @@ $(DESTDIR)$(PREFIX)/share/zsh/site-functions/ in a makefile.  If the
 third-party tool's $(PREFIX) is not the same as zsh's prefix, then that
 directory should be added to $fpath in zsh's initialization files.
 
-
 ================================
 AUTOMATIC NEW USER CONFIGURATION
 ================================
@@ -295,7 +293,6 @@ could copy skeleton files into place safe in the knowledge that the files
 don't yet exist.  Also, as there is currently no internationalization
 support, administrators of sites with users who mostly do not speak English
 may wish not to install the zsh/newuser module.
-
 
 =====================
 CONFIGURATION OPTIONS
@@ -636,4 +633,3 @@ function-subdirs     # if functions will be installed into subdirectories [no]
 dynamic              # allow dynamically loaded binary modules [yes]
 largefile            # allow configure check for large files [yes]
 locale               # allow use of locale library [yes]
-

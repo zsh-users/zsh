@@ -1130,7 +1130,6 @@ patgetglobflags(char **strp, long *assertp, int *ignore)
     return 1;
 }
 
-
 static const char *colon_stuffs[]  = {
     "alpha", "alnum", "ascii", "blank", "cntrl", "digit", "graph", 
     "lower", "print", "punct", "space", "upper", "xdigit", "IDENT",
@@ -1156,7 +1155,6 @@ range_type(char *start, int len)
 
     return PP_UNKWN;
 }
-
 
 /*
  * Convert the contents of a [...] or [^...] expression (just the
@@ -1865,7 +1863,6 @@ patoptail(long p, long val)
 	pattail(P_OPERAND(p) + 1, val);
 }
 
-
 /*
  * Run a pattern.
  */
@@ -1896,7 +1893,6 @@ static struct rpat pattrystate;
 #define patendp		(pattrystate.patendp)
 #define parsfound	(pattrystate.parsfound)
 #define globdots	(pattrystate.globdots)
-
 
 /*
  * Character functions operating on unmetafied strings.
@@ -1957,7 +1953,6 @@ charnext(char *x, char *y)
 /* Increment a pointer past the current character. */
 #define CHARINC(x, y)	((x) = charnext((x), (y)))
 
-
 /* Get a character and increment */
 #define CHARREFINC(x, y, z)	charrefinc(&(x), (y), (z))
 static wchar_t
@@ -1984,7 +1979,6 @@ charrefinc(char **x, char *y, int *z)
 
     return wc;
 }
-
 
 /*
  * Counter the number of characters between two pointers, smaller first
@@ -2212,7 +2206,6 @@ char *patallocstr(Patprog prog, char *string, int stringlen, int unmetalen,
 
     return patstralloc->alloced;
 }
-
 
 /*
  * Test prog against null-terminated, metafied string.
@@ -3561,7 +3554,6 @@ patmatch(Upat prog)
     return 0;
 }
 
-
 /**/
 #ifdef MULTIBYTE_SUPPORT
 
@@ -3731,7 +3723,6 @@ mb_patmatchrange(char *range, wchar_t ch, int zmb_ind, wint_t *indptr, int *mtp)
     }
     return 0;
 }
-
 
 /*
  * This is effectively the reverse of mb_patmatchrange().
@@ -3966,7 +3957,6 @@ patmatchrange(char *range, int ch, int *indptr, int *mtp)
     }
     return 0;
 }
-
 
 /**/
 #ifndef MULTIBYTE_SUPPORT
@@ -4278,7 +4268,6 @@ clearpatterndisables(void)
 {
     memset(zpc_disables, 0, ZPC_COUNT);
 }
-
 
 /* Check to see if str is eligible for filename generation. */
 

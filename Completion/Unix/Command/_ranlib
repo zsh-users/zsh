@@ -10,4 +10,3 @@ _arguments \
     "-t[do not rebuild ToC (ignored)]" \
     "(-)-[no more options]" \
     "1:archive: _files"
-

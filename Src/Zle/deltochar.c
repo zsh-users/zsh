@@ -75,7 +75,6 @@ deltochar(UNUSED(char **args))
     return !ok;
 }
 
-
 static struct features module_features = {
     NULL, 0,
     NULL, 0,
@@ -83,7 +82,6 @@ static struct features module_features = {
     NULL, 0,
     0
 };
-
 
 /**/
 int

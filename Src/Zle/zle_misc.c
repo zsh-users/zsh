@@ -1536,7 +1536,6 @@ addsuffix(int tp, int flags, ZLE_STRING_T chars, int lenstr, int lensuf)
     newsuf->lensuf = lensuf;
 }
 
-
 /* Same as addsuffix, but from metafied string */
 
 /**/

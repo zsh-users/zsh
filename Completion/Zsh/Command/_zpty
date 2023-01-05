@@ -42,7 +42,6 @@ _arguments -C -s -S \
 #     ':cmd: _command_names -e' \
 #     '*::args:_precommand' && return 0
 
-
 if [[ $state = name ]]; then
   if ! zmodload -e zsh/zpty; then
     _message "zpty module not loaded"

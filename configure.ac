@@ -1793,7 +1793,6 @@ else
 fi
 AC_SUBST(ZSH_TERM_H)
 
-
 dnl -----------------------------------------------------
 dnl Look for the file containing the RLIMIT_* definitions
 dnl -----------------------------------------------------
@@ -1907,7 +1906,6 @@ if test x$zsh_cv_type_rlim_t = xno; then
   AC_DEFINE_UNQUOTED(rlim_t, $DEFAULT_RLIM_T)
 fi
 
-
 dnl On some systems the RLIMIT_* don't evaluate to integers at compile time
 dnl (they may be enums).  In this case we are not able to do preprocessor
 dnl comparisons and need our tests to determine what values exist and
@@ -1966,7 +1964,6 @@ if test x$ac_cv_func_getrusage = xyes; then
 #include <sys/resource.h>])
 fi
 
-
 dnl --------------------------------------------
 dnl CHECK FOR DEFAULT PATH (used for command -p)
 dnl --------------------------------------------
@@ -1982,7 +1979,6 @@ else
 fi])
 AC_DEFINE_UNQUOTED(DEFAULT_PATH, "$zsh_cv_cs_path",
 [The default path; used when running commands with command -p])
-
 
 dnl ----------------------------
 dnl CHECK FOR /dev/fd FILESYSTEM
@@ -2443,7 +2439,6 @@ int main() {
       AC_DEFINE(GETPWNAM_FAKED)
     fi
 fi
-
 
 dnl ---------------
 dnl check for the type of third argument of accept

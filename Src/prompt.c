@@ -55,7 +55,6 @@ static char *cmdnames[CS_COUNT] = {
     "heredocd", "brace",     "braceparam", "always",
 };
 
-
 struct buf_vars;
 
 struct buf_vars {
@@ -1584,7 +1583,6 @@ cmdpop(void)
     } else
 	cmdsp--;
 }
-
 
 /*****************************************************************************
  * Utilities dealing with colour and other forms of highlighting.

@@ -47,4 +47,3 @@ zsh_math_func_sum() {
   true # Careful here: `return 0` evaluates an arithmetic expression
 }
 functions -M sum 0 -1 zsh_math_func_sum
-

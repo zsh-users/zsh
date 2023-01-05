@@ -26,7 +26,6 @@
     print "${(U)0}:{${(qq)@}}"
   }
 
-
 %test
 
   BUFFER_STACK='btrfs --help'
@@ -101,6 +100,5 @@
 0:git with option, assignment & subcmd
 >git is WHENCE:{git}
 >GIT:{'help' 'clone'}
-
 
 %clean

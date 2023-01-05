@@ -265,7 +265,6 @@ scanpatstyles(HashNode hn, int spatflags)
     }
 }
 
-
 static HashTable
 newzstyletable(int size, char const *name)
 {

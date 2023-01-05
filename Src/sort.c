@@ -178,7 +178,6 @@ eltpcmp(const void *a, const void *b)
     return sortdir * cmp;
 }
 
-
 /*
  * Front-end to eltpcmp() to compare strings.
  * TODO: it would be better to eliminate this altogether by
@@ -218,7 +217,6 @@ zstrcmp(const char *as, const char *bs, int sortflags)
 
     return ret;
 }
-
 
 /*
  * Sort an array of metafied strings.  Use an "or" of bit flags

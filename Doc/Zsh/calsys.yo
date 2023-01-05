@@ -31,7 +31,6 @@ menu(Calendar Utility Functions)
 menu(Calendar Bugs)
 endmenu()
 
-
 texinode(Calendar File and Date Formats)(Calendar System User Functions)()(Calendar Function System)
 sect(File and Date Formats)
 
@@ -763,7 +762,6 @@ first line of the event does not include the text tt(EVENT) var(reltime).
 The default is 5 minutes.
 )
 enditem()
-
 
 texinode(Calendar Utility Functions)(Calendar Bugs)(Calendar Styles)(Calendar Function System)
 sect(Utility functions)

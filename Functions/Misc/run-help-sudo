@@ -4,4 +4,3 @@ if [ $# -eq 0 ]; then
 else
     run-help $1
 fi
-

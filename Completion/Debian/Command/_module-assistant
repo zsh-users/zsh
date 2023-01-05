@@ -34,4 +34,3 @@ _arguments -A \
   '(-t --text-mode)'{-t,--text-mode}'[no progress bars]' \
   '1:list of commands:_values -s , subcommands "${_module_assistant_commands[@]}"' \
   '*:package: compadd /usr/src/modass/var_cache_modass/*.avail_version(N:t:r) /var/cache/modass/*.avail_version(N:t:r)'
-

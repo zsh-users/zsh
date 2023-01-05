@@ -56,7 +56,6 @@ _arguments \
   '--all' \
   '--reallyall' && return 0
 
-
 # hwinfo-9.31-1.1
 #
 # Usage: hwinfo [options]
@@ -76,4 +75,3 @@ _arguments \
 # 
 #   Note: debug info is shown only in the log file. (If you specify a
 #   log file the debug level is implicitly set to a reasonable value.)
-

@@ -30,7 +30,6 @@
 #include "computil.mdh"
 #include "computil.pro"
 
-
 /* Help for `_describe'. */
 
 typedef struct cdset *Cdset;
@@ -4293,7 +4292,6 @@ cfp_test_exact(LinkList names, char **accept, char *skipped)
     return (found ? ret : NULL);
 }
 
-
 /*
  * This code constructs (from heap) and returns a string that
  * corresponds to a series of matches; when compiled as a pattern, at
@@ -4523,7 +4521,6 @@ cfp_matcher_range(Cmatcher *ms, char *add)
 	add = adds;
     }
 }
-
 
 static char *
 cfp_matcher_pats(char *matcher, char *add)
@@ -5121,7 +5118,6 @@ static struct features module_features = {
     NULL, 0,
     0
 };
-
 
 /**/
 int

@@ -128,7 +128,6 @@ mod_export int parbegin;
 /**/
 mod_export int parend;
 
-
 /* 1 if aliases should not be expanded */
 
 /**/
@@ -530,7 +529,6 @@ cmd_or_math(int cs_type)
     hungetc('(');
     return errflag ? CMD_OR_MATH_ERR : CMD_OR_MATH_CMD;
 }
-
 
 /*
  * Parse either a $(( ... )) or a $(...)
@@ -1446,7 +1444,6 @@ gettokstr(int c, int sub)
     DPUTS(cmdsp != ocmdsp, "BUG: gettok: cmdstack changed.");
     return peek;
 }
-
 
 /*
  * Parse input as if in double quotes.

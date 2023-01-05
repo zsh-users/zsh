@@ -260,4 +260,3 @@ F:The `4' on the second line is incorrect; see workers/48594.
 ?+f:11> g
 F:If this test fails, the new behaviour may be 
 F:workers/48591.
-

@@ -47,7 +47,6 @@ subcmd_prefix_label=(
   ":ipaddresslabel:IP addrlabel prefix currently set:( $(ip -6 addrlabel list 2>/dev/null | sed -n 's/^prefix \([0-9a-f\.:/]*\) .*$/\1/p') )"
 )
 
-
 local -a subcmd_scope
 _regex_words scope "IP address scope" \
   'global:address globally valid' \
@@ -163,7 +162,6 @@ subcmd_tunnelmode=("$reply[@]")
 local -a subcmd_files
 subcmd_files=(/$'[^\0]##\0'/ ':file:file name:_files')
 
-
 #
 # The ip top-level commands.  First link
 #
@@ -201,7 +199,6 @@ _regex_words \
   'se*t:change device attributes:$link_set_cmds' \
   'sh*ow:display device attributes:$link_show_cmds'
 link_cmds=("$reply[@]")
-
 
 #
 # addr
@@ -267,7 +264,6 @@ _regex_words addrlabel-add-commands "addlabel del command" \
   'l*abel: number:$subcmd_number'
 addrlabel_del_cmds=( "(" $subcmd_ipaddr "|" ")" "$reply[@]" "#")
 
-
 local -a addrlabel_cmds
 _regex_words \
   addrlabel-commands "addrlabel command" \
@@ -315,7 +311,6 @@ _regex_words \
   's*how:list neighbour entries:$neigh_show_cmds' \
   'f*lush:flush neighbour entries:$neigh_show_cmds'
 neigh_cmds=("$reply[@]")
-
 
 #
 # route
@@ -392,7 +387,6 @@ _regex_words \
   'g*et:get a single network route:$route_get_cmds'
 route_cmds=("$reply[@]")
 
-
 #
 # rule
 #
@@ -421,7 +415,6 @@ _regex_words \
   'f*lush:flush rules and dump deleted rules' \
   's*how:list routing rules'
 rule_cmds=("$reply[@]")
-
 
 #
 # tunnel
@@ -460,7 +453,6 @@ _regex_words \
   's*how:list IP tunnels'
 tunnel_cmds=("$reply[@]")
 
-
 #
 # maddr
 #
@@ -485,7 +477,6 @@ _regex_words \
   's*how:list multicast addresses:$maddr_show_cmds'
 maddr_cmds=("$reply[@]")
 
-
 #
 # mroute
 #
@@ -503,7 +494,6 @@ _regex_words \
   's*how:list multicast routing cache entries:$mroute_show_cmds'
 mroute_cmds=("$reply[@]")
 
-
 #
 # monitor
 #
@@ -517,7 +507,6 @@ _regex_words \
   'route:monitor changes to routes' \
   'file:read rtmon-generated log:$subcmd_files'
 monitor_cmds=("$reply[@]")
-
 
 #
 # Global argument handling

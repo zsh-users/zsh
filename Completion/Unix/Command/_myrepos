@@ -7,7 +7,6 @@
 # This script does not handle user defined alias nor user defined actions (lib,
 # plugins)
 
-
 local curcontext="$curcontext" state state_descr line ret=1
 local -a arguments
 typeset -A opt_args

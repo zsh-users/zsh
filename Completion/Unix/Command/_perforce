@@ -444,7 +444,6 @@ _perforce() {
   fi
 }
 
-
 #
 # Command and argument dispatchers
 #
@@ -462,7 +461,6 @@ _perforce_call_p4() {
   local +x P4LANGUAGE
   _call_program $cp_tag command p4 "${_perforce_global_options[@]}" "$@"
 }
-
 
 # The list of commands is cached in _perforce_cmd_list, but we
 # only generate it via this function when we need it.
@@ -514,13 +512,11 @@ _perforce_gen_cmd_list() {
   done
 }
 
-
 (( $+functions[_perforce_commands] )) ||
 _perforce_commands() {
   (( ${#_perforce_cmd_list} )) || _perforce_gen_cmd_list
   _describe -t p4-commands 'Perforce command' _perforce_cmd_list
 }
-
 
 (( $+functions[_perforce_command_args] )) ||
 _perforce_command_args() {
@@ -533,7 +529,6 @@ _perforce_command_args() {
   fi
 }
 
-
 (( $+functions[_perforce_service_dispatch] )) ||
 _perforce_service_dispatch() {
   # Put the original command name back, then dispatch for
@@ -542,7 +537,6 @@ _perforce_service_dispatch() {
   (( CURRENT++ ))
   _perforce_cmd_$2
 }
-
 
 #
 # Helper functions
@@ -616,7 +610,6 @@ _perforce_branches() {
   [[ $#bl -eq 1 && $bl[1] = '' ]] && bl=()
   (( $#bl )) && _describe -t branches 'Perforce branch' bl
 }
-
 
 (( $+functions[_perforce_changes] )) ||
 _perforce_changes() {
@@ -702,14 +695,12 @@ ${${${${${(f)"$(_perforce_call_p4 changes changes $amax $xargs $cstatus \$file)"
   _describe -t changes "${ctype}change" cl -V changes-unsorted $comma
 }
 
-
 (( $+functions[_perforce_charsets] )) ||
 _perforce_charsets() {
   local expl
   _wanted charset expl 'character set' \
     compadd eucjp iso8859-1 shiftjis utf8 winansi
 }
-
 
 (( $+functions[_perforce_clients] )) ||
 _perforce_clients() {
@@ -725,7 +716,6 @@ _perforce_clients() {
   _describe -t clients 'Perforce client' cl $slash
 }
 
-
 (( $+functions[_perforce_counters] )) ||
 _perforce_counters() {
   local cline match mbegin mend
@@ -735,7 +725,6 @@ _perforce_counters() {
   [[ $#cl -eq 1 && $cl[1] = '' ]] && cl=()
   _describe -t counters 'Perforce counter' cl
 }
-
 
 (( $+functions[_perforce_counter_values] )) ||
 _perforce_counter_values() {
@@ -748,7 +737,6 @@ _perforce_counter_values() {
     fi
   fi
 }
-
 
 (( $+functions[_perforce_dates] )) ||
 _perforce_dates() {
@@ -789,7 +777,6 @@ _perforce_dates() {
   _describe -t dates $name offer $opts
 }
 
-
 (( $+functions[_perforce_dbtables] )) ||
 _perforce_dbtables() {
   local -a tables
@@ -798,7 +785,6 @@ _perforce_dbtables() {
     user view working)
   _describe -t db-table "DB table" tables
 }
-
 
 (( $+functions[_perforce_depots] )) ||
 _perforce_depots() {
@@ -810,12 +796,10 @@ _perforce_depots() {
   _describe -t depots 'depot name' dl
 }
 
-
 (( $+functions[_perforce_files_or_minus] )) ||
 _perforce_files_or_minus() {
   _alternative 'minus:minus sign:(-)' 'files:file name:_files'
 }
-
 
 (( $+functions[_perforce_file_suffix] )) ||
 _perforce_file_suffix() {
@@ -844,7 +828,6 @@ _perforce_file_suffix() {
     fi
   fi
 }
-
 
 # Helper function for the helper function for the helper functions
 # for the helper function _perforce_files.
@@ -944,7 +927,6 @@ _perforce_retrieve_files() {
   compadd "$@" -a files
 }
 
-
 #
 # Helper functions for the helper function _perforce_files.  These files
 # are low-level enough that they don't handle tags; this is done
@@ -958,7 +940,6 @@ _perforce_integrated_files() {
 
   _perforce_retrieve_files integrated "$@"
 }
-
 
 (( $+functions[_perforce_opened_files] )) ||
 _perforce_opened_files() {
@@ -975,12 +956,10 @@ _perforce_opened_files() {
   _perforce_retrieve_files opened$csuf "$@"
 }
 
-
 (( $+functions[_perforce_resolved_files] )) ||
 _perforce_resolved_files() {
   _perforce_retrieve_files resolved "$@"
 }
-
 
 # This has no other function than to offer to add the `...' used
 # by Perforce to indicate a recursive search of directories.
@@ -997,7 +976,6 @@ _perforce_resolved_files() {
 #  fi
 #}
 
-
 (( $+functions[_perforce_depot_dirs] )) ||
 _perforce_depot_dirs() {
   # Normal completion of directories in depots
@@ -1005,14 +983,12 @@ _perforce_depot_dirs() {
   _perforce_retrieve_files dirs "$@" -S / -q
 }
 
-
 (( $+functions[_perforce_depot_files] )) ||
 _perforce_depot_files() {
   # Normal completion of files in depots
 
   _perforce_retrieve_files files "$@" -R _perforce_file_suffix
 }
-
 
 (( $+functions[_perforce_client_dirs] )) ||
 _perforce_client_dirs() {
@@ -1299,7 +1275,6 @@ _perforce_files() {
   fi
 }
 
-
 #
 # Remaining helpers for other types of Perforce metadata.
 #
@@ -1335,7 +1310,6 @@ _perforce_filetypes() {
   fi
 }
 
-
 (( $+functions[_perforce_fstat_fields] )) ||
 _perforce_fstat_fields() {
   local sep
@@ -1357,14 +1331,12 @@ _perforce_fstat_fields() {
   _describe -t fstat-fields 'Perforce fstat field' values -S, -q
 }
 
-
 (( $+functions[_perforce_groups] )) ||
 _perforce_groups() {
   local -a values
   values=($(_perforce_call_p4 groups groups))
   _describe -t groups 'Perforce group' values
 }
-
 
 (( $+functions[_perforce_hosts] )) ||
 _perforce_hosts() {
@@ -1381,7 +1353,6 @@ _perforce_hosts() {
     _hosts
   fi
 }
-
 
 (( $+functions[_perforce_hosts_ports] )) ||
 _perforce_hosts_ports() {
@@ -1538,7 +1509,6 @@ _perforce_labels() {
     _describe -t labels 'Perforce label' ll
 }
 
-
 (( $+functions[_perforce_revisions] )) ||
 _perforce_revisions() {
   # Doesn't handle standard completion options; requires space
@@ -1575,7 +1545,6 @@ _perforce_revisions() {
   _describe -t revisions 'revision' rl -V revisions-unsorted $comma
 }
 
-
 (( $+functions[_perforce_statuses] )) ||
 _perforce_statuses() {
   # Perforce statuses are usually limited to a set of values
@@ -1596,7 +1565,6 @@ _perforce_statuses() {
   _describe -t statuses 'job status' statuses
 }
 
-
 (( $+functions[_perforce_submit_options] )) ||
 _perforce_submit_options() {
   local -a soptions
@@ -1607,7 +1575,6 @@ _perforce_submit_options() {
   _describe -t submit-options 'submit option' soptions
 }
 
-
 (( $+functions[_perforce_pids] )) ||
 _perforce_pids() {
   local -a ul
@@ -1617,7 +1584,6 @@ _perforce_pids() {
   _describe -t id 'process ID' ul
 }
 
-
 (( $+functions[_perforce_users] )) ||
 _perforce_users() {
   local -a ul
@@ -1626,7 +1592,6 @@ _perforce_users() {
   [[ $#ul -eq 1 && $ul[1] = '' ]] && ul=()
   _describe -t users 'Perforce user' ul
 }
-
 
 (( $+functions[_perforce_users_or_groups] )) ||
 _perforce_users_or_groups() {
@@ -1665,7 +1630,6 @@ _perforce_cmd_add() {
     '*:file:_perforce_files -tu'
 }
 
-
 (( $+functions[_perforce_cmd_admin] )) ||
 _perforce_cmd_admin() {
   if (( CURRENT == 2 )); then
@@ -1696,7 +1660,6 @@ _perforce_cmd_admin() {
   fi
 }
 
-
 (( $+functions[_perforce_cmd_annotate] )) ||
 _perforce_cmd_annotate() {
   # New in release 2002.2.
@@ -1716,7 +1679,6 @@ l\:ignore\ line\ endings))' \
     '*::file:_perforce_files -tR'
 }
 
-
 (( $+functions[_perforce_cmd_attribute] )) ||
 _perforce_cmd_attribute() {
   # This is currently (2005.1) an unsupported command.
@@ -1734,7 +1696,6 @@ _perforce_cmd_attribute() {
     "*::file:_perforce_files$limit"
 }
 
-
 (( $+functions[_perforce_cmd_branch] )) ||
 _perforce_cmd_branch() {
   _arguments -s : \
@@ -1747,7 +1708,6 @@ _perforce_cmd_branch() {
     '(-i)*::branch name:_perforce_branches'
 }
 
-
 (( $+functions[_perforce_cmd_branches] )) ||
 _perforce_cmd_branches() {
   _arguments -s : \
@@ -1757,7 +1717,6 @@ _perforce_cmd_branches() {
     '-m[limit output to max branches]:max branches: ' \
     '-t[display time and date]'
 }
-
 
 (( $+functions[_perforce_cmd_change] )) ||
 _perforce_cmd_change() {
@@ -1787,12 +1746,10 @@ _perforce_cmd_change() {
     "(-i)1::change:_perforce_changes$ctype"
 }
 
-
 (( $+functions[_perforce_cmd_changelist] )) ||
 _perforce_cmd_changelist() {
   _perforce_cmd_change "$@"
 }
-
 
 (( $+functions[_perforce_cmd_changes] )) ||
 _perforce_cmd_changes() {
@@ -1810,12 +1767,10 @@ _perforce_cmd_changes() {
     '*::file:_perforce_files -tR'
 }
 
-
 (( $+functions[_perforce_cmd_changelists] )) ||
 _perforce_cmd_changelists() {
   _perforce_cmd_changes "$@"
 }
-
 
 (( $+functions[_perforce_cmd_clean] )) ||
 _perforce_cmd_clean() {
@@ -1828,8 +1783,6 @@ _perforce_cmd_clean() {
     '-n[preview clean]' \
     '*:file:_perforce_files -tu'
 }
-
-
 
 (( $+functions[_perforce_cmd_client] )) ||
 _perforce_cmd_client() {
@@ -1847,7 +1800,6 @@ _perforce_cmd_client() {
     '1::file:_perforce_clients'
 }
 
-
 (( $+functions[_perforce_cmd_clients] )) ||
 _perforce_cmd_clients() {
   _arguments -s : \
@@ -1861,7 +1813,6 @@ _perforce_cmd_clients() {
     '(-s)-a[display all clients]' \
     '(-a)-s[display clients dedicated to server]:server ID: '
 }
-
 
 (( $+functions[_perforce_cmd_copy] )) ||
 _perforce_cmd_copy() {
@@ -1908,7 +1859,6 @@ _perforce_cmd_counter() {
     '(-d -i)2::numeric value:_perforce_counter_values'
 }
 
-
 (( $+functions[_perforce_cmd_counters] )) ||
 _perforce_cmd_counters() {
   _arguments -s : \
@@ -1916,13 +1866,11 @@ _perforce_cmd_counters() {
     '-m[limit to max counters]:max counters: '
 }
 
-
 (( $+functions[_perforce_cmd_cstat] )) ||
 _perforce_cmd_cstat() {
   _arguments -s : \
   '*::file:_perforce_files'
 }
-
 
 (( $+functions[_perforce_cmd_dbschema] )) ||
 _perforce_cmd_dbschema() {
@@ -1933,7 +1881,6 @@ _perforce_cmd_dbschema() {
   fi
 }
 
-
 (( $+functions[_perforce_cmd_dbstat] )) ||
 _perforce_cmd_dbstat() {
   _arguments -s : \
@@ -1942,7 +1889,6 @@ _perforce_cmd_dbstat() {
   '(-h -a)-s[report sizes of tables]' \
   '(-s -a)*::DB table:_perforce_dbtable'
 }
-
 
 (( $+functions[_perforce_cmd_delete] )) ||
 _perforce_cmd_delete() {
@@ -1953,7 +1899,6 @@ _perforce_cmd_delete() {
     '-v[delete unsynced files]' \
     '*::file:_perforce_files'
 }
-
 
 (( $+functions[_perforce_cmd_depot] )) ||
 _perforce_cmd_depot() {
@@ -1966,13 +1911,11 @@ _perforce_cmd_depot() {
     '(-i)*::depot name:_perforce_depots'
 }
 
-
 (( $+functions[_perforce_cmd_depots] )) ||
 _perforce_cmd_depots() {
   # No arguments
   _arguments -s :
 }
-
 
 (( $+functions[_perforce_cmd_describe] )) ||
 _perforce_cmd_describe() {
@@ -1993,7 +1936,6 @@ l\:ignore\ line\ endings))' \
     '-m[limit output to max files]:max files: ' \
     '*::change:_perforce_changes'
 }
-
 
 (( $+functions[_perforce_cmd_diff] )) ||
 _perforce_cmd_diff() {
@@ -2022,7 +1964,6 @@ r\:list\ opened\ files\ that\ do\ not\ differ\ from\ depot))' \
     "*::file:_perforce_files$limit"
 }
 
-
 (( $+functions[_perforce_cmd_diff2] )) ||
 _perforce_cmd_diff2() {
   _arguments -s : \
@@ -2045,7 +1986,6 @@ l\:ignore\ line\ endings))' \
     '2::to file:_perforce_files'
 }
 
-
 (( $+functions[_perforce_cmd_dirs] )) ||
 _perforce_cmd_dirs() {
   _arguments -s : \
@@ -2056,7 +1996,6 @@ _perforce_cmd_dirs() {
     '*::directory:_perforce_files -td'
 }
 
-
 (( $+functions[_perforce_cmd_edit] )) ||
 _perforce_cmd_edit() {
   _arguments -s : \
@@ -2066,7 +2005,6 @@ _perforce_cmd_edit() {
     '-k[edit files on server]' \
     '*::file:_perforce_files'
 }
-
 
 (( $+functions[_perforce_cmd_export] )) ||
 _perforce_cmd_export() {
@@ -2080,7 +2018,6 @@ _perforce_cmd_export() {
     '-J[specify file prefix]:file prefix: ' \
     '-T[space-separated list of tables not to export]'
 }
-
 
 (( $+functions[_perforce_cmd_filelog] )) ||
 _perforce_cmd_filelog() {
@@ -2097,7 +2034,6 @@ _perforce_cmd_filelog() {
     '*::file:_perforce_files'
 }
 
-
 (( $+functions[_perforce_cmd_files] )) ||
 _perforce_cmd_files() {
   _arguments -s : \
@@ -2108,7 +2044,6 @@ _perforce_cmd_files() {
     '-U[display files in unload depot]' \
     '*::file:_perforce_files -tR'
 }
-
 
 (( $+functions[_perforce_cmd_fix] )) ||
 _perforce_cmd_fix() {
@@ -2134,7 +2069,6 @@ _perforce_cmd_fix() {
     "*::job:_perforce_jobs$job"
 }
 
-
 (( $+functions[_perforce_cmd_fixes] )) ||
 _perforce_cmd_fixes() {
   _arguments -s : \
@@ -2144,7 +2078,6 @@ _perforce_cmd_fixes() {
     '-m[limit output to max fixes]:max fixes: ' \
     '*::fixed file:_perforce_files -tR'
 }
-
 
 (( $+functions[_perforce_cmd_flush] )) ||
 _perforce_cmd_flush() {
@@ -2158,7 +2091,6 @@ _perforce_cmd_flush() {
     '-m[limit sync to max files]:max files: ' \
     '*::file:_perforce_files -tR'
 }
-
 
 (( $+functions[_perforce_cmd_fstat] )) ||
 _perforce_cmd_fstat() {
@@ -2208,7 +2140,6 @@ s\:filesize))' \
     '*::file:_perforce_files'
 }
 
-
 (( $+functions[_perforce_cmd_grep] )) ||
 _perforce_cmd_grep() {
   _arguments -s : \
@@ -2229,7 +2160,6 @@ _perforce_cmd_grep() {
     '*::file:_perforce_files -tR'
 }
 
-
 (( $+functions[_perforce_cmd_group] )) ||
 _perforce_cmd_group() {
   _arguments -s : \
@@ -2240,7 +2170,6 @@ _perforce_cmd_group() {
     '(-a -d)-A[allow admin user to add new group]' \
     '1::perforce group:_perforce_groups'
 }
-
 
 (( $+functions[_perforce_cmd_groups] )) ||
 _perforce_cmd_groups() {
@@ -2254,12 +2183,10 @@ _perforce_cmd_groups() {
     '(-g -u -o)1::user or group name:_perforce_users_or_groups'
 }
 
-
 (( $+functions[_perforce_cmd_have] )) ||
 _perforce_cmd_have() {
   _perforce_files
 }
-
 
 (( $+functions[_perforce_cmd_help] )) ||
 _perforce_cmd_help() {
@@ -2281,13 +2208,11 @@ _perforce_cmd_help() {
   _describe -t help-options 'Perforce help option' _perforce_help_list
 }
 
-
 (( $+functions[_perforce_cmd_info] )) ||
 _perforce_cmd_info() {
   _arguments -s : \
     '-s[short output]'
 }
-
 
 (( $+functions[_perforce_cmd_integrate] )) ||
 _perforce_cmd_integrate() {
@@ -2319,7 +2244,6 @@ s\:skip\ cherry-picked\ revisions\ already\ integrated))' \
     '*::file:_perforce_files'
 }
 
-
 (( $+functions[_perforce_cmd_integ] )) ||
 _perforce_cmd_integ() {
   _perforce_cmd_integrate "$@"
@@ -2332,7 +2256,6 @@ _perforce_cmd_integrated() {
     '-b[list files integrated from branch view]:branch:_perforce_branches' \
     '*::file:_perforce_files -ti'
 }
-
 
 # interchanges is an unsupported but useful command that reports
 # changes that haven't been integrated between source and target;
@@ -2369,7 +2292,6 @@ _perforce_cmd_interchanges() {
     $fileargs
 }
 
-
 (( $+functions[_perforce_cmd_istat] )) ||
 _perforce_cmd_istat() {
   _arguments -s : \
@@ -2380,7 +2302,6 @@ _perforce_cmd_istat() {
     '1::stream: '
 }
 
-
 (( $+functions[_perforce_cmd_job] )) ||
 _perforce_cmd_job() {
   _arguments -s : \
@@ -2390,7 +2311,6 @@ _perforce_cmd_job() {
     '(-d -o)-i[read job spec from standard input]' \
     '(-i)1::job:_perforce_jobs'
 }
-
 
 (( $+functions[_perforce_cmd_jobs] )) ||
 _perforce_cmd_jobs() {
@@ -2404,14 +2324,12 @@ _perforce_cmd_jobs() {
     '*::file:_perforce_files -tR'
 }
 
-
 (( $+functions[_perforce_cmd_jobspec] )) ||
 _perforce_cmd_jobspec() {
   _arguments -s : \
     '-i[read form from stdin]' \
     '-o[write form from to stdout]'
 }
-
 
 (( $+functions[_perforce_cmd_key] )) ||
 _perforce_cmd_key() {
@@ -2430,14 +2348,12 @@ _perforce_cmd_key() {
     $keyargs
 }
 
-
 (( $+functions[_perforce_cmd_keys] )) ||
 _perforce_cmd_keys() {
   _arguments -s : \
     '-e[list keys that match pattern]:pattern: ' \
     '-m[limit output to max keys]:max keys: '
 }
-
 
 (( $+functions[_perforce_cmd_label] )) ||
 _perforce_cmd_label() {
@@ -2450,7 +2366,6 @@ _perforce_cmd_label() {
     '-g[update global label]' \
     '*::label:_perforce_labels'
 }
-
 
 (( $+functions[_perforce_cmd_labels] )) ||
 _perforce_cmd_labels() {
@@ -2466,7 +2381,6 @@ _perforce_cmd_labels() {
     '1::file or revisions which must contain label:_perforce_files -tR'
 }
 
-
 (( $+functions[_perforce_cmd_labelsync] )) ||
 _perforce_cmd_labelsync() {
   _arguments -s : \
@@ -2479,7 +2393,6 @@ _perforce_cmd_labelsync() {
     '*::file:_perforce_files -tR'
 }
 
-
 (( $+functions[_perforce_cmd_list] )) ||
 _perforce_cmd_list() {
   _arguments -s : \
@@ -2490,14 +2403,12 @@ _perforce_cmd_list() {
     '*::file:_perforce_files -tR'
 }
 
-
 (( $+functions[_perforce_cmd_license] )) ||
 _perforce_cmd_license() {
   _arguments -s : \
     '-o[write license to stdout]' \
     '-i[read license from stdin]'
 }
-
 
 (( $+functions[_perforce_cmd_lock] )) ||
 _perforce_cmd_lock() {
@@ -2507,12 +2418,10 @@ _perforce_cmd_lock() {
     '*::file:_perforce_files -to'
 }
 
-
 (( $+functions[_perforce_cmd_lockstat] )) ||
 _perforce_cmd_lockstat() {
   _message 'no arguments'
 }
-
 
 (( $+functions[_perforce_cmd_logger] )) ||
 _perforce_cmd_logger() {
@@ -2520,8 +2429,6 @@ _perforce_cmd_logger() {
     '-c[list events after sequence]:sequence: ' \
     '-t[list events after counter]:counter:_perforce_counters'
 }
-
-
 
 (( $+functions[_perforce_cmd_login] )) ||
 _perforce_cmd_login() {
@@ -2534,19 +2441,16 @@ _perforce_cmd_login() {
     '(-s)1::user:_perforce_users'
 }
 
-
 (( $+functions[_perforce_cmd_logout] )) ||
 _perforce_cmd_logout() {
   _arguments -s : \
     '-a[invalidate ticket on server]'
 }
 
-
 (( $+functions[_perforce_cmd_logstat] )) ||
 _perforce_cmd_logstat() {
   _message 'no arguments'
 }
-
 
 (( $+functions[_perforce_cmd_logtail] )) ||
 _perforce_cmd_logtail() {
@@ -2555,7 +2459,6 @@ _perforce_cmd_logtail() {
     '-s[specify start offset]:offset: ' \
     '-m[specify max blocks]:max blocks: '
 }
-
 
 (( $+functions[_perforce_cmd_merge] )) ||
 _perforce_cmd_merge() {
@@ -2576,7 +2479,6 @@ _perforce_cmd_merge() {
     '-c[open in change]:change:_perforce_changes -tc' \
     $fileargs
 }
-
 
 (( $+functions[_perforce_cmd_monitor] )) ||
 _perforce_cmd_monitor() {
@@ -2609,7 +2511,6 @@ _perforce_cmd_monitor() {
   fi
 }
 
-
 (( $+functions[_perforce_cmd_move] )) ||
 _perforce_cmd_move() {
   _arguments -s : \
@@ -2622,7 +2523,6 @@ _perforce_cmd_move() {
     '2::to file:_perforce_files -tu'
 }
 
-
 (( $+functions[_perforce_cmd_obliterate] )) ||
 _perforce_cmd_obliterate() {
     if [[ ${words[(I)-y]} -gt 0 ]]; then
@@ -2634,7 +2534,6 @@ _perforce_cmd_obliterate() {
         '*::file:_perforce_files -tR'
     fi
 }
-
 
 (( $+functions[_perforce_cmd_opened] )) ||
 _perforce_cmd_opened() {
@@ -2654,7 +2553,6 @@ _perforce_cmd_opened() {
     '*::file:_perforce_files -to'
 }
 
-
 (( $+functions[_perforce_cmd_passwd] )) ||
 _perforce_cmd_passwd() {
   _arguments -s : \
@@ -2662,7 +2560,6 @@ _perforce_cmd_passwd() {
     '-P[explicit new password]:new password: ' \
     '1::user name:_perforce_users'
 }
-
 
 (( $+functions[_perforce_cmd_ping] )) ||
 _perforce_cmd_ping() {
@@ -2675,7 +2572,6 @@ _perforce_cmd_ping() {
     '-s[specify send size]:send size (octets)' \
     '-r[specify receive size]:receive size (octets)'
 }
-
 
 (( $+functions[_perforce_cmd_populate] )) ||
 _perforce_cmd_populate() {
@@ -2709,7 +2605,6 @@ _perforce_cmd_populate() {
     $fileargs
 }
 
-
 (( $+functions[_perforce_cmd_print] )) ||
 _perforce_cmd_print() {
   _arguments -s : \
@@ -2723,14 +2618,12 @@ _perforce_cmd_print() {
     '*::file:_perforce_files -tR'
 }
 
-
 (( $+functions[_perforce_cmd_protect] )) ||
 _perforce_cmd_protect() {
   _arguments -s : \
     '-o[write protection table to standard output]' \
     '-i[read protection table from standard input]'
 }
-
 
 (( $+functions[_perforce_cmd_protects] )) ||
 _perforce_cmd_protects() {
@@ -2743,14 +2636,12 @@ _perforce_cmd_protects() {
     '*:file:_perforce_files'
 }
 
-
 (( $+functions[_perforce_cmd_prune] )) ||
 _perforce_cmd_prune() {
   _arguments -s : \
     '-y[execute prune]' \
     '-S[stream to prune]:stream: '
 }
-
 
 (( $+functions[_perforce_cmd_pull] )) ||
 _perforce_cmd_pull() {
@@ -2760,7 +2651,6 @@ _perforce_cmd_pull() {
     '-p[display information about pending transfers]' \
     '-J[specify prefix for journal file]:journal file prefix: '
 }
-
 
 (( $+functions[_perforce_cmd_reconcile] )) ||
 _perforce_cmd_reconcile() {
@@ -2779,18 +2669,15 @@ _perforce_cmd_reconcile() {
     '*:file:_perforce_files -tu'
 }
 
-
 (( $+functions[_perforce_cmd_rec] )) ||
 _perforce_cmd_rec() {
   _perforce_cmd_reconcile "$@"
 }
 
-
 (( $+functions[_perforce_cmd_rename] )) ||
 _perforce_cmd_rename() {
   _perforce_cmd_move "$@"
 }
-
 
 (( $+functions[_perforce_cmd_reopen] )) ||
 _perforce_cmd_reopen() {
@@ -2808,7 +2695,6 @@ _perforce_cmd_reopen() {
     '*::file:_perforce_files -to'
 }
 
-
 (( $+functions[_perforce_cmd_replicate] )) ||
 _perforce_cmd_replicate() {
   _arguments -s : \
@@ -2823,7 +2709,6 @@ _perforce_cmd_replicate() {
     '-x[terminate when journal rotates]' \
     '*::->_command'
 }
-
 
 (( $+functions[_perforce_cmd_resolve] )) ||
 _perforce_cmd_resolve() {
@@ -2857,14 +2742,12 @@ l\:ignores\ line\ endings))' \
     '*::file:_perforce_files -to'
 }
 
-
 (( $+functions[_perforce_cmd_resolved] )) ||
 _perforce_cmd_resolved() {
   _arguments -s : \
     '-o[report revision used as base for resolve]' \
     '*::file:_perforce_files -tr'
 }
-
 
 (( $+functions[_perforce_cmd_revert] )) ||
 _perforce_cmd_revert() {
@@ -2878,14 +2761,12 @@ _perforce_cmd_revert() {
     '*::file:_perforce_files -to'
 }
 
-
 (( $+functions[_perforce_cmd_review] )) ||
 _perforce_cmd_review() {
   _arguments -s : \
     '-c[specify change]:change:_perforce_changes -ts' \
     '-t[specify counter]:counter:_perforce_counters'
 }
-
 
 (( $+functions[_perforce_cmd_reviews] )) ||
 _perforce_cmd_reviews() {
@@ -2894,7 +2775,6 @@ _perforce_cmd_reviews() {
     '-C[limit files opened in client]:client:_perforce_clients' \
     '*::file:_perforce_files'
 }
-
 
 (( $+functions[_perforce_cmd_set] )) ||
 _perforce_cmd_set() {
@@ -2905,7 +2785,6 @@ _perforce_cmd_set() {
     '-S[specify service]:service: ' \
     "*::environment variable:_perforce_variables"
 }
-
 
 (( $+functions[_perforce_cmd_shelve] )) ||
 _perforce_cmd_shelve() {
@@ -2919,7 +2798,6 @@ _perforce_cmd_shelve() {
     '-p[promote shelved change to commit server]' \
     '(-i -r)*::file:_perforce_files -to'
 }
-
 
 (( $+functions[_perforce_cmd_status] )) ||
 _perforce_cmd_status() {
@@ -2937,7 +2815,6 @@ _perforce_cmd_status() {
     '*:file:_perforce_files -tuo'
 }
 
-
 (( $+functions[_perforce_cmd_sizes] )) ||
 _perforce_cmd_sizes() {
   _arguments -s : \
@@ -2953,7 +2830,6 @@ _perforce_cmd_sizes() {
     '-U[display sizes for unload files]' \
     '*:file:_perforce_files -tR'
 }
-
 
 # TODO Add more logic for subcommands
 #p4 stream edit
@@ -2972,7 +2848,6 @@ _perforce_cmd_stream() {
     '1:stream name: '
 }
 
-
 (( $+functions[_perforce_cmd_streams] )) ||
 _perforce_cmd_streams() {
   _arguments -s : \
@@ -2983,7 +2858,6 @@ _perforce_cmd_streams() {
     '*:stream path: '
 }
 
-
 (( $+functions[_perforce_cmd_spec] )) ||
 _perforce_cmd_spec() {
   _arguments -s : \
@@ -2993,7 +2867,6 @@ _perforce_cmd_spec() {
     "*::spec type:(branch change client depot group job
 label spec trigger typemap user)"
 }
-
 
 # TODO Figure out how --parallel will work
 #p4 submit -i [-r -s -f option] --parallel=threads=N[,batch=N][,min=N]
@@ -3011,7 +2884,6 @@ _perforce_cmd_submit() {
     '--noretransfer[do not re-transfer submitted files]:no re-transfer?:(0 1)' \
     '*::file:_perforce_files -to -tr'
 }
-
 
 # TODO Figure out how --parallel will work
 #--parallel=threads=N[,batch=N][,batchsize=N][,min=N][,minsize=N]
@@ -3032,7 +2904,6 @@ _perforce_cmd_sync() {
     '*::file:_perforce_files -tR'
 }
 
-
 (( $+functions[_perforce_cmd_tag] )) ||
 _perforce_cmd_tag() {
   _arguments -s : \
@@ -3044,13 +2915,11 @@ _perforce_cmd_tag() {
     '*::file:_perforce_files -tR'
 }
 
-
 (( $+functions[_perforce_cmd_tickets] )) ||
 _perforce_cmd_tickets() {
   # No arguments.
   _arguments -s :
 }
-
 
 (( $+functions[_perforce_cmd_triggers] )) ||
 _perforce_cmd_triggers() {
@@ -3059,14 +2928,12 @@ _perforce_cmd_triggers() {
     '-i[read from stdin]'
 }
 
-
 (( $+functions[_perforce_cmd_typemap] )) ||
 _perforce_cmd_typemap() {
   _arguments -s : \
     '-o[output table to stdout]' \
     '-i[read table from stdin]'
 }
-
 
 (( $+functions[_perforce_cmd_unlock] )) ||
 _perforce_cmd_unlock() {
@@ -3077,7 +2944,6 @@ _perforce_cmd_unlock() {
     '-f[unlock files owned by other users]' \
     '*::file:_perforce_files'
 }
-
 
 (( $+functions[_perforce_cmd_unshelve] )) ||
 _perforce_cmd_unshelve() {
@@ -3092,7 +2958,6 @@ _perforce_cmd_unshelve() {
     '*::file, pattern allowed:_perforce_files'
 }
 
-
 (( $+functions[_perforce_cmd_update] )) ||
 _perforce_cmd_update() {
   _arguments -s : \
@@ -3105,7 +2970,6 @@ _perforce_cmd_update() {
     '*::file:_perforce_files -tR'
 }
 
-
 (( $+functions[_perforce_cmd_user] )) ||
 _perforce_cmd_user() {
   _arguments -s : \
@@ -3115,7 +2979,6 @@ _perforce_cmd_user() {
     '(-o)-f[force edit of user]' \
     '(-i)1::username:_perforce_users'
 }
-
 
 (( $+functions[_perforce_cmd_users] )) ||
 _perforce_cmd_users() {
@@ -3128,7 +2991,6 @@ _perforce_cmd_users() {
     '*::username:_perforce_users'
 }
 
-
 (( $+functions[_perforce_cmd_verify] )) ||
 _perforce_cmd_verify() {
   _arguments -s : \
@@ -3140,23 +3002,19 @@ _perforce_cmd_verify() {
     '*::file:_perforce_files -tR'
 }
 
-
 (( $+functions[_perforce_cmd_where] )) ||
 _perforce_cmd_where() {
   _perforce_files
 }
-
 
 (( $+functions[_perforce_cmd_workspace] )) ||
 _perforce_cmd_workspace() {
   _perforce_cmd_client "$@"
 }
 
-
 (( $+functions[_perforce_cmd_workspaces] )) ||
 _perforce_cmd_workspaces() {
   _perforce_cmd_clients "$@"
 }
-
 
 _perforce "$@"

@@ -129,7 +129,6 @@ sed -e '/^argv=/d' -e '/^cwd=/d' -e '/^filec=/d' -e '/^status=/d' \
 	 -e '/^savehist=/s//HISTFILE=\~\/.zhistory SAVEHIST=/' \
 	 -e '/^who=/s//WATCHFMT=/'
 
-
 exec 0<&9
 
 rm /tmp/cz$$.?

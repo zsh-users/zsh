@@ -108,7 +108,6 @@ enum {
 
 #define TFLAG(x) ((x) << 8)
 
-
 static struct mathfunc mftab[] = {
   NUMMATHFUNC("abs", math_func, 1, 1, MF_ABS |
 	      TFLAG(TF_NOCONV|TF_NOASS)),
@@ -519,7 +518,6 @@ math_string(UNUSED(char *name), char *arg, int id)
 
     return ret;
 }
-
 
 static struct features module_features = {
     NULL, 0,

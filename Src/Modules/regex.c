@@ -214,7 +214,6 @@ static struct conddef cotab[] = {
     CONDDEF("regex-match", CONDF_INFIX, zcond_regex_match, 0, 0, ZREGEX_EXTENDED)
 };
 
-
 static struct features module_features = {
     NULL, 0,
     cotab, sizeof(cotab)/sizeof(*cotab),
@@ -222,7 +221,6 @@ static struct features module_features = {
     NULL, 0,
     0
 };
-
 
 /**/
 int

@@ -237,7 +237,6 @@ getpmmapfile(UNUSED(HashTable ht), const char *name)
     return &pm->node;
 }
 
-
 /**/
 static void
 scanpmmapfile(UNUSED(HashTable ht), ScanFunc func, int flags)

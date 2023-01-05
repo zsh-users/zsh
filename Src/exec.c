@@ -205,7 +205,6 @@ mod_export int coprocout;
 /**/
 int fdtable_flocks;
 
-
 /* != 0 if the line editor is active */
 
 /**/
@@ -2087,7 +2086,6 @@ untokenize(char *s)
 	    }
     }
 }
-
 
 /*
  * Given a tokenized string, output it to standard output in
@@ -5480,7 +5478,6 @@ shfunc_set_sticky(Shfunc shf)
     else
 	shf->sticky = NULL;
 }
-
 
 /* Main entry point to execute a shell function. */
 

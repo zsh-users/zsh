@@ -10,7 +10,6 @@
 #  echo and pushln
 #  print's -b -c -s -z -N options
 
-
 %test
 
  print -D "${HOME:-~}"

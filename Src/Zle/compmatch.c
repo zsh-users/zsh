@@ -1256,7 +1256,6 @@ comp_match(char *pfx, char *sfx, char *w, Patprog cp, Cline *clp, int qu,
     return r;
 }
 
-
 /*
  * Guts of a single pattern for pattern_match().
  * Return non-zero if match successful.
@@ -1295,7 +1294,6 @@ pattern_match1(Cpattern p, convchar_t c, int *mtp)
 	return 0;
     }
 }
-
 
 /*
  * Use an equivalence to deduce the line character from the word, or
@@ -1527,7 +1525,6 @@ pattern_match_restrict(Cpattern p, Cpattern wp, convchar_t *wsc, int wsclen,
     return 1;
 }
 
-
 /*
  * The usual version of pattern matching, without the line string
  * being handled by restriction.
@@ -1618,7 +1615,6 @@ pattern_match(Cpattern p, char *s, Cpattern wp, char *ws)
 
     return 1;
 }
-
 
 /* This splits the given string into a list of cline structs, separated
  * at those places where one of the anchors of an `*' pattern was found.
@@ -1714,7 +1710,6 @@ bld_parts(char *str, int len, int plen, Cline *lp, Cline *lprem)
 
     return ret;
 }
-
 
 /*
  * This builds all the possible line patterns for the pattern pat in the

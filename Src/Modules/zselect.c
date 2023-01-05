@@ -267,7 +267,6 @@ bin_zselect(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 #endif
 }
 
-
 static struct builtin bintab[] = {
     BUILTIN("zselect", 0, bin_zselect, 0, -1, 0, NULL, NULL),
 };
@@ -279,7 +278,6 @@ static struct features module_features = {
     NULL, 0,
     0
 };
-
 
 /* The load/unload routines required by the zsh library interface */
 
@@ -311,7 +309,6 @@ boot_(UNUSED(Module m))
 {
     return 0;
 }
-
 
 /**/
 int

@@ -25,4 +25,3 @@ _arguments -S -s \
   "${ign}(- 1 *)"{-V,--version}'[display version information]' \
   '1: : _command_names -e' \
   '*::args :_normal'
-

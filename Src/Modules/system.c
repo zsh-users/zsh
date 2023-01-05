@@ -56,7 +56,6 @@ getposint(char *instr, char *nam)
     return ret;
 }
 
-
 /*
  * Return values of bin_sysread:
  *	0	Successfully read (and written if appropriate)
@@ -225,7 +224,6 @@ bin_sysread(char *nam, char **args, Options ops, UNUSED(int func))
     return count ? 0 : 5;
 }
 
-
 /*
  * Return values of bin_syswrite:
  *	0	Successfully written
@@ -278,7 +276,6 @@ bin_syswrite(char *nam, char **args, Options ops, UNUSED(int func))
 
     return 0;
 }
-
 
 static struct { const char *name; int oflag; } openopts[] = {
 #ifdef O_CLOEXEC
@@ -420,7 +417,6 @@ bin_sysopen(char *nam, char **args, Options ops, UNUSED(int func))
     return 0;
 }
 
-
 /*
  * Return values of bin_sysseek:
  *	0	Success
@@ -478,7 +474,6 @@ math_systell(UNUSED(char *name), UNUSED(int argc), mnumber *argv, UNUSED(int id)
     ret.u.l = lseek(fd, 0, SEEK_CUR);
     return ret;
 }
-
 
 /*
  * Return values of bin_syserror:
@@ -660,7 +655,6 @@ bin_zsystem_flock(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	}
     }
 
-
     if (!args[0]) {
 	zwarnnam(nam, "flock: not enough arguments");
 	return 1;
@@ -771,7 +765,6 @@ bin_zsystem_flock(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 #endif /* HAVE_FCNTL_H */
 }
 
-
 /*
  * Return status zero if the zsystem feature is supported, else 1.
  * Operates silently for future-proofing.
@@ -800,7 +793,6 @@ bin_zsystem_supports(char *nam, char **args,
     return 1;
 }
 
-
 /**/
 static int
 bin_zsystem(char *nam, char **args, Options ops, int func)
@@ -824,7 +816,6 @@ static struct builtin bintab[] = {
     BUILTIN("zsystem", 0, bin_zsystem, 1, -1, 0, NULL, NULL)
 };
 
-
 /* Functions for the errnos special parameter. */
 
 /**/
@@ -837,7 +828,6 @@ errnosgetfn(UNUSED(Param pm))
 
 static const struct gsu_array errnos_gsu =
 { errnosgetfn, arrsetfn, stdunsetfn };
-
 
 /* Functions for the sysparams special parameter. */
 
@@ -867,7 +857,6 @@ fillpmsysparams(Param pm, const char *name)
     pm->u.str = dupstring(buf);
 }
 
-
 /**/
 static HashNode
 getpmsysparams(UNUSED(HashTable ht), const char *name)
@@ -878,7 +867,6 @@ getpmsysparams(UNUSED(HashTable ht), const char *name)
     fillpmsysparams(pm, name);
     return &pm->node;
 }
-
 
 /**/
 static void
@@ -943,7 +931,6 @@ boot_(UNUSED(Module m))
 {
     return 0;
 }
-
 
 /**/
 int

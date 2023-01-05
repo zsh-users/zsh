@@ -124,10 +124,8 @@ integer _rpn_mode _matched _show_stack _i _n
 integer _max_stack _push
 local -a _expressions stack
 
-
 # We use our own history file with an automatic pop on exit.
 history -ap "${ZCALC_HISTFILE:-${ZDOTDIR:-$HOME}/.zcalc_history}"
-
 
 _forms=( '%2$g' '%.*g' '%.*f' '%.*E' '')
 

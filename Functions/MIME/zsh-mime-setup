@@ -30,7 +30,6 @@ while getopts "flv" opt; do
 done
 (( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
 
-
 if [[ -n $o_list ]]; then
   # List and return.  Remember that suffixes may be overridden by styles.
   # However, we require some sort of standard handler to be present,
@@ -55,7 +54,6 @@ if [[ -n $o_list ]]; then
   done
   return 0
 fi
-
 
 # Handler for each suffix.
 (( ${+zsh_mime_handlers} )) || typeset -gA zsh_mime_handlers
@@ -314,7 +312,6 @@ for file in $cap_files; do
     fi
   done <$file
 done
-
 
 # Check for styles which override whatever is in the file.
 # We need to make sure there is a handler set up; for some

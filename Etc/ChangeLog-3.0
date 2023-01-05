@@ -2953,7 +2953,6 @@ Wed Jun 19 20:21:33 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
 	* Src/params.c: unset USERNAME coredump fix.  Also do not reset
  	  integer variables to zero before unsetting.  From Zefram (1258)
 
-
 Wed Jun 19 20:12:37 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c, Src/params.c, Src/subst.c, Src/utils.c: handle
@@ -4393,7 +4392,6 @@ Mon Jul 10 20:29:37 1995  Richard Coleman  <coleman@math.gatech.edu>
 	  option so that "unhash -a" will unhash elements of the
 	  alias hash table.  unfunction is now equivalent to "unhash -f".
 	  unalias is now equivalent to "unhash -a".  rc
-
 
 	* enable/disable now only works on builtins.  You can use
 	  "enable -f" or "disable -f" to enable/disable shell

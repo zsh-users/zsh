@@ -324,7 +324,6 @@ F:regression test workers/31611
 >NO:{y}
 >NO:{z}
 
-
 %clean
 
   zmodload -ui zsh/zpty

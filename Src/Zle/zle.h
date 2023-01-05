@@ -33,7 +33,6 @@ typedef wchar_t *ZLE_STRING_T;
 typedef wint_t   ZLE_INT_T;
 #define ZLE_CHAR_SIZE	sizeof(wchar_t)
 
-
 #define ZLEEOF	WEOF
 
 /* Functions that operate on a ZLE_STRING_T. */
@@ -179,7 +178,6 @@ static inline int ZS_strncmp(ZLE_STRING_T s1, ZLE_STRING_T s2, size_t l)
 #define DECPOS(pos)	((void)(pos--))
 
 #endif
-
 
 typedef struct widget *Widget;
 typedef struct thingy *Thingy;
@@ -407,7 +405,6 @@ enum {
     ZSL_TOEND = 2,		/* Go to the end of the new line */
 };
 
-
 /* Type arguments to addsuffix() */
 enum suffixtype {
     SUFTYP_POSSTR,		/* String of characters to match */
@@ -420,7 +417,6 @@ enum suffixtype {
 enum suffixflags {
     SUFFLAGS_SPACE = 0x0001	/* Add a space when removing suffix */
 };
-
 
 /* Flags for the region_highlight structure */
 enum {
@@ -468,7 +464,6 @@ struct region_highlight {
  * interaction in Doc/Zsh/zle.yo. */
 #define N_SPECIAL_HIGHLIGHTS	(4)
 
-
 #ifdef MULTIBYTE_SUPPORT
 /*
  * We use a wint_t here, since we need an invalid character as a
@@ -502,7 +497,6 @@ typedef struct {
 /* A string of screen cells */
 typedef REFRESH_ELEMENT *REFRESH_STRING;
 
-
 #if defined(MULTIBYTE_SUPPORT) && defined(__STDC_ISO_10646__)
 /*
  * With ISO 10646 there is a private range defined within
@@ -529,7 +523,6 @@ typedef REFRESH_ELEMENT *REFRESH_STRING;
     ((wchar_t)((unsigned char) x + ZSH_INVALID_WCHAR_BASE))
 #endif
 
-
 #ifdef DEBUG
 #define METACHECK()		\
 	DPUTS(zlemetaline == NULL, "line not metafied")
@@ -539,7 +532,6 @@ typedef REFRESH_ELEMENT *REFRESH_STRING;
 #define METACHECK()
 #define UNMETACHECK()
 #endif
-
 
 typedef struct watch_fd *Watch_fd;
 

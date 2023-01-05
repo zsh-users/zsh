@@ -132,7 +132,6 @@ typedef struct stat *Statptr;	 /* This makes the Ultrix compiler happy.  Go figu
 #define TT_GIGABYTES 4
 #define TT_TERABYTES 5
 
-
 typedef int (*TestMatchFunc) _((char *, struct stat *, off_t, char *));
 
 struct qual {
@@ -1073,7 +1072,6 @@ static struct qual *dup_qual_list(struct qual *orig, struct qual **lastp)
 	*lastp = qlast;
     return qfirst;
 }
-
 
 /*
  * Get a glob string for execution, following e, P or + qualifiers.

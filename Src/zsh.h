@@ -129,7 +129,6 @@ struct mathfunc {
 /* When autoloading, enable all features in module */
 #define MFF_AUTOALL  8
 
-
 #define NUMMATHFUNC(name, func, min, max, id) \
     { NULL, name, 0, func, NULL, NULL, min, max, id }
 #define STRMATHFUNC(name, func, id) \
@@ -626,7 +625,6 @@ typedef void (*voidvoidfnptr_t) _((void));
 struct prepromptfn {
     voidvoidfnptr_t func;
 };
-
 
 /*
  * Element of the timedfns list.
@@ -1421,7 +1419,6 @@ enum {
     PARSEARGS_LOGIN    = 0x2	/* Shell is login shell */
 };
 
-
 /*
  * Handler arguments are: builtin name, null-terminated argument
  * list excluding command name, option structure, the funcid element from the
@@ -1817,7 +1814,6 @@ struct gsu_hash {
     void (*setfn) _((Param, HashTable));
     void (*unsetfn) _((Param, int));
 };
-
 
 /* node used in parameter hash table (paramtab) */
 
@@ -2319,7 +2315,6 @@ struct histent {
 #define IN_ENV     4
 /* In a parameter name in an assignment. */
 #define IN_PAR     5
-
 
 /******************************/
 /* Definition for zsh options */

@@ -84,4 +84,3 @@ case $service in
     _arguments $arguments
     ;;
 esac
-

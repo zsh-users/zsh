@@ -366,7 +366,6 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	}
     }
 
-
     if (OPT_ISSET(ops,'c')) {
 	if (!args[0]) {
 	    tcp_cleanup();
@@ -430,7 +429,6 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 
 	sess->sock.in.sin_family = AF_INET;
 	sess->sock.in.sin_port = lport;
-
 
 	if (bind(sess->fd, (struct sockaddr *)&sess->sock.in, sizeof(struct sockaddr_in)))
 	{
@@ -738,7 +736,6 @@ boot_(UNUSED(Module m))
     ztcp_sessions = znewlinklist();
     return 0;
 }
-
 
 /**/
 int

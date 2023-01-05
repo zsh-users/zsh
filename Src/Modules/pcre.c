@@ -27,7 +27,6 @@
  *
  */
 
-
 #include "pcre.mdh"
 #include "pcre.pro"
 
@@ -486,7 +485,6 @@ static struct builtin bintab[] = {
     BUILTIN("pcre_study",   0, bin_pcre_study,   0, 0, 0, NULL,    NULL)
 };
 
-
 static struct features module_features = {
     bintab, sizeof(bintab)/sizeof(*bintab),
 #if defined(HAVE_PCRE_COMPILE) && defined(HAVE_PCRE_EXEC)
@@ -498,7 +496,6 @@ static struct features module_features = {
     NULL, 0,
     0
 };
-
 
 /**/
 int

@@ -1086,4 +1086,3 @@ F:Must be tested with a top-level script rather than source or function
 %clean
 
   rm -f TRAPEXIT
-

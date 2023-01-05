@@ -160,7 +160,6 @@ _lp_list_jobs()
   return 1
 }
 
-
 _lp()
 {
   case $service in

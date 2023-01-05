@@ -77,7 +77,6 @@ alignmultiwordleft(int *pos, int setpos)
     }
 }
 
-
 /*
  * Same principle when moving right.  We need to check if
  * alignmultiwordleft() would be successful in order to decide
@@ -114,7 +113,6 @@ alignmultiwordright(int *pos, int setpos)
     return 1;
 }
 
-
 /* Move cursor right, checking for combining characters */
 
 /**/
@@ -124,7 +122,6 @@ inccs(void)
     zlecs++;
     alignmultiwordright(&zlecs, 1);
 }
-
 
 /* Move cursor left, checking for combining characters */
 
@@ -146,7 +143,6 @@ incpos(int *pos)
     alignmultiwordright(pos, 1);
 }
 
-
 /**/
 mod_export void
 decpos(int *pos)
@@ -155,7 +151,6 @@ decpos(int *pos)
     alignmultiwordleft(pos, 1);
 }
 #endif
-
 
 /* Size of buffer in the following function */
 #define BMC_BUFSIZE MB_CUR_MAX
@@ -291,7 +286,6 @@ backwardmetafiedchar(char *start, char *endptr, convchar_t *retchr)
 	*retchr = (convchar_t)0;
     return endptr;
 }
-
 
 /**/
 int

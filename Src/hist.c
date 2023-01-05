@@ -408,7 +408,6 @@ iaddtoline(int c)
     zleentry(ZLE_CMD_ADD_TO_LINE, itok(c) ? ztokens[c - Pound] : c);
 }
 
-
 static int
 ihgetc(void)
 {
@@ -2299,7 +2298,6 @@ casemodify(char *str, int how)
     return str2;
 }
 
-
 /*
  * Substitute "in" for "out" in "*strptr" and update "*strptr".
  * If "gbal", do global substitution.
@@ -3863,7 +3861,6 @@ pushhiststack(char *hf, zlong hs, zlong shs, int level)
 
     return histsave_stack_pos;
 }
-
 
 /**/
 int

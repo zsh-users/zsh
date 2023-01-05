@@ -130,7 +130,6 @@ if [[ -n ${clnts_compl_new[(r)$service]} ]]; then
       && ret=0
   fi
 
-
 # Old style clients
 elif [[ -n ${clnts_compl_old[(r)$service]} ]]; then
   if [[ -z $_cache_openstack_clnt_cmds[$service] ]]; then

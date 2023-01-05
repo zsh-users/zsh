@@ -69,7 +69,6 @@ typedef struct zftp_session *Zftp_session;
 # undef HAVE_POLL
 #endif
 
-
 #ifdef USE_LOCAL_H_ERRNO
 int h_errno;
 #endif
@@ -813,7 +812,6 @@ zfgetmsg(void)
     return lastcodestr[0] - '0';
 }
 
-
 /*
  * Send a command and get the reply.
  * The command is expected to have the \r\n already tacked on.
@@ -850,7 +848,6 @@ zfsendcmd(char *cmd)
 
     return zfgetmsg();
 }
-
 
 /* Set up a data connection, return 1 for failure, 0 for success */
 
@@ -1141,7 +1138,6 @@ zfgetdata(char *name, char *rest, char *cmd, int getsize)
 	 */
 	zfsess->dfd = zfmovefd(zfsess->dfd);
     }
-
 
     /* more options, just to look professional */
 #ifdef SO_LINGER
@@ -2297,7 +2293,6 @@ zftp_test(UNUSED(char *name), UNUSED(char **args), UNUSED(int flags))
 #endif /* defined(HAVE_POLL) || defined(HAVE_SELECT) */
 }
 
-
 /* do ls or dir on the remote directory */
 
 /**/
@@ -2784,7 +2779,6 @@ zftp_close(UNUSED(char *name), UNUSED(char **args), UNUSED(int flags))
     zfclose(0);
     return 0;
 }
-
 
 /*
  * Session management routines.  A session consists of various

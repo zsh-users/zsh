@@ -266,7 +266,6 @@ _yum-history() {
   fi
 }
 
-
 # Fills the all pkg cache
 _yum_all_pkgs()
 {

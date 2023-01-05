@@ -1,7 +1,6 @@
 # Autoload this function, run `zle -N <func-name>' and bind <func-name>
 # to a key.
 
-
 # This allows incremental completion of a word.  After starting this
 # command, a list of completion choices can be shown after every character
 # you type, which you can delete with ^h or DEL.  RET will accept the

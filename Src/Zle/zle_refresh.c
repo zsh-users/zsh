@@ -201,7 +201,6 @@ ZLE_STRING_T predisplay, postdisplay;
 /**/
 int predisplaylen, postdisplaylen;
 
-
 /*
  * Attributes used by default on the command line, and
  * attributes for highlighting special (unprintable) characters
@@ -380,7 +379,6 @@ zle_set_highlight(void)
     allocate_colour_buffer();
 }
 
-
 /**/
 static void
 zle_free_highlight(void)
@@ -451,7 +449,6 @@ get_region_highlight(UNUSED(Param pm))
     *arrp = NULL;
     return retarr;
 }
-
 
 /*
  * The parameter system requires the pm argument, but this
@@ -559,7 +556,6 @@ set_region_highlight(UNUSED(Param pm), char **aval)
     freearray(av);
 }
 
-
 /**/
 void
 unset_region_highlight(Param pm, int exp)
@@ -569,7 +565,6 @@ unset_region_highlight(Param pm, int exp)
 	stdunsetfn(pm, exp);
     }
 }
-
 
 /* The last attributes that were on. */
 static zattr lastatr;
@@ -902,7 +897,6 @@ nextline(Rparams rpms, int wrapped)
     return 0;
 }
 
-
 /*
  * Go to the next line in the status area.
  */
@@ -938,7 +932,6 @@ snextline(Rparams rpms)
     rpms->s = nbuf[rpms->ln];
     rpms->sen = rpms->s + winw;
 }
-
 
 /**/
 static void
@@ -994,7 +987,6 @@ addmultiword(REFRESH_ELEMENT *base, ZLE_STRING_T tptr, int ichars)
 }
 #endif
 
-
 /*
  * Swap the old and new video buffers, plus any associated multiword
  * buffers.  The new buffer becomes the old one; the new buffer
@@ -1027,7 +1019,6 @@ bufswap(void)
 #endif
 }
 
-
 /**/
 mod_export void
 zrefresh(void)
@@ -1049,7 +1040,6 @@ zrefresh(void)
 #ifdef MULTIBYTE_SUPPORT
     int width;			/* width of wide character		     */
 #endif
-
 
     /* If this is called from listmatches() (indirectly via trashzle()), and *
      * that was called from the end of zrefresh(), then we don't need to do  *

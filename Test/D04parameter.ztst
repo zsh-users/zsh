@@ -569,7 +569,6 @@
 >4:x:
 >5:):
 
-
   line=$'A line with # someone\'s comment\nanother line # (1 more\nanother one'
   print "*** Normal ***"
   print -l ${(z)line}
@@ -2726,4 +2725,3 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
  : ${(zZ+x+):-}
 1:parameter expansion flags parsing error gives a clue
 ?(eval):1: error in flags near position 7 in '${(zZ+x+):-}'
-

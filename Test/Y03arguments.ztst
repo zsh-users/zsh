@@ -796,7 +796,6 @@ F:shouldn't offer -t in the first case (with stacked options)
 >DESCRIPTION:{option}
 >NO:{-b}
 
-
 %clean
 
   zmodload -ui zsh/zpty

@@ -17,4 +17,3 @@ _arguments -S \
   '-V[volume]:percentage of normal volume' \
   '(-)'{-\?,--help,-h}'[display help information]' \
   '(-)*:quicktime file:_files'
-

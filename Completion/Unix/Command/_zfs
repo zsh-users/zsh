@@ -294,7 +294,6 @@ ci_ds_props+=( $rw_ds_props )
 ds_propnames=( ${rw_ds_props%%:*} )
 po_propnames=( ${ro_po_props%%:*} ${ci_po_props%%:*} ${rw_po_props%%:*} )
 
-
 case $service in
   zfs|zpool)
     _arguments -C -A "-*" \

@@ -159,7 +159,6 @@ __zni_retrieve_lines() {
   return 0
 }
 
-
 # First argument is a state; other arguments are lines
 # to parse.  They should either contain single assignments or
 # setopt or unsetopt statements.  The state for each parameter
@@ -379,7 +378,6 @@ __zni_apply_defaults() {
     ;;
   esac
 }
-
 
 # Display and edit the settings given by the set of *_lines arrays.
 # If requested by the user, apply the settings, updating the
@@ -626,7 +624,6 @@ Type:
   done
 }
 
-
 # Print and dispatch a submenu.
 # The first argument is the title.  The remaining arguments
 # are pairs of descriptions and functions to execute.
@@ -672,7 +669,6 @@ __zni_submenu() {
     fi
   done
 }
-
 
 # Save all values that have been edited to .zshrc.
 __zni_save() {
@@ -783,7 +779,6 @@ ${(F)unparsed}
   fi
 }
 
-
 ########################################################################
 # Specific configurations
 ########################################################################
@@ -799,7 +794,6 @@ __zni_history_config() {
     save=1
   fi
 }
-
 
 __zni_completion_config() {
   autoload -Uz compinstall
@@ -889,7 +883,6 @@ __zni_completion_save() {
   fi
 }
 
-
 __zni_options_config() {
   # when we have enough, should use:
   #   __zni_submenu "Common shell options"
@@ -912,7 +905,6 @@ __zni_options_config() {
   fi
 }
 
-
 ########################################################################
 # Main function
 ########################################################################
@@ -930,7 +922,6 @@ zstyle :compinstall filename $zd/.zshrc
 if compinstall -d; then
   install_state[completion]="Saved"
 fi
-
 
 # skip initial screen if the function was deliberately run by the user.
 if [[ $1 != -f ]]; then
@@ -993,7 +984,6 @@ The function will be run again next time.  To prevent this, execute:
     ;;
   esac
 fi
-
 
 print -r "Attempting to extract information from manual pages..."
 (man zshoptions | col -b > $tmpfile-man-options;

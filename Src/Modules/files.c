@@ -205,7 +205,6 @@ bin_ln(char *nam, char **args, Options ops, int func)
     struct stat st;
     size_t blen;
 
-
     if(func == BIN_MV) {
 	movefn = (MoveFunc) rename;
 	flags = OPT_ISSET(ops,'f') ? 0 : MV_ASKNW;
@@ -702,7 +701,6 @@ chown_dolchown(char *arg, char *rp, UNUSED(struct stat const *sp), void *magic)
     }
     return 0;
 }
-
 
 /**/
 static unsigned long getnumeric(char *p, int *errp)

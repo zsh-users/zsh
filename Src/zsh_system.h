@@ -788,7 +788,6 @@ extern char **environ;
 # define USE_SET_UNSET_ENV
 #endif
 
-
 /* These variables are sometimes defined in, *
  * and needed by, the termcap library.       */
 #if MUST_DEFINE_OSPEED

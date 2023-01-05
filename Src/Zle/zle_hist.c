@@ -100,9 +100,7 @@ forget_edits(void)
     }
 }
 
-
 /*** Search utilities ***/
-
 
 /*
  * Return zero if the ZLE string histp length histl and the ZLE string
@@ -174,7 +172,6 @@ zlinecmp(const char *histp, const char *inputp)
     return 3;
 }
 
-
 /*
  * Search for needle in haystack.  Haystack and needle are metafied strings.
  * Start the search at position pos in haystack.
@@ -212,9 +209,7 @@ zlinefind(char *haystack, int pos, char *needle, int dir, int sens)
     return NULL;
 }
 
-
 /*** Widgets ***/
-
 
 /**/
 int

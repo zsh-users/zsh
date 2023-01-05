@@ -78,13 +78,11 @@ else
   fi
 fi
 
-
 if [[ -n $detect ]]; then
   __ci_tidyup
   [[ $foundold = true ]]
   return
 fi
-
 
 __ci_output() {
   print -r "$startline"
@@ -103,7 +101,6 @@ compinit${compinit_args:+ $compinit_args}"
 
   print -r "$endline"
 }
-
 
 if [[ -n $basic ]]; then
   __ci_output
@@ -243,9 +240,7 @@ fi
 print "Note that you will be given a chance to save the new setup
 somewhere else at the end."
 
-
 __ci_newline || return 1
-
 
 typeset d compdir subdirs lines
 
@@ -343,7 +338,6 @@ fi
 
 __ci_newline || return 1
 
-
 #
 # Code for changing styles
 #
@@ -418,7 +412,6 @@ available.
   vared -eh -p 'context> ' curcontext
   [[ -z $curcontext ]] && curcontext=$defcontext
 }
-
 
 __ci_toggle_completer() {
   # used locally within __ci_do_completers
@@ -1359,7 +1352,6 @@ this case.  Do you want this?
   return 0;
 }
 
-
 __ci_do_selection() {
   local key listc menu select amenu elt listp selectp haslistp hasselectp
   integer num
@@ -1538,7 +1530,6 @@ to show without asking.  Hit return to keep the current value.
   return 0
 }
 
-
 __ci_do_display() {
   local key usec
 
@@ -1610,7 +1601,6 @@ completions?
 
   return 0
 }
-
 
 #       file-sort, special-dirs, ignore-parents,
 #       squeeze-slashes,
@@ -1854,7 +1844,6 @@ Accept the default to handle network resources as just described."
   return 0
 }
 
-
 # TODO: history completion, jobs, prefix-needed 'n' stuff.
 __ci_do_misc() {
   local key
@@ -1885,7 +1874,6 @@ q.  Return without saving.
 
   return 0;
 }
-
 
 # TODO: it should probably be possible to set completion options via
 #         compinstall, even though they've been around for years.
@@ -1933,7 +1921,6 @@ q.  Return without saving.
        ;;
   esac
 done
-
 
 if (( $#styles )); then
   typeset style stylevals context values

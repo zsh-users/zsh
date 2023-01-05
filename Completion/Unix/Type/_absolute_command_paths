@@ -33,5 +33,4 @@ _absolute_command_paths() {
     'commands:full path to an executable:_typed-in_absolute_command_paths'
 }
 
-
 _absolute_command_paths "$@"

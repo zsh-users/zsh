@@ -461,4 +461,3 @@ zlinklist2array(LinkList list, int copy)
 
     return ret;
 }
-

@@ -10,7 +10,6 @@ _mac_apps_caching_policy () {
   (( $#oldp ))
 }
 
-
 # _mac_apps_*_retrieve
 # 
 # Get search applications from directories specified in app_dir_root.
@@ -57,7 +56,6 @@ _mac_apps_old_retrieve () {
     _mac_apps+=( ${${(f)app_result}%/..namedfork/rsrc} )
   fi
 }
-
 
 _retrieve_mac_apps() {
   local cache_policy

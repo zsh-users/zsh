@@ -28,7 +28,6 @@ Equals signs are special inside the parens in a name=(...) assignment:
 Positional parameter references may not go higher than 9 in POSIX shell
 emulation; that is, $12 should be ${1}2, not ${12}.
 
-
 Semantics
 ---------
 

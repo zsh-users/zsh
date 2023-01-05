@@ -101,7 +101,6 @@ bindkey |
 
 print >& $_d_fd
 
-
 # Autoloads: look for all defined functions beginning with `_' (that also
 # exists in fpath: see workers/38547).
 

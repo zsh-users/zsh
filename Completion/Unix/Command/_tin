@@ -51,4 +51,3 @@ if [[ "$state" = newshosts ]]; then
 fi
 
 return 1
-

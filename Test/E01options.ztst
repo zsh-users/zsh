@@ -1298,7 +1298,6 @@ F:Regression test for workers/41811
 ?fn_wnv:20: numeric parameter foo5 set in enclosing scope in function fn_wnv
 ?all off again
 
-
   (
     setopt warnnestedvar
     () {

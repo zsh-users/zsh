@@ -85,7 +85,6 @@ scheddeltimed(void)
     }
 }
 
-
 /* Check scheduled commands; call this function from time to time. */
 
 /**/
@@ -335,7 +334,6 @@ bin_sched(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
     return 0;
 }
 
-
 /**/
 static char **
 schedgetfn(UNUSED(Param pm))
@@ -369,7 +367,6 @@ schedgetfn(UNUSED(Param pm))
 
     return ret;
 }
-
 
 static struct builtin bintab[] = {
     BUILTIN("sched", 0, bin_sched, 0, -1, 0, NULL, NULL),

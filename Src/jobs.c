@@ -327,7 +327,6 @@ handle_sub(int job, int fg)
     return 0;
 }
 
-
 /* Get the latest usage information */
 
 /**/
@@ -340,7 +339,6 @@ get_usage(void)
     times(&shtms);
 #endif
 }
-
 
 #if !defined HAVE_WAIT3 || !defined HAVE_GETRUSAGE
 /* Update status of process that we have just WAIT'ed for */
@@ -1736,7 +1734,6 @@ clearjobtab(int monitor)
 	--oldmaxjob;
     }
 
-
     memset(jobtab, 0, jobtabsize * sizeof(struct job)); /* zero out table */
     maxjob = 0;
 
@@ -2046,7 +2043,6 @@ static char *hackzero;
 static int hackspace;
 #endif
 
-
 /* Initialise job handling. */
 
 /**/
@@ -2097,7 +2093,6 @@ init_jobs(char **argv, char **envp)
 #endif
 }
 
-
 /*
  * We have run out of space in the job table.
  * Expand it by an additional MAXJOBS_ALLOC slots.
@@ -2135,7 +2130,6 @@ expandjobtab(void)
 
     return 1;
 }
-
 
 /*
  * See if we can reduce the job table.  We can if we go over
@@ -2904,7 +2898,6 @@ getsigname(int sig)
     return "";
 }
 
-
 /* Get the function node for a trap, taking care about alternative names */
 /**/
 HashNode
@@ -2996,7 +2989,6 @@ findjobnam(const char *s)
 	    return jobnum;
     return -1;
 }
-
 
 /* make sure we are a process group leader by creating a new process
    group if necessary */

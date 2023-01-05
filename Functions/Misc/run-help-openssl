@@ -4,4 +4,3 @@ if [ $# -eq 0 ]; then
 else
     man $1
 fi
-

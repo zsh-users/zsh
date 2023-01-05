@@ -36,7 +36,6 @@ static zlong intparam;
 static char *strparam;
 static char **arrparam;
 
-
 /**/
 static int
 bin_example(char *nam, char **args, Options ops, UNUSED(int func))

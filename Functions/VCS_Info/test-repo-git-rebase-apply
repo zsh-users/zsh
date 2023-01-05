@@ -55,5 +55,3 @@ case $0:P in
         echo >&2 "$0: unrecognized basename"
         ;;
 esac
-
-

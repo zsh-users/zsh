@@ -1242,7 +1242,6 @@ static const struct gsu_integer listlines_gsu =
 static const struct gsu_array compvararray_gsu =
 { arrvargetfn, arrvarsetfn, compunsetfn };
 
-
 static struct compparam comprparams[] = {
     { "words", PM_ARRAY, VAL(compwords), NULL },
     { "redirections", PM_ARRAY, VAL(compredirs), NULL },

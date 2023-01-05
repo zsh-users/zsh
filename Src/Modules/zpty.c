@@ -877,7 +877,6 @@ ptyhook(UNUSED(Hookdef d), UNUSED(void *dummy))
     return 0;
 }
 
-
 static struct builtin bintab[] = {
     BUILTIN("zpty", 0, bin_zpty, 0, -1, 0, "ebdmrwLnt", NULL),
 };
@@ -889,7 +888,6 @@ static struct features module_features = {
     NULL, 0,
     0
 };
-
 
 /**/
 int

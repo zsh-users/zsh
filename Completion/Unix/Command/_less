@@ -97,7 +97,6 @@ _arguments -S -s -A "[-+]*"  \
   '--wheel-lines=[specify lines to move for each click of the mouse wheel]:lines' \
   "$files[@]" && ret=0
 
-
 if [[ -n "$state" ]]; then
   case $state in
     colors)

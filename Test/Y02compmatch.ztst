@@ -36,7 +36,6 @@
     ZTST_unimplemented="the zsh/zpty module is not available"
   fi
 
-
 %test
 
  test_code z: list1
@@ -146,7 +145,6 @@
 >COMPADD:{}
 >INSERT_POSITIONS:{14}
 
-
  test_code $options_matcher example1_list
  comptest $'tst list_bee\t'
 0:Documentation example for options, input "list_bee"
@@ -175,7 +173,6 @@
 >line: {tst NOListBeep }{}
 >COMPADD:{}
 >INSERT_POSITIONS:{14}
-
 
  test_code $options_matcher example1_list
  comptest $'tst NO_List\t__\tB\t'
@@ -265,7 +262,6 @@
 >COMPADD:{}
 >INSERT_POSITIONS:{}
 
-
  test_code $options_matcher example1_list
  comptest $'tst ___\tlist_\tbeep__\t'
 0:Documentation example for options, input "___\tlist_\tbeep__\t" 
@@ -351,7 +347,6 @@
 >line: {tst aBC}{}
 >COMPADD:{}
 >INSERT_POSITIONS:{6}
-
 
  test_code $case_insensitive_m example3_list
  comptest $'tst aB\t\t'
@@ -504,7 +499,6 @@
 >COMPADD:{}
 >INSERT_POSITIONS:{44}
 
-
  example6_list=(LikeTHIS FooHoo 5foo123 5bar234)
  test_code 'r:|[A-Z0-9]=* r:|=*' example6_list
  comptest $'tst H\t'
@@ -582,7 +576,6 @@
 >COMPADD:{}
 >INSERT_POSITIONS:{18}
 
-
  example8_list=(passwd.byname)
  test_code 'r:[^.]||.=* l:.||[^.]=*'
  comptest $'tst .^B\tpass^Fname\t'
@@ -593,7 +586,6 @@
 >line: {tst passwd.byname }{}
 >COMPADD:{}
 >INSERT_POSITIONS:{17}
-
 
  workers_7311_matcher="m:{a-z}={A-Z} r:|[.,_-]=* r:|=*"
  workers_7311_list=(Abc-Def-Ghij.txt Abc-def.ghi.jkl_mno.pqr.txt Abc_def_ghi_jkl_mno_pqr.txt)
@@ -646,7 +638,6 @@
 >line: {tst build.out}{}
 >COMPADD:{}
 >INSERT_POSITIONS:{13}
-
 
  workers_11388_matcher='r:|[:.]=* r:|=*'
  workers_11388_list=(a.b:0 c.d:1)
@@ -731,7 +722,6 @@
 >NO:{A.B.C}
 >NO:{A.B.C.D}
 >NO:{A.C}
-
 
  workers_13345b_matcher='r:|[.,_-]=** r:|[0-9]=**'
  workers_13345b_list=(a-b_1_2_2  a-b_2_0.gz a-b_2_0.zip)

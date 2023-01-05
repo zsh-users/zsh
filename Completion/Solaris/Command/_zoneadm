@@ -119,7 +119,6 @@ _zoneadm() {
 	("halt"|"ready"|"reboot"|"verify")
 		;;
 
-
 	("help")
 		_wanted commands expl "zoneadm subcommand" compadd -a subcmds
 		;;

@@ -814,7 +814,6 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
     return ret;
 }
 
-
 /*
  * Flag that the user has requested the terminal be trashed
  * for whatever use.  We attempt to keep the tty settings in

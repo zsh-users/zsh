@@ -59,7 +59,6 @@ main()
   fi])
 ])
 
-
 dnl
 dnl zsh_SHARED_FUNCTION
 dnl

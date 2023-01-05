@@ -955,7 +955,6 @@ getbyte(long do_keytmout, int *timeout, int full)
     return lastchar = ret;
 }
 
-
 /*
  * Get a full character rather than just a single byte.
  */
@@ -972,7 +971,6 @@ getfullchar(int do_keytmout)
     return inchar;
 #endif
 }
-
 
 /**/
 #ifdef MULTIBYTE_SUPPORT
@@ -2049,7 +2047,6 @@ zle_resetprompt(void)
         redisplay(NULL);
 }
 
-
 /**/
 mod_export void
 trashzle(void)
@@ -2080,7 +2077,6 @@ trashzle(void)
     if (errflag)
 	kungetct = 0;
 }
-
 
 /* Hook functions. Used to allow access to zle parameters if zle is
  * active. */

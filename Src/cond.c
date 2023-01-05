@@ -432,7 +432,6 @@ evalcond(Estate state, char *fromtest)
     }
 }
 
-
 /**/
 static int
 doaccess(char *s, int c)
@@ -443,7 +442,6 @@ doaccess(char *s, int c)
 #endif
     return !access(unmeta(s), c);
 }
-
 
 static struct stat st;
 
@@ -468,7 +466,6 @@ getstat(char *s)
     return &st;
 }
 
-
 /**/
 static mode_t
 dostat(char *s)
@@ -480,7 +477,6 @@ dostat(char *s)
     return statp->st_mode;
 }
 
-
 /* pem@aaii.oz; needed since dostat now uses "stat" */
 
 /**/
@@ -491,7 +487,6 @@ dolstat(char *s)
 	return 0;
     return st.st_mode;
 }
-
 
 /*
  * optison returns evalcond-friendly statuses (true, false, error).

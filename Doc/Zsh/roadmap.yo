@@ -22,7 +22,6 @@ See also
 ifnzman(noderef(User Configuration Functions))\
 ifzman(the section `User Configuration Functions' in zmanref(zshcontrib)).
 
-
 sect(Interactive Use)
 
 Interaction with the shell uses the builtin Zsh Line Editor, ZLE.  This is

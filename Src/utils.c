@@ -119,7 +119,6 @@ set_widearray(char *mb_array, Widechar_array wca)
 }
 #endif
 
-
 /* Print an error
 
    The following functions use the following printf-like format codes
@@ -164,7 +163,6 @@ zwarning(const char *cmd, const char *fmt, va_list ap)
 
     zerrmsg(stderr, fmt, ap);
 }
-
 
 /**/
 mod_export void
@@ -242,7 +240,6 @@ VA_DCL
     zwarning(cmd, fmt, ap);
     va_end(ap);
 }
-
 
 #ifdef DEBUG
 
@@ -1047,7 +1044,6 @@ substnamedir(char *s)
     return zhtricat("~", d->node.nam, quotestring(s + strlen(d->dir),
 						  QT_BACKSLASH));
 }
-
 
 /* Returns the current username.  It caches the username *
  * and uid to try to avoid requerying the password files *
@@ -3285,7 +3281,6 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm, long nsec)
 #endif
     char *origbuf = buf;
 
-
     while (*fmt) {
 	if (*fmt == Meta) {
 	    int chr = fmt[1] ^ 32;
@@ -4077,7 +4072,6 @@ equalsplit(char *s, char **t)
     return 0;
 }
 
-
 /* the ztypes table */
 
 /**/
@@ -4215,7 +4209,6 @@ makebangspecial(int yesno)
     }
 }
 
-
 /**/
 #ifdef MULTIBYTE_SUPPORT
 /* A wide-character version of the iblank() macro. */
@@ -4296,7 +4289,6 @@ wcsitype(wchar_t c, int itype)
 
 /**/
 #endif
-
 
 /*
  * Find the end of a set of characters in the set specified by itype;
@@ -4736,7 +4728,6 @@ gettygrp(void)
     return arg;
 }
 
-
 /* Escape tokens and null characters.  Buf is the string which should be     *
  * escaped.  len is the length of the string.  If len is -1, buf should be   *
  * null terminated.  If len is non-negative and the third parameter is not   *
@@ -4824,7 +4815,6 @@ metafy(char *buf, int len, int heap)
     return buf;
 }
 
-
 /*
  * Duplicate a string, metafying it as we go.
  *
@@ -4845,7 +4835,6 @@ ztrdup_metafy(const char *s)
      */
     return metafy((char *)s, -1, META_DUP);
 }
-
 
 /*
  * Take a null-terminated, metafied string in s into a literal
@@ -5211,7 +5200,6 @@ nicedupstring(char const *s)
     return nicedup(s, 1);
 }
 
-
 #ifndef MULTIBYTE_SUPPORT
 /* Unmetafy and output a string, displaying special characters readably. */
 
@@ -5222,7 +5210,6 @@ nicezputs(char const *s, FILE *stream)
     sb_niceformat(s, stream, NULL, 0);
     return 0;
 }
-
 
 /* Return the length of the visible representation of a metafied string. */
 
@@ -5247,7 +5234,6 @@ niceztrlen(char const *s)
     return l;
 }
 #endif
-
 
 /**/
 #ifdef MULTIBYTE_SUPPORT
@@ -5441,7 +5427,6 @@ nicedup(const char *s, int heap)
 
     return retstr;
 }
-
 
 /*
  * The guts of mb_metacharlenconv().  This version assumes we are
@@ -5983,7 +5968,6 @@ hasspecial(char const *s)
     }
     return 0;
 }
-
 
 static char *
 addunprintable(char *v, const char *u, const char *uend)
@@ -6677,7 +6661,6 @@ ucs4toutf8(char *dest, unsigned int wval)
     return len;
 }
 #endif
-
 
 /*
  * The following only occurs once or twice in the code, but in different
@@ -7504,7 +7487,6 @@ restoredir(struct dirsav *d)
     }
     return err;
 }
-
 
 /* Check whether the shell is running with privileges in effect.  *
  * This is the case if EITHER the euid is zero, OR (if the system *

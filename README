@@ -269,7 +269,6 @@ and returns a non-zero exit code.  For further details, see the
 documentation of the -o switch in the chapter "Conditional Expressions"
 in the zshmisc(1) manual.
 
-
 Incompatibilities between 5.3.1 and 5.4.2
 -----------------------------------------
 
@@ -332,7 +331,6 @@ undocumented and inconvenient as it is generally more useful to consider
 execution within a function in isolation from its environment.  The shell
 now returns from the function on executing `false'.  (This is general
 to all functions; an anonymous function is shown here for compactness.)
-
 
 Incompatibilities between 5.0.8 and 5.3
 ----------------------------------------
@@ -527,7 +525,6 @@ New behaviour:
 % print $(( 5.5 % 2 ))
 1.5
 
-
 2) Previously, assignments to variables assigned the correct type to
 variables declared as floating point or integer, but this type was
 not propagated to the value of the expression, as a C programmer
@@ -551,7 +548,6 @@ New behaviour:
 2
 % print $var
 2
-
 
 3) Previously, the FORCE_FLOAT option only forced the use of floating
 point in arithmetic expressions for integer constants, i.e. numbers
@@ -589,12 +585,10 @@ New behaviour:
 % print $(( i / j ))
 0.5
 
-
 4) The _git completion used to offer both local and remote heads under the
 tag 'heads'.  The tag has now been split into 'heads-local' and
 'heads-remote' in all contexts that existed in 5.0.7.  The --fixup/--squash
 context still uses the tag 'heads' (but this may change in a future release).
-
 
 Incompatibilities between 5.0.2 and 5.0.5
 -----------------------------------------

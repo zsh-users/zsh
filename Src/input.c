@@ -27,7 +27,6 @@
  *
  */
 
-
 /*
  * This file deals with input buffering, supplying characters to the
  * history expansion code a character at a time.  Input is stored on a
@@ -100,7 +99,6 @@ static char *inbufptr;		/* Pointer into input buffer */
 static char *inbufpush;		/* Character at which to re-push alias */
 static int inbufleft;		/* Characters left in current input
 				   stack element */
-
 
  /* Input must be stacked since the input queue is used by
   * various different parts of the shell.
@@ -790,7 +788,6 @@ inpopalias(void)
     while (inbufflags & INP_ALIAS)
 	inpoptop();
 }
-
 
 /*
  * Get pointer to remaining string to read.

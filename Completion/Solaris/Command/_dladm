@@ -583,7 +583,6 @@ _dladm() {
       ':bridge name:'
   ;;
 
-
   (modify-bridge)
     _arguments -A "-*" \
       '(-P --protect)'{-P,--protect}'[specify a protection method]:protection method:(stp trill)' \
@@ -596,13 +595,11 @@ _dladm() {
       ':bridge name:_dladm_bridges'
   ;;
 
-
   (delete-bridge)
     _arguments -A "-*" \
       '(-R --root)'{-R,--root}'[root directory]:directory:_path_files -/' \
       ':bridge name:_dladm_bridges'
   ;;
-
 
   (add-bridge|remove-bridge)
     _arguments -A "-*" \
@@ -610,7 +607,6 @@ _dladm() {
       '*'{-l,--link}'[specify link to add]:link:_dladm_links' \
       ':bridge name:_dladm_bridges'
   ;;
-
 
   (show-bridge)
     # XXX $bridge_stats_properties get added into -o completions for set1
@@ -639,7 +635,6 @@ _dladm() {
       '(-o --output)'{-o,--output}'[properties to display]:property:_values -s , "property" $bridge_trill_properties' \
       ':bridge name:_dladm_bridges'
     ;
-
 
   (create-iptun)
     _arguments -A "-*" \

@@ -745,7 +745,6 @@ killrunjobs(int from_signal)
         zwarn("warning: %d jobs SIGHUPed", killed);
 }
 
-
 /* send a signal to a job (simply involves kill if monitoring is on) */
  
 /**/
@@ -896,7 +895,6 @@ dosavetrap(int sig, int level)
      */
     zinsertlinknode(savetraps, (LinkNode)savetraps, st);
 }
-
 
 /*
  * Set a trap:  note this does not handle manipulation of
@@ -1169,7 +1167,6 @@ endtrapscope(void)
 	  "BUG: still saved traps outside all function scope");
 }
 
-
 /*
  * Decide whether a trap needs handling.
  * If so, see if the trap should be run now or queued.
@@ -1217,7 +1214,6 @@ handletrap(int sig)
     return 1;
 }
 
-
 /*
  * Queue traps if they shouldn't be run asynchronously, i.e.
  * we're not in the wait builtin and TRAPSASYNC isn't set, when
@@ -1243,7 +1239,6 @@ queue_traps(int wait_cmd)
     }
 }
 
-
 /*
  * Disable trap queuing and run the traps.
  */
@@ -1257,7 +1252,6 @@ unqueue_traps(void)
 	(void) handletrap(trap_queue[trap_queue_front]);
     }
 }
-
 
 /* Execute a trap function for a given signal, possibly
  * with non-standard sigtrapped & siglists values

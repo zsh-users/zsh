@@ -356,7 +356,6 @@ and users or hosts after `-u' and for some reason you can't use
     ;;
   esac
 
-
 Styles
 ------
 
@@ -434,7 +433,6 @@ sure that an empty value for a style is treated in the same way as if
 the style wasn't set at all (this is used elsewhere and we want to
 keep things consistent).
 
-
 Descriptions
 ------------
 
@@ -490,7 +488,6 @@ and
 is all you need to make your function work correctly with both tags
 and description at the same time.
 
-
 Caching
 -------
 
@@ -503,7 +500,6 @@ especially large, use the `_store_cache` mechanism to allow for a
 persistent cache.  When caching matches, also consider whether
 generated matches might be affected by style settings for limited
 contexts and adapt to allow such configuration to work.
-
 
 Misc. remarks
 -------------

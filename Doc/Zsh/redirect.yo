@@ -358,4 +358,3 @@ example(< file)
 
 shows the contents of tt(file) on standard output, with paging if that is a
 terminal.  tt(NULLCMD) and tt(READNULLCMD) may refer to shell functions.
-

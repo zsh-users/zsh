@@ -1099,7 +1099,6 @@ struct m_hdr {
 #endif
 };
 
-
 /* alignment for memory blocks */
 
 #define M_ALIGN (sizeof(union mem_align))
@@ -1155,7 +1154,6 @@ static char *m_high, *m_low;
    length of that block (including the header of the memory block.  M_NSMALL
    is the number of possible block sizes that small blocks should be used
    for. */
-
 
 #define M_SIDX(S)  ((S) / M_ISIZE)
 #define M_SNUM     128

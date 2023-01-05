@@ -17,7 +17,6 @@ _mysqldiff () {
     {1,2}':MySQL database:_mysql_db_or_file'
 }
 
-
 _mysql_db_or_file () {
   _alternative \
     'databases:MySQL database:_mysql_databases' \

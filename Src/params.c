@@ -197,7 +197,6 @@ mod_export const struct gsu_hash nullsethash_gsu =
 mod_export const struct gsu_scalar colonarr_gsu =
 { colonarrgetfn, colonarrsetfn, stdunsetfn };
 
-
 /* Non standard methods (not exported) */
 static const struct gsu_integer pound_gsu =
 { poundgetfn, nullintsetfn, stdunsetfn };
@@ -1115,7 +1114,6 @@ createspecialhash(char *name, GetNodeFunc get, ScanTabFunc scan, int flags)
 
     return pm;
 }
-
 
 /*
  * Copy a parameter
@@ -2036,7 +2034,6 @@ getindex(char **pptr, Value v, int flags)
     return 0;
 }
 
-
 /**/
 mod_export Value
 getvalue(Value v, char **pptr, int bracks)
@@ -2459,7 +2456,6 @@ getnumvalue(Value v)
 {
     mnumber mn;
     mn.type = MN_INTEGER;
-
 
     if (!v) {
 	mn.u.l = 0;
@@ -3403,7 +3399,6 @@ assignaparam(char *s, char **val, int flags)
     return v->pm;
 }
 
-
 /**/
 mod_export Param
 setaparam(char *s, char **aval)
@@ -3462,7 +3457,6 @@ sethparam(char *s, char **val)
     unqueue_signals();
     return v->pm;
 }
-
 
 /*
  * Set a generic shell number, floating point or integer.
@@ -3967,7 +3961,6 @@ mod_export void
 nullunsetfn(UNUSED(Param pm), UNUSED(int exp))
 {}
 
-
 /* Function to get value of generic special integer *
  * parameter.  data is pointer to global variable   *
  * containing the integer value.                    */
@@ -4004,7 +3997,6 @@ zlevarsetfn(Param pm, zlong x)
     if (p == &zterm_lines || p == &zterm_columns)
 	adjustwinsize(2 + (p == &zterm_columns));
 }
-
 
 /* Implements gsu_integer.unsetfn for ZLE_RPROMPT_INDENT; see stdunsetfn() */
 
@@ -4804,7 +4796,6 @@ keyboardhackgetfn(UNUSED(Param pm))
     return buf;
 }
 
-
 /* Function to set value of special parameter `KEYBOARD_HACK' */
 
 /**/
@@ -5093,7 +5084,6 @@ arrfixenv(char *s, char **t)
     addenv(pm, t ? zjoin(t, joinchar, 1) : "");
 }
 
-
 /**/
 int
 zputenv(char *str)
@@ -5138,7 +5128,6 @@ zputenv(char *str)
     char **ep;
     int num_env;
 
-
     /* First check if there is already an environment *
      * variable matching string `name'.               */
     if (findenv(str, &num_env)) {
@@ -5166,7 +5155,6 @@ findenv(char *name, int *pos)
 {
     char **ep, *eq;
     int  nlen;
-
 
     eq = strchr(name, '=');
     nlen = eq ? eq - name : (int)strlen(name);
@@ -5278,7 +5266,6 @@ addenv(Param pm, char *value)
 #endif
 }
 
-
 /* Given strings *name = "foo", *value = "bar", *
  * return a new string *str = "foo=bar".        */
 
@@ -5309,7 +5296,6 @@ mkenvstr(char *name, char *value, int flags)
  * pointer to the location of this new environment *
  * string.                                         */
 
-
 #ifndef USE_SET_UNSET_ENV
 /**/
 void
@@ -5327,7 +5313,6 @@ delenvvalue(char *x)
     zsfree(x);
 }
 #endif
-
 
 /* Delete a pointer from the list of pointers to environment *
  * variables by shifting all the other pointers up one slot. */
@@ -5725,7 +5710,6 @@ scanendscope(HashNode hn, UNUSED(int flags))
 	    unsetparam_pm(pm, 0, 0);
     }
 }
-
 
 /**********************************/
 /* Parameter Hash Table Functions */

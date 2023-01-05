@@ -242,7 +242,6 @@ new_optarg(Options ops)
     return 0;
 }
 
-
 /* execute a builtin handler function after parsing the arguments */
 
 /**/
@@ -3145,7 +3144,6 @@ listusermathfunc(MathFunc p)
     putchar('\n');
 }
 
-
 static void
 add_autoload_function(Shfunc shf, char *funcname)
 {
@@ -4400,7 +4398,6 @@ bin_alias(char *name, char **argv, Options ops, UNUSED(int func))
     unqueue_signals();
     return returnval;
 }
-
 
 /**** miscellaneous builtins ****/
 

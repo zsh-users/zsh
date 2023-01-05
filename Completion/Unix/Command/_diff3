@@ -43,4 +43,3 @@ _arguments -s -S $args \
   '2: : _wanted files expl "original file (${${(As.:.)opt_args[-L]}[2]:-old})" _files' \
   '3: : _wanted files expl "second updated file (${${(As.:.)opt_args[-L]}[3]:-their})" _files' \
   + '(ed)' $ed
-

@@ -68,7 +68,6 @@ precmd() {
     fi
 }
 
-
 ### check-for-changes just in some places ####################################
 
 # Some backends (git and mercurial at the time of writing) can tell you
@@ -104,7 +103,6 @@ function estyle-cfc() {
     return 1
 }
 
-
 ### Hook Examples ############################################################
 
 # A number of examples in this file revolve around the concept of `hooks'
@@ -127,7 +125,6 @@ zstyle ':vcs_info:*+*:*' debug false
 
 # Further down, every example that uses a function named `+vi-*' uses a hook.
 
-
 ### Truncate Long Hashes
 
 ### Truncate a long hash to 12 characters (which is usually unique enough)
@@ -135,7 +132,6 @@ zstyle ':vcs_info:*+*:*' debug false
 
 # git:
 zstyle ':vcs_info:git*' formats "(%s)-[%12.12i %b]-" # hash & branch
-
 
 ### Fetch the full 40-character Mercurial revision id
 # There is no great way to obtain branch, local rev, and untracked changes in
@@ -153,7 +149,6 @@ function +vi-hg-fullglobalrev() {
     hook_com[revision]="${hook_com[revision]} ${grevid}"
 }
 
-
 ### Display the existence of files not yet known to VCS
 
 ### git: Show marker (T) if there are untracked files in repository
@@ -170,7 +165,6 @@ zstyle ':vcs_info:git*+set-message:*' hooks git-untracked
         hook_com[staged]+='T'
     fi
 }
-
 
 ### Compare local changes to remote changes
 
@@ -216,7 +210,6 @@ function +vi-git-remotebranch() {
     fi
 }
 
-
 ### Derive hook names dynamically
 # With the following line:
 zstyle -e ':vcs_info:git+set-message:*' hooks 'reply=( ${${(k)functions[(I)[+]vi-git-set-message*]}#+vi-} )'
@@ -225,7 +218,6 @@ zstyle -e ':vcs_info:git+set-message:*' hooks 'reply=( ${${(k)functions[(I)[+]vi
 +vi-git-set-message-foo() {}
 +vi-git-set-message-bar() {}
 # Both of these functions would be called, even if they are defined after the zstyle is set.
-
 
 ## git: Display pertinent environment variables
 # If environment variables such as $GIT_DIR, $GIT_WORK_TREE, etc are set in the
@@ -250,7 +242,6 @@ zstyle ':vcs_info:git+post-backend:*' hooks git-post-backend-envvars
     hook_com[misc]+=";%U${param//'%'/%%}%u=%F{white}${${(P)param}//'%'/%%}%f"
   done
 }
-
 
 ### hg: Show marker when the working directory is not on a branch head
 # This may indicate that running `hg up` will do something
@@ -285,7 +276,6 @@ function +vi-hg-branchhead() {
         fi
     fi
 }
-
 
 ### Show information about patch series
 # This is used with with hg mq, quilt, and git rebases and conflicts.
@@ -334,13 +324,11 @@ function +vi-gen-applied-string() {
 # In the latter case, you will need to arrange to print ${vcs_info_msg_1_} in
 # addition to ${vcs_info_msg_0_}; see the top of this file for details.
 
-
 ### Run vcs_info selectively to increase speed in large repos ################
 
 # The following example shows a possible setup for vcs_info which displays
 # staged and unstaged changes in the vcs_info prompt and prevents running
 # it too often for speed reasons.
-
 
 # Allow substitutions and expansions in the prompt, necessary for
 # using a single-quoted $vcs_info_msg_0_ in PS1, RPOMPT (as used here) and
@@ -357,7 +345,6 @@ zstyle ':vcs_info:*' get-revision true
 # Alternatively, the following would set only %c, but is faster:
 #zstyle ':vcs_info:*' check-for-changes false
 #zstyle ':vcs_info:*' check-for-staged-changes true
-
 
 # Default to running vcs_info. If possible we prevent running it later for
 # speed reasons. If set to a non empty value vcs_info is run.
@@ -418,7 +405,6 @@ add-zsh-hook chpwd prompt_chpwd
 # Display the VCS information in the right prompt. The {..:- } is a
 # workaround for Zsh below 4.3.9.
 RPROMPT='${vcs_info_msg_0_:- }'
-
 
 ### Quilt support ############################################################
 
@@ -599,7 +585,6 @@ function +vi-set-quilt-patches() {
 
 # Finally, the "Show information about patch series" example above this section
 # may also be useful.
-
 
 ### Using vcs_info from CVS ##################################################
 

@@ -322,4 +322,3 @@ _arguments -s $pathname \
   '(-p -t)-T[show timestamp of last match as seconds since epoch]' \
   '(-a -b -d -D -i -s -t -T *)-p+[specify preprocessor]:preprocessor:_command_names -e' \
   '*:::actions:= _ipfw_actions'
-

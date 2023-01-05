@@ -36,7 +36,6 @@ if (( $+commands[lpstat] )); then
   fi
 fi
 
-
 if (( ! $+_lp_cache )); then
   local file entry names i
 

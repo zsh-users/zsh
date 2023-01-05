@@ -1,7 +1,6 @@
 emulate -L zsh
 setopt extendedglob cbases
 
-
 if [[ $# -ne 1 ]]; then
     print "Usage: $0 port
 Listen on the given port; send anything that arrives to standard output." >&2

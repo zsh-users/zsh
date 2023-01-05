@@ -11,7 +11,6 @@
 >42 42 42
 >0
 
-
   (set -e; echo $(( min(0,   42) )))
   (set -e; echo $(( max(0,  -42) )))
   (set -e; echo $(( sum(42, -42) )))
@@ -53,6 +52,5 @@
 *??*
 F:Calling zsh_math_func_min directly isn't a supported use-case, but if it
 F:returns zero, something's probably wrong.
-
 
 %clean

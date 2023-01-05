@@ -29,7 +29,6 @@
 # - _remote_files -- rsh
 #   Use rsh to retrieve the remote paths.
 
-
 # There should be coloring based on all the different ls -F classifiers.
 local expl rempat remfiles remdispf remdispd args cmd suf ret=1
 local -a args cmd_args

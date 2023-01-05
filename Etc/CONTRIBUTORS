@@ -97,7 +97,6 @@ display, configuration
 Sven Wischnowsky <wischnow@zsh.org>: internal completion mechanism and
 low-level functions, line editor internals, syntax, wordcode mechanism,
 
-
 Version 4.0.1
 -------------
 

@@ -39,4 +39,3 @@ _arguments -C \
   "-M-:import <module>.*; for -e" \
   "-v[display version info]" \
   ":program file:_files -g '*.clay(-.)'"
-

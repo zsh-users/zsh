@@ -11,4 +11,3 @@ _arguments -s -A "-*" \
   '-h[allow access to history]' \
   '-e[exit on EOF (^D)]' \
   '1:parameter spec:_vars'
-

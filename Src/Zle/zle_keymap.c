@@ -261,7 +261,6 @@ unrefkeymap_by_name(KeymapName kmname)
     }
 }
 
-
 /**/
 static void
 freekeymapnamnode(HashNode hn)

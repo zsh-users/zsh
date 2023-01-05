@@ -33,4 +33,3 @@ _arguments -s \
   '(-)'{-v,--version}'[display version information]' \
   '(-)'{-\?,--help}'[display help information]' \
   '(-)--usage[display usage]'
-

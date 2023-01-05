@@ -113,7 +113,6 @@ _osc_cmd_submitreq() {
     _describe -t osc-commands 'osc command' cmdlist
 }
 
-
 _osc_cmd_do() {
     local hline
     local -a cmdlist
@@ -145,5 +144,3 @@ _osc_cmd_do() {
 
 # Code to make sure _osc is run when we load it
 _osc "$@"
-
-

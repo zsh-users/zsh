@@ -5823,7 +5823,6 @@ _git-shell () {
   return ret
 }
 
-
 (( $+functions[_git-upload-archive] )) ||
 _git-upload-archive () {
   _arguments \

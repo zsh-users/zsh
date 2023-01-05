@@ -328,7 +328,6 @@ enum prec_type {
     MPREC_ARG
 };
 
-
 /*
  * Get a number from a variable.
  * Try to be clever about reusing subscripts by caching the Value structure.
@@ -1025,7 +1024,6 @@ setmathvar(struct mathvalue *mvp, mnumber v)
     return v;
 }
 
-
 /**/
 static mnumber
 callmathfunc(char *o)
@@ -1439,7 +1437,6 @@ op(int what)
     stack[sp].pval = NULL;
 }
 
-
 /**/
 static void
 bop(int tk)
@@ -1464,7 +1461,6 @@ bop(int tk)
 	break;
     };
 }
-
 
 /**/
 mod_export mnumber
@@ -1498,7 +1494,6 @@ mathevali(char *s)
     mnumber x = matheval(s);
     return (x.type & MN_FLOAT) ? (zlong)x.u.d : x.u.l;
 }
-
 
 /**/
 zlong

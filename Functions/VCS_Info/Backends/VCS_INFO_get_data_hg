@@ -91,7 +91,6 @@ fi
 # This file only exists during a rebase
 [[ -e $rebasefile ]] && hgactionstring="rebasing"
 
-
 ### Build the current revision display
 [[ -n ${r_csetid} ]] && defrevformat+=( "%h" )
 [[ -n ${r_lrev} ]] && defrevformat+=( "%r" )
@@ -231,7 +230,6 @@ if zstyle -T ":vcs_info:${vcs}:${usercontext}:${rrn}" get-mq \
                               extra_hook_com VCS_INFO_hg_extra_zformats ''
     hgmqstring=$REPLY
 fi
-
 
 ### Build the misc string
 hgmisc+=( ${hgmqstring} )

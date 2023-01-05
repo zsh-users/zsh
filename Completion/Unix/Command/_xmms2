@@ -96,7 +96,6 @@ _xmms2_mlib() {
 
 }
 
-
 _xmms2_playlist() {
     local playlist_cmds
     playlist_cmds=(
@@ -124,13 +123,11 @@ _xmms2_playlist_load() {
     _describe -t command "xmms2 playlist" list
 }
 
-
 _xmms2_playlist_remove() {
     local list
     list=($(xmms2 playlist list))
     _describe -t command "xmms2 playlist" list
 }
-
 
 _xmms2_coll() {
     local coll_cmds

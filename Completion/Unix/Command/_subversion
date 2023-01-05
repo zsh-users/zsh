@@ -355,7 +355,6 @@ _svn_controlled() {
   return 0
 }
 
-
 (( $+functions[_svn_conflicts] )) ||
 _svn_conflicts() {
   # ### These strings are actually translatable

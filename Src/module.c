@@ -347,7 +347,6 @@ finish_(UNUSED(Module m))
     return 0;
 }
 
-
 /************************************************************************
  * Module utility functions
  ************************************************************************/
@@ -392,7 +391,6 @@ module_linked(char const *name)
 
     return NULL;
 }
-
 
 /************************************************************************
  * Support for the various feature types.
@@ -559,7 +557,6 @@ addbuiltins(char const *nam, Builtin binl, int size)
     return ret;
 }
 
-
 /************************************************************************
  * Function wrappers.
  ************************************************************************/
@@ -628,7 +625,6 @@ deletewrapper(Module m, FuncWrap w)
     }
     return 1;
 }
-
 
 /************************************************************************
  * Conditions.
@@ -1006,8 +1002,6 @@ runhookdef(Hookdef h, void *d)
     } else
 	return ((Hookfn) getdata(lastnode(h->funcs)))(h, d);
 }
-
-
 
 /************************************************************************
  * Shell parameters.
@@ -1973,7 +1967,6 @@ finish_module(Module m)
 /**/
 #endif /* !DYNAMIC */
 
-
 /************************************************************************
  * Functions called when manipulating modules
  ************************************************************************/
@@ -2419,7 +2412,6 @@ autoloadscan(HashNode hn, int printflags)
     }
     putchar('\n');
 }
-
 
 /************************************************************************
  * Handling for the zmodload builtin and its various options.
@@ -3253,7 +3245,6 @@ bin_zmodload_features(const char *nam, char **args, Options ops)
 
     return require_module(modname, features, OPT_ISSET(ops,'s'));
 }
-
 
 /************************************************************************
  * Generic feature support.

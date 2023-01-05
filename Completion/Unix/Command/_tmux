@@ -1723,7 +1723,6 @@ function __tmux-panes() {
     fi
 }
 
-
 function __tmux-server-options() {
     local -a tmux_server_options
     tmux_server_options=(

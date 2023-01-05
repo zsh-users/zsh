@@ -947,7 +947,6 @@ tt(enable) style - if you used that) marked as disabled by a hash sign.
 That means the detection of these systems is skipped em(completely). No
 wasted time there.
 
-
 texinode(vcs_info Configuration)(vcs_info Oddities)(vcs_info Quickstart)(Version Control Information)
 subsect(Configuration)
 
@@ -1474,7 +1473,6 @@ non-zero return value is interpreted as false.
 Note, if there is both a function and a variable by the name of
 tt(quilt-standalone), the function will take precedence.
 
-
 texinode(vcs_info API)(vcs_info Variables)(vcs_info Quilt Support)(Version Control Information)
 subsect(Function Descriptions (Public API))
 
@@ -1947,7 +1945,6 @@ the examples file located at Misc/vcs_info-examples in the Zsh source
 directory.
 
 This concludes our guided tour through zsh's tt(vcs_info).
-
 
 texinode(Prompt Themes)(ZLE Functions)(Version Control Information)(User Contributions)
 sect(Prompt Themes)

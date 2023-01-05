@@ -19,7 +19,6 @@ _moosic_add_cmds() {
     "version:print version information for client and server"
     )
 
-
     # appending to song queue
     typeset -a appending
     appending=(

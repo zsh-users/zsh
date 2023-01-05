@@ -619,6 +619,4 @@ _adb_cache_policy_daily () {
   (( $#old ))
 }
 
-
-
 _adb $@

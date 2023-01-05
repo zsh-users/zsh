@@ -25,4 +25,3 @@ F:report this to zsh-workers mailing list.
     (( $# == $#unique_options ))
   }
 0:check if limit option letters are unique
-

@@ -425,7 +425,6 @@ freecolorpairnode(HashNode hn)
     zfree(hn, sizeof(struct colorpairnode));
 }
 
-
 /*************
  * Subcommands
  *************/
@@ -497,7 +496,6 @@ zccmd_init(UNUSED(const char *nam), UNUSED(char **args))
     }
     return 0;
 }
-
 
 static int
 zccmd_addwin(const char *nam, char **args)
@@ -627,7 +625,6 @@ zccmd_delwin(const char *nam, char **args)
     return ret;
 }
 
-
 static int
 zccmd_refresh(const char *nam, char **args)
 {
@@ -664,7 +661,6 @@ zccmd_refresh(const char *nam, char **args)
     }
 }
 
-
 static int
 zccmd_move(const char *nam,  char **args)
 {
@@ -688,7 +684,6 @@ zccmd_move(const char *nam,  char **args)
 
     return 0;
 }
-
 
 static int
 zccmd_clear(const char *nam, char **args)
@@ -717,7 +712,6 @@ zccmd_clear(const char *nam, char **args)
 	return 1;
     }
 }
-
 
 static int
 zccmd_char(const char *nam, char **args)
@@ -753,7 +747,6 @@ zccmd_char(const char *nam, char **args)
 
     return 0;
 }
-
 
 static int
 zccmd_string(const char *nam, char **args)
@@ -797,7 +790,6 @@ zccmd_string(const char *nam, char **args)
     return 0;
 }
 
-
 static int
 zccmd_border(const char *nam, char **args)
 {
@@ -818,7 +810,6 @@ zccmd_border(const char *nam, char **args)
     return 0;
 }
 
-
 static int
 zccmd_endwin(UNUSED(const char *nam), UNUSED(char **args))
 {
@@ -837,7 +828,6 @@ zccmd_endwin(UNUSED(const char *nam), UNUSED(char **args))
     }
     return 0;
 }
-
 
 static int
 zccmd_attr(const char *nam, char **args)
@@ -902,7 +892,6 @@ zccmd_attr(const char *nam, char **args)
     }
     return ret;
 }
-
 
 static int
 zccmd_bg(const char *nam, char **args)
@@ -981,7 +970,6 @@ zccmd_bg(const char *nam, char **args)
     return ret;
 }
 
-
 static int
 zccmd_scroll(const char *nam, char **args)
 {
@@ -1023,7 +1011,6 @@ zccmd_scroll(const char *nam, char **args)
 
     return ret;
 }
-
 
 static int
 zccmd_input(const char *nam, char **args)
@@ -1250,7 +1237,6 @@ zccmd_input(const char *nam, char **args)
     return 0;
 }
 
-
 static int
 zccmd_timeout(const char *nam, char **args)
 {
@@ -1288,7 +1274,6 @@ zccmd_timeout(const char *nam, char **args)
     wtimeout(w->win, to);
     return 0;
 }
-
 
 static int
 zccmd_mouse(const char *nam, char **args)
@@ -1338,7 +1323,6 @@ zccmd_mouse(const char *nam, char **args)
 #endif
 }
 
-
 static int
 zccmd_position(const char *nam, char **args)
 {
@@ -1376,7 +1360,6 @@ zccmd_position(const char *nam, char **args)
     setaparam(args[1], array);
     return 0;
 }
-
 
 static int
 zccmd_querychar(const char *nam, char **args)
@@ -1466,7 +1449,6 @@ zccmd_querychar(const char *nam, char **args)
     /* Turn this into an array and store it. */
     return !setaparam(args[1] ? args[1] : "reply", zlinklist2array(clist, 1));
 }
-
 
 static int
 zccmd_touch(const char *nam, char **args)
@@ -1627,11 +1609,9 @@ bin_zcurses(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     return zcsc->cmd(nam, args+1);
 }
 
-
 static struct builtin bintab[] = {
     BUILTIN("zcurses", 0, bin_zcurses, 1, -1, 0, "", NULL),
 };
-
 
 /*******************
  * Special variables
@@ -1646,7 +1626,6 @@ zcurses_colorsarrgetfn(UNUSED(Param pm))
 static const struct gsu_array zcurses_colorsarr_gsu =
 { zcurses_colorsarrgetfn, arrsetfn, stdunsetfn };
 
-
 static char **
 zcurses_attrgetfn(UNUSED(Param pm))
 {
@@ -1656,7 +1635,6 @@ zcurses_attrgetfn(UNUSED(Param pm))
 static const struct gsu_array zcurses_attrs_gsu =
 { zcurses_attrgetfn, arrsetfn, stdunsetfn };
 
-
 static char **
 zcurses_keycodesgetfn(UNUSED(Param pm))
 {
@@ -1665,7 +1643,6 @@ zcurses_keycodesgetfn(UNUSED(Param pm))
 
 static const struct gsu_array zcurses_keycodes_gsu =
 { zcurses_keycodesgetfn, arrsetfn, stdunsetfn };
-
 
 static char **
 zcurses_windowsgetfn(UNUSED(Param pm))
@@ -1686,7 +1663,6 @@ zcurses_windowsgetfn(UNUSED(Param pm))
 static const struct gsu_array zcurses_windows_gsu =
 { zcurses_windowsgetfn, arrsetfn, stdunsetfn };
 
-
 static zlong
 zcurses_colorsintgetfn(UNUSED(Param pm))
 {
@@ -1696,7 +1672,6 @@ zcurses_colorsintgetfn(UNUSED(Param pm))
 static const struct gsu_integer zcurses_colorsint_gsu =
 { zcurses_colorsintgetfn, nullintsetfn, stdunsetfn };
 
-
 static zlong
 zcurses_colorpairsintgetfn(UNUSED(Param pm))
 {
@@ -1705,7 +1680,6 @@ zcurses_colorpairsintgetfn(UNUSED(Param pm))
 
 static const struct gsu_integer zcurses_colorpairsint_gsu =
 { zcurses_colorpairsintgetfn, nullintsetfn, stdunsetfn };
-
 
 static struct paramdef partab[] = {
     SPECIALPMDEF("zcurses_colors", PM_ARRAY|PM_READONLY,
@@ -1725,7 +1699,6 @@ static struct paramdef partab[] = {
 /***************************
  * Standard module interface
  ***************************/
-
 
 /*
  * boot_ is executed when the module is loaded.

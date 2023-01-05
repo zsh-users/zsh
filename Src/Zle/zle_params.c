@@ -622,7 +622,6 @@ get_cutbuffer(UNUSED(Param pm))
     return "";
 }
 
-
 /**/
 static void
 set_cutbuffer(UNUSED(Param pm), char *x)

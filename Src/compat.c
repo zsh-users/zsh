@@ -55,7 +55,6 @@ strstr(const char *s, const char *t)
 /**/
 #endif
 
-
 /**/
 #ifndef HAVE_GETHOSTNAME
 
@@ -77,7 +76,6 @@ gethostname(char *name, size_t namelen)
 /**/
 #endif
 
-
 /**/
 #ifndef HAVE_GETTIMEOFDAY
 
@@ -92,7 +90,6 @@ gettimeofday(struct timeval *tv, struct timezone *tz)
 
 /**/
 #endif
-
 
 /* Provide clock time with nanoseconds */
 
@@ -152,7 +149,6 @@ zgettime_monotonic_if_available(struct timespec *ts)
     return ret;
 }
 
-
 /* compute the difference between two calendar times */
 
 /**/
@@ -167,7 +163,6 @@ difftime(time_t t2, time_t t1)
 
 /**/
 #endif
-
 
 /**/
 #ifndef HAVE_STRERROR
@@ -186,7 +181,6 @@ strerror(int errnum)
 
 /**/
 #endif
-
 
 #if 0
 /* pathconf(_PC_PATH_MAX) is not currently useful to zsh.  The value *

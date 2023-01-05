@@ -915,7 +915,6 @@ do_allmatches(UNUSED(int end))
 #endif
     }
 
-
     mc = (minfo.group)->matches;
 
     while (1) {

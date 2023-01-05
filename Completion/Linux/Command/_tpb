@@ -17,4 +17,3 @@ _arguments \
   '(-W --wireless)'{-W,--wireless=}':command to execute:_command_names' \
   '(-C --callback)'{-C,--callback=}':command to execute:_command_names' \
   '(-v --verbose)'{-v,--verbose=}'[print information about pressed keys]'
-

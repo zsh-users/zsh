@@ -73,4 +73,3 @@ x=2; while (( x-- )); do f; done
 # works.
 # (See also the file Etc/BUGS)
 while true; do zcat foo.gz > /dev/null; done
-

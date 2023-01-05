@@ -1076,7 +1076,6 @@ has_real_token(const char *s)
     return 0;
 }
 
-
 /* Lasciate ogni speranza.                                                  *
  * This function is a nightmare.  It works, but I'm sure that nobody really *
  * understands why.  The problem is: to make it cleaner we would need       *

@@ -440,7 +440,6 @@ scanmatchtable(HashTable ht, Patprog pprog, int sorted,
     return match;
 }
 
-
 /**/
 mod_export int
 scanhashtable(HashTable ht, int sorted, int flags1, int flags2,
@@ -1215,7 +1214,6 @@ createaliastables(void)
     aliastab->addnode(aliastab, ztrdup("run-help"), createaliasnode(ztrdup("man"), 0));
     aliastab->addnode(aliastab, ztrdup("which-command"), createaliasnode(ztrdup("whence"), 0));
 
-
     /* Table for suffix aliases --- make this smaller */
 
     sufaliastab = newhashtable(11, "sufaliastab", NULL);
@@ -1473,7 +1471,6 @@ freehistdata(Histent he, int unlink)
 	}
     }
 }
-
 
 /***********************************************************************
  * Directory name cache mechanism

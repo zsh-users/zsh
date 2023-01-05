@@ -22,4 +22,3 @@ for i in "${(s.:.)classpath}"; do
 done
 
 _wanted classes expl 'java class' compadd "$@" -M 'r:|.=* r:|=*' -a - c
-

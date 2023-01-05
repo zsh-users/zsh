@@ -189,4 +189,3 @@ $(makefile).in: $(sdir_src)/mkmakemod.sh $(sdir_src)/Makemod.in.in $(MDDS) \
 	    '$$top_srcdir/Src/mkmakemod.sh -i $(subdir) $(makefile)'; \
 	cd $(dir_top) && \
 	    $(SHELL) $$top_srcdir/Src/mkmakemod.sh -i $(subdir) $(makefile)
-

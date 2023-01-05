@@ -18,7 +18,6 @@
   fi
 19:kill with no sigspec
 
-
   if zmodload zsh/system &>/dev/null; then
     (
       trap 'exit 11' USR1
@@ -83,4 +82,3 @@
   )
 1:Plain kill with empty pid should not send signal to current process group
 ?(eval):kill:3: illegal pid: 
-

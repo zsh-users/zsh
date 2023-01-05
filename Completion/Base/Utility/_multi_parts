@@ -167,7 +167,6 @@ while true; do
 	  tmp2=()
         fi
 
-
         compadd "$group[@]" "$expl[@]" -r "$sep" -S "$sep" "$opts[@]" \
 	        -p "$pref" "$tmp2[@]" -M "r:|${sep}=* r:|=* $matcher" - \
                 "${(@)${(@)${(@M)matches:#*${sep}}%%${sep}*}:#}" && ret=0

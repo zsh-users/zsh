@@ -2400,7 +2400,6 @@ caused by an error, but the function still continues executing and hence
 may tidy up.  This makes it safe for the user-defined widget to alter
 the command line or key bindings temporarily.
 
-
 The following widget, tt(caps-lock), serves as an example.
 
 example(self-insert-ucase+LPAR()RPAR() {
@@ -2854,4 +2853,3 @@ Within widgets, arbitrary regions may be highlighted by setting the
 special array parameter tt(region_highlight); see
 ifnzman(noderef(Zle Widgets))\
 ifzman(above).
-
