@@ -1,3 +1,9 @@
+2023-01-06  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted (cf. users/28616):
+	Completion/Unix/Command/_subversion: _svnadmin: Add comment
+	noting a case that's not completed correctly.
+
 2022-12-31  Oliver Kiddle  <opk@zsh.org>
 
 	* Max Coplan: 51263: Doc/Zsh/files.yo: fix typo, an -> a
