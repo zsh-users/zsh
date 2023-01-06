@@ -318,6 +318,9 @@ _svnadmin () {
           # Test cases:
           #   svnadmin freeze . rsync --<TAB> offers --file
           #   svnadmin freeze -- . rsync -<TAB> offers rsync's options
+          #   svnadmin freeze . -- rsync -<TAB> should do the same (but currently doesn't)
+          #
+          # TODO: Fix the third case.
           #
           # Note: the NORMARG calculations here include one positional argument
           # (the '.') before the command.
