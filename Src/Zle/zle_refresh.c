@@ -36,8 +36,8 @@
  * non-zero width followed by an arbitrary (but typically small)
  * number of characters that have zero width (combining characters).
  *
- * The allocated size for each array is given by ?mw_size; nmw_ind
- * is the next free element, i.e. nmwbuf[nmw_ind] will be the next
+ * The allocated size for each array is given by omw_size and nmw_size;
+ * nmw_ind is the next free element, i.e. nmwbuf[nmw_ind] will be the next
  * element to be written (we never insert into omwbuf).  We initialise
  * nmw_ind to 1 to avoid the index stored in the character looking like a
  * NULL.  This wastees a word but it's safer than messing with pointers.
