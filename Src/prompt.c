@@ -1648,6 +1648,9 @@ cleartextattributes(int flags)
 mod_export void
 treplaceattrs(zattr newattrs)
 {
+    if (newattrs == TXT_ERROR)
+	return;
+
     if (txtunknownattrs) {
 	/* Set current attributes to the opposite of the new ones
 	 * for any that are unknown so that applytextattributes()

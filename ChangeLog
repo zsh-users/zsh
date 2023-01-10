@@ -1,5 +1,8 @@
 2023-01-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 51291: Doc/Zsh/zle.yo, Src/Zle/zle_refresh.c, Src/prompt.c:
+	support for highlighting ellipses in the line editor
+
 	* 51290: Src/Zle/zle_refresh.c: fix display of control
 	characters with SINGLE_LINE_ZLE set
 

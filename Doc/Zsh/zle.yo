@@ -2691,6 +2691,9 @@ for different completions.
 item(tt(paste))(
 Following a command to paste text, the characters that were inserted.
 )
+item(tt(ellipsis))(
+Markers used to indicate where the text doesn't fit within the terminal.
+)
 enditem()
 
 When tt(region_highlight) is set, the contexts that describe a region DASH()-

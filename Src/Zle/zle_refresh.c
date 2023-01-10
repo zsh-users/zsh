@@ -203,12 +203,12 @@ int predisplaylen, postdisplaylen;
 
 
 /*
- * Attributes used by default on the command line, and
- * attributes for highlighting special (unprintable) characters
- * displayed on screen.
+ * Attributes used by default on the command line,
+ * for highlighting special (unprintable) characters displayed on screen,
+ * and for ellipsis continuation markers.
  */
 
-static zattr default_attr, special_attr;
+static zattr default_attr, special_attr, ellipsis_attr;
 
 /*
  * Array of region highlights, no special termination.
@@ -259,8 +259,8 @@ static const REFRESH_ELEMENT zr_cr = { ZWC('\r'), TXT_ERROR };
 static const REFRESH_ELEMENT zr_dt = { ZWC('.'), TXT_ERROR };
 #endif
 static const REFRESH_ELEMENT zr_nl = { ZWC('\n'), TXT_ERROR };
-static const REFRESH_ELEMENT zr_sp = { ZWC(' '), TXT_ERROR };
-static const REFRESH_ELEMENT zr_zr = { ZWC('\0'), TXT_ERROR };
+static const REFRESH_ELEMENT zr_sp = { ZWC(' '), 0 };
+static const REFRESH_ELEMENT zr_zr = { ZWC('\0'), 0 };
 
 /*
  * Constant arrays to be copied into place: these are memcpy'd,
@@ -269,10 +269,10 @@ static const REFRESH_ELEMENT zr_zr = { ZWC('\0'), TXT_ERROR };
 static const REFRESH_ELEMENT zr_end_ellipsis[] = {
     { ZWC(' '), 0 },
     { ZWC('<'), 0 },
-    { ZWC('.'), 0 },
-    { ZWC('.'), 0 },
-    { ZWC('.'), 0 },
-    { ZWC('.'), 0 },
+    { ZWC('.'), TXT_ERROR },
+    { ZWC('.'), TXT_ERROR },
+    { ZWC('.'), TXT_ERROR },
+    { ZWC('.'), TXT_ERROR },
     { ZWC(' '), 0 },
 };
 #define ZR_END_ELLIPSIS_SIZE	\
@@ -281,16 +281,16 @@ static const REFRESH_ELEMENT zr_end_ellipsis[] = {
 static const REFRESH_ELEMENT zr_mid_ellipsis1[] = {
     { ZWC(' '), 0 },
     { ZWC('<'), 0 },
-    { ZWC('.'), 0 },
-    { ZWC('.'), 0 },
-    { ZWC('.'), 0 },
-    { ZWC('.'), 0 },
+    { ZWC('.'), TXT_ERROR },
+    { ZWC('.'), TXT_ERROR },
+    { ZWC('.'), TXT_ERROR },
+    { ZWC('.'), TXT_ERROR },
 };
 #define ZR_MID_ELLIPSIS1_SIZE	\
     ((int)(sizeof(zr_mid_ellipsis1)/sizeof(zr_mid_ellipsis1[0])))
 
 static const REFRESH_ELEMENT zr_mid_ellipsis2[] = {
-    { ZWC('>'), 0 },
+    { ZWC('>'), TXT_ERROR },
     { ZWC(' '), 0 },
 };
 #define ZR_MID_ELLIPSIS2_SIZE	\
@@ -298,10 +298,10 @@ static const REFRESH_ELEMENT zr_mid_ellipsis2[] = {
 
 static const REFRESH_ELEMENT zr_start_ellipsis[] = {
     { ZWC('>'), 0 },
-    { ZWC('.'), 0 },
-    { ZWC('.'), 0 },
-    { ZWC('.'), 0 },
-    { ZWC('.'), 0 },
+    { ZWC('.'), TXT_ERROR },
+    { ZWC('.'), TXT_ERROR },
+    { ZWC('.'), TXT_ERROR },
+    { ZWC('.'), TXT_ERROR },
 };
 #define ZR_START_ELLIPSIS_SIZE	\
     ((int)(sizeof(zr_start_ellipsis)/sizeof(zr_start_ellipsis[0])))
@@ -321,6 +321,7 @@ zle_set_highlight(void)
     int isearch_attr_set = 0;
     int suffix_attr_set = 0;
     int paste_attr_set = 0;
+    int ellipsis_attr_set = 0;
     struct region_highlight *rhp;
 
     special_attr = default_attr = 0;
@@ -361,6 +362,9 @@ zle_set_highlight(void)
 	    } else if (strpfx("paste:", *atrs)) {
 		match_highlight(*atrs + 6, &(region_highlights[3].atr));
 		paste_attr_set = 1;
+	    } else if (strpfx("ellipsis:", *atrs)) {
+		match_highlight(*atrs + 9, &ellipsis_attr);
+		ellipsis_attr_set = 1;
 	    }
 	}
     }
@@ -376,6 +380,9 @@ zle_set_highlight(void)
 	region_highlights[2].atr = TXTBOLDFACE;
     if (!paste_attr_set)
 	region_highlights[3].atr = TXTSTANDOUT;
+    if (!ellipsis_attr_set)
+	ellipsis_attr = TXTBGCOLOUR | ((zattr) 3 << TXT_ATTR_BG_COL_SHIFT) |
+		TXTFGCOLOUR | ((zattr) 4 << TXT_ATTR_FG_COL_SHIFT);
 
     allocate_colour_buffer();
 }
@@ -599,10 +606,8 @@ zwcputc(const REFRESH_ELEMENT *c)
     VARARR(char, mbtmp, MB_CUR_MAX + 1);
 #endif
 
-    if (c->atr != TXT_ERROR) {
-	treplaceattrs(c->atr);
-	applytextattributes(0);
-    }
+    treplaceattrs(c->atr);
+    applytextattributes(0);
 
 #ifdef MULTIBYTE_SUPPORT
     if (c->atr & TXT_MULTIWORD_MASK) {
@@ -1479,6 +1484,7 @@ zrefresh(void)
 	}
 #endif
 	ZR_memcpy(rpms.sen, zr_end_ellipsis, ZR_END_ELLIPSIS_SIZE);
+	rpms.sen[1].atr = ellipsis_attr;
 #ifdef MULTIBYTE_SUPPORT
 	/* Extend to the end if we backed off for a wide character */
 	if (extra_ellipsis) {
@@ -1514,6 +1520,7 @@ zrefresh(void)
 	}
 #endif
 	ZR_memcpy(rpms.sen, zr_mid_ellipsis1, ZR_MID_ELLIPSIS1_SIZE);
+	rpms.sen[1].atr = ellipsis_attr;
 	rpms.sen += ZR_MID_ELLIPSIS1_SIZE;
 #ifdef MULTIBYTE_SUPPORT
 	/* Extend if we backed off for a wide character */
@@ -1523,6 +1530,7 @@ zrefresh(void)
 	}
 #endif
 	ZR_memcpy(rpms.sen, zr_mid_ellipsis2, ZR_MID_ELLIPSIS2_SIZE);
+	rpms.sen[1].atr = prompt_attr;
 	nbuf[rpms.tosln][winw] = nbuf[rpms.tosln][winw + 1] = zr_zr;
     }
 
@@ -1555,7 +1563,9 @@ zrefresh(void)
 	t0 = winw - lpromptw;
 	t0 = t0 > ZR_START_ELLIPSIS_SIZE ? ZR_START_ELLIPSIS_SIZE : t0;
 	ZR_memcpy(nbuf[0] + lpromptw, zr_start_ellipsis, t0);
+	(*nbuf + lpromptw)->atr = ellipsis_attr;
 	ZR_memset(nbuf[0] + lpromptw + t0, zr_sp, winw - t0 - lpromptw);
+	(*nbuf + lpromptw + t0)->atr = prompt_attr;
 	nbuf[0][winw] = nbuf[0][winw + 1] = zr_zr;
     }
 
@@ -2514,11 +2524,11 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
     }
     if (winpos) {
 	vbuf[winpos].chr = ZWC('<');	/* line continues to the left */
-	vbuf[winpos].atr = 0;
+	vbuf[winpos].atr = ellipsis_attr;
     }
     if ((int)ZR_strlen(vbuf + winpos) > (winw - hasam)) {
 	vbuf[winpos + winw - hasam - 1].chr = ZWC('>');	/* line continues to right */
-	vbuf[winpos + winw - hasam - 1].atr = 0;
+	vbuf[winpos + winw - hasam - 1].atr = ellipsis_attr;
 	vbuf[winpos + winw - hasam] = zr_zr;
     }
     ZR_strcpy(nbuf[0], vbuf + winpos);
