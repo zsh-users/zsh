@@ -2646,22 +2646,25 @@ struct ttyinfo {
 #define TCDELLINE      16
 #define TCNEXTTAB      17
 #define TCBOLDFACEBEG  18
-#define TCSTANDOUTBEG  19
-#define TCUNDERLINEBEG 20
-#define TCALLATTRSOFF  21
-#define TCSTANDOUTEND  22
-#define TCUNDERLINEEND 23
-#define TCHORIZPOS     24
-#define TCUPCURSOR     25
-#define TCDOWNCURSOR   26
-#define TCLEFTCURSOR   27
-#define TCRIGHTCURSOR  28
-#define TCSAVECURSOR   29
-#define TCRESTRCURSOR  30
-#define TCBACKSPACE    31
-#define TCFGCOLOUR     32
-#define TCBGCOLOUR     33
-#define TC_COUNT       34
+#define TCFAINTBEG     19
+#define TCSTANDOUTBEG  20
+#define TCUNDERLINEBEG 21
+#define TCITALICSBEG   22
+#define TCALLATTRSOFF  23
+#define TCSTANDOUTEND  24
+#define TCUNDERLINEEND 25
+#define TCITALICSEND   27
+#define TCHORIZPOS     27
+#define TCUPCURSOR     28
+#define TCDOWNCURSOR   29
+#define TCLEFTCURSOR   30
+#define TCRIGHTCURSOR  31
+#define TCSAVECURSOR   32
+#define TCRESTRCURSOR  33
+#define TCBACKSPACE    34
+#define TCFGCOLOUR     35
+#define TCBGCOLOUR     36
+#define TC_COUNT       37
 
 #define tccan(X) (tclen[X])
 
@@ -2676,12 +2679,14 @@ struct ttyinfo {
 #endif
 
 #define TXTBOLDFACE   0x0001
-#define TXTSTANDOUT   0x0002
-#define TXTUNDERLINE  0x0004
-#define TXTFGCOLOUR   0x0008
-#define TXTBGCOLOUR   0x0010
+#define TXTFAINT      0x0002
+#define TXTSTANDOUT   0x0004
+#define TXTUNDERLINE  0x0008
+#define TXTITALIC     0x0010
+#define TXTFGCOLOUR   0x0020
+#define TXTBGCOLOUR   0x0040
 
-#define TXT_ATTR_ALL  0x001F
+#define TXT_ATTR_ALL  0x007F
 
 /*
  * Indicates to zle_refresh.c that the character entry is an
@@ -2690,7 +2695,10 @@ struct ttyinfo {
 #define TXT_MULTIWORD_MASK  0x0400
 
 /* used when, e.g an invalid colour is specified */
-#define TXT_ERROR 0xF00000F000000800
+#define TXT_ERROR 0xF00000F000000003
+
+/* Mask for font weight */
+#define TXT_ATTR_FONT_WEIGHT     (TXTBOLDFACE|TXTFAINT)
 
 /* Mask for colour to use in foreground */
 #define TXT_ATTR_FG_COL_MASK     0x000000FFFFFF0000

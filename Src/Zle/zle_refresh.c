@@ -1193,23 +1193,10 @@ zrefresh(void)
 		offset = predisplaylen; /* increment over it */
 	    if (rhp->start + offset <= tmppos &&
 		tmppos < rhp->end + offset) {
-		if (rhp->atr & (TXTFGCOLOUR|TXTBGCOLOUR)) {
-		    /* override colour with later entry */
-		    base_attr = rhp->atr;
-		} else {
-		    /* no colour set yet */
-		    base_attr |= rhp->atr;
-		}
+		base_attr = mixattrs(rhp->atr, base_attr);
 	    }
 	}
-	if (special_attr & (TXTFGCOLOUR|TXTBGCOLOUR)) {
-	    /* keep colours from special attributes */
-	    all_attr = special_attr |
-		(base_attr & ~TXT_ATTR_COLOUR_MASK);
-	} else {
-	    /* keep colours from standard attributes */
-	    all_attr = special_attr | base_attr;
-	}
+	all_attr = mixattrs(special_attr, base_attr);
 
 	if (t == scs)			/* if cursor is here, remember it */
 	    rpms.nvcs = rpms.s - nbuf[rpms.nvln = rpms.ln];
@@ -2441,14 +2428,7 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 		}
 	    }
 	}
-	if (special_attr & (TXTFGCOLOUR|TXTBGCOLOUR)) {
-	    /* keep colours from special attributes */
-	    all_attr = special_attr |
-		(base_attr & ~TXT_ATTR_COLOUR_MASK);
-	} else {
-	    /* keep colours from standard attributes */
-	    all_attr = special_attr | base_attr;
-	}
+	all_attr = mixattrs(special_attr, base_attr);
 
 	if (tmpline[t0] == ZWC('\t')) {
 	    for (*vp++ = zr_sp; (vp - vbuf) & 7; )

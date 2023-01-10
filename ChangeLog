@@ -1,5 +1,9 @@
 2023-01-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 51280: Doc/Zsh/zle.yo, Src/Zle/zle_refresh.c, Src/init.c,
+	Src/prompt.c, Src/zsh.h: add support for italic and faint
+	fonts in the line editor
+
 	* 51258, 51272: Src/Modules/watch.c, Src/Zle/complist.c,
 	Src/Zle/zle.h, Src/Zle/zle_main.c, Src/Zle/zle_refresh.c,
 	Src/Zle/zle_tricky.c, Src/Zle/zle_utils.c, Src/builtin.c,

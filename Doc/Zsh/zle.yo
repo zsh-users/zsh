@@ -2780,8 +2780,12 @@ This works similarly to the foreground colour, except the background is
 not usually affected by the bold attribute.
 )
 item(tt(bold))(
-The characters in the given context are shown in a bold font.
+The characters in the given context are shown with a bold font weight.
 Not all terminals distinguish bold fonts.
+)
+item(tt(faint))(
+The characters in the given context are shown with a faint font weight.
+Not all terminals distinguish faint fonts.
 )
 item(tt(standout))(
 The characters in the given context are shown in the terminal's standout
@@ -2795,6 +2799,10 @@ item(tt(underline))(
 The characters in the given context are shown underlined.  Some
 terminals show the foreground in a different colour instead; in this
 case whitespace will not be highlighted.
+)
+item(tt(italic))(
+The characters in the given context are shown in a italic font.
+Not all terminals support italic fonts.
 )
 enditem()
 

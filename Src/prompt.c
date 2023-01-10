@@ -1590,7 +1590,15 @@ applytextattributes(int flags)
 	    turnoff &= turnoff - 1;
     }
 
-    if (keepcount < turncount || (change & ~txtpendingattrs & TXTBOLDFACE)) {
+    /* enabling bold can be relied upon to disable faint
+     * (the converse not so as that commonly does nothing at all) */
+    if (txtcurrentattrs & TXTFAINT && txtpendingattrs & TXTBOLDFACE) {
+	--turncount;
+	change &= ~TXTFAINT;
+    }
+
+    if (keepcount < turncount ||
+	    (change & ~txtpendingattrs & TXT_ATTR_FONT_WEIGHT)) {
 	tsetcap(TCALLATTRSOFF, flags);
 	/* this cleared all attributes, may need to restore some */
 	change = txtpendingattrs & TXT_ATTR_ALL & ~txtunknownattrs;
@@ -1607,13 +1615,19 @@ applytextattributes(int flags)
 	    /* in some cases, that clears all attributes */
 	    change = txtpendingattrs & TXT_ATTR_ALL & ~txtunknownattrs;
 	}
+	if (change & ~txtpendingattrs & TXTITALIC)
+	    tsetcap(TCITALICSEND, flags);
     }
     if (change & txtpendingattrs & TXTBOLDFACE)
 	tsetcap(TCBOLDFACEBEG, flags);
+    if (change & txtpendingattrs & TXTFAINT)
+	tsetcap(TCFAINTBEG, flags);
     if (change & txtpendingattrs & TXTSTANDOUT)
 	tsetcap(TCSTANDOUTBEG, flags);
     if (change & txtpendingattrs & TXTUNDERLINE)
 	tsetcap(TCUNDERLINEBEG, flags);
+    if (change & txtpendingattrs & TXTITALIC)
+	tsetcap(TCITALICSBEG, flags);
 
     if (change & TXT_ATTR_FG_MASK)
 	set_colour_attribute(txtpendingattrs, COL_SEQ_FG, flags);
@@ -1678,6 +1692,25 @@ tunsetattrs(zattr newattrs)
 	txtpendingattrs &= ~TXT_ATTR_BG_MASK;
 }
 
+/* Merge two attribute sets. In an case where attributes might conflict
+ * choose those from the first parameter.  Foreground and background
+ * colours are taken together - less likely to end up with unreadable
+ * combinations. */
+
+/**/
+mod_export zattr
+mixattrs(zattr primary, zattr secondary)
+{
+    zattr result = secondary;
+    /* take colours from primary */
+    if (primary & (TXTFGCOLOUR|TXTBGCOLOUR))
+        result &= ~TXT_ATTR_COLOUR_MASK;
+    /* take font weight from primary */
+    if (primary & TXT_ATTR_FONT_WEIGHT)
+        result &= ~TXT_ATTR_FONT_WEIGHT;
+    return result | primary;
+}
+
 /*****************************************************************************
  * Utilities dealing with colour and other forms of highlighting.
  *
@@ -1700,9 +1733,11 @@ struct highlight {
 
 static const struct highlight highlights[] = {
     { "none", 0, TXT_ATTR_ALL },
-    { "bold", TXTBOLDFACE, 0 },
+    { "bold", TXTBOLDFACE, TXTFAINT },
+    { "faint", TXTFAINT, TXTBOLDFACE },
     { "standout", TXTSTANDOUT, 0 },
     { "underline", TXTUNDERLINE, 0 },
+    { "italic", TXTITALIC, 0 },
     { NULL, 0, 0 }
 };
 

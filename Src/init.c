@@ -747,7 +747,7 @@ init_shout(void)
 static char *tccapnams[TC_COUNT] = {
     "cl", "le", "LE", "nd", "RI", "up", "UP", "do",
     "DO", "dc", "DC", "ic", "IC", "cd", "ce", "al", "dl", "ta",
-    "md", "so", "us", "me", "se", "ue", "ch",
+    "md", "mh", "so", "us", "ZH", "me", "se", "ue", "ZR", "ch",
     "ku", "kd", "kl", "kr", "sc", "rc", "bc", "AF", "AB"
 };
 
@@ -872,6 +872,23 @@ init_term(void)
 	/* The following is an attempt at a heuristic,
 	 * but it fails in some cases */
 	/* rprompt_indent = ((hasam && !hasbw) || hasye || !tccan(TCLEFT)); */
+
+	/* if there's no termcap entry for italics, use CSI 3 m */
+	if (!tccan(TCITALICSBEG)) {
+	    zsfree(tcstr[TCITALICSBEG]);
+	    tcstr[TCITALICSBEG] = ztrdup("\033[3m");
+	    tclen[TCITALICSBEG] = 4;
+	}
+	if (!tccan(TCITALICSEND)) {
+	    zsfree(tcstr[TCITALICSEND]);
+	    tcstr[TCITALICSEND] = ztrdup("\033[23m");
+	    tclen[TCITALICSEND] = 5;
+	}
+	if (!tccan(TCFAINTBEG)) {
+	    zsfree(tcstr[TCFAINTBEG]);
+	    tcstr[TCFAINTBEG] = ztrdup("\033[2m");
+	    tclen[TCFAINTBEG] = 4;
+	}
     }
     return 1;
 }
