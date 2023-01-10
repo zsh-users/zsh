@@ -1,5 +1,9 @@
 2023-01-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 51289: Src/Zle/zle_refresh.c, Src/prompt.c: don't disable
+	non-colour attributes in prompts for SINGLE_LINE_ZLE and remove
+	superfluous extra escapes to disable attributes
+
 	* 51281: Src/Zle/zle_main.c, Src/Zle/zle_refresh.c, Src/zsh.h:
 	keep track of attributes left on at the end of left and right
 	prompts and reapply them explicitly as appropriate

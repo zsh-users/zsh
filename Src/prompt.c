@@ -1004,8 +1004,7 @@ stradd(char *d)
 mod_export void
 tsetcap(int cap, int flags)
 {
-    if (tccan(cap) && !isset(SINGLELINEZLE) &&
-        !(termflags & (TERM_NOUP|TERM_BAD|TERM_UNKNOWN))) {
+    if (tccan(cap) && !(termflags & (TERM_NOUP|TERM_BAD|TERM_UNKNOWN))) {
 	switch (flags) {
 	case TSC_RAW:
 	    tputs(tcstr[cap], 1, putraw);

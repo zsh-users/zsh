@@ -1107,8 +1107,6 @@ zrefresh(void)
 #endif
 	/* we probably should only have explicitly set attributes */
 	tsetcap(TCALLATTRSOFF, 0);
-	tsetcap(TCSTANDOUTEND, 0);
-	tsetcap(TCUNDERLINEEND, 0);
 	txtcurrentattrs = txtpendingattrs = txtunknownattrs = 0;
 
 	if (trashedzle && !clearflag)
