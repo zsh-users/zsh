@@ -4603,6 +4603,8 @@ bin_print(char *name, char **args, Options ops, int func)
     /* compute lengths, and interpret according to -P, -D, -e, etc. */
     argc = arrlen(args);
     len = (int *) hcalloc(argc * sizeof(int));
+    if (OPT_ISSET(ops, 'P'))
+	txtunknownattrs = TXT_ATTR_ALL;
     for (n = 0; n < argc; n++) {
 	/* first \ sequences */
 	if (fmt ||
@@ -4633,7 +4635,7 @@ bin_print(char *name, char **args, Options ops, int func)
 	     */
 	    char *str = unmetafy(
 		promptexpand(metafy(args[n], len[n], META_NOALLOC),
-			     0, NULL, NULL, NULL),
+			     0, NULL, NULL),
 		&len[n]);
 	    args[n] = dupstrpfx(str, len[n]);
 	    free(str);

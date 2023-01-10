@@ -255,8 +255,10 @@ watchlog2(int inout, WATCH_STRUCT_UTMP *u, char *fmt, int prnt, int fini)
     while (*fmt)
 	if (*fmt == '\\') {
 	    if (*++fmt) {
-		if (prnt)
+		if (prnt) {
+		    applytextattributes(TSC_RAW);
 		    putchar(*fmt);
+		}
 		++fmt;
 	    } else if (fini)
 		return fmt;
@@ -266,8 +268,10 @@ watchlog2(int inout, WATCH_STRUCT_UTMP *u, char *fmt, int prnt, int fini)
 	else if (*fmt == fini)
 	    return ++fmt;
 	else if (*fmt != '%') {
-	    if (prnt)
+	    if (prnt) {
+		applytextattributes(TSC_RAW);
 		putchar(*fmt);
+	    }
 	    ++fmt;
 	} else {
 	    if (*++fmt == BEGIN3)
@@ -277,12 +281,15 @@ watchlog2(int inout, WATCH_STRUCT_UTMP *u, char *fmt, int prnt, int fini)
 	    else
 		switch (*(fm2 = fmt++)) {
 		case 'n':
+		    applytextattributes(TSC_RAW);
 		    printf("%.*s", (int)sizeof(u->ut_name), u->ut_name);
 		    break;
 		case 'a':
+		    applytextattributes(TSC_RAW);
 		    printf("%s", (!inout) ? "logged off" : "logged on");
 		    break;
 		case 'l':
+		    applytextattributes(TSC_RAW);
 		    if (!strncmp(u->ut_line, "tty", 3))
 			printf("%.*s", (int)sizeof(u->ut_line) - 3, u->ut_line + 3);
 		    else
@@ -290,6 +297,7 @@ watchlog2(int inout, WATCH_STRUCT_UTMP *u, char *fmt, int prnt, int fini)
 		    break;
 # ifdef WATCH_UTMP_UT_HOST
 		case 'm':
+		    applytextattributes(TSC_RAW);
 		    for (p = u->ut_host, i = sizeof(u->ut_host); i && *p; i--, p++) {
 			if (*p == '.' && !idigit(p[1]))
 			    break;
@@ -297,6 +305,7 @@ watchlog2(int inout, WATCH_STRUCT_UTMP *u, char *fmt, int prnt, int fini)
 		    }
 		    break;
 		case 'M':
+		    applytextattributes(TSC_RAW);
 		    printf("%.*s", (int)sizeof(u->ut_host), u->ut_host);
 		    break;
 # endif /* WATCH_UTMP_UT_HOST */
@@ -343,9 +352,11 @@ watchlog2(int inout, WATCH_STRUCT_UTMP *u, char *fmt, int prnt, int fini)
 		    len = ztrftime(buf, 40, fm2, tm, 0L);
 		    if (len > 0)
 			metafy(buf, len, META_NOALLOC);
+		    applytextattributes(TSC_RAW);
 		    printf("%s", (*buf == ' ') ? buf + 1 : buf);
 		    break;
 		case '%':
+		    applytextattributes(TSC_RAW);
 		    putchar('%');
 		    break;
 		case 'F':
@@ -354,16 +365,13 @@ watchlog2(int inout, WATCH_STRUCT_UTMP *u, char *fmt, int prnt, int fini)
 			atr = match_colour((const char**)&fmt, 1, 0);
 			if (*fmt == '}')
 			    fmt++;
-			if (!(atr & (TXT_ERROR | TXTNOFGCOLOUR))) {
-			    txtunset(TXT_ATTR_FG_COL_MASK);
-			    txtset(atr & TXT_ATTR_FG_ON_MASK);
-			    set_colour_attribute(atr, COL_SEQ_FG, TSC_RAW);
+			if (atr && atr != TXT_ERROR) {
+			    tsetattrs(atr);
+			    break;
 			}
-		    }
-		    break;
+		    } /* fall-through */
 		case 'f':
-		    txtunset(TXT_ATTR_FG_ON_MASK);
-		    set_colour_attribute(TXTNOFGCOLOUR, COL_SEQ_FG, TSC_RAW);
+		    tunsetattrs(TXTFGCOLOUR);
 		    break;
 		case 'K':
 		    if (*fmt == '{') {
@@ -371,49 +379,43 @@ watchlog2(int inout, WATCH_STRUCT_UTMP *u, char *fmt, int prnt, int fini)
 			atr = match_colour((const char**)&fmt, 0, 0);
 			if (*fmt == '}')
 			    fmt++;
-			if (!(atr & (TXT_ERROR | TXTNOBGCOLOUR))) {
-			    txtunset(TXT_ATTR_BG_COL_MASK);
-			    txtset(atr & TXT_ATTR_BG_ON_MASK);
-			    set_colour_attribute(atr, COL_SEQ_BG, TSC_RAW);
+			if (atr && atr != TXT_ERROR) {
+			    tsetattrs(atr);
+			    break;
 			}
-		    }
-		    break;
+		    } /* fall-through */
 		case 'k':
-		    txtunset(TXT_ATTR_BG_ON_MASK);
-		    set_colour_attribute(TXTNOBGCOLOUR, COL_SEQ_BG, TSC_RAW);
+		    tunsetattrs(TXTBGCOLOUR);
 		    break;
 		case 'S':
-		    txtset(TXTSTANDOUT);
-		    tsetcap(TCSTANDOUTBEG, TSC_RAW);
+		    tsetattrs(TXTSTANDOUT);
 		    break;
 		case 's':
-		    txtunset(TXTSTANDOUT);
-		    tsetcap(TCSTANDOUTEND, TSC_RAW|TSC_DIRTY);
+		    tunsetattrs(TXTSTANDOUT);
 		    break;
 		case 'B':
-		    txtset(TXTBOLDFACE);
-		    tsetcap(TCBOLDFACEBEG, TSC_RAW|TSC_DIRTY);
+		    tsetattrs(TXTBOLDFACE);
 		    break;
 		case 'b':
-		    txtunset(TXTBOLDFACE);
-		    tsetcap(TCALLATTRSOFF, TSC_RAW|TSC_DIRTY);
+		    tunsetattrs(TXTBOLDFACE);
 		    break;
 		case 'U':
-		    txtset(TXTUNDERLINE);
-		    tsetcap(TCUNDERLINEBEG, TSC_RAW);
+		    tsetattrs(TXTUNDERLINE);
 		    break;
 		case 'u':
-		    txtunset(TXTUNDERLINE);
-		    tsetcap(TCUNDERLINEEND, TSC_RAW|TSC_DIRTY);
+		    tunsetattrs(TXTUNDERLINE);
 		    break;
 		default:
+		    applytextattributes(TSC_RAW);
 		    putchar('%');
 		    putchar(*fm2);
 		    break;
 		}
 	}
-    if (prnt)
+    if (prnt) {
+	applytextattributes(TSC_RAW);
 	putchar('\n');
+    }
 
     return fmt;
 }

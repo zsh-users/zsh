@@ -3716,6 +3716,8 @@ colonsubscript:
     if (presc) {
 	int ops = opts[PROMPTSUBST], opb = opts[PROMPTBANG];
 	int opp = opts[PROMPTPERCENT];
+	zattr savecurrent = txtcurrentattrs;
+	zattr saveunknown = txtunknownattrs;
 
 	if (presc < 2) {
 	    opts[PROMPTPERCENT] = 1;
@@ -3738,7 +3740,8 @@ colonsubscript:
 	    for (; *ap; ap++) {
 		char *tmps;
 		untokenize(*ap);
-		tmps = promptexpand(*ap, 0, NULL, NULL, NULL);
+		txtunknownattrs = TXT_ATTR_ALL;
+		tmps = promptexpand(*ap, 0, NULL, NULL);
 		*ap = dupstring(tmps);
 		free(tmps);
 	    }
@@ -3747,10 +3750,14 @@ colonsubscript:
 	    if (!copied)
 		val = dupstring(val), copied = 1;
 	    untokenize(val);
-	    tmps = promptexpand(val, 0, NULL, NULL, NULL);
+	    txtunknownattrs = TXT_ATTR_ALL;
+	    tmps = promptexpand(val, 0, NULL, NULL);
 	    val = dupstring(tmps);
 	    free(tmps);
 	}
+
+	txtpendingattrs = txtcurrentattrs = savecurrent;
+	txtunknownattrs = saveunknown;
 	opts[PROMPTSUBST] = ops;
 	opts[PROMPTBANG] = opb;
 	opts[PROMPTPERCENT] = opp;

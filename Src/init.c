@@ -1654,8 +1654,7 @@ VA_DCL
 
 	lp = va_arg(ap, char **);
 
-	pptbuf = unmetafy(promptexpand(lp ? *lp : NULL, 0, NULL, NULL,
-				       NULL),
+	pptbuf = unmetafy(promptexpand(lp ? *lp : NULL, 0, NULL, NULL),
 			  &pptlen);
 	write_loop(2, pptbuf, pptlen);
 	free(pptbuf);

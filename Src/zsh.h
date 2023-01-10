@@ -2681,25 +2681,8 @@ struct ttyinfo {
 #define TXTFGCOLOUR   0x0008
 #define TXTBGCOLOUR   0x0010
 
-#define TXT_ATTR_ON_MASK   0x001F
+#define TXT_ATTR_ALL  0x001F
 
-#define txtisset(X)  (txtattrmask & (X))
-#define txtset(X)    (txtattrmask |= (X))
-#define txtunset(X)  (txtattrmask &= ~(X))
-
-#define TXTNOBOLDFACE	0x0020
-#define TXTNOSTANDOUT	0x0040
-#define TXTNOUNDERLINE	0x0080
-#define TXTNOFGCOLOUR	0x0100
-#define TXTNOBGCOLOUR	0x0200
-
-#define TXT_ATTR_OFF_MASK  0x03E0
-/* Bits to shift off right to get on */
-#define TXT_ATTR_OFF_ON_SHIFT 5
-#define TXT_ATTR_OFF_FROM_ON(attr)	\
-    (((attr) & TXT_ATTR_ON_MASK) << TXT_ATTR_OFF_ON_SHIFT)
-#define TXT_ATTR_ON_FROM_OFF(attr)	\
-    (((attr) & TXT_ATTR_OFF_MASK) >> TXT_ATTR_OFF_ON_SHIFT)
 /*
  * Indicates to zle_refresh.c that the character entry is an
  * index into the list of multiword symbols.
@@ -2707,7 +2690,7 @@ struct ttyinfo {
 #define TXT_MULTIWORD_MASK  0x0400
 
 /* used when, e.g an invalid colour is specified */
-#define TXT_ERROR 0x0800
+#define TXT_ERROR 0xF00000F000000800
 
 /* Mask for colour to use in foreground */
 #define TXT_ATTR_FG_COL_MASK     0x000000FFFFFF0000
@@ -2723,26 +2706,19 @@ struct ttyinfo {
 /* Flag to indicate that background is a 24-bit colour */
 #define TXT_ATTR_BG_24BIT        0x8000
 
-/* Things to turn on, including values for the colour elements */
-#define TXT_ATTR_ON_VALUES_MASK	\
-    (TXT_ATTR_ON_MASK|TXT_ATTR_FG_COL_MASK|TXT_ATTR_BG_COL_MASK|\
-     TXT_ATTR_FG_24BIT|TXT_ATTR_BG_24BIT)
-
 /* Mask out everything to do with setting a foreground colour */
-#define TXT_ATTR_FG_ON_MASK \
+#define TXT_ATTR_FG_MASK \
     (TXTFGCOLOUR|TXT_ATTR_FG_COL_MASK|TXT_ATTR_FG_24BIT)
 
 /* Mask out everything to do with setting a background colour */
-#define TXT_ATTR_BG_ON_MASK \
+#define TXT_ATTR_BG_MASK \
     (TXTBGCOLOUR|TXT_ATTR_BG_COL_MASK|TXT_ATTR_BG_24BIT)
 
 /* Mask out everything to do with activating colours */
-#define TXT_ATTR_COLOUR_ON_MASK			\
-    (TXT_ATTR_FG_ON_MASK|TXT_ATTR_BG_ON_MASK)
+#define TXT_ATTR_COLOUR_MASK \
+    (TXT_ATTR_FG_MASK|TXT_ATTR_BG_MASK)
 
-#define txtchangeisset(T,X)	((T) & (X))
 #define txtchangeget(T,A)	(((T) & A ## _MASK) >> A ## _SHIFT)
-#define txtchangeset(T, X, Y)	((void)(T && (*T &= ~(Y), *T |= (X))))
 
 /*
  * For outputting sequences to change colour: specify foreground
@@ -2750,7 +2726,6 @@ struct ttyinfo {
  */
 #define COL_SEQ_FG	(0)
 #define COL_SEQ_BG	(1)
-#define COL_SEQ_COUNT	(2)
 
 struct color_rgb {
     unsigned int red, green, blue;
@@ -2766,11 +2741,7 @@ enum {
     /* Raw output: use stdout rather than shout */
     TSC_RAW = 0x0001,
     /* Output to current prompt buffer: only used when assembling prompt */
-    TSC_PROMPT = 0x0002,
-    /* Mask to get the output mode */
-    TSC_OUTPUT_MASK = 0x0003,
-    /* Change needs reset of other attributes */
-    TSC_DIRTY = 0x0004
+    TSC_PROMPT = 0x0002
 };
 
 /****************************************/

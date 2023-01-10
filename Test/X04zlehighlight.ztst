@@ -79,7 +79,7 @@
   zpty_line 1 p       # the line of interest, preserving escapes ("p")
   zpty_stop
 0:region highlight - standout overlapping on other region_highlight entry
->0m27m24mtr7mu27me word2 word3
+>0m27m24mtr7mu0me word2 word3
 
   zpty_start
   zpty_input 'rh_widget() { BUFFER="true"; region_highlight+=( "0 4 fg=green" ); }'
@@ -90,7 +90,7 @@
   zpty_line 1 p       # the line of interest, preserving escapes ("p")
   zpty_stop
 0:basic region_highlight with 8 colors
->0m27m24mCDE|32|trueCDE|39|
+>0m27m24mCDE|32|true0m
 
   zpty_start
   zpty_input 'rh_widget() { region_highlight+=( "0 4 fg=green memo=someplugin" ); typeset -p region_highlight }'
@@ -145,7 +145,7 @@
   zpty_line 1 p       # the line of interest, preserving escapes ("p")
   zpty_stop
 0:basic region_highlight with true-color (hex-triplets)
->0m27m24m38;2;4;8;16mtrueCDE|39|
+>0m27m24m38;2;4;8;16mtrue0m
 
   zpty_start
   zpty_input 'zmodload zsh/nearcolor'
@@ -157,7 +157,7 @@
   zpty_line 1 p       # the line of interest, preserving escapes ("p")
   zpty_stop
 0:basic region_highlight with near-color (hex-triplets at input)
->0m27m24mCDE|3232|trueCDE|39|
+>0m27m24mCDE|3232|true0m
 
   zpty_start
   zpty_input 'rh_widget() { BUFFER="true"; region_highlight+=( "0 4 fg=green" ); rh2; }'
@@ -169,7 +169,7 @@
   zpty_line 1 p       # the line of interest, preserving escapes ("p")
   zpty_stop
 0:overlapping region_highlight with 8 colors
->0m27m24mCDE|32|tCDE|31|rCDE|39|CDE|32|ueCDE|39|
+>0m27m24mCDE|32|tCDE|31|rCDE|32|ue0m
 
   zpty_start
   zpty_input 'rh_widget() { BUFFER="true"; region_highlight+=( "0 4 fg=#00cc00" ); rh2; }'
@@ -181,7 +181,7 @@
   zpty_line 1 p       # the line of interest, preserving escapes ("p")
   zpty_stop
 0:overlapping region_highlight with true-color
->0m27m24m38;2;0;204;0mt38;2;204;0;0mrCDE|39|38;2;0;204;0mueCDE|39|
+>0m27m24m38;2;0;204;0mt38;2;204;0;0mr38;2;0;204;0mue0m
 
   zpty_start
   zpty_input 'zmodload zsh/nearcolor'
@@ -194,7 +194,7 @@
   zpty_line 1 p       # the line of interest, preserving escapes ("p")
   zpty_stop
 0:overlapping region_highlight with near-color (hex-triplets at input)
->0m27m24mCDE|340|tCDE|3160|rCDE|39|CDE|340|ueCDE|39|
+>0m27m24mCDE|340|tCDE|3160|rCDE|340|ue0m
 
   zpty_start
   zpty_input 'f () { zle clear-screen; zle g -f nolast; BUFFER=": ${(q)LASTWIDGET}" }; zle -N f'

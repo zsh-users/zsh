@@ -1072,7 +1072,7 @@ static int
 compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 {
     char *p, nc[2*DIGBUFSIZE + 12], nbuf[2*DIGBUFSIZE + 12];
-    int l = 0, cc = 0, b = 0, s = 0, u = 0, m, ask, beg, stat;
+    int l = 0, cc = 0, m, ask, beg, stat;
 
     if ((stat = !fmt)) {
 	if (mlbeg >= 0) {
@@ -1118,48 +1118,46 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		m = 0;
 		switch (cchar) {
 		case ZWC('%'):
-		    if (dopr == 1)
+		    if (dopr == 1) {
+			applytextattributes(0);
 			putc('%', shout);
+		    }
 		    cc++;
 		    break;
 		case ZWC('n'):
 		    if (!stat) {
 			sprintf(nc, "%d", n);
-			if (dopr == 1)
+			if (dopr == 1) {
+			    applytextattributes(0);
 			    fputs(nc, shout);
+			}
 			/* everything here is ASCII... */
 			cc += strlen(nc);
 		    }
 		    break;
 		case ZWC('B'):
-		    b = 1;
 		    if (dopr)
-			tcout(TCBOLDFACEBEG);
+			tsetattrs(TXTBOLDFACE);
 		    break;
 		case ZWC('b'):
-		    b = 0; m = 1;
 		    if (dopr)
-			tcout(TCALLATTRSOFF);
+			tunsetattrs(TXTBOLDFACE);
 		    break;
 		case ZWC('S'):
-		    s = 1;
 		    if (dopr)
-			tcout(TCSTANDOUTBEG);
+			tsetattrs(TXTSTANDOUT);
 		    break;
 		case ZWC('s'):
-		    s = 0; m = 1;
 		    if (dopr)
-			tcout(TCSTANDOUTEND);
+			tunsetattrs(TXTSTANDOUT);
 		    break;
 		case ZWC('U'):
-		    u = 1;
 		    if (dopr)
-			tcout(TCUNDERLINEBEG);
+			tsetattrs(TXTUNDERLINE);
 		    break;
 		case ZWC('u'):
-		    u = 0; m = 1;
 		    if (dopr)
-			tcout(TCUNDERLINEEND);
+			tunsetattrs(TXTUNDERLINE);
 		    break;
 		case ZWC('F'):
 		case ZWC('K'):
@@ -1173,20 +1171,21 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		    } else
 			atr = match_colour(NULL, is_fg, arg);
 		    if (atr != TXT_ERROR && dopr)
-			set_colour_attribute(atr, is_fg ? COL_SEQ_FG :
-					     COL_SEQ_BG, 0);
+			tsetattrs(atr);
 		    break;
 		case ZWC('f'):
 		    if (dopr)
-			set_colour_attribute(TXTNOFGCOLOUR, COL_SEQ_FG, 0);
+			tunsetattrs(TXTFGCOLOUR);
 		    break;
 		case ZWC('k'):
 		    if (dopr)
-			set_colour_attribute(TXTNOBGCOLOUR, COL_SEQ_BG, 0);
+			tunsetattrs(TXTBGCOLOUR);
 		    break;
 		case ZWC('{'):
 		    if (arg)
 			cc += arg;
+		    if (dopr)
+			applytextattributes(0);
 		    for (; *p && (*p != '%' || p[1] != '}'); p++)
 			if (dopr)
 			    putc(*p == Meta ? *++p ^ 32 : *p, shout);
@@ -1197,7 +1196,7 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		    if (stat) {
 			sprintf(nc, "%d/%d", (n ? mlastm : mselect),
 				listdat.nlist);
-			m = 2;
+			m = 1;
 		    }
 		    break;
 		case ZWC('M'):
@@ -1205,20 +1204,20 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 			sprintf(nbuf, "%d/%d", (n ? mlastm : mselect),
 				listdat.nlist);
 			sprintf(nc, "%-9s", nbuf);
-			m = 2;
+			m = 1;
 		    }
 		    break;
 		case ZWC('l'):
 		    if (stat) {
 			sprintf(nc, "%d/%d", ml + 1, listdat.nlines);
-			m = 2;
+			m = 1;
 		    }
 		    break;
 		case ZWC('L'):
 		    if (stat) {
 			sprintf(nbuf, "%d/%d", ml + 1, listdat.nlines);
 			sprintf(nc, "%-9s", nbuf);
-			m = 2;
+			m = 1;
 		    }
 		    break;
 		case ZWC('p'):
@@ -1230,7 +1229,7 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 				    ((ml + 1) * 100) / listdat.nlines);
 			else
 			    strcpy(nc, "Top");
-			m = 2;
+			m = 1;
 		    }
 		    break;
 		case ZWC('P'):
@@ -1242,25 +1241,19 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 				    ((ml + 1) * 100) / listdat.nlines);
 			else
 			    strcpy(nc, "Top   ");
-			m = 2;
+			m = 1;
 		    }
 		    break;
 		}
-		if (m == 2 && dopr == 1) {
+		if (m && dopr) {
 		    /* nc only contains ASCII text */
 		    int l = strlen(nc);
 
 		    if (l + cc > zterm_columns - 2)
 			nc[l -= l + cc - (zterm_columns - 2)] = '\0';
+		    applytextattributes(0);
 		    fputs(nc, shout);
 		    cc += l;
-		} else if (dopr && m == 1) {
-		    if (b)
-			tcout(TCBOLDFACEBEG);
-		    if (s)
-			tcout(TCSTANDOUTBEG);
-		    if (u)
-			tcout(TCUNDERLINEBEG);
 		}
 	    } else
 		break;
@@ -1276,6 +1269,7 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		cc = 0;
 	    }
 	    if (dopr == 1) {
+		applytextattributes(0);
 		if (ml == mlend - 1 && (cc % zterm_columns) ==
 		    zterm_columns - 1) {
 		    dopr = 0;

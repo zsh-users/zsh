@@ -1,5 +1,13 @@
 2023-01-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 51258, 51272: Src/Modules/watch.c, Src/Zle/complist.c,
+	Src/Zle/zle.h, Src/Zle/zle_main.c, Src/Zle/zle_refresh.c,
+	Src/Zle/zle_tricky.c, Src/Zle/zle_utils.c, Src/builtin.c,
+	Src/init.c, Src/input.c, Src/loop.c, Src/prompt.c,
+	Src/subst.c, Src/utils.c, Src/zsh.h, Test/D01prompt.ztst,
+	Test/X04zlehighlight.ztst: refactor handling of terminal
+	attributes, removing OFF flags in zattr
+
 	* Nathan Houghton: 51276: Completion/Unix/Type/_diff_options:
 	Fix diff completion for non GNU / FreeBSD platforms
 

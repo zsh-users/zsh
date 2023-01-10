@@ -30,10 +30,20 @@
 #include "zsh.mdh"
 #include "prompt.pro"
 
-/* text attribute mask */
+/* current text attributes */
 
 /**/
-mod_export zattr txtattrmask;
+mod_export zattr txtcurrentattrs;
+
+/* pending changes for attributes */
+
+/**/
+mod_export zattr txtpendingattrs;
+
+/* mask of attributes with an unknown state */
+
+/**/
+mod_export zattr txtunknownattrs;
 
 /* the command stack for use with %_ in prompts */
 
@@ -160,15 +170,11 @@ promptpath(char *p, int npath, int tilde)
  * between spacing and non-spacing parts of the prompt, and
  * Nularg, which (in a non-spacing sequence) indicates a
  * `glitch' space.
- *
- * txtchangep gives an integer controlling the attributes of
- * the prompt.  This is for use in zle to maintain the attributes
- * consistently.  Other parts of the shell should not need to use it.
  */
 
 /**/
 mod_export char *
-promptexpand(char *s, int ns, char *rs, char *Rs, zattr *txtchangep)
+promptexpand(char *s, int ns, char *rs, char *Rs)
 {
     struct buf_vars new_vars;
 
@@ -212,7 +218,7 @@ promptexpand(char *s, int ns, char *rs, char *Rs, zattr *txtchangep)
     new_vars.bp1 = NULL;
     new_vars.truncwidth = 0;
 
-    putpromptchar(1, '\0', txtchangep);
+    putpromptchar(1, '\0');
     addbufspc(2);
     if (new_vars.dontcount)
 	*new_vars.bp++ = Outpar;
@@ -253,7 +259,7 @@ parsecolorchar(zattr arg, int is_fg)
 	    *ep = '\0';
 	    /* expand the contents of the argument so you can use
 	     * %v for example */
-	    coll = col = promptexpand(bv->fm, 0, NULL, NULL, NULL);
+	    coll = col = promptexpand(bv->fm, 0, NULL, NULL);
 	    *ep = oc;
 	    arg = match_colour((const char **)&coll, is_fg, 0);
 	    free(col);
@@ -278,7 +284,7 @@ parsecolorchar(zattr arg, int is_fg)
 
 /**/
 static int
-putpromptchar(int doprint, int endchar, zattr *txtchangep)
+putpromptchar(int doprint, int endchar)
 {
     char *ss, *hostnam;
     int t0, arg, test, sep, j, numjobs, len;
@@ -430,10 +436,9 @@ putpromptchar(int doprint, int endchar, zattr *txtchangep)
 		/* Don't do the current truncation until we get back */
 		otruncwidth = bv->truncwidth;
 		bv->truncwidth = 0;
-		if (!putpromptchar(test == 1 && doprint, sep,
-				   txtchangep) || !*++bv->fm ||
-		    !putpromptchar(test == 0 && doprint, ')',
-				   txtchangep)) {
+		if (!putpromptchar(test == 1 && doprint, sep) ||
+				   !*++bv->fm ||
+		    !putpromptchar(test == 0 && doprint, ')')) {
 		    bv->truncwidth = otruncwidth;
 		    return 0;
 		}
@@ -519,71 +524,57 @@ putpromptchar(int doprint, int endchar, zattr *txtchangep)
 		unqueue_signals();
 		break;
 	    case 'S':
-		txtchangeset(txtchangep, TXTSTANDOUT, TXTNOSTANDOUT);
-		txtset(TXTSTANDOUT);
-		tsetcap(TCSTANDOUTBEG, TSC_PROMPT);
+		tsetattrs(TXTSTANDOUT);
+	        applytextattributes(TSC_PROMPT);
 		break;
 	    case 's':
-		txtchangeset(txtchangep, TXTNOSTANDOUT, TXTSTANDOUT);
-		txtunset(TXTSTANDOUT);
-		tsetcap(TCSTANDOUTEND, TSC_PROMPT|TSC_DIRTY);
+		tunsetattrs(TXTSTANDOUT);
+	        applytextattributes(TSC_PROMPT);
 		break;
 	    case 'B':
-		txtchangeset(txtchangep, TXTBOLDFACE, TXTNOBOLDFACE);
-		txtset(TXTBOLDFACE);
-		tsetcap(TCBOLDFACEBEG, TSC_PROMPT|TSC_DIRTY);
+		tsetattrs(TXTBOLDFACE);
+	        applytextattributes(TSC_PROMPT);
 		break;
 	    case 'b':
-		txtchangeset(txtchangep, TXTNOBOLDFACE, TXTBOLDFACE);
-		txtunset(TXTBOLDFACE);
-		tsetcap(TCALLATTRSOFF, TSC_PROMPT|TSC_DIRTY);
+		tunsetattrs(TXTBOLDFACE);
+	        applytextattributes(TSC_PROMPT);
 		break;
 	    case 'U':
-		txtchangeset(txtchangep, TXTUNDERLINE, TXTNOUNDERLINE);
-		txtset(TXTUNDERLINE);
-		tsetcap(TCUNDERLINEBEG, TSC_PROMPT);
+		tsetattrs(TXTUNDERLINE);
+	        applytextattributes(TSC_PROMPT);
 		break;
 	    case 'u':
-		txtchangeset(txtchangep, TXTNOUNDERLINE, TXTUNDERLINE);
-		txtunset(TXTUNDERLINE);
-		tsetcap(TCUNDERLINEEND, TSC_PROMPT|TSC_DIRTY);
+		tunsetattrs(TXTUNDERLINE);
+	        applytextattributes(TSC_PROMPT);
 		break;
 	    case 'F':
 		atr = parsecolorchar(arg, 1);
-		if (!(atr & (TXT_ERROR | TXTNOFGCOLOUR))) {
-		    txtchangeset(txtchangep, atr & TXT_ATTR_FG_ON_MASK,
-				 TXTNOFGCOLOUR | TXT_ATTR_FG_COL_MASK);
-		    txtunset(TXT_ATTR_FG_COL_MASK);
-		    txtset(atr & TXT_ATTR_FG_ON_MASK);
-		    set_colour_attribute(atr, COL_SEQ_FG, TSC_PROMPT);
+		if (atr && atr != TXT_ERROR) {
+		    tsetattrs(atr);
+		    applytextattributes(TSC_PROMPT);
 		    break;
 		}
 		/* else FALLTHROUGH */
 	    case 'f':
-		txtchangeset(txtchangep, TXTNOFGCOLOUR, TXT_ATTR_FG_ON_MASK);
-		txtunset(TXT_ATTR_FG_ON_MASK);
-		set_colour_attribute(TXTNOFGCOLOUR, COL_SEQ_FG, TSC_PROMPT);
+		tunsetattrs(TXTFGCOLOUR);
+		applytextattributes(TSC_PROMPT);
 		break;
 	    case 'K':
 		atr = parsecolorchar(arg, 0);
-		if (!(atr & (TXT_ERROR | TXTNOBGCOLOUR))) {
-		    txtchangeset(txtchangep, atr & TXT_ATTR_BG_ON_MASK,
-				 TXTNOBGCOLOUR | TXT_ATTR_BG_COL_MASK);
-		    txtunset(TXT_ATTR_BG_COL_MASK);
-		    txtset(atr & TXT_ATTR_BG_ON_MASK);
-		    set_colour_attribute(atr, COL_SEQ_BG, TSC_PROMPT);
+		if (atr && atr != TXT_ERROR) {
+		    tsetattrs(atr);
+		    applytextattributes(TSC_PROMPT);
 		    break;
 		}
 		/* else FALLTHROUGH */
 	    case 'k':
-		txtchangeset(txtchangep, TXTNOBGCOLOUR, TXT_ATTR_BG_ON_MASK);
-		txtunset(TXT_ATTR_BG_ON_MASK);
-		set_colour_attribute(TXTNOBGCOLOUR, COL_SEQ_BG, TSC_PROMPT);
+		tunsetattrs(TXTBGCOLOUR);
+	        applytextattributes(TSC_PROMPT);
 		break;
 	    case '[':
 		if (idigit(*++bv->fm))
 		    arg = zstrtol(bv->fm, &bv->fm, 10);
-		if (!prompttrunc(arg, ']', doprint, endchar, txtchangep))
+		if (!prompttrunc(arg, ']', doprint, endchar))
 		    return *bv->fm;
 		break;
 	    case '<':
@@ -596,7 +587,7 @@ putpromptchar(int doprint, int endchar, zattr *txtchangep)
 		    if (arg <= 0)
 			arg = 1;
 		}
-		if (!prompttrunc(arg, *bv->fm, doprint, endchar, txtchangep))
+		if (!prompttrunc(arg, *bv->fm, doprint, endchar))
 		    return *bv->fm;
 		break;
 	    case '{': /*}*/
@@ -1015,7 +1006,7 @@ tsetcap(int cap, int flags)
 {
     if (tccan(cap) && !isset(SINGLELINEZLE) &&
         !(termflags & (TERM_NOUP|TERM_BAD|TERM_UNKNOWN))) {
-	switch (flags & TSC_OUTPUT_MASK) {
+	switch (flags) {
 	case TSC_RAW:
 	    tputs(tcstr[cap], 1, putraw);
 	    break;
@@ -1044,20 +1035,6 @@ tsetcap(int cap, int flags)
 		*bv->bp++ = Outpar;
 	    }
 	    break;
-	}
-
-	if (flags & TSC_DIRTY) {
-	    flags &= ~TSC_DIRTY;
-	    if (txtisset(TXTBOLDFACE) && cap != TCBOLDFACEBEG)
-		tsetcap(TCBOLDFACEBEG, flags);
-	    if (txtisset(TXTSTANDOUT))
-		tsetcap(TCSTANDOUTBEG, flags);
-	    if (txtisset(TXTUNDERLINE))
-		tsetcap(TCUNDERLINEBEG, flags);
-	    if (txtisset(TXTFGCOLOUR))
-		set_colour_attribute(txtattrmask, COL_SEQ_FG, flags);
-	    if (txtisset(TXTBGCOLOUR))
-		set_colour_attribute(txtattrmask, COL_SEQ_BG, flags);
 	}
     }
 }
@@ -1219,8 +1196,7 @@ countprompt(char *str, int *wp, int *hp, int overf)
 
 /**/
 static int
-prompttrunc(int arg, int truncchar, int doprint, int endchar,
-	    zattr *txtchangep)
+prompttrunc(int arg, int truncchar, int doprint, int endchar)
 {
     if (arg > 0) {
 	char ch = *bv->fm, *ptr, *truncstr;
@@ -1267,7 +1243,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar,
 	w = bv->bp - bv->buf;
 	bv->fm++;
 	bv->trunccount = bv->dontcount;
-	putpromptchar(doprint, endchar, txtchangep);
+	putpromptchar(doprint, endchar);
 	bv->trunccount = 0;
 	ptr = bv->buf + w;	/* putpromptchar() may have realloc()'d */
 	*bv->bp = '\0';
@@ -1547,7 +1523,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar,
 	     * With bv->truncwidth set to zero, we always reach endchar *
 	     * (or the terminating NULL) this time round.         *
 	     */
-	    if (!putpromptchar(doprint, endchar, txtchangep))
+	    if (!putpromptchar(doprint, endchar))
 		return 0;
 	}
 	/* Now we have to trick it into matching endchar again */
@@ -1585,6 +1561,122 @@ cmdpop(void)
 	cmdsp--;
 }
 
+/* functions for handling attributes */
+
+/**/
+mod_export void
+applytextattributes(int flags)
+{
+    zattr change = txtcurrentattrs ^ txtpendingattrs;
+    zattr keepon = ~change & txtpendingattrs & TXT_ATTR_ALL;
+    zattr turnoff = change & ~txtpendingattrs & TXT_ATTR_ALL;
+    int keepcount, turncount = 0;
+
+    /* bail out early if we wouldn't do anything */
+    if (!change)
+	return;
+
+    if (txtunknownattrs) {
+	txtunknownattrs &= ~change; /* changes cease to be unknown */
+	/* can't turn unknown attrs back on so avoid wiping them */
+	keepcount = 1;
+    } else {
+	/* If we want to turn off more attributes than we want to keep on
+	 * then it takes fewer termcap sequences to just turn off all the
+	 * attributes. */
+	for (keepcount = 0; keepon; keepcount++) /* count bits */
+	    keepon &= keepon - 1;
+	for (; turnoff; turncount++)
+	    turnoff &= turnoff - 1;
+    }
+
+    if (keepcount < turncount || (change & ~txtpendingattrs & TXTBOLDFACE)) {
+	tsetcap(TCALLATTRSOFF, flags);
+	/* this cleared all attributes, may need to restore some */
+	change = txtpendingattrs & TXT_ATTR_ALL & ~txtunknownattrs;
+	txtunknownattrs = 0;
+    } else {
+	if (change & ~txtpendingattrs & TXTSTANDOUT) {
+	    tsetcap(TCSTANDOUTEND, flags);
+	    /* in some cases, that clears all attributes */
+	    change = (txtpendingattrs & TXT_ATTR_ALL & ~txtunknownattrs) |
+		    (TXTUNDERLINE & change);
+	}
+	if (change & ~txtpendingattrs & TXTUNDERLINE) {
+	    tsetcap(TCUNDERLINEEND, flags);
+	    /* in some cases, that clears all attributes */
+	    change = txtpendingattrs & TXT_ATTR_ALL & ~txtunknownattrs;
+	}
+    }
+    if (change & txtpendingattrs & TXTBOLDFACE)
+	tsetcap(TCBOLDFACEBEG, flags);
+    if (change & txtpendingattrs & TXTSTANDOUT)
+	tsetcap(TCSTANDOUTBEG, flags);
+    if (change & txtpendingattrs & TXTUNDERLINE)
+	tsetcap(TCUNDERLINEBEG, flags);
+
+    if (change & TXT_ATTR_FG_MASK)
+	set_colour_attribute(txtpendingattrs, COL_SEQ_FG, flags);
+    if (change & TXT_ATTR_BG_MASK)
+	set_colour_attribute(txtpendingattrs, COL_SEQ_BG, flags);
+
+    txtcurrentattrs = txtpendingattrs;
+}
+
+/**/
+mod_export void
+cleartextattributes(int flags)
+{
+    treplaceattrs(0);
+    applytextattributes(flags);
+}
+
+/**/
+mod_export void
+treplaceattrs(zattr newattrs)
+{
+    if (txtunknownattrs) {
+	/* Set current attributes to the opposite of the new ones
+	 * for any that are unknown so that applytextattributes()
+	 * detects them as changed. */
+	txtcurrentattrs &= ~txtunknownattrs;
+	txtcurrentattrs |= txtunknownattrs & ~newattrs;
+    }
+
+    txtpendingattrs = newattrs;
+}
+
+/**/
+mod_export void
+tsetattrs(zattr newattrs)
+{
+    /* assume any unknown attributes that we're now setting were unset */
+    txtcurrentattrs &= ~(newattrs & txtunknownattrs);
+
+    txtpendingattrs |= newattrs & TXT_ATTR_ALL;
+    if (newattrs & TXTFGCOLOUR) {
+	txtpendingattrs &= ~TXT_ATTR_FG_MASK;
+	txtpendingattrs |= newattrs & TXT_ATTR_FG_MASK;
+    }
+    if (newattrs & TXTBGCOLOUR) {
+	txtpendingattrs &= ~TXT_ATTR_BG_MASK;
+	txtpendingattrs |= newattrs & TXT_ATTR_BG_MASK;
+    }
+}
+
+/**/
+mod_export void
+tunsetattrs(zattr newattrs)
+{
+    /* assume any unknown attributes that we're now unsetting were set */
+    txtcurrentattrs |= newattrs & txtunknownattrs;
+
+    txtpendingattrs &= ~(newattrs & TXT_ATTR_ALL);
+    if (newattrs & TXTFGCOLOUR)
+	txtpendingattrs &= ~TXT_ATTR_FG_MASK;
+    if (newattrs & TXTBGCOLOUR)
+	txtpendingattrs &= ~TXT_ATTR_BG_MASK;
+}
 
 /*****************************************************************************
  * Utilities dealing with colour and other forms of highlighting.
@@ -1607,7 +1699,7 @@ struct highlight {
 };
 
 static const struct highlight highlights[] = {
-    { "none", 0, TXT_ATTR_ON_MASK },
+    { "none", 0, TXT_ATTR_ALL },
     { "bold", TXTBOLDFACE, 0 },
     { "standout", TXTSTANDOUT, 0 },
     { "underline", TXTUNDERLINE, 0 },
@@ -1645,8 +1737,8 @@ match_named_colour(const char **teststrp)
  * Match just the colour part of a highlight specification.
  * If teststrp is NULL, use the already parsed numeric colour.
  * Return the attributes to set in the attribute variable.
- * Return -1 for out of range.  Does not check the character
- * following the colour specification.
+ * Return TXT_ERROR for out of range.  Does not check the
+ * character following the colour specification.
  */
 
 /**/
@@ -1693,10 +1785,8 @@ match_colour(const char **teststrp, int is_fg, int colour)
 	    }
 	} else if ((named = ialpha(**teststrp))) {
 	    colour = match_named_colour(teststrp);
-	    if (colour == 8) {
-		/* default */
-		return is_fg ? TXTNOFGCOLOUR : TXTNOBGCOLOUR;
-	    }
+	    if (colour == 8) /* default */
+		return 0;
 	    if (colour < 0)
 		return TXT_ERROR;
 	}
@@ -2024,13 +2114,13 @@ set_colour_attribute(zattr atr, int fg_bg, int flags)
     if (fg_bg == COL_SEQ_FG) {
 	colour = txtchangeget(atr, TXT_ATTR_FG_COL);
 	tc = TCFGCOLOUR;
-	def = txtchangeisset(atr, TXTNOFGCOLOUR);
-	use_truecolor = txtchangeisset(atr, TXT_ATTR_FG_24BIT);
+	def = !(atr & TXTFGCOLOUR);
+	use_truecolor = atr & TXT_ATTR_FG_24BIT;
     } else {
 	colour = txtchangeget(atr, TXT_ATTR_BG_COL);
 	tc = TCBGCOLOUR;
-	def = txtchangeisset(atr, TXTNOBGCOLOUR);
-	use_truecolor = txtchangeisset(atr, TXT_ATTR_BG_24BIT);
+	def = !(atr & TXTBGCOLOUR);
+	use_truecolor = atr & TXT_ATTR_BG_24BIT;
     }
 
     /* Test if current zle_highlight settings are customized, or

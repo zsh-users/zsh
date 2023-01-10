@@ -1250,7 +1250,7 @@ getzlequery(void)
 	REFRESH_ELEMENT re;
 	re.chr = c;
 	re.atr = 0;
-	zwcputc(&re, NULL);
+	zwcputc(&re);
     }
     return c == ZWC('y');
 }

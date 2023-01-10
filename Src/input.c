@@ -402,7 +402,7 @@ inputline(void)
 	    char *pptbuf;
 	    int pptlen;
 	    pptbuf = unmetafy(promptexpand(ingetcpmptl ? *ingetcpmptl : NULL,
-					   0, NULL, NULL, NULL), &pptlen);
+					   0, NULL, NULL), &pptlen);
 	    write_loop(2, pptbuf, pptlen);
 	    free(pptbuf);
 	}

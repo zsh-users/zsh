@@ -490,11 +490,7 @@ typedef struct {
      */
     REFRESH_CHAR chr;
     /*
-     * Its attributes.  'On' attributes (TXT_ATTR_ON_MASK) are
-     * applied before the character, 'off' attributes (TXT_ATTR_OFF_MASK)
-     * after it.  'On' attributes are present for all characters that
-     * need the effect; 'off' attributes are only present for the
-     * last character in the sequence.
+     * Its attributes.
      */
     zattr atr;
 } REFRESH_ELEMENT;
