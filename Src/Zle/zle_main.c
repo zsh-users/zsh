@@ -1267,11 +1267,13 @@ zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
     fetchttyinfo = 0;
     trashedzle = 0;
     raw_lp = lp;
+    txtcurrentattrs = txtpendingattrs = txtunknownattrs = 0;
     lpromptbuf = promptexpand(lp ? *lp : NULL, 1, NULL, NULL);
     pmpt_attr = txtcurrentattrs;
     raw_rp = rp;
     rpromptbuf = promptexpand(rp ? *rp : NULL, 1, NULL, NULL);
     rpmpt_attr = txtcurrentattrs;
+    prompt_attr = mixattrs(pmpt_attr, rpmpt_attr);
     free_prepostdisplay();
 
     zlereadflags = flags;
@@ -2010,6 +2012,7 @@ reexpandprompt(void)
 	    char *new_lprompt, *new_rprompt;
 	    looping = reexpanding;
 
+	    txtcurrentattrs = txtpendingattrs = txtunknownattrs = 0;
 	    new_lprompt = promptexpand(raw_lp ? *raw_lp : NULL, 1, NULL, NULL);
 	    pmpt_attr = txtcurrentattrs;
 	    free(lpromptbuf);
@@ -2018,9 +2021,9 @@ reexpandprompt(void)
 	    if (looping != reexpanding)
 		continue;
 
-	    rpmpt_attr = pmpt_attr;
 	    new_rprompt = promptexpand(raw_rp ? *raw_rp : NULL, 1, NULL, NULL);
 	    rpmpt_attr = txtcurrentattrs;
+	    prompt_attr = mixattrs(pmpt_attr, rpmpt_attr);
 	    free(rpromptbuf);
 	    rpromptbuf = new_rprompt;
 	} while (looping != reexpanding);
@@ -2067,6 +2070,8 @@ trashzle(void)
 	zrefresh();
 	showinglist = sl;
 	moveto(nlnct, 0);
+	treplaceattrs(prompt_attr);
+	applytextattributes(0);
 	if (clearflag && tccan(TCCLEAREOD)) {
 	    tcout(TCCLEAREOD);
 	    clearflag = listshown = 0;

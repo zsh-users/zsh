@@ -149,7 +149,7 @@ char *lpromptbuf, *rpromptbuf;
 /* Text attributes after displaying prompts */
 
 /**/
-zattr pmpt_attr, rpmpt_attr;
+zattr pmpt_attr, rpmpt_attr, prompt_attr;
 
 /* number of lines displayed */
 
@@ -254,13 +254,13 @@ int cost;
 # define zwrite(a, b)		zwcwrite((a), (b))
 #endif
 
-static const REFRESH_ELEMENT zr_cr = { ZWC('\r'), 0 };
+static const REFRESH_ELEMENT zr_cr = { ZWC('\r'), TXT_ERROR };
 #ifdef MULTIBYTE_SUPPORT
-static const REFRESH_ELEMENT zr_dt = { ZWC('.'), 0 };
+static const REFRESH_ELEMENT zr_dt = { ZWC('.'), TXT_ERROR };
 #endif
-static const REFRESH_ELEMENT zr_nl = { ZWC('\n'), 0 };
-static const REFRESH_ELEMENT zr_sp = { ZWC(' '), 0 };
-static const REFRESH_ELEMENT zr_zr = { ZWC('\0'), 0 };
+static const REFRESH_ELEMENT zr_nl = { ZWC('\n'), TXT_ERROR };
+static const REFRESH_ELEMENT zr_sp = { ZWC(' '), TXT_ERROR };
+static const REFRESH_ELEMENT zr_zr = { ZWC('\0'), TXT_ERROR };
 
 /*
  * Constant arrays to be copied into place: these are memcpy'd,
@@ -599,8 +599,10 @@ zwcputc(const REFRESH_ELEMENT *c)
     VARARR(char, mbtmp, MB_CUR_MAX + 1);
 #endif
 
-    treplaceattrs(c->atr);
-    applytextattributes(0);
+    if (c->atr != TXT_ERROR) {
+	treplaceattrs(c->atr);
+	applytextattributes(0);
+    }
 
 #ifdef MULTIBYTE_SUPPORT
     if (c->atr & TXT_MULTIWORD_MASK) {
@@ -1131,9 +1133,8 @@ zrefresh(void)
 	    zputs(lpromptbuf, shout);
 	    if (lpromptwof == winw)
 		zputs("\n", shout);	/* works with both hasam and !hasam */
-	} else {
-	    treplaceattrs(pmpt_attr);
-	    applytextattributes(0);
+	    /* lpromptbuf includes literal escapes so we need to update for it */
+	    txtcurrentattrs = txtpendingattrs = pmpt_attr;
 	}
 	if (clearflag) {
 	    zputc(&zr_cr);
@@ -1177,7 +1178,7 @@ zrefresh(void)
     rpms.sen = *nbuf + winw;
     for (t = tmpline, tmppos = 0; tmppos < tmpll; t++, tmppos++) {
 	unsigned ireg;
-	zattr base_attr = default_attr;
+	zattr base_attr = mixattrs(default_attr, prompt_attr);
 	zattr all_attr;
 	struct region_highlight *rhp;
 	/*
@@ -1265,10 +1266,6 @@ zrefresh(void)
 		rpms.s++;
 	    } else {
 		/* We can fit it without reaching the end of the line. */
-		/*
-		 * As we don't actually output the WEOF, we attach
-		 * any off attributes to the character itself.
-		 */
 		rpms.s->atr = base_attr;
 		if (ichars > 1) {
 		    /*
@@ -1606,8 +1603,9 @@ zrefresh(void)
 
     /* output the right-prompt if appropriate */
 	if (put_rpmpt && !iln && !oput_rpmpt) {
-
 	    moveto(0, winw - rprompt_off - rpromptw);
+	    treplaceattrs(pmpt_attr);
+	    applytextattributes(0);
 	    zputs(rpromptbuf, shout);
 	    if (rprompt_off) {
 		vcs = winw - rprompt_off;
@@ -1615,9 +1613,7 @@ zrefresh(void)
 		zputc(&zr_cr);
 		vcs = 0;
 	    }
-	    /* reset character attributes to that set by the main prompt */
-	    treplaceattrs(pmpt_attr);
-	    applytextattributes(0);
+	    txtcurrentattrs = txtpendingattrs = rpmpt_attr;
 	}
     }
 
@@ -1630,11 +1626,6 @@ individually */
 	    refreshline(iln);
     }
 
-/* reset character attributes */
-    if (clearf && postedit) {
-	treplaceattrs(pmpt_attr ? pmpt_attr : rpmpt_attr);
-	applytextattributes(0);
-    }
     clearf = 0;
     oput_rpmpt = put_rpmpt;
 

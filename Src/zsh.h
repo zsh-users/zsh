@@ -2694,7 +2694,8 @@ struct ttyinfo {
  */
 #define TXT_MULTIWORD_MASK  0x0400
 
-/* used when, e.g an invalid colour is specified */
+/* Used when, e.g an invalid colour is specified. Also used in REFRESH_ELEMENT
+ * to indicate that attributes should remain unchanged. */
 #define TXT_ERROR 0xF00000F000000003
 
 /* Mask for font weight */
