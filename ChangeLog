@@ -1,5 +1,8 @@
 2023-01-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 51292: Src/Zle/zle_utils.c: fix dynamic updates of
+	region_highlight to account for PREDISPLAY
+
 	* 51291: Doc/Zsh/zle.yo, Src/Zle/zle_refresh.c, Src/prompt.c:
 	support for highlighting ellipses in the line editor
 

@@ -866,13 +866,13 @@ shiftchars(int to, int cnt)
 		    if (rhp->start_meta - sub > to + cnt)
 			rhp->start_meta -= cnt;
 		    else
-			rhp->start_meta = to;
+			rhp->start_meta = to + sub;
 		}
 		if (rhp->end_meta - sub > to) {
 		    if (rhp->end_meta - sub > to + cnt)
 			rhp->end_meta -= cnt;
 		    else
-			rhp->end_meta = to;
+			rhp->end_meta = to + sub;
 		}
 	    }
 	}
@@ -896,13 +896,13 @@ shiftchars(int to, int cnt)
 		    if (rhp->start - sub > to + cnt)
 			rhp->start -= cnt;
 		    else
-			rhp->start = to;
+			rhp->start = to + sub;
 		}
 		if (rhp->end - sub > to) {
 		    if (rhp->end - sub > to + cnt)
 			rhp->end -= cnt;
 		    else
-			rhp->end = to;
+			rhp->end = to + sub;
 		}
 	    }
 	}
