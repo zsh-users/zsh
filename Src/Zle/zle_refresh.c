@@ -2419,6 +2419,8 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 	}
 	all_attr = mixattrs(special_attr, base_attr);
 
+	if (t0 == tmpcs)
+	    nvcs = vp - vbuf;
 	if (tmpline[t0] == ZWC('\t')) {
 	    for (*vp++ = zr_sp; (vp - vbuf) & 7; )
 		*vp++ = zr_sp;
@@ -2461,7 +2463,7 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 		   && (unsigned)tmpline[t0] <= 0xffU
 #endif
 		   ) {
-	    ZLE_INT_T t = tmpline[++t0];
+	    ZLE_INT_T t = tmpline[t0];
 
 	    vp->chr = ZWC('^');
 	    vp->atr = all_attr;
@@ -2498,8 +2500,6 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 	    vp++;
 	}
 #endif
-	if (t0 == tmpcs)
-	    nvcs = vp - vbuf - 1;
     }
     if (t0 == tmpcs)
 	nvcs = vp - vbuf;

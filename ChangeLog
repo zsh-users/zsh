@@ -1,5 +1,8 @@
 2023-01-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 51290: Src/Zle/zle_refresh.c: fix display of control
+	characters with SINGLE_LINE_ZLE set
+
 	* 51289: Src/Zle/zle_refresh.c, Src/prompt.c: don't disable
 	non-colour attributes in prompts for SINGLE_LINE_ZLE and remove
 	superfluous extra escapes to disable attributes
