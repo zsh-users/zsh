@@ -580,7 +580,7 @@ struct zle_region;
 struct zle_region  {
     struct zle_region *next;
     /* Entries of region_highlight, as needed */
-    int atr;
+    zattr atr;
     int start;
     int end;
     int flags;
@@ -799,7 +799,7 @@ spaceinline(int ct)
 		if (rhp->start_meta - sub >= zlemetacs) {
 		    rhp->start_meta += ct;
 		}
-		if (rhp->end_meta - sub >= zlemetacs) {
+		if (rhp->end_meta - sub >= zlemetacs && (!predisplaylen || zlecs)) {
 		    rhp->end_meta += ct;
 		}
 	    }
@@ -827,7 +827,7 @@ spaceinline(int ct)
 		if (rhp->start - sub >= zlecs) {
 		    rhp->start += ct;
 		}
-		if (rhp->end - sub >= zlecs) {
+		if (rhp->end - sub >= zlecs && (!predisplaylen || zlecs)) {
 		    rhp->end += ct;
 		}
 	    }

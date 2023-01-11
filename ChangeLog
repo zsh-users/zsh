@@ -1,3 +1,8 @@
+2023-01-11  Oliver Kiddle  <opk@zsh.org>
+
+	* 51295: Src/Zle/zle_utils.c: where the end of a region coincides
+	with the end of PREDISPLAY, don't extend it to include new text
+
 2023-01-10  Oliver Kiddle  <opk@zsh.org>
 
 	* 51292: Src/Zle/zle_utils.c: fix dynamic updates of
