@@ -7,6 +7,12 @@ Note also the list of incompatibilities in the README file.
 Changes since 5.9
 -----------------
 
+In region_highlight and zle_highlight, italic and faint can be
+specified as font attributes for terminals that support them.
+
+Ellipsis markers shown by the line editor to indicate where the line
+doesn't fit in the terminal can be highlighted.
+
 The ERR_EXIT and ERR_RETURN options were refined to be more self-
 consistent and better aligned with the POSIX-2017 specification of
 `set -e`. For details on what exactly changed, see the list of

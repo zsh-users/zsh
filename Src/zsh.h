@@ -2653,7 +2653,7 @@ struct ttyinfo {
 #define TCALLATTRSOFF  23
 #define TCSTANDOUTEND  24
 #define TCUNDERLINEEND 25
-#define TCITALICSEND   27
+#define TCITALICSEND   26
 #define TCHORIZPOS     27
 #define TCUPCURSOR     28
 #define TCDOWNCURSOR   29

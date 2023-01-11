@@ -1,5 +1,9 @@
 2023-01-11  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: NEWS, Src/zsh.h, Completion/Zsh/Type/_ps1234: mention
+	attributes changes, fix renumbering mistake and allow completion
+	to offer prompt escapes for PROMPT_EOL_MARK
+
 	* 51295: Src/Zle/zle_utils.c: where the end of a region coincides
 	with the end of PREDISPLAY, don't extend it to include new text
 
