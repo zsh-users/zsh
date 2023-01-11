@@ -1,5 +1,8 @@
 2023-01-11  Oliver Kiddle  <opk@zsh.org>
 
+	* 51297: Test/X04zlehighlight.ztst: update expected test results
+	to match more optimised escape sequences with recent changes
+
 	* Jörg Sommer: 51256: Completion/Unix/Command/_git:
 	Add --refetch to completions of git-fetch
 
