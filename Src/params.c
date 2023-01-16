@@ -1669,7 +1669,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 	    /* Searching characters */
 	    int slen;
 	    d = getstrvalue(v);
-	    if (!d || !*d)
+	    if (!d)
 		return 0;
 	    /*
 	     * beg and len are character counts, not raw offsets.

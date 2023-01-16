@@ -299,3 +299,12 @@ F:In math, (($i)) should be the same as ((i)), see workers/47748.
   echo ${string[(pws:\0:)1]}
 0:Word splitting by NUL
 >foo
+
+  string="a"
+  print ${string[(i)x]}
+  string=""
+  print ${string[(i)x]}
+0:Can check off end of zero length string
+F:Regression test for inconsistency of failed (i) on zero-length string
+>2
+>1
