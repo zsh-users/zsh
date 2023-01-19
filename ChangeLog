@@ -1,3 +1,8 @@
+2023-01-22  Shohei YOSHIDA  <syohex@gmail.com>
+
+	* 51322 (+ minor tweak): Completion/Unix/Command/_make: Update gnu
+	make completion for version 4.4
+
 2023-01-21  Bart Schaefer  <schaefer@zsh.org>
 
 	* 51313: Completion/Unix/Command/_git: fix "git rerere forget"
