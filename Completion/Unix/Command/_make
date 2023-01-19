@@ -176,26 +176,28 @@ _make() {
       '(-i --ignore-errors)'{-i,--ignore-errors}'[ignore errors from recipes]'
       '*'{-I,--include-dir=}'[search specified directory for included makefiles]:search path for included makefile:->dir'
       '(-j --jobs)'{-j+,--jobs=}'[allow specified number of parallel jobs; unlimited jobs with no arg]:: : _guard "[0-9]#" "number of jobs"'
+      '--jobserver-style=[select the style of jobserver to use]:style:(fifo pipe sem)'
       '(-k --keep-going)'{-k,--keep-going}"[keep going when some targets can't be made]"
       '(-l --load-average --max-load)'{-l,--load-average=,--max-load}"[don't start multiple jobs unless load is below specified value]:load"
       '(-L --check-symlink-times)'{-L,--check-symlink-times}'[use the latest mtime between symlinks and target]'
       '(-n --just-print --dry-run --recon)'{-n,--just-print,--dry-run,--recon}"[don't actually run any recipe; just print them]"
       '*'{-o,--old-file=,--assume-old=}"[consider specified file to be old and don't remake it]:file not to remake:->file"
       '(-O --output-sync)'{-O-,--output-sync=-}'[synchronize output of parallel jobs]::granularity for grouping output:compadd -E 0 none line target recurse'
-      '(-p --print-data-base)'{-p,--print-data-base}'[print makes internal database]'
+      '(-p --print-data-base)'{-p,--print-data-base}"[print make's internal database]"
       '(-q --question)'{-q,--question}'[run no recipe; exit status says if up to date]'
       '(-r --no-builtin-rules)'{-r,--no-builtin-rules}'[disable the built-in implicit rules]'
+      '--shuffle=-[perform shuffle of prerequisites and goals]::seed (integer) or mode:(random reverse none)'
       '(-R --no-builtin-variables)'{-R,--no-builtin-variables}'[disable the built-in variable settings]'
       '(-s --silent --quiet)'{-s,--silent,--quiet}"[don't echo recipes]"
       '--no-silent[echo recipes (disable --silent mode)]'
       '(-S --no-keep-going --stop)'{-S,--no-keep-going,--stop}'[turns off -k]'
       '(-t --touch)'{-t,--touch}'[touch targets instead of remaking them]'
+      '--trace[print tracing information]'
       '(- *)'{-v,--version}'[print the version number of make and exit]'
       '(-w --print-directory)'{-w,--print-directory}'[print the current directory]'
       '--no-print-directory[turn off -w, even if it was turned on implicitly]'
       '*'{-W,--what-if=,--new-file=,--assume-new=}'[consider specified file to be infinitely new]:file to treat as modified:->file'
       '--warn-undefined-variables[warn when an undefined variable is referenced]'
-      '--warn-undefined-functions[warn when an undefined user function is called]'
     )
   else
     # Basic make options only.
