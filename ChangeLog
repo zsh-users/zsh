@@ -1,5 +1,7 @@
 2023-01-21  Bart Schaefer  <schaefer@zsh.org>
 
+	* 51313: Completion/Unix/Command/_git: fix "git rerere forget"
+
 	* 51310: Src/Zle/zle_main.c: zle -F handlers preserve LASTWIDGET
 
 2023-01-16  Peter Stephenson  <p.stephenson@samsung.com>
