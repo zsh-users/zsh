@@ -4259,14 +4259,14 @@ _git-rerere () {
 
   _arguments -C -S -s $endopt \
     '--rerere-autoupdate[register clean resolutions in index]' \
-    ': :->command' && ret=0
+    ': :->command' \
+    '*: :{ [[ $words[CURRENT-1] = forget ]] && __git_cached_files }' && ret=0
 
   case $state in
     (command)
-      # TODO: This isn't optimal, as forget get confused.
       _values command \
         'clear[reset metadata used by rerere]' \
-        'forget[resets metadata used by rerere for specific conflict]: :__git_cached_files' \
+        'forget[resets metadata used by rerere for specific conflict]' \
         'diff[output diffs for the current state of the resolution]' \
         'status[print paths with conflicts whose merge resolution rerere will record]' \
         'remaining[print paths with conflicts that have not been autoresolved by rerere]' \
