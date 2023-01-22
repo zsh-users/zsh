@@ -1,3 +1,7 @@
+2023-01-21  Bart Schaefer  <schaefer@zsh.org>
+
+	* 51310: Src/Zle/zle_main.c: zle -F handlers preserve LASTWIDGET
+
 2023-01-16  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 51278: Src/params.c, Test/D06subscript.ztst: result of (i)
@@ -627,7 +631,7 @@
 
 	* 49960: Doc/Zsh/compsys.yo: Sort lists in zshcompsys.
 
-2022-04-05  Bart Schaefer  <schaefer@toltec-ubuntu>
+2022-04-05  Bart Schaefer  <schaefer@zsh.org>
 
 	* 49994: Src/glob.c: Single-byte equivalence of users/22601 and
 	workers/40891 for matching against zero-length strings
