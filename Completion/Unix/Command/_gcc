@@ -1894,7 +1894,7 @@ args+=(
   '-freschedule-modulo-scheduled-loops[enable/disable the traditional scheduling in loops that already passed modulo scheduling]'
   '-frounding-math[disable optimizations that assume default FP rounding behavior]'
   '-frtti[generate run time type descriptor information]'
-  "-fsanitize=-[enable AddressSanitizer, a memory error detector]:style:($sanitizers)"
+  "*-fsanitize=-[enable AddressSanitizer, a memory error detector]:style:->sanitize"
   '-fsched2-use-superblocks[if scheduling post reload, do superblock scheduling]'
   '-fsched-critical-path-heuristic[enable the critical path heuristic in the scheduler]'
   '-fsched-dep-count-heuristic[enable the dependent count heuristic in the scheduler]'
@@ -2283,6 +2283,9 @@ arch)
 archgeneric)
   arch+=(generic)
   _wanted cputypes expl "CPU type" compadd -a arch && ret=0
+  ;;
+sanitize)
+  _values -s , 'sanitizer' $sanitizers
   ;;
 esac
 
