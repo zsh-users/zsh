@@ -1,3 +1,8 @@
+2023-01-24  Shohei YOSHIDA  <syohex@gmail.com>
+
+	* 51326: Completion/Unix/Command/_gcc: Improve -fsanitize
+	option completion
+
 2023-01-22  Shohei YOSHIDA  <syohex@gmail.com>
 
 	* 51322 (+ minor tweak): Completion/Unix/Command/_make: Update gnu
