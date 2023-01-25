@@ -1,7 +1,7 @@
 #compdef -P python[0-9.]#
 
 # Python 2.7
-# Python 3.9
+# Python 3.11
 
 local curcontext="$curcontext" state state_descr line _compskip="$_compskip"
 typeset -A opt_args
@@ -12,7 +12,11 @@ if _pick_variant python3=Python\ 3 python2 --version; then
     '(-bb)-b[issue warnings about str(bytes_instance), str(bytearray_instance) and comparing bytes/bytearray with str]'
     '(-b)-bb[issue errors about str(bytes_instance), str(bytearray_instance) and comparing bytes/bytearray with str]'
     '--check-hash-based-pycs[configure how Python evaluates up-to-dateness of hash-based .pyc files]:mode:(always default never)'
+    '--help-env[print help about Python environment variables and exit]'
+    '--help-xoptions[print help about implementation-specific -X options and exit]'
+    '--help-all[print complete help information and exit]'
     "-I[isolate Python from the user's environment]"
+    '-P[do not prepend a potentially unsafe path to sys.path]'
     '-q[do not print version and copyright messages]'
     '-X[set implementation-specific option]:option'
   )
