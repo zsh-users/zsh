@@ -1,3 +1,8 @@
+2023-01-27  Shohei YOSHIDA  <syohex@gmail.com>
+
+	* 51330: Completion/Unix/Command/_python: Update python3
+	completion for version 3.11
+
 2023-01-24  Shohei YOSHIDA  <syohex@gmail.com>
 
 	* 51326: Completion/Unix/Command/_gcc: Improve -fsanitize
