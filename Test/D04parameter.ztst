@@ -2727,3 +2727,18 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 1:parameter expansion flags parsing error gives a clue
 ?(eval):1: error in flags near position 7 in '${(zZ+x+):-}'
 
+ slash='/'
+ print -r -- x${slash/'/'}y
+-Df:(users/28784) substituting a single-quoted backslash, part #1: slash
+>xy
+
+ single_quote="'"
+ print -r -- x${single_quote/'/'}y
+-Df:(users/28784) substituting a single-quoted backslash, part #2: single quote
+>x/y
+
+ control="foobar"
+ print -r -- x${control/'bar'}y
+0:(users/28784 inspired this) substituting a single-quoted backslash, part #3: control
+>xfooy
+

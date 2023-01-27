@@ -1,3 +1,9 @@
+2023-01-27  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted (cribbed from users/28784 by Roman):
+	Test/D04parameter.ztst: Add XFail tests for substituting a
+	single-quoting backslash.
+
 2023-01-27  Shohei YOSHIDA  <syohex@gmail.com>
 
 	* 51330: Completion/Unix/Command/_python: Update python3
