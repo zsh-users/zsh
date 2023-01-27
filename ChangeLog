@@ -8770,7 +8770,7 @@ g
 
 2016-12-10  Barton E. Schaefer  <schaefer@zsh.org>
 
-	* 40134: Src/builtin.c, Src/Zle/compmatch.c: silence spurious
+	* 40143: Src/builtin.c, Src/Zle/compmatch.c: silence spurious
 	compiler warnings.
 
 2016-12-10  Daniel Shahaf  <d.s@daniel.shahaf.name>
