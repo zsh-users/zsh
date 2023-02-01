@@ -1,3 +1,8 @@
+2023-01-31  Bart Schaefer  <schaefer@zsh.org>
+
+	* 51337: Doc/Zsh/expn.yo, Doc/Zsh/mod_parameter.yo: parameter
+	attributes cross-reference typeset equivalents (or lack thereof)
+
 2023-01-27  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted (cribbed from users/28784 by Roman):

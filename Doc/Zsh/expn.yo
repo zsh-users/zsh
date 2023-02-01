@@ -1093,7 +1093,7 @@ tt(KSH_ARRAYS) option a subscript `tt([*])' or `tt([@])' is needed
 to operate on the whole array, as usual.
 )
 item(tt(L))(
-Convert all letters in the result to lower case.
+Convert all letters in the result to lower case, like `tt(typeset -l)'.
 )
 item(tt(n))(
 Sort decimal integers numerically; if the first differing
@@ -1177,34 +1177,35 @@ of the parameter would usually appear. This string consists of keywords
 separated by hyphens (`tt(-)'). The first keyword in the string describes
 the main type, it can be one of `tt(scalar)', `tt(array)', `tt(integer)',
 `tt(float)' or `tt(association)'. The other keywords describe the type in
-more detail:
+more detail, in most cases corresponding to options of the `tt(typeset)'
+command:
 
 startitem()
 item(tt(local))(
 for local parameters
 )
 item(tt(left))(
-for left justified parameters
+for left justified parameters (tt(-L))
 )
 item(tt(right_blanks))(
-for right justified parameters with leading blanks
+for right justified parameters with leading blanks (tt(-R))
 )
 item(tt(right_zeros))(
-for right justified parameters with leading zeros
+for right justified parameters with leading zeros (tt(-Z))
 )
 item(tt(lower))(
 for parameters whose value is converted to all lower case when it is
-expanded
+expanded (tt(-l))
 )
 item(tt(upper))(
 for parameters whose value is converted to all upper case when it is
-expanded
+expanded (tt(-u))
 )
 item(tt(readonly))(
-for readonly parameters
+for readonly parameters (tt(-r))
 )
 item(tt(tag))(
-for tagged parameters
+for tagged parameters (tt(-t))
 )
 item(tt(tied))(
 for parameters tied to another parameter in the manner of tt(PATH)
@@ -1212,16 +1213,16 @@ for parameters tied to another parameter in the manner of tt(PATH)
 special parameters or user-defined with `tt(typeset -T)'
 )
 item(tt(export))(
-for exported parameters
+for exported parameters (tt(-x) or `tt(export)')
 )
 item(tt(unique))(
-for arrays which keep only the first occurrence of duplicated values
+for arrays which keep only the first occurrence of duplicated values (tt(-U))
 )
 item(tt(hide))(
-for parameters with the `hide' flag
+for parameters with the `hide' flag (tt(-h))
 )
 item(tt(hideval))(
-for parameters with the `hideval' flag
+for parameters with the `hideval' flag (tt(-H))
 )
 item(tt(special))(
 for special parameters defined by the shell
@@ -1229,10 +1230,10 @@ for special parameters defined by the shell
 enditem()
 )
 item(tt(u))(
-Expand only the first occurrence of each unique word.
+Expand only the first occurrence of each unique word, like `tt(typeset -U)'.
 )
 item(tt(U))(
-Convert all letters in the result to upper case.
+Convert all letters in the result to upper case, like `tt(typeset -u)'.
 )
 item(tt(v))(
 Used with tt(k), substitute (as two consecutive words) both the key
