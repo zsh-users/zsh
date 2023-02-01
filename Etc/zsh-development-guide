@@ -612,7 +612,7 @@ For defining parameters, a module can call `createparam()' directly or
 use a table to describe them, e.g.:
 
   static struct paramdef patab[] = {
-    PARAMDEF("foo", PM_INTEGER, NULL, get_foo, set_foo, unset_foo),
+    PARAMDEF("foo", PM_INTEGER, NULL, foo_gsu),
     INTPARAMDEF("exint", &intparam),
     STRPARAMDEF("exstr", &strparam),
     ARRPARAMDEF("exarr", &arrparam),
@@ -626,15 +626,18 @@ There are four macros used:
       in zsh.h)
     - optionally a pointer to a variable holding the value of the
       parameter
-    - three functions that will be used to get the value of the
-      parameter, store a value in the parameter, and unset the
-      parameter
+    - a GSU pointer to the three functions that will be used to get
+      the value of the parameter, store a value in the parameter,
+      and unset the parameter
   - the other macros provide simple ways to define the most common
     types of parameters; they get the name of the parameter and a
     pointer to a variable holding the value as arguments; they are
     used to define integer-, scalar-, and array-parameters, so the
     variables whose addresses are given should be of type `long',
     `char *', and `char **', respectively
+
+GSU (get, set, unset) structures are defined in Src/zsh.h for each of
+the parameter types scalar, integer, float, array, and hash.
 
 For a description of how to write functions for getting or setting the 
 value of parameters, or how to write a function to unset a parameter,

@@ -1,5 +1,7 @@
 2023-01-31  Bart Schaefer  <schaefer@zsh.org>
 
+	* 51342: Etc/zsh-development-guide: update PARAMDEF description
+
 	* 51337: Doc/Zsh/expn.yo, Doc/Zsh/mod_parameter.yo: parameter
 	attributes cross-reference typeset equivalents (or lack thereof)
 
