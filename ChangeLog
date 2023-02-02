@@ -1,3 +1,7 @@
+2023-02-02  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 51354: Doc/Zsh/params.yo: Fix markup in man page version
+
 2023-02-02  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 51306: Doc/Zsh/expn.yo, Src/subst.c, Test/D04parameter.ztst:

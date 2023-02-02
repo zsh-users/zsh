@@ -1668,7 +1668,7 @@ well as any directory names.  The default is `tt(/tmp/zsh)'.
 vindex(TMPSUFFIX)
 item(tt(TMPSUFFIX))(
 A filename suffix which the shell will use for temporary files created
-by process substitutions (e.g., `tt(=LPAR()var(list)RPAR())').
+by process substitutions (e.g., `tt(=LPAR())var(list)tt(RPAR())').
 Note that the value should include a leading dot `tt(.)' if intended
 to be interpreted as a file extension.  The default is not to append
 any suffix, thus this parameter should be assigned only when needed
