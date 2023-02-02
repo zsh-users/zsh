@@ -665,7 +665,9 @@ item(tt(${)var(name)tt(:?)var(word)tt(}))(
 In the first form, if var(name) is set, or in the second form if var(name)
 is both set and non-null, then substitute its value; otherwise, print
 var(word) and exit from the shell.  Interactive shells instead return to
-the prompt.  If var(word) is omitted, then a standard message is printed.
+the prompt.  If var(word) is omitted, then a standard message is
+printed.  Note that var(word) is expanded even though its value
+is not substituted onto the command line.
 )
 enditem()
 

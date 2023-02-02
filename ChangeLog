@@ -1,3 +1,8 @@
+2023-02-02  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 51306: Doc/Zsh/expn.yo, Src/subst.c, Test/D04parameter.ztst:
+	error message in ${unset?...} should be expanded.
+
 2023-01-27  Shohei YOSHIDA  <syohex@gmail.com>
 
 	* 51330: Completion/Unix/Command/_python: Update python3
