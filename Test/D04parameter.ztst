@@ -110,6 +110,11 @@
 *>*foo:1: 1: no arguments given
 >reached
 
+  message="expand me and remove quotes"
+  (: ${UNSET_PARAM?$message})
+1:${...?....} performs expansion on the message
+?(eval):2: UNSET_PARAM: expand me and remove quotes
+
   print ${set1:+word1} ${set1+word2} ${null1:+word3} ${null1+word4}
   print ${unset1:+word5} ${unset1+word6}
 0:${...:+...}, ${...+...}

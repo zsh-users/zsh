@@ -3076,7 +3076,11 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	    if (vunset) {
                 if (isset(EXECOPT)) {
                     *idend = '\0';
-                    zerr("%s: %s", idbeg, *s ? s : "parameter not set");
+		    if (*s){
+			singsub(&s);
+			zerr("%s: %s", idbeg, s);
+		    } else
+			zerr("%s: %s", idbeg, "parameter not set");
                     /*
                      * In interactive shell we need to return to
                      * top-level prompt --- don't clear this error
