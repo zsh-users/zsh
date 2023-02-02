@@ -816,6 +816,7 @@ char *input_hasalias(void)
 {
     int flags = inbufflags;
     struct instacks *instackptr = instacktop;
+    char *alias_nam = NULL;
 
     for (;;)
     {
@@ -824,9 +825,9 @@ char *input_hasalias(void)
 	DPUTS(instackptr == instack, "BUG: continuation at bottom of instack");
 	instackptr--;
 	if (instackptr->alias)
-	    return instackptr->alias->node.nam;
+	    alias_nam = instackptr->alias->node.nam;
 	flags = instackptr->flags;
     }
 
-    return NULL;
+    return alias_nam;
 }

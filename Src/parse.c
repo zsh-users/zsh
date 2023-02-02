@@ -2055,6 +2055,9 @@ par_simple(int *cmplx, int nr)
 	    if (isset(EXECOPT) && hasalias && !isset(ALIASFUNCDEF) && argc &&
 		hasalias != input_hasalias()) {
 		zwarn("defining function based on alias `%s'", hasalias);
+		herrflush();
+		if (noerrs != 2)
+		    errflag |= ERRFLAG_ERROR;
 		YYERROR(oecused);
 	    }
 

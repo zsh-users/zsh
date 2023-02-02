@@ -123,7 +123,12 @@
   eval 'badalias() { print does not work; }')
 1:ALIAS_FUNC_DEF off by default.
 ?(eval):1: defining function based on alias `badalias'
-?(eval):1: parse error near `()'
+
+  (alias firstalias=notacommand
+  alias secondalias=firstalias
+  eval 'secondalias() { print does not work either; }')
+1:ALIAS_FUNC_DEF reports original alias if multiple
+?(eval):1: defining function based on alias `secondalias'
 
   (alias goodalias=isafunc
   setopt ALIAS_FUNC_DEF
