@@ -380,7 +380,7 @@ local mpccmd="$words[1]"
 _arguments -C \
   '(-q --quiet --no-status -v --verbose)'{-v,--verbose}'[give verbose output]' \
   '(-q --quiet --no-status -v --verbose)'{-q,--quiet,--no-status}'[prevent printing song status on completion]' \
-  '(-h --host)'{-h,--host=}'[connect to specified host]:_hosts' \
+  '(-h --host)'{-h,--host=}'[connect to specified host]: :_hosts' \
   '(-p --port)'{-p,--port=}'[connect to server port]:port' \
   '(-f --format)'{-f,--format=}'[specify the format of song display]:format string:->formats' \
   '(-w --wait)'{-w,--wait}'[wait for operation to finish (e.g. database update)]' \
