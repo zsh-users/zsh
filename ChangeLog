@@ -1,3 +1,8 @@
+2023-02-06  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 51350: Src/subst.c, Test/D04parameter.ztst: the combination
+	${(S)...//#%...} needs to match as far as possible.
+
 2023-02-02  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 51306: Doc/Zsh/expn.yo, Src/subst.c, Test/D04parameter.ztst:

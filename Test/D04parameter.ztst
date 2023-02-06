@@ -2307,6 +2307,13 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 >x
 >y
 
+  a="string"
+  print ${(S)a//#%((#b)(*))/different}
+  print $match[1]
+0:Fully anchored string must be fully searched
+>different
+>string
+
   my_width=6
   my_index=1
   my_options=Option1

@@ -2926,6 +2926,9 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	 */
 	if (!(flags & (SUB_MATCH|SUB_REST|SUB_BIND|SUB_EIND|SUB_LEN)))
 	    flags |= SUB_REST;
+	/* If matching at start and end, don't stop early */
+	if ((flags & (SUB_START|SUB_END)) == (SUB_START|SUB_END))
+	    flags |= SUB_LONG;
 
 	/*
 	 * With ":" treat a value as unset if the variable is set but
