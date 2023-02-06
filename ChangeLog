@@ -1,3 +1,8 @@
+2023-02-06  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 51350: Src/subst.c, Test/D04parameter.ztst: the combination
+	${(S)...//#%...} needs to match as far as possible.
+
 2023-02-02  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 51354: Doc/Zsh/params.yo: Fix markup in man page version
