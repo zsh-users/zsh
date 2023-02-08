@@ -40,7 +40,7 @@
         # Fix e^Mexit - match ((?)\r(?)), if \2 == \3, then replace with \2
         # otherwise replace with \1 stripped out of leading/trailing [[:space:]]
         REPLY=${REPLY//(#b)((?(#c0,1))$cm(?(#c0,1)))/${${${(M)match[2]:#${match[3]}}:+${match[2]}}:-${${match[1]##[[:space:]]##}%%[[:space:]]##}}}
-        [[ -n "$REPLY" ]] && print -r -- ${${REPLY%%[[:space:]]##}##[[:space:]]##}
+        [[ -n "$REPLY" ]] && print -r -- ${${REPLY%%${~cm}*}##[[:space:]]##}
       done
     }
     zpty_stop() {

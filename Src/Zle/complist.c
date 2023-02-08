@@ -1305,6 +1305,8 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 	}
     }
     if (dopr) {
+	treplaceattrs(0);
+	applytextattributes(0);
         if (!(cc % zterm_columns))
             fputs(" \010", shout);
         cleareol();

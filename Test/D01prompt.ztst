@@ -261,7 +261,7 @@
   A1=${(%):-%s}
   A2=${(%):-%u}
   A3=${(%):-%s%u%s}
-  [[ $A3 = $A1$A2 && -n $A1 && -n $A2 ]]
+  [[ $A3 = $A1$A2 ]]
 0:Attribute optimisation - preserve initial disabling of attribute but drop useless later one
 
   : ${(%):-%K{blue}}

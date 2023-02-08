@@ -2560,6 +2560,8 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 	}
     }
     if (dopr) {
+	treplaceattrs(0);
+	applytextattributes(0);
         if (!(cc % zterm_columns))
             fputs(" \010", shout);
 	if (tccan(TCCLEAREOL))

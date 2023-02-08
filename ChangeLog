@@ -1,3 +1,10 @@
+2023-02-09  Oliver Kiddle  <opk@zsh.org>
+
+	* 51320, 51383: Src/Zle/zle_main.c, Src/Zle/complist.c,
+	Src/Zle/zle_tricky.c, Test/D01prompt.ztst,
+	Test/X04zlehighlight.ztst: fixes to prevent later reappearance
+	of old attributes
+
 2023-02-06  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 51350: Src/subst.c, Test/D04parameter.ztst: the combination

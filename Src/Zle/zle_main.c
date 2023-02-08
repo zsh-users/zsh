@@ -2071,9 +2071,9 @@ trashzle(void)
 	trashedzle = 1;
 	zrefresh();
 	showinglist = sl;
-	moveto(nlnct, 0);
 	treplaceattrs(prompt_attr);
 	applytextattributes(0);
+	moveto(nlnct, 0);
 	if (clearflag && tccan(TCCLEAREOD)) {
 	    tcout(TCCLEAREOD);
 	    clearflag = listshown = 0;
