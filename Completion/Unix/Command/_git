@@ -1459,6 +1459,14 @@ _git-push () {
   # only complete files on the local end, not the remote end.  Still, it may be
   # helpful to get some sort of completion going, perhaps modifying the path
   # later on to match the remote end.
+
+  local ref_arg
+  if (( words[(I)-d|--delete] )); then
+      ref_arg='*: :__git_remote_branch_names_noprefix'
+  else
+      ref_arg='*: :__git_ref_specs_pushy'
+  fi
+
   _arguments -S -s $endopt \
     '--all[push all refs under refs/heads/]' \
     '--prune[remove remote branches that do not have a local counterpart]' \
@@ -1494,7 +1502,7 @@ _git-push () {
     '(-4 --ipv4 -6 --ipv6)'{-4,--ipv4}'[use IPv4 addresses only]' \
     '(-4 --ipv4 -6 --ipv6)'{-6,--ipv6}'[use IPv6 addresses only]' \
     ': :__git_any_repositories' \
-    '*: :__git_ref_specs_pushy' && ret=0
+    $ref_arg && ret=0
 
   case $state in
     (lease)

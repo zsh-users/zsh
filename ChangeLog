@@ -1,3 +1,8 @@
+2023-02-17  Oliver Kiddle  <opk@zsh.org>
+
+	* Øystein Walle: 51391: Completion/Unix/Command/_git:
+	complete remote branch names respecting --delete for git push
+
 2023-02-14  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 51425: Src/exec.c, Test/E01OPTIONS: $(<...) shouldn't try to
