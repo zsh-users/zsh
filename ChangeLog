@@ -1,3 +1,8 @@
+2023-02-17  Oliver Kiddle  <opk@zsh.org>
+
+	* Øystein Walle: 51391: Completion/Unix/Command/_git:
+	complete remote branch names respecting --delete for git push
+
 2023-02-14  Bart Schaefer  <schaefer@zsh.org>
 
 	* 51437: Src/params.c, Test/K01nameref.ztst: Fix incorrectly-passed
