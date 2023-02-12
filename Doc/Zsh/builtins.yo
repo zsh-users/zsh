@@ -2037,6 +2037,20 @@ To initialize a parameter var(param) to a command output and mark it readonly,
 use tt(typeset -r )var(param) or tt(readonly )var(param) after the parameter
 assignment statement.
 
+cindex(named reference)
+cindex(reference, named)
+The flag tt(-n) creates a em(named reference) to another parameter.
+The second parameter need not exist at the time the reference is
+created.  No other attribute flags may be used in conjunction with
+tt(-n).  The var(name) assigned-to may not be an array element nor use
+a subscript, but the var(value) assigned may be any valid parameter
+name syntax, even a subscripted array element (incuding an associative
+array element) or an array slice, which is evaluated when the named
+reference is expanded.
+See ifzman(zmanref(zshexpn))ifnzman(noderef(Parameter Expansion)) and
+ifzman(zmanref(zshparam))ifnzman(noderef(Parameters)) for details of the
+behavior of named references.
+
 If no attribute flags are given, and either no var(name) arguments are
 present or the flag tt(+m) is used, then each parameter name printed is
 preceded by a list of the attributes of that parameter (tt(array),
@@ -2242,9 +2256,9 @@ automatically given the tt(-h) attribute to avoid name clashes.
 item(tt(-H))(
 Hide value: specifies that tt(typeset) will not display the value of the
 parameter when listing parameters; the display for such parameters is
-always as if the `tt(PLUS())' flag had been given.  Use of the parameter is
-in other respects normal, and the option does not apply if the parameter is
-specified by name, or by pattern with the tt(-m) option.  This is on by
+always as if the `tt(PLUS())' flag were given, but use of the parameter is
+in other respects normal.  This effect does not apply when the parameter is
+specified by name or by pattern with the tt(-m) option.  This is on by
 default for the parameters in the tt(zsh/parameter) and tt(zsh/mapfile)
 modules.  Note, however, that unlike the tt(-h) flag this is also useful
 for non-special parameters.

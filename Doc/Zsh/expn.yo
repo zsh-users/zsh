@@ -1226,6 +1226,9 @@ for parameters with the `hide' flag (tt(-h))
 item(tt(hideval))(
 for parameters with the `hideval' flag (tt(-H))
 )
+item(tt(nameref))(
+for named references having an empty value (tt(-n))
+)
 item(tt(special))(
 for special parameters defined by the shell
 )
@@ -1523,6 +1526,77 @@ Include the unmatched portion in the result (the em(R)est).
 )
 enditem()
 
+subsect(Named References)
+cindex(named references)
+cindex(namerefs)
+cindex(reference variables)
+cindex(parameters, nameref)
+The command
+ifzman()
+indent(tt(typeset -n )var(pname)tt(=)var(rname))
+
+initializes a parameter var(pname) as a reference to a second
+parameter var(rname).  With the few exceptions described here, when
+var(pname) is used in any of the expansion forms described above, the
+parameter var(rname) is expanded instead.  This is similar to the
+action of the `tt((P))' expansion flag, but when var(rname) has itself
+been declared a named reference, that third parameter referenced by
+var(pname) is also expanded, and so on.  With `tt((P))' this must be
+done explicitly, so for example
+tt(${LPAR()P)tt(RPAR()${LPAR()P)tt(RPAR())var(name)tt(}}).
+
+Unlike `tt((P))', named references in substitutions that perform
+assignment, such as tt(${)var(pname)tt(::=)var(word)tt(}), do not
+create new arrays when var(rname) is in the form of an array element
+or slice and no such array (or associative array) is presently set.
+This includes arrays declared, but not initialized, when the option
+tt(TYPESET_TO_UNSET) is in effect.  The var(word) is substituted but
+no assignment occurs.
+
+Also unlike `tt((P))' named references always expand parameters at
+the scope in which var(rname) existed when `tt(typeset -n)' was
+called.  This can be used to expand or assign parameters from an
+earlier scope even if a local of the same name has been declared at
+a later scope.  Example:
+ifzman()
+example(tt(caller=OUTER)
+tt(func LPAR()RPAR() {)
+tt(  print before local: $caller)
+tt(  typeset -n outer=$1)
+tt(  local caller=INNER)
+tt(  print by reference: $outer)
+tt(  outer=RESULT)
+tt(})
+tt(func caller)
+tt(print after func: $caller))
+
+displays the output
+ifzman()
+example(tt(before local: OUTER)
+tt(by reference: OUTER)
+tt(after func: RESULT))
+
+When var(rname) includes an array subscript, the subscript expression
+is interpreted at the time tt(${)var(pname)tt(}) is expanded.  Any
+form of subscript is allowed, including those that select individual
+elements, substrings of scalar strings, or multiple elements as with
+array slices or the `tt((i))', `tt((I))', `tt((r))', `tt((R))' and
+`tt((w))' subscript flags.
+
+When var(rname) is an array (but not an array element or slice), the
+named reference may also be used in substitutions requiring an
+var(arrayname), so these are equivalent:
+ifzman()
+example(tt(${)var(name)tt(:|)var(rname)tt(})
+tt(${)var(name)tt(:|)var(pname)tt(}))
+
+Expansions of the form `tt(${LPAR()t)tt(RPAR())var(pname)tt(})' expand
+the type information of var(rname), unless var(rname) is empty, in which
+case `tt(nameref)' is expanded, or when no variable var(rname) exists,
+in which case the expansion is empty.
+
+See also ifzman(zmanref(zshparam))ifnzman(noderef(Parameters)).
+
 subsect(Rules)
 cindex(parameter expansion rules)
 cindex(rules, parameter expansion)
@@ -1545,12 +1619,16 @@ substitutions; the nested substitution will return either a scalar or an
 array as determined by the flags, possibly adjusted for quoting.  All the
 following steps take place where applicable at all levels of substitution.
 
-Note that, unless the `tt((P))' flag is present, the flags and any
+Note that, unless the `tt((P))' flag or a named reference is present,
+the flags and any
 subscripts apply directly to the value of the nested substitution; for
 example, the expansion tt(${${foo}}) behaves exactly the same as
-tt(${foo}).  When the `tt((P))' flag is present in a nested substitution,
+tt(${foo}).  When a named reference or the `tt((P))' flag is used in a
+nested substitution,
 the other substitution rules are applied to the value em(before) it is
 interpreted as a name, so tt(${${(P)foo}}) may differ from tt(${(P)foo}).
+When both a named reference and the `tt((P))' flag appear, the named
+reference is resolved before `tt((P))' is applied.
 
 At each nested level of substitution, the substituted words undergo all
 forms of single-word substitution (i.e. not filename generation), including

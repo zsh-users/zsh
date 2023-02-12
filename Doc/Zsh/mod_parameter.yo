@@ -125,7 +125,7 @@ zmanref(zshexpn)
 ifnzman(\
 noderef(Parameter Expansion)
 )\
-.  The value may also be `tt(undefined)' indicating a parameter that
+. The value may also be `tt(undefined)' indicating a parameter that
 may be autoloaded from a module but has not yet been referenced.
 Setting or unsetting keys in this array is not possible.
 )

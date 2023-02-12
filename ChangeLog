@@ -1,5 +1,8 @@
 2023-02-12  Bart Schaefer  <schaefer@zsh.org>
 
+	* 51362: Doc/Zsh/builtins.yo, Doc/Zsh/expn.yo, Doc/Zsh/params.yo,
+	Doc/Zsh/mod_parameter.yo: Begin documentation for named references.
+
 	* 51361: Test/K01nameref.ztst, Test/V10private.ztst: Tests
 	for 51360.
 
