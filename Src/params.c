@@ -6281,7 +6281,16 @@ valid_refname(char *val)
     if (*t != 0) {
 	if (*t == '[') {
 	    tokenize(t = dupstring(t+1));
-	    t = parse_subscript(t, 0, ']');
+	    while ((t = parse_subscript(t, 0, ']')) && *t++ == Outbrack) {
+		if (*t == Inbrack)
+		    ++t;
+		else
+		    break;
+	    }
+	    if (t && *t) {
+		/* zwarn("%s: stuff after subscript: %s", val, t); */
+		t = NULL;
+	    }
 	} else if (t[1] || !(*t == '!' || *t == '?' ||
 			     *t == '$' || *t == '-' ||
 			     *t == '0' || *t == '_')) {

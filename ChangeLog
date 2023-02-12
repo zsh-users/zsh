@@ -1,5 +1,8 @@
 2023-02-12  Bart Schaefer  <schaefer@zsh.org>
 
+	* 51417: Src/params.c, Test/K01nameref.ztst: Check subscripts
+	in named reference values more rigorously.
+
 	* 51403: Doc/Zsh/builtins.yo, Doc/Zsh/expn.yo, Doc/Zsh/func.yo,
 	Doc/Zsh/grammar.yo, Doc/Zsh/params.yo, Test/K01nameref.ztst:
 	Tests and documentation for 51402, clean up some other tests.

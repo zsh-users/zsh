@@ -350,9 +350,9 @@ F:ksh93 does not implement this either
 >typeset -A hash=( [y]=HIT )
 
  unset -n ptr1
- typeset -n ptr1='not good'
+ typeset -n ptr1='not[2]good'
 1:invalid nameref
-*?*invalid variable name: not good
+*?*invalid variable name: not\[2\]good
 
  unset -n ptr1
  unset hash
