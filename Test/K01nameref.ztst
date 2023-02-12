@@ -1,0 +1,439 @@
+# Tests for the zsh/param/private module
+
+%prep
+
+ # Required in order to declare an unset hash for substitution test
+ setopt TYPESET_TO_UNSET
+
+ : ${ZTST_continue:=1}
+
+%test
+
+ typeset -n ptr
+ typeset -n
+0:minimal declaration
+>ptr
+
+ typeset -n ptr=
+ typeset -n
+0:nameref placeholder
+>ptr=''
+
+ typeset -n ptr
+ ptr=var
+ typeset -n
+0:assign nameref placeholder
+>ptr=var
+
+ typeset -n ptr=var
+ typeset +n ptr
+ typeset -p ptr
+0:remove nameref attribute
+>typeset ptr=var
+
+  typeset -n ptr
+  typeset -t ptr
+  typeset -p ptr
+0:change type of a placeholder
+F:Other type changes are fatal errors, should this also be?
+>typeset -n ptr=''
+*?*ptr: can't change type of a named reference
+
+ typeset -n ptr=var
+ typeset -t ptr
+ typeset -p ptr var
+0:change type of referenced var
+>typeset -n ptr=var
+>typeset -t var
+
+ typeset -n ptr[1]=var
+1:illegal nameref name
+*?*reference variable cannot be an array
+
+ typeset var=value
+ typeset -n ptr=var
+ print $ptr
+0:basic nameref expansion
+>value
+
+ typeset var=(val1 val2)
+ typeset -n ptr=var
+ print $ptr
+0:nameref array expansion
+>val1 val2
+
+ typeset -A var=(val1 val2)
+ typeset -n ptr=var
+ print ${(kv)ptr}
+0:nameref hash expansion
+>val1 val2
+
+ typeset -n ptr=var
+ typeset var=value
+ typeset -p ptr var
+ ptr=newvalue
+ typeset -p ptr var
+0:assign existing scalar via nameref
+>typeset -n ptr=var
+>typeset var=value
+>typeset -n ptr=var
+>typeset var=newvalue
+
+ typeset -n ptr=var
+ typeset var=value
+ unset ptr
+ typeset -p var
+0:unset via nameref
+
+ typeset -n ptr=var
+ typeset var=value
+ typeset -p ptr var
+ typeset ptr=newvalue
+ typeset -p ptr var
+0:typeset existing scalar via nameref
+>typeset -n ptr=var
+>typeset var=value
+>typeset -n ptr=var
+>typeset var=newvalue
+
+ typeset -n ptr=var
+ ptr=value
+ typeset -p var ptr
+ unset var	# for next test
+0:assign new scalar via nameref
+>typeset -g var=value
+>typeset -n ptr=var
+
+ typeset -n ptr=var
+ typeset var=(val1 val2)
+ typeset -p ptr var
+ ptr=(new1 new2)
+ typeset -p ptr var
+0:assign existing array via nameref
+>typeset -n ptr=var
+>typeset -a var=( val1 val2 )
+>typeset -n ptr=var
+>typeset -a var=( new1 new2 )
+
+ typeset -p ptr1 ptr2 var
+1:check state of paramtab ONE
+F:unexpected side-effects of previous tests
+*?*no such variable: ptr1
+*?*no such variable: ptr2
+*?*no such variable: var
+
+ typeset -n ptr=var
+ ptr=(val1 val2)
+ typeset -p var ptr
+ unset var	# for next test
+0:assign new array via nameref
+>typeset -g -a var=( val1 val2 )
+>typeset -n ptr=var
+
+ typeset -n ptr2=var
+ typeset -n ptr1=ptr2
+ typeset var=value
+ typeset -p ptr1 ptr2 var
+ print $ptr1
+0:indirect nameref expansion
+>typeset -n ptr1=ptr2
+>typeset -n ptr2=var
+>typeset var=value
+>value
+
+ typeset -p ptr1 ptr2 var
+1:check state of paramtab TWO
+F:unexpected side-effects of previous tests
+*?*no such variable: ptr1
+*?*no such variable: ptr2
+*?*no such variable: var
+
+ typeset var
+ typeset -n ptr2=var
+ typeset -n ptr1=ptr2
+ typeset ptr1=newvalue
+ typeset -p ptr1 ptr2 var
+0:typeset existing parameter indirectly
+>typeset -n ptr1=ptr2
+>typeset -n ptr2=var
+>typeset var=newvalue
+
+ typeset var=value
+ typeset -n ptr2=var
+ typeset -n ptr1=ptr2
+ unset ptr1
+ typeset -p ptr1 ptr2 var
+0:unset parameter indirectly
+>typeset -n ptr1=ptr2
+>typeset -n ptr2=var
+
+ typeset -n ptr2=var
+ typeset -n ptr1=ptr2
+ typeset ptr1=newvalue
+ typeset -p ptr1 ptr2 var
+ unset var	# for next test
+0:typeset new parameter indirectly
+>typeset -n ptr1=ptr2
+>typeset -n ptr2=var
+>typeset var=newvalue
+
+ typeset -n ptr2=var
+ typeset -n ptr1=ptr2
+ typeset var=value
+ typeset -p ptr1 ptr2 var
+ ptr1=newvalue
+ typeset -p ptr1 ptr2 var
+0:assign new parameter indirectly
+>typeset -n ptr1=ptr2
+>typeset -n ptr2=var
+>typeset var=value
+>typeset -n ptr1=ptr2
+>typeset -n ptr2=var
+>typeset var=newvalue
+
+ typeset -p ptr1 ptr2 var
+1:check state of paramtab THREE
+F:unexpected side-effects of previous tests
+*?*no such variable: ptr1
+*?*no such variable: ptr2
+*?*no such variable: var
+
+ typeset -a var
+ typeset -n ptr2=var
+ typeset -n ptr1=ptr2
+ typeset ptr1=(val1 val2)
+ typeset -p ptr1 ptr2 var
+0:typeset existing array indirectly
+>typeset -n ptr1=ptr2
+>typeset -n ptr2=var
+>typeset -a var=( val1 val2 )
+
+ typeset -n ptr2=var
+ typeset -n ptr1=ptr2
+ typeset ptr1=(val1 val2)
+ typeset -p ptr1 ptr2 var
+ unset var	# for next test
+0:typeset new array indirectly
+>typeset -n ptr1=ptr2
+>typeset -n ptr2=var
+>typeset -a var=( val1 val2 )
+
+ typeset -p ptr1 ptr2 var
+1:check state of paramtab FOUR
+F:unexpected side-effects of previous tests
+*?*no such variable: ptr1
+*?*no such variable: ptr2
+*?*no such variable: var
+
+ typeset -n ptr2=var
+ typeset -n ptr1=ptr2
+ ptr1=(val1 val2)
+ typeset -p ptr1 ptr2 var
+0:assign new array indirectly
+>typeset -n ptr1=ptr2
+>typeset -n ptr2=var
+>typeset -g -a var=( val1 val2 )
+
+ typeset -n ptr1=ptr2
+ typeset -n ptr2=ptr1
+1:direct nameref loop not allowed
+*?*invalid self reference
+
+ typeset -n ptr1=ptr2
+ typeset -n ptr2=ptr3
+ typeset -n ptr3=ptr1
+1:indirect nameref loop not allowed
+*?*invalid self reference
+
+ typeset -n ptr2='path[2]'
+ print -r -- $ptr2
+0d:nameref to array element
+>${path[2]}
+
+ typeset -A hash=(x MISS y HIT)
+ typeset -n ptr1='hash[y]'
+ print -r -- $ptr1
+0:nameref to hash element
+>HIT
+
+ typeset -a ary=(1 2)
+ typeset -n ptr2='ary[2]'
+ ptr2=TWO
+ typeset -p ary
+0:assign array element by nameref
+>typeset -a ary=( 1 TWO )
+
+ typeset -n ptr2='ary[2]'
+ ptr2=TWO
+ typeset -p ary
+0f:create array element by nameref
+F:ksh93 does not implement this either
+>typeset -a ary=( '' TWO )
+
+ typeset -A hash=(x MISS y MISS)
+ typeset -n ptr1='hash[y]'
+ ptr1=HIT
+ typeset -p hash
+0:assign to hash element by nameref
+>typeset -A hash=( [x]=MISS [y]=HIT )
+
+ typeset -A hash
+ typeset -n ptr1='hash[y]'
+ ptr1=HIT
+ typeset -p hash
+0f:create hash by element nameref
+F:ksh93 does not implement this either
+>typeset -A hash=( [y]=HIT )
+
+ typeset -n ptr1='not good'
+1:invalid nameref
+*?*invalid variable name: not good
+
+ typeset -A hash
+ typeset -n ptr1='hash[y]'
+ print ${ptr1::=HIT}
+ typeset -p ptr1 hash
+0f:create hash by element substitution
+>HIT
+>typeset -n ptr1='hash[y]'
+>typeset -A hash=( [y]=HIT )
+
+ typeset -n ptr=gval
+ gval=global
+ () { local gval=local; print $ptr; typeset -p ptr gval }
+ unset gval	# for next test
+0:up-reference part 1
+>global
+>typeset -g -n ptr=gval
+>typeset gval=local
+
+ typeset -p ptr ptr1 ptr2 val gval
+1:check state of paramtab FIVE
+F:unexpected side-effects of previous tests
+*?*no such variable: ptr
+*?*no such variable: ptr1
+*?*no such variable: ptr2
+*?*no such variable: val
+*?*no such variable: gval
+
+ typeset -n ptr1=gval
+ typeset gval
+ () { typeset gval=local; ptr1=global }
+ typeset -p ptr1 gval
+0:up-reference assignment part 1
+F:All tests run inside a function, so "typeset gval" creates a local;
+F:if that were omitted, ptr1= assignment would create a true global
+F:and the output below would change to "typeset -g gval=global"
+>typeset -n ptr1=gval
+>typeset gval=global
+
+ typeset -p ptr ptr1 ptr2 val gval
+1:check state of paramtab SIX
+F:unexpected side-effects of previous tests
+*?*no such variable: ptr
+*?*no such variable: ptr1
+*?*no such variable: ptr2
+*?*no such variable: val
+*?*no such variable: gval
+
+ typeset gval=global
+ () {
+   typeset -n ptr=gval
+   local gval=local
+   print $ptr
+ }
+ typeset -p ptr gval
+1:up-reference part 2
+>global
+*?*no such variable: ptr
+>typeset gval=global
+
+ typeset -n ptr=gval
+ () {
+    local lval=local
+    typeset -n ptr=lval
+    ptr=LOCAL
+    typeset -p lval gval ptr
+  }
+ typeset -p ptr
+0:localized namerefs hide global namerefs
+*?*no such variable: gval
+>typeset lval=LOCAL
+>typeset -n ptr=lval
+>typeset -n ptr=gval
+
+ () {
+   zmodload -u zsh/parameter
+   typeset -n myself=parameters[myself]
+   local -h parameters
+   print -r -- $myself
+   typeset -p parameters
+ }
+0:up-reference part 3, autoloading with hidden special
+>nameref-local
+>typeset parameters
+
+ () {
+   typeset notdef
+   unset notdef
+   () {
+     typeset -n ptr=notdef
+     ptr=(DEFINED)
+   }
+   typeset -p notdef
+ }
+0:up-reference part 4, unset local and type change
+>typeset -a notdef=( DEFINED )
+
+ () {
+   typeset -n ptr1=ptr2
+   typeset -n ptr2
+   typeset -p ptr1 ptr2
+   typeset val=LOCAL
+   () {
+     ptr1=val
+     typeset -n
+     printf "%s=%s\n" ptr1 "$ptr1" ptr2 "$ptr2"
+   }
+   typeset -p ptr1 ptr2
+ }
+ typeset -p ptr2
+1:up-reference part 5, stacked namerefs, end not in scope
+F:What is the correct behavior for the scope of ptr1?
+>typeset -n ptr1=ptr2
+>typeset -n ptr2=''
+>ptr1=ptr2
+>ptr2=val
+>ptr1=LOCAL
+>ptr2=LOCAL
+>typeset -n ptr1=ptr2
+>typeset -n ptr2=val
+*?*no such variable: ptr2
+
+ typeset ptr2
+ () {
+   typeset -n ptr1=ptr2
+   typeset -n ptr2
+   typeset -p ptr1 ptr2
+   typeset val=LOCAL
+   () {
+     ptr1=val
+     typeset -n
+     printf "%s=%s\n" ptr1 "$ptr1" ptr2 "$ptr2"
+   }
+   typeset -p ptr1 ptr2
+ }
+ typeset -p ptr2
+0:up-reference part 6, stacked namerefs, end is in scope
+F:Same test, should part 5 output look like this?
+>typeset -n ptr1=ptr2
+>typeset -n ptr2=''
+>ptr1=ptr2
+>ptr2=''
+>ptr1=val
+>ptr2=
+>typeset -n ptr1=ptr2
+>typeset -n ptr2=''
+>typeset ptr2=val
+
+%clean

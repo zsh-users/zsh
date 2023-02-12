@@ -299,6 +299,84 @@ F:future revision will create a global with this assignment
 *>*
 *>*
 
+ typeset top=TOP
+ () {
+  local -P -n test=top
+  print $top
+  () { print UP: $test }
+ }
+0:nameref can be declared private
+>TOP
+>UP:
+
+ () {
+   typeset -n ptr1=ptr2
+   private -n ptr2
+   typeset -p ptr1 ptr2
+   typeset val=LOCAL
+   () {
+     ptr1=val
+     typeset -n
+     printf "%s=%s\n" ptr1 "$ptr1" ptr2 "$ptr2"
+   }
+   typeset -p ptr1 ptr2
+ }
+ typeset -p ptr2
+1:up-reference for private namerefs, end not in scope
+F:See K01typeset.ztst up-reference part 5
+F:Here ptr1 finds private ptr2 by scope mismatch, assignment silently fails
+>typeset -n ptr1=ptr2
+>ptr1=ptr2
+>ptr1=
+>ptr2=
+>typeset -n ptr1=ptr2
+*?*no such variable: ptr2
+
+ typeset ptr2
+ () {
+   typeset -n ptr1=ptr2
+   private -n ptr2
+   typeset -p ptr1 ptr2
+   typeset val=LOCAL
+   () {
+     ptr1=val;
+     typeset -n
+     printf "%s=%s\n" ptr1 "$ptr1" ptr2 "$ptr2"
+   }
+   typeset -p ptr1 ptr2
+ }
+ typeset -p ptr2
+0:up-reference for private namerefs, end is in scope
+F:See K01typeset.ztst up-reference part 5
+F:Here ptr1 points to global ptr2 so assignment succeeds
+>typeset -n ptr1=ptr2
+>ptr1=ptr2
+>ptr2=val
+>ptr1=val
+>ptr2=val
+>typeset -n ptr1=ptr2
+>typeset ptr2=val
+
+ () {
+   setopt localoptions errreturn
+   private -n ptr2
+   typeset -n ptr1=ptr2
+   typeset -p ptr1 ptr2
+   typeset val=LOCAL
+   () {
+     ptr1=val
+     typeset -n
+     printf "v %s=%s\n" ptr1 "$ptr1" ptr2 "$ptr2"
+   }
+   typeset -p ptr1 ptr2
+ }
+ typeset -p ptr1 ptr2
+1:up-reference for private namerefs, end is in scope but private
+F:Should we allow "public" namerefs to private parameters?
+*?*ptr2: invalid reference
+*?*no such variable: ptr1
+*?*no such variable: ptr2
+
 %clean
 
   rm -r private.TMP
