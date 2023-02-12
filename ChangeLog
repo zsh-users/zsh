@@ -1,3 +1,7 @@
+2023-02-12  Bart Schaefer  <schaefer@zsh.org>
+
+	* 51404: Src/jobs.c: Nullify filelist after deleting (fix segfault)
+
 2023-02-09  Oliver Kiddle  <opk@zsh.org>
 
 	* 51320, 51383: Src/Zle/zle_main.c, Src/Zle/complist.c,

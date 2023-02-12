@@ -1372,8 +1372,10 @@ cleanfilelists(void)
 
     DPUTS(shell_exiting >= 0, "BUG: cleanfilelists() before exit");
  
-    for (i = 1; i <= maxjob; i++)
+    for (i = 1; i <= maxjob; i++) {
 	deletefilelist(jobtab[i].filelist, 0);
+	jobtab[i].filelist = 0;
+    }
 }
 
 /**/
@@ -1531,8 +1533,10 @@ havefiles(void)
     int i;
 
     for (i = 1; i <= maxjob; i++)
-	if (jobtab[i].stat && jobtab[i].filelist)
+	if (jobtab[i].stat && jobtab[i].filelist &&
+	    peekfirst(jobtab[i].filelist)) {
 	    return 1;
+	}
     return 0;
 
 }
