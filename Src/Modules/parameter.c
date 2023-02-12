@@ -105,10 +105,15 @@ getpmparameter(UNUSED(HashTable ht), const char *name)
     pm->node.nam = dupstring(name);
     pm->node.flags = PM_SCALAR | PM_READONLY;
     pm->gsu.s = &nullsetscalar_gsu;
-    if ((rpm = (Param) realparamtab->getnode(realparamtab, name)) &&
-	!(rpm->node.flags & PM_UNSET))
+    if ((rpm = (Param) realparamtab->getnode2(realparamtab, name)) &&
+	!(rpm->node.flags & PM_UNSET)) {
 	pm->u.str = paramtypestr(rpm);
-    else {
+	if ((rpm->node.flags & PM_NAMEREF) &&
+	    (rpm = (Param) realparamtab->getnode(realparamtab, name)) &&
+	    !(rpm->node.flags & PM_UNSET)) {
+	    pm->u.str = zhtricat(pm->u.str, "-", paramtypestr(rpm));
+	}
+    } else {
 	pm->u.str = dupstring("");
 	pm->node.flags |= (PM_UNSET|PM_SPECIAL);
     }

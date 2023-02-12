@@ -2155,7 +2155,7 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 		return NULL;
 	    if (ss)
 		*ss = sav;
-	    s = ss;
+	    s = dyncat(ss,*pptr);
 	}
 	if (PM_TYPE(pm->node.flags) & (PM_ARRAY|PM_HASHED)) {
 	    /* Overload v->isarr as the flag bits for hashed arrays. */
@@ -6170,6 +6170,7 @@ setscope(Param pm)
 {
     if (pm->node.flags & PM_NAMEREF) {
 	Param basepm;
+	struct asgment stop;
 	char *t = pm->u.str ? itype_end(pm->u.str, IIDENT, 0) : NULL;
 
 	/* Temporarily change nameref to array parameter itself */
@@ -6177,7 +6178,12 @@ setscope(Param pm)
 	    *t = 0;
 	else
 	    t = 0;
-	basepm = (Param)resolve_nameref(pm, NULL);
+	stop.name = "";
+	stop.value.scalar = NULL;
+	stop.flags = PM_NAMEREF;
+	if (locallevel)
+	    stop.flags |= PM_LOCAL;
+	basepm = (Param)resolve_nameref(pm, &stop);
 	if (t) {
 	    pm->width = t - pm->u.str;
 	    *t = '[';

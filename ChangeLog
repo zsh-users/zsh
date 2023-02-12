@@ -1,5 +1,9 @@
 2023-02-12  Bart Schaefer  <schaefer@zsh.org>
 
+	* 51374: Src/Modules/parameter.c, Src/params.c, Test/README,
+	Test/K01nameref.ztst: Expose named references in $parameters,
+	fix substitution error.
+
 	* 51362: Doc/Zsh/builtins.yo, Doc/Zsh/expn.yo, Doc/Zsh/params.yo,
 	Doc/Zsh/mod_parameter.yo: Begin documentation for named references.
 

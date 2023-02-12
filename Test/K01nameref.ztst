@@ -1,11 +1,11 @@
-# Tests for the zsh/param/private module
+# Tests for named references
 
 %prep
 
  # Required in order to declare an unset hash for substitution test
  setopt TYPESET_TO_UNSET
 
- : ${ZTST_continue:=1}
+ : ${ZTST_continue::=1}
 
 %test
 
@@ -53,7 +53,13 @@ F:Other type changes are fatal errors, should this also be?
  typeset var=value
  typeset -n ptr=var
  print $ptr
-0:basic nameref expansion
+0:basic nameref expansion, no braces
+>value
+
+ typeset var=value
+ typeset -n ptr=var
+ print ${ptr}
+0:basic nameref expansion, braces
 >value
 
  typeset var=(val1 val2)
@@ -115,9 +121,10 @@ F:Other type changes are fatal errors, should this also be?
 >typeset -n ptr=var
 >typeset -a var=( new1 new2 )
 
- typeset -p ptr1 ptr2 var
+ typeset -p ptr ptr1 ptr2 var
 1:check state of paramtab ONE
 F:unexpected side-effects of previous tests
+*?*no such variable: ptr
 *?*no such variable: ptr1
 *?*no such variable: ptr2
 *?*no such variable: var
@@ -247,13 +254,24 @@ F:unexpected side-effects of previous tests
 
  typeset -n ptr2='path[2]'
  print -r -- $ptr2
-0d:nameref to array element
+0q:nameref to array element, no braces
+>${path[2]}
+
+ typeset -n ptr2='path[2]'
+ print -r -- ${ptr2}
+0q:nameref to array element, with braces
 >${path[2]}
 
  typeset -A hash=(x MISS y HIT)
  typeset -n ptr1='hash[y]'
  print -r -- $ptr1
-0:nameref to hash element
+0:nameref to hash element, no braces
+>HIT
+
+ typeset -A hash=(x MISS y HIT)
+ typeset -n ptr1='hash[y]'
+ print -r -- ${ptr1}
+0:nameref to hash element, with braces
 >HIT
 
  typeset -a ary=(1 2)
@@ -362,16 +380,16 @@ F:unexpected side-effects of previous tests
 >typeset -n ptr=lval
 >typeset -n ptr=gval
 
+ typeset -A var=(myself outside)
  () {
-   zmodload -u zsh/parameter
-   typeset -n myself=parameters[myself]
-   local -h parameters
+   typeset -n myself=var[myself]
+   local -h var
    print -r -- $myself
-   typeset -p parameters
+   typeset -p var
  }
-0:up-reference part 3, autoloading with hidden special
->nameref-local
->typeset parameters
+0:up-reference part 3, hidden global
+>outside
+>typeset var
 
  () {
    typeset notdef
@@ -401,7 +419,7 @@ F:unexpected side-effects of previous tests
 1:up-reference part 5, stacked namerefs, end not in scope
 F:What is the correct behavior for the scope of ptr1?
 >typeset -n ptr1=ptr2
->typeset -n ptr2=''
+>typeset -n ptr2
 >ptr1=ptr2
 >ptr2=val
 >ptr1=LOCAL
@@ -427,13 +445,68 @@ F:What is the correct behavior for the scope of ptr1?
 0:up-reference part 6, stacked namerefs, end is in scope
 F:Same test, should part 5 output look like this?
 >typeset -n ptr1=ptr2
->typeset -n ptr2=''
+>typeset -n ptr2
 >ptr1=ptr2
->ptr2=''
+>ptr2
 >ptr1=val
 >ptr2=
 >typeset -n ptr1=ptr2
 >typeset -n ptr2=''
 >typeset ptr2=val
+
+ if zmodload zsh/parameter; then
+ () {
+   zmodload -u zsh/parameter
+   typeset -n myself=parameters[myself]
+   local -h parameters
+   print -r -- $myself
+   typeset -p parameters
+ }
+ else ZTST_skip='Cannot zmodload zsh/parameter, skipping autoload test'
+ fi
+0:up-reference part 3, autoloading with hidden special
+>nameref-local-nameref-local
+>typeset parameters
+
+ typeset ptr2=var2
+ typeset var2=GLOBAL
+ () {
+   typeset -n ptr1=ptr2
+   typeset ptr2=var1
+   typeset var1=VAR1
+   typeset var2=VAR2
+   print -r -- ${(P)ptr1}
+ }
+0:
+>VAR2
+
+ ary=(one two three four)
+ typeset -n ptr=ary
+ print -r ${(j.:.)ptr//o/0}
+0:expansion flags and string replacement
+>0ne:tw0:three:f0ur
+
+ var=value
+ typeset -n ptr=var
+ myscalar=ptr
+ echo ${(P)myscalar}
+0:named references with (P), as ${(P)name_of_nameref}
+>value
+
+ var=value
+ myscalar=var
+ typeset -n ptr=myscalar
+ echo ${(P)ptr}
+0:named references with (P), as ${(P)nameref}
+>value
+
+ ary=( 'bry[1]' 'bry[2]' ) 
+ bry=( lorem ipsum )
+ typeset -n ptr='ary[2]'
+ print -r -- ${ptr}
+ print -r -- ${(P)ptr}
+0:named references with (P), array element to array element
+>bry[2]
+>ipsum
 
 %clean
