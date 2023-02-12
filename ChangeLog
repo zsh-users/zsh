@@ -1,3 +1,7 @@
+2023-02-12  Bart Schaefer  <schaefer@zsh.org>
+
+	* 51404: Src/jobs.c: Nullify filelist after deleting (fix segfault)
+
 2023-02-06  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 51350: Src/subst.c, Test/D04parameter.ztst: the combination
