@@ -55,7 +55,7 @@ static struct builtin builtins[] =
     BUILTIN("cd", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 2, BIN_CD, "qsPL", NULL),
     BUILTIN("chdir", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 2, BIN_CD, "qsPL", NULL),
     BUILTIN("continue", BINF_PSPECIAL, bin_break, 0, 1, BIN_CONTINUE, NULL, NULL),
-    BUILTIN("declare", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%klmp:%rtuxz", NULL),
+    BUILTIN("declare", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%klmnp:%rtuxz", NULL),
     BUILTIN("dirs", 0, bin_dirs, 0, -1, 0, "clpv", NULL),
     BUILTIN("disable", 0, bin_enable, 0, -1, BIN_DISABLE, "afmprs", NULL),
     BUILTIN("disown", 0, bin_fg, 0, -1, BIN_DISOWN, NULL, NULL),
@@ -88,7 +88,7 @@ static struct builtin builtins[] =
     BUILTIN("jobs", 0, bin_fg, 0, -1, BIN_JOBS, "dlpZrs", NULL),
     BUILTIN("kill", BINF_HANDLES_OPTS, bin_kill, 0, -1, 0, NULL, NULL),
     BUILTIN("let", 0, bin_let, 1, -1, 0, NULL, NULL),
-    BUILTIN("local", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%ahi:%lp:%rtux", NULL),
+    BUILTIN("local", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%ahi:%lnp:%rtux", NULL),
     BUILTIN("logout", 0, bin_break, 0, 1, BIN_LOGOUT, NULL, NULL),
 
 #if defined(ZSH_MEM) & defined(ZSH_MEM_DEBUG)
@@ -121,7 +121,7 @@ static struct builtin builtins[] =
     BUILTIN("trap", BINF_PSPECIAL | BINF_HANDLES_OPTS, bin_trap, 0, -1, 0, NULL, NULL),
     BUILTIN("true", 0, bin_true, 0, -1, 0, NULL, NULL),
     BUILTIN("type", 0, bin_whence, 0, -1, 0, "ampfsSw", "v"),
-    BUILTIN("typeset", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%klp:%rtuxmz", NULL),
+    BUILTIN("typeset", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%klp:%rtuxmnz", NULL),
     BUILTIN("umask", 0, bin_umask, 0, 1, 0, "S", NULL),
     BUILTIN("unalias", 0, bin_unhash, 0, -1, BIN_UNALIAS, "ams", NULL),
     BUILTIN("unfunction", 0, bin_unhash, 1, -1, BIN_UNFUNCTION, "m", "f"),
@@ -2030,6 +2030,19 @@ typeset_single(char *cname, char *pname, Param pm, int func,
     int usepm, tc, keeplocal = 0, newspecial = NS_NONE, readonly, dont_set = 0;
     char *subscript;
 
+    if (pm && (pm->node.flags & PM_NAMEREF) && !((off|on) & PM_NAMEREF)) {
+	if (!(off & PM_NAMEREF))
+	    pm = (Param)resolve_nameref(pm, NULL);
+	if (pm && (pm->node.flags & PM_NAMEREF) &&
+	    (on & ~(PM_NAMEREF|PM_LOCAL))) {
+	    /* Changing type of PM_SPECIAL|PM_AUTOLOAD is a fatal error.  *
+	     * Should this be a fatal error as well, rather than warning? */
+	    zwarnnam(cname, "%s: can't change type of a named reference",
+		     pname);
+	    return NULL;
+	}
+    }
+
     /*
      * Do we use the existing pm?  Note that this isn't the end of the
      * story, because if we try and create a new pm at the same
@@ -2406,6 +2419,11 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 		return NULL;
 	}
     } else if ((subscript = strchr(pname, '['))) {
+	if (on & PM_NAMEREF) {
+	    zerrnam(cname,
+		    "%s: reference variable cannot be an array", pname);
+	    return NULL;
+	}
 	if (on & PM_READONLY) {
 	    zerrnam(cname,
 		    "%s: can't create readonly array elements", pname);
@@ -2640,6 +2658,14 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	else if (OPT_PLUS(ops,optval))
 	    off |= bit;
     }
+    if (OPT_MINUS(ops,'n')) {
+	if (on|off) {
+	    zwarnnam(name, "no other attributes allowed with -n");
+	    return 1;
+	}
+	on |= PM_NAMEREF;
+    } else if (OPT_PLUS(ops,'n'))
+	off |= PM_NAMEREF;
     roff = off;
 
     /* Sanity checks on the options.  Remove conflicting options. */
@@ -3022,6 +3048,27 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	    }
 	    continue;
 	}
+
+	if (on & PM_NAMEREF) {
+	    if (asg->value.scalar &&
+		(strcmp(asg->name, asg->value.scalar) == 0 ||
+		 ((pm = (Param)resolve_nameref((Param)hn, asg)) &&
+		  (pm->node.flags & PM_NAMEREF)))) {
+		if (pm->node.flags & PM_SPECIAL)
+		    zwarnnam(name, "%s: invalid reference", pm->node.nam);
+		else
+		    zwarnnam(name, "%s: invalid self reference", asg->name);
+		returnval = 1;
+		continue;
+	    }
+	    if (hn) {
+		/* namerefs always start over fresh */
+		if (((Param)hn)->level >= locallevel)
+		    unsetparam_pm((Param)hn, 0, 1);
+		hn = NULL;
+	    }
+	}
+
 	if (!typeset_single(name, asg->name, (Param)hn,
 			    func, on, off, roff, asg, NULL,
 			    ops, 0))
@@ -3805,7 +3852,8 @@ bin_unset(char *name, char **argv, Options ops, int func)
 		returnval = 1;
 	    }
 	} else {
-	    if (unsetparam_pm(pm, 0, 1))
+	    if ((pm = (Param)resolve_nameref(pm, NULL)) &&
+		unsetparam_pm(pm, 0, 1))
 		returnval = 1;
 	}
 	if (ss)

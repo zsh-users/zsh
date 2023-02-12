@@ -536,6 +536,9 @@ getparamnode(HashTable ht, const char *nam)
 		 nam);
 	}
     }
+
+    if (hn && ht == realparamtab)
+	hn = resolve_nameref(pm, NULL);
     return hn;
 }
 
@@ -992,6 +995,34 @@ createparam(char *name, int flags)
 			 /* gethashnode2() for direct table read */
 			 gethashnode2(paramtab, name) :
 			 paramtab->getnode(paramtab, name));
+
+	if (oldpm && (oldpm->node.flags & PM_NAMEREF) &&
+	    !(flags & PM_NAMEREF)) {
+	    Param lastpm;
+	    struct asgment stop;
+	    stop.flags = PM_NAMEREF | (flags & PM_LOCAL);
+	    stop.name = oldpm->node.nam;
+	    stop.value.scalar = oldpm->u.str;
+	    lastpm = (Param)resolve_nameref(oldpm, &stop);
+	    if (lastpm) {
+		if (lastpm->node.flags & PM_NAMEREF) {
+		    if (lastpm->u.str && *(lastpm->u.str)) {
+			name = lastpm->u.str;
+			oldpm = NULL;
+		    } else {
+			if (!(lastpm->node.flags & PM_READONLY))
+			    lastpm->node.flags |= PM_UNSET;
+			return lastpm;
+		    }
+		} else {
+		    /* nameref pointing to an unset local */
+		    DPUTS(!(lastpm->node.flags & PM_UNSET),
+			  "BUG: local parameter is not unset");
+		    oldpm = lastpm;
+		}
+	    } else
+		flags |= PM_NAMEREF;
+	}
 
 	DPUTS(oldpm && oldpm->level > locallevel,
 	      "BUG: old local parameter not deleted");
@@ -2109,6 +2140,23 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 	    memset(v, 0, sizeof(*v));
 	else
 	    v = (Value) hcalloc(sizeof *v);
+	if ((pm->node.flags & PM_NAMEREF) && pm->u.str && *(pm->u.str)) {
+	    /* only happens for namerefs pointing to array elements */
+	    char *ref = dupstring(pm->u.str);
+	    char *ss = pm->width ? ref + pm->width : NULL;
+	    if (ss) {
+		sav = *ss;
+		*ss = 0;
+	    }
+	    Param p1 = (Param)gethashnode2(paramtab, ref);
+	    if (!(p1 && (pm = upscope(p1, pm->base))) ||
+		((pm->node.flags & PM_UNSET) &&
+		!(pm->node.flags & PM_DECLARED)))
+		return NULL;
+	    if (ss)
+		*ss = sav;
+	    s = ss;
+	}
 	if (PM_TYPE(pm->node.flags) & (PM_ARRAY|PM_HASHED)) {
 	    /* Overload v->isarr as the flag bits for hashed arrays. */
 	    v->isarr = flags | (isvarat ? SCANPM_ISVAR_AT : 0);
@@ -2677,6 +2725,7 @@ assignstrvalue(Value v, char *val, int flags)
         }
 	break;
     }
+    setscope(v->pm);
     if ((!v->pm->env && !(v->pm->node.flags & PM_EXPORTED) &&
 	 !(isset(ALLEXPORT) && !(v->pm->node.flags & PM_HASHELEM))) ||
 	(v->pm->node.flags & PM_ARRAY) || v->pm->ename)
@@ -3084,10 +3133,19 @@ assignsparam(char *s, char *val, int flags)
 	}
     }
     if (!v && !(v = getvalue(&vbuf, &t, 1))) {
-	unqueue_signals();
 	zsfree(val);
+	unqueue_signals();
 	/* errflag |= ERRFLAG_ERROR; */
 	return NULL;
+    }
+    if (*val && (v->pm->node.flags & PM_NAMEREF)) {
+	if (!valid_refname(val)) {
+	    zerr("invalid variable name: %s", val);
+	    zsfree(val);
+	    unqueue_signals();
+	    errflag |= ERRFLAG_ERROR;
+	    return NULL;
+	}
     }
     if (flags & ASSPM_WARN)
 	check_warn_pm(v->pm, "scalar", created, 1);
@@ -3115,8 +3173,8 @@ assignsparam(char *s, char *val, int flags)
 			lhs.u.l = lhs.u.l + (zlong)rhs.u.d;
 		}
 		setnumvalue(v, lhs);
-    	    	unqueue_signals();
 		zsfree(val);
+    	    	unqueue_signals();
 		return v->pm; /* avoid later setstrvalue() call */
 	    case PM_ARRAY:
 	    	if (unset(KSHARRAYS)) {
@@ -3141,9 +3199,9 @@ assignsparam(char *s, char *val, int flags)
 	    case PM_INTEGER:
 	    case PM_EFLOAT:
 	    case PM_FFLOAT:
+		zsfree(val);
 		unqueue_signals();
 		zerr("attempt to add to slice of a numeric variable");
-		zsfree(val);
 		return NULL;
 	    case PM_ARRAY:
 	      kshappend:
@@ -3602,7 +3660,8 @@ unsetparam(char *s)
     if ((pm = (Param) (paramtab == realparamtab ?
 		       /* getnode2() to avoid autoloading */
 		       paramtab->getnode2(paramtab, s) :
-		       paramtab->getnode(paramtab, s))))
+		       paramtab->getnode(paramtab, s))) &&
+	!(pm->node.flags & PM_NAMEREF))
 	unsetparam_pm(pm, 0, 1);
     unqueue_signals();
 }
@@ -5783,7 +5842,8 @@ static const struct paramtypes pmtypes[] = {
     { PM_TAGGED, "tagged", 't', 0},
     { PM_EXPORTED, "exported", 'x', 0},
     { PM_UNIQUE, "unique", 'U', 0},
-    { PM_TIED, "tied", 'T', 0}
+    { PM_TIED, "tied", 'T', 0},
+    { PM_NAMEREF, "namref", 'n', 0}
 };
 
 #define PMTYPES_SIZE ((int)(sizeof(pmtypes)/sizeof(struct paramtypes)))
@@ -6036,4 +6096,124 @@ printparamnode(HashNode hn, int printflags)
 	putchar(' ');
     else if (!(printflags & PRINT_KV_PAIR))
 	putchar('\n');
+}
+
+/**/
+mod_export HashNode
+resolve_nameref(Param pm, const Asgment stop)
+{
+    HashNode hn = (HashNode)pm;
+    const char *seek = stop ? stop->value.scalar : NULL;
+
+    if (pm && (pm->node.flags & PM_NAMEREF)) {
+	if (pm && (pm->node.flags & (PM_UNSET|PM_TAGGED))) {
+	    /* Semaphore with createparam() */
+	    pm->node.flags &= ~PM_UNSET;
+	    /* See V10private.ztst end is in scope but private:
+	    if (pm->node.flags & PM_SPECIAL)
+		return NULL;
+	    */
+	    return (HashNode) pm;
+	} else if (pm->u.str) {
+	    if ((pm->node.flags & PM_TAGGED) ||
+		(stop && strcmp(pm->u.str, stop->name) == 0)) {
+		/* zwarnnam(pm->u.str, "invalid self reference"); */
+		return stop ? (HashNode)pm : NULL;
+	    }
+	    if (*(pm->u.str))
+		seek = pm->u.str;
+	}
+    }
+    else if (pm && !(stop && (stop->flags & PM_NAMEREF)))
+	return (HashNode)pm;
+    if (seek) {
+	queue_signals();
+	/* pm->width is the offset of any subscript */
+	if (pm && (pm->node.flags & PM_NAMEREF) && pm->width) {
+	    if (stop) {
+		if (stop->flags & PM_NAMEREF)
+		    hn = (HashNode)pm;
+		else
+		    hn = NULL;
+	    } else {
+		/* this has to be the end of any chain */
+		hn = (HashNode)pm;	/* see fetchvalue() */
+	    }
+	} else if ((hn = gethashnode2(realparamtab, seek))) {
+	    if (pm) {
+		if (!(stop && (stop->flags & (PM_LOCAL))))
+		    hn = (HashNode)upscope((Param)hn,
+					   ((pm->node.flags & PM_NAMEREF) ?
+					    pm->base : ((Param)hn)->level));
+		/* user can't tag a nameref, safe for loop detection */
+		pm->node.flags |= PM_TAGGED;
+	    }
+	    if (hn) {
+		if (hn->flags & PM_AUTOLOAD)
+		    hn = getparamnode(realparamtab, seek);
+		if (!(hn->flags & PM_UNSET))
+		    hn = resolve_nameref((Param)hn, stop);
+	    }
+	    if (pm)
+		pm->node.flags &= ~PM_TAGGED;
+	} else if (stop && (stop->flags & PM_NAMEREF))
+	    hn = (HashNode)pm;
+	unqueue_signals();
+    }
+
+    return hn;
+}
+
+/**/
+static void
+setscope(Param pm)
+{
+    if (pm->node.flags & PM_NAMEREF) {
+	Param basepm;
+	char *t = pm->u.str ? itype_end(pm->u.str, IIDENT, 0) : NULL;
+
+	/* Temporarily change nameref to array parameter itself */
+	if (t && *t == '[')
+	    *t = 0;
+	else
+	    t = 0;
+	basepm = (Param)resolve_nameref(pm, NULL);
+	if (t) {
+	    pm->width = t - pm->u.str;
+	    *t = '[';
+	}
+	if (basepm)
+	    pm->base = ((basepm->node.flags & PM_NAMEREF) ?
+			basepm->base : basepm->level);
+    }
+}
+
+/**/
+mod_export Param
+upscope(Param pm, int reflevel)
+{
+    Param up = pm->old;
+    while (pm && up && up->level >= reflevel) {
+	pm = up;
+	if (up)
+	    up = up->old;
+    }
+    return pm;
+}
+
+/**/
+mod_export int
+valid_refname(char *val)
+{
+    char *t = itype_end(val, IIDENT, 0);
+
+    if (*t != 0) {
+	if (*t == '[') {
+	    tokenize(t = dupstring(t+1));
+	    t = parse_subscript(t, 0, ']');
+	} else {
+	    t = NULL;
+	}
+    }
+    return !!t;
 }

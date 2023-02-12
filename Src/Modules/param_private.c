@@ -512,9 +512,16 @@ static GetNodeFunc getparamnode;
 static HashNode
 getprivatenode(HashTable ht, const char *nam)
 {
-    HashNode hn = getparamnode(ht, nam);
+    /* getparamnode() would follow namerefs, we must not do that here */
+    HashNode hn = gethashnode2(ht, nam);
     Param pm = (Param) hn;
 
+    /* autoload has precedence over nameref, so getparamnode() */
+    if (pm && (pm->node.flags & PM_AUTOLOAD)) {
+	hn = getparamnode(ht, nam);
+	pm = (Param) hn;
+	/* how would an autoloaded private behave?  return here? */
+    }
     while (!fakelevel && pm && locallevel > pm->level && is_private(pm)) {
 	if (!(pm->node.flags & PM_UNSET)) {
 	    /*
@@ -533,6 +540,12 @@ getprivatenode(HashTable ht, const char *nam)
 	}
 	pm = pm->old;
     }
+
+    /* resolve nameref after skipping private parameters */
+    if (pm && (pm->node.flags & PM_NAMEREF) &&
+	(pm->u.str || (pm->node.flags & PM_UNSET)))
+	pm = (Param) resolve_nameref(pm, NULL);
+
     return (HashNode)pm;
 }
 
@@ -571,7 +584,7 @@ printprivatenode(HashNode hn, int printflags)
 
 static struct builtin bintab[] = {
     /* Copied from BUILTIN("local"), "P" added */
-    BUILTIN("private", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_private, 0, -1, 0, "AE:%F:%HL:%PR:%TUZ:%ahi:%lmprtux", "P")
+    BUILTIN("private", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_private, 0, -1, 0, "AE:%F:%HL:%PR:%TUZ:%ahi:%lnmprtux", "P")
 };
 
 static struct features module_features = {

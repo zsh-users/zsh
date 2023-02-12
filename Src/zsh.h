@@ -1852,8 +1852,9 @@ struct param {
 	GsuHash h;
     } gsu;
 
-    int base;			/* output base or floating point prec    */
-    int width;			/* field width                           */
+    int base;			/* output base or floating point prec or */
+ 				/* for namerefs, locallevel of reference */
+    int width;			/* field width or nameref subscript idx  */
     char *env;			/* location in environment, if exported  */
     char *ename;		/* name of corresponding environment var */
     Param old;			/* old struct for use with local         */
@@ -1932,9 +1933,10 @@ struct tieddata {
 				 */
 #define PM_HASHELEM     (1<<28) /* is a hash-element */
 #define PM_NAMEDDIR     (1<<29) /* has a corresponding nameddirtab entry    */
+#define PM_NAMEREF      (1<<30) /* pointer to a different parameter         */
 
 /* The option string corresponds to the first of the variables above */
-#define TYPESET_OPTSTR "aiEFALRZlurtxUhHTkz"
+#define TYPESET_OPTSTR "aiEFALRZlurtxUhHT"
 
 /* These typeset options take an optional numeric argument */
 #define TYPESET_OPTNUM "LRZiEF"

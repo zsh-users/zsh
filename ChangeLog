@@ -1,5 +1,9 @@
 2023-02-12  Bart Schaefer  <schaefer@zsh.org>
 
+	* 51360: Src/Modules/param_private.c, Src/Modules/parameter.c,
+	Src/builtin.c, Src/params.c, Src/subst.c, Src/zsh.h: Initial
+	implementation of named references.
+
 	* 51404: Src/jobs.c: Nullify filelist after deleting (fix segfault)
 
 2023-02-09  Oliver Kiddle  <opk@zsh.org>
