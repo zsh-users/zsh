@@ -1581,7 +1581,10 @@ is interpreted at the time tt(${)var(pname)tt(}) is expanded.  Any
 form of subscript is allowed, including those that select individual
 elements, substrings of scalar strings, or multiple elements as with
 array slices or the `tt((i))', `tt((I))', `tt((r))', `tt((R))' and
-`tt((w))' subscript flags.
+`tt((w))' subscript flags.  However, the subscript is evaluated with
+the tt(NO_EXEC) option in effect, so command substitution and other
+similar constructs produce no output, although are not syntactically
+excluded.
 
 When var(rname) is an array (but not an array element or slice), the
 named reference may also be used in substitutions requiring an

@@ -25,6 +25,12 @@
 0:assign nameref placeholder
 >ptr=var
 
+ typeset ptr=var
+ typeset -n ptr
+ typeset -n
+0:convert scalar to nameref
+>ptr=var
+
  typeset -n ptr=var
  typeset +n ptr
  typeset -p ptr
@@ -45,6 +51,11 @@ F:Other type changes are fatal errors, should this also be?
 0:change type of referenced var
 >typeset -n ptr=var
 >typeset -t var
+
+ typeset -n ptr=var[2]
+ typeset -t ptr
+1:change type of referenced array element
+*?*var\[2\]: can't change type via subscript reference
 
  typeset -n ptr[1]=var
 1:illegal nameref name
@@ -93,6 +104,14 @@ F:Other type changes are fatal errors, should this also be?
 
  typeset -n ptr=var
  typeset var=value
+ unset -n ptr
+ typeset -p var ptr
+0:unset of the nameref itself
+F:If earlier tests change, might get "no such variable" here
+>typeset var=value
+
+ typeset -n ptr=var
+ typeset var=value
  typeset -p ptr var
  typeset ptr=newvalue
  typeset -p ptr var
@@ -105,11 +124,11 @@ F:Other type changes are fatal errors, should this also be?
  typeset -n ptr=var
  ptr=value
  typeset -p var ptr
- unset var	# for next test
 0:assign new scalar via nameref
 >typeset -g var=value
 >typeset -n ptr=var
 
+ unset var
  typeset -n ptr=var
  typeset var=(val1 val2)
  typeset -p ptr var
@@ -132,11 +151,11 @@ F:unexpected side-effects of previous tests
  typeset -n ptr=var
  ptr=(val1 val2)
  typeset -p var ptr
- unset var	# for next test
 0:assign new array via nameref
 >typeset -g -a var=( val1 val2 )
 >typeset -n ptr=var
 
+ unset var
  typeset -n ptr2=var
  typeset -n ptr1=ptr2
  typeset var=value
@@ -178,12 +197,12 @@ F:unexpected side-effects of previous tests
  typeset -n ptr1=ptr2
  typeset ptr1=newvalue
  typeset -p ptr1 ptr2 var
- unset var	# for next test
 0:typeset new parameter indirectly
 >typeset -n ptr1=ptr2
 >typeset -n ptr2=var
 >typeset var=newvalue
 
+ unset var
  typeset -n ptr2=var
  typeset -n ptr1=ptr2
  typeset var=value
@@ -219,19 +238,18 @@ F:unexpected side-effects of previous tests
  typeset -n ptr1=ptr2
  typeset ptr1=(val1 val2)
  typeset -p ptr1 ptr2 var
- unset var	# for next test
 0:typeset new array indirectly
 >typeset -n ptr1=ptr2
 >typeset -n ptr2=var
 >typeset -a var=( val1 val2 )
 
- typeset -p ptr1 ptr2 var
+ typeset -p ptr1 ptr2
 1:check state of paramtab FOUR
 F:unexpected side-effects of previous tests
 *?*no such variable: ptr1
 *?*no such variable: ptr2
-*?*no such variable: var
 
+ unset var
  typeset -n ptr2=var
  typeset -n ptr1=ptr2
  ptr1=(val1 val2)
@@ -246,34 +264,59 @@ F:unexpected side-effects of previous tests
 1:direct nameref loop not allowed
 *?*invalid self reference
 
+ unset var
+ typeset -gn ptr1=var
+ typeset -p ptr1
+0:global reference to unset var
+>typeset -g -n ptr1=var
+
+ unset -n ptr1
+ typeset -gn ptr1
+ typeset -p ptr1
+ ptr1=ptr1
+1:global direct reference
+>typeset -g -n ptr1
+*?*invalid self reference
+
  typeset -n ptr1=ptr2
  typeset -n ptr2=ptr3
  typeset -n ptr3=ptr1
 1:indirect nameref loop not allowed
 *?*invalid self reference
 
+ typeset -n ptr1 ptr2
+ ptr1=ptr2
+ ptr2=ptr1
+1:looping assignment not allowed
+*?*invalid self reference
+
+ unset -n ptr2
  typeset -n ptr2='path[2]'
  print -r -- $ptr2
 0q:nameref to array element, no braces
 >${path[2]}
 
+ unset -n ptr2
  typeset -n ptr2='path[2]'
  print -r -- ${ptr2}
 0q:nameref to array element, with braces
 >${path[2]}
 
+ unset -n ptr1
  typeset -A hash=(x MISS y HIT)
  typeset -n ptr1='hash[y]'
  print -r -- $ptr1
 0:nameref to hash element, no braces
 >HIT
 
+ unset -n ptr1
  typeset -A hash=(x MISS y HIT)
  typeset -n ptr1='hash[y]'
  print -r -- ${ptr1}
 0:nameref to hash element, with braces
 >HIT
 
+ unset -n ptr2
  typeset -a ary=(1 2)
  typeset -n ptr2='ary[2]'
  ptr2=TWO
@@ -281,6 +324,7 @@ F:unexpected side-effects of previous tests
 0:assign array element by nameref
 >typeset -a ary=( 1 TWO )
 
+ unset -n ptr2
  typeset -n ptr2='ary[2]'
  ptr2=TWO
  typeset -p ary
@@ -288,6 +332,7 @@ F:unexpected side-effects of previous tests
 F:ksh93 does not implement this either
 >typeset -a ary=( '' TWO )
 
+ unset -n ptr1
  typeset -A hash=(x MISS y MISS)
  typeset -n ptr1='hash[y]'
  ptr1=HIT
@@ -295,6 +340,7 @@ F:ksh93 does not implement this either
 0:assign to hash element by nameref
 >typeset -A hash=( [x]=MISS [y]=HIT )
 
+ unset -n ptr1
  typeset -A hash
  typeset -n ptr1='hash[y]'
  ptr1=HIT
@@ -303,10 +349,13 @@ F:ksh93 does not implement this either
 F:ksh93 does not implement this either
 >typeset -A hash=( [y]=HIT )
 
+ unset -n ptr1
  typeset -n ptr1='not good'
 1:invalid nameref
 *?*invalid variable name: not good
 
+ unset -n ptr1
+ unset hash
  typeset -A hash
  typeset -n ptr1='hash[y]'
  print ${ptr1::=HIT}
@@ -316,24 +365,25 @@ F:ksh93 does not implement this either
 >typeset -n ptr1='hash[y]'
 >typeset -A hash=( [y]=HIT )
 
+ unset -n ptr
+ unset gval
  typeset -n ptr=gval
  gval=global
  () { local gval=local; print $ptr; typeset -p ptr gval }
- unset gval	# for next test
 0:up-reference part 1
 >global
 >typeset -g -n ptr=gval
 >typeset gval=local
 
- typeset -p ptr ptr1 ptr2 val gval
+ typeset -p ptr ptr1 ptr2 val
 1:check state of paramtab FIVE
 F:unexpected side-effects of previous tests
 *?*no such variable: ptr
 *?*no such variable: ptr1
 *?*no such variable: ptr2
 *?*no such variable: val
-*?*no such variable: gval
 
+ unset gval
  typeset -n ptr1=gval
  typeset gval
  () { typeset gval=local; ptr1=global }
@@ -508,5 +558,107 @@ F:Same test, should part 5 output look like this?
 0:named references with (P), array element to array element
 >bry[2]
 >ipsum
+
+ unset -n ref
+ unset var
+ typeset -n ref=var
+ typeset var=GLOBAL
+ () {
+  typeset -n ref=$1
+  print -r $ref
+  ref=RESET
+  typeset -p ref var
+ } ref
+ typeset -p ref var
+0:local reference points to same-name global reference, part 1
+>GLOBAL
+>typeset -n ref=ref
+>typeset -g var=RESET
+>typeset -n ref=var
+>typeset var=RESET
+
+ unset -n ref
+ unset var
+ typeset -n ref=var
+ () {
+  typeset -n ref=$1
+  print -r $ref
+  ref=RESET
+  typeset -p ref var
+ } ref
+ typeset -p ref var
+0:local reference points to same-name global reference, part 2
+>
+>typeset -n ref=ref
+>typeset -g var=RESET
+>typeset -n ref=var
+>typeset -g var=RESET
+
+ unset -n ref
+ unset one
+ typeset -n ref
+ typeset one=ONE
+ for ref in one ref two; do print -r $ref; done
+1:for-loop variable is a reference, part 1
+>ONE
+*?*ref: invalid self reference
+
+ unset -n ref
+ unset one
+ typeset -n ref
+ () {
+  typeset one=ONE
+  for ref in one ref two; do print -r ${(t)ref}; done
+ }
+1:for-loop variable is a reference, part 2
+>scalar-local
+*?*ref: invalid self reference
+
+ unset -n ref
+ unset one var
+ typeset -n ref=var
+ () {
+  typeset one=ONE
+  typeset -n ref=ref
+  for ref in one ref two; do
+   typeset -p ref
+   print -r $ref
+  done
+  typeset -p ref
+ }
+ typeset -p ref
+0:for-loop variable is a reference, part 3
+>typeset -n ref=one
+>ONE
+>typeset -n ref=ref
+>
+>typeset -n ref=two
+>
+>typeset -n ref=two
+>typeset -n ref=var
+
+ unset -n ref
+ unset one
+ typeset -n ref
+ () {
+  setopt localoptions warn_nested_var
+  typeset one=ONE
+  for ref in one two; do print -r ${(t)ref}; done
+  typeset -n ref
+  for ref in one two; do print -r ${(t)ref}; done
+ }
+0:for-loop variable is a reference, part 4, warnings
+>scalar-local
+>
+>scalar-local
+>
+*?*ref: global reference to local variable: one
+
+ typeset -n ptr='ary[$(echo 2)]'
+ typeset -a ary=(one two three)
+ print $ptr
+1:attempt deferred command substitution in subscript
+F:runs in `setopt noexec` so $(...) returns nothing
+*?*bad math expression: empty string
 
 %clean

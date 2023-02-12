@@ -13,6 +13,40 @@ Functions are executed like commands with the arguments
 passed as positional parameters.
 (See noderef(Command Execution).)
 
+Parameters declared by any of the `tt(typeset)' family of commands
+during the execution of a function become em(local) to the function
+unless the `tt(-g)' option is used.  This is the em(scope) of the
+parameter, which extends dynamically to any other functions called by
+the declaring function.  In most cases, local parameters take the
+place of any other parameter having the same name that was assigned or
+declared in an earlier function scope.
+(See noderef(Local Parameters).)
+
+A named parameter declared with the `tt(-n)' option to any of the
+`tt(typeset)' commands becomes a reference to a parameter in scope at
+the time of assignment to the named reference, which may be at a
+different call level than the declaring function.  For this reason,
+it is good practice to declare a named reference as soon as the
+referent parameter is in scope, and as early as possible in the
+function if the reference is to a parameter in a calling scope.
+
+A typical use of named references is to pass the name
+of the referent as a positional parameter.  For example,
+ifzman()
+example(pop+LPAR()RPAR() {
+  local -n ref=$1
+  local last=$ref[$#ref]
+  ref[$#ref]=LPAR()RPAR()
+  print -r -- $last
+}
+array=LPAR() a list of five values RPAR()
+pop array)
+
+prints the word `tt(values)' and shortens `tt($array)' to
+`tt(LPAR() a list of five RPAR())'.  There are no local parameters in
+tt(pop) at the time `tt(ref=$1)' is assigned, so `tt(ref)' becomes a
+reference to `tt(array)' in the caller.
+
 Functions execute in the same process as the caller and
 share all files
 and present working directory with the

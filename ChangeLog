@@ -1,5 +1,9 @@
 2023-02-12  Bart Schaefer  <schaefer@zsh.org>
 
+	* 51403: Doc/Zsh/builtins.yo, Doc/Zsh/expn.yo, Doc/Zsh/func.yo,
+	Doc/Zsh/grammar.yo, Doc/Zsh/params.yo, Test/K01nameref.ztst:
+	Tests and documentation for 51402, clean up some other tests.
+
 	* 51402: Src/builtin.c, Src/loop.c, Src/params.c, Src/zsh.h:
 	Add ksh/bash features (unset -n, for ref), readonly refs,
 	better error checking and messages, code injection safety,
