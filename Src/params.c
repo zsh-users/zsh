@@ -997,7 +997,7 @@ createparam(char *name, int flags)
 			 paramtab->getnode(paramtab, name));
 
 	if (oldpm && (oldpm->node.flags & PM_NAMEREF) &&
-	    !(flags & PM_NAMEREF)) {
+	    !(flags & PM_NAMEREF) && (oldpm = upscope(oldpm, oldpm->base))) {
 	    Param lastpm;
 	    struct asgment stop;
 	    stop.flags = PM_NAMEREF | (flags & PM_LOCAL);
@@ -1467,10 +1467,14 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
     if (ishash && (keymatch || !rev))
 	remnulargs(s);
     if (needtok) {
+	char exe = opts[EXECOPT];
 	s = dupstring(s);
 	if (parsestr(&s))
 	    return 0;
+	if (flags & SCANPM_NOEXEC)
+	    opts[EXECOPT] = 0;
 	singsub(&s);
+	opts[EXECOPT] = exe;
     } else if (rev)
 	remnulargs(s);	/* This is probably always a no-op, but ... */
     if (!rev) {
@@ -2153,9 +2157,12 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 		((pm->node.flags & PM_UNSET) &&
 		!(pm->node.flags & PM_DECLARED)))
 		return NULL;
-	    if (ss)
+	    if (ss) {
+		flags |= SCANPM_NOEXEC;
 		*ss = sav;
-	    s = dyncat(ss,*pptr);
+		s = dyncat(ss,*pptr);
+	    } else
+		s = *pptr;
 	}
 	if (PM_TYPE(pm->node.flags) & (PM_ARRAY|PM_HASHED)) {
 	    /* Overload v->isarr as the flag bits for hashed arrays. */
@@ -5782,7 +5789,8 @@ scanendscope(HashNode hn, UNUSED(int flags))
 		export_param(pm);
 	} else
 	    unsetparam_pm(pm, 0, 0);
-    }
+    } else if ((pm->node.flags & PM_NAMEREF) && pm->base > pm->level)
+	pm->base = locallevel;
 }
 
 
@@ -6109,10 +6117,10 @@ resolve_nameref(Param pm, const Asgment stop)
 	if (pm && (pm->node.flags & (PM_UNSET|PM_TAGGED))) {
 	    /* Semaphore with createparam() */
 	    pm->node.flags &= ~PM_UNSET;
-	    /* See V10private.ztst end is in scope but private:
-	    if (pm->node.flags & PM_SPECIAL)
+	    if (pm->node.flags & PM_NEWREF)	/* See setloopvar() */
 		return NULL;
-	    */
+	    if (pm->u.str && *(pm->u.str) && (pm->node.flags & PM_TAGGED))
+		pm->node.flags |= PM_SELFREF;	/* See setscope() */
 	    return (HashNode) pm;
 	} else if (pm->u.str) {
 	    if ((pm->node.flags & PM_TAGGED) ||
@@ -6157,11 +6165,27 @@ resolve_nameref(Param pm, const Asgment stop)
 	    if (pm)
 		pm->node.flags &= ~PM_TAGGED;
 	} else if (stop && (stop->flags & PM_NAMEREF))
-	    hn = (HashNode)pm;
+	    hn = (pm && (pm->node.flags & PM_NEWREF)) ? NULL : (HashNode)pm;
 	unqueue_signals();
     }
 
     return hn;
+}
+
+/**/
+mod_export void
+setloopvar(char *name, char *value)
+{
+  Param pm = (Param) gethashnode2(realparamtab, name);
+
+  if (pm && (pm->node.flags & PM_NAMEREF)) {
+      pm->base = pm->width = 0;
+      pm->u.str = ztrdup(value);
+      pm->node.flags |= PM_NEWREF;
+      setscope(pm);
+      pm->node.flags &= ~PM_NEWREF;
+  } else
+      setsparam(name, value);
 }
 
 /**/
@@ -6188,9 +6212,50 @@ setscope(Param pm)
 	    pm->width = t - pm->u.str;
 	    *t = '[';
 	}
-	if (basepm)
-	    pm->base = ((basepm->node.flags & PM_NAMEREF) ?
-			basepm->base : basepm->level);
+	if (basepm) {
+	    if (basepm->node.flags & PM_NAMEREF) {
+		if (pm == basepm) {
+		    if (pm->node.flags & PM_SELFREF) {
+			/* Loop signalled by resolve_nameref() */
+			if (upscope(pm, pm->base) == pm) {
+			    zerr("%s: invalid self reference", pm->u.str);
+			    unsetparam_pm(pm, 0, 1);
+			    return;
+			}
+			pm->node.flags &= ~PM_SELFREF;
+		    } else if (pm->base == pm->level) {
+			if (pm->u.str && *(pm->u.str) &&
+			    strcmp(pm->node.nam, pm->u.str) == 0) {
+			    zerr("%s: invalid self reference", pm->u.str);
+			    unsetparam_pm(pm, 0, 1);
+			    return;
+			}
+		    }
+		} else if (basepm->u.str) {
+		    if (basepm->base <= basepm->level &&
+			strcmp(pm->node.nam, basepm->u.str) == 0) {
+			zerr("%s: invalid self reference", pm->u.str);
+			unsetparam_pm(pm, 0, 1);
+			return;
+		    }
+		}
+	    } else
+		pm->base = basepm->level;
+	}
+	if (pm->base > pm->level) {
+	    if (EMULATION(EMULATE_KSH)) {
+		zerr("%s: global reference cannot refer to local variable",
+		      pm->node.nam);
+		unsetparam_pm(pm, 0, 1);
+	    } else if (isset(WARNNESTEDVAR))
+		zwarn("%s: global reference to local variable: %s",
+		      pm->node.nam, pm->u.str);
+	}
+	if (pm->u.str && upscope(pm, pm->base) == pm &&
+	    strcmp(pm->node.nam, pm->u.str) == 0) {
+	    zerr("%s: invalid self reference", pm->u.str);
+	    unsetparam_pm(pm, 0, 1);
+	}
     }
 }
 
@@ -6217,7 +6282,10 @@ valid_refname(char *val)
 	if (*t == '[') {
 	    tokenize(t = dupstring(t+1));
 	    t = parse_subscript(t, 0, ']');
-	} else {
+	} else if (t[1] || !(*t == '!' || *t == '?' ||
+			     *t == '$' || *t == '-' ||
+			     *t == '0' || *t == '_')) {
+	    /* Skipping * @ # because of doshfunc() implementation */
 	    t = NULL;
 	}
     }

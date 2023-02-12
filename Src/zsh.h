@@ -1935,6 +1935,9 @@ struct tieddata {
 #define PM_NAMEDDIR     (1<<29) /* has a corresponding nameddirtab entry    */
 #define PM_NAMEREF      (1<<30) /* pointer to a different parameter         */
 
+#define PM_SELFREF	PM_UNIQUE	/* Overload when namerefs resolved  */
+#define PM_NEWREF	PM_SINGLE	/* Overload in for-loop namerefs    */
+
 /* The option string corresponds to the first of the variables above */
 #define TYPESET_OPTSTR "aiEFALRZlurtxUhHT"
 
@@ -1959,6 +1962,7 @@ struct tieddata {
 				  * elements
 				  */
 #define SCANPM_CHECKING   (1<<10) /* Check if set, no need to create */
+#define SCANPM_NOEXEC     (1<<11) /* No command substitutions, etc. */
 /* "$foo[@]"-style substitution
  * Only sign bit is significant
  */

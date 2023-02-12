@@ -1,5 +1,10 @@
 2023-02-12  Bart Schaefer  <schaefer@zsh.org>
 
+	* 51402: Src/builtin.c, Src/loop.c, Src/params.c, Src/zsh.h:
+	Add ksh/bash features (unset -n, for ref), readonly refs,
+	better error checking and messages, code injection safety,
+	allow references to $! $? $$ $- $0 $_
+
 	* 51375: Doc/Zsh/builtins.yo, Doc/Zsh/expn.yo, Doc/Zsh/params.yo,
 	Doc/Zsh/mod_parameter.yo: Clarify, fix typos, add indexing.
 

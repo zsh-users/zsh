@@ -53,7 +53,7 @@ execfor(Estate state, int do_exec)
     wordcode code = state->pc[-1];
     int iscond = (WC_FOR_TYPE(code) == WC_FOR_COND), ctok = 0, atok = 0;
     int last = 0;
-    char *name, *str, *cond = NULL, *advance = NULL;
+    char *str, *cond = NULL, *advance = NULL;
     zlong val = 0;
     LinkList vars = NULL, args = NULL;
     int old_simple_pline = simple_pline;
@@ -151,7 +151,7 @@ execfor(Estate state, int do_exec)
 	    int count = 0;
 	    for (node = firstnode(vars); node; incnode(node))
 	    {
-		name = (char *)getdata(node);
+		char *name = (char *)getdata(node);
 		if (!args || !(str = (char *) ugetnode(args)))
 		{
 		    if (count) { 
@@ -165,7 +165,7 @@ execfor(Estate state, int do_exec)
 		    fprintf(xtrerr, "%s=%s\n", name, str);
 		    fflush(xtrerr);
 		}
-		setsparam(name, ztrdup(str));
+		setloopvar(name, ztrdup(str));
 		count++;
 	    }
 	    if (!count)

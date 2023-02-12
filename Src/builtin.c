@@ -126,7 +126,7 @@ static struct builtin builtins[] =
     BUILTIN("unalias", 0, bin_unhash, 0, -1, BIN_UNALIAS, "ams", NULL),
     BUILTIN("unfunction", 0, bin_unhash, 1, -1, BIN_UNFUNCTION, "m", "f"),
     BUILTIN("unhash", 0, bin_unhash, 1, -1, BIN_UNHASH, "adfms", NULL),
-    BUILTIN("unset", BINF_PSPECIAL, bin_unset, 1, -1, BIN_UNSET, "fmv", NULL),
+    BUILTIN("unset", BINF_PSPECIAL, bin_unset, 1, -1, BIN_UNSET, "fmvn", NULL),
     BUILTIN("unsetopt", 0, bin_setopt, 0, -1, BIN_UNSETOPT, NULL, NULL),
     BUILTIN("wait", 0, bin_fg, 0, -1, BIN_WAIT, NULL, NULL),
     BUILTIN("whence", 0, bin_whence, 0, -1, 0, "acmpvfsSwx:", NULL),
@@ -2034,11 +2034,16 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	if (!(off & PM_NAMEREF))
 	    pm = (Param)resolve_nameref(pm, NULL);
 	if (pm && (pm->node.flags & PM_NAMEREF) &&
-	    (on & ~(PM_NAMEREF|PM_LOCAL))) {
+	    (on & ~(PM_NAMEREF|PM_LOCAL|PM_READONLY))) {
 	    /* Changing type of PM_SPECIAL|PM_AUTOLOAD is a fatal error.  *
 	     * Should this be a fatal error as well, rather than warning? */
-	    zwarnnam(cname, "%s: can't change type of a named reference",
-		     pname);
+	    if (pm->width)
+		zwarnnam(cname,
+			 "%s: can't change type via subscript reference",
+			 pm->u.str);
+	    else
+		zwarnnam(cname, "%s: can't change type of a named reference",
+			 pname);
 	    return NULL;
 	}
     }
@@ -2221,6 +2226,11 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	}
 	if ((pm->node.flags & PM_RESTRICTED) && isset(RESTRICTED)) {
 	    zerrnam(cname, "%s: restricted", pname);
+	    return pm;
+	}
+	if ((pm->node.flags & PM_READONLY) &&
+	    (pm->node.flags & PM_NAMEREF & off)) {
+	    zerrnam(cname, "%s: read-only reference", pname);
 	    return pm;
 	}
 	if ((on & PM_UNIQUE) && !(pm->node.flags & PM_READONLY & ~off)) {
@@ -2659,7 +2669,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	    off |= bit;
     }
     if (OPT_MINUS(ops,'n')) {
-	if (on|off) {
+	if ((on & ~PM_READONLY)|off) {
 	    zwarnnam(name, "no other attributes allowed with -n");
 	    return 1;
 	}
@@ -3051,9 +3061,8 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 
 	if (on & PM_NAMEREF) {
 	    if (asg->value.scalar &&
-		(strcmp(asg->name, asg->value.scalar) == 0 ||
-		 ((pm = (Param)resolve_nameref((Param)hn, asg)) &&
-		  (pm->node.flags & PM_NAMEREF)))) {
+		((pm = (Param)resolve_nameref((Param)hn, asg)) &&
+		 (pm->node.flags & PM_NAMEREF))) {
 		if (pm->node.flags & PM_SPECIAL)
 		    zwarnnam(name, "%s: invalid reference", pm->node.nam);
 		else
@@ -3063,8 +3072,12 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	    }
 	    if (hn) {
 		/* namerefs always start over fresh */
-		if (((Param)hn)->level >= locallevel)
+		if (((Param)hn)->level >= locallevel) {
+		    Param oldpm = (Param)hn;
+		    if (!asg->value.scalar && oldpm->u.str)
+			asg->value.scalar = dupstring(oldpm->u.str);
 		    unsetparam_pm((Param)hn, 0, 1);
+		}
 		hn = NULL;
 	    }
 	}
@@ -3762,7 +3775,11 @@ bin_unset(char *name, char **argv, Options ops, int func)
 			if ((!(pm->node.flags & PM_RESTRICTED) ||
 			     unset(RESTRICTED)) &&
 			    pattry(pprog, pm->node.nam)) {
-			    unsetparam_pm(pm, 0, 1);
+			    if (!OPT_ISSET(ops,'n') &&
+				(pm->node.flags & PM_NAMEREF) && pm->u.str)
+				unsetparam(pm->u.str);
+			    else
+				unsetparam_pm(pm, 0, 1);
 			    match++;
 			}
 		    }
@@ -3814,6 +3831,11 @@ bin_unset(char *name, char **argv, Options ops, int func)
 	    zerrnam(name, "%s: restricted", pm->node.nam);
 	    returnval = 1;
 	} else if (ss) {
+	    if ((pm->node.flags & PM_NAMEREF) &&
+		(!(pm = (Param)resolve_nameref(pm, NULL)) || pm->width)) {
+		/* warning? */
+		continue;
+	    }
 	    if (PM_TYPE(pm->node.flags) == PM_HASHED) {
 		HashTable tht = paramtab;
 		if ((paramtab = pm->gsu.h->getfn(pm)))
@@ -3852,8 +3874,11 @@ bin_unset(char *name, char **argv, Options ops, int func)
 		returnval = 1;
 	    }
 	} else {
-	    if ((pm = (Param)resolve_nameref(pm, NULL)) &&
-		unsetparam_pm(pm, 0, 1))
+	    if (!OPT_ISSET(ops,'n')) {
+		if (!(pm = (Param)resolve_nameref(pm, NULL)))
+		    continue;
+	    }
+	    if (unsetparam_pm(pm, 0, 1))
 		returnval = 1;
 	}
 	if (ss)
