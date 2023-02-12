@@ -1592,8 +1592,8 @@ tt(${)var(name)tt(:|)var(pname)tt(}))
 
 Expansions of the form `tt(${LPAR()t)tt(RPAR())var(pname)tt(})' expand
 the type information of var(rname), unless var(rname) is empty, in which
-case `tt(nameref)' is expanded, or when no variable var(rname) exists,
-in which case the expansion is empty.
+case the expansion is `tt(nameref)', or when no variable var(rname)
+exists, in which case the expansion is empty.
 
 See also ifzman(zmanref(zshparam))ifnzman(noderef(Parameters)).
 

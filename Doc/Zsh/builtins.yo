@@ -2041,15 +2041,21 @@ cindex(named reference)
 cindex(reference, named)
 The flag tt(-n) creates a em(named reference) to another parameter.
 The second parameter need not exist at the time the reference is
-created.  No other attribute flags may be used in conjunction with
-tt(-n).  The var(name) assigned-to may not be an array element nor use
+created.  No attributes except tt(-g) may be used in conjunction with
+tt(-n).  The var(name) so created may not be an array element nor use
 a subscript, but the var(value) assigned may be any valid parameter
-name syntax, even a subscripted array element (incuding an associative
+name syntax, even a subscripted array element (including an associative
 array element) or an array slice, which is evaluated when the named
 reference is expanded.
 See ifzman(zmanref(zshexpn))ifnzman(noderef(Parameter Expansion)) and
 ifzman(zmanref(zshparam))ifnzman(noderef(Parameters)) for details of the
 behavior of named references.
+
+Local function scoping rules for `tt(typeset)' do apply with `tt(-n)',
+so a declaration within a function persists only until the end of the
+function unless `tt(-g -n)' is specified, and any local parameter (of
+any type) with the same var(name) supplants a named reference from a
+surrounding scope.
 
 If no attribute flags are given, and either no var(name) arguments are
 present or the flag tt(+m) is used, then each parameter name printed is

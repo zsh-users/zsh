@@ -85,6 +85,8 @@ menu(Parameters Set By The Shell)
 menu(Parameters Used By The Shell)
 endmenu()
 texinode(Array Parameters)(Positional Parameters)()(Parameters)
+cindex(array parameters)
+cindex(parameters, array)
 sect(Array Parameters)
 To assign an array value, write one of:
 findex(set, use of)
@@ -567,6 +569,8 @@ entire second parameter concatenated with the filename generation pattern
 `tt([3,5])'.
 
 texinode(Positional Parameters)(Local Parameters)(Array Parameters)(Parameters)
+cindex(positional parameters)
+cindex(parameters, positional)
 sect(Positional Parameters)
 The positional parameters provide access to the command-line arguments
 of a shell function, shell script, or the shell itself; see
@@ -594,6 +598,8 @@ allowed, and has the effect of shifting all the values at positions greater
 than var(n) by as many positions as necessary to accommodate the new values.
 
 texinode(Local Parameters)(Named References)(Positional Parameters)(Parameters)
+cindex(local parameters)
+cindex(parameters, local)
 sect(Local Parameters)
 Shell function executions delimit scopes for shell parameters.
 (Parameters are dynamically scoped.)  The tt(typeset) builtin, and its
@@ -627,9 +633,9 @@ find the programs in tt(/new/directory) inside a function.
 Note that the restriction in older versions of zsh that local parameters
 were never exported has been removed.
 
+texinode(Named References)(Parameters Set By The Shell)(Local Parameters)(Parameters)
 cindex(named references)
 cindex(references, named)
-texinode(Named References)(Parameters Set By The Shell)(Local Parameters)(Parameters)
 sect(Named References)
 Zsh supports two different mechanisms for indirect parameter referencing:
 ifzman()
@@ -641,24 +647,24 @@ tt(print -r -- ${)var(pname)tt(}))
 
 The `tt((P))' flag method is older and should be used when a script
 needs to be backwards-compatible.  This is described fully in
-ifzman(zmanref(zshexpn))ifnzman(noderef(Parameter Expansion)).
+the Parameter Expansion Flags section of
+ifzman(zmanref(zshexpn))ifnzman(noderef(Parameter Expansion)).  Zsh
+versions em(greater than) tt(5.9.0) are required for `tt(typeset -n)'.
+This manual was generated with Zsh tt(version()).
 
 When a em(named reference) is created with `tt(typeset -n)', all uses
 of var(pname) in assignments and expansions instead assign to or
 expand var(rname).  This also applies to `tt(unset )var(pname)' and to
 most subsequent uses of `tt(typeset)' with the exception of
-`tt(typeset +n)', so to remove a named reference it is necessary to
-use:
+`tt(typeset -n)' and `tt(typeset +n)', so to remove a named reference
+it is necessary to use one of:
 ifzman()
-example(tt(typeset +n )var(pname)
-tt(unset )var(pname))
+example(tt(typeset -n )var(pname)
+tt(typeset +n )var(pname))
 
-When `tt(typeset -n )var(pname)tt(=)var(rname)' appears in a given
-(global or function) scope, `tt(${)var(pname)tt(})' refers to
-var(rname) in the scope of the tt(typeset) command.  This differs
-from ksh93 where the scope used is that of var(rname) even if the
-current var(rname) would be found in a surrounding scope.
-em(This is a misfeature.)
+followed by
+ifzman()
+indent(tt(unset )var(pname))
 
 An empty reference such as one of
 ifzman()
@@ -668,9 +674,11 @@ tt(typeset -n )var(pname)tt(=""))
 
 acts as a placeholder.  The first non-empty assignment to var(pname)
 initializes the reference, and subsequently any expansions of, or
-assignments to, var(pname) act on the referenced parameter.
+assignments to, var(pname) act on the referenced parameter.  This
+is explained in the Named References section of
+ifzman(zmanref(zshexpn))ifnzman(noderef(Parameter Expansion)).
 
-texinode(Parameters Set By The Shell)(Parameters Used By The Shell)(Local Parameters)(Parameters)
+texinode(Parameters Set By The Shell)(Parameters Used By The Shell)(Named References)(Parameters)
 sect(Parameters Set By The Shell)
 In the parameter lists that follow, the mark `<S>' indicates that the
 parameter is special.  `<Z>' indicates that the parameter does not exist

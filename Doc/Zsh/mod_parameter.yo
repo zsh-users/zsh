@@ -127,6 +127,14 @@ noderef(Parameter Expansion)
 )\
 . The value may also be `tt(undefined)' indicating a parameter that
 may be autoloaded from a module but has not yet been referenced.
+When the key is the name of a named reference, the value is
+`tt(nameref-)' prepended to the type of the referenced parameter,
+for example
+ifzman()
+example(tt(% typeset -n parms=parameters)
+tt(% print -r ${parameters[parms]})
+tt(nameref-association-readonly-hide-hideval-special))
+
 Setting or unsetting keys in this array is not possible.
 )
 vindex(modules)
