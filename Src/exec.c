@@ -4636,6 +4636,9 @@ getoutput(char *cmd, int qt)
     if (!prog)
 	return NULL;
 
+    if (!isset(EXECOPT))
+	return newlinklist();
+
     if ((s = simple_redir_name(prog, REDIR_READ))) {
 	/* $(< word) */
 	int stream;

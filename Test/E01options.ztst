@@ -416,6 +416,9 @@
 1:NO_EXEC does recognize bad substitution syntax
 *?* bad substitution
 
+  (setopt noexec; : $(<nonexistentfile))
+0:NO_EXEC does not attempt to read files in $(<....)
+
   setopt NO_eval_lineno
   eval 'print $LINENO'
   setopt eval_lineno
