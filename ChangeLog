@@ -1,3 +1,8 @@
+2023-02-14  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 51425: Src/exec.c, Test/E01OPTIONS: $(<...) shouldn't try to
+	open a file with NO_EXEC.
+
 2023-02-13  Bart Schaefer  <schaefer@zsh.org>
 
 	* 51430: Src/Modules/parameter.c, Src/builtin.c, Src/params.c,
