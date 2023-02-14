@@ -108,7 +108,7 @@ getpmparameter(UNUSED(HashTable ht), const char *name)
     if ((rpm = (Param) realparamtab->getnode2(realparamtab, name)) &&
 	!(rpm->node.flags & PM_UNSET)) {
 	pm->u.str = paramtypestr(rpm);
-	if ((rpm->node.flags & PM_NAMEREF) &&
+	if ((rpm->node.flags & PM_NAMEREF) && rpm->u.str && *(rpm->u.str) &&
 	    (rpm = (Param) realparamtab->getnode(realparamtab, name)) &&
 	    !(rpm->node.flags & PM_UNSET)) {
 	    pm->u.str = zhtricat(pm->u.str, "-", paramtypestr(rpm));

@@ -1,3 +1,10 @@
+2023-02-13  Bart Schaefer  <schaefer@zsh.org>
+
+	* 51430: Src/Modules/parameter.c, Src/builtin.c, Src/params.c,
+	Test/K01nameref.ztst: Fix and test for regression of assignment
+	when using typeset command, fix output of typeset +m and
+	$parameters[ref], prevent segfault in typeset.
+
 2023-02-12  Bart Schaefer  <schaefer@zsh.org>
 
 	* 51417: Src/params.c, Test/K01nameref.ztst: Check subscripts

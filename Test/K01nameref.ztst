@@ -25,6 +25,20 @@
 0:assign nameref placeholder
 >ptr=var
 
+ unset ptr
+ typeset -n ptr
+ typeset -n ptr=var
+ typeset -n
+0:assign placeholder with new typeset
+>ptr=var
+
+ typeset -n ptr1
+ typeset -n ptr2=ptr1
+ typeset -n
+0:chain ending in placeholder
+>ptr1
+>ptr2=ptr1
+
  typeset ptr=var
  typeset -n ptr
  typeset -n

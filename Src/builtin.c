@@ -2262,8 +2262,9 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	     */
 	    if (!(on & PM_READONLY) || !isset(POSIXBUILTINS))
 		off |= PM_UNSET;
-	    pm->node.flags = (pm->node.flags |
-			      (on & ~PM_READONLY)) & ~off;
+	    if (!OPT_ISSET(ops, 'p'))
+		pm->node.flags = (pm->node.flags |
+				  (on & ~PM_READONLY)) & ~off;
 	}
 	if (on & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) {
 	    if (typeset_setwidth(cname, pm, ops, on, 0))
@@ -3063,12 +3064,15 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	    if (asg->value.scalar &&
 		((pm = (Param)resolve_nameref((Param)hn, asg)) &&
 		 (pm->node.flags & PM_NAMEREF))) {
-		if (pm->node.flags & PM_SPECIAL)
+		if (pm->node.flags & PM_SPECIAL) {
 		    zwarnnam(name, "%s: invalid reference", pm->node.nam);
-		else
+		    returnval = 1;
+		    continue;
+		} else if (pm->u.str && strcmp(pm->u.str, asg->name) == 0) {
 		    zwarnnam(name, "%s: invalid self reference", asg->name);
-		returnval = 1;
-		continue;
+		    returnval = 1;
+		    continue;
+		}
 	    }
 	    if (hn) {
 		/* namerefs always start over fresh */

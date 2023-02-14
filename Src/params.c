@@ -5851,7 +5851,7 @@ static const struct paramtypes pmtypes[] = {
     { PM_EXPORTED, "exported", 'x', 0},
     { PM_UNIQUE, "unique", 'U', 0},
     { PM_TIED, "tied", 'T', 0},
-    { PM_NAMEREF, "namref", 'n', 0}
+    { PM_NAMEREF, "nameref", 'n', 0}
 };
 
 #define PMTYPES_SIZE ((int)(sizeof(pmtypes)/sizeof(struct paramtypes)))
