@@ -3068,7 +3068,7 @@ check_warn_pm(Param pm, const char *pmtype, int created,
     } else
 	return;
 
-    if (pm->node.flags & PM_SPECIAL)
+    if (pm->node.flags & (PM_SPECIAL|PM_NAMEREF))
 	return;
 
     for (i = funcstack; i; i = i->prev) {
@@ -6181,6 +6181,7 @@ setloopvar(char *name, char *value)
   if (pm && (pm->node.flags & PM_NAMEREF)) {
       pm->base = pm->width = 0;
       pm->u.str = ztrdup(value);
+      pm->node.flags &= ~PM_UNSET;
       pm->node.flags |= PM_NEWREF;
       setscope(pm);
       pm->node.flags &= ~PM_NEWREF;
@@ -6248,7 +6249,7 @@ setscope(Param pm)
 		      pm->node.nam);
 		unsetparam_pm(pm, 0, 1);
 	    } else if (isset(WARNNESTEDVAR))
-		zwarn("%s: global reference to local variable: %s",
+		zwarn("reference %s in enclosing scope set to local variable %s",
 		      pm->node.nam, pm->u.str);
 	}
 	if (pm->u.str && upscope(pm, pm->base) == pm &&

@@ -1,3 +1,8 @@
+2023-02-14  Bart Schaefer  <schaefer@zsh.org>
+
+	* 51437: Src/params.c, Test/K01nameref.ztst: Fix incorrectly-passed
+	test case, masked by unrelated bug.  Improve warnnestedvar message.
+
 2023-02-14  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 51425: Src/exec.c, Test/E01OPTIONS: $(<...) shouldn't try to

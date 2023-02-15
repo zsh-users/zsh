@@ -532,6 +532,13 @@ F:Same test, should part 5 output look like this?
 >nameref-local-nameref-local
 >typeset parameters
 
+ if [[ $options[typesettounset] != on ]]; then
+   ZTST_skip='Ignoring zmodload bug that resets TYPESET_TO_UNSET'
+   setopt typesettounset
+ fi
+0:options reloaded
+F:Checking for a bug in zmodload that affects later tests
+
  typeset ptr2=var2
  typeset var2=GLOBAL
  () {
@@ -541,7 +548,7 @@ F:Same test, should part 5 output look like this?
    typeset var2=VAR2
    print -r -- ${(P)ptr1}
  }
-0:
+0:Order of evaluation with ${(P)...}
 >VAR2
 
  ary=(one two three four)
@@ -666,7 +673,19 @@ F:Same test, should part 5 output look like this?
 >
 >scalar-local
 >
-*?*ref: global reference to local variable: one
+*?*reference ref*to local variable one
+
+ unset -n ref
+ typeset -n ref
+ () {
+   setopt localoptions warn_nested_var
+   typeset inner
+   ref=inner
+ }
+ typeset -p ref
+0:Global variable is a reference, warning
+>typeset -n ref=inner
+*?*reference ref*to local variable inner
 
  typeset -n ptr='ary[$(echo 2)]'
  typeset -a ary=(one two three)
