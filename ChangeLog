@@ -1,5 +1,8 @@
 2023-02-17  Oliver Kiddle  <opk@zsh.org>
 
+	* 51447: Src/Zle/zle_keymap.c: silence compiler maybe-uninitialized
+	warning by combining a couple of variables
+
 	* Øystein Walle: 51391: Completion/Unix/Command/_git:
 	complete remote branch names respecting --delete for git push
 
