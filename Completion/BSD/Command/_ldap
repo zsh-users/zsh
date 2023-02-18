@@ -80,8 +80,8 @@ else
         '-x[use simple authentication]' \
         '-Z[use StartTLS]' \
         '-z+[specify maximum number of results or 0 for no limit]:size limit [0]:' \
-        '::filter:' \
-        '*:attribute:'
+        '1: :_ldap_filters' \
+        '*: :_ldap_attributes'
       ;;
   esac
 fi

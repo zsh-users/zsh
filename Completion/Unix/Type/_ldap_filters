@@ -1,0 +1,91 @@
+#autoload
+
+# LDAP search filters conforming to RFC4515
+
+local -a expl excl optype disp end pre
+local -i nest=0
+local open='(' close=')' andop='&' orop='|'
+
+[[ -prefix - ]] && return 1
+
+local -a matchingrules=( # From RFC4517
+  bitStringMatch booleanMatch caseExactIA5Match
+  caseExactMatch caseExactOrderingMatch caseExactSubstringsMatch
+  caseIgnoreIA5Match caseIgnoreIA5SubstringsMatch caseIgnoreListMatch
+  caseIgnoreListSubstringsMatch caseIgnoreMatch caseIgnoreOrderingMatch
+  caseIgnoreSubstringsMatch directoryStringFirstComponentMatch
+  distinguishedNameMatch generalizedTimeMatch generalizedTimeOrderingMatch
+  integerFirstComponentMatch integerMatch integerOrderingMatch keywordMatch
+  numericStringMatch numericStringOrderingMatch numericStringSubstringsMatch
+  objectIdentifierFirstComponentMatch objectIdentifierMatch octetStringMatch
+  octetStringOrderingMatch telephoneNumberMatch telephoneNumberSubstringsMatch
+  uniqueMemberMatch wordMatch
+)
+local -a classes=( # Sampled from real servers, arbitrary other values allowed
+  automount automountMap cosTemplate dcObject device dnaSharedConfig domain
+  domainRelatedObject DUAConfigProfile extensibleObject groupOfNames
+  groupOfPrincipals ieee802device inetOrgPerson inetuser ipaassociation ipaca
+  ipacaacl ipaCertificate ipaCertMapConfigObject ipacertprofile ipaConfigObject
+  ipaDomainIDRange ipaDomainLevelConfig ipaGuiConfig ipahbacrule ipahbacservice
+  ipahbacservicegroup ipahost ipahostgroup ipaIDrange ipaKeyPolicy
+  ipakrbprincipal ipaNameResolutionData ipaNTDomainAttrs ipaNTGroupAttrs
+  ipaNTUserAttrs ipaobject ipaPublicKeyObject ipaReplTopoManagedServer
+  ipaservice ipaSshGroupOfPubKeys ipasshhost ipasshuser ipasudorule
+  ipaSupportedDomainLevelConfig ipaTrustedADDomainRange ipaUserAuthTypeClass
+  ipausergroup ipHost krbContainer krbprincipal krbprincipalaux
+  krbrealmcontainer krbTicketPolicyAux mepManagedEntry mepOriginEntry
+  nestedGroup nisDomainObject nisNetgroup nsContainer nsDS5Replica nshost
+  organization organizationalPerson organizationalRole organizationalUnit
+  person pilotObject pkiCA pkiuser posixAccount posixGroup pwdPolicy
+  shadowAccount simpleSecurityObject top
+)
+
+compquote open close andop orop
+open=${(q)open} close=${(q)close}
+# default to double rather than backslash quoting
+[[ -z $compstate[quote] && -z $PREFIX ]] && pre='"('
+
+zstyle -s ":completion:${curcontext}:operators" list-separator sep || sep=--
+print -v disp -f "%s $sep %s" \| or \& and \! not
+end=( ") $sep end" )
+excl=( ! \\\| \& ) # compadd -F uses globs: only | needs quoting
+
+local -a query=(
+  \( /$'*\0[ \t\n]#'/ \) # strip off any preceding arguments
+  \(
+    \( "/${open}!/" -'optype[++nest]=1;pre=""'
+    \| "/${open}${(q)orop}/" -'optype[++nest]=2;pre=""'
+    \| "/${open}${andop}/" -'optype[++nest]=3;pre=""'
+    \| '/[]/' ':operators:operator:compadd -F "( ${(q)excl[optype[nest]]} )" -d disp -P ${pre:-${(Q)open}} -S ${(Q)open} \| \& \!' \)
+  \|
+    \( "/${open}[^\\)]##/" "%$close%" # pass over whole var=value, needed due to lack of backtracking after the following
+    \| "/${open}(#i)homeDirectory=/" '/[]/' ':directories:directory:_directories -P / -W / -r ") \t\n\-"'
+    \| "/${open}(#i)loginShell=/" '/[]/' ':shells:shell:compadd -S ${(Q)close} ${(f)^"$(</etc/shells)"}(N)'
+    \| "/${open}(#i)mail=/" '/[]/' ':email-addresses:mail:_email_addresses -S ${(Q)close}'
+    \| "/${open}(#i)objectClass=/" '/[]/' ':object-classes:class:compadd -S ${(Q)close} -M "m:{a-zA-Z}={A-Za-z} r:[^A-Z]||[A-Z]=* r:|=*" -a classes'
+    \| "/${open}(#i)(automountKey|(member|)uid)=/" '/[]/' ':users:username:_users -S ${(Q)close}'
+    \| "/${open}(#i)cn=/" '/[]/' ':cn:cn: _alternative "users:user:_users -S ${close}" "groups:group:_groups -S ${close}" "hosts:host:_hosts -S ${close}"'
+    \|
+      '/[^:=<>~]##/' '%[=:<>~]%' -'pre=""'
+      ':object-types:object type:_ldap_attributes -P ${pre:-${(Q)open}}  -S = -r ":=~<> \t\n\-"'
+      \(
+        '/:/'
+        '/[^:]##:=/' ':matching-rules:matching rule:compadd -S ":=" -a matchingrules'
+      \|
+        '/([~<>]|)=/' ':operators:operator:compadd -S "" "<=" \>= \~='
+      \)
+      '/[^\\)]##/' "%$close%" ': _message -e object-values "object value (* for presence check)"'
+    \)
+    "/$close/" -'(( nest ))' ':brackets:bracket:compadd ${=query[nest]:+-S ""} \)'
+    \(
+      # This use of -P/-d and an empty match works around a limitation/bug where
+      # mixed use of -P removes any quoting
+      "/$close/" ':operators:operator:compadd ${=query[nest-1]:+-S ""} -d end -P ${(Q)close} ""'
+      \( // -'(( --nest ))' \| '//' -'((!nest))' '/[]/' ': compadd ""' \)
+    \) \#
+    // -'(( nest && optype[nest] > 1 ))'
+  \) \#
+)
+
+_regex_arguments _ldap_search_filters "$query[@]"
+_ldap_search_filters
