@@ -1,3 +1,10 @@
+2023-02-19  Oliver Kiddle  <opk@zsh.org>
+
+	* 51455, 51461: Completion/Unix/Type/_ldap_attributes
+	Completion/BSD/Command/_ldap, Completion/Unix/Command/_openldap,
+	Completion/Unix/Type/_ldap_filters: new completion for the OpenLDAP
+	client tools including a helper function for LDAP search filters
+
 2023-02-17  Oliver Kiddle  <opk@zsh.org>
 
 	* 51447: Src/Zle/zle_keymap.c: silence compiler maybe-uninitialized

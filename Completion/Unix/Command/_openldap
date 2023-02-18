@@ -1,0 +1,222 @@
+#compdef ldapadd ldapcompare ldapdelete ldapexop ldapmodify ldapmodrdn ldappasswd ldapsearch ldapurl ldapwhoami
+
+local curcontext="$curcontext" nm="$compstate[nmatches]"
+local -a args auth state line expl
+
+args=( '*-e[general extensions]:extension:->general-extensions' )
+
+case $service in
+  ldapadd|ldapcompare|ldapdelete|ldapexop|ldapmodify|ldapmodrdn|ldappasswd|ldapsearch|ldapwhoami)
+    if (( $words[(I)-[^Z]#Z[^Z]#] )); then
+      args+=( '*-Z[require success for start TLS request]' )
+    elif (( ! $words[(I)-[^Z]#Z] )); then
+      args+=( '-Z[start TLS request]' )
+    fi
+    args+=(
+      '!(-)-VV' '-V[display version information]'
+      '*-d+[set LDAP debugging level]:level:((1\:trace 2\:packets 4\:args 8\:conns 10\:ber 2048\:parse -1\:all))'
+      "-n[show what would be done but don't actually do it]"
+      '-v[verbose output]'
+      "-N[don't use reverse DNS to canonicalize SASL host name]"
+      '*-o+[specify any ldap.conf options]: : _values option
+        "ldif_wrap[specify width]\:width"
+        "nettimeout[specify timeout]\:timeout (seconds)"'
+    )
+    auth=(
+      '-D[specify bind DN]:binddn'
+      '-H[specify LDAP URIs]:uri'
+      '-P[specify protocol version]:version [3]:(2 3)'
+      + simple
+      '(sasl)-x[use simple authentication]'
+      '(sasl -W -y)-w+[specify bind password]:bind password'
+      '(sasl -w -y)-W[prompt for bind password]'
+      '(sasl -w -W)-y+[read password from file]:file:_files'
+      + sasl
+      '(simple)-O+[specify SASL security properties]: : _values -s , property
+          none noplain noactive nodict noanonymous forwardsec passcred
+          minssf\:factor maxssf\:factor maxbufsize\:factor'
+      '(simple)-X+[specify SASL authorization identity]:authzid:->authzids'
+      '(simple)-Y+[specify SASL mechanism]:mechanism:compadd -M "m:{a-zA-Z}={A-Za-z}" EXTERNAL GSSAPI' # iana has a full list but cyrus support seems limited
+      '(simple)-R+[specify SASL realm]:realm'
+      '(simple)-U+[specify SASL authentication identity]:authcid'
+      '(simple)-I[use SASL Interactive mode]'
+      '(simple)-Q[use SASL Quiet mode]'
+    )
+  ;|
+  ldapadd|ldapcompare|ldapdelete|ldapmodify|ldapmodrdn|ldapsearch)
+    if (( $words[(I)-[^M]#M[^M]#] )); then
+      args+=( '*-M[enable Manage DSA IT control critical]' )
+    elif (( ! $words[(I)-[^M]#M] )); then
+      args+=( '-M[enable Manage DSA IT control]' )
+    fi
+  ;|
+  ldapadd|ldapdelete|ldapmodify|ldapmodrdn|ldapsearch)
+    # ldapexop documents but doesn't implement this
+    args+=( '(1 2 *)-f+[read operations from file]:file:_files' )
+  ;|
+  ldapadd|ldapdelete|ldapmodify|ldapmodrdn|ldapsearch)
+    args+=( "-c[continuous operation mode (don't stop on errors)]" )
+  ;|
+  ldapdelete|ldapsearch)
+    args+=( '-z+[specify size limit]:size limit (entries)' )
+  ;|
+  ldapadd|ldapmodify)
+    args+=(
+      '-S+[write records that are skipped due to an error to file]:file:_files'
+      '*-E+[modify extensions]:extension:->modify-extensions'
+    )
+  ;|
+  ldapurl|ldapsearch)
+    args+=(
+      '(decompose)-s+[specify search scope]:search scope [sub]:(base one sub children)'
+    )
+  ;|
+  ldapdelete|ldapmodrdn|ldapurl|ldapwhoami) args+=( '!*-E+:extension' ) ;|
+
+  ldapadd) args+=( '!-a' ) ;;
+  ldapmodify) args+=( '-a[add new entries]' ) ;;
+  ldapcompare)
+    args+=(
+      '-z[quiet mode - no output aside return status]'
+      '*-E+[compare extensions]:extension:->compare-extensions'
+    )
+  ;;
+  ldapdelete)
+    args+=(
+      '-r[do a recursive delete]'
+      '*: :_guard "^-*" "distinguished name"'
+    )
+  ;;
+  ldapexop) args+=( '*:: :->extended-operations' ) ;;
+  ldapmodrdn)
+    args+=(
+      '-r[remove old RDN values from the entry]'
+      '-s[specify new superior entry to move target to]:entry'
+      '1:distinguished name'
+      '2:relative distinguished name'
+    )
+  ;;
+  ldappasswd)
+    args+=(
+      '(-a -t)-A[prompt for old password]'
+      '(-A -t)-a+[specify old password]:password'
+      '(-A -a)-t+[read old password from file]:file:_files'
+      '(-s -T)-S[prompt for new password]'
+      '(-S -T)-s+[specify new password]:password'
+      '(-S -s)-T+[read new password from file]:file:_files'
+    )
+  ;;
+  ldapsearch)
+    if (( $words[(I)-[^L]#L[^L]#L[^L]#] )); then
+      args+=( '*-L[LDIF format without comments and version]' )
+    elif (( $words[(I)-[^L]#L[^L]#] )); then
+      args+=( '*-L[LDIF format without comments]' )
+    elif ! (( $words[(I)-[^L]#L[^L]#L[^L]#L] )); then
+      args+=( '-L[LDIFv1 format]' )
+    else
+      args+=( '!*-L' )
+    fi
+    if (( $words[(I)-[^t]#t[^t]#] )); then
+      args+=( '*-t[write all retrieved values to files in temporary directory]' )
+    elif (( ! $words[(I)-[^t]#t] )); then
+      args+=( '-t[write binary values to files in temporary directory]' )
+    fi
+
+    args+=(
+      '-a+[specify how aliases dereferencing is done]:deref [never]:(never always search find)'
+      '-A[retrieve attributes only (no values)]'
+      '-b+[specify base dn for search]:basedn'
+      '*-E+[search extensions]:extension:->search-extensions'
+      '-F+[specify URL prefix for temporary files]:prefix [file:///tmp//]'
+      '-l+[specify time limit for search]:time limit (seconds)'
+      '-S+[sort results by specified attribute]:attribute:_ldap_attributes'
+      '-T[write files to specified directory]:path [/tmp]:_directories'
+      '-u[include User Friendly entry names in the output]'
+      '1: :_ldap_filters'
+      '2: : _alternative
+        "attributes:attribute:_ldap_attributes"
+        "attributes:attribute:((1.1\:no\ attributes \*\:all\ user\ attributes \+\:all\ operational\ attributes))"'
+      '*:attribute:_ldap_attributes -F line'
+    )
+  ;;
+  ldapurl)
+    args+=(
+      - compose
+      '-a+[set a list of attribute selectors]:attribute selectors (comma separated)'
+      '-b+[set the searchbase]:search base'
+      '-f+[set the URL filter]:filter:_ldap_filters'
+      '-h+[set the host]:host:_hosts'
+      '-p+[set the tcp port]:port:(389 636)'
+      '-S+[set the URL scheme]:scheme:(ldap ldaps)'
+      - decompose
+      '(-s)-H+[specify URI to be exploded]:uri'
+    )
+  ;;
+esac
+
+_arguments -C -S -s $args $auth
+
+case $state in
+  extended-operations)
+    case $CURRENT:$words[1] in
+      1:*)
+        if compset -P '*::'; then
+          _message -e data 'base64 data'
+        elif compset -P '*:'; then
+          _message -e data data
+        else
+          _alternative \
+            'oids::_guard "(<->(|.))#" oid' \
+            'operations:operation:(whoami cancel refresh)'
+        fi
+      ;;
+      2:cancel) _message -e ids 'cancel id' ;;
+      2:refresh) _message -e names 'distinguished name' ;;
+      3:refresh) _message -e times 'ttl' ;;
+      *) _message 'no more arguments' ;;
+    esac
+  ;;
+  *-extensions)
+    if ! compset -P \!; then
+      _description criticality expl critical
+      compadd -S "" "$expl[@]" \!
+    fi
+  ;|
+  modify-extensions) _values extension 'txn:txn:(abort commit)' ;;
+  compare-extensions) _values extension dontUseCopy ;;
+  search-extensions)
+    _values extension \
+      'mv[matched values filter]:filter:_ldap_filters' \
+      'pr[paged results/prompt]:size[/prompt|noprompt]' \
+      'sss[server side sorting]: :_sequence -s / _ldap_attributes' \
+      'subentries: :(true false)' \
+      'sync:sync[/cookie][/slimit]:((ro\:refreshOnly rp\:refreshAndPersist))' \
+      'vlv[virtual list view]:before/after(/offset/count|\:value' \
+      'deref:derefAttr:_sequence _ldap_attributes' \
+      dontUseCopy domainScope
+  ;;
+  general-extensions)
+    _values extension \
+      'assert:filter:_ldap_filters' \
+      'authzid:authzid:->authzids' \
+      {post,pre}'read: :_sequence _ldap_attributes' \
+      'sessiontracking:username:_users' \
+      'chaining:behavior:(chainingPreferred chainingRequired referralsPreferred referralsRequired)' \
+      bauthzid manageDSAit noop ppolicy relax abandon cancel ignore
+  ;&
+  authzids)
+    if [[ $state != authzids ]]; then
+      : # fall-through from above without the authzids state
+    elif compset -P 'u:'; then
+      _description users expl authzid
+      _users "$expl[@]"
+    elif compset -P 'dn:'; then
+      _message -e ids 'distinguished name'
+    else
+      _description prefixes expl prefix
+      compadd -S: "$expl[@]" u dn
+    fi
+  ;;
+esac
+
+[[ nm -ne "$compstate[nmatches]" ]]

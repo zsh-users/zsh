@@ -1,0 +1,27 @@
+#autoload
+
+local -a expl attrs
+
+# These come from dumping attributes from basic installations of both openldap
+# and FreeIPA and combining results. It is possible to have custom additions so
+# a definitive list is not possible Hence the use of -x with compadd.
+#
+attrs=(
+  associatedDomain authenticationMethod automountInformation automountKey
+  automountMapName bindTimeLimit cACertificate;binary cn dc defaultSearchBase
+  defaultServerList description displayName dn followReferrals gecos gidNumber
+  givenName homeDirectory info initials ipaCertIssuerSerial ipaCertSubject
+  ipaConfigString ipaKeyExtUsage ipaKeyTrust ipaNTSecurityIdentifier
+  ipaPublicKey ipaUniqueID ipHostNumber loginShell mail member memberUid
+  mepManagedBy nisDomain nisNetgroupTriple o objectClass objectClassMap ou
+  pwdAllowUserChange pwdAttribute pwdCheckQuality pwdExpireWarning
+  pwdFailureCountInterval pwdGraceAuthNLimit pwdInHistory pwdLockout
+  pwdLockoutDuration pwdMaxAge pwdMaxFailure pwdMinAge pwdMinLength
+  pwdMustChange pwdSafeModify searchTimeLimit serviceSearchDescriptor sn
+  telephoneNumber uid uidNumber userCertificate;binary userPKCS12
+  userSMIMECertificate
+)
+
+_description ldap-attributes expl "ldap attribute"
+compadd "${@:/-X/-x}" "${expl[@]:/-X/-x}" \
+    -M 'm:{a-zA-Z}={A-Za-z} r:[^A-Z]||[A-Z]=* r:|=*' -a attrs
