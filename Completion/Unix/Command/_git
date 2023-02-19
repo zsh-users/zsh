@@ -76,17 +76,21 @@ _git-add () {
 
   case $state in
     (file)
-      declare -a ignored_files_alternatives
+      declare -a file_alternatives
+      if [[ -z ${opt_args[(I)-u|--update]} ]]; then
+        file_alternatives=(
+          'other-files::__git_ignore_line_inside_arguments __git_other_files'
+        )
+      fi
       if [[ -n ${opt_args[(I)-f|--force]} ]]; then
-        ignored_files_alternatives=(
+        file_alternatives+=(
           'ignored-modified-files:ignored modified file:__git_ignore_line_inside_arguments __git_modified_files --ignored'
           'ignored-other-files:ignored other file:__git_ignore_line_inside_arguments __git_other_files --ignored')
       fi
 
       _alternative \
         'modified-files::__git_ignore_line_inside_arguments __git_modified_files' \
-        'other-files::__git_ignore_line_inside_arguments __git_other_files' \
-        $ignored_files_alternatives && ret=0
+        $file_alternatives && ret=0
       ;;
   esac
 
@@ -2365,7 +2369,7 @@ _git-worktree() {
           _arguments -S $endopt \
 	    '(-n --dry-run)'{-n,--dry-run}"[don't remove, show only]" \
 	    '(-v --verbose)'{-v,--verbose}'[report pruned objects]' \
-	    '--expire[expire objects older than specified time]:time' && ret=0
+            '--expire=[expire objects older than specified time]:time' && ret=0
 	;;
         (list)
 	  _arguments -S $endopt '--porcelain[machine-readable output]' && ret=0
@@ -2379,7 +2383,8 @@ _git-worktree() {
             ':location:_directories' && ret=0
 	;;
 	(remove)
-	  _arguments -C -S $endopt '--force[remove working trees that are not clean or that have submodules]' \
+          _arguments -C -S $endopt \
+            '(-f --force)'{-f,--force}'[remove working trees that are not clean or that have submodules]' \
             ': :->worktrees' && ret=0
 	;;
 	(unlock)
@@ -3901,7 +3906,7 @@ _git-reflog () {
             ;;
           (delete)
             _arguments -C -S \
-              '(-n --dry-run)'{-n,--dry-run}"[dpn't update entries; show what would be done]" \
+              '(-n --dry-run)'{-n,--dry-run}"[don't update entries; show what would be done]" \
               '--updateref[update ref with SHA-1 of top reflog entry after expiring or deleting]' \
               '--rewrite[adjust reflog entries to ensure old SHA-1 points to new SHA-1 of previous entry after expiring or deleting]' \
               '--verbose[output additional information]' \
@@ -4134,7 +4139,8 @@ _git-blame () {
       else
         _alternative \
           'line-numbers: :__git_guard_number "line number"' \
-          'regexes::_guard "(/[^/]#(\\?[^/]#)#(/|)|)" regex' && ret=0
+          'regexes::_guard "(/[^/]#(\\?[^/]#)#(/|)|)" regex' \
+          'functions::_guard "(|:*)" "function name"' && ret=0
       fi
       ;;
   esac
