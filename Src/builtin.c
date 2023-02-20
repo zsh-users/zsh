@@ -2106,15 +2106,27 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    return NULL;
 	}
 	tc = 1;
-	usepm = 0;
+	if (OPT_MINUS(ops,'p'))
+	    usepm = (on & pm->node.flags);
+	else if (OPT_PLUS(ops,'p'))
+	    usepm = (off & pm->node.flags);
+	else
+	    usepm = 0;
     }
     else if (usepm || newspecial != NS_NONE) {
 	int chflags = ((off & pm->node.flags) | (on & ~pm->node.flags)) &
 	    (PM_INTEGER|PM_EFLOAT|PM_FFLOAT|PM_HASHED|
 	     PM_ARRAY|PM_TIED|PM_AUTOLOAD);
 	/* keep the parameter if just switching between floating types */
-	if ((tc = chflags && chflags != (PM_EFLOAT|PM_FFLOAT)))
-	    usepm = 0;
+	if ((tc = chflags && chflags != (PM_EFLOAT|PM_FFLOAT))) {
+	    if (OPT_MINUS(ops,'p'))
+		usepm = (on & pm->node.flags);
+	    else if (OPT_PLUS(ops,'p'))
+		usepm = (off & pm->node.flags);
+	    else
+		usepm = 0;
+	}
+
     }
 
     /*
@@ -2166,13 +2178,16 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    }
 	    if (err)
 	    {
-		zerrnam(cname, "%s: can't change type of a special parameter",
-			pname);
+		if (!OPT_ISSET(ops,'p'))
+		    zerrnam(cname,
+			    "%s: can't change type of a special parameter",
+			    pname);
 		return NULL;
 	    }
 	} else if (pm->node.flags & PM_AUTOLOAD) {
-	    zerrnam(cname, "%s: can't change type of autoloaded parameter",
-		    pname);
+	    if (!OPT_ISSET(ops,'p'))
+		zerrnam(cname, "%s: can't change type of autoloaded parameter",
+			pname);
 	    return NULL;
 	}
     }
@@ -2208,6 +2223,10 @@ typeset_single(char *cname, char *pname, Param pm, int func,
      *   ii. we are creating a new local parameter
      */
     if (usepm) {
+	if (OPT_MINUS(ops,'p') && on && !(on & pm->node.flags))
+	    return NULL;
+	else if (OPT_PLUS(ops,'p') && off && !(off & pm->node.flags))
+	    return NULL;
 	if ((asg->flags & ASG_ARRAY) ?
 	    !(PM_TYPE(pm->node.flags) & (PM_ARRAY|PM_HASHED)) :
 	    (asg->value.scalar && (PM_TYPE(pm->node.flags &
@@ -2254,6 +2273,10 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 		    arrfixenv(pm->node.nam, x);
 	    }
 	}
+	if (OPT_ISSET(ops,'p')) {
+	    paramtab->printnode(&pm->node, PRINT_TYPESET);
+	    return pm;
+	}
 	if (usepm == 2)		/* do not change the PM_UNSET flag */
 	    pm->node.flags = (pm->node.flags | (on & ~PM_READONLY)) & ~off;
 	else {
@@ -2262,9 +2285,8 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	     */
 	    if (!(on & PM_READONLY) || !isset(POSIXBUILTINS))
 		off |= PM_UNSET;
-	    if (!OPT_ISSET(ops, 'p'))
-		pm->node.flags = (pm->node.flags |
-				  (on & ~PM_READONLY)) & ~off;
+	    pm->node.flags = (pm->node.flags |
+			      (on & ~PM_READONLY)) & ~off;
 	}
 	if (on & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) {
 	    if (typeset_setwidth(cname, pm, ops, on, 0))
@@ -2310,8 +2332,6 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	if (errflag)
 	    return NULL;
 	pm->node.flags |= (on & PM_READONLY);
-	if (OPT_ISSET(ops,'p'))
-	    paramtab->printnode(&pm->node, PRINT_TYPESET);
 	return pm;
     }
 
@@ -2328,7 +2348,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
      * or we're converting the type of a parameter.  In the
      * last case only, we need to delete the old parameter.
      */
-    if (tc) {
+    if (tc && !OPT_ISSET(ops,'p')) {
 	/* Maintain existing readonly/exported status... */
 	on |= ~off & (PM_READONLY|PM_EXPORTED) & pm->node.flags;
 	/* ...but turn off existing readonly so we can delete it */
