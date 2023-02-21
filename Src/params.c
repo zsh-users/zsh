@@ -538,7 +538,7 @@ getparamnode(HashTable ht, const char *nam)
     }
 
     if (hn && ht == realparamtab)
-	hn = resolve_nameref(pm, NULL);
+	hn = resolve_nameref((Param)hn, NULL);
     return hn;
 }
 

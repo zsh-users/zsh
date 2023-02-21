@@ -1,3 +1,7 @@
+2023-02-21  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 51466: Src/params.c: fix access to autoloaded parameter.
+
 2023-02-20  Bart Schaefer  <schaefer@zsh.org>
 
 	* 51431: Src/builtin.c: "typeset -p" shouldn't change parameter flags
