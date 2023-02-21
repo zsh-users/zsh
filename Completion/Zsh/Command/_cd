@@ -70,8 +70,15 @@ else
 
     tmpcdpath=(${${(@)cdpath:#.}:#$PWD})
 
-    (( $#tmpcdpath )) &&
-      alt=( 'path-directories:directory in cdpath:_path_files -W tmpcdpath -/' )
+    if zstyle -t ":completion:${curcontext}:path-directories" separate-sections; then
+      local elem
+      for ((elem=1; elem <= $#tmpcdpath; elem++)); do
+        alt+=( "path-directories-$elem:directory in $tmpcdpath[$elem]:_path_files -W 'tmpcdpath[$elem]' -/" )
+      done
+    else
+      (( $#tmpcdpath )) &&
+        alt=( 'path-directories:directory in cdpath:_path_files -W tmpcdpath -/' )
+    fi
 
     # With cdablevars, we can complete foo as if ~foo/
     if [[ -o cdablevars && -n "$PREFIX" && "$PREFIX" != <-> ]]; then

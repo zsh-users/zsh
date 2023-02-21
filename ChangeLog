@@ -1,5 +1,9 @@
 2023-02-24  Oliver Kiddle  <opk@zsh.org>
 
+	* Sebastian Stark: 51470 (tweaked, c.f. 51476):
+	Completion/Zsh/Command/_cd: Separate cdpath elements in
+	path-directories completion
+
 	* 51474: Completion/Unix/Command/_ansible: make -e and --vault-id
 	options repeatable and update for new options to ansible 2.13.2
 
