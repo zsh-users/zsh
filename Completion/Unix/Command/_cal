@@ -1,28 +1,131 @@
 #compdef cal ncal
 
-local args
+local -a args
+args=()
 
 case $service in
   cal)
-    args=(
-      '-3[three in a row]'
-      '-m[Monday as first day of the week]'
-    )
+    # check util-linux's cal or bsdmainutils's cal
+    if $service --version 1>/dev/null 2>/dev/null ; then
+      args+=(
+        '(-1 --one)'{-1,--one}'[show only a single month]'
+        '(-3 --three)'{-3,--three}'[show three months spanning the date]'
+        '(-n --months)'{-n,--months=}"[show num months starting with date's month]:month"
+        '(-S --span)'{-S,--span}'[span the date when displaying multiple month]'
+        '(-s --sunday)'{-s,--sunday}'[Sunday as first day of week]'
+        '(-m --monday)'{-m,--monday}'[Monday as first day of week]'
+        '(-j --julian)'{-j,--julian}'[use day-of-year for all calendars]'
+        '--reform=[Gregorian reform date]:val:(1752 gregorian iso julian)'
+        '--iso[alias for --reform=iso]'
+        '(-y --year)'{-y,--year}'[show the whole year]'
+        '(-Y --twelve)'{-Y,--twelve}'[show the next twelve months]'
+        '(-w --week)'{-w,--week=-}'[show US or ISO-8601 week numbers]::num'
+        '(-v --vertical)'{-v,--vertical}'[show day vertically instead of line]'
+        '(-c --columns)'{-c,--columns=}'[amount of columns to use]:width'
+        '--color=-[colorize messages]:when:(auto always never)'
+        '(- *)'{-h,--help}'[display help]'
+        '(- *)'{-V,--version}'[display version]'
+      )
+    else
+      case $OSTYPE in
+        (linux*|openbsd*|freebsd*|netbsd*|darwin*|dragonfly*)
+          args+=(
+            '-j[display Julian days]'
+          )
+        ;|
+        (linux*|freebsd*|netbsd*|darwin*|dragonfly*)
+          args+=(
+            '-3[display the previous, current and next month surrounding today]'
+            '-A[months to add after]:months'
+            '-B[months to add before]:months'
+          )
+        ;|
+        (freebsd*|netbsd*|darwin*|dragonfly*)
+          args+=(
+            '-h[turns off highlighting of today]'
+          )
+        ;|
+        (netbsd*|openbsd*)
+          args+=(
+            '-y[display a calendar for the current year]'
+          )
+        ;|
+        (linux*|freebsd*|darwin*|dragonfly*)
+          args+=(
+            '-m[display the specified month]:month'
+            '-y[display a calendar for the specified year]:year'
+            '-C[switch to cal mode]'
+            '-d[use yyyy-mm as the current date]:yyyy-mm'
+          )
+        ;|
+        (freebsd*|darwin*|dragonfly*)
+          args+=(
+            '-N[switch to ncal mode]'
+          )
+        ;|
+        (linux*)
+          args+=(
+            '-1[display only the current month]'
+          )
+        ;|
+        (openbsd*)
+          args+=(
+            '-m[display weeks starting on Monday instead of Sunday]'
+            '-w[display week numbers in the month display]'
+          )
+        ;|
+        (netbsd*)
+          args+=(
+            '-C[display context months before and after the specified month]:months'
+            '-d[specifies the day of the week on which the calendar should start]:day_of_week'
+            '-h[highlight the current day]'
+            '-R[selects an alternate Gregorian reform point from the default of September 3rd, 1752]:reform-sp'
+            '-r[display the month in which the Gregorian Reform adjustment was applied]'
+          )
+        ;;
+      esac
+    fi
   ;;
   ncal)
     args=(
-      '-J[display Julian calendar]'
-      '-e[display date of western Easter]'
-      '-o[display date of orthodox Easter]'
-      '-p[assume as by ncal]'
-      '-s[country code]'
-      '-w[print number of the week below each column]'
+      '-h[turns off highlighting of today]'
+      '-J[display Julian Calendar]'
+      '-e[display date of Easter]'
+      '-j[display Julian days]'
+      '-o[display date of Orthodox Easter]'
+      '-m[display the specified month]:month'
+      '-p[print the country codes and switching days from Julian to Gregorian Calendar]'
+      '-s[assume the switch from Julian to Gregorian Calendar at the date associated with the country_code]:country_code'
+      '-w[print the number of the week below each week column]'
+      '-y[display a calendar for the specified year]:year'
+      '-3[display the previous, current and next month surrounding today]'
+      '-A[months to add after]:months'
+      '-B[months to add before]:months'
+      '-C[switch to cal mode]'
+      '-d[use yyyy-mm as the current date]:yyyy-mm'
+      '-H[use yyyy-mm-dd as the current date]:yyyy-mm-dd'
+      '-M[weeks start on Monday]'
+      '-S[weeks start on Sunday]'
+      '-W[first week of the year has at least number days]:number'
+      '-b[use oldstyle format for ncal output]'
     )
+
+    case $OSTYPE in
+      (linux*)
+        args+=(
+          '-b[use oldstyle format for ncal output]'
+          '-1[display only the current month]'
+        )
+        ;;
+      (*)
+        args+=(
+          '-N[switch to ncal mode]'
+        )
+        ;;
+    esac
   ;;
 esac
 
 _arguments "${args[@]}" \
-  '-j[display Julian days]' \
-  '-y[display a calendar for the current year]' \
   '::month' \
   ':year'

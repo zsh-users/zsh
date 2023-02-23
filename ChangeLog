@@ -1,5 +1,8 @@
 2023-02-24  Oliver Kiddle  <opk@zsh.org>
 
+	* Shohei YOSHIDA: 51473: Completion/Unix/Command/_cal:
+	Update cal/ncal completion
+
 	* Sebastian Stark: 51470 (tweaked, c.f. 51476):
 	Completion/Zsh/Command/_cd: Separate cdpath elements in
 	path-directories completion
