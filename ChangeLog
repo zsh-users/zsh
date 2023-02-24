@@ -1,3 +1,8 @@
+2023-02-24  Oliver Kiddle  <opk@zsh.org>
+
+	* 51474: Completion/Unix/Command/_ansible: make -e and --vault-id
+	options repeatable and update for new options to ansible 2.13.2
+
 2023-02-21  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 51466: Src/params.c: fix access to autoloaded parameter.
