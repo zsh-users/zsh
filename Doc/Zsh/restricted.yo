@@ -65,7 +65,7 @@ variables.  Except for the few listed above, zsh does not restrict
 the setting of environment variables.
 
 If a `tt(perl)', `tt(python)', `tt(bash)', or other general purpose
-interpreted script it treated as a restricted
+interpreted script is treated as a restricted
 command, the user can work around the restriction by
 setting specially crafted `tt(PERL5LIB)', `tt(PYTHONPATH)',
 `tt(BASHENV)' (etc.) environment variables. On GNU systems, any

@@ -1,5 +1,7 @@
 2023-02-26  Bart Schaefer  <schaefer@zsh.org>
 
+	* unposted: Doc/Zsh/restricted.yo: fix typo
+
 	* 51460: Src/module.c: avoid crash on bad parameter autofeature
 
 2023-02-24  Oliver Kiddle  <opk@zsh.org>
