@@ -1,0 +1,601 @@
+#!/bin/zsh -f
+emulate -L zsh -o extendedglob
+
+zmodload zsh/param/private
+
+local -AHPrt jobstats=(
+ mapbase 16
+ $((0x0001)) STAT_CHANGED	# status changed and not reported
+ $((0x0002)) STAT_STOPPED	# all procs stopped or exited
+ $((0x0004)) STAT_TIMED		# job is being timed
+ $((0x0008)) STAT_DONE		# job is done
+ $((0x0010)) STAT_LOCKED	# shell is finished creating this job,
+                         	#   may be deleted from job table
+ $((0x0020)) STAT_NOPRINT	# job was killed internally,
+                         	#   we don't want to show that
+ $((0x0040)) STAT_INUSE		# this job entry is in use
+ $((0x0080)) STAT_SUPERJOB	# job has a subjob
+ $((0x0100)) STAT_SUBJOB	# job is a subjob
+ $((0x0200)) STAT_WASSUPER	# was a super-job, sub-job needs to be
+				# deleted
+ $((0x0400)) STAT_CURSH		# last command is in current shell
+ $((0x0800)) STAT_NOSTTY	# the tty settings are not inherited
+				# from this job when it exits.
+ $((0x1000)) STAT_ATTACH	# delay reattaching shell to tty
+ $((0x2000)) STAT_SUBLEADER	# is super-job, but leader is sub-shell
+
+ $((0x4000)) STAT_BUILTIN	# job at tail of pipeline is a builtin
+ $((0x8000)) STAT_SUBJOB_ORPHANED
+                        	# STAT_SUBJOB with STAT_SUPERJOB exited
+ $((0x10000)) STAT_DISOWN	# STAT_SUPERJOB with disown pending
+
+#-1 SP_RUNNING			# fake status for jobs currently running
+)
+local -AHPrt paramflags=(
+ mapbase 2
+ 0		PM_SCALAR	# scalar
+ $((1<<0))	PM_ARRAY	# array
+ $((1<<1))	PM_INTEGER	# integer
+ $((1<<2))	PM_EFLOAT	# double with %e output
+ $((1<<3))	PM_FFLOAT	# double with %f output
+ $((1<<4))	PM_HASHED	# association
+
+ $((1<<5))	PM_LEFT		# left justify, remove leading blanks
+ $((1<<6))	PM_RIGHT_B	# right justify, fill with leading blanks
+ $((1<<7))	PM_RIGHT_Z	# right justify, fill with leading zeros
+ $((1<<8))	PM_LOWER	# all lower case
+
+ $((1<<9))	PM_UPPER	# all upper case
+# $((1<<9))	PM_UNDEFINED	# undefined (autoloaded) shell function
+
+ $((1<<10))	PM_READONLY	# readonly
+ $((1<<11))	PM_TAGGED	# tagged
+ $((1<<12))	PM_EXPORTED	# exported
+# $((1<<12))	PM_ABSPATH_USED	# (function): loaded using absolute path
+
+ $((1<<13))	PM_UNIQUE	# remove duplicates
+# $((1<<13))	PM_UNALIASED	# (function) do not expand aliases
+
+ $((1<<14))	PM_HIDE		# Special behaviour hidden by local
+# $((1<<14))	PM_CUR_FPATH	# (function): can use $fpath with filename
+ $((1<<15))	PM_HIDEVAL	# Value not shown in `typeset' commands
+# $((1<<15))	PM_WARNNESTED	# (function): non-recursive WARNNESTEDVAR
+ $((1<<16))	PM_TIED		# array tied to colon-path or v.v.
+# $((1<<16))	PM_TAGGED_LOCAL	# (function): non-recursive PM_TAGGED
+
+# Remaining flags do not correspond directly to command line switches
+ $((1<<17))	PM_DONTIMPORT_SUID	# do not import if running setuid
+# $((1<<17))	PM_LOADDIR	# (function) filename gives load directory
+ $((1<<18))	PM_SINGLE	# special can only have a single instance
+ $((1<<18))	PM_ANONYMOUS	# (function) anonymous function
+ $((1<<19))	PM_LOCAL	# this parameter will be made local
+# $((1<<19))	PM_KSHSTORED	# (function) stored in ksh form
+ $((1<<20))	PM_SPECIAL	# special builtin parameter
+# $((1<<20))	PM_ZSHSTORED	# (function) stored in zsh form
+ $((1<<21))	PM_RO_BY_DESIGN	# specials that can be made read-only by user
+##$(((1<<20)|(1<<10)|(1<<21))) PM_READONLY_SPECIAL
+# $((1<<22))	PM_DONTIMPORT	# do not import this variable
+ $((1<<22))	PM_DECLARED	# explicitly named with typeset
+ $((1<<23))	PM_RESTRICTED	# cannot be changed in restricted mode
+ $((1<<24))	PM_UNSET	# has null value
+##$(((1<<22)|(1<<24))) PM_DEFAULTED
+ $((1<<25))	PM_REMOVABLE	# special can be removed from paramtab
+ $((1<<26))	PM_AUTOLOAD	# autoloaded from module
+ $((1<<27))	PM_NORESTORE	# do not restore value of local special
+ $((1<<27))	PM_AUTOALL	# autoload all features in module
+ $((1<<28))	PM_HASHELEM	# is a hash-element
+ $((1<<29))	PM_NAMEDDIR	# has a corresponding nameddirtab entry
+ $((1<<30))	PM_NAMEREF	# pointer to a different parameter
+)
+local -AHPrt chartokens=(
+ mapbase integer
+ $((83))	Meta
+ $((84))	Pound
+ $((85))	String
+ $((86))	Hat
+ $((87))	Star
+ $((88))	Inpar
+ $((89))	Inparmath
+ $((90))	Outbrace
+ $((91))	Inbrack
+ $((92))	Outbrack
+ $((93))	Tick
+ $((94))	Inang
+ $((95))	Outang
+ $((96))	OutangProc
+ $((97))	Quest
+ $((98))	Tilde
+ $((99))	Qtick
+ $((a0))	Bnullkeep
+ $((a1))	Nularg
+ $((a2))	Marker
+)
+local -AHPrt fdtabletype=(
+ mapbase integer
+ $((0))		FDT_UNUSED
+ $((1))		FDT_INTERNAL
+ $((2))		FDT_EXTERNAL
+ $((3))		FDT_MODULE
+ $((4))		FDT_XTRACE
+ $((5))		FDT_FLOCK
+ $((6))		FDT_FLOCK_EXEC
+ $((7))		FDT_PROC_SUBST
+)
+local -AHPrt inputstates=(
+ mapbase 2
+ $((1<<0))	INP_FREE
+ $((1<<1))	INP_ALIAS
+ $((1<<2))	INP_HIST
+ $((1<<3))	INP_CONT
+ $((1<<4))	INP_ALCONT
+ $((1<<5))	INP_HISTCONT
+)
+local -AHPrt metafytypes=(
+ mapbase integer
+ $((0))	META_REALLOC
+ $((1))	META_USEHEAP
+ $((2))	META_STATIC
+ $((3))	META_DUP
+ $((4))	META_ALLOC
+ $((5))	META_NOALLOC
+ $((6))	META_HEAPDUP
+ $((7))	META_HREALLOC
+)
+local -AHPrt jobtypes=(
+ mapbase 2
+ $((1<<0))	Z_TIMED		# pipeline is being timed
+ $((1<<1))	Z_SYNC		# run this sublist synchronously       (;)
+ $((1<<2))	Z_ASYNC		# run this sublist asynchronously      (&)
+ $((1<<3))	Z_DISOWN	# run this sublist without job control (&|)
+ $((1<<4))	Z_END
+ $((1<<5))	Z_SIMPLE
+)
+local -AHPrt condtypes=(
+ mapbase integer
+ $((0))		COND_NOT
+ $((1))		COND_AND
+ $((2))		COND_OR
+ $((3))		COND_STREQ
+ $((4))		COND_STRDEQ
+ $((5))		COND_STRNEQ
+ $((6))		COND_STRLT
+ $((7))		COND_STRGTR
+ $((8))		COND_NT
+ $((9))		COND_OT
+ $((10))	COND_EF
+ $((11))	COND_EQ
+ $((12))	COND_NE
+ $((13))	COND_LT
+ $((14))	COND_GT
+ $((15))	COND_LE
+ $((16))	COND_GE
+ $((17))	COND_REGEX
+ $((18))	COND_MOD
+ $((19))	COND_MODI
+)
+local -AHPrt wordcodes=(
+ mapbase integer
+ $((1))		WC_LIST
+ $((2))		WC_SUBLIST
+ $((3))		WC_PIPE
+ $((4))		WC_REDIR
+ $((5))		WC_ASSIGN
+ $((6))		WC_SIMPLE
+ $((7))		WC_TYPESET
+ $((8))		WC_SUBSH
+ $((9))		WC_CURSH
+ $((10))	WC_TIMED
+ $((11))	WC_FUNCDEF
+ $((12))	WC_FOR
+ $((13))	WC_SELECT
+ $((14))	WC_WHILE
+ $((15))	WC_REPEAT
+ $((16))	WC_CASE
+ $((17))	WC_IF
+ $((18))	WC_COND
+ $((19))	WC_ARITH
+ $((20))	WC_AUTOFN
+ $((21))	WC_TRY
+ $((22))	WC_COUNT
+)
+local -AHPrt wcsublists=(
+ mapbase 10
+ $((0))		WC_SUBLIST_END
+ $((1))		WC_SUBLIST_AND
+ $((2))		WC_SUBLIST_OR
+ $((4))		WC_SUBLIST_COPROC
+ $((8))		WC_SUBLIST_NOT
+ $((16))	WC_SUBLIST_SIMPLE
+)
+local -AHPrt eprogstates=(
+ mapbase 10
+ $((1))	EF_REAL
+ $((2))	EF_HEAP
+ $((4))	EF_MAP
+ $((8))	EF_RUN
+)
+local -AHPrt builtintypes=(
+ mapbase 2
+ $((1<<1))	BINF_PLUSOPTS	# +xyz legal
+ $((1<<2))	BINF_PRINTOPTS
+ $((1<<3))	BINF_ADDED	# is in the builtins hash table
+ $((1<<5))	BINF_PREFIX
+ $((1<<6))	BINF_DASH
+ $((1<<7))	BINF_BUILTIN
+ $((1<<8))	BINF_COMMAND
+ $((1<<9))	BINF_EXEC
+ $((1<<10))	BINF_NOGLOB
+ $((1<<11))	BINF_PSPECIAL
+ $((1<<12))	BINF_SKIPINVALID	# Treat invalid option as argument
+ $((1<<13))	BINF_KEEPNUM	# `[-+]NUM' can be an option
+ $((1<<14))	BINF_SKIPDASH	# Treat `-' as argument (maybe `+')
+ $((1<<15))	BINF_DASHDASHVALID	# Handle `--' even if SKIPINVALD
+ $((1<<16))	BINF_CLEARENV	# new process started with cleared env
+ $((1<<17))	BINF_AUTOALL	# autoload all features at once
+ $((1<<18))	BINF_HANDLES_OPTS
+ $((1<<19))	BINF_ASSIGN
+)
+local -AHPrt patflags=(
+ mapbase 16
+ $((0x0000))	PAT_HEAPDUP	# Dummy flag for default behavior
+ $((0x0001))	PAT_FILE	# Pattern is a file name
+ $((0x0002))	PAT_FILET	# Pattern is top level file, affects ~
+ $((0x0004))	PAT_ANY	# Match anything (cheap "*")
+ $((0x0008))	PAT_NOANCH	# Not anchored at end
+ $((0x0010))	PAT_NOGLD	# Don't glob dots
+ $((0x0020))	PAT_PURES	# Pattern is a pure string: set internally
+ $((0x0040))	PAT_STATIC	# Don't copy pattern to heap as per default
+ $((0x0080))	PAT_SCAN	# Scanning, so don't try must-match test
+ $((0x0200))	PAT_NOTSTART	# Start of string is not real start
+ $((0x0400))	PAT_NOTEND	# End of string is not real end
+ $((0x0800))	PAT_HAS_EXCLUDP	# (internal): top-level path1~path2.
+)
+local -AHPrt patclasses=(
+ mapbase integer
+ $((1))		PP_FIRST
+ $((1))		PP_ALPHA
+ $((2))		PP_ALNUM
+ $((3))		PP_ASCII
+ $((4))		PP_BLANK
+ $((5))		PP_CNTRL
+ $((6))		PP_DIGIT
+ $((7))		PP_GRAPH
+ $((8))		PP_LOWER
+ $((9))		PP_PRINT
+ $((10))	PP_PUNCT
+ $((11))	PP_SPACE
+ $((12))	PP_UPPER
+ $((13))	PP_XDIGIT
+ $((14))	PP_IDENT
+ $((15))	PP_IFS
+ $((16))	PP_IFSSPACE
+ $((17))	PP_WORD
+ $((18))	PP_INCOMPLETE
+ $((19))	PP_INVALID
+ $((19))	PP_LAST
+ $((20))	PP_UNKWN
+ $((21))	PP_RANGE
+)
+local -AHPrt globmodifiers=(
+ mapbase 16
+ $((0x0100))	GF_LCMATCHUC
+ $((0x0200))	GF_IGNCASE
+ $((0x0400))	GF_BACKREF
+ $((0x0800))	GF_MATCHREF
+ $((0x1000))	GF_MULTIBYTE	# Use multibyte if supported by build
+)
+local -AHPrt scanparamflags=(
+ mapbase 2
+ $((1<<0))	SCANPM_WANTVALS	# Return value includes hash values
+ $((1<<1))	SCANPM_WANTKEYS	# Return value includes hash keys
+ $((1<<2))	SCANPM_WANTINDEX	# Return value includes array index
+ $((1<<3))	SCANPM_MATCHKEY	# Subscript matched against key
+ $((1<<4))	SCANPM_MATCHVAL	# Subscript matched against value
+ $((1<<5))	SCANPM_MATCHMANY	# Subscript matched repeatedly, return all
+ $((1<<6))	SCANPM_ASSIGNING	# Assigning whole array/hash
+ $((1<<7))	SCANPM_KEYMATCH	# keys of hash treated as patterns
+ $((1<<8))	SCANPM_DQUOTED	# substitution was double-quoted
+ $((1<<9))	SCANPM_ARRONLY	# value is array but we don't
+ $((1<<10))	SCANPM_CHECKING	# Check if set, no need to create
+ $((1<<11))	SCANPM_NOEXEC	# No command substitutions, etc.
+)
+local -AHPrt substmodifiers=(
+ mapbase 16
+ $((0x0001))	SUB_END	# match end instead of beginning, % or %%
+ $((0x0002))	SUB_LONG	# % or # doubled, get longest match
+ $((0x0004))	SUB_SUBSTR	# match a substring
+ $((0x0008))	SUB_MATCH	# include the matched portion
+ $((0x0010))	SUB_REST	# include the unmatched portion
+ $((0x0020))	SUB_BIND	# index of beginning of string
+ $((0x0040))	SUB_EIND	# index of end of string
+ $((0x0080))	SUB_LEN		# length of match
+ $((0x0100))	SUB_ALL		# match complete string
+ $((0x0200))	SUB_GLOBAL	# global substitution ${..//all/these}
+ $((0x0400))	SUB_DOSUBST	# replacement string needs substituting
+ $((0x4000))	SUB_EGLOB	# use extended globbing in patterns
+)
+local -AHPrt printnodeflags=(
+ mapbase 2
+ $((1<<0))	PRINT_NAMEONLY
+ $((1<<1))	PRINT_TYPE
+ $((1<<2))	PRINT_LIST
+ $((1<<3))	PRINT_KV_PAIR
+ $((1<<4))	PRINT_INCLUDEVALUE
+ $((1<<5))	PRINT_TYPESET
+ $((1<<6))	PRINT_LINE
+ $((1<<7))	PRINT_POSIX_EXPORT
+ $((1<<8))	PRINT_POSIX_READONLY
+ $((1<<7))	PRINT_WHENCE_CSH
+ $((1<<8))	PRINT_WHENCE_VERBOSE
+ $((1<<9))	PRINT_WHENCE_SIMPLE
+ $((1<<10))	PRINT_WHENCE_FUNCDEF
+ $((1<<11))	PRINT_WHENCE_WORD
+)
+local -AHPrt savehistflags=(
+ mapbase 16
+ $((0x00000001))	HIST_MAKEUNIQUE	# Kill this new entry if not unique
+ $((0x00000002))	HIST_OLD	# Command is already written to disk
+ $((0x00000004))	HIST_READ	# Command was read back from disk
+ $((0x00000008))	HIST_DUP	# Command duplicates a later line
+ $((0x00000010))	HIST_FOREIGN	# Command came from another shell
+ $((0x00000020))	HIST_TMPSTORE	# Kill when user enters another cmd
+ $((0x00000040))	HIST_NOWRITE	# Keep internally but don't write
+)
+local -AHPrt histflags=(
+ mapbase 10
+ $((1))	HISTFLAG_DONE
+ $((2))	HISTFLAG_NOEXEC
+ $((4))	HISTFLAG_RECALL
+ $((8))	HISTFLAG_SETTY
+)
+local -AHPrt histfileflags=(
+ mapbase 16
+ $((0x0001))	HFILE_APPEND
+ $((0x0002))	HFILE_SKIPOLD
+ $((0x0004))	HFILE_SKIPDUPS
+ $((0x0008))	HFILE_SKIPFOREIGN
+ $((0x0010))	HFILE_FAST
+ $((0x0020))	HFILE_NO_REWRITE
+ $((0x8000))	HFILE_USE_OPTIONS
+)
+local -AHPrt modloadflags=(
+ mapbase 2
+ $((1<<0))	MOD_BUSY
+ $((1<<1))	MOD_UNLOAD
+ $((1<<2))	MOD_SETUP
+ $((1<<3))	MOD_LINKED
+ $((1<<4))	MOD_INIT_S
+ $((1<<5))	MOD_INIT_B
+ $((1<<6))	MOD_ALIAS
+)
+local -AHPrt modcondflags=(
+ mapbase 10
+ $((1))	CONDF_INFIX
+ $((2))	CONDF_ADDED
+ $((4))	CONDF_AUTOALL
+)
+local -AHPrt mathfunctypes=(
+ mapbase 10
+ $((1))	MFF_STR
+ $((2))	MFF_ADDED
+ $((4))	MFF_USERFUNC
+ $((8))	MFF_AUTOALL
+)
+local -AHPrt lexflags=(
+ mapbase 16
+ $((0x0001))	LEXFLAGS_ACTIVE
+ $((0x0002))	LEXFLAGS_ZLE
+ $((0x0004))	LEXFLAGS_COMMENTS_KEEP
+ $((0x0008))	LEXFLAGS_COMMENTS_STRIP
+ $((0x0010))	LEXFLAGS_NEWLINE
+)
+local -AHPrt lexstates=(
+ mapbase integer
+ $((0))	IN_NOTHING
+ $((1))	IN_CMD
+ $((2))	IN_MATH
+ $((3))	IN_COND
+ $((4))	IN_ENV
+ $((5))	IN_PAR
+)
+local -AHPrt emulations=(
+ mapbase 2
+ $((1<<1))	EMULATE_CSH	# C shell
+ $((1<<2))	EMULATE_KSH	# Korn shell
+ $((1<<3))	EMULATE_SH	# Bourne shell
+ $((1<<4))	EMULATE_ZSH	# `native' mode
+)
+local -AHPrt terminaltypes=(
+ mapbase 16
+ $((0x01))	TERM_BAD	# terminal has extremely basic capabilities
+ $((0x02))	TERM_UNKNOWN	# unknown terminal type
+ $((0x04))	TERM_NOUP	# terminal has no up capability
+ $((0x08))	TERM_SHORT	# terminal is < 3 lines high
+ $((0x10))	TERM_NARROW	# terminal is < 3 columns wide
+)
+local -AHPrt termcapacts=(
+ mapbase integer
+ $((0))		TCCLEARSCREEN
+ $((1))		TCLEFT
+ $((2))		TCMULTLEFT
+ $((3))		TCRIGHT
+ $((4))		TCMULTRIGHT
+ $((5))		TCUP
+ $((6))		TCMULTUP
+ $((7))		TCDOWN
+ $((8))		TCMULTDOWN
+ $((9))		TCDEL
+ $((10))	TCMULTDEL
+ $((11))	TCINS
+ $((12))	TCMULTINS
+ $((13))	TCCLEAREOD
+ $((14))	TCCLEAREOL
+ $((15))	TCINSLINE
+ $((16))	TCDELLINE
+ $((17))	TCNEXTTAB
+ $((18))	TCBOLDFACEBEG
+ $((19))	TCFAINTBEG
+ $((20))	TCSTANDOUTBEG
+ $((21))	TCUNDERLINEBEG
+ $((22))	TCITALICSBEG
+ $((23))	TCALLATTRSOFF
+ $((24))	TCSTANDOUTEND
+ $((25))	TCUNDERLINEEND
+ $((26))	TCITALICSEND
+ $((27))	TCHORIZPOS
+ $((28))	TCUPCURSOR
+ $((29))	TCDOWNCURSOR
+ $((30))	TCLEFTCURSOR
+ $((31))	TCRIGHTCURSOR
+ $((32))	TCSAVECURSOR
+ $((33))	TCRESTRCURSOR
+ $((34))	TCBACKSPACE
+ $((35))	TCFGCOLOUR
+ $((36))	TCBGCOLOUR
+)
+local -AHPrt cmdstackstates=(
+ mapbase integer
+ $((0))		CS_FOR
+ $((1))		CS_WHILE
+ $((2))		CS_REPEAT
+ $((3))		CS_SELECT
+ $((4))		CS_UNTIL
+ $((5))		CS_IF
+ $((6))		CS_IFTHEN
+ $((7))		CS_ELSE
+ $((8))		CS_ELIF
+ $((9))		CS_MATH
+ $((10))	CS_COND
+ $((11))	CS_CMDOR
+ $((12))	CS_CMDAND
+ $((13))	CS_PIPE
+ $((14))	CS_ERRPIPE
+ $((15))	CS_FOREACH
+ $((16))	CS_CASE
+ $((17))	CS_FUNCDEF
+ $((18))	CS_SUBSH
+ $((19))	CS_CURSH
+ $((20))	CS_ARRAY
+ $((21))	CS_QUOTE
+ $((22))	CS_DQUOTE
+ $((23))	CS_BQUOTE
+ $((24))	CS_CMDSUBST
+ $((25))	CS_MATHSUBST
+ $((26))	CS_ELIFTHEN
+ $((27))	CS_HEREDOC
+ $((28))	CS_HEREDOCD
+ $((29))	CS_BRACE
+ $((30))	CS_BRACEPAR
+ $((31))	CS_ALWAYS
+ $((32))	CS_COUNT
+)
+
+zmodload zsh/parameter
+local seek=${parameters[paramflags]}
+
+if [[ $1 = (|-)-h(|elp) ]]
+then
+  print -u2 Usage:
+  print -u2 "  printdefines [ category ] [ name | value ]"
+  shift
+fi
+
+if [[ -z $1 ]]
+then
+  print -u2 "Choose category:"
+  print -u2 -aC3 -- ${(ok)parameters[(R)$seek]}
+  return 1
+fi
+
+local -a outflag
+
+if [[ -z $parameters[$1] || $parameters[$1] != $seek ]]
+then
+  local -n scan
+  for scan in ${(k)parameters[(R)$seek]}
+  do
+    if [[ -n ${scan[(R)$1]} ]]
+    then
+      local -a hits
+      set -A hits ${${(nk)scan[(R)$~1]}:#mapbase}
+      integer -i ${scan[mapbase]/integer/10} w=${hits[-1]}
+      integer x=${#${scan[mapbase]/integer/}}+2
+      while (($#hits))
+      do
+	if [[ $scan[mapbase] = 2 ]]
+	then
+	  w=${hits[1]}
+	  local +i flag  
+	  if (( w ))
+	  then
+	    printf -v flag '1<<%d\t%s' $((${#w} - x))  $hits[1]
+	  else
+	    printf -v flag '0<<0\t%s' $hits[1]
+	  fi
+	else
+	  integer -i ${scan[mapbase]/integer/10} -Z ${#w} flag=${hits[1]}
+	fi
+	outflag+=($scan[$hits[1]] $flag )
+        shift hits
+      done
+      local +n scan	# ${!scan}
+      print -aC2 -- "--- $scan" --- $outflag
+      local -n scan
+      outflag=()
+    fi
+  done
+  return 0
+fi
+
+local -n ref=$1
+
+if [[ $2 = <-> ]]
+then
+  integer i=$2
+  integer flag
+  if [[ $ref[mapbase] = integer ]]
+  then
+    if (( (i -= ${${ref[$2]:+$2}:-0}) == 0 ))
+    then
+      outflag=($ref[$2])
+    fi
+  else
+    for flag in ${${(nk)ref}:#mapbase}
+    do
+      if (( i == flag || flag > 0 && (i & flag) == flag ))
+      then
+        # print $i $flag
+        outflag+=(${ref[$flag]})
+        (( i -= flag ))
+      fi
+    done
+  fi
+  print $2 ${(j:|:)outflag}
+  if (( i ))
+  then
+    print Unknown $1: $i
+  fi
+else
+  set -- ${${(nk)ref[(R)${~2:-*}]}:#mapbase}
+  integer -i ${ref[mapbase]/integer/10} w=${argv[-1]}
+  integer x=${#${ref[mapbase]/integer/}}+2
+  while ((ARGC))
+  do
+    if [[ $ref[mapbase] = 2 ]]
+    then
+      integer -i 2 w=$1
+      local +i flag
+      if (( w ))
+      then
+	printf -v flag '1<<%d\t%s' $((${#w} - x)) $1
+      else
+	printf -v flag '0<<0\t%s' $1
+      fi
+    else
+      integer -i ${ref[mapbase]/integer/10} -Z ${#w} flag=$1
+    fi
+    outflag+=($ref[$1] $flag )
+    shift
+  done
+  print -aC2 -- $outflag
+fi
