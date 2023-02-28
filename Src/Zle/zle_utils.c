@@ -799,7 +799,7 @@ spaceinline(int ct)
 		if (rhp->start_meta - sub >= zlemetacs) {
 		    rhp->start_meta += ct;
 		}
-		if (rhp->end_meta - sub >= zlemetacs && (!predisplaylen || zlecs)) {
+		if (rhp->end_meta - sub >= zlemetacs && (!predisplaylen || zlemetacs)) {
 		    rhp->end_meta += ct;
 		}
 	    }

@@ -1,3 +1,8 @@
+2023-02-28  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 51491: Src/Zle/zle_utils.c: Check should use zlemetacs instead
+	of zlecs
+
 2023-02-26  Bart Schaefer  <schaefer@zsh.org>
 
 	* 51464: Util/printdefines: utility to interpret zsh.h constants
