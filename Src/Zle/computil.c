@@ -911,7 +911,7 @@ struct cadef {
     Caarg rest;			/* the rest-argument */
     char **defs;		/* the original strings */
     int ndefs;			/* number of ... */
-    int lastt;			/* last time this was used */
+    time_t lastt;		/* last time this was used */
     Caopt *single;		/* array of single-letter options */
     char *match;		/* -M spec to use */
     int argsactive;		/* if normal arguments are still allowed */
@@ -2935,7 +2935,7 @@ struct cvdef {
     Cvval vals;			/* value definitions */
     char **defs;		/* original strings */
     int ndefs;			/* number of ... */
-    int lastt;			/* last time used */
+    time_t lastt;		/* last time used */
     int words;                  /* if to look at other words */
 };
 

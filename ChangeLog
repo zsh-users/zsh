@@ -3,6 +3,9 @@
 	* 52056: Completion/Unix/Command/_sccs: _sccs: don't handle
 	subcommands in main namespace
 
+	* 51490: Src/Zle/computil.c: Use time_t for lastt which stores
+	result of time(0)
+
 2023-10-15  Bart Schaefer  <schaefer@zsh.org>
 
 	* 52218: Etc/BUGS, NEWS, README: notes since 5.9 release
