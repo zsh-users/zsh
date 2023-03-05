@@ -122,6 +122,7 @@ makeprivate(HashNode hn, UNUSED(int flags))
 	    break;
 	default:
 	    makeprivate_error = 1;
+	    zfree(gsu, sizeof(struct gsu_closure));
 	    break;
 	}
 	/* PM_HIDE so new parameters in deeper scopes do not shadow */

@@ -1,3 +1,7 @@
+2023-03-05  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: Src/Modules/param_private.c: coverity memory leak
+
 2023-02-28  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 51491: Src/Zle/zle_utils.c: Check should use zlemetacs instead
