@@ -3123,7 +3123,7 @@ spckword(char **s, int hist, int cmd, int ask)
 
     if (**s == String && !*t) {
 	guess = *s + 1;
-	if (itype_end(guess, IIDENT, 1) == guess)
+	if (itype_end(guess, INAMESPC, 1) == guess)
 	    return;
 	ic = String;
 	d = 100;
@@ -4310,13 +4310,27 @@ wcsitype(wchar_t c, int itype)
  * If "once" is set, just test the first character, i.e. (outptr !=
  * inptr) tests whether the first character is valid in an identifier.
  *
- * Currently this is only called with itype IIDENT, IUSER or ISEP.
+ * Currently called only with itype INAMESPC, IIDENT, IUSER or ISEP.
  */
 
 /**/
 mod_export char *
 itype_end(const char *ptr, int itype, int once)
 {
+    if (itype == INAMESPC) {
+	itype = IIDENT;
+	if (once == 0 && !isset(POSIXIDENTIFIERS)) {
+	    /* Special case for names containing ".", ksh93 namespaces */
+	    char *t = itype_end(ptr + (*ptr == '.'), itype, 0);
+	    if (t > ptr+1) {
+		if (*t == '.')
+		    return itype_end(t+1, itype, 0);
+		else
+		    return t;
+	    }
+	}
+    }
+
 #ifdef MULTIBYTE_SUPPORT
     if (isset(MULTIBYTE) &&
 	(itype != IIDENT || !isset(POSIXIDENTIFIERS))) {

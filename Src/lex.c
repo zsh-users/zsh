@@ -1230,7 +1230,7 @@ gettokstr(int c, int sub)
 		    else {
 			int sav = *lexbuf.ptr;
 			*lexbuf.ptr = '\0';
-			t = itype_end(t, IIDENT, 0);
+			t = itype_end(t, INAMESPC, 0);
 			if (t < lexbuf.ptr) {
 			    skipparens(Inbrack, Outbrack, &t);
 			} else {

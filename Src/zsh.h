@@ -1963,6 +1963,8 @@ struct tieddata {
 				  */
 #define SCANPM_CHECKING   (1<<10) /* Check if set, no need to create */
 #define SCANPM_NOEXEC     (1<<11) /* No command substitutions, etc. */
+#define SCANPM_NONAMESPC  (1<<12) /* namespace syntax not allowed */
+
 /* "$foo[@]"-style substitution
  * Only sign bit is significant
  */

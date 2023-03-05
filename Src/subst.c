@@ -1870,7 +1870,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
      * these later on, too.
      */
     c = *s;
-    if (itype_end(s, IIDENT, 1) == s && *s != '#' && c != Pound &&
+    if (itype_end(s, INAMESPC, 1) == s && *s != '#' && c != Pound &&
 	!IS_DASH(c) &&
 	c != '!' && c != '$' && c != String && c != Qstring &&
 	c != '?' && c != Quest &&
@@ -2332,7 +2332,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	    }
 	} else if ((c == '#' || c == Pound) &&
 		   (inbrace || !isset(POSIXIDENTIFIERS)) &&
-		   (itype_end(s+1, IIDENT, 0) != s + 1
+		   (itype_end(s+1, INAMESPC, 0) != s + 1
 		    || (cc = s[1]) == '*' || cc == Star || cc == '@'
 		    || cc == '?' || cc == Quest
 		    || cc == '$' || cc == String || cc == Qstring
@@ -2369,8 +2369,9 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	     * Try to handle this when parameter is named
 	     * by (P) (second part of test).
 	     */
-	    if (itype_end(s+1, IIDENT, 0) != s+1 || (aspar && isstring(s[1]) &&
-				 (s[2] == Inbrace || s[2] == Inpar)))
+	    if (itype_end(s+1, INAMESPC, 0) != s+1 ||
+		(aspar && isstring(s[1]) &&
+		 (s[2] == Inbrace || s[2] == Inpar)))
 		chkset = 1, s++;
 	    else if (!inbrace) {
 		/* Special case for `$+' on its own --- leave unmodified */
@@ -2531,6 +2532,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	    scanflags |= SCANPM_DQUOTED;
 	if (chkset)
 	    scanflags |= SCANPM_CHECKING;
+	if (!inbrace)
+	    scanflags |= SCANPM_NONAMESPC;
 	/*
 	 * Second argument: decide whether to use the subexpression or
 	 *   the string next on the line as the parameter name.
@@ -3211,7 +3214,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	    shortest = 0;
 	    ++s;
 	}
-	if (*itype_end(s, IIDENT, 0)) {
+	if (*itype_end(s, INAMESPC, 0)) {
 	    untokenize(s);
 	    zerr("not an identifier: %s", s);
 	    return NULL;
@@ -3271,7 +3274,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	int intersect = (*s == '*' || *s == Star);
 	char **compare, **ap, **apsrc;
 	++s;
-	if (*itype_end(s, IIDENT, 0)) {
+	if (*itype_end(s, INAMESPC, 0)) {
 	    untokenize(s);
 	    zerr("not an identifier: %s", s);
 	    return NULL;

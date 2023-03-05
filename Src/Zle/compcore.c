@@ -1230,14 +1230,14 @@ check_param(char *s, int set, int test)
 	else if (idigit(*e))
 	    while (idigit(*e))
 		e++;
-	else if ((ie = itype_end(e, IIDENT, 0)) != e) {
+	else if ((ie = itype_end(e, INAMESPC, 0)) != e) {
 	    do {
 		e = ie;
 		if (comppatmatch && *comppatmatch &&
 		    (*e == Star || *e == Quest))
 		    ie = e + 1;
 		else
-		    ie = itype_end(e, IIDENT, 0);
+		    ie = itype_end(e, INAMESPC, 0);
 	    } while (ie != e);
 	}
 

@@ -43,6 +43,7 @@
 #define IWSEP    (1 << 13)
 #define INULL    (1 << 14)
 #define IPATTERN (1 << 15)
+#define INAMESPC (1 << 16)
 #define zistype(X,Y) (typtab[(unsigned char) (X)] & Y)
 #define idigit(X) zistype(X,IDIGIT)
 #define ialnum(X) zistype(X,IALNUM)

@@ -1,5 +1,10 @@
 2023-03-05  Bart Schaefer  <schaefer@zsh.org>
 
+	* 51483: Src/Zle/compcore.c, Src/Zle/zle_tricky.c, Src/lex.c,
+	Src/params.c, Src/subst.c, Src/utils.c, Src/zsh.h, Src/ztype.h:
+	Enable assignment and expansion of parameters with ksh-like
+	namespace prefixes.
+
 	* unposted: Src/Modules/param_private.c: coverity memory leak
 
 2023-02-28  Mikael Magnusson  <mikachu@gmail.com>

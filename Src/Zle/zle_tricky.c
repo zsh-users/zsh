@@ -576,7 +576,7 @@ parambeg(char *s)
 	    while (idigit(*e))
 		e++;
 	else
-	    e = itype_end(e, IIDENT, 0);
+	    e = itype_end(e, INAMESPC, 0);
 
 	/* Now make sure that the cursor is inside the name. */
 	if (offs <= e - s && offs >= b - s && n <= 0) {
@@ -765,7 +765,7 @@ docomplete(int lst)
 			    else if (idigit(*q))
 				do q++; while (idigit(*q));
 			    else
-				q = itype_end(q, IIDENT, 0);
+				q = itype_end(q, INAMESPC, 0);
 			    sav = *q;
 			    *q = '\0';
 			    if (zlemetacs - wb == q - s &&
@@ -1497,7 +1497,7 @@ get_comp_string(void)
 	if (varq)
 	    tt = clwords[clwpos];
 
-	s = itype_end(tt, IIDENT, 0);
+	s = itype_end(tt, INAMESPC, 0);
 	sav = *s;
 	*s = '\0';
 	zsfree(varname);

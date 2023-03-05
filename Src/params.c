@@ -1223,7 +1223,7 @@ isident(char *s)
 		break;
     } else {
 	/* Find the first character in `s' not in the iident type table */
-	ss = itype_end(s, IIDENT, 0);
+	ss = itype_end(s, INAMESPC, 0);
     }
 
     /* If the next character is not [, then it is *
@@ -2086,6 +2086,7 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
     char *s, *t, *ie;
     char sav, c;
     int ppar = 0;
+    int itype = (flags & SCANPM_NONAMESPC) ? IIDENT : INAMESPC;
 
     s = t = *pptr;
 
@@ -2095,7 +2096,7 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 	else
 	    ppar = *s++ - '0';
     }
-    else if ((ie = itype_end(s, IIDENT, 0)) != s)
+    else if ((ie = itype_end(s, itype, 0)) != s)
 	s = ie;
     else if (c == Quest)
 	*s++ = '?';
@@ -2183,7 +2184,7 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 		return v;
 	    }
 	} else if (!(flags & SCANPM_ASSIGNING) && v->isarr &&
-		   itype_end(t, IIDENT, 1) != t && isset(KSHARRAYS))
+		   itype_end(t, INAMESPC, 1) != t && isset(KSHARRAYS))
 	    v->end = 1, v->isarr = 0;
     }
     if (!bracks && *s)
@@ -6196,7 +6197,7 @@ setscope(Param pm)
     if (pm->node.flags & PM_NAMEREF) {
 	Param basepm;
 	struct asgment stop;
-	char *t = pm->u.str ? itype_end(pm->u.str, IIDENT, 0) : NULL;
+	char *t = pm->u.str ? itype_end(pm->u.str, INAMESPC, 0) : NULL;
 
 	/* Temporarily change nameref to array parameter itself */
 	if (t && *t == '[')
@@ -6277,7 +6278,7 @@ upscope(Param pm, int reflevel)
 mod_export int
 valid_refname(char *val)
 {
-    char *t = itype_end(val, IIDENT, 0);
+    char *t = itype_end(val, INAMESPC, 0);
 
     if (*t != 0) {
 	if (*t == '[') {
