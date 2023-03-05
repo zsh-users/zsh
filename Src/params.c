@@ -475,6 +475,15 @@ static initparam argvparam_pm = IPDEF9("", &pparams, NULL, \
 	((V) && (!(V)->pm || ((V)->pm->node.flags & PM_UNSET) || \
 		 !(V)->pm->node.nam || !*(V)->pm->node.nam))
 
+/*
+ * For named references.  Simple named references are just like scalars
+ * for efficiency, but special named references need get/set functions.
+ */
+#define GETREFNAME(PM) (((PM)->node.flags & PM_SPECIAL) ?	\
+			(PM)->gsu.s->getfn(PM) : (PM)->u.str)
+#define SETREFNAME(PM,S) (((PM)->node.flags & PM_SPECIAL) ?		\
+			  (PM)->gsu.s->setfn(PM,(S)) : ((PM)->u.str = (S)))
+
 static Param argvparam;
 
 /* "parameter table" - hash table containing the parameters
@@ -520,7 +529,7 @@ getparamnode(HashTable ht, const char *nam)
     HashNode hn = gethashnode2(ht, nam);
     Param pm = (Param) hn;
 
-    if (pm && pm->u.str && (pm->node.flags & PM_AUTOLOAD)) {
+    if (pm && (pm->node.flags & PM_AUTOLOAD) && pm->u.str) {
 	char *mn = dupstring(pm->u.str);
 
 	(void)ensurefeature(mn, "p:", (pm->node.flags & PM_AUTOALL) ? NULL :
@@ -1002,12 +1011,13 @@ createparam(char *name, int flags)
 	    struct asgment stop;
 	    stop.flags = PM_NAMEREF | (flags & PM_LOCAL);
 	    stop.name = oldpm->node.nam;
-	    stop.value.scalar = oldpm->u.str;
+	    stop.value.scalar = GETREFNAME(oldpm);
 	    lastpm = (Param)resolve_nameref(oldpm, &stop);
 	    if (lastpm) {
 		if (lastpm->node.flags & PM_NAMEREF) {
-		    if (lastpm->u.str && *(lastpm->u.str)) {
-			name = lastpm->u.str;
+		    char *refname = GETREFNAME(lastpm);
+		    if (refname && *refname) {
+			name = refname;
 			oldpm = NULL;
 		    } else {
 			if (!(lastpm->node.flags & PM_READONLY))
@@ -2145,25 +2155,28 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 	    memset(v, 0, sizeof(*v));
 	else
 	    v = (Value) hcalloc(sizeof *v);
-	if ((pm->node.flags & PM_NAMEREF) && pm->u.str && *(pm->u.str)) {
-	    /* only happens for namerefs pointing to array elements */
-	    char *ref = dupstring(pm->u.str);
-	    char *ss = pm->width ? ref + pm->width : NULL;
-	    if (ss) {
-		sav = *ss;
-		*ss = 0;
+	if (pm->node.flags & PM_NAMEREF) {
+	    char *refname = GETREFNAME(pm);
+	    if (refname && *refname) {
+		/* only happens for namerefs pointing to array elements */
+		char *ref = dupstring(refname);
+		char *ss = pm->width ? ref + pm->width : NULL;
+		if (ss) {
+		    sav = *ss;
+		    *ss = 0;
+		}
+		Param p1 = (Param)gethashnode2(paramtab, ref);
+		if (!(p1 && (pm = upscope(p1, pm->base))) ||
+		    ((pm->node.flags & PM_UNSET) &&
+		     !(pm->node.flags & PM_DECLARED)))
+		    return NULL;
+		if (ss) {
+		    flags |= SCANPM_NOEXEC;
+		    *ss = sav;
+		    s = dyncat(ss,*pptr);
+		} else
+		    s = *pptr;
 	    }
-	    Param p1 = (Param)gethashnode2(paramtab, ref);
-	    if (!(p1 && (pm = upscope(p1, pm->base))) ||
-		((pm->node.flags & PM_UNSET) &&
-		!(pm->node.flags & PM_DECLARED)))
-		return NULL;
-	    if (ss) {
-		flags |= SCANPM_NOEXEC;
-		*ss = sav;
-		s = dyncat(ss,*pptr);
-	    } else
-		s = *pptr;
 	}
 	if (PM_TYPE(pm->node.flags) & (PM_ARRAY|PM_HASHED)) {
 	    /* Overload v->isarr as the flag bits for hashed arrays. */
@@ -3648,7 +3661,7 @@ mod_export Param
 setiparam_no_convert(char *s, zlong val)
 {
     /*
-     * If the target is already an integer, thisgets converted
+     * If the target is already an integer, this gets converted
      * back.  Low technology rules.
      */
     char buf[BDIGBUFSIZE];
@@ -6115,22 +6128,23 @@ resolve_nameref(Param pm, const Asgment stop)
     const char *seek = stop ? stop->value.scalar : NULL;
 
     if (pm && (pm->node.flags & PM_NAMEREF)) {
-	if (pm && (pm->node.flags & (PM_UNSET|PM_TAGGED))) {
+	char *refname = GETREFNAME(pm);
+	if (pm->node.flags & (PM_UNSET|PM_TAGGED)) {
 	    /* Semaphore with createparam() */
 	    pm->node.flags &= ~PM_UNSET;
 	    if (pm->node.flags & PM_NEWREF)	/* See setloopvar() */
 		return NULL;
-	    if (pm->u.str && *(pm->u.str) && (pm->node.flags & PM_TAGGED))
+	    if (refname && *refname && (pm->node.flags & PM_TAGGED))
 		pm->node.flags |= PM_SELFREF;	/* See setscope() */
 	    return (HashNode) pm;
-	} else if (pm->u.str) {
+	} else if (refname) {
 	    if ((pm->node.flags & PM_TAGGED) ||
-		(stop && strcmp(pm->u.str, stop->name) == 0)) {
-		/* zwarnnam(pm->u.str, "invalid self reference"); */
+		(stop && strcmp(refname, stop->name) == 0)) {
+		/* zwarnnam(refname, "invalid self reference"); */
 		return stop ? (HashNode)pm : NULL;
 	    }
-	    if (*(pm->u.str))
-		seek = pm->u.str;
+	    if (*refname)
+		seek = refname;
 	}
     }
     else if (pm && !(stop && (stop->flags & PM_NAMEREF)))
@@ -6180,8 +6194,13 @@ setloopvar(char *name, char *value)
   Param pm = (Param) gethashnode2(realparamtab, name);
 
   if (pm && (pm->node.flags & PM_NAMEREF)) {
+      if (pm->node.flags & PM_READONLY) {
+	  /* Bash error is: "%s: readonly variable" */
+	  zerr("read-only reference: %s", pm->node.nam);
+	  return;
+      }
       pm->base = pm->width = 0;
-      pm->u.str = ztrdup(value);
+      SETREFNAME(pm, ztrdup(value));
       pm->node.flags &= ~PM_UNSET;
       pm->node.flags |= PM_NEWREF;
       setscope(pm);
@@ -6197,7 +6216,8 @@ setscope(Param pm)
     if (pm->node.flags & PM_NAMEREF) {
 	Param basepm;
 	struct asgment stop;
-	char *t = pm->u.str ? itype_end(pm->u.str, INAMESPC, 0) : NULL;
+	char *refname = GETREFNAME(pm);
+	char *t = refname ? itype_end(refname, INAMESPC, 0) : NULL;
 
 	/* Temporarily change nameref to array parameter itself */
 	if (t && *t == '[')
@@ -6211,7 +6231,7 @@ setscope(Param pm)
 	    stop.flags |= PM_LOCAL;
 	basepm = (Param)resolve_nameref(pm, &stop);
 	if (t) {
-	    pm->width = t - pm->u.str;
+	    pm->width = t - refname;
 	    *t = '[';
 	}
 	if (basepm) {
@@ -6220,23 +6240,23 @@ setscope(Param pm)
 		    if (pm->node.flags & PM_SELFREF) {
 			/* Loop signalled by resolve_nameref() */
 			if (upscope(pm, pm->base) == pm) {
-			    zerr("%s: invalid self reference", pm->u.str);
+			    zerr("%s: invalid self reference", refname);
 			    unsetparam_pm(pm, 0, 1);
 			    return;
 			}
 			pm->node.flags &= ~PM_SELFREF;
 		    } else if (pm->base == pm->level) {
-			if (pm->u.str && *(pm->u.str) &&
-			    strcmp(pm->node.nam, pm->u.str) == 0) {
-			    zerr("%s: invalid self reference", pm->u.str);
+			if (refname && *refname &&
+			    strcmp(pm->node.nam, refname) == 0) {
+			    zerr("%s: invalid self reference", refname);
 			    unsetparam_pm(pm, 0, 1);
 			    return;
 			}
 		    }
-		} else if (basepm->u.str) {
+		} else if ((t = GETREFNAME(basepm))) {
 		    if (basepm->base <= basepm->level &&
-			strcmp(pm->node.nam, basepm->u.str) == 0) {
-			zerr("%s: invalid self reference", pm->u.str);
+			strcmp(pm->node.nam, t) == 0) {
+			zerr("%s: invalid self reference", refname);
 			unsetparam_pm(pm, 0, 1);
 			return;
 		    }
@@ -6251,11 +6271,11 @@ setscope(Param pm)
 		unsetparam_pm(pm, 0, 1);
 	    } else if (isset(WARNNESTEDVAR))
 		zwarn("reference %s in enclosing scope set to local variable %s",
-		      pm->node.nam, pm->u.str);
+		      pm->node.nam, refname);
 	}
-	if (pm->u.str && upscope(pm, pm->base) == pm &&
-	    strcmp(pm->node.nam, pm->u.str) == 0) {
-	    zerr("%s: invalid self reference", pm->u.str);
+	if (refname && upscope(pm, pm->base) == pm &&
+	    strcmp(pm->node.nam, refname) == 0) {
+	    zerr("%s: invalid self reference", refname);
 	    unsetparam_pm(pm, 0, 1);
 	}
     }

@@ -1,5 +1,8 @@
 2023-03-05  Bart Schaefer  <schaefer@zsh.org>
 
+	* 51484: Src/builtins.yo Src/params.c: Extend named reference
+	handling for special parameters, improve doc.
+
 	* 51483: Src/Zle/compcore.c, Src/Zle/zle_tricky.c, Src/lex.c,
 	Src/params.c, Src/subst.c, Src/utils.c, Src/zsh.h, Src/ztype.h:
 	Enable assignment and expansion of parameters with ksh-like
