@@ -371,8 +371,8 @@ particular they can be called before or after `boot_'.
 The function named `boot_' should register function wrappers, hooks and
 anything that will be visible to the user that is not handled by features_
 and enables_ (so features should not be turned on here).  It will be called
-after the `setup_'-function, and also after the initial set of features
-have been set by calls to `features_' and `enables_'.
+after the initial set of features have been set by calls to `features_'
+and `enables_'.
 
 The function named `cleanup_', is called when the user tries to unload
 a module and should de-register all features and hooks.  A call
@@ -624,17 +624,20 @@ There are four macros used:
     - the name of the parameter
     - the parameter flags to set for it (from the PM_* flags defined
       in zsh.h)
-    - optionally a pointer to a variable holding the value of the
-      parameter
+    - optionally a pointer to the value of the parameter
     - a GSU pointer to the three functions that will be used to get
       the value of the parameter, store a value in the parameter,
       and unset the parameter
   - the other macros provide simple ways to define the most common
     types of parameters; they get the name of the parameter and a
     pointer to a variable holding the value as arguments; they are
-    used to define integer-, scalar-, and array-parameters, so the
-    variables whose addresses are given should be of type `long',
-    `char *', and `char **', respectively
+    used to define integer-, scalar-, and array-parameters, so for
+    those macros the pointer to the parameter value should be the
+    address of a variable of type `long', `char *',or `char **',
+    respectively, pointing in turn to the desired value.
+  - Parameters used in a module that don't have special behaviour
+    shouldn't be declared in this way, instead they should just be
+    created in `boot_'  with the standard parameter functions.
 
 GSU (get, set, unset) structures are defined in Src/zsh.h for each of
 the parameter types scalar, integer, float, array, and hash.

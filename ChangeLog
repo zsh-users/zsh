@@ -1,5 +1,7 @@
 2023-03-05  Bart Schaefer  <schaefer@zsh.org>
 
+	* 51486: Etc/zsh-development-guide: clarify module section
+
 	* 51485: Doc/Makefile.in, Doc/Zsh/mod_ksh93.yo, Src/utils.c,
 	Src/Modules/ksh93.c, Src/Modules/ksh93.mdd: module for several
 	ksh93 features, mostly enabled only in ksh emulation.
