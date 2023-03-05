@@ -4319,7 +4319,7 @@ itype_end(const char *ptr, int itype, int once)
 {
     if (itype == INAMESPC) {
 	itype = IIDENT;
-	if (once == 0 && !isset(POSIXIDENTIFIERS)) {
+	if (once == 0 && (!isset(POSIXIDENTIFIERS) || EMULATION(EMULATE_KSH))) {
 	    /* Special case for names containing ".", ksh93 namespaces */
 	    char *t = itype_end(ptr + (*ptr == '.'), itype, 0);
 	    if (t > ptr+1) {

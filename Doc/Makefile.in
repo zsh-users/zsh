@@ -63,7 +63,7 @@ Zsh/mod_compctl.yo Zsh/mod_complete.yo Zsh/mod_complist.yo \
 Zsh/mod_computil.yo Zsh/mod_curses.yo \
 Zsh/mod_datetime.yo Zsh/mod_db_gdbm.yo Zsh/mod_deltochar.yo \
 Zsh/mod_example.yo Zsh/mod_files.yo Zsh/mod_langinfo.yo \
-Zsh/mod_mapfile.yo Zsh/mod_mathfunc.yo \
+Zsh/mod_ksh93.yo Zsh/mod_mapfile.yo Zsh/mod_mathfunc.yo \
 Zsh/mod_nearcolor.yo Zsh/mod_newuser.yo \
 Zsh/mod_parameter.yo Zsh/mod_pcre.yo Zsh/mod_private.yo \
 Zsh/mod_regex.yo Zsh/mod_sched.yo Zsh/mod_socket.yo \

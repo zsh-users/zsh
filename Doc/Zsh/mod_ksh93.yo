@@ -1,0 +1,211 @@
+COMMENT(!MOD!zsh/ksh93
+Extended ksh93 compatibility for "emulate ksh"
+!MOD!)
+cindex(ksh93)
+The tt(zsh/ksh93) module provides one builtin and several parameters to
+improve compatibility with ksh93.  As of this writing, several ksh93
+features are still missing.
+
+subsect(Ksh Builtins)
+The single builtin provided by this module is:
+
+startitem()
+findex(nameref)
+cindex(named references, creating)
+item(tt(nameref) [ tt(-r) ] var(pname)[tt(=)var(rname)])(
+Equivalent to tt(typeset -n )var(pname)tt(=)var(rname)
+
+However, tt(nameref) is a builtin command rather than a reserved word,
+so when var(rname) uses subscript syntax it must be quoted against
+globbing.  Subscripts in referenced parameters are not supported in
+ksh93, so this is not a significant compatibility issue.
+)
+enditem()
+
+subsect(Ksh Parameters)
+cindex(parameters, ksh)
+Parameters supplied by this module that are marked with `<K>' below are
+available only in ksh emulation.
+
+startitem()
+vindex(.sh.command)
+item(tt(.sh.command))(
+A named reference to `tt(ZSH_DEBUG_CMD)'
+)
+vindex(.sh.edchar)
+item(tt(.sh.edchar) <K>)(
+In a ZLE widget, equivalent to the `tt(KEYS)' special parameter.  In a
+future release, assignments to this parameter will affect the input
+stream seen by ZLE.
+)
+vindex(.sh.edcol)
+item(tt(.sh.edcol))(
+A named reference to the ZLE special parameter `tt(CURSOR)'.
+)
+vindex(.sh.edmode)
+item(tt(.sh.edmode) <K>)(
+In a ZLE widget, this parameter has the value tt(ESC) (tt($'\e')) if the
+`tt(main)' keymap is selected, and the empty string otherwise.  This is
+intended for use with vi-mode key bindings (`tt(bindkey -v)').  In a
+future revision, assigning `tt(.sh.edchar=${.sh.edmode})' is expected
+to initiate `tt(vicmd)' mode when `tt(viins)' is active, and do
+nothing when `tt(vicmd)' is already active.
+)
+vindex(.sh.edtext)
+item(tt(.sh.edtext))(
+A named reference to the `tt(BUFFER)' special ZLE parameter.
+)
+vindex(.sh.file)
+item(tt(.sh.file))(
+A named reference to the `tt(ZSH_SCRIPT)' parameter.
+)
+vindex(.sh.fun)
+item(tt(.sh.fun) <K>)(
+In a shell function, the function's name.  Usually the same as `tt($0)',
+but not affected by tt(POSIX_ARGZERO) or tt(FUNCTION_ARGZERO) options.
+)
+vindex(.sh.level)
+item(tt(.sh.level) <K>)(
+In a shell function, initially set to the depth of the call stack. This
+may be assigned to change the apparent depth.  However, such assignment
+does not affect the scope of local parameters.
+)
+vindex(.sh.lineno)
+item(tt(.sh.lineno))(
+A named reference to the `tt(LINENO)' special parameter.
+)
+vindex(.sh.match)
+item(tt(.sh.match))(
+An array equivalent to the `tt(match)' parameter as assigned by the
+`tt(LPAR()#b)tt(RPAR())' extended globbing flag.  When the
+tt(KSH_ARRAYS) option is set, `tt(${.sh.match[0]})' gives the value of
+the `tt(MATCH)' parameter as set by the `tt(LPAR()#m)tt(RPAR())' extended
+globbing flag.  Currently, the tt(EXTENDED_GLOB) option must be enabled
+and those flags must be explicitly used in a pattern in order for these
+values of `tt(.sh.match)' to be set.
+)
+vindex(.sh.name)
+item(tt(.sh.name) <K>)(
+When the `tt(vared)' command is used, this parameter may be used in
+user-defined ZLE widgets to get the name of the variable being edited.
+A future release is expected to use this parameter in the implementation
+of "discipline functions".
+)
+vindex(.sh.subscript)
+item(tt(.sh.subscript) <K>)(
+When `tt(vared)' has been used on an array element, this parameter holds
+the array index (either a number, or an associative array key).
+)
+vindex(.sh.subshell)
+item(tt(.sh.subshell))(
+A named reference to the `tt(ZSH_SUBSHELL)' parameter.
+)
+vindex(.sh.value)
+item(tt(.sh.value) <K>)(
+In `tt(vared)' this is a named reference to the ZLE special `tt(BUFFER)'.
+A future release is expected to use this parameter in the implementation
+of "discipline functions".
+)
+vindex(.sh.version)
+item(tt(.sh.version))(
+A named reference to `tt(ZSH_PATCHLEVEL)'.
+)
+enditem()
+
+subsect(Future Compatibility)
+
+The following features of ksh93 are not currently supported but may be
+available in a future release.
+
+startitem()
+item(var(pathdir)tt(/.paths))(
+Each directory var(pathdir) in the tt(PATH) parameter may contain a
+text file `tt(.paths)' which may define additional directories to
+be searched for function definitions (tt(FPATH)), external executables
+(tt(PATH)), and plugin files (similar to tt(MODULE_PATH)).
+
+em(THIS FEATURE IS UNLIKELY EVER TO BE IMPLEMENTED.)
+)
+item(tt(builtin -f )var(file))(
+Installs a new shell builtin command dynamically linked from var(file),
+where var(file) is found by a path search and the base name of the file
+is the name of the builtin to be added.
+
+Similar to `tt(zmodload -F zsh/)var(file)tt( +b:)var(file)'.
+
+em(THIS FEATURE IS UNLIKELY EVER TO BE IMPLEMENTED.)
+)
+item(tt(namespace )var(ident)tt( { )var(list)tt( }))(
+This reserved word executes the current shell compound command
+tt({ )var(list)tt( }), with the special behavior that all functions
+and parameters `var(name)' declared within var(list) are implicitly
+prefixed to become `tt(.)var(ident)tt(.)var(name)', and similarly any
+reference to a function or parameter `var(name)' is searched for as
+`tt(.)var(ident)tt(.)var(name)' before falling back to `var(name)'.
+
+em(THIS FEATURE IS NOT YET IMPLEMENTED.)
+)
+item(tt(.sh.math) <K>)(
+This parameter is more accurately considered a namespace.  A function
+defintion of the form
+ifzman()
+indent(tt(function .sh.math.)var(name)tt( )var(ident)tt( ... { )var(list)tt( }))
+
+is equivalent to the native zsh definition
+ifzman()
+example(tt(function )var(name)tt( {)
+tt(  local )var(ident)tt(=$1 ...)
+tt(  )var(list)
+tt(})
+tt(functions -M )var(name)tt( 1 3))
+ifzman()
+Up to 3 var(ident) arguments, interpreted as floating point numbers,
+may be provided for a function defined with tt(.sh.math) in this way.
+The names (but not definitions) of all such functions are available
+via tt(${.sh.math[@]}).
+
+em(THIS FEATURE IS NOT YET IMPLEMENTED.)
+)
+item(tt(var(name)tt(.get)))(
+A shell function having this name, if defined, is invoked whenever the
+parameter tt(${)var(name)tt(}) is referenced, including by commands
+such as `tt(typeset -p)'.  If the special variable `tt(.sh.value)' is
+assigned by the function, that value is substituted instead of the
+true value of var(name).  This does not change the value of var(name),
+but there is no way to access the actual value without first removing
+the function.
+
+Additionally, an explicit reference to tt(${)var(name)tt(.get})
+calls the function var(name)tt(.get) even if there is no parameter
+`var(name)' and substitutes the standard output of the function.
+
+em(THIS FEATURE IS NOT YET IMPLEMENTED.)
+)
+xitem(tt(var(name)tt(.set)))
+item(tt(var(name)tt(.append)))(
+Shell functions having these names are invoked when the parameter
+var(name) is assigned or (for array types) has a new field appended.
+The function may change the result of the operation by assigning to
+the `tt(.sh.value)' special parameter, or block the change by
+unsetting `tt(.sh.value)'.
+
+Explicit reference to tt(${)var(name)tt(.set}) or tt(${)var(name)tt(.append})
+substitutes the standard output of the function.
+
+em(THIS FEATURE IS NOT YET IMPLEMENTED.)
+)
+item(tt(var(name)tt(.unset)))(
+When a function of this name is defined, it is called whenever the
+parameter var(name) would be unset.  The function must explicitly
+`tt(unset )var(name)', otherwise the variable remains set.
+
+em(THIS FEATURE IS NOT YET IMPLEMENTED.)
+)
+item(tt(${ )var(list)tt(;}))(
+Note the space after the opening brace (tt({)). This executes var(list)
+in the current shell and substitutes its standard output in the manner
+of `tt($LPAR())var(list)tt(RPAR())' but without forking.
+
+em(THIS FEATURE IS NOT YET IMPLEMENTED.)
+)
+enditem()

@@ -1,0 +1,8 @@
+name=zsh/ksh93
+link=either
+load=yes
+
+autofeatures="b:nameref"
+autofeatures_emu="b:nameref p:.sh.command p:.sh.edcol p:.sh.edtext p:.sh.file p:.sh.lineno p:.sh.match p:.sh.subshell p:.sh.version"
+
+objects="ksh93.o"
