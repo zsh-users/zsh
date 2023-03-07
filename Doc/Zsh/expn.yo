@@ -604,6 +604,16 @@ and other operators, such as `tt(${PREFIX:-"/usr/local"})'.  Parameter
 expansions can also be nested.  These topics will be introduced below.
 The full rules are complicated and are noted at the end.
 
+cindex(namespace)
+Parameter expansions may optionally include a em(namespace) prefix in
+the format `tt(.)var(identifier)tt(.)' This currently has no special
+meaning to the shell, but provides a convenient means of grouping
+related parameters.  Expansions using a namespace em(must) include
+braces (tt({) and tt(})) as shown in the descriptions below, and
+only one namespace prefix is allowed.  Note that, for support of
+possible future features, the first `tt(.)' is optional, but omitting
+it is discouraged.
+
 In the expansions discussed below that require a pattern, the form of
 the pattern is the same as that used for filename generation;
 see noderef(Filename Generation).  Note that these patterns, along with
@@ -616,6 +626,8 @@ substitution on the expansion of parameter tt($i).
 
 In the following descriptions, `var(word)' refers to a single word
 substituted on the command line, not necessarily a space delimited word.
+The reference to `var(name)' in each description presumes any optional
+namespace prefix.
 
 startitem()
 item(tt(${)var(name)tt(}))(

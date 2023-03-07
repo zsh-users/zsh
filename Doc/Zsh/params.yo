@@ -52,6 +52,20 @@ cindex(assignment)
 ifzman()
 indent(var(name)tt(=)var(value))
 
+cindex(namespace)
+The var(name) in an assignment may optionally include a em(namespace)
+prefix:
+ifzman()
+indent(tt(.)var(namespace)tt(.)var(parameter)tt(=)var(value))
+
+Namespaces have no special meaning to the shell except that parameters
+with a `tt(.)' prefix are not listed by the `tt(set)' builtin, nor
+shown by the `tt(typeset)' builtin unless explicitly named or the
+`tt(-m)' option is used.  They provide a convenient way to group
+related variables.  Note that, for support of possible future features,
+the first `tt(.)' is optional, but omitting it is discouraged.  Unlike
+ksh, a namespace need not be declared before it is referenced.
+
 In scalar assignment, var(value) is expanded as a single string, in
 which the elements of arrays are joined together; filename expansion is
 not performed unless the option tt(GLOB_ASSIGN) is set.
@@ -70,7 +84,8 @@ change its type to integer or float, and with tt(GLOB_ASSIGN) assigning a
 pattern to a variable may change its type to an array.
 
 To reference the value of a parameter, write `tt($)var(name)' or
-`tt(${)var(name)tt(})'.  See
+`tt(${)var(name)tt(})'.  The latter form is required when var(name)
+includes a namespace prefix.  See
 ifzman(em(Parameter Expansion) in zmanref(zshexpn))\
 ifnzman(noderef(Parameter Expansion))
 for complete details.  That section also explains the effect

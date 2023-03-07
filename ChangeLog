@@ -1,5 +1,7 @@
 2023-03-06  Bart Schaefer  <schaefer@zsh.org>
 
+	* 51511: Doc/Zsh/expn.yo, Doc/Zsh/params.yo: Document namespaces
+
 	* 51510: Src/builtin.c, Src/params.c, Src/utils.c, Src/zsh.h,
 	Test/K02parameter.ztst: parameters with a leading namespace are
 	skipped in output of "set" and "typeset", add tests for ksh-like
