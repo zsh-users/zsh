@@ -118,23 +118,6 @@ The following features of ksh93 are not currently supported but may be
 available in a future release.
 
 startitem()
-item(var(pathdir)tt(/.paths))(
-Each directory var(pathdir) in the tt(PATH) parameter may contain a
-text file `tt(.paths)' which may define additional directories to
-be searched for function definitions (tt(FPATH)), external executables
-(tt(PATH)), and plugin files (similar to tt(MODULE_PATH)).
-
-em(THIS FEATURE IS UNLIKELY EVER TO BE IMPLEMENTED.)
-)
-item(tt(builtin -f )var(file))(
-Installs a new shell builtin command dynamically linked from var(file),
-where var(file) is found by a path search and the base name of the file
-is the name of the builtin to be added.
-
-Similar to `tt(zmodload -F zsh/)var(file)tt( +b:)var(file)'.
-
-em(THIS FEATURE IS UNLIKELY EVER TO BE IMPLEMENTED.)
-)
 item(tt(namespace )var(ident)tt( { )var(list)tt( }))(
 This reserved word executes the current shell compound command
 tt({ )var(list)tt( }), with the special behavior that all functions
@@ -207,5 +190,59 @@ in the current shell and substitutes its standard output in the manner
 of `tt($LPAR())var(list)tt(RPAR())' but without forking.
 
 em(THIS FEATURE IS NOT YET IMPLEMENTED.)
+)
+item(tt(typeset -C )var(name)[tt(=)var(values)tt( ...)])(
+Creates a em(compound variable).
+
+em(THIS FEATURE IS NOT YET IMPLEMENTED, and the syntax of var(values)
+is unlikely to be fully ksh compatible.)
+)
+enditem()
+
+subsect(Other Differences)
+
+The following features of ksh93 are not currently supported and there are
+no plans to implement them.
+
+startitem()
+item(var(pathdir)tt(/.paths))(
+Each directory var(pathdir) in the tt(PATH) parameter may contain a
+text file `tt(.paths)' which may define additional directories to
+be searched for function definitions (tt(FPATH)), external executables
+(tt(PATH)), and plugin files (similar to tt(MODULE_PATH)).
+
+em(THIS FEATURE IS UNLIKELY EVER TO BE IMPLEMENTED.)
+)
+item(tt(builtin -f )var(file))(
+Installs a new shell builtin command dynamically linked from var(file),
+where var(file) is found by a path search and the base name of the file
+is the name of the builtin to be added.
+
+Similar to `tt(zmodload -F zsh/)var(file)tt( +b:)var(file)'.
+
+em(THIS FEATURE IS UNLIKELY EVER TO BE IMPLEMENTED.)
+)
+item(tt(typeset -H )var(name)[tt(=)var(value)])(
+Used for em(host-name file mapping) on some operating systems.
+
+em(THIS FEATURE IS UNLIKELY EVER TO BE IMPLEMENTED.)
+)
+item(tt(typeset ){tt(PLUS()|-)}tt(M )var(mapname)tt( )var(name)[tt(=)var(value)])(
+Declares a character translation var(mapname) for values assigned to var(name).
+)
+xitem(tt(typeset -S))
+xitem(tt(typeset -T ) [tt(-f)] [ var(tname)tt(=LPAR())var(values)tt(RPAR()) ])
+item(tt(typeset -h )var(str))(
+Used to define em(typed variables) and properties of their em(sub-variables).
+The tt(-T) and tt(-h) options conflict with existing zsh usage.
+)
+item(tt(typeset -X )var(name)[tt(=)var(value)])(
+Declares a floating-point variable displayed in hexadecimal format.
+)
+item(tt(typeset -b )var(name)[tt(=)var(value)])(
+Declares a parameter stored in em(base64) format.
+)
+item(tt(typeset -m )var(newname)tt(=)var(oldname))(
+em(Moves) var(oldname) to var(newname).  Conflicts with native zsh usage.
 )
 enditem()
