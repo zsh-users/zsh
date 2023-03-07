@@ -2184,6 +2184,7 @@ typedef groupset *Groupset;
 #define PRINT_LINE	        (1<<6)
 #define PRINT_POSIX_EXPORT	(1<<7)
 #define PRINT_POSIX_READONLY	(1<<8)
+#define PRINT_WITH_NAMESPACE	(1<<9)
 
 /* flags for printing for the whence builtin */
 #define PRINT_WHENCE_CSH	(1<<7)

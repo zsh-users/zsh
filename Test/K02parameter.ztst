@@ -1,0 +1,106 @@
+# Test parameter expansion with namespace syntax
+# (heavily borrowed from D04parameter.ztst)
+
+%prep
+
+%test
+
+  .k02.foo='the first parameter'
+  .k02.bar='the second parameter'
+  print -l $.k02.foo ${.k02.bar}
+0:Basic scalars with namespace
+F:Braces are required
+>$.k02.foo
+>the second parameter
+
+  typeset .k02.bar='the second parameter'
+  print -l ${.k02.bar}
+0:Scalar but with typeset
+>the second parameter
+
+  .k02.array1=(the first array)
+  .k02.array2=(the second array)
+  print -l $.k02.array1 ${.k02.array2}
+0:Basic arrays with namespace
+>$.k02.array1
+>the
+>second
+>array
+
+  typeset -a .k02.array2=(the second array)
+  print -l ${.k02.array2}
+0:Array but with typeset
+>the
+>second
+>array
+
+  setopt ksharrays
+  print -l ${.k02.array2}
+  unsetopt ksharrays
+0:Basic ksharray with namespace
+>the
+
+  setopt shwordsplit
+  print -l ${.k02.foo} ${==.k02.bar}
+  unsetopt shwordsplit
+0:Basic shwordsplit with namespace
+>the
+>first
+>parameter
+>the second parameter
+
+  print ${+.k02.foo} ${+.k02.notappearinginthistest}
+0:$+... and namespace
+>1 0
+
+  .k02.x=()
+  print ${+.k02.x} ${+.k02.x[1]} ${+.k02.x[(r)foo]} ${+.k02.x[(r)bar]}
+  .k02.x=(foo)
+  print ${+.k02.x} ${+.k02.x[1]} ${+.k02.x[(r)foo]} ${+.k02.x[(r)bar]}
+0:$+... with arrays and namespace
+>1 0 0 0
+>1 1 1 0
+
+  # See D04 for complete explanation.
+  # For K02 we're just testing that flag syntax works.
+  .k02.foo='<five> {six} (seven) >eight< }nine{ |forty-two| $many$ )ten( more'
+  .k02.array=(${(z).k02.foo})
+  print -l ${(Q).k02.array}
+0:${(z)...} and ${(Q)...} for some hard to parse cases
+><
+>five
+>>
+>{six}
+>(
+>seven
+>)
+>>
+>eight
+><
+>}nine{
+>|
+>forty-two
+>|
+>$many$
+>)
+>ten( more
+
+  .k02.array=(characters in an array)
+  print ${(c)#.k02.array}
+0:${(c)#...}
+>22
+
+  () {
+    typeset -n .k02.ref=.k02.array
+    emulate -L ksh
+    print -l ${!.k02.ref} ${(!).k02.ref} ${.k02.ref}
+  }
+0:namerefs with namespaces
+>.k02.array
+>.k02.array
+>characters
+
+  k.2=test
+  print ${k.2}
+0:Parse without leading dot (future proofing)
+>test

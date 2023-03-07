@@ -2240,7 +2240,8 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 		paramtab->printnode(&pm->node, PRINT_TYPESET);
 	    else if (!OPT_ISSET(ops,'g') &&
 		     (unset(TYPESETSILENT) || OPT_ISSET(ops,'m')))
-		paramtab->printnode(&pm->node, PRINT_INCLUDEVALUE);
+		paramtab->printnode(&pm->node,
+				    PRINT_INCLUDEVALUE|PRINT_WITH_NAMESPACE);
 	    return pm;
 	}
 	if ((pm->node.flags & PM_RESTRICTED) && isset(RESTRICTED)) {
@@ -2274,7 +2275,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    }
 	}
 	if (OPT_ISSET(ops,'p')) {
-	    paramtab->printnode(&pm->node, PRINT_TYPESET);
+	    paramtab->printnode(&pm->node, PRINT_TYPESET|PRINT_WITH_NAMESPACE);
 	    return pm;
 	}
 	if (usepm == 2)		/* do not change the PM_UNSET flag */
@@ -2662,7 +2663,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
     char *optstr = TYPESET_OPTSTR;
     int on = 0, off = 0, roff, bit = PM_ARRAY;
     int i;
-    int returnval = 0, printflags = 0;
+    int returnval = 0, printflags = PRINT_WITH_NAMESPACE;
     int hasargs = *argv != NULL || (assigns && firstnode(assigns));
 
     /* POSIXBUILTINS is set for bash/ksh and both ignore -p with args */
@@ -2730,7 +2731,6 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 
     queue_signals();
 
-    /* Given no arguments, list whatever the options specify. */
     if (OPT_ISSET(ops,'p')) {
 
 	if (isset(POSIXBUILTINS) && SHELL_EMULATION() != EMULATE_KSH) {
@@ -2756,8 +2756,14 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	    /* -p0 treated as -p for consistency */
 	}
     }
+
+    /* Given no arguments, list whatever the options specify. */
     if (!hasargs) {
 	int exclude = 0;
+
+	if (!OPT_ISSET(ops,'m'))
+	    printflags &= ~PRINT_WITH_NAMESPACE;
+	
 	if (!OPT_ISSET(ops,'p')) {
 	    if (!(on|roff))
 		printflags |= PRINT_TYPE;

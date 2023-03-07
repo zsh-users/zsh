@@ -1,5 +1,10 @@
 2023-03-06  Bart Schaefer  <schaefer@zsh.org>
 
+	* 51510: Src/builtin.c, Src/params.c, Src/utils.c, Src/zsh.h,
+	Test/K02parameter.ztst: parameters with a leading namespace are
+	skipped in output of "set" and "typeset", add tests for ksh-like
+	parameter handling and fix a bug thus revealed
+
 	* 51509 (+ fix typo): Src/params.c, Src/subst.c, Src/zsh.h: Add
 	${(!)name} for the referred-to parameter of a named reference,
 	and extend ${!name} in ksh emulation for same

@@ -5966,6 +5966,10 @@ printparamnode(HashNode hn, int printflags)
     Param p = (Param) hn;
     Param peer = NULL;
 
+    if (!(p->node.flags & PM_HASHELEM) &&
+	!(printflags & PRINT_WITH_NAMESPACE) && *(p->node.nam) == '.')
+	return;
+    
     if (p->node.flags & PM_UNSET) {
 	if ((printflags & (PRINT_POSIX_READONLY|PRINT_POSIX_EXPORT) &&
 	     p->node.flags & (PM_READONLY|PM_EXPORTED)) ||

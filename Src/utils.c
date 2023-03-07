@@ -4319,13 +4319,13 @@ itype_end(const char *ptr, int itype, int once)
 {
     if (itype == INAMESPC) {
 	itype = IIDENT;
-	if (once == 0 && (!isset(POSIXIDENTIFIERS) || EMULATION(EMULATE_KSH))) {
+	if (!isset(POSIXIDENTIFIERS) || EMULATION(EMULATE_KSH)) {
 	    /* Special case for names containing ".", ksh93 namespaces */
 	    char *t = itype_end(ptr + (*ptr == '.'), itype, 0);
-	    if (t > ptr+1) {
+	    if (t > ptr + (*ptr == '.')) {
 		if (*t == '.')
-		    return itype_end(t+1, itype, 0);
-		else
+		    ptr = t + 1;	/* Fall through */
+		else if (!once)
 		    return t;
 	    }
 	}
