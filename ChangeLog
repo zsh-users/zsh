@@ -1,5 +1,9 @@
 2023-03-06  Bart Schaefer  <schaefer@zsh.org>
 
+	* 51509 (+ fix typo): Src/params.c, Src/subst.c, Src/zsh.h: Add
+	${(!)name} for the referred-to parameter of a named reference,
+	and extend ${!name} in ksh emulation for same
+
 	* 51524: Src/Modules/ksh93.mdd: dependency on zsh/zle for linkage
 
 2023-03-05  Bart Schaefer  <schaefer@zsh.org>

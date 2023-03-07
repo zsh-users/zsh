@@ -2144,7 +2144,10 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 	int isvarat;
 
         isvarat = (t[0] == '@' && !t[1]);
-	pm = (Param) paramtab->getnode(paramtab, *t == '0' ? "0" : t);
+	if (flags & SCANPM_NONAMEREF)
+	    pm = (Param) paramtab->getnode2(paramtab, *t == '0' ? "0" : t);
+	else
+	    pm = (Param) paramtab->getnode(paramtab, *t == '0' ? "0" : t);
 	if (sav)
 	    *s = sav;
 	*pptr = s;
@@ -2155,7 +2158,7 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 	    memset(v, 0, sizeof(*v));
 	else
 	    v = (Value) hcalloc(sizeof *v);
-	if (pm->node.flags & PM_NAMEREF) {
+	if ((pm->node.flags & PM_NAMEREF) && !(flags & SCANPM_NONAMEREF)) {
 	    char *refname = GETREFNAME(pm);
 	    if (refname && *refname) {
 		/* only happens for namerefs pointing to array elements */
