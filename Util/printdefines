@@ -288,16 +288,18 @@ local -AHPrt scanparamflags=(
  mapbase 2
  $((1<<0))	SCANPM_WANTVALS	# Return value includes hash values
  $((1<<1))	SCANPM_WANTKEYS	# Return value includes hash keys
- $((1<<2))	SCANPM_WANTINDEX	# Return value includes array index
+ $((1<<2))	SCANPM_WANTINDEX # Return value includes array index
  $((1<<3))	SCANPM_MATCHKEY	# Subscript matched against key
  $((1<<4))	SCANPM_MATCHVAL	# Subscript matched against value
- $((1<<5))	SCANPM_MATCHMANY	# Subscript matched repeatedly, return all
- $((1<<6))	SCANPM_ASSIGNING	# Assigning whole array/hash
+ $((1<<5))	SCANPM_MATCHMANY # Subscript matched repeatedly, return all
+ $((1<<6))	SCANPM_ASSIGNING # Assigning whole array/hash
  $((1<<7))	SCANPM_KEYMATCH	# keys of hash treated as patterns
  $((1<<8))	SCANPM_DQUOTED	# substitution was double-quoted
  $((1<<9))	SCANPM_ARRONLY	# value is array but we don't
  $((1<<10))	SCANPM_CHECKING	# Check if set, no need to create
  $((1<<11))	SCANPM_NOEXEC	# No command substitutions, etc.
+ $((1<<12))	SCANPM_NONAMESPC # namespace syntax not allowed
+ $((1<<13))	SCANPM_NONAMEREF # named references are not followed
 )
 local -AHPrt substmodifiers=(
  mapbase 16
@@ -314,7 +316,7 @@ local -AHPrt substmodifiers=(
  $((0x0400))	SUB_DOSUBST	# replacement string needs substituting
  $((0x4000))	SUB_EGLOB	# use extended globbing in patterns
 )
-local -AHPrt printnodeflags=(
+local -AHPrt printparamflags=(
  mapbase 2
  $((1<<0))	PRINT_NAMEONLY
  $((1<<1))	PRINT_TYPE
@@ -325,6 +327,9 @@ local -AHPrt printnodeflags=(
  $((1<<6))	PRINT_LINE
  $((1<<7))	PRINT_POSIX_EXPORT
  $((1<<8))	PRINT_POSIX_READONLY
+ $((1<<9))	PRINT_WITH_NAMESPACE
+)
+local -AHPrt printwhenceflags=(
  $((1<<7))	PRINT_WHENCE_CSH
  $((1<<8))	PRINT_WHENCE_VERBOSE
  $((1<<9))	PRINT_WHENCE_SIMPLE

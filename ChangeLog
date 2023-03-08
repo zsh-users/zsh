@@ -1,3 +1,7 @@
+2023-03-07  Bart Schaefer  <schaefer@zsh.org>
+
+	* 51534: Util/printdefines: update for recent changes
+
 2023-03-06  Bart Schaefer  <schaefer@zsh.org>
 
 	* 51512: Doc/Zsh/mod_ksh93.yo: More about unsupported features
