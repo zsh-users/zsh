@@ -1,0 +1,88 @@
+#compdef shortcuts
+
+_shortcuts() {
+  local curcontext="$curcontext"
+  local -a line state
+
+  _arguments -C \
+    "1: :->subcommand" \
+    "*:: :->args"
+
+  case $state in
+  subcommand)
+    _values "subcommand" \
+      "run[run a shortcut]" \
+      "list[list your shortcuts]" \
+      "view[view a shortcut in shortcuts]" \
+      "sign[sign a shortcut file]" \
+      "help[show subcommand help information]"
+    ;;
+  args)
+    case ${line[1]} in
+    run)
+      _shortcuts-run
+      ;;
+    list)
+      _shortcuts-list
+      ;;
+    view)
+      _shortcuts-view
+      ;;
+    sign)
+      _shortcuts-sign
+      ;;
+    help)
+      _shortcuts-help
+      ;;
+    esac
+    ;;
+  esac
+}
+
+_shortcuts-run() {
+  _arguments \
+    ":shortcut name or identifier:$(_shortcut_options)" \
+    {-i,--input-path}'[specify input to provide to the shortcut]:input path:_files' \
+    {-o,--output-path}'[specify where to write the shortcut output, if applicable]:output path:_files' \
+    '--output-type[specify type to output data in]:output type (Universal Type Identifier format)' \
+    {-h,--help}'[show help information]'
+}
+
+_shortcuts-list() {
+  _arguments \
+    {-f,--folder-name}"[specify folder name or identifier to list shortcuts in, or \"none\" to list shortcuts not in a folder]:folder name:$(_shortcut_folder_options)" \
+    '--folders[list folders instead of shortcuts]' \
+    '--show-identifiers[show identifiers with each result]' \
+    {-h,--help}'[show help information]'
+}
+
+_shortcuts-view() {
+  _arguments \
+    ":shortcut name:$(_shortcut_options)" \
+    {-h,--help}'[show help information]'
+}
+
+_shortcuts-sign() {
+  _arguments \
+    {-m,--mode}'[specify signing mode]:mode [people-who-know-me]:(anyone people-who-know-me)' \
+    {-i,--input}'[specify shortcut file to sign]:input:_files -g "*.shortcut(-.)"' \
+    {-o,--output}'[specify output path for the signed shortcut file]:output:_files -g "*.shortcut(-.)"' \
+    {-h,--help}'[show help information]'
+}
+
+_shortcuts-help() {
+  _arguments \
+    ":subcommand:(run list view sign help)"
+}
+
+# utilities
+
+_shortcut_options() {
+  echo "($(shortcuts list | sed 's/ /\\ /g'))"
+}
+
+_shortcut_folder_options() {
+  echo "($(shortcuts list --folders | sed 's/ /\\ /g') none)"
+}
+
+_shortcuts "$@"

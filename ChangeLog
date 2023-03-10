@@ -1,3 +1,8 @@
+2023-05-13  Oliver Kiddle  <opk@zsh.org>
+
+	* github #98: Vidhan Bhatt: Completion/Darwin/Command/_shortcuts:
+	feat: add `shortcuts` completions
+
 2023-05-11  Bart Schaefer  <schaefer@zsh.org>
 
 	* users/29070: Src/Zle/zle_tricky.c: clean up tokens in cmdstr
