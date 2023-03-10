@@ -40,7 +40,7 @@ _shortcuts() {
 
 _shortcuts_run() {
   _arguments \
-    ":shortcut name or identifier:$(shortcut_options)" \
+    ":shortcut name or identifier:$(_shortcut_options)" \
     {-i,--input-path}"[The input to provide to the shortcut.]:input path:_files" \
     {-o,--output-path}"[Where to write the shortcut output, if applicable.]:output path:_files" \
     "(--output-type)--output-type[What type to output data in, in Universal Type Identifier format.]:output type:" \
@@ -49,7 +49,7 @@ _shortcuts_run() {
 
 _shortcuts_list() {
   _arguments \
-    {-f,--folder-name}"[The folder name or identifier to list shortcuts in, or \"none\" to list shortcuts not in a folder.]:folder name:$(shortcut_folder_options)" \
+    {-f,--folder-name}"[The folder name or identifier to list shortcuts in, or \"none\" to list shortcuts not in a folder.]:folder name:$(_shortcut_folder_options)" \
     "(--folders)--folders[List folders instead of shortcuts.]" \
     "(--show-identifiers)--show-identifiers[Show identifiers with each result.]" \
     {-h,--help}"[Show help information.]"
@@ -57,7 +57,7 @@ _shortcuts_list() {
 
 _shortcuts_view() {
   _arguments \
-    ":shortcut name:$(shortcut_options)" \
+    ":shortcut name:$(_shortcut_options)" \
     {-h,--help}"[Show help information.]"
 }
 
