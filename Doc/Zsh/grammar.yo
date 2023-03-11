@@ -190,6 +190,9 @@ use the positional parameters instead of the var(word)s.
 If any var(name) has been declared as a named reference,
 the corresponding var(word) is treated as the name of a
 parameter and var(name) is made a reference to that.
+Note that for the positional parameters, this treats the
+value of each positional as parameter name rather than
+creating a reference to the position.
 
 The var(term) consists of one or more newline or tt(;)
 which terminate the var(word)s, and are optional when the
