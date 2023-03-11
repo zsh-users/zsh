@@ -168,8 +168,9 @@ ksh93_wrapper(Eprog prog, FuncWrap w, char *name)
     if (zleactive) {
 	extern mod_import_variable char *curkeymapname;	/* XXX */
 	extern mod_import_variable char *varedarg;	/* XXX */
-	/* How to distinguish emacs bindings? */
-	if (curkeymapname && strcmp(curkeymapname, "main") == 0)
+	/* bindkey -v forces VIMODE so this test is as good as any */
+	if (curkeymapname && isset(VIMODE) &&
+	    strcmp(curkeymapname, "main") == 0)
 	    strcpy(sh_edmode, "\e");
 	else
 	    strcpy(sh_edmode, "");

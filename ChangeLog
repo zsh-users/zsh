@@ -1,3 +1,8 @@
+2023-03-11  Bart Schaefer  <schaefer@zsh.org>
+
+	* 51557: Doc/zsh/mod_ksh93.yo, Src/Modules/ksh93.c: Clarify
+	availability of ksh-mode parameters, improve vi-mode detection.
+
 2023-03-07  Bart Schaefer  <schaefer@zsh.org>
 
 	* 51534: Util/printdefines: update for recent changes

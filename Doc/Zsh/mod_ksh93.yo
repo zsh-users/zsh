@@ -24,8 +24,10 @@ enditem()
 
 subsect(Ksh Parameters)
 cindex(parameters, ksh)
-Parameters supplied by this module that are marked with `<K>' below are
-available only in ksh emulation.
+Parameters supplied by this module that are marked with `<K>' below
+are available only when ksh emulation is active before entry to the
+shell function, that is, `tt(emulate ksh)' locally to a function does
+not populate these parameters for that function.
 
 startitem()
 vindex(.sh.command)
@@ -45,7 +47,7 @@ A named reference to the ZLE special parameter `tt(CURSOR)'.
 vindex(.sh.edmode)
 item(tt(.sh.edmode) <K>)(
 In a ZLE widget, this parameter has the value tt(ESC) (tt($'\e')) if the
-`tt(main)' keymap is selected, and the empty string otherwise.  This is
+tt(VI) option is set and the `tt(main)' keymap is selected.  This is
 intended for use with vi-mode key bindings (`tt(bindkey -v)').  In a
 future revision, assigning `tt(.sh.edchar=${.sh.edmode})' is expected
 to initiate `tt(vicmd)' mode when `tt(viins)' is active, and do
