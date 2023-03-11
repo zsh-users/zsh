@@ -393,7 +393,7 @@ _git-bundle () {
               ':bundle:_files' && ret=0
           else
             local revision_options
-            __git_setup_revision_options
+            __git_setup_revision_options -d
 
             _arguments -S -s \
               $revision_options \
@@ -783,6 +783,7 @@ _git-diff () {
   _arguments -C -s $endopt \
     $* \
     $diff_options \
+    '--exit-code[report exit code 1 if differences, 0 otherwise]' \
     '(--exit-code)--quiet[disable all output]' \
     $diff_stage_options \
     '(--cached --staged)--no-index[show diff between two paths on the filesystem]' \
@@ -974,6 +975,7 @@ _git-format-patch () {
     '--interdiff=[insert interdiff against previous patch series in cover letter or single patch]:reference to tip of previous series:__git_revisions' \
     '--range-diff=[insert range-diff against previous patch series in cover letter or single patch]:reference to tip ot previous series:__git_revisions' \
     '--creation-factor=[for range-diff, specify weighting for creation]:weighting (percent)' \
+    '--force-in-body-from[show in-body From: even if identical to the e-mail header]' \
     ': :->commit-or-commit-range' && ret=0
 
   case $state in
@@ -4096,7 +4098,7 @@ _git-blame () {
   declare -A opt_args
 
   declare -a revision_options
-  __git_setup_revision_options
+  __git_setup_revision_options -d
 
   # TODO: Not sure about __git_cached_files.
   _arguments -C -S -s $endopt \
@@ -5344,8 +5346,11 @@ _git-diff-index () {
   # to given tree-ish?  This should be done for git-diff as well, in that case.
   _arguments -S \
     $revision_options \
+    '--exit-code[report exit code 1 if differences, 0 otherwise]' \
+    '(--exit-code)--quiet[disable all output]' \
     "--cached[don't consider the work tree at all]" \
     '-m[flag non-checked-out files as up-to-date]' \
+    '--merge-base[use merge base instead of comparing directly]' \
     ': :__git_tree_ishs' \
     '*: :__git_cached_files'
 }
@@ -5362,16 +5367,18 @@ _git-diff-tree () {
   # __git_setup_revision_options, but only used by this command, so only have
   # them here.
   _arguments -C -S -s \
-    $revision_options \
+    ${revision_options:#*--cc\[*} \
+    '--exit-code[report exit code 1 if differences, 0 otherwise]' \
+    '(--exit-code)--quiet[disable all output]' \
     '-r[recurse into subdirectories]' \
     '(-r   )-t[display tree objects in diff output]' \
     '--root[display root diff]' \
+    '--merge-base[use merge base instead of comparing directly]' \
     '-m[do not ignore merges]' \
     '-s[do not show differences]' \
     '(--pretty --header)-v[display commit message before differences]' \
     '--no-commit-id[do not display commit IDs]' \
-    '(-c --cc)-c[show differences from each of parents to merge result]' \
-    '(-c --cc)--cc[how differences from each of parents and omit differences from only one parent]' \
+    '(-c)--cc[combined diff format for merge commits, further omitting uninteresting hunks]' \
     '--combined-all-paths[show name of file in all parents for combined diffs]' \
     '--always[always show commit itself and commit log message]' \
     ': :__git_tree_ishs' \
@@ -5560,7 +5567,7 @@ _git-rev-list () {
   declare -A opt_args
 
   declare -a revision_options
-  __git_setup_revision_options
+  __git_setup_revision_options -d
 
   _arguments -C -S $endopt \
     $revision_options \
@@ -7691,8 +7698,9 @@ __git_setup_diff_options () {
   local exclusive_diff_options='(--name-only --name-status --check -s --no-patch)'
 
   diff_options=(
-    {-p,-u,--patch}'[generate diff in patch format]'
-    {-U,--unified=}'[generate diff with given lines of context]: :__git_guard_number lines'
+    '(-p -u --patch)'{-p,-u,--patch}'[generate diff in patch format]'
+    '(-U --unified -W --function-context)'{-U-,--unified=-}'[generate diff with given lines of context]:: :__git_guard_number lines'
+    '(-U --unified -W --function-context)'{-W,--function-context}'[show whole function where a match was found]' \
     '--raw[generate default raw diff output]'
     '--patch-with-raw[generate patch but also keep the default raw diff output]'
     $exclusive_diff_options{-s,--no-patch}'[suppress diff output]'
@@ -7773,7 +7781,6 @@ __git_setup_diff_options () {
     '--output-indicator-new=[specify the character to indicate a new line]:character [+]'
     '--output-indicator-old=[specify the character to indicate a old line]:character [-]'
     '--output-indicator-context=[specify the character to indicate a context line]:character [ ]'
-    '--exit-code[report exit code 1 if differences, 0 otherwise]'
     '(           --no-ext-diff)--ext-diff[allow external diff helper to be executed]'
     '(--ext-diff              )--no-ext-diff[disallow external diff helper to be executed]'
     '(--textconv --no-textconv)--textconv[allow external text conversion filters to be run when comparing binary files]'
@@ -7784,7 +7791,10 @@ __git_setup_diff_options () {
     '--line-prefix=[prepend additional prefix to every line of output]:prefix'
     '(--src-prefix --dst-prefix)--no-prefix[do not show any source or destination prefix]'
     '(-c --cc)'{-c,--cc}'[combined diff format for merge commits]'
-    '--output=[output to a specific file]: :_files')
+    '--output=[output to a specific file]: :_files'
+    '--expand-tabs=-[replace each tab with spaces]::tab width [8]'
+    '!(--expand-tabs)--no-expand-tabs'
+  )
 }
 
 (( $+functions[__git_setup_diff_stage_options] )) ||
@@ -7894,11 +7904,15 @@ __git_format_placeholders() {
 
 (( $+functions[__git_setup_revision_options] )) ||
 __git_setup_revision_options () {
-  local -a diff_options
-  __git_setup_diff_options
+  if [[ $1 = "-d" ]]; then # don't include diff options if passed -d
+    revision_options=()
+  else
+    local -a diff_options
+    __git_setup_diff_options
+    revision_options=( $diff_options )
+  fi
 
-  revision_options=(
-    $diff_options
+  revision_options+=(
     '(-v --header)'{--pretty=-,--format=-}'[pretty print commit messages]::format:__git_format_placeholders'
     '(--abbrev-commit --no-abbrev-commit)--abbrev-commit[show only partial prefixes of commit object names]'
     '(--abbrev-commit --no-abbrev-commit)--no-abbrev-commit[show the full 40-byte hexadecimal commit object name]'
