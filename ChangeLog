@@ -1,5 +1,7 @@
 2023-03-13  Bart Schaefer  <schaefer@zsh.org>
 
+	* 51572: Functions/Misc/run-help: fix error when running standalone
+
 	* Sven Joachim: 51563: Completion/Debian/Command/_sbuild: unmatched "
 
 2023-03-11  Bart Schaefer  <schaefer@zsh.org>

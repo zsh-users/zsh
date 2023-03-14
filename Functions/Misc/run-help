@@ -98,13 +98,13 @@ do
 	    if whence "run-help-$1:t" >/dev/null
 	    then
 		local cmd_args
-		builtin getln cmd_args
+		builtin getln cmd_args &&
 		builtin print -z "$cmd_args"
-		cmd_args=( ${(z)cmd_args} )
+		cmd_args=( ${(z)${cmd_args:-"$*"}} )
 
                 # Discard the command itself & everything before it.
                 shift $cmd_args[(i)${run_help_orig_cmd:-$1}] cmd_args ||
-                    return
+                    continue
 
                 # Discard options, parameter assignments & paths.
                 cmd_args=( ${cmd_args[@]:#([-+]*|*=*|*/*|\~*)} )
