@@ -124,7 +124,7 @@ _sbuild() {
     '--aspcud-criteria=[Optimization for aspcud]:criteria' \
     '(--resolve-alternatives --no-resolve-alternatives)--resolve-alternatives[allow alternatives in Build-Depends*]' \
     '(--resolve-alternatives --no-resolve-alternatives)--no-resolve-alternatives[disallow alternatives in Build-Depends*]' \
-    '--extra-package=[make a package or directory available to the resolver]:package:_files -g "*deb(-.)' \
+    '--extra-package=[make a package or directory available to the resolver]:package:_files -g "*deb(-.)"' \
     '--extra-repository=[add a repository to the resolver]:url' \
     '--extra-repository-key=[add key to the resolver]:key:_files -g "*.asc(-.)"' \
     '--build-path=[place to build the package inside chroot]:path:_files -/' \
