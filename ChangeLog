@@ -1,3 +1,7 @@
+2023-03-14  Bart Schaefer  <schaefer@zsh.org>
+
+	* 51573: Src/builtin.c: additional "typset -p -m" fix for namespaces
+
 2023-03-13  Bart Schaefer  <schaefer@zsh.org>
 
 	* 51572: Functions/Misc/run-help: fix error when running standalone

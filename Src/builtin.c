@@ -2236,12 +2236,12 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	}
 	on &= ~PM_LOCAL;
 	if (!on && !roff && !ASG_VALUEP(asg)) {
+	    int with_ns = OPT_ISSET(ops,'m') ? PRINT_WITH_NAMESPACE : 0;
 	    if (OPT_ISSET(ops,'p'))
-		paramtab->printnode(&pm->node, PRINT_TYPESET);
+		paramtab->printnode(&pm->node, PRINT_TYPESET|with_ns);
 	    else if (!OPT_ISSET(ops,'g') &&
 		     (unset(TYPESETSILENT) || OPT_ISSET(ops,'m')))
-		paramtab->printnode(&pm->node,
-				    PRINT_INCLUDEVALUE|PRINT_WITH_NAMESPACE);
+		paramtab->printnode(&pm->node, PRINT_INCLUDEVALUE|with_ns);
 	    return pm;
 	}
 	if ((pm->node.flags & PM_RESTRICTED) && isset(RESTRICTED)) {
@@ -2502,6 +2502,8 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 		    "%s: inconsistent array element or slice assignment", pname);
 	    return NULL;
 	}
+    } else if (!pm && OPT_ISSET(ops,'p')) {
+	return NULL;
     }
     /*
      * As we can hide existing parameters, we allow a name if
