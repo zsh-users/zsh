@@ -1,5 +1,7 @@
 2023-03-16  Oliver Kiddle  <opk@zsh.org>
 
+	* 51582: Completion/Unix/Command/_ssh: openssh 9.3 completion update
+
 	* 51581: Completion/BSD/Command/_fw_update,
 	Completion/BSD/Command/_rcctl, Completion/Unix/Command/_grep,
 	Completion/Unix/Command/_netstat, Completion/Unix/Command/_ps:
