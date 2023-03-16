@@ -18,14 +18,18 @@ _ssh () {
     '*-o+[specify extra options]:option string:->option'
   )
   common_transfer=(
+    '(-O)-D+[connect directly to a local sftp server]:sftp server path:_command_names -e'
     '-J+[connect via a jump host]: :->userhost'
     '-l+[limit used bandwidth]:bandwidth (Kbit/s)'
     '-P+[specify port on remote host]:port number on remote host'
     '-p[preserve modification times, access times and modes]'
     '-q[disable progress meter and warnings]'
     '-r[recursively copy directories (follows symbolic links)]'
-    '-S+[specify ssh program]:path to ssh:_command_names -e' \
+    '-S+[specify ssh program]:path to ssh:_command_names -e'
     '-v[verbose mode]'
+    '*(-O)-X+[specify sftp protocol option]: : _values "sftp option"
+      "nrequests[set max concurrent SFTP read or write requests]\:requests [64]"
+      "buffer[set max buffer size for a single SFTP read/write operation]\: \:_numbers -l 0 -m 256K -d 32K -u bytes -f size \:B\:bytes \:K\:kilobytes"'
   )
   algopt='-E+[specify hash algorithm for fingerprints]:algorithm:(md5 sha256)'
 
@@ -58,7 +62,7 @@ _ssh () {
       '(-v)*-q[quiet operation]' \
       '*-R+[specify remote port forwarding]:remote port forwarding:->forward' \
       '-S+[specify location of control socket for connection sharing]:path to control socket:_files' \
-      '-Q+[query parameters]:query option:((cipher\:"supported symmetric ciphers" cipher-auth\:"supported symmetric ciphers that support authenticated encryption" mac\:"supported message integrity codes" kex\:"key exchange algorithms" key\:"key types" key-cert\:"certificate key types" key-plain\:"non-certificate key types" protocol-version\:"supported SSH protocol versions" sig\:"supported signature algorithms" help\:"show supported queries"))' \
+      '-Q+[query parameters]:query option:((cipher\:"supported symmetric ciphers" cipher-auth\:"supported symmetric ciphers that support authenticated encryption" compression mac\:"supported message integrity codes" kex\:"key exchange algorithms" kex-gss\:"GSSAPI key exchange algorithms" key\:"key types" key-cert\:"certificate key types" key-plain\:"non-certificate key types" key-sig\:"all key types and signature algorithms" protocol-version\:"supported SSH protocol versions" sig\:"supported signature algorithms" help\:"show supported queries" HostbasedAcceptedAlgorithms HostKeyAlgorithms KexAlgorithms MACs PubkeyAcceptedAlgorithms))' \
       '-s[invoke subsystem]' \
       '(-t)-T[disable pseudo-tty allocation]' \
       "(-T)*-t[force pseudo-tty allocation${tdesc}]" \
@@ -76,7 +80,8 @@ _ssh () {
   scp)
     _arguments -C -s \
       '-3[copy through local host, not directly between the remote hosts]' \
-      '-B[batch mode (don'\''t ask for passphrases)]' \
+      "-B[batch mode (don't ask for passwords or passphrases)]" \
+      '(-D -X)-O[use the original SCP protocol instead of the SFTP protocol]' \
       '-T[disable strict filename checking]' \
       '*:file:->file' "$common[@]" "$common_transfer[@]" && ret=0
     ;;
@@ -95,12 +100,14 @@ _ssh () {
       '--apple-load-keychain[add identities from keychain]'
       '--apple-use-keychain[update keychain when adding/removing identities]'
     )
-    _arguments -s : $args \
+    _arguments -C -s : $args \
       '-c[identity is subject to confirmation via SSH_ASKPASS]' \
       '-D[delete all identities]' \
       '-d[remove identity]' \
       $algopt \
       '-e+[remove keys provided by the PKCS#11 shared library]:library:_files -g "*.(so|dylib)(|.<->)(-.)"' \
+      '*-H[specify a known hosts file to look up hostkeys]:known hosts file:_files' \
+      '*-h[constrain keys to specific hosts or destinations]:destination:->destinations' \
       '-k[load plain private keys only and skip certificates]' \
       '-K[load resident keys from a FIDO authenticator]' \
       '-L[list public key parameters of all identities in the agent]'\
@@ -109,14 +116,13 @@ _ssh () {
       '-M+[specify maximum number of signatures]:number' \
       '-S+[use specified library when adding FIDO authenticator-hosted keys]:library:_files' \
       '-s+[add keys provided by the PKCS#11 shared library]:library:_files -g "*.(so|dylib)(|.<->)(-.)"' \
-      '-t+[set maximum lifetime for identity]:maximum lifetime (in seconds or time format):' \
+      '-t+[set maximum lifetime for identity]: :_numbers -u seconds "maximum lifetime" \:s\:seconds m\:minutes h\:hours d\:days w\:weeks' \
       "-T[test usability of identity files' private keys]:*:public key file:_files -g '*.pub(-.)'" \
       '*-v[verbose mode]' \
       '-q[be quiet after a successful operation]' \
       '-X[unlock the agent]' \
       '-x[lock the agent with a password]' \
-      '*:SSH identity file:_files'
-    return
+      '*:SSH identity file:_files' && ret=0
     ;;
   ssh-agent)
     _arguments -s \
@@ -128,7 +134,7 @@ _ssh () {
       '-k[kill current agent]' \
       '(-k)-P[specify PKCS#11 shared library whitelist]:PKCS#11 library whitelist pattern' \
       '(-k -c)-s[force sh-style shell]' \
-      '-t[set default maximum lifetime for identities]:maximum lifetime (in seconds or time format):' \
+      '-t+[set default maximum lifetime for identities]: :_numbers -u seconds "maximum lifetime" \:s\:seconds m\:minutes h\:hours d\:days w\:weeks' \
       '-v[verbose mode]' \
       '*::command: _normal'
     return
@@ -183,15 +189,13 @@ _ssh () {
       case ${words[arg]#-Y} in
         ^find-*) sigargs+=( "$p1-n+[specify namespace]:namespace" ) ;|
 	check*|find*|verify)
-	  sigargs+=( "$p1-s+[specify signature file]:signature file:-files" )
+	  sigargs+=( "$p1-s+[specify signature file]:signature file:_files" )
 	;|
+        match*|verify) sigargs+=( '-I+[specify signer identity]:identity' ) ;|
 	sign) sigargs+=( '*:file:_files' ) ;;
 	verify)
 	  args=()
-	  sigargs+=(
-	    '-I+[specify signer identity]:identity'
-	    '-r+[specify revocation file]:revocation file:_files'
-	  )
+	  sigargs+=( '-r+[specify revocation file]:revocation file:_files' )
 	;;
       esac
     fi
@@ -235,12 +239,6 @@ _ssh () {
       "($cmn)-L[print the contents of a certificate]" \
       "(${${(@)cmn:#-a}})-A[generate host keys for all key types]" \
       "($cmn)-Q[test whether keys have been revoked in a KRL]" \
-      "($cmn)-Y+[signature action]:action:((
-        find-principals\:find\ the\ principal\ associated\ with\ the\ public\ key\ of\ a\ signature
-        sign\:sign\ a\ file\ using\ SSH\ key
-        verify\:verify\ a\ signature\ generated\ using\ the\ sign\ option
-        check-novalidate\:check\ signature\ structure
-      ))" \
       - finger \
       "$p1($cmn)$algopt" \
       - create \
@@ -260,6 +258,13 @@ _ssh () {
       "($cmn -I -h -n -D -O -U -V)-k[generate a KRL file]" \
       "$p1($cmn -I -h -n -D -O -U -V)-u[update a KRL]" \
       - signature \
+      "(${${(@)cmn:#-O}})-Y+[signature action]:action:((
+        find-principals\:find\ the\ principal\ associated\ with\ the\ public\ key\ of\ a\ signature
+        sign\:sign\ a\ file\ using\ SSH\ key
+        verify\:verify\ a\ signature\ generated\ using\ the\ sign\ option
+        check-novalidate\:check\ signature\ structure
+        match-principals\:find\ matching\ principal
+      ))" \
       $sigargs
     return
   ;;
@@ -271,8 +276,10 @@ _ssh () {
       '-D[print keys found as SSHFP DNS records]' \
       '*-f+[read hosts from file, one per line]:file:_files' \
       '-H[hash all hostnames and addresses in the output]' \
+      '-O+[specify a key/value option]: : _values option
+        "hashalg[select a hash algorithm to use with -D]\:algorithm [both]\:(sha1 sha256)"' \
       '-p+[specify port on remote host]:port number on remote host' \
-      '-T+[specify timeout]:timeout (seconds) [5]' \
+      '-T+[specify timeout]: :_numbers -u seconds -d 5 timeout \:s\:seconds m\:minutes h\:hours d\:days w\:weeks' \
       '-t+[specify key types to fetch from scanned hosts]:key type:_sequence compadd - rsa dsa ecdsa ed25519' \
       '-v[verbose mode]'
     return
@@ -282,7 +289,6 @@ _ssh () {
       '-a[attempt to continue interrupted transfers]' \
       '-B+[specify buffer size]:buffer size (bytes) [32768]' \
       '-b+[specify batch file to read]:batch file:_files' \
-      '-D+[connect directly to a local sftp server]:sftp server path' \
       '-f[request that files be flushed immediately after transfer]' \
       '-N[disable implicit quiet mode set by -b]' \
       '-R+[specify number of outstanding requests]:number of requests [64]' \
@@ -309,22 +315,37 @@ _ssh () {
     option)
       if compset -P 1 '*='; then
         case "${IPREFIX#-o}" in
-          (#i)(ciphers|macs|kexalgorithms|hostkeyalgorithms|pubkeyacceptedkeytypes|hostbasedkeytypes)=)
-          if ! compset -P '[+-]'; then
-            _wanted prefix expl 'relative to default' compadd - + - && ret=0
+          (#i)(ciphers|macs|kexalgorithms|hostkeyalgorithms|pubkeyacceptedalgorithms)=)
+          local sep
+          zstyle -s ":completion:${curcontext}:" list-separator sep || sep=--
+          if ! compset -P '[+-^]'; then
+            _wanted prefix expl 'relative to default' compadd -S '' -d \
+                "(
+                   +\ $sep\ append\ to\ default\ list
+                   -\ $sep\ remove\ from\ default\ list
+                   ^\ $sep\ insert\ at\ head\ of\ default\ list
+                )" - + - \^ && ret=0
           fi
           ;;
         esac
         case "${IPREFIX#-o}" in
-        (#i)(afstokenpassing|batchmode|canonicalizefallbacklocal|challengeresponseauthentication|checkhostip|clearallforwardings|compression|enablesshkeysign|exitonforwardfailure|fallbacktorsh|forward(agent|x11)|forwardx11trusted|gatewayports|gssapiauthentication|gssapidelegatecredentials|gssapikeyexchange|gssapirenewalforcesrekey|gssapitrustdns|hashknownhosts|hostbasedauthentication|identitiesonly|kbdinteractiveauthentication|(tcp|)keepalive|nohostauthenticationforlocalhost|passwordauthentication|permitlocalcommand|proxyusefdpass|pubkeyauthentication|rhosts(|rsa)authentication|rsaauthentication|streamlocalbindunlink|usersh|kerberos(authentication|tgtpassing)|useprivilegedport|visualhostkey)=*)
+        (#i)(batchmode|canonicalizefallbacklocal|checkhostip|clearallforwardings|compression|enableescapecommandline|enablesshkeysign|exitonforwardfailure|fallbacktorsh|forkafterauthentication|forward(agent|x11)|forwardx11trusted|gatewayports|gssapiauthentication|gssapidelegatecredentials|gssapikeyexchange|gssapirenewalforcesrekey|gssapitrustdns|hashknownhosts|hostbasedauthentication|identitiesonly|kbdinteractiveauthentication|tcpkeepalive|nohostauthenticationforlocalhost|passwordauthentication|permitlocalcommand|permitremoteopen|proxyusefdpass|stdinnull|streamlocalbindunlink|visualhostkey)=*)
           _wanted values expl 'truth value' compadd yes no && ret=0
           ;;
+        (#i)addkeystoagent=*)
+          _alternative \
+            'timeouts: :_numbers -u seconds "time interval" :s:seconds m:minutes h:hours d:days w:weeks' \
+            'values:value:(yes no ask confirm)' && ret=0
+        ;;
         (#i)addressfamily=*)
           _wanted values expl 'address family' compadd any inet inet6 && ret=0
           ;;
         (#i)bindaddress=*)
           _wanted bind-addresses expl 'bind address' _bind_addresses && ret=0
           ;;
+        (#i)bindinterface=*)
+          _wanted bind-interfaces expl 'bind interface' _network_interfaces && ret=0
+        ;;
         (#i)canonicaldomains=*)
           _message -e 'canonical domains (space separated)' && ret=0
           ;;
@@ -340,23 +361,27 @@ _ssh () {
         (#i)ciphers=*)
           state=ciphers
           ;;
+        (#i)certificatefile=*)
+          _description files expl 'file'
+          _files "$expl[@]" && ret=0
+        ;;
         (#i)connectionattempts=*)
           _message -e 'connection attempts' && ret=0
           ;;
         (#i)connecttimeout=*)
-          _message -e 'connection timeout' && ret=0
+          _numbers -u seconds timeout :s:seconds m:minutes h:hours d:days w:weeks && ret=0
           ;;
         (#i)controlmaster=*)
-          _wanted values expl 'truthish value' compadd yes no auto autoask && ret=0
+          _wanted values expl 'truthish value' compadd yes no auto ask autoask && ret=0
           ;;
         (#i)controlpath=*)
           _description files expl 'path to control socket'
           _files "$expl[@]" && ret=0
           ;;
         (#i)controlpersist=*)
-          _message -e 'timeout'
-          ret=0
-          _wanted values expl 'truth value' compadd yes no && ret=0
+          _alternative \
+            'timeouts: :_numbers -u seconds timeout :s:seconds m:minutes h:hours d:days w:weeks' \
+            'values:truth value:(yes no)' && ret=0
           ;;
         (#i)escapechar=*)
           _message -e 'escape character (or `none'\'')'
@@ -377,9 +402,10 @@ _ssh () {
         (#i)hostname=*)
           _wanted hosts expl 'real host name to log into' _ssh_hosts && ret=0
           ;;
-        (#i)(hostbasedkeytypes|hostkeyalgorithms|pubkeyacceptedkeytypes)=*)
-	  _wanted key-types expl 'key type' _sequence compadd - $(_call_program key-types ssh -Q key) && ret=0
-          ;;
+        (#i)identityagent=*)
+          _description files expl 'socket file'
+          _files -g "*(-=)" "$expl[@]" && ret=0
+        ;;
         (#i)identityfile=*)
           _description files expl 'SSH identity file'
           _files "$expl[@]" && ret=0
@@ -410,13 +436,16 @@ _ssh () {
           _values -s , 'keyboard-interactive authentication method' \
               'bsdauth' 'pam' 'skey' && ret=0
           ;;
-        (#i)(kexalgorithms|gssapikexalgorithms)=*)
+        (#i)kexalgorithms=*)
           _wanted algorithms expl 'key exchange algorithm' _sequence compadd - \
               $(_call_program algorithms ssh -Q kex) && ret=0
           ;;
-        (#i)localcommand=*)
-          _description commands expl 'run command locally after connecting'
-          _command_names && ret=0
+        (#i)gssapikexalgorithms=*)
+          _wanted algorithms expl 'key exchange algorithm' _sequence compadd - \
+              $(_call_program algorithms ssh -Q kex-gss) && ret=0
+        ;;
+        (#i)(local|knownhosts)command=*)
+          _command_names -e && ret=0
           ;;
         (#i)loglevel=*)
           _values 'log level' QUIET FATAL ERROR INFO VERBOSE\
@@ -429,8 +458,8 @@ _ssh () {
           _message -e 'number of password prompts'
           ret=0
           ;;
-        (#i)pkcs11provider=*)
-          _description files expl 'PKCS#11 shared library'
+        (#i)(pkcs11|securitykey)provider=*)
+          _description files expl 'shared library'
           _files -g '*.(so|dylib)(|.<->)(-.)' "$expl[@]" && ret=0
           ;;
         (#i)port=*)
@@ -441,6 +470,17 @@ _ssh () {
           _values -s , 'authentication method' gssapi-with-mic \
               hostbased publickey keyboard-interactive password && ret=0
           ;;
+        (#i)proxyjump=*)
+          compset -P "* "
+          state=userhost
+        ;;
+        (#i)(hostkey|(hostbased|pubkey)accepted)algorithms=*)
+	  _wanted key-types expl 'key type' _sequence compadd - \
+              $(_call_program key-types ssh -Q key-sig) && ret=0
+        ;;
+        (#i)pubkeyauthentication=*)
+          _wanted values expl 'enable' compadd yes no unbound host-bound && ret=0
+        ;;
         (#i)protocol=*)
           _values -s , 'protocol version' \
               '1' \
@@ -450,7 +490,13 @@ _ssh () {
           _cmdstring && ret=0
           ;;
         (#i)rekeylimit=*)
-          _message -e 'maximum number of bytes transmitted before renegotiating session key'
+          if compset -P "* "; then
+            _numbers -u seconds "maximum time before renegotiating session key" \
+                :s:seconds h:hours d:days w:weeks
+          else
+            _numbers -u bytes "maximum amount of data transmitted before renegotiating session key" \
+                K:kilobytes M:megabytes G:gigabytes
+          fi
           ret=0
           ;;
         (#i)requesttty=*)
@@ -460,6 +506,9 @@ _ssh () {
               'force[always request a TTY]' \
               'auto[request a TTY when opening a login session]' && ret=0
           ;;
+        (#i)requiredrsasize=)
+          _wanted sizes expl 'minimum size [1024]' compadd 1024 2048 4096 && ret=0
+        ;;
         (#i)revokedhostkeys=*)
           _description files expl 'revoked host keys file'
           _files "$expl[@]" && ret=0
@@ -478,6 +527,9 @@ _ssh () {
         (#i)streamlocalbindmask=*)
           _message -e 'octal mask' && ret=0
           ;;
+        (#i)sessiontype=*)
+          _wanted session-types expl "session type" compadd none subsystem default && ret=0
+        ;;
         (#i)stricthostkeychecking=*)
           _wanted values expl 'value' compadd yes no ask accept-new off && ret=0
           ;;
@@ -512,15 +564,18 @@ _ssh () {
           _description files expl 'xauth program'
           _files "$expl[@]" -g '*(-*)' && ret=0
           ;;
+        *) _message -e values value ;;
         esac
       else
-        # old options are after the empty "\"-line
+        # Include, Host and Match not supported from the command-line
+        # final GSSAPI options are not in upstream but are widely patched in
         _wanted values expl 'configure file option' \
             compadd -M 'm:{a-z}={A-Z} r:[^A-Z]||[A-Z]=* r:|=*' -q -S '=' - \
                 AddKeysToAgent \
                 AddressFamily \
                 BatchMode \
                 BindAddress \
+                BindInterface \
                 CanonicalDomains \
                 CanonicalizeFallbackLocal \
                 CanonicalizeHostname \
@@ -528,7 +583,6 @@ _ssh () {
                 CanonicalizePermittedCNAMEs \
                 CASignatureAlgorithms \
                 CertificateFile \
-                ChallengeResponseAuthentication \
                 CheckHostIP \
                 Ciphers \
                 ClearAllForwardings \
@@ -539,10 +593,12 @@ _ssh () {
                 ControlPath \
                 ControlPersist \
                 DynamicForward \
+                EnableEscapeCommandline \
                 EnableSSHKeysign \
                 EscapeChar \
                 ExitOnForwardFailure \
                 FingerprintHash \
+                ForkAfterAuthentication \
                 ForwardAgent \
                 ForwardX11 \
                 ForwardX11Timeout \
@@ -550,19 +606,13 @@ _ssh () {
                 GatewayPorts \
                 GlobalKnownHostsFile \
                 GSSAPIAuthentication \
-                GSSAPIClientIdentity \
                 GSSAPIDelegateCredentials \
-                GSSAPIKeyExchange \
-                GSSAPIRenewalForcesRekey \
-                GSSAPIServerIdentity \
-                GSSAPITrustDns \
-                GSSAPIKexAlgorithms \
                 HashKnownHosts \
+                HostbasedAcceptedAlgorithms \
                 HostbasedAuthentication \
-                HostbasedKeyTypes \
                 HostKeyAlgorithms \
                 HostKeyAlias \
-                HostName \
+                Hostname \
                 IdentitiesOnly \
                 IdentityAgent \
                 IdentityFile \
@@ -571,33 +621,38 @@ _ssh () {
                 KbdInteractiveAuthentication \
                 KbdInteractiveDevices \
                 KexAlgorithms \
+                KnownHostsCommand \
                 LocalCommand \
                 LocalForward \
                 LogLevel \
+                LogVerbose \
                 MACs \
                 NoHostAuthenticationForLocalhost \
                 NumberOfPasswordPrompts \
                 PasswordAuthentication \
                 PermitLocalCommand \
+                PermitRemoteOpen \
                 PKCS11Provider \
                 Port \
                 PreferredAuthentications \
                 ProxyCommand \
                 ProxyJump \
                 ProxyUseFdpass \
-                PubkeyAcceptedKeyTypes \
                 PubkeyAuthentication \
+                PubkeyAcceptedAlgorithms \
                 RekeyLimit \
                 RemoteCommand \
                 RemoteForward \
                 RequestTTY \
+                RequiredRSASize \
                 RevokedHostKeys \
-                RhostsRSAAuthentication \
-                RSAAuthentication \
+                SecurityKeyProvider \
                 SendEnv \
                 ServerAliveCountMax \
                 ServerAliveInterval \
                 SetEnv \
+                SessionType \
+                StdinNull \
                 StreamLocalBindMask \
                 StreamLocalBindUnlink \
                 StrictHostKeyChecking \
@@ -606,24 +661,17 @@ _ssh () {
                 Tunnel \
                 TunnelDevice \
                 UpdateHostKeys \
-                UsePrivilegedPort \
                 User \
                 UserKnownHostsFile \
                 VerifyHostKeyDNS \
                 VisualHostKey \
                 XAuthLocation \
-                \
-                AFSTokenPassing \
-                FallBackToRsh \
-                KeepAlive \
-                KerberosAuthentication \
-                KerberosTgtPassing \
-                PreferredAuthentications \
-                ProtocolKeepAlives \
-                RhostsAuthentication \
-                SetupTimeOut \
-                SmartcardDevice \
-                UseRsh \
+                GSSAPIClientIdentity \
+                GSSAPIKeyExchange \
+                GSSAPIRenewalForcesRekey \
+                GSSAPIServerIdentity \
+                GSSAPITrustDns \
+                GSSAPIKexAlgorithms \
                 && ret=0
       fi
       ;;
@@ -693,6 +741,10 @@ _ssh () {
       _normal
       return
       ;;
+    destinations)
+      compset -P 1 '*>'
+      compset -S '>*'
+    ;& # fall-through
     userhost)
       if compset -P '*@'; then
         _wanted hosts expl 'remote host name' _ssh_hosts && ret=0
