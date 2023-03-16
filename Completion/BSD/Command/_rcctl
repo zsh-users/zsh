@@ -3,7 +3,7 @@
 local context state line
 local -a actions lsarg subcmds variables
 
-actions=(check reload restart start stop)
+actions=(configtest check reload restart start stop)
 subcmds=(disable enable get getdef ls order set)
 variables=(class flags status timeout user)
 lsarg=(

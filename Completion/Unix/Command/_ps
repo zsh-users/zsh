@@ -105,6 +105,7 @@ case $OSTYPE in
     bsdarg+=( 'M[extract values from specified core]' )
   ;|
   linux-gnu|netbsd*) bsdarg+=( 'k[specify sort order]' ) ;|
+  linux-gnu|openbsd*) bsd+=( 'f[show process hierarchy]' ) ;|
   darwin*|freebsd*)
     bsd+=( 'X[skip processes with no controlling terminal]' )
     bsdarg+=( '*G[select processes by real group]' )
@@ -188,7 +189,6 @@ case $OSTYPE in
     done
     bsd+=(
       'c[show true command name]'
-      'f[show process hierarchy]'
       'h[suppress header]'
       'm[show threads after processes]'
       'n[numeric output for WCHAN and USER]'
