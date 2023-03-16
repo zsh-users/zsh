@@ -89,7 +89,7 @@ case $variant:$OSTYPE in
   ;|
   gpl2:(freebsd|darwin)*)
     arguments+=(
-      '(--null --no-filename -h)--null[print 0 byte after each filename]'
+      '(--no-filename -h)--null[print 0 byte after each filename]'
       '(-Z --decompress -J --bz2decompress)'{-J,--bz2decompress}"[decompress bzip2'ed input before searching]"
       '(-Z --decompress -J --bz2decompress)'{-Z,--decompress}"[decompress gzip'ed input before searching]"
     )
@@ -129,6 +129,7 @@ case $variant:$OSTYPE in
     arguments=(
       ${(M)arguments:#((#s)|*\))--(context|binary-files|line-buffered|label|max-count)*}
       ${${arguments:#((#s)|*\))(\*|)-[d-]*}/\)-r/\)-R}
+      '(-h)--null[print 0 byte after each filename]'
       "-U[search binary files but don't print them]"
       '-Z[behave as zgrep]'
     )
