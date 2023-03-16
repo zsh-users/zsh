@@ -5866,46 +5866,51 @@ _git-upload-pack () {
 
 (( $+functions[_git-check-attr] )) ||
 _git-check-attr () {
-  local z_opt=
-
-  local curcontext=$curcontext state line ret=1
+  local curcontext="$curcontext" z_opt ret=1
+  local -a state line
   declare -A opt_args
 
   if (( words[(I)--stdin] )); then
-    z_opt='-z[paths are separated with NUL character when reading from stdin]'
+    z_opt='-z[terminate input file list and output records by a NUL character]'
+  else
+    z_opt='-z[separate output records with NUL character]'
   fi
 
-  _arguments -C \
-    {-a,--all}'[list all attributes that are associated with the specified paths]' \
+  _arguments -C $z_opt \
     '--stdin[read file names from stdin instead of from command line]' \
-    '--cached[consider .gitattributes in the index only, ignoring the working tree.]' \
-    '-z[terminate input and output records by a NUL character]' \
-    $z_opt \
+    '(--source)--cached[consider .gitattributes in the index only, ignoring the working tree]' \
+    '(--cached)--source=[specify tree to scan for .gitattributes (useful in bare repo)]:tree object:__git_tree_ishs' \
+    - files \
+    '(-a --all --)'{-a,--all}'[list all attributes that are associated with the specified paths]' \
     '(-)--[interpret preceding arguments as attributes and following arguments as path names]' \
-    '*:: :->attribute-or-file' && ret=0
+    '*: :__git_cached_files' \
+    - attrs \
+    '*:::attribute:->attributes' && ret=0
 
   case $state in
-    (attribute-or-file)
-      local -a attributes
-
-      attributes=(crlf ident filter diff merge)
-
-      local only_attributes=1
-      for (( i = 2; i < $#words; i++ )); do
-        if (( attributes[(I)$words[i]] == 0 )); then
-          only_attributes=0
-          break
-        fi
-      done
-
-      if (( !only_attributes )) || [[ -n ${opt_args[(I)--]} ]]; then
-        __git_cached_files && ret=0
-      else
-        _alternative \
-          'attributes::__git_attributes' \
-          'files::__git_cached_files' && ret=0
-      fi
-      ;;
+    attributes)
+      local -a attributes plain dedup
+      attributes=(
+        crlf:"line-ending convention (deprecated)"
+        text:"line-ending normalization"
+        eol:"line-ending style"
+        working-tree-encoding:"text encoding in working directory"
+        ident:'$Id$ substitution'
+        filter:"filters"
+        diff:"textual diff"
+        merge:"merging strategy"
+        conflict-marker-size:"length of markers left in the work tree"
+        whitespace:"control over what diff and apply should consider whitespace errors"
+        export-ignore:"exclude from archive files"
+        export-subst:"expand placeholders when adding to an archive"
+        delta:"don't attempt compression of blobs"
+        encoding:"character encoding that should be used by GUI tools"
+      )
+      plain=( ${attributes%%:*} )
+      dedup=( "${(@)words[1,CURRENT-1]}" )
+      (( ! ${#dedup:|plain} )) && _describe -t git-attributes \
+          attribute attributes -F dedup && ret=0
+    ;;
   esac
 
   return ret
@@ -6582,20 +6587,6 @@ __git_compression_levels () {
     '7:getting there' \
     '8:close to maximum compression' \
     '9:maximum compression'
-}
-
-(( $+functions[__git_attributes] )) ||
-__git_attributes () {
-  local -a attributes
-
-  attributes=(
-    'crlf:line-ending convention'
-    'ident:ident substitution'
-    'filter:filters'
-    'diff:textual diff'
-    'merge:merging strategy')
-
-  _describe -t attributes attribute attributes $*
 }
 
 (( $+functions[__git_daemon_service] )) ||
