@@ -17,7 +17,6 @@ if _pick_variant -r variant binutils=GNU elftoolchain=elftoolchain elfutils=elfu
     '(- *)'{-V,--version}'[display version information]'
     '(-f --format -P --portability)-B[same as --format=bsd]'
     '(-u --undefined-only)--defined-only[display only defined symbols]'
-    '(-f --format -P)--format=[specify output format]:format:(bsd sysv posix)'
     '(-n --numeric-sort -p --no-sort --size-sort -v)'{-n,--numeric-sort}'[sort symbols numerically by address]'
     '(-p --no-sort -n -v --numeric-sort -r --reverse-sort --size-sort)'{-p,--no-sort}'[do not sort symbols]'
     '(-P --portability -B -f --format)'{-P,--portability}'[same as --format=posix]'
@@ -41,7 +40,7 @@ if _pick_variant -r variant binutils=GNU elftoolchain=elftoolchain elfutils=elfu
       args=( ${args:#*(-C|-o|--portability)\[*}
 	'(-C --demangle)'{-C,--demangle=-}'[decode symbol names]::style:(auto gnu-v2 gnu-v3 arm)'
 	'(-g --extern-only)-e[only display global and static symbols]'
-	'(--format -P)-F+[specify output format]:format:(bsd sysv posix)'
+	'(-B --format -P)'{-F,--format}'[specify output format]:format:(bsd sysv posix)'
 	'-o[with -P, same as -t o; otherwise same as -A]'
 	'(-t --radix)-x[print values in hexadecimal]'
       )
@@ -51,7 +50,7 @@ if _pick_variant -r variant binutils=GNU elftoolchain=elftoolchain elfutils=elfu
         '--mark-special[mark special symbols]'
 	'--color=[use color in output]:color:(always auto never)'
 	'(-C)--demangle[decode symbol names]'
-	'(--format -P)-f+[specify output format]:format:(bsd sysv posix)'
+	'(-B -f --format -P --portability)'{-f,--format}'[specify output format]:format:(bsd sysv posix)'
 	'(- *)--usage[give a short usage message]'
 	'(- *)-?[display help information]'
       )
@@ -61,14 +60,19 @@ if _pick_variant -r variant binutils=GNU elftoolchain=elftoolchain elfutils=elfu
       args+=(
         '!(--no-recurse-limit)--recurse-limit'
         '--no-recurse-limit[disable demangling recursion limit]'
-	'(-f --format -P)-f+[specify output format]:format:(bsd sysv posix)'
+	'(-f --format -P -j)'{-f,--format}'[specify output format]:format:(bsd sysv posix just-symbols)'
 	'(-C --no-demangle)--demangle=-[decode symbol names]::style [auto]:(auto gnu lucid arm hp edg gnu-v3 java gnat rust dlang)'
         '--ifunc-chars=[specify characters to use for indirect function symbols]:characters for global/local indirect function symbols [ii]'
+	'(-B -f --format -P --portability -j --just-symbols)'{-j,--just-symbols}'[Same as --format=just-symbols]'
 	'--plugin[load specified plugin]:plugin'
+	'--quiet[suppress no "no symbols" diagnostic]'
 	'--special-syms[include special symbols in the output]'
 	'--synthetic[display synthetic symbols as well]'
 	"--target=[target object format]:target:(${${(@M)${(f)$(_call_program targets nm --help)}:#*supported targets:*}##*: })"
+	'--unicode=[specify how to treat UTF-8 encoded unicode characters]:how_to_treat:(default show invalid hex escape highlight)'
+	'(-W --no-weak)'{-W,--no-weak}'[ignore weak symbols]'
 	'--with-symbol-versions[display version strings after symbol names]'
+	'--without-symbol-versions[not display of symbol version information]'
       )
     ;;
   esac
