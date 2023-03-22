@@ -1,3 +1,9 @@
+2023-03-22  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 51586: Src/builtin.c: When printf "%s" encounters a byte
+	that's not part of a vaild multibyte character it should handle
+	it a single byte at a time.
+
 2023-03-16  Oliver Kiddle  <opk@zsh.org>
 
 	* 51583: Completion/Unix/Command/_git: update completion of

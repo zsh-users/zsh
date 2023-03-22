@@ -5329,20 +5329,21 @@ bin_print(char *name, char **args, Options ops, int func)
 #ifdef MULTIBYTE_SUPPORT
 			if (isset(MULTIBYTE)) {
 			    chars = mbrlen(ptr, lleft, &mbs);
-			    if (chars < 0) {
-				/*
-				 * Invalid/incomplete character at this
-				 * point.  Assume all the rest are a
-				 * single byte.  That's about the best we
-				 * can do.
-				 */
-				lchars += lleft;
-				lbytes = (ptr - b) + lleft;
-				break;
-			    } else if (chars == 0) {
-				/* NUL, handle as real character */
+			    /*
+			     * chars <= 0 means one of
+			     *
+			     * 0: NUL, handle as real character
+			     *
+			     * -1: MB_INVALID: Assume this is
+			     *     a single character as we do
+			     *     elsewhere in the code.
+			     *
+			     * -2: MB_INCOMPLETE: We're not waiting
+			     *     for input on this occasion, so
+			     *     just treat this as invalid.
+			     */
+			    if (chars <= 0)
 				chars = 1;
-			    }
 			}
 			else	/* use the non-multibyte code below */
 #endif
