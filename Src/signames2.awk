@@ -13,7 +13,8 @@
     signam = substr(tmp[1], 4, 20)
     signum = tmp[2]
     if (signam == "CHLD" && sig[signum] == "CLD")  sig[signum] = ""
-    if (signam == "POLL" && sig[signum] == "IO")  sig[signum] = ""
+    if (signam == "POLL" && sig[signum] == "IO")   sig[signum] = ""
+    if (signam == "ABRT" && sig[signum] == "IOT")  sig[signum] = ""
     if (sig[signum] == "") {
 	sig[signum] = signam
 	if (0 + max < 0 + signum && signum < 60)
@@ -33,9 +34,9 @@
 	if (signam == "IO")     { msg[signum] = "i/o ready" }
 	if (signam == "IOT")    { msg[signum] = "IOT instruction" }
 	if (signam == "KILL")   { msg[signum] = "killed" }
-	if (signam == "LOST")	{ msg[signum] = "resource lost" }
+	if (signam == "LOST")   { msg[signum] = "resource lost" }
 	if (signam == "PIPE")   { msg[signum] = "broken pipe" }
-	if (signam == "POLL")	{ msg[signum] = "pollable event occurred" }
+	if (signam == "POLL")   { msg[signum] = "pollable event occurred" }
 	if (signam == "PROF")   { msg[signum] = "profile signal" }
 	if (signam == "PWR")    { msg[signum] = "power fail" }
 	if (signam == "QUIT")   { msg[signum] = "quit" }
@@ -43,7 +44,7 @@
 	if (signam == "SYS")    { msg[signum] = "invalid system call" }
 	if (signam == "TERM")   { msg[signum] = "terminated" }
 	if (signam == "TRAP")   { msg[signum] = "trace trap" }
-	if (signam == "URG")	{ msg[signum] = "urgent condition" }
+	if (signam == "URG")    { msg[signum] = "urgent condition" }
 	if (signam == "USR1")   { msg[signum] = "user-defined signal 1" }
 	if (signam == "USR2")   { msg[signum] = "user-defined signal 2" }
 	if (signam == "VTALRM") { msg[signum] = "virtual time alarm" }
