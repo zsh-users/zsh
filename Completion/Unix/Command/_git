@@ -996,7 +996,7 @@ _git-gc () {
   _arguments -S -s $endopt \
     '--aggressive[more aggressively optimize]' \
     '--auto[check whether housekeeping is required]' \
-    '(        --no-prune)--prune=-[prune loose objects older than given date]::date [2 weeks ago]:__git_datetimes' \
+    '(        --no-prune)--prune=-[prune loose objects older than given date]::date [2 weeks ago]:_git_approxidates' \
     '(--prune           )--no-prune[do not prune any loose objects]' \
     '(-q --quiet)'{-q,--quiet}'[suppress progress reporting]' \
     '--keep-largest-pack[repack all other packs except the largest pack]' \
@@ -2371,10 +2371,14 @@ _git-worktree() {
           _arguments -S $endopt \
 	    '(-n --dry-run)'{-n,--dry-run}"[don't remove, show only]" \
 	    '(-v --verbose)'{-v,--verbose}'[report pruned objects]' \
-            '--expire=[expire objects older than specified time]:time' && ret=0
+            '--expire=[expire objects older than specified time]: :_git_approxidates' && ret=0
 	;;
         (list)
-	  _arguments -S $endopt '--porcelain[machine-readable output]' && ret=0
+          _arguments -S $endopt \
+            '(-v --verbose --porcelain -z)'{-v,--verbose}'[output additional information about worktrees]' \
+            "--expire=[add 'prunable' annotation to worktrees older than specified time]: :_git_approxidates" \
+            '(-v)--porcelain[machine-readable output]' \
+            '(-v)-z[terminate each line with a NUL rather than a newline]' && ret=0
 	;;
 	(lock)
 	  _arguments -C -S $endopt '--reason=[specify reason for locking]:reason' ': :->worktrees' && ret=0
@@ -3851,7 +3855,7 @@ _git-prune () {
     '(-n --dry-run)'{-n,--dry-run}'[do not remove anything; just report what would be removed]' \
     '(-v --verbose)'{-v,--verbose}'[report all removed objects]' \
     '--progress[show progress]' \
-    '--expire=[only expire loose objects older than specified date]: :__git_datetimes' \
+    '--expire=[only expire loose objects older than specified date]: :_git_approxidates' \
     '--exclude-promisor-objects[limit traversal to objects outside promisor packfiles]' \
     '*:: :__git_heads'
 }
@@ -3899,8 +3903,8 @@ _git-reflog () {
             _arguments -S \
               '(-n --dry-run)'{-n,--dry-run}"[don't actually prune any entries; show what would be pruned]" \
               '--stale-fix[prune any reflog entries that point to "broken commits"]' \
-              '--expire=-[prune entries older than given time]: :__git_datetimes' \
-              '--expire-unreachable=-[prune entries older than given time and unreachable]: :__git_datetimes' \
+              '--expire=-[prune entries older than given time]:age [90 days]:_git_approxidates' \
+              '--expire-unreachable=-[prune entries older than given time and unreachable]:age [30 days]:_git_approxidates' \
               '--all[prune all refs]' \
               '--updateref[update ref with SHA-1 of top reflog entry after expiring or deleting]' \
               '--rewrite[adjust reflog entries to ensure old SHA-1 points to new SHA-1 of previous entry after expiring or deleting]' \
@@ -4046,8 +4050,10 @@ _git-repack () {
   _arguments -s \
     '(-A --unpack-unreachable)-a[pack all objects into a single pack]' \
     '(-a -k --keep-unreachable)-A[pack all objects into a single pack, but unreachable objects become loose]' \
+    '--cruft[pack unreachable cruft objects separately]' \
+    '--cruft-expiration=[expire cruft objects older than specified time]: :_git_approxidates' \
     '-d[remove redundant packs after packing]' \
-    "--unpack-unreachable=[with -A, don't loosen objects older than specified date]:date" \
+    "--unpack-unreachable=[with -A, don't loosen objects older than specified date]: :_git_approxidates" \
     '-f[pass --no-reuse-delta option to git pack-objects]' \
     '-F[pass --no-reuse-object option to git pack-objects]' \
     "-n[don't update server information]" \
@@ -4055,7 +4061,7 @@ _git-repack () {
     '(-l --local)'{-l,--local}'[pass --local option to git pack-objects]' \
     '(-b --write-bitmap-index)'{-b,--write-bitmap-index}'[write a bitmap index]' \
     '(-i --delta-islands)'{-i,--delta-islands}'[pass --delta-islands to git-pack-objects]' \
-    "--unpack-unreachable=[with -A, don't loosen objects older than specified time]:time" \
+    "--unpack-unreachable=[with -A, don't loosen objects older than specified time]: :_git_approxidates" \
     '(-k --keep-unreachable)'{-k,--keep-unreachable}'[with -a, repack unreachable objects]' \
     '--window=[number of objects to consider when doing delta compression]:number of objects' \
     '--window-memory=[scale window size dynamically to not use more than specified amount of memory]: : __git_guard_bytes' \
@@ -4358,8 +4364,8 @@ _git-rev-parse () {
       '--is-inside-work-tree[show whether or not current working directory is inside work tree]' \
       '--is-bare-repository[show whether or not repository is bare]' \
       '(--revs-only --no-revs --flags --no-flags --verify)--short=-[show only shorter unique name]:: :__git_guard_number length' \
-      '(--since --after)'{--since=-,--after=-}'[show --max-age= parameter corresponding given date string]:datestring' \
-      '(--until --before)'{--until=-,--before=-}'[show --min-age= parameter corresponding given date string]:datestring' \
+      '(--since --after)'{--since=-,--after=-}'[show --max-age= parameter corresponding given date string]: :_git_approxidates' \
+      '(--until --before)'{--until=-,--before=-}'[show --min-age= parameter corresponding given date string]: :_git_approxidates' \
       '--resolve-git-dir[check if <path> is a valid repository or gitfile and print location]:git dir:_files -/' \
       '*: :__git_objects' && ret=0
   fi
@@ -4399,7 +4405,7 @@ _git-show-branch () {
       if compset -P '[[:digit:]]##,'; then
         _alternative \
           'counts: :__git_guard_number count' \
-          'dates::__git_datetimes' && ret=0
+          'dates::_git_approxidates' && ret=0
       else
         __git_guard_number limit
       fi
@@ -4961,7 +4967,7 @@ _git-commit-graph() {
       '(--reachable --stdin-packs)--stdin-commits[walk commits starting at commits read from input]'
       '(--append)--size-multiple=:commits [2]'
       '(--append)--max-commits=:commits'
-      '(--append)--expire-time=:date/time:__git_datetimes'
+      '(--append)--expire-time=: :_git_approxidates'
       '--max-new-filters=[specify maximum number of changed-path bloom filters to compute]:'
     )
   elif [[ $words[2] = verify ]]; then
@@ -5130,7 +5136,9 @@ _git-pack-objects () {
     '--include-tag[include unasked-for annotated tags if object they reference is included]' \
     '(--revs --stdin-packs --unpack-unreachable)--keep-unreachable[add objects unreachable from refs in packs named with --unpacked to resulting pack]' \
     '(--revs --stdin-packs)--pack-loose-unreachable[pack unreachable loose objects]' \
-    '(--revs --stdin-packs --keep-unreachable)--unpack-unreachable=-[keep unreachable objects in loose form]::time' \
+    '(--revs --stdin-packs --keep-unreachable)--unpack-unreachable=-[keep unreachable objects in loose form]:: :_git_approxidates' \
+    '--cruft[create a cruft pack]' \
+    '--cruft-expiration=[expire cruft objects older than specified time]: :_git_approxidates' \
     '--sparse[use sparse reachability algorithm]' \
     '--include-tag[include tag objects that refer to objects to be packed]' \
     $thin_opt \
@@ -7626,10 +7634,65 @@ __git_guard_bytes () {
   _numbers -u bytes ${*:-size} k m g
 }
 
-(( $+functions[__git_datetimes] )) ||
-__git_datetimes () {
-  # TODO: Use this in more places.
-  _guard '*' 'time specification'
+(( $+functions[_git_approxidates] )) ||
+_git_approxidates() {
+  local MATCH MBEGIN MEND
+  local match mbegin mend
+  local -i date time num
+  local -a months=( January February March April May June July August September
+      October November December )
+  local -a weekdays=( Sunday Monday Tuesday Wednesday Thursday Friday Saturday )
+  local -a numbers=( zero one two three four five six seven eight nine ten )
+  local -a periods=( second minute hour day week month year )
+  local -a suf=( -S. -r "._,+\\ \t\n\-" )
+
+  local -a pexpl
+  zparseopts -D -E X+:=pexpl
+
+  local -a query=(
+    \( /$'*\0[ \t\n]#'/ \)
+    \( '/[]/' ':dates:date:compadd "${pexpl[@]:/-X/-x}"'
+    \| '/(@|[0-9](#c9))/' ':specials:special:compadd -S "" @' '/[]/' ': _message -e epochtimes "seconds since Unix epoch"'
+    \| '/(#i)(now|never)/' '%?%' ':specials:special:(now never)' '/[]/'
+    \| \)
+    \(
+      \( '/(#i)(one|last)/' '%[ ._,+]%' -'num=1'
+      \| '/[0-9](#c2,4)(-|/|.|)[0-9](#c1,2)(-|/|.|)[0-9](#c1,4)(|T)/' -'date=3'
+      \| '/[0-9](#c2)(:|)[0-9](#c2)(:|)[0-9](#c2)(.<->|)/' -'time=1'
+      \| '/20/' -'((!date))' '/[]/' ':dates:date:_dates -f "%y-%m-%d"'
+      \| '/1/' -'num=1'
+      \| '/<->/' -'num=2'
+      \| "/(#i)(${(j.|.)numbers})/" '%[ ._,+]%' -'num=2'
+      \| "/(#i)(${(j.|.)${(@)months//(#b)(???)(*)/$match[1]${match[2]//(#m)?/(|$MATCH}${match[2]//?/)}}})/"
+         '%[ ._,+]%' -'(( num = 0, date |= 2 ))'
+      \| "/(#i)(${(j.|.)${(@)weekdays//(#b)(???)(*)/$match[1]${match[2]//(#m)?/(|$MATCH}${match[2]//?/)}}})(|s)/"
+         '%[ ._,+]%' -'(( num = 0, date |= 1 ))'
+      \| '/(#i)yesterday/' '%[ ._,+]%' -'date=3'
+      \| "/(#i)(${(j.|.)${(@)periods%s}})(|s)/" '%[ ._,+]%' -'num=0'
+      \| '/(#i)(noon|midnight|tea|[ap]m)/' '%[ ._,+]%' -'time=1'
+      \|
+        \( // -'(( !(date&2) ))' // ':months:month:compadd -o nosort $suf -a months' \| \)
+        \( // -'(( num <= 1 && !(date&1) ))' // ':weekdays:weekday:compadd $suf -o nosort -a weekdays' \| \)
+        \( // -'(( num > 1 ))'
+          \( // -'(( date < 3 ))' // ':periods:period:compadd $suf -o nosort ${^periods[4,-1]}s' \| \)
+          \( // -'(( !(date&1) ))' // ':weekdays:weekday:compadd $suf -o nosort ${^weekdays}s' \| \)
+          \( // -'(( !time ))' // ':periods:period:compadd $suf -o nosort ${^periods[1,3]}s' \| \)
+        \| // -'(( num == 1 ))'
+          \( // -'(( date < 3 ))' // ':periods:period:compadd $suf -o nosort -a "periods[4,-1]"' \| \)
+          \( // -'(( !time ))' // ':periods:period:compadd $suf -o nosort -a "periods[1,3]"' \| \)
+        \| // -'(( num == 0 ))'
+          \( // -'(( !time ))' // ':specials:special:compadd $suf noon midnight tea AM PM' \| \)
+          \( // -'(( !date ))' // ':specials:special:compadd $suf yesterday' \| \)
+          // ':specials:special:compadd $suf last' # "last" is equivalent to "one"
+          // ':numbers:number:compadd $suf -n -o nosort -a numbers'
+        \)
+        '/[]/'
+      \) '/([ ._,+]|)/'
+    \) \#
+  )
+
+  _regex_arguments _git_dates "$query[@]"
+  _git_dates
 }
 
 (( $+functions[__git_stages] )) ||
@@ -7923,8 +7986,8 @@ __git_setup_revision_options () {
     '--count[display how many commits would have been listed]'
     '(-n --max-count)'{-n+,--max-count=}'[maximum number of commits to display]: :__git_guard_number'
     '--skip=[skip given number of commits before output]: :__git_guard_number'
-    '(--max-age --since --after)'{--since=,--after=}'[show commits more recent than given date]:date'
-    '(--min-age --until --before)'{--until=,--before=}'[show commits older than given date]: :__git_guard_number timestamp'
+    '(--max-age --since --after)'{--since=,--after=}'[show commits more recent than given date]: :_git_approxidates'
+    '(--min-age --until --before)'{--until=,--before=}'[show commits older than given date]: :_git_approxidates'
     '(          --since --after)--max-age=-[maximum age of commits to output]: :__git_guard_number timestamp'
     '(          --until --before)--min-age[minimum age of commits to output]: :__git_guard_number timestamp'
     '*--author=[limit commits to those by given author]:author'
