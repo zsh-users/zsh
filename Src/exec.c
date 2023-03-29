@@ -1491,7 +1491,7 @@ execlist(Estate state, int dont_change_job, int exiting)
 		 * we find a sublist followed by ORNEXT.                   */
 		if ((ret = ((WC_SUBLIST_FLAGS(code) & WC_SUBLIST_SIMPLE) ?
 			    execsimple(state) :
-			    execpline(state, code, Z_SYNC, 0)))) {
+			    execpline(state, code, Z_SYNC, 0))) || breaks) {
 		    state->pc = next;
 		    code = *state->pc++;
 		    next = state->pc + WC_SUBLIST_SKIP(code);
@@ -1524,7 +1524,7 @@ execlist(Estate state, int dont_change_job, int exiting)
 		 * we find a sublist followed by ANDNEXT.              */
 		if (!(ret = ((WC_SUBLIST_FLAGS(code) & WC_SUBLIST_SIMPLE) ?
 			     execsimple(state) :
-			     execpline(state, code, Z_SYNC, 0)))) {
+			     execpline(state, code, Z_SYNC, 0))) || breaks) {
 		    state->pc = next;
 		    code = *state->pc++;
 		    next = state->pc + WC_SUBLIST_SKIP(code);

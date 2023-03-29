@@ -982,3 +982,39 @@ F:its expectations.
  }
  fn
 1:! does not affect return status of explicit return
+
+  msg=unset
+  for x in 1 2 3 4 5; do
+    continue && msg=set && print Not executed
+    print Not executed, neither.
+  done
+  print $msg
+0:continue causes immediate continuation
+>unset
+
+  msg=unset
+  () {
+    return && msg=set && print Not executed
+    print Not executed, not nor neither.
+  }
+  print $msg
+0:return causes immediate return
+>unset
+
+  msg=unset
+  for x in 1 2 3 4 5; do
+    ! continue || msg=set && print Not executed
+    print Not executed, neither.
+  done
+  print $msg
+0:! continue causes immediate continuation
+>unset
+
+  msg=unset
+  () {
+    ! return || msg=set && print Not executed
+    print Not executed, not nor neither.
+  }
+  print $msg
+0:! return causes immediate return
+>unset
