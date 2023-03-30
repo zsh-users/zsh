@@ -1965,6 +1965,15 @@ if test x$ac_cv_func_getrusage = xyes; then
 #endif
 #include <sys/resource.h>])
 fi
+dnl On some OSes (only macOS?) ru_maxrss is in bytes (not in kilobytes).
+dnl Solaris uses pages as the unit, but ru_maxrss is set to zero anyway.
+AH_TEMPLATE(RU_MAXRSS_IS_IN_BYTES,
+[Define to 1 if ru_maxrss in struct rusage is in bytes.])
+case "$host_os" in
+  darwin*)
+    AC_DEFINE(RU_MAXRSS_IS_IN_BYTES)
+  ;;
+esac
 
 
 dnl --------------------------------------------
