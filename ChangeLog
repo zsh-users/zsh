@@ -1,3 +1,8 @@
+2023-03-30  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 51604: Src/jobs.c, configure.ac: %M in TIMEFMT should report
+	in kilobytes
+
 2023-03-28  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 51602: Src/jobs.c, Src/signames2.awk: Handle SIGIOT as an

@@ -890,8 +890,13 @@ printtime(struct timeval *real, child_times_t *ti, char *desc)
 		break;
 #endif
 #ifdef HAVE_STRUCT_RUSAGE_RU_MAXRSS
+#ifdef RU_MAXRSS_IS_IN_BYTES
+# define MAXRSS_IN_KB(x) ((x)/1024)
+#else
+# define MAXRSS_IN_KB(x) (x)
+#endif
 	    case 'M':
-		fprintf(stderr, "%ld", ti->ru_maxrss / 1024);
+		fprintf(stderr, "%ld", MAXRSS_IN_KB(ti->ru_maxrss));
 		break;
 #endif
 #ifdef HAVE_STRUCT_RUSAGE_RU_MAJFLT
@@ -1038,7 +1043,7 @@ should_report_time(Job j)
 
 #ifdef HAVE_GETRUSAGE
     if (reportmemory >= 0 &&
-	j->procs->ti.ru_maxrss / 1024 > reportmemory)
+	MAXRSS_IN_KB(j->procs->ti.ru_maxrss) > reportmemory)
 	return 1;
 #endif
 
@@ -2648,11 +2653,6 @@ static const struct {
 #if defined(SIGPOLL) && defined(SIGIO)
 #if SIGPOLL == SIGIO
     { "IO", SIGIO },
-#endif
-#endif
-#if defined(SIGABRT) && defined(SIGIOT)
-#if SIGABRT == SIGIOT
-    { "IOT", SIGIOT },
 #endif
 #endif
 #if !defined(SIGERR)
