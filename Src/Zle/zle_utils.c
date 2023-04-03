@@ -512,12 +512,13 @@ stringaszleline(char *instr, int incs, int *outll, int *outsz, int *outcs)
 	    *outcs = outptr - outstr;
 	*outll = outptr - outstr;
     } else {
+	*outstr = ZWC('\0');
 	*outll = 0;
 	if (outcs)
 	    *outcs = 0;
     }
 #else
-    memcpy(outstr, instr, ll);
+    strcpy(outstr, instr);
     *outll = ll;
     if (outcs)
 	*outcs = incs;
