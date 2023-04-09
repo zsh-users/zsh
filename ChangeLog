@@ -1,3 +1,7 @@
+2023-04-09  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 51632: Src/exec.c: unmetafy $_ when exporting it to child
+
 2023-04-03  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 51597: Src/Zle/zle_utils.c: fix 'vared -c var' when var is unset
