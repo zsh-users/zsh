@@ -1,5 +1,8 @@
 2023-04-09  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* 51631: Doc/Zsh/params.yo, Src/init.c: initialize $_ by copying
+	it from environment
+
 	* 51632: Src/exec.c: unmetafy $_ when exporting it to child
 
 2023-04-03  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>

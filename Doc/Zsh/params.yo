@@ -779,7 +779,10 @@ last pipeline.
 )
 vindex(_)
 item(tt(_) <S>)(
-The last argument of the previous command.
+Initially, if tt(_) exists in the environment, then this parameter is set to
+its value. This value may be the full pathname of the current zsh
+executable or the script command file.
+Later, this parameter is set to the last argument of the previous command.
 Also, this parameter is set in the environment of every command
 executed to the full pathname of the command.
 )

@@ -1084,9 +1084,12 @@ setupvals(char *cmd, char *runscript, char *zsh_name)
 	ztrdup(DEFAULT_IFS_SH) : ztrdup(DEFAULT_IFS);
     wordchars   = ztrdup(DEFAULT_WORDCHARS);
     postedit    = ztrdup("");
-    zunderscore  = (char *) zalloc(underscorelen = 32);
-    underscoreused = 1;
-    *zunderscore = '\0';
+    /* If _ is set in environment then initialize our $_ by copying it */
+    zunderscore = getenv("_");
+    zunderscore = zunderscore ? metafy(zunderscore, -1, META_DUP) : ztrdup("");
+    underscoreused = strlen(zunderscore) + 1;
+    underscorelen = (underscoreused + 31) & ~31;
+    zunderscore = (char *)zrealloc(zunderscore, underscorelen);
 
     zoptarg = ztrdup("");
     zoptind = 1;
