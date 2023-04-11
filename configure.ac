@@ -2011,6 +2011,25 @@ if test x$zsh_cv_sys_path_dev_fd != xno; then
   AC_DEFINE_UNQUOTED(PATH_DEV_FD, "$zsh_cv_sys_path_dev_fd")
 fi
 
+dnl ----------------------------------------------------
+dnl CHECK FOR SYMLINK TO THE CURRENT EXECUTABLE IN /proc
+dnl ----------------------------------------------------
+dnl Linux: /proc/self/exe
+dnl NetBSD: /proc/curproc/exe (or /proc/self/exe, but not /proc/curproc/file)
+dnl DragonFly: /proc/curproc/file
+dnl Solaris: /proc/self/path/a.out
+AH_TEMPLATE([PROC_SELF_EXE],
+[Define to the path of the symlink to the current executable file.])
+AC_CACHE_CHECK(for symlink to the current executable in /proc,
+zsh_cv_proc_self_exe,
+[for zsh_cv_proc_self_exe in /proc/self/exe /proc/curproc/exe \
+                             /proc/curproc/file /proc/self/path/a.out no; do
+   test -L $zsh_cv_proc_self_exe && break
+done])
+if test x$zsh_cv_proc_self_exe != xno; then
+  AC_DEFINE_UNQUOTED(PROC_SELF_EXE, "$zsh_cv_proc_self_exe")
+fi
+
 dnl ---------------------------------
 dnl CHECK FOR RFS SUPERROOT DIRECTORY
 dnl ---------------------------------

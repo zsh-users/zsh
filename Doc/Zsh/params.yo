@@ -1112,6 +1112,10 @@ item(tt(ZSH_EXECUTION_STRING))(
 If the shell was started with the option tt(-c), this contains
 the argument passed to the option.  Otherwise it is not set.
 )
+vindex(ZSH_EXEPATH)
+item(tt(ZSH_EXEPATH))(
+Full pathname of the executable file of the current zsh process.
+)
 vindex(ZSH_NAME)
 item(tt(ZSH_NAME))(
 Expands to the basename of the command used to invoke this instance

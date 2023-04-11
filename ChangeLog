@@ -1,3 +1,9 @@
+2023-04-11  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 51639: Doc/Zsh/params.yo, Src/init.c, configure.ac: add new
+	parameter ZSH_EXEPATH that is set to the full pathname of the
+	executable file of the current zsh
+
 2023-04-09  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 51631: Doc/Zsh/params.yo, Src/init.c: initialize $_ by copying
