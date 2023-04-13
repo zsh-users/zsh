@@ -20,6 +20,11 @@
 	* 51604: Src/jobs.c, configure.ac: %M in TIMEFMT should report
 	in kilobytes
 
+2023-03-29  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 51608: Src/exec.c, Test/A01grammar.ztst: shouldn't be
+	executing commands after "continue &&" or "! continue ||".
+
 2023-03-28  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 51602: Src/jobs.c, Src/signames2.awk: Handle SIGIOT as an
