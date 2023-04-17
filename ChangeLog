@@ -1244,6 +1244,11 @@
 
 	* 51663: Completion/Unix/Command/_ssh: fix a typo in 51582
 
+2023-04-17  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 51652 (plus typo correction): Src/exec.c, Test/C03traps.ztst:
+	fix running of TRAPEXIT explicitly.
+
 2023-03-30  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 51604: Src/jobs.c, configure.ac: %M in TIMEFMT should report
