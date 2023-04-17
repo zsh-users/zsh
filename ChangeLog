@@ -1,3 +1,8 @@
+2023-04-17  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 51652 (plus typo correction): Src/exec.c, Test/C03traps.ztst:
+	fix running of TRAPEXIT explicitly.
+
 2023-04-11  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 51639: Doc/Zsh/params.yo, Src/init.c, configure.ac: add new

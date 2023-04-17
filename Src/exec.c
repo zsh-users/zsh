@@ -5779,12 +5779,25 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
     char *name = shfunc->node.nam;
     int flags = shfunc->node.flags;
     char *fname = dupstring(name);
-    Eprog prog;
+    Eprog prog, marked_prog;
     static int oflags;
     static int funcdepth;
     Heap funcheap;
 
     queue_signals();	/* Lots of memory and global state changes coming */
+    /*
+     * In case this is a special function such as a trap, mark it
+     * as in use right now, so it doesn't get freed early.  The
+     * worst that can happen is this hangs around in memory a little
+     * longer than strictly needed.
+     *
+     * Classic example of this happening is running TRAPEXIT directly.
+     *
+     * Because the shell function's contents may change, we'll ensure
+     * we use a consistent structure for use / free.
+     */
+    marked_prog = shfunc->funcdef;
+    useeprog(marked_prog);
 
     NEWHEAPS(funcheap) {
 	/*
@@ -5816,6 +5829,22 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	    size_t bytes = sizeof(int)*numpipestats;
 	    funcsave->pipestats = (int *)zhalloc(bytes);
 	    memcpy(funcsave->pipestats, pipestats, bytes);
+	}
+
+	if (!strcmp(fname, "TRAPEXIT")) {
+	    /*
+	     * If we are executing TRAPEXIT directly, starttrapscope()
+	     * will pull the rug out from under us to ensure the
+	     * exit trap isn't run inside the function.  We just need
+	     * the information locally here, so copy it on the heap.
+	     *
+	     * The funcdef is separately handled by reference counting.
+	     */
+	    Shfunc shcopy = (Shfunc)zhalloc(sizeof(struct shfunc));
+	    memcpy(shcopy, shfunc, sizeof(struct shfunc));
+	    shcopy->node.nam = dupstring(shfunc->node.nam);
+	    shfunc = shcopy;
+	    name = shfunc->node.nam;
 	}
 
 	starttrapscope();
@@ -5942,6 +5971,8 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	funcsave->fstack.filename = getshfuncfile(shfunc);
 
 	prog = shfunc->funcdef;
+	DPUTS1(!prog->nref, "function definition %s has zero reference count",
+	       (fname && *fname) ? fname : "<anon>");
 	if (prog->flags & EF_RUN) {
 	    Shfunc shf;
 
@@ -6046,6 +6077,7 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	}
     } OLDHEAPS;
 
+    freeeprog(marked_prog);
     unqueue_signals();
 
     /*

@@ -1083,6 +1083,17 @@ F:Must be tested with a top-level script rather than source or function
 >trap1
 # As of 5.7.1-test-2, the output was "out1 fn1 trap1 fn2" (on separate lines).
 
+  TRAPEXIT() { echo This is TRAPEXIT; }
+  TRAPEXIT
+  TRAPEXIT
+  TRAPEXIT
+0:No memory problems with explicit call to TRAPEXIT.
+>This is TRAPEXIT
+>This is TRAPEXIT
+>This is TRAPEXIT
+>This is TRAPEXIT
+# Three explicit calls, one implicit call at function exit.
+
 %clean
 
   rm -f TRAPEXIT
