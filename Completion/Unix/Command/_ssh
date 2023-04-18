@@ -27,7 +27,7 @@ _ssh () {
     '-r[recursively copy directories (follows symbolic links)]'
     '-S+[specify ssh program]:path to ssh:_command_names -e'
     '-v[verbose mode]'
-    '*(-O)-X+[specify sftp protocol option]: : _values "sftp option"
+    '(-O)*-X+[specify sftp protocol option]: : _values "sftp option"
       "nrequests[set max concurrent SFTP read or write requests]\:requests [64]"
       "buffer[set max buffer size for a single SFTP read/write operation]\: \:_numbers -l 0 -m 256K -d 32K -u bytes -f size \:B\:bytes \:K\:kilobytes"'
   )
