@@ -1,3 +1,7 @@
+2023-04-18  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 51663: Completion/Unix/Command/_ssh: fix a typo in 51582
+
 2023-03-30  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 51604: Src/jobs.c, configure.ac: %M in TIMEFMT should report
