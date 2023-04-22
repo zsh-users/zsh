@@ -1,3 +1,7 @@
+2023-04-22  Bart Schaefer  <schaefer@zsh.org>
+
+	* 51670: Src/text.c: prevent possible underflow in gettext()
+
 2023-04-18  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 51663: Completion/Unix/Command/_ssh: fix a typo in 51582
