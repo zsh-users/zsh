@@ -93,19 +93,15 @@ fi
 if [[ -z "$compstate[quote]" ]]; then
   if [[ -o equals ]] && compset -P 1 '='; then
     compstate[context]=equal
-  elif [[ "$PREFIX" != */* && "$PREFIX[1]" = '~' ]]; then
-    if [[ "$PREFIX" = '~['[^\]]# ]]; then
-      # Inside ~[...] should be treated as a subscript.
-      compset -p 2
-      # To be consistent, we ignore all but the contents of the square
-      # brackets.
-      compset -S '\]*'
-      compstate[context]=subscript
-      [[ -n $_comps[-subscript-] ]] && $_comps[-subscript-] && return
-    else
-      compset -p 1
-      compstate[context]=tilde
-    fi
+  elif [[ "$PREFIX" = \~\[[^]]# ]]; then
+    # Inside ~[...] should be treated as a subscript.
+    compset -p 2
+    # To be consistent, we ignore all but the contents of the square brackets.
+    compset -S '\]*'
+    compstate[context]=subscript
+  elif [[ "$PREFIX" = \~[^/]# ]]; then
+    compset -p 1
+    compstate[context]=tilde
   fi
 fi
 

@@ -1,5 +1,9 @@
 2023-05-21  Oliver Kiddle  <opk@zsh.org>
 
+	* Marlon Richert: 51682: Completion/Base/Core/_main_complete,
+	Test/Y01completion.ztst: Fix subscript completion bugs
+	inside ~[...]
+
 	* Marlon Richert: 51759: Completion/Zsh/Type/_command_names:
 	Show alias values in command completions
 
