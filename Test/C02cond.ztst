@@ -111,10 +111,6 @@
   if (( EUID == 0 )); then
     print -u$ZTST_fd 'Warning: Not testing [[ ! -r file ]] (root reads anything)'
     [[ -r zerolength && -r unmodish ]]
-  elif [[ $OSTYPE = cygwin ]]; then
-    print -u$ZTST_fd 'Warning: Not testing [[ ! -r file ]]
-   (all files created by user may be readable)'
-   [[ -r zerolength ]]
   else
     [[ -r zerolength && ! -r unmodish ]]
   fi
@@ -148,9 +144,7 @@
 
   print -ru $ZTST_fd 'This test may take two seconds...'
   touch $newnewnew
-  if [[ $OSTYPE == "cygwin" ]]; then
-    ZTST_skip="[[ -N file ]] not supported on Cygwin"
-  elif (( isnfs )); then
+  if (( isnfs )); then
     ZTST_skip="[[ -N file ]] not supported with NFS"
   elif ! zmodload -F zsh/stat b:zstat 2> /dev/null; then
     ZTST_skip='[[ -N file ]] not tested; zsh/stat not available'
