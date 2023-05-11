@@ -13,7 +13,7 @@ blocks until a file descriptor is ready for reading or writing, or has an
 error condition, with an optional timeout.  If this is not available on
 your system, the command prints an error message and returns status 2
 (normal errors return status 1).  For more information, see your system's
-documentation for manref(select)(3).  Note there is no connection with the
+documentation for manref(select)(2).  Note there is no connection with the
 shell builtin of the same name.
 
 Arguments and options may be intermingled in any order.  Non-option

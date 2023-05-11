@@ -1,5 +1,8 @@
 2023-05-11  Bart Schaefer  <schaefer@zsh.org>
 
+	* Jim <linux.tech.guy@gmail.com>: 51609: Doc/Zsh/mod_zselect.yo:
+	fix reference to select(2)
+
 	* Shohei YOSHIDA: 51340: Completion/Unix/Command/_rake: update
 	for version 13
 
