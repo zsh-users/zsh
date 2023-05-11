@@ -1,3 +1,8 @@
+2023-05-11  Bart Schaefer  <schaefer@zsh.org>
+
+	* Shohei YOSHIDA: 51331: Completion/Unix/Command/_pydoc: update
+	for version 3.11
+
 2023-05-10  Bart Schaefer  <schaefer@zsh.org>
 
 	* 51593: Functions/Misc/run-help: improve search for original

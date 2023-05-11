@@ -6,13 +6,14 @@ local -a args
 
 args=(
   '(- *)-k[search keyword]:keyword'
-  '(-k -g -w *)-p[start web server on specified port]:port number'
+  '(-k -g -w)-p[start web server on specified port]:port number'
   '(-)-w[write out HTML in current directory]'
   '(-)*: :->lookup'
 )
 
 if _pick_variant pydoc3='pydoc3 -b' pydoc2 -h; then
-  args+=( '(-k -w *)-b[start server and open browser]' )
+  args+=( '(-k -w)-b[start server and open browser]' )
+  args+=( '(-k -w)-n[start web server with the given hostname]:hostname' )
 else
   args+=( '(- *)-g[start gui]' )
 fi
