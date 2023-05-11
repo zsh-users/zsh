@@ -1,3 +1,8 @@
+2023-05-10  Bart Schaefer  <schaefer@zsh.org>
+
+	* 51593: Functions/Misc/run-help: improve search for original
+	command name after skipping prefix assignments
+
 2023-05-08  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 51692: Test/C02cond.ztst: do not skip tests for [[ -r file ]]

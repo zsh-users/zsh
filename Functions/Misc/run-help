@@ -58,11 +58,11 @@ do
     case $what in
     (*( is an alias for (noglob|nocorrect))*)
 	[[ ${what[(w)7]:t} != ${what[(w)1]} ]] &&
-	  run_help_orig_cmd=${what[(w)1]} run-help ${what[(w)7]:t}
+	  run_help_orig_cmd=${what[(w)1]} run-help ${what[(w)7]:t} ${(z)${what[(w)8,-1]}}
 	;;
     (*( is an alias)*)
 	[[ ${what[(w)6]:t} != ${what[(w)1]} ]] &&
-	  run_help_orig_cmd=${what[(w)1]} run-help ${what[(w)6]:t}
+	  run_help_orig_cmd=${what[(w)1]} run-help ${what[(w)6]:t} ${(z)${what[(w)7,-1]}}
 	;;
     (*( is a * function))
 	case ${what[(w)1]} in
@@ -103,7 +103,7 @@ do
 		cmd_args=( ${(z)${cmd_args:-"$*"}} )
 
                 # Discard the command itself & everything before it.
-                shift $cmd_args[(i)${run_help_orig_cmd:-$1}] cmd_args ||
+                shift $cmd_args[(i)(${run_help_orig_cmd}|$1)] cmd_args 2>/dev/null ||
                     continue
 
                 # Discard options, parameter assignments & paths.
