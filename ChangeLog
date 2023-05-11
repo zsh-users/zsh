@@ -1,5 +1,8 @@
 2023-05-11  Bart Schaefer  <schaefer@zsh.org>
 
+	* Shohei YOSHIDA: 51340: Completion/Unix/Command/_rake: update
+	for version 13
+
 	* Shohei YOSHIDA: 51331: Completion/Unix/Command/_pydoc: update
 	for version 3.11
 
