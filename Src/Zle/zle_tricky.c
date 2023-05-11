@@ -1315,6 +1315,8 @@ get_comp_string(void)
 	    ins = (tok == REPEAT ? 2 : (tok != STRING && tok != TYPESET));
 	    zsfree(cmdstr);
 	    cmdstr = ztrdup(tokstr);
+	    untokenize(cmdstr);
+	    remnulargs(cmdstr);
 	    cmdtok = tok;
 	    /*
 	     * If everything before is a redirection, or anything
