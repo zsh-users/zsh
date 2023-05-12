@@ -129,14 +129,17 @@ bin_pcre_study(char *nam, UNUSED(char **args), UNUSED(Options ops), UNUSED(int f
 }
 
 static int
-zpcre_get_substrings(char *arg, pcre2_match_data *mdata, int captured_count,
-	char *matchvar, char *substravar, int want_offset_pair,
-	int matchedinarr, int want_begin_end)
+zpcre_get_substrings(pcre2_code *pat, char *arg, pcre2_match_data *mdata,
+	int captured_count, char *matchvar, char *substravar, char *namedassoc,
+	int want_offset_pair, int matchedinarr, int want_begin_end)
 {
     PCRE2_SIZE *ovec;
     char *match_all, **matches;
     char offset_all[50];
     int capture_start = 1;
+    int vec_off;
+    PCRE2_SPTR ntable; /* table of named captures */
+    uint32_t ncount, nsize;
 
     if (matchedinarr) {
 	/* bash-style ovec[0] entire-matched string in the array */
@@ -174,7 +177,7 @@ zpcre_get_substrings(char *arg, pcre2_match_data *mdata, int captured_count,
 	if (substravar &&
 	    (!want_begin_end || nelem)) {
 	    char **x;
-	    int vec_off, i;
+	    int i;
 	    matches = x = (char **) zalloc(sizeof(char *) * (captured_count+1-capture_start));
 	    for (i = capture_start; i < captured_count; i++) {
 		vec_off = 2*i;
@@ -182,6 +185,23 @@ zpcre_get_substrings(char *arg, pcre2_match_data *mdata, int captured_count,
 	    }
 	    *x = NULL;
 	    setaparam(substravar, matches);
+	}
+
+	if (!pcre2_pattern_info(pat, PCRE2_INFO_NAMECOUNT, &ncount) && ncount
+		&& !pcre2_pattern_info(pat, PCRE2_INFO_NAMEENTRYSIZE, &nsize)
+		&& !pcre2_pattern_info(pat, PCRE2_INFO_NAMETABLE, &ntable))
+	{
+	    char **hash, **hashptr;
+	    uint32_t nidx;
+	    hashptr = hash = (char **)zshcalloc((ncount+1)*2*sizeof(char *));
+	    for (nidx = 0; nidx < ncount; nidx++) {
+		vec_off = (ntable[nsize * nidx] << 9) + 2 * ntable[nsize * nidx + 1];
+		/* would metafy the key but pcre limits characters in the name */
+		*hashptr++ = ztrdup((char *) ntable + nsize * nidx + 2);
+		*hashptr++ = metafy(arg + ovec[vec_off],
+			ovec[vec_off+1]-ovec[vec_off], META_DUP);
+	    }
+	    sethparam(namedassoc, hash);
 	}
 
 	if (want_begin_end) {
@@ -286,6 +306,7 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
     char *matched_portion = NULL;
     char *plaintext = NULL;
     char *receptacle = NULL;
+    char *named = ".pcre.match";
     int return_value = 1;
     /* The subject length and offset start are both int values in pcre_exec */
     int subject_len;
@@ -304,6 +325,9 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
     }
     if(OPT_HASARG(ops,c='v')) {
 	matched_portion = OPT_ARG(ops,c);
+    }
+    if (OPT_HASARG(ops, c='A')) {
+	named = OPT_ARG(ops, c);
     }
     if(OPT_HASARG(ops,c='n')) { /* The offset position to start the search, in bytes. */
 	if ((offset_start = getposint(OPT_ARG(ops,c), nam)) < 0)
@@ -326,8 +350,8 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
     if (ret==0) return_value = 0;
     else if (ret == PCRE2_ERROR_NOMATCH) /* no match */;
     else if (ret>0) {
-	zpcre_get_substrings(plaintext, pcre_mdata, ret, matched_portion, receptacle,
-			     want_offset_pair, 0, 0);
+	zpcre_get_substrings(pcre_pattern, plaintext, pcre_mdata, ret, matched_portion,
+		receptacle, named, want_offset_pair, 0, 0);
 	return_value = 0;
     }
     else {
@@ -405,9 +429,8 @@ cond_pcre_match(char **a, int id)
 		    break;
 		}
                 else if (r>0) {
-		    zpcre_get_substrings(lhstr_plain, pcre_mdata, r, svar, avar, 0,
-					 isset(BASHREMATCH),
-					 !isset(BASHREMATCH));
+		    zpcre_get_substrings(pcre_pat, lhstr_plain, pcre_mdata, r, svar, avar,
+			    ".pcre.match", 0, isset(BASHREMATCH), !isset(BASHREMATCH));
 		    return_value = 1;
 		    break;
 		}
@@ -443,7 +466,7 @@ static struct conddef cotab[] = {
 
 static struct builtin bintab[] = {
     BUILTIN("pcre_compile", 0, bin_pcre_compile, 1, 1, 0, "aimxs",  NULL),
-    BUILTIN("pcre_match",   0, bin_pcre_match,   1, 1, 0, "a:v:n:b",    NULL),
+    BUILTIN("pcre_match",   0, bin_pcre_match,   1, 1, 0, "A:a:v:n:b",    NULL),
     BUILTIN("pcre_study",   0, bin_pcre_study,   0, 0, 0, NULL,    NULL)
 };
 
