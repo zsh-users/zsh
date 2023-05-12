@@ -1,5 +1,8 @@
 2023-05-13  Oliver Kiddle  <opk@zsh.org>
 
+	* 51738: Doc/Zsh/mod_pcre.yo, Src/Modules/pcre.c,
+	Test/V07pcre.ztst: support pcre's DFA matching algorithm
+
 	* 51728: Doc/Zsh/mod_pcre.yo, Src/Modules/pcre.c,
 	Test/V07pcre.ztst: assign pcre named capture groups to a hash
 

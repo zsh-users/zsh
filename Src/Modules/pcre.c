@@ -305,30 +305,29 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
     pcre2_match_data *pcre_mdata = NULL;
     char *matched_portion = NULL;
     char *plaintext = NULL;
-    char *receptacle = NULL;
-    char *named = ".pcre.match";
+    char *receptacle;
+    char *named = NULL;
     int return_value = 1;
     /* The subject length and offset start are both int values in pcre_exec */
     int subject_len;
     int offset_start = 0;
     int want_offset_pair = 0;
+    int use_dfa = 0;
 
     if (pcre_pattern == NULL) {
 	zwarnnam(nam, "no pattern has been compiled");
 	return 1;
     }
 
-    matched_portion = "MATCH";
-    receptacle = "match";
-    if(OPT_HASARG(ops,c='a')) {
-	receptacle = OPT_ARG(ops,c);
+    if (!(use_dfa = OPT_ISSET(ops, 'd'))) {
+	matched_portion = OPT_HASARG(ops, c='v') ? OPT_ARG(ops, c) : "MATCH";
+	named = OPT_HASARG(ops, c='A') ? OPT_ARG(ops, c) : ".pcre.match";
+    } else if (OPT_HASARG(ops, c='v') || OPT_HASARG(ops, c='A')) {
+	zwarnnam(nam, "-d cannot be combined with -%c", c);
+	return 1;
     }
-    if(OPT_HASARG(ops,c='v')) {
-	matched_portion = OPT_ARG(ops,c);
-    }
-    if (OPT_HASARG(ops, c='A')) {
-	named = OPT_ARG(ops, c);
-    }
+    receptacle = OPT_HASARG(ops, 'a') ? OPT_ARG(ops, 'a') : "match";
+
     if(OPT_HASARG(ops,c='n')) { /* The offset position to start the search, in bytes. */
 	if ((offset_start = getposint(OPT_ARG(ops,c), nam)) < 0)
 	    return 1;
@@ -341,7 +340,25 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
 
     if (offset_start > 0 && offset_start >= subject_len)
 	ret = PCRE2_ERROR_NOMATCH;
-    else {
+    else if (use_dfa) {
+	PCRE2_SIZE old, wscount = 128, capcount = 128;
+	void *workspace = zhalloc(sizeof(int) * wscount);
+	pcre_mdata = pcre2_match_data_create(capcount, NULL);
+	do {
+	    ret = pcre2_dfa_match(pcre_pattern, (PCRE2_SPTR) plaintext, subject_len,
+		offset_start, 0, pcre_mdata, NULL, (int *) workspace, wscount);
+	    if (ret == PCRE2_ERROR_DFA_WSSIZE) {
+		old = wscount;
+		wscount += wscount / 2;
+		workspace = hrealloc(workspace, sizeof(int) * old, sizeof(int) * wscount);
+	    } else if (ret == 0) {
+		capcount += capcount / 2;
+		pcre2_match_data_free(pcre_mdata);
+		pcre_mdata = pcre2_match_data_create(capcount, NULL);
+	    } else
+		break;
+	} while(1);
+    } else {
 	pcre_mdata = pcre2_match_data_create_from_pattern(pcre_pattern, NULL);
 	ret = pcre2_match(pcre_pattern, (PCRE2_SPTR) plaintext, subject_len,
 		offset_start, 0, pcre_mdata, NULL);
@@ -350,12 +367,14 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
     if (ret==0) return_value = 0;
     else if (ret == PCRE2_ERROR_NOMATCH) /* no match */;
     else if (ret>0) {
-	zpcre_get_substrings(pcre_pattern, plaintext, pcre_mdata, ret, matched_portion,
-		receptacle, named, want_offset_pair, 0, 0);
+	zpcre_get_substrings(pcre_pattern, plaintext, pcre_mdata, ret,
+		matched_portion, receptacle, named, want_offset_pair, use_dfa, 0);
 	return_value = 0;
     }
     else {
-	zwarnnam(nam, "error in pcre2_match [%d]", ret);
+	PCRE2_UCHAR buffer[256];
+	pcre2_get_error_message(ret, buffer, sizeof(buffer));
+	zwarnnam(nam, "error in pcre matching for /%s/: %s", plaintext, buffer);
     }
     
     if (pcre_mdata)
@@ -466,7 +485,7 @@ static struct conddef cotab[] = {
 
 static struct builtin bintab[] = {
     BUILTIN("pcre_compile", 0, bin_pcre_compile, 1, 1, 0, "aimxs",  NULL),
-    BUILTIN("pcre_match",   0, bin_pcre_match,   1, 1, 0, "A:a:v:n:b",    NULL),
+    BUILTIN("pcre_match",   0, bin_pcre_match,   1, 1, 0, "A:a:v:n:bd",    NULL),
     BUILTIN("pcre_study",   0, bin_pcre_study,   0, 0, 0, NULL,    NULL)
 };
 

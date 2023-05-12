@@ -196,3 +196,8 @@
 >  [package]=name-12345
 >  [version]=12345
 >)
+
+  pcre_compile 'cat(er(pillar)?)?'
+  pcre_match -d 'the caterpillar catchment' && print $match
+0:pcre_match -d
+>caterpillar cater cat

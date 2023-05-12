@@ -25,7 +25,7 @@ may result in faster matching.
 )
 findex(pcre_match)
 item(tt(pcre_match) [ tt(-v) var(var) ] [ tt(-a) var(arr) ] \
-[ tt(-A) var(assoc) ] [ tt(-n) var(offset) ] [ tt(-b) ] var(string))(
+[ tt(-A) var(assoc) ] [ tt(-n) var(offset) ] [ tt(-bd) ] var(string))(
 Returns successfully if tt(string) matches the previously-compiled
 PCRE.
 
@@ -68,6 +68,10 @@ done
 print -l $accum)
 )
 enditem()
+
+The option tt(-d) uses the alternative breadth-first DFA search algorithm of
+pcre. This sets tt(match), or the array given with tt(-a), to all the matches
+found from the same start point in the subject.
 
 The tt(zsh/pcre) module makes available the following test condition:
 
