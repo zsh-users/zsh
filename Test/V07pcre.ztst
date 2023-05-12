@@ -117,11 +117,16 @@
 >78884; ZPCRE_OP: 25 30
 >90210; ZPCRE_OP: 31 36
 
-# Embedded NULs allowed in plaintext, but not in RE (although \0 as two-chars allowed)
+# Embedded NULs allowed in plaintext, in RE, pcre supports \0 as two-chars
   [[ $'a\0bc\0d' =~ '^(a\0.)(.+)$' ]]
   print "${#MATCH}; ${#match[1]}; ${#match[2]}"
 0:ensure ASCII NUL passes in and out of matched plaintext
 >6; 3; 3
+
+# PCRE2 supports NULs also in the RE
+  [[ $'a\0b\0c' =~ $'^(.\0)+' ]] && print "${#MATCH}; ${#match[1]}"
+0:ensure ASCII NUL works also in the regex
+>4; 2
 
 # Ensure the long-form infix operator works
   [[ foo -pcre-match ^f..$ ]]
@@ -169,7 +174,11 @@
   [[ é =~ '^..\z' ]]; echo $?
   LANG=$LANG_SAVE
   [[ é =~ '^.\z' ]]; echo $?
-0:swich between C/UTF-8 locales
+0:switch between C/UTF-8 locales
 >0
 >0
 >0
+
+  [[ abc =~ 'a(d*)bc' ]] && print "$#MATCH; $#match; ${#match[1]}"
+0:empty capture
+>3; 1; 0

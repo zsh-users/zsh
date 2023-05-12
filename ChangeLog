@@ -1,5 +1,8 @@
 2023-05-13  Oliver Kiddle  <opk@zsh.org>
 
+	* 51723: Src/Modules/pcre.c, Test/V07pcre.ztst, configure.ac:
+	migrate pcre module to pcre2
+
 	* Felipe Contreras: 50612: Misc/vcs_info-examples: fix typo
 
 	* github #98: Vidhan Bhatt: Completion/Darwin/Command/_shortcuts:
