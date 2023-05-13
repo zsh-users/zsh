@@ -1,3 +1,8 @@
+2023-05-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 51722: Src/Modules/parameter.c: Add safety to extracting
+	elements of $historywords.
+
 2023-05-13  Oliver Kiddle  <opk@zsh.org>
 
 	* 51738: Doc/Zsh/mod_pcre.yo, Src/Modules/pcre.c,

@@ -1233,9 +1233,16 @@ histwgetfn(UNUSED(Param pm))
             pushnode(l, getdata(n));
 
     while (he) {
+	char *hstr = he->node.nam;
+	int len = strlen(hstr);
 	for (iw = he->nwords - 1; iw >= 0; iw--) {
-	    h = he->node.nam + he->words[iw * 2];
-	    e = he->node.nam + he->words[iw * 2 + 1];
+	    int wbegin = he->words[iw * 2];
+	    int wend = he->words[iw * 2 + 1];
+
+	    if (wbegin < 0 || wbegin >= len || wend < 0 || wend > len)
+		break;
+	    h = hstr + wbegin;
+	    e = hstr + wend;
 	    sav = *e;
 	    *e = '\0';
 	    addlinknode(l, dupstring(h));
