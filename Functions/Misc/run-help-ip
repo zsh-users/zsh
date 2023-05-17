@@ -18,7 +18,7 @@ case $1 in
     (addrl*) man ip-addrlabel ;;
     (a*) man ip-address ;;
     (l2*) man ip-l2tp ;;
-    (li*) man ip-link ;;
+    (l*) man ip-link ;;
     (ma*) man ip-maddress ;;
     (mo*) man ip-monitor ;;
     (mr*) man ip-mroute ;;

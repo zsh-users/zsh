@@ -1,5 +1,8 @@
 2023-09-20  Oliver Kiddle  <opk@zsh.org>
 
+	* Jörg Sommer: 51747: Functions/Misc/run-help-ip:
+	ip accepts the reduction of link to l
+
 	* Jörg Sommer: 51776: Functions/Misc/run-help-openssl:
 	Reduce code and use new manpages
 
