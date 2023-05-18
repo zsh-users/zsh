@@ -1,5 +1,8 @@
 2023-05-21  Oliver Kiddle  <opk@zsh.org>
 
+	* Marlon Richert: 51761: Completion/Zsh/Type/_parameters:
+	Use zstyle verbose for _parameters descriptions
+
 	* Marlon Richert: 51682: Completion/Base/Core/_main_complete,
 	Test/Y01completion.ztst: Fix subscript completion bugs
 	inside ~[...]

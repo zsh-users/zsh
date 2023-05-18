@@ -21,7 +21,7 @@ zstyle -t ":completion:${curcontext}:parameters" prefix-needed &&
 _description parameters expl parameter
 zparseopts -D -K -E g:=pattern
 
-if zstyle -t ":completion:${curcontext}:parameters" extra-verbose; then
+if zstyle -t ":completion:${curcontext}:parameters" verbose; then
   described=(
       "${(@M)${(@k)parameters[(R)$~pattern[2]~*(hideval|local|special)*]}:#$~pfilt*}"
   )
