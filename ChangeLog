@@ -1,5 +1,8 @@
 2023-05-21  Oliver Kiddle  <opk@zsh.org>
 
+	* Marlon Richert: 51759: Completion/Zsh/Type/_command_names:
+	Show alias values in command completions
+
 	* Marlon Richert: 51760: Doc/Zsh/compwid.yo: r and R were listed
 	in the wrong order.
 
