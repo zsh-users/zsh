@@ -112,7 +112,7 @@ vindex(QIPREFIX)
 item(tt(QIPREFIX))(
 This parameter is read-only and contains the quoted string up to the
 word being completed. E.g. when completing `tt("foo)', this parameter
-contains the double quote. If the tt(-q) option of tt(compset) is used 
+contains the double quote. If the tt(-q) option of tt(compset) is used
 (see below), and the original string was `tt("foo bar)' with the
 cursor on the `tt(bar)', this parameter contains `tt("foo )'.
 )
@@ -1082,8 +1082,8 @@ enditem()
 )
 xitem(tt(l:)tt(|)var(word-pat)tt(=)var(match-pat))
 xitem(tt(L:)tt(|)var(word-pat)tt(=)var(match-pat))
-xitem(tt(R:)var(word-pat)tt(|)tt(=)var(match-pat))
-item(tt(r:)var(word-pat)tt(|)tt(=)var(match-pat))(
+xitem(tt(r:)var(word-pat)tt(|)tt(=)var(match-pat))
+item(tt(R:)var(word-pat)tt(|)tt(=)var(match-pat))(
 
 If there is a substring at the tt(l:)eft or tt(r:)ight edge of the current word
 that matches var(word-pat), then broaden the corresponding part of the match

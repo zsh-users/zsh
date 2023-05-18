@@ -1,5 +1,8 @@
 2023-05-21  Oliver Kiddle  <opk@zsh.org>
 
+	* Marlon Richert: 51760: Doc/Zsh/compwid.yo: r and R were listed
+	in the wrong order.
+
 	* Marlon Richert: 51758: Test/Y01completion.ztst, Doc/Zsh/expn.yo,
 	Completion/Zsh/Context/_dynamic_directory_name: Make dynamic dir
 	completion easier to implement
