@@ -2066,34 +2066,24 @@ tt(/home/pws/perforce).  In this simple case a static name for the
 directory would be just as effective.
 
 example(zsh_directory_name+LPAR()RPAR() {
-  emulate -L zsh
-  setopt extendedglob
+  emulate -L zsh -o extendedglob
   local -a match mbegin mend
-  if [[ $1 = d ]]; then
-    # turn the directory into a name
-    if [[ $2 = (#b)(/home/pws/perforce/)([^/]##)* ]]; then
-      typeset -ga reply
-      reply=(p:$match[2] $(( ${#match[1]} + ${#match[2]} )) )
-    else
-      return 1
-    fi
-  elif [[ $1 = n ]]; then
-    # turn the name into a directory
-    [[ $2 != (#b)p:(?*) ]] && return 1
-    typeset -ga reply
-    reply=(/home/pws/perforce/$match[1])
-  elif [[ $1 = c ]]; then
-    # complete names
-    local expl
-    local -a dirs
-    dirs=(/home/pws/perforce/*(/:t))
-    dirs=(p:${^dirs})
-    _wanted dynamic-dirs expl 'dynamic directory' compadd -S\] -a dirs
-    return
-  else
-    return 1
-  fi
-  return 0
+  local base=/home/pws/perforce
+  case $1 in
+  ( d )  # Turn the directory into a name.
+    [[ $2 == (#b)($base/)([^/]##)* ]] &&
+        reply=( p:$match[2] $(( $#match[1] + $#match[2] )) )
+  ;;
+  ( n )  # Turn the name into a directory.
+    [[ $2 == (#b)p:(?*) ]] &&
+        reply=( $base/$match[1] )
+  ;;
+  ( c )  # Complete names.
+    local -a dirs=( $base/*(/:t) )
+    # Completion system populates $expl with flags for compadd.
+    compadd "$expl[@]" p:$^dirs
+  ;;
+  esac
 })
 
 texinode(Static named directories)(`=' expansion)(Dynamic named directories)(Filename Expansion)

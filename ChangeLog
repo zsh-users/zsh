@@ -1,3 +1,9 @@
+2023-05-21  Oliver Kiddle  <opk@zsh.org>
+
+	* Marlon Richert: 51758: Test/Y01completion.ztst, Doc/Zsh/expn.yo,
+	Completion/Zsh/Context/_dynamic_directory_name: Make dynamic dir
+	completion easier to implement
+
 2023-05-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 51722: Src/Modules/parameter.c: Add safety to extracting

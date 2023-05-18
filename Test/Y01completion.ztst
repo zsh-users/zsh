@@ -75,6 +75,17 @@
 >line: {: ~user2}{}
 >line: {: ~user1}{}
 
+  comptesteval 'zsh_directory_name() { compadd "$expl[@]" -- name1 name2 }'
+  comptest $': ~[\t\t\t\t'
+0:dynamic directory names after ~[
+>line: {: ~[name}{}
+>line: {: ~[name}{}
+>DESCRIPTION:{dynamically named directory}
+>NO:{name1}
+>NO:{name2}
+>line: {: ~[name1]}{}
+>line: {: ~[name2]}{}
+
   comptest $'echo ;:\C-b\C-b\t'
 0:directories and files before separator
 >line: {echo }{;:}
