@@ -380,11 +380,13 @@ zerrmsg(FILE *file, const char *fmt, va_list ap)
     fflush(file);
 }
 
+#ifdef HAVE_SETUPTERM
 /*
  * Wrapper for setupterm() and del_curterm().
  * These are called from terminfo.c and termcap.c.
  */
 static int term_count;	/* reference count of cur_term */
+#endif
 
 /**/
 mod_export void
