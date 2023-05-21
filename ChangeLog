@@ -1,5 +1,8 @@
 2023-05-21  Oliver Kiddle  <opk@zsh.org>
 
+	* 51769: Src/jobs.c, Src/utils.c: fix compilation when
+	HAVE_GETRUSAGE is not defined
+
 	* Marlon Richert: 51761: Completion/Zsh/Type/_parameters:
 	Use zstyle verbose for _parameters descriptions
 

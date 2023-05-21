@@ -1032,7 +1032,7 @@ should_report_time(Job j)
 	    return 1;
 #else
 	{
-	    clktck = get_clktck();
+	    long clktck = get_clktck();
 	    if ((j->procs->ti.ut + j->procs->ti.st) / clktck >= reporttime)
 		return 1;
 	}
