@@ -1,5 +1,8 @@
 2023-09-20  Oliver Kiddle  <opk@zsh.org>
 
+	* Jörg Sommer: 51776: Functions/Misc/run-help-openssl:
+	Reduce code and use new manpages
+
 	* Wim de With: 51857: Completion/Linux/Command/_fusermount:
 	Include fusermount3 in fusermount completions
 
