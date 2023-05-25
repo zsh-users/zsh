@@ -1,3 +1,7 @@
+2023-05-25  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 51739: Src/hist.c: detect invalid history word beginning.
+
 2023-05-21  Oliver Kiddle  <opk@zsh.org>
 
 	* 51769: Src/jobs.c, Src/utils.c: fix compilation when

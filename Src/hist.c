@@ -1643,12 +1643,17 @@ hend(Eprog prog)
 void
 ihwbegin(int offset)
 {
+    int pos = hptr - chline + offset;
     if (stophist == 2 || (histactive & HA_INWORD) ||
 	(inbufflags & (INP_ALIAS|INP_HIST)) == INP_ALIAS)
 	return;
     if (chwordpos%2)
 	chwordpos--;	/* make sure we're on a word start, not end */
-    chwords[chwordpos++] = hptr - chline + offset;
+    DPUTS1(pos < 0, "History word position < 0 in %s",
+	   dupstrpfx(chline, hptr-chline));
+    if (pos < 0)
+	pos = 0;
+    chwords[chwordpos++] = pos;
 }
 
 /* Abort current history word, not needed */
