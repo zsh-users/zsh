@@ -1,0 +1,9 @@
+if [[ $# == 0 ]]
+then
+    man docker
+elif [[ $# > 1 && $1 == (builder|checkpoint|config|container|context|image|manifest|network|node|plugin|secret|service|stack|swarm|system|trust|volume) ]]
+then
+    man docker-$1-$2
+else
+    man docker-$1
+fi

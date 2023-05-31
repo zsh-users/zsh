@@ -1,0 +1,9 @@
+if [[ $# == 0 ]]
+then
+    man podman
+elif [[ $# > 1 && $1 == (container|generate|healthcheck|image|kube|machine|manifest|network|pod|secret|system|volume) ]]
+then
+    man podman-$1-$2
+else
+    man podman-$1
+fi

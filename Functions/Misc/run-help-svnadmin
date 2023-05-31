@@ -1,0 +1,1 @@
+svnadmin help $1 | ${=PAGER:-more}
