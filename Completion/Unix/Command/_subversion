@@ -139,7 +139,7 @@ _svn () {
           ;;
           (commit)
             args=(
-	      ${args/(#b)(*--file*):arg:/$match[1]:file:_files}
+	      ${args/(#b)(*--file*):arg:/${match[1]}:file:_files}
               '*:file: _svn_modified "committable"'
             )
           ;;
@@ -189,7 +189,7 @@ _svn () {
 	    args=(
 	    ':propname:(svn:ignore svn:keywords svn:executable svn:eol-style svn:mime-type svn:externals svn:needs-lock svn:global-ignores svn:auto-props)'
 	    ':propval:->propset_propval'
-	    ${args/(#b)(*--file*):arg:/$match[1]:file:_files}
+	    ${args/(#b)(*--file*):arg:/${match[1]}:file:_files}
 	    '*:path or url: _alternative "files:file:_files" "urls:URL:_svn_urls"'
 	    )
 	  ;;

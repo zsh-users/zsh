@@ -1,0 +1,13 @@
+--- Completion/Unix/Command/_ant
++++ Completion/Unix/Command/_ant
+@@ -79,8 +79,8 @@ case $state in
+     compset -P '*:'
+     compset -S ':*'
+     _alternative \
+-      "classpath:$state:_path_files -qS: -g '*.(jar|zip)(-.)'" \
+-      "classpath:$state:_path_files -r': ' -/" && ret=0
++      "classpath:${state}:_path_files -qS: -g '*.(jar|zip)(-.)'" \
++      "classpath:${state}:_path_files -r': ' -/" && ret=0
+   ;;
+   property)
+     if compset -P 1 '*='; then

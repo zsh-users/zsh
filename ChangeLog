@@ -1,5 +1,8 @@
 2023-06-06  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Stephane: 51817: Protect some use of ':' from history modifier
+	interpreation.
+
 	* 51816: Doc/Zsh/expn.yo, Src/hist.c, Src/subst.c,
 	Test/D04parameter.ztst: add :S history modifier with pattern
 	match.

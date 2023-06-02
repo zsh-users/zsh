@@ -125,7 +125,7 @@ local -a _ffmpeg_argspecs
                 lastopt_description=${lastopt_description//:/\\:}
                 if [[ $example == filename ]]; then
                     lastopt_takesargs=0
-                    lastopt+=":$lastopt_description:_files"
+                    lastopt+=":${lastopt_description}:_files"
                 elif [[ $lastopt == -[asv]pre ]]; then
                     lastopt_takesargs=0
                     lastopt="*$lastopt"
