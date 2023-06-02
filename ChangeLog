@@ -1,5 +1,7 @@
 2023-06-06  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Stephan: 51818: Protect another ':'.
+
 	* Stephane: 51817: Protect some use of ':' from history modifier
 	interpreation.
 
