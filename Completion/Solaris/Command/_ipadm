@@ -136,7 +136,7 @@ _ipadm() {
 	proto_icmp_properties=( "max_buf" "recv_buf" "send_buf" )
 	proto_all_properties=( $proto_ipv4_properties $proto_ipv6_properties $proto_tcp_properties
 		$proto_udp_properties $proto_sctp_properties $proto_icmp_properties )
-	proto_all_properties=( $^proto_all_properties:value:_ipadm_get_possible_values )
+	proto_all_properties=( ${^proto_all_properties}:value:_ipadm_get_possible_values )
 
 	proto_propproperties=( "proto" "property" "perm" "current" "persistent" "default" "possible" )
 
