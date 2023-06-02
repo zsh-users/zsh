@@ -3,6 +3,11 @@
 	* Marlon Richert: 51779: Test/Y01completion.ztst: update
 	completion test for 51761
 
+2023-06-06  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Stephane: 51817: Protect some use of ':' from history modifier
+	interpreation.
+
 2023-05-21  Oliver Kiddle  <opk@zsh.org>
 
 	* 51769: Src/jobs.c, Src/utils.c: fix compilation when

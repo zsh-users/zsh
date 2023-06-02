@@ -73,7 +73,7 @@ else
     if zstyle -t ":completion:${curcontext}:path-directories" separate-sections; then
       local elem
       for ((elem=1; elem <= $#tmpcdpath; elem++)); do
-        alt+=( "path-directories-$elem:directory in $tmpcdpath[$elem]:_path_files -W 'tmpcdpath[$elem]' -/" )
+        alt+=( "path-directories-${elem}:directory in ${tmpcdpath[$elem]}:_path_files -W 'tmpcdpath[$elem]' -/" )
       done
     else
       (( $#tmpcdpath )) &&
