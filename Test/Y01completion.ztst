@@ -281,10 +281,10 @@ F:regression test workers/31611
   comptesteval "typeset -a bar=({$'\\0'..$'\\C-?'})"
   comptesteval 'typeset -A bat=( "$bar[@]" )'
   comptesteval 'typeset bay="$bar"'
-  comptesteval 'zstyle ":completion:*:parameters" extra-verbose yes'
+  comptesteval 'zstyle ":completion:*:parameters" verbose yes'
   comptesteval 'zstyle ":completion:*" fake-parameters bar bat bay'
   comptest $': $ba\t'
-0:extra-verbose shows parameter values
+0:verbose shows parameter values
 >line: {: $ba}{}
 >DESCRIPTION:{parameter}
 >NO:{bar  -- ( '^@' '^A' '^B' '^C' '^D' '^E' '^F' '^G' '^H' '\t' '\n' '^K' '^L' '}
@@ -294,15 +294,15 @@ F:regression test workers/31611
   comptesteval "path=( $ZTST_srcdir:A )"
   comptesteval 'typeset -H paths=HIDDEN'
   comptest $': $path\t'
-0:extra-verbose doesn't show special or hidden parameter values
+0:verbose doesn't show special or hidden parameter values
 >line: {: $path}{}
 >DESCRIPTION:{parameter}
 >NO:{path}
 >NO:{paths}
 
-  comptesteval 'zstyle -d ":completion:*:parameters" extra-verbose'
+  comptesteval 'zstyle -d ":completion:*:parameters" verbose'
   comptest $': $ba\t'
-0:parameter values not shown without extra-verbose
+0:parameter values not shown without verbose
 >line: {: $ba}{}
 >DESCRIPTION:{parameter}
 >NO:{bar}

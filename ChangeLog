@@ -1,3 +1,8 @@
+2023-06-06  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* Marlon Richert: 51779: Test/Y01completion.ztst: update
+	completion test for 51761
+
 2023-05-25  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 51739: Src/hist.c: detect invalid history word beginning.
