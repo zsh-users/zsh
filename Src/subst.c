@@ -4351,6 +4351,8 @@ modify(char **str, char **ptr, int inbrace)
 		break;
 
 	    case 's':
+	    case 'S':
+		hsubpatopt = (**ptr == 'S');
 		c = **ptr;
 		(*ptr)++;
 		ptr1 = *ptr;
@@ -4445,7 +4447,7 @@ modify(char **str, char **ptr, int inbrace)
 		break;
 
 	    case '&':
-		c = 's';
+		c = hsubpatopt ? 'S' : 's';
 		break;
 
 	    case 'g':
@@ -4534,8 +4536,10 @@ modify(char **str, char **ptr, int inbrace)
 			copy = casemodify(tt, CASMOD_UPPER);
 			break;
 		    case 's':
+		    case 'S':
+			hsubpatopt = (c == 'S');
 			if (hsubl && hsubr)
-			    subst(&copy, hsubl, hsubr, gbal);
+			    subst(&copy, hsubl, hsubr, gbal, hsubpatopt);
 			break;
 		    case 'q':
 			copy = quotestring(copy, QT_BACKSLASH_SHOWNULL);
@@ -4620,8 +4624,10 @@ modify(char **str, char **ptr, int inbrace)
 		    *str = casemodify(*str, CASMOD_UPPER);
 		    break;
 		case 's':
+		case 'S':
+		    hsubpatopt = (c == 'S');
 		    if (hsubl && hsubr)
-			subst(str, hsubl, hsubr, gbal);
+			subst(str, hsubl, hsubr, gbal, hsubpatopt);
 		    break;
 		case 'q':
 		    *str = quotestring(*str, QT_BACKSLASH);

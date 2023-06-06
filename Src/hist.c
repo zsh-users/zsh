@@ -163,6 +163,11 @@ char *hsubl;
 /**/
 char *hsubr;
  
+/* state of histsubstpattern at last substitution */
+
+/**/
+int hsubpatopt;
+
 /* pointer into the history line */
  
 /**/
@@ -624,7 +629,7 @@ histsubchar(int c)
 	    return substfailed();
 	if (!hsubl)
 	    return -1;
-	if (subst(&sline, hsubl, hsubr, gbal))
+	if (subst(&sline, hsubl, hsubr, gbal, 0))
 	    return substfailed();
     } else {
 	/* Line doesn't begin ^foo^bar */
@@ -831,7 +836,7 @@ histsubchar(int c)
 	    if ((c = ingetc()) == 'g') {
 		gbal = 1;
 		c = ingetc();
-		if (c != 's' && c != '&') {
+		if (c != 's' && c != 'S' && c != '&') {
 		    zerr("'s' or '&' modifier expected after 'g'");
 		    return -1;
 		}
@@ -891,11 +896,13 @@ histsubchar(int c)
 		}
 		break;
 	    case 's':
+	    case 'S':
+		hsubpatopt = (c == 'S');
 		if (getsubsargs(sline, &gbal, &cflag))
 		    return -1; /* fall through */
 	    case '&':
 		if (hsubl && hsubr) {
-		    if (subst(&sline, hsubl, hsubr, gbal))
+		    if (subst(&sline, hsubl, hsubr, gbal, hsubpatopt))
 			return substfailed();
 		} else {
 		    herrflush();
@@ -2315,7 +2322,7 @@ casemodify(char *str, int how)
 
 /**/
 int
-subst(char **strptr, char *in, char *out, int gbal)
+subst(char **strptr, char *in, char *out, int gbal, int forcepat)
 {
     char *str = *strptr, *substcut, *sptr;
     int off, inlen, outlen;
@@ -2323,7 +2330,7 @@ subst(char **strptr, char *in, char *out, int gbal)
     if (!*in)
 	in = str, gbal = 0;
 
-    if (isset(HISTSUBSTPATTERN)) {
+    if (isset(HISTSUBSTPATTERN) || forcepat) {
 	int fl = SUB_LONG|SUB_REST|SUB_RETFAIL;
 	char *oldin = in;
 	if (gbal)

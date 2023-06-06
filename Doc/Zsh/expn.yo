@@ -312,7 +312,8 @@ zero) that are neither `tt(.)' nor `tt(/)' and that continue to the end
 of the string.  For example, the extension of
 `tt(foo.orig.c)' is `tt(.c)', and `tt(dir.c/foo)' has no extension.
 )
-item(tt(s/)var(l)tt(/)var(r)[tt(/)])(
+xitem(tt(s/)var(l)tt(/)var(r)[tt(/)])
+item(tt(S/)var(l)tt(/)var(r)[tt(/)])(
 Substitute var(r) for var(l) as described below.
 The substitution is done only for the
 first string that matches var(l).  For arrays and for filename
@@ -324,13 +325,17 @@ perform global substitution, i.e. substitute every occurrence of var(r)
 for var(l).  Note that the tt(g) or tt(:G) must appear in exactly the
 position shown.
 
+The use of tt(S) instead of tt(s) is identical except that
+the source is treated as a pattern, just as if the option
+tt(HIST_SUBST_PATTERN) were set.
+
 See further notes on this form of substitution below.
 )
 item(tt(&))(
-Repeat the previous tt(s) substitution.  Like tt(s), may be preceded
-immediately by a tt(g).  In parameter expansion the tt(&) must appear
-inside braces, and in filename generation it must be quoted with a
-backslash.
+Repeat the previous tt(s) or tt(S) substitution, whichever was most
+recent.  Like tt(s) and tt(S), may be preceded immediately by a tt(g).
+In parameter expansion the tt(&) must appear inside braces, and in
+filename generation it must be quoted with a backslash.
 )
 item(tt(t) [ var(digits) ])(
 Remove all leading pathname components, leaving the final component (tail).
@@ -377,7 +382,8 @@ substitutions or expansions are performed once at the time the qualifier
 is parsed, even before the `tt(:s)' expression itself is divided into
 var(l) and var(r) sides.
 
-If the option tt(HIST_SUBST_PATTERN) is set, var(l) is treated as
+If the option tt(HIST_SUBST_PATTERN) is set or the original substitution
+was started with a capital tt(S), var(l) is treated as
 a pattern of the usual form described in
 ifzman(the section FILENAME GENERATION below)\
 ifnzman(noderef(Filename Generation)).  This can be used in

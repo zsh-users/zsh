@@ -2754,3 +2754,13 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 0:(users/28784 inspired this) substituting a single-quoted backslash, part #3: control
 >xfooy
 
+ spacestring="string with spaces"
+ print ${spacestring:gs/[[:space:]]/ /}
+ print ${spacestring:g&}
+ print ${spacestring:gS/[[:space:]]//}
+ print ${spacestring:g&}
+0:Different behaviour of :s and :S modifiers
+>string with spaces
+>string with spaces
+>stringwithspaces
+>stringwithspaces
