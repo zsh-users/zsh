@@ -1,5 +1,8 @@
 2023-06-08  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* 51826: Src/hist.c: correctly handle metafied null character
+	when reading history file
+
 	* Stephane: 51817: Completion/BSD/Command/_rcctl: protect ':'
 	in _rcctl (was in 51817 but missed in commit 0577daf)
 

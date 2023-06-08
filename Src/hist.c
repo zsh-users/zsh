@@ -3803,8 +3803,14 @@ histsplitwords(char *lineptr, short **wordsp, int *nwordsp, int *nwordposp,
 			zrealloc(words, nwords*sizeof(*words));
 		}
 		words[nwordpos++] = lineptr - start;
-		while (*lineptr && !inblank(*lineptr))
-		    lineptr++;
+		while (*lineptr) {
+		    if (*lineptr == Meta && lineptr[1])
+			lineptr += 2;
+		    else if (!inblank(*lineptr))
+			lineptr++;
+		    else
+			break;
+		}
 		words[nwordpos++] = lineptr - start;
 	    }
 	} while (*lineptr);
