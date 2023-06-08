@@ -1,5 +1,8 @@
 2023-09-20  Oliver Kiddle  <opk@zsh.org>
 
+	* Wim de With: 51857: Completion/Linux/Command/_fusermount:
+	Include fusermount3 in fusermount completions
+
 	* Atte Peltomäki: 51980: Completion/Zsh/Type/_globquals,
 	Doc/Zsh/expn.yo: Add glob qualifier grouping operator to completion
 

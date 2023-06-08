@@ -1,4 +1,4 @@
-#compdef fusermount
+#compdef fusermount fusermount3
 
 local expl context state line
 typeset -A opt_args
