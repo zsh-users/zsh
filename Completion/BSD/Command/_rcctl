@@ -46,6 +46,6 @@ case $service in
       '*:argument:'
     ;;
   ${(~j:|:)actions}|disable|enable)
-    _arguments "*:service to $words[2]:_services"
+    _arguments "*:service to ${words[2]}:_services"
     ;;
 esac

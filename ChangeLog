@@ -1,3 +1,8 @@
+2023-06-08  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* Stephane: 51817: Completion/BSD/Command/_rcctl: protect ':'
+	in _rcctl (was in 51817 but missed in commit 0577daf)
+
 2023-06-06  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Stephan: 51818: Protect another ':'.
