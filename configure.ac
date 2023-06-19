@@ -623,7 +623,12 @@ fi
 
 if test x"$TEXI2HTML" = xtexi2any; then
   TEXI2HTML='texi2any -c TEXI2HTML=1'
+  case `texi2any --version 2>/dev/null | sed -e 's/^.*) *//' -e 1q` in
+    [[1-6]].*) SET_TEXI2ANY_VAR=set_from_init_file ;;
+    *) SET_TEXI2ANY_VAR=texinfo_set_from_init_file ;;
+  esac
 fi
+AC_SUBST(SET_TEXI2ANY_VAR)
 
 case "$LC_PAPER" in
   ??_US*) PAPERSIZE=us ;;
