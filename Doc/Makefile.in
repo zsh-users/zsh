@@ -43,6 +43,7 @@ TEXI2DVI = @TEXI2DVI@
 DVIPS = dvips
 TEXI2PDF  = @TEXI2PDF@
 TEXI2HTML = @TEXI2HTML@
+SET_TEXI2ANY_VAR = @SET_TEXI2ANY_VAR@
 PAPERSIZE = @PAPERSIZE@
 
 .SUFFIXES: .yo .1
@@ -266,7 +267,7 @@ texi2html.conf: $(sdir_top)/Config/version.mk
 	d=`echo $(VERSION_DATE)`; \
 	v="<font size=\"-1\">Zsh version $(VERSION), released on $$d.</font>"; \
 	case '$(TEXI2HTML)' in \
-	  *texi2any*) echo "set_from_init_file('PRE_BODY_CLOSE','$$v');" ;; \
+	  *texi2any*) echo "$(SET_TEXI2ANY_VAR)('PRE_BODY_CLOSE','$$v');" ;; \
 	  *) echo "\$$PRE_BODY_CLOSE = '$$v';" ;; \
 	esac > $@
 

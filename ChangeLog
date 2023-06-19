@@ -1,3 +1,7 @@
+2023-06-19  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 51862: Doc/Makefile.in, configure.ac: support texinfo-7.0
+
 2023-06-08  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 51826: Src/hist.c: correctly handle metafied null character
