@@ -440,6 +440,17 @@ dnl Do you want to look for pcre support?
 AC_ARG_ENABLE(pcre,
 AS_HELP_STRING([--enable-pcre],[enable the search for the pcre2 library (may create run-time library dependencies)]))
 
+AC_ARG_VAR(PCRE_CONFIG, [pathname of pcre2-config if it is not in PATH])
+if test "x$enable_pcre" = xyes; then
+  AC_CHECK_PROG([PCRE_CONFIG], pcre2-config, pcre2-config)
+  if test "x$PCRE_CONFIG" = x; then
+    enable_pcre=no
+    AC_MSG_WARN([pcre2-config not found: pcre module is disabled.])
+    AC_MSG_NOTICE(
+      [Set PCRE_CONFIG to pathname of pcre2-config if it is not in PATH.])
+  fi
+fi
+
 dnl Do you want to look for capability support?
 AC_ARG_ENABLE(cap,
 AS_HELP_STRING([--enable-cap],[enable the search for POSIX capabilities (may require additional headers to be added by hand)]))
@@ -655,15 +666,12 @@ AC_HEADER_DIRENT
 AC_HEADER_STAT
 AC_HEADER_SYS_WAIT
 
-oldcflags="$CFLAGS"
-if test x$enable_pcre = xyes; then
-AC_CHECK_PROG([PCRECONF], pcre2-config, pcre2-config)
 dnl pcre2-config --cflags may produce a -I output which needs to go into
 dnl CPPFLAGS else configure's preprocessor tests don't pick it up,
 dnl producing a warning.
-if test "x$ac_cv_prog_PCRECONF" = xpcre2-config; then
-  CPPFLAGS="$CPPFLAGS `pcre2-config --cflags`"
-fi
+if test "x$enable_pcre" = xyes; then
+  CPPFLAGS="`$PCRE_CONFIG --cflags` $CPPFLAGS"
+  AC_CHECK_HEADERS([pcre2.h],,,[#define PCRE2_CODE_UNIT_WIDTH 8])
 fi
 
 AC_CHECK_HEADERS(sys/time.h sys/times.h sys/select.h termcap.h termio.h \
@@ -675,7 +683,6 @@ AC_CHECK_HEADERS(sys/time.h sys/times.h sys/select.h termcap.h termio.h \
 		 netinet/in_systm.h langinfo.h wchar.h stddef.h \
 		 sys/stropts.h iconv.h ncurses.h ncursesw/ncurses.h \
 		 ncurses/ncurses.h)
-AC_CHECK_HEADERS([pcre2.h],,,[#define PCRE2_CODE_UNIT_WIDTH 8])
 if test x$dynamic = xyes; then
   AC_CHECK_HEADERS(dlfcn.h)
   AC_CHECK_HEADERS(dl.h)
@@ -950,10 +957,6 @@ if test "x$ac_found_iconv" = "xyes"; then
       [ac_cv_iconv_const=const])])
   AC_DEFINE_UNQUOTED([ICONV_CONST], $ac_cv_iconv_const,
     [Define as const if the declaration of iconv() needs const.])
-fi
-
-if test x$enable_pcre = xyes; then
-  LIBS="`$ac_cv_prog_PCRECONF --libs8` $LIBS"
 fi
 
 dnl ---------------------
@@ -1316,7 +1319,6 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       pathconf sysconf \
 	       tgetent tigetflag tigetnum tigetstr setupterm initscr resize_term \
 	       getcchar setcchar waddwstr wget_wch win_wch use_default_colors \
-	       pcre2_compile_8 \
 	       nl_langinfo \
 	       erand48 open_memstream \
 	       posix_openpt \
@@ -1369,6 +1371,11 @@ return(!realpath("/", (char*)0));
 [zsh_cv_func_realpath_accepts_null=$ac_cv_func_canonicalize_file_name])])
 if test x$zsh_cv_func_realpath_accepts_null = xyes; then
   AC_DEFINE(REALPATH_ACCEPTS_NULL)
+fi
+
+if test x$enable_pcre = xyes; then
+  LIBS="`$PCRE_CONFIG --libs8` $LIBS"
+  AC_CHECK_FUNCS(pcre2_compile_8)
 fi
 
 if test x$enable_cap = xyes; then
