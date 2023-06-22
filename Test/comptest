@@ -40,7 +40,7 @@ KEYTIMEOUT=1
 setopt zle
 autoload -U compinit
 compinit -u
-zstyle ":completion:*" completer _expand _complete _ignored
+zstyle ":completion:*" completer _expand _complete _prefix _ignored
 zstyle ":completion:*:default" list-colors "no=<NO>" "fi=<FI>" "di=<DI>" "ln=<LN>" "pi=<PI>" "so=<SO>" "bd=<BD>" "cd=<CD>" "ex=<EX>" "mi=<MI>" "tc=<TC>" "sp=<SP>" "lc=<LC>" "ec=<EC>\n" "rc=<RC>"
 zstyle ":completion:*" group-name ""
 zstyle ":completion:*:messages" format "<MESSAGE>%d</MESSAGE>
@@ -51,6 +51,12 @@ zstyle ":completion:*:options" verbose yes
 zstyle ":completion:*:values" verbose yes
 setopt noalwayslastprompt listrowsfirst completeinword
 zmodload zsh/complist
+zle -C complete-word complete-word complete-word-with-postfunc
+complete-word-with-postfunc() {
+  local +h -a comppostfuncs=( comptest-postfunc )
+  _main_complete "$@"
+}
+comptest-postfunc() {}
 complete-word-with-report () {
   print -lr "<WIDGET><complete-word>"
   zle complete-word

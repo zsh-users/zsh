@@ -35,6 +35,54 @@
 >line: {: dir1/}{}
 >line: {: dir2/}{}
 
+  comptest $': d\t\t\t\t\t \t'
+0:unambiguous prefix and autoremovable suffix
+>line: {: dir}{}
+>line: {: dir}{}
+>DESCRIPTION:{file}
+>DI:{dir1}
+>DI:{dir2}
+>line: {: dir1/}{}
+>line: {: dir2/}{}
+>line: {: dir1/}{}
+>line: {: dir1 }{}
+>DESCRIPTION:{file}
+>DI:{dir1}
+>DI:{dir2}
+>FI:{file1}
+>FI:{file2}
+
+  comptest $': suf\ebd\t\t\t\t\t \t'
+0:unambiguous prefix and autoremovable suffix with _prefix completer
+>line: {: dir}{suf}
+>line: {: dir}{suf}
+>DESCRIPTION:{file}
+>DI:{dir1}
+>DI:{dir2}
+>line: {: dir1/}{suf}
+>line: {: dir2/}{suf}
+>line: {: dir1/}{suf}
+>line: {: dir1 }{suf}
+>DESCRIPTION:{file}
+>DI:{dir1}
+>DI:{dir2}
+>FI:{file1}
+>FI:{file2}
+F:regression test workers/51641
+
+  comptesteval 'comptest-postfunc() { compstate[insert]=1 compstate[list]= }'
+  comptest $': \t \t'
+0:compstate[insert]=1 compstate[list]=
+>line: {: dir1/}{}
+>line: {: dir1 dir1/}{}
+
+  comptest $': suf\eb\t \t'
+0:compstate[insert]=1 compstate[list]= with _prefix completer
+>line: {: dir1/}{suf}
+>line: {: dir1 dir1/}{suf}
+F:regression test workers/51641
+
+  comptesteval 'comptest-postfunc() {}'
   comptest $': *\t\t\t\t\t\t'
 0:_expand shows file types
 >line: {: dir1/}{}

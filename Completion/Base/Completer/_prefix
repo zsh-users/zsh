@@ -49,13 +49,8 @@ for tmp in "$comp[@]"; do
     fi
 
     if [[ "$tmp" != _prefix ]] && "$tmp"; then
-      [[ compstate[nmatches] -gt 1 ]] && return 0
-      compadd -U -i "$IPREFIX" -I "$ISUFFIX" - "${compstate[unambiguous]%$suf}x"
-      compstate[list]=
-      if [[ -n $compstate[unambiguous] ]]; then
-        compstate[insert]=unambiguous
-      else
-        compstate[insert]=0
+      if [[ -n $compstate[old_list] || ${compstate[unambiguous]%$suf} == $PREFIX ]]; then
+        compstate[to_end]=match
       fi
       return 0
     fi
