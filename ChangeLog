@@ -1,3 +1,8 @@
+2023-06-22  Bart Schaefer  <schaefer@zsh.org>
+
+	* Stephane: 51813: Functions/Misc/is-at-least: differentiate empty
+	$2 from omitted $2 to avoid wrong comparisons against ZSH_VERSION.
+
 2023-06-20  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 51877: Src/Modules/pcre.mdd, configure.ac: do not build pcre
@@ -17,7 +22,7 @@
 
 2023-06-06  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* Stephan: 51818: Protect another ':'.
+	* Stephane: 51818: Protect another ':'.
 
 	* Stephane: 51817: Protect some use of ':' from history modifier
 	interpreation.

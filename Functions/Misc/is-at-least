@@ -24,8 +24,14 @@ emulate -L zsh
 
 local IFS=".-" min_cnt=0 ver_cnt=0 part min_ver version order
 
+: ${2=$ZSH_VERSION}
+
+# sort out the easy corner cases first
+[[ $1 = $2 ]] && return 0 # same version
+[[ -n $2 ]] || return 1   # no version
+
 min_ver=(${=1})
-version=(${=2:-$ZSH_VERSION} 0)
+version=(${=2} 0)
 
 while (( $min_cnt <= ${#min_ver} )); do
   while [[ "$part" != <-> ]]; do
