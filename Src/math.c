@@ -641,7 +641,9 @@ zzlex(void)
 		return MINUSEQ;
 	    }
 	    if (unary) {
-		if (idigit(*ptr) || *ptr == '.') {
+		if (idigit(*ptr) ||
+		    (*ptr == '.' &&
+		     (idigit(ptr[1]) || !itype_end(ptr, INAMESPC, 0)))) {
 		    int ctype = lexconstant();
 		    if (ctype == NUM)
 		    {
@@ -835,7 +837,9 @@ zzlex(void)
 	case Dnull:
 	    break;
 	default:
-	    if (idigit(*--ptr) || *ptr == '.')
+	    if (idigit(*--ptr) ||
+		(*ptr == '.' &&
+		 (idigit(ptr[1]) || !itype_end(ptr, INAMESPC, 0))))
 		return lexconstant();
 	    if (*ptr == '#') {
 		if (*++ptr == '\\' || *ptr == '#') {
@@ -857,7 +861,7 @@ zzlex(void)
 		}
 		cct = 1;
 	    }
-	    if ((ie = itype_end(ptr, IIDENT, 0)) != ptr) {
+	    if ((ie = itype_end(ptr, INAMESPC, 0)) != ptr) {
 		int func = 0;
 		char *p;
 

@@ -1226,6 +1226,26 @@ isident(char *s)
     if (!*s)			/* empty string is definitely not valid */
 	return 0;
 
+    /* This partly duplicates code in itype_end(), but we need to
+     * distinguish the leading namespace at this point to check the
+     * correctness of the identifier that follows
+     */
+    if (*s == '.') {
+	if (idigit(s[1]))
+	    return 0;	/* Namespace must not start with a digit */
+	/* Reject identifiers beginning with a digit in namespaces.
+	 * Move this out below this block to also reject v.1x form.
+	 */
+	if ((ss = itype_end(s + (*s == '.'), IIDENT, 0))) {
+	    if (*ss == '.') {
+		if (!ss[1])
+		    return 0;
+		if (idigit(ss[1]))
+		    s = ss + 1;
+	    }
+	}
+    }
+
     if (idigit(*s)) {
 	/* If the first character is `s' is a digit, then all must be */
 	for (ss = ++s; *ss; ss++)
@@ -2148,7 +2168,12 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 	    pm = (Param) paramtab->getnode2(paramtab, *t == '0' ? "0" : t);
 	else
 	    pm = (Param) paramtab->getnode(paramtab, *t == '0' ? "0" : t);
-	if (sav)
+	if (!pm && *t == '.' && !isident(t)) {
+	    /* badly formed namespace reference */
+	    if (sav)
+		*s = sav;
+	    return NULL;
+	} else if (sav)
 	    *s = sav;
 	*pptr = s;
 	if (!pm || ((pm->node.flags & PM_UNSET) &&

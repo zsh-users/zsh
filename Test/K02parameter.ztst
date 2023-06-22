@@ -100,7 +100,55 @@ F:Braces are required
 >.k02.array
 >characters
 
+  k.=empty
   k.2=test
-  print ${k.2}
+  print ${k.} ${k.2}
 0:Parse without leading dot (future proofing)
->test
+>empty test
+
+  .k=OK
+  print ${.k}
+0:Bare namespace is usable (ksh compatibility)
+>OK
+
+  .k.=empty
+1:Namespace must precede an identifier, assignment
+?(eval):1: not an identifier: .k.
+
+  typeset .k.=empty
+1:Namespace must precede an identifier, typeset
+?(eval):typeset:1: not valid in this context: .k.
+
+  print ${.k.}
+1:Namespace must precede an identifier, reference
+?(eval):1: bad substitution
+
+  .2.b=not
+1:Namespace identifier must not begin with a digit, assignment
+?(eval):1: not an identifier: .2.b
+
+  typeset .2.b=not
+1:Namespace identifier must not begin with a digit, typeset
+?(eval):typeset:1: not valid in this context: .2.b
+
+  print ${.2.b}
+1:Namespace identifier must not begin with a digit, reference
+?(eval):1: bad substitution
+
+  .not.2b=question
+1:Identifier starting with a digit must be all digits, assignment
+?(eval):1: not an identifier: .not.2b
+
+  typeset .not.2b=question
+1:Identifier starting with a digit must be all digits, typeset
+?(eval):typeset:1: not valid in this context: .not.2b
+
+  print ${.not.2b}
+1:Identifier starting with a digit must be all digits, reference
+?(eval):1: bad substitution
+
+  integer .var.d=0
+  float .var.f=.2
+  print $((.var.x = ++.var.d - -.var.f))
+0:Namespaces in math context
+>1.2

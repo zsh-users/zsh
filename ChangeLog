@@ -1,5 +1,8 @@
 2023-06-22  Bart Schaefer  <schaefer@zsh.org>
 
+	* 51887: Src/math.c, Src/params.c, Test/K02parameter.ztst:
+	namespaces recognized in math, incorrect usages rejected.
+
 	* Marlon Richert: 51860: Completion/Base/Completer/_prefix,
 	Test/Y01completion.ztst, Test/comptest: simplify suffix handling
 	in _prefix to remove longstanding and less accurate hack; tests.
