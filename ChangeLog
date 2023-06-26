@@ -1,3 +1,9 @@
+2023-06-26  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 51884: Doc/Zsh/params.yo, Src/params.c, Src/utils.c,
+	Test/D04parameter.ztst: if MULTIBYTE option is on and IFS contains
+	invalid bytes in curret locale then reset it to default
+
 2023-06-22  Bart Schaefer  <schaefer@zsh.org>
 
 	* 51887: Src/math.c, Src/params.c, Test/K02parameter.ztst:

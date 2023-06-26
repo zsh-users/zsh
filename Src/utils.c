@@ -74,9 +74,6 @@ set_widearray(char *mb_array, Widechar_array wca)
     }
     wca->len = 0;
 
-    if (!isset(MULTIBYTE))
-	return;
-
     if (mb_array) {
 	VARARR(wchar_t, tmpwcs, strlen(mb_array));
 	wchar_t *wcptr = tmpwcs;
@@ -87,8 +84,7 @@ set_widearray(char *mb_array, Widechar_array wca)
 	    int mblen;
 
 	    if ((unsigned char) *mb_array <= 0x7f) {
-		mb_array++;
-		*wcptr++ = (wchar_t)*mb_array;
+		*wcptr++ = (wchar_t)*mb_array++;
 		continue;
 	    }
 
@@ -4121,8 +4117,9 @@ inittyptab(void)
      * having IIDENT here is a good idea at all, but this code
      * should disappear into history...
      */
-    for (t0 = 0240; t0 != 0400; t0++)
-	typtab[t0] = IALPHA | IALNUM | IIDENT | IUSER | IWORD;
+    if isset(MULTIBYTE)
+	for (t0 = 0240; t0 != 0400; t0++)
+	    typtab[t0] = IALPHA | IALNUM | IIDENT | IUSER | IWORD;
 #endif
     /* typtab['.'] |= IIDENT; */ /* Allow '.' in variable names - broken */
     typtab['_'] = IIDENT | IUSER;
@@ -4137,11 +4134,24 @@ inittyptab(void)
 	typtab[t0] |= ITOK | IMETA;
     for (t0 = (int) (unsigned char) Snull; t0 <= (int) (unsigned char) Nularg; t0++)
 	typtab[t0] |= ITOK | IMETA | INULL;
-    for (s = ifs ? ifs : EMULATION(EMULATE_KSH|EMULATE_SH) ?
-	DEFAULT_IFS_SH : DEFAULT_IFS; *s; s++) {
+     /* ifs */
+#define CURRENT_DEFAULT_IFS (EMULATION(EMULATE_KSH|EMULATE_SH) ? \
+			    DEFAULT_IFS_SH : DEFAULT_IFS)
+#ifdef MULTIBYTE_SUPPORT
+    if (isset(MULTIBYTE)) {
+	set_widearray(ifs ? ifs : CURRENT_DEFAULT_IFS, &ifs_wide);
+	if (ifs && !ifs_wide.chars) {
+	    zwarn("IFS has an invalid character; resetting IFS to default");
+	    zsfree(ifs);
+	    ifs = ztrdup(CURRENT_DEFAULT_IFS);
+	    set_widearray(ifs, &ifs_wide);
+	}
+    }
+#endif
+     for (s = ifs ? ifs : CURRENT_DEFAULT_IFS; *s; s++) {
 	int c = (unsigned char) (*s == Meta ? *++s ^ 32 : *s);
 #ifdef MULTIBYTE_SUPPORT
-	if (!isascii(c)) {
+	if (isset(MULTIBYTE) && !isascii(c)) {
 	    /* see comment for wordchars below */
 	    continue;
 	}
@@ -4154,10 +4164,15 @@ inittyptab(void)
 	}
 	typtab[c] |= ISEP;
     }
+    /* wordchars */
+#ifdef MULTIBYTE_SUPPORT
+    if (isset(MULTIBYTE))
+	set_widearray(wordchars, &wordchars_wide);
+#endif
     for (s = wordchars ? wordchars : DEFAULT_WORDCHARS; *s; s++) {
 	int c = (unsigned char) (*s == Meta ? *++s ^ 32 : *s);
 #ifdef MULTIBYTE_SUPPORT
-	if (!isascii(c)) {
+	if (isset(MULTIBYTE) && !isascii(c)) {
 	    /*
 	     * If we have support for multibyte characters, we don't
 	     * handle non-ASCII characters here; instead, we turn
@@ -4170,11 +4185,6 @@ inittyptab(void)
 #endif
 	typtab[c] |= IWORD;
     }
-#ifdef MULTIBYTE_SUPPORT
-    set_widearray(wordchars, &wordchars_wide);
-    set_widearray(ifs ? ifs : EMULATION(EMULATE_KSH|EMULATE_SH) ?
-	DEFAULT_IFS_SH : DEFAULT_IFS, &ifs_wide);
-#endif
     for (s = SPECCHARS; *s; s++)
 	typtab[(unsigned char) *s] |= ISPECIAL;
     if (typtab_flags & ZTF_SP_COMMA)

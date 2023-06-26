@@ -4748,6 +4748,7 @@ setlang(char *x)
 	if ((x = getsparam_u(ln->name)) && *x)
 	    setlocale(ln->category, x);
     unqueue_signals();
+    inittyptab();
 }
 
 /**/
@@ -4771,6 +4772,7 @@ lc_allsetfn(Param pm, char *x)
     else {
 	setlocale(LC_ALL, unmeta(x));
 	clear_mbstate();
+	inittyptab();
     }
 }
 
@@ -4809,6 +4811,7 @@ lcsetfn(Param pm, char *x)
     }
     unqueue_signals();
     clear_mbstate();	/* LC_CTYPE may have changed */
+    inittyptab();
 }
 #endif /* USE_LOCALE */
 

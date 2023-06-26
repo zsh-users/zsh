@@ -1325,15 +1325,18 @@ Internal field separators (by default space, tab, newline and NUL), that
 are used to separate words which result from
 command or parameter expansion and words read by
 the tt(read) builtin.  Any characters from the set space, tab and
-newline that appear in the IFS are called em(IFS white space).
+newline that appear in the tt(IFS) are called em(IFS white space).
 One or more IFS white space characters or one non-IFS white space
 character together with any adjacent IFS white space character delimit
 a field.  If an IFS white space character appears twice consecutively
-in the IFS, this character is treated as if it were not an IFS white
+in the tt(IFS), this character is treated as if it were not an IFS white
 space character.
 
 If the parameter is unset, the default is used.  Note this has
 a different effect from setting the parameter to an empty string.
+
+If tt(MULTIBYTE) option is on and tt(IFS) contains invalid characters in
+the current locale, it is reset to the default.
 )
 vindex(KEYBOARD_HACK)
 item(tt(KEYBOARD_HACK))(
