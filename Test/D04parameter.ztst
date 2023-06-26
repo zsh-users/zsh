@@ -2280,6 +2280,27 @@ F:We do not care what $OLDPWD is, as long as it does not cause an error
 F:As of this writing, var=$@ and var="$@" with null IFS have unspecified
 F:behavior, see http://austingroupbugs.net/view.php?id=888
 
+  (
+  IFS=$'\x80'
+  if [[ $IFS = $' \t\n\0' ]]; then
+    echo OK     # if $'\x80' is illegal (e.g. Linux)
+  else          # otherwise (e.g. macOS), it should work as a separator
+    s=$'foo\x80\bar'
+    [[ ${${=s}[1]} = foo ]] && echo OK
+  fi
+  )
+0D:reset IFS to default if it contains illegal character
+>OK
+
+  (
+  unsetopt multibyte
+  IFS=$'\xc3\xa9'
+  s=$'foo\xc3bar\xa9boo'
+  echo ${${=s}[2]}
+  )
+0:eight bit chars in IFS should work if multibute option is off
+>bar
+
   () {
     setopt localoptions extendedglob
     [[ $- = [[:alnum:]]## ]] || print Failed 1
