@@ -1,5 +1,9 @@
 2023-06-26  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* 51889: Src/Modules/zftp.c, Src/mkbltnmlst.sh: enable loading a
+	module (e.g. zftp) that depends on other modules even if zsh is
+	built with the full RELRO
+
 	* 51884: Doc/Zsh/params.yo, Src/params.c, Src/utils.c,
 	Test/D04parameter.ztst: if MULTIBYTE option is on and IFS contains
 	invalid bytes in curret locale then reset it to default
