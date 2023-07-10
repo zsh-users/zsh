@@ -1,3 +1,7 @@
+2023-07-09  Bart Schaefer  <schaefer@zsh.org>
+
+	* 51890: Src/builtin.c: fix "whence -wa" for multiple arguments
+
 2023-06-26  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 51889: Src/Modules/zftp.c, Src/mkbltnmlst.sh: enable loading a

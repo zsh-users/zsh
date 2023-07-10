@@ -4046,6 +4046,7 @@ bin_whence(char *nam, char **argv, Options ops, int func)
     /* Take arguments literally -- do not glob */
     queue_signals();
     for (; *argv; argv++) {
+	informed = 0;
 	if (!OPT_ISSET(ops,'p') && !allmatched) {
 	    char *suf;
 
