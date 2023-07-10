@@ -1,3 +1,8 @@
+2023-07-10  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 51897 (+ minor tweaks): Completion/Darwin/Command/_softwareupdate:
+	update _softwareupdate (based on 51895 by Shohei YOSHIDA)
+
 2023-07-09  Bart Schaefer  <schaefer@zsh.org>
 
 	* 51890: Src/builtin.c: fix "whence -wa" for multiple arguments
