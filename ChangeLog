@@ -1,3 +1,8 @@
+2023-07-19  dana  <dana@dana.is>
+
+	* github #99: mirsella: Completion/Darwin/Command/_trash,
+	Completion/Unix/Command/_trash: add completion for trash-d
+
 2023-07-10  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 51897 (+ minor tweaks): Completion/Darwin/Command/_softwareupdate:
