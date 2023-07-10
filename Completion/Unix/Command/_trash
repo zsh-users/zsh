@@ -1,0 +1,57 @@
+#compdef trash
+
+local variant
+
+_pick_variant -r variant ali='(Rantakari|hasseg)' steven='(Steven|vanZyl)' other --version
+
+case $variant in
+  ali)
+    # The hidden options here are options to rm that trash silently (and
+    # undocumentedly) ignores. Some options are not made mutually exclusive where
+    # they technically could be, for compatibility with aliases, etc.
+    _arguments -s -S -A '-*' : \
+      '!-'{d,f,i,r,P,R,W} \
+      '(: * -F -l -v)-e[empty trash]' \
+      '-F[use Finder instead of system API]' \
+      '(: * -e -F -s -y)-l[list items in trash]' \
+      '(: * -F -l -v)-s[securely empty trash]' \
+      '-v[increase output verbosity]' \
+      '-y[skip confirmation prompts (with -e or -s)]' \
+      '*: :_files'
+    return
+    ;;
+  steven)
+    local trash_dir="${TRASH_D_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/Trash}/files"
+
+    local -a args=(
+      '(-v --verbose)'{-v,--verbose}'[print more information]'
+
+      + options
+      '(-d --dir)'{-d,--dir}'[remove empty directories]'
+      '(-r -R --recursive)'{-r,-R,--recursive}'[delete directories and their contents]'
+      '--rm[permanently delete files]'
+
+      + '(interactive)'
+      {-i,--interactive}'[ask before each deletion]'
+      {-I,--interactive-once}'[ask before deleting 3 or more files, or deleting recursively]'
+      {-f,--force}'[don'\''t prompt and ignore errors]'
+
+      + '(actions)'
+      '(options input info interactive)--list[list out the files in the trash]'
+      '(options input info interactive)--orphans[list orphaned files in the trash]'
+      '(options input info)--restore[restore specified file from the trash]:trashed file:_files -W "$trash_dir"'
+      '(options input info)--delete[delete specified file from the trash]:trashed file:_files -W "$trash_dir"'
+      '(options input info)--empty[empty the trash bin]'
+
+      + info
+      '(- *)'{-h,--help}'[display help information]'
+      '(- *)--version[output the version and exit]'
+
+      + input
+      '(actions)*: :_files'
+    )
+    _arguments -s -S : $args
+    return
+    ;;
+  *) _default ;;
+esac
