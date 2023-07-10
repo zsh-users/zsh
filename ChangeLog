@@ -1,3 +1,8 @@
+2023-07-10  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 51897 (+ minor tweaks): Completion/Darwin/Command/_softwareupdate:
+	update _softwareupdate (based on 51895 by Shohei YOSHIDA)
+
 2023-06-26  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 51884: Doc/Zsh/params.yo, Src/params.c, Src/utils.c,
