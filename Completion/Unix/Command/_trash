@@ -31,8 +31,8 @@ case $variant in
     '(- *)--version[output the version and exit]' \
     '(- *)--list[list out the files in the trash]' \
     '(- *)--orphans[list orphaned files in the trash]' \
-    '(- *)--restore[restore specified file from the trash]' \
-    '(- *)--delete[delete specified file from the trash]' \
+    '(- *)--restore[restore specified file from the trash]:trashed file:_files -W ${XDG_DATA_HOME\:-$HOME/.local/share}/Trash/files' \
+    '(- *)--delete[delete specified file from the trash]:trashed file:_files -W ${XDG_DATA_HOME\:-$HOME/.local/share}/Trash/files' \
     '(- *)--empty[empty the trash bin]' \
     '--rm[permanently delete specified file]' \
     '(- *)'{-h,--help}'[diplay help information]' \
