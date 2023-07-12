@@ -1,6 +1,9 @@
 #compdef trash
 
+local variant
+
 _pick_variant -r variant ali='(Rantakari|hasseg)' steven='(Steven|vanZyl)' other --version
+
 case $variant in
 	ali) 
 		# The hidden options here are options to rm that trash silently (and
