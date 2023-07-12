@@ -28,7 +28,7 @@ case $variant in
     '(-r --recursive)'{-r,--recursive}'[delete directories and their contents]' \
     '(-v --verbose)'{-v,--verbose}'[print more information]' \
     '(-i --interactive -I --interactive-once -f --force)'{-i,--interactive}'[ask before each deletion]' \
-    '(-i --interactive -I --interactive-once -f --force)'{-I,--interactive-once}'[ask once if deleting 3 or more]' \
+    '(-i --interactive -I --interactive-once -f --force)'{-I,--interactive-once}'[ask before deleting 3 or more files, or deleting recursively]' \
     '(-i --interactive -I --interactive-once -f --force)'{-f,--force}'[don'\''t prompt and ignore errors]' \
     '(- *)--version[output the version and exit]' \
     '(- *)--list[list out the files in the trash]' \
