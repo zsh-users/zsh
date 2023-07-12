@@ -31,15 +31,14 @@ case $variant in
     '(-i --interactive -I --interactive-once -f --force)'{-I,--interactive-once}'[ask once if deleting 3 or more]' \
     '(-i --interactive -I --interactive-once -f --force)'{-f,--force}'[don'\''t prompt and ignore errors]' \
     '(- *)--version[output the version and exit]' \
-    '(--list --orphans)--list[list out the files in the trash]' \
-    '(--list --orphans)--orphans[list orphaned files in the trash]' \
-    '(--restore --delete)--restore[restore a file from the trash]' \
-    '(--restore --delete)--delete[delete a file from the trash]' \
-    '--empty[empty the trash bin]' \
+    '(- *)--list[list out the files in the trash]' \
+    '(- *)--orphans[list orphaned files in the trash]' \
+    '(- *)--restore[restore a file from the trash]' \
+    '(- *)--delete[delete a file from the trash]' \
+    '(- *)--empty[empty the trash bin]' \
     '--rm[escape hatch to permanently delete a file]' \
     '(- *)'{-h,--help}'[this help information]' \
-    '*:: :->file'
-    && ret=0
+    '*:: :->file' && ret=0
 
     case $state in
       (file)
