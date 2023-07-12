@@ -21,9 +21,7 @@ case $variant in
     return
     ;;
   steven) 
-    local curcontext=$curcontext state line ret=1
-
-    _arguments -C -s -S -A '-*' : \
+    _arguments -s -S -A '-*': \
     '(-d --dir)'{-d,--dir}'[remove empty directories]' \
     '(-r --recursive)'{-r,--recursive}'[delete directories and their contents]' \
     '(-v --verbose)'{-v,--verbose}'[print more information]' \
@@ -38,7 +36,7 @@ case $variant in
     '(- *)--empty[empty the trash bin]' \
     '--rm[permanently delete specified file]' \
     '(- *)'{-h,--help}'[diplay help information]' \
-    '*:: :->file' && ret=0
+    '*: :->file'
 
     case $state in
       (file)
@@ -47,8 +45,6 @@ case $variant in
         _files -F line && ret=0
         ;;
     esac
-    return $ret
     ;;
-  other) _default ;;
   *) _default ;;
 esac
