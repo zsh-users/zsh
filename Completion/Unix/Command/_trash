@@ -5,55 +5,55 @@ local variant
 _pick_variant -r variant ali='(Rantakari|hasseg)' steven='(Steven|vanZyl)' other --version
 
 case $variant in
-	ali) 
-		# The hidden options here are options to rm that trash silently (and
-		# undocumentedly) ignores. Some options are not made mutually exclusive where
-		# they technically could be, for compatibility with aliases, etc.
-		_arguments -s -S -A '-*' : \
-			'!-'{d,f,i,r,P,R,W} \
-			'(: * -F -l -v)-e[empty trash]' \
-			'-F[use Finder instead of system API]' \
-			'(: * -e -F -s -y)-l[list items in trash]' \
-			'(: * -F -l -v)-s[securely empty trash]' \
-			'-v[increase output verbosity]' \
-			'-y[skip confirmation prompts (with -e or -s)]' \
-			'*: :_files'
-		return
-		;;
-	steven) 
-		declare -a args
-		args=(
-			'(-d --dir)'{-d,--dir}'[Remove empty directories]'
-			'(-r --recursive)'{-r,--recursive}'[Delete directories and their contents]'
-			'(-v --verbose)'{-v,--verbose}'[Print more information]'
-			'(-i --interactive -I --interactive-once -f --force)'{-i,--interactive}'[Ask before each deletion]'
-			'(-i --interactive -I --interactive-once -f --force)'{-I,--interactive-once}'[Ask once if deleting 3 or more]'
-			'(-i --interactive -I --interactive-once -f --force)'{-f,--force}'[Don'\''t prompt and ignore errors]'
-			'(- *)--version[Output the version and exit]'
-			'(--list --orphans)--list[List out the files in the trash]'
-			'(--list --orphans)--orphans[List orphaned files in the trash]'
-			'(--restore --delete)--restore[Restore a file from the trash]'
-			'(--restore --delete)--delete[Delete a file from the trash]'
-			'--empty[Empty the trash bin]'
-			'--rm[Escape hatch to permanently delete a file]'
-			'(- *)'{-h,--help}'[This help information]'
-			'*:: :->file'
-		)
+  ali) 
+    # The hidden options here are options to rm that trash silently (and
+    # undocumentedly) ignores. Some options are not made mutually exclusive where
+    # they technically could be, for compatibility with aliases, etc.
+    _arguments -s -S -A '-*' : \
+      '!-'{d,f,i,r,P,R,W} \
+      '(: * -F -l -v)-e[empty trash]' \
+      '-F[use Finder instead of system API]' \
+      '(: * -e -F -s -y)-l[list items in trash]' \
+      '(: * -F -l -v)-s[securely empty trash]' \
+      '-v[increase output verbosity]' \
+      '-y[skip confirmation prompts (with -e or -s)]' \
+      '*: :_files'
+    return
+    ;;
+  steven) 
+    declare -a args
+    args=(
+      '(-d --dir)'{-d,--dir}'[Remove empty directories]'
+      '(-r --recursive)'{-r,--recursive}'[Delete directories and their contents]'
+      '(-v --verbose)'{-v,--verbose}'[Print more information]'
+      '(-i --interactive -I --interactive-once -f --force)'{-i,--interactive}'[Ask before each deletion]'
+      '(-i --interactive -I --interactive-once -f --force)'{-I,--interactive-once}'[Ask once if deleting 3 or more]'
+      '(-i --interactive -I --interactive-once -f --force)'{-f,--force}'[Don'\''t prompt and ignore errors]'
+      '(- *)--version[Output the version and exit]'
+      '(--list --orphans)--list[List out the files in the trash]'
+      '(--list --orphans)--orphans[List orphaned files in the trash]'
+      '(--restore --delete)--restore[Restore a file from the trash]'
+      '(--restore --delete)--delete[Delete a file from the trash]'
+      '--empty[Empty the trash bin]'
+      '--rm[Escape hatch to permanently delete a file]'
+      '(- *)'{-h,--help}'[This help information]'
+      '*:: :->file'
+    )
 
-		local curcontext=$curcontext state line ret=1
-		declare -A opt_args
+    local curcontext=$curcontext state line ret=1
+    declare -A opt_args
 
-		_arguments -C -s -S -A '-*'  $args && ret=0
+    _arguments -C -s -S -A '-*'  $args && ret=0
 
-		case $state in
-			(file)
-				(( CURRENT > 0 )) && line[CURRENT]=()
-				line=( ${line//(#m)[\[\]()\\*?#<>~\^\|]/\\$MATCH} )
-				_files -F line && ret=0
-				;;
-		esac
-		return $ret
-		;;
-	other) _default ;;
-	*) _default ;;
+    case $state in
+      (file)
+        (( CURRENT > 0 )) && line[CURRENT]=()
+        line=( ${line//(#m)[\[\]()\\*?#<>~\^\|]/\\$MATCH} )
+        _files -F line && ret=0
+        ;;
+    esac
+    return $ret
+    ;;
+  other) _default ;;
+  *) _default ;;
 esac
