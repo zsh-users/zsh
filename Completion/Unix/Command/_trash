@@ -21,30 +21,23 @@ case $variant in
     return
     ;;
   steven) 
-    _arguments -s -S -A '-*': \
-    '(-d --dir)'{-d,--dir}'[remove empty directories]' \
-    '(-r --recursive)'{-r,--recursive}'[delete directories and their contents]' \
-    '(-v --verbose)'{-v,--verbose}'[print more information]' \
-    '(-i --interactive -I --interactive-once -f --force)'{-i,--interactive}'[ask before each deletion]' \
-    '(-i --interactive -I --interactive-once -f --force)'{-I,--interactive-once}'[ask before deleting 3 or more files, or deleting recursively]' \
-    '(-i --interactive -I --interactive-once -f --force)'{-f,--force}'[don'\''t prompt and ignore errors]' \
-    '(- *)--version[output the version and exit]' \
-    '(- *)--list[list out the files in the trash]' \
-    '(- *)--orphans[list orphaned files in the trash]' \
-    '(- *)--restore[restore specified file from the trash]:trashed file:_files -W ${XDG_DATA_HOME\:-$HOME/.local/share}/Trash/files' \
-    '(- *)--delete[delete specified file from the trash]:trashed file:_files -W ${XDG_DATA_HOME\:-$HOME/.local/share}/Trash/files' \
-    '(- *)--empty[empty the trash bin]' \
-    '--rm[permanently delete specified file]' \
-    '(- *)'{-h,--help}'[diplay help information]' \
-    '*: :->file'
-
-    case $state in
-      (file)
-        (( CURRENT > 0 )) && line[CURRENT]=()
-        line=( ${line//(#m)[\[\]()\\*?#<>~\^\|]/\\$MATCH} )
-        _files -F line && ret=0
-        ;;
-    esac
+    _arguments -s -S -A '-*' : \
+      '(-d --dir)'{-d,--dir}'[remove empty directories]' \
+      '(-r --recursive)'{-r,--recursive}'[delete directories and their contents]' \
+      '(-v --verbose)'{-v,--verbose}'[print more information]' \
+      '(-i --interactive -I --interactive-once -f --force)'{-i,--interactive}'[ask before each deletion]' \
+      '(-i --interactive -I --interactive-once -f --force)'{-I,--interactive-once}'[ask before deleting 3 or more files, or deleting recursively]' \
+      '(-i --interactive -I --interactive-once -f --force)'{-f,--force}'[don'\''t prompt and ignore errors]' \
+      '(- *)--version[output the version and exit]' \
+      '(- *)--list[list out the files in the trash]' \
+      '(- *)--orphans[list orphaned files in the trash]' \
+      '(- *)--restore[restore specified file from the trash]:trashed file:_files -W ${XDG_DATA_HOME\:-$HOME/.local/share}/Trash/files' \
+      '(- *)--delete[delete specified file from the trash]:trashed file:_files -W ${XDG_DATA_HOME\:-$HOME/.local/share}/Trash/files' \
+      '(- *)--empty[empty the trash bin]' \
+      '--rm[permanently delete specified file]' \
+      '(- *)'{-h,--help}'[diplay help information]' \
+      '*: :_files'
+    return
     ;;
   *) _default ;;
 esac
