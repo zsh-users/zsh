@@ -34,7 +34,7 @@ case $variant in
       '(- *)--restore[restore specified file from the trash]:trashed file:_files -W ${XDG_DATA_HOME\:-$HOME/.local/share}/Trash/files' \
       '(- *)--delete[delete specified file from the trash]:trashed file:_files -W ${XDG_DATA_HOME\:-$HOME/.local/share}/Trash/files' \
       '(- *)--empty[empty the trash bin]' \
-      '--rm[permanently delete specified file]' \
+      '--rm[permanently delete files]' \
       '(- *)'{-h,--help}'[display help information]' \
       '*: :_files'
     return
