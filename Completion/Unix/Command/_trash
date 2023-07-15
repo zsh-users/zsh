@@ -22,7 +22,7 @@ case $variant in
     ;;
   steven) 
     local trash_dir="${TRASH_D_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/Trash}/files"
-    _arguments -s -S -A '-*' : \
+    _arguments -s -S : \
       '(-d --dir)'{-d,--dir}'[remove empty directories]' \
       '(-r -R --recursive)'{-r,-R,--recursive}'[delete directories and their contents]' \
       '(-v --verbose)'{-v,--verbose}'[print more information]' \
