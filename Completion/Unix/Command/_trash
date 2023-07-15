@@ -22,22 +22,35 @@ case $variant in
     ;;
   steven) 
     local trash_dir="${TRASH_D_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/Trash}/files"
-    _arguments -s -S : \
-      '(-d --dir)'{-d,--dir}'[remove empty directories]' \
-      '(-r -R --recursive)'{-r,-R,--recursive}'[delete directories and their contents]' \
-      '(-v --verbose)'{-v,--verbose}'[print more information]' \
-      '(-i --interactive -I --interactive-once -f --force)'{-i,--interactive}'[ask before each deletion]' \
-      '(-i --interactive -I --interactive-once -f --force)'{-I,--interactive-once}'[ask before deleting 3 or more files, or deleting recursively]' \
-      '(-i --interactive -I --interactive-once -f --force)'{-f,--force}'[don'\''t prompt and ignore errors]' \
-      '(- *)--version[output the version and exit]' \
-      '(- *)--list[list out the files in the trash]' \
-      '(- *)--orphans[list orphaned files in the trash]' \
-      '(- *)--restore[restore specified file from the trash]:trashed file:_files -W "$trash_dir"' \
-      '(- *)--delete[delete specified file from the trash]:trashed file:_files -W "$trash_dir"' \
-      '(- *)--empty[empty the trash bin]' \
-      '--rm[permanently delete files]' \
-      '(- *)'{-h,--help}'[display help information]' \
+
+    local -a args=(
+      '(-v --verbose)'{-v,--verbose}'[print more information]'
+
+      + options
+      '(-d --dir)'{-d,--dir}'[remove empty directories]'
+      '(-r -R --recursive)'{-r,-R,--recursive}'[delete directories and their contents]'
+      '--rm[permanently delete files]'
+
+      + '(interactive)'
+      '(interactive)'{-i,--interactive}'[ask before each deletion]'
+      '(interactive)'{-I,--interactive-once}'[ask before deleting 3 or more files, or deleting recursively]'
+      '(interactive)'{-f,--force}'[don'\''t prompt and ignore errors]'
+
+      + '(actions)'
+      '(actions options)--list[list out the files in the trash]'
+      '(actions options)--orphans[list orphaned files in the trash]'
+      '(actions options)--restore[restore specified file from the trash]:trashed file:_files -W "$trash_dir"'
+      '(actions options)--delete[delete specified file from the trash]:trashed file:_files -W "$trash_dir"'
+      '(actions options)--empty[empty the trash bin]'
+
+      + info
+      '(- *)'{-h,--help}'[display help information]'
+      '(- *)--version[output the version and exit]'
+
+      + input
       '*: :_files'
+    )
+    _arguments -s -S : $args
     return
     ;;
   *) _default ;;
