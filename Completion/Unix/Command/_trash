@@ -32,23 +32,23 @@ case $variant in
       '--rm[permanently delete files]'
 
       + '(interactive)'
-      '(interactive)'{-i,--interactive}'[ask before each deletion]'
-      '(interactive)'{-I,--interactive-once}'[ask before deleting 3 or more files, or deleting recursively]'
-      '(interactive)'{-f,--force}'[don'\''t prompt and ignore errors]'
+      {-i,--interactive}'[ask before each deletion]'
+      {-I,--interactive-once}'[ask before deleting 3 or more files, or deleting recursively]'
+      {-f,--force}'[don'\''t prompt and ignore errors]'
 
       + '(actions)'
-      '(actions options)--list[list out the files in the trash]'
-      '(actions options)--orphans[list orphaned files in the trash]'
-      '(actions options)--restore[restore specified file from the trash]:trashed file:_files -W "$trash_dir"'
-      '(actions options)--delete[delete specified file from the trash]:trashed file:_files -W "$trash_dir"'
-      '(actions options)--empty[empty the trash bin]'
+      '(options input info interactive)--list[list out the files in the trash]'
+      '(options input info interactive)--orphans[list orphaned files in the trash]'
+      '(options input info)--restore[restore specified file from the trash]:trashed file:_files -W "$trash_dir"'
+      '(options input info)--delete[delete specified file from the trash]:trashed file:_files -W "$trash_dir"'
+      '(options input info)--empty[empty the trash bin]'
 
       + info
       '(- *)'{-h,--help}'[display help information]'
       '(- *)--version[output the version and exit]'
 
       + input
-      '*: :_files'
+      '(actions)*: :_files'
     )
     _arguments -s -S : $args
     return
