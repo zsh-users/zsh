@@ -3117,9 +3117,10 @@ so both can be used on the same glob expression; for example by writing
 )
 enditem()
 
-More than one of these lists can be combined, separated by commas. The
-whole list matches if at least one of the sublists matches (they are
-`or'ed, the qualifiers in the sublists are `and'ed).  Some qualifiers,
+Multiple consecutive qualifiers are joined into a list by implicit logical AND.
+More than one of these lists can be combined using comma `tt(,)' as logical OR.
+The whole list matches if at least one of the sublists matches.
+Some qualifiers,
 however, affect all matches generated, independent of the sublist in
 which they are given.  These are the qualifiers `tt(M)', `tt(T)',
 `tt(N)', `tt(D)', `tt(n)', `tt(o)', `tt(O)' and the subscripts given

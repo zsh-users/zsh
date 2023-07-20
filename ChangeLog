@@ -1,10 +1,13 @@
 2023-09-20  Oliver Kiddle  <opk@zsh.org>
 
+	* Atte Peltomäki: 51980: Completion/Zsh/Type/_globquals,
+	Doc/Zsh/expn.yo: Add glob qualifier grouping operator to completion
+
 	* Jörg Sommer: 52102: Completion/Debian/Command/_apt:
 	Add subcommand autopurge to apt completion
 
-	* Wesley Schwengle: 52141: Completion/Unix/Command/_git: add trailer
-	token completion for git commit --trailer
+	* Wesley Schwengle: 52141: Completion/Unix/Command/_git:
+	add trailer token completion for git commit --trailer
 
 	* 52163: Completion/Unix/Command/_zfs: completion update for
 	OpenZFS 2.2
