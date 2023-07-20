@@ -1379,6 +1379,64 @@ F:Regression test for workers/41811
 >1
 >2
 
+  pipefailfn1() {
+     emulate -L zsh
+     setopt errreturn pipefail
+     false | { true; }
+     print "Shouldn't get here, status $?"
+  }
+  pipefailfn1
+1:PIPE_FAIL causes ERR_RETURN with complex end of pipeline: braces
+
+  pipefailfn2() {
+     emulate -L zsh
+     setopt errreturn pipefail
+     false | if true; then true; fi
+     print "Shouldn't get here, status $?"
+  }
+  pipefailfn2 || print Function failed, as expected
+0:PIPE_FAIL causes ERR_RETURN with complex end of pipeline: if
+>Function failed, as expected
+
+  pipefailfn3() {
+     emulate -L zsh
+     setopt errreturn pipefail
+     false | while true; do break; done
+     print "Shouldn't get here, status $?"
+  }
+  pipefailfn3 || print Function failed, as expected
+0:PIPE_FAIL causes ERR_RETURN with complex end of pipeline: while
+>Function failed, as expected
+
+  pipefailfn4() {
+      emulate -L zsh
+      setopt errreturn pipefail
+      false | true
+      print "Shouldn't get here, status $?"
+  }
+  pipefailfn4
+1:PIPE_FAIL causes ERR_RETURN in simple case
+
+  pipefailfn5() {
+      emulate -L zsh
+      setopt errreturn pipefail
+      false | { true | true; }
+      print "Shouldn't get here, status $?"
+  }
+  pipefailfn5 || print Function failed as expected
+0:PIPE_FAIL causes ERR_RETURN with nested successful pipe
+>Function failed as expected
+
+  pipefailfn6() {
+      emulate -L zsh
+      setopt errreturn pipefail
+      false | { false | true; }
+      print "Shouldn't get here, status $?"
+  }
+  pipefailfn6 || print Function failed as expected
+0:PIPE_FAIL causes ERR_RETURN with nested failed pipe
+>Function failed as expected
+
   for (( i = 0; i < 10; i++ )); do
      () {
         print $i

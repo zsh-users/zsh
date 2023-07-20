@@ -427,11 +427,17 @@ storepipestats(Job jn, int inforeground, int fixlastval)
     }
 
     if (fixlastval) {
-      if (jn->stat & STAT_CURSH) {
-	if (!lastval && isset(PIPEFAIL))
-	  lastval = pipefail;
-      } else if (isset(PIPEFAIL))
-	lastval = pipefail;
+	if (jn->stat & STAT_CURSH) {
+	    if (!lastval && isset(PIPEFAIL)) {
+		if (inforeground)
+		    this_noerrexit = 0;
+		lastval = pipefail;
+	    }
+	} else if (isset(PIPEFAIL)) {
+	    if (inforeground)
+		this_noerrexit = 0;
+	    lastval = pipefail;
+	}
     }
 }
 
