@@ -1,6 +1,6 @@
 2023-07-26  Bart Schaefer  <schaefer@zsh.org>
 
-	* 51950 (tweak per 51949): Src/Zle/zle_main.c: correct Thingy
+	* 51949 (tweak per 51950): Src/Zle/zle_main.c: correct Thingy
 	refcount in raw_getbyte()
 
 	* Shohei YOSHIDA: 51927: Completion/Unix/Command/_watch: Update
