@@ -1,5 +1,8 @@
 2023-07-26  Bart Schaefer  <schaefer@zsh.org>
 
+	* Shohei YOSHIDA: 51964: Completion/Linux/Command/_pidof: support
+	pidof variants other than procps
+
 	* 51969: Src/builtin.c: read -d and -s should not reset terminal
 	state when stdin is redirected
 
