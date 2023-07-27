@@ -1,5 +1,8 @@
 2023-07-26  Bart Schaefer  <schaefer@zsh.org>
 
+	* Shohei YOSHIDA: 51979: Completion/Linux/Command/_free: Update
+	free completion for procps-ng version 4.0.3
+
 	* Shohei YOSHIDA: 51964: Completion/Linux/Command/_pidof: support
 	pidof variants other than procps
 
