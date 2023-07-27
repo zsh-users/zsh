@@ -1,5 +1,8 @@
 2023-07-26  Bart Schaefer  <schaefer@zsh.org>
 
+	* unposted (cf. 51968): Doc/Zsh/builtins.yo: improve description
+	of typeset -gn and -r
+
 	* 51945: Doc/Zsh/builtins.yo, Doc/Zsh/expn.yo, Doc/Zsh/params.yo,
 	Src/builtin.c, Src/params.c, Test/K01nameref.ztst: improve named
 	references documentation, fixes for typeset -r and -g behavior,

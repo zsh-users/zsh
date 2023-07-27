@@ -1924,8 +1924,8 @@ redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ @ @ ))ifnztexi(        )))
 xitem(tt(typeset )[ {tt(PLUS())|tt(-)}tt(AHUaghlmrtux) ] \
 [ {tt(PLUS())|tt(-)}tt(EFLRZip) [ var(n) ] ])
 xitem(SPACES()[ tt(+) ] [ var(name)[tt(=)var(value)] ... ])
-xitem(tt(typeset )[ {tt(PLUS())|tt(-)}tt(n) ] \
-[ tt(-gr) ] [ var(name)[tt(=)var(value)] ... ])
+xitem(tt(typeset ){tt(PLUS())|tt(-)}tt(n) [ tt(-g) ] \
+[ {tt(PLUS())|tt(-)}tt(r) ] [ var(name)[tt(=)var(value)] ... ])
 xitem(tt(typeset )tt(-T) [ {tt(PLUS())|tt(-)}tt(Uglrux) ] [ {tt(PLUS())|tt(-)}tt(LRZp) [ var(n) ] ])
 xitem(SPACES()[ tt(+) | var(SCALAR)[tt(=)var(value)] var(array)[tt(=LPAR())var(value) ...tt(RPAR())] [ var(sep) ] ])
 item(tt(typeset) tt(-f) [ {tt(PLUS())|tt(-)}tt(TUkmtuz) ] [ tt(+) ] [ var(name) ... ])(
