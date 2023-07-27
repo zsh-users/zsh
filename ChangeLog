@@ -1,5 +1,8 @@
 2023-07-26  Bart Schaefer  <schaefer@zsh.org>
 
+	* 51969: Src/builtin.c: read -d and -s should not reset terminal
+	state when stdin is redirected
+
 	* 51949 (tweak per 51950): Src/Zle/zle_main.c: correct Thingy
 	refcount in raw_getbyte()
 

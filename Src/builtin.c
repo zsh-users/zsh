@@ -6483,7 +6483,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
     } else
 	readfd = izle = 0;
 
-    if (OPT_ISSET(ops,'s') && SHTTY != -1) {
+    if (OPT_ISSET(ops,'s') && SHTTY == readfd) {
 	struct ttyinfo ti;
 	gettyinfo(&ti);
 	saveti = ti;
@@ -6531,7 +6531,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
         delim = (unsigned char) ((delimstr[0] == Meta) ?
 			delimstr[1] ^ 32 : delimstr[0]);
 #endif
-	if (SHTTY != -1) {
+	if (SHTTY == readfd) {
 	    struct ttyinfo ti;
 	    gettyinfo(&ti);
 	    if (! resettty) {
@@ -6691,7 +6691,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 	    /* dispose of result appropriately, etc. */
 	    if (isem)
 		while (val > 0 && read(SHTTY, &d, 1) == 1 && d != '\n');
-	    else {
+	    else if (resettty) {
 		settyinfo(&shttyinfo);
 		resettty = 0;
 	    }
