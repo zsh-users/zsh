@@ -3,19 +3,51 @@
 local curcontext="$curcontext" state line expl ret=1
 typeset -A opt_args
 
-local exargs="-h --help -V --version"
-_arguments -C -s -w \
-  '(- *)'{-h,--help}'[display help information]' \
-  '(- *)'{-V,--version}'[print program version]' \
-  "(-s --single-shot $exargs)"{-s,--single-shot}'[return one PID only]' \
-  "(-c --check-root $exargs)"{-c,--check-root}'[omit processes with different root]' \
-  '-q[quiet mode, only set the exit code]' \
-  '(-w --with-workers)'{-w,--with-workers}'[show kernel workers too]' \
-  "(-x $exargs)"-x'[include shells running named scripts]' \
-  "($exargs)"\*{-o+,--omit-pid=}'[omit processes with PIDs]:pids:_sequence -s , _pids' \
-  '(-S --separator)'{-S+,--separator=}'[specify separator put between PIDs]:separator' \
-  '*:process:->procnames' \
-  && return 0
+_pick_variant -r variant procps='--separator' $OSTYPE -h
+
+case $variant in
+  (procps)
+    local exargs="-h --help -V --version"
+    _arguments -C -s -w \
+      '(- *)'{-h,--help}'[display help information]' \
+      '(- *)'{-V,--version}'[print program version]' \
+      "(-s --single-shot $exargs)"{-s,--single-shot}'[return one PID only]' \
+      "(-c --check-root $exargs)"{-c,--check-root}'[omit processes with different root]' \
+      '-q[quiet mode, only set the exit code]' \
+      '(-w --with-workers)'{-w,--with-workers}'[show kernel workers too]' \
+      "(-x $exargs)"-x'[include shells running named scripts]' \
+      "($exargs)"\*{-o+,--omit-pid=}'[omit processes with PIDs]:pids:_sequence -s , _pids' \
+      '(-S --separator)'{-S+,--separator=}'[specify separator put between PIDs]:separator' \
+      '*:process:->procnames' \
+      && return 0
+    ;;
+  (darwin*)
+    # Night Production pidof
+    _arguments -s -w \
+      '(- *)'{-h,-\?}'[display help information]' \
+      '(- *)-v[print out version info on pidof]' \
+      '-l[print output in long format]' \
+      '-k[kill processes by name]' \
+      '*:process:_process_names -a' \
+      && return 0
+    ;;
+  (*)
+    # sysvinit-utils
+    _arguments -C -s -w \
+      '(- *)-h[display help information]' \
+      '-c[return PIDs with the same root directory]' \
+      '-d[use the provided character as output separator]:separator' \
+      '-n[avoid using stat system function on network shares]' \
+      '-o[omit results with a given PID]:pid:_sequence -s , _pids' \
+      '-s[return one PID only]' \
+      '-q[quiet mode. Do not display output]' \
+      '-s[only return one PID]' \
+      '-x[return PIDs of shells running scripts with a matching name]' \
+      '-z[list zombie and I/O waiting processes. May cause pidof to hang]' \
+      '*:process:->procnames' \
+      && return 0
+    ;;
+esac
 
 case $state in
   procnames)
