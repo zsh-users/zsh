@@ -1,5 +1,8 @@
 2023-07-26  Bart Schaefer  <schaefer@zsh.org>
 
+	* Shohei YOSHIDA: 51927: Completion/Unix/Command/_watch: Update
+	procps watch completion for version 4.0.3
+
 	* unposted (cf. 51899): Doc/Zsh/compsys.yo: document _shadow
 
 2023-07-20  Peter Stephenson  <p.stephenson@samsung.com>
