@@ -737,7 +737,7 @@ raw_getbyte(long do_keytmout, char *cptr, int full)
 			) {
 			/* Handle the fd. */
 			char *fdbuf;
-			Thingy save_lbindk = lbindk;
+			Thingy save_lbindk = refthingy(lbindk);
 			{
 			    char buf[BDIGBUFSIZE];
 			    convbase(buf, lwatch_fd->fd, 10);
@@ -780,6 +780,7 @@ raw_getbyte(long do_keytmout, char *cptr, int full)
 			     */
 			    errtry = 1;
 			}
+			unrefthingy(lbindk);
 			lbindk = save_lbindk;
 		    }
 		}
