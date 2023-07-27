@@ -5227,6 +5227,50 @@ the group name.
 This function is called automatically from tt(_description)
 and hence is not normally called explicitly.
 )
+findex(_shadow)
+findex(_unshadow)
+xitem(tt(_shadow) [ tt(-s) var(suffix) ] var(command_name) ...)
+item(tt(_unshadow) [ tt(-s) var(suffix) ] var(command_name) ...)(
+The tt(_shadow) function creates a copy of each of the shell functions
+in the var(command_name) arguments.  The original functions can then
+be replaced by new implementations.  A later call to tt(_unshadow),
+with the same var(command_name) list, removes the new implementations,
+if any, and restores the originals.
+
+Recommended usage is to pair tt(_shadow) and tt(_unshadow) calls by
+use of an `tt(always)' block:
+example({
+  _shadow fname
+  function fname {
+    # Do your new thing
+  }
+  # Invoke callers of fname
+} always {
+  _unshadow fname
+})
+
+Any var(command_name) may instead be a builtin, but in that case no
+copy is created.  The expectation is that an initial tt(_shadow) is
+followed by creating a wrapper function, and therafter any nested or
+recursive calls thus copy and replace the wrapper function.
+example({
+  _shadow compadd
+  compadd LPAR()RPAR() { builtin compadd -O tmparr "$@" }
+} always {
+  _unshadow compadd
+})
+
+The var(suffix), if supplied, is prepended by an `tt(@)' character and
+then appended to each var(command_name) to create the copy.  Thus
+example(_shadow -s XX foo)
+creates a function named `tt(foo@XX)' (unless `tt(foo)' is a builtin).
+Note that a nested call to tt(_shadow) with the same var(suffix) may
+result in name collisions and unexpected results, but this provides a
+well-known name for the original function if the new implementation
+needs to call it as a wrapper.  The same var(suffix) must be used in
+the call to tt(_unshadow).  When no var(suffix) is present,
+tt(_shadow) creates a unique suffix to avoid name collisions.
+)
 findex(_store_cache)
 item(tt(_store_cache) var(cache_identifier) var(param) ...)(
 This function, together with tt(_retrieve_cache) and

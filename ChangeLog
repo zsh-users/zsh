@@ -1,3 +1,7 @@
+2023-07-26  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted (cf. 51899): Doc/Zsh/compsys.yo: document _shadow
+
 2023-07-20  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 51977: Src/jobs.c, Test/E01options.ztst: Combination of
