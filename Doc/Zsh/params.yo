@@ -672,9 +672,9 @@ of var(pname) in assignments and expansions instead assign to or
 expand var(rname).  This also applies to `tt(unset )var(pname)' and to
 most subsequent uses of `tt(typeset)' with the exception of
 `tt(typeset -n)' and `tt(typeset +n)', so to remove a named reference,
-use either `tt(unset -n )var(pname)' or one of:
+use either `tt(unset -n )var(pname)' (preferred) or one of:
 ifzman()
-example(tt(typeset -n )var(pname)
+example(tt(typeset -n )var(pname=)
 tt(typeset +n )var(pname))
 
 followed by

@@ -987,6 +987,11 @@ means the same thing as the more readable `(tt(%%qqq))'.  The
 following flags are supported:
 
 startitem()
+item(tt(!))(
+When the parameter being expanded is a named reference, the reference
+itself is examined and thus is em(not) resolved to its referent.  In
+ksh emulation, the parens around this flag are optional.
+)
 item(tt(#))(
 Evaluate the resulting words as numeric expressions and interpret
 these as character codes.  Output the corresponding characters.  Note
@@ -1245,7 +1250,8 @@ item(tt(hideval))(
 for parameters with the `hideval' flag (tt(-H))
 )
 item(tt(nameref))(
-for named references having an empty value (tt(-n))
+for named references (tt(typeset -n)) either having an empty value or
+when combined with `tt(!)' as in `tt(${LPAR()!t)tt(RPAR()var(rname)})'
 )
 item(tt(special))(
 for special parameters defined by the shell

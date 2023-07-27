@@ -1,5 +1,10 @@
 2023-07-26  Bart Schaefer  <schaefer@zsh.org>
 
+	* 51945: Doc/Zsh/builtins.yo, Doc/Zsh/expn.yo, Doc/Zsh/params.yo,
+	Src/builtin.c, Src/params.c, Test/K01nameref.ztst: improve named
+	references documentation, fixes for typeset -r and -g behavior,
+	fix unset reference behavior including scoping crash, more tests
+
 	* Shohei YOSHIDA: 51979: Completion/Linux/Command/_free: Update
 	free completion for procps-ng version 4.0.3
 

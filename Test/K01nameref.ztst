@@ -515,7 +515,7 @@ F:Same test, should part 5 output look like this?
 >ptr1=val
 >ptr2=
 >typeset -n ptr1=ptr2
->typeset -n ptr2=''
+>typeset -n ptr2
 >typeset ptr2=val
 
  if zmodload zsh/parameter; then
@@ -693,5 +693,73 @@ F:Checking for a bug in zmodload that affects later tests
 1:attempt deferred command substitution in subscript
 F:runs in `setopt noexec` so $(...) returns nothing
 *?*bad math expression: empty string
+
+ unset -n ref
+ typeset -n ref=GLOBAL
+ () {
+   typeset -gn ref=RESET
+ }
+ typeset -p ref
+0:reset global reference within function
+>typeset -n ref=RESET
+
+ unset -n ref
+ typeset -rn ref=RO
+ typeset -p ref
+ (typeset -n ref=RW)
+ print status: $? expected: 1
+ typeset +r -n ref
+ typeset -p ref
+ typeset -r +n ref
+ typeset -p ref
+ (typeset -rn ref)
+ print status: $? expected: 1
+ typeset +r -n ref=RW	# Assignment occurs after type change,
+ typeset -p ref RO	# so RO=RW here.  Potentially confusing.
+ typeset -r -n ref=RX	# No type change, so referent changes ...
+ typeset -p ref RO	# ... and previous refererent does not.
+ typeset +rn ref=RW	# Here ref=RW, again type changed first.
+ typeset -p ref
+0:add and remove readonly attribute with references
+>typeset -rn ref=RO
+*?*: ref: read-only reference
+>status: 1 expected: 1
+>typeset -n ref=RO
+>typeset -r ref=RO
+*?*: ref: read-only variable
+>status: 1 expected: 1
+>typeset -n ref=RO
+>typeset -g RO=RW
+>typeset -rn ref=RX
+>typeset -g RO=RW
+>typeset ref=RW
+
+ () {
+  typeset -n r1 r2=
+  typeset -p r1 r2
+  print -- ${(!)r1-unset}
+  print -- ${+r1}
+  typeset -p r1
+ }
+0:unset nameref remains unset when resolved
+F:relies on global TYPESET_TO_UNSET in %prep
+>typeset -n r1
+>typeset -n r2=''
+>unset
+>0
+>typeset -n r1
+
+ bar=xx
+ typeset -n foo=bar
+ () { typeset -n foo; foo=zz; foo=zz; print $bar $zz }
+ () { typeset -n foo; foo=zz; local zz; foo=zz; print $bar $zz }
+0:regression: local nameref may not in-scope a global parameter
+F:previously this could create an infinite recursion and crash
+>xx
+>xx zz
+
+ typeset -nm foo=bar
+1:create nameref by pattern match not allowed
+*?*typeset:1: invalid reference
 
 %clean
