@@ -1,3 +1,8 @@
+2023-07-26  Bart Schaefer  <schaefer@zsh.org>
+
+	* Shohei YOSHIDA: 51927: Completion/Unix/Command/_watch: Update
+	procps watch completion for version 4.0.3
+
 2023-07-19  dana  <dana@dana.is>
 
 	* github #99: mirsella: Completion/Darwin/Command/_trash,
