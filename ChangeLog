@@ -1,3 +1,8 @@
+2023-07-31  dana  <dana@dana.is>
+
+	* github #100: HexorCatZ: Completion/Unix/Command/_qemu:
+	add -enable-kvm and -bios suggestion
+
 2023-07-26  Bart Schaefer  <schaefer@zsh.org>
 
 	* Shohei YOSHIDA: 51979: Completion/Linux/Command/_free: Update
