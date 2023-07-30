@@ -546,7 +546,7 @@ getparamnode(HashTable ht, const char *nam)
 	}
     }
 
-    if (hn && ht == realparamtab)
+    if (hn && ht == realparamtab && !(hn->flags & PM_UNSET))
 	hn = resolve_nameref((Param)hn, NULL);
     return hn;
 }
@@ -3729,7 +3729,9 @@ unsetparam_pm(Param pm, int altflag, int exp)
     char *altremove;
 
     if ((pm->node.flags & PM_READONLY) && pm->level <= locallevel) {
-	zerr("read-only variable: %s", pm->node.nam);
+	zerr("read-only %s: %s",
+	     (pm->node.flags & PM_NAMEREF) ? "reference" : "variable",
+	     pm->node.nam);
 	return 1;
     }
     if ((pm->node.flags & PM_RESTRICTED) && isset(RESTRICTED)) {
@@ -6182,8 +6184,12 @@ resolve_nameref(Param pm, const Asgment stop)
 		seek = refname;
 	}
     }
-    else if (pm && !(stop && (stop->flags & PM_NAMEREF)))
-	return (HashNode)pm;
+    else if (pm) {
+	if (!(stop && (stop->flags & PM_NAMEREF)))
+	    return (HashNode)pm;
+	if (!(pm->node.flags & PM_NAMEREF))
+	    return (pm->level < locallevel ? NULL : (HashNode)pm);
+    }
     if (seek) {
 	queue_signals();
 	/* pm->width is the offset of any subscript */

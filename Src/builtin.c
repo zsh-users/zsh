@@ -2248,10 +2248,14 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    zerrnam(cname, "%s: restricted", pname);
 	    return pm;
 	}
-	if ((pm->node.flags & PM_READONLY) &&
-	    (pm->node.flags & PM_NAMEREF & off)) {
-	    zerrnam(cname, "%s: read-only reference", pname);
-	    return pm;
+	if ((pm->node.flags & PM_READONLY) && !(off & PM_READONLY) &&
+	    /* It seems as though these checks should not be specific to
+	     * PM_NAMEREF, but changing that changes historic behavior */
+	    ((on & PM_NAMEREF) != (pm->node.flags & PM_NAMEREF) ||
+	     (asg && (pm->node.flags & PM_NAMEREF)))) {
+	    zerrnam(cname, "%s: read-only %s", pname,
+		    (pm->node.flags & PM_NAMEREF) ? "reference" : "variable");
+	    return NULL;
 	}
 	if ((on & PM_UNIQUE) && !(pm->node.flags & PM_READONLY & ~off)) {
 	    Param apm;
@@ -2693,7 +2697,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	    off |= bit;
     }
     if (OPT_MINUS(ops,'n')) {
-	if ((on & ~PM_READONLY)|off) {
+	if ((on|off) & ~PM_READONLY) {
 	    zwarnnam(name, "no other attributes allowed with -n");
 	    return 1;
 	}
@@ -3021,6 +3025,13 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
     /* With the -m option, treat arguments as glob patterns */
     if (OPT_ISSET(ops,'m')) {
 	if (!OPT_ISSET(ops,'p')) {
+	    if (on & PM_NAMEREF) {
+		/* It's generally unwise to mass-change the types of
+		 * parameters, but for namerefs it would be fatal */
+		unqueue_signals();
+		zerrnam(name, "invalid reference");
+		return 1;
+	    }
 	    if (!(on|roff))
 		printflags |= PRINT_TYPE;
 	    if (!on)
@@ -3104,13 +3115,25 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	    }
 	    if (hn) {
 		/* namerefs always start over fresh */
-		if (((Param)hn)->level >= locallevel) {
+		if (((Param)hn)->level >= locallevel ||
+		    (!(on & PM_LOCAL) && ((Param)hn)->level < locallevel)) {
 		    Param oldpm = (Param)hn;
-		    if (!asg->value.scalar && oldpm->u.str)
+		    if (!asg->value.scalar &&
+			PM_TYPE(oldpm->node.flags) == PM_SCALAR &&
+			oldpm->u.str)
 			asg->value.scalar = dupstring(oldpm->u.str);
-		    unsetparam_pm((Param)hn, 0, 1);
+		    /* Defer read-only error to typeset_single() */
+		    if (!(hn->flags & PM_READONLY))
+			unsetparam_pm(oldpm, 0, 1);
 		}
-		hn = NULL;
+		/* Passing a NULL pm to typeset_single() makes the
+		 * nameref read-only before assignment, which breaks
+		 *   typeset -rn ref=var
+		 * so this is special-cased to permit that action
+		 * like assign-at-create for other parameter types.
+		 */
+		if (!(hn->flags & PM_READONLY))
+		    hn = NULL;
 	    }
 	}
 
@@ -6483,7 +6506,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
     } else
 	readfd = izle = 0;
 
-    if (OPT_ISSET(ops,'s') && SHTTY != -1) {
+    if (OPT_ISSET(ops,'s') && SHTTY == readfd) {
 	struct ttyinfo ti;
 	gettyinfo(&ti);
 	saveti = ti;
@@ -6531,7 +6554,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
         delim = (unsigned char) ((delimstr[0] == Meta) ?
 			delimstr[1] ^ 32 : delimstr[0]);
 #endif
-	if (SHTTY != -1) {
+	if (SHTTY == readfd) {
 	    struct ttyinfo ti;
 	    gettyinfo(&ti);
 	    if (! resettty) {
@@ -6691,7 +6714,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 	    /* dispose of result appropriately, etc. */
 	    if (isem)
 		while (val > 0 && read(SHTTY, &d, 1) == 1 && d != '\n');
-	    else {
+	    else if (resettty) {
 		settyinfo(&shttyinfo);
 		resettty = 0;
 	    }

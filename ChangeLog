@@ -1,3 +1,30 @@
+2023-07-26  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted (cf. 51968): Doc/Zsh/builtins.yo: improve description
+	of typeset -gn and -r
+
+	* 51945: Doc/Zsh/builtins.yo, Doc/Zsh/expn.yo, Doc/Zsh/params.yo,
+	Src/builtin.c, Src/params.c, Test/K01nameref.ztst: improve named
+	references documentation, fixes for typeset -r and -g behavior,
+	fix unset reference behavior including scoping crash, more tests
+
+	* Shohei YOSHIDA: 51979: Completion/Linux/Command/_free: Update
+	free completion for procps-ng version 4.0.3
+
+	* Shohei YOSHIDA: 51964: Completion/Linux/Command/_pidof: support
+	pidof variants other than procps
+
+	* 51969: Src/builtin.c: read -d and -s should not reset terminal
+	state when stdin is redirected
+
+	* 51949 (tweak per 51950): Src/Zle/zle_main.c: correct Thingy
+	refcount in raw_getbyte()
+
+	* Shohei YOSHIDA: 51927: Completion/Unix/Command/_watch: Update
+	procps watch completion for version 4.0.3
+
+	* unposted (cf. 51899): Doc/Zsh/compsys.yo: document _shadow
+
 2023-07-20  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 51977: Src/jobs.c, Test/E01options.ztst: Combination of

@@ -1924,8 +1924,8 @@ redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ @ @ ))ifnztexi(        )))
 xitem(tt(typeset )[ {tt(PLUS())|tt(-)}tt(AHUaghlmrtux) ] \
 [ {tt(PLUS())|tt(-)}tt(EFLRZip) [ var(n) ] ])
 xitem(SPACES()[ tt(+) ] [ var(name)[tt(=)var(value)] ... ])
-xitem(tt(typeset )[ {tt(PLUS())|tt(-)}tt(n) ] \
-[ tt(-gr) ] [ var(name)[tt(=)var(value)] ... ])
+xitem(tt(typeset ){tt(PLUS())|tt(-)}tt(n) [ tt(-g) ] \
+[ {tt(PLUS())|tt(-)}tt(r) ] [ var(name)[tt(=)var(value)] ... ])
 xitem(tt(typeset )tt(-T) [ {tt(PLUS())|tt(-)}tt(Uglrux) ] [ {tt(PLUS())|tt(-)}tt(LRZp) [ var(n) ] ])
 xitem(SPACES()[ tt(+) | var(SCALAR)[tt(=)var(value)] var(array)[tt(=LPAR())var(value) ...tt(RPAR())] [ var(sep) ] ])
 item(tt(typeset) tt(-f) [ {tt(PLUS())|tt(-)}tt(TUkmtuz) ] [ tt(+) ] [ var(name) ... ])(
@@ -2060,6 +2060,11 @@ function unless `tt(-g -n)' is specified, and any local parameter (of
 any type) with the same var(name) supplants a named reference from a
 surrounding scope.
 
+A scalar parameter, including an existing named reference, may be
+converted to a new named reference by `tt(typeset -n )var(name)', so
+the `tt(-p)' option must be included to display the value of a
+specific named reference var(name).
+
 If no attribute flags are given, and either no var(name) arguments are
 present or the flag tt(+m) is used, then each parameter name printed is
 preceded by a list of the attributes of that parameter (tt(array),
@@ -2104,7 +2109,8 @@ is not used in this case).
 
 If the tt(+g) flag is combined with tt(-m), a new local parameter is
 created for every matching parameter that is not already local.  Otherwise
-tt(-m) applies all other flags or assignments to the existing parameters.
+tt(-m) applies all other flags or assignments to the existing parameters,
+except that the tt(-n) option cannot create named references in this way.
 
 Except when assignments are made with var(name)tt(=)var(value), using
 tt(+m) forces the matching parameters and their attributes to be printed,
