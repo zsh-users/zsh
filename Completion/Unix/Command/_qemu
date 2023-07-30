@@ -51,5 +51,7 @@ _arguments \
   '-no-acpi[disable ACPI]' \
   '-loadvm[start right away with a saved state]:file:_files' \
   '-g[set initial graphic mode]:graphic mode:' \
+  '-enable-kvm[enable KVM full virtualization support]' \
+  '-bios[use specified BIOS image]:bios image:_files' \
   ':disk image:_files'
 

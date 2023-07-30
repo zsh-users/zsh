@@ -1,3 +1,8 @@
+2023-07-31  dana  <dana@dana.is>
+
+	* github #100: HexorCatZ: Completion/Unix/Command/_qemu:
+	add -enable-kvm and -bios suggestion
+
 2023-07-26  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted (cf. 51968): Doc/Zsh/builtins.yo: improve description
