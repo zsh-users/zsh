@@ -1,3 +1,8 @@
+2023-08-01  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 52008: Src/pattern.c, Test/D02glob.ztst: Fix bug with branches
+	in patterns followed by an exculsion, and add tests.
+
 2023-07-31  dana  <dana@dana.is>
 
 	* github #100: HexorCatZ: Completion/Unix/Command/_qemu:

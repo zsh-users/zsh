@@ -2987,14 +2987,15 @@ patmatch(Upat prog)
 	case P_EXCSYNC:
 	    /* See the P_EXCLUDE code below for where syncptr comes from */
 	    {
-		unsigned char *syncptr;
+		unsigned char *syncstart, *syncptr, *ptr;
 		Upat after;
 		after = P_OPERAND(scan);
 		DPUTS(!P_ISEXCLUDE(after),
 		      "BUG: EXCSYNC not followed by EXCLUDE.");
 		DPUTS(!P_OPERAND(after)->p,
 		      "BUG: EXCSYNC not handled by EXCLUDE");
-		syncptr = P_OPERAND(after)->p + (patinput - patinstart);
+		syncstart = P_OPERAND(after)->p;
+		syncptr = syncstart + (patinput - patinstart);
 		/*
 		 * If we already matched from here, this time we fail.
 		 * See WBRANCH code for story about error count.
@@ -3009,6 +3010,23 @@ patmatch(Upat prog)
 		 * failed anyway.
 		 */
 		*syncptr = errsfound + 1;
+		/*
+		 * Because of backtracking, any match before this point
+		 * can't apply to the current branch we're on so is now
+		 * a failure --- this can happen if, on a previous
+		 * branch, we initially marked a success before failing
+		 * on a later part of the pattern after marking up the
+		 * P_EXCSYNC (even an end anchor will have this effect).
+		 * To make sure we record the current match point
+		 * correctly, mark those down now.
+		 *
+		 * This might have side effects on the efficiency of
+		 * pathological cases involving nested branches.  To
+		 * fix that we'd probably need to record matches on
+		 * different branches separately.
+		 */
+		for (ptr = syncstart; ptr < syncptr; ++ptr)
+		    *ptr = 0;
 	    }
 	    break;
 	case P_EXCEND:
