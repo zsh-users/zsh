@@ -817,6 +817,32 @@
 *>*/glob.tmp/(flip|flop)
 *>*/glob.tmp/(flip|flop)/trailing/components
 
+# The following set test an obscure problem with branches followed by
+# exclusions that shows up when the exclusion matches against
+# something other than the complete test string, hence the complicated
+# double negative.
+  [[ ab = (|a*)~^(*b) ]]
+0:Regression test for exclusion after branches: empty first alternative
+
+  [[ ab = (b|a*)~^(*b) ]]
+0:Regression test for exclusion after branches: non-empty first alternative
+
+  [[ ab = (b*|a*)~^(*b) ]]
+0:Regression test for exclusion after branches: full length first alternative
+
+# Corresponding tests where the exclusion should succeed, so the
+# match fails.  It's hard to know how to provoke bugs here...
+  [[ abc = (|a*)~^(*b) ]]
+1:Regression test for exclusion after branches: failure case 1
+
+  [[ abc = (b|a*)~^(*b) ]]
+1:Regression test for exclusion after branches: failure case 2
+
+  [[ abc = (b*|a*)~^(*b) ]]
+1:Regression test for exclusion after branches: failure case 3
+
+# Careful: extendedglob off from this point.
+
   unsetopt extendedglob
   print -r -- ${(*)=${(@s.+.):-A+B}/(#b)(?)/-${(L)match[1]} ${match[1]}}
 0:the '*' qualfier enables extended_glob for pattern matching
