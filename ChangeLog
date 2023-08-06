@@ -1,3 +1,23 @@
+2023-08-06  Bart Schaefer  <schaefer@zsh.org>
+
+	* Shohei YOSHIDA: 52018: Completion/Unix/Command/_wc: latest
+	coreutils options
+
+	* Shohei YOSHIDA: 52017: Completion/Unix/Command/_tr: latest
+	coreutils options
+
+	* Shohei YOSHIDA: 52016: Completion/Unix/Command/_tail: latest
+	coreutils options
+
+	* Shohei YOSHIDA: 52015: Completion/Unix/Command/_env: latest
+	coreutils options
+
+	* Shohei YOSHIDA: 52014: Completion/Unix/Command/_date: latest
+	coreutils options
+
+	* Shohei YOSHIDA: 52013: Completion/Unix/Command/_head: latest
+	coreutils options
+
 2023-08-01  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 52008: Src/pattern.c, Test/D02glob.ztst: Fix bug with branches

@@ -16,6 +16,7 @@ case $variant in
       '(-c -C --complement)'{-c,-C,--complement}"${descr[-c]}"
       '(-d --delete 2)'{-d,--delete}"${descr[-d]}"
       '(-s --squeeze-repeats)'{-s,--squeeze-repeats}"${descr[-s]}"
+      '(-t --truncate-set1)'{-t,--truncate-set1}'[first truncate ARRAY1 to length of ARRAY2]'
       '(- 1 2)--help[display help information]'
       '(- 1 2)--version[display version information]'
     )
