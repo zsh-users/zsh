@@ -19,6 +19,7 @@ if _pick_variant gnu="Free Software Foundation" unix --version; then
     $f{-R,--rfc-email}'[display in RFC5322 format]'
     $f'--rfc-3339=-[display in RFC 3339 format]:precision:(date seconds ns)'
     '(-u --utc --universal)'{-u,--utc,--universal}'[display or set time in UTC]'
+    '--resolution[output the available resolution of timestamps]'
     '(- :)--help[output help and exit]'
     '(- :)--version[output version info and exit]'
   )

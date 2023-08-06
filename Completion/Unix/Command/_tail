@@ -16,6 +16,7 @@ if _pick_variant gnu=GNU unix --version; then
     '(-q --quiet --silent -v --verbose)'{-q,--quiet,--silent}'[never output headers giving file names]'
     '(-q --quiet --silent -v --verbose)'{-v,--verbose}'[always output headers giving file names]'
     '--retry[keep trying to open a file even when it becomes inaccessible]'
+    '(-z --zero-terminated)'{-z,--zero-terminated}'[line delimiter is NUL, not newline]'
     '(- *)--help[display help and exit]'
     '(- *)--version[output version information and exit]'
   )
