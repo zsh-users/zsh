@@ -9,7 +9,7 @@ case $variant in
     (( $#words > 2 )) && ign='!'
     args=(
       '(-)'{-i,--ignore-environment}'[start with empty environment]'
-      '(-0 --null)'{-0,--null}'[end each output line with NUL, not newline]'
+      '(* -0 --null)'{-0,--null}'[end each output line with NUL, not newline]'
       '(--ignore-environment -i --help --version)*'{-u+,--unset=}'[remove variable from the environment]:env var to remove:_parameters -g "*export*"'
       '(-C --chdir)'{-C+,--chdir=}'[change working directory]:directory:_directories'
       '(-S --split-string)'{-S+,--split-string=}'[perform word splitting]:string to split'
@@ -59,7 +59,7 @@ if [[ -n $state ]]; then
         shift words
         (( CURRENT-- ))
       done
-      _normal && ret=0
+      _normal -p env && ret=0
     ;;
     user-class)
       if compset -P 1 '*/'; then
