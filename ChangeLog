@@ -1,3 +1,10 @@
+2023-08-14  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 52037: Completion/Unix/Command/_date,
+	Completion/Unix/Command/_env, Completion/Unix/Command/_watch:
+	complete only external commands for env and watch, with a few
+	more minor fixes
+
 2023-08-06  Bart Schaefer  <schaefer@zsh.org>
 
 	* Shohei YOSHIDA: 52018: Completion/Unix/Command/_wc: latest

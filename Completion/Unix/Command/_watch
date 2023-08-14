@@ -18,7 +18,7 @@ case $variant in
       '(-g --chgexit)'{-g,--chgexit}'[exit on command output change]' \
       '(-n --interval)'{-n+,--interval=}'[specify update interval]:update interval (seconds) [2]' \
       '(-p --precise)'{-p,--precise}'[run command at precise intervals]' \
-      '(-q --equexit)'{-q,--equexit}'[exit when output of command does not change for the given cycles]:cycles' \
+      '(-q --equexit)'{-q+,--equexit=}'[exit when output of command does not change for the given cycles]:cycles' \
       '(-r --no-rerun)'{-r,--no-rerun}'[do not run the program on terminal resize]' \
       '(-t --no-title)'{-t,--no-title}'[disable header]' \
       '(-w --no-wrap)'{-w,--no-wrap}'[disable line wrapping]' \
@@ -34,7 +34,7 @@ case $variant in
     then
       _cmdstring && ret=0
     else
-      _normal && ret=0
+      _normal -p watch && ret=0
     fi
     ;;
   # watch(1) has completely different semantics on freebsd compared to linux, hence:
