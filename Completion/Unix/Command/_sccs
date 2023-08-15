@@ -1,4 +1,4 @@
-#compdef sccs admin cdc comb delta get help prs prt rmdel sact sccsdiff unget val what
+#compdef sccs sccsdiff
 
 (( $+functions[_sccs_files] )) ||
 _sccs_files() {
