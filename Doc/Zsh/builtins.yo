@@ -2320,8 +2320,10 @@ readonly). Special variables that have been made readonly retain their value
 and readonly attribute when made local.
 )
 item(tt(-t))(
-Tags the named parameters.  Tags have no special meaning to the shell.
-This flag has a different meaning when used with tt(-f); see above.
+Tags the named parameters.  Tags only exist to flag the parameter for
+the user's own purposes --- the list of tagged parameters can be queried
+using `tt(typeset -t)'.  Tags have no other use.  Note that the tt(-t)
+flag has a different meaning when used with tt(-f); see above.
 )
 item(tt(-u))(
 Convert the result to upper case whenever the parameter is expanded.

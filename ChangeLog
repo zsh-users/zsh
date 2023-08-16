@@ -1,3 +1,8 @@
+2023-08-16  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 29130, 29131 (Ray): Doc/Zsh/builtins.yo: document what typeset
+	-t is for, not what it isn't for.
+
 2023-08-14  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 52037: Completion/Unix/Command/_date,
