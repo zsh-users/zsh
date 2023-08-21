@@ -68,6 +68,13 @@ Keymap isearch_keymap;
  */
 #define GETZLETEXT(ent)	((ent)->zle_text ? (ent)->zle_text : (ent)->node.nam)
 
+/*
+ * Flag that edits have been made to a zle line.
+ * If not set, nothing to forget.
+ */
+/**/
+int have_edits = 0;
+
 /**/
 void
 remember_edits(void)
@@ -81,6 +88,7 @@ remember_edits(void)
 	    if (ent->zle_text)
 		free(ent->zle_text);
 	    ent->zle_text = zlemetaline ? ztrdup(line) : line;
+	    have_edits = 1;
 	} else if (!zlemetaline)
 	    free(line);
     }
@@ -90,6 +98,10 @@ remember_edits(void)
 void
 forget_edits(void)
 {
+    if (!have_edits) {
+       return;
+    }
+    have_edits = 0;
     Histent he;
 
     for (he = hist_ring; he; he = up_histent(he)) {
