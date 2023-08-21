@@ -24,14 +24,14 @@ _arguments -s -S \
   '(--implicit-cache --implicit-deps-changed)--implicit-deps-changed[rescan dependencies]' \
   '(--implicit-cache --implicit-deps-unchanged)--implicit-deps-unchanged[ignore changes to scanned dependencies]' \
   '--interactive[start interactive mode]' \
-  '(-j --jobs)-'{j,jobs=}'[specify no of jobs to run in parallel]' \
+  '(-j --jobs)-'{j,-jobs=}'[specify no of jobs to run in parallel]:number of jobs' \
   '(-k --keep-going)-'{k,-keep-going}'[continue after an error]' \
   '--max-drift=[set the maximum clock drift]:drift (seconds)' \
   '--md5-chunksize=[set chunksize for MD5 signature computation]:size (kB)' \
   '(-n --just-print --dry-run --recon)-'{n,-just-print,-dry-run,-recon}"[print commands but don't run them]" \
   "--no-site-dir[don't use the usual site_scons directory]" \
   '--profile=[profile scons]:output file:_files' \
-  '(-q --question)-'{q,question}'[query whether up-to-date]' \
+  '(-q --question)-'{q,-question}'[query whether up-to-date]' \
   '-Q[suppress progress messages]' \
   '--random[build dependencies in random order]' \
   '(-s --silent --quiet)-'{s,-silent,-quiet}"[don't print commands]" \
