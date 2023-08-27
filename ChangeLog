@@ -1,5 +1,8 @@
 2023-09-20  Oliver Kiddle  <opk@zsh.org>
 
+	* Jörg Sommer: 52102: Completion/Debian/Command/_apt:
+	Add subcommand autopurge to apt completion
+
 	* Wesley Schwengle: 52141: Completion/Unix/Command/_git: add trailer
 	token completion for git commit --trailer
 
