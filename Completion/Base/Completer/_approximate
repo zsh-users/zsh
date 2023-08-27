@@ -12,7 +12,6 @@
 
 local _comp_correct _correct_expl _correct_group comax cfgacc match
 local oldcontext="${curcontext}" opm="$compstate[pattern_match]"
-local dounfunction
 integer ret=1
 
 if [[ "$1" = -a* ]]; then
@@ -44,34 +43,31 @@ fi
 
 _tags corrections original
 
-# Otherwise temporarily define a function to use instead of
-# the builtin that adds matches. This is used to be able
-# to stick the `(#a...)' in the right place (after an
-# ignored prefix).
+# Otherwise temporarily define a function to use instead of the builtin that
+# adds matches. This is used to be able to stick the `(#a...)' in the right
+# place (after an ignored prefix).
 #
-# Current shell structure for use with "always", to make sure
-# we unfunction the compadd.
+# Current shell structure for use with "always", to make sure we unfunction our
+# compadd and restore any compadd function defined previously.
 {
-if (( ! $+functions[compadd] )); then
-  dounfunction=1
-  compadd() {
-    local ppre="$argv[(I)-p]"
+_shadow -s _approximate compadd
+compadd() {
+  local ppre="$argv[(I)-p]"
 
-    [[ ${argv[(I)-[a-zA-Z]#U[a-zA-Z]#]} -eq 0 &&
-       "${#:-$PREFIX$SUFFIX}" -le _comp_correct ]] && return
+  [[ ${argv[(I)-[a-zA-Z]#U[a-zA-Z]#]} -eq 0 &&
+      "${#:-$PREFIX$SUFFIX}" -le _comp_correct ]] && return
 
-    if [[ "$PREFIX" = \~* && ( ppre -eq 0 || "$argv[ppre+1]" != \~* ) ]]; then
-      PREFIX="~(#a${_comp_correct})${PREFIX[2,-1]}"
-    else
-      PREFIX="(#a${_comp_correct})$PREFIX"
-    fi
+  if [[ "$PREFIX" = \~* && ( ppre -eq 0 || "$argv[ppre+1]" != \~* ) ]]; then
+    PREFIX="~(#a${_comp_correct})${PREFIX[2,-1]}"
+  else
+    PREFIX="(#a${_comp_correct})$PREFIX"
+  fi
 
-    (( $_correct_group && ${${argv[1,(r)-(|-)]}[(I)-*[JV]]} )) &&
-        _correct_expl[_correct_group]=${argv[1,(r)-(-|)][(R)-*[JV]]}
+  (( $_correct_group && ${${argv[1,(r)-(|-)]}[(I)-*[JV]]} )) &&
+      _correct_expl[_correct_group]=${argv[1,(r)-(-|)][(R)-*[JV]]}
 
-    builtin compadd "$_correct_expl[@]" "$@"
-  }
-fi
+  compadd@_approximate "$_correct_expl[@]" "$@"
+}
 
 _comp_correct=1
 
@@ -115,7 +111,7 @@ while [[ _comp_correct -le comax ]]; do
 done
 
 } always {
-    [[ -n $dounfunction ]] && (( $+functions[compadd] )) && unfunction compadd
+  _unshadow
 }
 
 (( ret == 0 )) && return 0
