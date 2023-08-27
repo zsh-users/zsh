@@ -8,7 +8,7 @@
 #    }
 #    # Invoke callers of fname
 #  } always {
-#    _unshadow fname
+#    _unshadow
 #  }
 ## Alternate usage:
 # {
@@ -19,7 +19,7 @@
 #   }
 #   # Invoke callers of fname
 # } always {
-#   _unshadow -s suffix fname
+#   _unshadow
 # }
 ##
 
@@ -33,36 +33,62 @@ zmodload zsh/parameter # Or what?
 # This probably never comes up, but protect ourself from recursive call
 # chains that may duplicate the top elements of $funcstack by creating
 # a counter of _shadow calls and using it to make shadow names unique.
-typeset -gHi _shadowdepth=0
+builtin typeset -gHi .shadow.depth=0
+builtin typeset -gHa .shadow.stack
 
 # Create a copy of each fname so that a caller may redefine
 _shadow() {
-  local -A fsfx=( -s ${funcstack[2]}:${functrace[2]}:$((_shadowdepth+1)) )
-  local fname
+  emulate -L zsh
+  local -A fsfx=( -s ${funcstack[2]}:${functrace[2]}:$((.shadow.depth+1)) )
+  local fname shadowname
+  local -a fnames
   zparseopts -K -A fsfx -D s:
   for fname; do
-    local shadowname=${fname}@${fsfx[-s]}
-    (( ${+functions[$fname]} )) &&
-      builtin functions -c $fname $shadowname
+    shadowname=${fname}@${fsfx[-s]}
+    if (( ${+functions[$shadowname]} ))
+    then
+      # Called again with the same -s, just ignore it
+      continue
+    elif (( ${+functions[$fname]} ))
+    then
+      builtin functions -c -- $fname $shadowname
+      fnames+=(f@$fname)
+    elif (( ${+builtins[$fname]} ))
+    then
+      eval "function -- $shadowname { builtin $fname \"\$@\" }"
+      fnames+=(b@$fname)
+    else
+      eval "function -- $shadowname { command $fname \"\$@\" }"
+      fnames+=(c@$fname)
+    fi
   done
-  ((_shadowdepth++))
+  [[ -z $REPLY ]] && REPLY=${fsfx[-s]}
+  builtin set -A .shadow.stack ${fsfx[-s]} $fnames -- ${.shadow.stack}
+  ((.shadow.depth++))
 }
 
 # Remove the redefined function and shadowing name
 _unshadow() {
-  local -A fsfx=( -s ${funcstack[2]}:${functrace[2]}:${_shadowdepth} )
-  local fname
-  zparseopts -K -A fsfx -D s:
-  for fname; do
-    local shadowname=${fname}@${fsfx[-s]}
-    if (( ${+functions[$shadowname]} )); then
-      builtin functions -c $shadowname $fname
-      builtin unfunction $shadowname
-    elif (( ${+functions[$fname]} )); then
-      builtin unfunction $fname
+  emulate -L zsh
+  local fname shadowname fsfx=${.shadow.stack[1]}
+  local -a fnames
+  [[ -n $fsfx ]] || return 1
+  shift .shadow.stack
+  while [[ ${.shadow.stack[1]?no shadows} != -- ]]; do
+    fname=${.shadow.stack[1]#?@}
+    shadowname=${fname}@${fsfx}
+    if (( ${+functions[$fname]} )); then
+      builtin unfunction -- $fname
     fi
+    case ${.shadow.stack[1]} in
+      (f@*) builtin functions -c -- $shadowname $fname ;&
+      ([bc]@*) builtin unfunction -- $shadowname ;;
+    esac
+    shift .shadow.stack
   done
-  ((_shadowdepth--))
+  [[ -z $REPLY ]] && REPLY=$fsfx
+  shift .shadow.stack
+  ((.shadow.depth--))
 }
 
 # This is tricky.  When we call _shadow recursively from autoload,

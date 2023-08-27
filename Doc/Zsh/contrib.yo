@@ -4336,6 +4336,27 @@ example(is-at-least 3.1.6-15 && setopt NO_GLOBAL_RCS
 is-at-least 3.1.0 && setopt HIST_REDUCE_BLANKS
 is-at-least 2.6-17 || print "You can't use is-at-least here.")
 )
+findex(mkshadow)
+findex(rmshadow)
+xitem(tt(mkshadow) [ tt(-s) var(suffix) ] [ -- ] var(command_name) ...)
+item(tt(rmshadow))(
+These functions are an interface to the tt(_shadow) and tt(_unshadow)
+completion utilities to make them more easily accessible in other
+contexts.  Usage is exactly as for the completion utility:
+example({
+  mkshadow fname
+  function fname {
+    # Do your new thing
+  }
+  # Invoke callers of fname
+} always {
+  rmshadow
+})
+
+Upon return, the value of tt($REPLY) is the suffix used to create a
+copy of the original var(command_name), so var(command_name)tt(@$REPLY)
+invokes that original.
+)
 findex(nslookup)
 item(tt(nslookup) [ var(arg) ... ])(
 This wrapper function for the tt(nslookup) command requires the

@@ -1,0 +1,11 @@
+#autoload
+# Front-end to the completion helper _shadow for use outside completion.
+# This just forces proper autoload of _shadow/_unshadow and calls them.
+
+autoload _shadow
+mkshadow() { unset REPLY; _shadow "$@" }
+rmshadow() { unset REPLY; _unshadow }
+
+# Bootstrap because of autoload special case
+unset REPLY
+_shadow "$@"

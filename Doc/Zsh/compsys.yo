@@ -5229,13 +5229,12 @@ and hence is not normally called explicitly.
 )
 findex(_shadow)
 findex(_unshadow)
-xitem(tt(_shadow) [ tt(-s) var(suffix) ] var(command_name) ...)
-item(tt(_unshadow) [ tt(-s) var(suffix) ] var(command_name) ...)(
+xitem(tt(_shadow) [ tt(-s) var(suffix) ] [ -- ] var(command_name) ...)
+item(tt(_unshadow))(
 The tt(_shadow) function creates a copy of each of the shell functions
 in the var(command_name) arguments.  The original functions can then
-be replaced by new implementations.  A later call to tt(_unshadow),
-with the same var(command_name) list, removes the new implementations,
-if any, and restores the originals.
+be replaced by new implementations.  A later call to tt(_unshadow)
+removes the new implementations, if any, and restores the originals.
 
 Recommended usage is to pair tt(_shadow) and tt(_unshadow) calls by
 use of an `tt(always)' block:
@@ -5246,30 +5245,38 @@ example({
   }
   # Invoke callers of fname
 } always {
-  _unshadow fname
-})
-
-Any var(command_name) may instead be a builtin, but in that case no
-copy is created.  The expectation is that an initial tt(_shadow) is
-followed by creating a wrapper function, and therafter any nested or
-recursive calls thus copy and replace the wrapper function.
-example({
-  _shadow compadd
-  compadd LPAR()RPAR() { builtin compadd -O tmparr "$@" }
-} always {
-  _unshadow compadd
+  _unshadow
 })
 
 The var(suffix), if supplied, is prepended by an `tt(@)' character and
 then appended to each var(command_name) to create the copy.  Thus
 example(_shadow -s XX foo)
-creates a function named `tt(foo@XX)' (unless `tt(foo)' is a builtin).
-Note that a nested call to tt(_shadow) with the same var(suffix) may
-result in name collisions and unexpected results, but this provides a
-well-known name for the original function if the new implementation
-needs to call it as a wrapper.  The same var(suffix) must be used in
-the call to tt(_unshadow).  When no var(suffix) is present,
-tt(_shadow) creates a unique suffix to avoid name collisions.
+creates a function named `tt(foo@XX)'.  This provides a well-known
+name for the original implementation if the new implementation needs
+to call it as a wrapper.  If a nested call to  tt(_shadow) uses the
+same var(suffix), em(no new copy is made).  The presumption thus is
+that suffixes and new implementations correspond one to one.
+
+If var(command_name) is a builtin or external command, and there has been
+no preceding tt(_shadow) replacement made, the function so created calls
+the shadowed name prefixed by the tt(builtin) or tt(command) keywords as
+appropriate.
+example({
+  _shadow -s wrap compadd
+  compadd LPAR()RPAR() {
+    # compadd@wrap runs builtin compadd
+    compadd@wrap -O tmparr "$@" }
+} always {
+  _unshadow
+})
+
+When no var(suffix) argument is present, tt(_shadow) creates a unique
+suffix to avoid name collisions.
+
+Arguments of tt(_unshadow) are ignored.  Every listed var(command_name)
+for the most recent call to tt(_shadow) is removed.  This differs from
+an early implementation that required tt(_unshadow) to receive the
+same var(suffix) and var(command_name) list as tt(_shadow).
 )
 findex(_store_cache)
 item(tt(_store_cache) var(cache_identifier) var(param) ...)(
