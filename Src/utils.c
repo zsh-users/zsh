@@ -7551,9 +7551,9 @@ privasserted(void)
 	    /* POSIX doesn't define a way to test whether a capability set *
 	     * is empty or not.  Typical.  I hope this is conforming...    */
 	    cap_flag_value_t val;
-	    cap_value_t n;
-	    for(n = 0; !cap_get_flag(caps, n, CAP_EFFECTIVE, &val); n++)
-		if(val) {
+	    cap_value_t cap;
+	    for(cap = 0; !cap_get_flag(caps, cap, CAP_EFFECTIVE, &val); cap++)
+		if(val && cap != CAP_WAKE_ALARM) {
 		    cap_free(caps);
 		    return 1;
 		}

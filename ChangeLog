@@ -1,5 +1,8 @@
 2023-08-27  Bart Schaefer  <schaefer@zsh.org>
 
+	* Robert Woods: 52053: Src/utils.c: whitelist capability
+	CAP_WAKE_ALARM in 'privasserted' function
+
 	* Shohei YOSHIDA: 52034: Completion/Unix/Command/_sqlite:
 	update for version 3.42.0
 
