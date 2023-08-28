@@ -25,14 +25,20 @@ _open() {
     '(: * -)--args[pass remaining arguments to application]:*:::argument' \
     '(-a -b -e -f -R -t)-b+[specify application bundle identifier]: :->bundle-ids' \
     '(-a -b -e -f -R -t)-e[open with TextEdit]' \
+    '*--env[add the environment variable of the launched application]:env_var=value:_parameters -g "*export*" -qS=' \
     '(-h)-f[open standard input with TextEdit or specified application]' \
     '(-R)-F[open application with fresh state]' \
-    '-g[do not bring application to foreground]' \
+    '(-j)-g[do not bring application to foreground]' \
     '(-f)-h[open library header file]' \
+    '(-g)-j[launch the app hidden]' \
     '(-R)-n[always open new instance of application]' \
     '(-a -b -e -f -F -n -s -t -W --args)-R[reveal in Finder]' \
     '(-R)-s+[specify SDK name/version]: :->sdks' \
+    '--stdin[launch the application with stdin connected to the given file]:file:_files' \
+    '--stdout[launch the application with stdout connected to the given file]:file:_files' \
+    '--stderr[launch the application with stderr connected to the given file]:file:_files' \
     '(-a -b -e -f -R -t)-t[open with default text editor]' \
+    '-u[open URL with whatever application claims the url scheme]:url:_urls' \
     '(-R)-W[wait for application to exit]' \
     '(-f)*: :->files' \
   && ret=0

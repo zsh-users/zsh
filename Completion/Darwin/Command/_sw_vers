@@ -1,6 +1,11 @@
 #compdef sw_vers
 
+# Only options with a single dash '-' are accepted on Monterey or older,
+# but both a single and double dashes are accepted on Ventura (or newer).
+# We may replace '-' by '--' when Monterey fades out.
+
 _arguments : \
   '(-)-buildVersion[display build version only]' \
   '(-)-productName[display product name only]' \
-  '(-)-productVersion[display product version only]'
+  '(-)-productVersion[display product version only]' \
+  '(-)-productVersionExtra[display rapid security response version only]'

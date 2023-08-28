@@ -1,5 +1,11 @@
 2023-08-28  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* Shohei YOSHIDA: 52098(+comment), 52099, 52100, 52105(+52106):
+	Completion/Darwin/Command/_open, Completion/Darwin/Command/_otool,
+	Completion/Darwin/Command/_sw-vers,
+	Completion/Darwin/Command/_system_profiler:
+	update for latest macOS (with a few fixes)
+
 	* sergio: 51858 (+52073): Completion/Unix/Command/_libvirt:
 	virsh's edit subcommand accepts all domains
 
