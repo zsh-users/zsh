@@ -1,3 +1,8 @@
+2023-08-28  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* sergio: 51858 (+52073): Completion/Unix/Command/_libvirt:
+	virsh's edit subcommand accepts all domains
+
 2023-08-27  Bart Schaefer  <schaefer@zsh.org>
 
 	* Marlon Richert: 51861 (tweaked for 52028):

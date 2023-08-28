@@ -20,7 +20,6 @@ typeset -A dom_opts
 dom_opts=(
   console " "
   destroy " "
-  edit " "
   managedsave " "
   reboot " "
   reset " "
