@@ -299,6 +299,13 @@ F:future revision will create a global with this assignment
 *>*
 *>*
 
+ () {
+   private x=1
+   unset x
+   x=2
+ }
+0:regression test for unset private
+
 %clean
 
   rm -r private.TMP
