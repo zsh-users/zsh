@@ -377,6 +377,13 @@ F:Should we allow "public" namerefs to private parameters?
 *?*no such variable: ptr1
 *?*no such variable: ptr2
 
+ () {
+   private x=1
+   unset x
+   x=2
+ }
+0:regression test for unset private
+
 %clean
 
   rm -r private.TMP

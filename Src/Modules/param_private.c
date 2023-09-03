@@ -230,7 +230,9 @@ setfn_error(Param pm)
  * calling the original unsetfn.  This assures that if the old unsetfn
  * wants to use its getfn or setfn, they're unconditionally present.
  * The "explicit" flag indicates that "unset" was called, if zero the
- * parameter is going out of scope (see params.c).
+ * parameter is going out of scope (see params.c).  PM_DECLARED is
+ * asserted as if TYPESET_TO_UNSET were in use so that the private
+ * parameter is re-used rather than re-created when assigned again.
  *
  */
 
@@ -268,9 +270,10 @@ pps_unsetfn(Param pm, int explicit)
     pm->gsu.s = gsu;
     if (locallevel <= pm->level)
 	gsu->unsetfn(pm, explicit);
-    if (explicit)
+    if (explicit) {
+	pm->node.flags |= PM_DECLARED;
 	pm->gsu.s = (GsuScalar)c;
-    else
+    } else
 	zfree(c, sizeof(struct gsu_closure));
 }
 
@@ -307,9 +310,10 @@ ppi_unsetfn(Param pm, int explicit)
     pm->gsu.i = gsu;
     if (locallevel <= pm->level)
 	gsu->unsetfn(pm, explicit);
-    if (explicit)
+    if (explicit) {
+	pm->node.flags |= PM_DECLARED;
 	pm->gsu.i = (GsuInteger)c;
-    else
+    } else
 	zfree(c, sizeof(struct gsu_closure));
 }
 
@@ -346,9 +350,10 @@ ppf_unsetfn(Param pm, int explicit)
     pm->gsu.f = gsu;
     if (locallevel <= pm->level)
 	gsu->unsetfn(pm, explicit);
-    if (explicit)
+    if (explicit) {
+	pm->node.flags |= PM_DECLARED;
 	pm->gsu.f = (GsuFloat)c;
-    else
+    } else
 	zfree(c, sizeof(struct gsu_closure));
 }
 
@@ -386,9 +391,10 @@ ppa_unsetfn(Param pm, int explicit)
     pm->gsu.a = gsu;
     if (locallevel <= pm->level)
 	gsu->unsetfn(pm, explicit);
-    if (explicit)
+    if (explicit) {
+	pm->node.flags |= PM_DECLARED;
 	pm->gsu.a = (GsuArray)c;
-    else
+    } else
 	zfree(c, sizeof(struct gsu_closure));
 }
 
@@ -427,9 +433,10 @@ pph_unsetfn(Param pm, int explicit)
     pm->gsu.h = gsu;
     if (locallevel <= pm->level)
 	gsu->unsetfn(pm, explicit);
-    if (explicit)
+    if (explicit) {
+	pm->node.flags |= PM_DECLARED;
 	pm->gsu.h = (GsuHash)c;
-    else
+    } else
 	zfree(c, sizeof(struct gsu_closure));
 }
 
