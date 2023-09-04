@@ -33,7 +33,7 @@ case $variant in
     ;;
 esac
 
-args+=( '1:new root directory:_directories' '*:::command:_normal' )
+args+=( '1:new root directory:_directories' '*::: : _normal -p $service' )
 
 _arguments -s -S : $args && ret=0
 

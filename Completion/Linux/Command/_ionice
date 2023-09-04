@@ -28,7 +28,7 @@ if [[ -n $state ]]; then
   elif (( $+opt_args[args--u] || $+opt_args[args---uid] )); then
     _message -e uids 'user id'
   else
-    _normal && ret=0
+    _normal -p $service && ret=0
   fi
 fi
 

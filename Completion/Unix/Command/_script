@@ -68,7 +68,7 @@ case $OSTYPE in
       '-F[send output to specified named pipe]:fifo:_files -g "*(p)"'
       '-t+[specify interval of data flushing]:interval (seconds)'
       '-k[log keys sent to the program as well as output]'
-      '*:::arguments: _normal'
+      '*:::arguments: _normal $service'
     )
   ;|
   darwin*|freebsd*)

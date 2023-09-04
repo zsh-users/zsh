@@ -96,7 +96,7 @@ _arguments -C -S -s \
   '--selinux-label[request a selinux label]:SELinux labels: ' \
   '--apparmor-profile[request an apparmor profile]:AppArmor profiles: ' \
   '--reset-env[set environment as for a classic login shell]' \
-  '*:::command:_normal' \
+  '*:::command: _normal -p $service' \
   && return 0
 
 case $state in

@@ -27,6 +27,6 @@ for ((i=1;i<=3;i++)); do
     "(${short[i]})${long[i]}=${(e)opt}"
   )
 done
-(( CURRENT > 2 )) && args+=( '*::command:_normal' )
+(( CURRENT > 2 )) && args+=( '*::command: _normal -p $service' )
 
 _arguments -s -S $args

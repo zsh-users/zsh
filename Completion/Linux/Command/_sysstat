@@ -130,7 +130,7 @@ _pidstat() {
   _arguments -s : \
     '-C[filter tasks by string]:task filter' \
     '-d[report I/O statistics]' \
-    '-e[execute specified program and monitor it with pidstat]:*::command: _normal' \
+    '-e[execute specified program and monitor it with pidstat]:*::command: _normal -p $service' \
     '-H[display timestamp in seconds since the epoch]' \
     '-h[display horizontally]' \
     '-I[divide CPU usage by number of processors]' \

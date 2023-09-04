@@ -107,7 +107,7 @@ if [[ -n $state ]]; then
       elif (( CURRENT > 2 )) && [[ ${words[1]} == /dev/* ]]; then
 	  _message "no more parameters"
       else
-	  _normal
+	  _normal -p $service
       fi
     ;;
     attached-sessions)
