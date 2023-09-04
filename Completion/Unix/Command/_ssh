@@ -136,7 +136,7 @@ _ssh () {
       '(-k -c)-s[force sh-style shell]' \
       '-t+[set default maximum lifetime for identities]: :_numbers -u seconds "maximum lifetime" \:s\:seconds m\:minutes h\:hours d\:days w\:weeks' \
       '-v[verbose mode]' \
-      '*::command: _normal'
+      '*::command: _normal -p $service'
     return
     ;;
   ssh-keygen)
@@ -738,7 +738,7 @@ _ssh () {
       local -a _comp_priv_prefix
       shift 1 words
       (( CURRENT-- ))
-      _normal
+      _normal -p $service
       return
       ;;
     destinations)

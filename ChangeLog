@@ -1,3 +1,15 @@
+2023-09-04  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 52112: Completion/BSD/Command/_jexec,
+	Completion/Linux/Command/_chrt, Completion/Linux/Command/_cpupower,
+	Completion/Linux/Command/_ionice,Completion/Linux/Command/_setpriv,
+	Completion/Linux/Command/_sysstat, Completion/Unix/Command/_chroot,
+	Completion/Unix/Command/_mosh, Completion/Unix/Command/_route,
+	Completion/Unix/Command/_screen, Completion/Unix/Command/_script,
+	Completion/Unix/Command/_ssh, Completion/Unix/Command/_stdbuf,
+	Completion/Unix/Command/_timeout: use '_normal -p $service' to
+	complete only external commands
+
 2023-09-03  Bart Schaefer  <schaefer@zsh.org>
 
 	* users/29220: Src/Modules/param_private.c, Test/V10private.ztst:

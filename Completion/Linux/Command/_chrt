@@ -62,7 +62,7 @@ elif (( CURRENT == 1 )); then
 else
   shift words
   (( CURRENT-- ))
-  _normal && ret=0
+  _normal -p $service && ret=0
 fi
 
 return ret

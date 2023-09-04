@@ -95,7 +95,7 @@ case $state in
           '-i+[measurement interval]:interval (seconds)'
           '-c[schedule on every core]'
           '-v[increase verbosity]'
-          '*:::command: _normal'
+          '*:::command: _normal -p $service'
         )
       ;;
     esac

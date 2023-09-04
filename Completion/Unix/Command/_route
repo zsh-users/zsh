@@ -196,7 +196,7 @@ if [[ -n $state ]]; then
   if [[ $line[1] = exec ]]; then
     shift words
     (( CURRENT-- ))
-    _normal
+    _normal -p $service && return
   elif [[ $line[1] = (flush|monitor) ]]; then
     sequential=()
   fi

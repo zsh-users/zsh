@@ -7,7 +7,7 @@ _arguments -C \
   '(-)--help[display help information]' \
   '(-)--version[display version information]' \
   "--no-init[don't set terminal init string]" \
-  '--ssh=[specify ssh command to setup session]:ssh command:_normal' \
+  '--ssh=[specify ssh command to setup session]:ssh command: _cmdstring' \
   '--port=[specify server-side port range]:port:_sequence -n 2 -s \: _ports' \
   '(-a -n)--predict=[control speculative local echo]:mode:(adaptive always never)' \
   '(--predict -n)-a[synonym for --predict=always]' \
@@ -22,7 +22,7 @@ _arguments -C \
   '--local[run mosh-server locally without using ssh]' \
   '--experimental-remote-ip=[select method for discovering remote IP address to use for mosh]:method:(local remote proxy)' \
   '1:remote host name:->userhost' \
-  '*:::args:_normal' && ret=0
+  '*::: : _normal -p $service' && ret=0
 
 case $state in
   userhost)
