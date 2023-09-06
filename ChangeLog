@@ -1,3 +1,8 @@
+2023-09-05  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52115: Src/Modules/param_private.c, Test/V10private.ztst: permit
+	repeated "private" declarations as long as types aren't changed
+
 2023-09-04  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 52112: Completion/BSD/Command/_jexec,

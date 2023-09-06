@@ -384,6 +384,23 @@ F:Should we allow "public" namerefs to private parameters?
  }
 0:regression test for unset private
 
+ () {
+   private x=1
+   unset x
+   private x=2
+   print $x
+ }
+0:private may be called twice
+>2
+
+ () {
+   private x=1
+   private -a x
+   print $x
+ }
+1:private may not change parameter type
+?(anon):private:2: can't change type of private param: x
+
 %clean
 
   rm -r private.TMP

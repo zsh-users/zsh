@@ -87,9 +87,52 @@ makeprivate(HashNode hn, UNUSED(int flags))
 	      ((pm->node.flags & (PM_SPECIAL|PM_REMOVABLE)) == PM_SPECIAL &&
 	       /* typeset_single() line 2300 discards PM_REMOVABLE -- why? */
 	       !is_private(pm->old))))) {
-	    zwarnnam("private", "can't change scope of existing param: %s",
-		     pm->node.nam);
-	    makeprivate_error = 1;
+	    if (is_private(pm->old)) {
+		if (pm->old->node.flags & PM_READONLY) {
+		    zerr("read-only variable: %s", pm->node.nam);
+		    makeprivate_error = 1;
+		} else if ((pm->node.flags | pm->old->node.flags) ==
+		    pm->old->node.flags) {
+		    /* private called twice on same parameter */
+		    Param tpm = pm;
+		    pm = pm->old;
+		    --locallevel;
+		    /* why have a union if we need this switch anyway? */
+		    switch (PM_TYPE(pm->node.flags)) {
+		    case PM_SCALAR:
+			pm->gsu.s->setfn(pm, tpm->u.str);
+			tpm->u.str = NULL;
+			break;
+		    case PM_INTEGER:
+			pm->gsu.i->setfn(pm, tpm->u.val);
+			break;
+		    case PM_EFLOAT:
+		    case PM_FFLOAT:
+			pm->gsu.f->setfn(pm, tpm->u.dval);
+			break;
+		    case PM_ARRAY:
+			pm->gsu.a->setfn(pm, tpm->u.arr);
+			tpm->u.arr = NULL;
+			break;
+		    case PM_HASHED:
+			pm->gsu.h->setfn(pm, tpm->u.hash);
+			tpm->u.hash = NULL;
+			break;
+		    }
+		    ++locallevel;
+		    if (!(tpm->node.flags & PM_UNSET))
+			pm->node.flags &= ~PM_UNSET;
+		} else {
+		    zerrnam("private",
+			    "can't change type of private param: %s",
+			    pm->node.nam);
+		    makeprivate_error = 1;
+		}
+	    } else {
+		zerrnam("private", "can't change scope of existing param: %s",
+			pm->node.nam);
+		makeprivate_error = 1;
+	    }
 	    return;
 	}
 	struct gsu_closure *gsu = zalloc(sizeof(struct gsu_closure));
