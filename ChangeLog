@@ -1,3 +1,8 @@
+2023-09-07  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 52114: Completion/Unix/Command/_nice: improve _nice (support
+	-n option, complete only external commands)
+
 2023-09-04  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 52112: Completion/BSD/Command/_jexec,

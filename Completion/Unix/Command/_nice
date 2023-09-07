@@ -1,14 +1,23 @@
 #compdef nice
 
-shift words
-(( CURRENT-- ))
+local -a specs=( '*:: : _normal -p $service' )
 
-if [[ $CURRENT -gt 1 && $words[1] = ([-+](-|)|-n)<-> ]]; then
-    shift words
-    (( CURRENT -- ))
-elif [[ $CURRENT -gt 2 && $words[1] = -n ]]; then
-    shift 2 words
-    (( CURRENT -= 2 ))
+# See if the 1st arg is such as -10 --10 or -+10
+if [[ $words[2] = -(-|+|)[0-9]## ]]; then
+  if (( $CURRENT == 2 )); then
+    _message 'niceness increment' && return
+  fi
+  compset -n 2  # Ignore the 1st arg
+else
+  if _pick_variant gnu=GNU unix --version; then
+    specs+=(
+      '(-)'{-n+,--adjustment=}'[adjust niceness]:niceness increment'
+      '(* -)--help[display help and exit]'
+      '(* -)--version[output version information and exit]'
+    )
+  else
+    specs+=( '-n+[specify increment of niceness]:niceness increment' )
+  fi
 fi
 
-_normal
+_arguments : $specs
