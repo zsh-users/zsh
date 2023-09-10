@@ -55,10 +55,10 @@ _shadow() {
       fnames+=(f@$fname)
     elif (( ${+builtins[$fname]} ))
     then
-      eval "function -- $shadowname { builtin $fname \"\$@\" }"
+      eval "function -- ${(q-)shadowname} { builtin ${(q-)fname} \"\$@\" }"
       fnames+=(b@$fname)
     else
-      eval "function -- $shadowname { command $fname \"\$@\" }"
+      eval "function -- ${(q-)shadowname} { command ${(q-)fname} \"\$@\" }"
       fnames+=(c@$fname)
     fi
   done
