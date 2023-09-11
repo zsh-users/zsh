@@ -12,7 +12,7 @@ PATH=/sbin:$PATH
 
 case $OSTYPE in
   aix*)
-    net_intf_list=( ${(f)"$(lsdev -C -c if -F 'name:description')"} )
+    net_intf_list=( ${(f)"$(command lsdev -C -c if -F 'name:description')"} )
     if zstyle -T ":completion:${curcontext}" verbose; then
       zstyle -s ":completion:${curcontext}:" list-separator sep || sep=--
       zformat -a list " $sep " "$net_intf_list[@]"
@@ -24,10 +24,10 @@ case $OSTYPE in
   *)
     if (( $+commands[ip] )); then
       # if ip is available, we can also show altnames
-      net_intf_list=( $(_call_program interfaces "ip link | sed -ne 's/^[0-9]\+: \([^:@]\+\).*/\1/p;t; s/^[\ ]\+altname \(.\+\)\$/\1/p'") )
+      net_intf_list=( $(_call_program interfaces "command ip link | command sed -ne 's/^[0-9]\+: \([^:@]\+\).*/\1/p;t; s/^[\ ]\+altname \(.\+\)\$/\1/p'") )
     else
       # linux's deprecated ifconfig may truncate long interface names
-      net_intf_list=( $(_call_program interfaces "ifconfig -a 2>/dev/null | sed -n 's/^\([^ 	:]*\).*/\1/p'") )
+      net_intf_list=( $(_call_program interfaces "command ifconfig -a 2>/dev/null | command sed -n 's/^\([^ 	:]*\).*/\1/p'") )
     fi
 
     if (( ${#net_intf_list} == 0 )) && [[ -d /proc/sys/net/ipv4/conf ]]; then
