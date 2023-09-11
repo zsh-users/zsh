@@ -1,3 +1,7 @@
+2023-09-10  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52125: Src/exec.c: getoutput() must not free() gettempname()
+
 2023-09-09  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Completion/Base/Utility/_shadow: quoting for safety

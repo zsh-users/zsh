@@ -4897,7 +4897,6 @@ getoutputfile(char *cmd, char **eptr)
 
     if ((fd = open(nam, O_WRONLY | O_CREAT | O_EXCL | O_NOCTTY, 0600)) < 0) {
 	zerr("process substitution failed: %e", errno);
-	free(nam);
 	if (!s)
 	    child_unblock();
 	return NULL;
