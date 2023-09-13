@@ -1,3 +1,9 @@
+2023-09-13  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 52122 + 52129: Src/subst.c, Test/D04parameter.ztst: fix (#)
+	parameter expansion flag for bad math expressions and out-of-
+	range characters
+
 2023-09-10  Bart Schaefer  <schaefer@zsh.org>
 
 	* 52125: Src/exec.c: getoutput() must not free() gettempname()

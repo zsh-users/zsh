@@ -1489,11 +1489,18 @@ subst_parse_str(char **sp, int single, int err)
 static char *
 substevalchar(char *ptr)
 {
-    zlong ires = mathevali(ptr);
+    zlong ires;
     int len = 0;
+    int saved_errflag = errflag;
 
-    if (errflag)
-	return NULL;
+    errflag = 0;
+    ires = mathevali(ptr);
+
+    if (errflag) {  /* not a valid numerical expression */
+	errflag |= saved_errflag;
+	return noerrs ? dupstring(""): NULL;
+    }
+    errflag |= saved_errflag;
 #ifdef MULTIBYTE_SUPPORT
     if (isset(MULTIBYTE) && ires > 127) {
 	/* '\\' + 'U' + 8 bytes of character + '\0' */

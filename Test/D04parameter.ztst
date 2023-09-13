@@ -2785,3 +2785,43 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 >string with spaces
 >stringwithspaces
 >stringwithspaces
+
+  : ${(#X):-@}
+1:${(#X)...}: bad math expression
+?(eval):1: bad math expression: illegal character: @
+
+  echo a${(#):-@}z
+0:${(#)...}: bad math expression
+>az
+
+  printf "a%sz\n" ${(#):-@}
+0:${(#)...}: bad math expression, printf
+>az
+
+  a=( '1 +' '@' )
+  : ${(#X)a}
+1:${(#X)...}: array of bad math expressions
+?(eval):2: bad math expression: operand expected at end of string
+
+  printf "a%sz\n" ${(#)a}
+0:${(#)...}: array of bad math expressions, printf
+>az
+
+  : ${(#X):-0x80}
+1:${(#X)...}: out-of-range character
+?(eval):1: character not in range
+
+  [[ ${(#):-0x80} = $'\x80' ]] && echo OK
+0:${(#)...}: out-of-range character
+>OK
+
+  a=( 0x80 0x81 )
+  : ${(#X)a}
+1:${(#X)...}: array of out-of-range characters
+?(eval):2: character not in range
+
+  printf "%s\n" ${(#)a} |
+  while read x; do echo $(( #x )); done
+0:${(#)...}: array of out-of-range characters
+>128
+>129
