@@ -1,5 +1,8 @@
 2023-09-20  Oliver Kiddle  <opk@zsh.org>
 
+	* Wesley Schwengle: 52141: Completion/Unix/Command/_git: add trailer
+	token completion for git commit --trailer
+
 	* 52163: Completion/Unix/Command/_zfs: completion update for
 	OpenZFS 2.2
 

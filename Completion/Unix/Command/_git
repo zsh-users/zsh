@@ -717,7 +717,7 @@ _git-commit () {
     {-p,--patch}'[use the interactive patch selection interface to chose which changes to commit]' \
     '(--reset-author)--author[override the author name used in the commit]:author name' \
     '--date=[override the author date used in the commit]:date' \
-    '*--trailer=[add custom trailer(s)]:trailer' \
+    '*--trailer=[add custom trailer(s)]:trailer:__git_trailers_tokens' \
     '(-s --signoff)'{-s,--signoff}'[add Signed-off-by trailer at the end of the commit message]' \
     '(-n --no-verify)'{-n,--no-verify}'[bypass pre-commit and commit-msg hooks]' \
     '--allow-empty[allow recording an empty commit]' \
@@ -7411,6 +7411,19 @@ __git_cached_files () {
 (( $+functions[__git_deleted_files] )) ||
 __git_deleted_files () {
   __git_files --deleted deleted-files 'deleted file' $*
+}
+
+(( $+functions[__git_trailers_tokens] )) ||
+__git_trailers_tokens() {
+  declare -a trailers
+  local i
+
+  local -a gtrailers=( $(_call_program trailers git config --name-only --get-regexp '^trailer\..*\.key$') )
+  for i in $gtrailers; do
+    i=( ${${(@s:.:)i}[2,-2]} )
+    trailers+=( ${(j|.|)i} )
+  done
+  _wanted trailers expl "trailer" compadd -a trailers
 }
 
 (( $+functions[__git_modified_files] )) ||
