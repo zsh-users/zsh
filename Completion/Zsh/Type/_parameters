@@ -6,11 +6,6 @@
 # If you specify a -g option with a pattern, the pattern will be used to
 # restrict the type of parameters matched.
 
-if compset -P '*:'; then
-  _history_modifiers p
-  return
-fi
-
 local i pfilt
 local -i nm=$compstate[nmatches]
 local -a expl pattern=( -g \* ) normal described verbose faked fakes tmp

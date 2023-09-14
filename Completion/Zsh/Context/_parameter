@@ -1,3 +1,8 @@
 #compdef -parameter-
 
+if compset -P '*:'; then
+  _history_modifiers p
+  return
+fi
+
 _parameters -e

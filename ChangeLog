@@ -1,3 +1,9 @@
+2023-09-15  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 52142: Completion/Zsh/Context/_parameter,
+	Completion/Zsh/Type/_parameters: Move _history_modifiers call
+	to _parameter
+
 2023-09-13  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 52122 + 52129: Src/subst.c, Test/D04parameter.ztst: fix (#)
