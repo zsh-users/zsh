@@ -610,11 +610,11 @@ inungetc(int c)
     }
 }
 
-/* stuff a whole file into the input queue and print it */
+/* stuff a whole file into memory and return it */
 
 /**/
-int
-stuff(char *fn)
+off_t
+zstuff(char **out, const char *fn)
 {
     FILE *in;
     char *buf;
@@ -622,20 +622,50 @@ stuff(char *fn)
 
     if (!(in = fopen(unmeta(fn), "r"))) {
 	zerr("can't open %s", fn);
-	return 1;
+	return -1;
     }
+    queue_signals();
     fseek(in, 0, SEEK_END);
     len = ftell(in);
     fseek(in, 0, SEEK_SET);
     buf = (char *)zalloc(len + 1);
-    if (!(fread(buf, len, 1, in))) {
+    if (len && !(fread(buf, len, 1, in))) {
 	zerr("read error on %s", fn);
 	fclose(in);
-	zfree(buf, len + 1);
-	return 1;
+	unqueue_signals();
+	return -1;
     }
     fclose(in);
     buf[len] = '\0';
+    *out = buf;
+    unqueue_signals();
+    return len;
+}
+
+/**/
+char *
+ztuff(const char *fn)
+{
+    char *buf;
+    off_t len = zstuff(&buf, fn);
+    if (len > 0)
+	return buf;
+    else
+	return NULL;
+}
+
+/* stuff a whole file into the input queue and print it */
+
+/**/
+int
+stuff(char *fn)
+{
+    char *buf;
+    off_t len = zstuff(&buf, fn);
+
+    if (len < 0)
+	return 1;
+    
     fwrite(buf, len, 1, stderr);
     fflush(stderr);
     inputsetline(metafy(buf, len, META_REALLOC), INP_FREE);

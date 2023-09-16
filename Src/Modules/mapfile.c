@@ -170,6 +170,8 @@ get_contents(char *fname)
 #ifdef USE_MMAP
     caddr_t mmptr;
     struct stat sbuf;
+#else
+    off_t size;
 #endif
     char *val;
     unmetafy(fname = ztrdup(fname), &fd);
@@ -196,12 +198,8 @@ get_contents(char *fname)
     close(fd);
 #else /* don't USE_MMAP */
     val = NULL;
-    if ((fd = open(fname, O_RDONLY | O_NOCTTY)) >= 0) {
-	LinkList ll;
-
-	if ((ll = readoutput(fd, 1, 0)))
-	    val = peekfirst(ll);
-    }
+    if ((size = zstuff(&val, fname)) > 0)
+	val = metafy(val, size, META_HEAPDUP);
 #endif /* USE_MMAP */
     free(fname);
     return val;

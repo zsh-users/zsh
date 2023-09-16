@@ -1,3 +1,8 @@
+2023-09-16  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52153: Src/input.c, Src/Modules/mapfile.c: $mapfile[fname]
+	should not trim newlines (only applies when not HAVE_MMAP)
+
 2023-09-15  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 52142: Completion/Zsh/Context/_parameter,
