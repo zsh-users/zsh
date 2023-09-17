@@ -4507,7 +4507,7 @@ modify(char **str, char **ptr, int inbrace)
 			break;
 		    case 's':
 			if (hsubl && hsubr)
-			    subst(&copy, hsubl, hsubr, gbal);
+			    subst(&copy, dupstring(hsubl), dupstring(hsubr), gbal);
 			break;
 		    case 'q':
 			copy = quotestring(copy, QT_BACKSLASH_SHOWNULL);
@@ -4593,7 +4593,7 @@ modify(char **str, char **ptr, int inbrace)
 		    break;
 		case 's':
 		    if (hsubl && hsubr)
-			subst(str, hsubl, hsubr, gbal);
+			subst(str, dupstring(hsubl), dupstring(hsubr), gbal);
 		    break;
 		case 'q':
 		    *str = quotestring(*str, QT_BACKSLASH);

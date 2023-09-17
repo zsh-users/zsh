@@ -1,3 +1,9 @@
+2023-09-16  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52156: Test/E01options.ztst: Test case for user/29160.
+
+	* users/29160: Src/subst.c: Fix repetition of substituion modifier.
+
 2023-09-13  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 52122 + 52129: Src/subst.c, Test/D04parameter.ztst: fix (#)
