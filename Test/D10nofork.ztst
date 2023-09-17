@@ -1,0 +1,448 @@
+# Tests for "nofork" command substitution.
+
+%prep
+  mkdir nofork.tmp
+  touch nofork.tmp/file{1,2}.txt
+
+  purr() { print -r -- "$@" }
+  purl() { print -rl -- "$@" }
+
+%test
+
+  REPLY=OUTER
+  purr ${| REPLY=INNER } $REPLY
+0:Basic substitution and REPLY scoping
+>INNER OUTER
+
+  purr ${| REPLY=first}:${| REPLY=second}:$REPLY
+0:re-scoping of REPLY in one statement
+>first:second:OUTER
+
+  purr BEGIN${| printf -v REPLY '%s\n' one two three ; }END
+0:Adjacent words
+>BEGINone
+>two
+>three
+>END
+
+  purr "BEGIN${| printf -v REPLY '%s\n' one two three }END"
+0:Adjacent words and quoting, part 1
+>BEGINone
+>two
+>three
+>END
+
+  purr BEGIN"${| printf -v REPLY '%s\n' one two three }"END
+0:Adjacent words and quoting, part 2
+>BEGINone
+>two
+>three
+>END
+
+  purr BEGIN"${|
+   printf -v REPLY '%s\n'\
+    one two three
+  }"END
+0:Embedded newlines
+>BEGINone
+>two
+>three
+>END
+
+  purr BEGIN"${|
+   printf -v REPLY $'%s\n' one two three
+  }"END
+0:Embedded newlines and $'...'
+>BEGINone
+>two
+>three
+>END
+
+  purl ${| print -v REPLY one word here; setopt shwordsplit }
+  purl ${| print -v REPLY three words here }
+  purl "and ${| print -v REPLY one word here }"
+  unsetopt shwordsplit
+0:test word splitting on result
+F:setting option inside is too late for that substitution
+>one word here
+>three
+>words
+>here
+>and one word here
+
+ (
+  cd nofork.tmp
+  setopt globsubst
+  purr ${| REPLY=f* }
+  purr ${| REPLY=f? }*
+  unsetopt globsubst
+  purr ${| REPLY=f* }
+  purr ${| REPLY=f? }*
+ )
+1:globsubst on result
+>file1.txt file2.txt
+>file1.txt file2.txt
+>f*
+?(eval):8: no matches found: f?*
+
+  purr ${| REPLY=$'trailing newlines remain\n\n' }
+0:newline removal should not occur
+>trailing newlines remain
+>
+>
+
+  () {
+   purr ${| REPLY=$* ; shift 2 }
+   purr $*
+  } these are arguments
+0:access to context $argv
+>these are arguments
+>arguments
+
+  purr ${:-${| REPLY=${REPLY:-buried}}}
+  purr ${:-"${| REPLY=${REPLY:-more buried}}"}
+0:nofork inside parameter scope
+>buried
+>more buried
+
+  : ${(e):-'${| REPLY=oops'}
+1:unclosed braces are sometimes a bad substitution
+F:This seems silly, but see A01grammar ${(e):-'${'} test
+?(eval):1: bad substitution
+
+  purr ${| REPLY=oops
+1:other times lack of closing brace is merely unexpected
+F:Why not use this error in the previous case as well?
+?(eval):1: closing brace expected
+
+# Next tests check that the PS2 stack is properly managed on error
+
+  purr ${| REPLY=${REPLY:-buried}}}
+1:unbalanced braces, part 0
+?(eval):1: parse error near `}'
+
+  purr ${:-${| REPLY=${REPLY:-buried}}
+1:unbalanced braces, part 1
+?(eval):1: closing brace expected
+
+  purr ${:-"${| REPLY=${REPLY:-more buried}"}
+1:unbalanced braces, part 2
+?(eval):1: unmatched "
+
+  purr ${:-"${| REPLY=${REPLY:-more buried"}}}
+1:unbalanced braces, part 3
+?(eval):1: unmatched "
+
+  purr ${:-"${| REPLY=${REPLY:-more buried}}}"
+1:unbalanced braces, part 4
+?(eval):1: closing brace expected
+
+# Same tests with leading space (future-proofing)
+
+  purr ${ purr ${REPLY:-buried}}}
+1:unbalanced braces, part 0+
+?(eval):1: parse error near `}'
+
+  purr ${:-${ purr ${REPLY:-buried}}
+1:unbalanced braces, part 1+
+?(eval):1: closing brace expected
+
+  purr ${:-"${ purr ${REPLY:-more buried}"}
+1:unbalanced braces, part 2+
+?(eval):1: unmatched "
+
+  purr ${:-"${ purr ${REPLY:-more buried"}}}
+1:unbalanced braces, part 3+
+?(eval):1: unmatched "
+
+  purr ${:-"${ purr ${REPLY:-more buried}}}"
+1:unbalanced braces, part 4+
+?(eval):1: closing brace expected
+
+  purr ${ purr STDOUT }
+0:capture stdout
+>STDOUT
+>
+
+# end PS2 stack tests 
+
+  purr $(purr outside ${| REPLY=inside })
+  purr BEGIN$(purr outside ${| REPLY=inside })END
+  purr "BEGIN$(purr outside ${| REPLY=inside })END"
+  purr outside ${| REPLY=$(purr inside)}
+  purr "outside ${| REPLY=$(purr inside)}"
+0:mixing with forking cmdsubst
+>outside inside
+>BEGINoutside insideEND
+>BEGINoutside insideEND
+>outside inside
+>outside inside
+
+  purr `purr outside ${| REPLY=inside }`
+  purr "outside `purr ${| REPLY=inside }`"
+  purr outside ${| REPLY=`purr inside`}
+  purr "outside ${| REPLY=`purr inside`}"
+  purr outside "`purr ${| REPLY="${:-inside}"}`"
+  purr "outside ${| REPLY=`purr ${:-inside}`}"
+0:mixing with backticks
+>outside inside
+>outside inside
+>outside inside
+>outside inside
+>outside inside
+>outside inside
+
+  purr ${| REPLY=$(( 9 + 17 )) }
+  purr $(( 9 + ${| REPLY=17 } ))
+0:mixing with arithemetic
+>26
+>26
+
+  unset reply
+  purl ${|reply| reply=(1 2 ${| REPLY=3 } 4) }
+  typeset -p reply
+0:array behavior with global assignment
+>1
+>2
+>3
+>4
+>typeset -g -a reply=( 1 2 3 4 )
+
+  unset outer
+  purr "${|
+   outer=OUTER
+   REPLY=INNER
+   return 7
+   OUTER=NOTREACHED
+  } $outer $?"
+0:return statement inside, part 1
+F:status of "print" should hide return
+>INNER OUTER 7
+
+  unset outer
+  outer=${| REPLY=${| return 7}}
+7:return status propages in assignment like $(...)
+
+  unset outer
+  purr "${|
+   outer=OUTER
+   REPLY=INNER
+   return 7
+   OUTER=NOTREACHED
+  } $outer $?"
+  print REACHED $OUTER
+0:return statement inside, part 2
+>INNER OUTER 7
+>REACHED
+
+  unset outer
+  purr "${|
+   # Localoptions needed to avoid breaking test harness?
+   # The setopt command affects surrounding context
+   setopt localoptions errreturn
+   outer=OUTER
+   REPLY=INNER
+   false
+   OUTER=NOTREACHED
+  } $outer $?"
+  print REACHED $OUTER ${options[errreturn]}
+0:errreturn works inside and remains outside
+>INNER OUTER 1
+>REACHED on
+
+ (
+  unset outer
+  purr "${|
+   outer=OUTER
+   REPLY=INNER
+   exit 7
+   OUTER=NOTREACHED
+  } $outer $OUTER $?"
+  print NOT REACHED
+ )
+7:exit statement inside
+
+ (
+  unset outer
+  purr "${|
+   setopt errexit
+   outer=OUTER
+   REPLY=INNER
+   false
+   OUTER=NOTREACHED
+  } $outer $?"
+  print NOT REACHED
+ )
+1:errexit inside
+
+  outer=GLOBAL
+  purr "${|
+   local outer=LOCAL
+   REPLY=INNER
+  } $outer $?"
+0:local declaration inside
+>INNER GLOBAL 0
+
+  unset zz
+  outer=GLOBAL
+  purr "${|zz|
+   local outer=LOCAL
+   zz=NONLOCAL
+  } $outer $?"
+  print $zz
+0:local declaration, global assignment, part 1
+>NONLOCAL GLOBAL 0
+>NONLOCAL
+
+  unset zz
+  outer=GLOBAL
+  purr "${${|
+   local outer=LOCAL
+   zz=NONLOCAL
+  }:-$zz} $outer $?"
+0:local declaration, global assignment, part 2 (evaluation order)
+>NONLOCAL GLOBAL 0
+
+  : ${| fn1() { () { print -v REPLY $'Defined Function' ;} ;} }
+  print "IN${| fn2() { () { print "${:-Second }${|fn1}" ;} ;} }OUT"
+  fn2
+0:function definition, brace nesting, quote nesting
+>INOUT
+>Second Defined Function
+
+  <<-EOF
+	${| REPLY=$'in a here document\n' }
+	EOF
+0:here-document behavior
+F:Fiddly here to get EOF past the test syntax
+>in a here document
+>
+
+  <<<${| REPLY="in a here string" }
+0:here-string behavior
+>in a here string
+
+  <<<${ purr $'stdout as a here string' }
+0:another capture stdout
+>stdout as a here string
+>
+
+  wrap=${| REPLY="REPLY in environment assignment" } typeset -p wrap
+  wrap=${ purr "capture in environment assignment" } typeset -p wrap
+0:assignment context
+>typeset -g wrap='REPLY in environment assignment'
+>typeset -g wrap=$'capture in environment assignment\n'
+
+# Repeat return and exit tests with stdout capture
+
+  purr "${
+   print INNER
+   return 7
+  } $?"
+0:return statement inside, part 1+
+F:status of "print" should hide return
+>INNER
+> 7
+
+  unset outer
+  outer=${ return 7 }
+7:return status propages in stdout capture
+
+  unset outer
+  purr "${
+   outer=OUTER
+   print INNER
+   return 7
+   OUTER=NOTREACHED
+  } $outer $?"
+  print REACHED $OUTER
+0:return statement inside, part 2+
+>INNER
+> OUTER 7
+>REACHED
+
+  unset outer
+  purr "${
+   # Localoptions needed to avoid breaking test harness?
+   # The setopt command affects surrounding context
+   setopt localoptions errreturn
+   outer=OUTER
+   print INNER
+   false
+   OUTER=NOTREACHED
+  } $outer $?"
+  print REACHED $OUTER ${options[errreturn]}
+0:errreturn works inside stdout capture
+>INNER
+> OUTER 1
+>REACHED on
+
+ (
+  unset outer
+  purr "${
+   outer=OUTER
+   print INNER
+   exit 7
+   OUTER=NOTREACHED
+  } $outer $OUTER $?"
+  print NOT REACHED
+ )
+7:exit statement inside stdout capture
+
+ (
+  unset outer
+  purr "${
+   setopt errexit
+   outer=OUTER
+   print INNER
+   false
+   OUTER=NOTREACHED
+  } $outer $?"
+  print NOT REACHED
+ )
+1:errexit inside stdout capture
+
+  setopt ignorebraces
+0:dummy test to set option soon enough
+F:must do this before evaluating the next test block
+
+  purr ${| REPLY=${REPLY:-buried}}}
+0:ignored braces, part 1
+>buried}
+
+  purr ${ purr ${REPLY:-buried}}}
+0:ignored braces, part 2
+>buried
+>}
+
+  purr ${ { echo nested ;} }
+0:ignored braces, part 3
+>nested
+>
+
+  purr ${ { echo nested } } DONE
+1:ignored braces, part 4
+?(eval):1: parse error near `}'
+
+  # "break" blocks function calls in outer loop
+  # Could use print, but that might get fixed
+  repeat 3 do purr ${
+   for x in 1 2 3 4
+    do (( x == 3 )) && break 2
+     # use error output to confirm loop count
+     print -u 2 $x
+    done
+   } XX
+  done
+0:break N propagates
+?1
+?2
+
+  print -u $ZTST_fd ${ZTST_testname}: TEST COMPLETE
+0:make sure we got to the end
+F:some tests might silently break the test harness
+
+%clean
+
+  unfunction purr purl
+  unsetopt ignorebraces
