@@ -1881,22 +1881,54 @@ sect(Command Substitution)
 cindex(command substitution)
 cindex(substitution, command)
 A command enclosed in parentheses preceded by a dollar sign, like
-`tt($LPAR())...tt(RPAR())', or quoted with grave
-accents, like `tt(`)...tt(`)', is replaced with its standard output, with
-any trailing newlines deleted.
-If the substitution is not enclosed in double quotes, the
-output is broken into words using the tt(IFS) parameter.
+`tt($LPAR())...tt(RPAR())', or quoted with grave accents, like
+`tt(`)...tt(`)', is executed in a subshell and replaced by its
+standard output, with any trailing newlines deleted.  If the
+substitution is not enclosed in double quotes, the output is broken
+into words using the tt(IFS) parameter.
 vindex(IFS, use of)
 
 The substitution `tt($LPAR()cat) var(foo)tt(RPAR())' may be replaced
 by the faster `tt($LPAR()<)var(foo)tt(RPAR())'.  In this case var(foo)
 undergoes single word shell expansions (em(parameter expansion),
 em(command substitution) and em(arithmetic expansion)), but not
-filename generation.
+filename generation.  No subshell is created.
 
 If the option tt(GLOB_SUBST) is set, the result of any unquoted command
 substitution, including the special form just mentioned, is eligible for
 filename generation.
+
+A command with a leading pipe character, enclosed in braces prefixed by
+a dollar sign, as in `tt(${|)...tt(})', is executed in the current shell
+context, rather than in a subshell, and is replaced by the value of the
+parameter tt(REPLY) at the end of the command.  There em(must not) be
+any whitespace between the opening brace and the pipe character.  Any
+prior value of tt($REPLY) is saved and restored around this substitution,
+in the manner of a function local parameter.  Other parameters declared
+within the substitution also behave as locals, as if in a function,
+unless `tt(typeset -g)' is used.  Trailing newlines are em(not) deleted
+from the final replacement in this case, and it is subject to filename
+generation in the same way as `tt($LPAR())...tt(RPAR())' but is em(not)
+split on tt(IFS) unless the tt(SH_WORD_SPLIT) option is set.
+
+Substitutions of the form `tt(${|)var(param)tt(|)...tt(})' are similar,
+except that the substitution is replaced by the value of the parameter
+named by var(param).  No implicit save or restore applies to var(param)
+except as noted for tt(REPLY), and var(param) should em(not) be declared
+within the command.  If var(param) names an array, array expansion rules
+apply.
+
+A command enclosed in braces preceded by a dollar sign, and set off from
+the braces by whitespace, like `tt(${ )...tt( })', is replaced by its
+standard output.  Like `tt(${|)...tt(})' and unlike
+`tt($LPAR())...tt(RPAR())', the command executes in the current shell
+context with function local behaviors and does not create a subshell.
+
+Note that because the `tt(${|)...tt(})' and `tt(${ )...tt( })' forms
+must be parsed at once as both string tokens and commands, all other
+braces (`tt({)' or `tt(})') within the command either must be quoted,
+or must appear in syntactically valid pairs, such as around complex
+commands, function bodies, or parameter references.
 
 texinode(Arithmetic Expansion)(Brace Expansion)(Command Substitution)(Expansion)
 sect(Arithmetic Expansion)

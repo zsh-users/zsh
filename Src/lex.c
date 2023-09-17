@@ -937,7 +937,7 @@ static enum lextok
 gettokstr(int c, int sub)
 {
     int bct = 0, pct = 0, brct = 0, seen_brct = 0, fdpar = 0;
-    int intpos = 1, in_brace_param = 0;
+    int intpos = 1, in_brace_param = 0, cmdsubst = 0;
     int inquote, unmatched = 0;
     enum lextok peek;
 #ifdef DEBUG
@@ -1135,7 +1135,7 @@ gettokstr(int c, int sub)
 	    c = Inpar;
 	    break;
 	case LX2_INBRACE:
-	    if (isset(IGNOREBRACES) || sub)
+	    if ((isset(IGNOREBRACES) && !cmdsubst) || sub)
 		c = '{';
 	    else {
 		if (!lexbuf.len && incmdpos) {
@@ -1157,8 +1157,11 @@ gettokstr(int c, int sub)
 	    if (in_brace_param) {
 		cmdpop();
 	    }
-	    if (bct-- == in_brace_param)
-		in_brace_param = 0;
+	    if (bct-- == in_brace_param) {
+		if (cmdsubst)
+		    cmdpop();
+		in_brace_param = cmdsubst = 0;
+	    }
 	    c = Outbrace;
 	    break;
 	case LX2_COMMA:
@@ -1405,16 +1408,24 @@ gettokstr(int c, int sub)
        }
        add(c);
        c = hgetc();
-	if (intpos)
+       if (intpos)
 	    intpos--;
-	if (lexstop)
+       if (lexstop)
 	    break;
+       if (!cmdsubst && in_brace_param && act == LX2_STRING &&
+	   (c == '|' || c == Bar || inblank(c))) {
+	   cmdsubst = in_brace_param;
+	   cmdpush(CS_CURSH);
+       }
     }
   brk:
     if (errflag) {
 	if (in_brace_param) {
-	    while(bct-- >= in_brace_param)
+	    while(bct >= in_brace_param) {
+		if (bct-- == cmdsubst)
+		    cmdpop();
 		cmdpop();
+	    }
 	}
 	return LEXERR;
     }
@@ -1422,8 +1433,11 @@ gettokstr(int c, int sub)
     if (unmatched && !(lexflags & LEXFLAGS_ACTIVE))
 	zerr("unmatched %c", unmatched);
     if (in_brace_param) {
-	while(bct-- >= in_brace_param)
+	while(bct >= in_brace_param) {
+	    if (bct-- == cmdsubst)
+		cmdpop();
 	    cmdpop();
+	}
 	zerr("closing brace expected");
     } else if (unset(IGNOREBRACES) && !sub && lexbuf.len > 1 &&
 	       peek == STRING && lexbuf.ptr[-1] == '}' &&
@@ -1459,8 +1473,8 @@ gettokstr(int c, int sub)
 static int
 dquote_parse(char endchar, int sub)
 {
-    int pct = 0, brct = 0, bct = 0, intick = 0, err = 0;
-    int c;
+    int pct = 0, brct = 0, bct = 0, intick = 0, err = 0, cmdsubst = 0;
+    int c, bskip = 0;
     int math = endchar == ')' || endchar == ']' || infor;
     int zlemath = math && zlemetacs > zlemetall + addedx - inbufct;
 
@@ -1529,11 +1543,25 @@ dquote_parse(char endchar, int sub)
 		c = Qstring;
 	    }
 	    break;
+	case '{':
+	    if (cmdsubst && !intick) {
+		/* In nofork substitution, tokenize as if unquoted */
+		c = Inbrace;
+		bskip++;
+	    }
+	    break;
 	case '}':
 	    if (intick || !bct)
 		break;
 	    c = Outbrace;
-	    bct--;
+	    if (bskip) {
+		bskip--;
+		break;
+	    }
+	    if (bct-- == cmdsubst) {
+		cmdsubst = 0;
+		cmdpop();
+	    }
 	    cmdpop();
 	    break;
 	case '`':
@@ -1588,14 +1616,34 @@ dquote_parse(char endchar, int sub)
 	if (err || lexstop)
 	    break;
 	add(c);
+	if (!cmdsubst && c == Inbrace) {
+	    /* Check for ${|...} nofork command substitution */
+	    if ((c = hgetc()) && !lexstop) {
+		if (c == '|' || inblank(c)) {
+		    cmdsubst = bct;
+		    cmdpush(CS_CURSH);
+		}
+		hungetc(c);
+	    }
+	}
     }
     if (intick == 2)
 	ALLOWHIST
     if (intick) {
 	cmdpop();
     }
-    while (bct--)
+    while (bct) {
+	if (bct-- == cmdsubst) {
+	    /*
+	     * You would think this is an error, but if we call it one,
+	     * parsestrnoerr() returns nonzero to subst_parse_str() and
+	     * subsequently "bad substitution" is not reported
+	     */
+	    /* err = 1 */
+	    cmdpop();
+	}
 	cmdpop();
+    }
     if (lexstop)
 	err = intick || endchar || err;
     else if (err == 1) {

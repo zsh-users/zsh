@@ -1,5 +1,11 @@
 2023-09-16  Bart Schaefer  <schaefer@zsh.org>
 
+	* 52155: Test/D10nofork.ztst: Tests for non-forking substitution.
+
+	* 52154: Doc/Zsh/expn.yo, Src/lex.c, Src/subst.c:  implement
+	and document non-forking command substitutions ${|...} and
+	${ ... }.  Based on Sebastian Gniazdowski: 51702.
+
 	* 52153: Src/input.c, Src/Modules/mapfile.c: $mapfile[fname]
 	should not trim newlines (only applies when not HAVE_MMAP)
 

@@ -1867,6 +1867,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
      * joining the array into a string (for compatibility with ksh/bash).
      */
     int quoted_array_with_offset = 0;
+    /* Indicates ${|...;} */
+    char *rplyvar = NULL;
+    /* Indicates ${ ... ;} */
+    char *rplytmp = NULL;
 
     *s++ = '\0';
     /*
@@ -1894,8 +1898,147 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
      * flags in parentheses, but also one ksh hack.
      */
     if (c == Inbrace) {
+	/* The command string to be run by ${|...;} */
+	char *cmdarg = NULL;
+	size_t slen = 0;
 	inbrace = 1;
 	s++;
+
+        /* Short-path for the nofork command substitution ${|cmd;}
+	 * See other comments about kludges for why this is here.
+	 *
+         * The command string is extracted and executed, and the
+         * substitution assigned. There's no (...)-flags processing,
+         * i.e. no ${|(U)cmd;}, because it looks quite awful and
+         * should not be part of command substitution in any case.
+         * Use ${(U)${|cmd;}} as you would for ${(U)$(cmd;)}.
+	 */
+	if (*s == '|' || *s == Bar || inblank(*s)) {
+	    char *outbracep = s;
+	    char sav = *s;
+	    *s = Inbrace;
+	    if (skipparens(Inbrace, Outbrace, &outbracep) == 0) {
+		slen = outbracep - s - 1;
+		if ((*s = sav) != Bar) {
+		    sav = *outbracep;
+		    *outbracep = '\0';
+		    tokenize(s);
+		    *outbracep = sav;
+		}
+	    }
+	}
+	if (slen > 1) {
+	    char *outbracep = s + slen;
+	    if (*outbracep == Outbrace) {
+		if ((rplyvar = itype_end(s+1, INAMESPC, 0))) {
+		    if (*rplyvar == Inbrack &&
+			(rplyvar = parse_subscript(++rplyvar, 1, ']')))
+			++rplyvar;
+		}
+		if (rplyvar == s+1 && *rplyvar == Bar) {
+		    /* Is ${||...} a subtitution error or a syntax error?
+		    zerr("bad substitution");
+		    return NULL;
+		    */
+		    rplyvar = NULL;
+		}
+		if (rplyvar && *rplyvar == Bar) {
+		    cmdarg = dupstrpfx(rplyvar+1, outbracep-rplyvar-1);
+		    rplyvar = dupstrpfx(s+1,rplyvar-s-1);
+		} else {
+		    cmdarg = dupstrpfx(s+1, outbracep-s-1);
+		    rplyvar = "REPLY";
+		}
+		if (inblank(*s)) {
+		    /*
+		     * Admittedly a hack.  Take advantage of the enforced
+		     * locality of REPLY and the semantics of $(<file) to
+		     * construct a command to write/read a temporary file.
+		     * Then fall through to the regular handling of $REPLY
+		     * to manage word splitting, expansion flags, etc.
+		     */
+		    char *outfmt = ">| %s { %s ;}";	/* 13 */
+		    if ((rplytmp = gettempname(NULL, 1))) {
+			/* Prevent shenanigans with $TMPPREFIX */
+			char *tmpfile = quotestring(rplytmp, QT_BACKSLASH);
+			char *dummy = zhalloc(strlen(cmdarg) +
+					      strlen(tmpfile) +
+					      13);
+			sprintf(dummy, outfmt, tmpfile, cmdarg);
+			cmdarg = dummy;
+		    } else {
+			/* TMPPREFIX not writable? */
+			cmdoutval = lastval;
+			cmdarg = NULL;
+		    }
+		}
+		s = outbracep;
+	    }
+	}
+
+	if (rplyvar) {
+	    Param pm;
+	    /* char *rplyval = getsparam("REPLY"); */
+	    startparamscope(); /* "local" behaves as if in a function */
+	    pm = createparam("REPLY", PM_LOCAL|PM_UNSET);
+	    if (pm)	/* Shouldn't createparam() do this? */
+		pm->level = locallevel;
+	    /* if (rplyval) setsparam("REPLY", ztrdup(rplyval)); */
+	}
+
+	if (rplyvar && cmdarg && *cmdarg) {
+	    int obreaks = breaks;
+	    Eprog cmdprog;
+	    /* Execute the shell command */
+	    untokenize(cmdarg);
+	    cmdprog = parse_string(cmdarg, 0);
+	    if (cmdprog) {
+		execode(cmdprog, 1, 0, "cmdsubst");
+		cmdoutval = lastval;
+		/* "return" behaves as if in a function */
+		if (retflag) {
+		    retflag = 0;
+		    breaks = obreaks;	/* Is this ever not zero? */
+		}
+	    } else	/* parse error */
+		errflag |= ERRFLAG_ERROR;
+	    if (rplytmp && !errflag) {
+		int onoerrs = noerrs;
+		noerrs = 2;
+		if ((cmdarg = ztuff(rplytmp)))
+		    setsparam("REPLY", cmdarg);
+		noerrs = onoerrs;
+	    }
+	}
+
+	if (rplytmp)
+	    unlink(rplytmp);
+	if (rplyvar) {
+	    if (strcmp(rplyvar, "REPLY") == 0) {
+		if ((val = dupstring(getsparam("REPLY"))))
+		    vunset = 0;
+		else {
+		    vunset = 1;
+		    val = dupstring("");
+		}
+	    } else {
+		s = dyncat(rplyvar, s);
+		rplyvar = NULL;
+	    }
+	    endparamscope();
+	    if (exit_pending) {
+		if (mypid == getpid()) {
+		    /*
+		     * paranoia: don't check for jobs, but there
+		     * shouldn't be any if not interactive.
+		     */
+		    stopmsg = 1;
+		    zexit(exit_val, ZEXIT_NORMAL);
+		} else
+		    _exit(exit_val);
+	    }
+	}
+
 	/*
 	 * In ksh emulation a leading `!' is a special flag working
 	 * sort of like our (k).  This is true only for arrays or
@@ -2590,14 +2733,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	 * we let fetchvalue set the main string pointer s to
 	 * the end of the bit it's fetched.
 	 */
-	if (!(v = fetchvalue(&vbuf, (subexp ? &ov : &s),
-			     (wantt ? -1 :
-			      ((unset(KSHARRAYS) || inbrace) ? 1 : -1)),
-			     scanflags)) ||
-	    (v->pm && (v->pm->node.flags & PM_UNSET)) ||
-	    (v->flags & VALFLAG_EMPTY))
+	if (!rplyvar &&
+	    (!(v = fetchvalue(&vbuf, (subexp ? &ov : &s),
+			      (wantt ? -1 :
+			       ((unset(KSHARRAYS) || inbrace) ? 1 : -1)),
+			      scanflags)) ||
+	     (v->pm && (v->pm->node.flags & PM_UNSET)) ||
+	     (v->flags & VALFLAG_EMPTY)))
 	    vunset = 1;
-
 	if (wantt) {
 	    /*
 	     * Handle the (t) flag: value now becomes the type
