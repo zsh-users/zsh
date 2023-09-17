@@ -11,15 +11,30 @@ local left right prebuffer buffer=$BUFFER lbuffer=$LBUFFER
 local TMPSUFFIX=.zsh
 # set up parameters depending on which context we are called from,
 # see below comment for more details
-if (( REGION_ACTIVE )); then
+if (( REGION_ACTIVE == 1 )); then
   if (( CURSOR < MARK )); then
     left=$CURSOR right=$MARK
-    lbuffer=
   else
     left=$MARK right=$CURSOR
-    lbuffer[right-left,-1]=
   fi
-  (( left++ ))
+  lbuffer=$lbuffer[++left,-1]
+  buffer=$BUFFER[left,++right]
+elif (( REGION_ACTIVE == 2 )); then
+  local nl=$'\n'
+  if (( CURSOR < MARK )); then
+    left=${${BUFFER[1,CURSOR]}[(I)$nl]}
+    right=${${BUFFER[MARK+1,-1]}[(i)$nl]}
+    (( right += MARK ))
+  else
+    left=${${BUFFER[1,MARK]}[(I)$nl]}
+    right=${${BUFFER[CURSOR+1,-1]}[(i)$nl]}
+    (( right += CURSOR ))
+  fi
+  lbuffer=$lbuffer[++left,-1]
+  if [[ $BUFFER[right] = $nl ]]; then
+    # Keep the newline because "$(<$1)" below trims it
+    (( --right ))
+  fi
   buffer=$BUFFER[left,right]
 elif (( ! ZLE_RECURSIVE )); then
   prebuffer=$PREBUFFER

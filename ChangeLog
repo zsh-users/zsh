@@ -1,5 +1,8 @@
 2023-09-16  Bart Schaefer  <schaefer@zsh.org>
 
+	* Christoffer Lundell: 52082: Functions/Zle/edit-command-line:
+	Enable linewise edit-command when in visual-line mode.
+
 	* 52155: Test/D10nofork.ztst: Tests for non-forking substitution.
 
 	* 52154: Doc/Zsh/expn.yo, Src/lex.c, Src/subst.c:  implement
