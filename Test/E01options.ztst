@@ -561,12 +561,14 @@
   foo=(one.c two.c three.c)
   print ${foo:s/#%(#b)t(*).c/T${match[1]}.X/}
   print *(#q:s/#(#b)tmp(*e)/'scrunchy${match[1]}'/)
+  print ${${:-"left[({})]over"}:fs/(\\{\\}|\\(\\)|\\[\\])//}
   unsetopt histsubstpattern
 0:HIST_SUBST_PATTERN option
 >TINGcd TINGfile1 TINGfile2 homedir
 >THUMPcd THUMPfile1 THUMPfile2
 >one.c Two.X Three.X
 >homedir scrunchyfile1 scrunchyfile2 tmpcd
+>leftover
 
   setopt ignorebraces
   echo X{a,b}Y

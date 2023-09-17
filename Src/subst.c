@@ -4689,7 +4689,8 @@ modify(char **str, char **ptr, int inbrace)
 		    case 'S':
 			hsubpatopt = (c == 'S');
 			if (hsubl && hsubr)
-			    subst(&copy, hsubl, hsubr, gbal, hsubpatopt);
+			    subst(&copy, dupstring(hsubl), dupstring(hsubr),
+				  gbal, hsubpatopt);
 			break;
 		    case 'q':
 			copy = quotestring(copy, QT_BACKSLASH_SHOWNULL);
@@ -4777,7 +4778,8 @@ modify(char **str, char **ptr, int inbrace)
 		case 'S':
 		    hsubpatopt = (c == 'S');
 		    if (hsubl && hsubr)
-			subst(str, hsubl, hsubr, gbal, hsubpatopt);
+			subst(str, dupstring(hsubl), dupstring(hsubr),
+			      gbal, hsubpatopt);
 		    break;
 		case 'q':
 		    *str = quotestring(*str, QT_BACKSLASH);

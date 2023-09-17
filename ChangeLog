@@ -1,5 +1,9 @@
 2023-09-16  Bart Schaefer  <schaefer@zsh.org>
 
+	* 52156: Test/E01options.ztst: Test case for user/29160.
+
+	* users/29160: Src/subst.c: Fix repetition of substituion modifier.
+
 	* Christoffer Lundell: 52082: Functions/Zle/edit-command-line:
 	Enable linewise edit-command when in visual-line mode.
 
