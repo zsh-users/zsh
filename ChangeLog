@@ -1,3 +1,8 @@
+2023-09-20  Oliver Kiddle  <opk@zsh.org>
+
+	* 52163: Completion/Unix/Command/_zfs: completion update for
+	OpenZFS 2.2
+
 2023-09-16  Bart Schaefer  <schaefer@zsh.org>
 
 	* 52156: Test/E01options.ztst: Test case for user/29160.
