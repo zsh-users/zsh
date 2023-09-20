@@ -1,7 +1,8 @@
-#compdef zfs zdb zpool
+#compdef zfs zdb zpool zstream
 
 local curcontext="$curcontext" implementation nm="$compstate[nmatches]"
 local -a state curstate line state_descr expl alts args
+local -a devices features
 typeset -A opt_args val_args
 local MATCH MBEGIN MEND
 local -a subcmds
@@ -13,6 +14,7 @@ local -a ds_types sum_algorithms comp_algorithms dedup_algorithms
 
 local -a ds_propnames ro_ds_props rw_ds_props ci_ds_props # dataset properties
 local -a po_propnames ro_po_props rw_po_props ci_po_props # pool properties
+local -a ro_vdev_props rw_vdev_props
 
 _pick_variant -r implementation -c 'zpool upgrade -v' openzfs='This system supports ZFS pool feature flags' solaris
 
@@ -98,14 +100,32 @@ rw_ds_props=(
   'volsize:size:_numbers -M "m:{a-zA-Z}={A-Za-z}" -u bytes size :B {k,M,G,T,P,E,Z}{,B}'
 )
 
+ro_vdev_props=(
+  capacity state guid asize psize ashift size free allocated expandsize
+  fragmentation parity devid physpath encpath fru parent children numchildren
+  read_errors write_errors checksum_errors initialize_errors
+  null_ops read_ops write_ops free_ops claim_ops trim_ops
+  null_bytes read_bytes write_bytes free_bytes claim_bytes trim_bytes
+  removing
+)
+rw_vdev_props=(
+  {checksum,io}'_n:number of errors' {checksum,io}'_t:threshold (seconds)'
+  {comment,bootsize}:value
+  {allocating,failfast}':value:(on off)'
+  'path:device path:_files -g "*(-%)" -P / -W /'
+)
+
 case $service:$implementation in
   *:openzfs)
     ds_types+=( bookmark )
-    sum_algorithms+=( noparity sha512 skein edonr )
+    sum_algorithms+=( noparity sha512 skein edonr blake3 )
     comp_algorithms+=( zstd zstd-{1..19} zstd-fast zstd-fast-{{1..9}{,0},100,500,1000} )
-    dedup_algorithms+=( {sha512,skein}{,\,verify} edonr,verify )
+    dedup_algorithms+=( {sha512,skein,blake3}{,\,verify} edonr,verify )
     share_rw_properties=( sharesmb:option sharenfs:option )
     ro_po_props+=(
+      'bcloneratio[block cloning ratio for saved space]'
+      'bclonesaved[amount of storage spared by use of block cloning]'
+      'bcloneused[amount of storage used by cloned blocks]'
       'expandsize[uninitialized space within the pool]'
       'fragmentation[amount of fragmentation in the pool]'
       'freeing[amount of space remaining to be reclaimed]'
@@ -119,6 +139,7 @@ case $service:$implementation in
       'autotrim[periodically trim recently freed space]:value:(on off)'
       'comment[text string that is available even if the pool becomes faulted]:value'
       'multihost[perform pool activity check during import]:value:(on off)'
+      'feature@'
     )
     rw_ds_props+=(
       'aclmode:value:(discard groupmask passthrough restricted)'
@@ -139,7 +160,8 @@ case $service:$implementation in
     )
     ro_ds_props+=(
       createtxg clones filesystem_count guid logicalreferenced logicalused
-      receive_resume_token refcompressratio snapshot_count volblocksize written
+      receive_resume_token refcompressratio snapshot_count snapshots_changed
+      volblocksize written
     )
     delegatable_perms=(
       bookmark load-key change-key userobjquota userobjused groupobjquota
@@ -257,6 +279,9 @@ case $service:$implementation in
       list offline online reguid remove replace scrub set split status upgrade
     )
   ;;
+  zstream:*)
+    subcmds+=( dump decompress redup token recompress )
+  ;;
 esac
 
 case $OSTYPE in
@@ -294,9 +319,8 @@ ci_ds_props+=( $rw_ds_props )
 ds_propnames=( ${rw_ds_props%%:*} )
 po_propnames=( ${ro_po_props%%:*} ${ci_po_props%%:*} ${rw_po_props%%:*} )
 
-
 case $service in
-  zfs|zpool)
+  zfs|zpool|zstream)
     _arguments -C -A "-*" \
       '-?[display usage information]' \
       '*::command:->subcmd' && return 0
@@ -633,7 +657,9 @@ case $service:$words[1] in
         '(-e --embed)'{-e,--embed}'[more compact stream for blocks stored with the embedded_data feature]'
         '(-c --compressed)'{-c,--compressed}'[more compact stream for compressed blocks]'
         '(-h --holds)'{-h,--holds}'[send snapshot holds]'
-        '-V[set the process title to a per-second report of how much data has been send]'
+        '(-V --proctitle)'{-V,--proctitle}'[set the process title to a per-second report of how much data has been sent]'
+        \*{-X,--exclude}'[exclude datasets (with -R)]:dataset:_sequence _zfs_dataset -t fs'
+        '(-s --skip-missing)'{-s,--skip-missing}'[continue even when snapshots missing in the hierarchy]'
         '-t[create a send stream that resumes an interrupted receive]:resume token'
         '(-w --raw)'{-w,--raw}'[keep encrypted data exactly as it exists on disk]'
         - redact
@@ -763,10 +789,10 @@ case $service:$words[1] in
   zfs:holds)
     [[ $implementation = openzfs ]] && args=(
       '-H[suppress printing of headers, tab-delimit columns]'
+      '-p[use (parsable) numeric output for timestamps]'
     )
     [[ $OSTYPE = freebsd<-12>.* ]] && args+=(
       # features were lost with the openzfs rebase
-      '-p[use exact (parsable) numeric output]'
       '(-r)-d+[depth]:value'
     )
     _arguments -A "-*" -S $args \
@@ -788,6 +814,9 @@ case $service:$words[1] in
       '-q[silence warnings for missing snapshots on recursive datasets]'
       '-N[enumerate new child datasets (with -r)]'
       '(1 -e)-E[show difference from empty]'
+    )
+    [[ $implementation = openzfs ]] && args=(
+      "-h[don't"' \\0ooo-escape non-ASCII paths]'
     )
     _arguments -A "-*" -S $args \
       '-F[add column for filetype character, similar to ls(1)]' \
@@ -981,8 +1010,10 @@ case $service:$words[1] in
       '-H[suppress headers and tab-delimit fields]' \
       '-p[display numbers in parseable (exact) values]' \
       '-o+[specify fields to display]: : _values -s , field name property value source' \
-      ':property:_values -s , "property" $po_propnames' \
-      '*:pool:_zfs_pool'
+      ':property:_values -s , "property" $po_propnames ${ro_vdev_props%:*}' \
+      ':pool:_zfs_pool' \
+      '::vdev:->pool-vdevs-all' \
+      '*:pool:_zfs_pool -F line'
   ;;
 
   zpool:history)
@@ -1030,9 +1061,10 @@ case $service:$words[1] in
     _arguments -A "-*" -S \
       '(-s --suspend -c --cancel)'{-c,--cancel}'[cancel initializing on specified devices]' \
       '(-s --suspend -c --cancel)'{-s,--suspend}'[suspend initializing on specified devices]' \
+      '(-u --uninit)'{-u,--uninit}'[clear initialization state on specified devices]' \
       '(-w --wait)'{-w,--wait}'[wait until devices have finished initializing before returning]' \
       ':pool:_zfs_pool' \
-      '*:device:pool-devices'
+      '*:device:->pool-devices'
   ;;
 
   zpool:iostat)
@@ -1165,6 +1197,7 @@ case $service:$words[1] in
     [[ $implementation = openzfs ]] && args=(
       '(-s)-p[pause scrubbing]'
       '-w[wait until scrub has completed before returning]'
+      '-e[only scrub files with known data errors]'
     )
     _arguments -A "-*" -S $args \
       '(-p)-s[stop scrubbing]' \
@@ -1174,7 +1207,8 @@ case $service:$words[1] in
   zpool:set)
     _arguments -C -A "-*" -S \
       ':property:->set-pool-properties' \
-      '*:pool:_zfs_pool'
+      ':pool:_zfs_pool' \
+      ':vdev:->pool-vdevs'
   ;;
 
   zpool:split)
@@ -1251,6 +1285,36 @@ case $service:$words[1] in
       ':interval'
   ;;
 
+  zstream:dump)
+    _arguments -A "-*" -S \
+      '-C[suppress the validation of checksums]' \
+      '(-d)-v[print metadata for each record]' \
+      '(-v)-d[dump data contained in each record]' \
+      ':file:_files'
+  ;;
+
+  zstream:token)
+    _message -e tokens 'resume token'
+  ;;
+
+  zstream:decompress)
+    _arguments -A "-*" -S \
+      '-v[print summary of decompressed records]' \
+      '*:offset'
+  ;;
+
+  zstream:redup)
+    _arguments -A "-*" -S \
+      '-v[print summary of converted records]' \
+      ':file:stream file'
+  ;;
+
+  zstream:recompress)
+    _arguments -A "-*" -S \
+      '-l+[specify compression level]:level' \
+      '*:algorithm:compadd -a comp_algorithms'
+  ;;
+
   *)
     _default
   ;;
@@ -1259,6 +1323,7 @@ esac
 while (( $#state )); do
   curstate=$state
   state=()
+  devices=()
   case $curstate in
     virtual-devices)
       local -a vdevtypes
@@ -1278,8 +1343,15 @@ while (( $#state )); do
       _alternative $alts 'file-vdevs:file vdev:_files -W / -P /'
     ;;
 
+    pool-vdevs-all) devices=( all-vdevs ) ;&
+    pool-vdevs) # same as pool-devices but on OpenZFS 2.2+ only features
+      # path field is also valid
+      devices+=( $(_call_program devices zpool get -H -o name state $line[CURRENT-2] all-vdevs) )
+      _description devices expl "$state_descr"
+      compadd "$expl[@]" -a devices
+    ;;
+
     pool-devices)
-      local -a devices
       devices=( ${${${(M)${(f)"$(_call_program devices zpool status $line[1])"}:#$'\t' *}##[[:blank:]]#}%%[[:blank:]]*} )
       if (( $#devices )); then
         _description devices expl "$state_descr"
@@ -1321,12 +1393,13 @@ while (( $#state )); do
     create-properties) args=( $ci_ds_props ) ;|
     set-properties) args=( $rw_ds_props ) ;|
     newpool-properties) args=( $rw_po_props $ci_po_props ) ;|
-    set-pool-properties) args=( $rw_po_props ) ;|
+    set-pool-properties) args=( $rw_po_props $rw_vdev_props ) ;|
 
     *-properties)
       if compset -P 1 '(#m)*@'; then
         if compset -P 1 '*='; then
           case $MATCH in
+            *feature@) _wanted states expl state compadd active enabled disabled ;;
             *quota@) _alternative \
               'sizes: :_numbers -M "m\:{a-zA-Z}={A-Za-z}" -u bytes size \:B {k,M,G,T,P,E,Z}{,B}' \
               'properties:property:(none)'
@@ -1334,8 +1407,12 @@ while (( $#state )); do
           esac
         else
           case $MATCH in
-            user*@) _users -S = ;;
-            group*@) _groups -S = ;;
+            feature@)
+              features=( ${${${${${(f)"$(_call_program features zpool upgrade -v)"}[(r)---*,(R)VER *]}[2,-3]}:# *}%% *} )
+              _wanted features expl feature compadd -qS= -a features
+            ;;
+            user*@) _users -qS= ;;
+            group*@) _groups -qS= ;;
             project*@) _message -e projects project ;;
           esac
         fi
