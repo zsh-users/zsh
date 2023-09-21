@@ -1,0 +1,33 @@
+#compdef xfconf-query
+local curcontext="$curcontext" state state_descr line ret=1
+typeset -A opt_args
+
+_arguments -C -s -w : \
+  '(-c --channel)'{-c,--channel}'[select channel to query/modify]:channel:( ${$(xfconf-query -l)\:#Channels\:} )' \
+  '(-p --property)'{-p,--property}'[select property to query/modify]:property:->property' \
+  '(-v --verbose)'{-v,--verbose}'[print property and value (with -l/-m)]' \
+  '(-t --type)'{-t,--type}'[specify the property value type]:type:(empty string bool {,u}int{,16,64} double array {,u}char float)' \
+  '(-R --recursive)'{-R,--recursive}'[recursively reset properties (with -r)]' \
+  + '(operations)' \
+  {-h,--help}'[show help options]' \
+  {-V,--version}'[show version information]' \
+  {-s,--set}'[define the value of a property]:value' \
+  {-l,--list}'[list properties or channels]' \
+  {-n,--create}'[create a new property]:new property name' \
+  {-r,--reset}'[reset property]' \
+  {-T,--toggle}'[invert boolean property]' \
+  {-m,--monitor}'[monitor a channel for property changes]' && return
+
+case $state in
+  property)
+    # if -c/--channel is currently on the line, use it to complete an property.
+    if [[ -v opt_args[(i)-(c|-channel)] ]]; then
+      local expl
+      _wanted properties expl property compadd "$@" -- ${(f)"$(xfconf-query -c ${(v)opt_args[(i)-(c|-channel)]} -l)"} && ret=0
+    else # just display a message
+      _message -e properties property && ret=0
+    fi
+  ;;
+esac
+
+return ret
