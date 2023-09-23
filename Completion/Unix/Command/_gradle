@@ -92,7 +92,7 @@ if [[ $state == task && ! -prefix - ]]; then
                 zle -R "Generating cache from $gradle_buildfile"
 
                 # Run gradle/gradlew and retrieve possible tasks.
-                for outputline in ${(f)"$($service --build-file $gradle_buildfile -q tasks --all)"}; do
+                for outputline in ${(f)"$($words[1] --build-file $gradle_buildfile -q tasks --all)"}; do
 
                     # Tasks and subprojects each start with a lowercase letter, but whereas tasks are in camelCase, each
                     # subproject consists of one or more sections of kebab-case, with each section ending in a ':'.
