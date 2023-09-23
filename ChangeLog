@@ -1,3 +1,8 @@
+2023-09-23  Bart Schaefer  <schaefer@BartMAC2014.local>
+
+	* 52180: Doc/Zsh/expn.yo: clarify array behavior of ${|var|...}
+	and the REPLY parameter
+
 2023-09-22  Bart Schaefer  <schaefer@zsh.org>
 
 	* 52176: Src/subst.c: metafy return from ${ ... } substitution

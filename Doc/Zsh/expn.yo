@@ -1915,8 +1915,9 @@ Substitutions of the form `tt(${|)var(param)tt(|)...tt(})' are similar,
 except that the substitution is replaced by the value of the parameter
 named by var(param).  No implicit save or restore applies to var(param)
 except as noted for tt(REPLY), and var(param) should em(not) be declared
-within the command.  If var(param) names an array, array expansion rules
-apply.
+within the command.  If, after evaluating the expression, var(param)
+names an array, array expansion rules apply.  However, tt(REPLY) is
+always expanded in scalar context, even if assigned an array.
 
 A command enclosed in braces preceded by a dollar sign, and set off from
 the braces by whitespace, like `tt(${ )...tt( })', is replaced by its
