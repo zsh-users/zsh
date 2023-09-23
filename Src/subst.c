@@ -2003,11 +2003,12 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	    } else	/* parse error */
 		errflag |= ERRFLAG_ERROR;
 	    if (rplytmp && !errflag) {
-		int onoerrs = noerrs;
+		int onoerrs = noerrs, rplylen;
 		noerrs = 2;
-		if ((cmdarg = ztuff(rplytmp)))
-		    setsparam("REPLY", cmdarg);
+		rplylen = zstuff(&cmdarg, rplytmp);
 		noerrs = onoerrs;
+		if (rplylen >= 0)
+		    setsparam("REPLY", metafy(cmdarg, rplylen, META_REALLOC));
 	    }
 	}
 
