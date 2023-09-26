@@ -829,7 +829,9 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 
  ca_args:
 
-    if (mstr && (match = parse_cmatcher(name, mstr)) == pcm_err) {
+    if (mstr && (dat.aflags & CAF_MATCH) &&
+	    (match = parse_cmatcher(name, mstr)) == pcm_err)
+    {
 	zsfree(mstr);
 	zfree(dat.dpar, dparsize);
 	return 1;

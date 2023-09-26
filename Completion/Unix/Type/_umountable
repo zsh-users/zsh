@@ -1,6 +1,6 @@
 #autoload
 local tmp
-local dev_tmp dpath_tmp mp_tmp mline
+local -a dev_tmp dpath_tmp mp_tmp mline
 
 case "$OSTYPE" in
 linux*)
@@ -15,6 +15,7 @@ irix*)
   ;;
 freebsd*|dragonfly*)
   /sbin/mount | while read mline; do
+    [[ $mline[(w)1] = map ]] && continue
     dev_tmp+=( $mline[(w)1] )
     mp_tmp+=( $mline[(w)3] )
   done
