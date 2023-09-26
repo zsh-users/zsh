@@ -97,7 +97,7 @@ case $state in
 	;;
 	(replace)
 	item=${words[CURRENT-1]##0##}
-	compadd -Q -- "${(qq)$(todo.sh -p list "^[ 0]*$item " | sed '/^--/,$d')##<-> (\([A-Z]\) |)}"
+	compadd -Q -- "${(qq)$(todo.sh -p command list "^[ 0]*$item " | sed '/^--/,$d')##<-> (\([A-Z]\) |)}"
 	;;
       esac
     fi
@@ -144,7 +144,7 @@ case $nextstate in
   ;;
 
   (item)
-  itemlist=(${${(M)${(f)"$(todo.sh -p list | sed '/^--/,$d')"}##<-> *}/(#b)(<->) (*)/${match[1]}:${match[2]}})
+  itemlist=(${${(M)${(f)"$(todo.sh -p command list | sed '/^--/,$d')"}##<-> *}/(#b)(<->) (*)/${match[1]}:${match[2]}})
   _describe -t todo-items 'todo item' itemlist
   ;;
 
@@ -173,6 +173,6 @@ case $nextstate in
   # the + or @ (which may not even be there yet).
   compset -P '*[[:space:]]'
   _wanted search expl $projmsg \
-    compadd $(todo.sh lsprj) $(todo.sh lsc)
+    compadd $(todo.sh  command lsprj) $(todo.sh command lsc)
   ;;
 esac
