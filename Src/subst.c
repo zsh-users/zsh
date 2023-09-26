@@ -1501,16 +1501,15 @@ substevalchar(char *ptr)
 	return noerrs ? dupstring(""): NULL;
     }
     errflag |= saved_errflag;
-#ifdef MULTIBYTE_SUPPORT
-    if (isset(MULTIBYTE) && ires > 127) {
-	/* '\\' + 'U' + 8 bytes of character + '\0' */
-	char buf[11];
-
-	/* inefficient: should separate out \U handling from getkeystring */
-	sprintf(buf, "\\U%.8x", (unsigned int)ires & 0xFFFFFFFFu);
-	ptr = getkeystring(buf, &len, GETKEYS_BINDKEY, NULL);
+    if (ires < 0) {
+	zerr("character not in range");
     }
-    if (len == 0)
+#ifdef MULTIBYTE_SUPPORT
+    else if (isset(MULTIBYTE) && ires > 127) {
+	ptr = zhalloc(MB_CUR_MAX);
+	len = ucs4tomb((unsigned int)ires & 0xffffffff, ptr);
+    }
+    if (len <= 0)
 #endif
     {
 	ptr = zhalloc(2);
