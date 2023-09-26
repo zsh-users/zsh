@@ -1,5 +1,9 @@
 2023-10-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 52189: Completion/Unix/Type/_umountable, Src/Zle/complete.c:
+	ignore compadd -M if -U also specified as they don't make
+	sense together, this fixes df completion
+
 	* 52217: Completion/BSD/Command/_freebsd-update,
 	Completion/BSD/Command/_ipfw, Completion/BSD/Command/_pfctl,
 	Completion/BSD/Command/_sockstat, Completion/Unix/Command/_cmp,
