@@ -173,6 +173,6 @@ case $nextstate in
   # the + or @ (which may not even be there yet).
   compset -P '*[[:space:]]'
   _wanted search expl $projmsg \
-    compadd $(todo.sh  command lsprj) $(todo.sh command lsc)
+    compadd $(todo.sh  command listproj) $(todo.sh command listcon)
   ;;
 esac
