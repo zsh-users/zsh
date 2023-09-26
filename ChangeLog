@@ -1,3 +1,8 @@
+2023-10-29  Matthew Martin  <phy1729@gmail.com>
+
+	* github #102: Ulysse Buonomo: Completion/Unix/Command/_todo.sh:
+	Ensure todo.sh completion uses builtin commands
+
 2023-10-25  Bart Schaefer  <schaefer@zsh.org>
 
 	* Daniel Shahaf: 50569 (tweaked): main keymap defaults to emacs
