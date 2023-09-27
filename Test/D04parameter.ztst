@@ -2807,21 +2807,29 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 0:${(#)...}: array of bad math expressions, printf
 >az
 
-  : ${(#X):-0x80}
+  if [[ ! -o multibyte ]]; then
+    ZTST_skip='(#X) accepts any byte if multibyte is off'
+  else
+    : ${(#X):-0x80}
+  fi
 1:${(#X)...}: out-of-range character
-?(eval):1: character not in range
+?(eval):4: character not in range
 
   [[ ${(#):-0x80} = $'\x80' ]] && echo OK
 0:${(#)...}: out-of-range character
 >OK
 
   a=( 0x80 0x81 )
-  : ${(#X)a}
-1:${(#X)...}: array of out-of-range characters
-?(eval):2: character not in range
-
   printf "%s\n" ${(#)a} |
   while read x; do echo $(( #x )); done
 0:${(#)...}: array of out-of-range characters
 >128
 >129
+
+  if [[ ! -o multibyte ]]; then
+    ZTST_skip='(#X) accepts any byte if multibyte is off'
+  else
+    : ${(#X)a}
+  fi
+1:${(#X)...}: array of out-of-range characters
+?(eval):4: character not in range

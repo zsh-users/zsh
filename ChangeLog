@@ -1,5 +1,8 @@
 2023-09-27  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* 52188: Test/D04parameter.ztst: skip tests that fail if
+	multibyte is not available
+
 	* 52169: Src/subst.c, Src/utils.c: a few more improvemets of (#)
 
 2023-09-23  Bart Schaefer  <schaefer@BartMAC2014.local>
