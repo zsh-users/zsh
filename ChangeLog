@@ -1,3 +1,8 @@
+2023-09-27  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 52188: Test/D04parameter.ztst: skip tests that fail if
+	multibyte is not available
+
 2023-09-20  Oliver Kiddle  <opk@zsh.org>
 
 	* Wim de With: 51857: Completion/Linux/Command/_fusermount:
