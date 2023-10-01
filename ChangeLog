@@ -1,3 +1,8 @@
+2023-10-01  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52195: Src/params.c: cached_username is already metafied when
+	initializing LOGNAME
+
 2023-09-27  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 52188: Test/D04parameter.ztst: skip tests that fail if
