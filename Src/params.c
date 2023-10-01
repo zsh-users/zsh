@@ -4561,7 +4561,7 @@ usernamesetfn(UNUSED(Param pm), char *x)
 	    zwarn("failed to change user ID: %e", errno);
 	else {
 	    zsfree(cached_username);
-	    cached_username = ztrdup(pswd->pw_name);
+	    cached_username = ztrdup_metafy(pswd->pw_name);
 	    cached_uid = pswd->pw_uid;
 	}
     }

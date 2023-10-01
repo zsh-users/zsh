@@ -1212,8 +1212,8 @@ setupvals(char *cmd, char *runscript, char *zsh_name)
 #ifdef USE_GETPWUID
     if ((pswd = getpwuid(cached_uid))) {
 	if (EMULATION(EMULATE_ZSH))
-	    home = metafy(pswd->pw_dir, -1, META_DUP);
-	cached_username = ztrdup(pswd->pw_name);
+	    home = ztrdup_metafy(pswd->pw_dir);
+	cached_username = ztrdup_metafy(pswd->pw_name);
     }
     else
 #endif /* USE_GETPWUID */

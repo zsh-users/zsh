@@ -1,3 +1,10 @@
+2023-10-01  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52193: Src/init.c, Src/params.c, Src/utils.c: metafy USERNAME
+	(mostly for Cygwin compatibilty with UTF8 encodings)
+
+	* 52193: Src/parse.c: unmetafy file paths in zcompile
+
 2023-09-27  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 52188: Test/D04parameter.ztst: skip tests that fail if

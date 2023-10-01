@@ -3217,12 +3217,14 @@ bin_zcompile(char *nam, char **args, Options ops, UNUSED(int func))
 
     if (!args[1] && !(OPT_ISSET(ops,'c') || OPT_ISSET(ops,'a'))) {
 	queue_signals();
-	ret = build_dump(nam, dyncat(*args, FD_EXT), args, OPT_ISSET(ops,'U'),
+	dump = unmetafy(dyncat(*args, FD_EXT), NULL);
+	ret = build_dump(nam, dump, args, OPT_ISSET(ops,'U'),
 			 map, flags);
 	unqueue_signals();
 	return ret;
     }
-    dump = (strsfx(FD_EXT, *args) ? *args : dyncat(*args, FD_EXT));
+    dump = (strsfx(FD_EXT, *args) ? dupstring(*args) : dyncat(*args, FD_EXT));
+    unmetafy(dump, NULL);
 
     queue_signals();
     ret = ((OPT_ISSET(ops,'c') || OPT_ISSET(ops,'a')) ?
@@ -3400,6 +3402,7 @@ build_dump(char *nam, char *dump, char **files, int ali, int map, int flags)
 
     for (hlen = FD_PRELEN, tlen = 0; *files; files++) {
 	struct stat st;
+	char *fnam;
 
 	if (check_cond(*files, "k")) {
 	    flags = (flags & ~(FDHF_KSHLOAD | FDHF_ZSHLOAD)) | FDHF_KSHLOAD;
@@ -3408,7 +3411,8 @@ build_dump(char *nam, char *dump, char **files, int ali, int map, int flags)
 	    flags = (flags & ~(FDHF_KSHLOAD | FDHF_ZSHLOAD)) | FDHF_ZSHLOAD;
 	    continue;
 	}
-	if ((fd = open(*files, O_RDONLY)) < 0 ||
+	fnam = unmeta(*files);
+	if ((fd = open(fnam, O_RDONLY)) < 0 ||
 	    fstat(fd, &st) != 0 || !S_ISREG(st.st_mode) ||
 	    (flen = lseek(fd, 0, 2)) == -1) {
 	    if (fd >= 0)
@@ -3417,8 +3421,10 @@ build_dump(char *nam, char *dump, char **files, int ali, int map, int flags)
 	    zwarnnam(nam, "can't open file: %s", *files);
 	    noaliases = ona;
 	    unlink(dump);
+	    zsfree(fnam);
 	    return 1;
 	}
+	zsfree(fnam);
 	file = (char *) zalloc(flen + 1);
 	file[flen] = '\0';
 	lseek(fd, 0, 0);

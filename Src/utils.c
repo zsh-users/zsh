@@ -1069,7 +1069,7 @@ get_username(void)
 	cached_uid = current_uid;
 	zsfree(cached_username);
 	if ((pswd = getpwuid(current_uid)))
-	    cached_username = ztrdup(pswd->pw_name);
+	    cached_username = ztrdup_metafy(pswd->pw_name);
 	else
 	    cached_username = ztrdup("");
     }
