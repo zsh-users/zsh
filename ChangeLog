@@ -1,5 +1,8 @@
 2023-10-01  Bart Schaefer  <schaefer@zsh.org>
 
+	* 52195: Src/params.c: cached_username is already metafied when
+	initializing LOGNAME
+
 	* 52193: Src/init.c, Src/params.c, Src/utils.c: metafy USERNAME
 	(mostly for Cygwin compatibilty with UTF8 encodings)
 

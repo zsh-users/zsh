@@ -850,12 +850,11 @@ createparamtable(void)
     setsparam("HOST", ztrdup_metafy(hostnam));
     zfree(hostnam, 256);
 
-    setsparam("LOGNAME", ztrdup_metafy(
+    setsparam("LOGNAME",
 #ifndef DISABLE_DYNAMIC_NSS
-			(str = getlogin()) && *str ?  str :
+	      (str = getlogin()) && *str ? ztrdup_metafy(str) :
 #endif
-				cached_username
-			));
+	      ztrdup(cached_username));
 
 #if !defined(HAVE_PUTENV) && !defined(USE_SET_UNSET_ENV)
     /* Copy the environment variables we are inheriting to dynamic *
