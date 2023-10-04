@@ -632,6 +632,7 @@ zstuff(char **out, const char *fn)
     if (len && !(fread(buf, len, 1, in))) {
 	zerr("read error on %s", fn);
 	fclose(in);
+	zfree(buf, len + 1);
 	unqueue_signals();
 	return -1;
     }

@@ -1,3 +1,7 @@
+2023-10-03  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52198: Src/input.c: put back incorrectly removed zfree()
+
 2023-10-01  Bart Schaefer  <schaefer@zsh.org>
 
 	* 52195: Src/params.c: cached_username is already metafied when
