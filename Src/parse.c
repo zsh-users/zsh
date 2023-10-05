@@ -3421,10 +3421,8 @@ build_dump(char *nam, char *dump, char **files, int ali, int map, int flags)
 	    zwarnnam(nam, "can't open file: %s", *files);
 	    noaliases = ona;
 	    unlink(dump);
-	    zsfree(fnam);
 	    return 1;
 	}
-	zsfree(fnam);
 	file = (char *) zalloc(flen + 1);
 	file[flen] = '\0';
 	lseek(fd, 0, 0);
