@@ -1506,7 +1506,7 @@ substevalchar(char *ptr)
     }
 #ifdef MULTIBYTE_SUPPORT
     else if (isset(MULTIBYTE) && ires > 127) {
-	ptr = zhalloc(MB_CUR_MAX);
+	ptr = zhalloc(MB_CUR_MAX+1);
 	len = ucs4tomb((unsigned int)ires & 0xffffffff, ptr);
     }
     if (len <= 0)
