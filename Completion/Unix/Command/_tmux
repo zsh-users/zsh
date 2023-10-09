@@ -145,7 +145,6 @@ _tmux_aliasmap=(
     if          if-shell
     lock        lock-server
     run         run-shell
-    info        server-info
     wait        wait-for
 )
 
@@ -881,7 +880,7 @@ _tmux-send-prefix() {
 # aliasmap system in check-tmux-state can properly handle aliases which are
 # more complex than a single word, it's best to leave this here.
 
-_tmux-server-info() {
+_tmux-server-access() {
   [[ -n ${tmux_describe} ]] && print "show server information" && return
   __tmux-nothing-else
 }
@@ -1654,6 +1653,7 @@ function __tmux-session-options() {
         'lock-after-time:lock sessions after N seconds'
         'lock-command:command to run for locking a client'
         'message-command-style:status line message command style'
+        'message-line:status message and command prompt position'
         'message-style:status line message style'
         'mouse:enable mouse support'
         'prefix:primary prefix key'
@@ -1798,6 +1798,7 @@ function __tmux-window-options() {
     local -a tmux_window_options
     tmux_window_options=(
         'aggressive-resize:aggressively resize windows'
+        'allow-passthrough:allow programs in the pane to bypass tmux'
         'allow-rename:allow programs to change window titles'
         'alternate-screen:allow alternate screen feature to be used'
         'automatic-rename-format:format for automatic renames'
@@ -1809,8 +1810,13 @@ function __tmux-window-options() {
         'copy-mode-match-style:set the style of search matches in copy mode'
         'cursor-colour:set the colour of the cursor'
         'cursor-style:set the style of the cursor'
+        'fill-character:set the character used to fill unused window areas'
         'main-pane-height:set height for main-* layouts'
         'main-pane-width:set width for main-* layouts'
+        'menu-style:set the menu style'
+        'menu-selected-style:set the selected menu item style'
+        'menu-border-style:set the menu border style'
+        'menu-border-lines:set the type of characters used for drawing menu borders'
         'mode-keys:mode to use in copy and choice modes (vi/emacs)'
         'mode-style:set window modes style'
         'monitor-activity:monitor window activity'
@@ -1830,6 +1836,8 @@ function __tmux-window-options() {
         "popup-border-style:set the style for the popup's border"
         'popup-style:set the popup style'
         "remain-on-exit:don't destroy windows after the program exits"
+        "remain-on-exit-format:set the text shown at bottom of exited panes"
+        'scroll-on-clear:scroll previous contents into history before clear'
         'synchronize-panes:send input to all panes of a window'
         'window-active-style:style of active window'
         'window-size:indicate how to automatically size windows'

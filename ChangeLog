@@ -1,5 +1,8 @@
 2023-11-14  Oliver Kiddle  <opk@zsh.org>
 
+	* github #106: Matt Koscica: Completion/Unix/Command/_tmux,
+	Util/check-tmux-state: update tmux completion (20230919)
+
 	* unposted (cf. 52167): Completion/Unix/Command/_mutt:
 	mutt's -a takes a list of files terminated by --
 
