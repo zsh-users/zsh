@@ -59,7 +59,7 @@ __tmux-window-options
 # in the _tmux function definition file.
 typeset -a supported_commands
 supported_commands=( $( grep '^_tmux-[^(]*() *{$' $func |
-                        sed -e 's,^.*\<_tmux-,,' -e 's,(.*$,,' ) )
+                        sed -e 's,^_tmux[-]\([a-z-]*\)[(].*,\1,' ) )
 
 # Ask tmux for available commands:
 typeset -a available_commands
