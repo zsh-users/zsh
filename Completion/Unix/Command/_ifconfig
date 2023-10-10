@@ -20,10 +20,20 @@ case $OSTYPE in
     )
   ;;
   freebsd*|dragonfly*)
-    args=( -s $updown
-      '(-a -l -u -d -m -L 1 *)-C[list interface cloners]'
+    args=( -s $updownlist
+      '(-a -j -f -l -G -g -u -d -m -L 1 *)-C[list interface cloners]'
+      '(-C)-f+[control the output format]: :_values -s, -S\: format
+        "addr[adjust inet address display]\:format [numeric]\:(default fqdn host numeric)"
+        "ether[adjust ethernet address display]\:format [colon]\:(colon dash dotted default)"
+        "inet[adjust inet subnet mask display]\:format [hex]\:(default cidr dotted hex)"
+        "inet6[adjust inet6 prefix display]\:format [numeric]\:(default cidr numeric)"'
+      '(-C)-G+[exclude members of the specified group]:group'
+      '(-C)-g+[limit output to members of the specified group]:group'
+      '(-C)-k[print keying information for the interface]'
       '(-l -C)-m[list supported media]'
+      '(-C)-n[disable automatic loading of network interface drivers]'
       '(-l -C)-L[show address lifetime as time offset]'
+      '(-C)-v[get more verbose status for an interface]'
     )
     listopts=(
         active caps chan countries mac mesh regdomain roam txparam txpower
@@ -37,6 +47,9 @@ case $OSTYPE in
       roam roam:rssi roam:rate roaming
     )
   ;|
+  freebsd<14->.*)
+    args+=( '(-C)-j+[perform actions inside jail]:jail:_jails' )
+  ;;
   dragonfly*)
     args+=( '-n[disable auto-loading of kernel network interface driver]' )
   ;;

@@ -76,8 +76,8 @@ else
     ;|
     openbsd*|netbsd*) args+=( '-a[gradually skew]' )
     ;|
-    openbsd*)
-      args+=( '-z[specify timezone for output]:time zone:_time_zone')
+    freebsd<14->.*|openbsd*)
+      args+=( '-z+[specify timezone for output]:time zone:_time_zone')
     ;|
     netbsd*)
       args+=( '-d[output date specified by string]:time string:' )

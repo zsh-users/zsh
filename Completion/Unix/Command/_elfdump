@@ -34,10 +34,15 @@ case $OSTYPE in
       '-l[show long section names without truncation]'
       '-O[specify osabi to apply]:osabi'
       '-P[use alternative section header]'
-      "*:elf file:_object_files"
     )
   ;;
-  freebsd*) args+=( '-a[dump all information]' ) ;;
+  freebsd*)
+    args+=(
+      '-a[dump all information]'
+      '(-)-E[return success if file is an ELF file and failure if not]'
+    )
+  ;;
 esac
 
-_arguments -s $args
+_arguments -s $args \
+  "*:elf file:_object_files"

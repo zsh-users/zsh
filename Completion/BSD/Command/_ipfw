@@ -1,7 +1,7 @@
-#compdef ipfw
+#compdef ipfw dnctl
 
 local word=$'/[^ \t\0]#[ \t\0]/' comma next pqs nat
-local -a actions address pathname ropts ca
+local -a actions address dummynet args ropts ca
 local -A opt_args nat_options
 
 _ipfw_tables() {
@@ -78,6 +78,46 @@ address=(
     \( $'/not[ \t\0]/' ':specifiers:specifier:$ca - not' \| \)
     $word -$'[[ $match != to? && -z ${(M)ropts:#${match%?}} ]]' ':ports:port:_sequence _ports'
   \| \)
+)
+
+dummynet=(
+  $'/(pipe|queue|sched)[ \t\0]/' -'pqs=${match%?}' ':dummynet-commands:dummynet configuration:$ca pipe queue sched'
+  $word ': _message -e numbers number'
+  $word ':options:config:$ca config'
+  \( $'/bw[ \t\0]/'
+    \( $word ':bandwidths: :_numbers -M "m:{a-z}={A-Z}" bandwidth {K,M,G}{bit,Byte}/s'
+    \| $word ':devices:device:_net_interfaces -qS " "' \)
+  \| $'/delay[ \t\0]/' $word ': _message -e numbers "propagation delay (ms)"'
+  \| $'/burst[ \t\0]/' $word ': _message -e numbers "size (bytes)"'
+  \| $'/profile[ \t\0]/' $word ':files:file:_files -qS " "'
+  \| $'/pipe[ \t\0]/' $word ': _message -e pipes pipe'
+  \| $'/weight[ \t\0]/' $word ': _message -e weights "weight (1-100) [1]"'
+  \| $'/type[ \t\0]/-'
+    \( $'/fq_(pie|codel)[ \t\0]/'
+      \( $'/limit[ \t\0]/' $word ': _message -e numbers "limit (packets) [10240]"'
+      \| $'/flows[ \t\0]/' $word ': _message -e numbers "flow queues [1024]"'
+      \| $'/quantum[ \t\0]/' ':parameters:parameter:$ca -F line quantum limit flows' \) \#
+      '/[]/'
+    \| $word ':types:scheduling algorithm:$ca fifo wf2q+ rr qfq fq_codel fq_pie fq_codel' \)
+  \| $'/buckets[ \t\0]/' $word ': _message -e sizes "hash table size (16-65536)"'
+  \| $'/mask[ \t\0]/' $word ':mask-specifiers:mask specifier:$ca dst-ip dst-ip6 src-ip src-ip6 dst-port src-port flow-id proto all'
+  \| $'/plr[ \t\0]/' $word ': _message -e numbers "packet loss rate (0.0-1.0)"'
+  \| $'/queue[ \t\0]/' $word ': _message -e sizes "queue size"'
+  \| $'/(red|gred)[ \t\0]/' $word ': _message -e thresholds thresholds'
+  \| $'/codel[ \t\0]/'
+    \( $'/(target|interval)[ \t\0]/' $word ': _message -e times "time (ms)"'
+    \| $'/(ecn|noecn)[ \t\0]/' ':options:option:$ca -F line target interval ecn noecn' \) \#
+    '/[]/'
+  \| $'/pie[ \t\0]/'
+    \( $'/(target|tupdate|max_burst)[ \t\0]/' $word ': _message -e times "time"'
+    \| $'/(alpha|beta)[ \t\0]/' $word ': _message -e weights weight'
+    \| $'/max_ecnth[ \t\0]/' $word ': _message -e probabilities probability'
+    \| $word ':options:option:$ca -F line alpha beta max_burst max_ecnth {,no}{ecn,capdrop,drand} onoff dre ts' \) \#
+    '/[]/'
+  \| // '-[[ $pqs = pipe ]]' $'/noerror[ \t\0]/' ':options:option:$ca -F line bw delay burst profile buckets mask noerror plr queue red gred codel pie'
+  \| // '-[[ $pqs = queue ]]' $'/noerror[ \t\0]/' ':options:option:$ca -F line pipe weight buckets mask noerror plr queue red gred codel pie'
+  \| // '-[[ $pqs = sched ]]' $'/[]/' ':options:option:$ca -F line type bw delay burst profile'
+  \) \#
 )
 
 actions=(
@@ -241,48 +281,14 @@ actions=(
         \| $'/redirect_proto[ \t\0]/' $word ':protocols:protocol:$ca sctp tcp udp'
           $word ': _message -e ip-addresses "IP address"'
           $word ': _message -e ip-addresses "IP address"'
-        \| $word ':parameters:config parameter:$ca ip if log deny_in same_ports unreg_only unreg_cgn reset reverse proxy_only skip_global redirect_port redirect_addr redirect_proto'
+        \| $'/port_range[ \t\0]/'
+          '/[0-9]#-/' ': _message -e ports lower'
+          $word ': _message -e ports upper'
+        \| $word ':parameters:config parameter:$ca ip if log deny_in same_ports unreg_only unreg_cgn reset reverse proxy_only skip_global redirect_port redirect_addr redirect_proto port_range'
         \) \#
       \| $'/show[ \t\0]/' $word ':actions:action:(config log)'
       \| '/[]/' ':commands:command:$ca config show' \)
-  \| # dummynet configuration
-    $'/(pipe|queue|sched)[ \t\0]/' -'pqs=${match%?}' ':dummynet-commands:dummynet configuration:$ca pipe queue sched'
-    $word ': _message -e numbers number'
-    $word ':options:config:$ca config'
-    \( $'/bw[ \t\0]/'
-      \( $word ':bandwidths: :_numbers -M "m:{a-z}={A-Z}" bandwidth {K,M,G}{bit,Byte}/s'
-      \| $word ':devices:device:_net_interfaces -qS " "' \)
-    \| $'/delay[ \t\0]/' $word ': _message -e numbers "propagation delay (ms)"'
-    \| $'/burst[ \t\0]/' $word ': _message -e numbers "size (bytes)"'
-    \| $'/profile[ \t\0]/' $word ':files:file:_files -qS " "'
-    \| $'/pipe[ \t\0]/' $word ': _message -e pipes pipe'
-    \| $'/weight[ \t\0]/' $word ': _message -e weights "weight (1-100) [1]"'
-    \| $'/type[ \t\0]/-'
-      \( $'/fq_(pie|codel)[ \t\0]/'
-        \( $'/limit[ \t\0]/' $word ': _message -e numbers "limit (packets) [10240]"'
-        \| $'/flows[ \t\0]/' $word ': _message -e numbers "flow queues [1024]"'
-        \| $'/quantum[ \t\0]/' ':parameters:parameter:$ca -F line quantum limit flows' \) \#
-        '/[]/'
-      \| $word ':types:scheduling algorithm:$ca fifo wf2q+ rr qfq fq_codel fq_pie fq_codel' \)
-    \| $'/buckets[ \t\0]/' $word ': _message -e sizes "hash table size (16-65536)"'
-    \| $'/mask[ \t\0]/' $word ':mask-specifiers:mask specifier:$ca dst-ip dst-ip6 src-ip src-ip6 dst-port src-port flow-id proto all'
-    \| $'/plr[ \t\0]/' $word ': _message -e numbers "packet loss rate (0.0-1.0)"'
-    \| $'/queue[ \t\0]/' $word ': _message -e sizes "queue size"'
-    \| $'/(red|gred)[ \t\0]/' $word ': _message -e thresholds thresholds'
-    \| $'/codel[ \t\0]/'
-      \( $'/(target|interval)[ \t\0]/' $word ': _message -e times "time (ms)"'
-      \| $'/(ecn|noecn)[ \t\0]/' ':options:option:$ca -F line target interval ecn noecn' \) \#
-      '/[]/'
-    \| $'/pie[ \t\0]/'
-      \( $'/(target|tupdate|max_burst)[ \t\0]/' $word ': _message -e times "time"'
-      \| $'/(alpha|beta)[ \t\0]/' $word ': _message -e weights weight'
-      \| $'/max_ecnth[ \t\0]/' $word ': _message -e probabilities probability'
-      \| $word ':options:option:$ca -F line alpha beta max_burst max_ecnth {,no}{ecn,capdrop,drand} onoff dre ts' \) \#
-      '/[]/'
-    \| // '-[[ $pqs = pipe ]]' $'/noerror[ \t\0]/' ':options:option:$ca -F line bw delay burst profile buckets mask noerror plr queue red gred codel pie'
-    \| // '-[[ $pqs = queue ]]' $'/noerror[ \t\0]/' ':options:option:$ca -F line pipe weight buckets mask noerror plr queue red gred codel pie'
-    \| // '-[[ $pqs = sched ]]' $'/[]/' ':options:option:$ca -F line type bw delay burst profile'
-    \) \#
+  \| $dummynet
   \| # sysctl shortcuts
     $'/(en|dis)able[ \t\0]/' ':sysctl-shortcuts:sysctl shortcut:$ca enable disable'
     $word ':values:value:(firewall altq one_pass debug verbose dyn_keepalive)'
@@ -292,11 +298,36 @@ actions=(
   \)
 )
 
-if (( $words[(I)-p*] )); then
-  pathname=( ':path:_files -P / -W /' )
-fi
+case $service in
+  ipfw)
+    _regex_arguments _ipfw_actions "$actions[@]"
+    args=(
+      '!-e' # nop for compatibility
+      '(-p)-a[show counter values when listing rules (implied by show)]'
+      '(-p)-b[show only the action and the comment]'
+      '-c[show rules in compact form]'
+      '(-p)-d[show dynamic rules in addition to static ones]'
+      '(-p)-D[act on dynamic states only]'
+      '-f[run without confirmation]'
+      '(-p)-i[format values as IP addresses in table listings]'
+      '-N[resolve addresses and service names in output]'
+      '-q[quiet output]'
+      '-S[show the set each rule belongs to]'
+      '(-p -T)-t[show timestamp of last match, ctime() format]'
+      '(-p -t)-T[show timestamp of last match as seconds since epoch]'
+      '(-a -b -d -D -i -s -t -T *)-p+[specify preprocessor]:preprocessor:_command_names -e'
+    )
+    if (( $words[(I)-p*] )); then
+      args+=( ':path:_files -P / -W /' )
+    fi
+  ;;
+  dnctl)
+    _regex_arguments _ipfw_actions \
+      $'/[^\0]##\0(-[a-zA-Z0-9]##[ \t]#)#/' \
+      "$dummynet[@]"
+  ;;
+esac
 
-_regex_arguments _ipfw_actions "$actions[@]"
 
 if [[ -prefix *[$' \t']* ]]; then
   # This allows from things like ipfw "-n add..."
@@ -304,22 +335,10 @@ if [[ -prefix *[$' \t']* ]]; then
   return
 fi
 
-_arguments -s $pathname \
-  '(-p)-a[show counter values when listing rules (implied by show)]' \
-  '(-p)-b[show only the action and the comment]' \
-  '-c[show rules in compact form]' \
-  '(-p)-d[show dynamic rules in addition to static ones]' \
-  '(-p)-D[act on dynamic states only]' \
-  '-f[run without confirmation]' \
+_arguments -s $args \
   '(- *)-h[display syntax summary]' \
-  '(-p)-i[format values as IP addresses in table listings]' \
   '-n[only check syntax, make no changes]' \
-  '-N[resolve addresses and service names in output]' \
-  '-q[quiet output]' \
-  '-S[show the set each rule belongs to]' \
   '(-p)-s+[sort pipes by field]:field (negative reverses):((0\:unsorted 1\:packets 2\:bytes 3\:total\ packets 4\:total\ bytes))' \
-  '(-p -T)-t[show timestamp of last match, ctime() format]' \
-  '(-p -t)-T[show timestamp of last match as seconds since epoch]' \
-  '(-a -b -d -D -i -s -t -T *)-p+[specify preprocessor]:preprocessor:_command_names -e' \
+  '-v[verbose]' \
   '*:::actions:= _ipfw_actions'
 

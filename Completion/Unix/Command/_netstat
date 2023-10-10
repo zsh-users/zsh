@@ -302,6 +302,9 @@ case $OSTYPE in
     memory+=( $Xopt) statistics+=( $Xopt )
     pcb+=( $Mopts $popt )
   ;;
+  freebsd<14->.*)
+    args+=( '-j+[run inside a jail]:jail:_jails' )
+  ;&
   freebsd<13->.*)
     sockets+=(
       '-c[show TCP stack used for each session]'

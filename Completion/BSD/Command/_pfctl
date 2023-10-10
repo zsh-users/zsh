@@ -91,7 +91,10 @@ case $OSTYPE in
     )
   ;|
   freebsd*)
-    args+=( '-P[display ports numerically]' )
+    args+=(
+      '-M[kill matching states in the opposite direction]'
+      '-P[display ports numerically]'
+    )
   ;;
 esac
 

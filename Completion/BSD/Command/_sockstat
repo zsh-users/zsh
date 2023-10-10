@@ -21,6 +21,14 @@ case $OSTYPE in
       '-w[use wider field size for displaying addresses]'
     )
   ;|
+  freebsd<13->.*)
+    args+=(
+      '-C[display the congestion control module]'
+      '-i[display the inp_gencnt]'
+      "-n[don't resolve numeric UIDs to user names]"
+      '-q[quiet mode, do not print the header line]'
+    )
+  ;|
   freebsd*)
     for proto in ${${(M)${(f)"$(</etc/protocols)"}##[a-z0-9]*}}; do
       case $proto in
