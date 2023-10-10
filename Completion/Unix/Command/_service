@@ -10,8 +10,11 @@ zstyle -T  ":completion:${ctx}" tag-order && \
   zstyle ":completion:${ctx}" tag-order init
 
 case $OSTYPE in
+  freebsd<14->.*)
+    args=( '-E+[set environment variable before executing the rc.d script]:variable:_parameters -g "*export*~*readonly*" -S=' )
+  ;&
   freebsd<11->.*)
-    args=( '-j+[perform actions in specified jail]:jail:_jails' )
+    args+=( '-j+[perform actions in specified jail]:jail:_jails' )
   ;&
   freebsd*|dragonfly*)
     actions=(

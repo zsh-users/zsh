@@ -30,8 +30,7 @@ else
     freebsd*)
       args=(
         '-a[show all objects that are needed by each loaded object]'
-	'-v[verbose listing of the dynamic linking headers]'
-	'-f+[specify format]:format:((%a\:program\ name %A\:environment\ name %o\:library\ name %p\:path\ to\ library %x\:load\ address))'
+	'*-f+[specify format]:format:((%a\:program\ name %A\:environment\ name %o\:library\ name %p\:path\ to\ library %x\:load\ address))'
       )
     ;;
   esac

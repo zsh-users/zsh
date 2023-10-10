@@ -46,6 +46,7 @@ case $OSTYPE in
     _arguments -s \
       '-c+[write core file to specified file]:file:_files' \
       '-f[dump all available segments]' \
+      '-k[use the ptrace(2) PT_COREDUMP kernel facility to write the core dump]' \
       '::executable:' \
       ':pid:_pids'
   ;;

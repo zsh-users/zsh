@@ -28,6 +28,12 @@ case $OSTYPE in
       '(- :)'{-V,--version}'[display version info and exit]' \
       '*:sysctl variable:_files -W /proc/sys'
   ;;
+  freebsd<14->.*)
+    args+=(
+      '-F[print the format of the variable]'
+      '(-N)-l[show the length of variables along with their values]'
+    )
+  ;|
   freebsd<11->.*)
     args+=(
       '-B[specify buffer size for reading]:buffer size'
@@ -53,7 +59,7 @@ case $OSTYPE in
       '-d[print the description of the variable instead of its value]' \
       '(-N -n)-e[separate name and value with =]' \
       "-i[silently exit if variable doesn't exist]" \
-      '(-n)-N[show only variable names]' \
+      '(-n -l)-N[show only variable names]' \
       '(-N)-n[show only variable values]' \
       '(-x)-o[show opaques as well (values suppressed)]' \
       '-q[suppress some warnings]' \

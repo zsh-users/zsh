@@ -34,7 +34,6 @@ case $OSTYPE:l in
     args+=(
       '-x[show extended disk statistics]'
       '-z[omit lines for devices with no activity]'
-      '(* -)-?[display a usage statement and exit]'
     )
     ;;
   dragonfly*)
@@ -126,6 +125,7 @@ case $OSTYPE:l in
     parser=( -s )
     args=(
       '-c[display CPU utilization report]'
+      "--compact[don't break into sub-reports keeping metrics to a single line]"
       '-d[display device utilization report]'
       '--dec=-[specify the number of decimal places to use]:decimal places [2]:(0 1 2)'
       '-f[specify alternative directory to read device statistics from]:directory:_directories'

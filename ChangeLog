@@ -1,5 +1,18 @@
 2023-10-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 52217: Completion/BSD/Command/_freebsd-update,
+	Completion/BSD/Command/_ipfw, Completion/BSD/Command/_pfctl,
+	Completion/BSD/Command/_sockstat, Completion/Unix/Command/_cmp,
+	Completion/Unix/Command/_date, Completion/Unix/Command/_elfdump,
+	Completion/Unix/Command/_gcore, Completion/Unix/Command/_mktemp,
+	Completion/Unix/Command/_iostat, Completion/Unix/Command/_ldd,
+	Completion/Unix/Command/_ls, Completion/Unix/Command/_ifconfig,
+	Completion/Unix/Command/_netstat, Completion/Unix/Command/_script,
+	Completion/Unix/Command/_service, Completion/Unix/Command/_split,
+	Completion/Unix/Command/_ssh, Completion/Unix/Command/_sysctl,
+	Completion/Unix/Type/_diff_options:
+	update completions for FreeBSD 14
+
 	* 52216: Src/Modules/watch.c: metafy usernames to allow for
 	them to be UTF-8 encoded
 

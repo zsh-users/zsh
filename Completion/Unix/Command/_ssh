@@ -57,7 +57,7 @@ _ssh () {
       "-N[don't execute a remote command]" \
       '-n[redirect stdin from /dev/null]' \
       '-O+[control an active connection multiplexing master process]:multiplex control command:((check\:"check master process is running" exit\:"request the master to exit" forward\:"request forward without command execution" stop\:"request the master to stop accepting further multiplexing requests" cancel\:"cancel existing forwardings with -L and/or -R" proxy))' \
-      '-P[use non privileged port]' \
+      '-P+[specify a tag name that may be used to select configuration]:tag' \
       '-p+[specify port on remote host]:port number on remote host' \
       '(-v)*-q[quiet operation]' \
       '*-R+[specify remote port forwarding]:remote port forwarding:->forward' \

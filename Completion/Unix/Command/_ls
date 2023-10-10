@@ -96,6 +96,7 @@ if ! _pick_variant gnu=gnu unix --help; then
   if [[ $OSTYPE = freebsd* ]]; then
     arguments+=(
       '-,[print file sizes grouped and separated by thousands]'
+      '(-S -f -t -U)-v[sort by version (filename treated numerically)]'
       '-y[with -t, sort filenames in the same order as the time]'
       '-Z[display MAC label]'
       '--color=-[control use of color]:color:(never always auto)'
@@ -163,12 +164,12 @@ else
     '(-a --all -U -l --format -s --size -t --sort --full-time)-f[unsorted, all, short list]'
     '(--reverse -r -U -f)'{--reverse,-r}'[reverse sort order]'
 
-    '(--sort -t -U -v -X)-S[sort by size]'
-    '(--sort -S -U -v -X)-t[sort by modification time]'
-    '(--sort -S -t -v -X)-U[unsorted]'
-    '(--sort -S -t -U -X)-v[sort by version (filename treated numerically)]'
-    '(--sort -S -t -U -v)-X[sort by extension]'
-    '(-S -t -U -v -X)--sort=[specify sort key]:sort key:(size time none version extension)'
+    '(--sort -f -t -U -v -X)-S[sort by size]'
+    '(--sort -f -S -U -v -X)-t[sort by modification time]'
+    '(--sort -f -S -t -v -X)-U[unsorted]'
+    '(--sort -f -S -t -U -X)-v[sort by version (filename treated numerically)]'
+    '(--sort -f -S -t -U -v)-X[sort by extension]'
+    '(-S -f -t -U -v -X)--sort=[specify sort key]:sort key:(size time none version extension)'
 
     '--color=-[control use of color]:color:(never always auto)'
     "*--hide=[like -I, but overridden by -a or -A]:pattern: "
