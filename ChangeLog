@@ -1,5 +1,8 @@
 2023-10-10  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted (cf. 52166): Functions/Misc/run-help-svk:
+	remove obsolete helper for svk
+
 	* Jörg Sommer: 51812: Functions/Misc/run-help-docker,
 	Functions/Misc/run-help-perf, Functions/Misc/run-help-podman,
 	Functions/Misc/run-help-ssh, Functions/Misc/run-help-svnadmin:
