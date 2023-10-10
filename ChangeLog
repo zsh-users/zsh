@@ -1,5 +1,8 @@
 2023-10-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 52216: Src/Modules/watch.c: metafy usernames to allow for
+	them to be UTF-8 encoded
+
 	* 52214: Src/subst.c: allow extra byte for nul in allocation
 
 	* unposted (cf. 52166): Functions/Misc/run-help-svk:
