@@ -1269,7 +1269,7 @@ case $service:$words[1] in
 
   zpool:upgrade)
     _arguments -A "-*" -S \
-      '(- *)-v[display ZFS versions and descriptions]'
+      '(- *)-v[display ZFS versions and descriptions]' \
       "(-v)-V+[upgrade to given version]:version" \
       '(-v *)-a[upgrade all pools]' \
       '(-a -v)*:pool:_zfs_pool'
