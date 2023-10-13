@@ -1,3 +1,8 @@
+2023-10-24  Matthew Martin  <phy1729@gmail.com>
+
+	* github #103: Christian Heusel: Completion/Unix/Command/_zfs: fix
+	completion for zpool upgrade
+
 2023-10-16  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 52056: Completion/Unix/Command/_sccs: _sccs: don't handle
