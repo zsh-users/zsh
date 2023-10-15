@@ -46,12 +46,12 @@ related, probably obsolete, vared special case for $TERM set to "emacs".
 ------------------------------------------------------------------------
 47561: [PATCH v4] vcs_info: choose backend by basedir
 ------------------------------------------------------------------------
-48091: Bug in compdescribe with matcher 'b:-=+'
+48091, 49276: Bug in compdescribe with matcher 'b:-=+'
 ------------------------------------------------------------------------
 users/26071: Strange behavior about option completion of "git push --f"
 ------------------------------------------------------------------------
 50930: If a conditional expression appears in a current-shell construct
 (such as { sleep 20 && print $? }) which is then suspended with ^Z, the
-return value of the left side of the expression is always 148 (SIGSTOP)
+return value of the left side of the expression is always 148 (SIGTSTP)
 and thus the expression is likely to be incorrectly interpreted.
 ------------------------------------------------------------------------
