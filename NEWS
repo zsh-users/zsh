@@ -20,7 +20,7 @@ incompatibilities in the README file.
 
 Support for named references and namespaces has been added, similar to
 those features in ksh but with some notable differences. The `nameref`
-builtin and some ksh-equivlent namespace names are available by loading
+builtin and some ksh-equivalent namespace names are available by loading
 the zsh/ksh93 module.  See the documentation of that module for more.
 
 Non-forking command substitutions with ${ ... } and ${| ... } are now
