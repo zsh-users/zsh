@@ -79,7 +79,7 @@ consistent and better aligned with the POSIX-2017 specification of
       f() { { false; echo "This is printed only since 5.10." } || true }
       if f; then true; fi
 
-PCRE support is now PCRE2 by default.
+PCRE support is now PCRE2.
 
 Parameter names may begin with a "." and follow a relaxed implementation
 of ksh namespace syntax.  Expansion of such parameters must use braces,
@@ -89,7 +89,7 @@ or matched by a pattern with `typeset -m`.
 
 Interpretation of exclusion-patterns following alternation-patterns has
 been rationalised.  This means for example that `[[ ab = (|a*)~^(*b) ]]`
-is true where prevously it was false.
+is true where previously it was false.
 
 Improvements to handling of terminal colors and attributes in prompts
 may change the behavior of some prompt sequences, most notably in
@@ -106,14 +106,9 @@ Nul and characters greater than \x77 are correctly handled by `read -d`.
 Return values of `sysopen` from the zsh/system module have been updated
 to be more similar to other commands in that module.
 
-The `watch' parameter and `log' command have moved to an autoloaded module.
-
 Tied parameters created with the zsh/db/gdbm module may not be re-tied
 as locals in nested function scope.  This prevents database corruption
 when a function scope ends.
-
-Many Completion/ functions have been updated to recent versions of their
-corresponding commands, so the results offered may have changed.
 
 Incompatibilities between 5.8.1 and 5.9
 ---------------------------------------
