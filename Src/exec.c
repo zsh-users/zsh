@@ -2388,7 +2388,7 @@ addfd(int forked, int *save, struct multio **mfds, int fd1, int fd2, int rflag,
 	/* fd will be over 10, don't touch mfds */
 	fd1 = movefd(fd2);
 	if (fd1 == -1) {
-	    zerr("cannot moved fd %d: %e", fd2, errno);
+	    zerr("cannot move fd %d: %e", fd2, errno);
 	    return;
 	} else {
 	    fdtable[fd1] = FDT_EXTERNAL;

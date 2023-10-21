@@ -3,6 +3,8 @@
 	* github #103: Christian Heusel: Completion/Unix/Command/_zfs: fix
 	completion for zpool upgrade
 
+	* github #104: ErrrorMaxx: Src/exec.c: fix small typo
+
 2023-10-16  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 52056: Completion/Unix/Command/_sccs: _sccs: don't handle
