@@ -1,3 +1,12 @@
+2023-10-25  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52244: Src/Modules/zutil.c, Src/Zle/compcore.c,
+	Src/Zle/compresult.c, Src/builtin.c, Src/glob.c, Src/hist.c,
+	Src/input.c, Src/params.c, Src/utils.c: Coverity defects 1547831,
+	1547826 (remove unused function), 1521551, 1500752, 1500747,
+	1401549, 1372423, 1270645, 1255799, 1255792, 1255789, 1255787,
+	1255782, 1255750
+
 2023-10-24  Matthew Martin  <phy1729@gmail.com>
 
 	* github #103: Christian Heusel: Completion/Unix/Command/_zfs: fix

@@ -1317,7 +1317,8 @@ zglob(LinkList list, LinkNode np, int nountok)
 		sense = 0;
 		if (qualct) {
 		    qn = (struct qual *)hcalloc(sizeof *qn);
-		    qo->or = qn;
+		    if (qo)
+			qo->or = qn;
 		    qo = qn;
 		    qualorct++;
 		    qualct = 0;

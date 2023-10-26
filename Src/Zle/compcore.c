@@ -2249,8 +2249,9 @@ addmatches(Cadata dat, char **argv)
 	    llpl = strlen(lpre);
 	    llsl = strlen(lsuf);
 
-	    if (llpl + (int)strlen(compqiprefix) + (int)strlen(lipre) != origlpre
-	     || llsl + (int)strlen(compqisuffix) + (int)strlen(lisuf) != origlsuf)
+	    /* This used to reference compqiprefix and compqisuffix, why? */
+	    if (llpl + (int)strlen(qipre) + (int)strlen(lipre) != origlpre
+	     || llsl + (int)strlen(qisuf) + (int)strlen(lisuf) != origlsuf)
 		lenchanged = 1;
 
 	    /* Test if there is an existing -P prefix. */

@@ -7523,8 +7523,8 @@ restoredir(struct dirsav *d)
     else if (d->level < 0)
 	err = -1;
     if (d->dev || d->ino) {
-	stat(".", &sbuf);
-	if (sbuf.st_ino != d->ino || sbuf.st_dev != d->dev)
+	if (stat(".", &sbuf) < 0 ||
+	    sbuf.st_ino != d->ino || sbuf.st_dev != d->dev)
 	    err = -2;
     }
     return err;

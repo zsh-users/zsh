@@ -6326,10 +6326,9 @@ mod_export Param
 upscope(Param pm, int reflevel)
 {
     Param up = pm->old;
-    while (pm && up && up->level >= reflevel) {
+    while (up && up->level >= reflevel) {
 	pm = up;
-	if (up)
-	    up = up->old;
+	up = up->old;
     }
     return pm;
 }

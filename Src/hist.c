@@ -1359,7 +1359,8 @@ putoldhistentryontop(short keep_going)
 	do {
 	    if (max_unique_ct-- <= 0 || he == hist_ring) {
 		max_unique_ct = 0;
-		he = hist_ring->down;
+		if (hist_ring)
+		    he = hist_ring->down;
 		next = hist_ring;
 		break;
 	    }
@@ -1367,12 +1368,16 @@ putoldhistentryontop(short keep_going)
 	    next = he->down;
 	} while (!(he->node.flags & HIST_DUP));
     }
-    if (he != hist_ring->down) {
+    /* Is it really possible for hist_ring to be NULL here? */
+    if (he && (!hist_ring || he != hist_ring->down)) {
 	he->up->down = he->down;
 	he->down->up = he->up;
 	he->up = hist_ring;
-	he->down = hist_ring->down;
-	hist_ring->down = he->down->up = he;
+	if (hist_ring) {
+	    he->down = hist_ring->down;
+	    hist_ring->down = he;
+	}
+	he->down->up = he;
     }
     hist_ring = he;
 }
@@ -1468,7 +1473,7 @@ should_ignore_line(Eprog prog)
 mod_export int
 hend(Eprog prog)
 {
-    int flag, hookret, stack_pos = histsave_stack_pos;
+    int flag, hookret = 0, stack_pos = histsave_stack_pos;
     /*
      * save:
      * 0: don't save

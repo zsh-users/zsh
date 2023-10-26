@@ -643,18 +643,6 @@ zstuff(char **out, const char *fn)
     return len;
 }
 
-/**/
-char *
-ztuff(const char *fn)
-{
-    char *buf;
-    off_t len = zstuff(&buf, fn);
-    if (len > 0)
-	return buf;
-    else
-	return NULL;
-}
-
 /* stuff a whole file into the input queue and print it */
 
 /**/

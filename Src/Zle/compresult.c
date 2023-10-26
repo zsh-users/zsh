@@ -897,7 +897,7 @@ void
 do_allmatches(UNUSED(int end))
 {
     int first = 1, nm = nmatches - 1, omc = menucmp, oma = menuacc, e;
-    Cmatch *mc;
+    Cmatch *mc = 0;
     struct menuinfo mi;
     char *p = (brbeg ? ztrdup(lastbrbeg->str) : NULL);
 
@@ -915,10 +915,10 @@ do_allmatches(UNUSED(int end))
 #endif
     }
 
+    if (minfo.group)
+	mc = (minfo.group)->matches;
 
-    mc = (minfo.group)->matches;
-
-    while (1) {
+    while (mc) {
 	if (!((*mc)->flags & CMF_ALL)) {
 	    if (!first)
 		accept_last();
@@ -1731,8 +1731,6 @@ calclist(int showall)
                                  width < zterm_columns && nth < g->dcount;
                                  nth++, tcol++) {
 
-                                m = *p;
-
                                 if (tcol == tcols) {
                                     tcol = 0;
                                     tlines++;
@@ -1994,7 +1992,6 @@ printlist(int over, CLPrintFunc printm, int showall)
 		     (listdat.onlyexpl & ((*e)->always > 0 ? 2 : 1)))) {
 		    if (pnl) {
 			putc('\n', shout);
-			pnl = 0;
 			ml++;
 			if (cl >= 0 && --cl <= 1) {
 			    cl = -1;
@@ -2087,7 +2084,6 @@ printlist(int over, CLPrintFunc printm, int showall)
                         (showall || !(m->flags & (CMF_HIDE|CMF_NOLIST)))) {
 			if (pnl) {
 			    putc('\n', shout);
-			    pnl = 0;
 			    ml++;
 			    if (cl >= 0 && --cl <= 1) {
 				cl = -1;

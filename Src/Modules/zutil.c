@@ -1378,11 +1378,11 @@ rmatch(RParseResult *sm, char *subj, char *var1, char *var2, int comp)
 					     "zregexparse-guard"), !lastval))) {
 		LinkNode aln;
 		char **mend;
-		int len;
+		int len = 0;
 
 		queue_signals();
-		mend = getaparam("mend");
-		len = atoi(mend[0]);
+		if ((mend = getaparam("mend")))
+		    len = atoi(mend[0]);
 		unqueue_signals();
 
 		for (i = len; i; i--)

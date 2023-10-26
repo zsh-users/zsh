@@ -6508,6 +6508,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 
     if (OPT_ISSET(ops,'s') && SHTTY == readfd) {
 	struct ttyinfo ti;
+	memset(&ti, 0, sizeof(struct ttyinfo));
 	gettyinfo(&ti);
 	saveti = ti;
 	resettty = 1;
@@ -6606,7 +6607,8 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 		else if (resettty && SHTTY != -1)
 		    settyinfo(&saveti);
 		if (haso) {
-		    fclose(shout);
+		    if (shout)
+			fclose(shout);
 		    shout = oshout;
 		    SHTTY = -1;
 		}
