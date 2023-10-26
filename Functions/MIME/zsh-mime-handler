@@ -193,7 +193,7 @@ if ! zsh-mime-contexts -s $suffix flags flags; then
   # Same again for flags.
   s=$suffix
   while true; do
-    flags="${zsh_mime_flags[$suffix]}"
+    flags="${zsh_mime_flags[$s]}"
     if [[ -n $flags ]]; then
       break
     fi

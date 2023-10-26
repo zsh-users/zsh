@@ -1,5 +1,8 @@
 2023-10-25  Bart Schaefer  <schaefer@zsh.org>
 
+	* Sebastian Gniazdowski: 52240: Functions/MIME/zsh-mime-handler:
+	use work-var $s not $suffix when setting flags
+
 	* 52244: Src/Modules/zutil.c, Src/Zle/compcore.c,
 	Src/Zle/compresult.c, Src/builtin.c, Src/glob.c, Src/hist.c,
 	Src/input.c, Src/params.c, Src/utils.c: Coverity defects 1547831,
