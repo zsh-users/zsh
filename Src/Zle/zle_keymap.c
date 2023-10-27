@@ -1315,7 +1315,7 @@ default_bindings(void)
     Keymap vismap = newkeymap(NULL, "visual");
     Keymap smap = newkeymap(NULL, ".safe");
     Keymap vimaps[2], vilmaps[2], kptr;
-    char buf[3], *ed;
+    char buf[3];
     int i;
 
     /* vi insert mode and emacs mode:  *
@@ -1445,20 +1445,14 @@ default_bindings(void)
 	}
 
     /* Put the keymaps in the right namespace.  The "main" keymap  *
-     * will be linked to the "emacs" keymap, except that if VISUAL *
-     * or EDITOR contain the string "vi" then it will be linked to *
-     * the "viins" keymap.                                         */
+     * will be linked to the "emacs" keymap.                       */
     linkkeymap(vmap, "viins", 0);
     linkkeymap(emap, "emacs", 0);
     linkkeymap(amap, "vicmd", 0);
     linkkeymap(oppmap, "viopp", 0);
     linkkeymap(vismap, "visual", 0);
     linkkeymap(smap, ".safe", 1);
-    if (((ed = zgetenv("VISUAL")) && strstr(ed, "vi")) ||
-	((ed = zgetenv("EDITOR")) && strstr(ed, "vi")))
-	linkkeymap(vmap, "main", 0);
-    else
-	linkkeymap(emap, "main", 0);
+    linkkeymap(emap, "main", 0);
 
     /* the .safe map cannot be modified or deleted */
     smap->flags |= KM_IMMUTABLE;
