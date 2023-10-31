@@ -187,7 +187,8 @@ zpcre_get_substrings(pcre2_code *pat, char *arg, pcre2_match_data *mdata,
 	    setaparam(substravar, matches);
 	}
 
-	if (!pcre2_pattern_info(pat, PCRE2_INFO_NAMECOUNT, &ncount) && ncount
+	if (namedassoc
+		&& !pcre2_pattern_info(pat, PCRE2_INFO_NAMECOUNT, &ncount) && ncount
 		&& !pcre2_pattern_info(pat, PCRE2_INFO_NAMEENTRYSIZE, &nsize)
 		&& !pcre2_pattern_info(pat, PCRE2_INFO_NAMETABLE, &ntable))
 	{

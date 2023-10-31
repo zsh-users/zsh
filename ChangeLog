@@ -1,5 +1,7 @@
 2023-11-01  Oliver Kiddle  <opk@zsh.org>
 
+	* 52252: Src/Modules/pcre.c: Coverity defect 1547827
+
 	* Shohei YOSHIDA: 52179: Completion/Unix/Command/_gradle:
 	Fix gradlew completion when it isn't in PATH
 
