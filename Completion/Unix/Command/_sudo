@@ -1,9 +1,7 @@
 #compdef sudo sudoedit
 
-setopt localoptions extended_glob
-
-local environ e cmd cpp
-local -a args _comp_priv_prefix
+local curcontext="$curcontext" environ e cmd cpp ret=1
+local -a context state line args _comp_priv_prefix
 local -A opt_args
 
 zstyle -a ":completion:${curcontext}:" environ environ
@@ -20,20 +18,21 @@ args=(
   '(-g --group)'{-g+,--group=}'[run command as the specified group name or ID]:group:_groups'
   '(-)'{-h,--help}'[display help message and exit]'
   '(-h --host)'{-h+,--host=}'[run command on host]:host:_hosts'
-  '(-K --remove-timestamp)'{-K,--remove-timestamp}'[remove timestamp file completely]'
-  '(-k --reset-timestamp)'{-k,--reset-timestamp}'[invalidate timestamp file]'
+  '(-k --reset-timestamp -K --remove-timestamp -N --no-update)'{-K,--remove-timestamp}'[remove timestamp file completely]'
+  '(-k --reset-timestamp -K --remove-timestamp -N --no-update)'{-k,--reset-timestamp}'[invalidate timestamp file]'
   \*{-l,--list}"[list user's privileges or check a specific command]"
   '(-n --non-interactive)'{-n,--non-interactive}'[non-interactive mode, no prompts are used]'
+  '(-k --reset-timestamp -K --remove-timestamp -N --no-update)'{-N,--no-update}"[don't update user's cached credentials]"
   '(-p --prompt)'{-p+,--prompt=}'[use the specified password prompt]:prompt'
   '(-R --chroot)'{-R+,--chroot=}'[change the root directory before running command]:directory:_directories'
   '(-r --role)'{-r+,--role=}'[create SELinux security context with specified role]: :_selinux_roles'
   '(-S --stdin)'{-S,--stdin}'[read password from standard input]'
   '(-t --type)'{-t+,--type=}'[create SELinux security context with specified type]: :_selinux_types'
   '(-T --command-timeout)'{-T+,--command-timeout=}'[terminate command after specified time limit]:timeout'
-  '(-U --other-user)'{-U+,--other-user=}'[in list mode, display privileges for user]:user:_users'
+  '(-U --other-user -v --validate)'{-U+,--other-user=}'[in list mode, display privileges for user]:user:_users'
   '(-u --user)'{-u+,--user=}'[run command (or edit file) as specified user]:user:_users'
   '(-)'{-V,--version}'[display version information and exit]'
-  '(-v --validate)'{-v,--validate}"[update user's timestamp without running a command]"
+  '(-v --validate -U --other-user *)'{-v,--validate}"[update user's timestamp without running a command]"
 )
 
 # Does -e appears before the first word that doesn't begin with a hyphen?
@@ -45,10 +44,6 @@ if [[ $service = sudoedit ]] || (( $words[(i)-e] < $words[(i)^(*sudo|-[^-]*)] ))
   args=( -A "-*" $args '!(-V --version -h --help)-e' '*:file:_files' )
 else
   cmd="$words[1]"
-  cpp='_comp_priv_prefix=(
-    $cmd -n
-    ${(kv)opt_args[(I)(-[ugHEP]|--(user|group|set-home|preserve-env|preserve-groups))]}
-  )'
   args+=(
     '(-e --edit 1 *)'{-e,--edit}'[edit files instead of running a command]' \
     '(-s --shell)'{-s,--shell}'[run shell as the target user; a command may also be specified]' \
@@ -58,9 +53,40 @@ else
     '(-E -i --login -s --shell -e --edit)--preserve-env=-[preserve user environment when running command]::environment variable:_sequence _parameters -g "*export*"' \
     '(-H --set-home -i --login -s --shell -e --edit)'{-H,--set-home}"[set HOME variable to target user's home dir]" \
     '(-P --preserve-groups -i -login -s --shell -e --edit)'{-P,--preserve-groups}"[preserve group vector instead of setting to target's]" \
-    "(-)1: :{ $cpp; _command_names -e }"
-    "*:: :{ $cpp; _normal }"
+    '*:: :->normal'
   )
 fi
 
-_arguments -s -S $args
+_arguments -s -S $args && ret=0
+
+if [[ $state = normal ]]; then
+  _comp_priv_prefix=(
+    $cmd -n
+    ${(kv)opt_args[(I)(-[ugHEP]|--(user|group|set-home|preserve-env|preserve-groups))]}
+  )
+  if (( $+opt_args[-l] || $+opt_args[--list] )); then
+    _normal -p $service
+    return
+  fi
+  while [[ $words[1] = *=* ]]; do
+    if (( CURRENT == 1 )); then
+      compstate[parameter]="${PREFIX%%\=*}"
+      compset -P 1 '*='
+      _value && ret=0
+      return ret
+    fi
+    shift words
+    (( CURRENT-- ))
+  done
+  if (( CURRENT == 1 )); then
+    curcontext="${curcontext%:*:*}:-command-:"
+    _alternative \
+      'commands:: _command_names -e' \
+      'options:option:(-s --shell -l --login)' \
+      'parameters: :_parameters -g "*export*~*readonly*" -qS=' && ret=0
+  else
+    _normal
+  fi
+fi
+
+return ret

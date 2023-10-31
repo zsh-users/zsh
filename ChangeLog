@@ -1,3 +1,8 @@
+2023-11-02  Oliver Kiddle  <opk@zsh.org>
+
+	* 52260: Completion/Unix/Command/_sudo: handle variable assignments
+	before the command in sudo completion
+
 2023-11-01  Oliver Kiddle  <opk@zsh.org>
 
 	* 52252: Src/Modules/pcre.c: Coverity defect 1547827
