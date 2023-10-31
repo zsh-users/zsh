@@ -69,6 +69,11 @@ print -l $accum)
 )
 enditem()
 
+If the regular expression contains callouts, these are executed as shell code.
+During the execution of the callout, the string the regular expression is
+matching against is available in the parameter tt(.pcre.subject). If there is a
+non-zero return status from the shell code, the callout does not match.
+
 The option tt(-d) uses the alternative breadth-first DFA search algorithm of
 pcre. This sets tt(match), or the array given with tt(-a), to all the matches
 found from the same start point in the subject.

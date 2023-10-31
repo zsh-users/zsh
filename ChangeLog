@@ -1,5 +1,8 @@
 2023-11-02  Oliver Kiddle  <opk@zsh.org>
 
+	* 52253: Src/Modules/pcre.c: support pcre callouts with shell
+	evaluation of the callout string
+
 	* 52260: Completion/Unix/Command/_sudo: handle variable assignments
 	before the command in sudo completion
 
