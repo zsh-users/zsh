@@ -6,16 +6,19 @@ local curcontext="$curcontext" state line expl
 typeset -A opt_args
 
 _arguments -C -s -S \
+  '(H -A --noempty)'{-A,--noempty}"[don't print empty devices]" \
   '(H -E --dedup)'{-E+,--dedup=}'[de-duplicate output by specified column]:column:->columns' \
   '(H -a --all)'{-a,--all}'[print all devices]' \
   '(H -b --bytes)'{-b,--bytes}'[print size in bytes rather than in human readable format]' \
   '(H -d --nodeps)'{-d,--nodeps}"[don't print slaves or holders]" \
   '(H -I --include)*'{-e,--exclude}'[exclude devices by major number]:major device number:->majorlist' \
   '(H -e --exclude)*'{-I+,--include=}'[show only devices with specified major numbers]:major device number:->majorlist' \
-  '(H -n --noheadings)'{-n,--noheadings}"[don't print headings]" \
+  '(H -n --noheadings -y --shell)'{-n,--noheadings}"[don't print headings]" \
   '(H -p --paths)'{-p,--paths}'[print complete device path]' \
   '(H -s --inverse)'{-s,--inverse}'[reverse dependency order]' \
+  '(H -w --width)'{-w+,--width=}'[specify output width]:width' \
   '(H -x --sort)'{-x+,--sort=}'[sort output by specified column]:column:->columns' \
+  '(H -y --shell -n --noheadings)'{-y,--shell}'[use column names usable as shell variable identifiers]' \
   '(H)--sysroot=[use specified directory as system root]:directory:_directories' \
   '*:device:_files -g "*(-%b)" -P / -W /' \
   + fields \
@@ -24,6 +27,8 @@ _arguments -C -s -S \
   '(H -f --fs -o --output -O --output-all)'{-f,--fs}'[output info about filesystems]' \
   '(H -m --perms -o --output -O --output-all)'{-m,--perms}'[output info about permissions]' \
   '(H -S --scsi -o --output -O --output-all)'{-S,--scsi}'[output info about SCSI devices]' \
+  '(H -N --nvme -o --output -O --output-all)'{-N,--nvme}'[output info about NVMe devices]' \
+  '(H -v --virtio -o --output -O --output-all)'{-v,--virtio}'[output info about virtio devices]' \
   '(H -t --topology -o --output -O --output-all)'{-t,--topology}'[output info about topology]' \
   '(H fields)'{-o+,--output=}'[specify output columns]:output column:->columnlist' \
   '(H fields)'{-O,--output-all}'[output all columns]' \
