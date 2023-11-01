@@ -23,6 +23,7 @@ _arguments -s -S \
     \(${(j. .)opts:#-[La]}')-l+[list user-defined widgets]:*:-:->listing' \
     \(${(j. .)opts:#-l}')-a[with -l, list all widgets]' \
     "(: * ${(j. .)opts:#-[Lw]})-F[install file descriptor handler]:file descriptor:_file_descriptors::handler:_functions" \
+    "($opts)-I[invalidate the current zle display]" \
     "!($opts)-K:keymap:compadd -a keymaps" \
     "($opts)-M[display message]:message: " \
     "($opts)-N[define new widget]:widget name:->widget-or-function ::widget shell function:->function" \
