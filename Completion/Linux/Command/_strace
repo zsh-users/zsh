@@ -11,6 +11,7 @@ _arguments -C -s \
   \*{-E+,--env=}'[set or remove exported environment variable]:variable:->envars' \
   '(:)*'{-p+,--attach=}'[attach to the process with specified process ID and begin tracing]:process ID:_pids' \
   "${root}(-u --user)"{-u+,--user=}'[run as specified user]:user:_users' \
+  '--argv0=[set argv0 for program]:name' \
   '(-b --detach-on)'{-b+,--detach-on=}'[detach from process on specified syscall]:syscall:(execve)' \
   '(--daemonize)-D[run tracer as detached grandchild, keeping traced process as direct child of calling process]' \
   '(-D)--daemonize=-[specify how to run tracer process]::method:(grandchild pgroup session)' \
@@ -45,11 +46,14 @@ _arguments -C -s \
   '(-v --no-abbrev)'{-v,--no-abbrev}'[print unabbreviated versions of environment, stat, termios, etc. calls]' \
   '(-xx --strings-in-hex)-x[print all non-ASCII strings in hexadecimal string format]' \
   '(-x --strings-in-hex)-xx[print all strings in hexadecimal string format]' \
-  '(-x -xx)--strings-in-hex=[specify strings to print in hexadecimal format]:string type:(all non-ascii)' \
+  '(-x -xx)--strings-in-hex=[specify strings to print in hexadecimal format]:string type:(all non-ascii non-ascii-chars)' \
   '(-X --const-print-style)'{-X+,--const-print-style=}'[set the format for printing of named constants and flags]:format:(raw abbrev verbose)' \
   '(-c --summary-only -yy --decode-fds)-y[print paths associated with file descriptor arguments]' \
   '(-c --summary-only -y --decode-fds)-yy[print protocol specific information associated with socket file descriptors]' \
-  '(-c --summary-only -y -yy)--decode-fds=-[print information associated with file descriptors]::information [none]:_sequence compadd - none all path socket dev pidfd' \
+  '(-c --summary-only -y -yy)--decode-fds=-[print information associated with file descriptors]::information [none]:_sequence compadd - none all path socket dev pidfd signalfd' \
+  '(-c --summary-only -Y)--decode-pids=[print information associated with process IDs]:information [none]:_sequence compadd - none comm pidns' \
+  '!(-c --summary-only -Y --decode-pids)--pidns-translation' \
+  '(-c --summary-only --decode-pids)-Y[print command names for PIDs]' \
   '(-c --summary-only -C --summary -i --instruction-pointer -k --stack-traces -r --relative-timestamps -ff -t -tt -ttt --absolute-timestamps -T --syscall-times -y -yy --decode-fds)'{-c,--summary-only}'[count time, calls, and errors for each system call and report a summary]' \
   '(-c --summary-only -C --summary)'{-C,--summary}'[count time, calls, and errors for each system call and report a summary in addition to regular output]' \
   '(-O --summary-syscall-overhead)'{-O+,--summary-syscall-overhead=}'[specify overhead for tracing system calls]:overhead (microseconds)' \
@@ -57,9 +61,11 @@ _arguments -C -s \
   '(-U --summary-columns)'{-U+,--summary-columns=}'[show specific columns in the summary report]:column:_sequence compadd - time-percent total-time min-time max-time avg-time calls errors name' \
   '(-w --summary-wall-clock)'{-w,--summary-wall-clock}'[summarise syscall latency]' \
   '(-c --summary-only -C)-ff[write each process trace to <filename>.<pid> (when using -o <filename>]' \
+  '--syscall-limit=[detach all tracees after tracing given number of syscalls]:limit' \
   '(-d --debug)'{-d,--debug}'[show debug output of strace itself on standard error]' \
   '(- 1 *)'{-h,--help}'[display help information]' \
   '--seccomp-bpf[enable seccomp-bpf filtering]' \
+  '--tips=-[show strace tips, tricks, and tweaks before exit]:tip [id\:random,format\:compact]' \
   '(- 1 *)'{-V,--version}'[display version information]' \
   '(-):command name: _command_names -e' \
   '*::arguments:_normal' && ret=0
@@ -72,6 +78,7 @@ case $state in
       'verbose[dereference structures for the specified set of system calls]:system call:_sequence _sys_calls -a -n' \
       'raw[print raw, undecoded arguments for the specified set of system calls]:system call:_sequence _sys_calls -a -n' \
       'signal[trace only the specified subset of signals]:signal:_sequence _signals -s -M "B\:!="' \
+      'trace-fds[trace operations on listed file descriptors]:file descriptor:_sequence _file_descriptors' \
       'read[perform a full hex and ASCII dump of all the data read from listed file descriptors]:file descriptor:_sequence _file_descriptors' \
       'write[perform a full hex and ASCII dump of all the data written to listed file descriptors]:file descriptor:_sequence _file_descriptors' \
       'fault[perform syscall fault injection]:system call:_sys_calls -a -n' \
@@ -79,7 +86,8 @@ case $state in
       'status[trace system calls with given return status]:status:->status' \
       'quiet[suppress various information messages]:message [none]:_sequence compadd - none attach exit path-resolution personality thread-execve superseded' \
       'kvm[print the exit reason of kvm vcpu]: :(vcpu)' \
-      'decode-fds[print information associated with file descriptors]:information [none]:_sequence compadd - none all path socket dev pidfd' && ret=0
+      'decode-fds[print information associated with file descriptors]:information [none]:_sequence compadd - none all path socket dev pidfd signalfd' \
+      'decode-pids[print information associated with process IDs]:information [none]:_sequence compadd - none comm pidns' && ret=0
     if [[ $state = status ]]; then
       _values -s , 'return status [all]' \
         all successful failed \
