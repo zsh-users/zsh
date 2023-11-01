@@ -1,5 +1,8 @@
 2023-11-08  Oliver Kiddle  <opk@zsh.org>
 
+	* github #105: Shotaro Aoyama: Completion/Zsh/Command/_zle:
+	add "-I" for "zle" completion
+
 	* Eric Cook: 52168: Completion/Unix/Command/_xfconf-query:
 	add completion for xfce's xfconf-query(1)
 
