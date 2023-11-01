@@ -22,7 +22,7 @@ case $variant in
     aopts=()
     args=(
       '(info json -c --output-width)'{-c+,--output-width=}'[format output to fit display of specified width]:width'
-      '(info)'{-L,--table-empty-lines}"[don't ignore empty lines]"
+      '(info)'{-L,--keep-empty-lines}"[don't ignore empty lines]"
       + fill
       '(info table text json -x --fillrows)'{-x,--fillrows}'[print across before down]'
       + table
@@ -30,8 +30,20 @@ case $variant in
       '(info fill -o --output-separator)'{-o+,--output-separator=}'[specify column separator for table output]:separator [two spaces]'
       '(info fill -s --separator)'{-s+,--separator=}'[specify column delimiters in input data]:delimiters'
       '(info fill -O --table-order)'{-O+,--table-order=}'[specify order of output columns]: :->columns'
-      '(info fill -N --table-columns)'{-N+,--table-columns=}'[specify column names]:names'
+      '(info fill -N --table-columns)*'{-C+,--table-column=}'[specify column properties]: :_values -s, -S= property
+        "name[column name]\:name"
+        "trunc[truncate text in the columns when necessary]"
+        "right[right align text]"
+        "width[specify column width]\:width"
+        "strictwidth[strictly follow column width setting]"
+        "noextreme[allow length to be ignored]"
+        "wrap[wrap text when necessary]"
+        "hide[don'\''t print column]"
+        "json[define type for JSON output]\:type\:(string number boolean)"'
+      '(info fill -N --table-columns -C --table-column)'{-N+,--table-columns=}'[specify column names]:names'
+      '(info fill -l --table-columns-limit)'{-l+,--table-columns-limit=}'[specify maximum number of input columns]:columns'
       '(info fill -H --table-hide)'{-H+,--table-hide=}"[don't print specified columns]: :->columns"
+      '(info fill -m --table-maxout)'{-m,--table-maxout}'[fill all available space]'
       + text
       '(info fill json -d --table-noheadings)'{-d,--table-noheadings}"[don't print header]"
       '(info fill json -E --table-noextreme)'{-E+,--table-noextreme}"[specify columns where length can be ignored]: :->columns"

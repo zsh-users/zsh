@@ -26,6 +26,7 @@ _arguments -s -C \
   '(H -o --output)--output-all[output all available columns]' \
   '(H -p --poll)'{-p+,--poll=}'[monitor changes in /proc/self/mountinfo]::action:(mount umount remount move)' \
   '(H --real)--pseudo[print only pseudo-filesystems]' \
+  '(H)--shadowed[print only filesystems over-mounted by another filesystem]' \
   '(H -R --submounts)'{-R,--submounts}'[print recursively all submounts]' \
   '(H --pseudo)--real[print only real filesystems]' \
   '(H -S --source :)'{-S+,--source=}'[specify the mount source]: :->sources' \
@@ -35,9 +36,11 @@ _arguments -s -C \
   '(H -U --uniq)'{-U,--uniq}'[ignore filesystems with duplicated mount targets]' \
   '(H -u --notruncate)'{-u,--notruncate}'[do not truncate text in columns]' \
   '(H -v --nofsroot)'{-v,--nofsroot}'[do not print \[/dir\] in the SOURCE column]' \
+  '(H -y --shell -n --noheadings)'{-y,--shell}'[use column names usable as shell variable identifiers]' \
   '(H -w --timeout)'{-w+,--timeout}'[specify timeout for --poll]:milliseconds: ' \
   '(H -x --verify)'{-x,--verify}'[check mount table content]' \
   '(H)--verbose[print more information]' \
+  '(H)--vfs-all[print all VFS options]' \
   '(H)1: :->sources_targets' \
   '(H)2:: :->targets' \
   + '(format)' \

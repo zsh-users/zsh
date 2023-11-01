@@ -1,5 +1,9 @@
 2023-11-02  Oliver Kiddle  <opk@zsh.org>
 
+	* 52265: Completion/Linux/Command/_findmnt,
+	Completion/Linux/Command/_lsblk, Completion/Unix/Command/_column:
+	update completions for some util-linux tools to version 2.39.2
+
 	* 52253: Src/Modules/pcre.c: support pcre callouts with shell
 	evaluation of the callout string
 
