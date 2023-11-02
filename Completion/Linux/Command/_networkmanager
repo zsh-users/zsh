@@ -42,8 +42,24 @@ _nm_fields() {
 }
 
 _nm_general() {
-  _arguments "1:command:(status hostname permissions logging help)"
-  # TODO: provide completions for logging
+  local curcontext="$curcontext" state line
+  _arguments "1:command:(status hostname permissions logging reload help)" \
+    "*::arguments:->args"
+
+  case $line[1] in
+    l*)
+      _values -w -S ' ' values \
+        'level:level' \
+        'domains:domain'
+    ;;
+    r*)
+      _describe -t flags 'flag' '(
+        "conf:NetworkManager.conf configuration"
+        "dns-rc:update DNS configuration"
+        "dns-full:restart the DNS plugin"
+      )'
+    ;;
+  esac
 }
 
 _nm_networking() {
