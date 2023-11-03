@@ -34,6 +34,24 @@ details, see the documentation.
 Incompatibilities since 5.9
 ---------------------------
 
+The line editor's default keymap is now the "emacs" keymap regardless of the
+value of the environment variables $VISUAL and $EDITOR.  This only affects you
+if your $VISUAL or $EDITOR environment variable is set to a value that
+contains the string "vi".  To get the previous behaviour, add
+
+    bindkey -v
+
+or, if your $VISUAL and $EDITOR environment variables vary,
+
+    if [[ ${VISUAL} == *vi* || ${EDITOR} == *vi* ]]; then
+        bindkey -v
+    else
+        bindkey -e
+    fi
+
+to your .zshrc file.  These snippets are compatible with previous
+versions of the shell.
+
 The ERR_EXIT and ERR_RETURN options were refined to be more self-
 consistent and better aligned with the POSIX-2017 specification of
 `set -e`:
