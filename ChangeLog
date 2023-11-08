@@ -1,3 +1,7 @@
+2023-11-08  Oliver Kiddle  <opk@zsh.org>
+
+	* 52271: Src/Modules/pcre.c: use correct form for unused parameter
+
 2023-11-02  Oliver Kiddle  <opk@zsh.org>
 
 	* 52268: Completion/Linux/Command/_networkmanager: update to 1.42.2

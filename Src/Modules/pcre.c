@@ -129,7 +129,7 @@ bin_pcre_study(char *nam, UNUSED(char **args), UNUSED(Options ops), UNUSED(int f
 }
 
 static int
-pcre_callout(pcre2_callout_block_8 *block, void *)
+pcre_callout(pcre2_callout_block_8 *block, UNUSED(void *callout_data))
 {
     Eprog prog;
     int ret=0;
