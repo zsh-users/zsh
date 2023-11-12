@@ -31,6 +31,7 @@ arguments=(
   '(-A)-H[start in Hebrew mode]'
   '-u[use given vimrc file instead of default .vimrc]:config:->config'
   "--noplugin[don't load plugin scripts]"
+  '--clean[start with defaults in non-compatible mode]'
   '-o-[number of windows to open (default: one for each file)]::window count: '
   '-O-[number of windows to vertically split open (default is one for each file)]::window count: '
   '-p-[number of tabs to open (default: one for each file)]::tab count: '
@@ -89,7 +90,6 @@ else
     '--servername[name of vim server to send to or name of server to become]:server name:->server'
     '--socketid[run GVIM in another window]'
     '-i[use specified viminfo file]:viminfo file [~/.viminfo]:_files'
-    '--clean[start with defaults in non-compatible mode]'
   )
 fi
 [[ $service != *g* && $service != nvim ]] && arguments+='-g[start with GUI]'
