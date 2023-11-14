@@ -25,7 +25,6 @@ case $service in
       '(-k --ask-pass --connection-password-file)'{-k,--ask-pass}'[ask for connection password]'
       '(-k --ask-pass)--connection-password-file=[specify file containing connection password]:file:_files'
       '--list-hosts[output list of matching hosts]'
-      '(-l --limit)'{-l+,--limit=}'[further limit hosts to an additional pattern]:host subset:->hosts'
       '(-T --timeout)'{-T+,--timeout=}'[override the connection timeout]:timeout (seconds) [10]'
       '(-c --connection)'{-c+,--connection=}'[specify connection type]:connection type [smart]:->connect-types'
       '(-u --user)'{-u+,--user=}'[specify remote user for connection]:remote user:_users'
@@ -44,7 +43,6 @@ case $service in
       '(-f --forks)'{-f+,--forks=}'[specify number of parallel processes to use]:processes [5]'
       '--become-method=[specify privilege escalation method to use]:method [sudo]:(sesu sudo su pbrun pfexec doas dzdo ksu runas pmrun enable machinectl)'
       '--become-user=[specify remote user for running operations]:user:_users'
-      "--syntax-check[perform a syntax check on the playbook, but don't execute it]"
       '!(-R --su-user -U --sudo-user)'{-R,-U,--su-user,--sudo-user}':user [root]:_users'
     )
   ;|
@@ -57,6 +55,7 @@ case $service in
       \*{-i+,--inventory=}'[specify inventory host file or host list]: : _alternative "files\:inventory file\:_files"
 	"hosts\:host\: _sequence _hosts"'
       '!(-i --inventory)--inventory-file=:inventory file:_files'
+      '(-l --limit)'{-l+,--limit=}'[further limit hosts to an additional pattern]:host subset:->hosts'
     )
   ;|
   ansible|ansible-console|ansible-inventory)
@@ -112,7 +111,7 @@ case $service in
       '(-l --list -F --list_files -s --snippet --metadata-dump -e --entry-point)'{-s,--snippet}'[show playbook snippet for inventory, lookup and module plugins]'
       '(-l --list -F --list_files -s --snippet -e --entry-point)--metadata-dump[dump json metadata for all plugins]'
       '(-l --list -F --list_files -s --snippet --metadata-dump -e --entry-point)'{-e+,--entry-point=}'[select the entry point for roles]:entry point'
-      '(-t --type)'{-t+,--type=}'[choose plugin type]:plugin type [module]:(become cache callback cliconf connection httpapi inventory lookup netconf shell vars module strategy role keyword)'
+      '(-t --type)'{-t+,--type=}'[choose plugin type]:plugin type [module]:(become cache callback cliconf connection httpapi inventory lookup netconf shell vars module strategy test filter role keyword)'
       '(-r --roles-path)'{-r+,--roles-path=}'[specify directory containing roles]:directory:_directories'
       '*:plugin:->plugins'
     )
@@ -147,6 +146,7 @@ case $service in
       '--list-tags[list all available tags]'
       '--list-tasks[list all tasks that would be executed]'
       '--start-at-task=[start the playbook at specified task]:task'
+      "--syntax-check[perform a syntax check on the playbook, but don't execute it]"
       '--key-file=[specify file to use to authenticate the connection]:private key file:_files'
       '*:playbook:_files -g "(#i)*.y(|a)ml"'
     )
@@ -249,12 +249,18 @@ case $state in
       dump)
         args+=(
           '(--only-changed --changed-only)'{--only-changed,--changed-only}'[only show configuration that is changed from the default]'
+          '(-f --format)'{-f+,--format=}'[specify output format]:format:(json yaml display)'
         )
       ;;
       init)
         args+=(
           '--format=[specify output format for init]:format:(init env vars)'
           '--disabled[prefix all entries with a comment character]'
+        )
+      ;;
+      list)
+        args+=(
+          '(-f --format)'{-f+,--format=}'[specify output format]:format:(json yaml)'
         )
       ;;
     esac
@@ -289,6 +295,7 @@ case $state in
       *-*)
         args+=(
           '(-c --ignore-certs)'{-c,--ignore-certs}'[ignore SSL certificate validation errors]'
+          '--timeout=[specify time to wait for operations against the galaxy]:timeout (seconds) [60]'
           '(-s --server)'{-s+,--server=}'[specify API server destination]:server:_hosts'
           --{token,api-key}='[specify ansible galaxy API key]:api key'
           \*{-v,--verbose}'[verbose mode]'
