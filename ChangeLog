@@ -1,3 +1,7 @@
+2023-11-14  Oliver Kiddle  <opk@zsh.org>
+
+	* 52300: Completion/Unix/Command/_ansible: ansible 2.15.2 updates
+
 2023-11-09  Oliver Kiddle  <opk@zsh.org>
 
 	* 52280: Completion/Unix/Command/_git: update git completion for new
