@@ -44,6 +44,7 @@ opts=(
   \!--{en,dis}able-{gems,rubyopt,all}
   '--dump=[dump debug information]:information:_sequence compadd - insns insns_without_opt yydebug parsetree parsetree_with_comment'
   --{external,internal}'-encoding=:charset:->charsets'
+  '--backtrace-limit=[limit the maximum length of backtrace]:number'
   '!'{-y,--yydebug}
   '!--dump=:target:(version copyright usage yydebug syntax parsetree parsetree_with_comment insns)'
   '(--mjit --yjit)--jit[enable jit for the platform]'
@@ -65,11 +66,10 @@ opts=(
 
 irb=(
   '-f[suppress read of ~/.irbrc]'
-  '(--noinspect)-m[bc mode (load mathn, fraction, matrix)]'
   $opts[(r)*-d\[*]
   '(--noinspect)--inspect[use inspect for output]'
   "(--inspect)--noinspect[don't use inspect for output]"
-  '(--prompt --prompt-mode --inf-ruby-mode --simple-prompt --noprompt)'{--prompt,--prompt-mode}'[switch prompt mode]:prompt mode:(default simple xmp inf-ruby)'
+  '(--prompt --prompt-mode --inf-ruby-mode --simple-prompt --noprompt)'{--prompt=,--prompt-mode=}'[switch prompt mode]:prompt mode:(default classic simple inf-ruby xmp null)'
   '(--prompt --prompt-mode --inf-ruby-mode --simple-prompt --noprompt)'{--inf-ruby-mode,--simple-prompt,--noprompt}
   '--tracer[display trace for each command execution]'
   '--back-trace-limit[set limit for backtraces]:limit [16]:'
