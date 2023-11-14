@@ -20,6 +20,7 @@ lropts=( $proxy
 _arguments -C -s \
   '(* -)'{-h,--help}'[display usage information]' \
   '(* -)'{-v,--version}'[display version information]' \
+  '-C[change directory first]:directory:_directories' \
   '*::command:->command' && ret=0
 
 if [[ $state = command ]]; then
@@ -27,7 +28,7 @@ if [[ $state = command ]]; then
     cmd=subcommands
   else
     cmds=(
-      build cert check cleanup contents dependency environment fetch
+      build cert check cleanup contents dependency environment exec fetch
       generate_index help install info list lock mirror open outdated owner
       pristine push query rdoc search server signin signout sources
       specification stale uninstall unpack update which yank
@@ -87,13 +88,13 @@ if [[ $state = command ]]; then
         '!(-d --details)--no-details'
       )
     ;|
-    check|contents|dependency|fetch|install|list|open|pristine|query|rdoc|search|specification|uninstall|unpack|yank)
+    check|contents|dependency|exec|fetch|install|list|open|pristine|query|rdoc|search|specification|uninstall|unpack|yank)
       args+=( '(-v --version)'{-v,--version=}'[specify version of gem]:version' )
     ;|
-    dependency|fetch|install|outdated|specification|uninstall|update|yank)
+    build|dependency|fetch|install|outdated|specification|uninstall|update|yank)
       args+=( '--platform=[specify the platform of gem]:platform' )
     ;|
-    dependency|fetch|install|list|query|search|specification|update)
+    dependency|exec|fetch|install|list|query|search|specification|update)
       args+=( '--prerelease[include prerelease versions of a gem]' '!(--prerelease)--no-prerelease' )
     ;|
     install|unpack|update)
@@ -125,13 +126,13 @@ if [[ $state = command ]]; then
     ;|
     (un|)install|pristine|update)
       args+=(
+        '(-i --install-dir)'{-i,--install-dir=}'[specify gem repository directory to get installed gems]:directory:_directories'
         '(-n --bindir)'{-n,--bindir=}'[specify directory where binary files are located]:directory:_directories'
       )
     ;|
     (un|)install|update)
       args+=(
         '--ignore-dependencies[ignore dependency requirements]'
-        '(-i --install-dir)'{-i,--install-dir=}'[specify gem repository directory to get installed gems]:directory:_directories'
       )
     ;|
     owner|push)
@@ -166,6 +167,7 @@ if [[ $state = command ]]; then
         '(-b --build)'{-b,--build=}'[build private key and self-signed certificate for specified email address]:email address:_email_addresses -c'
         '(-C --certificate)'{-C,--certificate=}'[specify signing certificate for --sign]:certificate'
         '(-K --private-key)'{-K,--private-key=}'[specify key for --sign or --build]:key'
+        '(-A --key-algorithm)'{-A,--key-algorithm=}'[select which key algorithm to use for --build]:algorithm'
         '(-s --sign)'{-s,--sign=}'[sign specified certificate with the key from -K and the certificate from -C]:certificate'
         '(-d --days)'{-d,--days=}'[specify days before certificate expires]:days'
         '(-R --re-sign)'{-R,--re-sign}'[re-sign the certificate]'
@@ -181,7 +183,7 @@ if [[ $state = command ]]; then
     ;;
     cleanup)
       args+=(
-        '(-n -d --dryrun)'{-n,-d,--dryrun}"[don't uninstall gems]"
+        '(-n -d --dry-run)'{-n,-d,--dry-run}"[don't uninstall gems]"
         "--user-install[cleanup in user's home directory instead of GEM_HOME]"
       )
     ;;
@@ -201,11 +203,20 @@ if [[ $state = command ]]; then
       )
     ;;
     environment)
-      args+=( '1:information:(gemdir gempath version remotesources platform)' )
+      args+=( '1:information:(gemdir gempath home path user_gemhome version remotesources platform)' )
+    ;;
+    exec)
+      args+=(
+        '--conservative[prefer most recent installed version to the overall latest]'
+        '1:gem:->gems-remote'
+        '*: :_default'
+      )
     ;;
     fetch)
       def=( both \! local \! remote \! )
-      args+=( ${(e)lropts} )
+      args+=( ${(e)lropts}
+        "--no-suggestions[don't suggest alternates when gems are not found]"
+      )
     ;;
     generate_index)
       args+=(
@@ -232,13 +243,15 @@ if [[ $state = command ]]; then
       args+=(
         '(*)*--skip=[with --all, skip specified gem]:installed gem:->gems-local'
         "--no-extensions[don't restore gems with extensions in addition to regular gems]"
+        '--only-missing-extensions[only restore gems with missing extensions]'
         '--only-executables[only restore executables]'
+        '--only-plugins[only restore plugins]'
       )
     ;;
     push)
       args+=( '1:gem file:_files -g "*.gem(-.)"' )
     ;;
-    query)
+    query) # deprecated
       args+=(
         '(-n --name-matches)'{-n,--name-matches=}'[specify regex to match against gem names]:gem name (regex):->gems-local'
       )
@@ -266,6 +279,7 @@ if [[ $state = command ]]; then
         '(-r --remove)'{-r,--remove=}'[remove source]:source URI:_urls'
         '(-c --clear-all)'{-c,--clear-all}'[remove all sources (clear the cache)]'
         '(-u --update)'{-u,--update}'[update source cache]'
+        '(-f --force)'{-f,--force}"[don't show any confirmation prompts]"
       )
     ;;
     specification)
@@ -319,7 +333,7 @@ if [[ $state = command ]]; then
     '--norc[avoid loading any .gemrc file]' && ret=0
 
   if [[ $state == gems* ]]; then
-    filter=( ${${opt_args[(I)-([lbr]|-local|-remote|-both)]}:-${${(M)state:#*-*}/gems-/--}} )
+    filter=( ${${opt_args[(I)-([lbr]|-conservative|-local|-remote|-both)]/conservative/local}:-${${(M)state:#*-*}/gems-/--}} )
     _description gems expl gem
     compadd "$expl[@]" ${${(f)"$(_call_program gems gem list $filter -q --no-versions)"}%% *} && ret=0
   fi

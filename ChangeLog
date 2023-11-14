@@ -1,5 +1,9 @@
 2023-11-14  Oliver Kiddle  <opk@zsh.org>
 
+	* 52301: Completion/Unix/Command/_gem, Completion/Unix/Command/_ri,
+	Completion/Unix/Command/_ruby: update options in completions for
+	ruby 3.2, gem 3.4.10 and ri 6.5
+
 	* 52300: Completion/Unix/Command/_ansible: ansible 2.15.2 updates
 
 2023-11-09  Oliver Kiddle  <opk@zsh.org>
