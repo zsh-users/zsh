@@ -1,5 +1,8 @@
 2023-11-14  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted (cf. 52167): Completion/Unix/Command/_mutt:
+	mutt's -a takes a list of files terminated by --
+
 	* 52301: Completion/Unix/Command/_gem, Completion/Unix/Command/_ri,
 	Completion/Unix/Command/_ruby: update options in completions for
 	ruby 3.2, gem 3.4.10 and ri 6.5
