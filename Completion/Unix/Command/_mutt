@@ -1,14 +1,15 @@
 #compdef mutt neomutt
 
-_arguments -s -S \
+# should pass -S but that doesn't work with -- ending -a
+_arguments -s \
   '::recipient:_email_addresses -n mutt' \
   '(- :)-A[expand given alias]:alias:_email_addresses -n mutt' \
-  '*-a[attach file using MIME]::file attachment:_files' \
+  '*-a[attach file using MIME]:*--:file attachment:_files' \
   '*-b[specify a BCC recipient]:BCC recipient:_email_addresses -n mutt' \
   '*-c[specify a CC recipient]:CC recipient:_email_addresses -n mutt' \
   '(- :)-D[print the value of all variables]' \
   '(-x)-E[edit the draft (-H) or include (-i) file]' \
-  '-d+[log debugging output to ~/.muttdebug0]:level:(1 2 3 4 5)' \
+  '-d+[log debugging output to ~/.muttdebug0]:level:(-5 -4 -3 -2 -1 0 1 2 3 4 5)' \
   '-e+[specify a post-init configuration command]:post-init configuration' \
   '-f+[specify mailbox to load]:mailbox: _mailboxes' \
   '-F+[specify an init file]:init file:_files' \
