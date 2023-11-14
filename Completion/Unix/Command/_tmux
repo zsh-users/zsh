@@ -282,6 +282,8 @@ _tmux-command-prompt() {
   [[ -n ${tmux_describe} ]] && print "open the tmux command prompt in a client" && return
   _arguments -s \
     '-1[only accept one key press]' \
+    '-b[show prompt in background and wait till it is dismissed]' \
+    '-F[expand template as a format]' \
     '-k[only accept one key press and translate it to a key name]' \
     '-N[accept only numeric key presses]' \
     '-i[execute the command every time the prompt input changes]' \
@@ -295,6 +297,7 @@ _tmux-command-prompt() {
 _tmux-confirm-before() {
   [[ -n ${tmux_describe} ]] && print "run a command but ask for confirmation before" && return
   _arguments -s \
+    '-b[show prompt in background and wait till it is dismissed]' \
     '-p+[specify prompt]:prompt string' \
     '-t+[specify target client]:client:__tmux-clients' \
     '*:::command:= _tmux'
@@ -393,7 +396,8 @@ _tmux-display-panes() {
 _tmux-display-popup() {
   [[ -n ${tmux_describe} ]] && print "display a popup box over a pane" && return
   _arguments -s \
-    "-B[don't surround the popup by a border]" \
+    "(-b)-B[don't surround the popup by a border]" \
+    '(-B)-b[set type of border line for the popup]:border type:(single rounded double heavy simple padded none)' \
     '-C[close any popup on the client]' \
     '-c+[specify target client]:client:__tmux-clients' \
     '-d+[specify working directory for the command]:directory:_directories' \
@@ -876,13 +880,15 @@ _tmux-send-prefix() {
     '-t+[specify target pane]:pane:__tmux-panes'
 }
 
-# NOTE: this is actually an alias for "show-messages -JT", but until the
-# aliasmap system in check-tmux-state can properly handle aliases which are
-# more complex than a single word, it's best to leave this here.
-
 _tmux-server-access() {
-  [[ -n ${tmux_describe} ]] && print "show server information" && return
-  __tmux-nothing-else
+  [[ -n ${tmux_describe} ]] && print "change access permissions of user" && return
+  _arguments -s \
+    '(-l -d)-a[grant access]' \
+    '(-l -a)-d[revoke access and detach clients]' \
+    '(-l -w)-r[read-only]' \
+    '(-l -r)-w[writable]' \
+    '(-a -d -r -w)-l[list current permissions]' \
+    ':user:_users'
 }
 
 _tmux-set-buffer() {

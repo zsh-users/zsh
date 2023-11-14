@@ -1,5 +1,8 @@
 2026-11-01  Oliver Kiddle  <opk@zsh.org>
 
+	* 52302: Completion/Unix/Command/_tmux: complete for
+	tmux server-access
+
 	* tiandic: github #185: Completion/Unix/Command/_ffmpeg:
 	fix ffmpeg completion
 
