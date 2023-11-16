@@ -1,5 +1,9 @@
 2023-11-15  Bart Schaefer  <schaefer@zsh.org>
 
+	* 52309: Src/exec.c: suppress job control inside <<(substition)
+	to fix cases that hang with all signals blocked.  Similarly,
+	allow interrupt of multios reading from a terminal.
+
 	* 52308: Etc/FAQ.yo: mention new features, fix some old answers
 
 	* 52275: Src/compat.c: rationality in zgetdir() and zgetcwd() to

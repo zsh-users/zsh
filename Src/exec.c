@@ -2309,7 +2309,7 @@ closemn(struct multio **mfds, int fd, int type)
 	    for (i = 0; i < mn->ct; i++)
 		while ((len = read(mn->fds[i], buf, TCBUFSIZE)) != 0) {
 		    if (len < 0) {
-			if (errno == EINTR)
+			if (errno == EINTR && !isatty(mn->fds[i]))
 			    continue;
 			else
 			    break;
@@ -5096,7 +5096,7 @@ getpipe(char *cmd, int nullexec)
 	procsubstpid = pid;
 	return pipes[!out];
     }
-    entersubsh(ESUB_ASYNC|ESUB_PGRP, NULL);
+    entersubsh(ESUB_ASYNC|ESUB_PGRP|ESUB_NOMONITOR, NULL);
     redup(pipes[out], out);
     closem(FDT_UNUSED, 0);	/* this closes pipes[!out] as well */
     cmdpush(CS_CMDSUBST);
