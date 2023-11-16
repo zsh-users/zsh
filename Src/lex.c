@@ -938,7 +938,7 @@ gettokstr(int c, int sub)
 {
     int bct = 0, pct = 0, brct = 0, seen_brct = 0, fdpar = 0;
     int intpos = 1, in_brace_param = 0, cmdsubst = 0;
-    int inquote, unmatched = 0;
+    int inquote, unmatched = 0, in_pattern = 0;
     enum lextok peek;
 #ifdef DEBUG
     int ocmdsp = cmdsp;
@@ -1160,7 +1160,7 @@ gettokstr(int c, int sub)
 	    if (bct-- == in_brace_param) {
 		if (cmdsubst)
 		    cmdpop();
-		in_brace_param = cmdsubst = 0;
+		in_brace_param = cmdsubst = in_pattern = 0;
 	    }
 	    c = Outbrace;
 	    break;
@@ -1309,7 +1309,8 @@ gettokstr(int c, int sub)
 			    lexbuf.ptr--, lexbuf.len--;
 			else
 			    break;
-		    }
+		    } else if (in_pattern && c == '/')
+			add(Bnull);
 		    add(c);
 		}
 		ALLOWHIST
@@ -1397,26 +1398,36 @@ gettokstr(int c, int sub)
 	     */
 	    c = Dash;
            break;
-       case LX2_BANG:
-           /*
-            * Same logic as Dash, for ! to perform negation in range.
-            */
-           if (seen_brct)
-               c = Bang;
-           else
-               c = '!';
-       }
-       add(c);
-       c = hgetc();
-       if (intpos)
+	case LX2_BANG:
+	    /*
+	     * Same logic as Dash, for ! to perform negation in range.
+	     */
+	    if (seen_brct)
+		c = Bang;
+	    else
+		c = '!';
+	case LX2_OTHER:
+	    if (in_brace_param) {
+		if (c == '/') {
+		    if (in_pattern == 0)
+			in_pattern = 2;
+		    else
+			--in_pattern;
+		}
+	    }
+	}
+	add(c);
+	c = hgetc();
+	if (intpos)
 	    intpos--;
-       if (lexstop)
+	if (lexstop)
 	    break;
-       if (!cmdsubst && in_brace_param && act == LX2_STRING &&
-	   (c == '|' || c == Bar || inblank(c))) {
-	   cmdsubst = in_brace_param;
-	   cmdpush(CS_CURSH);
-       }
+	if (!cmdsubst && in_brace_param && act == LX2_STRING &&
+	    (c == '|' || c == Bar || inblank(c))) {
+	    cmdsubst = in_brace_param;
+	    cmdpush(CS_CURSH);
+	} else if (in_pattern == 2 && c != '/')
+	    in_pattern = 1;
     }
   brk:
     if (errflag) {

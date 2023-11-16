@@ -3088,6 +3088,13 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 			chuck(ptr);
 		    else
 			ptr++;
+		} else if (c == Dnull) {
+		    chuck(ptr);
+		    while (*ptr && *ptr != c)
+			ptr++;
+		    if (*ptr == Dnull)
+			chuck(ptr);
+		    ptr--;	/* Outer loop is about to increment */
 		}
 	    }
 	    replstr = (*ptr && ptr[1]) ? ptr+1 : "";

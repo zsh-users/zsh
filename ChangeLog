@@ -1,3 +1,9 @@
+2023-11-15  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52202: Src/lex.c, Src/subst.c, Test/D04parameter.ztst: improve
+	handling of quoting in ${var/pattern/replacement}.  Still not
+	perfect, e.g., deeply nested expansions	in the pattern may fail.
+
 2023-11-14  Oliver Kiddle  <opk@zsh.org>
 
 	* github #106: Matt Koscica: Completion/Unix/Command/_tmux,

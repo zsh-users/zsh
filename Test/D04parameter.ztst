@@ -2762,13 +2762,13 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 
  slash='/'
  print -r -- x${slash/'/'}y
--Df:(users/28784) substituting a single-quoted backslash, part #1: slash
+0:(users/28784) substituting a single-quoted backslash, part #1: slash
 >xy
 
  single_quote="'"
- print -r -- x${single_quote/'/'}y
--Df:(users/28784) substituting a single-quoted backslash, part #2: single quote
->x/y
+ print -r -- x${single_quote/$'/'}y
+0:(users/28784) substituting a single-quoted backslash, part #2: single quote
+>x'y
 
  control="foobar"
  print -r -- x${control/'bar'}y
