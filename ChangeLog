@@ -1,5 +1,9 @@
 2023-11-15  Bart Schaefer  <schaefer@zsh.org>
 
+	* 52275: Src/compat.c: rationality in zgetdir() and zgetcwd() to
+	avoid silently wandering out of the current directory when path
+	parents are inaccessible.
+
 	* 52202: Src/lex.c, Src/subst.c, Test/D04parameter.ztst: improve
 	handling of quoting in ${var/pattern/replacement}.  Still not
 	perfect, e.g., deeply nested expansions	in the pattern may fail.

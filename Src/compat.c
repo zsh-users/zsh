@@ -342,36 +342,69 @@ zopenmax(void)
 mod_export char *
 zgetdir(struct dirsav *d)
 {
-    char nbuf[PATH_MAX+3];
     char *buf;
+#if defined(HAVE_GETCWD) || defined(__CYGWIN__)
+    char *cwdbuf;
+#endif
+#if defined(USE_GETCWD) || defined(__CYGWIN__)
+#ifdef GETCWD_CALLS_MALLOC
+    if ((cwdbuf = getcwd(NULL, 0))) {
+	buf = dupstring(cwdbuf);
+	free(cwdbuf);
+    } else
+	buf = NULL;
+#else
+    cwdbuf = zalloc(PATH_MAX+1);
+    if ((buf = getcwd(cwdbuf, PATH_MAX)))
+	buf = dupstring(buf);
+    zfree(cwdbuf, PATH_MAX+1);
+#endif /* GETCWD_CALLS_MALLOC */
+    if (d && buf)
+	return d->dirname = ztrdup(buf);
+    else
+	return buf;
+#else /* !USE_GETCWD && !__CYGWIN__ */
     int bufsiz, pos;
-    struct stat sbuf;
-    ino_t pino;
-    dev_t pdev;
-#if !defined(__CYGWIN__) && !defined(USE_GETCWD)
+    char nbuf[PATH_MAX+3];
     struct dirent *de;
     DIR *dir;
-    dev_t dev;
-    ino_t ino;
+    struct stat sbuf;
+    ino_t pino, ino;
+    dev_t pdev, dev;
     int len;
-#endif
 
+    strcpy(nbuf, "../");
+    if (stat(".", &sbuf) == 0) {
+	/* Record the initial inode and device */
+	pino = sbuf.st_ino;
+	pdev = sbuf.st_dev;
+	if (d)
+	    d->ino = pino, d->dev = pdev;
+    }
+#ifdef HAVE_GETCWD
+    else {
+#ifdef GETCWD_CALLS_MALLOC
+	if ((cwdbuf = getcwd(NULL, 0))) {
+	    buf = dupstring(cwdbuf);
+	    free(cwdbuf);
+	} else
+	    buf = NULL;
+#else
+	cwdbuf = zalloc(PATH_MAX+1);
+	if ((buf = getcwd(cwdbuf, PATH_MAX)))
+	    buf = dupstring(buf);
+	zfree(cwdbuf, PATH_MAX+1);
+#endif /* GETCWD_CALLS_MALLOC */
+	return buf;    /* NULL when stat() and getcwd() both failed */
+    }
+#endif
+    /* stat() succeeded */
     buf = zhalloc(bufsiz = PATH_MAX+1);
     pos = bufsiz - 1;
     buf[pos] = '\0';
-    strcpy(nbuf, "../");
-    if (stat(".", &sbuf) < 0) {
-	return NULL;
-    }
 
-    /* Record the initial inode and device */
-    pino = sbuf.st_ino;
-    pdev = sbuf.st_dev;
-    if (d)
-	d->ino = pino, d->dev = pdev;
-#if !defined(__CYGWIN__) && !defined(USE_GETCWD)
 #ifdef HAVE_FCHDIR
-    else
+    if (!d)
 #endif
 	holdintr();
 
@@ -487,18 +520,6 @@ zgetdir(struct dirsav *d)
 	zchdir(buf + pos + 1);
     noholdintr();
 
-#else  /* __CYGWIN__, USE_GETCWD cases */
-
-    if (!getcwd(buf, bufsiz)) {
-	if (d) {
-	    return NULL;
-	}
-    } else {
-	if (d) {
-	    return d->dirname = ztrdup(buf);
-	}
-	return buf;
-    }
 #endif
 
     /*
@@ -526,23 +547,6 @@ mod_export char *
 zgetcwd(void)
 {
     char *ret = zgetdir(NULL);
-#ifdef HAVE_GETCWD
-    if (!ret) {
-#ifdef GETCWD_CALLS_MALLOC
-	char *cwd = getcwd(NULL, 0);
-	if (cwd) {
-	    ret = dupstring(cwd);
-	    free(cwd);
-	}
-#else
-	char *cwdbuf = zalloc(PATH_MAX+1);
-	ret = getcwd(cwdbuf, PATH_MAX);
-	if (ret)
-	    ret = dupstring(ret);
-	zfree(cwdbuf, PATH_MAX+1);
-#endif /* GETCWD_CALLS_MALLOC */
-    }
-#endif /* HAVE_GETCWD */
     if (!ret)
 	ret = unmeta(pwd);
     if (!ret || *ret == '\0')
