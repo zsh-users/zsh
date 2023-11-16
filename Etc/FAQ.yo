@@ -445,7 +445,14 @@ label(21)
      invoked with the appropriate name.  Including the command
      `emulate sh; setopt localoptions' in a shell function will
      turn on sh emulation for that function only.  In version 4 (and in
-     3.0.6 through 8), this can be abbreviated as `emulate -L sh'.
+     3.0.6 through 8), this can be abbreviated as `emulate -L sh';
+  myeit() in versions after 5.9, the myem(namespace) syntax and
+     myem(named references) (ksh mytt(nameref)) are available, but
+     differ in some details from the ksh93+ semantics;
+  myeit() also after 5.9, myem(non-forking command substitutions) are
+     available.  These are described by ksh as myem(a brace group preceded
+     by a dollar sign) (mytt(${ list;})), but zsh has both some added
+     features adopted from mksh, and some limitations, see link(2.11)(211)
    )
 
   The classic difference is word splitting, discussed in question \
@@ -496,9 +503,9 @@ tt(RM_STAR_SILENT),
 	those are a completely different type of object.)
     it()  Coprocesses are established by mytt(coproc); mytt(|&) behaves like
         csh.  Handling of coprocess file descriptors is also different.
-    it()  In mytt(cmd1 && cmd2 &), only mytt(cmd2) instead of the whole
-        expression is run in the background in zsh.  The manual implies
-        this is a bug.  Use mytt({ cmd1 && cmd2 } &) as a workaround.
+    it()  In mytt(cmd1 && cmd2 &), instead of backgrounding the whole
+        expression, only mytt(cmd2) is run in the background in zsh.
+        Use mytt(( cmd1 && cmd2 ) &) as a workaround.
   )
   it() Command line substitutions, globbing etc.:
   itemization(
@@ -959,6 +966,106 @@ label(28)
   properly, reviewing it line by line for differences between the two
   languages and adjusting it accordingly, just like you would
   when translating a book from American English to British English.
+
+sect(What is a mytt(namespace) anyway?)
+label(29)
+
+  As of this writing, namespaces in zsh are little more than syntactic
+  sugar for grouping related parameters.  For example, as of the update
+  to PCRE2, the parameters ${.pcre.match} and ${.pcre.subject} are used
+  for regular expression substring capture.  The mytt(.pcre.) part is
+  the namespace, and when you refer to a parameter that has one, you
+  mybf(must) use the mytt(${...}) braces around the name.  Assignments
+  are not special, they have the form mytt(.nspace.var=value) as usual.
+
+  Parameters using a namespace have the additional property that, like
+  file names beginning with a dot for globbing, they're hidden from
+  mytt(typeset) output unless explicitly asked for.
+
+  Namespaces appear in releases after but not including zsh 5.9.
+
+sect(What about named references?)
+label(210)
+
+  Named references are a bit like aliases, but for parameters.  A named
+  reference would typically be usable in the same cases as ${(P)name}
+  (see link(3.22)(322)).  The value of a named reference is the name
+  of another parameter, and when you expand or assign to the named
+  reference, that other parameter is expanded or assigned instead.
+  Thus a trivial example is
+  verb(
+    % target=RING
+    % typeset -n ref=target
+    % print $ref
+    RING
+    % ref=BULLSEYE
+    % print $target
+    BULLSEYE
+  )
+
+  One exception to this behavior is when a named reference is used as
+  the loop variable in a mytt(for) loop.  In that case the reference is
+  unset and reset on each iteration of the loop.
+  verb(
+    % target=RING bullseye=SPOT other=MISS
+    % typeset -n ref=other
+    % for ref in target bullseye; do
+    > print $ref
+    > ref=HIT:$ref
+    > done
+    RING
+    SPOT
+    % print $other
+    MISS
+    % print $ref
+    HIT:SPOT
+  )
+
+  Named references may be used in zsh versions later than 5.9.
+
+sect(What is zsh's support for non-forking command substitution?)
+label(211)
+
+  This is for cases where you'd write mytt($(command)) but you don't want
+  the overhead or other issues associated with forking a subshell.
+  There are 3 variations:
+  enumeration(
+  myeit() Borrowed from mksh
+   verb(
+     ${| code }
+   )
+   Runs code in the current shell context and then substitutes mytt(${REPLY}).
+
+  myeit() An extension to #1
+   verb(
+     ${|var| code }
+   )
+   Runs code in the current shell and then substitutes mytt(${var}).
+
+  myeit() The traditional ksh form, except that the closing mytt(;)
+   may usually be omitted:
+   verb(
+     ${ code }
+   )
+   Runs code in the current shell and substitutes its standard output.
+   (this is done with a temporary file ala mytt($(<=( code ))) but
+   without the fork implied by mytt(=(...))).
+  )
+
+  In all three forms mytt(code) behaves myem(similarly) to an anonymous
+  function invoked like:
+  verb(
+    () { local REPLY; code } "$@"
+  )
+  Thus, mytt($REPLY) is implicitly local and returns to its previous
+  value after the substitution ends, all other parameters declared from
+  inside the substitution are also local by default, and positional
+  parameters mytt($1), mytt($2), etc. are those of the calling context.
+
+  The most significant limitation is that braces (mytt({) and mytt(}))
+  within the substitutions must either be in balanced pairs, or must be
+  quoted, that is, included in a quoted string or prefixed by backslash.
+  These substitutions first become usable after zsh 5.9.
 
 chapter(How to get various things to work)
 
@@ -1641,6 +1748,7 @@ label(321)
   manual.
 
 sect(How do I get a variable's value to be evaluated as another variable?)
+label(322)
 
   The problem is that you have a variable tt($E) containing the string
   mytt(EDITOR), and a variable tt($EDITOR) containing the string mytt(emacs),
@@ -2509,14 +2617,11 @@ sect(What's on the wish-list?)
      characters.  Initial support for this appeared in version 4.3;
      it is reasonably complete in the line editor but patchy elsewhere
      (note this may require the configuration option --enable-multibyte).
-  it() The parameter code could do with tidying up, maybe with more of the
-     features made available in ksh93.
+  it() The parameter code could do with tidying up.
   it() Configuration files to enable zsh startup files to be created
      with the Dotfile Generator.
   it() Further improvements in integrating the line editor with shell
      functions.
-  it() POSIX compatibility could be improved.
-  it() Option for glob qualifiers to follow perl syntax (a traditional item).
   )
 
 sect(Did zsh have problems in the year 2000?)
@@ -2618,11 +2723,12 @@ https://github.com/chrisbra/vim_faq/blob/de424bd8e08bcf0e6b1e0563ee49514dfed926a
 
 nsect(Acknowledgments:)
 
-Thanks to zsh-list, in particular Bart Schaefer, for suggestions
+Thanks to zsh-workers, in particular Bart Schaefer, for suggestions
 regarding this document.  Zsh has been in the hands of archivists Jim
 Mattson, Bas de Bakker, Richard Coleman, Zoltan Hidvegi and Andrew
-Main, and the mailing list has been run by Peter Gray, Rick Ohnemus,
-Richard Coleman, Karsten Thygesen and Geoff Wing, all of whom deserve
+Main, and the mailing lists have been managed or hosted by Peter Gray,
+Rick Ohnemus, Richard Coleman, Karsten Thygesen, Geoff Wing, Phil
+Pennock, Daniel Shahaf, and Oliver Kiddle, all of whom deserve
 thanks.  The world is eternally in the debt of Paul Falstad for inventing
 zsh in the first place (though the wizzo extended completion is by Sven
 Wischnowsky).
@@ -2630,15 +2736,15 @@ Wischnowsky).
 nsect(Copyright Information:)
 
 This document is copyright (C) P.W. Stephenson, 1995, 1996, 1997,
-1998, 1999, 2000, 2012, 2020. This text originates in the U.K. and the author
-asserts his moral rights under the Copyrights, Designs and Patents Act,
-1988.
+1998, 1999, 2000, 2012, 2020, 2023. This text originates in the U.K.
+and the author asserts his moral rights under the Copyrights, Designs
+and Patents Act, 1988.
 
 Permission is hereby granted, without written agreement and without
 license or royalty fees, to use, copy, modify, and distribute this
 documentation for any purpose, provided that the above copyright
 notice appears in all copies of this documentation.  Remember,
-however, that this document changes monthly and it may be more useful
+however, this document changes occasionally and it may be more useful
 to provide a pointer to it rather than the entire text.  A suitable
 pointer is "information on the Z-shell can be obtained on the World
 Wide Web at URL https://zsh.sourceforge.io/".

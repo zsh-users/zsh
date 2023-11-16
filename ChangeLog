@@ -1,5 +1,7 @@
 2023-11-15  Bart Schaefer  <schaefer@zsh.org>
 
+	* 52308: Etc/FAQ.yo: mention new features, fix some old answers
+
 	* 52275: Src/compat.c: rationality in zgetdir() and zgetcwd() to
 	avoid silently wandering out of the current directory when path
 	parents are inaccessible.
