@@ -75,12 +75,12 @@ if ! _pick_variant gnu=gnu unix --help; then
   if [[ $OSTYPE = (dragonfly*|freebsd*|darwin*) ]]; then
     arguments+=(
       '-G[enable colorized output]'
+      '(-A)-I[prevent -A from being automatically set for the super-user]'
       '-P[do not follow symlinks]'
     )
   fi
   if [[ $OSTYPE = (dragonfly*|freebsd*) ]]; then
     arguments+=(
-      '(-A)-I[prevent -A from being automatically set for the super-user]'
       '(-1 -C -m -x)-D+[specify format for date]:format: _date_formats'
     )
   fi
@@ -91,15 +91,17 @@ if ! _pick_variant gnu=gnu unix --help; then
     )
   fi
   if [[ $OSTYPE = (freebsd*|darwin*) ]]; then
-    arguments+=( '(-c -u)-U[file creation time]' )
+    arguments+=(
+      '-,[print file sizes grouped and separated by thousands]'
+      '(-c -u)-U[file creation time]'
+      '-y[with -t, sort filenames in the same order as the time]'
+      '--color=-[control use of color]:color:(never always auto)'
+    )
   fi
   if [[ $OSTYPE = freebsd* ]]; then
     arguments+=(
-      '-,[print file sizes grouped and separated by thousands]'
       '(-S -f -t -U)-v[sort by version (filename treated numerically)]'
-      '-y[with -t, sort filenames in the same order as the time]'
       '-Z[display MAC label]'
-      '--color=-[control use of color]:color:(never always auto)'
     )
   fi
   if [[ $OSTYPE = darwin* ]]; then
@@ -109,6 +111,7 @@ if ! _pick_variant gnu=gnu unix --help; then
       '(-l -1 -C -m -x)-o[long listing but without group information]'
       '-O[display file flags]'
       '-v[print raw characters]'
+      '-%[distinguish dataless files and directories with a %]'
     )
   fi
   if [[ $OSTYPE = solaris* ]]; then
@@ -140,8 +143,8 @@ else
     '(--recursive -R)'{--recursive,-R}'[list subdirectories recursively]'
 
     '(--no-group -G)'{--no-group,-G}'[inhibit display of group information]'
-    '(--block-size --human-readable -h --si --kilobytes -k)'{--human-readable,-h}'[print sizes in human readable form]'
-    '(--block-size --human-readable -h --si --kilobytes -k)--si[sizes in human readable form; powers of 1000]'
+    '(--block-size --human-readable -h --si --kibibytes -k)'{--human-readable,-h}'[print sizes in human readable form]'
+    '(--block-size --human-readable -h --si --kibibytes -k)--si[sizes in human readable form; powers of 1000]'
     '(--inode -i)'{--inode,-i}'[print file inode numbers]'
 
     '(--format -l -g -o -1 -C -m -x)-l[long listing]'
@@ -149,16 +152,16 @@ else
     --group-directories-first
     '(--format -l --no-group -G -1 -C -m -x)-o[no group, long]'
     '(--format -l -g -o -C -m -x)-1[single column output]'
-    '(--format -l -g -o -1 -m -x)-C[list entries in columns sorted vertically]'
-    '(--format -l -g -o -1 -C -x)-m[comma separated]'
-    '(--format -l -g -o -1 -C -m)-x[sort horizontally]'
+    '(--format -l -g -o -1 -m -x --block-size --human-readable -h --si --kibibytes -k)-C[list entries in columns sorted vertically]'
+    '(--format -l -g -o -1 -C -x --block-size --human-readable -h --si --kibibytes -k)-m[comma separated]'
+    '(--format -l -g -o -1 -C -m --block-size --human-readable -h --si --kibibytes -k)-x[sort horizontally]'
     '(-l -g -o -1 -C -m -x)--format=[specify output format]:format:(verbose long commas horizontal across vertical single-column)'
 
     '(--size -s -f)'{--size,-s}'[display size of each file in blocks]'
 
     '(--time -u)-c[status change time]'
     '(--time -c)-u[access time]'
-    '(-c -u)--time=[specify time to show]:time:(ctime status use atime access)'
+    '(-c -u)--time=[specify time to show]:time:(ctime status use atime access birth creation)'
     '--time-style=[show times using specified style]:style: _alternative "time-styles\:time style\:(full-iso long-iso iso locale)" $datef'
 
     '(-a --all -U -l --format -s --size -t --sort --full-time)-f[unsorted, all, short list]'
@@ -174,15 +177,16 @@ else
     '--color=-[control use of color]:color:(never always auto)'
     "*--hide=[like -I, but overridden by -a or -A]:pattern: "
     '--hyperlink=[output terminal codes to link files using file::// URI]::when:(none auto always)'
-    '(--classify -F --indicator-style -p --file-type)'{--classify,-F}'[append file type indicators]'
+    '(--classify -F --indicator-style -p --file-type)-F[append file type indicators]'
+    '(--classify -F --indicator-style -p --file-type)--classify=-[append file type indicators]::when [always]:(none auto always)'
     '(--file-type -p --indicator-style -F --classify)--file-type[append file type indicators except *]'
     '(--file-type -p --indicator-style -F --classify)-p[append / to directories]'
     '(-F --classify -p --file-type)--indicator-style=[specify indicator style]:indicator style:(none file-type classify slash)'
 
     '(-f)--full-time[list both full date and full time]'
 
-    '(--block-size --human-readable -h --si --kilobytes -k)'{--kilobytes,-k}'[use block size of 1k]'
-    '(--human-readable -h --si --kilobytes -k)--block-size=[specify block size]:block size (bytes):(K M G T P E Z Y KB MB TB PB EB ZB YB)'
+    '(--block-size --human-readable -h --si --kibibytes -k)'{--kibibytes,-k}'[use block size of 1k]'
+    '(--human-readable -h --si --kibibytes -k -C -x)--block-size=[specify block size]:block size (bytes):(K M G T P E Z Y KB MB TB PB EB ZB YB)'
 
     '(--numeric-uid-gid -n)'{--numeric-uid-gid,-n}'[numeric uid, gid]'
     '(--tabsize -T)'{--tabsize=,-T+}'[specify tab size]:tab size'
@@ -195,6 +199,7 @@ else
 
     '(--hide-control-chars -q --show-control-chars)'{--hide-control-chars,-q}'[hide control chars]'
     '(-q --hide-control-chars)--show-control-chars'
+    '--zero[end each output line with NUL, not newline]'
     '(- :)--help[display help information]'
     '(- :)--version[display version information]'
     '*:file:_files'

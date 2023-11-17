@@ -55,7 +55,7 @@ else
   )
   local xdev='[skip directories on different filesystems]'
   for pattern arg in \
-    'freebsd*' '-A[apparent size instead of usage]' \
+    '(freebsd|darwin)*' '-A[apparent size instead of usage]' \
     '(darwin*|*bsd*|dragonfly*|solaris2.<10->)' '(-H -L -P)-H[follow symlinks on the command line]' \
     '(darwin|*bsd|dragonfly)*' '(-H -L -P)-P[do not follow symlinks (default)]' \
     '(darwin|dragonfly|freebsd)*' '*-I+[ignore files/directories matching specified mask]:mask' \
@@ -64,12 +64,12 @@ else
     'netbsd*' '-i[output inode usage instead of blocks]' \
     '(darwin*|freebsd*|netbsd*|solaris2.<11->)' '(-h -k -g -B)-m[use block size of 1M-byte]' \
     '(darwin|freebsd<8->.|netbsd)*' '(-h -k -m -B)-g[use block size of 1G-byte]' \
-    'freebsd*' '(-h -k -m -g)-B+[block size]:block size (bytes)' \
+    '(freebsd|darwin)*' '(-h -k -m -g)-B+[block size]:block size (bytes)' \
     '(darwin|*bsd|dragonfly)*' '-c[display grand total]' \
-    'freebsd*' '-l[count sizes many times if hard linked]' \
+    '(freebsd|darwin)*' '-l[count sizes many times if hard linked]' \
     '(freebsd|netbsd)*' '-n[ignore files and directories with nodump flag set]' \
     'solaris*' "(-a)-o[don't add child directories' usage to parent's total]" \
-    'freebsd<8->.*' '-t+[report only entries for which size exceeds threshold]:threshold' \
+    '(freebsd|darwin)*' '-t+[report only entries for which size exceeds threshold]:threshold' \
     'solaris*' "-d$xdev" \
     '(darwin|*bsd|dragonfly|solaris)*' "-x$xdev"
   do

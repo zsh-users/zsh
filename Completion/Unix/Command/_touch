@@ -28,7 +28,7 @@ case $variant in
   darwin*|dragonfly*|freebsd*|netbsd*)
     args+=( '-h[act on symbolic links themselves]' )
   ;|
-  dragonfly*|freebsd*|openbsd*|solaris*)
+  darwin*|dragonfly*|freebsd*|openbsd*|solaris*)
     args+=( '(-r -t 1)-d+[use specified date/time]:date/time' )
   ;|
   darwin*|dragonfly*|freebsd*|netbsd*|solaris*)

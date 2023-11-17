@@ -47,14 +47,10 @@ case $variant; in
   darwin*|dragonfly*|freebsd*|netbsd*)
     args+=(
       '-W[attempt to undelete named files]'
-    )
-    ;|
-  dragonfly*|freebsd*|netbsd*)
-    args+=(
       "-x[don't cross file systems when removing a hierarchy]"
     )
     ;|
-  dragonfly*|freebsd*)
+  darwin*|dragonfly*|freebsd*)
     args+=(
       '(-i)-I[prompt when removing many files]'
     )

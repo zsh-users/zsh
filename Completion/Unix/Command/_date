@@ -7,8 +7,8 @@ local -a opts args
 opts=( -s -w -C )
 
 if _pick_variant gnu="Free Software Foundation" unix --version; then
-  local d='(-d --date -f --file -r --reference -s --set)'
-  local f='(-I --iso-8601 -R --rfc-email --rfc-3339)'
+  local d='(-d --date -f --file -r --reference -s --set --resolution)'
+  local f='(-I --iso-8601 -R --rfc-email --rfc-3339 --resolution)'
   args=(
     $d{-d+,--date=}'[output date specified by string]:time string'
     '--debug[annotate parsed date and warn about questionable usage]'
@@ -16,10 +16,10 @@ if _pick_variant gnu="Free Software Foundation" unix --version; then
     $d{-r+,--reference=}'[output last modification time of specified file]:file:_files'
     $d{-s+,--set=}'[set time]:time string'
     $f{-I-,--iso-8601=-}'[display in ISO 8601 format]::precision:(date hours minutes seconds ns)'
+    '(-)--resolution[output the available resolution of timestamps]'
     $f{-R,--rfc-email}'[display in RFC5322 format]'
     $f'--rfc-3339=-[display in RFC 3339 format]:precision:(date seconds ns)'
-    '(-u --utc --universal)'{-u,--utc,--universal}'[display or set time in UTC]'
-    $d'--resolution[output the available resolution of timestamps]'
+    '(-u --utc --universal --resolution)'{-u,--utc,--universal}'[display or set time in UTC]'
     '(- :)--help[output help and exit]'
     '(- :)--version[output version info and exit]'
   )
@@ -44,12 +44,12 @@ else
 	'-f+[use specified format for input]:parsing format:_date_formats:new date'
       )
     ;|
-    dragonfly*|darwin*|netbsd*|openbsd*)
+    dragonfly*|netbsd*|openbsd*)
       args+=(
 	'-r+[output date specified by reference time]:seconds since epoch'
       )
     ;|
-    freebsd*)
+    freebsd*|darwin*)
       local -a alts
       alts=(
 	'seconds:sec:_guard "(0x[0-9a-fA-F]#|[0-9]#)" "seconds since epoch"'
@@ -57,22 +57,20 @@ else
       )
       args+=(
 	'-r+[reference time: file modification or literal time]:reference: _alternative $alts'
-	'(-R)-I-[display in ISO 8601 format]::precision:(date hours minutes seconds)'
       )
     ;|
     freebsd*|dragonfly*|darwin*)
       args+=(
+        '-R[display in RFC2822 format]'
+	'(-R)-I-[display in ISO 8601 format]::precision [date]:(date hours minutes seconds)'
 	"*-v+[adjust and print (but don't set) date]:[+-]value[ymwdHMS]"
       )
     ;|
-    freebsd<-12>.*|darwin*)
+    freebsd<-12>.*)
       args+=(
 	'-d+:daylight saving time value'
 	'-t+:minutes west of GMT'
       )
-    ;|
-    freebsd*|dragonfly*)
-      args+=( '-R[display in RFC2822 format]' )
     ;|
     openbsd*|netbsd*) args+=( '-a[gradually skew]' )
     ;|

@@ -1,4 +1,4 @@
-#compdef make gmake pmake dmake freebsd-make bmake
+#compdef make gmake gnumake pmake dmake freebsd-make bmake
 
 # TODO: Based on targets given on the command line, show only variables that
 # are used in those targets and their dependencies.

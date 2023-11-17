@@ -41,13 +41,13 @@ else
     darwin*|dragonfly*|freebsd*)
       args+=( '(-)-P[print id in the form of a password file entry]' )
     ;|
-    darwin*|freebsd*)
+    freebsd*)
       args+=(
 	'(-)-A[print process audit user ID]'
 	'(-)-M[print MAC label of the current process]'
+        '(-)-c[print current login class]'
       )
     ;|
-    freebsd*) args+=( '(-)-c[print current login class]' ) ;|
     darwin*|dragonfly*|freebsd*|netbsd*|openbsd*)
       args+=( '(-)-p[human readable output]' )
     ;;

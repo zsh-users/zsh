@@ -13,15 +13,16 @@ updownlist=(
 
 case $OSTYPE in
   darwin*)
-    args=( -s $updownlist )
+    args=( -s $updownlist
+      '-X+[list interfaces whose names match regular expression]:regex:_net_interfaces'
+    )
     opts=(
       $alias $debug delete dest_address ipdst nsellength
       {,-}trailers {,-}link{0,1,2}
     )
-  ;;
+  ;|
   freebsd*|dragonfly*)
     args=( -s $updownlist
-      '(-a -j -f -l -G -g -u -d -m -L 1 *)-C[list interface cloners]'
       '(-C)-f+[control the output format]: :_values -s, -S\: format
         "addr[adjust inet address display]\:format [numeric]\:(default fqdn host numeric)"
         "ether[adjust ethernet address display]\:format [colon]\:(colon dash dotted default)"
@@ -30,10 +31,7 @@ case $OSTYPE in
       '(-C)-G+[exclude members of the specified group]:group'
       '(-C)-g+[limit output to members of the specified group]:group'
       '(-C)-k[print keying information for the interface]'
-      '(-l -C)-m[list supported media]'
       '(-C)-n[disable automatic loading of network interface drivers]'
-      '(-l -C)-L[show address lifetime as time offset]'
-      '(-C)-v[get more verbose status for an interface]'
     )
     listopts=(
         active caps chan countries mac mesh regdomain roam txparam txpower
@@ -45,6 +43,14 @@ case $OSTYPE in
       stationname channel authmode {,-}powersave powersavesleep wepmode
       {,-}wep {,-}nwkey add delete ether {,-}link{0,1,2} list wme wmm
       roam roam:rssi roam:rate roaming
+    )
+  ;|
+  freebsd*|darwin*|dragonfly*)
+    args+=(
+      '(-a -j -f -l -G -g -u -d -m -L 1 *)-C[list interface cloners]'
+      '(-l -C)-m[list supported media]'
+      '(-l -C)-L[show address lifetime as time offset]'
+      '(-C)-v[get more verbose status for an interface]'
     )
   ;|
   freebsd<14->.*)

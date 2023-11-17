@@ -1,3 +1,17 @@
+2023-11-17  Oliver Kiddle  <opk@zsh.org>
+
+	* 52303: Completion/Unix/Command/_ifconfig,
+	Completion/Unix/Command/_chown, Completion/Unix/Command/_cp,
+	Completion/Unix/Command/_cut, Completion/Unix/Command/_date,
+	Completion/Unix/Command/_du, Completion/Unix/Command/_env,
+	Completion/Unix/Command/_id, Completion/Unix/Command/_ln,
+	Completion/Unix/Command/_ls, Completion/Unix/Command/_make,
+	Completion/Unix/Command/_mount, Completion/Unix/Command/_mv,
+	Completion/Unix/Command/_rm, Completion/Unix/Command/_sed,
+	Completion/Unix/Command/_split, Completion/Unix/Command/_touch,
+	Completion/Unix/Command/_uniq, Completion/Unix/Command/_xargs:
+	updates to completions for macOS 13
+
 2023-11-15  Bart Schaefer  <schaefer@zsh.org>
 
 	* 52309: Src/exec.c: suppress job control inside <<(substition)

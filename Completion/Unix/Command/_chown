@@ -43,7 +43,7 @@ case "$variant" in
       '(-H -L -P)-P[do not follow symlinks (default)]'
     )
     ;|
-  dragonfly*|freebsd*)
+  dragonfly*|freebsd*|darwin*)
     args+=(
       "-x[don't traverse file systems]"
     )
@@ -61,6 +61,11 @@ case "$variant" in
   solaris2.<11->)
     args+=(
       '-s[owner and/or group are Windows SID strings]'
+    )
+    ;;
+  darwin*)
+    args+=(
+      '-n[interpret user and group as numeric, avoiding name lookups]'
     )
     ;;
 esac

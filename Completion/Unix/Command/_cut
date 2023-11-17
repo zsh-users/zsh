@@ -46,7 +46,7 @@ if _pick_variant gnu="Free Soft" unix --version; then
     '*:file:_files'
 else
   case $OSTYPE in
-    freebsd*|dragonfly*) args=( '(-d)-w[use whitespace as the delimiter]' ) ;;
+    freebsd*|dragonfly*|darwin*) args=( '(-d)-w[use whitespace as the delimiter]' ) ;;
   esac
   _arguments $args \
     "-b[${_cut_args[bytes]}]:list" \
