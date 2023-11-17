@@ -93,7 +93,7 @@ _arguments -C -S -s \
   '--reuid[set real and effective UNIX user id]:UNIX user:_users' \
   '--securebits[set "process securebits"]: : _sequence __setpriv_prctl_securebits_set_elements' \
   '--pdeathsig[keep, clear, or set parent death signal]: : __setpriv_death_signals' \
-  '--selinux-label[request a selinux label]:SELinux labels: ' \
+  '--selinux-label[request a selinux label]:SELinux label:_selinux_contexts' \
   '--apparmor-profile[request an apparmor profile]:AppArmor profiles: ' \
   '--reset-env[set environment as for a classic login shell]' \
   '*:::command: _normal -p $service' \

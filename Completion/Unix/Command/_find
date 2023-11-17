@@ -115,14 +115,14 @@ case $variant in
       '*-readable'
       '*-writable'
       '*-xtype:file type:((b\:block\ special\ file c\:character\ special\ file d\:directory p\:named\ pipe f\:normal\ file l\:symbolic\ link s\:socket))'
-      '-files0-from[start recursing from targets in given file]:NUL-separated targets file:_files'
+      '(*)-files0-from[start recursing from targets in given file]:NUL-separated targets file:_files'
       '*-fls:output file:_files'
       '*-fprint:output file:_files'
       '*-fprint0:output file:_files'
       '*-fprintf:output file:_files:output format'
       '*-printf:output format'
     )
-    [[ $OSTYPE = linux-gnu ]] && args+=( '*-context:SELinux context (glob pattern):_selinux_contexts' )
+    [[ $OSTYPE = linux-gnu ]] && args+=( '*-context:SELinux context (glob pattern):_selinux_contexts -a file_type' )
   ;;
 esac
 

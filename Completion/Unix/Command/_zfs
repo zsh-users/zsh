@@ -295,7 +295,7 @@ case $OSTYPE in
   linux-gnu)
     rw_ds_props+=( 'relatime:value:(on off)' )
     ci_ds_props+=(
-      {,fs,def,root}'context:SELinux context:_selinux_contexts'
+      {,fs,def,root}'context:SELinux context:_selinux_contexts -a file_type'
     )
   ;;
 esac

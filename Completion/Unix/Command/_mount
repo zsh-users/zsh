@@ -334,9 +334,9 @@ if (( ! $+_fs_any )); then
       'keybits[set number of bits in encryption key]:key size:(64 128 160 192 256)'
       'offset[specify data start for loopback mount]:offset (bytes)'
       '(loud)silent' '(silent)loud'
-      '(fscontext defcontext)context:context'
-      '(context)'{fscontext,defcontext}':context'
-      'rootcontext:context'
+      '(fscontext defcontext)context:context:_selinux_contexts -a file_type'
+      '(context)'{fscontext,defcontext}':context:_selinux_contexts -a file_type'
+      'rootcontext:context:_selinux_contexts -a file_type'
     )
     _fs_adfs=(
       'uid[set owner of root]:user ID'
