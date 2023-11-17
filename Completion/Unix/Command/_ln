@@ -45,9 +45,11 @@ case $variant; in
       {-h,-n}'[do not dereference destination]'
       '(-f)-i[prompt before removing destination files]')
     ;;
-  darwin*|dragonfly*|freebsd*|netbsd*|openbsd*)
+  darwin*|dragonfly*|*bsd*)
     args+=(
-      {-h,-n}'[do not dereference destination]'
+      {-h,-n}"[don't dereference destination]"
+      '(-L)-P[create hard links directly to symbolic links]'
+      '(-P)-L[create hard links to symbolic link references]'
     )
     ;|
   darwin*|dragonfly*|freebsd*|netbsd*)
@@ -55,12 +57,6 @@ case $variant; in
       '-F[remove existing destination directories]'
       '(-f)-i[prompt before removing destination files]'
       '-v[print name of each linked file]'
-    )
-    ;|
-  dragonfly*|freebsd*|netbsd*|openbsd*)
-    args+=(
-      '(-L)-P[create hard links directly to symbolic links]'
-      '(-P)-L[create hard links to symbolic link references]'
     )
     ;|
   dragonfly*|freebsd*|netbsd*)

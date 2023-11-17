@@ -13,13 +13,17 @@ case $variant; in
         {existing,nil}"[numbered backups, if they already exist]"
         {simple,never}"[always make simple backups]"'
       '(-b --backup -n --no-clobber)-b[make a backup of each existing destination file]'
+      '(-v)--debug[explain how a file is copied]'
       '(-f --force -i --interactive -n --no-clobber)'{-f,--force}"[don't prompt before overwriting]"
       '(-f --force -i --interactive -n --no-clobber)'{-i,--interactive}'[prompt before overwriting existing file]'
+      '(-f --force -i --interactive -n --no-clobber)'{-n,--no-clobber}"[don't overwrite existing file]"
+      "--no-copy[don't copy if renaming fails]"
       '--strip-trailing-slashes[remove any trailing slashes from each source argument]'
       '(-S --suffix)'{-S+,--suffix=}'[specify the backup suffix]:backup suffix [~]'
       '(-t --target-directory)'{-t+,--target-directory=}'[move all source arguments into specified directory]:directory:_directories'
       '(-T --no-target-directory)'{-T,--no-target-directory}'[treat final argument as a normal file]'
-      '(-u --update)'{-u,--update}'[move only when destination file is older or missing]'
+      '(-u)--update=-[move only when destination file is older or missing]::update files [older]:(all none older)'
+      '(--update)-u[move only when destination file is older or missing]'
       '(-v --verbose)'{-v,--verbose}'[show file names after they are moved]'
       '(- *)--help[display usage information]'
       '(- *)--version[display version information]'
@@ -37,6 +41,7 @@ case $variant; in
   darwin*|dragonfly*|freebsd*)
     args+=(
       "(-f -i)-n[don't overwrite existing file]"
+      "-h[if target is a symlink to a directory, don't follow it]"
     )
     ;|
   darwin*|dragonfly*|*bsd*)
@@ -44,11 +49,6 @@ case $variant; in
       '-v[show file names after they are moved]'
     )
     ;|
-  dragonfly*|freebsd*)
-    args+=(
-      "-h[if target is a symlink to a directory, don't follow it]"
-    )
-    ;;
 esac
 
 _arguments -s -S $aopts $args \

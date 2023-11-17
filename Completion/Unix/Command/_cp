@@ -51,14 +51,16 @@ else
     '(aix|hpux|irix|solaris)*' '-r[copy directories recursively]' \
     'solaris2.<9->*' '-@[preserve extended attributes]' \
     'solaris2.<11->*' '-/[preserve extended attributes and extended system attributes]' \
+    'solaris2.<11->*' '-z[fast relink(3C) based copy]' \
     '(darwin|dragonfly|freebsd)*' "(-f -i)-n[don't overwrite existing file]" \
     'netbsd*' "-N[don't copy file flags]" \
     '(darwin|dragonfly|freebsd|netbsd|openbsd)*' '-a[archive mode, same as -RpP]' \
-    '(dragonfly|freebsd)*' '-l[link files instead of copying]' \
+    '(dragonfly|freebsd|darwin)*' '-l[link files instead of copying]' \
     '(darwin|dragonfly|*bsd)*' '-v[show file names as they are copied]' \
     'darwin*' "-X[don't copy extended attributes or resource forks]" \
-    '(dragonfly|freebsd)*' "-x[don't traverse file systems]" \
-    'freebsd<10->.*' '-s[make symbolic links instead of copies of non-directories]'
+    '(dragonfly|freebsd|darwin)*' "-x[don't traverse file systems]" \
+    '(freebsd<10->.|darwin)*' '-s[make symbolic links instead of copies of non-directories]' \
+    'darwin*' '-c[copy files using clonefile(2)]'
   do
     [[ $OSTYPE = $~pattern ]] && args+=( $arg )
   done

@@ -104,14 +104,13 @@ else
   case $OSTYPE in
     openbsd*|freebsd*|netbsd*|darwin*|dragonfly*)
       args+=(
-	'(-r -E)'-E$extended
+	'(-r -E)'{-E,-r}$extended
 	'-a[delay opening files listed with w function]'
       )
     ;|
-    openbsd*|freebsd*|netbsd*|dragonfly*) args+=( '(-r -E)'-r$extended ) ;|
     darwin*|freebsd*|netbsd*|openbsd*|dragonfly*) args+=( '-i+'$inplace ) ;|
     darwin*|freebsd*|netbsd*|dragonfly*) args+=( '-l[make output line buffered]' ) ;|
-    freebsd*|dragonfly*) args+=( '-u[disable data buffering]' ) ;|
+    darwin*|freebsd*|dragonfly*) args+=( '-u[disable data buffering]' ) ;|
     freebsd*|netbsd*|dragonfly*)
       args+=(
         '-I+[edit files in-place, treating all files as a single input stream]:: :_guard "^(*[@/; \\\]*|?(#c6,)|-*)" "suffix for backup"'

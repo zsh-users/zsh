@@ -24,10 +24,12 @@ case $variant in
   ;;
   freebsd*)
     args=(
-      '-0[use NUL, not newline after each variable in output]'
       '-L[add variables from system login.conf(5)]: :->user-class'
       '-U[add variables from user and system login.conf(5)]: :->user-class'
     )
+  ;|
+  freebsd*|darwin*)
+    args=( '-0[use NUL, not newline after each variable in output]' )
   ;|
   freebsd*|darwin*|dragonfly*)
     args+=(

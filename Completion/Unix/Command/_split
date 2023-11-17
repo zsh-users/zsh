@@ -39,17 +39,17 @@ case $variant in
       '(- 1 2)--version[display version information]'
     )
   ;;
-  (free|net)bsd*)
+  (free|net)bsd*|darwin*)
     args+=( '(-b -l -p)-n+[generate specified number of output files]:output files' )
   ;|
   darwin*|freebsd*)
     args+=(
+      '-d[use numeric suffixes]'
       '(-b -l -n)-p+[split the file whenever a line matches specified pattern]:pattern'
     )
   ;|
   freebsd*)
     args+=(
-      '-d[use numeric suffixes]'
       "-c[continue creating files and don't overwrite existing output files]"
     )
   ;;
