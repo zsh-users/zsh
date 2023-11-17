@@ -1,0 +1,781 @@
+#compdef audit2allow audit2why avcstat chcon checkmodule checkpolicy fixfiles getpidprevcon getsebool matchpathcon restorecon runcon sealert secon sedta seinfo selinuxconlist selinuxdefcon selinuxexeccon semanage semodule semodule_unpackage sepolgen sepolicy sesearch sestatus setenforce setsebool validatetrans
+
+# encompasses checkpolicy libselinux-utils policycoreutils
+# policycoreutils-devel policycoreutils-python-utils setools-console
+# setools-console-analyses setroubleshoot-server and a few utilities from
+# coreutils
+
+_selinux_attributes() {
+  local -a seattrs expl
+
+  seattrs=( ${(f)"$(_call_program selinux-attributes seinfo --flat -a)"} )
+  _description selinux-attrs expl "selinux attribute"
+  compadd "$@" "$expl[@]" -a seattrs
+}
+
+_selinux_bools() {
+  local -a sebools expl
+
+  sebools=( ${(f)"$(_call_program selinux-bools seinfo --flat -b)"} )
+  _description selinux-bools expl "selinux boolean"
+  compadd "$@" "$expl[@]" -a sebools
+}
+
+_selinux_categories() {
+  local -a secats expl
+
+  secats=( ${(f)"$(_call_program selinux-categories seinfo --flat --category)"} )
+  _description selinux-categories expl "selinux category"
+  compadd "$@" "$expl[@]" -a secats
+}
+
+_selinux_classes() {
+  local -a seclasses expl
+
+  seclasses=( ${(f)"$(_call_program selinux-classes seinfo --flat -c)"} )
+  _description selinux-classes expl "selinux object class"
+  compadd "$@" "$expl[@]" -a seclasses
+}
+
+_selinux_commons() {
+  local -a secommons expl
+
+  secommons=( ${(f)"$(_call_program selinux-commons seinfo --flat --common)"} )
+  _description selinux-commons expl "selinux common permission set"
+  compadd "$@" "$expl[@]" -a secommons
+}
+
+_selinux_interfaces() {
+  local -a seints expl
+
+  seints=( ${(f)"$(_call_program selinux-interfaces sepolicy interface -l)"} )
+  _description selinux-interfaces expl "selinux interface"
+  compadd "$@" "$expl[@]" -a seints
+}
+
+_selinux_permissions() {
+  local -a seperms expl
+
+  seperms=( ${${${${(f)"$(_call_program selinux-permissions seinfo -c --flat -x)"}:#[^[:blank:]]*}#[[:blank:]]}:1} )
+  _description selinux-permissions expl "selinux permission"
+  compadd "$@" "$expl[@]" -a seperms
+}
+
+_selinux_sids() {
+  local -a sesids expl
+
+  sesids=( ${(f)"$(_call_program selinux-sids seinfo --flat --initialsid)"} )
+  _description selinux-sids expl "selinux SID"
+  compadd "$@" "$expl[@]" -a sesids
+}
+
+_selinux_sens() {
+  local -a sens expl
+
+  sesids=( ${(f)"$(_call_program selinux-sens seinfo --flat --initialsid)"} )
+  _description selinux-sensitivities expl "selinux sensitivity"
+  compadd "$@" "$expl[@]" -a sesids
+}
+
+_selinux_modules() {
+  local -a modules expl
+
+  modules=( ${(f)"$(_call_program selinux-modules semodule -l)"} )
+  _description selinux-modules expl "selinux module"
+  compadd "$@" "$expl[@]" -a modules
+}
+
+local curcontext="$curcontext" ret=1
+local -A opt_args
+local -a args sepolgen state state_descr line
+local ign
+(( $#words > 2 )) && ign='!'
+
+sepolgen=(
+  "${ign}(-h --help)"{-h,--help}'[display help information]'
+  '(--application --cgi --dbus --inetd --init --admin_user --confined_admin --desktop_user --newtype --sandbox --x_user)'*{-d+,--domain=}'[specify domain to expand]:domain:_selinux_types -a domain'
+  \*{-r+,--role=}'[specify role(s) to which the administrator domain will transition]: :_selinux_roles'
+  \*{-u+,--user=}'[specify SELinux user(s) which will transition to this domain]: :_selinux_users'
+  \*{-a+,--admin=}'[specify domain(s) which this confined admin will administrate]:admin domain:_selinux_types'
+  '(-n --name)'{-n+,--name=}'[specify name of policy to generate]:name'
+  '(--admin_user --confined_admin --desktop_user --newtype --sandbox --x_user)*'{-t+,--type=}'[specify type(s) for which you will generate new definition and rule(s)]:type:_selinux_types'
+  '(-p --path)'{-p+,--path=}'[specify path in which the generated policy files will be stored]:path:_directories'
+  '(--newtype)*'{-w+,--writepath=}'[specify path to which the confined processes will need to write]:path:_directories'
+  '1:command:_files'
+  + '(application)'
+  "(-d)--application[generate 'User Application' policy]"
+  "(-d)--cgi[generate 'Web Application/Script (CGI)' policy]"
+  "(-d)--dbus[generate 'DBUS System Daemon' policy]"
+  "(-d)--inetd[generate 'Internet Services Daemon' policy]"
+  "(-d)--init[generate 'Standard Init Daemon' policy]"
+  "(-d -t 1)--admin_user[generate 'Administrator Login User Role' policy]"
+  "(-d -t 1)--confined_admin[generate 'Confined Root Administrator Role' policy]"
+  "(1)--customize[generate 'Existing Domain Type' policy]"
+  "(-d -t 1)--desktop_user[generate 'Desktop Login User Role' policy]"
+  "(-d -w 1)--newtype[generate 'Module information for a new type' policy]"
+  "(-d -t 1)--sandbox[generate 'Sandbox' policy]"
+  "(-d -t 1)--term_user[generate 'Minimal Terminal Login User Role' policy]"
+  "(-d -t 1)--x_user[generate 'Minimal X Windows Login User Role' policy]"
+)
+
+case $service in
+  check(module|policy))
+    args=(
+      '(-b --binary)'{-b,--binary}'[read an existing binary policy file rather than a source policy.conf file]'
+      '(-C --cil)'{-C,--cil}'[write CIL policy file rather than binary policy file]'
+      '(-E --werror)'{-E,--werror}'[treat warnings as errors]'
+      "${ign}(-h --help)"{-h,--help}'[display help information]'
+      '(-U --handle-unknown)'{-U+,--handle-unknown=}'[specify how the kernel should handle unknown classes or permissions]:action:(deny allow reject)'
+      '(-M --mls)'{-M,--mls}'[enable the MLS policy when checking and compiling the policy]'
+      '(-o --output)'{-o+,--output=}'[write a policy file]:file:_files'
+      '-c+[specify the policy version]:policy version [latest]'
+      ':input file:_files'
+    )
+  ;|
+
+  audit2(allow|why))
+    args=(
+      '(-b --boot -i --input)'{-b,--boot}'[audit messages since last boot]'
+      '(-a --all -i --input -d --dmesg)'{-a,--all}'[read input from audit log]'
+      '(-p --policy)'{-p+,--policy=}'[specify policy file to use for analysis]:file:_files'
+      '(-d --dmesg -a --all -i --input)'{-d,--dmesg}'[read input from dmesg]'
+      '(-i --input -a --all -b --boot)'{-i+,--input=}'[read input from file]:file:_files'
+      '(-l --lastreload)'{-l,--lastreload}'[read input only after the last reload]'
+      '(-r --requires)'{-r,--requires}'[generate require statements for rules]'
+      '(-m --module -M --module-package -r --requires)'{-m+,--module=}'[set the module name]:module name:_selinux_modules'
+      '(-M --module-package -o --output -m --module)'{-M+,--module-package=}'[generate a module package]:module package:_files'
+      '(-o --output -M --module-package)'{-o+,--output=}'[append output to file]:file:_files'
+      '(-D --dontaudit)'{-D,--dontaudit}'[generate policy with dontaudit rules]'
+      '(-R --reference)'{-R,--reference}'[use installed macros in generated policy]'
+      '!(-R --reference -N --noreference)'{-N,--noreference}
+      '(-v --verbose)'{-v,--verbose}'[explain generated output]'
+      '(-e --explain)'{-e,--explain}'[fully explain generated output]'
+      '(-t --type)'{-t+,--type=}'[only process messages with type matching regex]:type'
+      '--perm-map=[specify file name of perm map]:file:_files'
+      '--interface-info=[specify file name of interface information]:file:_files'
+      '(-x --xperms)'{-x,--xperms}'[generate extended permission rules]'
+      '--debug[leave generated modules for -M]'
+      '(-w --why)'{-w,--why}'[translate SELinux audit messages into a description of why the access was denied]'
+      "${ign}(-h --help)"{-h,--help}'[display help information]'
+      "${ign}--version[display version information]"
+    )
+  ;;
+
+  avcstat)
+    args=(
+      '-c[cumulative]'
+      '-f+[specify AVC statistics file]:file [/sys/fs/selinux/avc/cache_stats]:_files'
+      ': :_guard "^-*" "interval (seconds)"'
+    )
+  ;;
+
+  chcon)
+    args=( -S
+      '(-h --no-dereference)--dereference[dereference symlinks]' \
+      '(-h --no-dereference --dereference)'{-h,--no-dereference}'[operate on symlinks themselves]' \
+      '(1 -u --user -r --role  -l --range -t --type)--reference=[copy security context of specified file]:file:_files' \
+      '(1 --reference -u --user)'{-u+,--user=}'[set user in the target security context]: :_selinux_users' \
+      '(1 --reference -r --role)'{-r+,--role=}'[set role in the target security context]: :_selinux_roles' \
+      '(1 --reference -t --type)'{-t+,--type=}'[set type in the target security context]: :_selinux_types' \
+      '(1 --reference -l --range)'{-l+,--range=}'[set range in the target security context]:selinux range' \
+      '(--recursive -R)'{--recursive,-R}'[recurse subdirectories]' \
+      '(-v --verbose)'{-v,--verbose}'[output a diagnostic for every file processed]' \
+      '(-H -L -P)-H[follow symlinks on the command line]' \
+      '(-H -L -P)-L[follow all symlinks]' \
+      "(-H -L -P)-P[don't follow symlinks (default)]" \
+      '!(--preserve-root)--no-preserve-root' \
+      "--preserve-root[fail to operate recursively on '/']" \
+      '(--reference -u --user -r --role  -l --range -t --type)1:security context:_selinux_contexts' \
+      "${ign}--help[display help information]" \
+      "${ign}--version[display version information]" \
+      '*:file:_files'
+    )
+  ;;
+
+  checkmodule)
+    args=(
+      "${ign}(-)"{-V,--version}'[show policy versions created by this program]'
+      '-m[build a policy module instead of a base module]'
+      '-c+[build a policy module targeting a modular policy version]:version (4-21)'
+    )
+  ;;
+
+  checkpolicy)
+    args=(
+      '(-F --conf)'{-F,--conf}'[write policy.conf file rather than binary policy file]'
+      '(-d --debug)'{-d,--debug}'[enter debug mode after loading the policy]'
+      '(-S --sort)'{-S,--sort}'[sort ocontexts before writing out the binary policy]'
+      '(-t --target)'{-t+,--target=}'[specify the target platform]:platform:(selinux xen)'
+      '(-O --optimize)'{-O,--optimize}'[optimize the final kernel policy (remove redundant rules)]'
+      "${ign}(-)"{-V,--version}'[display version information]'
+    )
+  ;;
+
+  fixfiles)
+    args=(
+      '-B[record current date in /.autorelabel to speed later labeling]'
+      '-F[force reset of context to match file_context for customizable files]'
+      '-f[clear /tmp directory without prompt for removal]'
+      '-R+[discover files from specified rpm packages]:package'
+      '-C+[run a diff on the specified file]:file:_files'
+      '-N+[only act on files created after the specified date]:date (YYYY-MM-DD HH\:MM):_dates'
+      '-v[show changes in file labels]'
+      '-T+[specify number of threads to use]:threads'
+      '1::action:(check verify restore relabel onboot)'
+      '*:file:_files'
+    )
+  ;;
+
+  getpidprevcon)
+    _pids
+    return
+  ;;
+
+  getsebool)
+    args=(
+      '(:)-a[show all booleans]'
+      '(-a):boolean:_selinux_bools'
+    )
+  ;;
+
+  matchpathcon)
+    args=(
+      '-m+[force file type for the lookup]:type:(file dir pipe chr_file blk_file lnk_file sock_file)'
+      "-n[don't display path]"
+      "-N[don't use translations]"
+      '-f+[use alternate file_context file]:file:_files'
+      '-p+[use prefix to speed translations]:prefix'
+      '-P+[use alternate policy root path]:path:_directories'
+      '-V[verify file context on disk matches defaults]'
+      '*:file path:_files'
+    )
+  ;;
+
+  restorecon)
+    args=(
+      '*-e+[exclude a directory]:directory:_directories'
+      '-f+[provide list of files to be processed]:file:_files'
+      '-F[force reset of context to match file_context for customizable files]'
+      "-i[ignore files that don't exist]"
+      '-I[ignore digest to force checking of labels even if SHA256 digest matches]'
+      '-D[set or update any directory SHA256 digests]'
+      '-m[include non-seclabel mounts in relabeling checks]'
+      "-n[don't change any file labels (passive check)]"
+      '(-v)-p[show progress]'
+      '(-R -r)'{-R,-r}'[change file labels recursively]'
+      '(-p)-v[show changes in file labels]'
+      '-W[display warnings about entries that had no matching files]'
+      '-0[expect NUL characters as input filename separators]'
+      "-x[don't cross file system boundaries]"
+      '-T+[specify number of threads to use]:threads'
+      "${ign}(-)"{-h,-\?}'[display help information]'
+      '*:file path:_files'
+    )
+  ;;
+
+  runcon)
+    args=(
+      '(1 -c --compute)'{-c,--compute}'[compute process transition context before modifying]'
+      '(1 -t --type=TYPE)'{-t+,--type=}'[specify type]: :_selinux_types'
+      '(1 -u --user=USER)'{-u+,--user=}'[specify user identity]: :_selinux_users'
+      '(1 -r --role=ROLE)'{-r+,--role=}'[specify role]: :_selinux_roles'
+      '(1 -l --range=RANGE)'{-l+,--range=}'[specify level range]:range'
+      '(-)1:security context:_selinux_contexts'
+      '*:::args:_normal'
+    )
+  ;;
+
+  sealert)
+    args=(
+      '(-b --browser)'{-b,--browser}'[launch the browser]'
+      '(-s --service -S --noservice)'{-s,--service}'[start sealert as a dbus service]'
+      '(-S --noservice -s --service)'{-S,--noservice}'[start sealert without dbus service as standalone app]'
+      '(-l --lookupid)'{-l+,--lookupid=}'[lookup alert by id, id may be wildcard * to lookup all alerts]:id'
+      '(-a --analyze)'{-a+,--analyze=}'[scan a log file, analyze its AVCs]:log file:_files'
+      '(-u --user)'{-u+,--user=}'[logon user name]:username'
+      '(-p --password)'{-p+,--password=}'[logon user password]:password'
+      '(-P --plugin)'{-P+,--plugin=}'[specify plugin name, required for -f]:plugin name'
+      '(-f --fix)'{-f+,--fix=}'[fix avc with the given uuid, requires plugin]:uuid'
+      "${ign}(-)"{-h,--help}'[display help information]'
+    )
+  ;;
+
+  secon)
+    args=(
+      "${ign}(-)"{-h,--help}'[display help information]'
+      "${ign}(-)--version[display version information]"
+      '(-P --prompt)'{-P,--prompt}'[output in a format good for a prompt]'
+      '(-u --user)'{-u,--user}'[show user of the context]'
+      '(-r --role)'{-r,--role}'[show role of the context]'
+      '(-t --type)'{-t,--type}'[show type of the context]'
+      '(-s --sensitivity)'{-s,--sensitivity}'[show sensitivity level of the context]'
+      '(-c --clearance)'{-c,--clearance}'[show clearance level of the context]'
+      '(-m --mls-range)'{-m,--mls-range}'[show sensitivity to clearance range of]'
+      '(-R --raw)'{-R,--raw}'[output context in "raw" format]'
+      '(-C --color)'{-C,--color}'[output using ANSI color codes (requires -P)]'
+      + '(context)'
+      {--self,--current}'[get context for the current process]'
+      {--self-exec,--current-exec}'[get exec context for the current process]'
+      {--self-fs,--current-fs}'[get fs context for the current process]'
+      {--self-key,--current-key}'[get key context for the current process]'
+      '--parent[get context for the parent process]'
+      '--parent-exec[get exec context for the parent process]'
+      '--parent-fs[get fs context for the parent process]'
+      '--parent-key[get key context for the parent process]'
+      {-p+,--pid=}'[context from the specified pid]:pid:_pids'
+      '--pid-exec[use exec context from the specified pid]:pid:_pids'
+      '--pid-fs[use fs context from the specified pid]:pid:_pids'
+      '--pid-key[use key context from the specified pid]:pid:_pids'
+      {-f+,--file=}'[use context from the specified file]:file:_files'
+      {-L+,--link=}"[use context from the specified file, doesn't follow symlinks]:file:_files"
+      ':context:_selinux_contexts'
+    )
+  ;;
+
+  sedta)
+    args=(
+      '(-p --policy)'{-p+,--policy=}'[specify path to SELinux policy to analyze]:policy:_files'
+      '(-s --source)'{-s+,--source=}'[specify source type of the analysis]:source:_selinux_types -a domain'
+      '(-t --target)'{-t+,--target=}'[specify target type of the analysis]:target:_selinux_types -a domain'
+      '--full[print rule lists for transitions]'
+      '--stats[display statistics at the end of the analysis]'
+      '(-v --verbose)'{-v,--verbose}'[extra informational messages]'
+      '--debug[enable debugging]'
+      '(-S --shortest_path)'{-S,--shortest_path}'[calculate all shortest paths]'
+      '(-A --all_paths)'{-A+,--all_paths=}'[calculate all paths]:max steps'
+      '(-r --reverse)'{-r,--reverse}'[perform a reverse DTA]'
+      '(-l --limit_trans)'{-l+,--limit_trans=}'[limit to the specified number of transitions]:limit'
+      '*:excluded domain:_selinux_types -a domain'
+      "${ign}(- *)"{-h,--help}'[display help information]'
+      "${ign}(-)--version[display version information]"
+    )
+  ;;
+
+  seinfo)
+    args=(
+      '(-a --attribute)'{-a,--attribute}'[list attributes or print named attribute]:: :_selinux_attributes'
+      '(-b --bool)'{-b,--bool}'[list booleans or print named boolean]:: :_selinux_bools'
+      '(-c --class)'{-c,--class}'[list object classes or print named object class]:: :_selinux_classes'
+      '(-r --role)'{-r,--role}'[list roles or print named role]:: :_selinux_roles'
+      '(-t --type)'{-t,--type}'[list types or print named type]:: :_selinux_types'
+      '(-u --user)'{-u,--user}'[list users or print named user]:: :_selinux_users'
+      '--category[list categories or print named category]:: :_selinux_categories'
+      '--common[list common permission sets or print named common]:: :_selinux_commons'
+      '--constrain[list constraints or print constraints for named object class]:: :_selinux_classes'
+      '--default[list default_* statements or print statements for named object class]:: :_selinux_classes'
+      '--fs_use[list fs_use_* statements or print statements for named filesystem type]:: :_file_systems'
+      '--genfscon[list genfscon statements or print statements for named filesystem type]:: :_file_systems'
+      '--initialsid[list initial SIDs or print named SID]:: : _selinux_sids'
+      '--netifcon[list netif contexts or print for named interface]:: : _net_interfaces'
+      '--nodecon[list node contexts or print statement for node with specified address]::address'
+      '--permissive[list permissive types or print named statement]::type'
+      '--polcap[list policy capabilities or print named statement]::type'
+      '--portcon[list port contexts or print statements for port range]::port range'
+      '--sensitivity[list sensitivities or print named sensitivity]:: :_selinux_sens'
+      '--typebounds[list type bounds or print named bound type]:: :_selinux_typebounds'
+      '--validatetrans[list validatetrans rules or print constraints for named object class]:: :_selinux_classes'
+      '--all[list all components]'
+      '(-x --expand)'{-x,--expand}'[print additional details]'
+      '--flat[exclude headers and indentation in output]'
+      '(-v --verbose)'{-v,--verbose}'[print additional informational messages]'
+      '--debug[enable debugging output]'
+      "${ign}--help[display help information]"
+      "${ign}--version[display version information]"
+      ':policy:_files'
+    )
+  ;;
+
+  selinuxconlist)
+    args=(
+      '-l+[specify mcs/mls level]:level'
+      ':user:_selinux_users'
+      ':context:_selinux_contexts'
+    )
+  ;;
+
+  selinuxdefcon)
+    args=(
+      '-l+[specify mcs/mls level]:level'
+      ':user:_users'
+      ':context:_selinux_contexts'
+    )
+  ;;
+
+  selinuxexeccon)
+    args=(
+      '1:command:_files -g "*(-*)"'
+      '2:from context:_selinux_contexts'
+    )
+  ;;
+
+  semanage)
+    _arguments -C \
+      {-h,--help}'[display help information]' \
+      ': :->command' \
+      '*::: := ->option-or-argument' && ret=0
+
+    case $state in
+      command)
+        local -a subcmds
+
+        subcmds=(
+          import:'import local customizations'
+          export:'output local customizations'
+          login:'manage login mappings between linux users and SELinux confined users'
+          user:'manage SELinux confined users (Roles and levels for an SELinux user)'
+          port:'manage network port type definitions'
+          interface:'manage network interface type definitions'
+          module:'manage SELinux policy modules'
+          node:'manage network node type definitions'
+          fcontext:'manage file context mapping definitions'
+          boolean:'manage booleans to selectively enable functionality'
+          permissive:'manage process type enforcement mode'
+          dontaudit:'disable/enable dontaudit rules in policy'
+          ibpkey:'manage infiniband pkey type definitions'
+          ibendport:'manage infiniband end port type definitions'
+        )
+
+        _describe -t commands command subcmds
+        return
+      ;;
+      option-or-argument)
+        (( $#words > 2 )) && ign='!' || ign=''
+        curcontext=${curcontext%:*}-$line[1]:
+        args=(
+          "${ign}(-)"{-h,--help}'[display help information]'
+          '(-S --store)'{-S+,--store=}'[select an alternate SELinux Policy Store to manage]:store:_files'
+        )
+
+        case $line[1] in
+          ^export)
+            args+=( '(-N --noreload)'{-N,--noreload}"[don't reload policy after commit]" )
+          ;|
+          boolean|fcontext|ibendport|ibpkey|interface|login|module|node|port|user)
+            args+=( '(-C --locallist)'{-C,--locallist}'[list local customizations]' )
+          ;|
+          boolean|fcontext|ibendport|ibpkey|interface|login|module|node|permissive|port|user)
+            args+=(
+              '(-n --noheading)'{-n,--noheading}"[don't print list heading]"
+              '(-l --list)'{-l,--list}'[list records]'
+              '(-E --extract)'{-E,--extract}'[extract customizable commands, for use within a transaction]'
+            )
+          ;|
+          boolean|dontaudit|export|import)
+            args+=( '(-a --add)'{-a,--add}'[add a record]' )
+          ;|
+          boolean|fcontext|ibendport|ibpkey|interface|login|node|permissive|port|user)
+            args+=(
+              '(-d --delete)'{-d,--delete}'[delete a record]'
+              '(-D --deleteall)'{-D,--deleteall}'[remove all local customizations]'
+            )
+          ;|
+          boolean|fcontext|ibendport|ibpkey|interface|login|node|port|user)
+            args+=( '(-m --modify)'{-m,--modify}'[modify a record]' )
+          ;|
+          fcontext|login)
+            args+=( '(-s --seuser)'{-s+,--seuser=}'[SELinux user name]:seuser:_selinux_users' )
+          ;|
+          fcontext|ibendport|ibpkey|interface|node|port)
+            args+=( '(-t --type)'{-t+,--type=}'[SELinux Type for the object]:type:_selinux_contexts -a file_type' )
+          ;|
+          fcontext|ibendport|ibpkey|interface|login|node|port|user)
+            args+=( '(-r --range)'{-r+,--range=}'[specify MLS/MCS Security Range]:range' )
+          ;|
+
+          import)
+            args+=( '(-f --input_file)'{-f+,--input_file=}'[specify input file]:input file:_files' )
+          ;;
+          export)
+            args+=( '(-f --output_file)'{-f+,--output_file=}'[specify output file]:output_file' )
+          ;;
+          login)
+            args+=( '(-l --list)1: :{ compset -P % && _groups || _users }' )
+          ;;
+          user)
+            args+=(
+              '(-L --level)'{-L,--level}'[default SELinux Level for SELinux user, s0 Default. (MLS/MCS Systems only)]:level'
+              \*{-R,--roles}'[specify SELinux Roles]:roles:_selinux_roles'
+              ': :_selinux_users'
+            )
+          ;;
+          port)
+            args+=(
+              '(-p --proto)'{-p+,--proto=}'[specify protocol for the specified port]:protocol:(tcp udp dccp sctp)'
+              ': :_ports'
+            )
+          ;|
+          interface)
+            args+=( ': :_selinux_interfaces' )
+          ;;
+          module)
+            args+=(
+              '(-P --priority)'{-P+,--priority=}'[select a priority for module operations]:priority [400]'
+              '(-E --extract)'{-E,--extract}'[extract customizable commands, for use within a transaction]'
+              '(-a --add)'{-a,--add}'[add a module]:module name:_selinux_modules'
+              '(-r --remove)'{-r,--remove}'[remove a module]:module name:_selinux_modules'
+              '(-d --disable)'{-d,--disable}'[disable a module]:module name:_selinux_modules'
+              '(-e --enable)'{-e,--enable}'[enable a module]:module name:_selinux_modules'
+            )
+          ;;
+          node)
+            args+=(
+              '(-p --proto)'{-p+,--proto=}'[specify protocol for the specified node]:protocol:(ipv4 ipv6)'
+              '(-M --netmask)'{-M+,--netmask=}'[specify network mask]:netmask'
+              ':node:'
+            )
+          ;;
+          fcontext)
+            args+=(
+              '(-e --equal)'{-e+,--equal=}'[substitute target path with sourcepath when generating default label]:equal'
+              '(-f --ftype)'{-f+,--ftype=}'[specify file type]:file type:((
+                f\:regular\ file
+                d\:directory
+                c\:character\ device
+                b\:block device
+                s\:socket
+                l\:symbolic\ link
+                p\:named\ pipe))'
+              ':file spec (regex):_files'
+            )
+          ;;
+          boolean)
+            args+=(
+              '(-)'{-1,--on}'[enable]'
+              '(-)'{-0,--off}'[disable]'
+              ':boolean:_selinux_bools'
+            )
+          ;;
+          permissive)
+            args+=( '1:type:_selinux_types' )
+          ;;
+          dontaudit)
+            args+=( '1:value:(on off)' )
+          ;;
+          ibpkey)
+            args+=(
+              '(-x --subnet_prefix)'{-x,--subnet_prefix}'[specify subnet prefix for the specified infiniband ibpkey]:subnet prefix'
+              ':pkey:'
+            )
+          ;;
+          ibendport)
+            args+=(
+              '(-z --ibdev_name)'{-z+,--ibdev_name=}'[specify name for the specified infiniband end port]:ibdev name'
+            )
+          ;;
+        esac
+      ;;
+    esac
+  ;;
+
+  semodule)
+    args=(
+      \*{-R,--reload}'[force a reload of policy]'
+      \*{-B,--build}'[build and reload policy]'
+      \*'--refresh[like --build but reuse existing linked policy if module files unchanged]'
+      \*{-D,--disable_dontaudit}'[remove dontaudits from policy]'
+      \*{-i+,--install=}'[install a new module]:module package:_files -g "*.pp(-.)"'
+      \!{-b,--base,-u,--upgrade}':module package:_files -g "*.pp(-.)"'
+      \*{-r+,--remove=}'[remove existing module at desired priority]:module name:_selinux_modules'
+      \*{-l+,--list-modules=-}'[display list of installed modules]::kind:((
+        standard\:highest\ priority,\ enabled\ modules
+        full\:list\ all\ modules
+      ))'
+      \*{-X+,--priority=}'[set priority for following operations]:priority (1-999)'
+      \*{-e,--enable=}'[enable module]:module name:_selinux_modules'
+      \*{-d,--disable=}'[disable module]:module name:_selinux_modules'
+      \*{-E,--extract=}'[extract module]:module name:_selinux_modules'
+      '(-s --store)'{-s+,--store=}'[name of the store to operate on]:store'
+      '(-N -n --noreload)'{-N,-n,--noreload}"[don't reload policy after commit]"
+      '(-v --verbose)'{-v,--verbose}'[be verbose]'
+      '(-P --preserve_tunables)'{-P,--preserve_tunables}'[preserve tunables in policy]'
+      '(-C --ignore-module-cache)'{-C,--ignore-module-cache}'[rebuild CIL modules compiled from HLL files]'
+      '(-p --path)'{-p,--path}'[use an alternate path for the policy root]'
+      '(-S --store-path)'{-S+,--store-path=}'[use an alternate path for the policy store root]:path:_directories'
+      '(-c --cil)'{-c,--cil}'[extract module as cil; only affects module extraction]'
+      '(-H --hll)'{-H,--hll}'[extract module as hll; only affects module extraction]'
+      '(-m --checksum)'{-m,--checksum}'[add SHA256 checksum of modules to the list output]'
+      '!(--refresh)--rebuild-if-modules-changed'
+      "${ign}(-)"{-h,--help}'[display help information]'
+    )
+  ;;
+
+  semodule_unpackage)
+    args=(
+      ':pp file:_files -g "*.pp(-.)"'
+      ':mod file:_files -g "*.mod(-.)"'
+      ':fc file:_files -g "*.fc(-.)"'
+    )
+  ;;
+
+  sepolgen)
+    args=( $sepolgen )
+  ;;
+  sepolicy)
+    _arguments -C \
+      '-P+[specify policy to examine]' \
+      "${ign}(- 1)-h[display help information]" \
+      '1:command:((
+          booleans\:"get description of booleans"
+          communicate\:"query if domains can communicate with each other"
+          generate\:"generate policy module template"
+          gui\:"graphical user interface for policies"
+          interface\:"list policy interfaces"
+          manpage\:"generate man pages for policies"
+          network\:"query policy network information"
+          transition\:"query policy to see how a source process domain can transition to the target process domain"))' \
+      '*::: := ->option-or-argument' && ret=0
+    case $state in
+      option-or-argument)
+        curcontext=${curcontext%:*}-$line[1]:
+        args=( '(-)'{-h,--help}'[display help information]' )
+        case $line[1] in
+          transition|communicate)
+            args+=(
+              '(-s --source)'{-s+,--source=}'[specify source domain]:source:_selinux_types -a domain'
+              '(-t --target)'{-t+,--target=}'[specify target domain]:target:_selinux_types -a domain'
+            )
+          ;|
+          manpage|network)
+            args+=(
+              {-d,--domain}'[specify domain]:*: :_selinux_types -a domain'
+              '!*'{-d-,--domain=-}': :_selinux_types -a domain'
+            )
+          ;|
+          booleans)
+            args+=(
+              '(-)'{-a,--all}'[get all booleans descriptions]'
+              \*{-b,--boolean}'[specify boolean to show description]:*:boolean:_selinux_bools'
+              '!(-a --all -h --help)*'{-b-,--boolean=}': :_selinux_bools'
+            )
+          ;;
+          communicate)
+            args+=(
+              '(-c --class)'{-c+,--class=}'[specify class to use for communications]:tclass [file]:_selinux_classes'
+              '(-S --sourceaccess)'{-S+,--sourceaccess=}'[specify permissions for the source type to use]:source access [open,write]'
+              '(-T --targetaccess)'{-T+,--targetaccess=}'[specify permissions for the target type to use]:target access [open,read]'
+            )
+          ;;
+          generate)
+            args=( $sepolgen )
+          ;;
+          interface)
+            args+=(
+              '(-c --compile)'{-c,--compile}'[run compile test for selected interface]'
+              '(-v --verbose)'{-v,--verbose}'[show verbose information]'
+              '(-f --file)'{-f+,--file=}'[specify interface file]:interface file:_files'
+              '(-a --list_admin)'{-a,--list_admin}'[list all domains with admin interface - DOMAIN_admin()]'
+              '(-u --list_user)'{-u,--list_user}'[list all domains with SELinux user role interface - DOMAIN_role()]'
+              '(-l --list)'{-l,--list}'[list all interfaces]'
+              {-i,--interfaces}'[specify interface names]:*:interface:_selinux_interfaces'
+              '!*'{-i-,--interfaces=-}':interface:_selinux_interfaces'
+            )
+          ;;
+          manpage)
+            args+=(
+              '(-p --path)'{-p+,--path=}'[specify path in which the generated selinux man pages will be stored]:path:_directories'
+              '(-o --os)'{-o+,--os=}'[specify name of the OS for man pages]:OS'
+              '(-w --web)'(-w,--web)'[generate HTML man pages structure]'
+              '(-r --root)'{-r+,--root=}'[specify alternate root directory]:root [/]:_directories'
+              '--source_files[alternative root path needs to include file context files and policy.xml file]'
+              '(-a --all -d --domain)'{-a,--all}'[all domains]'
+            )
+          ;;
+          network)
+            args+=(
+              '(-l --list)'{-l,--list}'[list all SELinux port types]'
+              {-p,--port}'[specify type related to the port]:*:port number'
+              '!*'{-p-,--port=-}':port number'
+              {-t,--type}'[show ports defined for this SELinux type]:*:port type:_selinux_types -a port_type'
+              '!*'{-t-,--type=-}':port type:_selinux_types -a port_type'
+              {-d,--domain}'[specify domain]:*:domain:_selinux_types -a domain'
+              '!*'{-d-,--domain=-}':domain:_selinux_types -a domain'
+              {-a,--application}'[show ports to which this application can bind and/or connect]:*:application:_selinux_types -a application_domain_type'
+              '!*'{-a-,--application=-}':domain:_selinux_types -a application_domain_type' # am not sure this is what is meant by applications
+            )
+          ;;
+        esac
+      ;;
+    esac
+  ;;
+
+  sesearch)
+    args=(
+      "${ign}(-h --help)"{-h,--help}'[display help information]'
+      "${ign}--version[display version information]"
+      '(-v --verbose)'{-v,--verbose}'[print extra informational messages]'
+      '--debug[enable debugging]'
+      '-A[search allow and allowxperm rules]'
+      '--allow[search allow rules]'
+      '--allowxperm[search allowxperm rules]'
+      '--auditallow[search auditallow rules]'
+      '--auditallowxperm[search auditallowxperm rules]'
+      '--dontaudit[search dontaudit rules]'
+      '--dontauditxperm[search dontauditxperm rules]'
+      '--neverallow[search neverallow rules]'
+      '--neverallowxperm[search neverallowxperm rules]'
+      '(-T --type_trans)'{-T,--type_trans}'[search type_transition rules]'
+      '--type_change[search type_change rules]'
+      '--type_member[search type_member rules]'
+      '--role_allow[find role allow rules]'
+      '--role_trans[find range_transition rules]'
+      '--range_trans[search range_transition rules]'
+      '(-s --source)'{-s+,--source=}'[source type/role of the TE/RBAC rule]: : _alternative
+        "types\:type\:_selinux_types"
+        "roles\:role\:_selinux_attributes"'
+      '(-t --target)'{-t+,--target=}'[target type/role of the TE/RBAC rule]: : _alternative
+        "types\:type\:_selinux_types"
+        "roles\:role\:_selinux_attributes"'
+      '(-c --class)'{-c+,--class=}'[comma separated list of object classes]:class:_sequence _selinux_classes'
+      '(-p --perms)'{-p+,--perms=}'[comma separated list of permissions]: :_sequence _selinux_permissions'
+      '(-x --xperms)'{-x+,--xperms=}'[comma separated list of extended permissions]:xperms'
+      '(-D --default)'{-D+,--default=}'[default of the rule. (type/role/range transition rules]:default'
+      '(-b --bool)'{-b+,--bool=}'[comma separated list of Booleans in the conditional expression]:bool '
+      '-eb[match Boolean list exactly instead of matching any listed boolean]'
+      '-ep[match permission set exactly instead of matching any listed permission]'
+      '-ex[match extended permission set exactly instead of matching any listed permission]'
+      '-Sp[match rules where the listed permissions are a subset of the rule permissions]'
+      '-ds[match source attributes directly instead of matching member types/roles]'
+      '-dt[match target attributes directly instead of matching member types/roles]'
+      '-rs[use regular expression matching for the source type/role]'
+      '-rt[use regular expression matching for the target type/role]'
+      '-rc[use regular expression matching for the object class]'
+      '-rd[use regular expression matching for the default type/role]'
+      '-rb[use regular expression matching for booleans]'
+      ':policy:_files'
+    )
+  ;;
+
+  sestatus)
+    args=( '-b[booleans]' '-v[contexts of files and processes listed in the /etc/sestatus.conf]' )
+  ;;
+
+  setenforce)
+    _alternative \
+      'enable-args:enable:(Enforcing 1)' \
+      'disable-args:disable:(Permissive 0)'
+    return
+  ;;
+
+  setsebool)
+    args=(
+      '-P[make changes persistent by writing pending values to disk]'
+      "-N[don't reload policy from disk]"
+      '-V[print verbose error messages]'
+      ':boolean:_selinux_bools'
+      ': : _values value
+              {1,on}"[enable]"
+              {0,off}"[disable]"'
+    )
+  ;;
+
+  validatetrans)
+    args=(
+      ':source context:_selinux_contexts'
+      ':target context:_selinux_contexts'
+      ':class:_selinux_classes'
+      ':new context:_selinux_contexts'
+    )
+  ;;
+esac
+
+_arguments -s $args

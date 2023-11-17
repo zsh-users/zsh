@@ -1,14 +1,21 @@
 #autoload
 
-local -a parts suf
+local -a parts users roles types
+
+zparseopts -E -D a:=types P:=users
+
+if ! compset -S ':*'; then
+  users+=( -qS : )
+  roles+=( -qS : )
+  [[ $(</sys/fs/selinux/mls) = 0 ]] 2>/dev/null || types+=( -qS : )
+fi
 
 parts=( users roles types )
 while compset -P 1 '*:' && (( $+parts[1] )) ; do
   shift parts
 done
 if (( $+parts[1] )); then
-  compset -S ':*' || suf=( -S : )
-  _selinux_$parts[1] $suf
+  _selinux_$parts[1] ${(P)parts[1]}
 else
   _message -e selinux-ranges 'selinux range'
 fi

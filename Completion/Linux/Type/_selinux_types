@@ -1,7 +1,19 @@
 #autoload
 
-local -a setypes expl
+# Pass -a attribute to filter types, e.g.:
+#   -a domain    - for process types
+#   -a file_type - for file types
+#   -a port_type - for network ports
 
-setypes=( ${(f)"$(_call_program selinux-types seinfo --flat -t)"} )
+local -a setypes expl extra
+
+zparseopts -E -D -a extra a:
+
+if (( $#extra )); then
+  setypes=( ${${${(f)"$(_call_program selinux-types seinfo $extra --flat -x)"}#[[:blank:]]}:1} )
+else
+  setypes=( ${(f)"$(_call_program selinux-types seinfo --flat -t)"} )
+fi
+
 _description selinux-types expl "selinux type"
 compadd "$@" "$expl[@]" -a setypes

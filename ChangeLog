@@ -1,5 +1,12 @@
 2023-11-17  Oliver Kiddle  <opk@zsh.org>
 
+	* 52307: Completion/Linux/Command/_selinux,
+	Completion/Linux/Command/_chcon, Completion/Linux/Command/_setpriv,
+	Completion/Linux/Type/_selinux_contexts, Completion/Unix/Command/_cp,
+	Completion/Linux/Type/_selinux_types, Completion/Unix/Command/_find,
+	Completion/Unix/Command/_install, Completion/Unix/Command/_mount,
+	Completion/Unix/Command/_zfs: new completion for many SELinux tools
+
 	* 52303: Completion/Unix/Command/_ifconfig,
 	Completion/Unix/Command/_chown, Completion/Unix/Command/_cp,
 	Completion/Unix/Command/_cut, Completion/Unix/Command/_date,

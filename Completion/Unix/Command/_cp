@@ -32,7 +32,7 @@ if _pick_variant gnu=GNU unix --version; then
     '(-v --verbose)'{-v,--verbose}'[explain what is being done]' \
     '(-x --one-file-system)'{-x,--one-file-system}'[stay on this file system]' \
     '(--context)-Z[set destination SELinux security context]' \
-    '(-Z)--context=-[set destination SELinux security context]:: :_selinux_contexts' \
+    '(-Z)--context=-[set destination SELinux security context]:: :_selinux_contexts -a file_type' \
     '(- *)--help' '(- *)--version' \
     '*:file or directory:_files'
 else
