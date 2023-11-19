@@ -376,7 +376,7 @@ If the tt(-p) flag is given, the following string will be taken as
 the prompt to display at the left.  If the tt(-r) flag is given,
 the following string gives the prompt to display at the right.  If the
 tt(-h) flag is specified, the history can be accessed from ZLE. If the
-tt(-e) flag is given, typing tt(^D) (Control-D) on an empty line
+tt(-e) flag is given, typing tt(^D) (Control-D) in an empty buffer
 causes tt(vared) to exit immediately with a non-zero return value.
 
 The tt(-M) option gives a keymap to link to the tt(main) keymap during
