@@ -1,3 +1,8 @@
+2023-11-18  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52313: Src/exec.c: subshells implementing multio reads/writes
+	are not interactive and should check for write errors.
+
 2023-11-17  Oliver Kiddle  <opk@zsh.org>
 
 	* 52307: Completion/Linux/Command/_selinux,

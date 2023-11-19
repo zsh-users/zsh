@@ -2290,6 +2290,8 @@ closemn(struct multio **mfds, int fd, int type)
 	    return;
 	}
 	/* pid == 0 */
+	opts[INTERACTIVE] = 0;
+	dont_queue_signals();
 	child_unblock();
 	closeallelse(mn);
 	if (mn->rflag) {
@@ -2302,7 +2304,8 @@ closemn(struct multio **mfds, int fd, int type)
 			break;
 		}
 		for (i = 0; i < mn->ct; i++)
-		    write_loop(mn->fds[i], buf, len);
+		    if (write_loop(mn->fds[i], buf, len) < 0)
+			break;
 	    }
 	} else {
 	    /* cat process */
@@ -2314,7 +2317,8 @@ closemn(struct multio **mfds, int fd, int type)
 			else
 			    break;
 		    }
-		    write_loop(mn->pipe, buf, len);
+		    if (write_loop(mn->pipe, buf, len) < 0)
+			break;
 		}
 	}
 	_exit(0);
