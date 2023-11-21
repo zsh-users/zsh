@@ -16,7 +16,11 @@ args=(
 
 case $OSTYPE in
   solaris2.<11->)
-    args+=( '(-c)-A[include absolute timestamps in output]' )
+    args+=(
+      '(-c)-A[include absolute timestamps in output]'
+      '-I[interpret system calls to well-known rather than underlying names]'
+      '-N[report only system calls that returned an error]'
+    )
   ;|
   aix*|solaris*)
     args+=(

@@ -26,6 +26,7 @@ _mpc_command() {
 
   mpc_cmds=(
     add:"append a song to the end of the current playlist"
+    albumart:"download album art for the given song and write to stdout"
     cdprev:"compact disk player-like previous command"
     channels:"list the channels that other clients have subscribed to"
     clear:"clear the current playlist"
@@ -57,6 +58,7 @@ _mpc_command() {
     prio:"change song priorities in the queue"
     queued:"show the next queued song"
     random:"toggle random mode, or specify state"
+    readpicture:"download a picture from the given song and write to stdout"
     repeat:"toggle repeat mode, or specify state"
     single:"toggle single mode, or specify state"
     consume:"toggle consume mode, or specify state"
@@ -205,6 +207,10 @@ _mpc_add() {
   _mpc_helper_files
 }
 
+_mpc_albumart() {
+  _mpc_helper_files
+}
+
 _mpc_del() {
   _mpc_helper_songnumbers
 }
@@ -304,8 +310,14 @@ _mpc_random() {
   _mpc_helper_bool
 }
 
+_mpc_readpicture() {
+  _mpc_helper_files
+}
+
 _mpc_single() {
-  _mpc_helper_bool
+  local state
+  _description states expl state
+  compadd "$@" "$expl[@]" on once off
 }
 
 _mpc_consume() {

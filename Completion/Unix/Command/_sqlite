@@ -12,7 +12,7 @@ dashes=( '' )
 
 options=(
   '(-init --init)'$^dashes'-init[startup file]:file containing SQLite commands:_files'
-  $^dashes'-echo[echo commands]'
+  $^dashes'-echo[print inputs before execution]'
 )
 
 exclusive=( {,-}-{no,}header )
@@ -72,12 +72,14 @@ if [[ -n $words[(r)-A*] ]]; then
     '(1 -a --append -f --file)'{-f+,--file=}'[specify archive file]:archive file:_files'
     '(1 -a --append -f --file)'{-a,--append=}'[operate on specified file opened using the apndvfs VFS]:archive file:_files'
     '(-C --directory)'{-C+,--directory=}'[change to specified directory to read/extract files]:directory:_directories'
+    '(-g --glob)'{-g,--glob}'[use glob matching for names in archive]'
     '(-n --dryrun)'{-n,--dryrun}'[show the SQL that would have occurred]'
     '*:file:_files'
     + '(commands)' \
     '(-c --create)'{-c,--create}'[create a new archive]'
     '(-u --update)'{-u,--update}'[update or add files to an existing archive]'
     '(-i --insert)'{-i,--insert}'[like -u but always add even if mtime unchanged]'
+    '(-r --remove)'{-r,--remove}'[remove files from archive]'
     '(-t --list)'{-t,--list}'[list contents of archive]'
     '(-x --extract)'{-x,--extract}'[extract files from archive]'
   )

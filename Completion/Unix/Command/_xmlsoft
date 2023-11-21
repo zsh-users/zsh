@@ -40,6 +40,7 @@ case $service in
       '--maxdepth[increase the maximum depth]:depth' \
       '--maxvars[increase the maximum variables]:variables' \
       '--maxparserdepth[increase the maximum parser depth]:depth' \
+      '--huge[relax hardcoded limits of the parser]' \
       '--seed-rand[initialise random number generator]:seed' \
       '--html[input document is an HTML file]' \
       '--encoding[the input document character encoding]:encoding:(${encoding[@]})' \

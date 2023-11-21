@@ -18,7 +18,7 @@ if _pick_variant -r variant binutils=GNU elftoolchain=elftoolchain elfutils=elfu
     '(-f --format -P --portability)-B[same as --format=bsd]'
     '(-u --undefined-only)--defined-only[display only defined symbols]'
     '(-n --numeric-sort -p --no-sort --size-sort -v)'{-n,--numeric-sort}'[sort symbols numerically by address]'
-    '(-p --no-sort -n -v --numeric-sort -r --reverse-sort --size-sort)'{-p,--no-sort}'[do not sort symbols]'
+    '(-p --no-sort -n -v --numeric-sort -r --reverse-sort --size-sort)'{-p,--no-sort}"[don't sort symbols]"
     '(-P --portability -B -f --format)'{-P,--portability}'[same as --format=posix]'
     '(-r --reverse-sort -p --no-sort)'{-r,--reverse-sort}'[reverse sort order]'
     '(-u --undefined-only --defined-only)'{-u,--undefined-only}'[display only undefined symbols]'
@@ -60,10 +60,10 @@ if _pick_variant -r variant binutils=GNU elftoolchain=elftoolchain elfutils=elfu
       args+=(
         '!(--no-recurse-limit)--recurse-limit'
         '--no-recurse-limit[disable demangling recursion limit]'
-	'(-f --format -P -j)'{-f,--format}'[specify output format]:format:(bsd sysv posix just-symbols)'
-	'(-C --no-demangle)--demangle=-[decode symbol names]::style [auto]:(auto gnu lucid arm hp edg gnu-v3 java gnat rust dlang)'
+        '(-f --format -P -j --just-symbols)'{-f+,--format=}'[specify output format]:format [bsd]:(bsd sysv posix just-symbols)'
+        '(-C --no-demangle)--demangle=-[decode symbol names]::style [auto]:(none auto gnu-v3 java gnat dlang rust)'
         '--ifunc-chars=[specify characters to use for indirect function symbols]:characters for global/local indirect function symbols [ii]'
-	'(-B -f --format -P --portability -j --just-symbols)'{-j,--just-symbols}'[Same as --format=just-symbols]'
+        '(-B -f --format -P --portability -j --just-symbols)'{-j,--just-symbols}'[same as --format=just-symbols]'
 	'--plugin[load specified plugin]:plugin'
 	'--quiet[suppress no "no symbols" diagnostic]'
 	'--special-syms[include special symbols in the output]'

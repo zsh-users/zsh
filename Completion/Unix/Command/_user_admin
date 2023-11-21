@@ -12,7 +12,7 @@ case ${service%???}:${(M)service%???}:$OSTYPE in
       shells=( ${(M)commands:#*/(|[abckz]|tc|ba)sh} )
     fi
     args+=(
-      '(-D -c --commend)'{-c+,--comment=}'[comment]:comment'
+      '(-D -c --comment)'{-c+,--comment=}'[comment]:comment'
       '(-D -d --home -b --base-dir)'{-d+,--home=}"[specify home directory]:home directory:_directories -W /"
       '(-D -e --expiredate)'{-e+,--expiredate}'[specify expiration date]:expiration date (YYYY-MM-DD)'
       '(-D -f --inactive)'{-f+,--inactive=}'[specify inactive days]:inactive days'
@@ -41,6 +41,8 @@ case ${service%???}:${(M)service%???}:$OSTYPE in
       SYS_GID_MIN SYS_UID_MAX SYS_UID_MIN UID_MAX UID_MIN UMASK
     )
     args+=(
+      '--btrfs-subvolume-home[use BTRFS subvolume for home directory]'
+      '(-F --add-subids-for-system)'{-F,--add-subids-for-system}'[add entries to sub[ud]id even when adding a system user]'
       '(-l --no-log-init)'{-l,--no-log-init}"[don't add user to lastlog and faillog databases]"
       '(-m --create-home -M --no-create-home)'{-M,--no-create-home}"[don't create user's home directory, regardless of /etc/login.defs]"
       '(-N --no-user-group -U --user-group)'{-N,--no-user-group}"[don't create a group with the same name as the user]"
@@ -103,6 +105,7 @@ case ${service%???}:${(M)service%???}:$OSTYPE in
   user:mod:linux*)
     args+=(
       '(-a --append)'{-a,--append}'[add user to supplementary groups without removing from other groups]'
+      '(-r --remove)'{-r,--remove}'[remove user from supplementary groups without removing from other groups]'
       \*{-v,--add-subuids}'[add a range of subordinate uids]:uids (first-last)'
       \*{-V,--del-subuids}'[remove a range of subordinate uids]:uids (first-last)'
       \*{-w,--add-subgids}'[add a range of subordinate gids]:gids (first-last)'
@@ -118,9 +121,16 @@ case ${service%???}:${(M)service%???}:$OSTYPE in
   ;|
   user:*:linux*)
     args+=(
+      '(-b --badname)'{-b,--badname}"[don't check for bad names]"
       '(-U --unlock --lock -L -p)'{-L,--lock}"[lock user's password]"
       '(-U --unlock --lock -L -p)'{-U,--unlock}"[unlock user's password]"
-      '(-Z --selinux-user)'{-Z,--selinux-user}"[specify SELinux user for the user's login]:user"
+      '(-Z --selinux-user)'{-Z,--selinux-user}"[specify SELinux user for the user's login]:user:_selinux_users"
+      "--selinux-range[specify SELinux MLS range for the user's login]:range"
+    )
+  ;|
+  group:*:linux*)
+    args+=(
+      '(-U --users)'{-U+,--users=}'[specify users to add as members of the group]:user:_sequence _users'
     )
   ;|
   group:*)
@@ -163,6 +173,9 @@ case ${service%???}:${(M)service%???}:$OSTYPE in
       '(-n --new-name)'{-n,--new-name}'[specify new group name]:new group name'
       ':group:_groups'
     )
+  ;|
+  group:mod:linux*)
+    args+=( '(-a --append)'{-a,--append}'[append the users mentioned by -U without removing existing members]' )
   ;|
   ^*:linux*)
     args=( ${(R)args:#(|\*)(|\(*\))--*} )    # remove long options

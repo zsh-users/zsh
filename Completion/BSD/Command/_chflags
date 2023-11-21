@@ -1,22 +1,31 @@
 #compdef chflags
 
-local args own='-g *(-u$EUID)'
+local own='-g *(-u$EUID)'
+local -a args recurse
 
 (( ! EUID || $+_comp_priv_prefix )) && own=
 
-if [[ $OSTYPE = (darwin|dragonfly|freebsd)* ]]; then
-  args=(
-    "-f[don't display diagnostic messages]"
-    '-v[verbose output]'
-  )
-fi
+case $OSTYPE in
+  (darwin|dragonfly|freebsd)*)
+    args=(
+      "-f[don't display diagnostic messages]"
+      '-v[verbose output]'
+    )
+  ;|
+  darwin*|freebsd*)
+    recurse=( "-x[don't cross mount points]" )
+  ;|
+  netbsd*)
+    args=( '-d[if the change requested would not alter the flags, attempt no change]' )
+  ;|
+esac
 
 _arguments -s -A "-*" : $args \
   ': :_file_flags' \
   '*:file:_files "$own"' \
   - opth \
   '-h[act on symlinks]' \
-  - optR \
+  - optR $recurse \
   '-R[recurse directories]' \
   '(-L -P)-H[follow symlinks on the command line (specify with -R)]' \
   '(-H -P)-L[follow all symlinks (specify with -R)]' \

@@ -17,6 +17,7 @@ _perl () {
     '(1 -e)*-E+[like -e but enable all optional features]:one line of program' \
     '-f[disable executing $Config{sitelib}/sitecustomize.pl at startup]' \
     '-F-[split() pattern for autosplit (-a)]:split() pattern, // is optional' \
+    '-g[read all input in one go (slurp), rather than line-by-line (alias for -0777)]' \
     '-h[list help summary]' \
     '-i-[edit <> files in place (make backup if extension supplied)]:backup file extension: ' \
     '*-I-[specify @INC/#include directory (may be used more than once)]:include path:_files -/' \

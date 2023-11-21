@@ -9,6 +9,7 @@ case $OSTYPE in
       '-E[display endpoint info for pipes, sockets and pseudoterminal files but not files of the endpoints]'
       '+E[display endpoint info for pipes, sockets and pseudoterminal files including files of the endpoints]'
       '-X[skip reporting of info on network connections]'
+      '*-Z[display or filter by SELinux security context]::context pattern:_selinux_contexts -a domain'
     )
   ;;
   solaris*)
@@ -23,7 +24,6 @@ _arguments -C -s -S $args \
   '(-)'{-\?,-h}'[list help]' \
   '-a[AND selections]' \
   '-b[avoid kernel blocks]' \
-  '-C[disable reporting of path name components]' \
   '+c[truncate command name to specified characters]:characters' \
   '-c[list files with specified command name beginning]:command name' \
   '+d[search for open instances for contents of specified dir]:search directory:_files -/' \
@@ -31,16 +31,19 @@ _arguments -C -s -S $args \
   '+D[recursively search from specified dir]:search directory:_files -/' \
   '-D[direct use of device cache file]:function:((\?\:report\ device\ cache\ file\ paths b\:build\ the\ device\ cache\ file i\:ignore\ the\ device\ cache\ file r\:read\ the\ device\ cache\ file u\:read\ and\ update\ the\ device\ cache\ file))' \
   '*-+e[exempt filesystem from blocking kernel calls]:file system:_directories' \
+  '-+E[show endpoint information for pipes, sockets, ptys, mqueues and eventfds; with -E, omit endpoint files]' \
   '-f[inhibit listing of kernel file structure info]::info type:->file-structures' \
   '+f[enable listing of kernel file structure info]::info type:->file-structures' \
   '-F[select output fields]:fields:->fields' \
   '-g[select by process group id]::process group id:_sequence -s , _pgids' \
+  '-H[print human readable sizes]' \
   '(*)*-i[select internet files]::address:->addresses' \
   '-K+[select listing of tasks of processes]::value:((i\:ignore\ tasks))' \
   '-k[specify kernel name list file]:kernel file:_files' \
   '-l[inhibit conversion of UIDs to user names]' \
   '-L[list no link counts]' \
   '+L[list all link counts]::max link count for listed files' \
+  '+m[specify or write a mount supplement file]::mount supplement file:_files' \
   '-m[specify kernel memory file]:kernel memory file:_files' \
   '-M[disable reporting of portmapper registrations]' \
   '+M[enable reporting of portmapper registrations]' \
@@ -49,6 +52,7 @@ _arguments -C -s -S $args \
   '(-s)-o[list file offset]::digits for file offset' \
   '-O[avoid overheads of bypassing potential blocking]' \
   '-P[inhibit conversion of port numbers to port names]' \
+  '-Q[ignore failed search terms]' \
   '-p[list files for specified processes]:process ID:_sequence -s , _pids' \
   '-r[repeat listing endlessly]::delay (seconds)' \
   '+r[repeat listing until no files listed]::delay (seconds)' \

@@ -27,6 +27,7 @@ if _pick_variant gnu='Free Soft' unix --version; then
     '(-b --backup)--backup=[create backup; optionally specify method]:: :->controls'
     "${lx}--context=-[like -Z, or specify SELinux security context to set]::SELinux security context:_selinux_contexts -a file_type"
     '-D[create all leading destination path components]'
+    '--debug[explain how a file is copied. Implies -v]'
     '(: -)--help[display help information]'
     "${lx}--preserve-context[preserve SELinux security context]"
     '--strip-program=[specify program used to strip binaries]:strip program:_files'

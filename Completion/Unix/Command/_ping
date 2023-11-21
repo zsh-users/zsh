@@ -199,7 +199,9 @@ case ${variant}:${${service#ping}:-4} in
       '-A[adaptive]'
       '-b[allow pinging a broadcast address]'
       "-B[don't allow ping to change source address]"
+      '-C[call connect() syscall on socket creation]'
       '-D[print timestamp before each line]'
+      '-e+[define identifier for ping session]:identifier'
       '(-4)-F+[allocate and set 20-bit flow label]:flow label (hex)'
       '(-)-h[show usage information]'
       '-I+[specify source interface]:interface:_net_interfaces'

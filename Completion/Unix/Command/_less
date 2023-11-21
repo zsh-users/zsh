@@ -56,7 +56,7 @@ _arguments -S -s -A "[-+]*"  \
   '(-L --no-lessopen)'{-L,--no-lessopen}'[ignore the LESSOPEN environment variable]' \
   '(-M --LONG-PROMPT -m --long-prompt)'{-m,--long-prompt}'[prompt verbosely]' \
   '(-m --long-prompt -M --LONG-PROMPT)'{-M,--LONG-PROMPT}'[prompt very verbosely]' \
-  '(-N --LINE-NUMBERS -n --line-numbers)'{-n,--line-numbers}"[don't keep track of line numbers]" \
+  '(-N --LINE-NUMBERS -n --line-numbers)'{-n,--line-numbers}'[suppress line numbers in prompts and messages]' \
   '(-n --line-numbers -N --LINE-NUMBERS)'{-N,--LINE-NUMBERS}'[show line numbers]' \
   '(* -O --LOG-FILE -o --log-file)'{-o+,--log-file=}'[copy input to file]:file:_files' \
   '(* -o --log-file -O --LOG-FILE)'{-O+,--LOG-FILE=}'[copy input to file, overwriting if necessary]:file:_files' \
@@ -83,18 +83,39 @@ _arguments -S -s -A "[-+]*"  \
   '(-\" --quotes)'{'-\"+',--quotes=}'[change quoting character]:quoting characters' \
   '(-~ --tilde)'{-~,--tilde}"[don't display tildes after end of file]" \
   '(-\# --shift)'{'-\#+',--shift=}"[specify amount to move when scrolling horizontally]:number" \
+  '--exit-follow-on-close[exit F command on a pipe when writer closes pipe]' \
   '--file-size[automatically determine the size of the input file]' \
+  '--header=[set header size]:lines,columns' \
   '--incsearch[search file as each pattern character is typed in]' \
+  '--intr=[specify interrupt character instead of ^X]:char [^X]' \
   '--line-num-width=[set the width of line number field]:width [7]' \
+  '--modelines=[look for vim modelines]:lines to search' \
   '--follow-name[the F command changes file if the input file is renamed]' \
   '--mouse[enable mouse input]' \
   '--no-histdups[remove duplicates from command history]' \
+  "--no-number-headers[don't give line numbers to header lines]" \
+  "--no-search-headers[don't search in header lines or columns]" \
+  "--no-vbell[disable the terminal's visual bell]" \
+  '--redraw-on-quit[redraw final screen when quitting]' \
   '--rscroll=[set the character used to mark truncated lines]:character [>]' \
   '--save-marks[retain marks across invocations of less]' \
+  '--search-options=[set default options for every search]: : _values -s ""
+    "search option"
+    "E[multi-file]" "F[from first line]" "K[highlight]"
+    "N[non-matching]" "R[literal]" "W[wrap]" -' \
+  '--show-preproc-errors[display a message if preprocessor exits with an error status]' \
+  '--proc-backspace[process backspaces for bold/underline]' \
+  '--SPECIAL-BACKSPACE[treat backspaces as control characters]' \
+  '--proc-return[delete carriage returns before newline]' \
+  '--SPECIAL-RETURN[treat carriage returns as control characters]' \
+  '--proc-tab[expand tabs to spaces]' \
+  '--SPECIAL-TAB[treat tabs as control characters]' \
   '--status-col-width=[set the width of the -J status column]:width [2]' \
+  '--status-line[highlight or color the entire line containing a mark]' \
   '--use-backslash[subsequent options use backslash as escape char]' \
   '--use-color[enable colored text]' \
   '--wheel-lines=[specify lines to move for each click of the mouse wheel]:lines' \
+  '--wordwrap[wrap lines at spaces]' \
   "$files[@]" && ret=0
 
 

@@ -74,6 +74,7 @@ _rpm () {
   selectopts=(
     {-a,--all}'[query all packages]'
     {-f,--file}'[query packages that own specified files]'
+    '--path[query packages that own specified files, installed or not]'
     {-p,--package}'[query uninstalled packages]'
     {-g,--group}'[query packages in one of specified groups]'
     --pkgid --hdrid --tid --querybynumber
@@ -165,9 +166,7 @@ _rpm () {
         {-F+,--freshen}'[freshen mode]:*:upgrade:->upgrade'
         {-e+,--erase}'[uninstall mode]:*:uninstall:->uninstall'
         '--reinstall[reinstall mode]:*:install:->install'
-        '--setperms[set file permissions]:*:package:->setattrs'
-        '--setugids[set file owner/group]:*:package:->setattrs'
-        '--setcaps[set capabilities of files in the given package]:*:package:->setattrs'
+        '!--set'{perms,ugids,caps}':*:package:->setattrs'
         '--restore[restore owner, group, permissions and capabilities of files in the given package]:*:package:->setattrs'
       )
     ;;
@@ -261,13 +260,15 @@ _rpm () {
     install)
       _arguments -s -C \!{-i,--install,-U,--upgrade,-F,--freshen} $tmp \
         $commonopts $pathopts \
+        '(--nodb)--justdb[update the database but not the filesystem]' \
+        '(--justdb)--nodb[update the filesystem but not the database]' \
         '--excludepath=:file to exclude:_files -/' \
 	'--relocate:relocate:->relocate' \
         '--prefix=[relocate the package]:package prefix directory:_files -/' \
         '(-h --hash)'{-h,--hash}'[print hash marks as package installs]' \
 	'(--replacepkgs --replacefiles --oldpackage)--force' \
 	'(--force)--'{replacefiles,replacepkgs} \
-        --{aid,allfiles,badreloc,excludedocs,ignorearch,ignoreos,ignoresize,includedocs,justdb,percent,test} \
+        --{aid,allfiles,badreloc,excludedocs,ignorearch,ignoreos,ignoresize,includedocs,percent,test} \
         --no{deps,filedigest,contexts,caps,order,suggest,pre,post,preun,postun,trigger{s,in,un,postun}} \
 	'(--nopre --nopost --nopreun --nopostun)--noscripts' \
         '*:pkg file:->package_file'
@@ -275,7 +276,9 @@ _rpm () {
     uninstall)
       _arguments -s -C \!{-e,--erase} \
 	"${commonopts[@]}" "${pathopts[@]}" \
-	--{allmatches,justdb,repackage,test} \
+        '(--nodb)--justdb[update the database but not the filesystem]' \
+        '(--justdb)--nodb[update the filesystem but not the database]' \
+	--{allmatches,repackage,test} \
 	--no{deps,scripts,preun,postun,trigger{s,un,postun}} \
         '*:package:->package'
       ;;

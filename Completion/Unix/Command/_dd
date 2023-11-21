@@ -74,7 +74,7 @@ case $variant in
     vals+=(
       'status[specify level of information to print to stderr]:level:(none noxfer progress)'
     )
-    flags+=( fullblock noatime nocache count_bytes skip_bytes seek_bytes )
+    flags+=( fullblock noatime nocache )
     conv+=( excl nocreat fdatasync fsync )
     units=( c:1 w:2 b:512 kB:1000 K:1024 MB:1000^2 M:1024\^2 GB G TB T PB P EB E ZB Z YB Y )
   ;;

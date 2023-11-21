@@ -378,6 +378,7 @@ _pkg5() {
 			'--non-sticky[Make this publisher non-sticky]' \
 			'--search-after[Set publisher search-order]:publisher:_pkg5_pubs' \
 			'--search-before[Set publisher search-order]:publisher:_pkg5_pubs' \
+			'--search-first[set the specified publisher first in the search order]' \
 			'--approve-ca-cert[Add trusted CA certificate]:CA cert path:_path_files' \
 			'--revoke-ca-cert[Revoke CA certificate]:CA cert hash:(${${certs#/etc/openssl/certs/}%.0})' \
 			'--unset-ca-cert[Remove trusted CA certificate]:CA cert hash:' \

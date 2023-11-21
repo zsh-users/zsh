@@ -50,6 +50,7 @@ case $variant in
       {-D-,--debug=-}'[enable debugging]::debugger command file:_files'
       {-g,--gen-pot}'[scan awk program and generate .po file on stdout]'
       '*'{-i+,--include}'[load source library]:library file:->script'
+      {-I,--trace}'[print internal byte code names as they are executed]'
       '*'{-l+,--load}'[load dynamic extension]:extension:->extension'
       {-M,--bignum}'[select arbitrary-precision arithmetic on numbers]'
       {-o-,--pretty-print=-}'[pretty-print awk program]::output file:_files'

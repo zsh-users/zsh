@@ -5,16 +5,29 @@ local -a state line expl msgs args ign
 
 (( CURRENT == 2 )) || ign='!'
 args=(
+  '--debug-stdout[send debug output to stdout]'
   '(-d --debuglevel)'{-d+,--debuglevel=}'[set debug level]:debug level (1..10) [1]'
   '(-s --configfile)'{-s+,--configfile=}'[specify alternate smb.conf file]:config file:_files'
   '(-l --log-basename)'{-l+,--log-basename=}'[specify base name for log files]:base name:_files'
   '*--option=[set smb.conf option from command line]:option=value'
+  '--leak-report[enable talloc leak reporting on exit]'
+  '--leak-report-full[enable full talloc leak reporting on exit]'
   "${ign}(1 2 3 -)"{-\?,--help}'[display usage information]'
   "${ign}(1 2 3 -)--usage[display brief usage information]"
   "${ign}(1 2 3 - *)"{-V,--version}'[display version information]'
 )
 
 case $service in
+  smbclient|nmblookup)
+    args+=(
+      '(2 -R --name-resolve)'{-R+,--name-resolve=}'[specify name resolution order]:name resolution order:_values -s " " "name resolution order" lmhosts host wins bcast'
+      '(-m --max-protocol)'{-m+,--max-protocol=}'[set the max protocol level]:level'
+      '(2 -O --socket-options)'{-O+,--socket-options=}'[specify socket options]:socket options'
+      '(2)--netbios-scope=[specify NetBIOS scope]:scope'
+      '(2 -W --workgroup)'{-W+,--workgroup=}'[specify workgroup name]:workgroup name'
+      '--realm=[set the realm name]:realm'
+    )
+  ;|
   smbcontrol)
     _arguments -C -S $args \
       '(-t --timeout)'{-t+,--timeout=}'[set timeout]:timeout (seconds)' \
@@ -42,12 +55,10 @@ case $service in
   smbclient)
     args+=(
       '(-N -A)2: :_guard "^-*" password'
-      '(2 -R --name-resolve)'{-R+,--name-resolve=}'[specify name resolution order]:name resolution order:_values -s " " "name resolution order" lmhosts host wins bcast'
       '(2 -M --message -L --list -D --directory -T --tar)'{-M+,--message=}'[send message]:host:_hosts'
       '(2 -I --ip-address)'{-I+,--ip-address=}'[specify IP address of server]:IP address'
       '(2 -E --stderr)'{-E,--stderr}'[output messages to stderr]'
       '(2 -M --message -D --directory -T --tar)'{-L+,--list=}'[list services on server]:host:_hosts'
-      '(-m --max-protocol)'{-m+,--max-protocol=}'[set the max protocol level]:level'
       '(2 -T --tar -M --message -L --list)'{-T+,--tar=}'[specify tar options]:tar options'
       '(2 -D --directory -M --message -L --list)'{-D+,--directory=}'[specify initial directory]:initial directory'
       '(2 -c --command)'{-c,--command=}'[specify commands]:command string'
@@ -58,19 +69,18 @@ case $service in
       '(-q --quiet)'{-q,--quiet}'[suppress help message]'
       '(-B --browse)'{-B,--browse}'[browse SMB servers using DNS]'
       '(2 -d --debuglevel)'{-d+,--debuglevel=}'[specify debug level]:debug level:(0 1 2 3 4 5 6 7 8 9 10)'
-      '(2 -O --socket-options)'{-O+,--socket-options=}'[specify socket options]:socket options'
       '(2 -n --netbiosname)'{-n+,--netbiosname=}'[specify local NetBIOS name]:local machine name'
-      '(2 -W --workgroup)'{-W+,--workgroup=}'[specify workgroup]:workgroup'
-      '(2 -i --scope)'{-i+,--scope=}'[specify NetBIOS scope]:scope'
       '(2 -U --user)'{-U+,--user=}'[specify username]:username:_users'
       '(2 -N --no-pass)'{-N,--no-pass}'[suppress password prompt]'
-      '(-k --kerberos)'{-k,--kerberos}'[use kerberos (active directory) authentication]'
-      '(2 -A --authentication-file)'{-A+,--authentication-file=}'[specify file containing username/password]:file:_files'
-      '(-S --signing)'{-S+,--signing=}'[set the client signing state]:state:(on off required)'
-      '(-P --machine-pass)'{-P,--machine-pass}'[use stored machine account password]'
-      '(-e --encrypt)'{-e,--encrypt}'[encrypt SMB transport]'
-      '(-C --use-ccache)'{-C,--use-ccache}'[use the winbind ccache for authentication]'
       '--pw-nt-hash[the supplied password is the NT hash]'
+      '(2 -A --authentication-file)'{-A+,--authentication-file=}'[specify file containing username/password]:file:_files'
+      '(-P --machine-pass)'{-P,--machine-pass}'[use stored machine account password]'
+      '--simple-bind-dn=[specify DN to use for a simple bind]:DN'
+      '--use-kerberos=[use Kerberos authentication]:state:(desired required off)'
+      '--use-krb5-ccache=[specify credentials cache location for Kerberos]:file:_files'
+      '--use-winbind-ccache[use the winbind ccache for authentication]'
+      '--client-protection=[configure protection used for client connections]:protection:(sign encrypt off)'
+      '!(--use-kerberos)'{-k,--kerberos}
     )
     (( CURRENT == 2 )) && args+=( '1:service name:_hosts -P // -S /' )
     _arguments -s -S $args
@@ -81,16 +91,13 @@ case $service in
       '(-f --flags)'{-f,--flags}'[list NMB flags returned]' \
       '(-U --unicast)'{-U+,--unicast=}'[specify unicast address]:unicast address' \
       '(-M --master-browser)'{-M,--master-browser}'[search for a master browser]' \
-      '(-R --recursion)'{-R,--recursion}'[set recursion desired in packet]' \
+      '--recursion[set recursion desired in packet]' \
       '(-S --status)'{-S,--status}'[lookup node status as well]' \
       '(-T --translate)'{-T,--translate}'[perform reverse DNS on IP addresses]' \
       '(-r --root-port)'{-r,--root-port}'[use root port 137]' \
       '(-A --lookup-by-ip)'{-A,--lookup-by-ip}'[query node status on IP address]' \
       '(-d --debuglevel)'{-d+,--debuglevel=}'[specify debug level]:debug level:(0 1 2 3 4 5 6 7 8 9 10)' \
-      '(-O --socket-options)'{-O+,--socket-options=}'[specify socket options to use]:socket option' \
       '(-n --netbiosname)'{-n+,--netbiosname=}'[specify primary netbios name]:netbios name' \
-      '(-W --workgroup)'{-W+,--workgroup=}'[specify workgroup name]:workgroup name' \
-      '(-i --scope)'{-i+,--scope=}'[specify NetBIOS scope]:scope' \
       '(h)*:NetBIOS name:_hosts'
   ;;
   smbstatus)

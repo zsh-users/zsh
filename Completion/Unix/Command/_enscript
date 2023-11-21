@@ -128,7 +128,7 @@ case "$state" in
     local suf='{'
     compquote suf
     if [[ ${PREFIX} = *[%$]D${suf}[^}]# ]]; then
-      _strftime
+      _date_formats
     elif [[ ${(Q)PREFIX} = *\$\([^\)]# ]]; then
       compset -P '*\('
       _parameters -g '*export*' -S '\)'

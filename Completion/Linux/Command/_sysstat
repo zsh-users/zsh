@@ -56,6 +56,7 @@ _sadf() {
       '--dev=-[specify block devices for which statistics are to be displayed]:block device:_files -g "*(-%)"' \
       '--fs=-[specify filesystems for which statistics are to be displayed]:file system:_dir_list -s ,' \
       '--iface=-[specify network interfaces for which statistics are to be displayed]:network interface:_sequence _net_interfaces' \
+      '--int=-[specify interrupts for which statistics are to be displayed]: : _values -s "," interrupt 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15' \
       '-s[set starting time of report]:starting time (HH\:MM\:SS)"' \
       '(-t -U)-T[display timestamp in local time]' \
       '(-T -U)-t[display timestamp in file\''s original localtime]' \
@@ -99,9 +100,10 @@ _sar() {
     '(--human -p)-h[make output easier to read: implies --human and -p]' \
     '(- 1 2)--help[display usage information]' \
     '--human[print sizes in human readable format]' \
-    '*-I[report statistics for interrupts]: : _values -s "," interrupt 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 SUM ALL XALL' \
+    '-I[report statistics for interrupts]:interrupt:(SUM ALL)' \
     '-i[select records as close as possible to interval]:interval' \
     '--iface=-[specify network interfaces for which statistics are to be displayed]:network interface:_sequence _net_interfaces' \
+    '--int=-[specify interrupts for which statistics are to be displayed]: : _values -s "," interrupt 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15' \
     '-j[display persistent device names]:type:(ID LABEL PATH UUID)' \
     '-m[report power management statistics]:keyword:_sequence compadd - CPU FAN FREQ IN TEMP USB ALL' \
     '-n[report network statistics]:keyword:_sequence compadd - DEV EDEV NFS NFSD SOCK IP EIP ICMP EICMP TCP ETCP UDP SOCK6 IP6 EIP6 ICMP6 EICMP6 UDP6 FC SOFT ALL' \

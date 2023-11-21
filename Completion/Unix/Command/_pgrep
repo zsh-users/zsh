@@ -34,6 +34,7 @@ arguments=(
   '(-P --parent)'{-P+,--parent=}'[match only on specified parent process IDs]: :->ppid'
   '(-l)-q[suppress normal output]'
   '(-r --runstates)'{-r+,--runstates}'[match runstates]:run state:compadd -S "" D I R S T t W X Z'
+  '(-A --ignore-ancestors)'{-A,--ignore-ancestors}'[exclude our ancestors from results]'
   '-S[search also in system processes (kernel threads)]'
   '(-s --session)'{-s+,--session=}'[match only on specified process session IDs]: :->sid'
   # _signals is OK here - we do it differently below
@@ -44,6 +45,7 @@ arguments=(
   '(-u --euid)'{-u+,--euid=}'[match only on specified effective user IDs]: :_sequence _users'
   '(-v --inverse)'{-v,--inverse}'[negate matching]'
   '(-x --exact)'{-x,--exact}'[match process name or command line (with -f) exactly]'
+  '--cgroup=[match by cgroup v2 names]:cgroup'
   '--ns=[match only on same namespaces as specified PID]: :_pids'
   '--nslist=[match only on specified namespaces (with --ns)]:namespace:(ipc mnt net pid user uts)'
   '(: * -)'{-V,--version}'[display version information]'
@@ -55,6 +57,8 @@ arguments=(
   '(-w --lightweight)'{-w,--lightweight}'[show all thread IDs instead of PID]'
 )
 [[ $service == pkill ]] && arguments+=(
+  '(-H --require-handler)'{-H,--require-handler}'[match only if signal handler is present]'
+  '(-q --queue)'{-q+,--queue=}'[specify value to be sent with the signal]:value'
   '(-e --echo)'{-e,--echo}'[display signalled process]'
   '-l[display kill command]'
 )
@@ -62,8 +66,8 @@ arguments=(
 case $OSTYPE in
   linux*)
     # Note: We deliberately exclude -v but not --inverse from pkill
-    pgopts=acdFfGghLlnoOPrstUuVvwx-
-    pkopts=ceFfGghLnoOPstUuVx-
+    pgopts=AacdFfGghLlnoOPrstUuVvwx-
+    pkopts=AceFfGgHhLnoOPstUuVx-
     arguments=(
       ${arguments:#((#s)|*\))(\*|)-[acl]*}
       '(-c --count)'{-c,--count}'[display count of matching processes]'

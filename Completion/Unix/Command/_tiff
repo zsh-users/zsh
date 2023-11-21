@@ -159,6 +159,7 @@ tiffinfo)
     '-f+[force fill order]:fill order:(lsb2msb msb2lsb)' \
     '-w[display raw data in words]' \
     '-z[enable strip chopping]' \
+    '-M+[set the memory allocation limit]:limit (MiB), 0 for unlimited' \
     '*:input TIFF file:_files -g "*.(#i)tif(|f)(-.)"' && ret=0
   ;;
 tiffmedian)
@@ -172,6 +173,7 @@ tiffmedian)
   ;;
 tiffsplit)
   _arguments \
+    '-M+[set the memory allocation limit]:limit (MiB), 0 for unlimited' \
     ':input file:_files -g "*.(#i)tif(|f)(-.)"' \
     ':output file prefix' && ret=0
   ;;
