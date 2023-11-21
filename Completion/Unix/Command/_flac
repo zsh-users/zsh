@@ -85,6 +85,7 @@ case $service in
       '(-p --qlp-coeff-precision-search -q --qlp-coeff-precision)'{-p,--qlp-coeff-precision-search}'[exhaustively search LP coeff quantization]' \
       '(-p --qlp-coeff-precision-search -q --qlp-coeff-precision)'{-q,--qlp-coeff-precision=}'[specify precision]:precision (bits)' \
       '(-r --rice-partition-order)'{-r,--rice-partition-order=}'[set min/max residual partition order]:order' \
+      "--limit-min-bitrate[don't allow frames consisting of only constant subframes]" \
       '--endian=:byte order:(big little)' \
       '--channels=:channels' \
       '--bps=:bits per sample' \

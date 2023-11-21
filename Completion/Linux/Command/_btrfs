@@ -8,16 +8,16 @@ groups=( subvolume filesystem device scrub balance inspect-internal property
          quota qgroup replace rescue check restore send receive
          help version )
 cmds_1=( create delete list snapshot get-default set-default find-new show sync help )
-cmds_2=( df du show sync defragment resize label usage help )
+cmds_2=( df du show sync defragment resize label mkswapfile usage help )
 cmds_3=( add delete remove ready scan stats usage help )
 cmds_4=( start cancel resume status help )
 cmds_5=( start pause cancel resume status )
-cmds_6=( dump-{super,tree} {inode,logical,subvolid}-resolve min-dev-size rootid tree-stats help )
+cmds_6=( dump-{super,tree} {inode,logical,subvolid}-resolve map-swapfile min-dev-size rootid tree-stats help )
 cmds_7=( get set list )
 cmds_8=( enable disable rescan help )
-cmds_9=( assign remove create destroy show limit help )
+cmds_9=( assign remove create clear-stale destroy show limit help )
 cmds_10=( start status cancel help )
-cmds_11=( chunk-recover fix-device-size super-recover zero-log create-control-device )
+cmds_11=( chunk-recover clear-uuid-tree fix-device-size super-recover zero-log create-control-device )
 
 _arguments -C -A "-*" "$args[@]" \
   '(- *)--help[print help information]' \
@@ -25,6 +25,7 @@ _arguments -C -A "-*" "$args[@]" \
   '(-v --verbose -q --quiet --help --version)'{-v,--verbose}'[verbose output of operation]' \
   '(-v --verbose -q --quiet --help --version)'{-q,--quiet}'[suppress all messages except errors]' \
   '(--help --version)--format=[specify output format]:format:(text json)' \
+  '(--help --version)--log=[set log level]:level:(default info verbose debug quiet)' \
   '(--version)1: :->groups' \
   '2: :->cmds' \
   '*:: :->args' && ret=0
@@ -151,7 +152,7 @@ while (( $#state )); do
         filesystem:defragment)
           args+=( '!-v'
             '-r[defragment files recursively]'
-            '-c+[compress files while defragmenting]::compression algorithm:(zlib lzo zstd)'
+            '-c-[compress files while defragmenting]::compression algorithm:(zlib lzo zstd)'
             '-r[defragment files recursively]'
             '-f[flush after defragmenting]'
             '-s[start position]: :_numbers -u bytes -d "beginning of file" offset K M G T P E'
@@ -169,6 +170,13 @@ while (( $#state )); do
             '--raw[output raw numbers in bytes]'
             '--human-readable[output human friendly numbers, base 1024]'
             '1: :_guard "^-*" uuid or label'
+          )
+        ;;
+        filesystem:mkswapfile)
+          args+=(
+            '-s[size]: :_numbers -d "2GiB" size K M G T P E'
+            '(-u --uuid)'{-u,--uuid}'[specify a uuid to use]:uuid:(clear random time)'
+            ':file:_files'
           )
         ;;
         filesystem:usage) args+=( '-T[show data in tabular format]' );;
@@ -194,6 +202,7 @@ while (( $#state )); do
           args+=(
             '(-c --check)'{-c,--check}'[return non-zero if any stat counter is not zero]'
             '(-z --reset)'{-z,--reset}'[reset stats when done]'
+            '-T[show current stats in tabular format]'
             "1:device or mountpoint:_files -g '*(-%,/)'"
           )
         ;;
@@ -233,7 +242,7 @@ while (( $#state )); do
         ;;
         balance:status) args+=( '!-v' '!--verbose' '1:path:_files -/' );;
         balance:(pause|cancel|resume)) args+=( '1:path:_files -/' );;
-        property:set) args+=( '3:value' );&
+        property:set) args+=( '-f[force the change]' '3:value' );&
         property:get) args+=( '2:property:(ro label compression)' );&
         property:list)
           args+=(
@@ -244,8 +253,9 @@ while (( $#state )); do
         quota:(enable|disable)) args+=( '1:path:_files -/' );;
         quota:rescan)
           args+=(
-            '-s[show status of currently running rescan]'
-            '-w[wait for rescan to finish]'
+            '(-s --status)'{-s,--status}'[show status of currently running rescan]'
+            '(-w --wait -W --wait-norescan)'{-w,--wait}'[wait for rescan to finish]'
+            '(-w --wait -W --wait-norescan)'{-w,--wait-norescan}'[wait for rescan to finish without starting it]'
             '1:path:_files -/'
           )
         ;;
@@ -268,10 +278,13 @@ while (( $#state )); do
             '-F[list impacted qgroups \(include ancestral qgroups\)]'
             '-f[list impacted qgroups \(exclude ancestral qgroups\)]'
             '--sort=-[sort qgroups]:sort:_values -s , sort \
-              qgroupid rfer excl max_rfer max_excl'
+              qgroupid rfer excl max_rfer max_excl path'
             '--sync[do filesystem sync before getting information]'
             '1:path:_files -/'
           )
+        ;;
+        qgroup:clear-stale)
+          args+=( '(-q --quiet)'{-q,--quiet}'[print only errors]' '1:path:_files -/' )
         ;;
         qgroup:limit)
           args+=(
@@ -287,6 +300,7 @@ while (( $#state )); do
             '-r[read from specified source device only]:srcdev:_files'
             '-f[force overwriting of target]'
             "-B[don't background]"
+            '(-K --nodiscard)'{-K,--nodiscard}"[don't perform whole device TRIM]"
             ':srcdev or devid:_files'
             ':target:_files'
             ':path:->mounts'
@@ -330,6 +344,12 @@ while (( $#state )); do
             '-s[specify buffer size]:buffer size [4096]'
             '1:logical address:_files'
             '2:filesystem path:_files -/'
+          )
+        ;;
+        inspect*:map-swapfile)
+          args+=(
+            '(-r --resume-offset)'{-r,--resume-offset}'[print only the value suitable as resume offset for file /sys/power/resume_offset]'
+            ':file:_files'
           )
         ;;
         inspect*:min*) args+=( '--id[specify the device id to query]:device id [1]' );;
@@ -395,6 +415,8 @@ while (( $#state )); do
             '*-c[use snapshot as clone source]:clone:_files -/'
             '-f[specify output file]:file:_files'
             '--no-data[send in NO_FILE_DATA mode]'
+            '--proto[specify protocol version]:version'
+            '--compressed-data[send data that is compressed on the filesystem directly without decompressing it]'
             '1:subvolume:_files -/'
           )
         ;;
@@ -405,6 +427,7 @@ while (( $#state )); do
             '(-C --chroot)'{-C,--chroot}'[confine the process to destination path using chroot(1)]'
             '(-E --max-errors)'{-E,--max-errors}'[terminate as soon as specified number of errors occur]:errors [1]'
             '(--dump)-m[specify root mount point of the destination filesystem]:mount point:_directories'
+            '--force-decompress[if the stream contains compressed data, always decompress it]'
             '(-m)--dump[dump stream metadata, one line per operation]'
             '1:mount:->mounts'
           )

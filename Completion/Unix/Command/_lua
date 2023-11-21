@@ -41,6 +41,7 @@ _lua() {
   _arguments -S -A '-*' : \
     '*-e+[execute specified command string]:command string' \
     '-E[ignore environment variables]' \
+    '-W[turn warnings on]' \
     '-i[enter interactive mode]' \
     '*-l+[specify library or module to require]: :_lua_libraries' \
     '-v[display version information]' \

@@ -24,7 +24,7 @@ arguments=(
   # output options
   '(-b -bits            -i -include -p -postscript -plain -ps -r -revert -u -uppercase)'{-b,-bits}'[output in binary digits, rather than hex]'
   '(         -E -EBCDIC -i -include -p -postscript -plain -ps -r -revert              )'{-E,-EBCDIC}'[print human-readable part in EBCDIC rather than ASCII]'
-  '(-i -include -p -postscript -plain -ps -r -revert)'{-e,-endian}'[little-endian dump]'
+  '(-i -include -p -postscript -plain -ps -r -revert)-e[little-endian dump]'
   '(-b -bits -E -EBCDIC -i -include -p -postscript -plain -ps -r -revert              )'{-i,-include}'[output in C include file style]'
   '(-b -bits -E -EBCDIC -i -include -p -postscript -plain -ps -C -capitalize          )'{-p,-postscript,-plain,-ps}'[read or write a plain hexdump (no line numbers or ASCII rendering)]'
 
@@ -35,12 +35,14 @@ arguments=(
   '(- :)'{-v,-version}'[show program version]'
   '*'{-a,-autoskip}"[a single '*' replaces runs of NUL (toggleable)]"
   '(-C -capitalize)'{-C,-capitalize}'[capitalize variable names in C include file style]'
-  {-c+,-cols}'[specify number of octets per line]: :_guard "[0-9a-fA-Fx]#" "number of octets per line"'
-  {-g+,-groupsize}'[specify the number of octets per group]: :_guard "[0-9]#" "number of octets per group"'
-  {-l+,-len}'[specify number of octets to output]: :_guard "[0-9]#" "number of octets to output"'
-  {-o+,-offset}'[add specified offset to displayed file position]:offset'
+  '(-c -cols)'{-c+,-cols}'[specify number of octets per line]: :_guard "(0x|)[0-9a-fA-Fx]#" "number of octets per line"'
+  '(-g -groupsize)'{-g+,-groupsize}'[specify the number of octets per group]: :_guard "(0x|)[0-9a-fA-F]#" "number of octets per group"'
+  '(-l -len)'{-l+,-len}'[specify number of octets to output]: :_guard "(0x|)[0-9a-fA-F]#" "number of octets to output"'
+  '(-n -name)'{-n+,-name}'[override the variable name output when -i is used]:variable name'
+  '(-o -offset)'{-o+,-offset}'[add specified offset to displayed file position]:offset'
   '-d[show offset in decimal instead of hex]'
-  {-s,-skip,-seek}'[specify file offset to dump from]: :_guard "[0-9]#" "file offset to dump from (absolute or relative)"'
+  '-R+[colorize the output]:when:(always auto never)'
+  '(-s -skip -seek)'{-s+,-skip,-seek}'[specify file offset to dump from]: :_guard "(0x|)[0-9a-fA-F]#" "file offset to dump from (absolute or relative)"'
 
   ': :_files'
 )

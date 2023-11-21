@@ -93,6 +93,7 @@ fi
   '--no-default-recipient[reset default recipient]'
   '*--encrypt-to[specify recipient]:key:->public-keys'
   '(--encrypt-to)--no-encrypt-to[disable the use of all --encrypt-to keys]'
+  '--group[set up email aliases]:spec'
   '-z[specify compression level]:compression level:((0\:no\ compression 1\:minimum 2 3 4 5 6\:default 7 8 9\:maximum))'
   '(-t --textmode)'{-t,--textmode}'[use canonical text mode]'
   '(-n --dry-run)'{-n,--dry-run}"[don't make any changes]"
@@ -117,6 +118,7 @@ fi
   '--utf8-strings' '--no-utf8-strings[arguments are not in UTF8]'
   '(--no-options)--options[specify file to read options from]:options file:_files'
   "(--options)--no-options[don't read options file]"
+  '--log-file[write server mode logs to file]:file:_files'
   '--'{attribute,passphrase,command}'-fd:file descriptor:_file_descriptors'
   '--sk-comments[include secret key comments when exporting keys]'
   '(--emit-version)--no-emit-version[omit version string in clear text signatures]'
@@ -170,6 +172,9 @@ fi
   '--ctapi-driver[file to use to access smartcard reader]:file:_files'
   '--pcsc-driver[file to use to access smartcard reader]:file:_files'
   '--auto-key-locate:parameters'
+  '--auto-key-import[import missing key from a signature]'
+  '--include-key-block[include the public key in signatures]'
+  '--disable-dirmngr[disable all access to the dirmngr]'
   '--dump-options[show all options]'
 )
 

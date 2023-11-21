@@ -32,7 +32,6 @@ case $service in
       '(-q --quality)'{-q+,--quality=}'[set encoding quality]:quality:(0 1 2 3 4 5 6 7 8 9 10)' \
       '--resample=[resample input to the given sample rate before encoding]:sample rate (Hz)' \
       '--downmix[down mix input from stereo to mono]' \
-      '--scale=[set input scaling factor]:scaling factor' \
       '(-s --serial)'{-s+,--serial=}'[force a specific serial number in the output stream]:serial number' \
       "--discard-comments[don't copy comments from FLAC file to output Ogg Vorbis file]" \
       '--ignorelength[ignore the datalength in Wave headers]' \
@@ -74,10 +73,6 @@ case $service in
       '(-q --quiet -v --verbose)'{--quiet,-q}'[quiet mode]' \
       '(-q --quiet)*'{-v,--verbose}'[increase verbosity]' \
       '(- *)'{-V,--version}'[display version information]' \
-      \*{-c-,--config=-}'[specify config options]: :_values option
-        "default_device\:device"
-        "shuffle\:value\:(0 1)"
-        "repeat\:value\:(0 1)"' \
       '*:sound file or directory:->urls-or-files' && ret=0
   ;;
   ogginfo)

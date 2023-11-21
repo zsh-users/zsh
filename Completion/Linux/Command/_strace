@@ -17,6 +17,7 @@ _arguments -C -s \
   '(-D)--daemonize=-[specify how to run tracer process]::method:(grandchild pgroup session)' \
   '(-f --follow-forks)'{-f,--follow-forks}'[trace child processes as they are created by currently traced processes]' \
   '(-I --interruptible)'{-I+,--interruptible=}'[specify when strace can be interrupted by signals]:interruptible:((1\:"no signals are blocked" 2\:"fatal signals are blocked while decoding syscall (default)" 3\:"fatal signals are always blocked (default with -o)" 4\:"fatal signals and SIGTSTP are always blocked"))' \
+  '--kill-on-exit[kill all tracees if strace is killed]' \
   \*{-e+,--trace=}'[select events to trace or how to trace]:system call:->expressions' \
   \*{-P+,--path=}'[trace only system calls accessing given path]:path:_files' \
   '(-z -Z --successful-only --failed-only)'{-z,--successful-only}'[trace only system calls that return success]' \

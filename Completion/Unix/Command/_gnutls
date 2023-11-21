@@ -4,8 +4,7 @@ local -a args
 
 args=(
   '(- :)'{-h,--help}'[display help information]'
-  '(- :)--version=[display version information]:information:((v\:simple c\:copyright n\:full))'
-  '(- :)-v[display version information]'
+  '(- :)'{-v+,--version=-}'[display version information]:information:((v\:simple c\:copyright n\:full))'
   '(- :)'{-\!,--more-help}'[display help information through a pager]'
   '(-d --debug)'{-d,--debug}'[enable debugging]:debug level'
   \*{-V,--verbose}'[more verbose output]'
@@ -15,6 +14,11 @@ case "$service" in
   gnutls-*)
     args+=(
       '(-p --port)'{-p,--port}'[specify port or service to connect to]:port:_ports'
+    )
+  ;|
+  gnutls-*|certtool)
+    args+=(
+      '--attime=[perform validation at the timestamp instead of the system time]:timestamp'
     )
   ;|
   gnutls-cli*)
@@ -30,6 +34,7 @@ case "$service" in
       '(-u --udp)'{-u,--udp}'[use DTLS (datagram TLS) over UDP]'
       '--mtu=[set MTU for datagram TLS]:mtu'
       '--srtp-profiles=[offer SRTP profiles]:string'
+      '*--compress-cert=[compress certificate]:compression method'
       '(-b --heartbeat)'{-b,--heartbeat}'[activate heartbeat support]'
       '--x509fmtder[use DER format for certificates to read from]'
       '--priority=[specify TLS algorithms and protocols to enable]:(NORMAL PFS SECURE128 SECURE192 SUITEB128 SUITEB192 LEGACY PERFORMANCE NONE)'
@@ -94,7 +99,8 @@ case "$service" in
       '--post-handshake-auth[enable post-handshake authentication under TLS1.3]'
       '--inline-commands[inline commands of the form ^<cmd>^]'
       '--inline-commands-prefix=[change delimiter used for inline commands]:delimiter [^]'
-      '--fips140-mode[report status of FIPS140-2 mode in gnutls library]'
+      '--fips140-mode[report status of FIPS140-3 mode in gnutls library]'
+      '--list-config[report configuration of the library]'
       '--logfile=[redirect informational messages to a specific file]:file:_files'
       '--waitresumption[block waiting for the resumption data under TLS1.3]'
       '--ca-auto-retrieve[enable automatic retrieval of missing CA certificates]'
@@ -127,6 +133,7 @@ case "$service" in
       '--ignore-ocsp-response-errors[ignore any errors when setting the OCSP response]'
       '--recordsize=[specify maximum record size to advertise]:record size (0-16384)'
       '--httpdata=[specify data to use as HTTP response]:file:_files'
+      '--timeout=[specify he timeout period for server]:timeout'
     )
   ;;
 

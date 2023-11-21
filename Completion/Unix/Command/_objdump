@@ -38,8 +38,10 @@ case $variant in
 
       '*-W-[display DWARF info in the file]::dwarf section:->short-dwarf-names'
       '*--dwarf=-[display DWARF info in the file]::dwarf section:->dwarf-names'
+      '(-L --process-links)'{-L,--process-links}'[display the contents of non-debug sections in separate debuginfo files]'
 
-      '--ctf=[display compact C type format info for section]:section'
+      '--ctf=-[display compact C type format info for section]::section'
+      '--sframe=-[display SFrame info from section]::section name [.sframe]'
       '(-t --syms)'{-t,--syms}'[display the contents of the symbol table(s)]'
       '(-T --dynamic-syms)'{-T,--dynamic-syms}'[display the contents of the dynamic symbol table]'
       '(-R --dynamic-reloc)'{-R,--dynamic-reloc}'[display the dynamic relocation entries in the file]'
@@ -59,11 +61,13 @@ case $variant in
       \*{-I+,--include=}'[add directory to search list for source files]:directory:_files -/'
       '(-l --line-numbers)'{-l,--line-numbers}'[include line numbers and filenames in output]'
       '(-F --file-offsets)'{-F,--file-offsets}'[include file offsets when displaying information]'
-      '(-C --demangle)-C[decode mangled/processed symbol names]'
-      '(-C --demangle)--demangle=-[decode mangled/processed symbol names]::style:(auto gnu lucid arm hp edg gnu-v3 java gnat rust dlang)'
+      '(--demangle)-C[decode symbol names]'
+      '(-C)--demangle=-[decode symbol names]::style [auto]:(none auto gnu-v3 java gnat dlang rust)'
       '!(--no-recurse-limit)--recurse-limit'
       '--no-recurse-limit[disable demangling recursion limit]'
       '(-w --wide)'{-w,--wide}'[format output for more than 80 columns]'
+      '-U+[specify how to display unicode characters]:method:(d l e x h i)'
+      '--unicode=[specify how to display unicode characters]:method:(default locale escape hex highlight invalid)'
       '(-z --disassemble-zeroes)'{-z,--disassemble-zeroes}"[don't skip blocks of zeroes when disassembling]"
 
       '--start-address=[only process data whose address is >= ADDR]:address'
@@ -73,15 +77,17 @@ case $variant in
       '(--show-raw-insn --no-show-raw-insn)'--{,no-}show-raw-insn'[display hex alongside symbolic disassembly]'
       '--insn-width=[display specified number of bytes on a single line with -d]:width (bytes)'
       '--adjust-vma=[add offset to all displayed section addresses]:offset'
+      '--show-all-symbols[when disassembling, display all symbols at a given address]'
       '--special-syms[include special symbols in symbol dumps]'
       '--inlines[print all inlines for source line (with -l)]'
       '--prefix=[add prefix to absolute paths for -S]:prefix'
       '--prefix-strip=[strip initial directory names for -S]:level'
       "--dwarf-depth=[don't display DIEs at specified or greater depth]:depth"
       '--dwarf-start=[display DIEs at specified or deeper depth]:depth'
-      '--dwarf-check[perform additional dwarf internal consistency checks]'
+      '--dwarf-check[perform additional dwarf consistency checks]'
       '--ctf-parent=[use specified section as the CTF parent]:section'
       '--visualize-jumps=-[visualize jumps by drawing ASCII art lines]::color:(color extended-color off)'
+      '--disassembler-color=[control use of colored syntax highlighting in disassembly output]:color use [on]:(off terminal on extended)'
     )
   ;;
   elfutils)

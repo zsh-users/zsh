@@ -23,6 +23,7 @@ _arguments -C -s \
   '(--config)--no-config' '--rejected-log=:file:_files' \
   '(--tries -t)'{--tries=,-t+}'[set number of retries]:number of retries' \
   '--retry-connrefused[retry even if connection is refused]' \
+  '--retry-on-host-error[consider host errors as non-fatal, transient errors]' \
   '--retry-on-http-error=[specify list of HTTP errors to retry]:http error' \
   '(--output-document -O)'{--output-document=,-O+}'[specify file to write documents to]:output file:_files' \
   '(--continue -c)'{--continue,-c}'[continue getting an existing file]'  \
@@ -98,7 +99,7 @@ _arguments -C -s \
   '--content-disposition[honor the Content-Disposition header when choosing local file names]'  \
   '--content-on-error[output received content on server errors]' \
   "--auth-no-challenge[send basic HTTP authentication without first waiting for server's challenge]" \
-  '--secure-protocol=[choose secure protocol]:protocol:(SSLv2 SSLv3 TLSv1 TLSv1_1 TLSv1_2 PFS)' \
+  '--secure-protocol=[choose secure protocol]:protocol:(SSLv2 SSLv3 TLSv1 TLSv1_1 TLSv1_2 TLSv1_3 PFS)' \
   --https-only \
   "--no-check-certificate[don't check the server certificate]" \
   '--certificate=[specify client certificate]:client certificate file:_files' \

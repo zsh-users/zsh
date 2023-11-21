@@ -216,7 +216,7 @@ _arguments -C ${(P)args} $cmd \
   '--vgdb=-[activate gdbserver]:enable [yes]:(yes no full)' \
   '--vgdb-error=-[invoke gdbserver after specified number of errors]:errors [999999999]:errors' \
   '--vgdb-stop-at=-[invoke gdbserver for given events]:event:_sequence compadd - startup exit valgrindabexit all none' \
-  '--track-fds=-[track open file descriptors]:enable:(yes no)' \
+  '--track-fds=-[track open file descriptors]:enable [no]:(yes no all)' \
   '--time-stamp=-[add timestamps to log messages]:enable:(yes no)' \
   '--log-fd=-[log messages to specified file descriptor]:file descriptor:_file_descriptors' \
   '--log-file=-[log messages to specified file with pid appended]:file:_files' \

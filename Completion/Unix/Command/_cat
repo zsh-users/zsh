@@ -38,6 +38,9 @@ elif [[ "$OSTYPE" == (*bsd|dragonfly|darwin)* ]]; then
     '-B+[read with buffer of specified size]:size (bytes)'
     '-f[only attempt to display regular files]'
   )
+  [[ $OSTYPE = darwin* ]] && args+=(
+    '-l[set an exclusive advisory lock on standard output]'
+  )
 elif [[ $OSTYPE = solaris* ]]; then
   args=(
     -A "-*"

@@ -15,6 +15,7 @@ _arguments -s -S \
   '--g-fatal-warnings[make all warnings fatal]' \
   '--gtk-debug=[specify GTK+ debugging flags to set]:flag' \
   '--gtk-no-debug=[specify GTK+ debugging flags to unset]:flag' \
+  '(-o --new-window)'{-o,--new-window}'[open a new window]' \
   '(-p --page-label -i --page-index -n --named-dest)'{-p,--page-label=}'[specify page label of the document to display]' \
   '(-p --page-label -i --page-index -n --named-dest)'{-i,--page-index=}'[specify page number of the document to display]' \
   '(-p --page-label -i --page-index -n --named-dest)'{-n,--named-dest=}'[specify named destination to display]' \

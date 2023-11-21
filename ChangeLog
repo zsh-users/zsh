@@ -1,3 +1,7 @@
+2023-11-22  Oliver Kiddle  <opk@zsh.org>
+
+	* 52315: Completion/...: completion options update
+
 2023-11-17  Oliver Kiddle  <opk@zsh.org>
 
 	* 52307: Completion/Linux/Command/_selinux,

@@ -8,11 +8,13 @@ case $service in
   dbus-send)
     _arguments -A "--*" -C \
       '(--session)--system' '(--system)--session' \
-      '--address=-:bus address:->addresses' \
+      '--bus=-:bus address:->addresses' \
+      '--peer=-:bus address:->addresses' \
       '--dest=-:connection:->connections' \
       '--print-reply=-::format:(literal)' \
       '--reply-timeout=-:timeout (ms)' \
-      '--type=-:type:(method_call signal)' \
+      '--sender=-:name' \
+      '--type=-:type [signal]:(method_call signal)' \
       '(* -)--help' \
       ':object path:->objectpaths' \
       ':message name:->methods' \

@@ -10,6 +10,7 @@ _arguments -s \
   '(-C --cycle)'{-C,--cycle}"[don't cycle after last image]" \
   '(-w --fixed_width -W --fixed_zoom)'{-w,--fixed_width}'[use window with specified width]:width' \
   '(-w --fixed_width -W --fixed_zoom)'{-W,--fixed_zoom}'[use window with specified zoom factor]:zoom (percentage)' \
+  '--highDPIfactor[specify resize factor to compensate for high (or also low) DPI screens]:factor' \
   '(-x -y -z --root --root_t --root_s -f --file *)'{-x,--root}'[use image as the current desktop background, centered]:image file:_files' \
   '(-x -y -z --root --root_t --root_s -f --file *)'{-y,--root_t}'[use image on the current desktop background, tiled]:image file:_files' \
   '(-x -y -z --root --root_t --root_s -f --file *)'{-z,--root_s}'[use image as the current desktop background, stretched]:image file:_files' \
@@ -22,6 +23,9 @@ _arguments -s \
   '(-n --no_filter)'{-n,--no_filter}'[disable filtering of images by extension]' \
   '(-i --no_statusbar -I --statusbar)'{-i,--no_statusbar}'[disable statusbar]' \
   '(-i --no_statusbar -I --statusbar)'{-I,--statusbar}'[enable statusbar]' \
+  '(-J --showJPEGcomments)'{-J,--showJPEGcomments}'[enable display of JPEG comments]' \
+  '(-E --showArtistName)'{-E,--showArtistName}'[enable display of artist (author) name]' \
+  "--artist_ignore[don't show specified artist name]:artist" \
   '(-p --transparency)'{-p,--transparency}'[enable transparency]' \
   '(-a --do_grab)'{-a,--do_grab}'[grab the pointer in windowed mode]' \
   '(-G --disable_grab)'{-G,--disable_grab}'[disable pointer grabbing in fullscreen mode]' \
@@ -47,4 +51,4 @@ _arguments -s \
   '(-Y --source_profile)'{-Y,--source_profile}'[specify colour profile file as source profile]:colour profile file:_files' \
   '(-Z --display_profile)'{-Z,--display_profile}'[specify colour profile file as display profile]:colour profile file:_files' \
   '--vikeys[enable movement with h/j/k/l]' \
-  '*:image file:_files -g "*.(#i)(bmp|eim|gif|ico|jp([eg]|eg)|pcx|png|p[pngb]m|pjpeg|svg|tif(|f)|wmf|x[pb]m)(-.)"'
+  '*:image file:_files -g "*.(#i)(bmp|eim|gif|hei[cf]|ico|jp([eg]|eg)|pcx|png|p[pngb]m|pjpeg|svg|tif(|f)|webp|wmf|x[pb]m)(-.)"'

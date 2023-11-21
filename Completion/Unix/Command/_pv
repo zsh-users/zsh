@@ -17,7 +17,9 @@ _arguments -s -S $args \
   '(-I --fineta -F --format)'{-I,--fineta}'[show absolute estimated time of arrival]' \
   '(-r --rate -F --format)'{-r,--rate}'[show data transfer rate counter]' \
   '(-a --average-rate -F --format)'{-a,--average-rate}'[show data transfer average rate counter]' \
-  '(-b --bytes -F --format)'{-b,--bytes}'[show number of bytes transferred]' \
+  '(-m --average-rate-window)'{-m+,--average-rate-window=}'[compute average rate over period]:duration (seconds) [30]' \
+  '(-b --bytes -8 --bits -F --format)'{-b,--bytes}'[show number of bytes transferred]' \
+  '(-8 --bits -b --bytes -F --format)'{-8,--bits}'[show number of bits transferred]' \
   '(-T --buffer-percent -F --format)'{-T,--buffer-percent}'[show percentage of transfer buffer in use]' \
   '(-A --last-written -F --format)'{-A+,--last-written=}'[show number of bytes last written]:number (bytes)' \
   '(-F --format -p --progress -t --timer -e --eta -I --fineta -r --rate -a --average-rate -b --bytes -T --buffer-percent -A --last-written -F --format)'{-F+,--format=}'[set output format]:format:->formats' \

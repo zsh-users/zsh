@@ -141,8 +141,9 @@ _rsync() {
     '(-X --xattrs)'{-X,--xattrs}'[preserve extended attributes]' \
     '--fake-super[use xattrs to save all file attributes]' \
     '(-d --dirs)'{-d,--dirs}'[transfer directories without recursing]' \
-    {--no-d,--no-dirs}'[turn off --dirs]' \
-    "--mkpath[create the destination's path component]" \
+    '(--no-d --no-dirs)'{--no-d,--no-dirs}'[turn off --dirs]' \
+    '(--old-dirs --old-d)'{--old-dirs,--old-d}'[work like --dirs when talking to old rsync]' \
+    "--mkpath[create destination's missing path components]" \
     '(-l --links)'{-l,--links}'[copy symlinks as symlinks]' \
     {--no-l,--no-links}'[turn off --links]' \
     '(-L --copy-links)'{-L,--copy-links}'[transform symlinks into referent file/dir]' \
@@ -161,8 +162,10 @@ _rsync() {
     '(-g --group)'{-g,--group}'[preserve group]' \
     {--no-g,--no-group}'[turn off --group]' \
     '(--devices --specials)-D[same as --devices --specials]' \
-    '(-D)--devices[preserve devices]' \
+    '(-D --copy-devices --write-devices)--devices[preserve devices]' \
     '--no-devices[turn off --devices]' \
+    '(-D --devices)--copy-devices[copy device contents as a regular file]' \
+    '(-D --devices)--write-devices[write to devices as files (implies --inplace)]' \
     '(-D)--specials[preserve special files]' \
     '--no-specials[turn off --specials]' \
     '--no-D[turn off --devices and --specials]' \
@@ -179,7 +182,7 @@ _rsync() {
     '(-n --dry-run)'{-n,--dry-run}'[show what would have been transferred]' \
     '(-W --whole-file)'{-W,--whole-file}'[copy files whole (without delta-transfer algorithm)]' \
     {--no-W,--no-whole-file}'[turn off --whole-file]' \
-    '(--cc --checksum-choice)'{--cc,--checksum-choice}'=[choose the checksum algorithms]:algorithm:_sequence -n 2 compadd - auto md4 md5 none' \
+    '(--cc --checksum-choice)'{--cc,--checksum-choice}'=[choose the checksum algorithms]:algorithm:_sequence -n 2 compadd - auto xxh128 xxh3 xxh64 xxhash md4 md5 sha1 none' \
     '(-x --one-file-system)'{-x,--one-file-system}"[don't cross filesystem boundaries]" \
     '(-B --block-size)'{-B+,--block-size=}'[force a fixed checksum block-size]: :_numbers -f -u bytes -d 1g "block size" B K M G T P' \
     '(-e --rsh)'{-e+,--rsh=}'[specify the remote shell to use]:remote-shell command:(rsh ssh)' \
@@ -233,7 +236,8 @@ _rsync() {
     '*--include=[do not exclude files matching pattern]:pattern' \
     '--files-from=[read list of source-file names from specified file]:file:_files' \
     '(-0 --from0)'{-0,--from0}'[all *-from file lists are delimited by nulls]' \
-    '(-s --protect-args)'{-s,--protect-args}'[no space-splitting; only wildcard special-chars]' \
+    '(-s --secluded-args)'{-s,--secluded-args}'[use the protocol to safely send arguments]' \
+    "--trust-sender[trust the remote sender's file list]" \
     '--copy-as=[specify user & optional group for the copy]:user:_rsync_users_groups' \
     '--version[print version number]' \
     '*'{-h,--human-readable}'[output numbers in a human-readable format]' \
@@ -251,6 +255,7 @@ _rsync() {
     '--list-only[list the files instead of copying them]' \
     '--stop-after=[stop copying after specified time has elapsed]:time (minutes)' \
     '--stop-at=[stop copying when specified point in time is reached]:date/time (YYYY-MM-DDTHH\:MM):_dates -F -S "T"' \
+    '--fsync[fsync every written file]' \
     '(--only-write-batch)--write-batch=[write a batched update to the specified file]:file:_files' \
     '(--write-batch)--only-write-batch=[like --write-batch but w/o updating destination]:file:_files' \
     '--protocol=[force an older protocol version to be used]:number' \
