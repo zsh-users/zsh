@@ -67,7 +67,7 @@ if [[ "$state" = ri-name ]]; then
           (class-methods)
           for dir in $ri_dirs[@]; do
             fnames=( $dir/$class_dir*-c.ri(-.:t) )
-            ri_wants+=( ${${fnames%-c.ri//(#b)%(??)/$(print "\\x$match[1]")} )
+            ri_wants+=( ${${fnames%-c.ri}//(#b)%(??)/$(print "\\x$match[1]")} )
           done
           ;;
           (instance-methods)

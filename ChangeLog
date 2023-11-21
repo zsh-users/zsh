@@ -1,5 +1,7 @@
 2023-11-22  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/Unix/Command/_ri: fix missing closing brace
+
 	* 52315: Completion/...: completion options update
 
 2023-11-18  Bart Schaefer  <schaefer@zsh.org>
