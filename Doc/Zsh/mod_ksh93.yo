@@ -186,13 +186,6 @@ parameter var(name) would be unset.  The function must explicitly
 
 em(THIS FEATURE IS NOT YET IMPLEMENTED.)
 )
-item(tt(${ )var(list)tt(;}))(
-Note the space after the opening brace (tt({)). This executes var(list)
-in the current shell and substitutes its standard output in the manner
-of `tt($LPAR())var(list)tt(RPAR())' but without forking.
-
-em(THIS FEATURE IS NOT YET IMPLEMENTED.)
-)
 item(tt(typeset -C )var(name)[tt(=)var(values)tt( ...)])(
 Creates a em(compound variable).
 

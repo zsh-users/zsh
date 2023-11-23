@@ -1,3 +1,12 @@
+2023-11-23  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52325: Doc/Zsh/expn.yo, Doc/Zsh/mod_ksh93.yo, Doc/Zsh/params.yo:
+	Clarify side-effects of $argv and named references to specials,
+	update ksh93 feature compatibility.
+
+	unposted: Src/subst.c, Test/D10nofork.ztst: whitespace tweak to
+	avoid unexpected parse error when comments are used in ${ ... }
+
 2023-11-22  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/Unix/Command/_ri: fix missing closing brace

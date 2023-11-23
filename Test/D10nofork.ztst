@@ -422,7 +422,7 @@ F:must do this before evaluating the next test block
 
   purr ${ { echo nested } } DONE
 1:ignored braces, part 4
-?(eval):1: parse error near `}'
+?(eval):3: parse error near `}'
 
   # "break" blocks function calls in outer loop
   # Could use print, but that might get fixed

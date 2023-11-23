@@ -1600,6 +1600,10 @@ example(tt(before local: OUTER)
 tt(by reference: OUTER)
 tt(after func: RESULT))
 
+Note, however, that named references to em(special) parameters acquire
+the behavior of the special parameter, regardless of the scope where
+the reference is declared.
+
 When var(rname) includes an array subscript, the subscript expression
 is interpreted at the time tt(${)var(pname)tt(}) is expanded.  Any
 form of subscript is allowed, including those that select individual
@@ -1929,7 +1933,9 @@ Note that because the `tt(${|)...tt(})' and `tt(${ )...tt( })' forms
 must be parsed at once as both string tokens and commands, all other
 braces (`tt({)' or `tt(})') within the command either must be quoted,
 or must appear in syntactically valid pairs, such as around complex
-commands, function bodies, or parameter references.
+commands, function bodies, or parameter references.  Furthermore,
+comments are always recognized, even when tt(NO_INTERACTIVE_COMMENTS)
+is in effect.
 
 texinode(Arithmetic Expansion)(Brace Expansion)(Command Substitution)(Expansion)
 sect(Arithmetic Expansion)

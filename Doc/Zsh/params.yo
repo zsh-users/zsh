@@ -748,9 +748,13 @@ vindex(argv)
 item(tt(argv) <S> <Z>)(
 Same as tt(*).  Assigning to tt(argv) changes the local positional
 parameters, but tt(argv) is em(not) itself a local parameter.
-Deleting tt(argv) with tt(unset) in any function deletes it everywhere,
-although only the innermost positional parameter array is deleted (so
-tt(*) and tt(@) in other scopes are not affected).
+Deleting tt(argv) with tt(unset) in any function deletes it everywhere.
+This can be avoided by declaring `tt(local +h argv)' before unsetting.
+Even when not so declared, only the innermost positional parameter
+array is deleted (so tt(*) and tt(@) in other scopes are not affected).
+
+A named reference to tt(argv) em(does not) permit a called function to
+access the positional parameters of its caller.
 )
 vindex(@)
 item(tt(@) <S>)(

@@ -1956,7 +1956,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		     * Then fall through to the regular handling of $REPLY
 		     * to manage word splitting, expansion flags, etc.
 		     */
-		    char *outfmt = ">| %s { %s ;}";	/* 13 */
+		    char *outfmt = ">| %s {\n%s\n;}";	/* 13 */
 		    if ((rplytmp = gettempname(NULL, 1))) {
 			/* Prevent shenanigans with $TMPPREFIX */
 			char *tmpfile = quotestring(rplytmp, QT_BACKSLASH);
