@@ -1,0 +1,128 @@
+# Created by Sebastian Gniazdowski 
+
+prompt_sprint2_help () {
+    cat <<EOF
+This prompt is color themable. You can invoke it in following way:
+
+prompt sprint2 <time/line color> <braces clr.> <text clr.> <at/colon clr.> <prompt clr.>
+
+You can provide only N first arguments, N=1..5.
+
+The default colors are: 39 green blue green yellow
+EOF
+}
+
+prompt_sprint2_setup () {
+    local col_time_line=${1:-'39'}
+    local col_parens=${2:-'green'}
+    local col_text=${3:-'blue'}
+    local col_at_colon=${4:-'green'}
+    local col_prompt=${5:-'yellow'}
+
+    autoload -Uz vcs_info
+
+    typeset -gA _psvar
+
+    local cl_time_line="%B%F{$col_time_line}"
+    local cl_text="%b%F{$col_text}"
+    local cl_parens="%B%F{$col_parens}"
+    local cl_at_colon="%b%F{$col_at_colon}"
+    local cl_prompt="%B%F{$col_prompt}"
+    local cl_rst="%b%f"
+
+    local _lpar="${cl_parens}["
+    local _rpar="${cl_parens}]"
+
+    local _time="$cl_time_line%D{%H:%M}"
+    _psvar[user]='%n'
+    local _user="$cl_text"'${_psvar[user]}'
+    _psvar[at]="@"
+    _psvar[host]='%m'
+    local _at="$cl_at_colon"'${_psvar[at]}'"$cl_text"'${_psvar[host]}'
+    _psvar[colon]=':'
+    local _path="$cl_at_colon"'${_psvar[colon]}'"$cl_text%28<*<%/%<<"
+    local _line="$cl_time_line%i"
+    local _prompt="$cl_prompt# "
+
+    # You can instantly shorten the prompt by setting PSSHORT=1
+    if [[ "$COLUMNS" -le 94 || "$PSSHORT" = "1" ]]; then
+        _psvar=()
+    else
+        _psvar[user]='%n'
+        _psvar[at]="@"
+        _psvar[host]='%m'
+        _psvar[colon]=':'
+    fi
+
+    PS1="$_time$_lpar$_user$_at$_path$_rpar$_line$_prompt$cl_rst"
+
+    PS2="$cl_parens> $cl_rst"
+
+    RPS1='${vcs_info_msg_0_}'
+    prompt_opts=(cr subst percent)
+
+    zstyle ':vcs_info:*' enable git svn darcs bzr hg
+    zstyle ':vcs_info:*' stagedstr "%F{green}●$cl_rst"
+    zstyle ':vcs_info:*' unstagedstr "%F{yellow}●$cl_rst"
+    zstyle ':vcs_info:*' check-for-changes true
+    zstyle ':vcs_info:*' formats '(%s)-[%b%u%c]-'
+
+    add-zsh-hook precmd prompt_sprint2_precmd
+}
+
+prompt_sprint2_precmd () {
+    setopt localoptions noxtrace noksharrays 
+
+    # You can instantly shorten the prompt by setting PSSHORT=1
+    if [[ "$COLUMNS" -le 94 || "$PSSHORT" = "1" ]]; then
+        _psvar=()
+    else
+        _psvar[user]='%n'
+        _psvar[at]="@"
+        _psvar[host]='%m'
+        _psvar[colon]=':'
+    fi
+
+    local -a changed_files
+    changed_files=( )
+    git diff --quiet 2>/dev/null || changed_files=( ${(f)"$( git diff --name-only 2>/dev/null )"} )
+    changed_files=( $^changed_files(N) )
+    if [[ "${#changed_files}" -gt 0 ]]; then
+        local basedir
+        basedir="$(git rev-parse --show-toplevel)/"
+        changed_files=( ${(f)"$( find "${basedir}${^changed_files[@]}" -mtime +2 )"} )
+    fi
+
+    if [[ "${#changed_files}" -eq 0 ]]; then
+        zstyle ':vcs_info:*' formats ' (%s)-[%b%u%c]'
+    else
+        zstyle ':vcs_info:*' formats ' (%s)-[%b%u%B%F{yellow}-OLD-%c%%b%f]'
+    fi
+
+    vcs_info
+}
+
+prompt_sprint2_preview () {
+    local -a colors_time_line colors_text
+    colors_time_line=(red yellow green blue magenta cyan)
+    colors_text=(red yellow green blue magenta cyan)
+
+    local ctime_line ctext i j
+
+    if (( ! $#* )); then
+        for (( i = 1; i <= ${#colors_time_line}; i++ )); do
+            ctime_line="${colors_time_line[$i]}"
+            for (( j = 1; j <= ${#colors_text}; j++ )); do
+                ctext="${colors_text[$j]}"
+                prompt_preview_theme sprint2 "$ctime_line" "red" "$ctext"
+                (( i != ${#colors_time_line} || j != ${#colors_text} )) && print
+            done
+        done
+    else
+        prompt_preview_theme sprint2 "$@"
+    fi
+}
+
+prompt_sprint2_setup "$@"
+
+# vim:ft=zsh
