@@ -921,6 +921,8 @@ cd_get_dest(char *nam, char **argv, int hard, int func)
 	}
 	len1 = strlen(argv[0]);
 	len2 = strlen(argv[1]);
+	if (!len1)
+	    u = pwd + strlen(pwd);
 	len3 = u - pwd;
 	d = (char *)zalloc(len3 + len2 + strlen(u + len1) + 1);
 	strncpy(d, pwd, len3);

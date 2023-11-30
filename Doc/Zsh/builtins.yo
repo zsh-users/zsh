@@ -287,7 +287,8 @@ directory hash table.
 
 The second form of tt(cd) substitutes the string var(new)
 for the string var(old) in the name of the current directory,
-and tries to change to this new directory.
+and tries to change to this new directory. If var(old) is empty, var(new)
+is appended to the name of the current directory.
 
 The third form of tt(cd) extracts an entry from the directory
 stack, and changes to that directory.  An argument of the form
