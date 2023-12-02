@@ -3,9 +3,8 @@
 %prep
   mkdir redir.tmp && cd redir.tmp
 
-  myfd=99
-  (echo >&$myfd) 2>msg
-  bad_fd_msg="${$(<msg)##*:}"
+  bad_fd_msg="${$( { exec 9>&-; echo >&9 } 2>&1)##*:}"
+  [[ -n "$bad_fd_msg" ]]
 
 %test
 

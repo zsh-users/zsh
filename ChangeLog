@@ -1,3 +1,9 @@
+2023-12-02  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52360: Test/A04redirect.ztst: Simplify bad-descriptor check in
+	%prep -- avoids accidentally using an open descriptor (derived
+	from German Riano: 52328)
+
 2023-11-29  Bart Schaefer  <schaefer@zsh.org>
 
 	* Sebastian Gniazdowski: 52145: Functions/Prompts/prompt_sprint2_setup:
