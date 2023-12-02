@@ -210,7 +210,7 @@
 
 	* 52169: Src/subst.c, Src/utils.c: a few more improvemets of (#)
 
-2023-09-23  Bart Schaefer  <schaefer@BartMAC2014.local>
+2023-09-23  Bart Schaefer  <schaefer@zsh.org>
 
 	* 52180: Doc/Zsh/expn.yo: clarify array behavior of ${|var|...}
 	and the REPLY parameter
@@ -1098,7 +1098,7 @@
 
 	* 50851: Doc/Zsh/options.yo, Src/exec.c, Src/options.c: restore
 	state (such as typtab) when returning from a function with
-	localoptions (but do not take care of EMACS/VI options).
+	localoptions (but do not take care of EMAS/CVI options).
 
 2022-10-31  Bart Schaefer  <schaefer@zsh.org>
 
@@ -3383,7 +3383,7 @@
 	* github #53: James Pike: Completion/Unix/Type/_remote_files:
 	allow specifying directory name.
 
-2020-07-07  Bart Schaefer  <schaefer@brasslantern.com>
+2020-07-07  Bart Schaefer  <schaefer@zsh.org>
 
 	* 46189: Test/comptest: Ignore exit status of final zpty_flush
 
@@ -4942,7 +4942,7 @@
 	* 44779: Completion/Unix/Command/_git: completion for new
 	git switch and git restore commands
 
-2019-09-24  Bart Schaefer  <schaefer@brasslantern.com>
+2019-09-24  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted (see 44772): Functions/Zle/bracketed-paste-magic:
 	quote the string argument to zle -U
@@ -5079,7 +5079,7 @@
 	* unposted: Etc/FAQ.yo: typo. also updates to outdated notes on
 	multibyte support.
 
-2019-07-08  Bart Schaefer  <schaefer@brasslantern.com>
+2019-07-08  Bart Schaefer  <schaefer@zsh.org>
 
 	* 43755: Functions/Zle/smart-insert-last-word: (Belated commit)
 	Fix state management for repeat uses to avoid clobbering command
