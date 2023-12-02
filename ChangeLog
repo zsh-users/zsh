@@ -1,8 +1,11 @@
 2023-12-02  Bart Schaefer  <schaefer@zsh.org>
 
+	* 52361: Completion/Unix/Command/_ant: fix quoting of target files
+	(derived from Germán Riaño: 52329)
+
 	* 52360: Test/A04redirect.ztst: Simplify bad-descriptor check in
 	%prep -- avoids accidentally using an open descriptor (derived
-	from German Riano: 52328)
+	from Germán Riaño: 52328)
 
 2023-11-29  Bart Schaefer  <schaefer@zsh.org>
 
