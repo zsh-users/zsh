@@ -683,6 +683,7 @@ the same as if the commands had been executed directly by the shell;
 if there are no var(args) or they contain no commands (i.e. are
 an empty string or whitespace) the return status is zero.
 )
+findex(exec)
 item(tt(exec) [ tt(-cl) ] [ tt(-a) var(argv0) ] [ var(command) [ var(arg) ... ] ])(
 Replace the current shell with var(command) rather than forking.
 If var(command) is a shell builtin command or a shell function,
@@ -1633,6 +1634,7 @@ cancels both tt(-p) and tt(-u).
 
 The tt(-c) or tt(-l) flags cancel any and all of tt(-kpquz).
 )
+findex(readonly)
 cindex(parameters, marking readonly)
 item(tt(readonly))(
 Same as tt(typeset -r).  With the tt(POSIX_BUILTINS) option set, same
@@ -2413,6 +2415,7 @@ the mask is printed as an octal number.  Note that in
 the symbolic form the permissions you specify are those which are to be
 allowed (not denied) to the users specified.
 )
+findex(unalias)
 cindex(aliases, removing)
 item(tt(unalias) [ tt(-ams) ] var(name) ...)(
 Removes aliases.  This command works the same as tt(unhash -a), except that
