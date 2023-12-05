@@ -22,20 +22,20 @@ case "$service" in
     '(I)*'{-v,--verbose}'[verbose mode]' \
     '(I * --files --files0)--files=-[read list of files to process from file]::file:_files' \
     '(I * --files --files0)--files0=-[read null terminated list of files to process from file]::file:_files' \
-    '(I -F --format)'{-F,--format}'=[specify file format]:format:(auto xz lzma raw)' \
+    '(I -F --format)'{-F+,--format=}'[specify file format]:format:(auto xz lzma lzip raw)' \
     '(I -T --threads)'{-T+,--threads=}'[use specified number of threads]:threads [1]' \
-    '(I -M --memlimit --memory)'{-M+,--memlimit=,--memory=}'[set memory usage limit]:memory usage' \
+    '(I -M --memlimit --memory)'{-M+,--memlimit=,--memory=}'[set memory usage limit]: :_numbers -u bytes "memory limit" KiB MiB GiB %\:percentage\ of\ available\ RAM' \
     '(I)--no-adjust[give error if settings exceed memory limit]' \
     '(I -Q --no-warn)'{-Q,--no-warn}'[make warnings not affect exit status]' \
     + 'comp' \
     "(I decomp)"{-z,--compress}'[compress]' \
     '(I decomp -e --extreme)'{-e,--extreme}'[try to improve compression ratio by using more CPU time]' \
     '(I decomp -S --suffix)'{-S+,--suffix=}'[use specified suffix for compressed files]:suffix [.xz]' \
-    '(I decomp -C --check)'{-C,--check}'=[integrity check type]:check type:(none crc32 crc64 sha256)' \
+    '(I decomp -C --check)'{-C+,--check=}'[integrity check type]:check type:(none crc32 crc64 sha256)' \
     '(I decomp)--block-size=[start a new .xz block after specified bytes of input]:size' \
     '(I decomp)--block-list=[start a new .xz block after specified intervals of uncompressed data]:size' \
     '(I decomp)--flush-timeout=[specify maximum time between flushing of output]:time (ms) [0]' \
-    '(I decomp)--memlimit-compress=[set memory usage limit for compression]:memory usage' \
+    '(I decomp)--memlimit-compress=[set memory usage limit for compression]: :_numbers -u bytes "memory limit" KiB MiB GiB %\:percentage\ of\ available\ RAM' \
     + 'decomp' \
     '(I comp level filters)'{-d,--decompress}'[decompress]' \
     '(I comp level filters)'{-t,--test}'[test compressed file integrity]' \
@@ -43,7 +43,8 @@ case "$service" in
     "(I comp level filters)--ignore-check[don't verify integrity when decompressing]" \
     '(I comp level filters)--single-stream[decompress only the first stream]' \
     "(I comp level filters)--no-sparse[don't create sparse files when decompressing]" \
-    '(I comp level filters)--memlimit-decompress=[set memory usage limit for decompression]:memory usage' \
+    '(I comp level filters)--memlimit-decompress=[set memory usage limit for decompression]: :_numbers -u bytes "memory limit" KiB MiB GiB %\:percentage\ of\ available\ RAM' \
+    '(I comp level filters)--memlimit-mt-decompress=[set memory usage limit for multi‐threaded decompression]: :_numbers -u bytes "memory limit" KiB MiB GiB %\:percentage\ of\ available\ RAM' \
     + '(I)' \
     '(* comp decomp level filters common)--info-memory[display amount of RAM and memory usage limits]' \
     '(- *)'{-h,--help}'[display help message]' \
@@ -52,7 +53,7 @@ case "$service" in
     + '(level)' \
     '(I filters decomp)-'{-best,-fast,1,2,3,4,5,6,7,8,9} \
     + filters \
-    '(I level decomp --extreme)'--{x86,powerpc,ia64,arm,armthumb,sparc}=-'[add a branch/call/jump filter]::option:->bcj-options' \
+    '(I level decomp --extreme)'--{x86,powerpc,ia64,arm,armthumb,arm64,sparc}=-'[add a branch/call/jump filter]::option:->bcj-options' \
     '(I level decomp --extreme)'--lzma{1,2}=-'[add lzma filter]::option:->lzma-options' \
     '(I level decomp --extreme)--delta=-[add delta filter]::option:->delta-options' && ret=0
   ;;
@@ -64,10 +65,10 @@ case $state in
     [[ -n ${(k)opt_args[(i)decomp*]} ]] && unset decompress
     if [[ -z "$decompress" ]]; then
       _description files expl 'compressed file'
-      _files "$expl[@]" -g '*.(xz|txz|lzma|tlz)(-.)' && return
+      _files "$expl[@]" -g '*.(xz|txz||lz|lzma|tlz)(-.)' && return
     else
       _description files expl 'file to compress'
-      _files "$expl[@]" -g '^*.(xz|txz|lzma|tlz)(-.)' && return
+      _files "$expl[@]" -g '^*.(xz|txz|lz|lzma|tlz)(-.)' && return
     fi
   ;;
   lzma-options)

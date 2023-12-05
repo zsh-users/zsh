@@ -16,7 +16,7 @@ _arguments -s \
   '-y[run savecore on reboot]' \
   '-c[set dump content]:dump content:(($content))' \
   '-d[set dump device]: : _alternative "tokens\:token\:(swap none)" "files\:block device\:_files -g \*\(-%b\)"' \
-  '-m[set minfree size]:size' \
+  '-m[set minfree size]: :_numbers size k m %' \
   '-s[set the savecore directory]:directory:_files -/' \
   '-r[alternate root directory]:directory:_files -/' \
   '-z[enable saving core files in a compressed format]:compression:(on off)'

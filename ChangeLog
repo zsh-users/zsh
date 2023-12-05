@@ -1,3 +1,9 @@
+2023-12-05  Oliver Kiddle  <opk@zsh.org>
+
+	* 52373: Completion/Base/Utility/_numbers,
+	Completion/Solaris/Command/_dumpadm, Completion/Unix/Command/_xz:
+	fix _numbers for suffixes containing % and update affected functions
+
 2023-12-04  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 52356: (cf. 52327 Dennis Eriksen): Doc/Zsh/builtins.yo: add
