@@ -1112,7 +1112,7 @@
 
 	* 50851: Doc/Zsh/options.yo, Src/exec.c, Src/options.c: restore
 	state (such as typtab) when returning from a function with
-	localoptions (but do not take care of EMAS/CVI options).
+	localoptions (but do not take care of EMACS/VI options).
 
 2022-10-31  Bart Schaefer  <schaefer@zsh.org>
 
