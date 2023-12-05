@@ -1143,7 +1143,7 @@ findex(kill)
 cindex(killing jobs)
 cindex(jobs, killing)
 xitem(tt(kill) [ tt(-s) var(signal_name) | tt(-n) var(signal_number) | \
-tt(-)var(sig) ] var(job) ...)
+tt(-)var(sig) ] [ tt(-q) var(value) ] var(job) ...)
 item(tt(kill) tt(-l) [ var(sig) ... ])(
 Sends either tt(SIGTERM) or the specified signal to the given
 jobs or processes.
@@ -1170,6 +1170,9 @@ tt(kill -IO) and tt(kill -POLL) have the same effect.
 
 Many systems will allow process IDs to be negative to kill a process
 group or zero to kill the current process group.
+
+The tt(-q) option allows an integer value to be sent with the signal
+on systems that support tt(sigqueue+LPAR()RPAR()).
 )
 findex(let)
 item(tt(let) var(arg) ...)(

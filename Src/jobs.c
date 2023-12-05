@@ -2677,9 +2677,35 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 {
     int sig = SIGTERM;
     int returnval = 0;
+#ifdef HAVE_SIGQUEUE
+    union sigval sigqueue_info;
+#endif
+    int use_sigqueue = 0, got_sig = 0;
+
+    while (*argv && **argv == '-') {
+	if (!use_sigqueue && (*argv)[1] == 'q' && (*argv)[2] == '\0') {
+	    char *endp;
+
+	    if (!*++argv) {
+		zwarnnam(nam, "-q: argument expected");
+		return 1;
+	    }
+#ifdef HAVE_SIGQUEUE
+	    sigqueue_info.sival_int =
+#endif
+		    zstrtol(*argv, &endp, 10);
+	    if (*endp) {
+		zwarnnam(nam, "invalid number: %s", *argv);
+		return 1;
+	    }
+	    use_sigqueue = 1;
+	    argv++;
+	    continue;
+	}
+	if (got_sig)
+	    break;
 
     /* check for, and interpret, a signal specifier */
-    if (*argv && **argv == '-') {
 	if (idigit((*argv)[1])) {
 	    char *endp;
 	    /* signal specified by number */
@@ -2796,6 +2822,7 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    }
 	}
 	argv++;
+	got_sig = 1;
     }
 
     /* Discard the standard "-" and "--" option breaks */
@@ -2844,7 +2871,12 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    returnval++;
 	} else {
 	    int pid = atoi(*argv);
-	    if (kill(pid, sig) == -1) {
+	    if (
+#ifdef HAVE_SIGQUEUE
+		use_sigqueue ? sigqueue(pid, sig, sigqueue_info) :
+#endif
+		kill(pid, sig) == -1)
+	    {
 		zwarnnam("kill", "kill %s failed: %e", *argv, errno);
 		returnval++;
 	    } 

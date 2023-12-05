@@ -1,5 +1,8 @@
 2023-12-05  Oliver Kiddle  <opk@zsh.org>
 
+	* 52326, 52372: configure.ac, Src/jobs.c, Doc/Zsh/builtins.yo,
+	Completion/Zsh/Command/_kill: add -q option to kill for sigqueue
+
 	* 52373: Completion/Base/Utility/_numbers,
 	Completion/Solaris/Command/_dumpadm, Completion/Unix/Command/_xz:
 	fix _numbers for suffixes containing % and update affected functions
