@@ -1,5 +1,8 @@
 2023-12-13  Oliver Kiddle  <opk@zsh.org>
 
+	* Florian Weimer: 52383: configure.ac: Avoid incompatible pointer
+	types in terminfo global variable checks
+
 	* 52394: configure.ac: alter form of /dev/fd test to work where
 	/bin/sh is ksh such as on Solaris 11
 
