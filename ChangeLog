@@ -1,5 +1,8 @@
 2023-12-09  Bart Schaefer  <schaefer@zsh.org>
 
+	* 52366 + fix typo: Completion/Unix/Command/_ant: rename
+	find_targets as _ant_targets, replace one sed with substitution
+
 	* 52365: Src/jobs.c, Src/signals.c: record state of exited
 	background jobs sooner so as to be visible in TRAPCHLD
 
