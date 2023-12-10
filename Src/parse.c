@@ -601,7 +601,7 @@ clear_hdocs(void)
  *			| sublist [ SEPER | AMPER | AMPERBANG ]
  *
  * cmdsubst indicates our event is part of a command-style
- * substitution terminated by the token indicationg, usual closing
+ * substitution terminated by the token indicated, usually closing
  * parenthesis.  In other cases endtok is ENDINPUT.
  */
 
