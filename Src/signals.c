@@ -556,9 +556,11 @@ wait_for_processes(void)
 		    jn->gleader = 0;
 		}
 	    }
+	    update_bg_job(jn, pid, status);
 	    update_job(jn);
 	} else if (findproc(pid, &jn, &pn, 1)) {
 	    pn->status = status;
+	    update_bg_job(jn, pid, status);
 	    update_job(jn);
 	} else {
 	    /* If not found, update the shell record of time spent by
@@ -567,19 +569,7 @@ wait_for_processes(void)
 	     * terminates.
 	     */
 	    get_usage();
-	}
-	/*
-	 * Accumulate a list of older jobs.  We only do this for
-	 * background jobs, which is something in the job table
-	 * that's not marked as in the current shell or as shell builtin
-	 * and is not equal to the current foreground job.
-	 */
-	if (jn && !(jn->stat & (STAT_CURSH|STAT_BUILTIN)) &&
-	    jn - jobtab != thisjob) {
-	    if (WIFEXITED(status))
-		addbgstatus(pid, WEXITSTATUS(status));
-	    else if (WIFSIGNALED(status))
-		addbgstatus(pid, 0200 | WTERMSIG(status));
+	    update_bg_job(jn, pid, status);
 	}
 
 	unqueue_signals();

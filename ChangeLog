@@ -1,3 +1,8 @@
+2023-12-09  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52365: Src/jobs.c, Src/signals.c: record state of exited
+	background jobs sooner so as to be visible in TRAPCHLD
+
 2023-12-05  Oliver Kiddle  <opk@zsh.org>
 
 	* 52326, 52372: configure.ac, Src/jobs.c, Doc/Zsh/builtins.yo,

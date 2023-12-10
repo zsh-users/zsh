@@ -660,6 +660,25 @@ update_job(Job jn)
     }
 }
 
+/**/
+void
+update_bg_job(Job jn, pid_t pid, int status)
+{
+    /*
+     * Accumulate a list of older jobs.  We only do this for
+     * background jobs, which is something in the job table
+     * that's not marked as in the current shell or as shell builtin
+     * and is not equal to the current foreground job.
+     */
+    if (jn && !(jn->stat & (STAT_CURSH|STAT_BUILTIN)) &&
+	jn - jobtab != thisjob) {
+	if (WIFEXITED(status))
+	    addbgstatus(pid, WEXITSTATUS(status));
+	else if (WIFSIGNALED(status))
+	    addbgstatus(pid, 0200 | WTERMSIG(status));
+    }
+}
+
 /* set the previous job to something reasonable */
 
 /**/
