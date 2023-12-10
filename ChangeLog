@@ -1,3 +1,8 @@
+2023-12-09  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52366 + fix typo: Completion/Unix/Command/_ant: rename
+	find_targets as _ant_targets, replace one sed with substitution
+
 2023-12-05  Oliver Kiddle  <opk@zsh.org>
 
 	* 52326, 52372: configure.ac, Src/jobs.c, Doc/Zsh/builtins.yo,

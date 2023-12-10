@@ -6,7 +6,8 @@ local curcontext="$curcontext" state line expl ret=1
 typeset -A opt_args
 local buildfile classpath cp userjars importedfiles target='*:target:->target' targets tmp
 
-find_targets() {
+(( $+functions[_ant_targets] )) ||
+_ant_targets() {
     importedfiles=( $(sed -n "s/ *<import[^>]* file=[\"']\([^\"']*\)[\"'].*/\1/p" < $1) )
     # Tweaked to omit targets beginning with "-" that can't
     # be invoked from the command line; see zsh-workers/24129.
@@ -14,12 +15,12 @@ find_targets() {
     if (( $#importedfiles )) ; then
         ( cd $1:h
             for file in $importedfiles ; do
-                expanded=( $(echo $file | sed -n "s|\${ant.home}|$ANT_HOME|p") )
-                if [[ ! "bla$expanded" = "bla" ]]; then
+                expanded=${file//\${ant.home}/$ANT_HOME}
+                if [[ "$expanded" != "$file" ]]; then
                     file=$expanded
                 fi
                 if [[ -f $file ]]; then
-                    find_targets $file
+                    _ant_targets $file
                 fi
         done )
     fi
@@ -135,7 +136,7 @@ case $state in
         )//$'\015'}"
         _describe 'target' tmp && ret=0
       else
-        targets=( $(find_targets $buildfile) )
+        targets=( $(_ant_targets $buildfile) )
         _wanted targets expl target compadd -a targets && ret=0
       fi
     else
