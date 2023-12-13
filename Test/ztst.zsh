@@ -326,6 +326,7 @@ ZTST_diff() {
   emulate -L zsh
   setopt extendedglob
 
+  local -a diff_arg
   local diff_out
   integer diff_pat diff_ret
 
@@ -342,6 +343,7 @@ ZTST_diff() {
     ;;
   esac
   shift
+  [[ $OSTYPE != solaris* ]] && diff_arg=( -a )
       
   if (( diff_pat )); then
     local -a diff_lines1 diff_lines2
@@ -382,7 +384,7 @@ ZTST_diff() {
       diff_ret=1
     fi
   else
-    diff_out=$(diff -a "$@")
+    diff_out=$(diff $diff_arg "$@")
     diff_ret="$?"
     if [[ "$diff_ret" != "0" ]]; then
       print -r -- "$diff_out"

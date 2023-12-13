@@ -1,5 +1,8 @@
 2023-12-13  Oliver Kiddle  <opk@zsh.org>
 
+	* 52393: Test/ztst.zsh: fix tests on Solaris by omitting -a option
+	to diff as it is not supported there
+
 	* 52392: Src/makepro.awk: use octal escape to match = without
 	error messages from either GNU awk or Solaris awk
 
