@@ -1,3 +1,8 @@
+2023-12-13  Oliver Kiddle  <opk@zsh.org>
+
+	* 52392: Src/makepro.awk: use octal escape to match = without
+	error messages from either GNU awk or Solaris awk
+
 2023-12-09  Bart Schaefer  <schaefer@zsh.org>
 
 	* 52366 + fix typo: Completion/Unix/Command/_ant: rename
