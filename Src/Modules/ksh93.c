@@ -171,7 +171,7 @@ ksh93_wrapper(Eprog prog, FuncWrap w, char *name)
 	/* bindkey -v forces VIMODE so this test is as good as any */
 	if (curkeymapname && isset(VIMODE) &&
 	    strcmp(curkeymapname, "main") == 0)
-	    strcpy(sh_edmode, "\e");
+	    strcpy(sh_edmode, "\033");
 	else
 	    strcpy(sh_edmode, "");
 	if (!sh_edchar)
