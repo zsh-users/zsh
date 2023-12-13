@@ -2016,7 +2016,7 @@ AH_TEMPLATE([PATH_DEV_FD],
 [Define to the path of the /dev/fd filesystem.])
 AC_CACHE_CHECK(for /dev/fd filesystem, zsh_cv_sys_path_dev_fd,
 [for zsh_cv_sys_path_dev_fd in /proc/self/fd /dev/fd no; do
-   test x`echo ok|(exec 3<&0; cat $zsh_cv_sys_path_dev_fd/3 2>/dev/null;)` = xok && break
+   (exec 3<&0; test -e $zsh_cv_sys_path_dev_fd/3;) && break
  done])
 if test x$zsh_cv_sys_path_dev_fd != xno; then
   AC_DEFINE_UNQUOTED(PATH_DEV_FD, "$zsh_cv_sys_path_dev_fd")

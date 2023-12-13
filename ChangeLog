@@ -1,5 +1,8 @@
 2023-12-13  Oliver Kiddle  <opk@zsh.org>
 
+	* 52394: configure.ac: alter form of /dev/fd test to work where
+	/bin/sh is ksh such as on Solaris 11
+
 	* 52393: Test/ztst.zsh: fix tests on Solaris by omitting -a option
 	to diff as it is not supported there
 
