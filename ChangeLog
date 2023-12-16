@@ -17,6 +17,11 @@
 	* 52366 + fix typo: Completion/Unix/Command/_ant: rename
 	find_targets as _ant_targets, replace one sed with substitution
 
+2023-12-06  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 52413: Completion/Unix/Command/_iconv: support Citrus version
+	on macOS, DragonFly and NetBSD
+
 2023-12-05  Oliver Kiddle  <opk@zsh.org>
 
 	* 52326, 52372: configure.ac, Src/jobs.c, Doc/Zsh/builtins.yo,
