@@ -63,7 +63,7 @@ else
     '1:file:_files' && return 0
 
   if [[ $state = codeset ]]; then
-    if [[ $OSTYPE = freebsd* ]]; then
+    if [[ $OSTYPE = (freebsd|dragonfly|netbsd|darwin)* ]]; then
       codeset=( $(_call_program codesets $words[1] -l) )
     elif [[ -f /usr/lib/iconv/iconv_data ]]; then  # IRIX & Solaris
       codeset=( ${${(f)"$(</usr/lib/iconv/iconv_data)"}%%[[:blank:]]*} )
