@@ -1,5 +1,7 @@
 2024-01-28  Oliver Kiddle  <opk@zsh.org>
 
+	* Jörg Sommer: 52442: Src/zsh.h: Mark hookdef.name as const
+
 	* Jörg Sommer: 52444: Src/module.c: Mark name argument of some
 	functions const
 

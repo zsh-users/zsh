@@ -1578,7 +1578,7 @@ typedef int (*Hookfn) _((Hookdef, void *));
 
 struct hookdef {
     Hookdef next;
-    char *name;
+    const char *name;
     Hookfn def;
     int flags;
     LinkList funcs;
