@@ -1014,7 +1014,7 @@ int
 visetbuffer(char **args)
 {
     ZLE_INT_T ch;
-    ZLE_CHAR_T *match = ZWS("_*+");
+    const ZLE_CHAR_T *match = ZWS("_*+");
     int registermod[] = { MOD_NULL, MOD_PRI, MOD_CLIP };
     ZLE_CHAR_T *found;
 
