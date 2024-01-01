@@ -283,9 +283,9 @@ selectargument(UNUSED(char **args))
     free(linein);
 
     if (IS_THINGY(bindk, selectinshellword)) {
-	ZLE_CHAR_T *match = ZWS("`\'\"");
-	ZLE_CHAR_T *lmatch = ZWS("\'({"), *rmatch = ZWS("\')}");
-	ZLE_CHAR_T *ematch = match, *found;
+	const ZLE_CHAR_T *match = ZWS("`\'\"");
+	const ZLE_CHAR_T *lmatch = ZWS("\'({"), *rmatch = ZWS("\')}");
+	const ZLE_CHAR_T *ematch = match, *found;
 	int start, end = zlecs;
 	/* for 'in' widget, don't include initial blanks ... */
 	while (mark < zlecs && ZC_iblank(zleline[mark]))
