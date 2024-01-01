@@ -356,7 +356,7 @@ finish_(UNUSED(Module m))
 
 /**/
 void
-register_module(char *n, Module_void_func setup,
+register_module(const char *n, Module_void_func setup,
 		Module_features_func features,
 		Module_enables_func enables,
 		Module_void_func boot,
@@ -846,7 +846,7 @@ Hookdef hooktab;
 
 /**/
 Hookdef
-gethookdef(char *n)
+gethookdef(const char *n)
 {
     Hookdef p;
 
@@ -974,7 +974,7 @@ deletehookdeffunc(Hookdef h, Hookfn f)
 
 /**/
 mod_export int
-deletehookfunc(char *n, Hookfn f)
+deletehookfunc(const char *n, Hookfn f)
 {
     Hookdef h = gethookdef(n);
 
@@ -1766,7 +1766,7 @@ dyn_finish_module(Module m)
 #else
 
 static Module_generic_func
-module_func(Module m, char *name)
+module_func(Module m, const char *name)
 {
 #ifdef DYNAMIC_NAME_CLASH_OK
     return (Module_generic_func) dlsym(m->u.handle, name);
@@ -2443,7 +2443,7 @@ bin_zmodload(char *nam, char **args, Options ops, UNUSED(int func))
     int ops_au = OPT_ISSET(ops,'a') || OPT_ISSET(ops,'u');
     int ret = 1, autoopts;
     /* options only allowed with -F */
-    char *fonly = "lP", *fp;
+    const char *fonly = "lP", *fp;
 
     if (ops_bcpf && !ops_au) {
 	zwarnnam(nam, "-b, -c, -f, and -p must be combined with -a or -u");
@@ -3182,7 +3182,7 @@ bin_zmodload_features(const char *nam, char **args, Options ops)
 	} else if (OPT_ISSET(ops, 'L'))
 	    printf("zmodload -F %s ", m->node.nam);
 	for (fp = features, ep = enables; *fp; fp++, ep++) {
-	    char *onoff;
+	    const char *onoff;
 	    int term;
 	    if (*args) {
 		char **argp;
@@ -3452,7 +3452,8 @@ autofeatures(const char *cmdnam, const char *module, char **features,
 	defm = NULL;
 
     for (; *features; features++) {
-	char *fnam, *typnam, *feature;
+	char *fnam, *feature;
+	const char *typnam;
 	int add, fchar, flags = defflags;
 	autofeaturefn_t fn;
 
