@@ -4668,10 +4668,10 @@ renames `tt(foo.lis)' to `tt(foo.txt)', `tt(my.old.stuff.lis)' to
 
 The pattern is always treated as an tt(EXTENDED_GLOB) pattern.  Any file
 whose name is not changed by the substitution is simply ignored.  Any
-error (a substitution resulted in an empty string, two substitutions gave
-the same result, the destination was an existing regular file and tt(-f)
-was not given) causes the entire function to abort without doing
-anything.
+error (no files matched the var(srcpat), substitution resulted in an empty
+string, two substitutions gave the same result, the destination was an
+existing regular file and tt(-f) was not given) causes the entire function
+to abort without doing anything.
 
 In addition to pattern replacement, the variable tt($f) can be referred
 to in the second (replacement) argument.  This makes it possible to

@@ -236,11 +236,17 @@ if [[ $pat = (#b)(*)\((\*\*##/)\)(*) ]]; then
 else
   fpat=$pat
 fi
-files=(${~fpat})
 
 [[ -n $hasglobqual ]] && pat=$opat
 
 errs=()
+
+() {
+  # (#qN) breaks bareglobqual -Q option, so:
+  setopt localoptions nullglob
+  files=(${~fpat})
+}
+(( ${#files} )) || errs=( "no files matched \`$fpat'" )
 
 for f in $files; do
   if [[ $pat = (#b)(*)\(\*\*##/\)(*) ]]; then

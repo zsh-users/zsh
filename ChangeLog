@@ -1,3 +1,8 @@
+2024-01-05  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52465: Doc/Zsh/contrib.yo, Functions/Misc/zmv: use NULL_GLOB
+	when expanding the input pattern to avoid NOMATCH exit
+
 2023-12-06  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 52413: Completion/Unix/Command/_iconv: support Citrus version
