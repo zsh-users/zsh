@@ -1,0 +1,315 @@
+#compdef perlbrew
+
+#
+# A zsh completion script for perlbrew (https://metacpan.org/dist/App-perlbrew/)
+#
+
+local curcontext="$curcontext" state state_descr line ret=1
+local -a args_common args_install
+typeset -A opt_args
+# others local variables
+typeset -g perlbrew_subcommands
+
+##
+## get the list of perl available versions
+##
+(( $+functions[_perlbrew_caching_policy] )) ||
+_perlbrew_caching_policy() {
+  # rebuild if cached data are more than one week old
+  local -a newer=( "$1"(Nmw-1) )
+  return $#newer
+}
+
+(( $+functions[_perl_available] )) ||
+_perl_available() {
+  local -a available_versions
+  local update_policy
+
+  zstyle -s ":completion:${curcontext}:" cache-policy update_policy
+  if [[ -z "$update_policy" ]]; then
+    zstyle ":completion:${curcontext}:" cache-policy _perlbrew_caching_policy
+  fi
+
+  if _cache_invalid perlbrew-available-versions || ! _retrieve_cache perlbrew-available-versions; then
+    # this can be slow
+    available_versions=( ${${${${(f)"$(_call_program perl_releases perlbrew available)"}/\# (cp|p)erl/}/(#s)i /}// /} \
+                         perl-stable \
+                         perl-blead )
+    _store_cache perlbrew-available-versions available_versions
+  fi
+  _values 'available version' ${(n)available_versions}
+}
+
+##
+## get the list of local perl installations
+##
+(( $+functions[_perl_installations] )) ||
+_perl_installations() {
+  local text
+  local -a installed alias_link
+
+  case "$1" in
+    (-with-lib)
+      installed=( ${${${(f)"$(_call_program perl_installed perlbrew list)"}/(#s)\*/}// /} )
+      text="perl installation"
+      ;;
+    (-only-lib)
+      installed=( ${(M)${${${(f)"$(_call_program perl_installed perlbrew list)"}/(#s)\*/}// /}:#*@*} )
+      text="perl installation"
+      ;;
+    (-without-lib)
+      installed=( ${${${${(f)"$(_call_program perl_installed perlbrew list)"}/(#s)\*/}// /}:#*@*} )
+      text="perl installation"
+      ;;
+    (-alias)
+      if [[ -n "$PERLBREW_ROOT" ]]; then
+        if [[ -d "$PERLBREW_ROOT/perls" ]]; then
+          alias_link=( $PERLBREW_ROOT/perls/*(@) )
+        fi
+      fi
+      installed=( ${(q)${alias_link:t}[@]} )
+      text="alias"
+      ;;
+  esac
+
+  if [[ ${#installed[@]} -eq 0 ]]; then
+    _message 'no local perl installation found'
+  else
+    case "$2" in
+      (-comma-separated)
+        _values -s , "$text" $installed
+        ;;
+      (*)
+        _values "$text" $installed
+        ;;
+    esac
+  fi
+}
+
+##
+## completion for the alias subcommand
+##
+(( $+functions[_perlbrew_alias] )) ||
+_perlbrew_alias() {
+  local line state ret=1
+
+  _arguments -C \
+    -f'[force]' \
+    "1: :->actions" \
+    "*::arg:->args" && ret 0
+
+  case "$state" in
+    (actions)
+      local -a alias_actions
+      alias_actions=(
+        "create:create an alias for the installation named <name>"
+        "rename:rename the alias to a new name"
+        "delete:delete the given alias"
+      )
+      _describe -t commands 'alias action' alias_actions && ret=0
+      ;;
+    (args)
+      case $line[1] in
+        (create)
+          _arguments \
+            '1:perl installation: _perl_installations -without-lib' \
+            '2: : _message "alias name"' && ret=0
+          ;;
+        (rename)
+          _arguments \
+            '1:perl installation: _perl_installations -alias' \
+            '2: : _message "new name"' && ret=0
+          ;;
+        (delete)
+          _arguments \
+            ':perl installation: _perl_installations -alias' && ret=0
+          ;;
+      esac
+      ;;
+  esac
+}
+
+##
+## completion for the lib subcommand
+##
+(( $+functions[_perlbrew_lib] )) ||
+_perlbrew_lib() {
+  local line state ret=1
+
+  _arguments -C \
+    "1: :->actions" \
+    "*::arg:->args" && ret=0
+
+  case "$state" in
+    (actions)
+      local -a lib_actions
+      lib_actions=(
+        "list:list existing local libs"
+        "create:create a local lib"
+        "delete:delete a local lib"
+      )
+      _describe -t commands 'lib action' lib_actions && ret=0
+      ;;
+    (args)
+      case $line[1] in
+        (list)
+          _nothing && ret=0
+          ;;
+        (create)
+          _message 'lib name' && ret=0
+          ;;
+        (delete)
+          _arguments \
+            ':perl installation: _perl_installations -only-lib' && ret=0
+          ;;
+      esac
+      ;;
+  esac
+}
+
+##
+## main completion script
+##
+
+args_common=(
+  '(-q --quiet)'{-q,--quiet}'[be quiet on informative output message]' \
+  '(-v --verbose)'{-v,--verbose}'[tell me more about it]' \
+  ':perlbrew command:->subcommands' \
+  '*::: := ->option-or-argument'
+)
+
+args_install=(
+  '(-f --force)'{-f,--force}'[force installation]' \
+  -j"[number of building jobs run in parallel]::number" \
+  '(-n --notest)'{-n,--notest}'[skip testing]' \
+  --switch"[automatically switch to this perl version once installed]" \
+  --as"[install the given version of perl by a name]:alias name" \
+  --noman"[skip installation of manpages]" \
+  --thread"[build perl with usethreads enabled]" \
+  --multi"[build perl with usemultiplicity enabled]" \
+  --64int"[build perl with use64bitint enabled]" \
+  --64all"[build perl with use64bitall enabled]" \
+  --ld"[build perl with uselongdouble enabled]" \
+  --debug"[build perl with DEBUGGING enabled]" \
+  --clang"[build perl using the clang compiler]" \
+  --no-patchperl"[skip calling patchperl]" \
+  {-D,-U,-A}"[switches passed to perl Configure script]:value:" \
+  --destdir"[install perl as per 'make install DESTDIR=\$path']: :_files -/" \
+  --sitecustomize"[specify a file to be installed as sitecustomize.pl]: :_files" \
+  --mirror"[specify a CPAN-mirror url]:URL:_urls"
+)
+
+_arguments -C $args_common && ret=0
+
+case $state in
+  (subcommands)
+
+    perlbrew_subcommands=(
+      "init:initialize perlbrew environment"
+      "info:show useful information about the perlbrew installation"
+      "install:install perl"
+      "uninstall:uninstall the given installation"
+      "available:list perls available to install"
+      "lib:manage local::lib directories"
+      "alias:give perl installations a new name"
+      "upgrade-perl:upgrade the current perl"
+      "list:list perl installations"
+      "use:use the specified perl in current shell"
+      "off:turn off perlbrew in current shell"
+      "switch:permanently use the specified perl as default"
+      "switch-off:permanently turn off perlbrew (revert to system perl)"
+      "exec:exec programs with specified perl environments"
+      "clone-modules:re-installs all CPAN modules from one installation to another"
+      "self-install:install perlbrew itself under PERLBREW_ROOT/bin"
+      "self-upgrade:upgrade perlbrew itself"
+      "install-patchperl:install patchperl"
+      "install-cpanm:install cpanm, a friendly companion"
+      "install-cpm:install cpm, a faster but still friendly companion"
+      "install-multiple:install multiple versions and flavors of perl"
+      "download:download the specified perl distribution tarball"
+      "clean:purge tarballs and build directories"
+      "version:display version"
+      "help:read more detailed instructions"
+    )
+
+    _describe -t commands 'perlbrew command' perlbrew_subcommands && ret=0
+
+    ;;
+  (option-or-argument)
+    curcontext=${curcontext%:*}-$line[1]:
+    case $line[1] in
+      (info)
+        _message 'perl module name' && ret=0
+        ;;
+      (install)
+        _arguments \
+           $args_install \
+           '1:perl release: _perl_available' && ret=0
+        ;;
+      (install-multiple)
+        _arguments \
+           $args_install \
+           '*'--both"[perl flavor]: :(thread multi ld 64int 64all debug clang )" \
+           --common-variations"[equivalent to '--both thread --both ld --both 64int']" \
+           --all-variations"[generates all the possible flavor combinations]" \
+           --append"[appends the given string to the generated names]:string" \
+           '*:perl release: _perl_available' && ret=0
+        ;;
+      (uninstall)
+        _arguments \
+          ":perl installation: _perl_installations -without-lib" && ret=0
+        ;;
+      (use|switch)
+        _arguments \
+          ':perl installation: _perl_installations -with-lib' && ret=0
+        ;;
+      (available)
+        _arguments \
+          '--all[list of all perls ever released, including development and RC versions]' \
+          '*: :' && ret=0
+        ;;
+      (alias)
+        _perlbrew_alias && ret=0
+        ;;
+      (exec)
+        _arguments -C \
+          --with'[specify one or more perl installations to use]: : _perl_installations -without-lib -comma-separated' \
+          --min'[minimum perl version]:version number (n.nnnnn):' \
+          --max'[maximum perl version]:version number (n.nnnnn):' \
+          --halt-on-error'[stop on first nonzero exit status]' \
+          "1:command:" \
+          "*:args:" && ret=0
+        ;;
+      (env) # NOTE: Low level command
+        _arguments \
+          ':perl installation: _perl_installations -with-lib' && ret=0
+        ;;
+      (symlink-executables) # NOTE: Low level command
+        _arguments \
+          ':perl installation: _perl_installations -with-lib' && ret=0
+        ;;
+      (lib)
+        _perlbrew_lib && ret=0
+        ;;
+      (download)
+        _arguments \
+          ':perl release: _perl_available' && ret=0
+        ;;
+      (clone-modules)
+        _arguments \
+          '--notest[skip all module tests]' \
+          ':perl installation: _perl_installations -with-lib' \
+          ':perl installation: _perl_installations -with-lib' && ret=0
+        ;;
+      (init|list|off|switch-off|install-cpanm|install-patchperl|self-upgrade|\
+        self-install|clean|version|upgrade-perl|list-modules)
+        _nothing && ret=0
+        ;;
+      (*)
+        _default && ret=0
+        ;;
+    esac
+    ;;
+esac
+
+return ret
