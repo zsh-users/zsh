@@ -1,3 +1,8 @@
+2024-01-26  Oliver Kiddle  <opk@zsh.org>
+
+	* github #108: Aurélien Olivier: Completion/Unix/Command/_perlbrew:
+	add perlbrew completion
+
 2024-01-25  Bart Schaefer  <schaefer@zsh.org>
 
 	* 52385: Test/B03print.ztst: avoid "tr" in test output formatting
