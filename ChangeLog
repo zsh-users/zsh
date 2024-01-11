@@ -1,3 +1,8 @@
+2024-01-14  Matthew Martin  <phy1729@gmail.com>
+
+	* github #109: Wu Zhenyu: Completion/Linux/Command/_valgrind: Fix
+	a typo
+
 2024-01-05  Bart Schaefer  <schaefer@zsh.org>
 
 	* 52465: Doc/Zsh/contrib.yo, Functions/Misc/zmv: use NULL_GLOB

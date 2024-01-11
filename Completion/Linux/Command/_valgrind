@@ -165,7 +165,7 @@ args_massif=(
   "--time-unit=-[specify time unit]:unit [i]:((
     i\:instructions\ executed
     ms\:milliseconds
-    b\:heap\ bytes\ alloc\'d/dealloc\'d
+    B\:heap\ bytes\ alloc\'d/dealloc\'d
   ))"
   '--detailed-freq=-[every Nth snapshot should be detailed]:snapshot interval [10]'
   '--max-snapshots=-[specofy maximum number of snapshots recorded]:maximum [100]'
