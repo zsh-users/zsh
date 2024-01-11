@@ -1,3 +1,8 @@
+2024-01-14  Matthew Martin  <phy1729@gmail.com>
+
+	* github #109: Wu Zhenyu: Completion/Linux/Command/_valgrind: Fix
+	a typo
+
 2023-12-13  Oliver Kiddle  <opk@zsh.org>
 
 	* Florian Weimer: 52383: configure.ac: Avoid incompatible pointer
