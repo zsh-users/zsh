@@ -1,5 +1,8 @@
 2024-01-26  Oliver Kiddle  <opk@zsh.org>
 
+	* github #110: opensauce04: Completion/Redhat/Command/_dnf:
+	Fix incorrect completion for `dnf --showduplicates`
+
 	* github #108: Aurélien Olivier: Completion/Unix/Command/_perlbrew:
 	add perlbrew completion
 
