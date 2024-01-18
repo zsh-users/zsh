@@ -245,7 +245,7 @@ _dnf() {
     '--security[include security relevant packages]'
     '*--setopt=[override config option]:repoid.option=value: '
     '--skip-broken[resolve depsolve problems by skipping packages]'
-    '--show-duplicates[show duplicate packages in repos]'
+    '--showduplicates[show duplicate packages in repos]'
     '(-v --verbose)'{-v,--verbose}'[set verbose, show debug messages]'
     '(- *)--version[show dnf version]'
     '(-y --assumeyes --assumeno)'{-y,--assumeyes}'[answer yes for all questions]'
