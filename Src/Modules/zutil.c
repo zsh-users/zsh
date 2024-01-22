@@ -997,7 +997,7 @@ bin_zformat(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     case 'a':
 	{
 	    char **ap, *cp;
-	    int nbc = 0, colon = 0, pre = 0, suf = 0;
+	    int nbc = 0, pre = 0, suf = 0;
 #ifdef MULTIBYTE_SUPPORT
 	    int prechars = 0;
 #endif /* MULTIBYTE_SUPPORT */
@@ -1012,7 +1012,6 @@ bin_zformat(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		    int dchars = 0;
 #endif /* MULTIBYTE_SUPPORT */
 
-		    colon++;
 		    if ((d = cp - *ap - nbc) > pre)
 			pre = d;
 #ifdef MULTIBYTE_SUPPORT
