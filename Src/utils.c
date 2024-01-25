@@ -1731,6 +1731,13 @@ freestr(void *a)
 mod_export void
 gettyinfo(struct ttyinfo *ti)
 {
+    fdgettyinfo(SHTTY, ti);
+}
+
+/**/
+mod_export void
+fdgettyinfo(int SHTTY, struct ttyinfo *ti)
+{
     if (SHTTY != -1) {
 #ifdef HAVE_TERMIOS_H
 # ifdef HAVE_TCGETATTR
@@ -1755,6 +1762,13 @@ gettyinfo(struct ttyinfo *ti)
 /**/
 mod_export void
 settyinfo(struct ttyinfo *ti)
+{
+    fdsettyinfo(SHTTY, ti);
+}
+
+/**/
+mod_export void
+fdsettyinfo(int SHTTY, struct ttyinfo *ti)
 {
     if (SHTTY != -1) {
 #ifdef HAVE_TERMIOS_H

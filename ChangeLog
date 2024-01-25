@@ -1,3 +1,8 @@
+2024-01-24  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52468: Src/builtin.c, Src/utils.c: save and restore state of
+	correct TTY when using read -s / -d
+
 2024-01-14  Matthew Martin  <phy1729@gmail.com>
 
 	* github #109: Wu Zhenyu: Completion/Linux/Command/_valgrind: Fix

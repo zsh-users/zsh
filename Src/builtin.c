@@ -6506,10 +6506,10 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
     } else
 	readfd = izle = 0;
 
-    if (OPT_ISSET(ops,'s') && SHTTY == readfd) {
+    if (OPT_ISSET(ops,'s') && isatty(readfd)) {
 	struct ttyinfo ti;
 	memset(&ti, 0, sizeof(struct ttyinfo));
-	gettyinfo(&ti);
+	fdgettyinfo(readfd, &ti);
 	saveti = ti;
 	resettty = 1;
 #ifdef HAS_TIO
@@ -6517,7 +6517,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 #else
 	ti.sgttyb.sg_flags &= ~ECHO;
 #endif
-	settyinfo(&ti);
+	fdsettyinfo(readfd, &ti);
     }
 
     /* handle prompt */
@@ -6555,9 +6555,9 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
         delim = (unsigned char) ((delimstr[0] == Meta) ?
 			delimstr[1] ^ 32 : delimstr[0]);
 #endif
-	if (SHTTY == readfd) {
+	if (isatty(readfd)) {
 	    struct ttyinfo ti;
-	    gettyinfo(&ti);
+	    fdgettyinfo(readfd, &ti);
 	    if (! resettty) {
 	      saveti = ti;
 	      resettty = 1;
@@ -6569,7 +6569,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 #else
 	    ti.sgttyb.sg_flags |= CBREAK;
 #endif
-	    settyinfo(&ti);
+	    fdsettyinfo(readfd, &ti);
 	}
     }
     if (OPT_ISSET(ops,'t')) {
@@ -6604,8 +6604,8 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 			   timeout)) {
 		if (keys && !zleactive && !isem)
 		    settyinfo(&shttyinfo);
-		else if (resettty && SHTTY != -1)
-		    settyinfo(&saveti);
+		else if (resettty)
+		    fdsettyinfo(readfd, &saveti);
 		if (haso) {
 		    if (shout)
 			fclose(shout);
@@ -6717,7 +6717,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 	    if (isem)
 		while (val > 0 && read(SHTTY, &d, 1) == 1 && d != '\n');
 	    else if (resettty) {
-		settyinfo(&shttyinfo);
+		fdsettyinfo(readfd, &saveti);
 		resettty = 0;
 	    }
 	    if (haso) {
@@ -6746,8 +6746,8 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 	    setsparam(reply, metafy(buf, bptr - buf, META_REALLOC));
 	else
 	    zfree(buf, bptr - buf + 1);
-	if (resettty && SHTTY != -1)
-	    settyinfo(&saveti);
+	if (resettty)
+	    fdsettyinfo(readfd, &saveti);
 	return eof;
     }
 
@@ -6957,8 +6957,8 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 	    *pp++ = NULL;
 	    setaparam(reply, p);
 	}
-	if (resettty && SHTTY != -1)
-	    settyinfo(&saveti);
+	if (resettty)
+	    fdsettyinfo(readfd, &saveti);
 	return c == EOF;
     }
     buf = bptr = (char *)zalloc(bsiz = 64);
@@ -7086,8 +7086,8 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 	    break;
     }
     *bptr = '\0';
-    if (resettty && SHTTY != -1)
-	settyinfo(&saveti);
+    if (resettty)
+	fdsettyinfo(readfd, &saveti);
     /* final assignment of reply, etc. */
     if (OPT_ISSET(ops,'e') || OPT_ISSET(ops,'E')) {
 	zputs(buf, stdout);
