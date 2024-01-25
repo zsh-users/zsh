@@ -1,5 +1,7 @@
 2024-01-24  Bart Schaefer  <schaefer@zsh.org>
 
+	* 52476 + cf. 52479: Etc/FAQ.yo: more about nofork substitution
+
 	* 52477: Src/Modules/curses.c: fix "zcurses mouse delay ..."
 
 	* 52473: Doc/Zsh/mod_zutil.yo, Src/Modules/zutil.c: zstyle -q
