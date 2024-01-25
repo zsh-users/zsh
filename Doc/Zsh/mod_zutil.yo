@@ -11,6 +11,7 @@ xitem(tt(zstyle) [ tt(-L) [ var(metapattern) [ var(style) ] ] ])
 xitem(tt(zstyle) [ tt(-e) | tt(-) | tt(-)tt(-) ] var(pattern) var(style) var(string) ...)
 xitem(tt(zstyle -d) [ var(pattern) [ var(style) ... ] ])
 xitem(tt(zstyle -g) var(name) [ var(pattern) [ var(style) ] ])
+xitem(tt(zstyle -q) var(context) var(style))
 xitem(tt(zstyle -){tt(a)|tt(b)|tt(s)} var(context) var(style) var(name) [ var(sep) ])
 xitem(tt(zstyle -){tt(T)|tt(t)} var(context) var(style) [ var(string) ... ])
 item(tt(zstyle -m) var(context) var(style) var(pattern))(
@@ -105,6 +106,12 @@ enditem()
 The other forms can be used to look up or test styles for a given context.
 
 startitem()
+item(tt(zstyle -q) var(context) var(style))(
+Return tt(0) if var(style) is defined in var(context).  This does not
+evaluate expressions defined by tt(zstyle -e) and does not examine any
+values set by var(style).  The expected use is to test whether a style
+has been defined for var(context) before asserting a new style.
+)
 item(tt(zstyle -s) var(context) var(style) var(name) [ var(sep) ])(
 The parameter var(name) is set to the value of the style interpreted as a
 string.  If the value contains several strings they are concatenated with
