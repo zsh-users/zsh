@@ -1,5 +1,7 @@
 2024-01-24  Bart Schaefer  <schaefer@zsh.org>
 
+	* 52477: Src/Modules/curses.c: fix "zcurses mouse delay ..."
+
 	* 52473: Doc/Zsh/mod_zutil.yo, Src/Modules/zutil.c: zstyle -q
 
 	* 52468: Src/builtin.c, Src/utils.c: save and restore state of
