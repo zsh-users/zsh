@@ -2005,6 +2005,12 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		int onoerrs = noerrs, rplylen;
 		noerrs = 2;
 		rplylen = zstuff(&cmdarg, rplytmp);
+		if (! EMULATION(EMULATE_ZSH)) {
+		    /* bash and ksh strip trailing newlines here */
+		    while (rplylen > 0 && cmdarg[rplylen-1] == '\n')
+			rplylen--;
+		    cmdarg[rplylen] = 0;
+		}
 		noerrs = onoerrs;
 		if (rplylen >= 0)
 		    setsparam("REPLY", metafy(cmdarg, rplylen, META_REALLOC));
