@@ -1,5 +1,8 @@
 2024-01-24  Bart Schaefer  <schaefer@zsh.org>
 
+	* 52496 + 52377: Doc/Zsh/options.yo, Doc/Zsh/params.yo: clarify
+	SPROMPT behavior when CORRECT_ALL is set
+
 	* 52492: Src/math.c: prevent indexing error when using recursive
 	arithmetic in array subscript (operator stops on operand error)
 

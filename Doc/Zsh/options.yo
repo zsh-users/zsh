@@ -1214,6 +1214,9 @@ Note that, when the tt(HASH_LIST_ALL) option is not set or when some
 directories in the path are not readable, this may falsely report spelling
 errors the first time some commands are used.
 
+Refer to the shell variable tt(SPROMPT) for an explanation of the
+`tt([nyae])' (no/yes/abort/edit) prompt that is offered.
+
 The shell variable tt(CORRECT_IGNORE) may be set to a pattern to
 match words that will never be offered as corrections.
 )
@@ -1222,7 +1225,10 @@ pindex(NO_CORRECT_ALL)
 pindex(CORRECTALL)
 pindex(NOCORRECTALL)
 item(tt(CORRECT_ALL) (tt(-O)))(
-Try to correct the spelling of all arguments in a line.
+Try to correct the spelling of all arguments in a line, in order from
+left to right, treating each as a file name.  Answering `tt(a)' or
+`tt(e)' at any prompt stops all corrections, otherwise every correction
+is prompted for.
 
 The shell variable tt(CORRECT_IGNORE_FILE) may be set to a pattern to
 match file names that will never be offered as corrections.

@@ -1635,9 +1635,13 @@ All other prompt escapes are also allowed.
 
 The actions available at the prompt are tt([nyae]):
 startsitem()
-sitem(tt(n) +LPAR()`no'+RPAR() +LPAR()default+RPAR())(Discard the correction and run the command.)
-sitem(tt(y) +LPAR()`yes'+RPAR())(Make the correction and run the command.)
-sitem(tt(a) +LPAR()`abort'+RPAR())(Discard the entire command line without running it.)
+sitem(tt(n) +LPAR()`no'+RPAR() +LPAR()default+RPAR())(Discard the correction.
+If there are no more corrections, accept the command line, else (with
+tt(CORRECT_ALL)) prompt for the next.)
+sitem(tt(y) +LPAR()`yes'+RPAR())(Make the correction. If there are no more
+corrections, accept the command line.)
+sitem(tt(a) +LPAR()`abort'+RPAR())(Place the entire command line in the
+history for later edit, but without accepting it.)
 sitem(tt(e) +LPAR()`edit'+RPAR())(Resume editing the command line.)
 endsitem()
 )
