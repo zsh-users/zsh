@@ -1,5 +1,8 @@
 2024-01-24  Bart Schaefer  <schaefer@zsh.org>
 
+	* 52492: Src/math.c: prevent indexing error when using recursive
+	arithmetic in array subscript (operator stops on operand error)
+
 	* 52482: Src/subst.c: strip trailing newlines in emulation modes
 	of ${ command; }, for bash/ksh compatibility
 

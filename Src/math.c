@@ -352,6 +352,8 @@ getmathparam(struct mathvalue *mptr)
 	    }
 	    return zero_mnumber;
 	}
+	if (errflag)
+	    return zero_mnumber;
     }
     result = getnumvalue(mptr->pval);
     if (isset(FORCEFLOAT) && result.type == MN_INTEGER) {
@@ -1367,8 +1369,11 @@ op(int what)
     }
 
     spval = &stack[sp].val;
-    if (stack[sp].val.type == MN_UNSET)
+    if (stack[sp].val.type == MN_UNSET) {
 	*spval = getmathparam(stack + sp);
+	if (errflag)
+	    return;
+    }
     switch (what) {
     case NOT:
 	if (spval->type & MN_FLOAT) {
