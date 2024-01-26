@@ -391,6 +391,8 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
 	pcre_mdata = pcre2_match_data_create_from_pattern(pcre_pattern, NULL);
 	ret = pcre2_match(pcre_pattern, (PCRE2_SPTR) plaintext, subject_len,
 		offset_start, 0, pcre_mdata, mcontext);
+	if (ret > 0)
+	    ret = pcre2_get_ovector_count(pcre_mdata);
     }
 
     if (ret==0) return_value = 0;
@@ -479,7 +481,8 @@ cond_pcre_match(char **a, int id)
 		    break;
 		}
                 else if (r>0) {
-		    zpcre_get_substrings(pcre_pat, lhstr_plain, pcre_mdata, r, svar, avar,
+		    uint32_t ovec_count = pcre2_get_ovector_count(pcre_mdata);
+		    zpcre_get_substrings(pcre_pat, lhstr_plain, pcre_mdata, ovec_count, svar, avar,
 			    ".pcre.match", 0, isset(BASHREMATCH), !isset(BASHREMATCH));
 		    return_value = 1;
 		    break;

@@ -1,5 +1,8 @@
 2024-01-26  Oliver Kiddle  <opk@zsh.org>
 
+	* 52405, 52502: Src/Modules/pcre.c, Test/V07pcre.ztst:
+	add empty elements to $match for optional captures that don't match
+
 	* github #110: opensauce04: Completion/Redhat/Command/_dnf:
 	Fix incorrect completion for `dnf --showduplicates`
 

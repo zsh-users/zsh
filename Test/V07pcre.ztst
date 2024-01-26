@@ -108,6 +108,11 @@
 >0 xo→t →t
 >0 Xo→t →t
 
+  [[ foo =~ (pre)?f(o*)(opt(i)onal)?(y)* ]]
+  typeset -p match
+0:Empty string for optional captures that don't match
+>typeset -g -a match=( '' oo '' '' '' )
+
   string="The following zip codes: 78884 90210 99513"
   pcre_compile -m "\d{5}"
   pcre_match -b -- $string && print "$MATCH; ZPCRE_OP: $ZPCRE_OP"
