@@ -1,3 +1,7 @@
+2024-01-25  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52385: Test/B03print.ztst: avoid "tr" in test output formatting
+
 2024-01-24  Bart Schaefer  <schaefer@zsh.org>
 
 	* 52496 + 52377: Doc/Zsh/options.yo, Doc/Zsh/params.yo: clarify

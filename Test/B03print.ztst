@@ -305,8 +305,9 @@
  foo+=$'\tone\ttwo\tthree\tfour\n'
  foo+=$'\t\tone\t\ttwo\t\tthree\t\tfour'
  foo+='\0' # regression test for multibyte tab expand
- print -x4 $foo | tr '\0' Z # avoid raw nul byte in expected output below
- print -X4 $foo | tr '\0' Z
+ # avoid raw nul byte in expected output below
+ print ${"$(print -x4 $foo)"/$'\0'/Z}
+ print ${"$(print -X4 $foo)"/$'\0'/Z}
 0:Tab expansion by print
 >one	two	three	four
 >    one	two	three	four
