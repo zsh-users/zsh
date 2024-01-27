@@ -241,6 +241,39 @@ promptexpand(char *s, int ns, char *rs, char *Rs)
     return new_vars.buf;
 }
 
+/* Parse the argument for %H */
+static char *
+parsehighlight(char *arg, char endchar, zattr *atr)
+{
+    static int entered = 0;
+    char *var = ".zle.hlgroups";
+    struct value vbuf;
+    Value v;
+    char *ep, *attrs;
+    if ((ep = strchr(arg, endchar)))
+	*ep = '\0';
+    if (!entered && (v = getvalue(&vbuf, &var, 0)) &&
+	    PM_TYPE(v->pm->node.flags) == PM_HASHED)
+    {
+	Param node;
+	HashTable ht = v->pm->gsu.h->getfn(v->pm);
+	if ((node = (Param) ht->getnode(ht, arg))) {
+	    attrs = node->gsu.s->getfn(node);
+	    entered = 1;
+	    if (match_highlight(attrs, atr) == attrs)
+		*atr = TXT_ERROR;
+	} else
+	    *atr = TXT_ERROR;
+    } else
+	*atr = TXT_ERROR;
+    if (ep)
+	*ep = endchar;
+    else
+	ep = strchr(arg, '\0') - 1;
+    entered = 0;
+    return ep;
+}
+
 /* Parse the argument for %F and %K */
 static zattr
 parsecolorchar(zattr arg, int is_fg)
@@ -570,6 +603,13 @@ putpromptchar(int doprint, int endchar)
 	    case 'k':
 		tunsetattrs(TXTBGCOLOUR);
 	        applytextattributes(TSC_PROMPT);
+		break;
+	    case 'H':
+		bv->fm = parsehighlight(bv->fm + 2, '}', &atr);
+		if (atr != TXT_ERROR) {
+		    treplaceattrs(atr);
+		    applytextattributes(TSC_PROMPT);
+		}
 		break;
 	    case '[':
 		if (idigit(*++bv->fm))
@@ -1856,11 +1896,17 @@ match_highlight(const char *teststr, zattr *on_var)
     *on_var = 0;
     while (found && *teststr) {
 	const struct highlight *hl;
+	zattr atr = 0;
 
 	found = 0;
-	if (strpfx("fg=", teststr) || strpfx("bg=", teststr)) {
+	if (strpfx("hl=", teststr)) {
+	    teststr += 3;
+	    teststr = parsehighlight((char *)teststr, ',', &atr);
+	    if (atr != TXT_ERROR)
+		*on_var = atr;
+	    found = 1;
+	} else if (strpfx("fg=", teststr) || strpfx("bg=", teststr)) {
 	    int is_fg = (teststr[0] == 'f');
-	    zattr atr;
 
 	    teststr += 3;
 	    atr = match_colour(&teststr, is_fg, 0);
