@@ -1,5 +1,9 @@
 2024-01-28  Oliver Kiddle  <opk@zsh.org>
 
+	* 52500: Src/Zle/zle.h, Src/Zle/zle_refresh.c, Src/prompt.c:
+	add layer token to zle attributes to provide control over
+	the precedence of highlighting
+
 	* 52499: Src/prompt.c: support highlight groups defined in a
 	.zle.hlgroups associative array and referenced using %H in
 	prompt strings or hl= in zle_highlight/region_highlight

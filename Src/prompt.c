@@ -260,7 +260,7 @@ parsehighlight(char *arg, char endchar, zattr *atr)
 	if ((node = (Param) ht->getnode(ht, arg))) {
 	    attrs = node->gsu.s->getfn(node);
 	    entered = 1;
-	    if (match_highlight(attrs, atr) == attrs)
+	    if (match_highlight(attrs, atr, 0) == attrs)
 		*atr = TXT_ERROR;
 	} else
 	    *atr = TXT_ERROR;
@@ -1884,12 +1884,13 @@ match_colour(const char **teststrp, int is_fg, int colour)
 /*
  * Match a set of highlights in the given teststr.
  * Set *on_var to reflect the values found.
+ * Set *layer to the layer
  * Return a pointer to the first character not consumed.
  */
 
 /**/
 mod_export const char *
-match_highlight(const char *teststr, zattr *on_var)
+match_highlight(const char *teststr, zattr *on_var, int *layer)
 {
     int found = 1;
 
@@ -1918,6 +1919,14 @@ match_highlight(const char *teststr, zattr *on_var)
 	    /* skip out of range colours but keep scanning attributes */
 	    if (atr != TXT_ERROR)
 		*on_var |= atr;
+	} else if (layer && strpfx("layer=", teststr)) {
+	    teststr += 6;
+	    *layer = (int) zstrtol(teststr, (char **) &teststr, 10);
+	    if (*teststr == ',')
+		teststr++;
+	    else if (*teststr && *teststr != ' ')
+		break;
+	    found = 1;
 	} else {
 	    for (hl = highlights; hl->name; hl++) {
 		if (strpfx(hl->name, teststr)) {

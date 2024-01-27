@@ -211,6 +211,12 @@ int predisplaylen, postdisplaylen;
 static zattr default_attr, special_attr, ellipsis_attr;
 
 /*
+ * Layer applied to highlighting for special characters
+ */
+
+static int special_layer;
+
+/*
  * Array of region highlights, no special termination.
  * The first N_SPECIAL_HIGHLIGHTS elements describe special uses of
  * highlighting, documented under N_SPECIAL_HIGHLIGHTS.
@@ -337,6 +343,13 @@ zle_set_highlight(void)
 	}
     }
 
+    /* Default layers */
+    region_highlights[0].layer = 20; /* region */
+    region_highlights[1].layer = 20; /* isearch */
+    region_highlights[2].layer = 10; /* suffix */
+    region_highlights[3].layer = 15; /* paste */
+    special_layer = 30;
+
     if (atrs) {
 	for (; *atrs; atrs++) {
 	    if (!strcmp(*atrs, "none")) {
@@ -346,30 +359,34 @@ zle_set_highlight(void)
 		paste_attr_set = region_attr_set =
 		    isearch_attr_set = suffix_attr_set = 1;
 	    } else if (strpfx("default:", *atrs)) {
-		match_highlight(*atrs + 8, &default_attr);
+		match_highlight(*atrs + 8, &default_attr, NULL);
 	    } else if (strpfx("special:", *atrs)) {
-		match_highlight(*atrs + 8, &special_attr);
+		match_highlight(*atrs + 8, &special_attr, &special_layer);
 		special_attr_set = 1;
 	    } else if (strpfx("region:", *atrs)) {
-		match_highlight(*atrs + 7, &region_highlights[0].atr);
+		match_highlight(*atrs + 7, &(region_highlights[0].atr),
+			&(region_highlights[0].layer));
 		region_attr_set = 1;
 	    } else if (strpfx("isearch:", *atrs)) {
-		match_highlight(*atrs + 8, &(region_highlights[1].atr));
+		match_highlight(*atrs + 8, &(region_highlights[1].atr),
+			&(region_highlights[1].layer));
 		isearch_attr_set = 1;
 	    } else if (strpfx("suffix:", *atrs)) {
-		match_highlight(*atrs + 7, &(region_highlights[2].atr));
+		match_highlight(*atrs + 7, &(region_highlights[2].atr),
+			&(region_highlights[2].layer));
 		suffix_attr_set = 1;
 	    } else if (strpfx("paste:", *atrs)) {
-		match_highlight(*atrs + 6, &(region_highlights[3].atr));
+		match_highlight(*atrs + 6, &(region_highlights[3].atr),
+			&(region_highlights[3].layer));
 		paste_attr_set = 1;
 	    } else if (strpfx("ellipsis:", *atrs)) {
-		match_highlight(*atrs + 9, &ellipsis_attr);
+		match_highlight(*atrs + 9, &ellipsis_attr, NULL);
 		ellipsis_attr_set = 1;
 	    }
 	}
     }
 
-    /* Defaults */
+    /* Default attributes */
     if (!special_attr_set)
 	special_attr = TXTSTANDOUT;
     if (!region_attr_set)
@@ -407,14 +424,13 @@ zle_free_highlight(void)
 char **
 get_region_highlight(UNUSED(Param pm))
 {
-    int arrsize = n_region_highlights;
+    int arrsize = n_region_highlights - N_SPECIAL_HIGHLIGHTS;
     char **retarr, **arrp;
     struct region_highlight *rhp;
 
     /* region_highlights may not have been set yet */
-    if (!arrsize)
+    if (!n_region_highlights)
 	return hmkarray(NULL);
-    arrsize -= N_SPECIAL_HIGHLIGHTS;
     DPUTS(arrsize < 0, "arrsize is negative from n_region_highlights");
     arrp = retarr = (char **)zhalloc((arrsize+1)*sizeof(char *));
 
@@ -422,20 +438,18 @@ get_region_highlight(UNUSED(Param pm))
     for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
 	 arrsize--;
 	 rhp++, arrp++) {
-	char digbuf1[DIGBUFSIZE], digbuf2[DIGBUFSIZE];
-	int atrlen, alloclen;
-	const char memo_equals[] = "memo=";
-
-	sprintf(digbuf1, "%d", rhp->start);
-	sprintf(digbuf2, "%d", rhp->end);
-
-	atrlen = output_highlight(rhp->atr, NULL);
-	alloclen = atrlen + strlen(digbuf1) + strlen(digbuf2) +
-	    3; /* 2 spaces, 1 terminating NUL */
+	char digbuf[2 * DIGBUFSIZE], layerbuf[7 + DIGBUFSIZE];
+	int offset;
+	const char memo_equals[] = " memo=";
+	int alloclen = sprintf(digbuf, "%d %d", rhp->start, rhp->end) +
+	    output_highlight(rhp->atr, NULL) +
+	    2; /* space and terminating NUL */
 	if (rhp->flags & ZRH_PREDISPLAY)
-	    alloclen += 2; /* "P " */
+	    alloclen++; /* "P" */
+	if (rhp->layer != 10)
+	    alloclen += sprintf(layerbuf, ",layer=%d", rhp->layer);
 	if (rhp->memo)
-	    alloclen += 1 /* space */ + strlen(memo_equals) + strlen(rhp->memo);
+	    alloclen += sizeof(memo_equals) - 1 + strlen(rhp->memo);
 	*arrp = (char *)zhalloc(alloclen * sizeof(char));
 	/*
 	 * On input we allow a space after the flags.
@@ -444,13 +458,14 @@ get_region_highlight(UNUSED(Param pm))
 	 * into three words, and then check the first to
 	 * see if there are flags.  However, it's arguable.
 	 */
-	sprintf(*arrp, "%s%s %s ",
+	offset = sprintf(*arrp, "%s%s ",
 		(rhp->flags & ZRH_PREDISPLAY) ? "P" : "",
-		digbuf1, digbuf2);
-	(void)output_highlight(rhp->atr, *arrp + strlen(*arrp));
+		digbuf);
+	(void)output_highlight(rhp->atr, *arrp + offset);
 
+	if (rhp->layer != 10)
+	    strcat(*arrp, layerbuf);
 	if (rhp->memo) {
-	    strcat(*arrp, " ");
 	    strcat(*arrp, memo_equals);
 	    strcat(*arrp, rhp->memo);
 	}
@@ -459,12 +474,10 @@ get_region_highlight(UNUSED(Param pm))
     return retarr;
 }
 
-
 /*
  * The parameter system requires the pm argument, but this
  * may be NULL if called directly.
  */
-
 /**/
 void
 set_region_highlight(UNUSED(Param pm), char **aval)
@@ -523,7 +536,8 @@ set_region_highlight(UNUSED(Param pm), char **aval)
 	while (inblank(*strp))
 	    strp++;
 
-	strp = (char*) match_highlight(strp, &rhp->atr);
+	rhp->layer = 10; /* default */
+	strp = (char*) match_highlight(strp, &rhp->atr, &rhp->layer);
 
 	while (inblank(*strp))
 	    strp++;
@@ -1180,27 +1194,40 @@ zrefresh(void)
     rpms.s = nbuf[rpms.ln = 0] + lpromptw;
     rpms.sen = *nbuf + winw;
     for (t = tmpline, tmppos = 0; tmppos < tmpll; t++, tmppos++) {
-	unsigned ireg;
 	zattr base_attr = mixattrs(default_attr, prompt_attr);
 	zattr all_attr;
 	struct region_highlight *rhp;
+	int layer, nextlayer = 0;
 	/*
 	 * Calculate attribute based on region.
 	 */
-	for (ireg = 0, rhp = region_highlights;
-	     ireg < n_region_highlights;
-	     ireg++, rhp++) {
-	    int offset;
-	    if (rhp->flags & ZRH_PREDISPLAY)
-		offset = 0;	/* include predisplay in start end */
-	    else
-		offset = predisplaylen; /* increment over it */
-	    if (rhp->start + offset <= tmppos &&
-		tmppos < rhp->end + offset) {
-		base_attr = mixattrs(rhp->atr, base_attr);
+	do {
+	    unsigned ireg;
+	    layer = nextlayer;
+	    nextlayer = special_layer;
+	    for (ireg = 0, rhp = region_highlights;
+		ireg < n_region_highlights;
+		ireg++, rhp++) {
+		if (rhp->layer == layer) {
+		    int offset;
+		    if (rhp->flags & ZRH_PREDISPLAY)
+			offset = 0;	/* include predisplay in start end */
+		    else
+			offset = predisplaylen; /* increment over it */
+		    if (rhp->start + offset <= tmppos &&
+			tmppos < rhp->end + offset) {
+			base_attr = mixattrs(rhp->atr, base_attr);
+			if (layer > special_layer)
+			    all_attr = mixattrs(rhp->atr, all_attr);
+		    }
+		} else if (rhp->layer > layer && rhp->layer < nextlayer) {
+		    nextlayer = rhp->layer;
+		}
 	    }
-	}
-	all_attr = mixattrs(special_attr, base_attr);
+	    if (special_layer == layer) {
+		all_attr = mixattrs(special_attr, base_attr);
+	    }
+	} while (nextlayer > layer);
 
 	if (t == scs)			/* if cursor is here, remember it */
 	    rpms.nvcs = rpms.s - nbuf[rpms.nvln = rpms.ln];

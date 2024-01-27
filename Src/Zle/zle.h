@@ -435,6 +435,8 @@ enum {
 struct region_highlight {
     /* Attributes turned on in the region */
     zattr atr;
+    /* Priority for this region relative to others that overlap */
+    int layer;
     /* Start of the region */
     int start;
     /* Start of the region in metafied ZLE line */
