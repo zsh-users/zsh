@@ -1295,7 +1295,7 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       select poll \
 	       readlink faccessx fchdir ftruncate \
 	       fstat lstat lchown fchown fchmod \
-	       fseeko ftello \
+	       fpurge fseeko ftello \
 	       mkfifo _mktemp mkstemp \
 	       waitpid wait3 \
 	       sigaction sigblock sighold sigrelse sigsetmask sigprocmask \

@@ -10,6 +10,11 @@
 
 	* Jörg Sommer: 52440: Src/Zle/textobjects.c: Mark variables as const
 
+2024-01-28  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52509: configure.ac, Src/utils.c: manage internals of stdio
+	objects when performing redirections.
+
 2024-01-26  Oliver Kiddle  <opk@zsh.org>
 
 	* github #110: opensauce04: Completion/Redhat/Command/_dnf:
