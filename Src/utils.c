@@ -2008,6 +2008,28 @@ redup(int x, int y)
 {
     int ret = y;
 
+#ifdef HAVE_FPURGE
+    /* Make sure buffers are cleared when changing descriptor for a
+     * FILE object.  No fflush() here because the only way anything
+     * can legitimately be left in the buffer is when an error has
+     * occurred, so attempting flush here would at best error again
+     * and at worst squirt out something unexpected.
+     */
+    if (stdout && y == fileno(stdout))
+	fpurge(stdout);
+    if (stderr && y == fileno(stderr))
+	fpurge(stderr);
+    if (shout && y == fileno(shout))
+	fpurge(shout);
+    if (xtrerr && y == fileno(xtrerr))
+	fpurge(xtrerr);
+#ifndef _IONBF
+    /* See init.c setupshin() -- stdin otherwise unbuffered */
+    if (stdin && y == fileno(stdin))
+	fpurge(stdin);
+#endif
+#endif
+
     if(x < 0)
 	zclose(y);
     else if (x != y) {
