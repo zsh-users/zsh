@@ -1915,6 +1915,9 @@ from the final replacement in this case, and it is subject to filename
 generation in the same way as `tt($LPAR())...tt(RPAR())' but is em(not)
 split on tt(IFS) unless the tt(SH_WORD_SPLIT) option is set.
 
+cindex(substitution, command, current shell)
+cindex(substitution, command, non forking)
+cindex(substitution, nofork)
 Substitutions of the form `tt(${|)var(param)tt(|)...tt(})' are similar,
 except that the substitution is replaced by the value of the parameter
 named by var(param).  No implicit save or restore applies to var(param)

@@ -1,5 +1,8 @@
 2024-01-28  Bart Schaefer  <schaefer@zsh.org>
 
+	* 52510: Doc/Zsh/expn.yo, Doc/Zsh/mod_private.yo: document how
+	${ ... } et al. affect use of "private"; add index entries
+
 	* 52509: configure.ac, Src/utils.c: manage internals of stdio
 	objects when performing redirections.
 
