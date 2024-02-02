@@ -1,43 +1,254 @@
-# Shell function to increment an integer either under the cursor or just
-# to the left of it.  Use
-#   autoload -Uz incarg
-#   zle -N incarg
-#   bindkey "..." incarg
-# to define it.  For example,
-#   echo 41
-#        ^^^ cursor anywhere here
-# with incarg gives
-#   echo 42
-# with the cursor in the same place.
-#
-# A numeric argument gives a number other than 1 to add (may be negative).
-# If you're going to do it a lot with one particular number, you can set
-# the parameter incarg to that number (a numeric argument still takes
-# precedence).
-
 emulate -L zsh
-setopt extendedglob
 
-local rrest lrest num
+# A ZLE widget to increment an integer.
+#
+# In addition to decimals, it can handle hexadecimals prefixed with "0x",
+# binaries with "0b", and octals with "0o".
+#
+# By default, the target integer will be incremented by one. With a numeric
+# argument, the integer is incremented by the amount of the argument. The shell
+# parameter "incarg" may be set to change the default increment to something
+# other than one.
+#
+# The behavior of this widget changes depending on how it is named.
+#
+# - incarg / decarg
+#
+#   incarg will increment an integer either under the cursor or just to the left
+#   of it. decarg, on the other hand, will decrement it.
+#
+#   For example,
+#
+#       echo 41
+#            ^^^ cursor anywhere here
+#
+#   with incarg gives
+#
+#       echo 42
+#              ^ cursor will move here
+#
+# - sync-incarg / sync-decarg
+#
+#   The sync- variant is used for creating a sequence of numbers on split
+#   terminals with synchronized key input. The first pane won't be incremented
+#   at all, but each pane after that will have the number incremented once more
+#   than the previous pane.
+#
+#   Currently supports tmux and iTerm2.
+#
+# - vim-incarg / vim-decarg
+#
+#   This behaves like Vim's CTRL-A / CTRL-X. It moves the cursor to the nearest
+#   number after the cursor and increments or decrements it.
+#
+# - vim-sync-incarg / vim-sync-decarg
+#
+#   This combines the behavior of the vim- and sync- variants. It's inspired by
+#   Vim's g_CTRL-A / g_CTRL-X.
+#
+# Example Usage:
+#
+#   autoload -Uz incarg
+#   for widget in vim-{,sync-}{inc,dec}arg; do
+#     zle -N "$widget" incarg
+#   done
+#   bindkey -a \
+#     '^A' vim-incarg \
+#     '^X' vim-decarg \
+#     'g^A' vim-sync-incarg \
+#     'g^X' vim-sync-decarg
 
-rrest=${RBUFFER##[0-9]#}
-if [[ $RBUFFER = [0-9]* ]]; then
-  if [[ -z $rrest ]]; then
-    num=$RBUFFER
-  else
-    num=${RBUFFER[1,-$#rrest-1]}
+setopt localoptions extended_glob
+local match mbegin mend MATCH MBEGIN MEND i
+
+# find the number and determine the base
+integer pos=$(( CURSOR + 1 )) base=0
+
+# avoid miscalculating positions when cursor is at the end of the line
+while (( pos > 0 )) && [[ "$BUFFER[pos]" == '' ]]; do
+  (( pos-- ))
+done
+
+# check for a prefix (e.g., 0x) before the cursor
+for (( i = 0; i < 2; i++ )); do
+  case "$BUFFER[1,pos]" in
+    *0[xX][0-9a-fA-F]##) base=16 ;;
+    *0[oO][0-7]##) base=8 ;;
+    *0[bB][01]##) base=2 ;;
+    *[1-9]) base=10 ;;
+    *0) ;; # there may be a prefix right after the cursor
+    *)
+      # the non-Vim variant looks right before the cursor too, but not after it
+      if [[ "$WIDGET" != vi* ]]; then
+        if (( i == 0 )); then
+          (( pos-- ))
+          continue
+        else
+          return 1
+        fi
+      fi
+      ;;
+  esac
+
+  break
+done
+
+# check for a prefix on the cursor
+if (( base == 0 && pos < $#BUFFER )); then
+  case "$BUFFER[1,pos+1]" in
+    *0[xX][0-9a-fA-F]) base=16; (( pos++ )) ;;
+    *0[oO][0-7]) base=8; (( pos++ )) ;;
+    *0[bB][01]) base=2; (( pos++ )) ;;
+  esac
+fi
+
+if (( base == 0 )); then
+  if [[ "$WIDGET" == vi* ]]; then
+    # jump to the nearest number after the cursor
+    while [[ "$BUFFER[pos]" == [^0-9] ]]; do
+      (( pos++ ))
+      (( pos > $#BUFFER )) && return 1
+    done
+  fi
+
+  # check for a prefix right after the cursor and jump right after it, if any
+  if (( pos <= 1 )) || [[ "$BUFFER[pos-1]" == [^0-9] ]]; then
+    case "$BUFFER[pos,-1]" in
+      0[xX][0-9a-fA-F]*) base=16; (( pos += 2 )) ;;
+      0[oO][0-7]*) base=8; (( pos += 2 )) ;;
+      0[bB][01]*) base=2; (( pos += 2 )) ;;
+    esac
   fi
 fi
 
-lrest=${LBUFFER%%[0-9]#}
-if [[ $LBUFFER = *[0-9] ]]; then
-  if [[ -z $lrest ]]; then
-    num="$LBUFFER$num"
-  else
-    num="${LBUFFER[$#lrest+1,-1]}$num"
-  fi
+if (( base == 0 )); then
+  base=10
 fi
 
-[[ -n $num ]] && (( num += ${NUMERIC:-${incarg:-1}} ))
+# find the start of the number
+integer first="$pos"
+case "$base" in
+  10)
+    while [[ "$BUFFER[first-1]" == [0-9] ]]; do
+      (( first-- ))
+    done
+    if [[ $BUFFER[first-1] = - ]]; then
+      (( first-- ))
+    fi
+    ;;
+  2)
+    while [[ "$BUFFER[first-1]" == [01] ]]; do
+      (( first-- ))
+    done
+    ;;
+  8)
+    while [[ "$BUFFER[first-1]" == [0-7] ]]; do
+      (( first-- ))
+    done
+    ;;
+  16)
+    while [[ "$BUFFER[first-1]" == [0-9a-fA-F] ]]; do
+      (( first-- ))
+    done
+    ;;
+esac
 
-BUFFER="$lrest$num$rrest"
+# find the end of the number
+integer last="$pos"
+case "$base" in
+  10)
+    while [[ "$BUFFER[last+1]" == [0-9] ]]; do
+      (( last++ ))
+    done
+    ;;
+  2)
+    while [[ "$BUFFER[last+1]" == [01] ]]; do
+      (( last++ ))
+    done
+    ;;
+  8)
+    while [[ "$BUFFER[last+1]" == [0-7] ]]; do
+      (( last++ ))
+    done
+    ;;
+  16)
+    while [[ "$BUFFER[last+1]" == [0-9a-fA-F] ]]; do
+      (( last++ ))
+    done
+    ;;
+esac
+
+# calculate the number of digits
+integer ndigits=0
+case "$BUFFER[first,first+1]" in
+  0*|-0) ndigits=$(( last - first + 1 )) ;;
+esac
+
+# determine the amount to increment
+integer delta=${NUMERIC:-${incarg:-1}}
+if [[ "$WIDGET" = *decarg ]]; then
+  (( delta = -delta ))
+fi
+if [[ "$WIDGET" = *sync-* ]]; then
+  integer pane_index=0
+  if [[ -n "$TMUX_PANE" ]]; then
+    pane_index="$(tmux display-message -pt "$TMUX_PANE" '#{pane_index}')"
+  elif [[ "$ITERM_SESSION_ID" =~ '^w[0-9]+t[0-9]+p([0-9]+)' ]]; then
+    pane_index="$match[1]"
+  else
+    zle -M "[$WIDGET] unsupported terminal"
+    return 1
+  fi
+  (( delta *= pane_index ))
+fi
+
+local old="$BUFFER[first,last]"
+integer oldlen=$#BUFFER
+
+local fmt1 fmt2
+case "$base" in
+  10) fmt1=d; fmt2='#10' ;;
+  2) fmt1=s; fmt2='##2' ;;
+  8) fmt1=s; fmt2='##8' ;;
+  16) fmt1="$BUFFER[first-1]"; fmt2='#16' ;;
+esac
+
+local raw_result padded
+raw_result="$( \
+  printf "%0$ndigits$fmt1" $(( [$fmt2] "$base#$old" + delta )) 2> /dev/null)"
+padded="${raw_result// /0}"
+
+integer oldnum="$base#$old" newnum="$base#$padded" 2> /dev/null
+if (( base != 10 && newnum < 0
+        || delta > 0 && newnum < oldnum
+        || delta < 0 && newnum > oldnum  )); then
+  zle -M "[$WIDGET] The resulting number is either too big or too small."
+  return 1
+fi
+
+# adjust the number of leading zeros if the sign of the integer changed
+local new
+if (( base == 10 && ndigits == $#padded )); then
+  if (( oldnum < 0 && newnum >= 0 )); then
+    new="${padded#0}"
+  elif (( oldnum >= 0 && newnum < 0 )); then
+    new="-0${padded#-}"
+  fi
+fi
+if [[ -z "$new" ]]; then
+  new="$padded"
+fi
+
+if zstyle -t ":zle:$WIDGET" debug; then
+  zle -M "[$WIDGET] base: $base delta: $delta old: '$old' new: '$new'"
+fi
+
+BUFFER[first,last]="$new"
+
+integer offset=0
+if [[ "$WIDGET" == vi* ]]; then
+  offset=-1
+fi
+(( CURSOR = last + $#BUFFER - oldlen + offset ))
+
+return 0
