@@ -2620,12 +2620,30 @@ zle -N history-pattern-search-forward history-pattern-search)
 tindex(incarg)
 vindex(incarg, use of)
 item(tt(incarg))(
-Typing the keystrokes for this widget with the cursor placed on or to the
-left of an integer causes that integer to be incremented by one.  With a
-numeric argument, the number is incremented by the amount of the
-argument (decremented if the numeric argument is negative).  The shell
-parameter tt(incarg) may be set to change the default increment to
-something other than one.
+This widget allows you to increment integers on the current line. In addition
+to decimals, it can handle hexadecimals prefixed with tt(0x), binaries with
+tt(0b), and octals with tt(0o).
+
+By default, the target integer will be incremented by one. With a numeric
+argument, the integer is incremented by the amount of the argument. The shell
+parameter tt(incarg) may be set to change the default increment to something
+other than one.
+
+The behavior of this widget changes depending on the widget name.
+
+When the widget is named tt(incarg), the widget will increment an integer
+placed under the cursor placed or just to the left of it. tt(decarg), on the
+other hand, decrements the integer. When the name is prefixed with tt(vim-),
+the cursor will jump to the nearest integer after the cursor before incrementing
+it.
+
+There's also a tt(sync-) prefix that can be added to the widget name. This
+variant is used for creating a sequence of numbers on split terminals with
+synchronized key input. The first pane won't increment the integer at all, but
+each pane after that will have the integer incremented once more than the
+previous pane. It currently supports tmux and iTerm2.
+
+The prefixes tt(vim-) and tt(sync-) can be combined into tt(vim-sync-).
 
 example(bindkey '^X+' incarg)
 )

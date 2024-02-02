@@ -1,5 +1,9 @@
 2024-02-15  Oliver Kiddle  <opk@zsh.org>
 
+	* 52520: midchildan: Doc/Zsh/contrib.yo, Functions/Zle/incarg,
+	Test/X05zleincarg.ztst: add new features and improvements to the
+	"incarg" ZLE widget
+
 	* github #112: Poncho: Completion/Unix/Command/_todo.sh:
 	Completion: todo.sh uses shorthelp and not showhelp
 

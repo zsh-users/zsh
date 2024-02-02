@@ -1,0 +1,360 @@
+# Tests the incarg ZLE widget
+
+%prep
+  ZSH_TEST_LANG=$(ZTST_find_UTF8)
+  if ( zmodload zsh/zpty 2>/dev/null ); then
+    . $ZTST_srcdir/comptest
+    comptestinit -v -z $ZTST_testdir/../Src/zsh
+  else
+    ZTST_unimplemented="the zsh/zpty module is not available"
+  fi
+  zpty_run '
+    autoload -Uz incarg
+    for name in {,vim-}{,sync-}{inc,dec}arg; do
+      zle -N "$name" incarg
+    done
+    bindkey -v "^N" incarg
+    bindkey -v "^P" decarg
+    bindkey -v "^F" sync-incarg
+    bindkey -v "^B" sync-decarg
+    bindkey -a "^N" vim-incarg
+    bindkey -a "^P" vim-decarg
+    bindkey -a "^F" vim-sync-incarg
+    bindkey -a "^B" vim-sync-decarg
+    unset TMUX_PANE ITERM_SESSION_ID
+    tmux() {
+      echo "$TMUX_PANE"
+    }
+  '
+
+%test
+
+  zletest $'0\C-n'
+0:increment an integer with incarg
+>BUFFER: 1
+>CURSOR: 1
+
+  zletest $'0\C-p'
+0:decrement an integer with decarg
+>BUFFER: -1
+>CURSOR: 2
+
+  zletest $'echo 0\e0\C-n'
+0:increment an integer with vim-incarg
+>BUFFER: echo 1
+>CURSOR: 5
+
+  zletest $'echo 0\e0\C-p'
+0:decrement an integer with vim-decarg
+>BUFFER: echo -1
+>CURSOR: 6
+
+  zletest $'0\C-f'
+0:sync-incarg does nothing on unsupported terminals
+>BUFFER: 0
+>CURSOR: 1
+
+  zpty_run 'TMUX_PANE=0'
+  zletest $'0\C-f'
+  zpty_run 'unset TMUX_PANE'
+0:sync-incarg on tmux in pane 0
+>BUFFER: 0
+>CURSOR: 1
+
+  zpty_run 'TMUX_PANE=1'
+  zletest $'0\C-f'
+  zpty_run 'unset TMUX_PANE'
+0:sync-incarg on tmux in pane 1
+>BUFFER: 1
+>CURSOR: 1
+
+  zpty_run 'TMUX_PANE=2'
+  zletest $'0\C-f'
+  zpty_run 'unset TMUX_PANE'
+0:sync-incarg on tmux in pane 2
+>BUFFER: 2
+>CURSOR: 1
+
+  zpty_run 'ITERM_SESSION_ID=w0t0p0:00000000-0000-0000-0000-000000000000'
+  zletest $'0\C-f'
+  zpty_run 'unset ITERM_SESSION_ID'
+0:sync-incarg on tmux in pane 0
+>BUFFER: 0
+>CURSOR: 1
+
+  zpty_run 'ITERM_SESSION_ID=w0t0p1:00000000-0000-0000-0000-000000000000'
+  zletest $'0\C-f'
+  zpty_run 'unset ITERM_SESSION_ID'
+0:sync-incarg on tmux in pane 1
+>BUFFER: 1
+>CURSOR: 1
+
+  zpty_run 'ITERM_SESSION_ID=w0t0p2:00000000-0000-0000-0000-000000000000'
+  zletest $'0\C-f'
+  zpty_run 'unset ITERM_SESSION_ID'
+0:sync-incarg on tmux in pane 2
+>BUFFER: 2
+>CURSOR: 1
+
+  zpty_run 'TMUX_PANE=1'
+  zpty_run 'ITERM_SESSION_ID=w0t0p2:00000000-0000-0000-0000-000000000000'
+  zletest $'0\C-f'
+  zpty_run 'unset TMUX_PANE ITERM_SESSION_ID'
+0:tmux pane number takes precedence over iTerm2's
+>BUFFER: 1
+>CURSOR: 1
+
+  zletest $'0\e2\C-n'
+0:Providing a numeric argument will change the incremented amount
+>BUFFER: 2
+>CURSOR: 0
+
+  zpty_run 'incarg=3'
+  zletest $'0\e\C-n'
+  zpty_run 'unset incarg'
+0:Setting the incarg variable will change the default incremented amount
+>BUFFER: 3
+>CURSOR: 0
+
+  zpty_run 'incarg=3'
+  zletest $'0\e2\C-n'
+  zpty_run 'unset incarg'
+0:A numeric argument will take precedence over the incarg variable
+>BUFFER: 2
+>CURSOR: 0
+
+  zpty_run 'TMUX_PANE=2'
+  zletest $'0\e2\C-f'
+  zpty_run 'unset TMUX_PANE'
+0:Providing a numeric argument will work for the sync- variants of incarg
+>BUFFER: 4
+>CURSOR: 0
+
+  zletest $'000\C-n'
+0:Incrementing a decimal integer preserves leading zeros
+>BUFFER: 001
+>CURSOR: 3
+
+  zletest $'-001\C-n\C-n'
+0:Leading zeros are preserved when the digit turns from negative to positive
+>BUFFER: 001
+>CURSOR: 3
+
+  zletest $'001\C-p\C-p'
+0:Leading zeros are preserved when the digit turns from positive to negative
+>BUFFER: -001
+>CURSOR: 4
+
+  zletest $'001\e1000\C-n'
+0:Incrementing an integer works when the result has more zeros than the original
+>BUFFER: 1001
+>CURSOR: 3
+
+  zletest $'001\e2000\C-p'
+0:Decrementing an integer with leading zeros works when the result has more digits than the original
+>BUFFER: -1999
+>CURSOR: 4
+
+  zletest $'0b11\C-n'
+0:Increment a binary integer
+>BUFFER: 0b100
+>CURSOR: 5
+
+  zletest $'0B11\C-n'
+0:Increment a binary integer with an upper case prefix
+>BUFFER: 0B100
+>CURSOR: 5
+
+  zletest $'0b100\C-p'
+0:Decrement a binary integer
+>BUFFER: 0b11
+>CURSOR: 4
+
+  zletest $'0b0011\C-n'
+0:Increment a binary integer preserves leading zeros
+>BUFFER: 0b0100
+>CURSOR: 6
+
+  zletest $'0b001\e8\C-n'
+0:Incrementing a binary integer work when the result has more zeros than the original
+>BUFFER: 0b1001
+>CURSOR: 5
+
+  zletest $'0b0\C-p'
+0:Decrementing a binary integer to a negative value will fail
+>BUFFER: 0b0
+>CURSOR: 3
+
+  zletest $'0o7\C-n'
+0:Increment an octal integer
+>BUFFER: 0o10
+>CURSOR: 4
+
+  zletest $'0O7\C-n'
+0:Increment an octal integer with an upper case prefix
+>BUFFER: 0O10
+>CURSOR: 4
+
+  zletest $'0o10\C-p'
+0:Decrement an octal integer
+>BUFFER: 0o7
+>CURSOR: 3
+
+  zletest $'0o0\C-p'
+0:Decrementing an octal integer to a negative value will fail
+>BUFFER: 0o0
+>CURSOR: 3
+
+  zletest $'0x9\C-n'
+0:Increment a hexadecimal integer
+>BUFFER: 0xa
+>CURSOR: 3
+
+  zletest $'0X9\C-n'
+0:Increment a hexadecimal integer with an upper case prefix
+>BUFFER: 0XA
+>CURSOR: 3
+
+  zletest $'0xf\C-n'
+0:Increment a hexadecimal integer with no numeric digit
+>BUFFER: 0x10
+>CURSOR: 4
+
+  zletest $'0x10\C-p'
+0:Decrement a hexadecimal integer
+>BUFFER: 0xf
+>CURSOR: 3
+
+  zletest $'0x0\C-p'
+0:Decrementing an octal integer to a negative value will fail
+>BUFFER: 0x0
+>CURSOR: 3
+
+  zletest $'0x0b1\C-n'
+0:a number that starts with 0x0b is interpreted as a hexadecimal integer
+>BUFFER: 0x0b2
+>CURSOR: 5
+
+  zletest $'10x9\e0\C-n'
+0:[0-9]0x[0-9a-f] will become [0-9]1x[0-9a-f] when incremented from the left of x
+>BUFFER: 11x9
+>CURSOR: 1
+
+  zletest $'10x9\eFx\C-n'
+0:[0-9]0x[0-9a-f] will increment the hexadecimal 0x[0-9a-f] when the cursor is on x
+>BUFFER: 10xa
+>CURSOR: 3
+
+  zletest $'10x9\e\C-n'
+0:[0-9]0x[0-9a-f] will increment the hexadecimal 0x[0-9a-f] when the cursor is on the right of x
+>BUFFER: 10xa
+>CURSOR: 3
+
+  zletest $'10b1\e0\C-n'
+0:[0-9]0b[01] will become [0-9]1b[01] when incremented from the left of b
+>BUFFER: 11b1
+>CURSOR: 1
+
+  zletest $'10b1\eFb\C-n'
+0:[0-9]0b[01] will increment the binary 0b[01] when the cursor is on b
+>BUFFER: 10b10
+>CURSOR: 4
+
+  zletest $'10b1\e\C-n'
+0:[0-9]0b[01] will increment the binary 0b[01] when the cursor is on the right of b
+>BUFFER: 10b10
+>CURSOR: 4
+
+  zletest $'10o7\e0\C-n'
+0:[0-9]0o[0-7] will become [0-9]1o[0-7] when incremented from the left of o
+>BUFFER: 11o7
+>CURSOR: 1
+
+  zletest $'10o7\eFo\C-n'
+0:[0-9]0o[0-7] will increment the octal 0o[0-7] when the cursor is on o
+>BUFFER: 10o10
+>CURSOR: 4
+
+  zletest $'10o7\e\C-n'
+0:[0-9]0o[0-7] will increment the octal 0o[0-7] when the cursor is on the right of o
+>BUFFER: 10o10
+>CURSOR: 4
+
+  zletest $'0b0x9\eF0\C-n'
+0:0b0x[0-9a-f] will increment the binary 0b0 when the cursor is on the left of x
+>BUFFER: 0b1x9
+>CURSOR: 2
+
+  zletest $'0b0x9\eFx\C-n'
+0:0b0x[0-9a-f] will increment the hexadecimal 0x[0-9a-f] when the cursor is on top of x
+>BUFFER: 0b0xa
+>CURSOR: 4
+
+  zletest $'0b0x9\e\C-n'
+0:0b0x[0-9a-f] will increment the hexadecimal 0x[0-9a-f] when the cursor is on the right of x
+>BUFFER: 0b0xa
+>CURSOR: 4
+
+  zletest $'echo 012ab\eF i\C-n'
+0:incarg does nothing when the cursor is placed just to the left of an integer
+>BUFFER: echo 012ab
+>CURSOR: 4
+
+  zletest $'echo 012ab\eF0i\C-n'
+0:incarg works when the cursor is placed at the leftmost digit of an integer
+>BUFFER: echo 013ab
+>CURSOR: 8
+
+  zletest $'echo 012ab\eF1i\C-n'
+0:incarg works when the cursor is placed at the inner digit of an integer
+>BUFFER: echo 013ab
+>CURSOR: 8
+
+  zletest $'echo 012ab\eF2i\C-n'
+0:incarg works when the cursor is placed at the rightmost digit of an integer
+>BUFFER: echo 013ab
+>CURSOR: 8
+
+  zletest $'echo 012ab\eFai\C-n'
+0:incarg works when the cursor is placed just to the right of an integer
+>BUFFER: echo 013ab
+>CURSOR: 8
+
+  zletest $'echo 012ab\ei\C-n'
+0:incarg does nothing when the cursor is placed more than a single letter away to the right
+>BUFFER: echo 012ab
+>CURSOR: 9
+
+  zletest $'echo 012ab\eF \C-n'
+0:vim-incarg works when the cursor is placed to the left of an integer
+>BUFFER: echo 013ab
+>CURSOR: 7
+
+  zletest $'echo 012ab\eF0\C-n'
+0:vim-incarg works when the cursor is placed at the leftmost digit of an integer
+>BUFFER: echo 013ab
+>CURSOR: 7
+
+  zletest $'echo 012ab\eF1\C-n'
+0:vim-incarg works when the cursor is placed at the inner digit of an integer
+>BUFFER: echo 013ab
+>CURSOR: 7
+
+  zletest $'echo 012ab\eF2\C-n'
+0:incarg works when the cursor is placed at the rightmost digit of an integer
+>BUFFER: echo 013ab
+>CURSOR: 7
+
+  zletest $'echo 012ab\eFa\C-n'
+0:vim-incarg does nothing when the cursor is placed to the right of an integer
+>BUFFER: echo 012ab
+>CURSOR: 8
+
+  zletest $'echo 012ab\ei\C-n'
+0:vim-incarg does nothing when the cursor is placed more than a single letter away to the right
+>BUFFER: echo 012ab
+>CURSOR: 9
+
+%clean
+
+  zmodload -ui zsh/zpty
