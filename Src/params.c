@@ -1049,7 +1049,7 @@ createparam(char *name, int flags)
 		/* POSIXBUILTINS horror: we need to retain 'export' flags */
 		(isset(POSIXBUILTINS) && (oldpm->node.flags & PM_EXPORTED))) {
 		if (oldpm->node.flags & PM_RO_BY_DESIGN) {
-		    zerr("%s: can't change parameter attribute",
+		    zerr("%s: can't modify read-only parameter",
 			 name);
 		    return NULL;
 		}
@@ -3615,9 +3615,18 @@ assignnparam(char *s, mnumber val, int flags)
 	pm = createparam(t, ss ? PM_ARRAY :
 			 isset(POSIXIDENTIFIERS) ? PM_SCALAR :
 			 (val.type & MN_INTEGER) ? PM_INTEGER : PM_FFLOAT);
-	if (!pm)
-	    pm = (Param) paramtab->getnode(paramtab, t);
-	DPUTS(!pm, "BUG: parameter not created");
+	if (errflag) {
+	    /* assume error message already output */
+	    unqueue_signals();
+	    return NULL;
+	}
+	if (!pm && !(pm = (Param) paramtab->getnode(paramtab, t))) {
+	    DPUTS(!pm, "BUG: parameter not created");
+	    if (!errflag)
+		zerr("%s: parameter not found", t);
+	    unqueue_signals();
+	    return NULL;
+	}
 	if (ss) {
 	    *ss = '[';
 	} else if (val.type & MN_INTEGER) {

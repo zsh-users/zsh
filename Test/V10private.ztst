@@ -10,6 +10,8 @@
    sed -e 's,# test_zsh_param_private,zmodload zsh/param/private,' < $ZTST_srcdir/B02typeset.ztst > private.TMP/B02
  fi
 
+ setopt TYPESET_TO_UNSET
+
 %test
 
  (zmodload -u zsh/param/private && zmodload zsh/param/private)
@@ -246,7 +248,7 @@ F:note "typeset" rather than "private" in output from outer
 1:privates are not visible in anonymous functions, part 3
 >X top level
 >array_test not set
-?(anon):4: array_test: can't change parameter attribute
+?(anon):4: array_test: can't modify read-only parameter
 F:future revision will create a global with this assignment
 
  typeset -a array_test
@@ -311,11 +313,30 @@ F:future revision will create a global with this assignment
 
  () {
    typeset -n ptr1=ptr2
-   private -n ptr2
+   private -n ptr2	# TYPESET_TO_UNSET makes this not a "placeholder"
    typeset -p ptr1 ptr2
    typeset val=LOCAL
    () {
-     ptr1=val
+     ptr1=val		# Test dies here as ptr2 is private and unset
+     typeset -n
+     printf "%s=%s\n" ptr1 "$ptr1" ptr2 "$ptr2"
+   }
+   typeset -p ptr1 ptr2
+ }
+ typeset -p ptr2
+1:up-reference for private namerefs, end unset and not in scope
+F:See K01nameref.ztst up-reference part 5
+F:Here ptr1 finds private ptr2 by scope mismatch
+>typeset -n ptr1=ptr2
+*?*read-only variable: ptr2
+
+ () {
+   typeset -n ptr1=ptr2
+   private -n ptr2=	# Assignment makes this a placeholder, not unset
+   typeset -p ptr1 ptr2
+   typeset val=LOCAL
+   () {
+     ptr1=val		# This is a silent no-op, why?
      typeset -n
      printf "%s=%s\n" ptr1 "$ptr1" ptr2 "$ptr2"
    }
@@ -323,8 +344,9 @@ F:future revision will create a global with this assignment
  }
  typeset -p ptr2
 1:up-reference for private namerefs, end not in scope
-F:See K01typeset.ztst up-reference part 5
-F:Here ptr1 finds private ptr2 by scope mismatch, assignment silently fails
+F:See K01nameref.ztst up-reference part 5
+F:Here ptr1 finds private ptr2 by scope mismatch
+F:Assignment silently fails, is that correct?
 >typeset -n ptr1=ptr2
 >ptr1=ptr2
 >ptr1=
@@ -335,11 +357,11 @@ F:Here ptr1 finds private ptr2 by scope mismatch, assignment silently fails
  typeset ptr2
  () {
    typeset -n ptr1=ptr2
-   private -n ptr2
+   private -n ptr2	# Set/unset is irrelevant, not referenced
    typeset -p ptr1 ptr2
    typeset val=LOCAL
    () {
-     ptr1=val;
+     ptr1=val
      typeset -n
      printf "%s=%s\n" ptr1 "$ptr1" ptr2 "$ptr2"
    }
@@ -401,6 +423,88 @@ F:Should we allow "public" namerefs to private parameters?
 1:private may not change parameter type
 ?(anon):private:2: can't change type of private param: x
 
+ () {
+   private fd1 fd2
+   exec {fd1}>&1
+   print OK
+   () { exec {fd2}>&2 }
+   print BAD $fd2
+ }
+1:redirection cannot assign private in wrong scope
+F:Better if caught in checkclobberparam() but exec.c doesn't know scope
+>OK
+?(anon): fd2: can't modify read-only parameter
+
+ () {
+   private z=outer
+   print ${(t)z} $z
+   print ${|
+    print ${(t)z} $z
+    REPLY=$z
+   }
+ }
+0:nofork may read private in calling function
+>scalar-local-hide-special outer
+>scalar-local-hide-special outer
+>outer
+
+ () {
+   private z=outer
+   print ${(t)z} $z
+   print ${| REPLY=${|z| z=nofork} }
+   print ${(t)z} $z
+ }
+0:nofork may write to private in calling function
+>scalar-local-hide-special outer
+>nofork
+>scalar-local-hide-special nofork
+
+ () {
+   local q=outer
+   print ${|
+     private q=nofork
+     REPLY=${| REPLY=$q}
+   }
+ }
+0:nofork cannot see private in surrounding nofork
+>outer
+
+ () {
+   private z=outer
+   print ${(t)z} $z
+   print ${|z|
+     private q
+     z=${|q| q=nofork}
+   }
+   print ${(t)z} $z
+ }
+1:nofork may not change private in surrounding nofork
+>scalar-local-hide-special outer
+*?*: q: can't modify read-only parameter
+
+ () {
+   private q=outer
+   print ${|
+     () { REPLY="{$q}" }
+   }
+   print ${|q|
+     () { q=nofork }
+   }
+ }
+1:function may not access private from inside nofork
+>{}
+*?*: q: can't modify read-only parameter
+
+ () {
+   print ${|
+     private q
+     () { q=nofork }
+   }
+ }
+1:function may not access private declared in nofork
+*?*: q: can't modify read-only parameter
+
 %clean
 
+  unsetopt TYPESET_TO_UNSET
   rm -r private.TMP

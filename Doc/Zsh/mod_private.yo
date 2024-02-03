@@ -84,9 +84,14 @@ created outside the local scope when it was not previously declared.)
 itemiz(An exported private remains in the environment of inner scopes but
 appears unset for the current shell in those scopes.  Generally, exporting
 private parameters should be avoided.)
+itemiz(Current shell command substitutions such as `tt(${|)...tt(})',
+`tt(${|)var(var)tt(|)...tt(})' and `tt(${ )...tt( })' may read and assign
+private parameters from the enclosing function.)
 itemiz(Declaring a private parameter in a current shell command substitution
-such as `tt(${ )...tt( })' limits the parameter to the scope of the command
-substitution, just as if the parameter were declared in a function.)
+limits that parameter to the scope of the command substitution, just as if
+the parameter were declared in a function.  This also prevents access by
+any enclosed current shell command substitutions, but other substitutions
+may use the private parameter because those have the same calling scope.)
 enditemize()
 
 Note that this differs from the static scope defined by compiled languages

@@ -298,7 +298,7 @@ pps_setfn(Param pm, char *x)
 {
     struct gsu_closure *c = (struct gsu_closure *)(pm->gsu.s);
     GsuScalar gsu = (GsuScalar)(c->g);
-    if (locallevel == pm->level)
+    if (locallevel == pm->level || locallevel > private_wraplevel)
 	gsu->setfn(pm, x);
     else
 	setfn_error(pm);
@@ -338,7 +338,7 @@ ppi_setfn(Param pm, zlong x)
 {
     struct gsu_closure *c = (struct gsu_closure *)(pm->gsu.i);
     GsuInteger gsu = (GsuInteger)(c->g);
-    if (locallevel == pm->level)
+    if (locallevel == pm->level || locallevel > private_wraplevel)
 	gsu->setfn(pm, x);
     else
 	setfn_error(pm);
@@ -378,7 +378,7 @@ ppf_setfn(Param pm, double x)
 {
     struct gsu_closure *c = (struct gsu_closure *)(pm->gsu.f);
     GsuFloat gsu = (GsuFloat)(c->g);
-    if (locallevel == pm->level)
+    if (locallevel == pm->level || locallevel > private_wraplevel)
 	gsu->setfn(pm, x);
     else
 	setfn_error(pm);
@@ -419,7 +419,7 @@ ppa_setfn(Param pm, char **x)
 {
     struct gsu_closure *c = (struct gsu_closure *)(pm->gsu.a);
     GsuArray gsu = (GsuArray)(c->g);
-    if (locallevel == pm->level)
+    if (locallevel == pm->level || locallevel > private_wraplevel)
 	gsu->setfn(pm, x);
     else
 	setfn_error(pm);
@@ -461,7 +461,7 @@ pph_setfn(Param pm, HashTable x)
 {
     struct gsu_closure *c = (struct gsu_closure *)(pm->gsu.h);
     GsuHash gsu = (GsuHash)(c->g);
-    if (locallevel == pm->level)
+    if (locallevel == pm->level || locallevel > private_wraplevel)
 	gsu->setfn(pm, x);
     else
 	setfn_error(pm);
@@ -540,18 +540,19 @@ static struct funcwrap wrapper[] = {
 };
 
 /**/
+static int private_wraplevel = 0;
+
+/**/
 static int
 wrap_private(Eprog prog, FuncWrap w, char *name)
 {
-    static int wraplevel = 0;
-
-    if (wraplevel < locallevel /* && strcmp(name, "(anon)") != 0 */) {
-	int owl = wraplevel;
-	wraplevel = locallevel;
+    if (private_wraplevel < locallevel /* && strcmp(name, "(anon)") != 0 */) {
+	int owl = private_wraplevel;
+	private_wraplevel = locallevel;
 	scanhashtable(paramtab, 0, 0, 0, scopeprivate, PM_UNSET);
 	runshfunc(prog, w, name);
 	scanhashtable(paramtab, 0, 0, 0, scopeprivate, 0);
-	wraplevel = owl;
+	private_wraplevel = owl;
 	return 0;
     }
     return 1;
@@ -573,22 +574,32 @@ getprivatenode(HashTable ht, const char *nam)
 	pm = (Param) hn;
 	/* how would an autoloaded private behave?  return here? */
     }
-    while (!fakelevel && pm && locallevel > pm->level && is_private(pm)) {
+    while (!fakelevel && pm && is_private(pm) && locallevel > pm->level) {
+	if (pm->level == private_wraplevel + 1) {
+	    /* Variable is in the current function scope */
+	    break;
+	}
+#if 0
 	if (!(pm->node.flags & PM_UNSET)) {
 	    /*
 	     * private parameters are always marked PM_UNSET before we
-	     * increment locallevel, so the only way we get here is
-	     * when createparam() wants a new parameter that is not at
-	     * the current locallevel and it has therefore cleared the
-	     * PM_UNSET flag.
+	     * increment locallevel, so there are three possible ways
+	     * to get here:
+	     *  1) createparam() wants a new parameter that is not at
+	     *  the current locallevel and it has therefore cleared the
+	     *  PM_UNSET flag
+	     *  2) locallevel has been incremented (startparamscope())
+	     *  outside the usual function call stack (private_wraplevel)
+	     *  3) dynamic scoping is fetching a value from a surrounding
+	     *  scope, we don't know if that's for assign or just expand
+	     * The first of those is now caught in createparam() when
+	     * testing PM_RO_BY_DESIGN and the second occurs only in
+	     * nofork substitution or handling of ZLE specials.  If the
+	     * third is an assignment, the GSU setfn rejects it.
 	     */
 	    DPUTS(pm->old, "BUG: PM_UNSET cleared in wrong scope");
-	    setfn_error(pm);
-	    /*
-	     * TODO: instead of throwing an error here, create a global
-	     * parameter, insert as pm->old, handle WARN_CREATE_GLOBAL.
-	     */
 	}
+#endif
 	pm = pm->old;
     }
 
