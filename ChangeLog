@@ -1,3 +1,7 @@
+2024-02-04  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 52516: Src/prompt.c: fix crash in %H when hlgroups is empty
+
 2024-02-03  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Util/printdefines: updates and fix omissions

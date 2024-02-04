@@ -257,7 +257,7 @@ parsehighlight(char *arg, char endchar, zattr *atr)
     {
 	Param node;
 	HashTable ht = v->pm->gsu.h->getfn(v->pm);
-	if ((node = (Param) ht->getnode(ht, arg))) {
+	if (ht && (node = (Param) ht->getnode(ht, arg))) {
 	    attrs = node->gsu.s->getfn(node);
 	    entered = 1;
 	    if (match_highlight(attrs, atr, 0) == attrs)
