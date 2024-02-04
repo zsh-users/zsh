@@ -54,6 +54,7 @@ local -AHPrt paramflags=(
 # $((1<<12))	PM_ABSPATH_USED	# (function): loaded using absolute path
 
  $((1<<13))	PM_UNIQUE	# remove duplicates
+# $((1<<13))	PM_SELFREF	# Overload when namerefs resolved
 # $((1<<13))	PM_UNALIASED	# (function) do not expand aliases
 
  $((1<<14))	PM_HIDE		# Special behaviour hidden by local
@@ -67,7 +68,8 @@ local -AHPrt paramflags=(
  $((1<<17))	PM_DONTIMPORT_SUID	# do not import if running setuid
 # $((1<<17))	PM_LOADDIR	# (function) filename gives load directory
  $((1<<18))	PM_SINGLE	# special can only have a single instance
- $((1<<18))	PM_ANONYMOUS	# (function) anonymous function
+# $((1<<18))	PM_NEWREF	# Overload in for-loop namerefs
+# $((1<<18))	PM_ANONYMOUS	# (function) anonymous function
  $((1<<19))	PM_LOCAL	# this parameter will be made local
 # $((1<<19))	PM_KSHSTORED	# (function) stored in ksh form
  $((1<<20))	PM_SPECIAL	# special builtin parameter
@@ -82,33 +84,45 @@ local -AHPrt paramflags=(
  $((1<<25))	PM_REMOVABLE	# special can be removed from paramtab
  $((1<<26))	PM_AUTOLOAD	# autoloaded from module
  $((1<<27))	PM_NORESTORE	# do not restore value of local special
- $((1<<27))	PM_AUTOALL	# autoload all features in module
+# $((1<<27))	PM_AUTOALL	# autoload all features in module
  $((1<<28))	PM_HASHELEM	# is a hash-element
  $((1<<29))	PM_NAMEDDIR	# has a corresponding nameddirtab entry
  $((1<<30))	PM_NAMEREF	# pointer to a different parameter
 )
 local -AHPrt chartokens=(
- mapbase integer
- $((83))	Meta
- $((84))	Pound
- $((85))	String
- $((86))	Hat
- $((87))	Star
- $((88))	Inpar
- $((89))	Inparmath
- $((90))	Outbrace
- $((91))	Inbrack
- $((92))	Outbrack
- $((93))	Tick
- $((94))	Inang
- $((95))	Outang
- $((96))	OutangProc
- $((97))	Quest
- $((98))	Tilde
- $((99))	Qtick
- $((a0))	Bnullkeep
- $((a1))	Nularg
- $((a2))	Marker
+ mapbase 16
+ $((0x83))	Meta
+ $((0x84))	Pound
+ $((0x85))	String
+ $((0x86))	Hat
+ $((0x87))	Star
+ $((0x88))	Inpar
+ $((0x89))	Inparmath
+ $((0x8a))	Outpar
+ $((0x8b))	Outparmath
+ $((0x8c))	Qstring
+ $((0x8d))	Equals
+ $((0x8e))	Bar
+ $((0x8f))	Inbrace
+ $((0x90))	Outbrace
+ $((0x91))	Inbrack
+ $((0x92))	Outbrack
+ $((0x93))	Tick
+ $((0x94))	Inang
+ $((0x95))	Outang
+ $((0x96))	OutangProc
+ $((0x97))	Quest
+ $((0x98))	Tilde
+ $((0x99))	Qtick
+ $((0x9a))	Comma
+ $((0x9b))	Dash	# Only in patterns
+ $((0x9c))	Bang	# Only in patterns
+ $((0x9d))	Snull
+ $((0x9e))	Dnull
+ $((0x9f))	Bnull
+ $((0xa0))	Bnullkeep
+ $((0xa1))	Nularg
+ $((0xa2))	Marker
 )
 local -AHPrt fdtabletype=(
  mapbase integer
@@ -120,6 +134,7 @@ local -AHPrt fdtabletype=(
  $((5))		FDT_FLOCK
  $((6))		FDT_FLOCK_EXEC
  $((7))		FDT_PROC_SUBST
+#$((16))	FDT_SAVED_MASK
 )
 local -AHPrt inputstates=(
  mapbase 2
@@ -129,6 +144,9 @@ local -AHPrt inputstates=(
  $((1<<3))	INP_CONT
  $((1<<4))	INP_ALCONT
  $((1<<5))	INP_HISTCONT
+ $((1<<6))	INP_LINENO
+ $((1<<7))	INP_APPEND
+ $((1<<8))	INP_RAW_KEEP
 )
 local -AHPrt metafytypes=(
  mapbase integer
@@ -175,12 +193,15 @@ local -AHPrt condtypes=(
 )
 local -AHPrt wordcodes=(
  mapbase integer
+ $((0))		WC_END
  $((1))		WC_LIST
  $((2))		WC_SUBLIST
  $((3))		WC_PIPE
  $((4))		WC_REDIR
  $((5))		WC_ASSIGN
+#$((5))		WC_SUBLIST_FREE
  $((6))		WC_SIMPLE
+#$((6))		WC_LIST_FREE
  $((7))		WC_TYPESET
  $((8))		WC_SUBSH
  $((9))		WC_CURSH
@@ -219,6 +240,7 @@ local -AHPrt builtintypes=(
  $((1<<1))	BINF_PLUSOPTS	# +xyz legal
  $((1<<2))	BINF_PRINTOPTS
  $((1<<3))	BINF_ADDED	# is in the builtins hash table
+ $((1<<4))	BINF_MAGICEQUALS
  $((1<<5))	BINF_PREFIX
  $((1<<6))	BINF_DASH
  $((1<<7))	BINF_BUILTIN
@@ -246,9 +268,11 @@ local -AHPrt patflags=(
  $((0x0020))	PAT_PURES	# Pattern is a pure string: set internally
  $((0x0040))	PAT_STATIC	# Don't copy pattern to heap as per default
  $((0x0080))	PAT_SCAN	# Scanning, so don't try must-match test
+ $((0x0100))	PAT_ZDUP	# Copy pattern in real memory
  $((0x0200))	PAT_NOTSTART	# Start of string is not real start
  $((0x0400))	PAT_NOTEND	# End of string is not real end
  $((0x0800))	PAT_HAS_EXCLUDP	# (internal): top-level path1~path2.
+ $((0x1000))	PAT_LCMATCHUC	# equivalent to setting (#l)
 )
 local -AHPrt patclasses=(
  mapbase integer
@@ -314,6 +338,9 @@ local -AHPrt substmodifiers=(
  $((0x0100))	SUB_ALL		# match complete string
  $((0x0200))	SUB_GLOBAL	# global substitution ${..//all/these}
  $((0x0400))	SUB_DOSUBST	# replacement string needs substituting
+ $((0x0800))	SUB_RETFAIL	# return status 0 if no match
+ $((0x1000))	SUB_START	# force match at start with SUB_END
+ $((0x2000))	SUB_LIST	# no substitution, return list of matches
  $((0x4000))	SUB_EGLOB	# use extended globbing in patterns
 )
 local -AHPrt printparamflags=(
@@ -333,6 +360,7 @@ local -AHPrt printwhenceflags=(
  $((1<<7))	PRINT_WHENCE_CSH
  $((1<<8))	PRINT_WHENCE_VERBOSE
  $((1<<9))	PRINT_WHENCE_SIMPLE
+#$((1<<9))	PRINT_WITH_NAMESPACE
  $((1<<10))	PRINT_WHENCE_FUNCDEF
  $((1<<11))	PRINT_WHENCE_WORD
 )

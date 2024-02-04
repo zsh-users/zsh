@@ -1,5 +1,7 @@
 2024-02-03  Bart Schaefer  <schaefer@zsh.org>
 
+	* unposted: Util/printdefines: updates and fix omissions
+
  	* unposted: cf. Roman in users/29472: Functions/Misc/zslurp:
 	Efficient lossless read of stdin into $REPLY
 
