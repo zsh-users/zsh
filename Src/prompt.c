@@ -605,10 +605,12 @@ putpromptchar(int doprint, int endchar)
 	        applytextattributes(TSC_PROMPT);
 		break;
 	    case 'H':
-		bv->fm = parsehighlight(bv->fm + 2, '}', &atr);
-		if (atr != TXT_ERROR) {
-		    treplaceattrs(atr);
-		    applytextattributes(TSC_PROMPT);
+		if (bv->fm[1] == '{') {
+		    bv->fm = parsehighlight(bv->fm + 2, '}', &atr);
+		    if (atr != TXT_ERROR) {
+			treplaceattrs(atr);
+			applytextattributes(TSC_PROMPT);
+		    }
 		}
 		break;
 	    case '[':

@@ -2,6 +2,8 @@
 
 	* 52516: Src/prompt.c: fix crash in %H when hlgroups is empty
 
+	* 52517: Src/prompt.c: ensure that %H is followed by {
+
 2024-02-03  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Util/printdefines: updates and fix omissions
