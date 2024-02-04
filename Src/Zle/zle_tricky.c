@@ -1572,7 +1572,7 @@ get_comp_string(void)
 	i = 0;
 	MB_METACHARINIT();
 	/* All further uses of IIDENT in this file should change to   *
-         * INAMESPACE if this case is changed.  Too ugly to risk now. */
+         * INAMESPC if this case is changed.  Too ugly to risk now.   */
 	if (itype_end(s, IIDENT, 1) == s)
 	    nnb = s + MB_METACHARLEN(s);
 	else
