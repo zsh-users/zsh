@@ -1,5 +1,8 @@
 2024-02-03  Bart Schaefer  <schaefer@zsh.org>
 
+ 	* unposted: cf. Roman in users/29472: Functions/Misc/zslurp:
+	Efficient lossless read of stdin into $REPLY
+
 	* unposted: Src/Zle/zle_tricky.c, Src/parse.c, Src/pattern.c:
 	Record as comments some notes about namespace usage exceptions.
 
