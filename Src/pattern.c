@@ -3691,6 +3691,7 @@ mb_patmatchrange(char *range, wchar_t ch, int zmb_ind, wint_t *indptr, int *mtp)
 		    return 1;
 		break;
 	    case PP_IDENT:
+		/* Could use INAMESPC here? */
 		if (wcsitype(ch, IIDENT))
 		    return 1;
 		break;

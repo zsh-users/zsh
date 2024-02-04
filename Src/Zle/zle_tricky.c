@@ -1499,6 +1499,7 @@ get_comp_string(void)
 	if (varq)
 	    tt = clwords[clwpos];
 
+	/* The only place we complete namespaces, see IIDENT below */
 	s = itype_end(tt, INAMESPC, 0);
 	sav = *s;
 	*s = '\0';
@@ -1570,6 +1571,8 @@ get_comp_string(void)
 
 	i = 0;
 	MB_METACHARINIT();
+	/* All further uses of IIDENT in this file should change to   *
+         * INAMESPACE if this case is changed.  Too ugly to risk now. */
 	if (itype_end(s, IIDENT, 1) == s)
 	    nnb = s + MB_METACHARLEN(s);
 	else
@@ -1643,7 +1646,7 @@ get_comp_string(void)
 	} else {
 	    /* In mathematical expression, we complete parameter names  *
 	     * (even if they don't have a `$' in front of them).  So we *
-	     * have to find that name.                                  */
+	     * have to find that name.  See above regarding INAMESPC    */
 	    char *cspos = zlemetaline + zlemetacs, *wptr, *cptr;
 	    we = itype_end(cspos, IIDENT, 0) - zlemetaline;
 

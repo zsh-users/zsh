@@ -1,5 +1,8 @@
 2024-02-03  Bart Schaefer  <schaefer@zsh.org>
 
+	* unposted: Src/Zle/zle_tricky.c, Src/parse.c, Src/pattern.c:
+	Record as comments some notes about namespace usage exceptions.
+
 	* 52513: Doc/Zsh/mod_private.yo, Src/Modules/param_private.c,
 	Src/params.c, Test/v10private.ztst: nofork substitutions can
 	use private parameters; fix crash bug on {privateFD}>&N; add

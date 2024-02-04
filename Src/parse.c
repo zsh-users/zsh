@@ -1935,6 +1935,8 @@ par_simple(int *cmplx, int nr)
 
 		if (*ptr == Outbrace && ptr > tokstr + 1)
 		{
+		    /* Should we allow namespace FDs, {.foo.bar}>&file ? *
+		     * If so, change IIDENT to INAMESPACE here           */
 		    if (itype_end(tokstr+1, IIDENT, 0) >= ptr)
 		    {
 			char *toksave = tokstr;
