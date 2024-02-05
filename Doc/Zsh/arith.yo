@@ -206,6 +206,11 @@ example,
 example(((val2 = val1 * 2)))
 
 assigns twice the value of tt($val1) to the parameter named tt(val2).
+If the expansion of tt($val1) is text rather than a number, then when
+tt(val1) is referenced that text is itself evaluated as a math expression
+as if surrounded by parentheses `tt(LPAR()$val1)tt(RPAR())'.  Expansion
+continues until there are no more parameter references, a number has
+resulted, or an expression error occurs.
 
 An internal integer representation of a named parameter
 can be specified with the tt(integer) builtin.

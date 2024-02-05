@@ -1,5 +1,8 @@
 2024-02-04  Bart Schaefer  <schaefer@zsh.org>
 
+	* unposted (cf. users/29635): Doc/Zsh/arith.yo: additional detail
+	of parameter expansion in math context.
+
 	* 52521: Etc/BUGS: mapfile handling of empty/unreadable files
 
 2024-02-04  Mikael Magnusson  <mikachu@gmail.com>
