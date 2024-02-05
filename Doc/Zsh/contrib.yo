@@ -2633,7 +2633,7 @@ The behavior of this widget changes depending on the widget name.
 
 When the widget is named tt(incarg), the widget will increment an integer
 placed under the cursor placed or just to the left of it. tt(decarg), on the
-other hand, decrements the integer. When the name is prefixed with tt(vim-),
+other hand, decrements the integer. When the name is prefixed with tt(vi),
 the cursor will jump to the nearest integer after the cursor before incrementing
 it.
 
@@ -2643,7 +2643,8 @@ synchronized key input. The first pane won't increment the integer at all, but
 each pane after that will have the integer incremented once more than the
 previous pane. It currently supports tmux and iTerm2.
 
-The prefixes tt(vim-) and tt(sync-) can be combined into tt(vim-sync-).
+The prefixes tt(vi) and tt(sync-) can be combined, for example, into
+tt(vim-sync-). In this case, the tt(vi) prefix should come first.
 
 example(bindkey '^X+' incarg)
 )
