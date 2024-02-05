@@ -55,3 +55,6 @@ users/26071: Strange behavior about option completion of "git push --f"
 return value of the left side of the expression is always 148 (SIGTSTP)
 and thus the expression is likely to be incorrectly interpreted.
 ------------------------------------------------------------------------
+52521: Empty files and unreadable files cannot be removed using the
+mapfile module "unset 'mapfile[filename]'", and are not distinguished
+from files that do not exist.

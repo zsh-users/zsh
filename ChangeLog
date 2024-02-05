@@ -1,3 +1,7 @@
+2024-02-04  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52521: Etc/BUGS: mapfile handling of empty/unreadable files
+
 2024-02-04  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 52516: Src/prompt.c: fix crash in %H when hlgroups is empty
