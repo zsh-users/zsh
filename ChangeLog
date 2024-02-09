@@ -1,3 +1,7 @@
+2024-02-09  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 52526: Src/Modules/terminfo.c: metafy terminfo capabilities
+
 2024-02-04  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted (cf. users/29635): Doc/Zsh/arith.yo: additional detail

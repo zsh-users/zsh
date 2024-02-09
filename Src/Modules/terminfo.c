@@ -160,7 +160,7 @@ getterminfo(UNUSED(HashTable ht), const char *name)
 	pm->node.flags |= PM_SCALAR;
 	pm->gsu.s = &nullsetscalar_gsu;
     } else if ((tistr = (char *)tigetstr(nameu)) != NULL && tistr != (char *)-1) {
-	pm->u.str = dupstring(tistr);
+	pm->u.str = metafy(tistr, -1, META_HEAPDUP);
 	pm->node.flags |= PM_SCALAR;
 	pm->gsu.s = &nullsetscalar_gsu;
     } else {
@@ -280,7 +280,7 @@ scanterminfo(UNUSED(HashTable ht), ScanFunc func, int flags)
     for (capname = (char **)strnames; *capname; capname++) {
 	if ((tistr = (char *)tigetstr(*capname)) != NULL &&
 	    tistr != (char *)-1) {
-	    pm->u.str = dupstring(tistr);
+	    pm->u.str = metafy(tistr, -1, META_HEAPDUP);
 	    pm->node.nam = dupstring(*capname);
 	    func(&pm->node, flags);
 	}
