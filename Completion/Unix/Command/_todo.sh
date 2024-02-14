@@ -74,7 +74,7 @@ case $state in
     "replace:replace in NUMBER the TEXT."
     "remdup:remove exact duplicates from todo.txt."
     "report:adds the number of open and done items to report.txt."
-    "showhelp:list the one-line usage of all built-in and add-on actions."
+    "shorthelp:list the one-line usage of all built-in and add-on actions."
   )
   _describe -t todo-commands 'todo.sh command' cmdlist
   ;;
