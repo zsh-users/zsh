@@ -1,3 +1,8 @@
+2024-02-15  Oliver Kiddle  <opk@zsh.org>
+
+	* github #112: Poncho: Completion/Unix/Command/_todo.sh:
+	Completion: todo.sh uses shorthelp and not showhelp
+
 2024-02-09  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 52526: Src/Modules/terminfo.c: metafy terminfo capabilities
