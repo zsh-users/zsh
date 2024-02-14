@@ -1,5 +1,8 @@
 2024-02-15  Oliver Kiddle  <opk@zsh.org>
 
+	* github #112: Poncho: Completion/Unix/Command/_todo.sh:
+	Completion: todo.sh uses shorthelp and not showhelp
+
 	* 52535: Doc/Makefile.in, Doc/Zsh/prompt.yo, Doc/Zsh/zle.yo,
 	Doc/Zsh/mod_hlgroup.yo, NEWS: documentation for highlight groups
 
