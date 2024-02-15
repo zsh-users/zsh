@@ -1,0 +1,25 @@
+COMMENT(!MOD!zsh/hlgroup
+Alternative views of highlighting groups
+!MOD!)
+The tt(zsh/hlgroup) module defines special parameters that represent
+highlighting groups in different forms to ease the use of the groups when
+configuring other tools.
+
+In each case, these are readonly associative arrays where accessing elements
+uses values from the underlying tt(.zle.hlgroups) variable.
+
+startitem()
+vindex(.zle.esc)
+item(tt(.zle.esc))(
+This associative array contains the literal escape sequences used to apply the
+highlighting for each group. An example use would be when setting the
+tt(LESS_TERMCAP_xx) environment variables for the tt(less) pager.
+)
+vindex(.zle.sgr)
+item(tt(.zle.sgr))(
+Where highlighting makes use of CSI escape sequences, this parameter contains
+the "Select Graphic Rendition" number sequence. This is useful with, for
+example the tt(GREP_COLORS) and  tt(LSCOLORS) environment variables and the
+tt(list-colors) style.
+)
+enditem()

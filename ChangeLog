@@ -1,5 +1,8 @@
 2024-02-15  Oliver Kiddle  <opk@zsh.org>
 
+	* 52535: Doc/Makefile.in, Doc/Zsh/prompt.yo, Doc/Zsh/zle.yo,
+	Doc/Zsh/mod_hlgroup.yo, NEWS: documentation for highlight groups
+
 	* 52533: Src/Modules/hlgroup.c, Src/Modules/hlgroup.mdd,
 	Src/prompt.c: add module to provide alternate readonly views of
 	the content of .zle.hlgroups

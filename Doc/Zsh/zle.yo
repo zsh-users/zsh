@@ -2807,6 +2807,17 @@ item(tt(italic))(
 The characters in the given context are shown in a italic font.
 Not all terminals support italic fonts.
 )
+item(tt(hl=)var(group))(
+Use the specified highlighting group.  The var(group) is used as a key into
+the associative array tt(.zle.hlgroups) to determine the actual highlighting.
+)
+item(tt(layer=)var(layer))(
+The layer is used to determine precedence when multiple highlighting regions
+overlap. The var(layer) is a decimal integer, with higher numbers taking
+precedence over lower numbers. The default layer is 10 with 30 used as the
+default for tt(special), 20 for tt(region) and tt(isearch) and 15 for
+tt(paste).
+)
 enditem()
 
 The characters described above as `special' are as follows.  The

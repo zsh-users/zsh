@@ -246,6 +246,14 @@ item(tt(%K) LPAR()tt(%k)RPAR())(
 Start (stop) using a different bacKground colour.  The syntax is
 identical to that for tt(%F) and tt(%f).
 )
+item(tt(%H))(
+Change all character visual attributes using a highlighting specification from
+the tt(.zle.hlgroups) associative array. The key is specified in following
+braces so, for example tt(%H{error}) will use the highlighting specification
+for the `error' group.  If the key is not found in the associative array then
+it has no effect.  Highlighting specifications are in the same format as for
+the tt(zle_highlight) parameter.
+)
 item(tt(%{)...tt(%}))(
 Include a string as a literal escape sequence.
 The string within the braces should not change the cursor

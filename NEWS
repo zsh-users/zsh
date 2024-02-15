@@ -10,6 +10,12 @@ Changes since 5.9
 In region_highlight and zle_highlight, italic and faint can be
 specified as font attributes for terminals that support them.
 
+Highlighting groups can be referenced in region_highlight and
+zle_highlight for common attribute combinations and a layer can be
+specified to indicate precedence where highlighted regions overlap.
+Highlighting groups are also supported in the prompt via a new %H
+prompt escape.
+
 Ellipsis markers shown by the line editor to indicate where the line
 doesn't fit in the terminal can be highlighted.
 
