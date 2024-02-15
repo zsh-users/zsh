@@ -1,3 +1,9 @@
+2024-02-15  Oliver Kiddle  <opk@zsh.org>
+
+	* 52533: Src/Modules/hlgroup.c, Src/Modules/hlgroup.mdd,
+	Src/prompt.c: add module to provide alternate readonly views of
+	the content of .zle.hlgroups
+
 2024-02-09  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 52526: Src/Modules/terminfo.c: metafy terminfo capabilities

@@ -1,0 +1,7 @@
+name=zsh/hlgroup
+link=either
+load=yes
+
+autofeatures="p:.zle.esc p:.zle.sgr"
+
+objects="hlgroup.o"

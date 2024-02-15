@@ -241,6 +241,34 @@ promptexpand(char *s, int ns, char *rs, char *Rs)
     return new_vars.buf;
 }
 
+/* Get the escape sequence for a given attribute. */
+/**/
+mod_export char *
+zattrescape(zattr atr, int *len)
+{
+    struct buf_vars new_vars;
+    zattr savecurrent = txtcurrentattrs;
+    zattr saveunknown = txtunknownattrs;
+
+    memset(&new_vars, 0, sizeof(new_vars));
+    new_vars.last = bv;
+    bv = &new_vars;
+    new_vars.bufspc = 256;
+    new_vars.bp = new_vars.bufline = new_vars.buf = zshcalloc(new_vars.bufspc);
+    new_vars.dontcount = 1;
+
+    txtunknownattrs = 0;
+    treplaceattrs(atr);
+    applytextattributes(TSC_PROMPT);
+
+    bv = new_vars.last;
+
+    txtpendingattrs = txtcurrentattrs = savecurrent;
+    txtunknownattrs = saveunknown;
+
+    return unmetafy(new_vars.buf, len);
+}
+
 /* Parse the argument for %H */
 static char *
 parsehighlight(char *arg, char endchar, zattr *atr)
