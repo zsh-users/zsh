@@ -1,3 +1,7 @@
+2024-02-16  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 52546: Functions/Zle/incarg: incarg: avoid unneeded subshell
+
 2024-02-15  Oliver Kiddle  <opk@zsh.org>
 
 	* 52520: midchildan: Doc/Zsh/contrib.yo, Functions/Zle/incarg,

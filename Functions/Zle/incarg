@@ -214,8 +214,7 @@ case "$base" in
 esac
 
 local raw_result padded
-raw_result="$( \
-  printf "%0$ndigits$fmt1" $(( [$fmt2] "$base#$old" + delta )) 2> /dev/null)"
+printf -v raw_result "%0$ndigits$fmt1" $(( [$fmt2] "$base#$old" + delta )) 2> /dev/null
 padded="${raw_result// /0}"
 
 integer oldnum="$base#$old" newnum="$base#$padded" 2> /dev/null
