@@ -2031,8 +2031,10 @@ typeset_single(char *cname, char *pname, Param pm, int func,
     char *subscript;
 
     if (pm && (pm->node.flags & PM_NAMEREF) && !((off|on) & PM_NAMEREF)) {
-	if (!(off & PM_NAMEREF))
-	    pm = (Param)resolve_nameref(pm, NULL);
+	if (!(off & PM_NAMEREF)) {
+	    if ((pm = (Param)resolve_nameref(pm, NULL)))
+		pname = pm->node.nam;
+	}
 	if (pm && (pm->node.flags & PM_NAMEREF) &&
 	    (on & ~(PM_NAMEREF|PM_LOCAL|PM_READONLY))) {
 	    /* Changing type of PM_SPECIAL|PM_AUTOLOAD is a fatal error.  *

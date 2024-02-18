@@ -1,3 +1,8 @@
+2024-02-17  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52556: Src/builtin.c: fix crash when applying a type change via
+	a named reference when the referent has been declared but unset
+
 2024-02-16  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 52546: Functions/Zle/incarg: incarg: avoid unneeded subshell
