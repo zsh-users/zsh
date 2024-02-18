@@ -25,7 +25,8 @@ _diff_palette() {
   return ret
 }
 
-if _pick_variant -r variant -c $cmd gnu=GNU unix -v || [[ $OSTYPE = freebsd<12->.* ]]; then
+if _pick_variant -r variant -c $cmd gnu=GNU unix -v ||
+  [[ $OSTYPE = (freebsd<12->|darwin<22->).* ]]; then
   (( $#words > 2 )) && ign='!'
 
   # output formats
@@ -73,15 +74,18 @@ if _pick_variant -r variant -c $cmd gnu=GNU unix -v || [[ $OSTYPE = freebsd<12->
       "($ofwl $ouc $oss)--unchanged-line-format=[set unchanged line format]:unchanged line format"
       '(--to-file)--from-file=[compare specified file to all operands]:from file:_files'
       '(--from-file)--to-file=[compare all operands to specified file]:to file:_files'
-      '--color=-[use colors in output]::when [auto]:(never always auto)'
       '--palette=[specify colors to use]:color:_diff_palette'
       "${ign}(1 2)-v[display version information]"
     )
   else
     args+=( '!--speed-large-files' )
+    if [[ $OSTYPE = darwin<22->.* ]]; then
+      args+=( '(-A --algorithm)'{-A+,--algorithm=}'[specify the algorithm to use]:algorithm:(myers patience stone)' )
+    fi
   fi
 
   _arguments -s $args \
+    '--color=-[use colors in output]::when [auto]:(never always auto)' \
     '(-i --ignore-case)'{-i,--ignore-case}'[case insensitive]' \
     '--ignore-file-name-case[ignore case when comparing file names]' \
     '!(--ignore-file-name-case)--no-ignore-file-name-case' \

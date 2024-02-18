@@ -1,3 +1,8 @@
+2024-02-19  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 52544: Completion/Unix/Type/_diff_options: support macOS Ventura
+	or newer
+
 2024-02-18  Stephane Chazelas  <stephane@chazelas.org>
 
 	* 45837: Src/exec.c, Src/init.c, Src/options.c: fix issue whereby
