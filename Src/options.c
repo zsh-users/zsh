@@ -881,11 +881,12 @@ dosetopt(int optno, int value, int force, char *new_opts)
     } else if (!force && optno == MONITOR && value) {
 	if (new_opts[optno] == value)
 	    return 0;
-	if (SHTTY != -1) {
+	if (SHTTY == -1)
+	    return -1;
+	if (!origpgrp) {
 	    origpgrp = GETPGRP();
 	    acquire_pgrp();
-	} else
-	    return -1;
+	}
 #else
     } else if(optno == MONITOR && value) {
 	    return -1;
