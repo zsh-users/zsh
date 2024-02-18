@@ -6348,6 +6348,8 @@ valid_refname(char *val)
 {
     char *t = itype_end(val, INAMESPC, 0);
 
+    if (idigit(*val))
+	return 0;
     if (*t != 0) {
 	if (*t == '[') {
 	    tokenize(t = dupstring(t+1));
