@@ -1,3 +1,8 @@
+2024-02-18  Bart Schaefer  <schaefer@toltec-ubuntu>
+
+	* 52558: Etc/FAQ.yo: make note of word splitting differences
+	with nofork substitutions; update ToC; minor formatting fixes
+
 2024-02-18  Stephane Chazelas  <stephane@chazelas.org>
 
 	* 45837: Src/exec.c, Src/init.c, Src/options.c: fix issue whereby

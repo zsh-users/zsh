@@ -101,6 +101,10 @@ Chapter 2:  How does zsh differ from...?
 2.6. Shouldn't zsh be more/less like ksh/(t)csh?
 2.7. What is zsh's support for Unicode/UTF-8?
 2.8. Why does my bash script report an error when I run it under zsh?
+2.9. What is a `namespace' anyway?
+2.10. What about named references?
+2.11. What is zsh's support for non-forking command substitution?
+2.12. Comparisons of forking and non-forking command substitution
 
 Chapter 3:  How to get various things to work
 3.1. Why does `$var' where `var="foo bar"' not do what I expect?
@@ -1029,27 +1033,32 @@ label(211)
   This is for cases where you'd write mytt($(command)) but you don't want
   the overhead or other issues associated with forking a subshell.
   There are 3 variations:
-  enumeration(
-  myeit() Borrowed from mksh
+  itemization(
+  eit() Borrowed from mksh
    verb(
      ${| code }
    )
    Runs code in the current shell context and then substitutes mytt(${REPLY}).
+   The result is not split into words unless the tt(SH_WORD_SPLIT) option
+   is set, for example by mytt(${=${| code }}).
 
-  myeit() An extension to #1
+  eit() An extension to #1
    verb(
      ${|var| code }
    )
-   Runs code in the current shell and then substitutes mytt(${var}).
+   Runs code in the current shell and then substitutes mytt(${var}).  If
+   mytt(${var}) names an array, the result is an array of those elements,
+   but no further splitting is done without tt(SH_WORD_SPLIT).
 
-  myeit() The traditional ksh form, except that the closing mytt(;)
+  eit() The traditional ksh form, except that the closing mytt(;)
    may usually be omitted:
    verb(
      ${ code }
    )
    Runs code in the current shell and substitutes its standard output.
    (this is done with a temporary file ala mytt($(<=( code ))) but
-   without the fork implied by mytt(=(...))).
+   without the fork implied by mytt(=(...))).  The result is not split
+   into words without tt(SH_WORD_SPLIT).
   )
 
   In all three forms mytt(code) behaves myem(similarly) to an anonymous
@@ -1079,31 +1088,34 @@ sect(Comparisons of forking and non-forking command substitution)
   when substituting, whereas mytt(${ command }) and its variants do not.
   The latter is consistent with mytt(${|...}) from mksh but differs from
   bash and ksh, so in emulation modes, newlines are stripped from command
-  output (not from mytt(REPLY) assignments).
+  output (not from tt(REPLY) assignments).
+
+  When not enclosed in double quotes, the expansion of mytt($(command)) is
+  split on tt(IFS) into an array of words.  In contrast, and unlike both
+  bash and ksh, unquoted non-forking substitutions behave like parameter
+  expansions with respect to the tt(SH_WORD_SPLIT) option.
 
   When mytt(command) is myem(not) a builtin, mytt(${ command }) does fork, and
   typically forks the same number of times as mytt($(command)), because in
   the latter case zsh usually optimizes the final fork into an exec.
 
   Redirecting input from files has subtle differences:
-
-  mytt($(<file)) is optimized to read from mytt(file) without forking, but
-  per above it removes trailing newlines.
-
-  mytt(${<file}) is a substitution error.
-
-  mytt(${ <file }) copies mytt(file) using the mytt(NULLCMD) programs, then
-  reads and substitutes the contents of the copy.  Also, this fails if the
-  mytt(CSH_NULLCMD) or mytt(SH_NULLCMD) options are in effect, so it does
-  not work in emulation modes.
-
-  mytt(${|<file}) copies mytt(file) to the standard output using mytt(NULLCMD)
-  but substitutes nothing because there is no assignment to mytt(REPLY).  It
-  fails in emulation modes.
-
+  itemization(
+    it() mytt($(<file)) is optimized to read from mytt(file) without forking,
+    	 but per above it removes trailing newlines.
+    it() mytt(${<file}) is a substitution error.
+    it() mytt(${ <file }) copies mytt(file) using the mytt(NULLCMD) programs,
+    	 then reads and substitutes the contents of the copy.  Also, this
+	 fails if the tt(CSH_NULLCMD) or tt(SH_NULLCMD) options are in effect,
+	 so it does not work in emulation modes.
+    it() mytt(${|<file}) copies mytt(file) to the standard output using
+    	 tt(NULLCMD) but substitutes nothing because there is no assignment
+	 to tt(REPLY).  It also fails in emulation modes.
+    )
   mytt(${|IFS= read -rd '' <file}) is therefore the best solution for files
   that do not contain nul bytes, because it copies the file directly into
-  the local mytt(REPLY) and then substitutes that.
+  the local mytt(REPLY) and then substitutes that.  For very large files,
+  refer to mytt(Functions/Misc/zslurp).
 
 chapter(How to get various things to work)
 
@@ -1979,7 +1991,7 @@ sect(Why is my output duplicated with `tt(foo 2>&1 >foo.out | bar)'?)
   to both files when the redirector appears twice.  What's going on in the
   first example is exactly the same, however the second redirector is
   disguised as a pipe.  So if you want to turn this effect off, you need
-  to unset the option mytt(MULTIOS), or alternatively write the following:
+  to unset the option tt(MULTIOS), or alternatively write the following:
   verb(
     % { print output; print error >&2 } 2>&1 >&- >foo.out | sed 's/error/erratic/'
     erratic
