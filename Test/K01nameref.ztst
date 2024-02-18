@@ -66,6 +66,17 @@ F:Other type changes are fatal errors, should this also be?
 >typeset -n ptr=var
 >typeset -t var
 
+ typeset var
+ unset var
+ typeset -n ptr=var
+ typeset -t ptr
+ typeset -p ptr var
+0:change type of unset referenced var
+F:regression - at one time this incorrectly applied the tag to "ptr"
+F:note this causes "var" to become set
+>typeset -n ptr=var
+>typeset -t var
+
  typeset -n ptr=var[2]
  typeset -t ptr
 1:change type of referenced array element
