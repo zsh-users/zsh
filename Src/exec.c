@@ -3768,7 +3768,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		addfd(forked, save, mfds, fn->fd1, fil, 0, fn->varid);
 		/* If this is 'exec < file', read from stdin, *
 		 * not terminal, unless `file' is a terminal. */
-		if (nullexec == 1 && fn->fd1 == 0 &&
+		if (nullexec == 1 && fn->fd1 == 0 && !fn->varid &&
 		    isset(SHINSTDIN) && interact && !zleactive)
 		    init_io(NULL);
 		break;

@@ -1,5 +1,11 @@
 2024-02-18  Stephane Chazelas  <stephane@chazelas.org>
 
+	* 45837: Src/exec.c, Src/init.c, Src/options.c: fix issue whereby
+	original process group is not restored properly upon exit when
+	exec {var} redirs are used or MONITOR is temporarily disabled.
+
+2024-02-18  Stephane Chazelas  <stephane@chazelas.org>
+
 	* 52515: Src/exec.c (+ tests in 52527) avoid sh errors when
 	  running shebang-less scripts with paths starting with - or +
 

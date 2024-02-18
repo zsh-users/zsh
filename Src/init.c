@@ -700,11 +700,14 @@ init_io(char *cmd)
      * process group leader.
      */
     mypid = (zlong)getpid();
-    if (opts[MONITOR] && (SHTTY != -1)) {
-	origpgrp = GETPGRP();
-        acquire_pgrp(); /* might also clear opts[MONITOR] */
-    } else
-	opts[MONITOR] = 0;
+    if (opts[MONITOR]) {
+	if (SHTTY == -1)
+	    opts[MONITOR] = 0;
+	else if (!origpgrp) {
+	    origpgrp = GETPGRP();
+	    acquire_pgrp(); /* might also clear opts[MONITOR] */
+	}
+    }
 #else
     opts[MONITOR] = 0;
 #endif
