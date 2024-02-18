@@ -2,7 +2,7 @@
 
   storepath=($path)
 
-  mkdir command.tmp command.tmp/dir1 command.tmp/dir2
+  mkdir command.tmp command.tmp/dir{1,2} command.tmp/{+,-}dir
 
   cd command.tmp
 
@@ -21,7 +21,10 @@
   print '#!xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxnyyy' >tstcmd-interp-too-long
   print "#!${sh}\necho should not execute; exit 1" >xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxn
 
-  chmod 755 tstcmd dir1/tstcmd dir2/tstcmd
+  print 'echo no shebang in -dir' > -dir/tstcmd
+  print 'echo no shebang in +dir' > +dir/tstcmd
+
+  chmod 755 tstcmd dir{1,2}/tstcmd ./{-,+}dir/tstcmd
   chmod 755 tstcmd-slashless tstcmd-arg tstcmd-interp-too-long
   chmod 755 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxn
 
@@ -422,3 +425,12 @@ F:anonymous function, and a descriptor leak when backgrounding a pipeline
  (exit 4); repeat 0 do done
 0:'repeat 0' resets lastval
 
+ -dir/tstcmd
+ +dir/tstcmd
+ PATH=-dir tstcmd
+ PATH=+dir tstcmd
+0:shebang-less scripts are to be run by sh even when their file paths start with - or + (workers/52515)
+>no shebang in -dir
+>no shebang in +dir
+>no shebang in -dir
+>no shebang in +dir
