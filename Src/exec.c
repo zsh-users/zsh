@@ -612,9 +612,22 @@ zexecve(char *pth, char **argv, char **newenvp)
                         }
                     }
 		    if (!isbinary) {
-			argv[-1] = "sh";
+		        char** args = argv;
+			if (argv[0][0] == '-' || argv[0][0] == '+') {
+			    /*
+			     * guard against +foo or -bar script paths being
+			     * taken as options. POSIX says the script path
+			     * must be passed as an *operand*. "--" would also
+			     * make sure the next argument is treated as an
+			     * operand with POSIX compliant sh implementations
+			     * but "-" is more portable (to the Bourne shell in
+			     * particular) and shorter.
+			     */
+			    *--args = "-";
+			}
+			*--args = "sh";
 			winch_unblock();
-			execve("/bin/sh", argv - 1, newenvp);
+			execve("/bin/sh", args, newenvp);
 		    }
 		}
 	    } else
