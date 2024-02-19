@@ -1,4 +1,9 @@
-2024-02-19  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+2024-02-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 52549: Doc/Zsh/builtins.yo: document that return already works
+	in a script.
+
+x2024-02-19  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 52544: Completion/Unix/Type/_diff_options: support macOS Ventura
 	or newer
