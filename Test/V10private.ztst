@@ -28,7 +28,7 @@
  print $scalar_test
 0:basic scope hiding
 >toplevel
->local scalar_test
+>local hide scalar_test
 >0
 >toplevel
 
@@ -54,7 +54,7 @@
  print $+unset_test
 0:variable defined only in scope
 >0
->local unset_test
+>local hide unset_test
 >setme
 >0
 
@@ -70,7 +70,7 @@
  }
  print $array_test
 0:nested scope with different type, correctly restored
->local array_test
+>local hide array_test
 >in function
 >top level
 
@@ -113,7 +113,7 @@
  typeset -a hash_test=(top level)
  typeset -p hash_test
  inner () {
-  private -p hash_test
+  typeset -p hash_test
   print ${(t)hash_test} ${(kv)hash_test}
  }
  outer () {
@@ -328,6 +328,7 @@ F:future revision will create a global with this assignment
 F:See K01nameref.ztst up-reference part 5
 F:Here ptr1 finds private ptr2 by scope mismatch
 >typeset -n ptr1=ptr2
+>typeset -hn ptr2
 *?*read-only variable: ptr2
 
  () {
@@ -348,10 +349,12 @@ F:See K01nameref.ztst up-reference part 5
 F:Here ptr1 finds private ptr2 by scope mismatch
 F:Assignment silently fails, is that correct?
 >typeset -n ptr1=ptr2
+>typeset -hn ptr2=''
 >ptr1=ptr2
 >ptr1=
 >ptr2=
 >typeset -n ptr1=ptr2
+>typeset -hn ptr2=''
 *?*no such variable: ptr2
 
  typeset ptr2
@@ -372,11 +375,13 @@ F:Assignment silently fails, is that correct?
 F:See K01typeset.ztst up-reference part 5
 F:Here ptr1 points to global ptr2 so assignment succeeds
 >typeset -n ptr1=ptr2
+>typeset -hn ptr2
 >ptr1=ptr2
 >ptr2=val
 >ptr1=val
 >ptr2=val
 >typeset -n ptr1=ptr2
+>typeset -hn ptr2
 >typeset ptr2=val
 
  () {

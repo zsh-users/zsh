@@ -5896,6 +5896,7 @@ static const struct paramtypes pmtypes[] = {
     { PM_ARRAY, "array", 'a', 0},
     { PM_HASHED, "association", 'A', 0},
     { 0, "local", 0, PMTF_TEST_LEVEL},
+    { PM_HIDE, "hide", 'h', 0 },
     { PM_LEFT, "left justified", 'L', PMTF_USE_WIDTH},
     { PM_RIGHT_B, "right justified", 'R', PMTF_USE_WIDTH},
     { PM_RIGHT_Z, "zero filled", 'Z', PMTF_USE_WIDTH},
@@ -6025,12 +6026,20 @@ printparamnode(HashNode hn, int printflags)
 	printflags |= PRINT_NAMEONLY;
 
     if (printflags & (PRINT_TYPESET|PRINT_POSIX_READONLY|PRINT_POSIX_EXPORT)) {
-	if (p->node.flags & (PM_RO_BY_DESIGN|PM_AUTOLOAD)) {
+	if (p->node.flags & PM_AUTOLOAD) {
 	    /*
 	     * It's not possible to restore the state of
 	     * these, so don't output.
 	     */
 	    return;
+	}
+	if (p->node.flags & PM_RO_BY_DESIGN) {
+	    /*
+	     * Compromise: cannot be restored out of context,
+	     * but show anyway if printed in scope of declaration
+	     */
+	    if (p->level != locallevel || p->level == 0)
+		return;
 	}
 	/*
 	 * The zsh variants of export -p/readonly -p also report other
@@ -6064,8 +6073,19 @@ printparamnode(HashNode hn, int printflags)
 	for (pmptr = pmtypes, i = 0; i < PMTYPES_SIZE; i++, pmptr++) {
 	    int doprint = 0;
 	    if (pmptr->flags & PMTF_TEST_LEVEL) {
-		if (p->level)
+		if (p->level) {
+		    /*
+		    if ((p->node.flags & PM_SPECIAL) &&
+			(p->node.flags & PM_LOCAL) &&
+			!(p->node.flags & PM_HIDE)) {
+			if (doneminus)
+			    putchar(' ');
+			printf("+h ");
+			doneminus = 0;
+		    }
+		    */
 		    doprint = 1;
+		}
 	    } else if ((pmptr->binflag != PM_EXPORTED || p->level ||
 			(p->node.flags & (PM_LOCAL|PM_ARRAY|PM_HASHED))) &&
 		       (p->node.flags & pmptr->binflag))

@@ -1,3 +1,12 @@
+2024-02-20  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52559: Doc/Zsh/builtins.yo, Doc/Zsh/mod_private.yo,
+	Src/Modules/param_private.c, Src/params.c, Test/B02typeset.ztst,
+	Test/K01nameref.ztst, Test/V10private.ztst: revise "typeset -p"
+	with respect to local readonly special parameters; update doc
+	and tests to describe handling of global readonly specials and
+	to account for side-effects on zsh/param/private.
+
 2024-02-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 52549: Doc/Zsh/builtins.yo: document that return already works

@@ -646,7 +646,7 @@ printprivatenode(HashNode hn, int printflags)
 
 static struct builtin bintab[] = {
     /* Copied from BUILTIN("local"), "P" added */
-    BUILTIN("private", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_private, 0, -1, 0, "AE:%F:%HL:%PR:%TUZ:%ahi:%lnmprtux", "P")
+    BUILTIN("private", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_private, 0, -1, 0, "AE:%F:%HL:%PR:%TUZ:%ahi:%lnmrtux", "P")
 };
 
 static struct features module_features = {

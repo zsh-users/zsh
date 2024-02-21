@@ -16,9 +16,10 @@ The tt(private) builtin accepts all the same options and arguments as tt(local)
 (ifzman(zmanref(zshbuiltins))ifnzman(noderef(Shell Builtin Commands))) except
 for the `tt(-)tt(T)' option.  Tied parameters may not be made private.
 
-The `tt(-)tt(p)' option is presently a no-op because the state of
-private parameters cannot reliably be reloaded.  This also applies
-to printing private parameters with `tt(typeset -p)'.
+The `tt(-)tt(p)' option is presently disabled because the state of
+private parameters cannot reliably be reloaded.  When `tt(typeset -)tt(p)'
+outputs a private parameter, it is treated as a local with the
+`tt(-)tt(h)' (hide) option enabled.
 
 If used at the top level (outside a function scope), tt(private) creates a
 normal parameter in the same manner as tt(declare) or tt(typeset).  A

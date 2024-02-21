@@ -2136,6 +2136,14 @@ tt(-p) may be followed by an optional integer argument.  Currently
 only the value tt(1) is supported.  In this case arrays and associative
 arrays are printed with newlines between indented elements for
 readability.
+
+The names and values of readonly special parameters
+(most of the parameters marked `<S>' in
+ifzman(zmanref(zshparam))ifnzman(noderef(Parameters Set By The Shell)),
+except those documented as settable)
+are not printed with `tt(-)tt(p)' because to execute those typeset commands
+would cause errors.  However, these parameters are printed when they
+have been made local to the scope where `tt(typeset -p)' is run.
 )
 item(tt(-T) [ var(scalar)[tt(=)var(value)] var(array)[tt(=LPAR())var(value) ...tt(RPAR())] [ var(sep) ] ])(
 This flag has a different meaning when used with tt(-f); see below.

@@ -959,6 +959,20 @@
 >  [three]=''
 >)
 
+ () {
+  local -h status
+  typeset -p status
+ }
+0:parameter hiding preserved by "typeset -p"
+>typeset -h status=''
+
+ () {
+  local status
+  typeset -p status
+ }
+0:read-only special params are output when localized
+>typeset -i10 -r status=0
+
  (export PATH MANPATH
  path=(/bin)
  MANPATH=/
