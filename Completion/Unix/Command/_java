@@ -82,7 +82,10 @@ java)
     '(- 1)-X-[non-standard java option]:option' \
     '(- 1)-jar[specify a program encapsulated as jar]:jar:_files -g \*.jar\(-.\)' \
     '-splash\:-[show splash screen with specified image]:image:_files' \
-    '(-):class:_java_class -m main ${(kv)opt_args[(i)(-classpath|-cp)]}' \
+    '--source=[set the version of the source in source-file mode]:version' \
+    '(-):arg: _alternative
+      "classes\:class\:{ (( ! $+opt_args[--source] )) && _java_class -m main ${(kv)opt_args[(i)(-classpath|-cp)]} }"
+      "files\:source file\:_files -g \*.java\(-.\)"' \
     '*::args:= _normal' \
      && return 0
   ;;
