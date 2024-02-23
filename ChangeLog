@@ -1,3 +1,9 @@
+2024-02-23  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52583: Src/params.c, Test/V10private.ztst: do an extra check
+	for proper scope and parameter existence when assigning to a
+	non-local name that resolves to a readonly special.
+
 2024-02-22  Oliver Kiddle  <opk@zsh.org>
 
 	* 52552: Completion/Unix/Command/_java: newer Java supports

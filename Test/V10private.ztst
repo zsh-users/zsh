@@ -312,6 +312,47 @@ F:future revision will create a global with this assignment
 >UP:
 
  () {
+   typeset -a ary
+   local -P -n ref=ary
+   {
+    (){
+     ref=XX	# Should be an error
+     typeset -p ary ref
+    }
+   } always {
+    TRY_BLOCK_ERROR=0
+    typeset -p ary ref
+   }
+ }
+ typeset -p ary
+1:assignment to private nameref in wrong scope, part 1
+>typeset -a ary
+>typeset -hn ref=ary
+*?*ref: can't modify read-only parameter
+*?*no such variable: ary
+
+ () {
+   typeset -a ary
+   local -P -n ref=ary
+   {
+    (){
+     typeset ref=XX	# Should create a local
+     typeset -p ary ref
+    }
+   } always {
+    TRY_BLOCK_ERROR=0
+    typeset -p ary ref
+   }
+ }
+ typeset -p ary
+1:assignment to private nameref in wrong scope, part 2
+>typeset -g -a ary
+>typeset ref=XX
+>typeset -a ary
+>typeset -hn ref=ary
+*?*no such variable: ary
+
+ () {
    typeset -n ptr1=ptr2
    private -n ptr2	# TYPESET_TO_UNSET makes this not a "placeholder"
    typeset -p ptr1 ptr2

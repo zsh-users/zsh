@@ -1004,8 +1004,29 @@ createparam(char *name, int flags)
 			 gethashnode2(paramtab, name) :
 			 paramtab->getnode(paramtab, name));
 
-	if (oldpm && (oldpm->node.flags & PM_NAMEREF) &&
-	    !(flags & PM_NAMEREF) && (oldpm = upscope(oldpm, oldpm->base))) {
+	if (oldpm && (oldpm->node.flags & PM_RO_BY_DESIGN)) {
+	    if (!(flags & PM_LOCAL)) {
+		/* Must call the API for namerefs and specials to work */
+		pm = (Param) paramtab->getnode2(paramtab, oldpm->node.nam);
+		if (!pm || ((pm->node.flags & PM_NAMEREF) &&
+			    pm->level != locallevel)) {
+		    zerr("%s: can't modify read-only parameter", name);
+		    return NULL;
+		}
+	    }
+	    /**
+	     * Implementation note: In the case of a readonly nameref,
+	     * the right thing might be to insert a new global into
+	     * the paramtab and point the local pm->old at it, rather
+	     * than error.  That is why gethashnode2() is called
+	     * first, to avoid skipping up the stack prematurely.
+	     **/
+	}
+
+	if (oldpm && !(flags & PM_NAMEREF) &&
+	    (!(oldpm->node.flags & PM_RO_BY_DESIGN) || !(flags & PM_LOCAL)) &&
+	    (oldpm->node.flags & PM_NAMEREF) &&
+	    (oldpm = upscope(oldpm, oldpm->base))) {
 	    Param lastpm;
 	    struct asgment stop;
 	    stop.flags = PM_NAMEREF | (flags & PM_LOCAL);
