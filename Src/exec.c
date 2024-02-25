@@ -509,7 +509,7 @@ zexecve(char *pth, char **argv, char **newenvp)
 			    break;
 		    if (t0 == ct)
 			zerr("%s: bad interpreter: %s: %e", pth,
-			     execvebuf + 2, eno);
+			     metafy(execvebuf + 2, -1, META_NOALLOC), eno);
 		    else {
 			while (inblank(execvebuf[t0]))
 			    execvebuf[t0--] = '\0';
@@ -532,8 +532,8 @@ zexecve(char *pth, char **argv, char **newenvp)
 				    execve(pprog, argv - 2, newenvp);
 				}
 			    }
-			    zerr("%s: bad interpreter: %s: %e", pth, ptr2,
-				 eno);
+			    zerr("%s: bad interpreter: %s: %e", pth,
+				 metafy(ptr2, -1, META_NOALLOC), eno);
 			} else if (*ptr) {
 			    *ptr = '\0';
 			    argv[-2] = ptr2;
