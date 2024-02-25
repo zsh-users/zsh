@@ -1,5 +1,8 @@
 2024-02-24  Bart Schaefer  <schaefer@zsh.org>
 
+	* 52597: Src/math.c: fix multibyte and metafied character counts
+	when providing context for operator and operand errors
+
 	* 52596: Src/exec.c: metafy interpreter name for error message
 
 	* Stephane: 52591: Src/builtin.c: printf builtin must pass

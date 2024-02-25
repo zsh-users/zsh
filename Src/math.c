@@ -1557,21 +1557,32 @@ checkunary(int mtokc, char *mptr)
 	    errmsg = 2;
     }
     if (errmsg) {
-	int len, over = 0;
+	int len = 0, over = 0;
 	char *errtype = errmsg == 2 ? "operator" : "operand";
 	while (inblank(*mptr))
 	    mptr++;
-	len = ztrlen(mptr);
-	if (len > 10) {
-	    len = 10;
-	    over = 1;
+	if (isset(MULTIBYTE))
+	    MB_CHARINIT();
+	while (over < 10 && mptr[len]) {
+	    if (isset(MULTIBYTE))
+		len += MB_METACHARLEN(mptr+len);
+	    else
+		len += (mptr[len] == Meta ? 2 : 1);
+	    ++over;
+	}
+	if ((over = mptr[len])) {
+	    mptr = dupstring(mptr);
+	    if (mptr[len] == Meta)
+		mptr[len+1] = 0;
+	    else
+		mptr[len] = 0;
 	}
 	if (!*mptr)
 	    zerr("bad math expression: %s expected at end of string",
 		errtype);
 	else
-	    zerr("bad math expression: %s expected at `%l%s'",
-		 errtype, mptr, len, over ? "..." : "");
+	    zerr("bad math expression: %s expected at `%s%s'",
+		 errtype, mptr, over ? "..." : "");
     }
     unary = !(tp & OP_OPF);
 }
