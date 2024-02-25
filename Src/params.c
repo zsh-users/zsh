@@ -107,7 +107,8 @@ mod_export zlong
      zterm_lines,	/* $LINES       */
      rprompt_indent,	/* $ZLE_RPROMPT_INDENT */
      ppid,		/* $PPID        */
-     zsh_subshell;	/* $ZSH_SUBSHELL */
+     zsh_subshell,	/* $ZSH_SUBSHELL */
+     zsh_xtracefd;	/* $ZSH_XTRACEFD */
 
 /* $FUNCNEST    */
 /**/
@@ -270,6 +271,9 @@ static const struct gsu_array pipestatus_gsu =
 static const struct gsu_integer rprompt_indent_gsu =
 { intvargetfn, zlevarsetfn, rprompt_indent_unsetfn };
 
+static const struct gsu_integer xtracefd_gsu =
+{ intvargetfn, xtracefdsetfn, xtracefdunsetfn };
+
 /* Nodes for special parameters for parameter hash table */
 
 #ifdef HAVE_UNION_INIT
@@ -359,6 +363,7 @@ IPDEF5("LINES", &zterm_lines, zlevar_gsu),
 IPDEF5U("ZLE_RPROMPT_INDENT", &rprompt_indent, rprompt_indent_gsu),
 IPDEF5("SHLVL", &shlvl, varinteger_gsu),
 IPDEF5("FUNCNEST", &zsh_funcnest, varinteger_gsu),
+IPDEF5("ZSH_XTRACEFD", &zsh_xtracefd, xtracefd_gsu),
 
 /* Don't import internal integer status variables. */
 #define IPDEF6(A,B,F) {{NULL,A,PM_INTEGER|PM_SPECIAL|PM_DONTIMPORT},BR((void *)B),GSU(F),10,0,NULL,NULL,NULL,0}
@@ -4560,6 +4565,65 @@ setsecondstype(Param pm, int on, int off)
 	return 1;
     pm->node.flags = newflags;
     return 0;
+}
+
+/* Open / assign the XTRACE fd */
+
+/**/
+void xtracefdassign(void)
+{
+    int fd = (int)zsh_xtracefd;
+    switch (fd)
+    {
+    case 0:                    /* bizarre, but handle for consistency */
+       xtrerr = stdin;
+       break;
+
+    case 1:
+       xtrerr = stdout;
+       break;
+
+    case 2:
+       xtrerr = stderr;
+       break;
+
+    default:
+       xtrerr = fdopen(fd, "w");
+       break;
+    }
+    xtrace_file = xtrerr;
+}
+
+/* Function to set value of special parameter `ZSH_XTRACEFD' */
+
+/**/
+void
+xtracefdsetfn(Param pm, zlong fd)
+{
+    /* Check that the given file descriptor is valid */
+    if (fcntl(fd, F_GETFD) != -1 || errno != EBADF) {
+      intvarsetfn(pm, fd);
+      xtracefdassign();
+    } else
+      zwarn("file descriptor %d is not valid", fd);
+
+}
+
+/* Function to unset value of special parameter `ZSH_XTRACEFD' */
+
+/**/
+void
+xtracefdunsetfn(Param pm, UNUSED(int exp))
+{
+    int current_fd = intvargetfn(pm);
+    if (current_fd == 2)  /* Nothing to do, already using stderr */
+      return;
+    else {  /* Reset to file descriptor 2 (stderr) */
+      intvarsetfn(pm, 2);
+    //   if (current_fd > 2)
+    //      fclose(xtrerr);  /* Never close standard descriptors */
+      xtrerr = xtrace_file = stderr;
+    }
 }
 
 /* Function to get value for special parameter `USERNAME' */

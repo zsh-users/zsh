@@ -619,8 +619,10 @@ init_io(char *cmd)
 	SHTTY = -1;
     }
 
-    /* Send xtrace output to stderr -- see execcmd() */
-    xtrerr = stderr;
+    /* Send xtrace output to zsh_xtracefd file descriptor -- see execcmd() */
+    if (zsh_xtracefd == 0)
+       zsh_xtracefd = 2;
+    xtracefdassign();
 
     /* Make sure the tty is opened read/write. */
     if (isatty(0)) {

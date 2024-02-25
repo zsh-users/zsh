@@ -721,3 +721,70 @@
 >Works
 >Works
 ?(eval):6: file exists: foo
+
+  rm -f redir
+  set -x
+  ZSH_XTRACEFD=4 print 'This is ZSH_XTRACEFD redir' 4>redir
+  set +x
+  cat redir
+0:Redirect xtrace output to ZSH_XTRACEFD file descriptor
+>This is ZSH_XTRACEFD redir
+>+(eval):3> print 'This is ZSH_XTRACEFD redir'
+?+(eval):3> ZSH_XTRACEFD=4 +(eval):4> set +x
+
+  rm -f redir
+  A() {
+    local ZSH_XTRACEFD=5
+    B
+    print 'Function A to file descriptor 5'
+    unset ZSH_XTRACEFD
+    print 'Function A to file descriptor 2'
+  }
+  B() {
+    local ZSH_XTRACEFD=6
+    print 'Function B to file descriptor 6'
+  }
+  exec 4>redir4 5>redir5 6>redir6
+  ZSH_XTRACEFD=4
+  set -x
+  print 'Main to file descriptor 4'
+  A
+  print 'Main to file descriptor 4 again\n'
+  a=0 ZSH_XTRACEFD=5  # appears as blank line in redir5
+  ZSH_XTRACEFD=6  # appears as blank line in redir6
+  unset ZSH_XTRACEFD
+  set +x
+  print "end of file redir4" >> redir4
+  cat redir4
+  print
+  print "end of file redir5" >> redir5
+  cat redir5
+  print
+  print "end of file redir6" >> redir6
+  cat redir6
+0:Scoped ZSH_XTRACEFD correctly set and restored
+>Main to file descriptor 4
+>Function B to file descriptor 6
+>Function A to file descriptor 5
+>Function A to file descriptor 2
+>Main to file descriptor 4 again
+>
+>+(eval):16> print 'Main to file descriptor 4'
+>+(eval):17> A
+>+A:1> local ZSH_XTRACEFD=5
+>+(eval):18> print 'Main to file descriptor 4 again\n'
+>end of file redir4
+>
+>+A:2> B
+>+B:1> local ZSH_XTRACEFD=6
+>+A:3> print 'Function A to file descriptor 5'
+>+A:4> unset ZSH_XTRACEFD
+>
+>end of file redir5
+>
+>+B:2> print 'Function B to file descriptor 6'
+>
+>+(eval):21> unset ZSH_XTRACEFD
+>end of file redir6
+?+A:5> print 'Function A to file descriptor 2'
+?+(eval):22> set +x

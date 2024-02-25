@@ -1699,12 +1699,19 @@ checkmailpath(char **s)
 /**/
 FILE *xtrerr = 0;
 
+/* This records the last file XTRACE was open too.
+ * It's used for restoring XTRACE after a possible redirection.
+ */
+
+/**/
+FILE *xtrace_file;
+
 /**/
 void
 printprompt4(void)
 {
     if (!xtrerr)
-	xtrerr = stderr;
+	xtracefdassign();
     if (prompt4) {
 	int l, t = opts[XTRACE];
 	char *s = dupstring(prompt4);
