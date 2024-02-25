@@ -5247,7 +5247,8 @@ bin_print(char *name, char **args, Options ops, int func)
 		    }
 		}
 		if (*argp) {
-		    width = (int)mathevali(*argp++);
+		    width = (int)mathevali(metafy(*argp, len[argp - args], META_USEHEAP));
+		    argp++;
 		    if (errflag) {
 			errflag &= ~ERRFLAG_ERROR;
 			ret = 1;
@@ -5281,7 +5282,8 @@ bin_print(char *name, char **args, Options ops, int func)
 		    }
 
 		    if (*argp) {
-			prec = (int)mathevali(*argp++);
+			prec = (int)mathevali(metafy(*argp, len[argp - args], META_USEHEAP));
+			argp++;
 			if (errflag) {
 			    errflag &= ~ERRFLAG_ERROR;
 			    ret = 1;
@@ -5465,7 +5467,7 @@ bin_print(char *name, char **args, Options ops, int func)
  		    	*d++ = 'l';
 #endif
 		    	*d++ = 'l', *d++ = *c, *d = '\0';
-			zlongval = (curarg) ? mathevali(curarg) : 0;
+			zlongval = (curarg) ? mathevali(metafy(curarg, curlen, META_HEAPDUP)) : 0;
 			if (errflag) {
 			    zlongval = 0;
 			    errflag &= ~ERRFLAG_ERROR;
@@ -5516,7 +5518,7 @@ bin_print(char *name, char **args, Options ops, int func)
 			if (!curarg)
 			    zulongval = (zulong)0;
 			else if (!zstrtoul_underscore(curarg, &zulongval))
-			    zulongval = mathevali(curarg);
+			    zulongval = mathevali(metafy(curarg, curlen, META_HEAPDUP));
 			if (errflag) {
 			    zulongval = 0;
 			    errflag &= ~ERRFLAG_ERROR;

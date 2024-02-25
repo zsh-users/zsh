@@ -1,3 +1,8 @@
+2024-02-24  Bart Schaefer  <schaefer@zsh.org>
+
+	* Stephane: 52591: Src/builtin.c: printf builtin must pass
+	metafied strings to math evaluation
+
 2024-02-23  Bart Schaefer  <schaefer@zsh.org>
 
 	* 52583: Src/params.c, Test/V10private.ztst: do an extra check
