@@ -836,10 +836,10 @@ static HashNode
 removeshfuncnode(UNUSED(HashTable ht), const char *nam)
 {
     HashNode hn;
-    int signum;
+    int sigidx;
 
-    if (!strncmp(nam, "TRAP", 4) && (signum = getsignum(nam + 4)) != -1)
-	hn = removetrap(signum);
+    if (!strncmp(nam, "TRAP", 4) && (sigidx = getsigidx(nam + 4)) != -1)
+	hn = removetrap(sigidx);
     else
 	hn = removehashnode(shfunctab, nam);
 
@@ -856,10 +856,10 @@ disableshfuncnode(HashNode hn, UNUSED(int flags))
 {
     hn->flags |= DISABLED;
     if (!strncmp(hn->nam, "TRAP", 4)) {
-	int signum = getsignum(hn->nam + 4);
-	if (signum != -1) {
-	    sigtrapped[signum] &= ~ZSIG_FUNC;
-	    unsettrap(signum);
+	int sigidx = getsigidx(hn->nam + 4);
+	if (sigidx != -1) {
+	    sigtrapped[sigidx] &= ~ZSIG_FUNC;
+	    unsettrap(sigidx);
 	}
     }
 }
@@ -876,9 +876,9 @@ enableshfuncnode(HashNode hn, UNUSED(int flags))
 
     shf->node.flags &= ~DISABLED;
     if (!strncmp(shf->node.nam, "TRAP", 4)) {
-	int signum = getsignum(shf->node.nam + 4);
-	if (signum != -1) {
-	    settrap(signum, NULL, ZSIG_FUNC);
+	int sigidx = getsigidx(shf->node.nam + 4);
+	if (sigidx != -1) {
+	    settrap(sigidx, NULL, ZSIG_FUNC);
 	}
     }
 }
