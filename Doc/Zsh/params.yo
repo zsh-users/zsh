@@ -953,7 +953,10 @@ has index 1, the signals are offset by 1 from the signal number
 used by the operating system.  For example, on typical Unix-like systems
 tt(HUP) is signal number 1, but is referred to as tt($signals[2]).  This
 is because of tt(EXIT) at position 1 in the array, which is used
-internally by zsh but is not known to the operating system.
+internally by zsh but is not known to the operating system. On many systems
+there is a block of reserved or unused signal numbers before the POSIX
+real-time signals so the array index can't be used as an accurate indicator
+of their signal number. Use, for example, tt(kill -l SIGRTMIN) instead.
 )
 vindex(TRY_BLOCK_ERROR)
 item(tt(TRY_BLOCK_ERROR) <S>)(

@@ -1,3 +1,12 @@
+2024-02-28  Oliver Kiddle  <opk@zsh.org>
+
+	* 52594: Completion/Zsh/Command/_kill, Doc/Zsh/builtins.yo,
+	Doc/Zsh/params.yo, Src/Modules/parameter.c, Src/builtin.c,
+	Src/exec.c, Src/hashtable.c, Src/init.c, Src/jobs.c, Src/params.c,
+	Src/signals.c, Src/signals.h, Src/signames2.awk: support for
+	POSIX real-time signals with kill and trap and add -L option to
+	kill for more verbose listing of signals
+
 2024-02-24  Bart Schaefer  <schaefer@zsh.org>
 
 	* 52597: Src/math.c: fix multibyte and metafied character counts

@@ -3425,16 +3425,16 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	    newsh->sticky = sticky_emulation_dup(shf->sticky, 0);
 	/* is newsh a signal trap? (adapted from exec.c) */
 	if (!strncmp(s, "TRAP", 4)) {
-	    int signum = getsignum(s + 4);
-	    if (signum != -1) {
-		if (settrap(signum, NULL, ZSIG_FUNC)) {
+	    int sigidx = getsigidx(s + 4);
+	    if (sigidx != -1) {
+		if (settrap(sigidx, NULL, ZSIG_FUNC)) {
 		    freeeprog(newsh->funcdef);
 		    dircache_set(&newsh->filename, NULL);
 		    zfree(newsh, sizeof(*newsh));
 		    return 1;
 		}
 		/* Remove any old node explicitly */
-		removetrapnode(signum);
+		removetrapnode(sigidx);
 	    }
 	}
 	shfunctab->addnode(shfunctab, ztrdup(s), &newsh->node);
@@ -3713,15 +3713,15 @@ bin_functions(char *name, char **argv, Options ops, int func)
 		/* no flags, so just print */
 		printshfuncexpand(&shf->node, pflags, expand);
 	} else if (on & PM_UNDEFINED) {
-	    int signum = -1, ok = 1;
+	    int sigidx = -1, ok = 1;
 
 	    if (!strncmp(*argv, "TRAP", 4) &&
-		(signum = getsignum(*argv + 4)) != -1) {
+		(sigidx = getsigidx(*argv + 4)) != -1) {
 		/*
 		 * Because of the possibility of alternative names,
 		 * we must remove the trap explicitly.
 		 */
-		removetrapnode(signum);
+		removetrapnode(sigidx);
 	    }
 
 	    if (**argv == '/') {
@@ -3757,8 +3757,8 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	    shfunc_set_sticky(shf);
 	    add_autoload_function(shf, *argv);
 
-	    if (signum != -1) {
-		if (settrap(signum, NULL, ZSIG_FUNC)) {
+	    if (sigidx != -1) {
+		if (settrap(sigidx, NULL, ZSIG_FUNC)) {
 		    shfunctab->removenode(shfunctab, *argv);
 		    shfunctab->freenode(&shf->node);
 		    returnval = 1;
@@ -7346,7 +7346,7 @@ bin_trap(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     /* If given no arguments, list all currently-set traps */
     if (!*argv) {
 	queue_signals();
-	for (sig = 0; sig < VSIGCOUNT; sig++) {
+	for (sig = 0; sig < TRAPCOUNT; sig++) {
 	    if (sigtrapped[sig] & ZSIG_FUNC) {
 		HashNode hn;
 
@@ -7372,13 +7372,13 @@ bin_trap(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 
     /* If we have a signal number, unset the specified *
      * signals.  With only -, remove all traps.        */
-    if ((getsignum(*argv) != -1) || (!strcmp(*argv, "-") && argv++)) {
+    if ((getsigidx(*argv) != -1) || (!strcmp(*argv, "-") && argv++)) {
 	if (!*argv) {
-	    for (sig = 0; sig < VSIGCOUNT; sig++)
+	    for (sig = 0; sig < TRAPCOUNT; sig++)
 		unsettrap(sig);
 	} else {
 	    for (; *argv; argv++) {
-		sig = getsignum(*argv);
+		sig = getsigidx(*argv);
 		if (sig == -1) {
 		    zwarnnam(name, "undefined signal: %s", *argv);
 		    break;
@@ -7403,12 +7403,12 @@ bin_trap(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	Eprog t;
 	int flags;
 
-	sig = getsignum(*argv);
+	sig = getsigidx(*argv);
 	if (sig == -1) {
 	    zwarnnam(name, "undefined signal: %s", *argv);
 	    break;
 	}
-	if (idigit(**argv) ||
+	if (idigit(**argv) || (sig >= VSIGCOUNT) ||
 	    !strcmp(sigs[sig], *argv) ||
 	    (!strncmp("SIG", *argv, 3) && !strcmp(sigs[sig], *argv+3))) {
 	    /* The signal was specified by number or by canonical name (with

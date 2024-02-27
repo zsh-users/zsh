@@ -4,10 +4,11 @@ local curcontext="$curcontext" line state ret=1
 typeset -A opt_args
 
 _arguments -C \
-  '(-s -l 1)-n[specify signal number]:signal number' \
-  '(-l)-q[send the specified integer with the signal using sigqueue]:value' \
-  '(-n -l 1)-s[specify signal name]:signal:_signals -s' \
-  '(-n -s)-l[list signal names or numbers of specified signals]:*:signal:_signals' \
+  '(-s -l -L 1)-n[specify signal number]:signal number' \
+  '(-l -L)-q[send the specified integer with the signal using sigqueue]:value' \
+  '(-n -l -L 1)-s[specify signal name]:signal:_signals -s' \
+  '-l[list signal names or numbers of specified signals]:*:signal:_signals' \
+  '(- *)-L[list each signal and corresponding number]' \
   '(-n -s -l)1::signal:_signals -p -s' \
   '*:processes:->processes' && ret=0
   

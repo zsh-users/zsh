@@ -1382,6 +1382,9 @@ setupshin(char *runscript)
 void
 init_signals(void)
 {
+    sigtrapped = (int *) hcalloc(TRAPCOUNT * sizeof(int));
+    siglists = (Eprog *) hcalloc(TRAPCOUNT * sizeof(Eprog));
+
     if (interact) {
 	int i;
 	signal_setmask(signal_mask(0));

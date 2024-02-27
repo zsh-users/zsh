@@ -309,7 +309,7 @@ setfunction(char *name, char *val, int dis)
     shfunc_set_sticky(shf);
 
     if (!strncmp(name, "TRAP", 4) &&
-	(sn = getsignum(name + 4)) != -1) {
+	(sn = getsigidx(name + 4)) != -1) {
 	if (settrap(sn, NULL, ZSIG_FUNC)) {
 	    freeeprog(shf->funcdef);
 	    zfree(shf, sizeof(*shf));

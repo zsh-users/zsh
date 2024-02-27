@@ -946,8 +946,18 @@ createparamtable(void)
     setsparam("ZSH_ARGZERO", ztrdup(posixzero));
     setsparam("ZSH_VERSION", ztrdup_metafy(ZSH_VERSION));
     setsparam("ZSH_PATCHLEVEL", ztrdup_metafy(ZSH_PATCHLEVEL));
-    setaparam("signals", sigptr = zalloc((SIGCOUNT+4) * sizeof(char *)));
-    for (t = sigs; (*sigptr++ = ztrdup_metafy(*t++)); );
+    setaparam("signals", sigptr = zalloc((TRAPCOUNT + 1) * sizeof(char *)));
+    t = sigs;
+#if defined(SIGRTMIN) && defined(SIGRTMAX)
+    while (t - sigs <= SIGCOUNT)
+	*sigptr++ = ztrdup_metafy(*t++);
+    {
+	int sig;
+	for (sig = SIGRTMIN; sig <= SIGRTMAX; sig++)
+	    *sigptr++ = ztrdup_metafy(rtsigname(sig, 0));
+    }
+#endif
+    while ((*sigptr++ = ztrdup_metafy(*t++))) /* empty */ ;
 
     noerrs = 0;
 }

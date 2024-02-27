@@ -15,7 +15,7 @@
     if (signam == "CHLD" && sig[signum] == "CLD")  sig[signum] = ""
     if (signam == "POLL" && sig[signum] == "IO")   sig[signum] = ""
     if (signam == "ABRT" && sig[signum] == "IOT")  sig[signum] = ""
-    if (sig[signum] == "") {
+    if (signam !~ /RTM(IN|AX)/ && sig[signum] == "") {
 	sig[signum] = signam
 	if (0 + max < 0 + signum && signum < 60)
 	    max = signum
@@ -64,10 +64,6 @@ END {
     printf "#define SIGCOUNT\t%d\n", max
     printf "\n"
     printf "#include %czsh.mdh%c\n", 34, 34
-    printf "\n"
-    printf "/**/\n"
-    printf "#define sigmsg(sig) ((sig) <= SIGCOUNT ? sig_msg[sig]"
-    printf " : %c%s%c)", 34, "unknown signal", 34
     printf "\n"
     printf "/**/\n"
     printf "mod_export char *sig_msg[SIGCOUNT+2] = {\n"

@@ -1073,6 +1073,21 @@ should_report_time(Job j)
     return 0;
 }
 
+/**/
+char *
+sigmsg(int sig)
+{
+    static char *unknown = "unknown signal";
+#if defined(SIGRTMIN) && defined(SIGRTMAX)
+    static char rtmsg[] = "real-time event XXX";
+    if (sig >= SIGRTMIN && sig <= SIGRTMAX) {
+	sprintf(rtmsg + sizeof(rtmsg) - 4, "%u", sig - SIGRTMIN + 1);
+	return rtmsg;
+    }
+#endif
+    return sig <= SIGCOUNT ? sig_msg[sig] : unknown;
+}
+
 /* !(lng & 3) means jobs    *
  *  (lng & 1) means jobs -l *
  *  (lng & 2) means jobs -p
@@ -2694,7 +2709,7 @@ static const struct {
 int
 bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 {
-    int sig = SIGTERM;
+    int status, sig = SIGTERM;
     int returnval = 0;
 #ifdef HAVE_SIGQUEUE
     union sigval sigqueue_info;
@@ -2740,23 +2755,29 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    if ((*argv)[1] == 'l' && (*argv)[2] == '\0') {
 		if (argv[1]) {
 		    while (*++argv) {
-			sig = zstrtol(*argv, &signame, 10);
+			status = zstrtol(*argv, &signame, 10);
 			if (signame == *argv) {
+			    signame = casemodify(signame, CASMOD_UPPER);
 			    if (!strncmp(signame, "SIG", 3))
 				signame += 3;
 			    for (sig = 1; sig <= SIGCOUNT; sig++)
-				if (!strcasecmp(sigs[sig], signame))
+				if (!strcmp(sigs[sig], signame))
 				    break;
 			    if (sig > SIGCOUNT) {
 				int i;
 
 				for (i = 0; alt_sigs[i].name; i++)
-				    if (!strcasecmp(alt_sigs[i].name, signame))
+				    if (!strcmp(alt_sigs[i].name, signame))
 				    {
 					sig = alt_sigs[i].num;
 					break;
 				    }
 			    }
+#if defined(SIGRTMIN) && defined(SIGRTMAX)
+			    if (sig > SIGCOUNT && (sig = rtsigno(signame))) {
+				printf("%d\n", sig);
+			    } else
+#endif
 			    if (sig > SIGCOUNT) {
 				zwarnnam(nam, "unknown signal: SIG%s",
 					 signame);
@@ -2769,14 +2790,15 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 					 signame);
 				returnval++;
 			    } else {
-				if (WIFSIGNALED(sig))
-				    sig = WTERMSIG(sig);
-				else if (WIFSTOPPED(sig))
-				    sig = WSTOPSIG(sig);
+				sig = status & ~0200;
 				if (1 <= sig && sig <= SIGCOUNT)
 				    printf("%s\n", sigs[sig]);
+#if defined(SIGRTMIN) && defined(SIGRTMAX)
+				else if ((signame = rtsigname(sig, 0)))
+				    printf("%s\n", signame);
+#endif
 				else
-				    printf("%d\n", sig);
+				    printf("%d\n", status);
 			    }
 			}
 		    }
@@ -2785,7 +2807,39 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 		printf("%s", sigs[1]);
 		for (sig = 2; sig <= SIGCOUNT; sig++)
 		    printf(" %s", sigs[sig]);
+#if defined(SIGRTMIN) && defined(SIGRTMAX)
+		for (sig = SIGRTMIN; sig <= SIGRTMAX; sig++)
+		    printf(" %s", rtsigname(sig, 0));
+#endif
 		putchar('\n');
+		return 0;
+	    }
+
+	    /* with argument "-L" list signals with their numbers in a table */
+	    if ((*argv)[1] == 'L' && (*argv)[2] == '\0') {
+#if defined(SIGRTMIN) && defined(SIGRTMAX)
+		const int width = SIGRTMAX >= 100 ? 3 : 2;
+#else
+		const int width = SIGCOUNT >= 100 ? 3 : 2;
+#endif
+		for (sig = 1; sig < SIGCOUNT
+#if defined(SIGRTMIN) && defined(SIGRTMAX)
+			+ 1
+#endif
+			; sig++)
+		{
+		    printf("%*d) %-10s%c", width, sig, sigs[sig],
+			    sig % 5 ? ' ' : '\n');
+		}
+#if defined(SIGRTMIN) && defined(SIGRTMAX)
+		for (sig = SIGRTMIN; sig < SIGRTMAX; sig++) {
+		    printf("%*d) %-10s%c", width, sig, rtsigname(sig, 0),
+			    (sig - SIGRTMIN + SIGCOUNT + 1) % 5 ? ' ' : '\n');
+		}
+		printf("%*d) RTMAX\n", width, sig);
+#else
+		printf("%*d) %s\n", width, sig, sigs[sig]);
+#endif
 		return 0;
 	    }
 
@@ -2833,9 +2887,13 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 			    break;
 			}
 		}
-		if (sig > SIGCOUNT) {
+		if (sig > SIGCOUNT
+#if defined(SIGRTMIN) && defined(SIGRTMAX)
+			&& !(sig = rtsigno(signame))
+#endif
+			) {
 		    zwarnnam(nam, "unknown signal: SIG%s", signame);
-		    zwarnnam(nam, "type kill -l for a list of signals");
+		    zwarnnam(nam, "type kill -L for a list of signals");
 		    return 1;
 		}
 	    }
@@ -2916,18 +2974,19 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 
     return returnval < 126 ? returnval : 1;
 }
-/* Get a signal number from a string */
+
+/* Get index into table of traps from a string describing a signal */
 
 /**/
 mod_export int
-getsignum(const char *s)
+getsigidx(const char *s)
 {
     int x, i;
 
     /* check for a signal specified by number */
     x = atoi(s);
-    if (idigit(*s) && x >= 0 && x < VSIGCOUNT)
-	return x;
+    if (idigit(*s) && x >= 0)
+	return SIGIDX(x);
 
     /* search for signal by name */
     if (!strncmp(s, "SIG", 3))
@@ -2943,11 +3002,16 @@ getsignum(const char *s)
 	    return alt_sigs[i].num;
     }
 
+#if defined(SIGRTMIN) && defined(SIGRTMAX)
+    if ((x = rtsigno(s)))
+	return SIGIDX(x);
+#endif
+
     /* no matching signal */
     return -1;
 }
 
-/* Get the name for a signal. */
+/* Get the name for a signal given the index into the traps table. */
 
 /**/
 mod_export const char *
@@ -2961,6 +3025,11 @@ getsigname(int sig)
 		return alt_sigs[i].name;
     }
     else
+#if defined(SIGRTMIN) && defined(SIGRTMAX)
+    if (sig >= VSIGCOUNT)
+	return rtsigname(SIGNUM(sig), 0);
+    else
+#endif
 	return sigs[sig];
 
     /* shouldn't reach here */
@@ -2985,9 +3054,21 @@ gettrapnode(int sig, int ignoredisable)
     else
 	getptr = shfunctab->getnode;
 
+#if defined(SIGRTMIN) && defined(SIGRTMAX)
+    if (sig >= VSIGCOUNT)
+	sprintf(fname, "TRAP%s", rtsigname(SIGNUM(sig), 0));
+    else
+#endif
     sprintf(fname, "TRAP%s", sigs[sig]);
     if ((hn = getptr(shfunctab, fname)))
 	return hn;
+
+#if defined(SIGRTMIN) && defined(SIGRTMAX)
+    if (sig >= VSIGCOUNT) {
+	sprintf(fname, "TRAP%s", rtsigname(SIGNUM(sig), 1));
+	return getptr(shfunctab, fname);
+    }
+#endif
 
     for (i = 0; alt_sigs[i].name; i++) {
 	if (alt_sigs[i].num == sig) {

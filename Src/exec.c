@@ -5427,7 +5427,7 @@ execfuncdef(Estate state, Eprog redir_prog)
 	} else {
 	    /* is this shell function a signal trap? */
 	    if (!strncmp(s, "TRAP", 4) &&
-		(signum = getsignum(s + 4)) != -1) {
+		(signum = getsigidx(s + 4)) != -1) {
 		if (settrap(signum, NULL, ZSIG_FUNC)) {
 		    freeeprog(shf->funcdef);
 		    dircache_set(&shf->filename, NULL);

@@ -1144,7 +1144,8 @@ cindex(killing jobs)
 cindex(jobs, killing)
 xitem(tt(kill) [ tt(-s) var(signal_name) | tt(-n) var(signal_number) | \
 tt(-)var(sig) ] [ tt(-q) var(value) ] var(job) ...)
-item(tt(kill) tt(-l) [ var(sig) ... ])(
+xitem(tt(kill) tt(-l) [ var(sig) ... ])
+item(tt(kill) tt(-L))(
 Sends either tt(SIGTERM) or the specified signal to the given
 jobs or processes.
 Signals are given by number or by names, with or without the `tt(SIG)'
@@ -1158,7 +1159,8 @@ specified the signal names are listed.  Otherwise, for each
 var(sig) that is a name, the corresponding signal number is
 listed.  For each var(sig) that is a signal number or a number
 representing the exit status of a process which was terminated or
-stopped by a signal the name of the signal is printed.
+stopped by a signal the name of the signal is printed.  The final
+form with tt(-L) lists each signal name with its corresponding number.
 
 On some systems, alternative signal names are allowed for a few signals.
 Typical examples are tt(SIGCHLD) and tt(SIGCLD) or tt(SIGPOLL) and

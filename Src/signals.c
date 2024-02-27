@@ -31,10 +31,12 @@
 #include "signals.pro"
  
 /* Array describing the state of each signal: an element contains *
- * 0 for the default action or some ZSIG_* flags ored together.   */
+ * 0 for the default action or some ZSIG_* flags ored together.   *
+ * Contains TRAPCOUNT elements but can't be allocated statically  *
+ * because that's a dynamic value on Linux                        */
 
 /**/
-mod_export int sigtrapped[VSIGCOUNT];
+mod_export int *sigtrapped;
 
 /*
  * Trap programme lists for each signal.
@@ -48,7 +50,7 @@ mod_export int sigtrapped[VSIGCOUNT];
  */
 
 /**/
-mod_export Eprog siglists[VSIGCOUNT];
+mod_export Eprog *siglists;
 
 /* Total count of trapped signals */
 
@@ -892,7 +894,7 @@ dosavetrap(int sig, int level)
  * Set a trap:  note this does not handle manipulation of
  * the function table for TRAPNAL functions.
  *
- * sig is the signal number.
+ * sig is index into the table of trapped signals.
  *
  * l is the list to be eval'd for a trap defined with the "trap"
  * builtin and should be NULL for a function trap.
@@ -931,6 +933,10 @@ settrap(int sig, Eprog l, int flags)
 #endif
             sig != SIGCHLD)
             signal_ignore(sig);
+#if defined(SIGRTMIN) && defined(SIGRTMAX)
+	else if (sig >= VSIGCOUNT && sig < TRAPCOUNT)
+	    signal_ignore(SIGNUM(sig));
+#endif
     } else {
 	nsigtrapped++;
         sigtrapped[sig] = ZSIG_TRAPPED;
@@ -940,6 +946,10 @@ settrap(int sig, Eprog l, int flags)
 #endif
             sig != SIGCHLD)
             install_handler(sig);
+#if defined(SIGRTMIN) && defined(SIGRTMAX)
+	if (sig >= VSIGCOUNT && sig < TRAPCOUNT)
+	    install_handler(SIGNUM(sig));
+#endif
     }
     sigtrapped[sig] |= flags;
     /*
@@ -1019,6 +1029,11 @@ removetrap(int sig)
 #endif
              sig != SIGCHLD)
         signal_default(sig);
+#if defined(SIGRTMIN) && defined(SIGRTMAX)
+    else if (sig >= VSIGCOUNT && sig < TRAPCOUNT)
+	    signal_default(SIGNUM(sig));
+#endif
+
     if (sig == SIGEXIT)
 	exit_trap_posix = 0;
 
@@ -1172,7 +1187,7 @@ endtrapscope(void)
 static int
 handletrap(int sig)
 {
-    if (!sigtrapped[sig])
+    if (!sigtrapped[SIGIDX(sig)])
 	return 0;
 
     if (trap_queueing_enabled)
@@ -1189,7 +1204,7 @@ handletrap(int sig)
 	return 1;
     }
 
-    dotrap(sig);
+    dotrap(SIGIDX(sig));
 
     if (sig == SIGALRM)
     {
@@ -1481,3 +1496,60 @@ dotrap(int sig)
 
     restore_queue_signals(q);
 }
+
+#if defined(SIGRTMIN) && defined(SIGRTMAX)
+
+/* Realtime signals, these are a contiguous block that can
+ * be separated from the other signals with an unused gap. */
+
+/**/
+int
+rtsigno(const char* signame)
+{
+    const int maxofs = SIGRTMAX - SIGRTMIN;
+    const char *end = signame + 5;
+    int offset;
+    struct rtdir { int sig; int dir; char op; } x = { 0, 0, 0 };
+    if (!strncmp(signame, "RTMIN", 5)) {
+	x = (struct rtdir) { SIGRTMIN, 1, '+' };
+    } else if (!strncmp(signame, "RTMAX", 5)) {
+	x = (struct rtdir) { SIGRTMAX, -1, '-' };
+    } else
+	return 0;
+
+    if (signame[5] == x.op) {
+	if ((offset = strtol(signame + 6, (char **) &end, 10)) > maxofs)
+	    return 0;
+	x.sig += offset * x.dir;
+    }
+    if (*end)
+	return 0;
+
+    return x.sig;
+}
+
+/**/
+char *
+rtsigname(int signo, int alt)
+{
+    char* buf = (char *) zhalloc(10);
+    int minofs = signo - SIGRTMIN;
+    int maxofs = SIGRTMAX - signo;
+    int offset;
+    int form = alt ^ (maxofs < minofs);
+
+    if (signo < SIGRTMIN || signo > SIGRTMAX)
+	return NULL;
+
+    strcpy(buf, "RT");
+    strcpy(buf+2, form ? "MAX-" : "MIN+");
+    offset = form ? maxofs : minofs;
+    if (offset) {
+	snprintf(buf + 6, 4, "%d", offset);
+    } else {
+	buf[5] = '\0';
+    }
+    return buf;
+}
+
+#endif
