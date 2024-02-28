@@ -27,6 +27,7 @@
 	if (signam == "CONT")   { msg[signum] = "continued" }
 	if (signam == "EMT")    { msg[signum] = "EMT instruction" }
 	if (signam == "FPE")    { msg[signum] = "floating point exception" }
+        if (signam == "FREEZE") { msg[signum] = "checkpoint freeze" }
 	if (signam == "HUP")    { msg[signum] = "hangup" }
 	if (signam == "ILL")    { msg[signum] = "illegal hardware instruction" }
 	if (signam == "INFO")   { msg[signum] = "status request from keyboard" }
@@ -43,6 +44,7 @@
 	if (signam == "SEGV")   { msg[signum] = "segmentation fault" }
 	if (signam == "SYS")    { msg[signum] = "invalid system call" }
 	if (signam == "TERM")   { msg[signum] = "terminated" }
+        if (signam == "THAW")   { msg[signum] = "checkpoint thaw" }
 	if (signam == "TRAP")   { msg[signum] = "trace trap" }
 	if (signam == "URG")    { msg[signum] = "urgent condition" }
 	if (signam == "USR1")   { msg[signum] = "user-defined signal 1" }
@@ -51,6 +53,7 @@
 	if (signam == "WINCH")  { msg[signum] = "window size changed" }
 	if (signam == "XCPU")   { msg[signum] = "cpu limit exceeded" }
 	if (signam == "XFSZ")   { msg[signum] = "file size limit exceeded" }
+        if (signam == "XRES")   { msg[signum] = "resource control exceeded" }
     }
 }
 
