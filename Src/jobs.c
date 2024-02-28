@@ -2822,23 +2822,26 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 #else
 		const int width = SIGCOUNT >= 100 ? 3 : 2;
 #endif
+		const int cols = zterm_columns >= 30 ?
+		    (zterm_columns < 90 ? zterm_columns / 15 : 6) : 1;
+
 		for (sig = 1; sig < SIGCOUNT
 #if defined(SIGRTMIN) && defined(SIGRTMAX)
 			+ 1
 #endif
 			; sig++)
 		{
-		    printf("%*d) %-10s%c", width, sig, sigs[sig],
-			    sig % 5 ? ' ' : '\n');
+		    printf("%*d %-10s%c", width, sig, sigs[sig],
+			    sig % cols ? ' ' : '\n');
 		}
 #if defined(SIGRTMIN) && defined(SIGRTMAX)
 		for (sig = SIGRTMIN; sig < SIGRTMAX; sig++) {
-		    printf("%*d) %-10s%c", width, sig, rtsigname(sig, 0),
-			    (sig - SIGRTMIN + SIGCOUNT + 1) % 5 ? ' ' : '\n');
+		    printf("%*d %-10s%c", width, sig, rtsigname(sig, 0),
+			    (sig - SIGRTMIN + SIGCOUNT + 1) % cols ? ' ' : '\n');
 		}
-		printf("%*d) RTMAX\n", width, sig);
+		printf("%*d RTMAX\n", width, sig);
 #else
-		printf("%*d) %s\n", width, sig, sigs[sig]);
+		printf("%*d %s\n", width, sig, sigs[sig]);
 #endif
 		return 0;
 	    }

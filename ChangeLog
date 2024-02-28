@@ -1,5 +1,8 @@
 2024-02-28  Oliver Kiddle  <opk@zsh.org>
 
+	* 52622 (tweaked, c.f. 52626): Src/jobs.c: adjust number of columns
+	and drop right-parenthesis in "kill -L" output
+
 	* 52623: Src/signames2.awk: add some Solaris signal descriptions
 
 2024-02-28  Oliver Kiddle  <opk@zsh.org>
