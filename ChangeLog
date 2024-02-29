@@ -1,3 +1,8 @@
+2024-02-28  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52619 (plus tests): Src/params.c, Test/A06assign.ztst: there
+	is no empty element when appending array to unset scalar
+
 2024-02-28  Oliver Kiddle  <opk@zsh.org>
 
 	* 52622 (tweaked, c.f. 52626): Src/jobs.c: adjust number of columns
@@ -54,7 +59,7 @@ x2024-02-19  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 	* 52544: Completion/Unix/Type/_diff_options: support macOS Ventura
 	or newer
 
-2024-02-18  Bart Schaefer  <schaefer@toltec-ubuntu>
+2024-02-18  Bart Schaefer  <schaefer@zsh.org>
 
 	* 52558: Etc/FAQ.yo: make note of word splitting differences
 	with nofork substitutions; update ToC; minor formatting fixes

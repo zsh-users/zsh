@@ -3355,7 +3355,7 @@ assignaparam(char *s, char **val, int flags)
 	} else if (!(PM_TYPE(v->pm->node.flags) & (PM_ARRAY|PM_HASHED)) &&
 		 !(v->pm->node.flags & (PM_SPECIAL|PM_TIED))) {
 	    int uniq = v->pm->node.flags & PM_UNIQUE;
-	    if (flags & ASSPM_AUGMENT) {
+	    if ((flags & ASSPM_AUGMENT) && !(v->pm->node.flags & PM_UNSET)) {
 	    	/* insert old value at the beginning of the val array */
 		char **new;
 		int lv = arrlen(val);
