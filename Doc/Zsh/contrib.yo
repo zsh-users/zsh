@@ -2635,7 +2635,8 @@ When the widget is named tt(incarg), the widget will increment an integer
 placed under the cursor placed or just to the left of it. tt(decarg), on the
 other hand, decrements the integer. When the name is prefixed with tt(vi),
 the cursor will jump to the nearest integer after the cursor before incrementing
-it.
+it. The tt(vi) prefix can also be combined with a tt(backward-) prefix to make
+the widget search backwards for numbers.
 
 There's also a tt(sync-) prefix that can be added to the widget name. This
 variant is used for creating a sequence of numbers on split terminals with
@@ -2643,8 +2644,9 @@ synchronized key input. The first pane won't increment the integer at all, but
 each pane after that will have the integer incremented once more than the
 previous pane. It currently supports tmux and iTerm2.
 
-The prefixes tt(vi) and tt(sync-) can be combined, for example, into
-tt(vim-sync-). In this case, the tt(vi) prefix should come first.
+The prefixes tt(vi), tt(backward-), and tt(sync-) can be combined, for example,
+into tt(vim-sync-) or tt(vim-backward-sync-). The tt(vi) prefix needs to be
+at the very beginning.
 
 example(bindkey '^X+' incarg)
 )

@@ -1,3 +1,8 @@
+2024-03-05  Oliver Kiddle  <opk@zsh.org>
+
+	* 52641: midchildan: Doc/Zsh/contrib.yo, Functions/Zle/incarg,
+	Test/X05zleincarg.ztst: add a backward variant and make it repeatable
+
 2024-03-02  Bart Schaefer  <schaefer@zsh.org>
 
 	* 52652: Src/params.c, Test/D04parameter.ztst: fix obscure bug

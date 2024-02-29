@@ -41,10 +41,19 @@ emulate -L zsh
 #   This behaves like Vim's CTRL-A / CTRL-X. It moves the cursor to the nearest
 #   number after the cursor and increments or decrements it.
 #
+# - vim-backward-incarg / vim-backward-decarg
+#
+#   This behaves like vim-incarg & vim-decarg, but it searches backwards for a
+#   number.
+#
 # - vim-sync-incarg / vim-sync-decarg
 #
 #   This combines the behavior of the vim- and sync- variants. It's inspired by
 #   Vim's g_CTRL-A / g_CTRL-X.
+#
+# - vim-backward-sync-incarg / vim-backward-sync-decarg
+#
+#   This combines the behavior of the vim-backward- and sync- variants.
 #
 # Example Usage:
 #
@@ -58,8 +67,12 @@ emulate -L zsh
 #     'g^A' vim-sync-incarg \
 #     'g^X' vim-sync-decarg
 
+zle -f vichange
+
 setopt localoptions extended_glob
 local match mbegin mend MATCH MBEGIN MEND i
+
+[[ -z "$BUFFER" ]] && return 1
 
 # find the number and determine the base
 integer pos=$(( CURSOR + 1 )) base=0
@@ -104,11 +117,35 @@ fi
 
 if (( base == 0 )); then
   if [[ "$WIDGET" == vi* ]]; then
-    # jump to the nearest number after the cursor
-    while [[ "$BUFFER[pos]" == [^0-9] ]]; do
-      (( pos++ ))
-      (( pos > $#BUFFER )) && return 1
-    done
+    if [[ "$WIDGET" == *backward-* ]]; then
+      # search backwards for a number
+      while true; do
+        case "$BUFFER[1,pos]" in
+          *0[xX][0-9a-fA-F]##) base=16 ;;
+          *0[oO][0-7]##) base=8 ;;
+          *0[bB][01]##) base=2 ;;
+          *[0-9]) base=10 ;;
+          *-)
+            case "$BUFFER[pos,-1]" in
+              -0[xX][0-9a-fA-F]*) ;;
+              -0[oO][0-7]*) ;;
+              -0[bB][01]*) ;;
+              -[0-9]*) base=10 ;;
+            esac
+            ;;
+        esac
+        (( base != 0 )) && break
+
+        (( pos-- ))
+        (( pos <= 0 )) && return 1
+      done
+    else
+      # jump to the nearest number after the cursor
+      while [[ "$BUFFER[pos]" == [^0-9] ]]; do
+        (( pos++ ))
+        (( pos > $#BUFFER )) && return 1
+      done
+    fi
   fi
 
   # check for a prefix right after the cursor and jump right after it, if any
@@ -204,6 +241,12 @@ fi
 
 local old="$BUFFER[first,last]"
 integer oldlen=$#BUFFER
+integer oldnum="$base#$old" 2> /dev/null
+
+# -00 should increment to 01 instead of 001
+if [[ "$BUFFER[first]" == '-' ]] && (( oldnum == 0 )); then
+  (( ndigits-- ))
+fi
 
 local fmt1 fmt2
 case "$base" in
@@ -214,10 +257,12 @@ case "$base" in
 esac
 
 local raw_result padded
+# $(( )) outputs an error message to stderr when integer truncation occurs
 printf -v raw_result "%0$ndigits$fmt1" $(( [$fmt2] "$base#$old" + delta )) 2> /dev/null
 padded="${raw_result// /0}"
+integer newnum="$base#$padded" 2> /dev/null
 
-integer oldnum="$base#$old" newnum="$base#$padded" 2> /dev/null
+# try to detect integer truncation
 if (( base != 10 && newnum < 0
         || delta > 0 && newnum < oldnum
         || delta < 0 && newnum > oldnum  )); then
@@ -242,7 +287,12 @@ if zstyle -t ":zle:$WIDGET" debug; then
   zle -M "[$WIDGET] base: $base delta: $delta old: '$old' new: '$new'"
 fi
 
-BUFFER[first,last]="$new"
+if (( 0 < first && first <= last && last <= $#BUFFER )); then
+  BUFFER[first,last]="$new"
+else
+  zle -M "[$WIDGET] The detected location of the integer was invalid. [location=BUFFER[$first,$last]]"
+  return 1
+fi
 
 integer offset=0
 if [[ "$WIDGET" == vi* ]]; then
