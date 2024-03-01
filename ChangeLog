@@ -1,3 +1,8 @@
+2024-03-01  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52645: Src/builtin.c: unset through a nameref keep up-scope
+	parameters declared, and not wipe out the entire parameter stack
+
 2024-02-28  Bart Schaefer  <schaefer@zsh.org>
 
 	* 52619 (plus tests): Src/params.c, Test/A06assign.ztst: there
