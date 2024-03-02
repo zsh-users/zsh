@@ -1,3 +1,9 @@
+2024-03-02  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52612: Src/parse.c, Src/subst.c, Src/utils.c: change the %l
+	replacment of zwarning() et al. to do literal string output;
+	change previous uses to %s and use new %l for ${var?$error}
+
 2024-03-01  Bart Schaefer  <schaefer@zsh.org>
 
 	* 52645: Src/builtin.c: unset through a nameref keep up-scope

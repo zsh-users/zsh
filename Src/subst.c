@@ -3271,8 +3271,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
                 if (isset(EXECOPT)) {
                     *idend = '\0';
 		    if (*s){
+			int l;
 			singsub(&s);
-			zerr("%s: %s", idbeg, s);
+			s = unmetafy(s, &l);
+			zerr("%s: %l", idbeg, s, l);
 		    } else
 			zerr("%s: %s", idbeg, "parameter not set");
                     /*

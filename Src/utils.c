@@ -122,14 +122,20 @@ set_widearray(char *mb_array, Widechar_array wca)
    (implemented by zerrmsg()):
 
    Code	Argument types		Prints
-   %s	const char *		C string (null terminated)
-   %l	const char *, int	C string of given length (null not required)
+   %s	const char *		C string (metafied, null terminated)
+     	                 	(output "nice")
+   %l	const char *, int	C string of given length (not metafied)
+     	                 	(output raw)
    %L	long			decimal value
    %d	int			decimal value
    %z	zlong			decimal value
    %%	(none)			literal '%'
    %c	int			character at that codepoint
-   %e	int			strerror() message (argument is typically 'errno')
+   %e	int			strerror() message (argument usually 'errno')
+     	                 	(output raw)
+
+   For %s and %l, the caller is responsible for assuring end-of-string
+   is not in the middle of a metafy pair (%s) or a multibyte character.
  */
 
 static void
@@ -310,14 +316,9 @@ zerrmsg(FILE *file, const char *fmt, va_list ap)
 		nicezputs(str, file);
 		break;
 	    case 'l': {
-		char *s;
 		str = va_arg(ap, const char *);
 		num = va_arg(ap, int);
-		num = metalen(str, num);
-		s = zhalloc(num + 1);
-		memcpy(s, str, num);
-		s[num] = '\0';
-		nicezputs(s, file);
+		fwrite(str, num, 1, file);
 		break;
 	    }
 	    case 'L':
@@ -715,7 +716,8 @@ wcs_nicechar(wchar_t c, size_t *widthp, char **swidep)
  */
 
 /**/
-mod_export int is_wcs_nicechar(wchar_t c)
+mod_export int
+is_wcs_nicechar(wchar_t c)
 {
     if (!WC_ISPRINT(c) && (c < 0x80 || !isset(PRINTEIGHTBIT))) {
 	if (c == 0x7f || c == L'\n' || c == L'\t' || c < 0x20)

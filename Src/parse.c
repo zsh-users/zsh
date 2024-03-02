@@ -2730,11 +2730,10 @@ yyerror(int noerr)
 	if (!t || !t[t0] || t[t0] == '\n')
 	    break;
     if (!(histdone & HISTFLAG_NOEXEC) && !(errflag & ERRFLAG_INT)) {
-	if (t0 == 20)
-	    zwarn("parse error near `%l...'", t, 20);
-	else if (t0)
-	    zwarn("parse error near `%l'", t, t0);
-	else
+	if (t0) {
+	    t = metafy(t, t0, META_STATIC);
+	    zwarn("parse error near `%s%s'", t, t0 == 20 ? "..." : "");
+	} else
 	    zwarn("parse error");
     }
     if (!noerr && noerrs != 2)
