@@ -1,5 +1,7 @@
 2024-03-02  Bart Schaefer  <schaefer@zsh.org>
 
+	* JunT.: 52635: Test/runtests.zsh: show file name when crashed
+
 	* 52612: Src/parse.c, Src/subst.c, Src/utils.c: change the %l
 	replacment of zwarning() et al. to do literal string output;
 	change previous uses to %s and use new %l for ${var?$error}

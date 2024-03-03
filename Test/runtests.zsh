@@ -15,6 +15,7 @@ for file in "${(f)ZTST_testlist}"; do
     (( skipped++ ))
   elif (( $retval )); then
     (( failure++ ))
+    (( $retval > 128 )) && print "$file: failed: SIG$signals[$retval - 127]."
   else
     (( success++ ))
   fi
