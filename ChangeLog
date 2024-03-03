@@ -1,3 +1,7 @@
+2024-03-02  Bart Schaefer  <schaefer@zsh.org>
+
+	* JunT.: 52635: Test/runtests.zsh: show file name when crashed
+
 2024-02-28  Oliver Kiddle  <opk@zsh.org>
 
 	* 52594: Completion/Zsh/Command/_kill, Doc/Zsh/builtins.yo,
