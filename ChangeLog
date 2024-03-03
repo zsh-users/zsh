@@ -1,5 +1,8 @@
 2024-03-02  Bart Schaefer  <schaefer@zsh.org>
 
+	* 52652: Src/params.c, Test/D04parameter.ztst: fix obscure bug
+	unsetting the array part of a tied parameter pair, update test
+
 	* JunT.: 52635: Test/runtests.zsh: show file name when crashed
 
 	* 52612: Src/parse.c, Src/subst.c, Src/utils.c: change the %l

@@ -3813,12 +3813,15 @@ unsetparam_pm(Param pm, int altflag, int exp)
 		/* fudge things so removenode isn't called */
 		altpm->level = 1;
 	    }
-	    unsetparam_pm(altpm, 1, exp);
+	    unsetparam_pm(altpm, 1, exp); /* This resets pm to empty */
+	    pm->node.flags |= PM_UNSET;   /* so we must repeat this */
 	}
 
 	zsfree(altremove);
-	if (!(pm->node.flags & PM_SPECIAL))
+	if (!(pm->node.flags & PM_SPECIAL)) {
 	    pm->gsu.s = &stdscalar_gsu;
+	    pm->node.flags &= ~PM_ARRAY;
+	}
     }
 
     /*
