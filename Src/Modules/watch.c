@@ -373,6 +373,13 @@ watchlog2(int inout, WATCH_STRUCT_UTMP *u, char *fmt, int prnt, int fini)
 		case 'f':
 		    tunsetattrs(TXTFGCOLOUR);
 		    break;
+		case 'H':
+		    if (*fmt == '{') {
+			fmt = parsehighlight(fmt + 1, '}', &atr);
+			if (atr && atr != TXT_ERROR)
+			    treplaceattrs(atr);
+		    }
+		    break;
 		case 'K':
 		    if (*fmt == '{') {
 			fmt++;
@@ -428,7 +435,7 @@ watchlog_match(char *teststr, char *actual, size_t buflen)
     int ret = 0;
     Patprog pprog;
     char *str = dupstring(teststr);
-    int len = strnlen(actual, buflen);
+    size_t len = strnlen(actual, buflen);
     char *user = metafy(actual, len,
 	    len == buflen ? META_HEAPDUP : META_USEHEAP);
 

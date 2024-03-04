@@ -2023,8 +2023,8 @@ position shown as a percentage of the total length otherwise.  In each
 case the form with the uppercase letter will be replaced by a string of fixed
 width, padded to the  right with spaces, while the lowercase form will
 be replaced by a variable width string.  As in other prompt strings, the
-escape sequences `tt(%S)', `tt(%s)', `tt(%B)', `tt(%b)', `tt(%U)',
-`tt(%u)' for entering and leaving the display modes
+escape sequence `tt(%H)` along with `tt(%S)', `tt(%s)', `tt(%B)', `tt(%b)',
+`tt(%U)', `tt(%u)' for entering and leaving the display modes
 standout, bold and underline, and `tt(%F)', `tt(%f)', `tt(%K)', `tt(%k)' for
 changing the foreground background colour, are also available, as is the form
 `tt(%{)...tt(%})' for enclosing escape sequences which display with zero

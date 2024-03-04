@@ -1,5 +1,10 @@
 2024-03-05  Oliver Kiddle  <opk@zsh.org>
 
+	* 52646: Completion/Zsh/Type/_ps1234, Doc/Zsh/compsys.yo,
+	Doc/Zsh/compwid.yo, Src/Modules/watch.c, Src/Zle/complist.c,
+	Src/Zle/zle_tricky.c, Src/prompt.c: extend support for highlight
+	groups to completion explanation strings and WATCHFMT
+
 	* 52641: midchildan: Doc/Zsh/contrib.yo, Functions/Zle/incarg,
 	Test/X05zleincarg.ztst: add a backward variant and make it repeatable
 
@@ -30,8 +35,6 @@
 	and drop right-parenthesis in "kill -L" output
 
 	* 52623: Src/signames2.awk: add some Solaris signal descriptions
-
-2024-02-28  Oliver Kiddle  <opk@zsh.org>
 
 	* 52594: Completion/Zsh/Command/_kill, Doc/Zsh/builtins.yo,
 	Doc/Zsh/params.yo, Src/Modules/parameter.c, Src/builtin.c,

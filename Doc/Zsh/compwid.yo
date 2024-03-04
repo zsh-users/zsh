@@ -597,7 +597,8 @@ ifnzman((see noderef(Prompt Expansion)))\
 ifzman(as described in the section EXPANSION OF PROMPT SEQUENCES in
 zmanref(zshmisc)):
 `tt(%B)', `tt(%S)', `tt(%U)', `tt(%F)', `tt(%K)' and their lower case
-counterparts, as well as `tt(%{)...tt(%})'.  `tt(%F)', `tt(%K)' and
+counterparts, as well as `tt(%H)' and `tt(%{)...tt(%})'.  `tt(%F)',
+`tt(%K)', `tt(%H)' and
 `tt(%{)...tt(%})' take arguments in the same form as prompt
 expansion.  (Note that the sequence `tt(%G)' is not available; an
 argument to `tt(%{)' should be used instead.)  The sequence `tt(%%)'

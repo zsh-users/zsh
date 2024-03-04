@@ -270,7 +270,8 @@ zattrescape(zattr atr, int *len)
 }
 
 /* Parse the argument for %H */
-static char *
+/**/
+mod_export char *
 parsehighlight(char *arg, char endchar, zattr *atr)
 {
     static int entered = 0;
@@ -295,9 +296,9 @@ parsehighlight(char *arg, char endchar, zattr *atr)
     } else
 	*atr = TXT_ERROR;
     if (ep)
-	*ep = endchar;
+	*ep++ = endchar;
     else
-	ep = strchr(arg, '\0') - 1;
+	ep = strchr(arg, '\0');
     entered = 0;
     return ep;
 }
@@ -635,6 +636,7 @@ putpromptchar(int doprint, int endchar)
 	    case 'H':
 		if (bv->fm[1] == '{') {
 		    bv->fm = parsehighlight(bv->fm + 2, '}', &atr);
+		    --bv->fm;
 		    if (atr != TXT_ERROR) {
 			treplaceattrs(atr);
 			applytextattributes(TSC_PROMPT);

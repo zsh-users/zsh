@@ -1181,6 +1181,13 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		    if (dopr)
 			tunsetattrs(TXTBGCOLOUR);
 		    break;
+		case ZWC('H'):
+		    if (*p == '{') {
+			p = parsehighlight(p + 1, '}', &atr);
+			if (atr != TXT_ERROR && dopr)
+			    treplaceattrs(atr);
+		    }
+		    break;
 		case ZWC('{'):
 		    if (arg)
 			cc += arg;
