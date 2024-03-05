@@ -1,5 +1,8 @@
 2024-03-04  Bart Schaefer  <schaefer@zsh.org>
 
+	* unposted (cf. 52617): Src/params.c: only scalars can instantiate
+	a declared named reference
+
 	* 52659: Src/builtin.c, Test/K01nameref.ztst: Fix crash when unset
 	was called on a named referece, add regression test
 

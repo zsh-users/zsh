@@ -1050,8 +1050,14 @@ createparam(char *name, int flags)
 			name = refname;
 			oldpm = NULL;
 		    } else {
-			if (!(lastpm->node.flags & PM_READONLY))
-			    lastpm->node.flags |= PM_UNSET;
+			if (!(lastpm->node.flags & PM_READONLY)) {
+			    if (flags) {
+				/* Only plain scalar assignment allowed */
+				zerr("%s: can't change type of named reference",
+				     name);	/* Differs from ksh93u+ */
+				return NULL;
+			    }
+			}
 			return lastpm;
 		    }
 		} else {
