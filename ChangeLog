@@ -1,5 +1,7 @@
 2024-03-04  Bart Schaefer  <schaefer@zsh.org>
 
+	* unposted (cf. 52615): Src/builtin.c: use META_NOALLOC for 52591
+
 	* unposted (cf. 52617): Src/params.c: only scalars can instantiate
 	a declared named reference
 
