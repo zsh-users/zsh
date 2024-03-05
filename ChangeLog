@@ -1,3 +1,8 @@
+2024-03-05  Stephane Chazelas  <stephane@chazelas.org>
+
+	* 52685: Doc/Zsh/restricted.yo: fix typo in the name of bash's
+	BASH_ENV variable.
+
 2024-03-04  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted (cf. 52615): Src/builtin.c: use META_NOALLOC for 52591

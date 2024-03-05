@@ -68,7 +68,7 @@ If a `tt(perl)', `tt(python)', `tt(bash)', or other general purpose
 interpreted script is treated as a restricted
 command, the user can work around the restriction by
 setting specially crafted `tt(PERL5LIB)', `tt(PYTHONPATH)',
-`tt(BASHENV)' (etc.) environment variables. On GNU systems, any
+`tt(BASH_ENV)' (etc.) environment variables. On GNU systems, any
 command can be made to run arbitrary code when performing character set
 conversion (including zsh itself) by setting a `tt(GCONV_PATH)'
 environment variable.  Those are only a few examples.
