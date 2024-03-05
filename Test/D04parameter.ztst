@@ -1222,6 +1222,7 @@
   typeset -T STRING string
   print $STRING $string
   unset string
+  typeset -p string
   STRING=x:y:z
   print $STRING $string
   STRING=a:b
