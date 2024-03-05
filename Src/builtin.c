@@ -2699,7 +2699,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	    off |= bit;
     }
     if (OPT_MINUS(ops,'n')) {
-	if ((on|off) & ~PM_READONLY) {
+	if ((on|off) & ~(PM_READONLY|PM_UPPER)) {
 	    zwarnnam(name, "no other attributes allowed with -n");
 	    return 1;
 	}

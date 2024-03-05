@@ -492,7 +492,6 @@ F:unexpected side-effects of previous tests
  }
  typeset -p ptr2
 1:up-reference part 5, stacked namerefs, end not in scope
-F:What is the correct behavior for the scope of ptr1?
 >typeset -n ptr1=ptr2
 >typeset -n ptr2
 >ptr1=ptr2
@@ -529,6 +528,49 @@ F:Same test, should part 5 output look like this?
 >typeset -n ptr2
 >typeset ptr2=val
 
+ () {
+   () {
+     local var
+     typeset -nu ptr1=var
+     ptr1=outer && print -u2 assignment expected to fail
+     typeset -n ptr2=var
+     ptr2=inner
+     typeset -n
+     printf "%s=%s\n" ptr1 "$ptr1" ptr2 "$ptr2"
+   }
+   typeset -p var
+ }
+ typeset -p var
+1:up-reference part 7, upscope namerefs, end not in scope
+>ptr1=var
+>ptr2=var
+>ptr1=
+>ptr2=inner
+*?*typeset*: no such variable: var
+*?*typeset*: no such variable: var
+
+ typeset var
+ () {
+   () {
+     local var
+     typeset -nu ptr1=var
+     ptr1=outer || print -u2 assignment expected to succeed
+     typeset -n ptr2=var
+     ptr2=inner
+     typeset -n
+     printf "%s=%s\n" ptr1 "$ptr1" ptr2 "$ptr2"
+   }
+   typeset -p var
+ }
+ typeset -p var
+0:up-reference part 8, upscope namerefs, end in scope
+>ptr1=var
+>ptr2=var
+>ptr1=outer
+>ptr2=inner
+>typeset -g var=outer
+>typeset var=outer
+
  if zmodload zsh/parameter; then
  () {
    zmodload -u zsh/parameter
@@ -539,7 +581,7 @@ F:Same test, should part 5 output look like this?
  }
  else ZTST_skip='Cannot zmodload zsh/parameter, skipping autoload test'
  fi
-0:up-reference part 3, autoloading with hidden special
+0:up-reference part 9, autoloading with hidden special
 >nameref-local-nameref-local
 >typeset -h parameters
 
@@ -762,12 +804,17 @@ F:relies on global TYPESET_TO_UNSET in %prep
 
  bar=xx
  typeset -n foo=bar
- () { typeset -n foo; foo=zz; foo=zz; print $bar $zz }
+ () {
+   typeset -n foo; foo=zz
+   foo=zz || print -u2 foo: assignment failed
+   print $bar $zz
+ }
  () { typeset -n foo; foo=zz; local zz; foo=zz; print $bar $zz }
 0:regression: local nameref may not in-scope a global parameter
 F:previously this could create an infinite recursion and crash
 >xx
 >xx zz
+*?*foo: assignment failed
 
  typeset -nm foo=bar
 1:create nameref by pattern match not allowed

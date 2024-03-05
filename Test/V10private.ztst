@@ -378,7 +378,7 @@ F:Here ptr1 finds private ptr2 by scope mismatch
    typeset -p ptr1 ptr2
    typeset val=LOCAL
    () {
-     ptr1=val		# This is a silent no-op, why?
+     ptr1=val || print -u2 ptr1: assignment failed
      typeset -n
      printf "%s=%s\n" ptr1 "$ptr1" ptr2 "$ptr2"
    }
@@ -388,7 +388,6 @@ F:Here ptr1 finds private ptr2 by scope mismatch
 1:up-reference for private namerefs, end not in scope
 F:See K01nameref.ztst up-reference part 5
 F:Here ptr1 finds private ptr2 by scope mismatch
-F:Assignment silently fails, is that correct?
 >typeset -n ptr1=ptr2
 >typeset -hn ptr2=''
 >ptr1=ptr2
@@ -396,6 +395,7 @@ F:Assignment silently fails, is that correct?
 >ptr2=
 >typeset -n ptr1=ptr2
 >typeset -hn ptr2=''
+*?*ptr1: assignment failed
 *?*no such variable: ptr2
 
  typeset ptr2

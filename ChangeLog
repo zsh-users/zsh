@@ -1,3 +1,12 @@
+2024-03-04  Bart Schaefer  <schaefer@toltec-ubuntu>
+
+	* 52650 plus minor fixes: Doc/Zsh/builtins.yo, Doc/Zsh/expn.yo,
+	Doc/Zsh/func.yo, Doc/Zsh/mod_ksh93.yo, Etc/FAQ.yo,
+	Src/Modules/ksh93.c, Src/builtin.c, Src/exec.c, Src/params.c,
+	Test/D04parameter.ztst, Test/K01nameref.ztst,
+	Test/V10private.ztst: add -u option for named references that
+	point to the "upper" scope, failed assignments have status 1
+
 2024-03-05  Oliver Kiddle  <opk@zsh.org>
 
 	* 52646: Completion/Zsh/Type/_ps1234, Doc/Zsh/compsys.yo,

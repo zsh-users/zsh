@@ -38,7 +38,7 @@
  */
 
 static struct builtin bintab[] = {
-    BUILTIN("nameref", BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "gr", "n")
+    BUILTIN("nameref", BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "gur", "n")
 };
 
 #include "zsh.mdh"

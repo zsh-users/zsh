@@ -1600,6 +1600,25 @@ example(tt(before local: OUTER)
 tt(by reference: OUTER)
 tt(after func: RESULT))
 
+To force a named reference to refer to the outer scope, even if a local
+has already been declared, add the tt(-u) option when declaring the
+named reference.  In this case var(rname) should already exist in the
+outer scope, otherwise the behavior of assignment through var(pname)
+is not defined and may change the scope of the reference or fail with
+a status of 1.  Example of correct usage:
+ifzman()
+example(tt(caller=OUTER)
+tt(func LPAR()RPAR() {)
+tt(  print before local: $caller)
+tt(  local caller=INNER)
+tt(  print after local: $caller)
+tt(  typeset -n -u outer=$1)
+tt(  print by reference: $outer)
+tt(  outer=RESULT)
+tt(})
+tt(func caller)
+tt(print after func: $caller))
+
 Note, however, that named references to em(special) parameters acquire
 the behavior of the special parameter, regardless of the scope where
 the reference is declared.

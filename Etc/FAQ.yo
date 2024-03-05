@@ -1025,6 +1025,13 @@ label(210)
     HIT:SPOT
   )
 
+  Dynamic scoping applies to named references, so for example a named
+  reference declared in global scope may be used in function scopes.
+  In ksh, local parameters have static scope, so named references in
+  zsh may have side-effects that do not occur in ksh.  To limit those
+  effects, mytt(zmodload zsh/param/private) and declare all named
+  references mytt(private).
+
   Named references may be used in zsh versions later than 5.9.
 
 sect(What is zsh's support for non-forking command substitution?)

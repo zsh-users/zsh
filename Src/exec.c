@@ -2604,6 +2604,17 @@ addvars(Estate state, Wordcode pc, int addflags)
 		opts[ALLEXPORT] = allexp;
 	    } else
 	    	pm = assignsparam(name, val, myflags);
+	    if (!pm) {
+		lastval = 1;
+		/*
+		 * This is cheating but some exec functions propagate
+		 * assignment status only from command substitution
+		 *
+		 * zerr("%s: assignment failed", name);
+		 */
+		if (!cmdoutval)
+		    cmdoutval = 1;
+	    }
 	    if (errflag) {
 		state->pc = opc;
 		return;
@@ -2628,7 +2639,16 @@ addvars(Estate state, Wordcode pc, int addflags)
 	    }
 	    fprintf(xtrerr, ") ");
 	}
-	assignaparam(name, arr, myflags);
+	if (!assignaparam(name, arr, myflags)) {
+	    lastval = 1;
+	    /*
+	     * See above RE "cheating"
+	     *
+	     * zerr("%s: array assignment failed", name);
+	     */
+	    if (!cmdoutval)
+		cmdoutval = 1;
+	}
 	if (errflag) {
 	    state->pc = opc;
 	    return;

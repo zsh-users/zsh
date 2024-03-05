@@ -1060,8 +1060,7 @@ createparam(char *name, int flags)
 			  "BUG: local parameter is not unset");
 		    oldpm = lastpm;
 		}
-	    } else
-		flags |= PM_NAMEREF;
+	    }
 	}
 
 	DPUTS(oldpm && oldpm->level > locallevel,
@@ -6267,10 +6266,12 @@ resolve_nameref(Param pm, const Asgment stop)
 	    }
 	} else if ((hn = gethashnode2(realparamtab, seek))) {
 	    if (pm) {
-		if (!(stop && (stop->flags & (PM_LOCAL))))
-		    hn = (HashNode)upscope((Param)hn,
-					   ((pm->node.flags & PM_NAMEREF) ?
-					    pm->base : ((Param)hn)->level));
+		if (!(stop && (stop->flags & (PM_LOCAL)))) {
+		    int scope = ((pm->node.flags & PM_NAMEREF) ?
+				 ((pm->node.flags & PM_UPPER) ? -1 :
+				  pm->base) : ((Param)hn)->level);
+		    hn = (HashNode)upscope((Param)hn, scope);
+		}
 		/* user can't tag a nameref, safe for loop detection */
 		pm->node.flags |= PM_TAGGED;
 	    }
@@ -6316,11 +6317,13 @@ setloopvar(char *name, char *value)
 static void
 setscope(Param pm)
 {
-    if (pm->node.flags & PM_NAMEREF) {
+    queue_signals();
+    if (pm->node.flags & PM_NAMEREF) do {
 	Param basepm;
 	struct asgment stop;
 	char *refname = GETREFNAME(pm);
 	char *t = refname ? itype_end(refname, INAMESPC, 0) : NULL;
+	int q = queue_signal_level();
 
 	/* Temporarily change nameref to array parameter itself */
 	if (t && *t == '[')
@@ -6330,9 +6333,11 @@ setscope(Param pm)
 	stop.name = "";
 	stop.value.scalar = NULL;
 	stop.flags = PM_NAMEREF;
-	if (locallevel)
+	if (locallevel && !(pm->node.flags & PM_UPPER))
 	    stop.flags |= PM_LOCAL;
+	dont_queue_signals();	/* Prevent unkillable loops */
 	basepm = (Param)resolve_nameref(pm, &stop);
+	restore_queue_signals(q);
 	if (t) {
 	    pm->width = t - refname;
 	    *t = '[';
@@ -6345,7 +6350,7 @@ setscope(Param pm)
 			if (upscope(pm, pm->base) == pm) {
 			    zerr("%s: invalid self reference", refname);
 			    unsetparam_pm(pm, 0, 1);
-			    return;
+			    break;
 			}
 			pm->node.flags &= ~PM_SELFREF;
 		    } else if (pm->base == pm->level) {
@@ -6353,7 +6358,7 @@ setscope(Param pm)
 			    strcmp(pm->node.nam, refname) == 0) {
 			    zerr("%s: invalid self reference", refname);
 			    unsetparam_pm(pm, 0, 1);
-			    return;
+			    break;
 			}
 		    }
 		} else if ((t = GETREFNAME(basepm))) {
@@ -6361,7 +6366,7 @@ setscope(Param pm)
 			strcmp(pm->node.nam, t) == 0) {
 			zerr("%s: invalid self reference", refname);
 			unsetparam_pm(pm, 0, 1);
-			return;
+			break;
 		    }
 		}
 	    } else
@@ -6381,7 +6386,8 @@ setscope(Param pm)
 	    zerr("%s: invalid self reference", refname);
 	    unsetparam_pm(pm, 0, 1);
 	}
-    }
+    } while (0);
+    unqueue_signals();
 }
 
 /**/
@@ -6393,6 +6399,8 @@ upscope(Param pm, int reflevel)
 	pm = up;
 	up = up->old;
     }
+    if (reflevel < 0 && locallevel > 0)
+	return pm->level == locallevel ? up : pm;
     return pm;
 }
 
