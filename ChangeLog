@@ -1,5 +1,8 @@
 2024-03-04  Bart Schaefer  <schaefer@toltec-ubuntu>
 
+	* 52659: Src/builtin.c, Test/K01nameref.ztst: Fix crash when unset
+	was called on a named referece, add regression test
+
 	* 52650 plus minor fixes: Doc/Zsh/builtins.yo, Doc/Zsh/expn.yo,
 	Doc/Zsh/func.yo, Doc/Zsh/mod_ksh93.yo, Etc/FAQ.yo,
 	Src/Modules/ksh93.c, Src/builtin.c, Src/exec.c, Src/params.c,

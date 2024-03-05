@@ -711,6 +711,31 @@ F:Checking for a bug in zmodload that affects later tests
 >typeset -n ref=two
 >typeset -n ref=var
 
+ typeset -g .K01.scalar='RW'
+ typeset -gA .K01.assoc=(x y)
+ typeset -ga .K01.array=(z)
+ typeset -gi .K01.integer=0
+ typeset -gE .K01.double=0.0
+ typeset -gF .K01.float=0.0
+ typeset -gr .K01.readonly='RO'
+ typeset -n gref
+ for gref in ARGC .K01.{scalar,assoc,array,integer,double,float,readonly}
+ do
+   { unset gref } always { TRY_BLOCK_ERROR=0 }
+ done
+ typeset -p .K01.{scalar,assoc,array,integer,double,float,readonly}
+ unset .K01.{scalar,assoc,array,integer,double,float}
+0:unset various types via nameref, including a readonly special
+>typeset -g .K01.scalar
+>typeset -g -A .K01.assoc
+>typeset -g -a .K01.array
+>typeset -g -i .K01.integer
+>typeset -g -E .K01.double
+>typeset -g -F .K01.float
+>typeset -g -r .K01.readonly=RO
+*?*read-only variable: ARGC
+*?*read-only variable: .K01.readonly
+
  unset -n ref
  unset one
  typeset -n ref
