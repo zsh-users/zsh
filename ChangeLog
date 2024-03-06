@@ -1,3 +1,10 @@
+2024-03-05  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52692: Doc/Zsh/params.yo, Src/builtin.c, Src/params.c,
+	Test/K01nameref.ztst: local declaration (typeset) of the
+	name of a named reference hides the reference rather than
+	following it.  Also fix two related crash bugs.
+
 2024-03-05  Stephane Chazelas  <stephane@chazelas.org>
 
 	* 52685: Doc/Zsh/restricted.yo: fix typo in the name of bash's

@@ -51,9 +51,19 @@
 0:remove nameref attribute
 >typeset ptr=var
 
-  typeset -n ptr
-  typeset -t ptr
-  typeset -p ptr
+ typeset -n ptr=gvar
+ () {
+   local ptr
+   typeset -p ptr
+ }
+ typeset -p ptr
+0:Local non-reference hides outside reference
+>typeset ptr
+>typeset -n ptr=gvar
+
+ typeset -n ptr
+ typeset -t ptr
+ typeset -p ptr
 0:change type of a placeholder
 F:Other type changes are fatal errors, should this also be?
 >typeset -n ptr=''
@@ -844,5 +854,40 @@ F:previously this could create an infinite recursion and crash
  typeset -nm foo=bar
 1:create nameref by pattern match not allowed
 *?*typeset:1: invalid reference
+
+#
+# The following tests are run in interactive mode, using PS1 as an
+# assignable special with side-effects.  This crashed at one time.
+#
+
+ # Note bypassing TYPESET_TO_UNSET here
+ $ZTST_testdir/../Src/zsh -fis <<<$'
+ typeset -n p=PS1
+ () {
+  typeset -p p
+  local p
+  typeset -p p
+  p=xx
+  typeset -p p
+ }
+ '
+0:regression: assign to local that shadows global named reference
+>typeset -g -n p=PS1
+>typeset p=''
+>typeset p=xx
+*?*
+
+ # Note bypassing TYPESET_TO_UNSET here
+ $ZTST_testdir/../Src/zsh -fis <<<$'
+ () {
+   typeset p=PS1
+   typeset -n p
+   p=zz
+ }
+ typeset -p PS1
+ '
+0:regression - converting a string into a named reference
+>typeset PS1=zz
+*?*
 
 %clean

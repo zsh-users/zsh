@@ -670,8 +670,9 @@ This manual was generated with Zsh tt(version()).
 When a em(named reference) is created with `tt(typeset -n)', all uses
 of var(pname) in assignments and expansions instead assign to or
 expand var(rname).  This also applies to `tt(unset )var(pname)' and to
-most subsequent uses of `tt(typeset)' with the exception of
-`tt(typeset -n)' and `tt(typeset +n)', so to remove a named reference,
+most subsequent uses of `tt(typeset)' with the exceptions of declaring
+a local in a called function, or updating a current-scope parameter with
+`tt(typeset -n)' or `tt(typeset +n)'. Thus to remove a named reference,
 use either `tt(unset -n )var(pname)' (preferred) or one of:
 ifzman()
 example(tt(typeset -n )var(pname=)

@@ -1034,7 +1034,8 @@ createparam(char *name, int flags)
 	}
 
 	if (oldpm && !(flags & PM_NAMEREF) &&
-	    (!(oldpm->node.flags & PM_RO_BY_DESIGN) || !(flags & PM_LOCAL)) &&
+	    (oldpm->level == locallevel ?
+	     !(oldpm->node.flags & PM_RO_BY_DESIGN) : !(flags & PM_LOCAL)) &&
 	    (oldpm->node.flags & PM_NAMEREF) &&
 	    (oldpm = upscope(oldpm, oldpm->base))) {
 	    Param lastpm;

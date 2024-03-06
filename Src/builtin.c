@@ -2030,11 +2030,10 @@ typeset_single(char *cname, char *pname, Param pm, int func,
     int usepm, tc, keeplocal = 0, newspecial = NS_NONE, readonly, dont_set = 0;
     char *subscript;
 
-    if (pm && (pm->node.flags & PM_NAMEREF) && !((off|on) & PM_NAMEREF)) {
-	if (!(off & PM_NAMEREF)) {
-	    if ((pm = (Param)resolve_nameref(pm, NULL)))
-		pname = pm->node.nam;
-	}
+    if (pm && (pm->node.flags & PM_NAMEREF) && !((off|on) & PM_NAMEREF) &&
+	(pm->level == locallevel || !(on & PM_LOCAL))) {
+	if ((pm = (Param)resolve_nameref(pm, NULL)))
+	    pname = pm->node.nam;
 	if (pm && (pm->node.flags & PM_NAMEREF) &&
 	    (on & ~(PM_NAMEREF|PM_LOCAL|PM_READONLY))) {
 	    /* Changing type of PM_SPECIAL|PM_AUTOLOAD is a fatal error.  *
@@ -3125,8 +3124,10 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 			oldpm->u.str)
 			asg->value.scalar = dupstring(oldpm->u.str);
 		    /* Defer read-only error to typeset_single() */
-		    if (!(hn->flags & PM_READONLY))
+		    if (!(hn->flags & PM_READONLY)) {
 			unsetparam_pm(oldpm, 0, 1);
+			hn = NULL;
+		    }
 		}
 		/* Passing a NULL pm to typeset_single() makes the
 		 * nameref read-only before assignment, which breaks
@@ -3134,7 +3135,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 		 * so this is special-cased to permit that action
 		 * like assign-at-create for other parameter types.
 		 */
-		if (!(hn->flags & PM_READONLY))
+		if (hn && !(hn->flags & PM_READONLY))
 		    hn = NULL;
 	    }
 	}
