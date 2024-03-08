@@ -1,3 +1,9 @@
+2024-03-08  Stephane Chazelas  <stephane@chazelas.org>
+
+	* 52704: Doc/Zsh/params.yo, mention new ${ ... } and ${|...}
+	operators and fix process substitution terminology in
+	documentation of $zsh_eval_context.
+
 2024-03-05  Bart Schaefer  <schaefer@zsh.org>
 
 	* 52692: Doc/Zsh/params.yo, Src/builtin.c, Src/params.c,

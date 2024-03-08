@@ -1031,11 +1031,12 @@ Code specified by the tt(-c) option to the command line that invoked
 the shell.
 )
 item(tt(cmdsubst))(
-Command substitution using the tt(`)var(...)tt(`) or
-tt($+LPAR())var(...)tt(RPAR()) construct.
+Command substitution using of the tt(`)var(...)tt(`),
+tt($+LPAR())var(...)tt(RPAR()), tt(${ )var(...)tt( }) or
+tt(${|)var(...)tt(}) constructs.
 )
 item(tt(equalsubst))(
-File substitution using the tt(=+LPAR())var(...)tt(RPAR()) construct.
+The tt(=+LPAR())var(...)tt(RPAR()) form of process substitution.
 )
 item(tt(eval))(
 Code executed by the tt(eval) builtin.
@@ -1063,13 +1064,13 @@ item(tt(globsort))(
 Code executed to order files by the tt(o) glob qualifier.
 )
 item(tt(insubst))(
-File substitution using the tt(<LPAR())var(...)tt(RPAR()) construct.
+The tt(<LPAR())var(...)tt(RPAR()) form of process substitution.
 )
 item(tt(loadautofunc))(
 Code read directly from a file to define an autoloaded function.
 )
 item(tt(outsubst))(
-File substitution using the tt(>LPAR())var(...)tt(RPAR()) construct.
+The tt(>LPAR())var(...)tt(RPAR()) form of process substitution.
 )
 item(tt(sched))(
 Code executed by the tt(sched) builtin.
