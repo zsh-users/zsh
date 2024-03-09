@@ -1,3 +1,8 @@
+2024-03-09  Stephane Chazelas  <stephane@chazelas.org>
+
+	* 52721: fix metafication and regexp/subject confusion in
+	pcre_match error message.
+
 2024-03-08  Stephane Chazelas  <stephane@chazelas.org>
 
 	* 52704: Doc/Zsh/params.yo, mention new ${ ... } and ${|...}

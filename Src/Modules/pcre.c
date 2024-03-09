@@ -405,7 +405,7 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
     else {
 	PCRE2_UCHAR buffer[256];
 	pcre2_get_error_message(ret, buffer, sizeof(buffer));
-	zwarnnam(nam, "error in pcre matching for /%s/: %s", plaintext, buffer);
+	zwarnnam(nam, "error in pcre matching for %s: %s", *args, buffer);
     }
     
     if (pcre_mdata)
