@@ -1,3 +1,7 @@
+2024-03-09  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52725: Src/Modules/ksh93.c: updated named reference semantics
+
 2024-03-09  Stephane Chazelas  <stephane@chazelas.org>
 
 	* 52721: fix metafication and regexp/subject confusion in
