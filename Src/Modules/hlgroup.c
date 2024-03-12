@@ -59,6 +59,10 @@ convertattr(char *attrstr, int sgr)
 	    *t = ';';
 	    c++;
 	}
+	if (t <= s) { /* always return at least "0" */
+	    *s = '0';
+	    t = s + 1;
+	}
 	*t = '\0';
 	len = t - s;
     }
