@@ -4313,13 +4313,17 @@ tt(colors) more than once.
 The eight base colors are: tt(black), tt(red), tt(green), tt(yellow),
 tt(blue), tt(magenta), tt(cyan), and tt(white).  Each of these has codes for
 foreground and background.  In addition there are seven intensity attributes:
-tt(bold), tt(faint), tt(standout), tt(underline), tt(blink), tt(reverse),
+tt(bold), tt(faint), tt(italic), tt(underline), tt(blink), tt(reverse),
 and tt(conceal).  Finally, there are seven codes used to negate attributes:
 tt(none) (reset all attributes to the defaults), tt(normal)
-(neither bold nor faint), tt(no-standout), tt(no-underline), tt(no-blink),
+(neither bold nor faint), tt(no-italic), tt(no-underline), tt(no-blink),
 tt(no-reverse), and tt(no-conceal).
 
 Some terminals do not support all combinations of colors and intensities.
+Prior to zsh tt(5.8.1) the intensity tt(standout) was provided.  It has
+been replaced by the more specific tt(italic) and tt(reverse) to match
+the specification, but some terminals may swap these or make one of them
+produce blinking text even if the tt(blink) code is not usable.
 
 The associative arrays are:
 

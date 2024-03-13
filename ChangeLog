@@ -1,3 +1,8 @@
+2024-03-13  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: Doc/Zsh/contrib.yo: update doc for "colors" to match
+	workers/47489,50212 (italic and bright)
+
 2024-03-12  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Src/Modules/ksh93.c: "typeset -p" has problems with
