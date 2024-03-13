@@ -1,5 +1,8 @@
 2024-03-12  Bart Schaefer  <schaefer@zsh.org>
 
+	* unposted: Src/Modules/ksh93.c: "typeset -p" has problems with
+	special parameters having NULL values, use a dummy static instead.
+
 	* 52742: Src/builtin.c: fix bad interactions of "typeset -p" with
 	GLOBAL_EXPORT, plus some other inconsistencies.
 

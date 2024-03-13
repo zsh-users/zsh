@@ -102,9 +102,10 @@ static const struct gsu_scalar sh_name_gsu =
 static const struct gsu_scalar sh_subscript_gsu =
     { strvargetfn, nullstrsetfn, nullunsetfn };
 
-static char *sh_name;
-static char *sh_subscript;
-static char *sh_edchar;
+static char sh_unsetval[2];	/* Dummy to treat as NULL */
+static char *sh_name = sh_unsetval;
+static char *sh_subscript = sh_unsetval;
+static char *sh_edchar = sh_unsetval;
 static char sh_edmode[2];
 
 /*
@@ -193,7 +194,7 @@ ksh93_wrapper(Eprog prog, FuncWrap w, char *name)
 	    strcpy(sh_edmode, "\033");
 	else
 	    strcpy(sh_edmode, "");
-	if (!sh_edchar)
+	if (sh_edchar == sh_unsetval)
 	    sh_edchar = dupstring(getsparam("KEYS"));
 	if (varedarg) {
 	    char *ie = itype_end((sh_name = dupstring(varedarg)), INAMESPC, 0);
@@ -204,16 +205,16 @@ ksh93_wrapper(Eprog prog, FuncWrap w, char *name)
 		ie = sh_subscript + strlen(sh_subscript);
 		*--ie = '\0';
 	    } else
-		sh_subscript = NULL;
+		sh_subscript = sh_unsetval;
 	    if ((pm = createparam(".sh.value", LOCAL_NAMEREF))) {
 		pm->level = locallevel;
 		setloopvar(".sh.value", "BUFFER");	/* Hack */
 		pm->node.flags |= PM_READONLY;
 	    }
 	} else
-	    sh_name = sh_subscript = NULL;
+	    sh_name = sh_subscript = sh_unsetval;
     } else {
-	sh_edchar = sh_name = sh_subscript = NULL;
+	sh_edchar = sh_name = sh_subscript = sh_unsetval;
 	strcpy(sh_edmode, "");
 	/* TODO:
 	 * - disciplines
