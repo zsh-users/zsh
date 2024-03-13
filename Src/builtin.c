@@ -2059,7 +2059,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
      * POSIXBUILTINS horror: we need to retain the 'readonly' or 'export'
      * flags of an unset parameter.
      */
-    usepm = pm && (!(pm->node.flags & PM_UNSET) ||
+    usepm = pm && (!(pm->node.flags & PM_UNSET) || OPT_ISSET(ops, 'p') ||
 		   (isset(POSIXBUILTINS) &&
 		    (pm->node.flags & (PM_READONLY|PM_EXPORTED))));
 
@@ -2195,7 +2195,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
     else if (newspecial != NS_NONE && strcmp(pname, "SECONDS") == 0)
 	newspecial = NS_SECONDS;
 
-    if (isset(POSIXBUILTINS)) {
+    if (isset(POSIXBUILTINS) && !OPT_ISSET(ops,'p')) {
 	/*
 	 * Stricter rules about retaining readonly attribute in this case.
 	 */
@@ -2224,7 +2224,8 @@ typeset_single(char *cname, char *pname, Param pm, int func,
      *   ii. we are creating a new local parameter
      */
     if (usepm) {
-	if (OPT_MINUS(ops,'p') && on && !(on & pm->node.flags))
+	if (OPT_MINUS(ops,'p') && on &&
+	    !((on & pm->node.flags) || ((on & PM_LOCAL) && pm->level)))
 	    return NULL;
 	else if (OPT_PLUS(ops,'p') && off && !(off & pm->node.flags))
 	    return NULL;
@@ -2339,7 +2340,8 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    return NULL;
 	pm->node.flags |= (on & PM_READONLY);
 	return pm;
-    }
+    } else if (OPT_ISSET(ops,'p'))
+	return NULL;	/* Nothing to print */
 
     if ((asg->flags & ASG_ARRAY) ?
 	!(on & (PM_ARRAY|PM_HASHED)) :
@@ -2686,6 +2688,15 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
     if (func == BIN_READONLY && isset(POSIXBUILTINS) && !OPT_PLUS(ops, 'g'))
 	ops->ind['g'] = 1;
 
+#if 0
+    /* "local" rejects -m, this should too ... what about +m ? */
+    if (locallevel && OPT_MINUS(ops, 'm') &&
+	!(OPT_MINUS(ops, 'g') || OPT_ISSET(ops, 'p'))) {
+	zerrnam(name, "bad option: -m");
+	return 1;
+    }
+#endif
+
     /* Translate the options into PM_* flags.   *
      * Unfortunately, this depends on the order *
      * these flags are defined in zsh.h         */
@@ -2788,10 +2799,18 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	return 0;
     }
 
-    if (!(OPT_ISSET(ops,'g') || OPT_ISSET(ops,'x') || OPT_ISSET(ops,'m')) ||
-	OPT_PLUS(ops,'g') || *name == 'l' ||
-	(!isset(GLOBALEXPORT) && !OPT_ISSET(ops,'g')))
-	on |= PM_LOCAL;
+    /* Using *name here is cheating, "local" allows no -g option */
+    if ((*name == 'l' || OPT_PLUS(ops,'g')))
+        on |= PM_LOCAL;
+    else if (!OPT_ISSET(ops,'g')) {
+        if (OPT_MINUS(ops, 'x')) {
+	    if (isset(GLOBALEXPORT))
+		ops->ind['g'] = 1;
+	    else if (locallevel)
+		on |= PM_LOCAL;
+        } else if (!(OPT_ISSET(ops,'x') || OPT_ISSET(ops,'m')))
+            on |= PM_LOCAL;
+    }
 
     if ((on & PM_TIED) && !OPT_ISSET(ops, 'p')) {
 	Param apm;
