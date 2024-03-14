@@ -5895,6 +5895,7 @@ printparamnode(HashNode hn, int printflags)
 {
     Param p = (Param) hn;
     Param peer = NULL;
+    int altname = 0;
 
     if (p->node.flags & PM_UNSET) {
 	if ((printflags & (PRINT_POSIX_READONLY|PRINT_POSIX_EXPORT) &&
@@ -5928,16 +5929,26 @@ printparamnode(HashNode hn, int printflags)
 	if (printflags & PRINT_POSIX_EXPORT) {
 	    if (!(p->node.flags & PM_EXPORTED))
 		return;
+	    altname = 'x';
 	    printf("export ");
 	} else if (printflags & PRINT_POSIX_READONLY) {
 	    if (!(p->node.flags & PM_READONLY))
 		return;
+	    altname = 'r';
 	    printf("readonly ");
-	} else if (locallevel && p->level >= locallevel) {
-	    printf("typeset ");	    /* printf("local "); */
 	} else if ((p->node.flags & PM_EXPORTED) &&
 		   !(p->node.flags & (PM_ARRAY|PM_HASHED))) {
-	    printf("export ");
+	  if (p->level && p->level >= locallevel)
+		printf("local ");
+	    else {
+		altname = 'x';
+		printf("export ");
+	    }
+	} else if (locallevel && p->level >= locallevel) {
+	    if (p->node.flags & PM_EXPORTED)
+		printf("local ");
+	    else
+		printf("typeset ");	    /* printf("local "); */
 	} else if (locallevel) {
 	    printf("typeset -g ");
 	} else
@@ -5951,6 +5962,10 @@ printparamnode(HashNode hn, int printflags)
 
 	for (pmptr = pmtypes, i = 0; i < PMTYPES_SIZE; i++, pmptr++) {
 	    int doprint = 0;
+
+	    if (altname && altname == pmptr->typeflag)
+		continue;
+
 	    if (pmptr->flags & PMTF_TEST_LEVEL) {
 		if (p->level)
 		    doprint = 1;

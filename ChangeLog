@@ -1,3 +1,8 @@
+2024-03-14  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52752: Src/params.c, Test/B02typeset.ztst: more typeset -p fixes
+	for local exports and improper "export -x" / "readonly -r" output.
+
 2024-03-04  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted (cf. 52615): Src/builtin.c: use META_NOALLOC for 52591
