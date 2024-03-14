@@ -1,5 +1,7 @@
 2024-03-14  Bart Schaefer  <schaefer@zsh.org>
 
+	* unposted: Etc/BUGS: HIST_IGNORE_DUPS mishandles quoted whitespace.
+
 	* 52752: Src/params.c, Test/B02typeset.ztst: more typeset -p fixes
 	for local exports and improper "export -x" / "readonly -r" output.
 

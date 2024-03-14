@@ -58,3 +58,6 @@ and thus the expression is likely to be incorrectly interpreted.
 52521: Empty files and unreadable files cannot be removed using the
 mapfile module "unset 'mapfile[filename]'", and are not distinguished
 from files that do not exist.
+------------------------------------------------------------------------
+52747,52755: HIST_IGNORE_DUPS et. al. ignore syntactically significant
+quoted whitespace and can incorrectly exclude commands as duplicates.
