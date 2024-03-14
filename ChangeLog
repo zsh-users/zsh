@@ -1,3 +1,8 @@
+2024-03-14  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52752: Src/params.c, Test/B02typeset.ztst: more typeset -p fixes
+	for local exports and improper "export -x" / "readonly -r" output.
+
 2024-03-13  Bart Schaefer  <schaefer@zsh.org>
 
 	* 52753: Doc/Zsh/grammar.yo: Clarify "nocorrect" when introducing

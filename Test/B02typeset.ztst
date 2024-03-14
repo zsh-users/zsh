@@ -311,7 +311,7 @@
  print $OUTER
 0:Export of tied parameters
 >i:n:n:e:r
->typeset -xT OUTER outer=( i n n e r )
+>local -xT OUTER outer=( i n n e r )
 >typeset -aT OUTER outer=( i n n e r )
 >OUTER=i:n:n:e:r
 >outer=( i n n e r )
@@ -1099,12 +1099,12 @@
  }
 0: no array/hash in POSIX export/readonly -p
 >zsh:
->typeset -arx zsh_exported_readonly_array=( 2 )
->typeset -Arx zsh_exported_readonly_hash=( [3]=3 )
->typeset -rx zsh_exported_readonly_scalar=1
->typeset -arx zsh_exported_readonly_array=( 2 )
->typeset -Arx zsh_exported_readonly_hash=( [3]=3 )
->typeset -rx zsh_exported_readonly_scalar=1
+>local -arx zsh_exported_readonly_array=( 2 )
+>local -Arx zsh_exported_readonly_hash=( [3]=3 )
+>local -rx zsh_exported_readonly_scalar=1
+>local -arx zsh_exported_readonly_array=( 2 )
+>local -Arx zsh_exported_readonly_hash=( [3]=3 )
+>local -rx zsh_exported_readonly_scalar=1
 >sh:
 >export zsh_exported_readonly_scalar=1
 >readonly zsh_exported_readonly_scalar=1
