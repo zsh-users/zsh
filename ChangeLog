@@ -1,5 +1,8 @@
 2024-03-13  Bart Schaefer  <schaefer@zsh.org>
 
+	* 52753: Doc/Zsh/grammar.yo: Clarify "nocorrect" when introducing
+	precommand modifiers.
+
 	* unposted: Doc/Zsh/contrib.yo: update doc for "colors" to match
 	workers/47489,50212 (italic and bright)
 

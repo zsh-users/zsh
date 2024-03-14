@@ -100,14 +100,15 @@ More generally, a list can be seen as a set of any shell commands
 whatsoever, including the complex commands below; this is implied wherever
 the word `list' appears in later descriptions.  For example, the commands
 in a shell function form a special sort of list.
+
 texinode(Precommand Modifiers)(Complex Commands)(Simple Commands & Pipelines)(Shell Grammar)
 sect(Precommand Modifiers)
 cindex(precommand modifiers)
 cindex(modifiers, precommand)
-A simple command may be preceded by a em(precommand modifier),
-which will alter how the command is interpreted.  These modifiers are
-shell builtin commands with the exception of tt(nocorrect) which is
-a reserved word.
+With the exception of tt(nocorrect), which is a reserved word that
+affects further parsing when it is found in command position, each
+of the following builtin commands is a em(precommand modifier) which
+may precede a simple command to alter how that command is interpreted.
 
 startitem()
 findex(-)
@@ -158,8 +159,7 @@ before any parsing is done.  It has no effect in non-interactive shells.
 )
 findex(noglob)
 item(tt(noglob))(
-Filename generation (globbing) is not performed on any of
-the words.
+Filename generation (globbing) is not performed on any of the words.
 )
 enditem()
 texinode(Complex Commands)(Alternate Forms For Complex Commands)(Precommand Modifiers)(Shell Grammar)
