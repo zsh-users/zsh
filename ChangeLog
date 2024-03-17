@@ -1,3 +1,8 @@
+2024-04-01  Oliver Kiddle  <opk@zsh.org>
+
+	* github #115: OKURA Masafumi: Completion/Unix/Command/_ruby:
+	IRB now has `--regexp-completor` and `--type-completor` options
+
 2024-03-25  Oliver Kiddle  <opk@zsh.org>
 
 	* 52798: Completion/Unix/Command/_ssh,
