@@ -1,5 +1,10 @@
 2024-03-14  Bart Schaefer  <schaefer@zsh.org>
 
+	* 52759: Doc/Zsh/expn.yo, Etc/FAQ.yo, Src/subst.c,
+	Test/D10nofork.ztst: change ${ ... } substitution to trim one
+	trailing newline; instead "${ ... }" (with quotes) preserves that
+	newline.  All trailing newlines are still trimmed in emulations.
+
 	* unposted: Etc/BUGS: HIST_IGNORE_DUPS mishandles quoted whitespace.
 
 	* 52752: Src/params.c, Test/B02typeset.ztst: more typeset -p fixes

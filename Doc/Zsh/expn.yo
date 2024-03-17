@@ -1950,6 +1950,9 @@ the braces by whitespace, like `tt(${ )...tt( })', is replaced by its
 standard output.  Like `tt(${|)...tt(})' and unlike
 `tt($LPAR())...tt(RPAR())', the command executes in the current shell
 context with function local behaviors and does not create a subshell.
+Word splitting does not apply unless tt(SH_WORD_SPLIT) is set, but a
+single trailing newline is stripped unless the substitution is enclosed
+in double quotes.
 
 Note that because the `tt(${|)...tt(})' and `tt(${ )...tt( })' forms
 must be parsed at once as both string tokens and commands, all other

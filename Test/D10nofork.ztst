@@ -86,8 +86,38 @@ F:setting option inside is too late for that substitution
 ?(eval):8: no matches found: f?*
 
   purr ${| REPLY=$'trailing newlines remain\n\n' }
-0:newline removal should not occur
+0:newline removal should not occur, part 1
 >trailing newlines remain
+>
+>
+
+  purr ${ echo $'one trailing newline\nremoved\n\n\n' }
+0:newline removal in ${ ... }, zsh mode
+>one trailing newline
+>removed
+>
+>
+>
+
+  () {
+    emulate -L ksh
+    purl ${ echo $'all trailing newlines\nremoved\n\n\n' }
+    purr "${ echo $'all trailing newlines\nremoved\n\n\n' }"
+  }
+0:newline removal in ${ ... }, emulation mode, shwordsplit
+>all
+>trailing
+>newlines
+>removed
+>all trailing newlines
+>removed
+
+  purr "${ echo $'no trailing newlines\nremoved\n\n\n' }"
+0:newline removal should not occur, part 2
+>no trailing newlines
+>removed
+>
+>
 >
 >
 
@@ -159,7 +189,7 @@ F:Why not use this error in the previous case as well?
 1:unbalanced braces, part 4+
 ?(eval):1: closing brace expected
 
-  purr ${ purr STDOUT }
+  purr "${ purr STDOUT }"
 0:capture stdout
 >STDOUT
 >
@@ -322,7 +352,7 @@ F:Fiddly here to get EOF past the test syntax
 0:here-string behavior
 >in a here string
 
-  <<<${ purr $'stdout as a here string' }
+  <<<"${ purr $'stdout as a here string' }"
 0:another capture stdout
 >stdout as a here string
 >
@@ -331,7 +361,7 @@ F:Fiddly here to get EOF past the test syntax
   wrap=${ purr "capture in environment assignment" } typeset -p wrap
 0:assignment context
 >typeset -g wrap='REPLY in environment assignment'
->typeset -g wrap=$'capture in environment assignment\n'
+>typeset -g wrap='capture in environment assignment'
 
 # Repeat return and exit tests with stdout capture
 
@@ -410,7 +440,7 @@ F:must do this before evaluating the next test block
 0:ignored braces, part 1
 >buried}
 
-  purr ${ purr ${REPLY:-buried}}}
+  purr "${ purr ${REPLY:-buried}}}"
 0:ignored braces, part 2
 >buried
 >}
@@ -418,7 +448,6 @@ F:must do this before evaluating the next test block
   purr ${ { echo nested ;} }
 0:ignored braces, part 3
 >nested
->
 
   purr ${ { echo nested } } DONE
 1:ignored braces, part 4

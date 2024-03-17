@@ -1091,20 +1091,23 @@ sect(Comparisons of forking and non-forking command substitution)
   mytt(set -- pos1 pos2 etc).  Nothing that happens within mytt($(command))
   affects the caller.
 
-  mytt($(command)) removes trailing newlines from the output of mytt(command)
-  when substituting, whereas mytt(${ command }) and its variants do not.
-  The latter is consistent with mytt(${|...}) from mksh but differs from
-  bash and ksh, so in emulation modes, newlines are stripped from command
-  output (not from tt(REPLY) assignments).
-
   When not enclosed in double quotes, the expansion of mytt($(command)) is
   split on tt(IFS) into an array of words.  In contrast, and unlike both
   bash and ksh, unquoted non-forking substitutions behave like parameter
   expansions with respect to the tt(SH_WORD_SPLIT) option.
 
-  When mytt(command) is myem(not) a builtin, mytt(${ command }) does fork, and
-  typically forks the same number of times as mytt($(command)), because in
-  the latter case zsh usually optimizes the final fork into an exec.
+  Both of the mytt(${|...}) formats retain any trailing newlines,
+  except as handled by the tt(SH_WORD_SPLIT) option, consistent with
+  mytt(${|...}) from mksh. mytt(${ command }) removes a single final
+  newline, but mytt("${ command }") retains it.  This differs from
+  bash and ksh, so in emulation modes, newlines are stripped even from
+  quoted command output.  In all cases, mytt($(command)) removes all
+  trailing newlines from the output of mytt(command).
+
+  When mytt(command) is myem(not) a builtin, mytt(${ command }) does
+  fork, and typically forks the same number of times as
+  mytt($(command)), because in the latter case zsh usually optimizes
+  the final fork into an exec.
 
   Redirecting input from files has subtle differences:
   itemization(

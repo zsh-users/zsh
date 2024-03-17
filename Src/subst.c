@@ -1900,6 +1900,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	/* The command string to be run by ${|...;} */
 	char *cmdarg = NULL;
 	size_t slen = 0;
+	int trim = (!EMULATION(EMULATE_ZSH)) ? 2 : !qt;
 	inbrace = 1;
 	s++;
 
@@ -2005,10 +2006,13 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		int onoerrs = noerrs, rplylen;
 		noerrs = 2;
 		rplylen = zstuff(&cmdarg, rplytmp);
-		if (! EMULATION(EMULATE_ZSH)) {
+		if (trim) {
 		    /* bash and ksh strip trailing newlines here */
-		    while (rplylen > 0 && cmdarg[rplylen-1] == '\n')
+		    while (rplylen > 0 && cmdarg[rplylen-1] == '\n') {
 			rplylen--;
+			if (trim == 1)
+			    break;
+		    }
 		    cmdarg[rplylen] = 0;
 		}
 		noerrs = onoerrs;
