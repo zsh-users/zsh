@@ -1,5 +1,8 @@
 2024-04-01  Oliver Kiddle  <opk@zsh.org>
 
+	* github #115: OKURA Masafumi: Completion/Unix/Command/_ruby:
+	IRB now has `--regexp-completor` and `--type-completor` options
+
 	* 52859: Completion/Zsh/Command/_fc, Completion/Zsh/Command/_vared:
 	use _date_formats for fc and complete -m/-M for vared
 
