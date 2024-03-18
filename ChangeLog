@@ -1,5 +1,7 @@
 2024-03-18  Oliver Kiddle  <opk@zsh.org>
 
+	* 52770: Completion/Linux/Command/_selinux: handle newrole
+
 	* 52769: Completion/Unix/Command/_ansible: fix completion of
 	ansible keywords and --step option
 
