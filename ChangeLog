@@ -1,3 +1,8 @@
+2024-03-23  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 52768: Completion/compdump, Completion/compinit: Handle
+	completer filenames with funny characters in them
+
 2024-03-21  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 52780: Src/Modules/hlgroup.c: remove unnecessary returns.
