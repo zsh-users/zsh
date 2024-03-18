@@ -1,5 +1,8 @@
 2024-03-18  Oliver Kiddle  <opk@zsh.org>
 
+	* 52769: Completion/Unix/Command/_ansible: fix completion of
+	ansible keywords and --step option
+
 	* 52750: Config/defs.mk.in, Etc/zsh-development-guide,
 	Src/Makemod.in.in, Src/Modules/files.c, Src/Modules/watch.c,
 	Src/Modules/zftp.c, Src/Modules/zprof.c, Src/Zle/compcore.c,

@@ -69,6 +69,11 @@ case $service in
       "--skip-tags[only run plays and tasks whose tags don't match]"
     )
   ;|
+  ansible-playbook|ansible-console)
+    args+=(
+      '--step[one-step-at-a-time: confirm each task before running]'
+    )
+  ;|
   ansible|ansible-console)
     args+=(
       '--task-timeout[set the task timeout limit]:timeout (seconds)'
@@ -95,11 +100,6 @@ case $service in
         init\:create\ initial\ configuration
       ))'
       '*::args:->config'
-    )
-  ;;
-  ansible-console)
-    args+=(
-      '--step[one-step-at-a-time: confirm each task before running]'
     )
   ;;
   ansible-doc)
@@ -440,11 +440,11 @@ if [[ $state = plugins ]]; then
   typeset -ga ${plug}
   if zstyle -T ":completion:${curcontext}:plugins" verbose; then
     (( ${(P)#plugvar} )) || set -A ${plugvar} \
-        ${${(f)"$(_call_program plugins ansible-doc -t $plug -l)"}/ ##/:}
+        ${${${(f)"$(_call_program plugins ansible-doc -t $plug -l)"}:# *}/(:|) ##/:}
     _describe -t plugins "${plug} plugin" $plugvar -M 'r:|.=* r:|=*' && ret=0
   else
     (( ${(P)#plugvar} )) || set -A ${plugvar} \
-        ${${(f)"$(_call_program plugins ansible-doc -t $plug -F)"}%% *}
+        ${${(f)"$(_call_program plugins ansible-doc -t $plug -F)"}%%(|:) *}
     _wanted plugins expl "${plug} plugin" compadd -M 'r:|.=* r:|=*' -a $plugvar && ret=0
   fi
 fi
