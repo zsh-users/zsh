@@ -163,9 +163,9 @@ bin_zprof(UNUSED(char *nam), UNUSED(char **args), Options ops, UNUSED(int func))
 	*ap = NULL;
 
 	qsort(fs, ncalls, sizeof(f),
-	      (int (*) _((const void *, const void *))) cmpsfuncs);
+	      (int (*) (const void *, const void *)) cmpsfuncs);
 	qsort(as, narcs, sizeof(a),
-	      (int (*) _((const void *, const void *))) cmpparcs);
+	      (int (*) (const void *, const void *)) cmpparcs);
 
 	printf("num  calls                time                       self            name\n-----------------------------------------------------------------------------------\n");
 	for (fp = fs, i = 1; *fp; fp++, i++) {
@@ -179,7 +179,7 @@ bin_zprof(UNUSED(char *nam), UNUSED(char **args), Options ops, UNUSED(int func))
 		   (*fp)->name);
 	}
 	qsort(fs, ncalls, sizeof(f),
-	      (int (*) _((const void *, const void *))) cmptfuncs);
+	      (int (*) (const void *, const void *)) cmptfuncs);
 
 	for (fp = fs; *fp; fp++) {
 	    printf("\n-----------------------------------------------------------------------------------\n\n");

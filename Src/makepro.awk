@@ -131,8 +131,8 @@ BEGIN {
 		sub(/@-.*$/, "", dnam)
 
 		# Put parens etc. back
-		gsub(/@[{]/, " _((", dcltor)
-		gsub(/@}/, "))", dcltor)
+		gsub(/@[{]/, " (", dcltor)
+		gsub(/@}/, ")", dcltor)
 		gsub(/@</, "(", dcltor)
 		gsub(/@>/, ")", dcltor)
 		gsub(/@!/, ",", dcltor)

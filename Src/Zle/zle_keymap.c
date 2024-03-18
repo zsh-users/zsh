@@ -745,7 +745,7 @@ bin_bindkey(char *name, char **argv, Options ops, UNUSED(int func))
     static struct opn {
 	char o;
 	char selp;
-	int (*func) _((char *, char *, Keymap, char **, Options, char));
+	int (*func) (char *, char *, Keymap, char **, Options, char);
 	int min, max;
     } const opns[] = {
 	{ 'l', 0, bin_bindkey_lsmaps, 0,  -1 },

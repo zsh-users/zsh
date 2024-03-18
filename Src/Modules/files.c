@@ -29,8 +29,8 @@
 
 #include "files.mdh"
 
-typedef int (*MoveFunc) _((char const *, char const *));
-typedef int (*RecurseFunc) _((char *, char *, struct stat const *, void *));
+typedef int (*MoveFunc) (char const *, char const *);
+typedef int (*RecurseFunc) (char *, char *, struct stat const *, void *);
 
 struct recursivecmd;
 

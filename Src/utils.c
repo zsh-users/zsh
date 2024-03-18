@@ -5246,6 +5246,7 @@ nicedupstring(char const *s)
 }
 
 
+/**/
 #ifndef MULTIBYTE_SUPPORT
 /* Unmetafy and output a string, displaying special characters readably. */
 
@@ -5280,8 +5281,9 @@ niceztrlen(char const *s)
     }
     return l;
 }
-#endif
 
+/**/
+#endif
 
 /**/
 #ifdef MULTIBYTE_SUPPORT
@@ -7604,6 +7606,7 @@ mode_to_octal(mode_t mode)
     return m;
 }
 
+/**/
 #ifdef MAILDIR_SUPPORT
 /*
  *     Stat a file. If it's a maildir, check all messages
@@ -7727,4 +7730,6 @@ mailstat(char *path, struct stat *st)
        *st = st_ret_last = st_ret;
        return 0;
 }
+
+/**/
 #endif

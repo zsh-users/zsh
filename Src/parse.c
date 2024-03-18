@@ -2384,7 +2384,7 @@ par_nl_wordlist(void)
  */
 
 /**/
-void (*condlex) _((void)) = zshlex;
+void (*condlex) (void) = zshlex;
 
 /*
  * cond	: cond_1 { SEPER } [ DBAR { SEPER } cond ]

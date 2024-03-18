@@ -82,12 +82,6 @@
  */
 #define _STRPTIME_DONTZERO
 
-#ifdef PROTOTYPES
-# define _(Args) Args
-#else
-# define _(Args) ()
-#endif
-
 #ifndef HAVE_ALLOCA
 # define alloca zhalloc
 #else
@@ -101,7 +95,7 @@
  #   pragma alloca
 #   else
 #    ifndef alloca
-char *alloca _((size_t));
+char *alloca (size_t);
 #    endif
 #   endif
 #  endif

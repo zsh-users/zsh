@@ -127,7 +127,7 @@ typedef int (*readwrite_t)(int, char *, off_t, int);
 
 struct zftpcmd {
     const char *nam;
-    int (*fun) _((char *, char **, int));
+    int (*fun) (char *, char **, int);
     int min, max, flags;
 };
 
