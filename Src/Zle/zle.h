@@ -186,7 +186,7 @@ typedef struct thingy *Thingy;
 
 /* widgets (ZLE functions) */
 
-typedef int (*ZleIntFunc) _((char **));
+typedef int (*ZleIntFunc) (char **);
 
 struct widget {
     int flags;		/* flags (see below) */
@@ -319,7 +319,7 @@ struct vichange {
 
 typedef struct keymap *Keymap;
 
-typedef void (*KeyScanFunc) _((char *, Thingy, char *, void *));
+typedef void (*KeyScanFunc) (char *, Thingy, char *, void *);
 
 #define invicmdmode() (!strcmp(curkeymapname, "vicmd"))
 

@@ -267,7 +267,7 @@ static char *blank_env[] = { NULL };
 
 /* Execution functions. */
 
-static int (*execfuncs[WC_COUNT-WC_CURSH]) _((Estate, int)) = {
+static int (*execfuncs[WC_COUNT-WC_CURSH]) (Estate, int) = {
     execcursh, exectime, NULL /* execfuncdef handled specially */,
     execfor, execselect,
     execwhile, execrepeat, execcase, execif, execcond,

@@ -618,7 +618,7 @@ union linkroot {
 /* Specific elements of linked lists */
 /*************************************/
 
-typedef void (*voidvoidfnptr_t) _((void));
+typedef void (*voidvoidfnptr_t) (void);
 
 /*
  * Element of the prepromptfns list.
@@ -678,7 +678,7 @@ struct timedfn {
 #define COND_MOD   18
 #define COND_MODI  19
 
-typedef int (*CondHandler) _((char **, int));
+typedef int (*CondHandler) (char **, int);
 
 struct conddef {
     Conddef next;		/* next in list                       */
@@ -1164,28 +1164,28 @@ struct dirsav {
 /* Definitions for Hash Tables */
 /*******************************/
 
-typedef void *(*VFunc) _((void *));
-typedef void (*FreeFunc) _((void *));
+typedef void *(*VFunc) (void *);
+typedef void (*FreeFunc) (void *);
 
-typedef unsigned (*HashFunc)       _((const char *));
-typedef void     (*TableFunc)      _((HashTable));
+typedef unsigned (*HashFunc)       (const char *);
+typedef void     (*TableFunc)      (HashTable);
 /*
  * Note that this is deliberately "char *", not "const char *",
  * since the AddNodeFunc is passed a pointer to a string that
  * will be stored and later freed.
  */
-typedef void     (*AddNodeFunc)    _((HashTable, char *, void *));
-typedef HashNode (*GetNodeFunc)    _((HashTable, const char *));
-typedef HashNode (*RemoveNodeFunc) _((HashTable, const char *));
-typedef void     (*FreeNodeFunc)   _((HashNode));
-typedef int      (*CompareFunc)    _((const char *, const char *));
+typedef void     (*AddNodeFunc)    (HashTable, char *, void *);
+typedef HashNode (*GetNodeFunc)    (HashTable, const char *);
+typedef HashNode (*RemoveNodeFunc) (HashTable, const char *);
+typedef void     (*FreeNodeFunc)   (HashNode);
+typedef int      (*CompareFunc)    (const char *, const char *);
 
 /* type of function that is passed to *
  * scanhashtable or scanmatchtable    */
-typedef void     (*ScanFunc)       _((HashNode, int));
-typedef void     (*ScanTabFunc)    _((HashTable, ScanFunc, int));
+typedef void     (*ScanFunc)       (HashNode, int);
+typedef void     (*ScanTabFunc)    (HashTable, ScanFunc, int);
 
-typedef void (*PrintTableStats) _((HashTable));
+typedef void (*PrintTableStats) (HashTable);
 
 /* Hash table for standard open hashing. Instances of struct hashtable can be *
  * created only by newhashtable(). In fact, this function creates an instance *
@@ -1352,7 +1352,7 @@ struct funcstack {
 
 /* node in list of function call wrappers */
 
-typedef int (*WrapFunc) _((Eprog, FuncWrap, char *));
+typedef int (*WrapFunc) (Eprog, FuncWrap, char *);
 
 struct funcwrap {
     FuncWrap next;
@@ -1428,8 +1428,8 @@ enum {
  * builtin structure.
  */
 
-typedef int (*HandlerFunc) _((char *, char **, Options, int));
-typedef int (*HandlerFuncAssign) _((char *, char **, LinkList, Options, int));
+typedef int (*HandlerFunc) (char *, char **, Options, int);
+typedef int (*HandlerFuncAssign) (char *, char **, LinkList, Options, int);
 #define NULLBINCMD ((HandlerFunc) 0)
 
 struct builtin {
@@ -1526,10 +1526,10 @@ struct module {
 /* Module record is an alias */
 #define MOD_ALIAS   (1<<6)
 
-typedef int (*Module_generic_func) _((void));
-typedef int (*Module_void_func) _((Module));
-typedef int (*Module_features_func) _((Module, char ***));
-typedef int (*Module_enables_func) _((Module, int **));
+typedef int (*Module_generic_func) (void);
+typedef int (*Module_void_func) (Module);
+typedef int (*Module_features_func) (Module, char ***);
+typedef int (*Module_enables_func) (Module, int **);
 
 struct linkedmod {
     char *name;
@@ -1574,7 +1574,7 @@ struct feature_enables {
 
 /* C-function hooks */
 
-typedef int (*Hookfn) _((Hookdef, void *));
+typedef int (*Hookfn) (Hookdef, void *);
 
 struct hookdef {
     Hookdef next;
@@ -1789,33 +1789,33 @@ typedef const struct gsu_array *GsuArray;
 typedef const struct gsu_hash *GsuHash;
 
 struct gsu_scalar {
-    char *(*getfn) _((Param));
-    void (*setfn) _((Param, char  *));
-    void (*unsetfn) _((Param, int));
+    char *(*getfn) (Param);
+    void (*setfn) (Param, char  *);
+    void (*unsetfn) (Param, int);
 };
 
 struct gsu_integer {
-    zlong (*getfn) _((Param));
-    void (*setfn) _((Param, zlong));
-    void (*unsetfn) _((Param, int));
+    zlong (*getfn) (Param);
+    void (*setfn) (Param, zlong);
+    void (*unsetfn) (Param, int);
 };
 
 struct gsu_float {
-    double (*getfn) _((Param));
-    void (*setfn) _((Param, double));
-    void (*unsetfn) _((Param, int));
+    double (*getfn) (Param);
+    void (*setfn) (Param, double);
+    void (*unsetfn) (Param, int);
 };
 
 struct gsu_array {
-    char **(*getfn) _((Param));
-    void (*setfn) _((Param, char **));
-    void (*unsetfn) _((Param, int));
+    char **(*getfn) (Param);
+    void (*setfn) (Param, char **);
+    void (*unsetfn) (Param, int);
 };
 
 struct gsu_hash {
-    HashTable (*getfn) _((Param));
-    void (*setfn) _((Param, HashTable));
-    void (*unsetfn) _((Param, int));
+    HashTable (*getfn) (Param);
+    void (*setfn) (Param, HashTable);
+    void (*unsetfn) (Param, int);
 };
 
 
@@ -2984,7 +2984,7 @@ enum errflag_bits {
 /* Sorting */
 /***********/
 
-typedef int (*CompareFn) _((const void *, const void *));
+typedef int (*CompareFn) (const void *, const void *);
 
 enum {
     SORTIT_ANYOLDHOW = 0,	/* Defaults */
@@ -3042,13 +3042,13 @@ struct hist_stack {
     short *chwords;
     int chwordlen;
     int chwordpos;
-    int (*hgetc) _((void));
-    void (*hungetc) _((int));
-    void (*hwaddc) _((int));
-    void (*hwbegin) _((int));
-    void (*hwabort) _((void));
-    void (*hwend) _((void));
-    void (*addtoline) _((int));
+    int (*hgetc) (void);
+    void (*hungetc) (int);
+    void (*hwaddc) (int);
+    void (*hwbegin) (int);
+    void (*hwabort) (void);
+    void (*hwend) (void);
+    void (*addtoline) (int);
     unsigned char *cstack;
     int csp;
     int hist_keep_comment;
@@ -3218,7 +3218,7 @@ enum {
 
 /* compctl entry point pointers */
 
-typedef int (*CompctlReadFn) _((char *, char **, Options, char *));
+typedef int (*CompctlReadFn) (char *, char **, Options, char *);
 
 /* ZLE entry point pointer */
 

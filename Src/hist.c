@@ -34,25 +34,25 @@
  * word control. */
 
 /**/
-mod_export int (*hgetc) _((void));
+mod_export int (*hgetc) (void);
 
 /**/
-void (*hungetc) _((int));
+void (*hungetc) (int);
 
 /**/
-void (*hwaddc) _((int));
+void (*hwaddc) (int);
 
 /**/
-void (*hwbegin) _((int));
+void (*hwbegin) (int);
 
 /**/
-void (*hwabort) _((void));
+void (*hwabort) (void);
 
 /**/
-void (*hwend) _((void));
+void (*hwend) (void);
 
 /**/
-void (*addtoline) _((int));
+void (*addtoline) (int);
 
 /* != 0 means history substitution is turned off */
  

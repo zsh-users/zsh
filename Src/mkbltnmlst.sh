@@ -122,12 +122,12 @@ for bin_mod in $bin_mods; do
 	esac
     done
     echo "    {"
-    echo "        extern int setup_${q_bin_mod} _((Module));"
-    echo "        extern int boot_${q_bin_mod} _((Module));"
-    echo "        extern int features_${q_bin_mod} _((Module,char***));"
-    echo "        extern int enables_${q_bin_mod} _((Module,int**));"
-    echo "        extern int cleanup_${q_bin_mod} _((Module));"
-    echo "        extern int finish_${q_bin_mod} _((Module));"
+    echo "        extern int setup_${q_bin_mod} (Module);"
+    echo "        extern int boot_${q_bin_mod} (Module);"
+    echo "        extern int features_${q_bin_mod} (Module,char***);"
+    echo "        extern int enables_${q_bin_mod} (Module,int**);"
+    echo "        extern int cleanup_${q_bin_mod} (Module);"
+    echo "        extern int finish_${q_bin_mod} (Module);"
     echo
     echo "        register_module(\"$bin_mod\","
     echo "                        setup_${q_bin_mod},"

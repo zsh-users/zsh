@@ -27,7 +27,7 @@
  *
  */
 
-#define SIGNAL_HANDTYPE void (*)_((int))
+#define SIGNAL_HANDTYPE void (*)(int)
 
 #ifndef HAVE_KILLPG
 # define killpg(pgrp,sig) kill(-(pgrp),sig)
@@ -145,7 +145,7 @@
 #ifdef BSD_SIGNALS
 #define signal_block(S) sigblock(S)
 #else
-extern sigset_t signal_block _((sigset_t));
+extern sigset_t signal_block (sigset_t);
 #endif  /* BSD_SIGNALS   */
 
-extern sigset_t signal_unblock _((sigset_t));
+extern sigset_t signal_unblock (sigset_t);

@@ -1,10 +1,10 @@
 #include "zsh.mdh"
 
-int setup_ _((Module));
-int boot_ _((Module));
-int cleanup_ _((Module));
-int finish_ _((Module));
-int modentry _((int boot, Module m, void *ptr));
+int setup_ (Module);
+int boot_ (Module);
+int cleanup_ (Module);
+int finish_ (Module);
+int modentry (int boot, Module m, void *ptr);
 
 /**/
 int

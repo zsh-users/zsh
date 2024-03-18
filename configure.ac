@@ -273,11 +273,6 @@ fi],
 AC_DEFINE(CONFIG_LOCALE)
 )
 
-dnl Do you want to compile as K&R C.
-AC_ARG_ENABLE(ansi2knr,
-AS_HELP_STRING([--enable-ansi2knr],[translate source to K&R C before compiling]),
-[ansi2knr="$enableval"], [ansi2knr=default])
-
 ifdef([runhelpdir],[undefine([runhelpdir])])dnl
 AC_ARG_ENABLE(runhelpdir,
 AS_HELP_STRING([--enable-runhelpdir=DIR],[the directory in which to install run-help files]),
@@ -483,7 +478,7 @@ fi
 dnl if the user hasn't specified CFLAGS, then
 dnl   if compiler is gcc, then use -O2 and some warning flags
 dnl   else use -O
-if test -n "$auto_cflags" && test ."$ansi2knr" != .yes; then
+if test -n "$auto_cflags"; then
   if test "${enable_zsh_debug}" = yes; then
     if test -n "$GCC"; then
       CFLAGS="$CFLAGS -Wall -Wmissing-prototypes -ggdb"
@@ -558,28 +553,6 @@ case "$host_os" in
 esac
 
 fp_PROG_CC_STDC
-AC_MSG_CHECKING([whether to use prototypes])
-if test ."$ansi2knr" = .yes || test ."$ansi2knr" = .no; then
-  msg="(overridden) "
-else
-  msg=
-  if test ."$fp_cv_prog_cc_stdc" = .no; then
-    ansi2knr=yes
-  else
-    ansi2knr=no
-  fi
-fi
-AH_TEMPLATE([PROTOTYPES],
-[Define to 1 if ANSI function prototypes are usable.])
-if test "$ansi2knr" = yes; then
-  AC_MSG_RESULT(${msg}no)
-  U=_
-else
-  AC_MSG_RESULT(${msg}yes)
-  AC_DEFINE(PROTOTYPES)
-  U=
-fi
-AC_SUBST(U)
 
 AC_FUNC_ALLOCA              dnl Check how to get `alloca'.
 
@@ -646,18 +619,6 @@ case "$LC_PAPER" in
   *)      PAPERSIZE=a4 ;;
 esac
 AC_SUBST(PAPERSIZE)
-
-AC_CHECK_PROGS([ANSI2KNR], [ansi2knr], [: ansi2knr])
-
-if test x"$ansi2knr" = xyes && test x"$ANSI2KNR" = x": ansi2knr"; then
-    echo "----------"
-    echo "configure fatal error:"
-    echo "ansi2knr was specified (--enable-ansi2knr) but the program could not be found."
-    echo "Either remove the configure option if it is not required or build the ansi2knr"
-    echo "program before reconfiguring Zsh.  The source code for ansi2knr is also"
-    echo "available in the GPL directory on Zsh distribution sites."
-    exit 1
-fi
 
 dnl ------------------
 dnl CHECK HEADER FILES

@@ -3253,7 +3253,7 @@ makearray(LinkList l, int type, int flags, int *np, int *nlp, int *llp)
 	    /* Now sort the array (it contains matches). */
 	    matchorder = flags;
 	    qsort((void *) rp, n, sizeof(Cmatch),
-		  (int (*) _((const void *, const void *)))matchcmp);
+		  (int (*) (const void *, const void *))matchcmp);
 
 	    /* since the matches are sorted and the default is to remove
 	     * all duplicates, -1 (remove only consecutive dupes) is a no-op,
@@ -3295,7 +3295,7 @@ makearray(LinkList l, int type, int flags, int *np, int *nlp, int *llp)
 		sp = (Cmatch *) zhalloc((n + 1) * sizeof(Cmatch));
 		memcpy(sp, rp, (n + 1) * sizeof(Cmatch));
 		qsort((void *) sp, n, sizeof(Cmatch),
-		      (int (*) _((const void *, const void *)))matchcmp);
+		      (int (*) (const void *, const void *))matchcmp);
 		for (asp = sp + 1; *asp; asp++) {
 		    Cmatch *ap = asp - 1, *bp = asp;
 		    if (matcheq(*ap, *bp)) {

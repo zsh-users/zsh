@@ -1057,17 +1057,17 @@ zrealloc(void *ptr, size_t size)
 #if !defined(__hpux) && !defined(DGUX) && !defined(__osf__)
 # if defined(_BSD)
 #  ifndef HAVE_BRK_PROTO
-   extern int brk _((caddr_t));
+   extern int brk (caddr_t);
 #  endif
 #  ifndef HAVE_SBRK_PROTO
-   extern caddr_t sbrk _((int));
+   extern caddr_t sbrk (int);
 #  endif
 # else
 #  ifndef HAVE_BRK_PROTO
-   extern int brk _((void *));
+   extern int brk (void *);
 #  endif
 #  ifndef HAVE_SBRK_PROTO
-   extern void *sbrk _((int));
+   extern void *sbrk (int);
 #  endif
 # endif
 #endif

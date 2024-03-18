@@ -1,3 +1,14 @@
+2024-03-18  Oliver Kiddle  <opk@zsh.org>
+
+	* 52750: Config/defs.mk.in, Etc/zsh-development-guide,
+	Src/Makemod.in.in, Src/Modules/files.c, Src/Modules/watch.c,
+	Src/Modules/zftp.c, Src/Modules/zprof.c, Src/Zle/compcore.c,
+	Src/Zle/zle.h, Src/Zle/zle_keymap.c, Src/Zle/zle_thingy.c,
+	Src/exec.c, Src/glob.c, Src/hist.c, Src/makepro.awk, Src/mem.c,
+	Src/mkbltnmlst.sh, Src/modentry.c, Src/parse.c, Src/prototypes.h,
+	Src/signals.h, Src/utils.c, Src/zsh.h, Src/zsh_system.h, aclocal.m4,
+	configure.ac: remove ansi2knr support for old pre-ansi K&R compilers
+
 2024-03-14  Bart Schaefer  <schaefer@zsh.org>
 
 	* 52759: Doc/Zsh/expn.yo, Etc/FAQ.yo, Src/subst.c,

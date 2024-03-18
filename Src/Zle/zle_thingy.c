@@ -344,7 +344,7 @@ bin_zle(char *name, char **args, Options ops, UNUSED(int func))
 {
     static struct opn {
 	char o;
-	int (*func) _((char *, char **, Options, char));
+	int (*func) (char *, char **, Options, char);
 	int min, max;
     } const opns[] = {
 	{ 'l', bin_zle_list, 0, -1 },

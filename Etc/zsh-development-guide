@@ -240,7 +240,7 @@ C coding style
   There must be an empty line, a line with "/**/", a line with the
   type of the function, and finally the name of the function with typed
   arguments.  These lines must not be indented.  The script generating
-  function prototypes and the ansi2knr program depend on this format.
+  function prototypes depends on this format.
 
 * Variable declarations must similarly be preceded by a
   line containing only "/**/", for the prototype generation script.

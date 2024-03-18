@@ -584,7 +584,7 @@ readwtab(WATCH_STRUCT_UTMP **head, int initial_sz)
 
     if (sz)
 	qsort((void *) *head, sz, sizeof(WATCH_STRUCT_UTMP),
-	           (int (*) _((const void *, const void *)))ucmp);
+	           (int (*) (const void *, const void *))ucmp);
     return sz;
 }
 

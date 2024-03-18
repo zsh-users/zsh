@@ -52,31 +52,16 @@ DLCOMPILE   = $(CC) -c -I. -I$(dir_top)/Src -I$(sdir_top)/Src -I$(sdir_top)/Src/
 LINK        = $(CC) $(LDFLAGS) $(EXELDFLAGS) $(EXTRA_LDFLAGS) -o $@
 DLLINK      = $(DLLD) $(LDFLAGS) $(LIBLDFLAGS) $(DLLDFLAGS) -o $@
 
-KNR_OBJ=.o
-KNROBJ=._foo_
+OBJ=.o
 
-ANSIOBJ=.o
-ANSI_OBJ=._foo_
+.SUFFIXES: .c .$(DL_EXT) ..o .o .syms .pro .epro
 
-.SUFFIXES: .c .$(DL_EXT) ..o .._foo_ .o ._foo_ .syms .pro .epro
-
-.c$(ANSI@U@OBJ):
+.c$(OBJ):
 	$(COMPILE) -o $@ $<
 	@rm -f $(dir_src)/stamp-modobjs
 
-.c$(KNR@U@OBJ):
-	@ANSI2KNR@ $< > $@.c
-	$(COMPILE) -o $@ $@.c
-	rm -f $@.c
-	@rm -f $(dir_src)/stamp-modobjs
-
-.c.$(ANSI@U@OBJ):
+.c.$(OBJ):
 	$(DLCOMPILE) -o $@ $<
-
-.c.$(KNR@U@OBJ):
-	@ANSI2KNR@ $< > $@.c
-	$(DLCOMPILE) -o $@ $@.c
-	rm -f $@.c
 
 .c.syms:
 	$(AWK) -f $(sdir_src)/makepro.awk $< $(subdir) > $@
