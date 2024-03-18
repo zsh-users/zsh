@@ -1,4 +1,4 @@
-#compdef audit2allow audit2why avcstat chcon checkmodule checkpolicy fixfiles getpidprevcon getsebool matchpathcon restorecon runcon sealert secon sedta seinfo selinuxconlist selinuxdefcon selinuxexeccon semanage semodule semodule_unpackage sepolgen sepolicy sesearch sestatus setenforce setsebool validatetrans
+#compdef audit2allow audit2why avcstat chcon checkmodule checkpolicy fixfiles getpidprevcon getsebool matchpathcon newrole restorecon runcon sealert secon sedta seinfo selinuxconlist selinuxdefcon selinuxexeccon semanage semodule semodule_unpackage sepolgen sepolicy sesearch sestatus setenforce setsebool validatetrans
 
 # encompasses checkpolicy libselinux-utils policycoreutils
 # policycoreutils-devel policycoreutils-python-utils setools-console
@@ -251,6 +251,21 @@ case $service in
     )
   ;;
 
+  newrole)
+    local cmd cpp
+    cmd="$words[1]"
+    cpp='_comp_priv_prefix=( $cmd ${(kv)opt_args[(I)-([rtl]|-role|-type|-level)]} )'
+    args=(
+      '(-r --role)'{-r+,--role=}'[specify role]: :_selinux_roles'
+      '(-t --type)'{-t+,--type=}'[specify type]: :_selinux_types'
+      '(-l --level)'{-l+,--range=}'[specify level]:level'
+      '(-p --preserve-environment)'{-p,--preserve-environment}"[don't create new minimal environment]"
+      "${ign}(-)"{-V,--version}'[display version information]'
+      "(-)1: :{ $cpp; _command_names -e }" \
+      "*:: :{ $cpp; _normal }"
+    )
+  ;;
+
   restorecon)
     args=(
       '*-e+[exclude a directory]:directory:_directories'
@@ -276,10 +291,10 @@ case $service in
   runcon)
     args=(
       '(1 -c --compute)'{-c,--compute}'[compute process transition context before modifying]'
-      '(1 -t --type=TYPE)'{-t+,--type=}'[specify type]: :_selinux_types'
-      '(1 -u --user=USER)'{-u+,--user=}'[specify user identity]: :_selinux_users'
-      '(1 -r --role=ROLE)'{-r+,--role=}'[specify role]: :_selinux_roles'
-      '(1 -l --range=RANGE)'{-l+,--range=}'[specify level range]:range'
+      '(1 -t --type)'{-t+,--type=}'[specify type]: :_selinux_types'
+      '(1 -u --user)'{-u+,--user=}'[specify user identity]: :_selinux_users'
+      '(1 -r --role)'{-r+,--role=}'[specify role]: :_selinux_roles'
+      '(1 -l --range)'{-l+,--range=}'[specify level range]:range'
       '(-)1:security context:_selinux_contexts'
       '*:::args:_normal'
     )
@@ -460,7 +475,7 @@ case $service in
               '(-E --extract)'{-E,--extract}'[extract customizable commands, for use within a transaction]'
             )
           ;|
-          boolean|dontaudit|export|import)
+          fcontext|ibendport|ibpkey|interface|login|module|node|permissive|port|user)
             args+=( '(-a --add)'{-a,--add}'[add a record]' )
           ;|
           boolean|fcontext|ibendport|ibpkey|interface|login|node|permissive|port|user)
@@ -573,8 +588,8 @@ case $service in
       \*{-B,--build}'[build and reload policy]'
       \*'--refresh[like --build but reuse existing linked policy if module files unchanged]'
       \*{-D,--disable_dontaudit}'[remove dontaudits from policy]'
-      \*{-i+,--install=}'[install a new module]:module package:_files -g "*.pp(-.)"'
-      \!{-b,--base,-u,--upgrade}':module package:_files -g "*.pp(-.)"'
+      \*{-i+,--install=}'[install a new module]:module package:_files -g "*.(pp|cil)(-.)"'
+      \!{-b,--base,-u,--upgrade}':module package:_files -g "*.(pp|cil)(-.)"'
       \*{-r+,--remove=}'[remove existing module at desired priority]:module name:_selinux_modules'
       \*{-l+,--list-modules=-}'[display list of installed modules]::kind:((
         standard\:highest\ priority,\ enabled\ modules
