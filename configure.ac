@@ -552,8 +552,6 @@ case "$host_os" in
   darwin[[0-9]].*) CPP="$CPP -traditional-cpp" ;;
 esac
 
-fp_PROG_CC_STDC
-
 AC_FUNC_ALLOCA              dnl Check how to get `alloca'.
 
 dnl If the compiler supports union initialisation
