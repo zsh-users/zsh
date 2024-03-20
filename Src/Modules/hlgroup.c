@@ -91,7 +91,8 @@ getgroup(const char *name, int sgr)
     if (!(v = getvalue(&vbuf, &var, 0)) ||
 	     PM_TYPE(v->pm->node.flags) != PM_HASHED ||
 	     !(hlg = v->pm->gsu.h->getfn(v->pm)) ||
-	     !(hn = gethashnode2(hlg, name)))
+	     !(hn = gethashnode2(hlg, name)) ||
+	     (((Param) hn)->node.flags & PM_UNSET))
     {
 	pm->u.str = dupstring("");
 	pm->node.flags |= PM_UNSET;
