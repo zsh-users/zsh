@@ -665,6 +665,11 @@
 	* 52798: Completion/Unix/Command/_ssh,
 	Completion/Unix/Type/_ssh_hosts: handle comments in ssh config
 
+2024-03-20  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: configure.ac: remove reference to fp_PROG_CC_STDC
+	macro which was removed in 52750
+
 2024-03-18  Oliver Kiddle  <opk@zsh.org>
 
 	* 52770: Completion/Linux/Command/_selinux: handle newrole
