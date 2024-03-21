@@ -142,7 +142,7 @@ getpmesc(UNUSED(HashTable ht), const char *name)
 static void
 scanpmesc(UNUSED(HashTable ht), ScanFunc func, int flags)
 {
-    return scangroup(func, flags, 0);
+    scangroup(func, flags, 0);
 }
 
 /**/
@@ -156,7 +156,7 @@ getpmsgr(UNUSED(HashTable ht), const char *name)
 static void
 scanpmsgr(UNUSED(HashTable ht), ScanFunc func, int flags)
 {
-    return scangroup(func, flags, 1);
+    scangroup(func, flags, 1);
 }
 
 static struct paramdef partab[] = {

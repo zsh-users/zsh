@@ -1,3 +1,7 @@
+2024-03-21  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 52780: Src/Modules/hlgroup.c: remove unnecessary returns.
+
 2024-03-20  Oliver Kiddle  <opk@zsh.org>
 
 	* 52783: Src/Modules/hlgroup.c: allow for unset hash element
