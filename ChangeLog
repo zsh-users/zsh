@@ -1,3 +1,8 @@
+2024-03-25  Oliver Kiddle  <opk@zsh.org>
+
+	* 52798: Completion/Unix/Command/_ssh,
+	Completion/Unix/Type/_ssh_hosts: handle comments in ssh config
+
 2024-03-23  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 52768: Completion/compdump, Completion/compinit: Handle
