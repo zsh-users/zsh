@@ -89,6 +89,8 @@ irb=(
   "(--colorize)--nocolorize[don't use color-highlighting]"
   '(--noautocomplete)--autocomplete[use auto-completion]'
   "(--autocomplete)--noautocomplete[don't use auto-completion]"
+  '(--regexp-completor)--type-completor[use regexp based completion]'
+  '(--type-completor)--regexp-completor[use type based completion]'
   '(--noscript)--script[script mode]'
   '(--script)--noscript[no script mode]'
   '--single-irb[share self with sub-irb]'
