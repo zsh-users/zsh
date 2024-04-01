@@ -1,3 +1,8 @@
+2024-04-01  Oliver Kiddle  <opk@zsh.org>
+
+	* 52859: Completion/Zsh/Command/_fc, Completion/Zsh/Command/_vared:
+	use _date_formats for fc and complete -m/-M for vared
+
 2024-03-25  Oliver Kiddle  <opk@zsh.org>
 
 	* 52798: Completion/Unix/Command/_ssh,

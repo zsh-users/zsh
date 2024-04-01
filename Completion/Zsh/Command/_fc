@@ -40,7 +40,7 @@ fc_hist=(
   '(-A -R -W -e -d -E -i -t -a -p -P)-f[mm/dd/yyyy format time-stamps]'
   '(-A -R -W -e -d -f -i -t -a -p -P)-E[dd.mm.yyyy format time-stamps]'
   '(-A -R -W -e -d -f -E -t -a -p -P)-i[yyyy-mm-dd format time-stamps]'
-  '(-A -R -W -e -d -f -E -i -a -p -P)-t[print time-stamps in specified format]:date format'
+  '(-A -R -W -e -d -f -E -i -a -p -P)-t[print time-stamps in specified format]: : _date_formats zsh'
   '(-A -R -W -e -a -p -P)-D[print elapsed times]'
 
   '(-A -R -W -I -e -d -f -i -l -m -n -r -D -E -t -P)-a[with -p, automatically pop history on function return]'
