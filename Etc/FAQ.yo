@@ -1047,15 +1047,18 @@ label(211)
    )
    Runs code in the current shell context and then substitutes mytt(${REPLY}).
    The result is not split into words unless the tt(SH_WORD_SPLIT) option
-   is set, for example by mytt(${=${| code }}).
+   is set, for example by mytt(${=${| code }}).  mytt($REPLY) is a local
+   parameter within the substitution so its value in the surrounding scope
+   is not changed.
 
   eit() An extension to #1
    verb(
-     ${|var| code }
+     ${{var} code }
    )
    Runs code in the current shell and then substitutes mytt(${var}).  If
    mytt(${var}) names an array, the result is an array of those elements,
-   but no further splitting is done without tt(SH_WORD_SPLIT).
+   but no further splitting is done without tt(SH_WORD_SPLIT). mytt(${var})
+   is myem(not) local to the substitution.
 
   eit() The traditional ksh form, except that the closing mytt(;)
    may usually be omitted:
@@ -1071,12 +1074,11 @@ label(211)
   In all three forms mytt(code) behaves myem(similarly) to an anonymous
   function invoked like:
   verb(
-    () { local REPLY; code } "$@"
+    () { code } "$@"
   )
-  Thus, mytt($REPLY) is implicitly local and returns to its previous
-  value after the substitution ends, all other parameters declared from
-  inside the substitution are also local by default, and positional
-  parameters mytt($1), mytt($2), etc. are those of the calling context.
+  Thus, all parameters declared inside the substitution are local by
+  default, and positional parameters mytt($1), mytt($2), etc. are those
+  of the calling context.
 
   The most significant limitation is that braces (mytt({) and mytt(}))
   within the substitutions must either be in balanced pairs, or must be
@@ -1096,7 +1098,7 @@ sect(Comparisons of forking and non-forking command substitution)
   bash and ksh, unquoted non-forking substitutions behave like parameter
   expansions with respect to the tt(SH_WORD_SPLIT) option.
 
-  Both of the mytt(${|...}) formats retain any trailing newlines,
+  Both mytt(${|...}) and mytt(${{var} ...}) retain any trailing newlines,
   except as handled by the tt(SH_WORD_SPLIT) option, consistent with
   mytt(${|...}) from mksh. mytt(${ command }) removes a single final
   newline, but mytt("${ command }") retains it.  This differs from

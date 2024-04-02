@@ -1,5 +1,8 @@
 2024-04-01  Bart Schaefer  <schaefer@zsh.org>
 
+	* 52865: Doc/Zsh/expn.yo, Doc/Zsh/params.yo, Etc/FAQ.yo:
+	Documentation update for 52864
+
 	* 52864: Src/lex.c, Src/subst.c, Test/D10nofork.ztst,
 	Test/V10private.ztst: Change ${|var|...} to ${{var} ...},
 	limit local REPLY behavior to ${|...}, update tests.

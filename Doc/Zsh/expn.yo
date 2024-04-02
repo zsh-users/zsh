@@ -1937,13 +1937,14 @@ split on tt(IFS) unless the tt(SH_WORD_SPLIT) option is set.
 cindex(substitution, command, current shell)
 cindex(substitution, command, non forking)
 cindex(substitution, nofork)
-Substitutions of the form `tt(${|)var(param)tt(|)...tt(})' are similar,
+Substitutions of the form `tt(${{)var(param)tt(}) ...tt(})' are similar,
 except that the substitution is replaced by the value of the parameter
 named by var(param).  No implicit save or restore applies to var(param)
-except as noted for tt(REPLY), and var(param) should em(not) be declared
-within the command.  If, after evaluating the expression, var(param)
-names an array, array expansion rules apply.  However, tt(REPLY) is
-always expanded in scalar context, even if assigned an array.
+and var(param) should em(not) be declared within the command.  No space
+is allowed within `tt(${{)' and space or newline is required after
+`tt({)var(param)tt(})'.  The var(param) may include a subscript, and if,
+after evaluating the expression, var(param) names an array, then array
+expansion rules apply to the final substitution.
 
 A command enclosed in braces preceded by a dollar sign, and set off from
 the braces by whitespace, like `tt(${ )...tt( })', is replaced by its
@@ -1954,7 +1955,7 @@ Word splitting does not apply unless tt(SH_WORD_SPLIT) is set, but a
 single trailing newline is stripped unless the substitution is enclosed
 in double quotes.
 
-Note that because the `tt(${|)...tt(})' and `tt(${ )...tt( })' forms
+Note that because `tt(${|)...tt(})' and the two related substitutions
 must be parsed at once as both string tokens and commands, all other
 braces (`tt({)' or `tt(})') within the command either must be quoted,
 or must appear in syntactically valid pairs, such as around complex
