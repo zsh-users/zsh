@@ -1566,12 +1566,9 @@ _git-range-diff () {
 (( $+functions[_git-rebase] )) ||
 _git-rebase () {
   local -a autosquash_opts
-
-  if (( words[(I)-i|--interactive] )); then
-    autosquash_opts=(
-      '(             --no-autosquash)--autosquash[check for auto-squash boundaries]'
-      '(--autosquash                )--no-autosquash[do not check for auto-squash boundaries]')
-  fi
+  autosquash_opts=(
+    '(             --no-autosquash)--autosquash[check for auto-squash boundaries]'
+    '(--autosquash                )--no-autosquash[do not check for auto-squash boundaries]')
 
   _arguments -s -S $endopt \
     - actions \
