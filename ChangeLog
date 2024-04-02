@@ -1,5 +1,8 @@
 2025-01-30  Oliver Kiddle  <opk@zsh.org>
 
+	* github #118: Eisuke Kawashima: Completion/Unix/Command/_git:
+	git rebase non-interactive mode also supports --autosquash
+
 	* 53338: Completion/Zsh/Command/_typeset: complete typeset -n option
 
 	* 53337: Doc/Zsh/mod_ksh93.yo, Src/Modules/ksh93.c: allow nameref -p
