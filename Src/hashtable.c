@@ -1397,6 +1397,14 @@ histstrcmp(const char *str1, const char *str2)
 {
     while (inblank(*str1)) str1++;
     while (inblank(*str2)) str2++;
+
+    /* If insignificant whitespace has already been eliminated,
+     * there is no reason to expend similar effort here.  Also,
+     * this is more accurate in cases of quoted whitespace.
+     */
+    if (isset(HISTREDUCEBLANKS))
+	return strcmp(str1, str2);
+
     while (*str1 && *str2) {
 	if (inblank(*str1)) {
 	    if (!inblank(*str2))

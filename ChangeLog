@@ -1,3 +1,8 @@
+2024-04-01  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52781 (and typo fix): Src/hashtable.c: HIST IGNORE_DUPS treats
+	whitespace as significant when HIST_REDUCE_BLANKS is also set.
+
 2024-04-01  Oliver Kiddle  <opk@zsh.org>
 
 	* github #115: OKURA Masafumi: Completion/Unix/Command/_ruby:
