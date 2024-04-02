@@ -1,5 +1,8 @@
 2025-01-30  Oliver Kiddle  <opk@zsh.org>
 
+	* github #118: Eisuke Kawashima: Completion/Unix/Command/_git:
+	git rebase non-interactive mode also supports --autosquash
+
 	* 53336: Doc/Makefile.in, Etc/Makefile.in:
 	avoid GNU make specific use of $< in a non-inference rule
 

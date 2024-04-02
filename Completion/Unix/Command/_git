@@ -1565,14 +1565,6 @@ _git-range-diff () {
 
 (( $+functions[_git-rebase] )) ||
 _git-rebase () {
-  local -a autosquash_opts
-
-  if (( words[(I)-i|--interactive] )); then
-    autosquash_opts=(
-      '(             --no-autosquash)--autosquash[check for auto-squash boundaries]'
-      '(--autosquash                )--no-autosquash[do not check for auto-squash boundaries]')
-  fi
-
   _arguments -s -S $endopt \
     - actions \
     '(-)--continue[continue after resolving merge conflict]' \
@@ -1605,7 +1597,8 @@ _git-rebase () {
     '(--apply --whitespace -C)*'{-s+,--strategy=}'[use given merge strategy]:merge strategy:__git_merge_strategies' \
     '(--apply --whitespace -C)*'{-X+,--strategy-option=}'[pass merge-strategy-specific option to merge strategy]: :_git_strategy_options' \
     '(1 --keep-base --fork-point)--root[rebase all reachable commits]' \
-    $autosquash_opts \
+    '(--no-autosquash)--autosquash[check for auto-squash boundaries]' \
+    "(--autosquash)--no-autosquash[don't check for auto-squash boundaries]" \
     '(--autostash --no-autostash)--autostash[stash uncommitted changes before rebasing and apply them afterwards]' \
     "(--autostash --no-autostash)--no-autostash[don't stash uncommitted changes before rebasing and apply them afterwards]" \
     '(--root)--fork-point[use merge-base --fork-point to refine upstream]' \
