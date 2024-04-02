@@ -497,7 +497,7 @@ F:Better if caught in checkclobberparam() but exec.c doesn't know scope
  () {
    private z=outer
    print ${(t)z} $z
-   print ${| REPLY=${|z| z=nofork} }
+   print ${| REPLY=${{z} z=nofork} }
    print ${(t)z} $z
  }
 0:nofork may write to private in calling function
@@ -518,9 +518,9 @@ F:Better if caught in checkclobberparam() but exec.c doesn't know scope
  () {
    private z=outer
    print ${(t)z} $z
-   print ${|z|
+   print ${{z}
      private q
-     z=${|q| q=nofork}
+     z=${{q} q=nofork}
    }
    print ${(t)z} $z
  }
@@ -533,7 +533,7 @@ F:Better if caught in checkclobberparam() but exec.c doesn't know scope
    print ${|
      () { REPLY="{$q}" }
    }
-   print ${|q|
+   print ${{q}
      () { q=nofork }
    }
  }

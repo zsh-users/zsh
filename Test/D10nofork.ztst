@@ -14,6 +14,28 @@
 0:Basic substitution and REPLY scoping
 >INNER OUTER
 
+  reply=(x OUTER x)
+  purl ${{reply} reply=(\{ INNER \})} $reply
+0:Basic substitution, brace quoting, and array result
+>{
+>INNER
+>}
+>{
+>INNER
+>}
+
+  () {
+    setopt localoptions ignorebraces
+    purl ${{reply} reply=({ INNER })} $reply
+  }
+0:Basic substitution, ignorebraces, and array result
+>{
+>INNER
+>}
+>{
+>INNER
+>}
+
   purr ${| REPLY=first}:${| REPLY=second}:$REPLY
 0:re-scoping of REPLY in one statement
 >first:second:OUTER
@@ -229,7 +251,7 @@ F:Why not use this error in the previous case as well?
 >26
 
   unset reply
-  purl ${|reply| reply=(1 2 ${| REPLY=3 } 4) }
+  purl ${{reply} reply=(1 2 ${| REPLY=3 } 4) }
   typeset -p reply
 0:array behavior with global assignment
 >1
@@ -315,7 +337,7 @@ F:status of "print" should hide return
 
   unset zz
   outer=GLOBAL
-  purr "${|zz|
+  purr "${{zz}
    local outer=LOCAL
    zz=NONLOCAL
   } $outer $?"
@@ -440,7 +462,8 @@ F:must do this before evaluating the next test block
 0:ignored braces, part 1
 >buried}
 
-  purr "${ purr ${REPLY:-buried}}}"
+  # Global $REPLY still set from earlier test
+  purr "${ purr ${REPLY:+buried}}}"
 0:ignored braces, part 2
 >buried
 >}
@@ -453,6 +476,7 @@ F:must do this before evaluating the next test block
 1:ignored braces, part 4
 ?(eval):3: parse error near `}'
 
+  unsetopt ignorebraces
   # "break" blocks function calls in outer loop
   # Could use print, but that might get fixed
   repeat 3 do purr ${
@@ -467,11 +491,25 @@ F:must do this before evaluating the next test block
 ?1
 ?2
 
-  print -u $ZTST_fd ${ZTST_testname}: TEST COMPLETE
-0:make sure we got to the end
-F:some tests might silently break the test harness
+ # Cannot "purr": break skips pending function calls
+ # Use "repeat" to avoid infinite loop on failure 
+ repeat 3 do; echo ${|REPLY=x; break }; done
+ repeat 3 do; echo ${{x} x=y; break }; done
+ repeat 3 do; echo ${ echo z; break }; done
+0:break after assignment completes the assignment
+>x
+>y
+>z
+
+ # Subshell because error exits
+ ( purr ${ echo ${unset?oops} } )
+1:error handling (without crashing)
+*?*unset: oops
+
+ purr ${ .zsh.cmdsubst=error }
+1:reserved parameter name (without crashing)
+*?*.zsh.cmdsubst: can't modify read-only parameter
 
 %clean
 
   unfunction purr purl
-  unsetopt ignorebraces

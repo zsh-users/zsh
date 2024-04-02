@@ -1,5 +1,9 @@
 2024-04-01  Bart Schaefer  <schaefer@zsh.org>
 
+	* 52864: Src/lex.c, Src/subst.c, Test/D10nofork.ztst,
+	Test/V10private.ztst: Change ${|var|...} to ${{var} ...},
+	limit local REPLY behavior to ${|...}, update tests.
+
 	* 52781 (and typo fix): Src/hashtable.c: HIST IGNORE_DUPS treats
 	whitespace as significant when HIST_REDUCE_BLANKS is also set.
 

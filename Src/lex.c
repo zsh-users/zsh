@@ -1423,7 +1423,7 @@ gettokstr(int c, int sub)
 	if (lexstop)
 	    break;
 	if (!cmdsubst && in_brace_param && act == LX2_STRING &&
-	    (c == '|' || c == Bar || inblank(c))) {
+	    (c == '|' || c == Bar || c == '{' || c == Inbrace || inblank(c))) {
 	    cmdsubst = in_brace_param;
 	    cmdpush(CS_CURSH);
 	} else if (in_pattern == 2 && c != '/')

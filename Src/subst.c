@@ -1866,10 +1866,11 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
      * joining the array into a string (for compatibility with ksh/bash).
      */
     int quoted_array_with_offset = 0;
-    /* Indicates ${|...;} */
-    char *rplyvar = NULL;
-    /* Indicates ${ ... ;} */
-    char *rplytmp = NULL;
+    /*
+     * Nofork substitution controls
+     */
+    char *rplyvar = NULL;    /* Indicates ${|...;} or ${{var} ...;} */
+    char *rplytmp = NULL;    /* Indicates ${ ... ;} */
 
     *s++ = '\0';
     /*
@@ -1897,14 +1898,16 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
      * flags in parentheses, but also one ksh hack.
      */
     if (c == Inbrace) {
-	/* The command string to be run by ${|...;} */
-	char *cmdarg = NULL;
+	/* For processing nofork command substitution string */
+	char *cmdarg = NULL, *endvar = NULL, inchar = *++s;
+	char *outbracep = s, sav = *s;
+	Param rplypm = NULL;
 	size_t slen = 0;
 	int trim = (!EMULATION(EMULATE_ZSH)) ? 2 : !qt;
-	inbrace = 1;
-	s++;
 
-        /* Short-path for the nofork command substitution ${|cmd;}
+	inbrace = 1;	/* Outer scope boolean, see above */
+
+        /* Handling for nofork command substitution e.g. ${|cmd;}
 	 * See other comments about kludges for why this is here.
 	 *
          * The command string is extracted and executed, and the
@@ -1913,48 +1916,77 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
          * should not be part of command substitution in any case.
          * Use ${(U)${|cmd;}} as you would for ${(U)$(cmd;)}.
 	 */
-	if (*s == '|' || *s == Bar || inblank(*s)) {
-	    char *outbracep = s;
-	    char sav = *s;
+	if (inchar == '|' || inchar == Bar || inblank(inchar)) {
 	    *s = Inbrace;
-	    if (skipparens(Inbrace, Outbrace, &outbracep) == 0) {
+	    if (skipparens(Inbrace, Outbrace, &outbracep) == 0)
 		slen = outbracep - s - 1;
-		if ((*s = sav) != Bar) {
-		    sav = *outbracep;
-		    *outbracep = '\0';
-		    tokenize(s);
-		    *outbracep = sav;
+	    *s = sav;
+	    if (inchar == '|')
+		inchar = Bar;	/* Simplify later compares */
+	} else if (inchar == '{' || inchar == Inbrace) {
+	    *s = Inbrace;
+	    if ((outbracep = itype_end(s+1, INAMESPC, 0))) {
+		if (*outbracep == Inbrack &&
+		    (outbracep = parse_subscript(++outbracep, 1, ']')))
+		    ++outbracep;
+	    }
+
+	    /* If we reached the first close brace, find the last */
+	    if (outbracep && *outbracep == Outbrace) {
+		char outchar = inchar == Inbrace ? Outbrace : '}';
+		endvar = outbracep++;
+
+		/* Require space to avoid ${{var}} typo for ${${var}} */
+		if (!inblank(*outbracep)) {
+		    zerr("bad substitution");
+		    return NULL;
 		}
+
+		*endvar = '|';	/* Almost anything but braces/brackets */
+		outbracep = s;
+		if (skipparens(Inbrace, outchar, &outbracep) == 0)
+		    *endvar = Outbrace;
+		else {	/* Never happens? */
+		    *endvar = outchar;
+		    outbracep = endvar + 1;
+		}
+		slen = outbracep - s - 1;
+		if (inchar != Inbrace)
+		    outbracep[-1] = Outbrace;
+		*s = sav;
+		inchar = Inbrace;	/* Simplify later compares */
+	    } else {
+		zerr("bad substitution");
+		return NULL;
 	    }
 	}
 	if (slen > 1) {
 	    char *outbracep = s + slen;
+	    if (!itok(*s) || inblank(inchar)) {
+		/* This tokenize() is important */
+		char sav = *outbracep;
+		*outbracep = '\0';
+		tokenize(s);
+		*outbracep = sav;
+	    }
 	    if (*outbracep == Outbrace) {
-		if ((rplyvar = itype_end(s+1, INAMESPC, 0))) {
-		    if (*rplyvar == Inbrack &&
-			(rplyvar = parse_subscript(++rplyvar, 1, ']')))
-			++rplyvar;
-		}
-		if (rplyvar == s+1 && *rplyvar == Bar) {
-		    /* Is ${||...} a subtitution error or a syntax error?
-		    zerr("bad substitution");
-		    return NULL;
-		    */
+		if (endvar == s+1) {
+		    /* For consistency with ${} we allow ${{}...} */
 		    rplyvar = NULL;
 		}
-		if (rplyvar && *rplyvar == Bar) {
-		    cmdarg = dupstrpfx(rplyvar+1, outbracep-rplyvar-1);
-		    rplyvar = dupstrpfx(s+1,rplyvar-s-1);
+		if (endvar && *endvar == Outbrace) {
+		    cmdarg = dupstrpfx(endvar+1, outbracep-endvar-1);
+		    rplyvar = dupstrpfx(s+1,endvar-s-1);
 		} else {
 		    cmdarg = dupstrpfx(s+1, outbracep-s-1);
 		    rplyvar = "REPLY";
 		}
-		if (inblank(*s)) {
+		if (inblank(inchar)) {
 		    /*
-		     * Admittedly a hack.  Take advantage of the enforced
-		     * locality of REPLY and the semantics of $(<file) to
+		     * Admittedly a hack.  Take advantage of the added
+		     * parameter scope and the semantics of $(<file) to
 		     * construct a command to write/read a temporary file.
-		     * Then fall through to the regular handling of $REPLY
+		     * Then fall through to the regular parameter handling
 		     * to manage word splitting, expansion flags, etc.
 		     */
 		    char *outfmt = ">| %s {\n%s\n;}";	/* 13 */
@@ -1977,22 +2009,39 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	}
 
 	if (rplyvar) {
-	    Param pm;
-	    /* char *rplyval = getsparam("REPLY"); */
+	    /* char *rplyval = getsparam("REPLY");  cf. Future? below */
 	    startparamscope(); /* "local" behaves as if in a function */
-	    pm = createparam("REPLY", PM_LOCAL|PM_UNSET);
-	    if (pm)	/* Shouldn't createparam() do this? */
-		pm->level = locallevel;
-	    /* if (rplyval) setsparam("REPLY", ztrdup(rplyval)); */
+	    if (inchar == Bar) {
+		/* rplyvar should be REPLY at this point, but create
+		 * hardwired name anyway to expose any bugs elsewhere
+		 */
+		rplypm = createparam("REPLY", PM_LOCAL|PM_UNSET|PM_HIDE);
+		if (rplypm)	/* Shouldn't createparam() do this? */
+		    rplypm->level = locallevel;
+		/* Future?  Expose global value of $REPLY if any? */
+		/* if (rplyval) setsparam("REPLY", ztrdup(rplyval)); */
+	    } else if (inblank(inchar)) {
+		rplypm = createparam(".zsh.cmdsubst",
+				     PM_LOCAL|PM_UNSET|PM_HIDE|
+				     PM_READONLY_SPECIAL);
+		if (rplypm)
+		    rplypm->level = locallevel;
+	    }
+	    if (inchar != Inbrace && !rplypm) {
+		zerr("failed to create scope for command substitution");
+		return NULL;
+	    }
 	}
 
 	if (rplyvar && cmdarg && *cmdarg) {
 	    int obreaks = breaks;
 	    Eprog cmdprog;
 	    /* Execute the shell command */
+	    queue_signals();
 	    untokenize(cmdarg);
 	    cmdprog = parse_string(cmdarg, 0);
 	    if (cmdprog) {
+		/* exec.c handles dont_queue_signals() */
 		execode(cmdprog, 1, 0, "cmdsubst");
 		cmdoutval = lastval;
 		/* "return" behaves as if in a function */
@@ -2002,6 +2051,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		}
 	    } else	/* parse error */
 		errflag |= ERRFLAG_ERROR;
+	    if (rplypm)
+		rplypm->node.flags &= ~PM_READONLY_SPECIAL;
 	    if (rplytmp && !errflag) {
 		int onoerrs = noerrs, rplylen;
 		noerrs = 2;
@@ -2017,15 +2068,16 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		}
 		noerrs = onoerrs;
 		if (rplylen >= 0)
-		    setsparam("REPLY", metafy(cmdarg, rplylen, META_REALLOC));
+		    setsparam(rplyvar, metafy(cmdarg, rplylen, META_REALLOC));
 	    }
+	    unqueue_signals();
 	}
 
 	if (rplytmp)
 	    unlink(rplytmp);
 	if (rplyvar) {
-	    if (strcmp(rplyvar, "REPLY") == 0) {
-		if ((val = dupstring(getsparam("REPLY"))))
+	    if (inchar != Inbrace) {
+		if ((val = dupstring(getsparam(rplyvar))))
 		    vunset = 0;
 		else {
 		    vunset = 1;
