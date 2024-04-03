@@ -11,7 +11,7 @@ setopt typesetsilent
 typeset -g __copyword
 if (( ${NUMERIC:-0} )); then
   # 1 means last word, 2 second last, etc.
-  (( __copyword = ${NUMERIC:-0} ))
+  (( __copyword = -${NUMERIC:-0} ))
   zstyle -s :$WIDGET widget __copywidget
 elif [[ -n $__copyword && $WIDGET = $LASTWIDGET ]]; then
   (( __copyword-- ))
