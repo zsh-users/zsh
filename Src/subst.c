@@ -3475,6 +3475,9 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	    char *sval;
 	    zip = getaparam(s);
 	    if (!zip) {
+		zip = gethparam(s);
+	    }
+	    if (!zip) {
 		sval = getsparam(s);
 		if (sval)
 		    zip = hmkarray(sval);
