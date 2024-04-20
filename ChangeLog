@@ -1,3 +1,8 @@
+2024-05-20  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 52895: Completion/Unix/Type/_baudrates: Partial revert of
+	44274 which broke _baudrates
+
 2024-05-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 52924: Src/Modules/zftp.c: NULL zfsessions after free.
