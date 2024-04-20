@@ -72,6 +72,7 @@ if (( ${+opts[-f]} )); then
   done
 fi
 
-# -1 removes dupes (which there shouldn't be)
-_description -1 -o numeric baud-rates expl 'baud rate'
+# -1V removes dupes (which there shouldn't be) and otherwise leaves the
+# order in the $rates array intact.
+_description -1V baud-rates expl 'baud rate'
 compadd "${argv[@]}" "$expl[@]" -- "${rates[@]}"
