@@ -1,3 +1,8 @@
+2024-05-08  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 52915: Doc/Zsh/cond.yo: be explicit about behaviour of globbing
+	patterns within conditions.
+
 2024-04-07  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 52878: Src/subst.c: Fix ${foo:^bar} where bar is an associative

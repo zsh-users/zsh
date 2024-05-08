@@ -241,7 +241,11 @@ ifnzman(\
 noderef(Filename Generation)\
 )\
 , but there is no special behaviour
-of `tt(/)' nor initial dots, and no glob qualifiers are allowed.
+of `tt(/)' nor initial dot, and the patterns `tt(**/)' and `tt(***/)' behave
+the same as `tt(*/)', in which the `tt(*)' has its standard behaviour
+but may also match further `tt(/)' characters.  Also, no bare glob
+qualifiers are allowed, though the form `((#q)var(...))' is allowed as
+shown above.
 
 In each of the above expressions, if
 var(file) is of the form `tt(/dev/fd/)var(n)',
