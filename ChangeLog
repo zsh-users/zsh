@@ -1,3 +1,7 @@
+2024-05-10  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 52924: Src/Modules/zftp.c: NULL zfsessions after free.
+
 2024-05-08  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 52915: Doc/Zsh/cond.yo: be explicit about behaviour of globbing
