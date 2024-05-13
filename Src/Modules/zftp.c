@@ -3147,6 +3147,7 @@ zftp_cleanup(void)
     lastmsg = NULL;
     zfunsetparam("ZFTP_SESSION");
     freelinklist(zfsessions, (FreeFunc) freesession);
+    zfsessions = NULL;
     zfree(zfstatusp, sizeof(int)*zfsesscnt);
     zfstatusp = NULL;
 }
