@@ -1,3 +1,8 @@
+2024-05-24  Bart Schaefer  <schaefer@zsh.org>
+
+	* 52904: Completion/Unix/Command/_git: Improve quoting of paths
+	passed via _call_program to "git ls-files"
+
 2024-05-20  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 52895: Completion/Unix/Type/_baudrates: Partial revert of
