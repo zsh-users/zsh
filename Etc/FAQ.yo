@@ -137,6 +137,7 @@ Chapter 3:  How to get various things to work
 3.28. How do I edit the input buffer in $EDITOR?
 3.29. Why does `which' output for missing commands go to stdout?
 3.30. Why doesn't the expansion mytt(*.{tex,aux,pdf}) do what I expect?
+3.31. Why does mytt($RANDOM) return the same number more than once?
 
 Chapter 4:  The mysteries of completion
 4.1. What is completion?
@@ -2218,6 +2219,37 @@ sect(Why doesn't the expansion mytt(*.{tex,aux,pdf}) do what I expect?)
   parentheses: again, see link(2.1)(21), and search for mytt(@_LPAR_).
   This is harder for the user to remember but easier for the shell to
   parse!
+
+sect(Why does mytt($RANDOM) return the same number more than once?)
+
+  As tt(zshparam(1)) says:
+  verb(
+      The values of RANDOM form an intentionally-repeatable
+      pseudo-random sequence; subshells that reference RANDOM
+      will result in identical pseudo-random values unless the
+      value of RANDOM is referenced or seeded in the parent shell
+      in between subshell invocations.
+  )
+
+  You can use a function, including an anonymous function, to always
+  evaluate mytt($RANDOM) in the parent shell.  This example illustrates
+  the difference:
+  verb(
+    for i in {1..10}; do
+      echo subshell: $(echo $RANDOM) $RANDOM
+      () { echo parent: $(echo $1) $2 } $RANDOM $RANDOM;
+    done
+  )
+
+  Remember that for a pipe like mytt(A | B), zsh runs A in a subshell
+  and B in the current shell.  This means that, for example:
+  verb(
+    for i in {1..10}; do
+      echo $RANDOM | tee
+    done
+  )
+  also repeats the same value, because mytt($RANDOM) is evaluated in
+  the subshell and the parent sequence is left unchanged.
 
 chapter(The mysteries of completion)
 
