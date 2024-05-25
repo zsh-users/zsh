@@ -7531,7 +7531,7 @@ __git_files () {
   # First allow ls-files to pattern-match in case of remote repository. Use the
   # icase pathspec magic word to ensure that we support case-insensitive path
   # completion for users with the appropriate matcher configuration
-  files=(${(0)"$(_call_program files git ls-files -z --exclude-standard ${(q)opts} -- ${(q)${pref:+:\(icase\)$pref\*}:-.} 2>/dev/null)"})
+  files=(${(0)"$(_call_program files git ls-files -z --exclude-standard ${(q)opts} -- ${(q)${pref:+:\(icase\)${(qq)pref}\*}:-.} 2>/dev/null)"})
   __git_command_successful $pipestatus || return
 
   # If ls-files succeeded but returned nothing, try again with no pattern. Note
