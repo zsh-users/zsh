@@ -249,13 +249,13 @@ errs=()
 (( ${#files} )) || errs=( "no files matched \`$fpat'" )
 
 for f in $files; do
-  if [[ $pat = (#b)(*)\(\*\*##/\)(*) ]]; then
+  if [[ $pat = (#b)(*)(\(\*\*##/\)|\*\*##/)(*) ]]; then
     # This looks like a recursive glob.  This isn't good enough,
-    # because we should really enforce that $match[1] and $match[2]
+    # because we should really enforce that $match[1] and $match[3]
     # don't match slashes unless they were explicitly given.  But
     # it's a start.  It's fine for the classic case where (**/) is
     # at the start of the pattern.
-    pat="$match[1](*/|)$match[2]"
+    pat="$match[1](*/|)$match[3]"
   fi
   [[ -e $f && $f = (#b)${~pat} ]] || continue
   set -- "$match[@]"

@@ -1,5 +1,7 @@
 2024-05-24  Bart Schaefer  <schaefer@zsh.org>
 
+	* 52910: Functions/Misc/zmv: Improve handling of **/ patterns
+
 	* 52904: Completion/Unix/Command/_git: Improve quoting of paths
 	passed via _call_program to "git ls-files"
 
