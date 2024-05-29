@@ -1,5 +1,8 @@
 2024-08-31  Oliver Kiddle  <opk@zsh.org>
 
+	* github #120: Semnodime: Completion/Unix/Command/_git: update
+	_git to reflect `--recursive` being an alias
+
 	* 53058: Completion/Unix/Command/_zstd: new completion for zstd
 
 	* 53057: Completion/Zsh/Context/_equal: complete glob qualifiers
