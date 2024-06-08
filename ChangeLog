@@ -1,3 +1,7 @@
+2024-06-08  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 52946: Completion/compdump, Completion/compinit: Revert 52768
+
 2024-05-24  Bart Schaefer  <schaefer@zsh.org>
 
 	* users/29882: Etc/FAQ.yo: Explain $RANDOM predictability

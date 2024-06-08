@@ -301,7 +301,7 @@ compdef() {
     if [[ -z "$eval" ]] && [[ "$1" = *\=* ]]; then
       while (( $# )); do
         if [[ "$1" = *\=* ]]; then
-	  cmd="${(q)${1%%\=*}}"
+	  cmd="${1%%\=*}"
 	  svc="${1#*\=}"
           func="$_comps[${_services[(r)$svc]:-$svc}]"
           [[ -n ${_services[$svc]} ]] &&
@@ -412,7 +412,7 @@ compdef() {
 	      svc=
             fi
             if [[ -z "$new" || -z "${_comps[$1]}" ]]; then
-              _comps[$cmd]="${(q)func}"
+              _comps[$cmd]="$func"
 	      [[ -n "$svc" ]] && _services[$cmd]="${1#*\=}"
 	    fi
             ;;

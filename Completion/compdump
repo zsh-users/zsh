@@ -113,7 +113,7 @@ integer _i=5
 print -n autoload -Uz >& $_d_fd
 while (( $#_d_als )); do
   if (( ! $+_compautos[$_d_als[1]] )); then
-    print -rn " ${(q-)_d_als[1]}"
+    print -n " $_d_als[1]"
     if (( ! --_i && $#_d_als > 1 )); then
       _i=5
       print -n ' \\\n           '
@@ -126,13 +126,13 @@ print >& $_d_fd
 
 local _c
 for _c in "${(ok@)_compautos}"; do
-  print -r "autoload -Uz ${(q-)_compautos[$_c]} $_c" >& $_d_fd
+  print "autoload -Uz $_compautos[$_c] $_c" >& $_d_fd
 done
 
 print >& $_d_fd
 
 print "typeset -gUa _comp_assocs" >& $_d_fd
-print -r "_comp_assocs=( ${(qq)_comp_assocs} )" >& $_d_fd
+print "_comp_assocs=( ${(qq)_comp_assocs} )" >& $_d_fd
 exec {_d_fd}>&-
 
 mv -f $_d_file ${_d_file%.$HOST.$$}
