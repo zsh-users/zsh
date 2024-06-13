@@ -1,3 +1,7 @@
+2024-06-13  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 52951: Src/builtin.c: make sure to close memstream for 'print -v'
+
 2024-06-08  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 52946: Completion/compdump, Completion/compinit: Revert 52768

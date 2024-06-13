@@ -5455,9 +5455,8 @@ bin_print(char *name, char **args, Options ops, int func)
 		}
 		zwarnnam(name, "%s: invalid directive", start);
 		if (*c) c[1] = save;
-		/* Why do we care about a clean close here? */
-		if (!CLOSE_CLEANLY(fout))
-		    zwarnnam(name, "write error: %e", errno);
+		if (fout != stdout)
+		    fclose(fout);
 #ifdef HAVE_OPEN_MEMSTREAM
 		if (buf)
 		    free(buf);
