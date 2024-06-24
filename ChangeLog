@@ -1,3 +1,7 @@
+2024-06-24  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 52968: Doc/Makefile.in: use pdfroff to create intro.pdf
+
 2024-06-13  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 52951: Src/builtin.c: make sure to close memstream for 'print -v'
