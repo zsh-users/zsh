@@ -118,15 +118,13 @@ zsh.pdf zsh_a4.pdf zsh_us.pdf: $(sdir)/zsh.texi
 	  $(TEXI2PDF) -o $@ -t @afourpaper $(sdir)/zsh.texi; \
 	fi
 
-# Use roff2ps / ps2pdf because pdfroff produces doubled output.
 intro.pdf intro.a4.pdf intro.us.pdf: $(sdir)/intro.ms
 	if test $@ = intro.us.pdf || \
 	  { test $@ = intro.pdf && test "$(PAPERSIZE)" = us; }; then \
-	  roff2ps -ms -P-pletter < $(sdir)/intro.ms > intro.ps; \
+	  pdfroff -ms -P-pletter $(sdir)/intro.ms > $@; \
 	else \
-	  roff2ps -ms -P-pa4 < $(sdir)/intro.ms > intro.ps; \
-	fi; \
-	ps2pdf -sOutputFile=$@ intro.ps
+	  pdfroff -ms -P-pa4 $(sdir)/intro.ms > $@; \
+	fi
 
 texi: $(sdir)/zsh.texi
 .PHONY: texi
