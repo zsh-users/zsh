@@ -995,6 +995,33 @@ F:Must be tested with a top-level script rather than source or function
 ?loop 0
 ?loop 1
 
+  ( set -e; true && {false; echo NOT REACHED} )
+  ( trap "print Trapped!" ERR; true && {false} )
+  ( trap "print Trapped!" ERR; true && if true; then false; fi )
+  ( trap "print Trapped!" ERR; true && {false} always {true} )
+  ( true && (set -e; false; echo NOT REACHED) )
+  ( true && (trap "print Trapped!" ERR; false) )
+  ( true && { set -e; false; echo NOT REACHED } )
+  ( true && { trap "print Trapped!" ERR; false } )
+  ( set -e; true && (false; echo one) || echo two )
+  ( set -e; true && { false; echo one; } || echo two )
+0:ERR_EXIT is triggered by last command in an AND-OR list
+>Trapped!
+>Trapped!
+>Trapped!
+>Trapped!
+>Trapped!
+>one
+>one
+
+  ( set -o ERR_RETURN; f() { false; echo NOT REACHED;  }; f || true; echo OK )
+  ( set -o ERR_RETURN; f() { true && false; echo NOT REACHED;  }; f || true; echo OK )
+  ( set -o ERR_RETURN; f() { true && { false }; echo NOT REACHED;  }; f || true; echo OK )
+0:ERR_RETURN is triggered in function calls on the left of an AND-OR
+>OK
+>OK
+>OK
+
   if zmodload zsh/system 2>/dev/null; then
   (
     trap 'echo TERM; exit 2' TERM

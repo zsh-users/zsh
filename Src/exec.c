@@ -1568,6 +1568,7 @@ execlist(Estate state, int dont_change_job, int exiting)
 	    }
 	    state->pc = next;
 	    code = *state->pc++;
+	    noerrexit = oldnoerrexit;
 	}
 	state->pc--;
 sublist_done:
