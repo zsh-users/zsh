@@ -60,10 +60,7 @@ if zstyle -T ":completion:${curcontext}:files" remote-access; then
     dirprefix=${dir}/
   fi
 
-  if [[ -z $QIPREFIX ]]
-    then rempat="${dirprefix}${PREFIX%%[^./][^/]#}\*"
-    else rempat="${dirprefix}${(q)PREFIX%%[^./][^/]#}\*"
-  fi
+  rempat="${dirprefix}${(q)PREFIX%%[^./][^/]#}\*"
 
   # remote filenames
   remfiles=(${(M)${(f)"$(
@@ -92,9 +89,9 @@ if zstyle -T ":completion:${curcontext}:files" remote-access; then
   while _tags; do
     while _next_label remote-files expl ${suf:-remote directory}; do
       [[ -n $suf ]] &&
-          compadd "$args[@]" "$expl[@]" -d remdispf -- ${(q)remdispf%[*=|]} && ret=0
+          compadd "$args[@]" "$expl[@]" -d remdispf -- ${remdispf%[*=|]} && ret=0
       compadd ${suf:+-S/} $autoremove "$args[@]" "$expl[@]" -d remdispd \
-	-- ${(q)remdispd%/} && ret=0
+	-- ${remdispd%/} && ret=0
     done
     (( ret )) || return 0
   done
