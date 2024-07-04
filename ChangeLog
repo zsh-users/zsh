@@ -1,3 +1,7 @@
+2024-07-04  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 52985: Src/exec.c: avoid adding original param to restorelist
+
 2024-06-24  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 52968: Doc/Makefile.in: use pdfroff to create intro.pdf

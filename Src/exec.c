@@ -4409,7 +4409,7 @@ save_params(Estate state, Wordcode pc, LinkList *restore_p, LinkList *remove_p)
     while (wc_code(ac = *pc) == WC_ASSIGN) {
 	s = ecrawstr(state->prog, pc + 1, NULL);
 	if ((pm = (Param) paramtab->getnode(paramtab, s))) {
-	    Param tpm;
+	    Param tpm = NULL;
 	    if (pm->env)
 		delenv(pm);
 	    if (!(pm->node.flags & PM_SPECIAL)) {
@@ -4426,7 +4426,6 @@ save_params(Estate state, Wordcode pc, LinkList *restore_p, LinkList *remove_p)
 		tpm = (Param) zshcalloc(sizeof *tpm);
 		tpm->node.nam = ztrdup(pm->node.nam);
 		copyparam(tpm, pm, 0);
-		pm = tpm;
 	    } else if (!(pm->node.flags & PM_READONLY) &&
 		       (unset(RESTRICTED) || !(pm->node.flags & PM_RESTRICTED))) {
 		/*
@@ -4437,10 +4436,10 @@ save_params(Estate state, Wordcode pc, LinkList *restore_p, LinkList *remove_p)
 		tpm = (Param) hcalloc(sizeof *tpm);
 		tpm->node.nam = pm->node.nam;
 		copyparam(tpm, pm, 1);
-		pm = tpm;
 	    }
 	    addlinknode(*remove_p, dupstring(s));
-	    addlinknode(*restore_p, pm);
+	    if (tpm)
+		addlinknode(*restore_p, tpm);
 	} else
 	    addlinknode(*remove_p, dupstring(s));
 
