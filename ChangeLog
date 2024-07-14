@@ -2,6 +2,12 @@
 
 	* 52985: Src/exec.c: avoid adding original param to restorelist
 
+2024-06-28  Bart Schaefer  <schaefer@zsh.org>
+
+	* Philippe Altherr: 52977: Src/exec.c, Test/C03traps.ztst: fix
+	and test regression so that ERR_EXIT and ERR_RETURN are respected
+	by the final command in an && / || sequence.
+
 2024-06-24  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 52968: Doc/Makefile.in: use pdfroff to create intro.pdf
