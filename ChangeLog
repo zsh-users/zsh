@@ -1,3 +1,8 @@
+2024-07-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 52999: Franklin Yu (adapted): Src/init.c: Import OLDPWD from
+	the environment if set.
+
 2024-07-04  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 52985: Src/exec.c: avoid adding original param to restorelist

@@ -1245,7 +1245,11 @@ setupvals(char *cmd, char *runscript, char *zsh_name)
 	pwd = metafy(zgetcwd(), -1, META_DUP);
     }
 
-    oldpwd = ztrdup(pwd);  /* initialize `OLDPWD' = `PWD' */
+    oldpwd = zgetenv("OLDPWD");
+    if (oldpwd == NULL)
+        oldpwd = ztrdup(pwd);  /* initialize `OLDPWD' = `PWD' */
+    else
+	oldpwd = ztrdup(oldpwd);
 
     inittyptab();     /* initialize the ztypes table */
     initlextabs();    /* initialize lexing tables    */
