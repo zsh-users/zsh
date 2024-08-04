@@ -1,3 +1,9 @@
+2024-08-03  Eric Cook  <llua@gmx.com>
+
+	* 52989: Completion/Unix/Command/_rsync,
+	Completion/Unix/Type/_remote_files: support rsync 3.2.4+ remote
+	filename handling.
+
 2024-07-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 52999: Franklin Yu (adapted): Src/init.c: Import OLDPWD from

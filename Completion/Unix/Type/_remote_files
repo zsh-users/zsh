@@ -11,6 +11,8 @@
 # - -g: specify a pattern to match against files
 #       p, = and * glob qualifiers supported
 # - -h: specify the remote host, default is ${IPREFIX%:}
+# - -Q: specify a pattern of characters to escape in the returned filenames,
+#       instead of shell metacharacters that ${(q)name} does
 # - -W: specify the parent directory to list files from,
 #       default is the home directory
 #
@@ -31,14 +33,14 @@
 
 
 # There should be coloring based on all the different ls -F classifiers.
-local expl rempat remfiles remdispf remdispd args cmd suf ret=1
+local expl rempat remfiles remdispf{,q} remdispd{,q} args cmd suf ret=1
 local -a args cmd_args
-local glob host dir dirprefix
+local glob host dir esc dirprefix
 
 if zstyle -T ":completion:${curcontext}:files" remote-access; then
 
   # Parse options to _remote_files. Stops at the first "--".
-  zparseopts -D -E -a args / g:=glob h:=host W:=dir
+  zparseopts -D -E -a args / g:=glob h:=host W:=dir Q:=esc
   (( $#host)) && shift host || host="${IPREFIX%:}"
 
   args=( ${argv[1,(i)--]} )
@@ -85,6 +87,14 @@ if zstyle -T ":completion:${curcontext}:files" remote-access; then
     remdispf=( ${(M)remdispf:#${~glob[2]}} )
   fi
 
+  if (( $#esc )); then
+    remdispfq=(${${remdispf%[*=|]}//(#b)(${~esc[2]})/\\$match[1]})
+    remdispdq=(${${remdispd%/}//(#b)(${~esc[2]})/\\$match[1]})
+  else
+    remdispfq=(${(q)remdispf%[*=|]})
+    remdispdq=(${(q)remdispd%/})
+  fi
+
   local -a autoremove
   [[ -o autoremoveslash ]] && autoremove=(-r "/ \t\n\-")
 
@@ -92,9 +102,9 @@ if zstyle -T ":completion:${curcontext}:files" remote-access; then
   while _tags; do
     while _next_label remote-files expl ${suf:-remote directory}; do
       [[ -n $suf ]] &&
-          compadd "$args[@]" "$expl[@]" -d remdispf -- ${(q)remdispf%[*=|]} && ret=0
+        compadd "$args[@]" "$expl[@]" -d remdispf -- $remdispfq && ret=0
       compadd ${suf:+-S/} $autoremove "$args[@]" "$expl[@]" -d remdispd \
-	-- ${(q)remdispd%/} && ret=0
+        -- $remdispdq && ret=0
     done
     (( ret )) || return 0
   done
