@@ -60,7 +60,14 @@ elif compset -P 1 '*::' || compset -P 1 'rsync://*/'; then
 elif compset -P 'rsync://'; then
   _rsync_user_or_host / "$@"
 elif compset -P 1 '*:'; then
-  _remote_files -- ssh
+  if [[ -v opt_args[(i)client---old-args] || $RSYNC_OLD_ARGS = 1 ]]; then
+    _remote_files -- ssh
+  else
+    # the 3.2.4+ way that rsync handles filenames does not protect *, ? and []
+    # so those characters still need to be escaped to prevent being treated as
+    # a pattern in the remote shell.
+    _remote_files -Q '[][*?]' -- ssh
+  fi
 else
   _rsync_user_or_host : "$@"
 fi
@@ -236,6 +243,7 @@ _rsync() {
     '*--include=[do not exclude files matching pattern]:pattern' \
     '--files-from=[read list of source-file names from specified file]:file:_files' \
     '(-0 --from0)'{-0,--from0}'[all *-from file lists are delimited by nulls]' \
+    '--old-args[disable the modern arg-protection idiom]' \
     '(-s --secluded-args)'{-s,--secluded-args}'[use the protocol to safely send arguments]' \
     "--trust-sender[trust the remote sender's file list]" \
     '--copy-as=[specify user & optional group for the copy]:user:_rsync_users_groups' \
