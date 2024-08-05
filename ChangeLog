@@ -1,3 +1,8 @@
+2024-08-04  Bart Schaefer  <schaefer@zsh.org>
+
+	* Philippe Altherr: 53005: Src/exec.c: off-by-one error when
+	resetting signals on subshell entrance
+
 2024-08-03  Eric Cook  <llua@gmx.com>
 
 	* 52989: Completion/Unix/Command/_rsync,
