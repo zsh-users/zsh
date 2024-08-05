@@ -165,7 +165,7 @@ execfor(Estate state, int do_exec)
 		    fprintf(xtrerr, "%s=%s\n", name, str);
 		    fflush(xtrerr);
 		}
-		setloopvar(name, ztrdup(str));
+		setloopvar(name, str);
 		count++;
 	    }
 	    if (!count)

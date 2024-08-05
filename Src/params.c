@@ -2811,9 +2811,10 @@ assignstrvalue(Value v, char *val, int flags)
 	break;
     }
     setscope(v->pm);
-    if ((!v->pm->env && !(v->pm->node.flags & PM_EXPORTED) &&
-	 !(isset(ALLEXPORT) && !(v->pm->node.flags & PM_HASHELEM))) ||
-	(v->pm->node.flags & PM_ARRAY) || v->pm->ename)
+    if (errflag ||
+	((!v->pm->env && !(v->pm->node.flags & PM_EXPORTED) &&
+	  !(isset(ALLEXPORT) && !(v->pm->node.flags & PM_HASHELEM))) ||
+	 (v->pm->node.flags & PM_ARRAY) || v->pm->ename))
 	return;
     export_param(v->pm);
 }
@@ -6330,9 +6331,10 @@ setloopvar(char *name, char *value)
       pm->node.flags &= ~PM_UNSET;
       pm->node.flags |= PM_NEWREF;
       setscope(pm);
-      pm->node.flags &= ~PM_NEWREF;
+      if (!errflag)
+	  pm->node.flags &= ~PM_NEWREF;
   } else
-      setsparam(name, value);
+      setsparam(name, ztrdup(value));
 }
 
 /**/

@@ -1,5 +1,8 @@
 2024-08-05  Bart Schaefer  <schaefer@zsh.org>
 
+	* 53025: Src/loop.c, Src/params.c: fix two memory leaks and two
+	pointer errors when encountering a named reference self-reference
+
 	* 53023: Src/params.c: fix memory leak of unset private parameter
 
 2024-08-04  Bart Schaefer  <schaefer@zsh.org>
