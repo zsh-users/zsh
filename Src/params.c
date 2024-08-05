@@ -3790,7 +3790,7 @@ unsetparam_pm(Param pm, int altflag, int exp)
 	altremove = NULL;
 
     pm->node.flags &= ~PM_DECLARED;	/* like ksh, not like bash */
-    if (!(pm->node.flags & PM_UNSET))
+    if (!(pm->node.flags & PM_UNSET) || (pm->node.flags & PM_REMOVABLE))
 	pm->gsu.s->unsetfn(pm, exp);
     if (pm->env)
 	delenv(pm);

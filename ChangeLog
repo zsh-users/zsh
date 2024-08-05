@@ -1,3 +1,7 @@
+2024-08-05  Bart Schaefer  <schaefer@zsh.org>
+
+	* 53023: Src/params.c: fix memory leak of unset private parameter
+
 2024-08-04  Bart Schaefer  <schaefer@zsh.org>
 
 	* Philippe Altherr: 53005: Src/exec.c: off-by-one error when
