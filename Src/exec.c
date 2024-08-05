@@ -1047,7 +1047,7 @@ entersubsh(int flags, struct entersubsh_ret *retp)
     int i, sig, monitor, job_control_ok;
 
     if (!(flags & ESUB_KEEPTRAP))
-	for (sig = 0; sig < SIGCOUNT; sig++)
+	for (sig = 0; sig <= SIGCOUNT; sig++)
 	    if (!(sigtrapped[sig] & ZSIG_FUNC) &&
 		!(isset(POSIXTRAPS) && (sigtrapped[sig] & ZSIG_IGNORED)))
 		unsettrap(sig);
@@ -1161,7 +1161,7 @@ entersubsh(int flags, struct entersubsh_ret *retp)
      * Start loop at 1 because 0 is SIGEXIT
      */
     if (intrap)
-	for (sig = 1; sig < SIGCOUNT; sig++)
+	for (sig = 1; sig <= SIGCOUNT; sig++)
 	    if (sigtrapped[sig] && sigtrapped[sig] != ZSIG_IGNORED)
 		signal_unblock(signal_mask(sig));
     if (!job_control_ok)
