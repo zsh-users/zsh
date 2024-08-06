@@ -482,7 +482,8 @@ static initparam argvparam_pm = IPDEF9("", &pparams, NULL, \
 #define GETREFNAME(PM) (((PM)->node.flags & PM_SPECIAL) ?	\
 			(PM)->gsu.s->getfn(PM) : (PM)->u.str)
 #define SETREFNAME(PM,S) (((PM)->node.flags & PM_SPECIAL) ?		\
-			  (PM)->gsu.s->setfn(PM,(S)) : ((PM)->u.str = (S)))
+			  (PM)->gsu.s->setfn(PM,(S)) :			\
+			  (zsfree((PM)->u.str), (PM)->u.str = (S)))
 
 static Param argvparam;
 

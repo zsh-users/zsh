@@ -1,3 +1,8 @@
+2024-08-06  Bart Schaefer  <schaefer@zsh.org>
+
+	* Jun.T: 53026: Src/params.c: fix failure to free old value when
+	setting new value of reference
+
 2024-08-05  Bart Schaefer  <schaefer@zsh.org>
 
 	* 53025: Src/loop.c, Src/params.c: fix two memory leaks and two
