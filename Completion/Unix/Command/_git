@@ -664,7 +664,7 @@ _git-clone () {
     '(--single-branch)--no-single-branch[clone history leading up to each branch]' \
     "--no-tags[don't clone any tags and make later fetches not follow them]" \
     '--shallow-submodules[any cloned submodules will be shallow]' \
-    '--recursive[initialize all contained submodules]' \
+    '--recursive[initialize submodules in the clone]' \
     '(--recursive --recurse-submodules)'{--recursive,--recurse-submodules}'=-[initialize submodules in the clone]::file:__git_files' \
     '--separate-git-dir[place .git dir outside worktree]:path to .git dir:_path_files -/' \
     \*--server-option='[send specified string to the server when using protocol version 2]:option' \
