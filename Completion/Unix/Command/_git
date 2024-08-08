@@ -278,6 +278,7 @@ _git-bisect () {
           _arguments -C -s \
             $log_options \
             $revision_options && ret=0
+          ;;
         (*)
           _nothing
           ;;
