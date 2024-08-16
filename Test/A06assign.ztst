@@ -743,3 +743,10 @@
  print $a
 0:overwrite [2] character (string: "") with "xx"
 >xx
+
+ ( sleep 1 &
+   x[1]=$!
+   typeset -p x
+ )
+0:regression workers/53033: assigning $! to array element
+*>typeset -g -a x=\( <-> \)

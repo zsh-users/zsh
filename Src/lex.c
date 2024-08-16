@@ -1402,10 +1402,11 @@ gettokstr(int c, int sub)
 	    /*
 	     * Same logic as Dash, for ! to perform negation in range.
 	     */
-	    if (seen_brct)
+	    if (seen_brct && brct)
 		c = Bang;
 	    else
 		c = '!';
+	    break;
 	case LX2_OTHER:
 	    if (in_brace_param) {
 		if (c == '/') {
