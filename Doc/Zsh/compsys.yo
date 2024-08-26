@@ -5448,10 +5448,6 @@ example(local expl
 _wanted tag expl 'description' \ 
     compadd -- var(match1) var(match2)...)
 
-See also the use of tt(_wanted) in the example function in
-ifzman(the subsection `Dynamic named directories' in zmanref(zshexpn))\
-ifnzman(noderef(Dynamic named directories)).
-
 Note that, as for tt(_requested), the var(command) must be able to
 accept options to be passed down to tt(compadd).
 

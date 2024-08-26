@@ -1,3 +1,7 @@
+2024-08-26  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* unposted: Doc/Zsh/compsys.yo: remove reference to removed code
+
 2024-08-15  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted (see 53034): Src/lex.c, Test/A06assign.ztst: fix parsing
