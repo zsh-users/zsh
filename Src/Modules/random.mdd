@@ -1,0 +1,7 @@
+name=zsh/random
+link=either
+load=yes
+
+autofeatures="p:SRANDOM f:zrand_float f:zrand_int"
+
+objects="random.o random_real.o"

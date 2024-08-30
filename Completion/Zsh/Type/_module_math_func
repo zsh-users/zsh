@@ -2,7 +2,7 @@
 
 local mod
 local -a funcs alts
-local -a modules=( example mathfunc system )
+local -a modules=( example mathfunc system random )
 
 for mod in $modules; do
   funcs=( ${${${(f)"$(zmodload -Fl zsh/$mod 2>/dev/null)"}:#^+f:*}##+f:} )

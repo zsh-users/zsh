@@ -1,5 +1,11 @@
 2024-08-31  Oliver Kiddle  <opk@zsh.org>
 
+	* Clinton Bunch: 53056: Completion/Zsh/Type/_module_math_func,
+	Doc/Makefile.in, Doc/Zsh/mod_random.yo, Src/Modules/random.c,
+	Src/Modules/random.mdd, Src/Modules/random_real.c, configure.ac:
+	new zsh/random module defining an SRANDOM parameter and
+	zrand_float() and zrand_int() math functions
+
 	* github #120: Semnodime: Completion/Unix/Command/_git: update
 	_git to reflect `--recursive` being an alias
 

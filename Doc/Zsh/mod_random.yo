@@ -1,0 +1,56 @@
+COMMENT(!MOD!zsh/random
+Some High-quality randomness parameters and functions.
+!MOD!)
+The tt(zsh/random) module gets random data from the kernel random pool. If no
+kernel random pool can be found, the module will not load.
+
+subsect(Parameters)
+
+startitem()
+vindex(SRANDOM)
+item(tt(SRANDOM)) (
+A random positive 32-bit integer between 0 and 4,294,967,295.  This parameter
+is read-only. The name was chosen for compatibility with Bash and to
+distinguish it from tt(RANDOM) which has a documented repeatable behavior.
+)
+enditem()
+
+subsect(Math Functions)
+
+startitem()
+item(tt(zrand_float+LPAR()RPAR())) (
+Returns a random floating point number between 0 and 1 inclusive.
+)
+enditem()
+
+startitem()
+item(tt(zrand_int)+LPAR()tt(upper), tt(lower), tt(inclusive)RPAR()) (
+Returns a random integer between tt(lower) and tt(upper). All parameters are
+optional.  If none are specified it is equivalent to
+tt(SRANDOM).
+
+tt(upper) is the upper bound on the resultant number and defaults to
+4,294,967,295.
+
+tt(lower) is the lower bound and defaults to 0.
+
+The defaults of these two arguments are also the maximum and minimum to which
+either can be set.
+
+tt(inclusive) is a flag that controls whether the result is ever equal to
+tt(upper).  By default it is not. If this argument is set to a non-zero value
+then it may be.
+
+This is to facilitate a construct like tt($a[zrand_int($#a)+1]) rather
+than tt($a[zrand_int+LPAR()$#a-1+RPAR()+1]).
+For example, if $#a is 16, you would use tt(zrand_int+LPAR()16RPAR()) which has
+16 possible return values 0-15.  Because the function can return zero, in order
+to use it as an array index from 1-16 you need to add one.  It would
+be an array index range error for it to also potentially return 16 ($#a). You
+could, however, use the construct tt(zrand_int+LPAR()16,1,1+RPAR()) instead of
+adding 1 to achieve the same result, but it is more verbose.
+
+Most statistics algorithms seem to also expect 0 to tt(upper)-1, so this was
+deemed the most commonly desired case and chosen as the default.
+)
+enditem()

@@ -636,6 +636,7 @@ fi
 AC_CHECK_HEADERS(sys/time.h sys/times.h sys/select.h termcap.h termio.h \
 		 termios.h sys/param.h sys/filio.h string.h memory.h \
 		 limits.h fcntl.h libc.h sys/utsname.h sys/resource.h \
+		 sys/random.h \
 		 locale.h errno.h stdio.h stdarg.h varargs.h stdlib.h \
 		 unistd.h sys/capability.h \
 		 utmp.h utmpx.h sys/types.h pwd.h grp.h poll.h sys/mman.h \
@@ -1292,6 +1293,7 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       cygwin_conv_path \
 	       nanosleep \
 	       srand_deterministic \
+	       getrandom arc4random_buf \
 	       setutxent getutxent endutxent getutent)
 AC_FUNC_STRCOLL
 
