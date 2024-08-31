@@ -1,101 +1,119 @@
 #compdef setxkbmap
 
-# TODO:
-# model, option, symbols and types suggestions
-# take -layout and -variant into account
+local curcontext="$curcontext" sourcedir layout ret=1
+local -a state state_descr line expl matches suf
+local -A opt_args
 
-_setxkbmap() {
-    emulate -L zsh
-    setopt extendedglob
+_arguments -C \
+  '(-)'{-\?,-help}'[display help message]' \
+  '-compat[compatibility map]:compatibility:->compatmaps' \
+  '-config[configuration file]:configuration:_files' \
+  '-device[specify numeric id of the input device]:device:->devices' \
+  '-display[display]:display:_x_display' \
+  '-geometry[geometry component]:geometry:->geometries' \
+  '*-I+[add a directory to be searched for layout or rules files]: :_directories' \
+  '-keycodes[specify keycodes component name]:name' \
+  '-keymap[specify keymap to load]:keymap' \
+  '-layout[specify layout used to choose component names]:layout:->layouts' \
+  '-model[specify model used to choose component names]:model:->models' \
+  '*-option[add an xkb option]:option:->options' \
+  '(-)'-print'[print a complete xkb_keymap description]' \
+  '-query[print the current layout settings]' \
+  '-rules[specify rules file to use]:rules:->rules' \
+  '-symbols[specify symbols component name]:symbol' \
+  '-synch[force synchronization]' \
+  '-types[types components]:type:->types' \
+  '(-verbose -v)'{-verbose,-v}'[set verbosity level]:verbosity:(0 1 2 3 4 5 6 7 8 9)' \
+  '(-)-version[display version information]' \
+  '-variant[specify layout variant used to choose component name]:variant:->variants' \
+  '1:layout:->layouts' \
+  '2:variant:->variants' \
+  '*:option:->options' && ret=0
 
-    # xkb files may be in different places depending on system
-    local dir sourcedir fullname
-    local -a searchdirs=(${XDG_DATA_HOME:-~/.local/share} ${(s.:.)XDG_DATA_DIRS:-/usr/lib:/usr/share:/usr/local/lib:/usr/local/share})
-    for dir in $searchdirs; do
-        fullname="$dir/X11/xkb"
-        if [ -d $fullname ] ; then
-           sourcedir=$fullname
-           break
-        fi
-    done
-    [ -d $sourcedir ] || return 1
+if [[ -n $state ]]; then
+  local open='(' close=')'
+  compquote open close
 
-    local -a arguments
-
-    arguments=(
-        '-compat[compatibility map]:compatibility:_setxkbmap_compat'
-        '-config[configuration file]:configuration:_files'
-        '-display[display]:display:_x_display'
-        '-geometry[geometry component]:geometry:_setxkbmap_geometry'
-        '-model[model name]:model:'
-        '-option[xkb option]:option:'
-        '(-)'-print'[print component names]'
-        '-rules[rules file]:rules:_files'
-        '-symbols[symbols components]:symbols:'
-        '(-)'{-help,-h}'[display help message]'
-        '-synch[force synchronization]'
-        '-types[types components]:types:'
-        '(-verbose -v)'{-verbose,-v}'[set verbosity level]:verbosity:(0 1 2 3 4 5 6 7 8 9)'
-        '*::keyboard:_setxkbmap_dispatcher'
-    )
-    _arguments $arguments
-}
-
-_setxkbmap_dispatcher () {
-
-    case $CURRENT in
-        1)
-            _setxkbmap_layout
-        ;;
-        2)
-            _setxkbmap_variant "$words[1]"
-        ;;
-    esac
-}
-
-_setxkbmap_files () {
-    local dir="$1"
-    local label="$2"
-
-    local -a fullpath shortpath expl
-
-    fullpath=($sourcedir/$dir/**/*~*README(.))
-    shortpath=(${fullpath#$sourcedir\/$dir\/})
-
-    _wanted layout expl $label compadd -a - shortpath
-
-}
-
-(( $+functions[_setxkbmap_compat] )) ||
-_setxkbmap_compat() {
-    _setxkbmap_files "compat" "compatibility"
-}
-
-(( $+functions[_setxkbmap_layout] )) ||
-_setxkbmap_layout () {
-    _setxkbmap_files "symbols" "layout"
-}
-
-(( $+functions[_setxkbmap_geometry] )) ||
-_setxkbmap_geometry () {
-    _setxkbmap_files "geometry" "geometry"
-}
-
-(( $+functions[_setxkbmap_variant] )) ||
-_setxkbmap_variant () {
-    local file=$sourcedir/symbols/${1}
-    local -a variants lines expl
-
-    if [ ! -f $file ]; then
-        _message "no such layout: ${1}"
-        return 1
+  layout=${opt_args[-layout]:-$line[1]}
+  if [[ $state = layouts ]]; then
+    compset -P '*,'
+    if compset -P 1 '*\('; then
+      layout="${${IPREFIX%$open}##*,}"
+      state=variants state_descr=variant
+      suf=( -S"$close$compstate[quote] " )
+    else
+      suf=( -S$open -r ",('\" \t\n\-" )
     fi
+  fi
 
-    lines=("${(f)$(< ${file})}")
-    variants=(${${${(M)lines:#*xkb_symbols*\"([^\"])##\"*}##*xkb_symbols([^\"])##\"}%%\"*})
-    
-    _wanted variant expl 'variant' compadd -a variants
+  _description $state expl $state_descr
+  if (( $+commands[localectl] )); then
+    case $state in
+      layouts) matches=( $(_call_program layouts localectl list-x11-keymap-layouts) ) ;;
+      models) matches=( $(_call_program layouts localectl list-x11-keymap-models) ) ;;
+      options) matches=( $(_call_program layouts localectl list-x11-keymap-options) ) ;;
+      variants) matches=( $(_call_program layouts localectl list-x11-keymap-variants $layout) ) ;;
+    esac
+  fi
+  if (( ! $#matches )); then
+    sourcedir=$(pkg-config xkeyboard-config --variable=xkb_base 2>/dev/null)
+    [[ -z $sourcedir ]] && sourcedir=(
+      ${XDG_DATA_HOME:-~/.local/share}/X11/xkb(N/)
+      ${(s.:.)XDG_DATA_DIRS:-/usr/lib:/usr/share:/usr/local/lib:/usr/local/share}/X11/xkb(N/)
+    )
+    (( $#sourcedir )) && case $state in
+      layouts) matches=( $sourcedir/symbols/**/^README(.Ne."REPLY=\${REPLY#*/symbols/}".) ) ;;
+      compatmaps) matches=( $sourcedir/compat/^README(.:t) ) ;;
+      models) matches=( $(sed -n '/modelList/,/\/modelList/ s, *<name>\(.*\)</name>,\1,p' $sourcedir/rules/(evdev|base).xml(.N[1])) ) ;;
+      options) matches=( $(sed -n '/optionList/,/\/optionList/ s, *<name>\(.*\)</name>,\1,p' $sourcedir/rules/(evdev|base).xml(.N[1])) ) ;;
+      rules) matches=( $sourcedir/rules/*.lst(-.:t:r) ) ;;
+      types) matches=( $sourcedir/types/^README(.:t) ) ;;
+      variants)
+        [[ -n $layout && -r $sourcedir/symbols/$layout ]] && matches=(
+            ${${${(M)${(f)"$(<$sourcedir/symbols/$layout)"}:#*xkb_symbols*\"([^\"])##\"*}##*xkb_symbols([^\"])##\"}%%\"*}
+        )
+      ;;
+      geometries)
+        if compset -P 1 '*\('; then
+          layout="${${IPREFIX%$open}##*,}"
+          suf=( -S"$close$compstate[quote] " )
+          matches=( $(sed -n -e '/xkb_geometry/ s/[^"]*"\([^"]*\).*/\1/p' $sourcedir/geometry/${IPREFIX%%[\\(]#}(.N)) )
+        else
+          suf=( -S$open -r "('\" \t\n\-" )
+          matches=( $sourcedir/geometry/^README(.:t) )
+        fi
+      ;;
+      devices)
+        # copied from _xinput
+        if (( $+commands[xinput] )); then
+          local -a ids names disp
+          local out
+          ids=( ${${(f)"$(_call_program input-devices xinput list --id-only)"}#? } )
+          names=( ${${(f)"$(_call_program input-devices xinput list --name-only)"}#? } )
+          disp=( ${(f)"$(_call_program input-devices xinput list --short)"} )
 
-}
+          if [[ $PREFIX$SUFFIX = [^-]*[^0-9]* ]]; then
+            # match based on the names but insert IDs
+            compadd "$expl[@]" -M 'b:=* m:{[:lower:]}={[:upper:]}' -D ids -D disp -a names
+            compadd "$expl[@]" -U -ld disp -a ids && ret=0
 
-_setxkbmap "$@"
+            zstyle -s ":completion:${curcontext}:input-devices" insert-ids out || out=menu
+            case "$out" in
+              menu)   compstate[insert]=menu ;;
+              single) [[ $#ids -ne 1 && $compstate[insert] != menu ]] &&
+                          compstate[insert]= ;;
+              *)      [[ ${#:-$PREFIX$SUFFIX} -gt ${#compstate[unambiguous]} ]] &&
+                          compstate[insert]=menu ;;
+            esac
+          else
+            compadd "$expl[@]" -M 'B:0=' -o nosort -ld disp -a ids && ret=0
+          fi
+        fi
+        return ret
+      ;;
+    esac
+  fi
+  compadd "$expl[@]" $suf -a matches && ret=0
+fi
+
+return ret
