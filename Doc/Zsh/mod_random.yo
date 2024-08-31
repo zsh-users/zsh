@@ -41,7 +41,7 @@ tt(inclusive) is a flag that controls whether the result is ever equal to
 tt(upper).  By default it is not. If this argument is set to a non-zero value
 then it may be.
 
-This is to facilitate a construct like tt($a[zrand_int($#a)+1]) rather
+This is to facilitate a construct like tt($a[zrand_int+LPAR()$#a+RPAR()+1]) rather
 than tt($a[zrand_int+LPAR()$#a-1+RPAR()+1]).
 For example, if $#a is 16, you would use tt(zrand_int+LPAR()16RPAR()) which has
 16 possible return values 0-15.  Because the function can return zero, in order

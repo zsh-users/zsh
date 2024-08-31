@@ -1,5 +1,8 @@
 2024-08-31  Oliver Kiddle  <opk@zsh.org>
 
+	* Clinton Bunch: 53060: Doc/Zsh/mod_random.yo,
+	Src/Modules/random.c: silence build warnings
+
 	* Clinton Bunch: 53056: Completion/Zsh/Type/_module_math_func,
 	Doc/Makefile.in, Doc/Zsh/mod_random.yo, Src/Modules/random.c,
 	Src/Modules/random.mdd, Src/Modules/random_real.c, configure.ac:

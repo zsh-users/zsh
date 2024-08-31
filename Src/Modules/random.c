@@ -62,8 +62,10 @@ ssize_t
 getrandom_buffer(void *buf, size_t len)
 {
     ssize_t ret;
+#ifndef HAVE_ARC4RANDOM_BUF
     size_t  val     = 0;
     uint8_t *bufptr = buf;
+#endif
 
     do {
 	errno = 0;
@@ -81,8 +83,10 @@ getrandom_buffer(void *buf, size_t len)
 		return -1;
 	    }
 	}
+#ifndef HAVE_ARC4RANDOM_BUF
 	bufptr += ret;
 	val    += ret;
+#endif
     } while (ret < len);
     return ret;
 }
