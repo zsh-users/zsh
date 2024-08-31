@@ -1,3 +1,11 @@
 #compdef -equal-
 
-_path_commands
+local -a match mbegin mend
+
+if _have_glob_qual $PREFIX; then
+  compset -p ${#match[1]}
+  compset -S '[^\)\|\~]#(|\))'
+  _globquals
+else
+  _path_commands
+fi

@@ -1,5 +1,8 @@
 2024-08-31  Oliver Kiddle  <opk@zsh.org>
 
+	* 53057: Completion/Zsh/Context/_equal: complete glob qualifiers
+	following an equals expansion
+
 	* 53052: Completion/X/Command/_setxkbmap: update completion with
 	newer options
 
