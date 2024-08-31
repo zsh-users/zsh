@@ -1,3 +1,8 @@
+2024-08-31  Oliver Kiddle  <opk@zsh.org>
+
+	* 53052: Completion/X/Command/_setxkbmap: update completion with
+	newer options
+
 2024-08-26  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* unposted: Doc/Zsh/compsys.yo: remove reference to removed code
