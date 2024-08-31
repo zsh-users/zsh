@@ -1,5 +1,7 @@
 2024-08-31  Oliver Kiddle  <opk@zsh.org>
 
+	* 53058: Completion/Unix/Command/_zstd: new completion for zstd
+
 	* 53057: Completion/Zsh/Context/_equal: complete glob qualifiers
 	following an equals expansion
 
