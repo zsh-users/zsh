@@ -1,0 +1,118 @@
+#compdef zstd zstdmt unzstd zstdcat -redirect-,<,unzstd=unzstd -redirect-,>,zstd=unzstd -redirect-,<,zstd=zstd
+
+local ign
+local -a levels implied noopt args blksize
+
+(( $#words > 2 )) && ign='!'
+
+[[ $compstate[context] = redirect ]] && noopt=( -- )
+case "$service" in
+  zstdmt) implied=( -T0 ) ;;
+  unzstd) (( $words[(I)(-z|--compress)] )) || implied=( -d ) ;;
+  zstdcat)
+    implied=( -dcf )
+    (( $words[(I)(-z|--compress)] )) && implied=( -cf )
+  ;;
+esac
+words[1]+=( $implied $noopt )
+(( CURRENT += $#implied + $#noopt ))
+
+if (( $words[(r)--ultra] )); then
+  levels=( -{20..22} )
+else
+  levels=( -{1..19} )
+fi
+
+blksize=(
+  '(M -B --block-size)'{-B+,--block-size=-}'[cut file into independent blocks of specified size]: :_numbers -d "no block" -u bytes size KiB MiB'
+)
+if (( $words[(r)--train] )); then
+  args=( $blksize
+    '(M)--train-cover=-[use the cover algorithm with optional arguments]::parameter'
+    '(M)--train-fastcover=-[use the fast cover algorithm with optional arguments]::parameter'
+    '(M)--train-legacy=-[use the legacy algorithm with selectivity]::selectivity [9]'
+    '-o[specify dictionary name]:dictionary name [dictionary]'
+    '(M)--maxdict=[limit dictionary to specified size]: :_numbers -u bytes -d 112640 size KiB MiB'
+    '(M)--dictID=[force dictionary ID to specified value]:value [random]'
+    '*:files:_files'
+  )
+elif (( $words[(I)-b[0-9]#] )); then
+  args=( $blksize
+    '(M)-e-[test all compression levels successively from -b level]: :_numbers -d 3 -l 1 -m 19 level'
+    '(M)-i-[specify minimum evaluation time]: :time (seconds) [3]'
+    '(M -B --block-size)'{-B+,--block-size=-}'[cut file into independent blocks of specified size]: :_numbers -d "no block" -u bytes size KiB MiB' \
+    '(M)-S[output one benchmark result per input file]'
+    '(M)--priority=-[set process priority]:priority:(rt)'
+    '*:files:_files -g "^*.(|t)zst(-.)"'
+  )
+elif (( $words[(I)(-d|--decompress|--uncompress|-l|--list|-t|--test)] )); then
+  args=(
+    '(M --sparse -c --stdout)--no-sparse[sparse mode]'
+    '(M --no-sparse -o)--sparse[sparse mode]'
+    '(--sparse)-o[specify output file]:file:_files -g "^*.(|t)zst(-.)"'
+    "(M)--no-check[ignore checksums in compressed frame]"
+    '!(M --no-check)'{-C,--check}
+    '*:files:_files -g "*.(|t)zst(-.)"'
+  )
+else
+  args=(
+    "(M)--no-check[don't add/verify XXH64 integrity checksums]"
+    '!(M --no-check)'{-C,--check}
+    "(M)--no-content-size[don't include original file size in header]"
+    '!(M --no-content-size)--content-size'
+    "(M)--no-progress[don't show the progress bar but keep other messages]"
+    '!(M --no-progress)--progress'
+    "(M --adapt --fast --ultra ${levels[*]})"$^levels
+    '(M --fast)--ultra[enable levels beyond 19, up to 22]'
+    '--long=-[enable long distance matching with given window log]:window log [27]'
+    "(M --adapt --ultra ${levels[*]})--fast=-[switch to very fast compression levels]:level [1]"
+    "(M --fast ${levels[*]})--adapt=-[dynamically adapt compression level to I/O conditions]: :_values -s , 'range'
+      'min\:level' '(min)max\:level'"
+    '(M)'--{no-,}row-match-finder'[force usage of fast row-based matchfinder for greedy, lazy, and lazy2 strategies]'
+    "(-D)--patch-from=[specify the file to be used as a reference point for zstd's diff engine]: :_files"
+    '(--single-thread -T --threads)'{-T-,--threads=}'[spawn specified number of threads]:threads [1]'
+    '(M -B --block-size)'{-B-,--block-size=-}'[select block size of each job]: :_numbers -u bytes -d 0\:automatic "block size" KiB MiB'
+    '(M -T --threads --rsyncable)--single-thread[use a single thread for both I/O and compression (result different than -T1)]'
+    '(M)--auto-threads=[use either physical cores or logical cores as default when specifying -T0]:cores [physical]:(physical logcial)'
+    '(M --single-thread)--rsyncable[compress using a rsync-friendly method]'
+    '(M)--exclude-compressed[only compress files that are not already compressed]'
+    '(M --size-hint)--stream-size=-[specify exact size of streaming input from stdin]:  :_numbers -u bytes size KiB MiB'
+    '(M --stream-size)--size-hint=[indicate size of streamed input to optimize compression parameters]: :_numbers -u bytes size KiB MiB'
+    '(M)--target-compressed-block-size=[generate compressed block of approximately targeted size]: :_numbers -u bytes limit KiB MiB'
+    "(M)--no-dictID[don't write dictID into header (dictionary compression only)]"
+    '(M --no-compress-literals --compress-literals)'--{no-,}compress-literals'[force (un)compressed literals]'
+    '(M)--show-default-cparams[show compression parameters for each file]'
+    '(--test)-o[specify output file]:file:_files -g "*.(|t)zst(-.)"'
+    '--format=-[compress files to specified format]:format [zstd]:(zstd gzip xz lzma lz4)'
+    '--zstd=[specify advanced compression options]: :_values -s , "option"
+      strategy\:strategy "windowLog\:bits (10-31)" "hashLog\:bits (6-30)"
+      "chainLog\:bits (6-31)" "searchLog\:searches" "minMatch\:length"
+      "targetLength\:length" "overlapLog\:size" "ldmHashLog\:size"
+      "ldmMinMatch\:length" "ldmBucketSizeLog\:size" "ldmHashRateLog\:frequency"'
+    '*:files:_files -g "^*.(|t)zst(-.)"'
+  )
+fi
+
+_arguments -s -S : $args \
+  "$ign(- *)"{-h,--help}'[display help message]' \
+  "$ign(- *)"{-V,--version}'[display version number]' \
+  '(--patch-from)-D[use specified dictionary for compression or decompression]:dictionary' \
+  '(-f --force)'{-f,--force}'[force overwrite]' \
+  '--rm[remove source file(s) after successful compression or decompression]' \
+  '!(-k --keep --rm)'{-k,--keep} \
+  '(-c --stdout --no-sparse --test)'{-c,--stdout}'[write on standard output]' \
+  '(-M --memory)'{-M-,--memory=}'[set a memory usage limit]: :_numbers -u bytes limit KiB MiB' \
+  \*{-v,--verbose}'[display more information]' \
+  \*{-q,--quiet}'[suppress messages]' \
+  '-r[operate recursively on directories]' \
+  '--filelist=[read list of files to operate upon from file]: :_files' \
+  '--output-dir-flat=[store processed files in directory]: :_directories' \
+  '--output-dir-mirror=[store processed files in directory respecting original structure]: :_directories' \
+  '--trace=[log tracing information to file]: :_files' \
+  + '(M)' \
+  \!{-z,--compress,--uncompress} \
+  '(-B --block-size)'{-d,--decompress}'[decompress]' \
+  '(-B --block-size)'{-l,--list}'[print information about zstd compressed files]' \
+  '(-c --stdout -o --rm -B --block-size)'{-t,--test}'[test compressed file integrity]' \
+  '(-c --stdout -D -k --keep --rm)--train=[create a dictionary from a training set of files]' \
+  '(-c --stdout -k --keep --rm)-b-[benchmark file(s), using specified compression level]:: :_numbers -d 3 -l 1 -m 19 level'
