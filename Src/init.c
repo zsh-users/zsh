@@ -36,6 +36,10 @@
 
 #include "version.h"
 
+#ifdef HAVE_SYS_SYSCTL_H
+#include <sys/sysctl.h>
+#endif
+
 /**/
 int noexitct = 0;
 
@@ -913,12 +917,6 @@ getmypath(const char *name, const char *cwd)
     char *buf;
     int namelen;
 
-    if (!name)
-	return NULL;
-    if (*name == '-')
-	++name;
-    if ((namelen = strlen(name)) == 0)
-	return NULL;
 #if defined(__APPLE__)
     {
 	uint32_t n = PATH_MAX;
@@ -934,6 +932,19 @@ getmypath(const char *name, const char *cwd)
 	else
 	    free(buf);
     }
+#elif defined(KERN_PROC_PATHNAME)
+    {
+#ifdef __NetBSD__
+	int mib[4] = { CTL_KERN, KERN_PROC_ARGS, getpid(), KERN_PROC_PATHNAME };
+#else
+	int mib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1 };
+#endif
+	size_t len = PATH_MAX;
+	buf = (char *) zalloc(PATH_MAX);
+	if (!sysctl(mib, 4, buf, &len, NULL, 0) && len > 1)
+	    return buf;
+	free(buf);
+    }
 #elif defined(PROC_SELF_EXE)
     {
 	ssize_t n;
@@ -947,6 +958,13 @@ getmypath(const char *name, const char *cwd)
 	    free(buf);
     }
 #endif
+
+    if (!name)
+	return NULL;
+    if (*name == '-')
+	++name;
+    if ((namelen = strlen(name)) == 0)
+	return NULL;
     /* guess the absolute pathname of 'name' */
     if (name[namelen-1] == '/')    /* name should not end with '/' */
 	return NULL;
@@ -964,7 +982,7 @@ getmypath(const char *name, const char *cwd)
     }
 #ifdef HAVE_REALPATH
     else {
-	/* search each dir in PARH */
+	/* search each dir in PATH */
 	const char *path, *sep;
 	char *real, *try;
 	int pathlen, dirlen;
@@ -978,7 +996,7 @@ getmypath(const char *name, const char *cwd)
 	do {
 	    sep = strchr(path, ':');
 	    dirlen = sep ? sep - path : strlen(path);
-	    strncpy(try, path, dirlen);
+	    memcpy(try, path, dirlen);
 	    try[dirlen] = '/';
 	    try[dirlen+1] = '\0';
 	    strcat(try, name);

@@ -1,5 +1,8 @@
 2024-09-14  Oliver Kiddle  <opk@zsh.org>
 
+	* 53085: configure.ac, Src/init.c: support for BSDs in
+	$ZSH_EXEPATH implementation
+
 	* 53084: configure.ac: yet another approach to the /dev/fd
 	autoconf test because of shells emulating /dev/fd
 
