@@ -171,6 +171,10 @@ static const resinfo_T known_resources[] = {
     {RLIMIT_TCACHE, "cachedthreads", ZLIMTYPE_NUMBER, 1,
 		'N', "cached threads"},
 # endif
+# ifdef HAVE_RLIMIT_NOVMON  /* Haiku */
+    {RLIMIT_NOVMON, "vnodemonitors", ZLIMTYPE_NUMBER, 1,
+		'N', "open vnode monitors"},
+# endif
 };
 
 /* resinfo[RLIMIT_XXX] points to the corresponding entry

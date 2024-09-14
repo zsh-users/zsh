@@ -1,5 +1,8 @@
 2024-09-14  Oliver Kiddle  <opk@zsh.org>
 
+	* 53083: configure.ac, Src/Builtins/rlimits.c: handle Haiku
+	specific resource limit for open vnode monitors
+
 	* 53082: configure.ac: remove a couple of unused #defines
 
 	* 53081: INSTALL, configure.ac, Src/init.c, Src/options.c,
