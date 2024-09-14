@@ -369,8 +369,6 @@ struct timespec {
 # ifndef TIME_H_SELECT_H_CONFLICTS
 #  include <sys/select.h>
 # endif
-#elif defined(SELECT_IN_SYS_SOCKET_H)
-# include <sys/socket.h>
 #endif
 
 #if defined(__APPLE__) && defined(HAVE_SELECT)
@@ -802,16 +800,6 @@ extern short ospeed;
 #define ftell ftello
 #endif
 #endif
-
-/* Can't support job control without working tcsetgrp() */
-#ifdef BROKEN_TCSETPGRP
-#undef JOB_CONTROL
-#endif /* BROKEN_TCSETPGRP */
-
-#ifdef BROKEN_KILL_ESRCH
-#undef ESRCH
-#define ESRCH EINVAL
-#endif /* BROKEN_KILL_ESRCH */
 
 /* Can we do locale stuff? */
 #undef USE_LOCALE
