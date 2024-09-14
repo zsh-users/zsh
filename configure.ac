@@ -1483,35 +1483,6 @@ case $host_os in
   darwin1[0-5]*) AC_DEFINE(SETENV_MANGLES_EQUAL) ;;
 esac
 
-dnl -------------
-dnl CHECK SIGNALS
-dnl -------------
-dnl What style of signal do you have (POSIX, BSD, or SYSV)?
-AH_TEMPLATE([POSIX_SIGNALS],
-[Define to 1 if you use POSIX style signal handling.])
-AH_TEMPLATE([BSD_SIGNALS],
-[Define to 1 if you use BSD style signal handling (and can block signals).])
-AH_TEMPLATE([SYSV_SIGNALS],
-[Define to 1 if you use SYS style signal handling (and can block signals).])
-AH_TEMPLATE([NO_SIGNAL_BLOCKING],
-[Define to 1 if you have no signal blocking at all (bummer).])
-AC_MSG_CHECKING(what style of signals to use)
-if test x$ac_cv_func_sigaction = xyes && test x$ac_cv_func_sigprocmask = xyes; then
-  signals_style=POSIX_SIGNALS
-  AC_DEFINE(POSIX_SIGNALS)
-elif test x$ac_cv_func_sigblock = xyes && test x$ac_cv_func_sigsetmask = xyes; then
-  signals_style=BSD_SIGNALS
-  AC_DEFINE(BSD_SIGNALS)
-elif test x$ac_cv_func_sighold = xyes && test x$ac_cv_func_sigrelse = xyes; then
-  signals_style=SYSV_SIGNALS
-  AC_DEFINE(SYSV_SIGNALS)
-else
-  signals_style=NO_SIGNAL_BLOCKING
-  AC_DEFINE(NO_SIGNAL_BLOCKING)
-fi
-AC_DEFINE_UNQUOTED($signals_style)
-AC_MSG_RESULT($signals_style)
-
 dnl Where is <signal.h> located?  Needed as input for signals.awk
 AC_CACHE_CHECK(where signal.h is located, zsh_cv_path_signal_h,
 [dnl Look at the output from the preprocessor.
@@ -2324,7 +2295,6 @@ dnl for instance, BeOS R4.51 is broken.
 dnl -----------
 AH_TEMPLATE([BROKEN_POSIX_SIGSUSPEND],
 Define to 1 if sigsuspend() is broken, ie BeOS R4.51.])
-if test x$signals_style = xPOSIX_SIGNALS; then
     AC_CACHE_CHECK(if POSIX sigsuspend() works,
     zsh_cv_sys_sigsuspend,
     [AC_RUN_IFELSE([AC_LANG_SOURCE([[
@@ -2356,7 +2326,6 @@ int main() {
     if test x$zsh_cv_sys_sigsuspend = xno; then
       AC_DEFINE(BROKEN_POSIX_SIGSUSPEND)
     fi
-fi
 
 dnl -----------
 dnl if found tcsetpgrp, test to see if it actually works

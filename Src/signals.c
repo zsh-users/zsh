@@ -91,33 +91,6 @@ mod_export volatile int trap_queueing_enabled, trap_queue_front, trap_queue_rear
 /**/
 mod_export int trap_queue[MAX_QUEUE_SIZE];
 
-/* This is only used on machines that don't understand signal sets.  *
- * On SYSV machines this will represent the signals that are blocked *
- * (held) using sighold.  On machines which can't block signals at   *
- * all, we will simulate this by ignoring them and remembering them  *
- * in this variable.                                                 */
-#if !defined(POSIX_SIGNALS) && !defined(BSD_SIGNALS)
-static sigset_t blocked_set;
-#endif
-
-#ifdef POSIX_SIGNALS
-# define signal_jmp_buf       sigjmp_buf
-# define signal_setjmp(b)     sigsetjmp((b),1)
-# define signal_longjmp(b,n)  siglongjmp((b),(n))
-#else
-# define signal_jmp_buf       jmp_buf
-# define signal_setjmp(b)     setjmp(b)
-# define signal_longjmp(b,n)  longjmp((b),(n))
-#endif
- 
-#ifdef NO_SIGNAL_BLOCKING
-# define signal_process(sig)  signal_ignore(sig)
-# define signal_reset(sig)    install_handler(sig)
-#else
-# define signal_process(sig)  ;
-# define signal_reset(sig)    ;
-#endif
-
 /* Install signal handler for given signal.           *
  * If possible, we want to make sure that interrupted *
  * system calls are not restarted.                    */
@@ -126,10 +99,9 @@ static sigset_t blocked_set;
 mod_export void
 install_handler(int sig)
 {
-#ifdef POSIX_SIGNALS
     struct sigaction act;
  
-    act.sa_handler = (SIGNAL_HANDTYPE) zhandler;
+    act.sa_handler = (void (*)(int)) zhandler;
     sigemptyset(&act.sa_mask);        /* only block sig while in handler */
     act.sa_flags = 0;
 # ifdef SA_INTERRUPT                  /* SunOS 4.x */
@@ -137,27 +109,6 @@ install_handler(int sig)
         act.sa_flags |= SA_INTERRUPT; /* make sure system calls are not restarted */
 # endif
     sigaction(sig, &act, (struct sigaction *)NULL);
-#else
-# ifdef BSD_SIGNALS
-    struct sigvec vec;
- 
-    vec.sv_handler = (SIGNAL_HANDTYPE) zhandler;
-    vec.sv_mask = sigmask(sig);    /* mask out this signal while in handler    */
-#  ifdef SV_INTERRUPT
-    vec.sv_flags = SV_INTERRUPT;   /* make sure system calls are not restarted */
-#  endif
-    sigvec(sig, &vec, (struct sigvec *)NULL);
-# else
-#  ifdef SYSV_SIGNALS
-    /* we want sigset rather than signal because it will   *
-     * block sig while in handler.  signal usually doesn't */
-    sigset(sig, zhandler);
-#  else  /* NO_SIGNAL_BLOCKING (bummer) */
-    signal(sig, zhandler);
-
-#  endif /* SYSV_SIGNALS  */
-# endif  /* BSD_SIGNALS   */
-#endif   /* POSIX_SIGNALS */
 }
 
 /* enable ^C interrupts */
@@ -220,48 +171,15 @@ signal_mask(int sig)
  * set. Return the old signal set.       */
 
 /**/
-#ifndef BSD_SIGNALS
-
-/**/
 mod_export sigset_t
 signal_block(sigset_t set)
 {
     sigset_t oset;
  
-#ifdef POSIX_SIGNALS
     sigprocmask(SIG_BLOCK, &set, &oset);
 
-#else
-# ifdef SYSV_SIGNALS
-    int i;
- 
-    oset = blocked_set;
-    for (i = 1; i <= NSIG; ++i) {
-        if (sigismember(&set, i) && !sigismember(&blocked_set, i)) {
-            sigaddset(&blocked_set, i);
-            sighold(i);
-        }
-    }
-# else  /* NO_SIGNAL_BLOCKING */
-/* We will just ignore signals if the system doesn't have *
- * the ability to block them.                             */
-    int i;
-
-    oset = blocked_set;
-    for (i = 1; i <= NSIG; ++i) {
-        if (sigismember(&set, i) && !sigismember(&blocked_set, i)) {
-            sigaddset(&blocked_set, i);
-            signal_ignore(i);
-        }
-   }
-# endif /* SYSV_SIGNALS */
-#endif /* POSIX_SIGNALS */
- 
     return oset;
 }
-
-/**/
-#endif /* BSD_SIGNALS */
 
 /* Unblock the signals in the given signal *
  * set. Return the old signal set.         */
@@ -272,39 +190,7 @@ signal_unblock(sigset_t set)
 {
     sigset_t oset;
 
-#ifdef POSIX_SIGNALS
     sigprocmask(SIG_UNBLOCK, &set, &oset);
-#else
-# ifdef BSD_SIGNALS
-    sigfillset(&oset);
-    oset = sigsetmask(oset);
-    sigsetmask(oset & ~set);
-# else
-#  ifdef SYSV_SIGNALS
-    int i;
- 
-    oset = blocked_set;
-    for (i = 1; i <= NSIG; ++i) {
-        if (sigismember(&set, i) && sigismember(&blocked_set, i)) {
-            sigdelset(&blocked_set, i);
-            sigrelse(i);
-        }
-    }
-#  else  /* NO_SIGNAL_BLOCKING */
-/* On systems that can't block signals, we are just ignoring them.  So *
- * to unblock signals, we just reenable the signal handler for them.   */
-    int i;
-
-    oset = blocked_set;
-    for (i = 1; i <= NSIG; ++i) {
-        if (sigismember(&set, i) && sigismember(&blocked_set, i)) {
-            sigdelset(&blocked_set, i);
-            install_handler(i);
-        }
-   }
-#  endif /* SYSV_SIGNALS  */
-# endif  /* BSD_SIGNALS   */
-#endif   /* POSIX_SIGNALS */
  
     return oset;
 }
@@ -318,49 +204,10 @@ signal_setmask(sigset_t set)
 {
     sigset_t oset;
  
-#ifdef POSIX_SIGNALS
     sigprocmask(SIG_SETMASK, &set, &oset);
-#else
-# ifdef BSD_SIGNALS
-    oset = sigsetmask(set);
-# else
-#  ifdef SYSV_SIGNALS
-    int i;
- 
-    oset = blocked_set;
-    for (i = 1; i <= NSIG; ++i) {
-        if (sigismember(&set, i) && !sigismember(&blocked_set, i)) {
-            sigaddset(&blocked_set, i);
-            sighold(i);
-        } else if (!sigismember(&set, i) && sigismember(&blocked_set, i)) {
-            sigdelset(&blocked_set, i);
-            sigrelse(i);
-        }
-    }
-#  else  /* NO_SIGNAL_BLOCKING */
-    int i;
-
-    oset = blocked_set;
-    for (i = 1; i < NSIG; ++i) {
-        if (sigismember(&set, i) && !sigismember(&blocked_set, i)) {
-            sigaddset(&blocked_set, i);
-            signal_ignore(i);
-        } else if (!sigismember(&set, i) && sigismember(&blocked_set, i)) {
-            sigdelset(&blocked_set, i);
-            install_handler(i);
-        }
-    }
-#  endif /* SYSV_SIGNALS  */
-# endif  /* BSD_SIGNALS   */
-#endif   /* POSIX_SIGNALS */
  
     return oset;
 }
-
-#if defined(NO_SIGNAL_BLOCKING)
-static int suspend_longjmp = 0;
-static signal_jmp_buf suspend_jmp_buf;
-#endif
 
 /**/
 int
@@ -368,11 +215,8 @@ signal_suspend(UNUSED(int sig), int wait_cmd)
 {
     int ret;
 
-#if defined(POSIX_SIGNALS) || defined(BSD_SIGNALS)
     sigset_t set;
-# if defined(POSIX_SIGNALS) && defined(BROKEN_POSIX_SIGSUSPEND)
     sigset_t oset;
-# endif
 
     sigemptyset(&set);
 
@@ -384,9 +228,7 @@ signal_suspend(UNUSED(int sig), int wait_cmd)
     if (!(wait_cmd || isset(TRAPSASYNC) ||
 	  (sigtrapped[SIGINT] & ~ZSIG_IGNORED)))
 	sigaddset(&set, SIGINT);
-#endif /* POSIX_SIGNALS || BSD_SIGNALS */
 
-#ifdef POSIX_SIGNALS
 # ifdef BROKEN_POSIX_SIGSUSPEND
     sigprocmask(SIG_SETMASK, &set, &oset);
     ret = pause();
@@ -394,26 +236,6 @@ signal_suspend(UNUSED(int sig), int wait_cmd)
 # else /* not BROKEN_POSIX_SIGSUSPEND */
     ret = sigsuspend(&set);
 # endif /* BROKEN_POSIX_SIGSUSPEND */
-#else /* not POSIX_SIGNALS */
-# ifdef BSD_SIGNALS
-    ret = sigpause(set);
-# else
-#  ifdef SYSV_SIGNALS
-    ret = sigpause(sig);
-
-#  else  /* NO_SIGNAL_BLOCKING */
-    /* need to use signal_longjmp to make this race-free *
-     * between the child_unblock() and pause()           */
-    if (signal_setjmp(suspend_jmp_buf) == 0) {
-        suspend_longjmp = 1;   /* we want to signal_longjmp after catching signal */
-        child_unblock();       /* do we need to do wait_cmd stuff as well?             */
-        ret = pause();
-    }
-    suspend_longjmp = 0;       /* turn off using signal_longjmp since we are past *
-                                * the pause() function.                           */
-#  endif /* SYSV_SIGNALS  */
-# endif  /* BSD_SIGNALS   */
-#endif   /* POSIX_SIGNALS */
 
     return ret;
 }
@@ -586,33 +408,12 @@ zhandler(int sig)
 {
     sigset_t newmask, oldmask;
 
-#if defined(NO_SIGNAL_BLOCKING)
-    int do_jump;
-    signal_jmp_buf jump_to;
-#endif
- 
     last_signal = sig;
-    signal_process(sig);
  
     sigfillset(&newmask);
     /* Block all signals temporarily           */
     oldmask = signal_block(newmask);
  
-#if defined(NO_SIGNAL_BLOCKING)
-    /* do we need to longjmp to signal_suspend */
-    do_jump = suspend_longjmp;
-    /* In case a SIGCHLD somehow arrives       */
-    suspend_longjmp = 0;
-
-    /* Traps can cause nested signal_suspend()  */
-    if (sig == SIGCHLD) {
-        if (do_jump) {
-	    /* Copy suspend_jmp_buf                    */
-            jump_to = suspend_jmp_buf;
-	}
-    }
-#endif
-
     /* Are we queueing signals now?      */
     if (queueing_enabled) {
         int temp_rear = ++queue_rear % MAX_QUEUE_SIZE;
@@ -627,7 +428,6 @@ zhandler(int sig)
 	    /* save current signal mask        */
             signal_mask_queue[queue_rear] = oldmask;
         }
-        signal_reset(sig);
         return;
     }
  
@@ -704,14 +504,6 @@ zhandler(int sig)
         break;
     }   /* end of switch(sig) */
  
-    signal_reset(sig);
-
-/* This is used to make signal_suspend() race-free */
-#if defined(NO_SIGNAL_BLOCKING)
-    if (do_jump)
-        signal_longjmp(jump_to, 1);
-#endif
-
 } /* handler */
 
  

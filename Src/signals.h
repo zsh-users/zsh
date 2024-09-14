@@ -27,8 +27,6 @@
  *
  */
 
-#define SIGNAL_HANDTYPE void (*)(int)
-
 #ifndef HAVE_KILLPG
 # define killpg(pgrp,sig) kill(-(pgrp),sig)
 #endif
@@ -51,20 +49,6 @@
 # define SV_INTERRUPT SV_BSDSIG
 #endif
 
-/* If not a POSIX machine, then we create our *
- * own POSIX style signal sets functions.     */
-#ifndef POSIX_SIGNALS
-# define sigemptyset(s)    (*(s) = 0)
-# if NSIG == 32
-#  define sigfillset(s)    (*(s) = ~(sigset_t)0, 0)
-# else
-#  define sigfillset(s)    (*(s) = (1 << NSIG) - 1, 0)
-# endif
-# define sigaddset(s,n)    (*(s) |=  (1 << ((n) - 1)), 0)
-# define sigdelset(s,n)    (*(s) &= ~(1 << ((n) - 1)), 0)
-# define sigismember(s,n)  ((*(s) & (1 << ((n) - 1))) != 0)
-#endif   /* ifndef POSIX_SIGNALS */
- 
 #define child_block()      signal_block(sigchld_mask)
 #define child_unblock()    signal_unblock(sigchld_mask)
 

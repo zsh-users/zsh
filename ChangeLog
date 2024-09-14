@@ -1,3 +1,8 @@
+2024-09-14  Oliver Kiddle  <opk@zsh.org>
+
+	* 53080: configure.ac, Src/init.c, Src/signals.c, Src/signals.h:
+	remove code for systems that only have the old pre-POSIX signal()
+
 2024-08-31  Oliver Kiddle  <opk@zsh.org>
 
 	* Clinton Bunch: 53060: Doc/Zsh/mod_random.yo,

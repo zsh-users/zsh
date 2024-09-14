@@ -1386,6 +1386,8 @@ setupshin(char *runscript)
 void
 init_signals(void)
 {
+    struct sigaction act;
+
     sigtrapped = (int *) hcalloc(TRAPCOUNT * sizeof(int));
     siglists = (Eprog *) hcalloc(TRAPCOUNT * sizeof(Eprog));
 
@@ -1399,14 +1401,8 @@ init_signals(void)
 
     intr();
 
-#ifdef POSIX_SIGNALS
-    {
-	struct sigaction act;
-	if (!sigaction(SIGQUIT, NULL, &act) &&
-	    act.sa_handler == SIG_IGN)
-	    sigtrapped[SIGQUIT] = ZSIG_IGNORED;
-    }
-#endif
+    if (!sigaction(SIGQUIT, NULL, &act) && act.sa_handler == SIG_IGN)
+	sigtrapped[SIGQUIT] = ZSIG_IGNORED;
 
 #ifndef QDEBUG
     signal_ignore(SIGQUIT);
