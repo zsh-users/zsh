@@ -399,13 +399,6 @@
 >This is name2
 >This is still name2
 
-  (time cat) >&/dev/null
-0:`time' keyword (status only)
-
-  TIMEFMT='%E %mE %uE %* %m%mm %u%uu'; time (:)
-0:`time' keyword with custom TIMEFMT
-*?[0-9]##.[0-9](#c2)s [0-9]##ms [0-9]##us %\* %m%mm %u%uu
-
   if [[ -f foo && -d . && -n $ZTST_testdir ]]; then
     true
   else

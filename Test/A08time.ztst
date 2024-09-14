@@ -1,0 +1,64 @@
+#
+# This file contains tests for the "time" reserved word
+#
+
+%prep
+
+  unset TIMEFMT
+
+%test
+
+  (time cat) >&/dev/null
+0:`time' keyword (status only)
+
+  ( TIMEFMT='%E %mE %uE %* %m%mm %u%uu'; time (:) )
+0:`time' keyword with custom TIMEFMT
+*?[0-9]##.[0-9](#c2)s [0-9]##ms [0-9]##us %\* %m%mm %u%uu
+
+  time x=1
+0:`time' simple assignment
+*?shell*
+*?children*
+
+  time x=$(date)
+0:`time' assignment with external command
+*?shell*
+*?children*
+
+  x=0; time for ((i=1; i<=10000; ++i)); do ((x+=i)); done; echo $x
+0:`time' for-loop with arithmetic condition
+>50005000
+*?shell*
+*?children*
+
+  time echo $(x=0;for ((i=0; i<=100000; ++i)); do ((x+=i)); done; echo $x)
+0:`time' of a builtin with argument command substitution
+>5000050000
+*?shell*
+*?children*
+
+  time cat <(x=0;for ((i=0; i<=100000; ++i)); do ((x+=i)); done; echo $x)
+0:`time' of external command with process substitution
+>5000050000
+*?*user*system*cpu*total
+
+  print -u $ZTST_fd 'This test takes 2 seconds'
+  time builtin nonesuch $(sleep 2)
+1:`time' of nonexistent builtin with command substitution
+*?*: no such builtin: nonesuch
+*?shell*
+*?children*
+
+  time /no/such/commmand
+127:`time' of nonexistent external
+*?*no such file or directory: /no/such/commmand
+*?*user*system*cpu*total
+
+  ( setopt errexit; time false; print notreached )
+1:`time' of failed builtin with errexit
+*?shell*
+*?children*
+
+  ( setopt errexit; time =false; print notreached )
+1:`time' of failed external with errexit
+*?*user*system*cpu*total

@@ -1894,7 +1894,7 @@ spawnjob(void)
 
 /**/
 void
-shelltime(void)
+shelltime(child_times_t *shell, child_times_t *kids, struct timeval *then, int delta)
 {
     struct timezone dummy_tz;
     struct timeval dtimeval, now;
@@ -1913,7 +1913,28 @@ shelltime(void)
     ti.ut = buf.tms_utime;
     ti.st = buf.tms_stime;
 #endif
-    printtime(dtime(&dtimeval, &shtimer, &now), &ti, "shell");
+    if (shell) {
+	if (delta) {
+#ifdef HAVE_GETRUSAGE
+	    dtime(&ti.ru_utime, &shell->ru_utime, &ti.ru_utime);
+	    dtime(&ti.ru_stime, &shell->ru_stime, &ti.ru_stime);
+#else
+	    ti.ut -= shell->ut;
+	    ti.st -= shell->st;
+#endif
+	} else
+	    *shell = ti;
+    }
+    if (delta)
+	dtime(&dtimeval, then, &now);
+    else {
+	if (then)
+	    *then = now;
+	dtime(&dtimeval, &shtimer, &now);
+    }
+
+    if (!delta == !shell)
+	printtime(&dtimeval, &ti, "shell");
 
 #ifdef HAVE_GETRUSAGE
     getrusage(RUSAGE_CHILDREN, &ti);
@@ -1921,8 +1942,20 @@ shelltime(void)
     ti.ut = buf.tms_cutime;
     ti.st = buf.tms_cstime;
 #endif
-    printtime(&dtimeval, &ti, "children");
-
+    if (kids) {
+	if (delta) {
+#ifdef HAVE_GETRUSAGE
+	    dtime(&ti.ru_utime, &kids->ru_utime, &ti.ru_utime);
+	    dtime(&ti.ru_stime, &kids->ru_stime, &ti.ru_stime);
+#else
+	    ti.ut -= shell->ut;
+	    ti.st -= shell->st;
+#endif
+	} else
+	    *kids = ti;
+    }
+    if (!delta == !kids)
+	printtime(&dtimeval, &ti, "children");
 }
 
 /* see if jobs need printing */

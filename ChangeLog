@@ -1,3 +1,9 @@
+2024-09-14  Bart Schaefer  <schaefer@zsh.org>
+
+	* 53088: Src/exec.c, Src/jobs.c, Test/A01grammar.ztst,
+	Test/A08time.ztst: enable `time' on builtins, assignments, and
+	other current-shell actions, including failed commands.  Tests.
+
 2024-09-14  Oliver Kiddle  <opk@zsh.org>
 
 	* c.f. Emil Velikov: 53072: Completion/Linux/Command/_dkms:

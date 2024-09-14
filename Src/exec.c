@@ -881,6 +881,10 @@ execute(LinkList args, int flags, int defpath)
 	_realexit();
     else
 	zerr("command not found: %s", arg0);
+    /* This is bash behavior, but fails to restore interactive settings etc.
+    lastval = ((eno == EACCES || eno == ENOEXEC) ? 126 : 127);
+    return;
+    */
     _exit((eno == EACCES || eno == ENOEXEC) ? 126 : 127);
 }
 
@@ -1677,7 +1681,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
     wordcode code = *state->pc++;
     static int lastwj, lpforked;
 
-    if (wc_code(code) != WC_PIPE)
+    if (wc_code(code) != WC_PIPE && !(how & Z_TIMED))
 	return lastval = (slflags & WC_SUBLIST_NOT) != 0;
     else if (slflags & WC_SUBLIST_NOT)
 	last1 = 0;
@@ -2939,6 +2943,14 @@ execcmd_exec(Estate state, Execcmd_params eparams,
      */
     LinkList preargs;
 
+    /*
+     * for the "time" keyword
+     */
+    child_times_t shti, chti;
+    struct timeval then;
+    if (how & Z_TIMED)
+	shelltime(&shti, &chti, &then, 0);
+
     doneps4 = 0;
 
     /*
@@ -3071,6 +3083,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		if (!(hn = resolvebuiltin(cmdarg, hn))) {
 		    if (forked)
 			_realexit();
+		    if (how & Z_TIMED)
+			shelltime(&shti, &chti, &then, 1);
 		    return;
 		}
 		if (type != WC_TYPESET)
@@ -3252,6 +3266,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 			    errflag |= ERRFLAG_ERROR;
 			    if (forked)
 				_realexit();
+			    if (how & Z_TIMED)
+				shelltime(&shti, &chti, &then, 1);
 			    return;
 			}
 		    }
@@ -3343,6 +3359,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 			errflag |= ERRFLAG_ERROR;
 			if (forked)
 			    _realexit();
+			if (how & Z_TIMED)
+			    shelltime(&shti, &chti, &then, 1);
 			return;
 		    } else if (!nullcmd || !*nullcmd || opts[SHNULLCMD]) {
 			if (!args)
@@ -3363,6 +3381,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		    lastval = 0;
 		    if (forked)
 			_realexit();
+		    if (how & Z_TIMED)
+			shelltime(&shti, &chti, &then, 1);
 		    return;
 		} else {
 		    /*
@@ -3375,6 +3395,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 			lastval = 1;
 			if (forked)
 			    _realexit();
+			if (how & Z_TIMED)
+			    shelltime(&shti, &chti, &then, 1);
 			return;
 		    }
 		    cmdoutval = use_cmdoutval ? lastval : 0;
@@ -3393,6 +3415,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		    }
 		    if (forked)
 			_realexit();
+		    if (how & Z_TIMED)
+			shelltime(&shti, &chti, &then, 1);
 		    return;
 		}
 	    } else if (isset(RESTRICTED) && (cflags & BINF_EXEC) && do_exec) {
@@ -3401,6 +3425,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		lastval = 1;
 		if (forked)
 		    _realexit();
+		if (how & Z_TIMED)
+		    shelltime(&shti, &chti, &then, 1);
 		return;
 	    }
 
@@ -3437,6 +3463,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 			opts[AUTOCONTINUE] = oautocont;
 		    if (forked)
 			_realexit();
+		    if (how & Z_TIMED)
+			shelltime(&shti, &chti, &then, 1);
 		    return;
 		}
 		break;
@@ -3448,6 +3476,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		if (!(hn = resolvebuiltin(cmdarg, hn))) {
 		    if (forked)
 			_realexit();
+		    if (how & Z_TIMED)
+			shelltime(&shti, &chti, &then, 1);
 		    return;
 		}
 		break;
@@ -3466,6 +3496,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 	    opts[AUTOCONTINUE] = oautocont;
 	if (forked)
 	    _realexit();
+	if (how & Z_TIMED)
+	    shelltime(&shti, &chti, &then, 1);
 	return;
     }
 
@@ -3545,6 +3577,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		    opts[AUTOCONTINUE] = oautocont;
 		if (forked)
 		    _realexit();
+		if (how & Z_TIMED)
+		    shelltime(&shti, &chti, &then, 1);
 		return;
 	    }
 	}
@@ -3575,6 +3609,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 	    opts[AUTOCONTINUE] = oautocont;
 	if (forked)
 	    _realexit();
+	if (how & Z_TIMED)
+	    shelltime(&shti, &chti, &then, 1);
 	return;
     }
 
@@ -4377,6 +4413,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 	    errflag |= ERRFLAG_ERROR;
 	}
     }
+    if ((is_cursh || do_exec) && (how & Z_TIMED))
+	shelltime(&shti, &chti, &then, 1);
     if (newxtrerr) {
 	int eno = errno;
 	fil = fileno(newxtrerr);
@@ -5265,7 +5303,7 @@ exectime(Estate state, UNUSED(int do_exec))
 
     jb = thisjob;
     if (WC_TIMED_TYPE(state->pc[-1]) == WC_TIMED_EMPTY) {
-	shelltime();
+	shelltime(NULL,NULL,NULL,0);
 	return 0;
     }
     execpline(state, *state->pc++, Z_TIMED|Z_SYNC, 0);
