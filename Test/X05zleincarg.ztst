@@ -5,29 +5,29 @@
   if ( zmodload zsh/zpty 2>/dev/null ); then
     . $ZTST_srcdir/comptest
     comptestinit -v -z $ZTST_testdir/../Src/zsh
+    zpty_run '
+      autoload -Uz incarg
+      for name in {,vim-,vim-backward-}{,sync-}{inc,dec}arg; do
+        zle -N "$name" incarg
+      done
+      bindkey -v "^N" incarg
+      bindkey -v "^P" decarg
+      bindkey -v "^F" sync-incarg
+      bindkey -v "^B" sync-decarg
+      bindkey -a "^N" vim-incarg
+      bindkey -a "^P" vim-decarg
+      bindkey -a "^F" vim-sync-incarg
+      bindkey -a "^B" vim-sync-decarg
+      bindkey -a "^E" vim-backward-incarg
+      bindkey -a "^Y" vim-backward-decarg
+      unset TMUX_PANE ITERM_SESSION_ID
+      tmux() {
+        echo "$TMUX_PANE"
+      }
+    '
   else
     ZTST_unimplemented="the zsh/zpty module is not available"
   fi
-  zpty_run '
-    autoload -Uz incarg
-    for name in {,vim-,vim-backward-}{,sync-}{inc,dec}arg; do
-      zle -N "$name" incarg
-    done
-    bindkey -v "^N" incarg
-    bindkey -v "^P" decarg
-    bindkey -v "^F" sync-incarg
-    bindkey -v "^B" sync-decarg
-    bindkey -a "^N" vim-incarg
-    bindkey -a "^P" vim-decarg
-    bindkey -a "^F" vim-sync-incarg
-    bindkey -a "^B" vim-sync-decarg
-    bindkey -a "^E" vim-backward-incarg
-    bindkey -a "^Y" vim-backward-decarg
-    unset TMUX_PANE ITERM_SESSION_ID
-    tmux() {
-      echo "$TMUX_PANE"
-    }
-  '
 
 %test
 

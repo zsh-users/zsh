@@ -1,5 +1,8 @@
 2024-09-14  Oliver Kiddle  <opk@zsh.org>
 
+	* 53087: Test/X05zleincarg.ztst: don't produce spurious error
+	when zpty is missing
+
 	* 53086: configure.ac: change flags used for building dynamic
 	modules on Haiku OS
 
