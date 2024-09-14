@@ -1,5 +1,8 @@
 2024-09-14  Oliver Kiddle  <opk@zsh.org>
 
+	* 53086: configure.ac: change flags used for building dynamic
+	modules on Haiku OS
+
 	* 53085: configure.ac, Src/init.c: support for BSDs in
 	$ZSH_EXEPATH implementation
 
