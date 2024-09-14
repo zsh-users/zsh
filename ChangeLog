@@ -1,5 +1,7 @@
 2024-09-14  Oliver Kiddle  <opk@zsh.org>
 
+	* 53082: configure.ac: remove a couple of unused #defines
+
 	* 53081: INSTALL, configure.ac, Src/init.c, Src/options.c,
 	Src/signals.c, Src/zsh_system.h: remove old BeOS support code
 

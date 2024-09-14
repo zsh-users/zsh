@@ -2982,13 +2982,6 @@ AH_TOP([/***** begin user configuration section *****/
 /* Define this to be the location of your password file */
 #define PASSWD_FILE "/etc/passwd"
 
-/* Define this to be the name of your NIS/YP password *
- * map (if applicable)                                */
-#define PASSWD_MAP "passwd.byname"
-
-/* Define to 1 if you want user names to be cached */
-#define CACHE_USERNAMES 1
-
 /* Define this if you use "suspended" instead of "stopped" */
 #define USE_SUSPENDED 1
  
