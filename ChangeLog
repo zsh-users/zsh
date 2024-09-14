@@ -1068,6 +1068,9 @@
 
 2024-09-14  Oliver Kiddle  <opk@zsh.org>
 
+	* 53083: configure.ac, Src/Builtins/rlimits.c: handle Haiku
+	specific resource limit for open vnode monitors
+
 	* c.f. Emil Velikov: 53072: Completion/Linux/Command/_dkms:
 	remove completion that has been imported by the upstream project
 
