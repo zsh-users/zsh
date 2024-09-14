@@ -1,5 +1,8 @@
 2024-09-14  Oliver Kiddle  <opk@zsh.org>
 
+	* 53084: configure.ac: yet another approach to the /dev/fd
+	autoconf test because of shells emulating /dev/fd
+
 	* 53083: configure.ac, Src/Builtins/rlimits.c: handle Haiku
 	specific resource limit for open vnode monitors
 
