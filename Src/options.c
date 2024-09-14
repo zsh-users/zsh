@@ -877,7 +877,6 @@ dosetopt(int optno, int value, int force, char *new_opts)
 	}
 #endif /* HAVE_SETRESGID && HAVE_SETRESUID */
 
-#ifdef JOB_CONTROL
     } else if (!force && optno == MONITOR && value) {
 	if (new_opts[optno] == value)
 	    return 0;
@@ -887,14 +886,6 @@ dosetopt(int optno, int value, int force, char *new_opts)
 	    origpgrp = GETPGRP();
 	    acquire_pgrp();
 	}
-#else
-    } else if(optno == MONITOR && value) {
-	    return -1;
-#endif /* not JOB_CONTROL */
-#ifdef GETPWNAM_FAKED
-    } else if(optno == CDABLEVARS && value) {
-	    return -1;
-#endif /* GETPWNAM_FAKED */
     } else if ((optno == EMACSMODE || optno == VIMODE) && value) {
 	if (sticky && sticky->emulation)
 	    return -1;

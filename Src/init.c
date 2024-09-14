@@ -695,7 +695,6 @@ init_io(char *cmd)
     } else
 	opts[USEZLE] = 0;
 
-#ifdef JOB_CONTROL
     /* If interactive, make sure the shell is in the foreground and is the
      * process group leader.
      */
@@ -708,9 +707,6 @@ init_io(char *cmd)
 	    acquire_pgrp(); /* might also clear opts[MONITOR] */
 	}
     }
-#else
-    opts[MONITOR] = 0;
-#endif
 }
 
 /**/
@@ -718,7 +714,7 @@ mod_export void
 init_shout(void)
 {
     static char shoutbuf[BUFSIZ];
-#if defined(JOB_CONTROL) && defined(TIOCSETD) && defined(NTTYDISC)
+#if defined(TIOCSETD) && defined(NTTYDISC)
     int ldisc;
 #endif
 
@@ -729,7 +725,7 @@ init_shout(void)
 	return;
     }
 
-#if defined(JOB_CONTROL) && defined(TIOCSETD) && defined(NTTYDISC)
+#if defined(TIOCSETD) && defined(NTTYDISC)
     ldisc = NTTYDISC;
     ioctl(SHTTY, TIOCSETD, (char *)&ldisc);
 #endif

@@ -216,7 +216,6 @@ signal_suspend(UNUSED(int sig), int wait_cmd)
     int ret;
 
     sigset_t set;
-    sigset_t oset;
 
     sigemptyset(&set);
 
@@ -229,13 +228,7 @@ signal_suspend(UNUSED(int sig), int wait_cmd)
 	  (sigtrapped[SIGINT] & ~ZSIG_IGNORED)))
 	sigaddset(&set, SIGINT);
 
-# ifdef BROKEN_POSIX_SIGSUSPEND
-    sigprocmask(SIG_SETMASK, &set, &oset);
-    ret = pause();
-    sigprocmask(SIG_SETMASK, &oset, NULL);
-# else /* not BROKEN_POSIX_SIGSUSPEND */
     ret = sigsuspend(&set);
-# endif /* BROKEN_POSIX_SIGSUSPEND */
 
     return ret;
 }

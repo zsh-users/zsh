@@ -2119,20 +2119,6 @@ if test x$zsh_cv_header_sys_ioctl_h_ioctl_proto = xyes; then
   AC_DEFINE(IOCTL_IN_SYS_IOCTL)
 fi
 
-dnl -------------------
-dnl select() defined in <sys/socket.h>, ie BeOS R4.51
-dnl -------------------
-AH_TEMPLATE([SELECT_IN_SYS_SOCKET_H],
-[Define to 1 if select() is defined in <sys/socket.h>, ie BeOS R4.51])
-if test x$ac_cv_header_sys_select_h != xyes; then
-  AC_CACHE_CHECK(for select() in <sys/socket.h>,
-  zsh_cv_header_socket_h_select_proto,
-  [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/socket.h>]], [[fd_set fd;]])],[zsh_cv_header_socket_h_select_proto=yes],[zsh_cv_header_socket_h_select_proto=no])])
-  if test x$zsh_cv_header_socket_h_select_proto = xyes; then
-    AC_DEFINE(SELECT_IN_SYS_SOCKET_H)
-  fi
-fi
-
 dnl -----------
 dnl named FIFOs
 dnl -----------
@@ -2265,154 +2251,6 @@ AH_TEMPLATE([HAVE_LINK],
 if test x$zsh_cv_sys_link = xyes; then
   AC_DEFINE(HAVE_LINK)
 fi
-
-dnl -----------
-dnl test for whether kill(pid, 0) where pid doesn't exit
-dnl should set errno to ESRCH, but some like BeOS R4.51 set to EINVAL
-dnl -----------
-AC_CACHE_CHECK(if kill(pid, 0) returns ESRCH correctly,
-zsh_cv_sys_killesrch,
-[AC_RUN_IFELSE([AC_LANG_SOURCE([[
-#include <unistd.h>
-#include <signal.h>
-#include <errno.h>
-int main()
-{
-    int pid = (getpid() + 10000) & 0xffffff;
-    while (pid && (kill(pid, 0) == 0 || errno != ESRCH)) pid >>= 1;
-    return(errno!=ESRCH);
-}
-]])],[zsh_cv_sys_killesrch=yes],[zsh_cv_sys_killesrch=no],[zsh_cv_sys_killesrch=yes])])
-AH_TEMPLATE([BROKEN_KILL_ESRCH],
-[Define to 1 if kill(pid, 0) doesn't return ESRCH, ie BeOS R4.51.])
-if test x$zsh_cv_sys_killesrch = xno; then
-  AC_DEFINE(BROKEN_KILL_ESRCH)
-fi
-
-dnl -----------
-dnl if POSIX, test for working sigsuspend().
-dnl for instance, BeOS R4.51 is broken.
-dnl -----------
-AH_TEMPLATE([BROKEN_POSIX_SIGSUSPEND],
-Define to 1 if sigsuspend() is broken, ie BeOS R4.51.])
-    AC_CACHE_CHECK(if POSIX sigsuspend() works,
-    zsh_cv_sys_sigsuspend,
-    [AC_RUN_IFELSE([AC_LANG_SOURCE([[
-#include <signal.h>
-#include <unistd.h>
-int child=0;
-void handler(sig)
-    int sig;
-{if(sig==SIGCHLD) child=1;}
-int main() {
-    struct sigaction act;
-    sigset_t set;
-    int pid, ret;
-    act.sa_handler = &handler;
-    sigfillset(&act.sa_mask);
-    act.sa_flags = 0;
-    sigaction(SIGCHLD, &act, 0);
-    sigfillset(&set);
-    sigprocmask(SIG_SETMASK, &set, 0);
-    pid=fork();
-    if(pid==0) return 0;
-    if(pid>0) {
-    sigemptyset(&set);
-        ret=sigsuspend(&set);
-        return(child==0);
-    }
-}
-]])],[zsh_cv_sys_sigsuspend=yes],[zsh_cv_sys_sigsuspend=no],[zsh_cv_sys_sigsuspend=yes])])
-    if test x$zsh_cv_sys_sigsuspend = xno; then
-      AC_DEFINE(BROKEN_POSIX_SIGSUSPEND)
-    fi
-
-dnl -----------
-dnl if found tcsetpgrp, test to see if it actually works
-dnl for instance, BeOS R4.51 does not support it yet
-dnl -----------
-AH_TEMPLATE([BROKEN_TCSETPGRP],
-[Define to 1 if tcsetpgrp() doesn't work, ie BeOS R4.51.])
-AC_ARG_WITH(tcsetpgrp,
-AS_HELP_STRING([--with-tcsetpgrp],[assumes that tcsetpgrp() exists and works correctly]),[
-case "x$withval" in
-    xyes) zsh_working_tcsetpgrp=yes;;
-    xno)  zsh_working_tcsetpgrp=no;;
-    *)    AC_MSG_ERROR(please use --with-tcsetpgrp=yes or --with-tcsetpgrp=no);;
-esac],[zsh_working_tcsetpgrp=check])
-if test "x$ac_cv_func_tcsetpgrp" = xyes; then
-case "x$zsh_working_tcsetpgrp" in
-  xcheck)
-    trap "" TTOU > /dev/null 2>&1 || :
-    AC_CACHE_CHECK(if tcsetpgrp() actually works,
-    zsh_cv_sys_tcsetpgrp,
-    [AC_RUN_IFELSE([AC_LANG_SOURCE([[
-#include <sys/types.h>
-#include <unistd.h>
-#include <fcntl.h>
-int main() {
-    int fd;
-    int ret;
-    fd=open("/dev/tty", O_RDWR);
-    if (fd < 0) return(2);
-    ret=tcsetpgrp(fd, tcgetpgrp(fd));
-    if (ret < 0) return(1);
-    return(0);
-}
-]])],[zsh_cv_sys_tcsetpgrp=yes],[
-case $? in
-    1) zsh_cv_sys_tcsetpgrp=no;;
-    2) zsh_cv_sys_tcsetpgrp=notty;;
-    *) zsh_cv_sys_tcsetpgrp=error;;
-esac
-      ],[zsh_cv_sys_tcsetpgrp=yes])])
-    case "x$zsh_cv_sys_tcsetpgrp" in
-      xno)    AC_DEFINE(BROKEN_TCSETPGRP);;
-      xyes)   :;;
-      xnotty) AC_MSG_ERROR([no controlling tty
-Try running configure with --with-tcsetpgrp or --without-tcsetpgrp]);;
-      *)      AC_MSG_ERROR([unexpected return status]);;
-    esac
-    trap - TTOU > /dev/null 2>&1 || :
-    ;;
-  xyes) :;;
-  xno)  AC_DEFINE(BROKEN_TCSETPGRP);;
-  *)    AC_MSG_ERROR([unexpected value zsh_working_tcsetpgrp=$zsh_working_tcsetpgrp]);;
-esac
-fi
-
-dnl -----------
-dnl test for faked getpwnam() entry, ie a single entry returned for any username
-dnl for instance, BeOS R4.51 is not multiuser yet, and fakes getpwnam()
-dnl test by looking up two usernames that shouldn't succeed, and compare entry
-dnl -----------
-AH_TEMPLATE([GETPWNAM_FAKED],
-[Define to 1 if getpwnam() is faked, ie BeOS R4.51.])
-if test x$ac_cv_func_getpwnam = xyes; then
-    AC_CACHE_CHECK(if getpwnam() is faked,
-    zsh_cv_sys_getpwnam_faked,
-    [AC_RUN_IFELSE([AC_LANG_SOURCE([[
-#include <pwd.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-int main() {
-    struct passwd *pw1, *pw2;
-    char buf[1024], name[1024];
-    sprintf(buf, "%d:%d", getpid(), rand());
-    pw1=getpwnam(buf);
-    if (pw1) strcpy(name, pw1->pw_name);
-    sprintf(buf, "%d:%d", rand(), getpid());
-    pw2=getpwnam(buf);
-    return(pw1!=0 && pw2!=0 && !strcmp(name, pw2->pw_name));
-}
-]])],[zsh_cv_sys_getpwnam_faked=no],[zsh_cv_sys_getpwnam_faked=yes],[zsh_cv_sys_getpwnam_faked=no])])
-    if test x$zsh_cv_sys_getpwnam_faked = xyes; then
-      AC_DEFINE(GETPWNAM_FAKED)
-    fi
-fi
-
 
 dnl ---------------
 dnl check for the type of third argument of accept
@@ -3150,9 +2988,6 @@ AH_TOP([/***** begin user configuration section *****/
 
 /* Define to 1 if you want user names to be cached */
 #define CACHE_USERNAMES 1
-
-/* Define to 1 if system supports job control */
-#define JOB_CONTROL 1
 
 /* Define this if you use "suspended" instead of "stopped" */
 #define USE_SUSPENDED 1

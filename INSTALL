@@ -576,13 +576,6 @@ shell is running in some privileged mode.  This is turned off by
 default as on some systems non-standard headers (in particular AIX) are
 required.  A direct fix for that problem would be appreciated.
 
-A test for the function tcsetpgrp is turned on by default.  The test
-needs to run the function to determine if the implementation is
-usable. However, this can cause problems when configure is run without
-a controlling terminal (eg. from cron).  To avoid this, use
---with-tcsetpgrp or --without-tcsetpgrp to tell configure whether the
-function should be used.
-
 Options For Configure
 ---------------------
 
