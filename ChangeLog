@@ -1,5 +1,8 @@
 2024-09-14  Oliver Kiddle  <opk@zsh.org>
 
+	* c.f. Emil Velikov: 53072: Completion/Linux/Command/_dkms:
+	remove completion that has been imported by the upstream project
+
 	* 53087: Test/X05zleincarg.ztst: don't produce spurious error
 	when zpty is missing
 
