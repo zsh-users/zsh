@@ -1,5 +1,8 @@
 2024-09-14  Oliver Kiddle  <opk@zsh.org>
 
+	* c.f. Emil Velikov: 53072: Completion/Linux/Command/_dkms:
+	remove completion that has been imported by the upstream project
+
 	* 53086: configure.ac: change flags used for building dynamic
 	modules on Haiku OS
 
