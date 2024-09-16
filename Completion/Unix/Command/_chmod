@@ -67,13 +67,13 @@ case "$variant" in
     ;;
 esac
 
-_arguments -C -s -S $aopts "$args[@]" && ret=0
+_arguments -C -s -S -0 $aopts "$args[@]" && ret=0
 
 case "$state" in
   files)
     if [[ -n $opt_args[--reference] ]]; then
       zmodload -F zsh/stat b:zstat 2>/dev/null
-      typeset -i8 ref=$(zstat +mode $opt_args[--reference])
+      typeset -i8 ref=$(zstat +mode $opt_args[--reference]:Q)
       _wanted files expl file _files -g "*(-.^f${ref#??})" && ret=0
     elif [[ $line[1] = [0-7]## ]]; then
       _wanted files expl file _files -g "*(-.^f$line[1])" && ret=0

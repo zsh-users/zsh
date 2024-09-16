@@ -1,5 +1,9 @@
 2024-09-18  Oliver Kiddle  <opk@zsh.org>
 
+	* Philip Sequeira: 53095: Completion/Unix/Command/_chmod,
+	Completion/Unix/Command/_chown: fix completion for chmod/chown
+	--reference with escaped filename
+
 	* 53094: configure.ac, Src/signals.h: remove unused autoconf tests
 
 	* 53093: Src/input.c: silence compiler warning when USE_LSEEK

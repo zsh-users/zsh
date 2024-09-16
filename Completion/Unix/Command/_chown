@@ -71,7 +71,7 @@ case "$variant" in
 esac
 
 (( $+words[(r)--reference*] )) || args+=( '(--reference)1: :->owner' )
-_arguments -C -s -S $aopts "$args[@]" '*: :->files' && ret=0
+_arguments -C -s -S -0 $aopts "$args[@]" '*: :->files' && ret=0
 
 case $state in
   owner)
@@ -95,8 +95,8 @@ case $state in
     (( $+opt_args[-h] || $+opt_args[--no-dereference] )) || deref="-"
     if (( $+opt_args[--reference] )); then
       zmodload -F zsh/stat b:zstat 2>/dev/null
-      usr=$(zstat +uid $opt_args[--reference])
-      grp=$(zstat +gid $opt_args[--reference])
+      usr=$(zstat +uid $opt_args[--reference]:Q)
+      grp=$(zstat +gid $opt_args[--reference]:Q)
       _wanted files expl file _files -g "*($deref^u$usr,$deref^g$grp)" && ret=0
       return ret
     fi
