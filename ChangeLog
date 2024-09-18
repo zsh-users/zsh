@@ -1,3 +1,8 @@
+2024-09-18  Oliver Kiddle  <opk@zsh.org>
+
+	* 53093: Src/input.c: silence compiler warning when USE_LSEEK
+	is not defined
+
 2024-09-14  Oliver Kiddle  <opk@zsh.org>
 
 	* c.f. Emil Velikov: 53072: Completion/Linux/Command/_dkms:
