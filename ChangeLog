@@ -1,3 +1,7 @@
+2024-09-18  Oliver Kiddle  <opk@zsh.org>
+
+	* 53092: Src/init.c: silence deprecated header warning on Linux
+
 2024-09-14  Bart Schaefer  <schaefer@zsh.org>
 
 	* 53088: Src/exec.c, Src/jobs.c, Test/A01grammar.ztst,
