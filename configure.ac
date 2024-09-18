@@ -634,7 +634,7 @@ if test "x$enable_pcre" = xyes; then
 fi
 
 AC_CHECK_HEADERS(sys/time.h sys/times.h sys/select.h termcap.h termio.h \
-		 termios.h sys/param.h sys/filio.h string.h memory.h \
+		 termios.h sys/param.h sys/filio.h \
 		 limits.h fcntl.h libc.h sys/utsname.h sys/resource.h \
 		 sys/sysctl.h sys/random.h \
 		 locale.h errno.h stdio.h stdarg.h varargs.h stdlib.h \
@@ -848,11 +848,6 @@ AC_CACHE_CHECK(if we need to ignore ncurses, zsh_cv_ignore_ncurses,
 esac])
 
 AC_SEARCH_LIBS(getpwnam, nsl)
-
-dnl I am told that told that unicos reqire these for nis_list
-if test `echo $host_os | sed 's/^\(unicos\).*/\1/'` = unicos; then
-  LIBS="-lcraylm -lkrb -lnisdb -lnsl -lrpcsvc $LIBS"
-fi
 
 if test "x$dynamic" = xyes; then
   AC_CHECK_LIB(dl, dlopen)
@@ -1258,13 +1253,12 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       fpurge fseeko ftello \
 	       mkfifo _mktemp mkstemp \
 	       waitpid wait3 \
-	       sigaction sigblock sighold sigrelse sigsetmask sigprocmask \
 	       sigqueue \
 	       killpg setpgid setpgrp tcsetpgrp tcgetattr nice \
 	       gethostname gethostbyname2 getipnodebyname \
 	       inet_aton inet_pton inet_ntop \
 	       getlogin getpwent getpwnam getpwuid getgrgid getgrnam \
-	       initgroups nis_list \
+	       initgroups \
 	       setuid seteuid setreuid setresuid setsid \
 	       setgid setegid setregid setresgid \
 	       memcpy memmove strstr strerror strtoul \
@@ -1275,7 +1269,7 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       signgam tgamma \
 	       log2 \
 	       scalbn \
-	       putenv getenv setenv unsetenv xw\
+	       putenv getenv setenv unsetenv \
 	       brk sbrk \
 	       pathconf sysconf \
 	       tgetent tigetflag tigetnum tigetstr setupterm initscr resize_term \

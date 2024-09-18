@@ -1,5 +1,7 @@
 2024-09-18  Oliver Kiddle  <opk@zsh.org>
 
+	* 53094: configure.ac, Src/signals.h: remove unused autoconf tests
+
 	* 53093: Src/input.c: silence compiler warning when USE_LSEEK
 	is not defined
 

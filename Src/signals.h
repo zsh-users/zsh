@@ -126,10 +126,5 @@
 
 #define queue_signal_level() queueing_enabled
 
-#ifdef BSD_SIGNALS
-#define signal_block(S) sigblock(S)
-#else
 extern sigset_t signal_block (sigset_t);
-#endif  /* BSD_SIGNALS   */
-
 extern sigset_t signal_unblock (sigset_t);
