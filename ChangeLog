@@ -1,3 +1,7 @@
+2024-09-21  Bart Schaefer  <schaefer@toltec-ubuntu>
+
+	* 53103: Test/A08time.ztst: fix spurious test failure on Solaris
+
 2024-09-18  Oliver Kiddle  <opk@zsh.org>
 
 	* Philip Sequeira: 53095: Completion/Unix/Command/_chmod,

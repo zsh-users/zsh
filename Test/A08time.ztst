@@ -59,6 +59,7 @@
 *?shell*
 *?children*
 
-  ( setopt errexit; time =false; print notreached )
+  ( setopt errexit; time expr 0; print notreached )
 1:`time' of failed external with errexit
+>0
 *?*user*system*cpu*total
