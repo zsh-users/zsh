@@ -1,5 +1,8 @@
 2024-11-23  Oliver Kiddle  <opk@zsh.org>
 
+	* github #122: Wu, Zhenyu: Completion/Unix/Command/_gcc: Add
+	newer C and C++ language standards to gcc completion
+
 	* github #123: Shlomi Fish: Completion/X/Command/_okular:
 	Make okular's completion support *.epub files.
 
