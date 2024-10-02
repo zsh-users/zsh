@@ -2637,7 +2637,9 @@ int main(int argc, char *argv[])
     sysv4*|esix*) DLLDFLAGS="${DLLDFLAGS=-G $ldflags}" ;;
     aix*)         DLLDFLAGS="${DLLDFLAGS=-G -bexpall -lc}" ;;
     solaris*|sysv4*|esix*) DLLDFLAGS="${DLLDFLAGS=-G}" ;;
-    darwin*)      DLLDFLAGS="${DLLDFLAGS=-bundle -flat_namespace -undefined suppress}" ;;
+    darwin[[0-9]].*|darwin1?.*|darwin2[01].*)
+                  DLLDFLAGS="${DLLDFLAGS=-bundle -flat_namespace -undefined suppress}" ;;
+    darwin*)      DLLDFLAGS="${DLLDFLAGS=-bundle -flat_namespace -undefined dynamic_lookup}" ;;
     beos*) DLLDFLAGS="${DLLDFLAGS=-nostart}" ;;
     openbsd*)
       if test x$zsh_cv_sys_elf = xyes; then
