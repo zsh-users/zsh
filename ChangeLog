@@ -24,6 +24,10 @@
 	* 53080: configure.ac, Src/init.c, Src/signals.c, Src/signals.h:
 	remove code for systems that only have the old pre-POSIX signal()
 
+2024-09-02  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 53134: configure.ac: use -undefined dynamic_lookup on recent macOS
+
 2024-08-31  Oliver Kiddle  <opk@zsh.org>
 
 	* github #120: Semnodime: Completion/Unix/Command/_git: update
