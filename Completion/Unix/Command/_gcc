@@ -2111,7 +2111,7 @@ args+=(
   '-s[remove all symbol table and relocation information from the executable]'
   '-static-libgcc[force static libgcc]'
   '-static[on systems that support dynamic linking, this prevents linking with the shared libraries]'
-  {'-std=-','--std='}'[assume that the input sources are for specified standard]:standard:(c90 c89 iso9899\:1990 iso9899\:199409 c99 iso9899\:1999 c11 iso9899\:2011 gnu90 gnu89 gnu99 gnu11 c++98 c++03 gnu++98 gnu++03 c++11 gnu++11 c++1y gnu++1y c++14 gnu++14 c++1z gnu++1z c++17 iso9899\:2017 gnu++17 c++2a gnu++2a)'
+  {'-std=-','--std='}'[assume that the input sources are for specified standard]:standard:(c90 c89 iso9899\:1990 iso9899\:199409 c99 iso9899\:1999 c11 iso9899\:2011 c17 iso9899\:2017 c18 iso9899\:2018 gnu90 gnu89 gnu99 gnu11 gnu17 gnu18 c++98 c++03 gnu++98 gnu++03 c++11 gnu++11 c++1y gnu++1y c++14 gnu++14 c++1z gnu++1z c++17 iso9899\:2017 gnu++17 c++2a gnu++2a c++20 gnu++20 c++23 gnu++23)'
   '-symbolic[bind references to global symbols when building a shared object]'
   '--sysroot=-[use <directory> as the root directory for headers and libraries]:directory:_files -/'
   '--target-help[display target specific command line options]'
