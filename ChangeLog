@@ -1,5 +1,8 @@
 2024-11-23  Oliver Kiddle  <opk@zsh.org>
 
+	* github #123: Shlomi Fish: Completion/X/Command/_okular:
+	Make okular's completion support *.epub files.
+
 	* github #124: Ryan Rotter: Completion/Debian/Command/_dpkg:
 	remove defunct --largemem, --smallmem options
 
