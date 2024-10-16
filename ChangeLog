@@ -857,6 +857,11 @@
 	* 53209 + comments + test: Src/params.c, Test/D04parameter.ztst:
 	do not unmetafy via string pointers into global parameter table
 
+2024-10-16  Bart Schaefer  <schaefer@toltec-ubuntu>
+
+	* 53146: Src/exec.c: trace flags cannot be copied from an
+	undefined function (cf. workers/45131)
+
 2024-09-18  Oliver Kiddle  <opk@zsh.org>
 
 	* Philip Sequeira: 53095: Completion/Unix/Command/_chmod,
