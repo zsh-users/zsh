@@ -5504,7 +5504,8 @@ execfuncdef(Estate state, Eprog redir_prog)
 	    if (funcstack && funcstack->tp == FS_FUNC &&
 		    !strcmp(s, funcstack->name)) {
 		Shfunc old = ((Shfunc)shfunctab->getnode(shfunctab, s));
-		shf->node.flags |= old->node.flags & (PM_TAGGED|PM_TAGGED_LOCAL);
+		if (old)
+		    shf->node.flags |= old->node.flags & (PM_TAGGED|PM_TAGGED_LOCAL);
 	    }
 	    shfunctab->addnode(shfunctab, ztrdup(s), shf);
 	}

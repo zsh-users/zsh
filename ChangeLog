@@ -1,3 +1,8 @@
+2024-10-16  Bart Schaefer  <schaefer@toltec-ubuntu>
+
+	* 53146: Src/exec.c: trace flags cannot be copied from an
+	undefined function (cf. workers/45131)
+
 2024-09-02  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 53134: configure.ac: use -undefined dynamic_lookup on recent macOS
