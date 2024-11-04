@@ -1,5 +1,8 @@
 2024-11-23  Oliver Kiddle  <opk@zsh.org>
 
+	* github #124: Ryan Rotter: Completion/Debian/Command/_dpkg:
+	remove defunct --largemem, --smallmem options
+
 	* 53243: Src/Zle/zle_hist.c: fix use of vi-fetch-history
 	with a range
 
