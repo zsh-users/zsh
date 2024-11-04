@@ -64,8 +64,6 @@ _dpkg_options=(
   '(--skip-same-version -E)'{--skip-same-version,-E}'[skip packages with same version as installed]'
   '(--refuse-downgrade -G)'{--refuse-downgrade,-G}'[skip packages with earlier version than installed]'
   '(--auto-deconfigure -B)'{--auto-deconfigure,-B}'[install can break other packages]'
-  '--largemem[optimize for >4Mb RAM]'
-  '--smallmem[optimize for <4Mb RAM]'
   '--no-act[show potential actions but do not follow through]'
   '-D+[debug options]:debug options:(h 1 2 3)'
   '--debug=[debug options]:debug options:(help 1 2 3)'
