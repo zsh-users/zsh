@@ -1,5 +1,8 @@
 2024-11-23  Oliver Kiddle  <opk@zsh.org>
 
+	* github #124: Ryan Rotter: Completion/Debian/Command/_dpkg:
+	remove defunct --largemem, --smallmem options
+
 	* 53244: Test/Y01completion.ztst: rename user in test case to
 	reduce likelihood of failure due to user existing
 
