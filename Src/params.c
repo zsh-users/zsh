@@ -3064,8 +3064,9 @@ getsparam(char *s)
 mod_export char *
 getsparam_u(char *s)
 {
+    /* getsparam() returns pointer into global params table, so ... */
     if ((s = getsparam(s)))
-	return unmetafy(s, NULL);
+	return unmeta(s);	/* returns static pointer to copy */
     return s;
 }
 

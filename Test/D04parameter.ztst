@@ -2834,3 +2834,11 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
   fi
 1:${(#X)...}: array of out-of-range characters
 ?(eval):4: character not in range
+
+  (
+   export ZDOTDIR=${ echo $PWD/'\0360\0237\0224\0256' }
+   $ZTST_testdir/../Src/zsh -c 'echo $ZDOTDIR'
+  )
+0:regression for workers/53179 unicode ZDOTDIR
+F:output ignorable as long as not an error
+*>*
