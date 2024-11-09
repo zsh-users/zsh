@@ -338,19 +338,6 @@ label(16)
   Please email email(zsh-workers@zsh.org) if you have information about
   other ports.
 
-  Starting from mid-October 1997, there is an archive of patches sent
-  to the maintainers' mailing list.  Note that these may not all be
-  added to the shell, and some may already have been; you simply have
-  to search for something you might want which is not in the version
-  you have.  Also, there may be some prerequisites earlier in the
-  archive.  It can be found on the zsh WWW pages (as described in
-  link(1.1)(11)) at:
-
-  description(
-    mydit()        url(https://zsh.sourceforge.io/Patches/)
-(https://zsh.sourceforge.io/Patches/)
-  )
-
 sect(I don't have root access: how do I make zsh my login shell?)
 
   Unfortunately, on many machines you can't use mytt(chsh) to change your
