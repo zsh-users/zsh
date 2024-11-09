@@ -1,5 +1,8 @@
 2024-11-23  Oliver Kiddle  <opk@zsh.org>
 
+	* Clinton Bunch: 53228: Etc/FAQ.yo: Remove references to
+	Patches "Archive" from FAQ
+
 	* github #122: Wu, Zhenyu: Completion/Unix/Command/_gcc: Add
 	newer C and C++ language standards to gcc completion
 
