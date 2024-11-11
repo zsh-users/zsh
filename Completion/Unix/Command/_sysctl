@@ -23,10 +23,18 @@ case $OSTYPE in
     else
       args=( ${args:#((#s)|*\))(\*|)--*} )	# remove long options
     fi
+    local delimiter=.
+    sysctlvars=( /proc/sys/**/*(.e*'REPLY=${REPLY#/proc/sys/}'*) )
+    if zstyle -t ":completion:${curcontext}:argument-rest" delimiter / || (( ${words[CURRENT][(Ie)/]} )); then
+      delimiter=/
+    else
+      sysctlvars=(${sysctlvars//\//.})
+    fi
+
     _arguments -S -A "-*" : $args \
       '(- :)'{-h,--help}'[display help text and exit]' \
       '(- :)'{-V,--version}'[display version info and exit]' \
-      '*:sysctl variable:_files -W /proc/sys'
+      "*:sysctl variable:_multi_parts -i -S = -q $delimiter sysctlvars"
   ;;
   freebsd<14->.*)
     args+=(
