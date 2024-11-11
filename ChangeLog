@@ -841,6 +841,10 @@
 
 2024-11-11  Eric Cook  <llua@gmx.com>
 
+	* Matthew Martin: 53174 + comments:
+	Completion/Base/Utility/_as_if: complete `as if'
+	a different command were being completed
+
 	* 53144: Completion/Unix/Command/_sysctl:
 	support completion with the dot delimiter on linux
 

@@ -1,0 +1,10 @@
+#autoload
+local words=("$words[@]") CURRENT=$CURRENT
+local _comp_command1 _comp_command2 _comp_command
+
+words[1]=("$@")
+(( CURRENT += $# - 1 ))
+
+_set_command
+
+_dispatch "$_comp_command" "$_comp_command1" "$_comp_command2" -default-
