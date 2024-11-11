@@ -4290,6 +4290,14 @@ arguments.  The first describes the first argument as a
 be completed.  The last description gives all other arguments the
 description `var(page number)' but does not offer completions.
 )
+findex(_as_if)
+item(tt(_as_if) var(command) [var(arg) ... ])(
+This function is useful when one command should be completed as if it were
+another command with particular arguments. For example to complete tt(foo) as
+if it were tt(bar --baz), use
+
+example(compdef '_as_if bar --baz' foo)
+)
 findex(_cache_invalid)
 item(tt(_cache_invalid) var(cache_identifier))(
 This function returns status zero if the completions cache corresponding to
