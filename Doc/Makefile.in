@@ -121,9 +121,16 @@ zsh.pdf zsh_a4.pdf zsh_us.pdf: $(sdir)/zsh.texi
 intro.pdf intro.a4.pdf intro.us.pdf: $(sdir)/intro.ms
 	if test $@ = intro.us.pdf || \
 	  { test $@ = intro.pdf && test "$(PAPERSIZE)" = us; }; then \
-	  pdfroff -ms -P-pletter $(sdir)/intro.ms > $@; \
+	  pdfroff -mspdf --no-kill-null-pages -P-pletter --pdf-output=$@ $<; \
 	else \
-	  pdfroff -ms -P-pa4 $(sdir)/intro.ms > $@; \
+	  pdfroff -mspdf --no-kill-null-pages -P-pa4 --pdf-output=$@ $<; \
+	fi
+
+intro.html: $(sdir)/intro.ms
+	if groff -ms -Thtml -P-jintro $< > tmp.html; then \
+	  mv tmp.html $@; \
+	else \
+	  rm -f tmp.html; false; \
 	fi
 
 texi: $(sdir)/zsh.texi
@@ -170,7 +177,7 @@ a4_ps: zsh_a4.ps
 zsh_a4.ps: zsh_a4.dvi
 	$(DVIPS) -t a4 -o $@ zsh_a4.dvi
 
-html: zsh_toc.html
+html: zsh_toc.html intro.html
 .PHONY: html
 
 zsh_toc.html: $(sdir)/zsh.texi texi2html.conf

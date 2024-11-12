@@ -1,3 +1,8 @@
+2024-11-12  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 53137 + 53213: Doc/Makefile.in, Doc/intro.ms, allow creating
+	intro.html
+
 2024-11-11  Eric Cook  <llua@gmx.com>
 
 	* 53144: Completion/Unix/Command/_sysctl:
