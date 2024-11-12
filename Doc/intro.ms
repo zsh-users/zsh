@@ -3,8 +3,32 @@
 .if \n(.g \{\
 .if "\*(.T"ascii" .ftr C R
 .if "\*(.T"latin1" .ftr C R
+.if "\*(.T"html" .nr HTML 1
 .nr De \n[.ss]
 .\}
+.\" ----- macro defintions -----
+.\" Ds/De: start/end of example
+.\" Sh: section header
+.\" XXX: It seems we can't use the same definition for both pdf and html
+.\"      (at least with groff-12.3.0).
+.\"
+.\" for HTML output
+.ie \n[HTML] \{\
+.de Ds
+.DS I .5i
+.ft C
+..
+.de De
+.DE
+.ft R
+..
+.de Sh
+.NH
+\\$1
+..
+.\}
+.\" for other output (such as PDF)
+.el \{\
 .de Ds
 .DS I .5i
 .ft C
@@ -21,12 +45,13 @@
 .el .ss
 ..
 .de Sh
-.SH
-\\$1
-.XS
-\\$1
-.XE
+.NH
+.XN \\$1
 ..
+.\}
+.\"
+.\" ----- Cover page -----
+.if !\n[HTML] \{\
 .nr HM 4i
 .ce 99
 .ps 18
@@ -50,6 +75,9 @@ bas@phys.uva.nl\fP
 .sv |1i
 .pn 1
 .bp
+.\}
+.\"
+.\" ----- main text -----
 .TL
 An Introduction to the Z Shell
 .AU
@@ -2712,6 +2740,7 @@ I (Bas de Bakker) would be happy to receive mail if anyone has any
 tricks or ideas to add to this document, or if there are some points
 that could be made clearer or covered more thoroughly.  Please notify
 me of any errors in this document.
+.if !\n[HTML] \{\
 .if o \{\
 .bp
 .sv 1i
@@ -2719,3 +2748,4 @@ me of any errors in this document.
 .pn 1
 .bp
 .PX
+.\}
