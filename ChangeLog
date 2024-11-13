@@ -3,6 +3,11 @@
 	* 53137 + 53213: Doc/Makefile.in, Doc/intro.ms, allow creating
 	intro.html
 
+2024-11-12  Bart Schaefer  <schaefer@zsh.org>
+
+	* Karel Balej: 53240, 53241: Completion/Unix/Command/_mpc:
+	updated completions for mpc add, mpc insert
+
 2024-11-11  Eric Cook  <llua@gmx.com>
 
 	* 53144: Completion/Unix/Command/_sysctl:
