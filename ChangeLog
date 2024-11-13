@@ -1,3 +1,8 @@
+2024-11-12  Bart Schaefer  <schaefer@zsh.org>
+
+	* Karel Balej: 53240, 53241: Completion/Unix/Command/_mpc:
+	updated completions for mpc add, mpc insert
+
 2024-11-12  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 53137 + 53213: Doc/Makefile.in, Doc/intro.ms, allow creating

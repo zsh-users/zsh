@@ -178,6 +178,16 @@ _mpc_helper_files() {
   fi
 }
 
+(( $+functions[_mpc_helper_all_files] )) ||
+_mpc_helper_all_files() {
+  local ret=1
+  if [[ $words[CURRENT] == [/~]* ]]; then
+    _files
+    ret=$?
+  fi
+  _mpc_helper_files || return $ret
+}
+
 (( $+functions[_mpc_helper_directories] )) ||
 _mpc_helper_directories() {
   if [[ -n $MPD_MUSIC_DIR ]]; then
@@ -204,7 +214,11 @@ _mpc_helper_outputs() {
 }
 
 _mpc_add() {
-  _mpc_helper_files
+  _mpc_helper_all_files
+}
+
+_mpc_insert() {
+  _mpc_helper_all_files
 }
 
 _mpc_albumart() {
