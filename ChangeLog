@@ -1,3 +1,8 @@
+2024-11-21  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 53238 (+53239 Mikael): Completion/Redhat/Command/_dnf,
+	Completion/Redhat/Command/_dnf5: support dnf5
+
 2024-11-12  Bart Schaefer  <schaefer@zsh.org>
 
 	* Karel Balej: 53240, 53241: Completion/Unix/Command/_mpc:
