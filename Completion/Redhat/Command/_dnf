@@ -1,7 +1,11 @@
-#compdef dnf dnf-2 dnf-3
-#
-# based on dnf-4.2.18
-#
+#compdef dnf dnf-2 dnf-3 dnf4
+# based on dnf-4.21.1
+
+# avoid 'dnf --version' since it's rather slow for dnf4
+if [[ $service = dnf && $commands[dnf]:P = */dnf5 ]]; then
+  _dnf5 "$@" && return 0
+  return 1
+fi
 
 _dnf_helper() {
   # Get the pathname of the python executable from the 1st line of dnf-2/dnf-3.
@@ -68,25 +72,23 @@ _dnf_packages_or_rpms() {
   fi
 }
 
-_dnf_groups_caching_policy() {
-  # TODO: Are there any reliable ways to validate the cache?
-  local -a newer=( "$1"(Nmw-1) )    # rebuild if more than a week old
-  return $#newer
-}
-
 _dnf_groups() {
-  local package_groups update_policy expl
-  zstyle -s ":completion:${curcontext}:" cache-policy update_policy
-  if [[ -z "$update_policy" ]]; then
-    zstyle ":completion:${curcontext}:" cache-policy _dnf_groups_caching_policy
-  fi
-  if _cache_invalid dnf-groups || ! _retrieve_cache dnf-groups; then
-    # this can be very slow
-    package_groups=( ${${${(M)${(f)"$(_call_program package-groups \
-                     $service group list -v 2>/dev/null)"}:# *}#*\(}%\)*} )
-    _store_cache dnf-groups package_groups
-  fi
-  _wanted package-groups expl 'package group' compadd "$@" -a package_groups
+  # optional option: -T (available|installed)
+  local selected line groups section=none
+  zparseopts -D -E - T:=selected
+  selected=$selected[2]
+  [[ -z $selected ]] && selected=all
+  # XXX hidden groups are not included.
+  # --installed and --available can't be specified with --hidden
+  for line in ${(f)"$(_call_program package-groups
+                      $service group list --$selected -qCv 2>/dev/null)"}; do
+    # a line for each group is of the following form:
+    # '  description of the group (group-id)'
+    if [[ $line = \ ##(#b)(*)\(([-_[:alnum:]]#)\) ]]; then
+      groups+=( "${match[2]}:${match[1]}" )
+    fi
+  done
+  _describe -t groups "$selected group" groups
 }
 
 _dnf_repoquery() {
@@ -194,7 +196,7 @@ _dnf_repository_packages() {
   fi
 }
 
-_dnf() {
+_dnf4() {
   local cache_file="/var/cache/dnf/packages.db"
   local -a opts=(
     '(-6)-4[resolve to IPv4 addresses only]'
@@ -226,7 +228,7 @@ _dnf() {
     '*'{-x+,--exclude=}'[exclude specified packages]: : _sequence _dnf_packages -T all'
     '--forcearch=[force the use of the specified arch]:arch: '
     '(-)'{-h,--help}'[show the help message]'
-    '--installroot=[set install root]:directory:_files -/'
+    '--installroot=[set install root]:directory:_files -/ -g "/*"'
     '--newpackage[include newpackage relevant packages]'
     '--noautoremove[disable removal of dependencies that are no longer used]'
     '--nobest[do not limit transactions to best candidates]'
@@ -289,18 +291,21 @@ _dnf_command() {
   if (( CURRENT == 1 )); then
     _describe -t dnf-commands 'dnf command' dnf_cmds
   else
-    local curcontext=$curcontext cur=$words[CURRENT] cmd tmp expl ret=1
+    local cur=$words[CURRENT] cmd=$words[1] tmp expl ret=1
     # Deal with aliases (not comprehensive)
-    case $words[1] in
+    case $cmd in
       check-updgrade) cmd=check-update;;
       distrosync|dsync) cmd=distro-sync;;
       dg) cmd=downgrade;;
+      dsync) cmd=distro-sync;;
       erase|rm) cmd=remove;;
       groups|grp) cmd=group;;
       hist) cmd=history;;
       in) cmd=install;;
+      if) cmd=info;;
+      ls) cmd=list;;
       mc) cmd=makecache;;
-      prov|whatprovides) cmd=provides;;
+      prov|whatprovides|wp) cmd=provides;;
       rei) cmd=reinstall;;
       repoinfo) cmd=repolist;;
       rq) cmd=repoquery;;
@@ -308,9 +313,9 @@ _dnf_command() {
       sh) cmd=shell;;
       update|up) cmd=upgrade;;
       update-minimal|up-min) cmd=upgrade-minimal;;
-      *) cmd="${${dnf_cmds[(r)$words[1]:*]%%:*}}";;
+      upif) cmd=updateinfo;;
     esac
-    (( $#cmd )) && curcontext="${curcontext%:*:*}:dnf-${cmd}:"
+    local curcontext="${curcontext%:*:*}:dnf-${cmd}:"
 
     case $cmd in
       alias)
@@ -337,11 +342,9 @@ _dnf_command() {
         _describe -t options 'option' tmp && ret=0
         ;;
       check-update)
-        if [[ $cur = -* ]]; then
-          _wanted options expl 'option' compadd - --changelogs && ret=0
-        else
-          _dnf_packages -T installed && ret=0
-        fi
+        _arguments : \
+          '--changelogs[also print changelog delta of packages]' \
+          '*: :_dnf_packages -T installed' && ret=0
         ;;
       clean)
         tmp=(
@@ -368,23 +371,38 @@ _dnf_command() {
             "mark:mark a group for installation or removal"
           )
           _describe -t subcommands 'subcommand' tmp && ret=0
-        elif (( CURRENT == 3 )) && [[ $cur = -* ]]; then
-          if [[ $words[2] == install ]]; then
-            _wanted options expl 'option' compadd - --with-optional && ret=0
-          elif [[ $words[2] == list ]]; then
-            tmp=(
-              '--available:show only available groups'
-              '--installed:show only installed groups'
-              '--hidden:show also hidden groups'
-              '--ids:show also ID of groups'
-            )
-            _describe -t options 'option' tmp && ret=0
-          fi
-        elif (( CURRENT == 3 )) && [[ $words[2] == mark ]]; then
-          _wanted subcommands expl 'subcommand' \
-                  compadd - install remove && ret=0
         else
-          _dnf_groups && ret=0
+          case $words[2] in
+            summary)
+              _arguments : '--hidden' '2: :_dnf_groups' && ret=0
+              ;;
+            info)
+              _dnf_groups && ret=0
+              ;;
+            install)
+              _arguments : '--with-optional[also include optional packages]' \
+                            '*: :_dnf_groups -T available' && ret=0
+              ;;
+            list)
+              _arguments : \
+                '(--installed)--available[show only available groups]' \
+                '(--available)--installed[show only installed groups]' \
+                '--hidden[show also hidden groups]' \
+                {--ids,-v}'[show also ID of groups]' \
+                '*: :_dnf_groups' && ret=0
+              ;;
+            remove|upgrade)
+              _dnf_groups -T installed && ret=0
+              ;;
+            mark)
+              if (( CURRENT == 3 )); then
+                _wanted subcommands expl 'subcommand' \
+                        compadd - install remove && ret=0
+              else
+                _dnf_groups && ret=0
+              fi
+              ;;
+          esac
         fi
         ;;
       help)
@@ -399,13 +417,32 @@ _dnf_command() {
             "list:list transactions"
             "info:describe the given transactions"
             "redo:repeat the specified transaction"
+            "replay:replay transaction stored in the specified file"
             "rollback:undo all since the given transaction"
+            "store:store the specified transaction in file"
             "undo:undo transactions"
             "userinstalled:list all packages installed by users"
           )
           _describe -t subcommands 'subcommand' tmp && ret=0
-        elif [[ $words[2] != userinstalled ]]; then
-          _message 'transaction' && ret=0
+        else
+          case $words[2] in
+            list)
+              _arguments : '--reverse[output history in reverse order]' \
+                '*:transaction ID or ID..ID: ' && ret=0 ;;
+            info)
+              _message 'transaction ID or ID..ID' && ret=0 ;;
+            redo|rollback|undo)
+              _message 'transaction or package' && ret=0 ;;
+            replay)
+              _arguments : \
+                "--ignore-installed[don't check for installed packages being in the same state as recorded in transaction]" \
+                "--ignore-extras[don't check for extra packages pulled into the transaction on the target system]" \
+                '--skip-unavailable[skip packages that are in transaction but not in target system]' \
+                '2:transaction file:_files' && ret=0 ;;
+            store)
+              _arguments : {-o+,--output=}'[store in specified file]: :_files' \
+                          '2:transaction: ' && ret=0 ;;
+          esac
         fi
         ;;
       info|list)
@@ -413,7 +450,7 @@ _dnf_command() {
           if [[ $cur = -* ]]; then
             tmp=( --all --available --installed --extras
                   --obsoletes --upgrades --autoremove --recent )
-            _wanted options expl 'option' compadd -a tmp
+            _wanted options expl 'option' compadd -a tmp && ret=0
           else
             _dnf_packages -T all && ret=0
           fi
@@ -449,6 +486,7 @@ _dnf_command() {
           tmp=(
             'install:install a module profile including its packages'
             'update:update packages associated with an active module stream'
+            'switch-to:switch to a module stream and change versions of installed packages'
             'remove:remove installed module profiles and their packages'
             'enable:enable a module stream'
             'disable:disable a module with all its streams'
@@ -502,7 +540,7 @@ _dnf_command() {
         _dnf_repoquery && ret=0
         ;;
       repository-packages)
-        _dnf_repository_packages
+        _dnf_repository_packages && ret=0
         ;;
       search)
         if [[ $cur = -* ]]; then
@@ -531,6 +569,7 @@ _dnf_command() {
           '--list[display list of advisories]'
           '--info[display detailed information of advisories]'
           + '(availability)'
+          '-all[include advisories about any versions of installed packages]'
           '--available[limit to advisories about newer versions of installed packages]'
           '--installed[limit to advisories about equal or older versions of installed packages]'
           '--updates[limit to advisories about newer and available versions of installed packages]'
@@ -548,4 +587,4 @@ _dnf_command() {
   fi
 }
 
-_dnf "$@"
+_dnf4 "$@"
