@@ -112,16 +112,16 @@ F:regression test workers/51641
 >NO:{file2}
 
   comptesteval $'zstyle -d \'*\' glob'
-  comptesteval '_users () { compadd user1 user2 }'
+  comptesteval '_users () { compadd zuser1 zuser2 }'
   comptest $': ~\t\t\t\t\t'
 0:tilde
->line: {: ~user}{}
->line: {: ~user}{}
->NO:{user1}
->NO:{user2}
->line: {: ~user1}{}
->line: {: ~user2}{}
->line: {: ~user1}{}
+>line: {: ~zuser}{}
+>line: {: ~zuser}{}
+>NO:{zuser1}
+>NO:{zuser2}
+>line: {: ~zuser1}{}
+>line: {: ~zuser2}{}
+>line: {: ~zuser1}{}
 
   comptesteval 'zsh_directory_name() { compadd "$expl[@]" -- name/1 name2 }'
   comptest $': ~[\t\t\t\t'

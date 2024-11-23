@@ -1,3 +1,8 @@
+2024-11-23  Oliver Kiddle  <opk@zsh.org>
+
+	* 53244: Test/Y01completion.ztst: rename user in test case to
+	reduce likelihood of failure due to user existing
+
 2024-11-21  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 53238 (+53239 Mikael): Completion/Redhat/Command/_dnf,
