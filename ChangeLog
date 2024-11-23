@@ -1,5 +1,8 @@
 2024-11-23  Oliver Kiddle  <opk@zsh.org>
 
+	* 53243: Src/Zle/zle_hist.c: fix use of vi-fetch-history
+	with a range
+
 	* 53244: Test/Y01completion.ztst: rename user in test case to
 	reduce likelihood of failure due to user existing
 
