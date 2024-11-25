@@ -1,5 +1,8 @@
 2025-01-27  Oliver Kiddle  <opk@zsh.org>
 
+	* github #125: Kouhei Yanagita: Completion/Unix/Command/_ruby:
+	Add completion for irb --no-pager
+
 	* unposted: Completion/Unix/Command/_openldap: fix quoting
 
 	* 53327: Completion/Unix/Command/_git: update for git 2.47
