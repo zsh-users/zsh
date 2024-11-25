@@ -69,6 +69,7 @@ irb=(
   $opts[(r)*-d\[*]
   '(--noinspect)--inspect[use inspect for output]'
   "(--inspect)--noinspect[don't use inspect for output]"
+  "--no-pager[don't use pager]"
   '(--prompt --prompt-mode --inf-ruby-mode --simple-prompt --noprompt)'{--prompt=,--prompt-mode=}'[switch prompt mode]:prompt mode:(default classic simple inf-ruby xmp null)'
   '(--prompt --prompt-mode --inf-ruby-mode --simple-prompt --noprompt)'{--inf-ruby-mode,--simple-prompt,--noprompt}
   '--tracer[display trace for each command execution]'
