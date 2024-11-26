@@ -2059,7 +2059,7 @@ redup(int x, int y)
  * Add an fd opened ithin a module.
  *
  * fdt is the type of the fd; see the FDT_ definitions in zsh.h.
- * The most likely falures are:
+ * The most likely failures are:
  *
  * FDT_EXTERNAL: the fd can be used within the shell for normal I/O but
  * it will not be closed automatically or by normal shell syntax.
