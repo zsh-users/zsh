@@ -1386,7 +1386,7 @@ execlist(Estate state, int dont_change_job, int exiting)
 	*list_pipe_text = '\0';
     }
 
-    /* Loop over all sets of comands separated by newline, *
+    /* Loop over all sets of commands separated by newline, *
      * semi-colon or ampersand (`sublists').               */
     code = *state->pc++;
     if (wc_code(code) != WC_LIST) {
@@ -3033,7 +3033,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 	/*
 	 * preargs contains args that have been expanded by prefork.
 	 * Running execcmd_getargs() causes any argument available
-	 * in args to be exanded where necessary and transferred to
+	 * in args to be expanded where necessary and transferred to
 	 * preargs.  We call execcmd_getargs() every time we need to
 	 * analyse an argument not available in preargs, though there is
 	 * no guarantee a further argument will be available.

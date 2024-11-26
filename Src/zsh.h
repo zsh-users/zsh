@@ -1667,7 +1667,7 @@ enum zpc_chars {
     ZPC_KSH_BANG,               /* ! for !(...) in KSH_GLOB */
     ZPC_KSH_BANG2,              /* ! for !(...) in KSH_GLOB, untokenised */
     ZPC_KSH_AT,                 /* @ for @(...) in KSH_GLOB */
-    ZPC_COUNT			/* Number of special chararacters */
+    ZPC_COUNT			/* Number of special characters */
 };
 
 /*
