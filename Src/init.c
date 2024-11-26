@@ -1283,7 +1283,7 @@ setupvals(char *cmd, char *runscript, char *zsh_name)
     adjustwinsize(0);
 #else
     /* columns and lines are normally zero, unless something different *
-     * was inhereted from the environment.  If either of them are zero *
+     * was inherited from the environment.  If either of them are zero *
      * the setiparam calls below set them to the defaults from termcap */
     setiparam("COLUMNS", zterm_columns);
     setiparam("LINES", zterm_lines);
