@@ -1,3 +1,8 @@
+2024-12-16  dana  <dana@dana.is>
+
+	* 53251: Completion/Unix/Command/_man: fix page completion on
+	macOS, update fall-back paths, etc.
+
 2024-11-23  Oliver Kiddle  <opk@zsh.org>
 
 	* Clinton Bunch: 53228: Etc/FAQ.yo: Remove references to
