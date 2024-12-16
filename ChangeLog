@@ -1,3 +1,7 @@
+2024-12-16  dana  <dana@dana.is>
+
+	* 52108: Doc/Zsh/compsys.yo: document benefits of `_normal -p`
+
 2024-11-23  Oliver Kiddle  <opk@zsh.org>
 
 	* Clinton Bunch: 53228: Etc/FAQ.yo: Remove references to

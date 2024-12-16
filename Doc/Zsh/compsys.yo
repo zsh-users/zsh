@@ -4397,8 +4397,10 @@ the functions for the fields if they are called.
 findex(_command_names)
 item(tt(_command_names) [ tt(-e) | tt(-) ])(
 This function completes words that are valid at command position: names of
-aliases, builtins, hashed commands, functions, and so on.  With the tt(-e)
-flag, only hashed commands are completed.  The tt(-) flag is ignored.
+aliases, builtins, hashed commands, functions, and so on.  If the tt(-e)
+flag is given, or if the list of precommands contains a non-builtin command
+(e.g. because tt(_normal -p) has been used previously), only hashed commands
+are completed.  The tt(-) flag is ignored.
 )
 findex(_comp_locale)
 item(tt(_comp_locale))(
@@ -4784,7 +4786,11 @@ functions) regardless of prior precommands (e.g. `tt(zsh -c)').
 )
 item(tt(-p) var(precommand))(
 Append var(precommand) to the list of precommands. This option should be
-used in nearly all cases in which tt(-P) is not applicable.
+used in nearly all cases in which tt(-P) is not applicable. An advantage
+of using this option is that it can automatically signal to
+tt(_command_names) that subsequent completion should be limited to hashed
+commands, which is usually the desired behaviour following commands like
+tt(chroot) and tt(nohup).
 )
 enditem()
 
