@@ -136,12 +136,27 @@ int numpipestats, pipestats[MAX_PIPESTATS];
 
 /**/
 static struct timeval *
-dtime(struct timeval *dt, struct timeval *t1, struct timeval *t2)
+dtime_tv(struct timeval *dt, struct timeval *t1, struct timeval *t2)
 {
     dt->tv_sec = t2->tv_sec - t1->tv_sec;
     dt->tv_usec = t2->tv_usec - t1->tv_usec;
     if (dt->tv_usec < 0) {
 	dt->tv_usec += 1000000.0;
+	dt->tv_sec -= 1.0;
+    }
+    return dt;
+}
+
+/* As above, but with timespecs */
+
+/**/
+static struct timespec *
+dtime_ts(struct timespec *dt, struct timespec *t1, struct timespec *t2)
+{
+    dt->tv_sec = t2->tv_sec - t1->tv_sec;
+    dt->tv_nsec = t2->tv_nsec - t1->tv_nsec;
+    if (dt->tv_nsec < 0) {
+	dt->tv_nsec += 1000000000.0;
 	dt->tv_sec -= 1.0;
     }
     return dt;
@@ -349,7 +364,6 @@ get_usage(void)
 void
 update_process(Process pn, int status)
 {
-    struct timezone dummy_tz;
 #ifdef HAVE_GETRUSAGE
     struct timeval childs = child_usage.ru_stime;
     struct timeval childu = child_usage.ru_utime;
@@ -360,12 +374,12 @@ update_process(Process pn, int status)
 
     /* get time-accounting info          */
     get_usage();
-    gettimeofday(&pn->endtime, &dummy_tz);  /* record time process exited        */
+    zgettime_monotonic_if_available(&pn->endtime); /* record time process exited */
 
     pn->status = status;                    /* save the status returned by WAIT  */
 #ifdef HAVE_GETRUSAGE
-    dtime(&pn->ti.ru_stime, &childs, &child_usage.ru_stime);
-    dtime(&pn->ti.ru_utime, &childu, &child_usage.ru_utime);
+    dtime_tv(&pn->ti.ru_stime, &childs, &child_usage.ru_stime);
+    dtime_tv(&pn->ti.ru_utime, &childu, &child_usage.ru_utime);
 #else
     pn->ti.st  = shtms.tms_cstime - childs; /* compute process system space time */
     pn->ti.ut  = shtms.tms_cutime - childu; /* compute process user space time   */
@@ -753,7 +767,7 @@ printhhmmss(double secs)
 }
 
 static void
-printtime(struct timeval *real, child_times_t *ti, char *desc)
+printtime(struct timespec *real, child_times_t *ti, char *desc)
 {
     char *s;
     double elapsed_time, user_time, system_time;
@@ -774,21 +788,21 @@ printtime(struct timeval *real, child_times_t *ti, char *desc)
     }
 
     /* go ahead and compute these, since almost every TIMEFMT will have them */
-    elapsed_time = real->tv_sec + real->tv_usec / 1000000.0;
+    elapsed_time = real->tv_sec + real->tv_nsec / 1000000000.0;
 
 #ifdef HAVE_GETRUSAGE
     user_time = ti->ru_utime.tv_sec + ti->ru_utime.tv_usec / 1000000.0;
     system_time = ti->ru_stime.tv_sec + ti->ru_stime.tv_usec / 1000000.0;
     total_time = user_time + system_time;
     percent = 100.0 * total_time
-	/ (real->tv_sec + real->tv_usec / 1000000.0);
+	/ (real->tv_sec + real->tv_nsec / 1000000000.0);
 #else
     {
 	long clktck = get_clktck();
 	user_time    = ti->ut / (double) clktck;
 	system_time  = ti->st / (double) clktck;
 	percent      =  100.0 * (ti->ut + ti->st)
-	    / (clktck * real->tv_sec + clktck * real->tv_usec / 1000000.0);
+	    / (clktck * real->tv_sec + clktck * real->tv_nsec / 1000000000.0);
     }
 #endif
 
@@ -840,6 +854,23 @@ printtime(struct timeval *real, child_times_t *ti, char *desc)
 		    break;
 		default:
 		    fprintf(stderr, "%%u");
+		    s--;
+		    break;
+		}
+		break;
+	    case 'n':
+		switch (*++s) {
+		case 'E':
+		    fprintf(stderr, "%0.fns", elapsed_time * 1000000000.0);
+		    break;
+		case 'U':
+		    fprintf(stderr, "%0.fns", user_time * 1000000000.0);
+		    break;
+		case 'S':
+		    fprintf(stderr, "%0.fns", system_time * 1000000000.0);
+		    break;
+		default:
+		    fprintf(stderr, "%%n");
 		    s--;
 		    break;
 		}
@@ -991,12 +1022,12 @@ static void
 dumptime(Job jn)
 {
     Process pn;
-    struct timeval dtimeval;
+    struct timespec dtimespec;
 
     if (!jn->procs)
 	return;
     for (pn = jn->procs; pn; pn = pn->next)
-	printtime(dtime(&dtimeval, &pn->bgtime, &pn->endtime), &pn->ti,
+	printtime(dtime_ts(&dtimespec, &pn->bgtime, &pn->endtime), &pn->ti,
 		  pn->text);
 }
 
@@ -1506,7 +1537,7 @@ deletejob(Job jn, int disowning)
 
 /**/
 void
-addproc(pid_t pid, char *text, int aux, struct timeval *bgtime,
+addproc(pid_t pid, char *text, int aux, struct timespec *bgtime,
 	int gleader, int list_pipe_job_used)
 {
     Process pn, *pnlist;
@@ -1894,16 +1925,15 @@ spawnjob(void)
 
 /**/
 void
-shelltime(child_times_t *shell, child_times_t *kids, struct timeval *then, int delta)
+shelltime(child_times_t *shell, child_times_t *kids, struct timespec *then, int delta)
 {
-    struct timezone dummy_tz;
-    struct timeval dtimeval, now;
+    struct timespec dtimespec, now;
     child_times_t ti;
 #ifndef HAVE_GETRUSAGE
     struct tms buf;
 #endif
 
-    gettimeofday(&now, &dummy_tz);
+    zgettime_monotonic_if_available(&now);
 
 #ifdef HAVE_GETRUSAGE
     getrusage(RUSAGE_SELF, &ti);
@@ -1916,8 +1946,8 @@ shelltime(child_times_t *shell, child_times_t *kids, struct timeval *then, int d
     if (shell) {
 	if (delta) {
 #ifdef HAVE_GETRUSAGE
-	    dtime(&ti.ru_utime, &shell->ru_utime, &ti.ru_utime);
-	    dtime(&ti.ru_stime, &shell->ru_stime, &ti.ru_stime);
+	    dtime_tv(&ti.ru_utime, &shell->ru_utime, &ti.ru_utime);
+	    dtime_tv(&ti.ru_stime, &shell->ru_stime, &ti.ru_stime);
 #else
 	    ti.ut -= shell->ut;
 	    ti.st -= shell->st;
@@ -1926,15 +1956,15 @@ shelltime(child_times_t *shell, child_times_t *kids, struct timeval *then, int d
 	    *shell = ti;
     }
     if (delta)
-	dtime(&dtimeval, then, &now);
+	dtime_ts(&dtimespec, then, &now);
     else {
 	if (then)
 	    *then = now;
-	dtime(&dtimeval, &shtimer, &now);
+	dtime_ts(&dtimespec, &shtimer, &now);
     }
 
     if (!delta == !shell)
-	printtime(&dtimeval, &ti, "shell");
+	printtime(&dtimespec, &ti, "shell");
 
 #ifdef HAVE_GETRUSAGE
     getrusage(RUSAGE_CHILDREN, &ti);
@@ -1945,8 +1975,8 @@ shelltime(child_times_t *shell, child_times_t *kids, struct timeval *then, int d
     if (kids) {
 	if (delta) {
 #ifdef HAVE_GETRUSAGE
-	    dtime(&ti.ru_utime, &kids->ru_utime, &ti.ru_utime);
-	    dtime(&ti.ru_stime, &kids->ru_stime, &ti.ru_stime);
+	    dtime_tv(&ti.ru_utime, &kids->ru_utime, &ti.ru_utime);
+	    dtime_tv(&ti.ru_stime, &kids->ru_stime, &ti.ru_stime);
 #else
 	    ti.ut -= shell->ut;
 	    ti.st -= shell->st;
@@ -1955,7 +1985,7 @@ shelltime(child_times_t *shell, child_times_t *kids, struct timeval *then, int d
 	    *kids = ti;
     }
     if (!delta == !kids)
-	printtime(&dtimeval, &ti, "children");
+	printtime(&dtimespec, &ti, "children");
 }
 
 /* see if jobs need printing */

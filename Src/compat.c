@@ -136,7 +136,19 @@ zgettime_monotonic_if_available(struct timespec *ts)
 
 #if defined(HAVE_CLOCK_GETTIME) && defined(CLOCK_MONOTONIC)
     struct timespec dts;
+
+/*
+ * On at least some versions of macOS it appears that CLOCK_MONOTONIC is not
+ * actually monotonic -- there are reports that it can go backwards.
+ * CLOCK_MONOTONIC_RAW does not have this problem. On top of that, it is faster
+ * to read and it has nanosecond precision. We could use it on other systems
+ * too, but on Linux at least it seems that CLOCK_MONOTONIC is preferred
+ */
+#if defined(__APPLE__) && defined(CLOCK_MONOTONIC_RAW)
+    if (clock_gettime(CLOCK_MONOTONIC_RAW, &dts) < 0) {
+#else
     if (clock_gettime(CLOCK_MONOTONIC, &dts) < 0) {
+#endif
 	zwarn("unable to retrieve CLOCK_MONOTONIC time: %e", errno);
 	ret--;
     } else {

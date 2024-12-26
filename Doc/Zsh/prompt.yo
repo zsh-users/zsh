@@ -195,7 +195,8 @@ sitem(tt(%K))(the hour of the day on the 24-hour clock)
 sitem(tt(%L))(the hour of the day on the 12-hour clock)
 endsitem()
 
-In addition, if the system supports the POSIX tt(gettimeofday) system
+In addition, if the system supports the POSIX tt(clock_gettime)
+or tt(gettimeofday) system
 call, tt(%.) provides decimal fractions of a second since the epoch with
 leading zeroes.  By default three decimal places are provided, but a
 number of digits up to 9 may be given following the tt(%); hence tt(%6.)

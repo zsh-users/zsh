@@ -1570,14 +1570,14 @@ preprompt(void)
     /* If 1) the parameter PERIOD exists, 2) a hook function for    *
      * "periodic" exists, 3) it's been greater than PERIOD since we *
      * executed any such hook, then execute it now.                 */
-    if (period && ((zlong)time(NULL) > (zlong)lastperiodic + period) &&
+    if (period && ((zlong)zmonotime(NULL) > (zlong)lastperiodic + period) &&
 	!callhookfunc("periodic", NULL, 1, NULL))
-	lastperiodic = time(NULL);
+	lastperiodic = zmonotime(NULL);
     if (errflag)
 	return;
 
     /* Check mail */
-    currentmailcheck = time(NULL);
+    currentmailcheck = zmonotime(NULL);
     if (mailcheck &&
 	(zlong) difftime(currentmailcheck, lastmailcheck) > mailcheck) {
 	char *mailfile;
@@ -2761,6 +2761,19 @@ timespec_diff_us(const struct timespec *t1, const struct timespec *t2)
     return (reverse ? LONG_MIN : LONG_MAX);
 }
 
+/* Like time(), but uses the monotonic clock */
+
+/**/
+mod_export int
+zmonotime(time_t *tloc)
+{
+    struct timespec ts;
+    zgettime_monotonic_if_available(&ts);
+    if (tloc)
+	*tloc = ts.tv_sec;
+    return ts.tv_sec;
+}
+
 /*
  * Sleep for the given number of microseconds --- must be within
  * range of a long at the moment, but this is only used for
@@ -2794,7 +2807,9 @@ zsleep(long us)
 
 /**
  * Sleep for time (fairly) randomly up to max_us microseconds.
- * Don't let the wallclock time extend beyond end_time.
+ * Don't let the time extend beyond end_time. end_time is compared to
+ * the current *monotonic* clock time, so do NOT base it on e.g. time(2);
+ * use zmonotime() or zgettime_monotonic_if_available().
  * Return 1 if that seemed to work, else 0.
  *
  * For best results max_us should be a multiple of 2**16 or large
@@ -2806,7 +2821,7 @@ int
 zsleep_random(long max_us, time_t end_time)
 {
     long r;
-    time_t now = time(NULL);
+    time_t now = zmonotime(NULL);
 
     /*
      * Randomish backoff.  Doesn't need to be fundamentally

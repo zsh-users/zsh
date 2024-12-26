@@ -1550,6 +1550,28 @@
 >1
 >1
 
+  # Integer
+  a=$SECONDS
+  sleep 1
+  b=$SECONDS
+  print -r - $a $b $(( b > a ))
+  # Float
+  typeset -F SECONDS
+  a=$SECONDS
+  repeat 10 :
+  b=$SECONDS
+  print -r - $a $b $(( b > a ))
+  # Assignment
+  a=$SECONDS
+  SECONDS=8888
+  repeat 10 :
+  b=$SECONDS
+  print -r - $(( a < 8888 )) $(( b > 8888 ))
+0:SECONDS
+*>[0-9]## [0-9]## 1
+*>[0-9]##.[0-9]## [0-9]##.[0-9]## 1
+*>1 1
+
   foo=("|" "?")
   [[ "|" = ${(j.|.)foo} ]] && print yes || print no
   [[ "|" = ${(j.|.)~foo} ]] && print yes || print no

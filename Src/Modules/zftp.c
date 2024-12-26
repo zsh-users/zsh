@@ -397,7 +397,7 @@ zfalarm(int tmout)
     signal(SIGALRM, zfhandler);
     oalremain = alarm(tmout);
     if (oalremain)
-	oaltime = time(NULL);
+	oaltime = zmonotime(NULL);
     /*
      * We'll leave sigtrapped, sigfuncs and TRAPXXX as they are; since the
      * shell's handler doesn't get the signal, they don't matter.
@@ -431,7 +431,7 @@ zfunalarm(void)
 	 * I love the way alarm() uses unsigned int while time_t
 	 * is probably something completely different.
 	 */
-	unsigned int tdiff = time(NULL) - oaltime;
+	time_t tdiff = zmonotime(NULL) - oaltime;
 	alarm(oalremain < tdiff ? 1 : oalremain - tdiff);
     } else
 	alarm(0);

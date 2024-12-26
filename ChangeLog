@@ -1,3 +1,12 @@
+2024-12-26  dana  <dana@dana.is>
+
+	* 53257: Doc/Zsh/params.yo, Doc/Zsh/prompt.yo,
+	Src/Modules/zftp.c, Src/Modules/zprof.c, Src/compat.c,
+	Src/exec.c, Src/hist.c, Src/init.c, Src/jobs.c, Src/params.c,
+	Src/prompt.c, Src/signals.c, Src/utils.c, Src/zsh.h,
+	Test/A08time.ztst, Test/D01prompt.ztst, Test/D04parameter.ztst:
+	use monotonic clock where appropriate
+
 2024-12-16  dana  <dana@dana.is>
 
 	* 53251: Completion/Unix/Command/_man: fix page completion on

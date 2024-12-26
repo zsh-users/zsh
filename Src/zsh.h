@@ -1115,8 +1115,8 @@ struct process {
     char text[JOBTEXTSIZE];	/* text to print when 'jobs' is run */
     int status;			/* return code from waitpid/wait3() */
     child_times_t ti;
-    struct timeval bgtime;	/* time job was spawned             */
-    struct timeval endtime;	/* time job exited                  */
+    struct timespec bgtime;	/* time job was spawned             */
+    struct timespec endtime;	/* time job exited                  */
 };
 
 struct execstack {

@@ -70,6 +70,13 @@
 >true
 >false
 
+  sec=$SECONDS
+  eval "print -P '%(${sec}S.true.false)'"
+  eval "print -P '%($((sec+30))S.true.false)'"
+0:ternary prompt escape with test character S
+>true
+>false
+
   print -P 'start %10<...<truncated at 10%<< Not truncated%3< ...<Not shown'
   print -P 'start %10>...>truncated at 10%>> Not truncated%3> ...>Not shown'
 0:prompt truncation

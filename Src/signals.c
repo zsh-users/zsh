@@ -342,8 +342,7 @@ wait_for_processes(void)
 		zwarn("job can't be suspended");
 	    } else {
 #if defined(HAVE_WAIT3) && defined(HAVE_GETRUSAGE)
-		struct timezone dummy_tz;
-		gettimeofday(&pn->endtime, &dummy_tz);
+		zgettime_monotonic_if_available(&pn->endtime);
 #ifdef WIFCONTINUED
 		if (WIFCONTINUED(status))
 		    pn->status = SP_RUNNING;

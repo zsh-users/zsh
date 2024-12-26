@@ -1022,7 +1022,6 @@ setupvals(char *cmd, char *runscript, char *zsh_name)
 #ifdef USE_GETPWUID
     struct passwd *pswd;
 #endif
-    struct timezone dummy_tz;
     char *ptr;
     int i, j;
 #if defined(SITEFPATH_DIR) || defined(FPATH_DIR) || defined (ADDITIONAL_FPATH) || defined(FIXED_FPATH_DIR)
@@ -1109,8 +1108,8 @@ setupvals(char *cmd, char *runscript, char *zsh_name)
     hatchar = '^';
     termflags = TERM_UNKNOWN;
     curjob = prevjob = coprocin = coprocout = -1;
-    gettimeofday(&shtimer, &dummy_tz);	/* init $SECONDS */
-    srand((unsigned int)(shtimer.tv_sec + shtimer.tv_usec)); /* seed $RANDOM */
+    zgettime_monotonic_if_available(&shtimer);	/* init $SECONDS */
+    srand((unsigned int)(shtimer.tv_sec + shtimer.tv_nsec)); /* seed $RANDOM */
 
     /* Set default path */
     path    = (char **) zalloc(sizeof(*path) * 5);
@@ -1297,7 +1296,7 @@ setupvals(char *cmd, char *runscript, char *zsh_name)
 #endif
 
     breaks = loops = 0;
-    lastmailcheck = time(NULL);
+    lastmailcheck = zmonotime(NULL);
     locallevel = sourcelevel = 0;
     sfcontext = SFC_NONE;
     trap_return = 0;

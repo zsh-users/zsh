@@ -11,9 +11,44 @@
   (time cat) >&/dev/null
 0:`time' keyword (status only)
 
-  ( TIMEFMT='%E %mE %uE %* %m%mm %u%uu'; time (:) )
+  ( TIMEFMT='%E %mE %uE %nE %* %m%mm %u%uu %n%nn'; time (:) )
 0:`time' keyword with custom TIMEFMT
-*?[0-9]##.[0-9](#c2)s [0-9]##ms [0-9]##us %\* %m%mm %u%uu
+*?[0-9]##.[0-9](#c2)s [0-9]##ms [0-9]##us [0-9]##ns %\* %m%mm %u%uu %n%nn
+
+  ( TIMEFMT='x %U %S %E'; time (:) )
+0:TIMEFMT %[USE] use centisecond precision
+*?x( <0-9>.<00-99>s)(#c3)
+
+  ( TIMEFMT='x %*U %*S %*E'; time (:) )
+0:TIMEFMT %*[USE] use millisecond precision
+*?x( <0-9>.<000-999>)(#c3)
+
+  ( TIMEFMT='%nU %nS'; time (read -k3 -t0.1) )
+1:TIMEFMT %nU and %nS are limited to microsecond precision
+*?[1-9][0-9]#000ns [1-9][0-9]#000ns
+
+# SECONDS (after - before) must be greater than the elapsed time, but not much
+# greater. 25% was picked arbitrarily as something that hopefully will prevent
+# the test from failing on slow machines
+  (
+    typeset -F SECONDS
+    TIMEFMT=%nE
+    a=$SECONDS
+    t=$( (time (read -k3 -t0.1)) 2>&1 )
+    b=$SECONDS
+    s=$(( b - a ))
+    t=$(( ${t%ns}.0 / 10**9 ))
+    echo $s $t $(( s > t )) $(( t > s - (s * 0.25) ))
+  )
+0:`time' elapsed time matches SECONDS
+*>[0-9.]## [0-9.]## 1 1
+
+# Again, the wide range here is an attempt to prevent this test from failing on
+# slow machines. We don't care about the exact time, just that it's vaguely sane
+# and that each representation has the same basis
+  ( TIMEFMT='%E %mE %uE %nE %*E'; time (read -k3 -t0.1) )
+1:TIMEFMT elapsed time values
+*?0.<10-50>s <10-500>ms <100000-500000>us <100000000-500000000>ns 0.<100-500>
 
   time x=1
 0:`time' simple assignment

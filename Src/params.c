@@ -137,11 +137,11 @@ unsigned char hatchar, hashchar;
 unsigned char keyboardhackchar = '\0';
  
 /* $SECONDS = now.tv_sec - shtimer.tv_sec
- *          + (now.tv_usec - shtimer.tv_usec) / 1000000.0
+ *          + (now.tv_nsec - shtimer.tv_nsec) / 1000000000.0
  * (rounded to an integer if the parameter is not set to float) */
  
 /**/
-struct timeval shtimer;
+struct timespec shtimer;
  
 /* 0 if this $TERM setup is usable, otherwise it contains TERM_* flags */
 
@@ -4496,13 +4496,12 @@ randomsetfn(UNUSED(Param pm), zlong v)
 zlong
 intsecondsgetfn(UNUSED(Param pm))
 {
-    struct timeval now;
-    struct timezone dummy_tz;
+    struct timespec now;
 
-    gettimeofday(&now, &dummy_tz);
+    zgettime_monotonic_if_available(&now);
 
     return (zlong)(now.tv_sec - shtimer.tv_sec -
-		  (now.tv_usec < shtimer.tv_usec ? 1 : 0));
+		  (now.tv_nsec < shtimer.tv_nsec ? 1 : 0));
 }
 
 /* Function to set value of special parameter `SECONDS' */
@@ -4511,48 +4510,47 @@ intsecondsgetfn(UNUSED(Param pm))
 void
 intsecondssetfn(UNUSED(Param pm), zlong x)
 {
-    struct timeval now;
-    struct timezone dummy_tz;
+    struct timespec now;
     zlong diff;
 
-    gettimeofday(&now, &dummy_tz);
+    zgettime_monotonic_if_available(&now);
+
     diff = (zlong)now.tv_sec - x;
     shtimer.tv_sec = diff;
     if ((zlong)shtimer.tv_sec != diff)
 	zwarn("SECONDS truncated on assignment");
-    shtimer.tv_usec = now.tv_usec;
+    shtimer.tv_nsec = now.tv_nsec;
 }
 
 /**/
 double
 floatsecondsgetfn(UNUSED(Param pm))
 {
-    struct timeval now;
-    struct timezone dummy_tz;
+    struct timespec now;
 
-    gettimeofday(&now, &dummy_tz);
+    zgettime_monotonic_if_available(&now);
 
     return (double)(now.tv_sec - shtimer.tv_sec) +
-	(double)(now.tv_usec - shtimer.tv_usec) / 1000000.0;
+	(double)(now.tv_nsec - shtimer.tv_nsec) / 1000000000.0;
 }
 
 /**/
 void
 floatsecondssetfn(UNUSED(Param pm), double x)
 {
-    struct timeval now;
-    struct timezone dummy_tz;
+    struct timespec now;
 
-    gettimeofday(&now, &dummy_tz);
+    zgettime_monotonic_if_available(&now);
+
     shtimer.tv_sec = now.tv_sec - (zlong)x;
-    shtimer.tv_usec = now.tv_usec - (zlong)((x - (zlong)x) * 1000000.0);
+    shtimer.tv_nsec = now.tv_nsec - (zlong)((x - (zlong)x) * 1000000000.0);
 }
 
 /**/
 double
 getrawseconds(void)
 {
-    return (double)shtimer.tv_sec + (double)shtimer.tv_usec / 1000000.0;
+    return (double)shtimer.tv_sec + (double)shtimer.tv_nsec / 1000000000.0;
 }
 
 /**/
@@ -4560,7 +4558,7 @@ void
 setrawseconds(double x)
 {
     shtimer.tv_sec = (zlong)x;
-    shtimer.tv_usec = (zlong)((x - (zlong)x) * 1000000.0);
+    shtimer.tv_nsec = (zlong)((x - (zlong)x) * 1000000000.0);
 }
 
 /**/

@@ -2891,9 +2891,9 @@ flockhistfile(char *fn, int keep_trying)
     /*
      * Timeout is ten seconds.
      */
-    end_time = time(NULL) + (time_t)10;
+    end_time = zmonotime(NULL) + (time_t)10;
     while (fcntl(flock_fd, F_SETLKW, &lck) == -1) {
-	if (!keep_trying || time(NULL) >= end_time ||
+	if (!keep_trying || zmonotime(NULL) >= end_time ||
 	    /*
 	     * Randomise wait to minimise clashes with shells exiting at
 	     * the same time.
@@ -3137,7 +3137,7 @@ static int lockhistct;
 static int
 checklocktime(char *lockfile, long *sleep_usp, time_t then)
 {
-    time_t now = time(NULL);
+    time_t now = zmonotime(NULL);
 
     if (now + 10 < then) {
 	/* File is more than 10 seconds in the future? */

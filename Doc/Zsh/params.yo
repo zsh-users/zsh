@@ -926,7 +926,9 @@ referenced or seeded in the parent shell in between subshell invocations.
 )
 vindex(SECONDS)
 item(tt(SECONDS) <S>)(
-The number of seconds since shell invocation.  If this parameter
+The number of seconds since shell invocation.  On most platforms, this
+is a monotonic value, so it is not affected by NTP time jumps or other
+clock changes (though it may be affected by slewing).  If this parameter
 is assigned a value, then the value returned upon reference
 will be the value that was assigned plus the number of seconds
 since the assignment.
@@ -936,8 +938,10 @@ be changed using the tt(typeset) command.  The type may be changed only
 to one of the floating point types or back to integer.  For example,
 `tt(typeset -F SECONDS)'
 causes the value to be reported as a floating point number.  The
-value is available to microsecond accuracy, although the shell may
-show more or fewer digits depending on the use of tt(typeset).  See
+value is nominally available to nanosecond precision, although this
+varies by platform (and probably isn't accurate to 1 ns regardless),
+and the shell may show more or fewer digits depending on the
+use of tt(typeset).  See
 the documentation for the builtin tt(typeset) in
 ifzman(zmanref(zshbuiltins))\
 ifnzman(noderef(Shell Builtin Commands)) for more details.
@@ -1735,8 +1739,12 @@ A star may be inserted between the percent sign and flags printing time
 (e.g., `tt(%*E)'); this causes the time to be printed in
 `var(hh)tt(:)var(mm)tt(:)var(ss)tt(.)var(ttt)'
 format (hours and minutes are only printed if they are not zero).
-Alternatively, `tt(m)' or `tt(u)' may be used (e.g., `tt(%mE)') to produce
-time output in milliseconds or microseconds, respectively.
+Alternatively, `tt(m)', `tt(u)', or `tt(n)' may be used (e.g.,
+`tt(%mE)') to produce time output in milliseconds, microseconds, or
+nanoseconds, respectively. Note that some timings on some platforms
+are not actually nanosecond-precise (nor accurate to 1 ns when
+they are); in fact on many systems user and kernel times are not
+even microsecond-precise.
 )
 vindex(TMOUT)
 item(tt(TMOUT))(

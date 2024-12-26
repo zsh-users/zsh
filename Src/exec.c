@@ -348,10 +348,9 @@ setlimits(char *nam)
 
 /**/
 static pid_t
-zfork(struct timeval *tv)
+zfork(struct timespec *ts)
 {
     pid_t pid;
-    struct timezone dummy_tz;
 
     /*
      * Is anybody willing to explain this test?
@@ -360,8 +359,8 @@ zfork(struct timeval *tv)
 	zerr("job table full");
 	return -1;
     }
-    if (tv)
-	gettimeofday(tv, &dummy_tz);
+    if (ts)
+	zgettime_monotonic_if_available(ts);
     /*
      * Queueing signals is necessary on Linux because fork()
      * manipulates mutexes, leading to deadlock in memory
@@ -460,7 +459,7 @@ zfork(struct timeval *tv)
 int list_pipe = 0, simple_pline = 0;
 
 static pid_t list_pipe_pid;
-static struct timeval list_pipe_start;
+static struct timespec list_pipe_start;
 static int nowait, pline_level = 0;
 static int list_pipe_child = 0, list_pipe_job;
 static char list_pipe_text[JOBTEXTSIZE];
@@ -1863,7 +1862,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		      (jobtab[list_pipe_job].stat & STAT_STOPPED)))) {
 		    pid_t pid = 0;
 		    int synch[2];
-		    struct timeval bgtime;
+		    struct timespec bgtime;
 
 		    /*
 		     * A pipeline with the shell handling the right
@@ -2284,7 +2283,7 @@ closemn(struct multio **mfds, int fd, int type)
 	char buf[TCBUFSIZE];
 	int len, i;
 	pid_t pid;
-	struct timeval bgtime;
+	struct timespec bgtime;
 
 	/*
 	 * We need to block SIGCHLD in case the process
@@ -2829,7 +2828,7 @@ execcmd_fork(Estate state, int how, int type, Wordcode varspc,
     pid_t pid;
     int synch[2], flags;
     struct entersubsh_ret esret;
-    struct timeval bgtime;
+    struct timespec bgtime;
 
     child_block();
     esret.gleader = -1;
@@ -2947,7 +2946,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
      * for the "time" keyword
      */
     child_times_t shti, chti;
-    struct timeval then;
+    struct timespec then;
     if (how & Z_TIMED)
 	shelltime(&shti, &chti, &then, 0);
 
@@ -5060,7 +5059,7 @@ getproc(char *cmd, char **eptr)
     int out = *cmd == Inang;
     char *pnam;
     pid_t pid;
-    struct timeval bgtime;
+    struct timespec bgtime;
 
 #ifndef PATH_DEV_FD
     int fd;
@@ -5149,7 +5148,7 @@ getpipe(char *cmd, int nullexec)
     Eprog prog;
     int pipes[2], out = *cmd == Inang;
     pid_t pid;
-    struct timeval bgtime;
+    struct timespec bgtime;
     char *ends;
 
     if (!(prog = parsecmd(cmd, &ends)))

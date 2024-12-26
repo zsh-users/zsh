@@ -469,7 +469,7 @@ putpromptchar(int doprint, int endchar)
 			test = 1;
 		    break;
 		case 'S':
-		    if (time(NULL) - shtimer.tv_sec >= arg)
+		    if (zmonotime(NULL) - shtimer.tv_sec >= arg)
 			test = 1;
 		    break;
 		case 'v':
