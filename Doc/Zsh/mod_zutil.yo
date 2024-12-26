@@ -228,7 +228,7 @@ item(tt(zregexparse))(
 This implements some internals of the tt(_regex_arguments) function.
 )
 findex(zparseopts)
-item(tt(zparseopts) [ tt(-D) tt(-E) tt(-F) tt(-K) tt(-M) ] [ tt(-a) var(array) ] [ tt(-A) var(assoc) ] [ tt(-) ] var(spec) ...)(
+item(tt(zparseopts) [ tt(-D) tt(-E) tt(-F) tt(-G) tt(-K) tt(-M) ] [ tt(-a) var(array) ] [ tt(-A) var(assoc) ] [ tt(-v) var(argv) ] [ tt(-) ] var(spec) ...)(
 This builtin simplifies the parsing of options in positional parameters,
 i.e. the set of arguments given by tt($*).  Each var(spec) describes one
 option and must be of the form `var(opt)[tt(=)var(array)]'.  If an option
@@ -282,19 +282,19 @@ first colon.
 )
 enditem()
 
-In all cases, option-arguments must appear either immediately following the
+By default, option-arguments may appear either immediately following the
 option in the same positional parameter or in the next one. Even an optional
 argument may appear in the next parameter, unless it begins with a `tt(-)'.
-There is no special handling of `tt(=)' as with GNU-style argument parsers;
-given the var(spec) `tt(-foo:)', the positional parameter `tt(-)tt(-foo=bar)'
-is parsed as `tt(-)tt(-foo)' with an argument of `tt(=bar)'.
+Additionally, there is no special consideration given to an `tt(=)'
+between an option and its argument. To make parsing use the more common
+GNU-style conventions, use the tt(-G) option.
 
 When the names of two options that take no arguments overlap, the longest one
 wins, so that parsing for the var(spec)s `tt(-foo -foobar)' (for example) is
 unambiguous. However, due to the aforementioned handling of option-arguments,
 ambiguities may arise when at least one overlapping var(spec) takes an
 argument, as in `tt(-foo: -foobar)'. In that case, the last matching
-var(spec) wins.
+var(spec) wins. (This is not an issue with GNU-style parsing.)
 
 The options of tt(zparseopts) itself cannot be stacked because, for
 example, the stack `tt(-DEK)' is indistinguishable from a var(spec) for
@@ -338,6 +338,33 @@ Note that the appearance in the positional parameters of an option without
 its required argument always aborts parsing and returns an error as described
 above regardless of whether this option is used.
 )
+item(tt(-G))(
+This option specifies that options are parsed in the GNU style,
+similar to tt(getopt_long+LPAR()3+RPAR()). In particular:
+
+Given the var(spec) `tt(-foo:)', the positional parameter
+`tt(-)tt(-foo=bar)' is interpreted as option `tt(-)tt(-foo)' with
+argument `tt(bar)', rather than argument `tt(=bar)' as is the default,
+whilst the positional parameter `tt(-)tt(-foobar)' is considered an
+unknown option (unless another var(spec) describes it). This applies
+to both singly and doubly hyphenated long options.
+
+An empty option-argument can be given to its long option in the same
+parameter using a trailing `tt(=)'.
+
+An optional argument to a long option must be given with the
+equals syntax, and an optional argument to a short option must
+follow it immediately in the same parameter; in both cases the
+following parameter is considered unrelated.
+
+Whenever a long option and its argument are stored in the same array
+element, an `tt(=)' is used to separate them.
+
+A mandatory option-argument given in a separate parameter from its
+option (as in `tt(-)tt(-foo) tt(bar)'), or any option-argument given to
+a short option in the same parameter, is always treated the same
+regardless of whether this option is in effect.
+)
 item(tt(-K))(
 With this option, the arrays specified with the tt(-a) option and with the
 `tt(=)var(array)' forms are kept unchanged when none of the var(spec)s for
@@ -354,6 +381,11 @@ which is used to choose where to store the values.  If no other var(spec)
 is found, the values are stored as usual.  This changes only the way the
 values are stored, not the way tt($*) is parsed, so results may be
 unpredictable if the `var(name)tt(+)' specifier is used inconsistently.
+)
+item(tt(-v) var(argv))(
+With this option, the elements of the named array var(argv) are used as the
+positional parameters to parse, rather than those given by tt($*).  The
+array may be modified according to the tt(-D) option.
 )
 enditem()
 

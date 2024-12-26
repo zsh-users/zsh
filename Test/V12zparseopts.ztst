@@ -104,6 +104,14 @@
 >ret: 0, optv: --aaa bar, opts: --aaa bar, argv: 1 2 3
 
   () {
+    local -a optv argvv=( -a -b -c 1 2 3 )
+    zparseopts -D -a optv -v argvv - a b c
+    print -r - ret: $?, optv: $optv, argvv: $argvv, argv: $argv
+  } -x -y -z 7 8 9
+0:zparseopts -v
+>ret: 0, optv: -a -b -c, argvv: 1 2 3, argv: -x -y -z 7 8 9
+
+  () {
     local -a optv aa ab
     zparseopts -a optv - a=aa b:=ab c:- z
     print -r - ret: $?, optv: $optv, aa: $aa, ab: $ab, argv: $argv
@@ -151,16 +159,35 @@
 >ret: 0, optv: -+ -: -= -\, argv: 1 2 3
 >ret: 0, optv: --::: foo, argv: 1 2 3
 
-  for specs in '-foo: -foobar' '-foobar -foo:'; do
+  for specs in \
+    '-foo: -foobar' '-foobar -foo:' '-foo: -foobar:' '-foobar: -foo:'
+  do
     () {
       local -a optv
-      zparseopts -a optv - $=specs
+      zparseopts -a optv -D - $=specs
       print -r - ret: $?, optv: $optv, argv: $argv
     } --foobar 1 2 3
   done
-0:overlapping option specs (scan order)
->ret: 0, optv: --foobar, argv: --foobar 1 2 3
->ret: 0, optv: --foo bar, argv: --foobar 1 2 3
+0:overlapping option specs without -G (scan order)
+>ret: 0, optv: --foobar, argv: 1 2 3
+>ret: 0, optv: --foo bar, argv: 1 2 3
+>ret: 0, optv: --foobar 1, argv: 2 3
+>ret: 0, optv: --foo bar, argv: 1 2 3
+
+  for specs in \
+    '-foo: -foobar' '-foobar -foo:' '-foo: -foobar:' '-foobar: -foo:'
+  do
+    () {
+      local -a optv
+      zparseopts -a optv -D -G - $=specs
+      print -r - ret: $?, optv: $optv, argv: $argv
+    } --foobar 1 2 3
+  done
+0:overlapping option specs with -G (scan order)
+>ret: 0, optv: --foobar, argv: 1 2 3
+>ret: 0, optv: --foobar, argv: 1 2 3
+>ret: 0, optv: --foobar 1, argv: 2 3
+>ret: 0, optv: --foobar 1, argv: 2 3
 
   () {
     local -a optv
@@ -170,3 +197,147 @@
 0:missing optarg
 ?(anon):zparseopts:2: missing argument for option: -c
 >ret: 1, optv: , argv: -ab1 -c
+
+  for spec in -foo: -foo:- -foo::; do
+    () {
+      local -a optv
+      zparseopts -a optv -D -F - $=spec
+      print -r - ret: $?, optv: $optv, argv: $argv
+    } --foo=bar 1 2 3
+  done
+0:zparseopts without -G, =optarg handling
+>ret: 0, optv: --foo =bar, argv: 1 2 3
+>ret: 0, optv: --foo=bar, argv: 1 2 3
+>ret: 0, optv: --foo=bar, argv: 1 2 3
+
+  for spec in -foo: -foo:- -foo::; do
+    () {
+      local -a optv
+      zparseopts -a optv -D -F -G - $=spec
+      print -r - ret: $?, optv: $optv, argv: $argv
+    } --foo=bar 1 2 3
+  done
+0:zparseopts -G, single parameter, with =
+>ret: 0, optv: --foo bar, argv: 1 2 3
+>ret: 0, optv: --foo=bar, argv: 1 2 3
+>ret: 0, optv: --foo=bar, argv: 1 2 3
+
+  for spec in -foo: -foo:- -foo:: ; do
+    () {
+      local -a optv
+      zparseopts -a optv -D -F -G - $=spec
+      print -r - ret: $?, optv: $optv, argv: $argv
+    } --foobar 1 2 3
+  done
+0:zparseopts -G, single parameter, without =
+?(anon):zparseopts:2: bad option: --foobar
+>ret: 1, optv: , argv: --foobar 1 2 3
+?(anon):zparseopts:2: bad option: --foobar
+>ret: 1, optv: , argv: --foobar 1 2 3
+?(anon):zparseopts:2: bad option: --foobar
+>ret: 1, optv: , argv: --foobar 1 2 3
+
+  for spec in -foo: -foo:- -foo::; do
+    () {
+      local -a optv
+      zparseopts -a optv -D -F -G - $=spec
+      print -r - ret: $?, optv: $optv, argv: $argv
+    } --foo bar 1 2 3
+  done
+0:zparseopts -G, separate parameters
+>ret: 0, optv: --foo bar, argv: 1 2 3
+>ret: 0, optv: --foo=bar, argv: 1 2 3
+>ret: 0, optv: --foo, argv: bar 1 2 3
+
+  for spec in -foo: -foo:- -foo::; do
+    () {
+      local -a optv
+      zparseopts -a optv -D -F -G - $=spec
+      print -r - ret: $?, optv: ${(j< >)${(q+)optv}}, argv: $argv
+    } --foo= 1 2 3
+  done
+0:zparseopts -G, empty optarg
+>ret: 0, optv: --foo '', argv: 1 2 3
+>ret: 0, optv: '--foo=', argv: 1 2 3
+>ret: 0, optv: '--foo=', argv: 1 2 3
+
+  for gopt in '' -G; do
+    for spec args in \
+      f:  '-fbar 1 2 3' \
+      f:  '-f=bar 1 2 3' \
+      f:  '-f bar 1 2 3' \
+      f:- '-fbar 1 2 3' \
+      f:- '-f=bar 1 2 3' \
+      f:- '-f bar 1 2 3' \
+      f:: '-fbar 1 2 3' \
+      f:: '-f=bar 1 2 3' \
+      f:: '-f bar 1 2 3'
+    do
+      () {
+        local -a optv
+        zparseopts -a optv -D -F $gopt - $=spec
+        print -r - ret: $?, gopt: $gopt, optv: $optv, argv: $argv
+      } $=args
+    done
+  done
+0:short options, with and without -G
+>ret: 0, gopt: , optv: -f bar, argv: 1 2 3
+>ret: 0, gopt: , optv: -f =bar, argv: 1 2 3
+>ret: 0, gopt: , optv: -f bar, argv: 1 2 3
+>ret: 0, gopt: , optv: -fbar, argv: 1 2 3
+>ret: 0, gopt: , optv: -f=bar, argv: 1 2 3
+>ret: 0, gopt: , optv: -fbar, argv: 1 2 3
+>ret: 0, gopt: , optv: -fbar, argv: 1 2 3
+>ret: 0, gopt: , optv: -f=bar, argv: 1 2 3
+>ret: 0, gopt: , optv: -fbar, argv: 1 2 3
+>ret: 0, gopt: -G, optv: -f bar, argv: 1 2 3
+>ret: 0, gopt: -G, optv: -f =bar, argv: 1 2 3
+>ret: 0, gopt: -G, optv: -f bar, argv: 1 2 3
+>ret: 0, gopt: -G, optv: -fbar, argv: 1 2 3
+>ret: 0, gopt: -G, optv: -f=bar, argv: 1 2 3
+>ret: 0, gopt: -G, optv: -fbar, argv: 1 2 3
+>ret: 0, gopt: -G, optv: -fbar, argv: 1 2 3
+>ret: 0, gopt: -G, optv: -f=bar, argv: 1 2 3
+>ret: 0, gopt: -G, optv: -f, argv: bar 1 2 3
+
+  for gopt in '' -G; do
+    for spec args in \
+      foo:  '-foobar 1 2 3' \
+      foo:  '-foo=bar 1 2 3' \
+      foo:  '-foo bar 1 2 3' \
+      foo:- '-foobar 1 2 3' \
+      foo:- '-foo=bar 1 2 3' \
+      foo:- '-foo bar 1 2 3' \
+      foo:: '-foobar 1 2 3' \
+      foo:: '-foo=bar 1 2 3' \
+      foo:: '-foo bar 1 2 3'
+    do
+      () {
+        local -a optv
+        zparseopts -a optv -D -F $gopt - $=spec
+        print -r - ret: $?, gopt: $gopt, optv: $optv, argv: $argv
+      } $=args
+    done
+  done
+0:Sun-style long options, with and without -G
+>ret: 0, gopt: , optv: -foo bar, argv: 1 2 3
+>ret: 0, gopt: , optv: -foo =bar, argv: 1 2 3
+>ret: 0, gopt: , optv: -foo bar, argv: 1 2 3
+>ret: 0, gopt: , optv: -foobar, argv: 1 2 3
+>ret: 0, gopt: , optv: -foo=bar, argv: 1 2 3
+>ret: 0, gopt: , optv: -foobar, argv: 1 2 3
+>ret: 0, gopt: , optv: -foobar, argv: 1 2 3
+>ret: 0, gopt: , optv: -foo=bar, argv: 1 2 3
+>ret: 0, gopt: , optv: -foobar, argv: 1 2 3
+?(anon):zparseopts:2: bad option: -f
+>ret: 1, gopt: -G, optv: , argv: -foobar 1 2 3
+>ret: 0, gopt: -G, optv: -foo bar, argv: 1 2 3
+>ret: 0, gopt: -G, optv: -foo bar, argv: 1 2 3
+?(anon):zparseopts:2: bad option: -f
+>ret: 1, gopt: -G, optv: , argv: -foobar 1 2 3
+>ret: 0, gopt: -G, optv: -foo=bar, argv: 1 2 3
+>ret: 0, gopt: -G, optv: -foo=bar, argv: 1 2 3
+?(anon):zparseopts:2: bad option: -f
+>ret: 1, gopt: -G, optv: , argv: -foobar 1 2 3
+>ret: 0, gopt: -G, optv: -foo=bar, argv: 1 2 3
+>ret: 0, gopt: -G, optv: -foo, argv: bar 1 2 3

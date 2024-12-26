@@ -1528,12 +1528,14 @@ struct zoptdesc {
     Zoptval vals, last;
 };
 
-#define ZOF_ARG  1
-#define ZOF_OPT  2
-#define ZOF_MULT 4
-#define ZOF_SAME 8
-#define ZOF_MAP 16
-#define ZOF_CYC 32
+#define ZOF_ARG    1
+#define ZOF_OPT    2
+#define ZOF_MULT   4
+#define ZOF_SAME   8
+#define ZOF_MAP   16
+#define ZOF_CYC   32
+#define ZOF_GNUS  64
+#define ZOF_GNUL 128
 
 struct zoptarr {
     Zoptarr next;
@@ -1568,9 +1570,29 @@ static Zoptdesc
 lookup_opt(char *str)
 {
     Zoptdesc p;
-
     for (p = opt_descs; p; p = p->next) {
-	if ((p->flags & ZOF_ARG) ? strpfx(p->name, str) : !strcmp(p->name, str))
+	/*
+	 * Option takes argument, with GNU-style handling of =. This should only
+	 * be set for long options, though we don't care about that here. Unlike
+	 * the default behaviour, matching is unambiguous
+	 */
+	if (p->flags & ZOF_GNUL) {
+	    if (!strcmp(p->name, str) || /* Inefficient, whatever */
+		    (strpfx(p->name, str) && str[strlen(p->name)] == '='))
+		return p;
+	/*
+	 * Option takes argument, default 'cuddled' style. This is weird with
+	 * long options because we naively accept whatever option has a prefix
+	 * match for the given parameter. Thus if you have specs `-foo:` and
+	 * `-foobar:` (or even `-foobar` with no optarg), without the GNU
+	 * setting, the behaviour depends on the order in which they were
+	 * defined. It is documented to work this way though
+	 */
+	} else if (p->flags & ZOF_ARG) {
+	    if (strpfx(p->name, str))
+		return p;
+	/* Option takes no argument */
+	} else if (!strcmp(p->name, str))
 	    return p;
     }
     return NULL;
@@ -1641,10 +1663,13 @@ add_opt_val(Zoptdesc d, char *arg)
 	if (d->arr)
 	    d->arr->num += (arg ? 2 : 1);
     } else if (arg) {
-	char *s = (char *) zhalloc(strlen(d->name) + strlen(arg) + 2);
+	/* 3 here is '-' + '=' + NUL */
+	char *s = (char *) zhalloc(strlen(d->name) + strlen(arg) + 3);
 
 	*s = '-';
 	strcpy(s + 1, d->name);
+	if (d->flags & ZOF_GNUL)
+	    strcat(s, "=");
 	strcat(s, arg);
 	v->str = s;
 	if (d->arr)
@@ -1713,7 +1738,8 @@ static int
 bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     char *o, *p, *n, **pp, **aval, **ap, *assoc = NULL, **cp, **np;
-    int del = 0, flags = 0, extract = 0, fail = 0, keep = 0;
+    char *paramsname = NULL, **params;
+    int del = 0, flags = 0, extract = 0, fail = 0, gnu = 0, keep = 0;
     Zoptdesc sopts[256], d;
     Zoptarr a, defarr = NULL;
     Zoptval v;
@@ -1757,6 +1783,14 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		    break;
 		}
 		fail = 1;
+		break;
+	    case 'G':
+		if (o[2]) {
+		    args--;
+		    o = NULL;
+		    break;
+		}
+		gnu = 1;
 		break;
 	    case 'K':
 		if (o[2]) {
@@ -1808,6 +1842,20 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		    return 1;
 		}
 		break;
+	    case 'v':
+		if (paramsname) {
+		    zwarnnam(nam, "argv array given more than once");
+		    return 1;
+		}
+		if (o[2])
+		    paramsname = o + 2;
+		else if (*args)
+		    paramsname = *args++;
+		else {
+		    zwarnnam(nam, "missing array name");
+		    return 1;
+		}
+		break;
 	    default:
 		/* Anything else is an option description */
 		args--;
@@ -1849,6 +1897,9 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	if (*p == ':') {
 	    f |= ZOF_ARG;
 	    *p = '\0';
+	    if (gnu) {
+		f |= o[1] ? ZOF_GNUL : ZOF_GNUS;
+	    }
 	    if (*++p == ':') {
 		p++;
 		f |= ZOF_OPT;
@@ -1901,8 +1952,10 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    return 1;
 	}
     }
-    np = cp = pp = ((extract && del) ? arrdup(pparams) : pparams);
+    params = getaparam((paramsname = paramsname ? paramsname : "argv"));
+    np = cp = pp = ((extract && del) ? arrdup(params) : params);
     for (; (o = *pp); pp++) {
+	/* Not an option */
 	if (*o != '-') {
 	    if (extract) {
 		if (del)
@@ -1911,6 +1964,7 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    } else
 		break;
 	}
+	/* '-' or '--', end parsing */
 	if (!o[1] || (o[1] == '-' && !o[2])) {
 	    if (del && extract)
 		*cp++ = o;
@@ -1918,6 +1972,7 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    break;
 	}
 	if (!(d = lookup_opt(o + 1))) {
+	    /* No match for whole param, try each character as a short option */
 	    while (*++o) {
 		if (!(d = sopts[(unsigned char) *o])) {
 		    if (fail) {
@@ -1931,19 +1986,27 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		    break;
 		}
 		if (d->flags & ZOF_ARG) {
+		    /* Optarg in same parameter */
 		    if (o[1]) {
 			add_opt_val(d, o + 1);
 			break;
+		    /*
+		     * Mandatory optarg or (if not GNU style) optional optarg in
+		     * next parameter
+		     */
 		    } else if (!(d->flags & ZOF_OPT) ||
-			       (pp[1] && pp[1][0] != '-')) {
+			       (!(d->flags & (ZOF_GNUL | ZOF_GNUS)) &&
+			        pp[1] && pp[1][0] != '-')) {
 			if (!pp[1]) {
 			    zwarnnam(nam, "missing argument for option: -%s",
 				    d->name);
 			    return 1;
 			}
 			add_opt_val(d, *++pp);
+		    /* Missing optional optarg */
 		    } else
 			add_opt_val(d, NULL);
+		/* No optarg required */
 		} else
 		    add_opt_val(d, NULL);
 	    }
@@ -1956,21 +2019,37 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		    break;
 	    }
 	} else {
+	    /* Whole param matches a defined option */
 	    if (d->flags & ZOF_ARG) {
 		char *e = o + strlen(d->name) + 1;
 
-		if (*e)
+		/* GNU style allows an empty optarg in the same parameter */
+		if ((d->flags & ZOF_GNUL) && *e == '=') {
+		    add_opt_val(d, ++e);
+		/*
+		 * Non-empty optarg in same parameter. lookup_opt() test ensures
+		 * that this won't be a GNU-style long option, where this would
+		 * be invalid
+		 */
+		} else if (*e) {
 		    add_opt_val(d, e);
-		else if (!(d->flags & ZOF_OPT) ||
-			 (pp[1] && pp[1][0] != '-')) {
+		/*
+		 * Mandatory optarg or (if not GNU style) optional optarg in
+		 * next parameter
+		 */
+		} else if (!(d->flags & ZOF_OPT) ||
+			 (!(d->flags & (ZOF_GNUL | ZOF_GNUS)) &&
+			  pp[1] && pp[1][0] != '-')) {
 		    if (!pp[1]) {
 			zwarnnam(nam, "missing argument for option: -%s",
 				d->name);
 			return 1;
 		    }
 		    add_opt_val(d, *++pp);
+		/* Missing optional optarg */
 		} else
 		    add_opt_val(d, NULL);
+	    /* No optarg required */
 	    } else
 		add_opt_val(d, NULL);
 	}
@@ -2041,12 +2120,9 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     if (del) {
 	if (extract) {
 	    *cp = NULL;
-	    freearray(pparams);
-	    pparams = zarrdup(np);
+	    setaparam(paramsname, zarrdup(np));
 	} else {
-	    pp = zarrdup(pp);
-	    freearray(pparams);
-	    pparams = pp;
+	    setaparam(paramsname, zarrdup(pp));
 	}
     }
     return 0;

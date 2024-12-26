@@ -1,5 +1,8 @@
 2024-12-26  dana  <dana@dana.is>
 
+	* 53260: Doc/Zsh/mod_zutil.yo, Src/Modules/zutil.c,
+	Test/V12zparseopts.ztst: add -v and -G options to zparseopts
+
 	* 53257: Doc/Zsh/params.yo, Doc/Zsh/prompt.yo,
 	Src/Modules/zftp.c, Src/Modules/zprof.c, Src/compat.c,
 	Src/exec.c, Src/hist.c, Src/init.c, Src/jobs.c, Src/params.c,
