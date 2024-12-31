@@ -10,8 +10,10 @@ _arguments -A '-*' : \
   '-D[remove parsed options from positional parameters]' \
   "-E[don't stop parsing at first parameter not described by specs]" \
   '-F[abort parsing and print error at first option-like parameter not described by specs]' \
+  '-G[enable GNU-style parsing]' \
   '-K[preserve contents of arrays/associations when specs are not matched]' \
   '-M[enable mapping among equivalent options with opt1=opt2 spec form]' \
+  '-v+[specify array from which to parse options]:array:_parameters -g "*array*"' \
   '(-)-[end zparseopts options; specs follow]' \
   '*: :->spec' \
 && ret=0

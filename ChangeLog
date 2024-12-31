@@ -1,3 +1,8 @@
+2025-01-02  dana  <dana@dana.is>
+
+	* unposted: Completion/Zsh/Command/_zparseopts: update
+	completion per workers/53260
+
 2024-12-26  dana  <dana@dana.is>
 
 	* 53260: Doc/Zsh/mod_zutil.yo, Src/Modules/zutil.c,
