@@ -25,7 +25,7 @@
 
   ( TIMEFMT='%nU %nS'; time (read -k3 -t0.1) )
 1:TIMEFMT %nU and %nS are limited to microsecond precision
-*?[1-9][0-9]#000ns [1-9][0-9]#000ns
+*?(0|[1-9][0-9]#000)ns (0|[1-9][0-9]#000)ns
 
 # SECONDS (after - before) must be greater than the elapsed time, but not much
 # greater. 25% was picked arbitrarily as something that hopefully will prevent

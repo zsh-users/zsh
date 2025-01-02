@@ -1,5 +1,7 @@
 2025-01-02  dana  <dana@dana.is>
 
+	* 53297: Test/A08time.ztst: allow %nU/%nS result to be 0
+
 	* unposted: Completion/Zsh/Command/_zparseopts: update
 	completion per workers/53260
 
