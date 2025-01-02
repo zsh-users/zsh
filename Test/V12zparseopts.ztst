@@ -57,7 +57,7 @@
 0:zparseopts -D -E
 >ret: 0, optv: -a -b 1 -c-d -z, argv: -e
 
-  for 1 in '-a -x -z' '-ax -z' '-a --x -z'; do
+  for 1 in '-a -x -z' '-ax -z' '-a --x -z' -axy -a-xy; do
     () {
       local -a optv
       zparseopts -D -E -F -a optv - a b: c:- z
@@ -71,6 +71,10 @@
 >ret: 1, optv: , argv: -ax -z
 ?(anon):zparseopts:2: bad option: --x
 >ret: 1, optv: , argv: -a --x -z
+?(anon):zparseopts:2: bad option: -x
+>ret: 1, optv: , argv: -axy
+?(anon):zparseopts:2: bad option: --
+>ret: 1, optv: , argv: -a-xy
 
   for 1 in '-a 1 2 3' '1 2 3'; do
     () {

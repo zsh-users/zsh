@@ -1980,7 +1980,7 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    while (*++o) {
 		if (!(d = sopts[(unsigned char) *o])) {
 		    if (fail) {
-			if (*o != '-')
+			if (*o != '-' || o > *pp + 1)
 			    zwarnnam(nam, "bad option: -%c", *o);
 			else
 			    zwarnnam(nam, "bad option: -%s", o);
