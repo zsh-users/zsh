@@ -5,7 +5,7 @@ def(printindex)(2)(\
   NL()\
   NOTRANS(@printindex) ARG2\
 )\
-texinode(Concept Index)(Variables Index)(Top)(Top)
+texinode(Concept Index)(Variables Index)()(Top)
 printindex(Concept Index)(cp)
 
 texinode(Variables Index)(Options Index)(Concept Index)(Top)

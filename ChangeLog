@@ -1,3 +1,8 @@
+2025-01-03  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 53293: Doc/Zsh/compsys.yo, Doc/Zsh/index.yo, Doc/Zsh/manual.yo:
+	fix menu() and texinode() in yodl docs
+
 2025-01-02  dana  <dana@dana.is>
 
 	* 53297: Test/A08time.ztst: allow %nU/%nS result to be 0

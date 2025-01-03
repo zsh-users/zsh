@@ -89,9 +89,9 @@ menu(Initialization)
 menu(Completion System Configuration)
 menu(Control Functions)
 menu(Bindable Commands)
-menu(Completion Functions)
-menu(Completion Directories)
+menu(Utility Functions)
 menu(Completion System Variables)
+menu(Completion Directories)
 endmenu()
 
 texinode(Initialization)(Completion System Configuration)()(Completion System)
@@ -3363,7 +3363,7 @@ endsitem()
 )
 enditem()
 
-texinode(Bindable Commands)(Completion Functions)(Control Functions)(Completion System)
+texinode(Bindable Commands)(Utility Functions)(Control Functions)(Completion System)
 sect(Bindable Commands)
 cindex(completion system, bindable commands)
 
@@ -3562,7 +3562,7 @@ emacs and vi respectively.
 )
 enditem()
 
-texinode(Completion Functions)(Completion System Variables)(Bindable Commands)(Completion System)
+texinode(Utility Functions)(Completion System Variables)(Bindable Commands)(Completion System)
 sect(Utility Functions)
 cindex(completion system, utility functions)
 
@@ -5481,7 +5481,7 @@ ifnzman(noderef(The zsh/zleparameter Module)).
 )
 enditem()
 
-texinode(Completion System Variables)(Completion Directories)(Completion Functions)(Completion System)
+texinode(Completion System Variables)(Completion Directories)(Utility Functions)(Completion System)
 sect(Completion System Variables)
 cindex(completion system, variables)
 

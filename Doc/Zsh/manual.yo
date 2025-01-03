@@ -126,7 +126,8 @@ menu(Initialization)
 menu(Completion System Configuration)
 menu(Control Functions)
 menu(Bindable Commands)
-menu(Completion Functions)
+menu(Utility Functions)
+menu(Completion System Variables)
 menu(Completion Directories)
 
 Completion Using compctl
