@@ -490,7 +490,7 @@ init_parse_status(void)
     /*
      * These variables are currently declared by the parser, so we
      * initialise them here.  Possibly they are more naturally declared
-     * by the lexical anaylser; however, as they are used for signalling
+     * by the lexical analyser; however, as they are used for signalling
      * between the two it's a bit ambiguous.  We clear them when
      * using the lexical analyser for strings as well as here.
      */

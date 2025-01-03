@@ -1342,7 +1342,7 @@ dnl  Check if tgetent accepts NULL (and will allocate its own termcap buffer)
 dnl  Some termcaps reportedly accept a zero buffer, but then dump core
 dnl  in tgetstr().
 dnl  Under Cygwin test program crashes but exit code is still 0. So,
-dnl  we test for a file that porgram should create
+dnl  we test for a file that program should create
 AH_TEMPLATE([TGETENT_ACCEPTS_NULL],
 [Define to 1 if tgetent() accepts NULL as a buffer.])
 AC_CACHE_CHECK(if tgetent accepts NULL,
@@ -1495,7 +1495,7 @@ $AWK '{ if ($1 ~ /sig/) files[[$1]] = $1 }
   END { for (var in files) print var }'`"
 rm -f nametmp.c
 if test -z "$sigfile_list"; then
-  dnl In case we don't get the stuff from the preprocesor, use the old
+  dnl In case we don't get the stuff from the preprocessor, use the old
   dnl list of standard places.
   sigfile_list="/usr/include/sys/iso/signal_iso.h
 /usr/include/bsd/sys/signal.h

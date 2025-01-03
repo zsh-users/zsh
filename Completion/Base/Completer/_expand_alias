@@ -49,7 +49,7 @@ if [[ -n $tmp ]]; then
     if [[ $tmpa[1] = $word && $tmp = $aliases[$word] ]]; then
       # This is an active regular alias and the first word in the result
       # is the same as what was on the line already.  Quote it so
-      # that it doesn't get reexanded on execution.
+      # that it doesn't get reexpanded on execution.
       #
       # Strictly we also need to check if the original word matches
       # a later word in the expansion and the previous words are
