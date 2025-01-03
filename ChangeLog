@@ -1,3 +1,7 @@
+2025-01-03  Bart Schaefer  <schaefer@zsh.org>
+
+	* 53294: Src/loop.c: fix multibyte handling in "select" prompts
+
 2025-01-03  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 53293: Doc/Zsh/compsys.yo, Doc/Zsh/index.yo, Doc/Zsh/manual.yo:
