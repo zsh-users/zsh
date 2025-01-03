@@ -351,9 +351,16 @@ selectlist(LinkList l, size_t start)
 
     zleentry(ZLE_CMD_TRASH);
     arr = hlinklist2array(l, 0);
-    for (ap = arr; *ap; ap++)
-	if (strlen(*ap) > longest)
-	    longest = strlen(*ap);
+    for (ap = arr; *ap; ap++) {
+#ifdef MB_METASTRWIDTH
+	int aplen = MB_METASTRWIDTH(*ap);
+#else
+      	int aplen = 0;
+	(void) unmetafy(*ap, &aplen);
+#endif
+	if (aplen > longest)
+	    longest = aplen;
+    }
     t0 = ct = ap - arr;
     longest++;
     while (t0)
@@ -368,7 +375,12 @@ selectlist(LinkList l, size_t start)
     for (t1 = start; t1 != colsz && t1 - start < zterm_lines - 2; t1++) {
 	ap = arr + t1;
 	do {
+#ifdef MB_METASTRWIDTH
+	    size_t t2 = MB_METASTRWIDTH(*ap) + 2;
+	    (void) unmetafy(*ap, NULL);
+#else
 	    size_t t2 = strlen(*ap) + 2;
+#endif
 	    int t3;
 
 	    fprintf(stderr, "%d) %s", t3 = ap - arr + 1, *ap);

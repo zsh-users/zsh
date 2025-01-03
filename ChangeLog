@@ -769,6 +769,10 @@
 	* Julian Prein: 53309: Completion/Unix/Command/_uniq: remove
 	uncommon / obsolete options -t and -W
 
+2025-01-03  Bart Schaefer  <schaefer@zsh.org>
+
+	* 53294: Src/loop.c: fix multibyte handling in "select" prompts
+
 2024-12-16  dana  <dana@dana.is>
 
 	* 53251: Completion/Unix/Command/_man: fix page completion on
