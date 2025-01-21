@@ -1,5 +1,8 @@
 2025-01-27  Oliver Kiddle  <opk@zsh.org>
 
+	* github #128: GI <gi1242+zsh@gmail.com>:
+	Completion/Unix/Command/_vim: Updated completion for neovim
+
 	* github #125: Kouhei Yanagita: Completion/Unix/Command/_ruby:
 	Add completion for irb --no-pager
 
