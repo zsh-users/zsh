@@ -1,5 +1,8 @@
 2025-01-27  Oliver Kiddle  <opk@zsh.org>
 
+	* github #128: GI <gi1242+zsh@gmail.com>:
+	Completion/Unix/Command/_vim: Updated completion for neovim
+
 	* github #126: Wu, Zhenyu: Completion/Base/Completer/_expand_alias,
 	Src/exec.c, Src/init.c, Src/parse.c, Src/utils.c, Src/zsh.h,
 	configure.ac: Fix some typos
