@@ -48,6 +48,7 @@ arguments=(
   '--cgroup=[match by cgroup v2 names]:cgroup'
   '--ns=[match only on same namespaces as specified PID]: :_pids'
   '--nslist=[match only on specified namespaces (with --ns)]:namespace:(ipc mnt net pid user uts)'
+  '*--env=[match on environment variable]:var[=value]:_parameters -g "*export*" -qS='
   '(: * -)'{-V,--version}'[display version information]'
   '-z+[match only on specified zone IDs]:zone:_sequence _zones'
 )

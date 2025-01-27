@@ -25,6 +25,7 @@ if [[ $OSTYPE = linux* ]]; then
     '(- *)'{-h,--help}'[display usage information]'
     '(- *)'{-V,--version}'[display version information]'
   )
+  fmts+=( {--one-byte-hex,-X}'[one-byte hexadecimal display]' )
 else
   # strip long options by taking every second element
   print -v fmts -f '%2$s' -- "$fmts[@]"

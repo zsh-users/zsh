@@ -14,6 +14,7 @@ case $variant; in
         {simple,never}"[always make simple backups]"'
       '(-b --backup -n --no-clobber)-b[make a backup of each existing destination file]'
       '(-v)--debug[explain how a file is copied]'
+      '--exchange[exchange source and destination]'
       '(-f --force -i --interactive -n --no-clobber)'{-f,--force}"[don't prompt before overwriting]"
       '(-f --force -i --interactive -n --no-clobber)'{-i,--interactive}'[prompt before overwriting existing file]'
       '(-f --force -i --interactive -n --no-clobber)'{-n,--no-clobber}"[don't overwrite existing file]"
@@ -22,7 +23,7 @@ case $variant; in
       '(-S --suffix)'{-S+,--suffix=}'[specify the backup suffix]:backup suffix [~]'
       '(-t --target-directory)'{-t+,--target-directory=}'[move all source arguments into specified directory]:directory:_directories'
       '(-T --no-target-directory)'{-T,--no-target-directory}'[treat final argument as a normal file]'
-      '(-u)--update=-[move only when destination file is older or missing]::update files [older]:(all none older)'
+      '(-u)--update=-[move only when destination file is older or missing]::update files [older]:(all none none-fail older)'
       '(--update)-u[move only when destination file is older or missing]'
       '(-v --verbose)'{-v,--verbose}'[show file names after they are moved]'
       '(- *)--help[display usage information]'

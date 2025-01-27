@@ -6,6 +6,7 @@ case $OSTYPE in
   linux*)
     args=(
       '(H -f --from)'{-f,--from}'[toggle display of remote hostname]'
+      '(-c --container)'{-c,--container}'[show container uptime]'
       '(H -h)--no-header[suppress the heading]'
       '(H -i --ip-addr)'{-i,--ip-addr}'[display IP address instead of hostname]'
       '(H -o --old-style -s --short)'{-o,--old-style}'[old style output format]'

@@ -19,6 +19,13 @@ case "$variant" in
       '*: :->files'
     )
     ;;
+  gnu|freebsd*|openbsd*|netbsd*|darwin*|dragonfly*)
+    args+=(
+      '(-H -L -P)-L[follow all symlinks]'
+      '(-H -L -P)-H[follow symlinks on the command line]'
+      '(-H -L -P)-P[do not follow symlinks (default)]'
+    )
+    ;|
   gnu)
     aopts=()
     args+=(
@@ -47,13 +54,6 @@ case "$variant" in
   freebsd*|netbsd*|darwin*|dragonfly*)
     args+=(
       '-h[operate on symlinks themselves]'
-    )
-    ;|
-  freebsd*|openbsd*|netbsd*|darwin*|dragonfly*)
-    args+=(
-      '(-H -L -P)-L[follow all symlinks]'
-      '(-H -L -P)-H[follow symlinks on the command line]'
-      '(-H -L -P)-P[do not follow symlinks (default)]'
     )
     ;|
   darwin*)

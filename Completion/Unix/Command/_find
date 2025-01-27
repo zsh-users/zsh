@@ -109,7 +109,6 @@ case $variant in
       '-regextype:regexp syntax:(help findutils-default awk egrep ed emacs gnu-awk grep posix-awk posix-basic posix-egrep posix-extended posix-minimal-basic sed)'
       '*-warn'
       '*-nowarn'
-      '*-xautofs'
       '*-used:access after inode change (days)'
       '*-executable'
       '*-readable'

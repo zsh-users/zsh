@@ -41,6 +41,7 @@ case $OSTYPE in
       '(-R --nohostname)'{-R,--nohostname}'[suppress display of hostname field]'
       '(-s --since)'{-s+,--since=}'[display lines since the specified time]:time (YYYYMMDDhhmmss)'
       '(-t --until)'{-t+,--until=}'[display lines until the specified time]:time (YYYYMMDDhhmmss)'
+      '(-T --tab-separated)'{-T,--tab-separated}'[use tabs as delimiters]'
       '(-p --present)'{-p+,--present=}'[display who were present at the specified time]:time (YYYYMMDDhhmmss)'
       '(-w --fullnames)'{-w,--fullnames}'[show full user and domain names]'
       '(-x --system)'{-x,--system}'[display shutdown/runlevel entries]'

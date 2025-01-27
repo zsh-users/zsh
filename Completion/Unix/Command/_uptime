@@ -9,9 +9,10 @@ case $variant in
     _arguments -s -S : \
       '(: -)'{-h,--help}'[display help information]' \
       '(: -)'{-V,--version}'[display version information]' \
-      + '(excl)' \
-      {-p,--pretty}'[display uptime in pretty format]' \
-      {-s,--since}'[display date/time of system boot]'
+      '(-c --container)'{-c,--container}'[show container uptime]' \
+      '(-p --pretty -s --since -r --raw)'{-p,--pretty}'[display uptime in pretty format]' \
+      '(-r --raw -p --pretty)'{-r,--raw}'[uptime values in raw format]' \
+      '(-s --since -p --pretty)'{-s,--since}'[display date/time of system boot]'
     return
     ;;
   gnu)

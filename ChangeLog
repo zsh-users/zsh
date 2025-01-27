@@ -1,5 +1,19 @@
 2025-01-27  Oliver Kiddle  <opk@zsh.org>
 
+	* 53326: Completion/Linux/Command/_findmnt,
+	Completion/Linux/Command/_free, Completion/Linux/Command/_losetup,
+	Completion/Linux/Command/_lsblk, Completion/Linux/Command/_pidof,
+	Completion/Linux/Command/_slabtop, Completion/Linux/Command/_wipefs,
+	Completion/Unix/Command/_awk, Completion/Unix/Command/_chmod,
+	Completion/Unix/Command/_chown, Completion/Unix/Command/_cmp,
+	Completion/Unix/Command/_find, Completion/Unix/Command/_hexdump,
+	Completion/Unix/Command/_last, Completion/Unix/Command/_mv,
+	Completion/Unix/Command/_objdump, Completion/Unix/Command/_pgrep,
+	Completion/Unix/Command/_ping, Completion/Unix/Command/_ps,
+	Completion/Unix/Command/_readelf, Completion/Unix/Command/_strip,
+	Completion/Unix/Command/_uptime, Completion/Unix/Command/_w:
+	completion updates for core Linux utils
+
 	* 53325: Completion/BSD/Command/_acpiconf,
 	Completion/BSD/Command/_bsdconfig, Completion/BSD/Command/_pkgin,
 	Completion/BSD/Command/_procstat, Completion/BSD/Command/_sockstat,

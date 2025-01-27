@@ -8,6 +8,7 @@
 #
 local curcontext=$curcontext state state_descr line ret=1
 typeset -A opt_args
+local -a suf dedup
 
 _arguments -s -C \
   '(H -A --all)'{-A,--all}'[print all filesystems]' \
@@ -45,6 +46,7 @@ _arguments -s -C \
   '(H)2:: :->targets' \
   + '(format)' \
   '(H)'{-D,--df}'[imitate the output of df command]' \
+  '(H)'{-I,--dfi}'[imitate the output of df with -i option]' \
   '(H)'{-J,--json}'[use JSON output format]' \
   '(H)'{-l,--list}'[use list output format]' \
   '(H)'{-P,--pairs}'[use key="value" output format]' \
@@ -55,6 +57,7 @@ _arguments -s -C \
   '(H)'{-N+,--task=}'[search /proc/<pid>/mountinfo]: :_pids' \
   '(H)'{-s,--fstab}'[search in /etc/fstab]' \
   + '(H)' \
+  '(* -)'{-H,--list-columns}'[list available columns]' \
   '(- :)'{-h,--help}'[display help text and exit]' \
   '(- :)'{-V,--version}'[display version and exit]' \
     && ret=0
@@ -66,13 +69,16 @@ __findmnt_mountpoints () {
 
 case $state in
   columns)
+    dedup=( ${(Ms.,.)${PREFIX#+}##*,} ${(Ms.,.)SUFFIX%%,*} )
+    suf=( -qS , )
+    compset -S ',*' && suf=()
     compset -P '+' || _describe -t list-prefixes prefix \
-		      '( +:"not replace but extend the list" )' -S '' && ret=0
+        '( +:"not replace but extend the list" )' -S '' && ret=0
+    compset -P '*,'
     local -a columns=(
-      ${${${(f)"$(_call_program columns findmnt -h)"}[(r)Available*,-2]}[2,-1]}
+      ${${${${(f)"$(_call_program columns findmnt --list-columns)"}## #}//:/\\:}/ <[^>]#> #/:}
     )
-    columns=( ${${${${${${columns## #}//:/\\:}//\[/\\[}//]/\\]}/  /[}/%/]} )
-    _values -s , -M 'm:{a-z}={A-Z}' column $columns && ret=0
+    _describe -t fields column columns -M 'm:{a-z}={A-Z}' $suf -F dedup && ret=0
     ;;
   *) # call "findmnt $opts" to get possible sources/targets
     local opts='-lnve'
