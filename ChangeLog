@@ -1,5 +1,7 @@
 2025-01-27  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/Unix/Command/_openldap: fix quoting
+
 	* 53327: Completion/Unix/Command/_git: update for git 2.47
 
 	* 53328: Completion/Linux/Command/_cpupower,

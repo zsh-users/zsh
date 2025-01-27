@@ -36,7 +36,7 @@ case $service in
           none noplain noactive nodict noanonymous forwardsec passcred
           minssf\:factor maxssf\:factor maxbufsize\:factor'
       '(simple)-X+[specify SASL authorization identity]:authzid:->authzids'
-      '(simple)-Y+[specify SASL mechanism]:mechanism:compadd -M "m:{a-zA-Z}={A-Za-z}" EXTERNAL GSSAPI' # iana has a full list but cyrus support seems limited
+      '(simple)-Y+[specify SASL mechanism]:mechanism:compadd -M "m\:{a-zA-Z}={A-Za-z}" EXTERNAL GSSAPI' # iana has a full list but cyrus support seems limited
       '(simple)-R+[specify SASL realm]:realm'
       '(simple)-U+[specify SASL authentication identity]:authcid'
       '(simple)-I[use SASL Interactive mode]'
