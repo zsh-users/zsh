@@ -1,26 +1,27 @@
 #compdef procstat
 
 _arguments -s -A "-*" -S \
-  '-b[show binary information]' \
-  '-c[show command line arguments]' \
-  '-e[show environment variables]' \
-  '-f[show file descriptor information]' \
-  '-i[show signal pending and disposition]' \
-  '-j[show signal pending and blocked information for process threads]' \
-  '-k[show stacks of kernel threads]' \
-  '-l[show resource limits]' \
-  "-L[show LWP info for the process pertaining to it's signal driven exit]" \
-  '-r[show resource usage]' \
-  '-s[show security credential information]' \
-  '-S[show cpuset information]' \
-  '-t[show thread information]' \
-  '-v[show virtual memory mappings]' \
-  '-x[show ELF auxiliary vector]' \
+  '(1)-b[show binary information]' \
+  '(1)-c[show command line arguments]' \
+  '(1)-e[show environment variables]' \
+  '(1)-f[show file descriptor information]' \
+  '(1)-i[show signal pending and disposition]' \
+  '(1)-j[show signal pending and blocked information for process threads]' \
+  '(1)-k[show stacks of kernel threads]' \
+  '(1)-l[show resource limits]' \
+  "(1)-L[show LWP info for the process pertaining to it's signal driven exit]" \
+  '(1)-r[show resource usage]' \
+  '(1)-s[show security credential information]' \
+  '(1)-S[show cpuset information]' \
+  '(1)-t[show thread information]' \
+  '(1)-v[show virtual memory mappings]' \
+  '(1)-x[show ELF auxiliary vector]' \
   '-h[suppress table headers]' \
-  '(1)-a[all processes]' \
+  '(2 *)-a[all processes]' \
   '-w+[repeat information after specified interval]:delay (seconds)' \
   '-C[print additional capability information for file descriptors]' \
   '-H[statistics per-thread rather than per-process]' \
   '-n[numeric form for signals]' \
-  '1::core file:_path_files -g "*core*(-.)"' \
+  '1::command:(advlock argument auxv basic binary cpuset credential environment fd file kstack pargs ptlwpinfo pwdx rlimit rlimitusage rusage sigfastblock signal thread tsignal vm)' \
+  '2::core file:_path_files -g "*core*(-.)"' \
   '*:process id:_pids'

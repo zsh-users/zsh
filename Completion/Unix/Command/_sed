@@ -104,7 +104,7 @@ else
   case $OSTYPE in
     openbsd*|freebsd*|netbsd*|darwin*|dragonfly*)
       args+=(
-	'(-r -E)'{-E,-r}$extended
+	'(-r -E -H)'{-E,-r}$extended
 	'-a[delay opening files listed with w function]'
       )
     ;|
@@ -115,8 +115,10 @@ else
       args+=(
         '-I+[edit files in-place, treating all files as a single input stream]:: :_guard "^(*[@/; \\\]*|?(#c6,)|-*)" "suffix for backup"'
       )
-    ;;
+    ;|
     openbsd*) args+=( '-u[make output line buffered]' ) ;;
+    darwin*) args+=( '(-r -E)-H[use enhanced regular expressions]' ) ;;
+    netbsd*) args+=( '(-r -E)-g[use GNU regular expressions]' '!(-r -E -g)-G' ) ;;
   esac
 fi
 

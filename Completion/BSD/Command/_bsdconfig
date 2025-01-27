@@ -51,6 +51,7 @@ shortcuts=(
   vt_saver
   vt_screenmap
   vt_ttys
+  wifi wireless wlan
 )
 
 _arguments -s -w -A '-*' : \

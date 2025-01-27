@@ -61,12 +61,16 @@ if ! _pick_variant gnu=gnu unix --help; then
       '(-l -1 -C -m -x)-g[long listing but without owner information]'
     )
   fi
+  if [[ $OSTYPE = (netbsd*|darwin*) ]]; then
+    arguments+=(
+      "-X[don't cross mount points when recursing]"
+    )
+  fi
   if [[ $OSTYPE = netbsd* ]]; then
     arguments+=(
       '-M[output file sizes in comma-separated form]'
       '-O[output only leaf (non-directory) files]'
       '-P[print full pathname for each file]'
-      "-X[don't cross mount points when recursing]"
     )
   fi
   if [[ $OSTYPE = (dragonfly*|freebsd*|openbsd*|darwin*) ]]; then

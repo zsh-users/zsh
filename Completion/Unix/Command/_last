@@ -8,17 +8,16 @@ ttys=( ${ttys#/dev/} )
 for pattern arg in \
   '(solaris*|linux-gnu)' '(--hostlast)-a[display hostname in last column]' \
   '((free|net|open)bsd*|darwin*|dragonfly*)' '-h+[limit sessions by hostname]:host:_hosts' \
-  '((free|open)bsd*)' '-s[report duration in seconds]' \
-  '(freebsd*|openbsd*)' '-d+[limit sessions to those active at snapshot time]:time ([[CC]YY][MMDD]hhmm[.SS])' \
+  '((free|open)bsd*|darwin*)' '-s[report duration in seconds]' \
+  '((free|open)bsd*|darwin*)' '-d+[limit sessions to those active at snapshot time]:time ([[CC]YY][MMDD]hhmm[.SS])' \
   '((net|free|open)bsd*|darwin*|dragonfly*)' '-t+[limit sessions by tty]:tty:_ttys -D' \
   'openbsd*' '-c[calculate total time]' \
-  '^darwin*' '(--file)-f+[specify account file]:file:_files' \
-  '(solaris*|linux-gnu|freebsd*|openbsd*)' '(--limit)-n+[specify number of lines to show]:number' \
+  '(solaris*|darwin*|linux-gnu|freebsd*|openbsd*)' '(--limit)-n+[specify number of lines to show]:number' \
   '((open|net)bsd*|dragonfly*)' '-T[show more detailed time information including year and seconds]' \
   'netbsd*' '-x[assume file is in wtmpx(5) format]' \
   'netbsd*' '-n[show IP of remote hosts]' \
-  'freebsd*' '-w[show seconds in duration field]' \
-  'freebsd*' '-y[show year in session start time]'
+  '(freebsd*|darwin*)' '-w[show seconds in duration field]' \
+  '(freebsd*|darwin*)' '-y[show year in session start time]'
 do
   [[ $OSTYPE = $~pattern ]] && args+=( $arg )
 done
@@ -58,4 +57,5 @@ else
   args+=( '*:user:_users' )
 fi
 
-_arguments -s -S $args
+_arguments -s -S $args \
+  '(--file)-f+[specify account file]:file:_files'

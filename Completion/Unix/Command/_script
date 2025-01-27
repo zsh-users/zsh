@@ -50,9 +50,19 @@ case $OSTYPE in
       '(-d -p -T)-r[record a session with input, output and timing data]'
     )
   ;|
+  darwin*|netbsd*|freebsd*)
+    args+=(
+      '-e[return exit status of the child process]'
+    )
+  ;|
   netbsd*|openbsd*)
     args+=(
       '-c[run specified command instead of a shell]:command:_cmdstring'
+    )
+  ;|
+  darwin*|freebsd*)
+    args+=(
+      '(-a -r -k -t)-T[play back a recorded session, reporting only timestamps]: :_date_formats'
     )
   ;|
   netbsd*)
@@ -60,9 +70,8 @@ case $OSTYPE in
   ;|
   freebsd*)
     args+=(
-      '-e[return exit status of the child process]'
       '-f[use filemon(4)]'
-      '(-a -r -k -t)-T[play back a recorded session, reporting only timestamps]: :_date_formats'
+      '-w[forward terminal size changes on SIGWINCH]'
     )
   ;|
   darwin*|dragonfly*|freebsd*)

@@ -79,6 +79,7 @@ case $OSTYPE in
       "-n[don't resolve IP addresses]"
       '(-b)-w[refresh interval]:refresh interval'
       "(-b)-t[specify amount of refreshes for each screen in 'all' display mode]:turns"
+      '-z[display 0 instead of space when there is no data]'
     )
 esac
 

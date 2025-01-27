@@ -5,8 +5,10 @@ _arguments -s \
   '(-)'{-h,--help}'[display usage information]' \
   '(-q --quiet -u --dump)'{-q,--quiet}'[be less verbose]' \
   '--no-quirks[decode everything without quirks]' \
-  '(-t --type -H --handle -u --dump --dump-bin -s --string)'{-s+,--string=}'[only display value of specified DMI string]:DMI string:(bios-vendor bios-version bios-release-date system-manufacturer system-product-name system-version system-serial-number system-uuid baseboard-manufacturer baseboard-product-name baseboard-version baseboard-serial-number baseboard-asset-tag chassis-manufacturer chassis-type chassis-version chassis-serial-number chassis-asset-tag processor-family processor-manufacturer processor-version processor-frequency)' \
-  '(-s --string -H --handle --dump-bin)*'{-t+,--type=}'[only display entries of specified type]:entry type:(bios system baseboard chassis processor memory cache connector slot)' \
+  '(-t --type -H --handle -u --dump --dump-bin -s --string)'{-s+,--string=}'[only display value of specified DMI string]:DMI string:compadd -M "r\:|-=* r\:|=*" - $(_call_program strings dmidecode --list-strings)' \
+  '--list-strings[list available string keywords]' \
+  '(-s --string -H --handle --dump-bin)*'{-t+,--type=}'[only display entries of specified type]:entry type:compadd - $(_call_program types dmidecode --list-types)' \
+  '--list-types[list available type keywords]' \
   '(-s --string -t --type -H --handle --dump-bin)'{-H,--handle=}'[only display the entry of specified handle]:handle' \
   '(-q --quiet -u --dump -s --string)'{-u,--dump}"[don't decode entries]" \
   '(-s --string -t --type -H --handle)--dump-bin=[dump DMI data to a binary file]:file:_files' \

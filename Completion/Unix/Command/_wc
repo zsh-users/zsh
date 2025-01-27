@@ -18,7 +18,7 @@ if _pick_variant gnu=GNU unix --version; then
 else
   args=( -A "-*" "${(@)args:#(|\(*\))(|\*)--*}" )
   case $OSTYPE in
-    freebsd*|netbsd*) args+=( '-L[print longest line lengths]' ) ;;
+    freebsd*|netbsd*|darwin*) args+=( '-L[print longest line lengths]' ) ;;
     openbsd*) args+=( '-h[human readable: use unit suffixes]' ) ;;
     solaris*) args+=( ${${(M)args:#*-m\[*}//-m\[/-C\[} ) ;;
   esac

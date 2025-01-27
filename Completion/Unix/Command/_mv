@@ -38,11 +38,11 @@ case $variant; in
       '(-f -n)-i[prompt before overwriting existing file]'
     )
     ;|
+  darwin*|dragonfly*|freebsd*|netbsd*)
+    args+=( "-h[if target is a symlink to a directory, don't follow it]" )
+  ;|
   darwin*|dragonfly*|freebsd*)
-    args+=(
-      "(-f -i)-n[don't overwrite existing file]"
-      "-h[if target is a symlink to a directory, don't follow it]"
-    )
+    args+=( "(-f -i)-n[don't overwrite existing file]" )
     ;|
   darwin*|dragonfly*|*bsd*)
     args+=(

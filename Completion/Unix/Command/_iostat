@@ -50,6 +50,9 @@ case $OSTYPE:l in
     args+=(
       '-x[show extended disk statistics]'
       '-y[report data on waiting and active requests]'
+      '-z[replace drive and CPU statistics that are zero with spaces]'
+      "-H+[set page height explicitly]:height [$LINES]"
+      "-W+[set page width explicitly]:width [$COLUMNS]"
     )
     ;;
   aix*)
