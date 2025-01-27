@@ -45,21 +45,25 @@ elif [[ "$OSTYPE" == (darwin|dragonfly|freebsd|netbsd*|openbsd)* ]]; then
         '-a[show all mount points]'
         '(-b -g -H -h -k -m --si)-g[use 1024^3-byte blocks]'
         '(-b -g -H -h -k -m --si)-m[use 1024*1024-byte blocks]'
-      )
-      ;|
-    (darwin*|dragonfly*|freebsd*)
-      args+=(
         '(-b -g -H -h -k -m --si)-b[use 512-byte blocks (default)]'
         '(-b -g -H -h -k -m --si)-H[human-readable output (base 10)]'
       )
       ;|
-    (darwin*|freebsd*)
+    (darwin*|freebsd*|netbsd*)
       args+=(
         '-c[display a grand total]'
+      )
+    ;|
+    (darwin*|freebsd*)
+      args+=(
+        '--libxo[generate output via libxo]'
+        '-,[separate thousands]'
       )
       ;|
     (darwin*)
       args+=(
+        '-I[suppress inode counts]'
+        '-Y[include file system type]'
         "-T+$spec"
         "!-t+$spec" # obsolete
       )
@@ -76,14 +80,15 @@ elif [[ "$OSTYPE" == (darwin|dragonfly|freebsd|netbsd*|openbsd)* ]]; then
       ;|
     (freebsd*)
       args+=(
-        '--libxo[generate output via libxo]'
         '(-b -g -H -h -k -m --si)--si[human-readable output (base 10)]'
-        '-,[separate thousands]'
       )
       ;;
     (netbsd*)
       args+=(
+        '(-P -G -N)-f[display only the available free]'
         '(-G -i -P)-G[display all fields in statvfs]'
+        '(-G -P)-N[suppress the header line normally output]'
+        '-W[print widge name instead of the device]'
       )
       ;;
   esac

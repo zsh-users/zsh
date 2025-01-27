@@ -8,6 +8,7 @@ case $variant in
   gnu)
     (( $#words > 2 )) && ign='!'
     args=(
+      '(-a --argv0)'{-a+,--argv0=}'[pass argument as the zeroth argument of command]:argument'
       '(-)'{-i,--ignore-environment}'[start with empty environment]'
       '(* -0 --null)'{-0,--null}'[end each output line with NUL, not newline]'
       '(--ignore-environment -i --help --version)*'{-u+,--unset=}'[remove variable from the environment]:env var to remove:_parameters -g "*export*"'
@@ -28,12 +29,19 @@ case $variant in
       '-U[add variables from user and system login.conf(5)]: :->user-class'
     )
   ;|
-  freebsd*|darwin*)
-    args=( '-0[use NUL, not newline after each variable in output]' )
+  freebsd*|netbsd*)
+    args+=( '-C+[change working directory]:directory:_directories' )
+  ;|
+  freebsd*|darwin*|netbsd*)
+    args+=( '-0[use NUL, not newline after each variable in output]' )
+  ;|
+  freebsd*|darwin*|dragonfly*|netbsd*|openbsd*)
+    args+=(
+      '(-i)*-u+[remove variable from the environment]:env var to remove:_parameters -g "*export*"'
+    )
   ;|
   freebsd*|darwin*|dragonfly*)
     args+=(
-      '(-i)*-u+[remove variable from the environment]:env var to remove:_parameters -g "*export*"'
       '-P+[specify alternate executable search PATH]:path:_dir_list'
       '-S+[perform word splitting]:string to split'
       '*-v[verbose output]'

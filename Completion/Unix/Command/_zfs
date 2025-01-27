@@ -79,7 +79,7 @@ rw_ds_props=(
       'paths:mountpoint:_directories -W / -P /'"
   'multilevel:value:(on off)'
   'nbmand:value:(on off)'
-  'primarycache:value:(all none metadata)'
+  {prefetch,primarycache}':value:(all none metadata)'
   'quota: :->quotas'
   'readonly:value:(on off)'
   'recordsize:value:(512 1K 2K 4K 8K 16K 32K 64K 128K 256K 512K 1M)'
@@ -515,9 +515,11 @@ case $service:$words[1] in
   ;;
 
   zfs:set)
-    [[ $implementation = solaris ]] && args=(
-      '-r[recursively apply value]' \
-    )
+    if [[ $implementation = solaris ]]; then
+      args=( '-r[recursively apply value]' )
+    else
+      args=( "-u[update property but don't mount or share dataset]" )
+    fi
     _arguments -C -A "-*" -S $args \
       ':property:->set-properties' \
       '*:filesystem/volume:_zfs_dataset -t fs -t vol'
@@ -598,13 +600,14 @@ case $service:$words[1] in
   zfs:mount)
     [[ $OSTYPE != freebsd* ]] && args=( '-O[overlay mount]' )
     [[ $implementation = openzfs ]] && args+=(
-    '-l[load keys for encrypted filesystems as they are being mounted]'
+      '-l[load keys for encrypted filesystems as they are being mounted]'
+      '(-a)-R[mount filesystems along with all their children]'
     )
     _arguments -A "-*" -S $args \
       '-o+[specify temporary file system options]: :_values -s , "option" {,no}{atime,dev,exec,relatime,suid,xattr} ro rw' \
       '-v[report mount progress]' \
       '-f[force mount]' \
-      '(:)-a[mount all available ZFS filesystems]' \
+      '(: -R)-a[mount all available ZFS filesystems]' \
       '(-a):filesystem:_zfs_dataset -t fs'
   ;;
 
@@ -888,6 +891,12 @@ case $service:$words[1] in
       ':property:($delegatable_perms $ro_ds_props ${rw_ds_props%%:*})'
   ;;
 
+  zpool:(clear|online))
+    [[ $OSTYPE = linux* ]] && args=(
+      "--power[power on the device's slot in the storage enclosure]"
+    )
+  ;|
+
   zpool:help)
     _arguments -A "-*" -S \
       - commands \
@@ -905,6 +914,7 @@ case $service:$words[1] in
         '-L[display real paths for vdevs resolving all symbolic links]'
         '-o+[set given pool properties]: :_values -s , "property" "${(@M)ci_po_props\:#ashift*}"' \
         '-P[display real paths for vdevs instead of only the last component of the path]'
+        --allow-ashift-mismatch --allow-in-use --allow-replication-mismatch
       )
     elif [[ $implementation = solaris ]]; then
       args=( '-l[display configuration in /dev/chassis location form]' )
@@ -1004,7 +1014,7 @@ case $service:$words[1] in
 
   zpool:get)
     [[ $implementation = solaris ]] && args=(
-      '-s+[specify sources to display]: :_values -s "source" local default none'
+      '-s+[specify sources to display]: :_values -s , "source" local default none'
     )
     _arguments -A "-*" -S $args \
       '-H[suppress headers and tab-delimit fields]' \
@@ -1140,6 +1150,9 @@ case $service:$words[1] in
     [[ $implementation = openzfs ]] && args=(
       '-f[force disk into faulted state]'
     )
+    [[ $OSTYPE = linux* ]] && args=(
+      "--power[power off the device's slot in the storage enclosure]"
+    )
     _arguments -C -A "-*" -S $args \
       '-t[offline until next reboot]' \
       ':pool:_zfs_pool' \
@@ -1147,7 +1160,7 @@ case $service:$words[1] in
   ;;
 
   zpool:online)
-    _arguments -C -A "-*" -S \
+    _arguments -C -A "-*" -S $args \
       '-e[expand device to use all available space]' \
       ':pool:_zfs_pool' \
       '*:virtual device:->pool-devices'
@@ -1234,8 +1247,10 @@ case $service:$words[1] in
   zpool:status)
     if [[ $implementation = openzfs ]]; then
       args=(
+        '--power[display vdev enclosure slot power status]'
         '-D[display a histogram of deduplication statistics]'
         '-c[run scripts on each vdev]:script:_files -W "($ZPOOL_SCRIPTS_PATH /etc/zfs/zpool.d ~/.zpool.d)"'
+        '-e[only show unhealthy vdevs]'
         '-i[display vdev initialization status]'
         '-g[display vdev GUIDs instead of the normal device names]'
         '-L[display real paths for vdevs resolving all symbolic links]'

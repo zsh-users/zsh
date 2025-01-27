@@ -29,6 +29,11 @@ case $OSTYPE in
       '-q[quiet mode, do not print the header line]'
     )
   ;|
+  freebsd<14->.*)
+    args+=(
+      '-I[show local address of socket to which the current socket is spliced]'
+    )
+  ;|
   freebsd*)
     for proto in ${${(M)${(f)"$(</etc/protocols)"}##[a-z0-9]*}}; do
       case $proto in

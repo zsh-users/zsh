@@ -12,6 +12,7 @@ case $OSTYPE in
     args+=(
       '(-d)-b[immediately move to the background]'
       '-l+[specify leases file]:file:_files'
+      "-n[don't wait for ARP resolution]"
       '-p+[specify PID file]:file:_files'
       '-u[reject leases with unknown options]'
       '-q[quiet]'

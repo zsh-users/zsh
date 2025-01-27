@@ -1,0 +1,28 @@
+#compdef acpiconf
+
+local curcontext="$curcontext" sep ret=1
+local -a state line modes desc
+local -A opt_args
+
+_arguments -s \
+  '(-)-h[display usage information]' \
+  '(-)-i[get battery information]:battery' \
+  '(-)-k[ack or abort a pending suspend]:ack' \
+  '(-)-s[enter specified sleep mode]: :->modes' && ret=0
+
+if [[ -n $state ]]; then
+  modes=( $(_call_program modes sysctl -n hw.acpi.supported_sleep_state) )
+  zstyle -s ":completion:${curcontext}:modes" list-separator sep || sep=--
+  (( $#modes )) || modes=( S3 S4 )
+  desc=(
+    "S1 $sep stop the processor clock"
+    "S2 $sep low wake latency sleep state"
+    "S3 $sep suspend to RAM"
+    "S4 $sep suspend to disk"
+    "S5 $sep soft off state"
+  )
+  desc=( ${(M)desc:#(${(~j.|.)modes}) *} )
+  _wanted modes expl 'mode' compadd -M 'B:S=' -ld desc - ${modes#S} && ret=0
+fi
+
+return ret

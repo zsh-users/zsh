@@ -23,7 +23,7 @@ case $OSTYPE in
   openbsd*)
     args+=( '-a[translate network addresses into names]' )
   ;|
-  (free|net)bsd*|dragonfly*)
+  (free|net)bsd*|dragonfly*|darwin*)
     args+=( '-n[show network addresses as numbers]' )
   ;|
   *bsd*|dragonfly*)
@@ -34,6 +34,11 @@ case $OSTYPE in
   ;|
   freebsd*|dragonfly*)
     args+=( '-d[dump process list on a per controlling tty basis]' )
+  ;|
+  netbsd*)
+    args+=(
+      '-A[sort tty names alphabetically instead of utmp or utmpx order]'
+    )
   ;|
   solaris*)
     args+=( '!(-s -w -l)'{-l,-w}

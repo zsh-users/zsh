@@ -37,7 +37,10 @@ else
       )
     ;|
     freebsd*|dragonfly*|darwin*|netbsd*)
-      args+=( '-n[only set time on current machine]' )
+      args+=(
+        '-n[only set time on current machine]'
+        '-R[display in RFC2822 format]'
+      )
     ;|
     freebsd*|dragonfly*|darwin*|openbsd*)
       args+=(
@@ -61,9 +64,12 @@ else
     ;|
     freebsd*|dragonfly*|darwin*)
       args+=(
-        '-R[display in RFC2822 format]'
-	'(-R)-I-[display in ISO 8601 format]::precision [date]:(date hours minutes seconds)'
 	"*-v+[adjust and print (but don't set) date]:[+-]value[ymwdHMS]"
+      )
+    ;|
+    dragonfly*|darwin*)
+      args+=(
+	'(-R)-I-[display in ISO 8601 format]::precision [date]:(date hours minutes seconds)'
       )
     ;|
     freebsd<-12>.*)
@@ -76,6 +82,11 @@ else
     ;|
     freebsd<14->.*|openbsd*)
       args+=( '-z+[specify timezone for output]:time zone:_time_zone')
+    ;|
+    freebsd*)
+      args+=(
+	'(-R)-I-[display in ISO 8601 format]::precision [date]:(date hours minutes seconds ns)'
+      )
     ;|
     netbsd*)
       args+=( '-d[output date specified by string]:time string:' )

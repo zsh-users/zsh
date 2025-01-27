@@ -1,3 +1,18 @@
+2025-01-27  Oliver Kiddle  <opk@zsh.org>
+
+	* 53325: Completion/BSD/Command/_acpiconf,
+	Completion/BSD/Command/_bsdconfig, Completion/BSD/Command/_pkgin,
+	Completion/BSD/Command/_procstat, Completion/BSD/Command/_sockstat,
+	Completion/BSD/Command/_systat, Completion/Unix/Command/_date,
+	Completion/Unix/Command/_df, Completion/Unix/Command/_dhclient,
+	Completion/Unix/Command/_dmidecode, Completion/Unix/Command/_env,
+	Completion/Unix/Command/_iostat, Completion/Unix/Command/_last,
+	Completion/Unix/Command/_ls, Completion/Unix/Command/_mv,
+	Completion/Unix/Command/_ps, Completion/Unix/Command/_script,
+	Completion/Unix/Command/_sed, Completion/Unix/Command/_vmstat,
+	Completion/Unix/Command/_w, Completion/Unix/Command/_wc,
+	Completion/Unix/Command/_zfs: cover newer BSD releases in completion
+
 2025-01-20  Bart Schaefer  <schaefer@zsh.org>
 
 	* Julian Prein: 53309: Completion/Unix/Command/_uniq: remove

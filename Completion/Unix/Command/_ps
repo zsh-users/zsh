@@ -106,9 +106,9 @@ case $OSTYPE in
   ;|
   linux-gnu|netbsd*) bsdarg+=( 'k[specify sort order]' ) ;|
   linux-gnu|openbsd*) bsd+=( 'f[show process hierarchy]' ) ;|
+  darwin*|freebsd*|netbsd*) bsdarg+=( '*G[select processes by real group]' ) ;|
   darwin*|freebsd*)
     bsd+=( 'X[skip processes with no controlling terminal]' )
-    bsdarg+=( '*G[select processes by real group]' )
   ;|
   freebsd*|dragonfly*)
     bsd+=( 'f[show command and environment for swapped out processes]' )

@@ -37,10 +37,14 @@ case $OSTYPE in
       '-f[report on the number fork syscalls since boot and pages of virtual memory for each]'
     )
   ;|
+  freebsd*|dragonfly*|netbsd*)
+    specs+=(
+      '-n+[change the maximum number of disks to display]:number of disks to display [2]'
+    )
+  ;|
   freebsd*|dragonfly*)
     specs+=(
       '-m[report on the usage of kernel dynamic memory allocated using malloc(9) by type]'
-      '-n+[change the maximum number of disks to display]:number of disks to display [2]'
       '*-p+[specify which types of devices to display]: :->devices'
       '-s[display the contents of the SUM structure]'
       '-z[report on memory used by the kernel zone allocator, uma(9), by zone]'
