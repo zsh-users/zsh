@@ -40,7 +40,7 @@ common_report_errors=(
   '--error-exitcode=-[exit code to return if errors found]:exit code' \
   '--error-markers=-[add lines with begin/end markers before/after]:markers (begin,end)' \
   '(--show-error-list)-s[show detected errors list and suppression counts at exit]' \
-  '--show-error-list=-[show detected errors list and suppression counts at exit]:enable [no]:(yes no)'
+  '--show-error-list=-[show detected errors list and suppression counts at exit]:enable [no]:(yes no all)'
   '--keep-debuginfo=-[keep symbols etc for unloaded code]:enable:(yes no)' \
   '--show-below-main=-[continue stack traces below main()]:enable [no]:(yes no)' \
   '--default-suppression=-[load default suppressions]:enable [yes]:(yes no)' \
@@ -115,6 +115,7 @@ args_memcheck=(
   $args_addrcheck
   $common_read_varinfo
   $common_report_errors
+  '--show-realloc-size-zero=-[show reallocs with a size of zero]:enable [yes]:(yes no)'
 )
 
 args_cachegrind=(
@@ -215,12 +216,13 @@ _arguments -C ${(P)args} $cmd \
   '--child-silent-after-fork=-[omit child output between fork & exec]:enable:(yes no)' \
   '--vgdb=-[activate gdbserver]:enable [yes]:(yes no full)' \
   '--vgdb-error=-[invoke gdbserver after specified number of errors]:errors [999999999]:errors' \
-  '--vgdb-stop-at=-[invoke gdbserver for given events]:event:_sequence compadd - startup exit valgrindabexit all none' \
+  '--vgdb-stop-at=-[invoke gdbserver for given events]:event:_sequence compadd - startup exit abexit valgrindabexit all none' \
   '--track-fds=-[track open file descriptors]:enable [no]:(yes no all)' \
   '--time-stamp=-[add timestamps to log messages]:enable:(yes no)' \
   '--log-fd=-[log messages to specified file descriptor]:file descriptor:_file_descriptors' \
   '--log-file=-[log messages to specified file with pid appended]:file:_files' \
   '--log-socket=-[log messages to socket]:ipaddr\:port' \
+  '--enable-debuginfod=-[query debuginfod servers for missing debuginfo]:enable [yes]:(no yes)' \
   '*--fullpath-after=-[show full source paths in call stacks]::prefix to remove from paths:_directories' \
   '--extra-debuginfo-path=-[specify absolute path to search for additional debug symbols]:path:_directories' \
   '--debuginfo-server=-[specify server to query for debug symbols]:server:_hosts' \
@@ -233,6 +235,7 @@ _arguments -C ${(P)args} $cmd \
   '--run-libc-freeres=-[free up glibc memory at exit]:enable [yes]:(yes no)' \
   '--run-cxx-freeres=-[free up libstdc++ memory at exit]:enable [yes]:(yes no)' \
   '--sim-hints=-[activate unusual sim behaviours]:hint [none]:_sequence compadd - lax-ioctls lax-doors fuse-compatible enable-outer no-inner-prefix no-nptl-pthread-stackcache fallback-llsc none' \
+  '--scheduling-quantum=-[thread-scheduling timeslice in number of basic blocks]:blocks [100000]' \
   '--fair-sched=-[schedule threads fairly on multicore systems]:enable [no]:(yes no try)' \
   '--kernel-variant=-[handle non-standard kernel variants]:kernel variant:_sequence compadd - bproc android-no-hw-tls android-gpu-sgx5xx android-gpu-adreno3xx' \
   '--merge-recursive-frames=-[merge frames between identical program counters in specified max frames]:frames [0]' \
@@ -247,6 +250,7 @@ _arguments -C ${(P)args} $cmd \
   '--unw-stack-scan-thresh=-[enable stack-scan unwind if fewer than specified number of good frames found]:frames' \
   '--resync-filter=-[attempt to avoid expensive address-space-resync operations]:enable:(yes no verbose)' \
   '--max-threads=-[specify maximum number of threads that valgrind can handle]:threads [500]' \
+  '--realloc-zero-bytes-frees=-[should calls to realloc() with a size of 0 free memory and return NULL]:enable:(yes no)' \
   && return
 
 typeset -a tools

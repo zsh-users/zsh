@@ -24,6 +24,7 @@ case "$service" in
   gnutls-cli*)
     args+=(
       '(--app-proto --starttls-proto)'{--app-proto,--starttls-proto}"=[specify application protocol to use to obtain the server's certificate]:protocol:(https ftp smtp imap ldap xmpp lmtp pop3 nntp sieve postgres)"
+      '(-s --starttls)--starttls-name=[specify hostname presented to the application protocol for STARTTLS]:hostname'
      ':hostname:_hosts'
     )
   ;|
@@ -99,7 +100,7 @@ case "$service" in
       '--post-handshake-auth[enable post-handshake authentication under TLS1.3]'
       '--inline-commands[inline commands of the form ^<cmd>^]'
       '--inline-commands-prefix=[change delimiter used for inline commands]:delimiter [^]'
-      '--fips140-mode[report status of FIPS140-3 mode in gnutls library]'
+      '--fips140-mode[report status of FIPS140-2 mode in gnutls library]'
       '--list-config[report configuration of the library]'
       '--logfile=[redirect informational messages to a specific file]:file:_files'
       '--waitresumption[block waiting for the resumption data under TLS1.3]'
@@ -202,9 +203,11 @@ case "$service" in
       '--seed=[when generating a private key use the given seed]:seed (hex-encoded)'
       '--pubkey-info[print information on a public key]'
       '--to-p12[generate a PKCS #12 structure]'
+      '--pbmac1[use PBMAC1 in a PKCS #12 structure]'
       '(-8 --pkcs8)'{-8,--pkcs8}'[use PKCS #8 format for private keys]'
       '--hash=[specify hash algorithm for signing]:algorithm:(MD5 SHA1 RMD160)'
       '--salt-size=[specify the RSA-PSS key default salt size]:size'
+      '--label=[specify the RSA-OAEP label, encoded in hexadecimal]:label'
       {--inder,--inraw}'[use DER format for input certificates and private keys]'
       {--outder,--outraw}'[use DER format for output certificates and private keys]'
       '--template=[specify template file to use for non-interactive operation]:file:_files'

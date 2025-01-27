@@ -62,7 +62,7 @@ _ssh () {
       '(-v)*-q[quiet operation]' \
       '*-R+[specify remote port forwarding]:remote port forwarding:->forward' \
       '-S+[specify location of control socket for connection sharing]:path to control socket:_files' \
-      '-Q+[query parameters]:query option:((cipher\:"supported symmetric ciphers" cipher-auth\:"supported symmetric ciphers that support authenticated encryption" compression mac\:"supported message integrity codes" kex\:"key exchange algorithms" kex-gss\:"GSSAPI key exchange algorithms" key\:"key types" key-cert\:"certificate key types" key-plain\:"non-certificate key types" key-sig\:"all key types and signature algorithms" protocol-version\:"supported SSH protocol versions" sig\:"supported signature algorithms" help\:"show supported queries" HostbasedAcceptedAlgorithms HostKeyAlgorithms KexAlgorithms MACs PubkeyAcceptedAlgorithms))' \
+      '(- 1 *)-Q+[query parameters]:query option:((cipher\:"supported symmetric ciphers" cipher-auth\:"supported symmetric ciphers that support authenticated encryption" compression mac\:"supported message integrity codes" kex\:"key exchange algorithms" kex-gss\:"GSSAPI key exchange algorithms" key\:"key types" key-cert\:"certificate key types" key-plain\:"non-certificate key types" key-sig\:"all key types and signature algorithms" protocol-version\:"supported SSH protocol versions" sig\:"supported signature algorithms" help\:"show supported queries" HostbasedAcceptedAlgorithms HostKeyAlgorithms KexAlgorithms MACs PubkeyAcceptedAlgorithms))' \
       '-s[invoke subsystem]' \
       '(-t)-T[disable pseudo-tty allocation]' \
       "(-T)*-t[force pseudo-tty allocation${tdesc}]" \
@@ -280,6 +280,7 @@ _ssh () {
       '-O+[specify a key/value option]: : _values option
         "hashalg[select a hash algorithm to use with -D]\:algorithm [both]\:(sha1 sha256)"' \
       '-p+[specify port on remote host]:port number on remote host' \
+      "-q[don't print server host name and banners in comments]" \
       '-T+[specify timeout]: :_numbers -u seconds -d 5 timeout \:s\:seconds m\:minutes h\:hours d\:days w\:weeks' \
       '-t+[specify key types to fetch from scanned hosts]:key type:_sequence compadd - rsa dsa ecdsa ed25519' \
       '-v[verbose mode]'
@@ -300,9 +301,13 @@ _ssh () {
     _arguments \
       '-i+[select identity file]:SSH identity file:_files -g "*(-.^AR)"' \
       '-f[copy keys without trying to check if they are already installed]' \
+      '-F+[specify alternate config file]:config file:_files' \
       '-n[dry run - no keys are actually copied]' \
       '*-o+[specify ssh options]:option string:->option' \
       '-p+[specify port on remote host]:port number on remote host' \
+      '-s[upload public keys with sftp]' \
+      '-t+[specify path on target system]:path [.ssh/authorized_keys]' \
+      '-x[debug script by turning on command tracing]' \
       '(- 1)'{-h,-\?}'[display usage information]' \
       ':remote host name:->userhost' && ret=0
     ;;
@@ -358,6 +363,10 @@ _ssh () {
           ;;
         (#i)canonicalizepermittedcnames=*)
           _message -e 'CNAME rule list (source_domain_list:target_domain_list, each pattern list comma separated)' && ret=0
+          ;;
+        (#i)channeltimeout=*)
+          _values 'channel type' \
+            {agent-connection,direct-tcpip,forwarded-tcpip,session,tun-connection,x11-connection}:interval:'_numbers -u seconds timeout :s:seconds m:minutes h:hours d:days w:weeks' && ret=0
           ;;
         (#i)ciphers=*)
           state=ciphers
@@ -584,6 +593,7 @@ _ssh () {
                 CanonicalizePermittedCNAMEs \
                 CASignatureAlgorithms \
                 CertificateFile \
+                ChannelTimeout \
                 CheckHostIP \
                 Ciphers \
                 ClearAllForwardings \

@@ -1,5 +1,17 @@
 2025-01-27  Oliver Kiddle  <opk@zsh.org>
 
+	* 53328: Completion/Linux/Command/_cpupower,
+	Completion/Linux/Command/_cryptsetup,
+	Completion/Linux/Command/_ethtool,
+	Completion/Linux/Command/_iptables,
+	Completion/Linux/Command/_selinux, Completion/Linux/Command/_sshfs,
+	Completion/Linux/Command/_valgrind, Completion/Unix/Command/_abcde,
+	Completion/Unix/Command/_dig, Completion/Unix/Command/_flac,
+	Completion/Unix/Command/_gnutls, Completion/Unix/Command/_jq,
+	Completion/Unix/Command/_pv, Completion/Unix/Command/_sqlite,
+	Completion/Unix/Command/_ssh, Completion/X/Command/_zeal: 
+	completion options update
+
 	* 53326: Completion/Linux/Command/_findmnt,
 	Completion/Linux/Command/_free, Completion/Linux/Command/_losetup,
 	Completion/Linux/Command/_lsblk, Completion/Linux/Command/_pidof,
