@@ -17,6 +17,7 @@ case $variant in
       '(-w --with-workers)'{-w,--with-workers}'[show kernel workers too]' \
       "(-x $exargs)"-x'[include shells running named scripts]' \
       "($exargs)"\*{-o+,--omit-pid=}'[omit processes with PIDs]:pids:_sequence -s , _pids' \
+      '(-t --lightweight)'{-t,--lightweight}'[list threads too]' \
       '(-S --separator)'{-S+,--separator=}'[specify separator put between PIDs]:separator' \
       '*:process:->procnames' \
       && return 0

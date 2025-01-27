@@ -196,6 +196,7 @@ case ${variant}:${${service#ping}:-4} in
   ;;
   iputils:*)
     args+=(
+      '-3[RTT precision (do not round up the result time)]'
       '-A[adaptive]'
       '-b[allow pinging a broadcast address]'
       "-B[don't allow ping to change source address]"
@@ -204,12 +205,14 @@ case ${variant}:${${service#ping}:-4} in
       '-e+[define identifier for ping session]:identifier'
       '(-4)-F+[allocate and set 20-bit flow label]:flow label (hex)'
       '(-)-h[show usage information]'
+      '(-n)-H[force reverse DNS name resolution even for numeric destination]'
       '-I+[specify source interface]:interface:_net_interfaces'
       '-m+[specify mark to tag outgoing packets]:mark'
       "-M+[specify path MTU discovery strategy]:strategy:((
         do\:prohibit\ fragmentation,\ even\ local\ one
 	want\:do\ PMTU\ discovery
-	dont\:don\'t\ set\ DF\ flag))"
+	dont\:don\'t\ set\ DF\ flag
+        probe\:set\ DF\ flag\ and\ bypass\ PMTU\ checks))"
       '(-4)-N+[send ICMPv6 node information queries instead of echo request]:sub option'
       '-O[report outstanding ICMP ECHO reply before sending next packet]'
       '-Q+[set Quality of Service-related bits in ICMP datagrams]:QoS TOS bits'

@@ -32,6 +32,7 @@ case $variant in
       '(-D --disassemble-all)'{-D,--disassemble-all}'[display assembler contents of all sections]'
       '(-S --source)'{-S,--source}'[intermix source code with disassembly]'
       '--source-comment=-[prefix lines of source code with specified text]::text prefix [# ]'
+      '(-Z --decompress)'{-Z,--decompress}'[decompress section(s) before displaying their contents]'
       '(-g --debugging)'{-g,--debugging}'[display debug information in object file]'
       '(-e --debugging-tags)'{-e,--debugging-tags}'[display debug information using ctags style]'
       '(-G --stabs)'{-G,--stabs}'[display (in raw form) any STABS info in the file]'
@@ -176,13 +177,14 @@ case "$state" in
         'O[str-offsets]' \
         "o[loc]" "R[ranges]" "t[pubtypes]" "U[trace_info]" "u[trace_abbrev]" \
         "T[trace_aranges]" "g[gdb_index]" "A[addr]" "c[cu_index]" "k[links]" \
-        "K[follow-links]" && ret=0
+        "K[follow-links]" "D[use-debuginfod]" "E[do-not-use-debuginfod]" && ret=0
   ;;
   dwarf-names)
     _sequence _wanted dwarf-sections expl "dwarf section" compadd - \
         rawline decodedline info abbrev pubnames aranges macro frames \
         frames-interp str str-offsets loc Ranges pubtypes gdb_index trace_info \
-        trace_abbrev trace_aranges addr cu_index links follow-links && ret=0
+        trace_abbrev trace_aranges addr cu_index links follow-links \
+        use-debuginfod do-not-use-debuginfod && ret=0
   ;;
   bfdnames)
     _wanted targets expl target compadd - \

@@ -172,6 +172,7 @@ case $OSTYPE in
       '--headers[repeat header lines, one per page of output]'
       '(--cols --columns --width)'{--cols,--columns,--width}'[set screen width]:width'
       '(--lines --rows)'{--lines,--rows}'[set screen height]'
+      '--signames[display signal masks using signal names]'
       '--cumulative[include child process data with the parent]'
       '-n[set namelist file for WCHAN display]:file:_files'
       '(--no-headers --no-heading)'{--no-headers,--no-heading}'[suppress headers]'

@@ -8,6 +8,10 @@ typeset -A opt_args
 _arguments -C -s -S \
   '(H -A --noempty)'{-A,--noempty}"[don't print empty devices]" \
   '(H -E --dedup)'{-E+,--dedup=}'[de-duplicate output by specified column]:column:->columns' \
+  '(H -Q --filter)'{-Q+,--filter=}'[only print lines matching expression]:expression' \
+  '(H)--highlight=[color lines matching expression]:expression' \
+  '(H)*--ct-filter=[restrict the next counter]:expression' \
+  '(H)*--ct=[define a custom counter]:name\:param\:func' \
   '(H -a --all)'{-a,--all}'[print all devices]' \
   '(H -b --bytes)'{-b,--bytes}'[print size in bytes rather than in human readable format]' \
   '(H -d --nodeps)'{-d,--nodeps}"[don't print slaves or holders]" \
@@ -40,6 +44,7 @@ _arguments -C -s -S \
   '(H)'{-P,--pairs}'[use key="value" output format]' \
   '(H)'{-r,--raw}'[use raw output format]' \
   + 'H' \
+  '(* -)'{-H,--list-columns}'[list the available columns]' \
   '(* -)'{-h,--help}'[display help information]' \
   '(* -)'{-V,--version}'[display version information]' && ret=0
 
@@ -56,7 +61,7 @@ case $state in
   ;|
   column*)
     values=(
-      ${${${${(f)"$(_call_program columns lsblk -h)"}[(r)Available*,-2]## #}[2,-1]//:/\\:}/  /:}
+      ${${${${(f)"$(_call_program columns lsblk --list-columns)"}## #}//:/\\:}/ <[^>]#> #/:}
     )
     _describe -t fields column values -M 'm:{a-z}={A-Z}' $suf -F dedup && ret=0
   ;;

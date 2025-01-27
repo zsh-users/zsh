@@ -19,8 +19,8 @@ args=(
   '(-D --use-dynamic)'{-D,--use-dynamic}'[use dynamic section info when showing symbols]'
   \*{-x,--hex-dump=}"[dump contents of specified section as bytes]:section:($sections)"
   \*{-p,--string-dump=}"[dump contents of specified section as strings]:section:($sections)"
-  '-w+[show the contents of DWARF2 debug sections]::debug section:(a A r c L f F g i o m p t R l s O u T U k K N)'
-  '--debug-dump=[show the contents of DWARF2 debug sections]::section:(abbrev addr aranges cu_index decodedline frames frames-interp gdb_index info loc macro pubnames pubtypes Ranges rawline str str-offsets trace_abbrev trace_aranges trace_info links follow-links no-follow-links)'
+  '*-w+[show the contents of DWARF2 debug sections]::debug section:(a A r c f F g i k K N D E l L m o O p r R s t T u U)'
+  '*--debug-dump=[show the contents of DWARF2 debug sections]::section:(abbrev addr cu_index frames frames-interp gdb_index info links follow-links no-follow-links use-debuginfod do-not-use-debuginfod rawline decodedline macro loc str-offsets pubnames aranges Ranges str pubtype trace_aranges trace_abbrev trace_info)'
   '(-P --process-links)'{-P,--process-links}'[display the contents of non-debug sections in separate debuginfo files]'
   '(-I --histogram)'{-I,--histogram}'[show histogram of bucket list lengths]'
   '(-W --wide)'{-W,--wide}'[allow output width to exceed 80 characters]'
@@ -59,8 +59,11 @@ case $variant in
       '--no-recurse-limit[disable demangling recursion limit]'
       '-U+[specify how to display unicode characters]:method:(d l e x h i)'
       '--unicode=[specify how to display unicode characters]:method:(default locale escape hex highlight invalid)'
+      '(-X --extra-sym-info)'{-X,--extra-sym-info}'[display extra information when showing symbols]'
+      '!(-X --extra-sym-info)--no-extra-sym-info'
       '(-L --lint --enable-checks)'{-L,--lint,--enable-checks}'[display warning messages for possible problems]'
       \*{-R,--relocated-dump=}"[dump contents of specified section as relocated bytes]:section:($sections)"
+      \*{-j,--display-section=}'[display contents of specified section]:section'
       "--dwarf-depth=[don't show DIEs at greater than specified depth]:depth"
       '--dwarf-start=[show DIEs starting at specified depth or deeper]:depth'
       '--ctf=[display compact C type format info from section]:section'

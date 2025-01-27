@@ -2,6 +2,7 @@
 
 _arguments -s \
   '(-l --lohi)'{-l,--lohi}'[show detailed low and high memory statistics]' \
+  '(-L --line)'{-L,--line}'[show output on a single line]' \
   '(-t --total)'{-t,--total}'[show total for RAM + swap]' \
   '(-v --committed)'{-v,--committed}'[show committed memory and commit limit]' \
   '(-w --wide)'{-w,--wide}'[wide mode]' \

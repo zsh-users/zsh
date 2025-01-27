@@ -13,6 +13,7 @@ case "$variant" in
       '(-h --no-dereference)--dereference[dereference symlinks]'
       '(-h --no-dereference --dereference)'{-h,--no-dereference}'[operate on symlinks themselves]'
       '(-f --silent --quiet)'{-f,--silent,--quiet}"[don't report errors]"
+      '--from=[restrict changes to files by current ownership]: :->owner'
       '--preserve-root[fail to operate recursively on /]'
       '--reference=[copy ownership of specified file]:file:_files'
       '(-R --recursive)'{-R,--recursive}'[change files and directories recursively]'
@@ -22,8 +23,6 @@ case "$variant" in
       '(- : *)--help[display help information]'
       '(- : *)--version[display version information]'
     )
-    [[ $service = chown ]] &&
-        args+=( '--from=[restrict changes to files by current ownership]: :->owner' )
     ;;
   *)
     args=(

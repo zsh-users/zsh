@@ -41,6 +41,7 @@ if _pick_variant -r variant gnu=GNU elftoolchain=elftoolchain $OSTYPE --version;
         '(-D --enable-deterministic-archives -U --disable-deterministic-archives)'{-U,--disable-deterministic-archives}'[disable -D behavior]'
         '(-D --enable-deterministic-archives -U --disable-deterministic-archives)'{-D,--enable-deterministic-archives}'[produce deterministic output when stripping archives (zero file metadata)]'
         '--remove-relocations=[remove relocations from specified section]:section'
+        '--strip-section-headers[strip section headers from the output]'
         '--strip-dwo[remove all DWARF .dwo sections]'
         '!(--no-merge-notes)'{-M,--merge-notes}
         "--no-merge-notes[don't attempt to remove redundant notes]"

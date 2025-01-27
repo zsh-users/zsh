@@ -18,7 +18,7 @@ _arguments -s -S \
   - 'info' \
   '(-v --verbose)'{-v,--verbose}'[verbose mode]' \
   '(-o --offset -a --all)'{-a,--all}'[show the status of all loop devices]' \
-  '(-O --output --output-all)'{-O+,--output=}'[specify columns to be printed with --list]:column:_sequence -s , compadd - name autoclear back-file back-ino back-maj\:min maj\:min offset partscan ro sizelimit dio log-sec' \
+  '(-O --output --output-all)'{-O+,--output=}'[specify columns to be printed with --list]:column:_sequence -s , compadd -M "B\:+=" - name autoclear back-file back-ino back-maj\:min back-maj back-min maj\:min maj min offset partscan ref ro sizelimit dio log-sec' \
   '(-O --output)--output-all[output all columns]' \
   '(-J --json --raw -O --output -n --noheadings)'{-J,--json}'[use JSON --list output format]' \
   '(-l --list)'{-l,--list}'[list currently used loop devices]' \
@@ -33,6 +33,7 @@ _arguments -s -S \
   {-D,--detach-all}'[detach all associated loop devices]' \
   - 'create' \
   '--direct-io[open backing file with O_DIRECT]::enable:(on off)' \
+  '--loop-ref=[specify loop device reference]:string' \
   '(-f --find 1)'{-f,--find}'[find the first unused loop device]' \
   '(-L --nooverlap)'{-L,--nooverlap}'[avoid possible conflict between devices]' \
   '(-P --partscan)'{-P,--partscan}'[scan the partition table of newly created loop devices]' \

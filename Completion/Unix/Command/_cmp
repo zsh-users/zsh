@@ -15,7 +15,7 @@ case $variant in
     units=":_numbers -u bytes offset K M G T P E Z Y"
   ;|
   gnu)
-    args=(
+    args+=(
       '(- *)'{-v,--version}'[display version information]'
       '(- *)--help[display help information]'
     )
