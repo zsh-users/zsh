@@ -50,9 +50,14 @@ convertattr(char *attrstr, int sgr)
 	char *c = s, *t = s - 1;
 
 	while (c[0] == '\033' && c[1] == '[') {
-	    c += 2;
-	    while (isdigit(*c) || *c == ';')
-		*++t = *c++;
+	    for (c += 2; ; c++) {
+		if (isdigit(*c))
+		    *++t = *c;
+		else if (*c == ';' || *c == ':')
+		    *++t = ';';
+		else
+		    break;
+	    }
 	    t++;
 	    if (*c != 'm')
 		break;
