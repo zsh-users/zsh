@@ -15,12 +15,13 @@ _arguments -C -S : \
   '(-d --debug -f)'{-d,--debug}'[enable debug output]' \
   '-f[foreground]' \
   '-s[disable multithreaded operation]' \
+  '(-v --verbose)'{-v,--verbose}'[print ssh replies and messages]' \
   ':remote directory:_user_at_host -S:' \
   ':mountpoint:_files -/' && ret=0
 
 if [[ $state == options ]]; then
   # TODO complete ssh(1) options
-  _values -s , "options to ssh, sshfs, mount, or FUSE" \
+  _values -s , "option to ssh, sshfs, mount, or FUSE" \
     'port:number' \
     'compression: :(yes no)' \
     reconnect delay_connect sshfs_sync no_readahead sync_readdir \
@@ -42,14 +43,15 @@ if [[ $state == options ]]; then
     'ssh_protocol:version:(1 2)' \
     sftp_server:path:_files \
     directport:port:_ports \
-    slave disable_hardlink transform_symlinks follow_symlinks no_check_root password_stdin \
-    debug \
-    allow_other allow_root auto_unmount nonempty default_permissions \
+    passive disable_hardlink transform_symlinks follow_symlinks no_check_root password_stdin \
+    max_conns:number \
+    debug nonempty default_permissions \
     fsname:filesystem\ name \
     subtype:filesystem\ type \
     large_read \
     max_read:max\ size \
-    hard_remove use_ino readdir_ino direct_io kernel_cache auto_cache noauto_cache \
+    hard_remove use_ino readdir_ino direct_io \
+    kernel_cache auto_cache noauto_cache \
     'umask:permissions' \
     'uid:owner' 'gid:group' \
     'entry_timeout:timeout (seconds) [1]' \
@@ -58,6 +60,7 @@ if [[ $state == options ]]; then
     'ac_attr_timeout:timeout (seconds) [= attr_timeout]' \
     noforget \
     'remember:time (seconds)' \
+    allow_other allow_root auto_unmount \
     nopath intr \
     'intr_signal:signal [10]' \
     modules:module \

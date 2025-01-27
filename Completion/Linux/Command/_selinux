@@ -1,4 +1,4 @@
-#compdef audit2allow audit2why avcstat chcon checkmodule checkpolicy fixfiles getpidprevcon getsebool matchpathcon newrole restorecon runcon sealert secon sedta seinfo selinuxconlist selinuxdefcon selinuxexeccon semanage semodule semodule_unpackage sepolgen sepolicy sesearch sestatus setenforce setsebool validatetrans
+#compdef audit2allow audit2why avcstat chcon checkmodule checkpolicy fixfiles getpidprevcon getsebool matchpathcon newrole restorecon runcon sealert secon sedismod sedta seinfo selinuxconlist selinuxdefcon selinuxexeccon semanage semodule semodule_unpackage sepolgen sepolicy sesearch sestatus setenforce setsebool validatetrans
 
 # encompasses checkpolicy libselinux-utils policycoreutils
 # policycoreutils-devel policycoreutils-python-utils setools-console
@@ -127,6 +127,7 @@ case $service in
       "${ign}(-h --help)"{-h,--help}'[display help information]'
       '(-U --handle-unknown)'{-U+,--handle-unknown=}'[specify how the kernel should handle unknown classes or permissions]:action:(deny allow reject)'
       '(-M --mls)'{-M,--mls}'[enable the MLS policy when checking and compiling the policy]'
+      '(-N --disable-neverallow)'{-N,--disable-neverallow}"[don't check neverallow rules]"
       '(-o --output)'{-o+,--output=}'[write a policy file]:file:_files'
       '-c+[specify the policy version]:policy version [latest]'
       ':input file:_files'
@@ -154,7 +155,6 @@ case $service in
       '--perm-map=[specify file name of perm map]:file:_files'
       '--interface-info=[specify file name of interface information]:file:_files'
       '(-x --xperms)'{-x,--xperms}'[generate extended permission rules]'
-      '--debug[leave generated modules for -M]'
       '(-w --why)'{-w,--why}'[translate SELinux audit messages into a description of why the access was denied]'
       "${ign}(-h --help)"{-h,--help}'[display help information]'
       "${ign}--version[display version information]"
@@ -193,7 +193,7 @@ case $service in
   ;;
 
   checkmodule)
-    args=(
+    args+=(
       "${ign}(-)"{-V,--version}'[show policy versions created by this program]'
       '-m[build a policy module instead of a base module]'
       '-c+[build a policy module targeting a modular policy version]:version (4-21)'
@@ -201,7 +201,7 @@ case $service in
   ;;
 
   checkpolicy)
-    args=(
+    args+=(
       '(-F --conf)'{-F,--conf}'[write policy.conf file rather than binary policy file]'
       '(-d --debug)'{-d,--debug}'[enter debug mode after loading the policy]'
       '(-S --sort)'{-S,--sort}'[sort ocontexts before writing out the binary policy]'
@@ -347,6 +347,10 @@ case $service in
     )
   ;;
 
+  sedismod)
+    args=( ':pp file:_files -g "*.pp(-.)"' )
+  ;;
+
   sedta)
     args=(
       '(-p --policy)'{-p+,--policy=}'[specify path to SELinux policy to analyze]:policy:_files'
@@ -410,7 +414,10 @@ case $service in
 
   selinuxdefcon)
     args=(
+      '-r+[specify role]:role'
       '-l+[specify mcs/mls level]:level'
+      '-s+[specify service]:service'
+      '-v[verbose output]'
       ':user:_users'
       ':context:_selinux_contexts'
     )
@@ -726,8 +733,6 @@ case $service in
       '--auditallowxperm[search auditallowxperm rules]'
       '--dontaudit[search dontaudit rules]'
       '--dontauditxperm[search dontauditxperm rules]'
-      '--neverallow[search neverallow rules]'
-      '--neverallowxperm[search neverallowxperm rules]'
       '(-T --type_trans)'{-T,--type_trans}'[search type_transition rules]'
       '--type_change[search type_change rules]'
       '--type_member[search type_member rules]'

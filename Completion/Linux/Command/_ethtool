@@ -157,7 +157,7 @@ if [[ -n $state ]]; then
     _wanted files expl 'file' _files
   ;;
   rx-flow-hash)
-    _wanted flow-types expl 'flow type' compadd {tcp,udp,ah,esp,sctp}{4,6}
+    _wanted flow-types expl 'flow type' compadd {tcp,udp,ah,esp,sctp}{4,6} gtp{c{4,6}{,t},u{4,6}{,e,u,d}}
   ;;
   rule)
     _message -e ids 'rule id'
@@ -177,6 +177,9 @@ if [[ -n $state ]]; then
   hfunc)
     _message -e functions 'hash function'
   ;;
+  xfrm)
+    _wanted transformations expl transformation compadd symmetric-xor none
+  ;;
   flags)
     _message -e masks mask
   ;;
@@ -185,6 +188,9 @@ if [[ -n $state ]]; then
   ;;
   power-mode-policy)
     _wanted policies expl 'policy' compadd high auto
+  ;;
+  tcp-data-split)
+    _wanted states expl state compadd auto on off
   ;;
   *)
     case ${${(Mk)opt_args:#cmd?*}[1]#cmd?-} in
@@ -209,7 +215,7 @@ if [[ -n $state ]]; then
         'rx-mini[change number of ring entries for the RX Mini ring]' \
         'rx-jumbo[change number of ring entries for the RX Jumbo ring]' \
         'tx[change number of ring entries for the TX ring]' \
-        rx-buf-len cqe-size tx-push rx-push tx-push-buf-len
+        rx-buf-len tcp-data-split cqe-size tx-push rx-push tx-push-buf-len
     ;;
     -d|--register-dump)
       _values -S ' ' -w 'option' \
@@ -306,7 +312,7 @@ if [[ -n $state ]]; then
         '(weight default)equal' \
         '(equal default)weight' \
         '(equal weight)default' \
-        hkey hfunc delete
+        hkey hfunc xfrm delete
     ;;
     -f|--flash)
       if (( CURRENT == 4 )); then

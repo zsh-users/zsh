@@ -128,6 +128,27 @@ while
       )
     ;;
     comment) args+=( '--comment[add comment to rule]:comment' ) ;;
+    connbytes)
+      args+=(
+        '--connbytes:size (min\:[max])'
+        '--connbytes-dir:packets:(original reply both)'
+        '--connbytes-mode:mode:(packets bytes avgpkt)'
+      )
+    ;;
+    connlabel)
+      args+=(
+        '--label[match if label name has been set on a connection]:label'
+        '--set[set label on connection]'
+      )
+    ;;
+    connlimit)
+      args+=(
+        --connlimit-{upto,above}:connections
+        '--connlimit-mask:prefix length'
+        --connlimit-{s,d}addr
+      )
+    ;;
+    connmark) args+=( --mark:value ) ;;
     conntrack)
       args+=(
         '--ctstate[match packet state]:state:->cfstates'
@@ -136,18 +157,69 @@ while
 	'--ctorigdst[match original destination address]:*^!:network:_hosts'
 	'--ctreplsrc[match reply source address]:*^!:network:_hosts'
 	'--ctrepldst[match reply destination address]:*^!:network:_hosts'
+        --ct{orig,repl}{src,dst}port':port:_ports'
 	'--ctstatus[match internal conntrack states]:state:(NONE EXPECTED SEEN_REPLY ASSURED)'
 	'--ctexpire[match remaining lifetime]:time'
+        '--ctdir:direction:(original reply)'
       )
     ;;
+    cpu) args+=( --cpu:number ) ;;
+    dccp)
+      args+=(
+        --{s,d,source-,destination-}port:port:_ports
+        '--dccp-types:type:_sequence compadd - REQUEST RESPONSE DATA ACK DATAACK CLOSEREQ CLOSE RESET SYNC SYNCACK INVALID'
+        --dccp-option:option
+      )
+    ;;
+    devgroup) args+=( --{src,dst}group:name ) ;;
     dscp)
       args+=(
         '--dscp[match DSCP field]:value'
 	'--dscp-class[match the DiffServ class]:class'
       )
     ;;
+    dst) args+=( --dst-len:length --dst-opts:type ) ;;
+    ecn) args+=( --ecn-{tcp-{cwr,ece},ip-ect} ) ;;
     esp) args+=( '--espspi[match SPIs in ESP header]:*^!:spi' ) ;;
+    frag)
+      args+=(
+        --fragid:id --fraglen:length
+        --frag{res,first,more,last}
+      )
+    ;;
+    hashlimit)
+      args+=(
+        --hashlimit-{upto,above,burst}:amount
+        '--hashlimit-mode:object:_sequence compadd - srcip srcport dstip dstport'
+        --hashlimit-{src,dst}mask:prefix
+        --hashlimit-name:name
+        --hashlimit-htable-size:buckets
+        --hashlimit-htable-max:entries
+        --hashlimit-htable-{expire,gcinterval}:msec
+        --hashlimit-rate-match
+        --hashlimit-rate-intervale:sec
+      )
+    ;;
+    hbh) args+=( --hbh-len:length --hbh-opts:type ) ;;
     helper) args+=( '--helper[match packets related to a conntrack-helper]:helper:(ftp)' ) ;;
+    hl) args+=( --hl-{eq,lt,gt}:value ) ;;
+    icmp) args+=( --icmp-type:type ) ;;
+    icmp6) args+=( --icmpv6-type:type ) ;;
+    iprange) args+=( --{src,dst}-range':IP range' ) ;;
+    ipv6header)
+      args+=(
+        --soft
+        '--header:header(hop dst route frag auth esp none prot)'
+      )
+    ;;
+    ipvs)
+      args+=(
+        --ipvs --vproto:protocol --vaddr:address
+        --vport{,ctl}':port:_ports'
+        '--vdir:directory:(ORIGINAL REPLY)'
+        '--vmethod:method:(GATE IPIP MASQ)'
+      )
+    ;;
     length) args+=( '--length[match packet length]:length' ) ;;
     limit)
       args+=(
@@ -164,31 +236,119 @@ while
 	'--ports[match where source and destination ports are equal]:ports:->port-list'
       )
     ;;
+    nfacct) args+=( --nfacct-name:name ) ;;
+    osf) args+=( --genre:string --{ttl,log}:level ) ;;
     owner)
       args+=(
         '--uid-owner[match packet by user id of creating process]:user id'
 	'--gid-owner[match packet by ggroup id of creating process]:group id'
 	'--pid-owner[match packet by process id of creating process]:process id:_pids'
 	'--sid-owner[match packet by session id of creating process]:session id'
-	'--cmd-owner[match packet by name of creating command]:command:_command_names -e'
+        --suppl-groups --socket-exists
       )
     ;;
     physdev)
       args+=(
         '--physdev-in[specify bridge port via which packet is received]:name'
         '--physdev-out[specify bridge port via which packet is sent]:name'
+        --physdev-is-{in,out,bridged}
       )
     ;;
     pkttype) args+=( '--pkt-type[match link-layer packet type]:type:(unicast broadcast multicast)' ) ;;
+    policy)
+      args+=(
+        '--dir:direction:(in out)'
+        '(--strict)--pol:policy:(none ipsec)'
+        '(--pol)--strict'
+        --reqid:id --spi:id
+        '--proto:encapsulation protocol:(ah esp ipcomp)'
+        '--mode:encapsulation mode:(tunnel transport)'
+        --tunnel-{src,dst}:addr --next
+      )
+    ;;
+    quota) args+=( '--quota:quota (bytes)' ) ;;
+    rateest)
+      args+=(
+        --rateest-{delta,lt,gt,eq}
+        --rateest{,1,2}:name
+        --rateest-{bps,pps}{,1,2}:value
+      )
+    ;;
+    realm) args+=( --realm:value ) ;;
+    recent)
+      args+=(
+        --name:name --r{source,dest} --mask:netmask
+        '(--rcheck --update --remove)--set'
+        '(--set --update --remove)--rcheck'
+        '(--set --rcheck --remove)--update'
+        '(--set --rcheck --update)--remove'
+        --seconds:seconds --reap --hitcount:hits --rttl
+      )
+    ;;
+    rpfilter) args+=( --loose --validmark --accept-local --invert ) ;;
+    rt)
+      args+=(
+        --rt-type:type --rt-segsleft:number --rt-len:length
+        --rt-0-{res,not-strict} --rt-0-addrs:address
+      )
+    ;;
+    sctp)
+      args+=(
+        --{s,d,source-,destination-}port:port:_ports
+        '--chunk-types:match type:(all any only):chunk type'
+      )
+    ;;
+    set)
+      args+=(
+        '--match-set:set: :flag'
+        --return-nomatch --update-counters --update-subcounters
+        --{packet,byte}s-{eq,lt,gt}:value
+      )
+    ;;
+    socket) args+=( --transparent --nowildcard --restore-skmark ) ;;
     state)
       args+=(
         '--state[match packet state]:state:->states'
       )
     ;;
+    statistic) args+=( --mode:mode --{probability,every,packet}:value ) ;;
+    string)
+      args+=(
+        '--algo:strategy:(bm kmp)'
+        --{from,to}:offset
+        --{,hex}string:pattern
+        -icase
+      )
+    ;;
+    tcp)
+      args+=(
+        --{s,d,source-,destination-}port:port:_ports
+        '--tcp-flags:mask:->tcp-flags:comp:->tcp-flags'
+        --syn --tcp-option:option
+      )
+    ;;
+    tcpmss) args+=( --mss:value ) ;;
+    time)
+      args+=(
+        --date{start,stop}:date --time{start,stop}:time
+        --{month,week}days:day
+        --contiguous --kerneltz
+      )
+    ;;
     tos) args+=( '--tos[match type of service field]:type of service:->tos' ) ;;
-    ttl) args+=( '--ttl[match type to live]:TTL value' ) ;;
+    ttl) args+=( '--ttl-'{eq,lt,gt}':TTL value' ) ;;
+    u32) args+=( '--u32:tests' ) ;;
+    udp) args+=( --{s,d,source-,destination-}port:port:_ports ) ;;
   esac
 done
+
+if (( CURRENT > 2 )); then
+  if [[ $words[CURRENT-1] = (|\\)\! && ! -prefix - ]]; then
+    args+=( '*: :compadd -S "" - -' )
+  else
+    args+=( '*:negation:(!)' )
+  fi
+fi
 
 _arguments -C -s \
   '(-)'{-h,--help}'[print program information]' \
@@ -211,13 +371,13 @@ _arguments -C -s \
   "($cmds -s --src --source)"{-s,--src,--source}'[specify source]:*^!:network:_sequence _hosts' \
   "($cmds -d --dst --destination)"{-d,--dst,--destination}'[specify destination]:*^!:network:_sequence _hosts' \
   "($cmds -j --jump)"{-j,--jump}'[specify rule target]:target:->targets' \
+  "($cmds -g --goto)"{-g,--goto}'[jump to chain with no return]:target:->targets' \
   "($cmds -i --in-interface)"{-i,--in-interface}'[specify interface via which packet is received]:*^!:interface:_net_interfaces' \
   "($cmds -o --out-interface)"{-o,--out-interface}'[specify interface via which packet is to be sent]:*^!:interface:_net_interfaces' \
   "($cmds -f --fragment)"{-f,--fragment}'[match second or further fragments only]' \
   "($cmds -D --delete -c --set-counters)"{-c,--set-counters}'[initialise packet and byte counters]:packets: :bytes' \
   '(-v --verbose)'{-v,--verbose}'[enable verbose output]' \
   '(-w --wait)'{-w,--wait}'[specify maximum wait to acquire xtables lock before giving up]: :_numbers -u seconds -d 1 wait' \
-  '(-W --wait-interval)'{-W,--wait-interval}'[specify wait time to try to acquire xtables lock]: :_numbers -u usecs -d "1 second" wait' \
   '(-n --numeric)'{-n,--numeric}'[print IP addresses and port numbers in numeric format]' \
   '(-x --exact)'{-x,--exact}'[expand numbers (display exact values)]' \
   '--line-numbers[print line numbers when listing]' \

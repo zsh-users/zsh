@@ -8,6 +8,7 @@ _arguments -S \
   ':query:->queries' \
   + '(opt)' \
   {-h,--help}'[display help information]' \
+  --help-all'[display help, including generic Qt options]' \
   {-v,--version}'[display version information]' \
   {-f,--force}'[force the application to run]' && ret=0
 

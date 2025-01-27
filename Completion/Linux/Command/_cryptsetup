@@ -13,7 +13,7 @@ _arguments -s \
   '(-y --verify-passphrase)'{-y,--verify-passphrase}'[query for password twice]' \
   '(-d --key-file)'{-d+,--key-file=}'[set keyfile]:key file:_files' \
   '--master-key-file=[set master key]:key file:_files' \
-  '--dump-master-key[dump luks master key]' \
+  '--dump-volume-key[dump volume key instead of keyslots info]' \
   '(-s --key-size)'{-s+,--key-size=}'[set key size]:size (bits)' \
   '(-l --keyfile-size)'{-l+,--keyfile-size=}'[set keyfile size]:size (bytes)' \
   '--keyfile-offset=[specify number of bytes to skip in keyfile]:offset (bytes)' \
@@ -37,8 +37,35 @@ _arguments -s \
   '--shared[share device with another non-overlapping crypt segment]' \
   '--uuid=[set device UUID]:uuid' \
   '--allow-discards[allow discard (aka TRIM) requests for device]' \
+  '--cancel-deferred[cancel previously set deferred device removal]' \
+  '--disable-blkid[disable blkid on-disk signature detection and wiping]' \
+  '--disable-external-tokens[disable loading of external LUKS2 token plugins]' \
+  "--disable-veracrypt[don't scan for VeraCrypt compatible device]" \
+  '--dump-json-metadata[dump info in JSON format (LUKS2 only)]' \
+  '--dump-volume-key[dump volume key instead of keyslots info]' \
+  '--external-tokens-path=[specify path to directory with external token handlers (plugins)]:path:_directories' \
+  '--force-offline-reencrypt[force offline LUKS2 reencryption and bypass active device detection]' \
   '--header=[device or file with separated LUKS header]:file:_files' \
-  '--test-passphrase[do not activate device, just check passphrase]' \
+  '--hw-opal[use HW OPAL encryption together with SW encryption]' \
+  '--hw-opal-factory-reset[wipe WHOLE OPAL disk on luksErase]' \
+  '--hw-opal-only[use only HW OPAL encryption]' \
+  '--keep-key[do not change volume key]' \
+  '--link-vk-to-keyring=[set keyring where to link volume key]:string' \
+  '--new-keyfile=[read the key for a new slot from a file]:file:_files' \
+  '--new-key-slot=[specify slot number for new key]:slot [first free]' \
+  '--new-token-id=[token number]:number [any]' \
+  '--progress-json[print progress data in json format]' \
+  "--test-args[don't run action, just validate all command line parameters]" \
+  '--volume-key-file=[use the volume key from file]:file:_files' \
+  '--volume-key-keyring=[use the specified keyring key as a volume key]:key' \
+  '(-B --block-size)'{-B+,--block-size=}'[reencryption block size]:block size (MiB)' \
+  '(-N --new)'{-N,--new}'[create new header on not encrypted device]' \
+  '--use-directio[use direct-io when accessing devices]' \
+  '--use-fsync[use fsync after each block]' \
+  '--write-log[update log file after every block]' \
+  "--test-passphrase[don't activate device, just check passphrase]" \
+  '--token-replace[replace the current token]' \
+  '--token-type=[restrict allowed token types used to retrieve LUKS2 key]:string' \
   '--tcrypt-hidden[use hidden header (hidden TCRYPT device)]' \
   '--tcrypt-system[device is system TCRYPT drive (with bootloader)]' \
   '--tcrypt-backup[use backup (secondary) TCRYPT header]' \
@@ -118,6 +145,7 @@ case $state in
       'luksDump:dump header information'
       'tcryptDump:dump TCRYPT device information'
       'bitlkDump:dump BITLK device information'
+      'fvault2Dump:dump FVAULT2 device information'
       'luksSuspend:suspend LUKS device and wipe key'
       'luksResume:resume suspended LUKS device'
       'luksHeaderBackup:store binary backup of headers'

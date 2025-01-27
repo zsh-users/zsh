@@ -56,6 +56,7 @@ options+=(
   $^dashes'-newline[set output row separator]:separator [\n]'
   $^dashes'-nofollow[refuse to open symbolic links to database files]'
   $^dashes'-nonce[set the safe-mode escape nonce]:string'
+  $^dashes'-no-rowid-in-view[disable rowid-in-view using sqlite3_config()]'
   $^dashes'-pagecache[specify size and number of slots for page cache memory]:size (bytes): :slots'
   $^dashes'-pcachetrace[trace all page cache operations]'
   $^dashes'-readonly[open the database read-only]'
@@ -63,6 +64,7 @@ options+=(
   $^dashes'-stats[print memory stats before each finalize]'
   $^dashes'-unsafe-testing[allow unsafe commands and modes for testing]'
   $^dashes'-vfs[use specified default VFS]:vfs:(unix-dotfile unix-excl unix-none unix-namedsem)'
+  $^dashes'-vfstrace[enable tracing of all VFS calls]'
   $^dashes'-zip[open the file as a ZIP Archive]'
 )
 

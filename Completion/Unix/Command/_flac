@@ -14,9 +14,11 @@ shortops=(
   --show-total-samples
   --show-vendor-tag
   '--show-tag=:FLAC tag'
+  '--show-all-tags'
   '--remove-tag=:FLAC tag'
   '--remove-first-tag=:FLAC tag'
   --remove-all-tags
+  '--remove-all-tags-except=:tag'
   '*--set-tag=:FLAC tag and value: '
   '*--set-tag-from-file=:tag'
   '--import-tags-from=:flat file:_files'
@@ -60,7 +62,7 @@ case $service in
       '(H)--until=[stop at specified sample for each input]:stop (+-mm:ss.ss)' \
       '(H)--ogg[use ogg as a transport layer]' \
       '(H)--serial-number=[serial number to use for the FLAC stream]:serial number' \
-      '(H --force-aiff-format --force-rf64-format --force-wave64-format)--format-raw-format' \
+      '(H --force-aiff-format --force-rf64-format --force-wave64-format --force-legacy-wave-format --force-extensible-wave-format --force-aiff-c-none-format --force-aiff-c-sowt-format)--force-raw-format' \
       '*:file:_files -F line -g "(#i)*.(${${opt_args[(i)decode-*]:+flac|oga}:-wav|aif|aiff|raw|rf64|w64})(-.)"' \
       - 'H' \
       '(-)'{-v,--version}'[display version information]' \
@@ -100,9 +102,13 @@ case $service in
       '(-F --decode-through-errors)'{-F,--decode-through-errors}'[continue decoding through stream errors]' \
       '--apply-replaygain-which-is-not-lossless=:specification' \
       '--cue=[set the beginning and ending cuepoints to decode]:cue point' \
-      '(--force-raw-format --force-rf64-format --force-wave64-format)--force-aiff-format' \
-      '(--force-raw-format --force-aiff-format --force-wave64-format)--force-rf64-format' \
-      '(--force-raw-format --force-aiff-format --force-rf64-format)--force-wave64-format' \
+      '(--force-raw-format --force-rf64-format --force-wave64-format --force-legacy-wave-format --force-extensible-wave-format --force-aiff-c-none-format --force-aiff-c-sowt-format)--force-aiff-format' \
+      '(--force-raw-format --force-aiff-format --force-wave64-format --force-legacy-wave-format --force-extensible-wave-format --force-aiff-c-none-format --force-aiff-c-sowt-format)--force-rf64-format' \
+      '(--force-raw-format --force-aiff-format --force-rf64-format --force-legacy-wave-format --force-extensible-wave-format --force-aiff-c-none-format --force-aiff-c-sowt-format)--force-wave64-format' \
+      '(--force-raw-format --force-aiff-format --force-rf64-format --force-wave64-format --force-extensible-wave-format --force-aiff-c-none-format --force-aiff-c-sowt-format)--force-legacy-wave-format' \
+      '(--force-raw-format --force-aiff-format --force-rf64-format --force-wave64-format --force-legacy-wave-format --force-aiff-c-none-format --force-aiff-c-sowt-format)--force-extensible-wave-format' \
+      '(--force-raw-format --force-aiff-format --force-rf64-format --force-wave64-format --force-legacy-wave-format --force-extensible-wave-format --force-aiff-c-sowt-format)--force-aiff-c-none-format' \
+      '(--force-raw-format --force-aiff-format --force-rf64-format --force-wave64-format --force-legacy-wave-format --force-extensible-wave-format --force-aiff-c-none-format)--force-aiff-c-sowt-format'
   ;;
   metaflac)
     _arguments -S $shared \
@@ -112,10 +118,11 @@ case $service in
       "*:FLAC file:_files -g \*.flac\(-.\)" \
       - 'short' $shortops \
       - 'list' $common --list \
+      '--data-format=:format:(binary binary-headerless text)' \
       '--application-data-format=:format:(text hexdump)' \
       - 'remove' $common --remove \
       - '(ops)' \
       '(-)--help' '(-)--version' \
-      --remove-all --merge-padding --sort-padding
+      --append --remove-all --merge-padding --sort-padding
   ;;
 esac
