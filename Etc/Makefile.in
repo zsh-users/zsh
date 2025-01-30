@@ -43,10 +43,10 @@ INSTALL         = @INSTALL@
 all: FAQ FAQ.html
 
 FAQ: $(sdir)/FAQ.yo
-	$(YODL2TXT) -o FAQ.txt $< && mv FAQ.txt $@
+	$(YODL2TXT) -o FAQ.txt $(sdir)/FAQ.yo && mv FAQ.txt $@
 
 FAQ.html: $(sdir)/FAQ.yo
-	$(YODL2HTML) -o $@ $<
+	$(YODL2HTML) -o $@ $(sdir)/FAQ.yo
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 

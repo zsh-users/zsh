@@ -1,3 +1,8 @@
+2025-01-30  Oliver Kiddle  <opk@zsh.org>
+
+	* 53336: Doc/Makefile.in, Etc/Makefile.in:
+	avoid GNU make specific use of $< in a non-inference rule
+
 2025-01-27  Oliver Kiddle  <opk@zsh.org>
 
 	* github #128: GI <gi1242+zsh@gmail.com>:
