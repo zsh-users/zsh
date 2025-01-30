@@ -489,7 +489,7 @@ static char *
 build_pos_string(LinkList list)
 {
     LinkNode node;
-    int l;
+    int l, buflen;
     char buf[40], *s;
     long p;
 
@@ -499,12 +499,12 @@ build_pos_string(LinkList list)
 	/* This could be used to put an extra colon before the end-of-word
 	 * position if there is nothing missing. */
 	if (p < 0)
-	    sprintf(buf, ":%ld", -p);
+	    buflen = sprintf(buf, ":%ld", -p);
 	else
 #endif
-	    sprintf(buf, "%ld", p);
-	setdata(node, dupstring(buf));
-	l += 1 + strlen(buf);
+	buflen = sprintf(buf, "%ld", p);
+	setdata(node, dupstring_wlen(buf, buflen));
+	l += 1 + buflen;
     }
     s = (char *) zalloc(l * sizeof(char));
     *s = 0;

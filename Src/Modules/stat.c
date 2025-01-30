@@ -236,9 +236,8 @@ statprint(struct stat *sbuf, char *outbuf, char *fname, int iwhich, int flags)
     char *optr = outbuf;
 
     if (flags & STF_NAME) {
-	sprintf(outbuf, (flags & (STF_PICK|STF_ARRAY)) ?
+	optr += sprintf(outbuf, (flags & (STF_PICK|STF_ARRAY)) ?
 		"%s " : "%-8s", statelts[iwhich]);
-	optr += strlen(outbuf);
     }
     *optr = '\0';
 

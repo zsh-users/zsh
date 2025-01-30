@@ -4809,9 +4809,8 @@ bin_print(char *name, char **args, Options ops, int func)
 	    if (d) {
 		int dirlen = strlen(d->dir);
 		char *arg = zhalloc(len[n] - dirlen + strlen(d->node.nam) + 2);
-		sprintf(arg, "~%s%s", d->node.nam, args[n] + dirlen);
+		len[n] = sprintf(arg, "~%s%s", d->node.nam, args[n] + dirlen);
 		args[n] = arg;
-		len[n] = strlen(args[n]);
 	    }
 	    unqueue_signals();
 	}

@@ -555,8 +555,7 @@ putpromptchar(int doprint, int endchar)
 		    if (jobtab[j].stat && jobtab[j].procs &&
 		    	!(jobtab[j].stat & STAT_NOPRINT)) numjobs++;
 		addbufspc(DIGBUFSIZE);
-		sprintf(bv->bp, "%d", numjobs);
-		bv->bp += strlen(bv->bp);
+		bv->bp += sprintf(bv->bp, "%d", numjobs);
 		break;
 	    case 'M':
 		queue_signals();
@@ -782,20 +781,18 @@ putpromptchar(int doprint, int endchar)
 	    case 'L':
 		addbufspc(DIGBUFSIZE);
 #if defined(ZLONG_IS_LONG_LONG) && defined(PRINTF_HAS_LLD)
-		sprintf(bv->bp, "%lld", shlvl);
+		bv->bp += sprintf(bv->bp, "%lld", shlvl);
 #else
-		sprintf(bv->bp, "%ld", (long)shlvl);
+		bv->bp += sprintf(bv->bp, "%ld", (long)shlvl);
 #endif
-		bv->bp += strlen(bv->bp);
 		break;
 	    case '?':
 		addbufspc(DIGBUFSIZE);
 #if defined(ZLONG_IS_LONG_LONG) && defined(PRINTF_HAS_LLD)
-		sprintf(bv->bp, "%lld", lastval);
+		bv->bp += sprintf(bv->bp, "%lld", lastval);
 #else
-		sprintf(bv->bp, "%ld", (long)lastval);
+		bv->bp += sprintf(bv->bp, "%ld", (long)lastval);
 #endif
-		bv->bp += strlen(bv->bp);
 		break;
 	    case '%':
 	    case ')':
@@ -886,8 +883,7 @@ putpromptchar(int doprint, int endchar)
 		    fsptr = fsptr->prev;
 		}
 		addbufspc(DIGBUFSIZE);
-		sprintf(bv->bp, "%d", depth);
-		bv->bp += strlen(bv->bp);
+		bv->bp += sprintf(bv->bp, "%d", depth);
 		break;
 	    }
 	    case 'I':
@@ -904,11 +900,10 @@ putpromptchar(int doprint, int endchar)
 			lineno--;
 		    addbufspc(DIGBUFSIZE);
 #if defined(ZLONG_IS_LONG_LONG) && defined(PRINTF_HAS_LLD)
-		    sprintf(bv->bp, "%lld", flineno);
+		    bv->bp += sprintf(bv->bp, "%lld", flineno);
 #else
-		    sprintf(bv->bp, "%ld", (long)flineno);
+		    bv->bp += sprintf(bv->bp, "%ld", (long)flineno);
 #endif
-		    bv->bp += strlen(bv->bp);
 		    break;
 		}
 		/* else we're in a file and lineno is already correct */
@@ -916,11 +911,10 @@ putpromptchar(int doprint, int endchar)
 	    case 'i':
 		addbufspc(DIGBUFSIZE);
 #if defined(ZLONG_IS_LONG_LONG) && defined(PRINTF_HAS_LLD)
-		sprintf(bv->bp, "%lld", lineno);
+		bv->bp += sprintf(bv->bp, "%lld", lineno);
 #else
-		sprintf(bv->bp, "%ld", (long)lineno);
+		bv->bp += sprintf(bv->bp, "%ld", (long)lineno);
 #endif
-		bv->bp += strlen(bv->bp);
 		break;
 	    case 'x':
 		if (funcstack && funcstack->tp != FS_SOURCE &&
@@ -1990,7 +1984,7 @@ match_highlight(const char *teststr, zattr *on_var, int *layer)
 static int
 output_colour(int colour, int fg_bg, int truecol, char *buf)
 {
-    int atrlen = 3, len;
+    int atrlen = 3;
     char *ptr = buf;
     if (buf) {
 	strcpy(ptr, fg_bg == COL_SEQ_FG ? "fg=" : "bg=");
@@ -2008,14 +2002,11 @@ output_colour(int colour, int fg_bg, int truecol, char *buf)
      */
     } else if (colour > 7) {
 	char digbuf[DIGBUFSIZE];
-	sprintf(digbuf, "%d", colour);
-	len = strlen(digbuf);
-	atrlen += len;
+	atrlen += sprintf(digbuf, "%d", colour);
 	if (buf)
 	    strcpy(ptr, digbuf);
     } else {
-	len = strlen(ansi_colours[colour]);
-	atrlen += len;
+	atrlen += strlen(ansi_colours[colour]);
 	if (buf)
 	    strcpy(ptr, ansi_colours[colour]);
     }

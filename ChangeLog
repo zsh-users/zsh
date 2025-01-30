@@ -1,3 +1,9 @@
+2025-01-30  Oliver Kiddle  <opk@zsh.org>
+
+	* 53332, 53334: Src/builtin.c, Src/prompt.c, Src/Modules/stat.c,
+	Src/Zle/compresult.c, Src/Zle/zle_misc.c:
+	Avoid strlen calls after sprintf
+
 2025-01-27  Oliver Kiddle  <opk@zsh.org>
 
 	* 53329: Src/Modules/hlgroup.c: adapt .zle.sgr for CSI sequences

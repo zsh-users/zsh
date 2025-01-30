@@ -841,9 +841,8 @@ whatcursorposition(UNUSED(char **args))
 	    strcpy(s, mbstr);
 	    s += len;
 	}
-	sprintf(s, " (0%o, %u, 0x%x)", (unsigned int)c,
+	s += sprintf(s, " (0%o, %u, 0x%x)", (unsigned int)c,
 		(unsigned int)c, (unsigned int)c);
-	s += strlen(s);
     }
     sprintf(s, "  point %d of %d(%d%%)  column %d", zlecs+1, zlell+1,
 	    zlell ? 100 * zlecs / zlell : 0, zlecs - bol);
