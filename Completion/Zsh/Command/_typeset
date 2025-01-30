@@ -1,59 +1,61 @@
-#compdef autoload declare export functions integer float local readonly typeset
+#compdef autoload declare export functions integer float local nameref private readonly typeset
 
 local expl state state_descr line func i use curcontext="$curcontext" ret=1
 local fopts="-f -k -z +k +z"
-local popts="-A -E -F -L -R -T -Z -a -g -h -H -i -l -r -x"
+local popts="-A -E -F -L -R -T -Z -a -g -h -H -i -l -n -r -x"
 local -A allargs opt_args
 local -a args
 
 allargs=(
-  A "($fopts -E -F -L -R -T -U -Z -a -i -m)-A[specify that arguments refer to associative arrays]"
-  E "($fopts -A -F -L -R -T -U -Z -a -i -m)-E[floating point, use engineering notation on output]"
-  F "($fopts -A -E -L -R -T -U -Z -a -i -m)-F[floating point, use fixed point decimal on output]"
-  L "($fopts -A -E -F -i)-L+[left justify and remove leading blanks from value]:width"
-  R "($fopts -A -E -F -i)-R+[right justify and fill with leading blanks]:width"
-  T "($fopts -A -E -F -a -g -h -i -l -m -t)-T[tie scalar to array or trace function]"
+  A "($fopts -E -F -L -R -T -U -Z -a -i -m -n)-A[specify that arguments refer to associative arrays]"
+  E "($fopts -A -F -L -R -T -U -Z -a -i -m -n)-E[floating point, use engineering notation on output]"
+  F "($fopts -A -E -L -R -T -U -Z -a -i -m -n)-F[floating point, use fixed point decimal on output]"
+  L "($fopts -A -E -F -i -n)-L+[left justify and remove leading blanks from value]:width"
+  R "($fopts -A -E -F -i -n)-R+[right justify and fill with leading blanks]:width"
+  T "($fopts -A -E -F -a -g -h -i -l -m -n -t)-T[tie scalar to array or trace function]"
   Tf "($popts -t)-T[trace execution of this function only]"
-  Tp "($fopts -A -E -F -a -g -h -i -l -m -t)-T[tie scalar to array]"
+  Tp "($fopts -A -E -F -a -g -h -i -l -m -n -t)-T[tie scalar to array]"
   U '(-A -E -F -i)-U[keep array values unique and suppress alias expansion for functions]'
   Uf '-U[suppress alias expansion for functions]'
-  Up '(-E -F -i)-+U[keep array values unique]'
+  Up '(-E -F -i -n)-+U[keep array values unique]'
   X '+X[immediately autoload function]'
-  Z "($fopts -A -E -F -i)-Z+[right justify and fill with leading zeros]:width"
-  a "($fopts -A -E -F -T -i)-a[specify that arguments refer to arrays]"
+  Z "($fopts -A -E -F -i -n)-Z+[right justify and fill with leading zeros]:width"
+  a "($fopts -A -E -F -T -i +i)-a[specify that arguments refer to arrays]"
   df "-d[default absolute path autoload to fpath]"
   f "($popts)-f[specify that arguments refer to functions]"
-  g "($fopts -T)-+g[do not restrict parameter to local scope]"
-  h "($fopts -T)-+h[hide specialness of parameter]"
-  H "($fopts -T)-+H[hide value of parameter in listings]"
-  i "($fopts -A -E -F -T)-+i[represent internally as an integer]"
+  g "($fopts -T)-+g[don't restrict parameter to local scope]"
+  h "($fopts -T -n)-+h[hide specialness of parameter]"
+  H "($fopts -T -n)-+H[hide value of parameter in listings]"
+  i "($fopts -A -E -F -T -n)-+i[represent internally as an integer]"
   k "($popts -w -z)-+k[mark function for ksh-style autoloading]"
-  l "($popts -T)-l[convert the value to lowercase]"
-  m '(-A -E -F -T -i)-m[treat arguments as patterns]'
+  l "($popts -T -n)-l[convert the value to lowercase]"
+  m '(-A -E -F -T -i -n)-m[treat arguments as patterns]'
+  n "($fopts -A -E -F -H +H -L -R -T -U +U -Z -a -i +i -h +h -l -m -t +t -x +x)-n[make parameter a reference to another parameter]"
   p '-p+[output parameters in form of calls to typeset]::option:((1\:multi-line\ output\ of\ arrays))'
   r '(-f)-+r[mark parameters as readonly]'
   rf '-r[remember autoload path]'
   Rf '-R[remember autoload path, error if not found]'
-  t '(-T)-+t[tag parameters and turn on execution tracing for functions]'
+  t '(-T -n)-+t[tag parameters and turn on execution tracing for functions]'
   tf '(-T)-+t[turn on execution tracing for functions]'
-  tp '(-T)-+t[tag parameters]'
+  tp '(-T -n)-+t[tag parameters]'
   u '-u[convert the value to uppercase or mark function for autoloading]'
   uf '-u[mark function for autoloadling]'
   up '-u[convert the value to uppercase]'
   w '(-k -z)-w[specify that arguments refer to files compiled with zcompile]'
   W '-+W[turn on WARN_NESTED_VAR for function]'
-  x "($fopts)-+x[export parameter]"
+  x "($fopts -n)-+x[export parameter]"
   z "($popts -k -w)-+z[mark function for zsh-style autoloading]"
 )
+allargs[rp]="$allargs[r]"
 
-use="AEFHLRTUZafghiklmprtuxz"
+use="AEFHLRTUZafghiklmnprtuxz"
 
 case ${service} in
   autoload)
     use="URTXdkrtwz"
     func=f
   ;;
-  float) use="EFHghlprtux";;
+  float) use="EFHghlprtux" func=p ;;
   functions)
     use="UkmTtuzW"
     func=f
@@ -66,15 +68,20 @@ case ${service} in
   ;;
   integer)
     use="Hghilprtux"
+    func=p
     allargs[i]='-i+[specify arithmetic base for output]:: :_guard "[0-9]#" base' \
   ;;
-  readonly) use="${use/r/}" ;;
-  local) use="${use//[fgkz]/}" ;;
-  export) use="${use//[fgkxz]/}" ;;
+  readonly) use="${use//[nr]/}" func=p ;;
+  local) use="${use//[fgkpz]/}" func=p ;;
+  export) use="${use//[fgknxz]/}" func=p ;;
+  nameref) use="gpur" func=p ;;
+  private) use="${use//[fgkpzT]/}" func=p ;;
 esac
 
-[[ -z "${words[(r)-*[aA]*]}" ]] || func=p
+[[ -z "${words[(r)-*[AEFHLRTZaghinrx]*]}" ]] || func=p
 [[ -z "${words[(r)-*f*]}" ]] || func=f
+[[ $service = nameref || -n "${words[(r)-*n*]}" ]] &&
+    allargs[up]='-u[reference the upper (calling function) scope]'
 
 # This function uses whacky features of _arguments which means we
 # need to look for options to the command beforehand.
