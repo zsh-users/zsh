@@ -708,7 +708,7 @@ callcompfunc(char *s, char *fn)
 
 	    sav = *ss;
 	    *ss = '\0';
-	    tmp = (linwhat == IN_MATH ? dupstring(s) : multiquote(s, 0));
+	    tmp = (linwhat == IN_MATH ? dupstring_wlen(s, offs) : multiquote(s, 0));
 	    untokenize(tmp);
 	    compprefix = ztrdup(tmp);
 	    *ss = sav;
@@ -1820,7 +1820,7 @@ set_comp_sep(void)
      */
     sav = s[(i = swb - 1 - sqq + dq)];
     s[i] = '\0';
-    qp = (qttype == QT_SINGLE) ? dupstring(s) : rembslash(s);
+    qp = (qttype == QT_SINGLE) ? dupstring_wlen(s, i) : rembslash(s);
     s[i] = sav;
     if (swe < swb)
 	swe = swb;
@@ -2244,10 +2244,10 @@ addmatches(Cadata dat, char **argv)
 	if (dat->aflags & CAF_MATCH) {
 	    lipre = dupstring(compiprefix);
 	    lisuf = dupstring(compisuffix);
-	    lpre = dupstring(compprefix);
-	    lsuf = dupstring(compsuffix);
-	    llpl = strlen(lpre);
-	    llsl = strlen(lsuf);
+	    llpl = strlen(compprefix);
+	    llsl = strlen(compsuffix);
+	    lpre = dupstring_wlen(compprefix, llpl);
+	    lsuf = dupstring_wlen(compsuffix, llsl);
 
 	    /* This used to reference compqiprefix and compqisuffix, why? */
 	    if (llpl + (int)strlen(qipre) + (int)strlen(lipre) != origlpre
@@ -2300,12 +2300,8 @@ addmatches(Cadata dat, char **argv)
 		for (p = lpre + 2; *p && *p != ')'; p++);
 
 		if (*p == ')') {
-		    char sav = p[1];
-
-		    p[1] = '\0';
-		    globflag = dupstring(lpre);
 		    gfl = p - lpre + 1;
-		    p[1] = sav;
+		    globflag = dupstring_wlen(lpre, gfl);
 
 		    lpre = p + 1;
 		    llpl -= gfl;
@@ -2731,7 +2727,7 @@ add_match_data(int alt, char *str, char *orig, Cline line,
 	    sl = tsl;
 	}
 	if (qisl) {
-	    Cline qsl = bld_parts(dupstring(qisuf), qisl, qisl, NULL, NULL);
+	    Cline qsl = bld_parts(dupstring_wlen(qisuf, qisl), qisl, qisl, NULL, NULL);
 
 	    qsl->flags |= CLF_SUF;
 	    qsl->suffix = qsl->prefix;
@@ -2814,7 +2810,7 @@ add_match_data(int alt, char *str, char *orig, Cline line,
 	    line = p;
 	}
 	if (qipl) {
-	    Cline lp, p = bld_parts(dupstring(qipre), qipl, qipl, &lp, NULL);
+	    Cline lp, p = bld_parts(dupstring_wlen(qipre, qipl), qipl, qipl, &lp, NULL);
 
 	    lp->next = line;
 	    line = p;

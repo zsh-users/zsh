@@ -1161,8 +1161,8 @@ comp_match(char *pfx, char *sfx, char *w, Patprog cp, Cline *clp, int qu,
 
 	/* We still break it into parts here, trying to build a sensible
 	 * cline list for these matches, too. */
-	w = dupstring(w);
 	wl = strlen(w);
+	w = dupstring_wlen(w, wl);
 	*clp = bld_parts(w, wl, wl, NULL, NULL);
 	*exact = 0;
     } else {
@@ -2127,7 +2127,7 @@ cmp_anchors(Cline o, Cline n, int join)
 	(j = join_strs(o->wlen, o->word, n->wlen, n->word))) {
 	o->flags |= CLF_JOIN;
 	o->wlen = strlen(j);
-	o->word = dupstring(j);
+	o->word = dupstring_wlen(j, o->wlen);
 
 	return 2;
     }

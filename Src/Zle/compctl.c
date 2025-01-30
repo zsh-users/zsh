@@ -3201,8 +3201,8 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	memcpy(lpre, s, lpl);
     lpre[lpl] = '\0';
     qlpre = quotename(lpre);
-    lsuf = dupstring(s + offs);
-    lsl = strlen(lsuf);
+    lsl = strlen(s + offs);
+    lsuf = dupstring_wlen(s + offs, lsl);
     qlsuf = quotename(lsuf);
 
     /* First check for ~.../... */

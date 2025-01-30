@@ -1,5 +1,10 @@
 2025-01-30  Oliver Kiddle  <opk@zsh.org>
 
+	* 53335: Src/hist.c, Src/string.c, Src/Zle/compcore.c,
+	Src/Zle/compctl.c, Src/Zle/compmatch.c, Src/Zle/computil.c:
+	Remove unused dupstring_glen() function and make use of the
+	dupstring_wlen() variant in more places to avoid a strlen()
+
 	* 53332, 53334: Src/builtin.c, Src/prompt.c, Src/Modules/stat.c,
 	Src/Zle/compresult.c, Src/Zle/zle_misc.c:
 	Avoid strlen calls after sprintf

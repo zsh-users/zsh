@@ -1296,8 +1296,7 @@ parse_cadef(char *nam, char **args)
 		int l = strlen(p) - 1;
 
 		if (*p == '(' && p[l] == ')') {
-		    axor = p = dupstring(p + 1);
-		    p[l - 1] = '\0';
+		    axor = p = dupstring_wlen(p + 1, l - 1);
 		} else
 		    axor = NULL;
 		if (!*p) {
@@ -1317,8 +1316,7 @@ parse_cadef(char *nam, char **args)
 	    p = *++args;
 	    l = strlen(p) - 1;
 	    if (*p == '(' && p[l] == ')') {
-		axor = p = dupstring(p + 1);
-		p[l - 1] = '\0';
+		axor = p = dupstring_wlen(p + 1, l - 1);
 	    } else
 		axor = NULL;
 	    if (!*p) {
@@ -1339,7 +1337,7 @@ parse_cadef(char *nam, char **args)
 
 	    LinkList list = newlinklist();
 	    LinkNode node;
-	    char **xp, sav;
+	    char **xp;
 
 	    while (*p && *p != ')') {
 		for (p++; inblank(*p); p++);
@@ -1351,11 +1349,8 @@ parse_cadef(char *nam, char **args)
 		if (!*p)
 		    break;
 
-		sav = *p;
-		*p = '\0';
-		addlinknode(list, dupstring(q));
+		addlinknode(list, dupstring_wlen(q, p - q));
 		xnum++;
-		*p = sav;
 	    }
 	    /* Oops, end-of-string. */
 	    if (*p != ')') {

@@ -3553,9 +3553,8 @@ bufferwords(LinkList list, char *buf, int *index, int flags)
 	} else if (buf) {
 	    if (IS_REDIROP(tok) && tokfd >= 0) {
 		char b[20];
-
-		sprintf(b, "%d%s", tokfd, tokstrings[tok]);
-		addlinknode(list, dupstring(b));
+		int l = sprintf(b, "%d%s", tokfd, tokstrings[tok]);
+		addlinknode(list, dupstring_wlen(b, l));
 		num++;
 	    } else if (tok != NEWLIN) {
 		addlinknode(list, dupstring(tokstrings[tok]));
