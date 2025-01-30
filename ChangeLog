@@ -1,5 +1,7 @@
 2025-01-30  Oliver Kiddle  <opk@zsh.org>
 
+	* 53337: Doc/Zsh/mod_ksh93.yo, Src/Modules/ksh93.c: allow nameref -p
+
 	* 53336: Doc/Makefile.in, Etc/Makefile.in:
 	avoid GNU make specific use of $< in a non-inference rule
 

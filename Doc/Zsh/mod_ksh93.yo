@@ -12,7 +12,7 @@ The single builtin provided by this module is:
 startitem()
 findex(nameref)
 cindex(named references, creating)
-item(tt(nameref) [ tt(-gur) ] var(pname)[tt(=)var(rname)])(
+item(tt(nameref) [ tt(-gpur) ] var(pname)[tt(=)var(rname)])(
 Equivalent to tt(typeset -n )var(pname)tt(=)var(rname)
 
 However, tt(nameref) is a builtin command rather than a reserved word,
