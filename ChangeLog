@@ -1,5 +1,8 @@
 2025-01-30  Oliver Kiddle  <opk@zsh.org>
 
+	* 53336: Doc/Makefile.in, Etc/Makefile.in:
+	avoid GNU make specific use of $< in a non-inference rule
+
 	* 53335: Src/hist.c, Src/string.c, Src/Zle/compcore.c,
 	Src/Zle/compctl.c, Src/Zle/compmatch.c, Src/Zle/computil.c:
 	Remove unused dupstring_glen() function and make use of the
