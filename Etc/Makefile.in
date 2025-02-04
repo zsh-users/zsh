@@ -53,7 +53,7 @@ FAQ.html: $(sdir)/FAQ.yo
 @CLEAN_MK@
 
 mostlyclean-here:
-	rm -f FAQ.html
+	rm -f FAQ*.html
 
 distclean-here:
 	rm -f Makefile
