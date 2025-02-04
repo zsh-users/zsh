@@ -414,7 +414,7 @@ uninstall.html:
 
 clean-here:
 	rm -f *.html *.info* *.dvi *.ps *.pdf
-	rm -f *.aux *.cp *.cps *.fn *.fns *.ky *.log
+	rm -f *.aux *.cp *.cps *.fn *.fns *.ky *.kys *.log *.idx
 	rm -f *.pg *.pgs *.toc *.tp *.tps *.vr *.vrs
 	rm -rf infodir
 	rm -f texi2html.conf
