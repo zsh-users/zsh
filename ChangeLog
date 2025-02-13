@@ -1,3 +1,8 @@
+2025-02-12  Bart Schaefer  <schaefer@zsh.org>
+
+	* 53360: Src/Zle/complist.c: domenuselect() fails if the previous
+	completion did not generate a list (fix for segfault)
+
 2025-02-04  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* unposted: Doc/Makefile.in, Etc/Makefile.in: remove a few more

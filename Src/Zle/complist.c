@@ -2388,6 +2388,9 @@ domenuselect(Hookdef dummy, Chdata dat)
     char *s;
     char status[MAX_STATUS], *modeline = NULL;
 
+    if (! hasoldlist)
+	return 2;
+
     msearchstack = NULL;
     msearchstr = "";
     msearchstate = MS_OK;
