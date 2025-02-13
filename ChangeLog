@@ -1,5 +1,8 @@
 2025-02-12  Bart Schaefer  <schaefer@zsh.org>
 
+	* 53360: Src/Zle/complist.c: domenuselect() fails if the previous
+	completion did not generate a list (fix for segfault)
+
 	* 53346 (cf. 53350): Util/helpfiles: fix use of "man" on file paths
 
 	* 53348: Doc/Zsh/builtins.yo, Src/builtin.c, Test/K01nameref.ztst:
