@@ -853,7 +853,7 @@ F:previously this could create an infinite recursion and crash
 
  typeset -nm foo=bar
 1:create nameref by pattern match not allowed
-*?*typeset:1: invalid reference
+*?*typeset:1: -m not allowed with -n
 
 #
 # The following tests are run in interactive mode, using PS1 as an

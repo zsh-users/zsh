@@ -2052,8 +2052,10 @@ cindex(named reference)
 cindex(reference, named)
 The flag tt(-n) creates a em(named reference) to another parameter.
 The second parameter need not exist at the time the reference is
-created.  Only tt(-g), tt(-u), and tt(-r) may be used in conjunction with
-tt(-n).  The var(name) so created may not be an array element nor use
+created.  Only the tt(-H), tt(-g), and tt(-r) flags may be used in
+conjunction with tt(-n), having their usual meanings.  The tt(-u)
+flag is special and may be applied to alter the scope of the reference.
+The var(name) so created may not be an array element nor use
 a subscript, but the var(value) assigned may be any valid parameter
 name syntax, even a subscripted array element (including an associative
 array element) or an array slice, which is evaluated when the named
@@ -2286,7 +2288,7 @@ special tt(PATH) parameter is not altered in any way.  It is also possible
 to create a local parameter using `tt(typeset +h )var(special)', where the
 local copy of var(special) will retain its special properties regardless of
 having the tt(-h) attribute.  Global special parameters loaded from shell
-modules (currently those in tt(zsh/mapfile) and tt(zsh/parameter)) are
+modules (for example, those in tt(zsh/mapfile) and tt(zsh/parameter)) are
 automatically given the tt(-h) attribute to avoid name clashes.
 )
 item(tt(-H))(
@@ -2349,7 +2351,7 @@ flag has a different meaning when used with tt(-f); see above.
 item(tt(-u))(
 Convert the result to upper case whenever the parameter is expanded.
 The value is em(not) converted when assigned.
-This flag has a different meaning when used with tt(-f); see above.
+This flag has different meanings when used with tt(-f) or tt(-n); see above.
 )
 item(tt(-x))(
 Mark for automatic export to the environment of subsequently

@@ -2707,10 +2707,18 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	    on |= bit;
 	else if (OPT_PLUS(ops,optval))
 	    off |= bit;
+	else
+	    continue;
+	if (OPT_MINUS(ops,'n')) {
+	    if ((on|off) & ~(PM_READONLY|PM_UPPER|PM_HIDEVAL)) {
+		zwarnnam(name, "-%c not allowed with -n", optval);
+		/* return 1; */
+	    }
+	}
     }
     if (OPT_MINUS(ops,'n')) {
-	if ((on|off) & ~(PM_READONLY|PM_UPPER)) {
-	    zwarnnam(name, "no other attributes allowed with -n");
+	if ((on|off) & ~(PM_READONLY|PM_UPPER|PM_HIDEVAL)) {
+	    /* zwarnnam(name, "no other attributes allowed with -n"); */
 	    return 1;
 	}
 	on |= PM_NAMEREF;
@@ -3049,7 +3057,8 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 		/* It's generally unwise to mass-change the types of
 		 * parameters, but for namerefs it would be fatal */
 		unqueue_signals();
-		zerrnam(name, "invalid reference");
+		zerrnam(name, "%cm not allowed with -n",
+			(OPT_PLUS(ops,'m') ? '+' : '-'));
 		return 1;
 	    }
 	    if (!(on|roff))
