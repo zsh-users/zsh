@@ -54,7 +54,7 @@ $ENV{'GROFF_NO_SGR'} = ''; # We need "classical" formatting of man pages.
 $mantmp = $destdir . '/man.tmp';
 $coltmpbase = 'col.tmp';
 $coltmp = $destdir . '/' . $coltmpbase;
-$args = "$manfile >$mantmp";
+$args = "./$manfile >$mantmp";
 unlink($mantmp);
 &Info('attempting man ', $args);
 if(system('man ' . $args) || !(-s $mantmp)) {

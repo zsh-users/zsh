@@ -1,5 +1,7 @@
 2025-02-12  Bart Schaefer  <schaefer@zsh.org>
 
+	* 53346 (cf. 53350): Util/helpfiles: fix use of "man" on file paths
+
 	* 53348: Doc/Zsh/builtins.yo, Src/builtin.c, Test/K01nameref.ztst:
 	Revise handling of incompatible typeset options when used with -n
 
