@@ -2,48 +2,48 @@
 
 local expl state state_descr line func i use curcontext="$curcontext" ret=1
 local fopts="-f -k -z +k +z"
-local popts="-A -E -F -L -R -T -Z -a -g -h -H -i -l -n -r -x"
+local popts="-A +A -E +E -F +F -L +L -R +R -T -Z +Z -a +a -g +g -h +h -H +H -i +i -l +l -n +n -r +r -x +x"
 local -A allargs opt_args
 local -a args
 
 allargs=(
-  A "($fopts -E -F -L -R -T -U -Z -a -i -m -n)-A[specify that arguments refer to associative arrays]"
-  E "($fopts -A -F -L -R -T -U -Z -a -i -m -n)-E[floating point, use engineering notation on output]"
-  F "($fopts -A -E -L -R -T -U -Z -a -i -m -n)-F[floating point, use fixed point decimal on output]"
-  L "($fopts -A -E -F -i -n)-L+[left justify and remove leading blanks from value]:width"
-  R "($fopts -A -E -F -i -n)-R+[right justify and fill with leading blanks]:width"
-  T "($fopts -A -E -F -a -g -h -i -l -m -n -t)-T[tie scalar to array or trace function]"
-  Tf "($popts -t)-T[trace execution of this function only]"
-  Tp "($fopts -A -E -F -a -g -h -i -l -m -n -t)-T[tie scalar to array]"
-  U '(-A -E -F -i)-U[keep array values unique and suppress alias expansion for functions]'
+  A "($fopts -A +A -E +E -F +F -L +L -R +R -T -U +U -Z +Z -a +a -i +i -m +m -n +n)-+A[specify that arguments refer to associative arrays]"
+  E "($fopts -A +A -E +E -F +F -L +L -R +R -T -U +U -Z +Z -a +a -i +i -m +m -n +n)-+E[floating point, use engineering notation on output]"
+  F "($fopts -A +A -E +E -F +F -L +L -R +R -T -U +U -Z +Z -a +a -i +i -m +m -n +n)-+F[floating point, use fixed point decimal on output]"
+  L "($fopts -A +A -E +E -F +F -L +L -R +R -i -n +n)-+L+[left justify and remove leading blanks from value]:width"
+  R "($fopts -A +A -E +E -F +F -L +L -R +R -i -n +n)-+R+[right justify and fill with leading blanks]:width"
+  T "($fopts -A +A -E -F -a +a -g -h -i -l +l -m +m -n +n -t)-T[tie scalar to array or trace function]"
+  Tf "($popts -t +t -T +T)-+T[trace execution of this function only]"
+  Tp "($fopts -A +A -E +E -F +F -a +a -g -h -i -l +l -m +m -n +n -t)-T[tie scalar to array]"
+  U '(-A +A -E +E -F +F -i)-U[keep array values unique and suppress alias expansion for functions]'
   Uf '-U[suppress alias expansion for functions]'
-  Up '(-E -F -i -n)-+U[keep array values unique]'
+  Up '(-E +E -F +F -i -n +n)-+U[keep array values unique]'
   X '+X[immediately autoload function]'
-  Z "($fopts -A -E -F -i -n)-Z+[right justify and fill with leading zeros]:width"
-  a "($fopts -A -E -F -T -i +i)-a[specify that arguments refer to arrays]"
+  Z "($fopts -A +A -E +E -F +F -Z +Z -i -n +n)-+Z+[right justify and fill with leading zeros]:width"
+  a "($fopts -A +A -E +E -F +F -T -i +i)-+a[specify that arguments refer to arrays]"
   df "-d[default absolute path autoload to fpath]"
-  f "($popts)-f[specify that arguments refer to functions]"
+  f "($popts -f +f)-+f[specify that arguments refer to functions]"
   g "($fopts -T)-+g[don't restrict parameter to local scope]"
-  h "($fopts -T -n)-+h[hide specialness of parameter]"
-  H "($fopts -T -n)-+H[hide value of parameter in listings]"
-  i "($fopts -A -E -F -T -n)-+i[represent internally as an integer]"
+  h "($fopts -T -n +n)-+h[hide specialness of parameter]"
+  H "($fopts -T)-+H[hide value of parameter in listings]"
+  i "($fopts -A +A -E +E -F +F -T -n +n)-+i[represent internally as an integer]"
   k "($popts -w -z)-+k[mark function for ksh-style autoloading]"
-  l "($popts -T -n)-l[convert the value to lowercase]"
-  m '(-A -E -F -T -i -n)-m[treat arguments as patterns]'
-  n "($fopts -A -E -F -H +H -L -R -T -U +U -Z -a -i +i -h +h -l -m -t +t -x +x)-n[make parameter a reference to another parameter]"
+  l "($popts -T -n +n)-+l[convert the value to lowercase]"
+  m '(-A +A -E +E -F +F -T -i -n)-+m[treat arguments as patterns]'
+  n "($fopts -A +A -E +E -F +F -L -R -T -U +U -Z +Z -a +a -i +i -h +h -l +l -m +m -t +t -x +x)-+n[make parameter a reference to another parameter]"
   p '-p+[output parameters in form of calls to typeset]::option:((1\:multi-line\ output\ of\ arrays))'
-  r '(-f)-+r[mark parameters as readonly]'
+  r '(-f -r +r)-+r[mark parameters as readonly]'
   rf '-r[remember autoload path]'
   Rf '-R[remember autoload path, error if not found]'
-  t '(-T -n)-+t[tag parameters and turn on execution tracing for functions]'
-  tf '(-T)-+t[turn on execution tracing for functions]'
-  tp '(-T -n)-+t[tag parameters]'
+  t '(-T -n +n)-+t[tag parameters and turn on execution tracing for functions]'
+  tf '(-t +t -T +T)-+t[turn on execution tracing for functions]'
+  tp '(-T -n +n)-+t[tag parameters]'
   u '-u[convert the value to uppercase or mark function for autoloading]'
   uf '-u[mark function for autoloadling]'
-  up '-u[convert the value to uppercase]'
+  up '(-u +u)-+u[convert the value to uppercase]'
   w '(-k -z)-w[specify that arguments refer to files compiled with zcompile]'
   W '-+W[turn on WARN_NESTED_VAR for function]'
-  x "($fopts -n)-+x[export parameter]"
+  x "($fopts -n +n)-+x[export parameter]"
   z "($popts -k -w)-+z[mark function for zsh-style autoloading]"
 )
 allargs[rp]="$allargs[r]"
@@ -60,8 +60,8 @@ case ${service} in
     use="UkmTtuzW"
     func=f
     args=(
-      '(-k -t -T -u -U -W -x -z -M +M +k +t +W +z)-+M[define mathematical function]'
-      '(-k -m -t -T -u -U -W -x -z +M +k +t +W +z)-s[define mathematical function that takes a string argument]'
+      '(-k -t -T +T -u -U -W -x -z -M +M +k +t +W +z)-+M[define mathematical function]'
+      '(-k -m +m -t -T +T -u -U -W -x -z +M +k +t +W +z)-s[define mathematical function that takes a string argument]'
       '(-M)-x+[specify spaces to use for indentation]:spaces'
       '(-* +*)-c[copy shell function to another name]:old name:_functions:new name:_functions'
     )
