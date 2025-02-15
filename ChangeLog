@@ -1,3 +1,10 @@
+2025-02-15  Bart Schaefer  <schaefer@zsh.org>
+
+	* 53363: Src/builtin.c: permit "typeset -n +m pattern"
+
+	* unposted: Src/builtin.c: fix spurious error printing the value
+	of a read-only named reference
+
 2025-02-13  Oliver Kiddle  <opk@zsh.org>
 
 	* 53358: Completion/Zsh/Command/_typeset: adapt completion to

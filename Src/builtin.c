@@ -2254,7 +2254,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    /* It seems as though these checks should not be specific to
 	     * PM_NAMEREF, but changing that changes historic behavior */
 	    ((on & PM_NAMEREF) != (pm->node.flags & PM_NAMEREF) ||
-	     (asg && (pm->node.flags & PM_NAMEREF)))) {
+	     (asg && (pm->node.flags & PM_NAMEREF))) && !OPT_ISSET(ops,'p')) {
 	    zerrnam(cname, "%s: read-only %s", pname,
 		    (pm->node.flags & PM_NAMEREF) ? "reference" : "variable");
 	    return NULL;
@@ -3053,12 +3053,11 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
     /* With the -m option, treat arguments as glob patterns */
     if (OPT_ISSET(ops,'m')) {
 	if (!OPT_ISSET(ops,'p')) {
-	    if (on & PM_NAMEREF) {
+	    if ((on & PM_NAMEREF) && OPT_MINUS(ops,'m')) {
 		/* It's generally unwise to mass-change the types of
 		 * parameters, but for namerefs it would be fatal */
 		unqueue_signals();
-		zerrnam(name, "%cm not allowed with -n",
-			(OPT_PLUS(ops,'m') ? '+' : '-'));
+		zerrnam(name, "-m not allowed with -n");
 		return 1;
 	    }
 	    if (!(on|roff))
