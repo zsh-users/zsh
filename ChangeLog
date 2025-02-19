@@ -1,3 +1,8 @@
+2025-02-27  Oliver Kiddle  <opk@zsh.org>
+
+	* github #129: Vadim Misbakh-Soloviov:
+	Completion/Unix/Command/_gpg: fix _gpg completion
+
 2025-02-12  Bart Schaefer  <schaefer@zsh.org>
 
 	* 53360: Src/Zle/complist.c: domenuselect() fails if the previous
