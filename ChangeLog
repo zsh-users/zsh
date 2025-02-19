@@ -1,5 +1,8 @@
 2025-02-27  Oliver Kiddle  <opk@zsh.org>
 
+	* github #129: Vadim Misbakh-Soloviov:
+	Completion/Unix/Command/_gpg: fix _gpg completion
+
 	* 53378: Doc/Zsh/builtins.yo, Src/Builtins/rlimits.c, configure.ac:
 	support new pipebuf resource limit on FreeBSD
 
