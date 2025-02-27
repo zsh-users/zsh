@@ -145,6 +145,10 @@ static const resinfo_T known_resources[] = {
     {RLIMIT_UMTXP, "umtxp", ZLIMTYPE_NUMBER, 1,
 		'o', "umtx shared locks"},
 # endif
+# ifdef HAVE_RLIMIT_PIPEBUF /* FreeBSD */
+    {RLIMIT_PIPEBUF, "pipebuf", ZLIMTYPE_MEMORY, 1024,
+		'y', "size of buffers for pipes/fifos"},
+#endif
 
 # ifdef HAVE_RLIMIT_POSIXLOCKS	/* DragonFly */
     {RLIMIT_POSIXLOCKS, "posixlocks", ZLIMTYPE_NUMBER, 1,
