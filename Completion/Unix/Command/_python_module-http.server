@@ -1,0 +1,8 @@
+#autoload
+
+_arguments -S \
+  '(-h --help)'{-h,--help}'[show a help message and exit]' \
+  '--cgi[run as CGI server]' \
+  '(-b --bind)'{-b+,--bind=}'[bind to this address]:address:' \
+  '(-d --directory)'{-d+,--directory=}'[serve this directory]:directory:_directories' \
+  '(-p --protocol)'{-p+,--protocol=}'[conform to this HTTP version]:protcol version:(HTTP/1.0 HTTP/1.1)'

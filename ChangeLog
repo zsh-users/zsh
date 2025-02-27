@@ -1,3 +1,11 @@
+2025-02-28  Oliver Kiddle  <opk@zsh.org>
+
+	* Ronan Pigott: 53393: Completion/Unix/Command/_python,
+	Completion/Unix/Command/_python_module-http.server,
+	Completion/Unix/Command/_python_module-json.tool,
+	Completion/Unix/Command/_python_module-venv:
+	Complete python module arguments
+
 2025-02-27  Oliver Kiddle  <opk@zsh.org>
 
 	* github #129: Vadim Misbakh-Soloviov:

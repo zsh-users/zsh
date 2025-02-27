@@ -1,0 +1,14 @@
+#autoload
+
+_arguments -S \
+  '(-h --help)'{-h,--help}'[show a help message and exit]' \
+  '--system-site-packages[give the virtual environment access to the system site-packages dir]' \
+  '(--symlinks --copies)--symlinks[try to use symlinks rather than copies]' \
+  '(--symlinks --copies)--copies[try to use copies rather than symlinks]' \
+  '(--clear --upgrade)--clear[delete the contents of the environment directory if it already exists]' \
+  '(--clear --upgrade)--upgrade[upgrade the environment directory to use this version of Python]' \
+  '--without-pip[skip installing or upgrading pip]' \
+  '--prompt[provides an alternative prompt prefix for the environment]' \
+  '--upgrade-deps[upgrade core dependencies to the latest version]' \
+  '--without-scm-ignore-files[skip adding SCM ignore files to the environment directory]'
+  '*::virtual environment:_directories'
