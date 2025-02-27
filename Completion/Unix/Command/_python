@@ -56,6 +56,9 @@ case "$state" in
     if [[ -z "$opt_args[(I)-(c|m)]" ]]; then
       shift words
       (( CURRENT-- ))
+    elif [[ -n "$opt_args[(I)-m]" ]]; then
+      local ret
+      _call_function ret _python_module-$opt_args[-m] && return ret
     fi
     _normal && return
     ;;
