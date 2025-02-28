@@ -1,5 +1,9 @@
 2025-02-28  Oliver Kiddle  <opk@zsh.org>
 
+	* 53395: Completion/Unix/Type/_zfs_dataset,
+	Completion/Unix/Command/_zfs:
+	complete snapshot ranges for zfs destroy
+
 	* Ronan Pigott: 53393: Completion/Unix/Command/_python,
 	Completion/Unix/Command/_python_module-http.server,
 	Completion/Unix/Command/_python_module-json.tool,

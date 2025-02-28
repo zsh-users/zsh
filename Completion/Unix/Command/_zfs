@@ -434,7 +434,7 @@ case $service:$words[1] in
       '-R[recursively destroy all dependents]' \
       '(-f)-d[delete or mark deferred]' \
       '(-d)-f[force unmounts]' \
-      ':dataset:_zfs_dataset -t fs -t vol ${=${opt_args[(i)-f]:--t snap}:/-f/} ${=${opt_args[(i)-*]:--t bookmark}:/-?/}'
+      ':dataset:_zfs_dataset -t fs -t vol ${=${opt_args[(i)-f]:--t snap -t range}:/-f/} ${=${opt_args[(i)-*]:--t bookmark}:/-?/}'
   ;;
 
   zfs:snap(|shot))

@@ -1,6 +1,6 @@
 #autoload
 
-local -a type expl_type_arr rsrc rdst paths_allowed
+local -a type expl_type_arr rsrc rdst paths_allowed suf
 local -a typearg datasetlist expl mlist
 local expl_type
 
@@ -9,11 +9,16 @@ local expl_type
 # -r1 indicates that we're completing the source of a rename
 # -r2 indicates that we're completing the destination of a rename
 # -t takes arguments (what kinds of datasets) and can appear multiple times
+#    in addition to the usual types
+#      clone - cloned file systems
+#      mtpt  - add mountpoints
+#      range - allow a range of snapshots
 zparseopts -D -E e:=expl_type_arr p=paths_allowed r1=rsrc r2=rdst t+:=type
 
+suf=( -r '\n\t\- @\\#' )
 [[ -n $type[(r)fs] ]] && typearg=( filesystem )
 [[ -n $type[(r)vol] ]] && typearg+=( volume )
-[[ -n $type[(r)snap] ]] && typearg+=( snapshot )
+[[ -n $type[(r)snap] || -prefix *@ ]] && typearg+=( snapshot )
 [[ -n $type[(r)share] && $implementation = solaris ]] && typearg+=( share )
 [[ -n $type[(r)bookmark] && $implementation = openzfs ]] &&
     typearg+=( bookmark )
@@ -62,7 +67,26 @@ fi
 if [[ -n $type[(r)clone] ]]; then
   datasetlist=( ${(f)"$(zfs list -H -o name,origin -t filesystem 2>/dev/null | awk -F$'\t' "\$2 != \"-\" {print \$1}")":#no cloned filesystems available} )
 else
-	datasetlist=( ${(f)"$(zfs list -H -o name $typearg 2>/dev/null)":#no datasets available} )
+  [[ -n $type[(r)range] && $implementation = openzfs ]] &&
+      typearg+=( -s creation ) suf=( -S% -r '\n\t\- ,' )
+  datasetlist=( ${(f)"$(zfs list -H -o name $typearg 2>/dev/null)":#no datasets available} )
+fi
+
+if [[ -n $type[(r)range] && -prefix *[%,] && $implementation = openzfs ]]; then
+  if [[ -n ${datasetlist[(r)${PREFIX%@*}@*]} ]]; then
+    datasetlist=( ${${(M)datasetlist:#${PREFIX%@*}@*}##*@} )
+    compset -P '*[@,]'
+    # if we can find the starting snapshot filter to later ones
+    [[ -prefix *% ]] && (( ${#datasetlist[(r)${PREFIX%\%*},-1]} > 2 )) &&
+      datasetlist=( ${${datasetlist[(r)${PREFIX%\%*},-1]}[2,-1]} )
+    expl_type=""
+    compset -P '*%' && suf=( -qS, ) expl_type="end "
+    _description snapshots expl "${expl_type}snapshot"
+    compadd $suf "$expl[@]" -a datasetlist
+  else
+    _message -e snapshots 'snapshot'
+  fi
+  return
 fi
 
 expl_type=${typearg[2,-1]//,/\/}
@@ -77,4 +101,4 @@ if [[ -n $expl_type_arr[2] ]]; then
 fi
 
 _description datasets expl "$expl_type"
-_multi_parts "$@" "$expl[@]" -q / datasetlist
+_multi_parts $suf "$@" "$expl[@]" -q / datasetlist
