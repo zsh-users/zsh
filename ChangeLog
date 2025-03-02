@@ -1,3 +1,7 @@
+2025-03-02  Bart Schaefer  <schaefer@toltec-ubuntu>
+
+	* 53368: Src/options.c: ignore no-op changes to EMACS/VI options
+
 2025-02-28  Oliver Kiddle  <opk@zsh.org>
 
 	* 53395: Completion/Unix/Type/_zfs_dataset,

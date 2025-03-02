@@ -887,8 +887,14 @@ dosetopt(int optno, int value, int force, char *new_opts)
 	    acquire_pgrp();
 	}
     } else if ((optno == EMACSMODE || optno == VIMODE) && value) {
+	/* What's going on here:
+	 * 1) unsetopt of either emacs or vi is an effective no-op.
+	 * 2) setopt of either emacs or vi toggles off the other.
+	 * Hence we disallow changing these options in emulation mode,
+	 * but only if the change is setopt rather than unsetopt.
+	 */
 	if (sticky && sticky->emulation)
-	    return -1;
+	    return opts[optno] ? 0 : -1;
 	zleentry(ZLE_CMD_SET_KEYMAP, optno);
 	new_opts[(optno == EMACSMODE) ? VIMODE : EMACSMODE] = 0;
     } else if (optno == SUNKEYBOARDHACK) {
