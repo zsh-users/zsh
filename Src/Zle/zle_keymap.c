@@ -1580,7 +1580,7 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
     Thingy func = t_undefinedkey;
     char *str = NULL;
     int lastlen = 0, lastc = lastchar;
-    int timeout = 0, csi = 0;
+    int timeout = 0, csi = 0, oscdcs = 0;
 
     keybuflen = 0;
     keybuf[0] = 0;
@@ -1647,14 +1647,38 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
 		if (keybuf[keybuflen - 1] >= 0x40 &&
 			keybuf[keybuflen - 1] <= 0x7e && lastlen > csi - 2 &&
 			lastlen <= csi) {
+		    if (keybuf[csi] == '?' && (keybuf[keybuflen - 1] == 'c' ||
+			keybuf[keybuflen - 1] == 'u'))
+		    { /* is a terminal query response - discard */
+			keybuflen = csi - 2;
+			timeout = csi = 0;
+			continue;
+		    }
 		    func = t_undefinedkey;
 		    lastlen = keybuflen;
 		}
 		csi = 0;
 	    }
 	}
+	/* An OSC or DCS sequence is likely a late arriving terminal query
+	 * response. Keep looping; if we reach an ST, discard the sequence
+	 * - unless we first match a keybinding or a keytimeout elapses. */
+	if (oscdcs) {
+	    if (keybuf[keybuflen - 1] == '\007' || /* BEL sometimes used */
+		(keybuf[keybuflen - 2] == '\033' &&
+		 keybuf[keybuflen - 1] == '\\') ||
+		(keybuf[keybuflen - 2] == Meta && /* ST can be 0x9b */
+		 (unsigned char) keybuf[keybuflen - 1] == (0x9b ^ 32)))
+	    {
+		keybuflen = oscdcs - 2; /* discard */
+		timeout = oscdcs = 0;
+		continue;
+	    }
+	} else if (keybuflen >= 2 && keybuf[keybuflen - 2] == '\033' &&
+		(keybuf[keybuflen - 1] == ']' || keybuf[keybuflen - 1] == 'P'))
+	    oscdcs = keybuflen;
 
-	if (!ispfx && !csi)
+	if (!ispfx && !csi && !oscdcs)
 	    break;
     }
     if(!lastlen && keybuflen)

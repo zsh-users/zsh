@@ -1,3 +1,8 @@
+2025-03-03  Oliver Kiddle  <opk@zsh.org>
+
+	* 53394: Src/Zle/zle_keymap.c: drop OSC and DCS sequences in key
+	input as they are likely to be terminal query responses not keys
+
 2025-03-02  Bart Schaefer  <schaefer@toltec-ubuntu>
 
 	* 53368: Src/options.c: ignore no-op changes to EMACS/VI options
