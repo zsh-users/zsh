@@ -1,5 +1,8 @@
 2025-03-03  Oliver Kiddle  <opk@zsh.org>
 
+	* 53399: Src/Zle/zle_keymap.c, Src/builtin.c, Src/init.c,
+	Src/options.c: don't load ZLE early to set keymap
+
 	* 53394: Src/Zle/zle_keymap.c: drop OSC and DCS sequences in key
 	input as they are likely to be terminal query responses not keys
 

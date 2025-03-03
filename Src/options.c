@@ -895,8 +895,9 @@ dosetopt(int optno, int value, int force, char *new_opts)
 	 */
 	if (sticky && sticky->emulation)
 	    return opts[optno] ? 0 : -1;
-	zleentry(ZLE_CMD_SET_KEYMAP, optno);
-	new_opts[(optno == EMACSMODE) ? VIMODE : EMACSMODE] = 0;
+	if (zle_load_state == 1)
+	    zleentry(ZLE_CMD_SET_KEYMAP, optno);
+	new_opts[optno ^ EMACSMODE ^ VIMODE] = 0;
     } else if (optno == SUNKEYBOARDHACK) {
 	/* for backward compatibility */
 	keyboardhackchar = (value ? '`' : '\0');

@@ -255,8 +255,7 @@ static char *argv0;
 
 /**/
 static void
-parseargs(char *zsh_name, char **argv, char **runscript, char **cmdptr,
-	  int *needkeymap)
+parseargs(char *zsh_name, char **argv, char **runscript, char **cmdptr)
 {
     char **x;
     LinkList paramlist;
@@ -273,7 +272,7 @@ parseargs(char *zsh_name, char **argv, char **runscript, char **cmdptr,
      * matched by code at the end of the present function.
      */
 
-    if (parseopts(zsh_name, &argv, opts, cmdptr, NULL, flags, needkeymap))
+    if (parseopts(zsh_name, &argv, opts, cmdptr, NULL, flags))
 	exit(1);
 
     /*
@@ -384,7 +383,7 @@ static void parseopts_setemulate(char *nam, int flags)
 /**/
 mod_export int
 parseopts(char *nam, char ***argvp, char *new_opts, char **cmdp,
-	  LinkList optlist, int flags, int *needkeymap)
+	  LinkList optlist, int flags)
 {
     int optionbreak = 0;
     int action, optno;
@@ -490,14 +489,8 @@ parseopts(char *nam, char ***argvp, char *new_opts, char **cmdp,
 		    return 1;
 		} else if (optno == RESTRICTED && toplevel) {
 		    restricted = action;
-		} else if ((optno == EMACSMODE || optno == VIMODE)
-			   && (!toplevel || needkeymap)){
-		    if (!toplevel) {
-			WARN_OPTION("can't change option: %s", *argv);
-		    } else {
-			/* Need to wait for modules to be loadable */
-			*needkeymap = optno;
-		    }
+		} else if ((optno == EMACSMODE || optno == VIMODE) && !toplevel) {
+		    WARN_OPTION("can't change option: %s", *argv);
 		} else {
 		    if (dosetopt(optno, action, toplevel, new_opts) &&
 			!toplevel) {
@@ -1864,7 +1857,7 @@ zsh_main(UNUSED(int argc), char **argv)
 {
     char **t, *runscript = NULL, *zsh_name;
     char *cmd;			/* argument to -c */
-    int t0, needkeymap = 0;
+    int t0;
 #ifdef USE_LOCALE
     setlocale(LC_ALL, "");
 #endif
@@ -1910,7 +1903,7 @@ zsh_main(UNUSED(int argc), char **argv)
     createoptiontable();
     /* sets emulation, LOGINSHELL, PRIVILEGED, ZLE, INTERACTIVE,
      * SHINSTDIN and SINGLECOMMAND */ 
-    parseargs(zsh_name, argv, &runscript, &cmd, &needkeymap);
+    parseargs(zsh_name, argv, &runscript, &cmd);
 
     SHTTY = -1;
     init_io(cmd);
@@ -1919,15 +1912,6 @@ zsh_main(UNUSED(int argc), char **argv)
     init_signals();
     init_bltinmods();
     init_builtins();
-
-    if (needkeymap)
-    {
-	/* Saved for after module system initialisation */
-	zleentry(ZLE_CMD_SET_KEYMAP, needkeymap);
-	opts[needkeymap] = 1;
-	opts[needkeymap == EMACSMODE ? VIMODE : EMACSMODE] = 0;
-    }
-
     run_init_scripts();
     setupshin(runscript);
     init_misc(cmd, zsh_name);

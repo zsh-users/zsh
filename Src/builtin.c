@@ -6333,7 +6333,7 @@ bin_emulate(char *nam, char **argv, Options ops, UNUSED(int func))
     savehackchar = keyboardhackchar;
     emulate(shname, opt_R, &new_emulation, new_opts);
     optlist = newlinklist();
-    if (parseopts(nam, &argv, new_opts, &cmd, optlist, 0, NULL)) {
+    if (parseopts(nam, &argv, new_opts, &cmd, optlist, 0)) {
 	ret = 1;
 	goto restore;
     }

@@ -1452,7 +1452,10 @@ default_bindings(void)
     linkkeymap(oppmap, "viopp", 0);
     linkkeymap(vismap, "visual", 0);
     linkkeymap(smap, ".safe", 1);
-    linkkeymap(emap, "main", 0);
+    if (isset(VIMODE))
+	linkkeymap(vmap, "main", 0);
+    else
+	linkkeymap(emap, "main", 0);
 
     /* the .safe map cannot be modified or deleted */
     smap->flags |= KM_IMMUTABLE;
