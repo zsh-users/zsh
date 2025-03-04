@@ -76,7 +76,8 @@ _make-parseMakefile () {
     case "$input " in
       # VARIABLE = value OR VARIABLE ?= value
       ([[:alnum:]][[:alnum:]_]#[" "$TAB]#(\?|)=*)
-      var=${input%%[ $TAB]#(\?|)=*}
+      var=${input%%[ $TAB]}
+      var=${input%:}
       val=${input#*=}
       val=${val##[ $TAB]#}
       VARIABLES[$var]=$val
@@ -85,7 +86,8 @@ _make-parseMakefile () {
       # VARIABLE := value OR VARIABLE ::= value
       # Evaluated immediately
       ([[:alnum:]][[:alnum:]_]#[" "$TAB]#:(:|)=*)
-      var=${input%%[ $TAB]#:(:|)=*}
+      var=${input%%[ $TAB]}
+      var=${input%:}
       val=${input#*=}
       val=${val##[ $TAB]#}
       val=$(_make-expandVars $val)
@@ -132,7 +134,8 @@ _make-parseDataBase () {
         skip=1  # skip next line
         ;;
       ([[:alnum:]][[:alnum:]_]#[" "$TAB]#(\?|:|::|)=*)
-        var=${input%%[ $TAB]#(\?|:|::|)=*}
+        var=${input%%[ $TAB]}
+        var=${input%:}
         VARIABLES[$var]=1
         ;;
       ([[*?[:alnum:]$][^$TAB:=%]#:[^=]*)
@@ -292,7 +295,7 @@ _make() {
     else
       _alternative \
         'targets:make target:compadd -Q -a TARGETS' \
-        'variables:make variable:compadd -S = -F keys -k VARIABLES' \
+        'variables:make variable:compadd -F keys -k VARIABLES' \
         '*:file:_files -W $basedir' && ret=0
     fi
   esac
