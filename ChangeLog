@@ -1,5 +1,9 @@
 2025-03-31  Bart Schaefer  <schaefer@zsh.org>
 
+	* Frank Dana: 53414: Functions/Prompts/prompt_restore_setup:
+	attempting to preview the "restore" keyword is nonsensical,
+	use a handler function to avoid messing up terminal output
+
 	* Frank Dana: 53413: Functions/Prompts/promptinit: "print -rP"
 	in preview, in case of special characters
 

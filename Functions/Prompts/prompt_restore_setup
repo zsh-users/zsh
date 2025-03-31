@@ -1,3 +1,11 @@
-# Damn that was easy
-zstyle -t :prompt-theme cleanup
-zstyle -t :prompt-theme restore
+prompt_restore_setup () {
+  # Damn that was easy
+  zstyle -t :prompt-theme cleanup
+  zstyle -t :prompt-theme restore
+}
+
+prompt_restore_preview () {
+  echo "The prompt command 'restore' is not a theme and cannot be previewed."
+}
+
+prompt_restore_setup "$@"
