@@ -6395,7 +6395,9 @@ setscope(Param pm)
 		}
 	    } else
 		pm->base = basepm->level;
-	}
+	} else if (pm->base < locallevel && refname &&
+		   (basepm = (Param)getparamnode(realparamtab, refname)))
+	    pm->base = basepm->level;
 	if (pm->base > pm->level) {
 	    if (EMULATION(EMULATE_KSH)) {
 		zerr("%s: global reference cannot refer to local variable",
@@ -6420,6 +6422,8 @@ upscope(Param pm, int reflevel)
 {
     Param up = pm->old;
     while (up && up->level >= reflevel) {
+	if (reflevel < 0 && up->level < locallevel)
+	    break;
 	pm = up;
 	up = up->old;
     }

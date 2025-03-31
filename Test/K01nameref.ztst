@@ -595,6 +595,53 @@ F:Same test, should part 5 output look like this?
 >nameref-local-nameref-local
 >typeset -h parameters
 
+ (
+  inner() { local -n var="${1:?}"; var=(alpha beta gamma); }
+  outer() { local -a foo=(outer); inner foo; typeset -p foo; }
+  foo=3 ; { outer foo } always { typeset -p foo }
+ )
+0:up-reference part 10, assignment to enclosing scope, types match
+>typeset -a foo=( alpha beta gamma )
+>typeset -g foo=3
+
+ (
+  inner() { local -n var="${1:?}"; var=(alpha beta gamma); }
+  outer() { local foo=outer; inner foo; typeset -p foo; }
+  foo=3 ; { outer foo } always { typeset -p foo }
+ )
+1:up-reference part 11, assignment to enclosing scope, type mismatch
+>typeset -g foo=3
+?inner: foo: attempt to assign array value to non-array
+
+ (
+  inner() { local -n var="${1:?}"; unset var; var=(alpha beta gamma); }
+  outer() { local foo=outer; inner foo; typeset -p foo; }
+  foo=3 ; { outer foo } always { typeset -p foo }
+ )
+0:up-reference part 12, assignment to enclosing scope, unset by reference
+>typeset -a foo=( alpha beta gamma )
+>typeset -g foo=3
+
+ (
+  inner() { local "${1:?}"; local -nu var="$1"; var=(alpha beta gamma); }
+  outer() { local -a foo=(outer); inner foo; typeset -p foo; }
+  foo=3 ; { outer foo } always { typeset -p foo }
+ )
+0:up-reference part 13, assignment to enclosing scope, skip local
+>typeset -a foo=( alpha beta gamma )
+>typeset -g foo=3
+
+ (
+  inner() { local "${1:?}"; local -nu var="$1";
+  	    typeset -g var=(alpha beta gamma); }
+  outer() { local -a foo=(outer); inner foo; typeset -p foo; }
+  foo=3 ; { outer foo } always { typeset -p foo }
+ )
+0f:up-reference part 14, typeset -g to enclosing scope, skip local
+F:typeset cannot bypass a name in the local scope, even via nameref
+>typeset -a foo=( alpha beta gamma )
+>typeset -g foo=3
+
  if [[ $options[typesettounset] != on ]]; then
    ZTST_skip='Ignoring zmodload bug that resets TYPESET_TO_UNSET'
    setopt typesettounset

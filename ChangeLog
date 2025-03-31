@@ -1,4 +1,7 @@
-2025-03-31  Bart Schaefer  <schaefer@zsh.org>
+2025-03-31  Bart Schaefer  <schaefer@toltec-ubuntu>
+
+	* 53431: Src/params.c, Test/K01nameref.ztst: fix assignment via
+	named reference to parameters in outer scopes; add tests
 
 	* Frank Dana: 53414: Functions/Prompts/prompt_restore_setup:
 	attempting to preview the "restore" keyword is nonsensical,
