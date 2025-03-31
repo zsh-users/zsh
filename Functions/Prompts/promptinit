@@ -246,7 +246,7 @@ prompt_preview_theme () {
   # while the ZLE is not active.
 
   [[ -o promptcr ]] && print -n $'\r'
-  :; print -P -- "${PS1}command arg1 arg2 ... argn"
+  :; print -rP -- "${PS1}command arg1 arg2 ... argn"
 
   [[ -n ${preexec_functions[(r)prompt_${1}_preexec]} ]] &&
       prompt_${1}_preexec
