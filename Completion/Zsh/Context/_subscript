@@ -98,6 +98,9 @@ elif [[ ${(Pt)${compstate[parameter]}} = array* ]]; then
   while _tags; do
     if _requested indexes; then
       ind=( {1..${#${(P)${compstate[parameter]}}}} )
+      if [[ ${ind[-1]} -eq 0 ]]; then
+        ind=()
+      fi
       if zstyle -T ":completion:${curcontext}:indexes" verbose; then
         list=()
         for i in "$ind[@]"; do
