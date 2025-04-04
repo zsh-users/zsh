@@ -24,13 +24,33 @@ return 1
 }
 
 _call_whatis() { 
-  case "$(whatis --version)" in
-  ("whatis from "*)
-    local -A args
-    zparseopts -D -A args s: r:
-    apropos "${args[-r]:-"$@"}" | fgrep "($args[-s]"
+  local sec impl variant sections=( 1 6 8 )
+  case "$OSTYPE" in
+    (#i)dragonfly|(free|open)bsd*) impl=mandoc ;;
+    netbsd*) impl=apropos ;;
+    linux-gnu*)
+      sections=( 1 8 )
+      # The same test as for man so has a good chance of being cached
+      _pick_variant -c man -r variant \
+        freebsd='-S mansect' \
+        openbsd='-S subsection' \
+        $OSTYPE \
+        ---
+      [[ $variant = $OSTYPE ]] && impl=man-db || impl=mandoc
     ;;
-  (*) whatis "$@";;
+  esac
+  case $impl in
+    mandoc)
+      for sec in $sections; do
+        whatis -s $sec .\*
+      done
+    ;;
+    man-db)
+      whatis -s ${(j.,.)sections} -r .\*
+    ;;
+    apropos)
+      apropos -l ''|grep "([${(j..)sections}])"
+    ;;
   esac
 }
 
@@ -49,7 +69,7 @@ if zstyle -t ":completion:${curcontext}:" extra-verbose; then
   if ( [[ -n $first ]] || _cache_invalid command-descriptions ) && \
     ! _retrieve_cache command-descriptions; then
     local line
-    for line in "${(f)$(_call_program command-descriptions _call_whatis -s 1 -r .\\\*\; _call_whatis -s 6 -r .\\\* 2>/dev/null)}"; do
+    for line in "${(f)$(_call_program command-descriptions _call_whatis)}"; do
       [[ -n ${line:#(#b)([^ ]#) #\([^ ]#\)( #\[[^ ]#\]|)[ -]#(*)} ]] && continue;
       [[ -z $match[1] || -z $match[3] || -z ${${match[1]}:#*:*} ]] && continue;
       _command_descriptions[$match[1]]=$match[3]

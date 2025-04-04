@@ -1,3 +1,8 @@
+2025-04-04  Oliver Kiddle  <opk@zsh.org>
+
+	* 53445: Completion/Unix/Type/_path_commands: extra-verbose mode
+	support on some recent Linux and BSD systems
+
 2025-03-31  Bart Schaefer  <schaefer@toltec-ubuntu>
 
 	* 53431: Src/params.c, Test/K01nameref.ztst: fix assignment via
