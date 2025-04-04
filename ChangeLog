@@ -1,5 +1,8 @@
 2025-04-04  Oliver Kiddle  <opk@zsh.org>
 
+	* Kyle Andelin: 53449: Completion/Zsh/Context/_subscript:
+	do not complete indices for empty array subscripts
+
 	* 53445: Completion/Unix/Type/_path_commands: extra-verbose mode
 	support on some recent Linux and BSD systems
 
