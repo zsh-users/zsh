@@ -1,0 +1,13 @@
+#compdef dhomepage
+
+local arguments
+
+arguments=(
+   '(-v,--vcs)'{-v,--vcs}'[Open VCS-Homepage instead]'
+   '(-e,--echo)'{-e,--echo}'[Only print the URL]'
+   {-h,--help}'[Show help]'
+   '--version[Show version information]'
+   ':package:_deb_packages avail'
+)
+
+_arguments -S $arguments
