@@ -1,6 +1,6 @@
 #compdef fortune
 
-_arguments \
+_arguments -S \
   '-a[choose from all lists of maxims, both offensive and not]' \
   '-c[show the cookie file from which the fortune came]' \
   '-e[consider all fortune files to be of equal size]' \
@@ -12,4 +12,4 @@ _arguments \
   '-s[short apothegms only]' \
   '-i[ignore case for -m patterns]' \
   '-w[wait before termination for a time based on msg length]' \
-  '*:databases'
+  '*:databases:_values -S " " "fortune db" /usr/share/games/fortunes/*(N:r:t)'
