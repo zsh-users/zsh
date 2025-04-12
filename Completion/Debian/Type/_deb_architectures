@@ -4,6 +4,6 @@ local extra expl
 zparseopts -E -D -a extra a:
 
 _description architectures expl 'architecture'
-compadd "$@" "$expl[@]" alpha amd64 arm64 armel armhf hppa hurd-i386 i386 ia64 \
-    kfreebsd-amd64 kfreebsd-i386 m68k mips mipsel powerpc powerpcspe ppc64 \
-    ppc64el s390x sh4 sparc sparc64 x32 ${=extra[2]}
+compadd "$@" "$expl[@]" alpha amd64 arm arm64 armel armhf hppa hurd-i386 i386 \
+    ia64 kfreebsd-amd64 loong64 loongarch6 m68k mips mips64el mipsel powerpc \
+    ppc64 ppc64el riscv64 s390x sh4 sparc sparc64 x32 ${=extra[2]}

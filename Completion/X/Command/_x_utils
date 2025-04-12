@@ -77,7 +77,7 @@ xev)
     '-s[use save-under]' \
     '-name:window name' \
     '-rv' \
-    '*-event:event mask:(keyboard mouse expose visibility structure substructure focus property colormap owner_grab_button randr)'
+    '*-event:event mask:(keyboard mouse expose visibility structure substructure focus property colormap owner_grab_button randr button)'
   ;;
 xhost)
   local type tmp match
