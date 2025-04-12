@@ -1,5 +1,11 @@
 2025-10-23  Oliver Kiddle  <opk@zsh.org>
 
+	* Christopher Bock: github #131 (with tweaks by dana):
+	Completion/Debian/Command/_dpkg, Completion/Debian/Command/_schroot,
+	Completion/Unix/Command/_libvirt, Completion/Debian/Type/_deb_files,
+	Completion/Debian/Command/_madison,
+	Completion/Unix/Command/_smartmontools: add missing options
+
 	* Kevin Cox: github #147: Completion/Unix/Command/_git,
 	Completion/Unix/Command/_ssh, Completion/Unix/Type/_hosts:
 	Clean up some leaked variables in completion functions
