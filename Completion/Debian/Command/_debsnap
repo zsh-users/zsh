@@ -10,7 +10,7 @@ _arguments \
   '(-d --destdir)'{-d+,--destdir=}'[set download directory]:download directory:_files -/' \
   '(-f --force)'{-f,--force}'[allow non-empty destination directory]' \
   '(-v --verbose)'{-v,--verbose}'[print configuration and report progress]' \
-  --list"[list versions; don't download]" \
+  '(-l --list)'{-l,--list}"[list versions; don't download]" \
   --binary'[operate on binary packages (default: source packages)]' \
   '*'{-a+,--architecture=}'[specify architectures to download]:architecture to download:_deb_architectures' \
   --first='[download all versions newer than this]:version number (lower bound):->versions' \
