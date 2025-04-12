@@ -9,19 +9,25 @@ _arguments -S \
        '(-a --all)'{-a,--all}'[select all chroots and active sessions]' \
        '--all-chroots[select all chroots]' \
        '--all-sessions[select all active sessions]' \
-       '*'{-c,--chroot=}'[use specified chroot]:chroot:->chroot' \
-       '(-d --directory)'{-d,--directory=}'[directory to use]:dir:_files -W / -P /' \
-       '(-u --user)'{-u,--user=}'[username (default current user)]:user:_users' \
+       '--all-source-chroots[select all source chroots]' \
+       '--exclude-aliases[do not include aliases]' \
+       '*'{-c+,--chroot=}'[use specified chroot]:chroot:->chroot' \
+       '(-d --directory)'{-d+,--directory=}'[directory to use]:dir:_files -W / -P /' \
+       '(-u --user)'{-u+,--user=}'[username (default current user)]:user:_users' \
+       '(-s --shell)'{-s+,--shell=}'[shell to use as login shell]:shell:->shells' \
        '(-l --list)'{-l,--list}'[list available chroots]' \
        '(-i --info)'{-i,--info}'[show information about selected chroots]' \
        '--location[print location of selected chroots]' \
        '--config[dump configuration of selected chroots]' \
        '(-p --preserve-environment)'{-p,--preserve-environment}'[preserve user environment]' \
+       '(-o --option)'{-o+,--option=}'[set option]:option key=value' \
        '(-q --quiet)'{-q,--quiet}'[quiet]' \
        '(-v --verbose)'{-v,--verbose}'[verbose]' \
        '(-V --version)'{-V,--version}'[version]' \
+       '--automatic-session[begin, run and end a session automatically]' \
        '(-b --begin-session)'{-b,--begin-session}'[begin a session; returns a session ID]' \
        '(-r --run-session)'{-r,--run-session}'[run an existing session]' \
+       '(-n --session-name)'{-n+,--session-name=}'[session name]:session name' \
        '--recover-session[recover an existing session]' \
        '(-e --end-session)'{-e,--end-session}'[end an existing session]' \
        '(-f --force)'{-f,--force}'[force operation]' \
@@ -32,5 +38,9 @@ case "$state" in
 	(chroot)
 	_wanted tag expl 'chroot' \
 	  compadd $(schroot -l -a)
+	;;
+	(shells)
+	_wanted -C $context shells expl shell compadd ${(f)^"$(</etc/shells)"}(N)
+	return
 	;;
 esac
