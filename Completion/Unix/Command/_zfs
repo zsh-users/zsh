@@ -16,6 +16,8 @@ local -a ds_propnames ro_ds_props rw_ds_props ci_ds_props # dataset properties
 local -a po_propnames ro_po_props rw_po_props ci_po_props # pool properties
 local -a ro_vdev_props rw_vdev_props
 
+local -a scriptnames
+
 _pick_variant -r implementation -c 'zpool upgrade -v' openzfs='This system supports ZFS pool feature flags' solaris
 
 ds_types=( filesystem snapshot volume all )
@@ -303,7 +305,7 @@ esac
 delegatable_perms+=(
   allow clone create destroy diff hold key keychange mount promote receive
   release rename rollback send share snapshot groupquota groupused userprop
-  userused ${ci_ds_props%%:*}
+  userused refreservation ${ci_ds_props%%:*}
 )
 
 key_properties=(
@@ -318,6 +320,7 @@ ci_ds_props+=( $rw_ds_props )
 
 ds_propnames=( ${rw_ds_props%%:*} )
 po_propnames=( ${ro_po_props%%:*} ${ci_po_props%%:*} ${rw_po_props%%:*} )
+scriptnames=( ${ZPOOL_SCRIPTS_PATH}/*(N:r:t) /etc/zfs/zpool.d/*(N:r:t) ~/.zpool.d/*(N:r:t) )
 
 case $service in
   zfs|zpool|zstream)
@@ -1080,7 +1083,7 @@ case $service:$words[1] in
   zpool:iostat)
     if [[ $implementation = openzfs ]]; then
       args=(
-        '-c[run scripts on each vdev]:script:_files -W "($ZPOOL_SCRIPTS_PATH /etc/zfs/zpool.d ~/.zpool.d)"'
+        '-c+[run scripts on each vdev]: :_values -s , "scriptname" $scriptnames'
         '-g[display vdev GUIDs instead of normal device names]'
         '-H[suppress headers and tab-delimit fields]'
         '-L[display real paths for vdevs resolving all symbolic links]'
@@ -1249,7 +1252,7 @@ case $service:$words[1] in
       args=(
         '--power[display vdev enclosure slot power status]'
         '-D[display a histogram of deduplication statistics]'
-        '-c[run scripts on each vdev]:script:_files -W "($ZPOOL_SCRIPTS_PATH /etc/zfs/zpool.d ~/.zpool.d)"'
+        '-c+[run scripts on each vdev]: :_values -s , "scriptname" $scriptnames'
         '-e[only show unhealthy vdevs]'
         '-i[display vdev initialization status]'
         '-g[display vdev GUIDs instead of the normal device names]'
@@ -1285,7 +1288,7 @@ case $service:$words[1] in
   zpool:upgrade)
     _arguments -A "-*" -S \
       '(- *)-v[display ZFS versions and descriptions]' \
-      "(-v)-V+[upgrade to given version]:version" \
+      '(-v)-V+[upgrade to given version]:version' \
       '(-v *)-a[upgrade all pools]' \
       '(-a -v)*:pool:_zfs_pool'
   ;;
