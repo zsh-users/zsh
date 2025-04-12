@@ -28,6 +28,7 @@ case $state in
       'update:resynchronize package contents'
       {find,search}:'search in which package file is included'
       {list,show}:'list contents of a package'
+      'list-indices:list known content indices'
       'purge:remove all Contents-<ARCH>.gz files in cache directory'
     )
     _describe -t commands 'apt-list command' cmds
@@ -46,7 +47,7 @@ case $state in
       list|show)
 	_deb_packages avail
       ;;
-      update|purge)
+      update|purge|list-indices)
 	# do nothing
       ;;
       *)

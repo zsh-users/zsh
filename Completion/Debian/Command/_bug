@@ -10,7 +10,7 @@ _bug_commonargs=(
 )
 
 _rb_commonargs=(
-  '(-B --bts)'{-B,--bts=}'[use alternate BTS]:system:(debian gnome kde tdyc kde-debian)'
+  '(-B --bts)'{-B,--bts=}'[use alternate BTS]:system:(debian ubuntu guug default Grml)'
   '(-l --ldap)'{-l,--ldap}'[enable LDAP support]'
   '(-l --ldap)--no-ldap[disable LDAP support]'
   '(--proxy --http_proxy)'--{http_,}'proxy=:proxy host:_hosts'
