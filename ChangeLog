@@ -1,6 +1,15 @@
 2025-06-05  dana  <dana@dana.is>
 
 	* Christopher Bock: github #131:
+	Completion/Debian/Command/_apt-file,
+	Completion/Debian/Command/_bug,
+	Completion/Debian/Command/_debsnap,
+	Completion/Debian/Type/_deb_architectures,
+	Completion/Linux/Command/_losetup,
+	Completion/Unix/Command/_rsync, Completion/X/Command/_x_utils:
+	minor updates
+
+	* Christopher Bock: github #131:
 	Completion/Debian/Command/_wanna-build: remove wanna-build
 
 	* Christopher Bock: github #131:
