@@ -1,3 +1,12 @@
+2025-06-05  dana  <dana@dana.is>
+
+	* Christopher Bock: github #131:
+	Completion/Debian/Command/_debmany,
+	Completion/Debian/Command/_dhomepage,
+	Completion/Debian/Command/_dpkg-info,
+	Completion/Debian/Command/_which-pkg-broke: complete debmany,
+	dhomepage, dpkg-info, which-pkg-broke
+
 2025-06-04  dana  <dana@dana.is>
 
 	* bryango: github #138: Completion/Darwin/Command/_networksetup:
