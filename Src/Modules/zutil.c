@@ -1955,8 +1955,8 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     params = getaparam((paramsname = paramsname ? paramsname : "argv"));
     np = cp = pp = ((extract && del) ? arrdup(params) : params);
     for (; (o = *pp); pp++) {
-	/* Not an option */
-	if (*o != '-') {
+	/* Not an option. With GNU style, this includes '-' */
+	if (*o != '-' || (gnu && !o[1])) {
 	    if (extract) {
 		if (del)
 		    *cp++ = o;
@@ -1964,7 +1964,7 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    } else
 		break;
 	}
-	/* '-' or '--', end parsing */
+	/* '--' or (with non-GNU style, see above) '-', end parsing */
 	if (!o[1] || (o[1] == '-' && !o[2])) {
 	    if (del && extract)
 		*cp++ = o;

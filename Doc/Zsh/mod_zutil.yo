@@ -242,8 +242,8 @@ Note that it is an error to give any var(spec) without an
 
 Unless the tt(-E) option is given, parsing stops at the first string
 that isn't described by one of the var(spec)s.  Even with tt(-E),
-parsing always stops at a positional parameter equal to `tt(-)' or
-`tt(-)tt(-)'. See also tt(-F).
+parsing always stops at a positional parameter equal to `tt(-)tt(-)' or
+(without tt(-G)) `tt(-)'. See also tt(-F).
 
 The var(opt) description must be one of the following.  Any of the special
 characters can appear in the option name provided it is preceded by a
@@ -314,9 +314,9 @@ as the values.
 item(tt(-D))(
 If this option is given, all options found are removed from the positional
 parameters of the calling shell or shell function, up to but not including
-any not described by the var(spec)s.  If the first such parameter is `tt(-)'
-or `tt(-)tt(-)', it is removed as well.  This is similar to using the
-tt(shift) builtin.
+any not described by the var(spec)s.  If the first such parameter is
+`tt(-)tt(-)' or (without tt(-G)) `tt(-)', it is removed as well.  This is
+similar to using the tt(shift) builtin.
 )
 item(tt(-E))(
 This changes the parsing rules to em(not) stop at the first string
@@ -364,6 +364,10 @@ A mandatory option-argument given in a separate parameter from its
 option (as in `tt(-)tt(-foo) tt(bar)'), or any option-argument given to
 a short option in the same parameter, is always treated the same
 regardless of whether this option is in effect.
+
+Lastly, when this option is active, only `tt(-)tt(-)' is treated as an
+explicit option-parsing terminator in the parsed arguments; a single
+`tt(-)' is considered a normal operand.
 )
 item(tt(-K))(
 With this option, the arrays specified with the tt(-a) option and with the

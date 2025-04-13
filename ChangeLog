@@ -1,5 +1,9 @@
 2025-04-19  dana  <dana@dana.is>
 
+	* 53483: Doc/Zsh/mod_zutil.yo, Src/Modules/zutil.c,
+	Test/V12zparseopts.ztst: with `zparseopts -G`, accept only
+	'--' as parsing terminator
+
 	* 53482: Src/Modules/zutil.c,
 	Src/Modules/Test/V12zparseopts.ztst: with `zparseopts -G`,
 	always add options options with optional args to array with =

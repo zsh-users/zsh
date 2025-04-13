@@ -341,3 +341,28 @@
 >ret: 1, gopt: -G, optv: , argv: -foobar 1 2 3
 >ret: 0, gopt: -G, optv: -foo=bar, argv: 1 2 3
 >ret: 0, gopt: -G, optv: -foo=, argv: bar 1 2 3
+
+  for term in - --; do
+    # With -D -E -G
+    () {
+      local -a optv
+      zparseopts -a optv -D -E -F -G - -foo -bar
+      print -r - ret: $?, term: $term, optv: $optv, argv: $argv
+    } --foo x --bar $term --baz
+    for gopt in '' -G; do
+      # With -D + with/without -G
+      () {
+        local -a optv
+        zparseopts -a optv -D -F $gopt - -foo -bar
+        print -r - ret: $?, term: $term, gopt: $gopt, optv: $optv, argv: $argv
+      } --foo $term --bar
+    done
+  done
+0:only -- acts as explicit parsing terminator with -G
+?(anon):zparseopts:2: bad option: --baz
+>ret: 1, term: -, optv: , argv: --foo x --bar - --baz
+>ret: 0, term: -, gopt: , optv: --foo, argv: --bar
+>ret: 0, term: -, gopt: -G, optv: --foo, argv: - --bar
+>ret: 0, term: --, optv: --foo --bar, argv: x -- --baz
+>ret: 0, term: --, gopt: , optv: --foo, argv: --bar
+>ret: 0, term: --, gopt: -G, optv: --foo, argv: --bar
