@@ -1,3 +1,7 @@
+2025-04-13  dana  <dana@dana.is>
+
+	* unposted: NEWS: update per w/53257 and w/53260
+
 2025-04-04  Oliver Kiddle  <opk@zsh.org>
 
 	* Kyle Andelin: 53449: Completion/Zsh/Context/_subscript:
