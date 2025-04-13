@@ -1,3 +1,9 @@
+2025-04-19  dana  <dana@dana.is>
+
+	* 53482: Src/Modules/zutil.c,
+	Src/Modules/Test/V12zparseopts.ztst: with `zparseopts -G`,
+	always add options options with optional args to array with =
+
 2025-04-15  Bart Schaefer  <schaefer@zsh.org>
 
 	* 53454: Src/hist.c: fix interrupt handling in savehistfile()

@@ -247,7 +247,7 @@
 0:zparseopts -G, separate parameters
 >ret: 0, optv: --foo bar, argv: 1 2 3
 >ret: 0, optv: --foo=bar, argv: 1 2 3
->ret: 0, optv: --foo, argv: bar 1 2 3
+>ret: 0, optv: --foo=, argv: bar 1 2 3
 
   for spec in -foo: -foo:- -foo::; do
     () {
@@ -340,4 +340,4 @@
 ?(anon):zparseopts:2: bad option: -f
 >ret: 1, gopt: -G, optv: , argv: -foobar 1 2 3
 >ret: 0, gopt: -G, optv: -foo=bar, argv: 1 2 3
->ret: 0, gopt: -G, optv: -foo, argv: bar 1 2 3
+>ret: 0, gopt: -G, optv: -foo=, argv: bar 1 2 3

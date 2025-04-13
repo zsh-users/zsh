@@ -1662,15 +1662,15 @@ add_opt_val(Zoptdesc d, char *arg)
 	v->str = NULL;
 	if (d->arr)
 	    d->arr->num += (arg ? 2 : 1);
-    } else if (arg) {
+    } else if (arg || d->flags & ZOF_GNUL) {
 	/* 3 here is '-' + '=' + NUL */
-	char *s = (char *) zhalloc(strlen(d->name) + strlen(arg) + 3);
+	char *s = (char *) zhalloc(strlen(d->name) + strlen(arg ? arg : "") + 3);
 
 	*s = '-';
 	strcpy(s + 1, d->name);
 	if (d->flags & ZOF_GNUL)
 	    strcat(s, "=");
-	strcat(s, arg);
+	strcat(s, arg ? arg : "");
 	v->str = s;
 	if (d->arr)
 	    d->arr->num += 1;
