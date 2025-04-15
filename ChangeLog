@@ -716,6 +716,9 @@
 	* 53463: Completion/Unix/Type/_hosts: allow overriding the default
 	matching control
 
+2025-04-15  Bart Schaefer  <schaefer@zsh.org>
+
+	* 53454: Src/hist.c: fix interrupt handling in savehistfile()
 
 2025-04-04  Oliver Kiddle  <opk@zsh.org>
 

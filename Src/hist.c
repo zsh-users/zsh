@@ -2822,11 +2822,12 @@ readhistfile(char *fn, int err, int readflags)
 	     */
 	    if (uselex || remeta)
 		freeheap();
-	    if (errflag & ERRFLAG_INT) {
-		/* Can't assume fast read next time if interrupted. */
-		lasthist.interrupted = 1;
+	    if (errflag & ERRFLAG_INT)
 		break;
-	    }
+	}
+	if (errflag & ERRFLAG_INT) {
+	    /* Can't assume fast read next time if interrupted. */
+	    lasthist.interrupted = 1;
 	}
 	if (start && readflags & HFILE_USE_OPTIONS) {
 	    zsfree(lasthist.text);
@@ -3092,7 +3093,9 @@ savehistfile(char *fn, int err, int writeflags)
 		hist_ignore_all_dups |= isset(HISTSAVENODUPS);
 		readhistfile(fn, err, 0);
 		hist_ignore_all_dups = isset(HISTIGNOREALLDUPS);
-		if (histlinect)
+		if (errflag & ERRFLAG_INT)
+		    ret = -1;
+		else if (histlinect)
 		    savehistfile(fn, err, 0);
 
 		pophiststack();
