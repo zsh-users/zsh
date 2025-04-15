@@ -1,3 +1,7 @@
+2025-04-15  Bart Schaefer  <schaefer@zsh.org>
+
+	* 53454: Src/hist.c: fix interrupt handling in savehistfile()
+
 2025-04-15  Eric Cook  <illua@users.sourceforge.net>
 
 	* 53485: NEWS: update for version 5.10
