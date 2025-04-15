@@ -7,12 +7,28 @@ Note also the list of incompatibilities in the README file.
 Changes since 5.9
 -----------------
 
+Support for named references and namespaces has been added, similar to
+those features in ksh but with some notable differences. The `nameref`
+builtin and some ksh-equivalent namespace names are available by loading
+the zsh/ksh93 module.  See the documentation of that module for more.
+
+The parameter expansion flag ! was added for the referred-to name of a
+named reference.
+
+The parameter ZSH_EXEPATH expands to the full path of the current zsh
+process, reliably on Linux, Mac, {Net,Free,Dragonfly}BSD and falls
+back to argv[0] elsewhere.
+
+The default keymap is now emacs. Users of the vi keymaps please check
+README to see if you are affected.
+
 In region_highlight and zle_highlight, italic and faint can be
 specified as font attributes for terminals that support them.
 
-Highlighting groups can be referenced in region_highlight and
-zle_highlight for common attribute combinations and a layer can be
-specified to indicate precedence where highlighted regions overlap.
+Highlighting groups can be referenced in region_highlight,
+zle_highlight, WATCHFMT and completion explanation strings for
+common attribute combinations and a layer can be specified to
+indicate precedence where highlighted regions overlap.
 Highlighting groups are also supported in the prompt via a new %H
 prompt escape.
 
@@ -24,13 +40,8 @@ consistent and better aligned with the POSIX-2017 specification of
 `set -e`. For details on what exactly changed, see the list of
 incompatibilities in the README file.
 
-Support for named references and namespaces has been added, similar to
-those features in ksh but with some notable differences. The `nameref`
-builtin and some ksh-equivalent namespace names are available by loading
-the zsh/ksh93 module.  See the documentation of that module for more.
-
 Non-forking command substitutions with ${ ... } and ${| ... } are now
-available, and the latter extended with ${|param| ... } to return the
+available, and the latter extended with ${{param} ... } to return the
 result via assignment to the named param rather than always via $REPLY.
 
 The shell now uses monotonic time instead of wall time for most
@@ -44,6 +55,14 @@ be used to specify the array of arguments to parse instead of $@.
 
 The zparseopts builtin also learnt a -G option which enables GNU-style
 argument parsing ('--opt=arg', etc.).
+
+The module zsh/pcre has been updated to use the pcre2 library.
+
+The new zsh/random module defines an SRANDOM parameter, zrand_float()
+and zrand_int() math functions.
+
+The shell keyword time now works on builtins, assignments, and
+current-shell actions.
 
 Changes since 5.8.1
 -------------------
