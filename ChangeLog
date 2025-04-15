@@ -2,6 +2,10 @@
 
 	* 53485: NEWS: update for version 5.10
 
+2025-04-14  Mikael Magnusson  <mikachu@gmail.com>
+
+	* unposted: _typeset: fix typo
+
 2025-04-13  dana  <dana@dana.is>
 
 	* unposted: NEWS: update per w/53257 and w/53260
