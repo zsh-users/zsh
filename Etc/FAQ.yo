@@ -297,7 +297,7 @@ sect(On what machines will it run?)
 
 sect(What's the latest version?)
 
-  Zsh 5.9 is the latest production version.  For details of all the
+  Zsh 5.10 is the latest production version.  For details of all the
   changes, see the NEWS file in the source distribution.
 
   A beta of the next version is sometimes available.  Development of zsh is

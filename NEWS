@@ -7,6 +7,10 @@ Note also the list of incompatibilities in the README file.
 Changes since 5.9
 -----------------
 
+zsh 5.10 is dedicated to the memory of Sebastian Gniazdowski, who was
+an enthusiastic new community member interested in making zsh easy to
+extend with community code/`plugins'.
+
 Support for named references and namespaces has been added, similar to
 those features in ksh but with some notable differences. The `nameref`
 builtin and some ksh-equivalent namespace names are available by loading

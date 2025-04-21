@@ -1,5 +1,9 @@
 2025-04-20  Eric Cook  <illua@users.sourceforge.net>
 
+	* unposted: Config/version.mk, Etc/FAQ.yo, NEWS, README: Test
+	release: zsh-5.9.0.2-test.
+
+
 	* 53463: Completion/Unix/Type/_hosts: allow overriding the default
 	matching control
 
