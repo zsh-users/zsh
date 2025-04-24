@@ -4782,27 +4782,27 @@ x2024-02-19  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 2020-03-25  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
-	* 45583/0008: Etc/BUGS, Src/utils.c, Test/B13whence.ztst:
+	* 45595/0008: Etc/BUGS, Src/utils.c, Test/B13whence.ztst:
 	Extend tests to prove that what remains of xsymlinks() handles
 	symlink loops gracefully.
 
-	* 45583/0007: Src/utils.c: Remove code that is now unreachable.
+	* 45595/0007: Src/utils.c: Remove code that is now unreachable.
 
-	* 45583/0006: Src/utils.c: Don't use xsymlinks() in 'whence -s'.
+	* 45595/0006: Src/utils.c: Don't use xsymlinks() in 'whence -s'.
 
-	* 45583/0005: Test/B13whence.ztst: Add a test for bin_whence's
+	* 45595/0005: Test/B13whence.ztst: Add a test for bin_whence's
 	symlinks resolution.
 
-	* 45583/0004: Etc/BUGS, Src/utils.c, Test/D02glob.ztst: Fix
+	* 45595/0004: Etc/BUGS, Src/utils.c, Test/D02glob.ztst: Fix
 	segfault on resolving symlink loops
 
-	* 45583/0003: Src/hist.c, Src/subst.c: chrealpath: Let caller
+	* 45595/0003: Src/hist.c, Src/subst.c: chrealpath: Let caller
 	decide how the return value should be allocated.
 
-	* 45583/0002: Src/hist.c, Src/subst.c: chrealpath: Make symlink
+	* 45595/0002: Src/hist.c, Src/subst.c: chrealpath: Make symlink
 	resolution optional.
 
-	* 45583/0001: Test/D02glob.ztst: Add tests for the segfault on
+	* 45595/0001: Test/D02glob.ztst: Add tests for the segfault on
 	resolving a symlink loop bug (workers/45282).
 
 	* 45590/0002 (in part): Test/B12limit.ztst: zsh/rlimits: Test
