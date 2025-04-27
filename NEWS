@@ -51,7 +51,7 @@ result via assignment to the named param rather than always via $REPLY.
 The shell now uses monotonic time instead of wall time for most
 internal time tracking, making it immune to system clock changes due to
 NTP, etc. For the most part this is transparent to users. However, as a
-side effect, some features like $SECONDS and the time builtin gained
+side effect, some features like $SECONDS and the time keyword gained
 (nominal) nanosecond precision.
 
 The zsh/zutil module's zparseopts builtin learnt a -v option which can
@@ -59,6 +59,9 @@ be used to specify the array of arguments to parse instead of $@.
 
 The zparseopts builtin also learnt a -G option which enables GNU-style
 argument parsing ('--opt=arg', etc.).
+
+A new contrib function zgetopt was added. It wraps `zparseopts -G` to
+provide an interface similar to util-linux's getopt(1).
 
 The module zsh/pcre has been updated to use the pcre2 library.
 

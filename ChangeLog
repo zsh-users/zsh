@@ -1,5 +1,8 @@
 2025-04-27  dana  <dana@dana.is>
 
+	* 53516: Doc/Zsh/contrib.yo, Functions/Misc/zgetopt, NEWS,
+	Test/Z04zgetopt.ztst: add zgetopt contrib function
+
 	* 53515: Test/B01cd.ztst: correct ztst documentation error
 
 2025-04-20  Eric Cook  <illua@users.sourceforge.net>
