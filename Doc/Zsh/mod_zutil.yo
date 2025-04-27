@@ -368,6 +368,9 @@ regardless of whether this option is in effect.
 Lastly, when this option is active, only `tt(-)tt(-)' is treated as an
 explicit option-parsing terminator in the parsed arguments; a single
 `tt(-)' is considered a normal operand.
+
+Note: Unlike most tt(getopt_long+LPAR()3+RPAR()) implementations,
+tt(zparseopts) does not support abbreviating long options.
 )
 item(tt(-K))(
 With this option, the arrays specified with the tt(-a) option and with the

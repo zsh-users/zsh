@@ -1,5 +1,9 @@
 2025-04-27  dana  <dana@dana.is>
 
+	* unposted: Doc/Zsh/contrib.yo, Doc/Zsh/mod_zutil.yo:
+	document zparseopts's lack of support for abbreviating long
+	options
+
 	* unposted: Doc/Zsh/contrib.yo: adjust zgetopt wording
 
 	* 53516: Doc/Zsh/contrib.yo, Functions/Misc/zgetopt, NEWS,

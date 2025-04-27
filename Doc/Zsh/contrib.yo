@@ -4748,7 +4748,8 @@ Refer to the manual for util-linux's tt(getopt+LPAR()1+RPAR()) for
 more information about the way arguments are parsed and results are
 returned. Note however that this function is not intended to be a
 complete re-implementation. In particular, it omits all
-portability/compatibility features.
+portability/compatibility features. Also, like tt(zparseopts)
+itself, it does not support abbreviating long options.
 )
 item(tt(zkbd))(
 See `Keyboard Definition'
