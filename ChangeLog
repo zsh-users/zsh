@@ -1,12 +1,14 @@
+2025-04-27  dana  <dana@dana.is>
+
+	* 53515: Test/B01cd.ztst: correct ztst documentation error
+
 2025-04-20  Eric Cook  <illua@users.sourceforge.net>
 
 	* unposted: Config/version.mk, Etc/FAQ.yo, NEWS, README: Test
 	release: zsh-5.9.0.2-test.
 
-
 	* 53463: Completion/Unix/Type/_hosts: allow overriding the default
 	matching control
-
 
 2025-04-19  dana  <dana@dana.is>
 

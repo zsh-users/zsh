@@ -57,13 +57,13 @@
 # subsequent whitespace being significant; lines are not subject to any
 # substitution unless the `q' flag (see below) is set.
 #
-# Each line of a '>' and '?' chunk may be preceded by a '*', so the line
-# starts '*>' or '*?'.  This signifies that for any line with '*' in front
-# the actual output should be pattern matched against the corresponding
-# lines in the test output.  Each line following '>' or '?' must be a
-# valid pattern, so characters special to patterns such as parentheses
-# must be quoted with a backslash.  The EXTENDED_GLOB option is used for
-# all such patterns.
+# If any '>' or '?' line in a chunk is preceded by a '*', all lines in
+# that chunk with the same symbol are pattern matched against the
+# corresponding lines in the test output.  For example, a '*>' anywhere
+# in the chunk causes all other '>' lines to use pattern matching.
+# Each line following '>' or '?' must be a valid pattern, so characters
+# special to patterns such as parentheses must be quoted with a
+# backslash.  The EXTENDED_GLOB option is used for all such patterns.
 #
 # Each chunk of indented code is to be evaluated in one go and is to
 # be followed by a line starting (in the first column) with
