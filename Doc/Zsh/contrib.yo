@@ -4710,13 +4710,13 @@ overwrites the caller's positional parameters. Has no meaning when
 called as a script, in which case the parsed and quoted arguments are
 always printed to standard output. An empty string forces the
 printing behaviour in either mode.)
-sitem(tt(-a))(Use Sun-style single-hyphenated long options instead of
-GNU-style double-hyphenated ones (tt(-foo) vs tt(--foo)). Note that
-long options with optional optargs can't always be distinguished
-accurately from short options with optional optargs when using this
-option. Also, due to limitations of tt(zparseopts), a Sun-style long
-option whose name is only one character long is always treated as a
-short option.)
+sitem(tt(-a))(Use `alternative'-style single-hyphenated long options
+instead of GNU-style double-hyphenated ones (tt(-foo) vs tt(--foo)).
+Note that long options with optional optargs can't always be
+distinguished accurately from short options with optional optargs
+when using this option. Also, due to limitations of tt(zparseopts),
+a single-hyphenated long option whose name is only one character long
+is always treated as a short option.)
 sitem(tt(-l var(spec)))(Specify long options to recognise when
 parsing. These should be given using just the option name (no
 dashes), suffixed by `tt(:)' or `tt(::)' if it takes a mandatory or

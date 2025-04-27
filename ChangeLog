@@ -1,5 +1,7 @@
 2025-04-27  dana  <dana@dana.is>
 
+	* unposted: Doc/Zsh/contrib.yo: adjust zgetopt wording
+
 	* 53516: Doc/Zsh/contrib.yo, Functions/Misc/zgetopt, NEWS,
 	Test/Z04zgetopt.ztst: add zgetopt contrib function
 
