@@ -1,3 +1,8 @@
+2025-04-28  dana  <dana@dana.is>
+
+	* 53527: Doc/Zsh/contrib.yo, Functions/Misc/zgetopt, NEWS,
+	Test/Z04zgetopt.ztst: remove zgetopt (feature not ready)
+
 2025-04-27  dana  <dana@dana.is>
 
 	* unposted: Doc/Zsh/contrib.yo, Doc/Zsh/mod_zutil.yo:

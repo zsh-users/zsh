@@ -60,9 +60,6 @@ be used to specify the array of arguments to parse instead of $@.
 The zparseopts builtin also learnt a -G option which enables GNU-style
 argument parsing ('--opt=arg', etc.).
 
-A new contrib function zgetopt was added. It wraps `zparseopts -G` to
-provide an interface similar to util-linux's getopt(1).
-
 The module zsh/pcre has been updated to use the pcre2 library.
 
 The new zsh/random module defines an SRANDOM parameter, zrand_float()
