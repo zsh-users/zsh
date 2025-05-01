@@ -1,3 +1,8 @@
+2025-05-01  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 53529: Test/A04redirect.ztst: Avoid using system area for
+	non-existent files as permissions may affect the result.
+
 2025-04-20  Eric Cook  <illua@users.sourceforge.net>
 
 	* 53463: Completion/Unix/Type/_hosts: allow overriding the default

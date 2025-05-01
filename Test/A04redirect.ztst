@@ -462,50 +462,50 @@
 >This file contains data.
 >This file contains data.
 
-  $ZTST_testdir/../Src/zsh -fc 'exec >/nonexistent/nonexistent
+  $ZTST_testdir/../Src/zsh -fc 'exec >./nonexistent/nonexistent
   echo output'
 0:failed exec redir, no POSIX_BUILTINS
 >output
-?zsh:1: no such file or directory: /nonexistent/nonexistent
+?zsh:1: no such file or directory: ./nonexistent/nonexistent
 
   $ZTST_testdir/../Src/zsh -f -o POSIX_BUILTINS -c '
-  exec >/nonexistent/nonexistent
+  exec >./nonexistent/nonexistent
   echo output'
 1:failed exec redir, POSIX_BUILTINS
-?zsh:2: no such file or directory: /nonexistent/nonexistent
+?zsh:2: no such file or directory: ./nonexistent/nonexistent
 
   $ZTST_testdir/../Src/zsh -f -o POSIX_BUILTINS -c '
-  set >/nonexistent/nonexistent
+  set >./nonexistent/nonexistent
   echo output'
 1:failed special builtin redir, POSIX_BUILTINS
-?zsh:2: no such file or directory: /nonexistent/nonexistent
+?zsh:2: no such file or directory: ./nonexistent/nonexistent
 
   $ZTST_testdir/../Src/zsh -f -o POSIX_BUILTINS -c '
-  command set >/nonexistent/nonexistent
+  command set >./nonexistent/nonexistent
   echo output'
 0:failed special builtin redir with command prefix, POSIX_BUILTINS
 >output
-?zsh:2: no such file or directory: /nonexistent/nonexistent
+?zsh:2: no such file or directory: ./nonexistent/nonexistent
 
   $ZTST_testdir/../Src/zsh -f -o POSIX_BUILTINS -c '
-  echo >/nonexistent/nonexistent
+  echo >./nonexistent/nonexistent
   echo output'
 0:failed unspecial builtin redir, POSIX_BUILTINS
 >output
-?zsh:2: no such file or directory: /nonexistent/nonexistent
+?zsh:2: no such file or directory: ./nonexistent/nonexistent
 
   $ZTST_testdir/../Src/zsh -f -o POSIX_BUILTINS -c '
-  . /nonexistent/nonexistent
+  . ./nonexistent/nonexistent
   echo output'
 1:failed dot, POSIX_BUILTINS
-?zsh:.:2: no such file or directory: /nonexistent/nonexistent
+?zsh:.:2: no such file or directory: ./nonexistent/nonexistent
 
   $ZTST_testdir/../Src/zsh -f -c '
-  . /nonexistent/nonexistent
+  . ./nonexistent/nonexistent
   echo output'
 0:failed dot, NO_POSIX_BUILTINS
 >output
-?zsh:.:2: no such file or directory: /nonexistent/nonexistent
+?zsh:.:2: no such file or directory: ./nonexistent/nonexistent
 
   $ZTST_testdir/../Src/zsh -f -o CONTINUE_ON_ERROR <<<'
   readonly foo
