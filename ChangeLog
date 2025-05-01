@@ -1,3 +1,8 @@
+2025-05-01  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 53529: Test/A04redirect.ztst: Avoid using system area for
+	non-existent files as permissions may affect the result.
+
 2025-04-28  dana  <dana@dana.is>
 
 	* unposted: README: add missed note about <<< redirection
