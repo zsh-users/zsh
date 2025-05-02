@@ -57,7 +57,7 @@ $coltmp = $destdir . '/' . $coltmpbase;
 $args = "./$manfile >$mantmp";
 unlink($mantmp);
 &Info('attempting man ', $args);
-if(system('man ' . $args) || !(-s $mantmp)) {
+if(system('MANPAGER=cat man ' . $args) || !(-s $mantmp)) {
     unlink($mantmp);
     &Info('attempting nroff -man ', $args);
     if(system('nroff -man ' . $args) || !(-s $mantmp)) {
