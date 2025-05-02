@@ -10,7 +10,7 @@ _arguments \
   '(-s --suite)'{-s,--suite=}':suite:_values -s , "suite list" stable testing unstable oldstable oldoldstable' \
   '(-r --regex)'{-r,--regex} \
   '(-S --source-and-binary)'{-S,--source-and-binary} \
-  '(-u --url)'{-u,--url=}':url:_values -s , "url alias" debian new qa ubuntu udd archive ports' \
+  '(-u --url)'{-u,--url=}':url:_values -s , "url alias" debian new qa ubuntu all udd archive ports' \
   '--version' \
   '(--no-conf --noconf)'{--no-conf,--noconf} \
   '*:package:_deb_packages avail'
