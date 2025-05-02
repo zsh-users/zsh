@@ -1,3 +1,8 @@
+2025-05-04  dana@dana.is  <dana@dana.is>
+
+	* Max Coplan: 53535: Util/helpfiles: fix builds with
+	interactive manpagers
+
 2025-05-01  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 53529: Test/A04redirect.ztst: Avoid using system area for
