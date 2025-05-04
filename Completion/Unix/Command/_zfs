@@ -1083,7 +1083,7 @@ case $service:$words[1] in
   zpool:iostat)
     if [[ $implementation = openzfs ]]; then
       args=(
-        '-c+[run scripts on each vdev]: :_values -s , "scriptname" $scriptnames'
+        '-c+[run scripts on each vdev]: :_values -s , "script name" $scriptnames'
         '-g[display vdev GUIDs instead of normal device names]'
         '-H[suppress headers and tab-delimit fields]'
         '-L[display real paths for vdevs resolving all symbolic links]'
@@ -1252,7 +1252,7 @@ case $service:$words[1] in
       args=(
         '--power[display vdev enclosure slot power status]'
         '-D[display a histogram of deduplication statistics]'
-        '-c+[run scripts on each vdev]: :_values -s , "scriptname" $scriptnames'
+        '-c+[run scripts on each vdev]: :_values -s , "script name" $scriptnames'
         '-e[only show unhealthy vdevs]'
         '-i[display vdev initialization status]'
         '-g[display vdev GUIDs instead of the normal device names]'
