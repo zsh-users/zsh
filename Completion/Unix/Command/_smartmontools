@@ -10,15 +10,15 @@ _arguments -s -S \
     "(b v)n[suppress printing bits]"
     "(b n)v[print all bits from valid words]"' \
   '(--json)-j[output as JSON]' \
-  '(-j)--json=-[specify JSON/YAML output format]: : _values -S "" "output format"
-    "(b v)c[compact]"
-    "(b v)g[grep/gron]"
-    "(b v)o[original]"
-    "(b v)s[sorted]"
-    "(b v)v[verbose]"
-    "(b v)y[YAML]"
-    "(b v)i[implemented dev]"
-    "(b v)u[unimplemented dev]"' \
+  '(-j)--json=-[specify JSON/YAML output format]:: : _values -S "" "output format"
+    "c[compact]"
+    "g[grep/gron]"
+    "o[original]"
+    "s[sorted]"
+    "v[verbose]"
+    "y[YAML]"
+    "i[implemented dev]"
+    "u[unimplemented dev]"' \
   '(H)*'{-g+,--get=}'[get device setting]:setting:(all aam apm lookahead security wcache rcache wcreorder)' \
   '(H -a --all -x --xall -H --health -i --info -c --capabilities -A --attributes --scan --scan-open)'{-a,--all}'[show all SMART information for device]' \
   '(H -x --xall -a --all -H --health -i --info -c --capabilities -A --attributes --scan --scan-open)'{-x,--xall}'[show all information for device]' \
