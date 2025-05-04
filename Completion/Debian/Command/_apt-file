@@ -28,7 +28,7 @@ case $state in
       'update:resynchronize package contents'
       {find,search}:'search in which package file is included'
       {list,show}:'list contents of a package'
-      'list-indices:list the known content indices'
+      'list-indices:list known content indices'
       'purge:remove all Contents-<ARCH>.gz files in cache directory'
     )
     _describe -t commands 'apt-list command' cmds

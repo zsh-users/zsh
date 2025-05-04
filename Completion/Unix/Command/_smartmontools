@@ -9,14 +9,14 @@ _arguments -s -S \
     "w[print all words]"
     "(b v)n[suppress printing bits]"
     "(b n)v[print all bits from valid words]"' \
-  '-j[output as json]' \
-  '--json=[output in various json formats or yaml]: : _values -S "" "output format"
+  '(--json)-j[output as JSON]' \
+  '(-j)--json=-[specify JSON/YAML output format]: : _values -S "" "output format"
     "(b v)c[compact]"
     "(b v)g[grep/gron]"
     "(b v)o[original]"
     "(b v)s[sorted]"
     "(b v)v[verbose]"
-    "(b v)y[yaml]"
+    "(b v)y[YAML]"
     "(b v)i[implemented dev]"
     "(b v)u[unimplemented dev]"' \
   '(H)*'{-g+,--get=}'[get device setting]:setting:(all aam apm lookahead security wcache rcache wcreorder)' \

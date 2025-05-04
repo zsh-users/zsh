@@ -430,7 +430,7 @@ _apt-cmd () {
     /$'changelog\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'full-upgrade\0'/ \| \
     /$'dist-upgrade\0'/ \| \
-    /$'edit-sources\0'/ /$'[^\0]#\0'/ ':sourcefiles::_values 'sourcefiles' $sources ' \# \| \
+    /$'edit-sources\0'/ /$'[^\0]#\0'/ ': ::_apt_sources' \# \| \
     /"[]"/ ':argument-1::compadd "$expl_action[@]" list search showsrc show depends rdepends policy update install reinstall download source build-dep satisfy remove upgrade full-upgrade dist-upgrade edit-sources autoclean distclean changelog autoremove autopurge purge'
 
   _apt-cmd () {
@@ -482,7 +482,7 @@ _apt-get () {
     --arch-only:bool \
     --allow-unauthenticated:bool \
     --auto-remove:bool \
-    -S,--snapshot:_snapshotdates \
+    -S,--snapshot:_apt_snapshot_dates \
     -- \
     /$'update\0'/ \| \
     /$'upgrade\0'/ \| \
@@ -640,12 +640,15 @@ ${${${${(M)tmp:#*release*n=*}#*n=}%%,*}:#now}
 }
 
 _apt_sources () {
-	local sourcelist sourceparts diretc
-	diretc="${"${"$(apt-config shell x dir::etc)"#*\'}"%\'*}"
-	sourceparts="${"${"$(apt-config shell x dir::etc::sourceparts)"#*\'}"%\'*}"
-	print /${diretc}/$sourceparts/*.{list,sources}(N:t)
+  local diretc=etc/apt sourceparts=sources.list.d
+  local -a expl
+
+  eval "$(apt-config shell diretc dir::etc 2> /dev/null)"
+  eval "$(apt-config shell sourceparts dir::etc::sourceparts 2> /dev/null)"
+
+  _description files expl 'source file'
+  _files "${(@)expl}" -W /$diretc/$sourceparts -g '*.(list|sources)(.:t)'
 }
-sources=( $(_apt_sources) )
 
 _apt_releases () {
   local update_policy
@@ -735,22 +738,17 @@ _apt-mark () {
   _apt-mark "$@"
 }
 
-_snapshotdates() {
-  local expl
-  local -a waybackdates
-
-  getdates() {
-    whence -p python3 &>/dev/null || return 0
-    local timespan='-6month'
-    local timestamp="$(date +%Y%m%d --date="${timespan}")"
-    local url="http://snapshot.debian.org/mr/timestamp/?archive=debian&after=${timestamp}"
-    python3 -c 'import sys,urllib.request,json;[print(x) for x in json.loads(urllib.request.urlopen(sys.argv[1]).read())["result"]["debian"]]' "$url" 2>/dev/null || :
-  }
+_apt_snapshot_dates() {
+  local -a expl snapshotdates
   snapshotdates=(
-    ${(u)$(getdates)%T*}
+    ${(u)$(
+      (( $+commands[python3] )) || return 0
+      local timestamp="$(date +%Y%m%d --date=-6month)"
+      local url="http://snapshot.debian.org/mr/timestamp/?archive=debian&after=${timestamp}"
+      python3 -c 'import sys,urllib.request,json;[print(x) for x in json.loads(urllib.request.urlopen(sys.argv[1]).read())["result"]["debian"]]' "$url" 2>/dev/null || :
+    )%T*}
   )
-  _wanted list expl 'wayback date(s)' compadd ${expl} -- ${snapshotdates}
+  _wanted list expl 'wayback date (yyyymmdd[ThhmmssZ])' compadd -- ${snapshotdates}
 }
-
 
 _apt "$@"
