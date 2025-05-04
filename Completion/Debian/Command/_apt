@@ -37,15 +37,15 @@ _apt_arguments () {
       arbitem) num_options[$opts]=-1;;
       release) num_options[$opts]=1;;
       *) num_options[$opts]=1
-	 comp_hasarg="${comp_hasarg}$opts) $type;;"$'\n'
-	 type=hasarg;;
+         comp_hasarg="${comp_hasarg}$opts) $type;;"$'\n'
+         type=hasarg;;
     esac
 
     for opt in ${(s:,:)=opts}; do
       canonicalize[$opt]="$opts"
       case $opt in
-	--*) eval "long_$type=(\$long_$type ${opt#--})";;
-	-?) eval "short_$type=(\$short_$type ${opt#-})";;
+        --*) eval "long_$type=(\$long_$type ${opt#--})";;
+        -?) eval "short_$type=(\$short_$type ${opt#-})";;
       esac
     done
     shift
@@ -122,223 +122,223 @@ _describe -o option tmp2 -- tmp3 -S=}'
   if (( $#short_hasarg )); then
     regex_short=("$regex_short[@]"
       /"$short_seq(${(j:|:)short_hasarg})(=|)"/
-	-'_apt_consume_short ${match[1]%=}; current_option=${canonicalize[-${${match[1]%=}[-1]}]}'
-	\( /"$word1"/ ":options:option:$comp_hasarg" \| /"$nul"/ /"$word"/ ":options:option:$comp_hasarg" \) \|
+        -'_apt_consume_short ${match[1]%=}; current_option=${canonicalize[-${${match[1]%=}[-1]}]}'
+        \( /"$word1"/ ":options:option:$comp_hasarg" \| /"$nul"/ /"$word"/ ":options:option:$comp_hasarg" \) \|
     )
     regex_long_prefix=("$regex_long_prefix[@]"
       /"(${(j:|:)short_hasarg})$nul"/
-	-'_apt_consume_short ${match[1][-2]}; current_option=${canonicalize[-${${match[1]%'$qnul'}[-1]}]}'
-	/"$word"/ ":options:option:$comp_hasarg" \|
+        -'_apt_consume_short ${match[1][-2]}; current_option=${canonicalize[-${${match[1]%'$qnul'}[-1]}]}'
+        /"$word"/ ":options:option:$comp_hasarg" \|
       /"(${(j:|:)short_hasarg})="/
-	-'_apt_consume_short ${match[1][-2]}; current_option=${canonicalize[-${${match[1]%=}[-1]}]}'
-	\( /"$word1"/ ":options:option:$comp_hasarg" \| /"$nul"/ /"$word"/ ":options:option:$comp_hasarg" \) \|
+        -'_apt_consume_short ${match[1][-2]}; current_option=${canonicalize[-${${match[1]%=}[-1]}]}'
+        \( /"$word1"/ ":options:option:$comp_hasarg" \| /"$nul"/ /"$word"/ ":options:option:$comp_hasarg" \) \|
     )
   fi
 
   if (( $#short_bool )); then
     regex_short=("$regex_short[@]"
       /"$short_seq(${(j:|:)short_bool})($nul(${(j:|:)bool})|(${(j:|:)bool})|)$nul"/
-	-'_apt_consume_short ${match[1]%%('$qnul'('${(j:|:)bool}')|('${(j:|:)bool}')|)'$qnul'}' \|
+        -'_apt_consume_short ${match[1]%%('$qnul'('${(j:|:)bool}')|('${(j:|:)bool}')|)'$qnul'}' \|
       /"$short_seq(${(j:|:)short_bool})="/
-	-'_apt_consume_short ${match[1]%=}'
-	\( /"$word1"/ ":names:boolean value:$comp_bool" \| /"$nul"/ /"$word"/ ":names:boolean value:$comp_bool" \) \|
+        -'_apt_consume_short ${match[1]%=}'
+        \( /"$word1"/ ":names:boolean value:$comp_bool" \| /"$nul"/ /"$word"/ ":names:boolean value:$comp_bool" \) \|
     )
     regex_long_prefix=("$regex_long_prefix[@]"
       /"(${(j:|:)short_bool})="/
-	-'_apt_consume_short ${match[1][-2]}'
-	\( /"$word1"/ ":names:boolean value:$comp_bool" \| /"$nul"/ /"$word"/ ":names:boolean value:$comp_bool" \) \|
+        -'_apt_consume_short ${match[1][-2]}'
+        \( /"$word1"/ ":names:boolean value:$comp_bool" \| /"$nul"/ /"$word"/ ":names:boolean value:$comp_bool" \) \|
       /"(${(j:|:)short_bool})$nul"/
-	-'_apt_consume_short ${match[1][-2]}'
-	/"((${(j:|:)bool})$nul|)"/ ":names:boolean value:$comp_bool" \|
+        -'_apt_consume_short ${match[1][-2]}'
+        /"((${(j:|:)bool})$nul|)"/ ":names:boolean value:$comp_bool" \|
     )
   fi
 
   if (( $#short_intlevel )); then
     regex_short=("$regex_short[@]"
       /"$short_seq(${(j:|:)short_intlevel})($nul$intlevel|$intlevel|)$nul"/
-	-'_apt_consume_short ${match[1]%%'"($qnul$intlevel|$intlevel|)$qnul"'}' \|
+        -'_apt_consume_short ${match[1]%%'"($qnul$intlevel|$intlevel|)$qnul"'}' \|
       /"$short_seq(${(j:|:)short_intlevel})="/
-	-'_apt_consume_short ${match[1]%=}'
-	\( /"$word1"/ ":options:option:$comp_intlevel" \| /"$nul"/ /"$word"/ ":options:option:$comp_intlevel" \) \|
+        -'_apt_consume_short ${match[1]%=}'
+        \( /"$word1"/ ":options:option:$comp_intlevel" \| /"$nul"/ /"$word"/ ":options:option:$comp_intlevel" \) \|
     )
     regex_long_prefix=("$regex_long_prefix[@]"
       /"(${(j:|:)short_intlevel})="/
-	-'_apt_consume_short ${match[1][-2]}'
-	\( /"$word1"/ ":options:option:$comp_intlevel" \| /"$nul"/ /"$word"/ ":options:option:$comp_intlevel" \) \|
+        -'_apt_consume_short ${match[1][-2]}'
+        \( /"$word1"/ ":options:option:$comp_intlevel" \| /"$nul"/ /"$word"/ ":options:option:$comp_intlevel" \) \|
       /"(${(j:|:)short_intlevel})$nul"/
-	-'_apt_consume_short ${match[1][-2]}'
-	/"($intlevel$nul|)"/ ":options:option:$comp_intlevel" \|
+        -'_apt_consume_short ${match[1][-2]}'
+        /"($intlevel$nul|)"/ ":options:option:$comp_intlevel" \|
     )
   fi
 
   if (( $#short_configfile )); then
     regex_short=("$regex_short[@]"
       /"$short_seq(${(j:|:)short_configfile})(=|)"/
-	-'_apt_consume_short ${match[1]%=}'
-	\( /"$word1"/ ":files:config file:$comp_configfile" \| /"$nul"/ /"$word"/ ":files:config file:$comp_configfile" \) \|
+        -'_apt_consume_short ${match[1]%=}'
+        \( /"$word1"/ ":files:config file:$comp_configfile" \| /"$nul"/ /"$word"/ ":files:config file:$comp_configfile" \) \|
     )
     regex_long_prefix=("$regex_long_prefix[@]"
       /"(${(j:|:)short_configfile})$nul"/
-	-'_apt_consume_short ${match[1][-2]}'
-	/"$word"/ ":files:config file:$comp_configfile" \|
+        -'_apt_consume_short ${match[1][-2]}'
+        /"$word"/ ":files:config file:$comp_configfile" \|
       /"(${(j:|:)short_configfile})="/
-	-'_apt_consume_short ${match[1][-2]}'
-	\( /"$word1"/ ":files:config file:$comp_configfile" \| /"$nul"/ /"$word"/ ":files:config file:$comp_configfile" \) \|
+        -'_apt_consume_short ${match[1][-2]}'
+        \( /"$word1"/ ":files:config file:$comp_configfile" \| /"$nul"/ /"$word"/ ":files:config file:$comp_configfile" \) \|
     )
   fi
 
   if (( $#short_arbitem )); then
     regex_short=("$regex_short[@]"
       /"$short_seq(${(j:|:)short_arbitem})(=|)"/
-	-'_apt_consume_short ${match[1]%=}'
-	\( /"$word1"/ ":options:option:$comp_arbitem" \| /"$nul"/ /"$word"/ ":options:option:$comp_arbitem" \) \|
+        -'_apt_consume_short ${match[1]%=}'
+        \( /"$word1"/ ":options:option:$comp_arbitem" \| /"$nul"/ /"$word"/ ":options:option:$comp_arbitem" \) \|
     )
     regex_long_prefix=("$regex_long_prefix[@]"
       /"(${(j:|:)short_arbitem})$nul"/
-	-'_apt_consume_short ${match[1][-2]}'
-	/"$word"/ ":options:option:$comp_arbitem" \|
+        -'_apt_consume_short ${match[1][-2]}'
+        /"$word"/ ":options:option:$comp_arbitem" \|
       /"(${(j:|:)short_arbitem})="/
-	-'_apt_consume_short ${match[1][-2]}'
-	\( /"$word1"/ ":options:option:$comp_arbitem" \| /"$nul"/ /"$word"/ ":options:option:$comp_arbitem" \) \|
+        -'_apt_consume_short ${match[1][-2]}'
+        \( /"$word1"/ ":options:option:$comp_arbitem" \| /"$nul"/ /"$word"/ ":options:option:$comp_arbitem" \) \|
     )
   fi
 
   if (( $#short_release )); then
     regex_short=("$regex_short[@]"
       /"$short_seq(${(j:|:)short_release})(=|)"/
-	-'_apt_consume_short ${match[1]%=}'
-	\( /"$word1"/ ":releases:release name:$comp_release" \| /"$nul"/ /"$word"/ ":release name:release:$comp_release" \) \|
+        -'_apt_consume_short ${match[1]%=}'
+        \( /"$word1"/ ":releases:release name:$comp_release" \| /"$nul"/ /"$word"/ ":release name:release:$comp_release" \) \|
     )
     regex_long_prefix=("$regex_long_prefix[@]"
       /"(${(j:|:)short_release})$nul"/
-	-'_apt_consume_short ${match[1][-2]}'
-	/"$word"/ ":releases:release name:$comp_release" \|
+        -'_apt_consume_short ${match[1][-2]}'
+        /"$word"/ ":releases:release name:$comp_release" \|
       /"(${(j:|:)short_release})="/
-	-'_apt_consume_short ${match[1][-2]}'
-	\( /"$word1"/ ":releases:release name:$comp_release" \| /"$nul"/ /"$word"/ ":releases:release name:$comp_release" \) \|
+        -'_apt_consume_short ${match[1][-2]}'
+        \( /"$word1"/ ":releases:release name:$comp_release" \| /"$nul"/ /"$word"/ ":releases:release name:$comp_release" \) \|
     )
   fi
 
   if (( $#long_hasarg )); then
     regex_long=("$regex_long[@]"
       /"(${(j:|:)long_hasarg})$nul"/
-	-'_apt_consume_long ${match[1]%'$qnul'}; current_option=${canonicalize[--${match[1]%'$qnul'}]}'
-	/"$word"/ ":options:option:$comp_hasarg" \|
+        -'_apt_consume_long ${match[1]%'$qnul'}; current_option=${canonicalize[--${match[1]%'$qnul'}]}'
+        /"$word"/ ":options:option:$comp_hasarg" \|
       /"(${(j:|:)long_hasarg})="/
-	-'_apt_consume_long ${match[1]%=}; current_option=${canonicalize[--${match[1]%=}]}'
-	\( /"$word1"/ ":options:option:$comp_hasarg" \| /"$nul"/ /"$word"/ ":options:option:$comp_hasarg" \) \|
+        -'_apt_consume_long ${match[1]%=}; current_option=${canonicalize[--${match[1]%=}]}'
+        \( /"$word1"/ ":options:option:$comp_hasarg" \| /"$nul"/ /"$word"/ ":options:option:$comp_hasarg" \) \|
     )
     regex_long_prefix=("$regex_long_prefix[@]"
       /"(${(j:|:)long_hasarg})$nul"/
-	-'_apt_consume_long ${match[1]%'$qnul'}; current_option=${canonicalize[--${match[1]%'$qnul'}]}'
-	/"$word"/ ":options:option:$comp_hasarg" \|
+        -'_apt_consume_long ${match[1]%'$qnul'}; current_option=${canonicalize[--${match[1]%'$qnul'}]}'
+        /"$word"/ ":options:option:$comp_hasarg" \|
       /"(${(j:|:)long_hasarg})="/
-	-'_apt_consume_long ${match[1]%=}; current_option=${canonicalize[--${match[1]%=}]}'
-	\( /"$word1"/ ":options:option:$comp_hasarg" \| /"$nul"/ /"$word"/ ":options:option:$comp_hasarg" \) \|
+        -'_apt_consume_long ${match[1]%=}; current_option=${canonicalize[--${match[1]%=}]}'
+        \( /"$word1"/ ":options:option:$comp_hasarg" \| /"$nul"/ /"$word"/ ":options:option:$comp_hasarg" \) \|
     )
   fi
 
   if (( $#long_bool )); then
     regex_long=("$regex_long[@]"
       /"(${(j:|:)long_bool})="/
-	-'_apt_consume_long ${match[1]%=}'
-	\( /"$word1"/ ":names:boolean value:$comp_bool" \| /"$nul"/ /"$word"/ ":names:boolean value:$comp_bool" \) \|
+        -'_apt_consume_long ${match[1]%=}'
+        \( /"$word1"/ ":names:boolean value:$comp_bool" \| /"$nul"/ /"$word"/ ":names:boolean value:$comp_bool" \) \|
       /"(${(j:|:)long_bool})$nul"/
-	-'_apt_consume_long ${match[1]%'$qnul'}'
-	/"((${(j:|:)bool})$nul|)"/ ":names:boolean value:$comp_bool" \|
+        -'_apt_consume_long ${match[1]%'$qnul'}'
+        /"((${(j:|:)bool})$nul|)"/ ":names:boolean value:$comp_bool" \|
     )
     regex_long_prefix=("$regex_long_prefix[@]"
       /"(${(j:|:)long_bool})="/
-	-'_apt_consume_long ${match[1]%=}'
-	\( /"$word1"/ ":names:boolean value:$comp_bool" \| /"$nul"/ /"$word"/ ":names:boolean value:$comp_bool" \) \|
+        -'_apt_consume_long ${match[1]%=}'
+        \( /"$word1"/ ":names:boolean value:$comp_bool" \| /"$nul"/ /"$word"/ ":names:boolean value:$comp_bool" \) \|
       /"(${(j:|:)long_bool})$nul"/
-	-'_apt_consume_long ${match[1]%'$qnul'}'
-	/"((${(j:|:)bool})$nul|)"/ ":names:boolean value:$comp_bool" \|
+        -'_apt_consume_long ${match[1]%'$qnul'}'
+        /"((${(j:|:)bool})$nul|)"/ ":names:boolean value:$comp_bool" \|
     )
   fi
 
   if (( $#long_intlevel )); then
     regex_long=("$regex_long[@]"
       /"(${(j:|:)long_intlevel})="/
-	-'_apt_consume_long ${match[1]%=}'
-	\( /"$word1"/ ":options:option:$comp_intlevel" \| /"$nul"/ /"$word"/ ":options:option:$comp_intlevel" \) \|
+        -'_apt_consume_long ${match[1]%=}'
+        \( /"$word1"/ ":options:option:$comp_intlevel" \| /"$nul"/ /"$word"/ ":options:option:$comp_intlevel" \) \|
       /"(${(j:|:)long_intlevel})$nul"/
-	-'_apt_consume_long ${match[1]%'$qnul'}'
-	/"($intlevel$nul|)"/ ":options:option:$comp_intlevel" \|
+        -'_apt_consume_long ${match[1]%'$qnul'}'
+        /"($intlevel$nul|)"/ ":options:option:$comp_intlevel" \|
     )
     regex_long_prefix=("$regex_long_prefix[@]"
       /"(${(j:|:)long_intlevel})="/
-	-'_apt_consume_long ${match[1]%=}'
-	\( /"$word1"/ ":options:option:$comp_intlevel" \| /"$nul"/ /"$word"/ ":options:option:$comp_intlevel" \) \|
+        -'_apt_consume_long ${match[1]%=}'
+        \( /"$word1"/ ":options:option:$comp_intlevel" \| /"$nul"/ /"$word"/ ":options:option:$comp_intlevel" \) \|
       /"(${(j:|:)long_intlevel})$nul"/
-	-'_apt_consume_long ${match[1]%'$qnul'}'
-	/"($intlevel$nul|)"/ ":options:option:$comp_intlevel" \|
+        -'_apt_consume_long ${match[1]%'$qnul'}'
+        /"($intlevel$nul|)"/ ":options:option:$comp_intlevel" \|
     )
   fi
 
   if (( $#long_configfile )); then
     regex_long=("$regex_long[@]"
       /"(${(j:|:)long_configfile})$nul"/
-	-'_apt_consume_long ${match[1]%'$qnul'}'
-	/"$word"/ ":files:config file:$comp_configfile" \|
+        -'_apt_consume_long ${match[1]%'$qnul'}'
+        /"$word"/ ":files:config file:$comp_configfile" \|
       /"(${(j:|:)long_configfile})="/
-	-'_apt_consume_long ${match[1]%=}'
-	\( /"$word1"/ ":files:config file:$comp_configfile" \| /"$nul"/ /"$word"/ ":files:config file:$comp_configfile" \) \|
+        -'_apt_consume_long ${match[1]%=}'
+        \( /"$word1"/ ":files:config file:$comp_configfile" \| /"$nul"/ /"$word"/ ":files:config file:$comp_configfile" \) \|
     )
     regex_long_prefix=("$regex_long_prefix[@]"
       /"(${(j:|:)long_configfile})$nul"/
-	-'_apt_consume_long ${match[1]%'$qnul'}'
-	/"$word"/ ":files:config file:$comp_configfile" \|
+        -'_apt_consume_long ${match[1]%'$qnul'}'
+        /"$word"/ ":files:config file:$comp_configfile" \|
       /"(${(j:|:)long_configfile})="/
-	-'_apt_consume_long ${match[1]%=}'
-	\( /"$word1"/ ":files:config file:$comp_configfile" \| /"$nul"/ /"$word"/ ":files:config file:$comp_configfile" \) \|
+        -'_apt_consume_long ${match[1]%=}'
+        \( /"$word1"/ ":files:config file:$comp_configfile" \| /"$nul"/ /"$word"/ ":files:config file:$comp_configfile" \) \|
     )
   fi
 
   if (( $#long_arbitem )); then
     regex_long=("$regex_long[@]"
       /"(${(j:|:)long_arbitem})$nul"/
-	-'_apt_consume_long ${match[1]%'$qnul'}'
-	/"$word"/ ":options:option:$comp_arbitem" \|
+        -'_apt_consume_long ${match[1]%'$qnul'}'
+        /"$word"/ ":options:option:$comp_arbitem" \|
       /"(${(j:|:)long_arbitem})="/
-	-'_apt_consume_long ${match[1]%=}'
-	\( /"$word1"/ ":options:option:$comp_arbitem" \| /"$nul"/ /"$word"/ ":options:option:$comp_arbitem" \) \|
+        -'_apt_consume_long ${match[1]%=}'
+        \( /"$word1"/ ":options:option:$comp_arbitem" \| /"$nul"/ /"$word"/ ":options:option:$comp_arbitem" \) \|
     )
     regex_long_prefix=("$regex_long_prefix[@]"
       /"(${(j:|:)long_arbitem})$nul"/
-	-'_apt_consume_long ${match[1]%'$qnul'}'
-	/"$word"/ ":options:option:$comp_arbitem" \|
+        -'_apt_consume_long ${match[1]%'$qnul'}'
+        /"$word"/ ":options:option:$comp_arbitem" \|
       /"(${(j:|:)long_arbitem})="/
-	-'_apt_consume_long ${match[1]%=}'
-	\( /"$word1"/ ":options:option:$comp_arbitem" \| /"$nul"/ /"$word"/ ":options:option:$comp_arbitem" \) \|
+        -'_apt_consume_long ${match[1]%=}'
+        \( /"$word1"/ ":options:option:$comp_arbitem" \| /"$nul"/ /"$word"/ ":options:option:$comp_arbitem" \) \|
     )
   fi
 
   if (( $#long_release )); then
     regex_long=("$regex_long[@]"
       /"(${(j:|:)long_release})$nul"/
-	-'_apt_consume_long ${match[1]%'$qnul'}'
-	/"$word"/ ":releases:release name:$comp_release" \|
+        -'_apt_consume_long ${match[1]%'$qnul'}'
+        /"$word"/ ":releases:release name:$comp_release" \|
       /"(${(j:|:)long_release})="/
-	-'_apt_consume_long ${match[1]%=}'
-	\( /"$word1"/ ":releases:release name:$comp_release" \| /"$nul"/ /"$word"/ ":releases:release name:$comp_release" \) \|
+        -'_apt_consume_long ${match[1]%=}'
+        \( /"$word1"/ ":releases:release name:$comp_release" \| /"$nul"/ /"$word"/ ":releases:release name:$comp_release" \) \|
     )
     regex_long_prefix=("$regex_long_prefix[@]"
       /"(${(j:|:)long_release})$nul"/
-	-'_apt_consume_long ${match[1]%'$qnul'}'
-	/"$word"/ ":releases:release name:$comp_release" \|
+        -'_apt_consume_long ${match[1]%'$qnul'}'
+        /"$word"/ ":releases:release name:$comp_release" \|
       /"(${(j:|:)long_release})="/
-	-'_apt_consume_long ${match[1]%=}'
-	\( /"$word1"/ ":releases:release name:$comp_release" \| /"$nul"/ /"$word"/ ":releases:release name:$comp_release" \) \|
+        -'_apt_consume_long ${match[1]%=}'
+        \( /"$word1"/ ":releases:release name:$comp_release" \| /"$nul"/ /"$word"/ ":releases:release name:$comp_release" \) \|
     )
   fi
 
   regex_all=(
     /"$word"/
     \( /--/+ \( "$regex_long[@]"
-		/"(${(j:|:)bool})-"/+
-		  \( "$regex_long_prefix[@]"
-		     /"[]"/ ":options:option:$comp_long_prefix" \) \) \|
+                /"(${(j:|:)bool})-"/+
+                  \( "$regex_long_prefix[@]"
+                     /"[]"/ ":options:option:$comp_long_prefix" \) \) \|
        /-/+ \( "$regex_short[@]" /"[]"/ \) \|
        /"[]"/ ":options:option:$comp_opt" \) \#
     "$regex_all[@]"
@@ -417,10 +417,10 @@ _apt-cmd () {
       /$'(install|download|source|build-dep)\0'/ -'subcmd=${match%?}' \
       /$'[^\0]#\0'/ ':packages::_deb_packages -qr "\n\t\- /=+-" "$expl_packages[@]" avail' \# \
       \( \
-	// '%(.|)/%' -'[[ $subcmd = install ]]' /'[]'/ ':files: :_deb_files' \| \
-	// '%(.|)/%' -'[[ $subcmd = build-dep ]]' /'[]'/ ':files: :_deb_files -D' \| \
-	/$'[^\0/=]#\/'/ /'[]'/ ':apt-releases:release name:_apt_releases' \| \
-	/$'[^\0/=]#='/ /'[]'/ ':apt-package-versions:package version:_apt_versions_of_binary_package' \| \
+        // '%(.|)/%' -'[[ $subcmd = install ]]' /'[]'/ ':files: :_deb_files' \| \
+        // '%(.|)/%' -'[[ $subcmd = build-dep ]]' /'[]'/ ':files: :_deb_files -D' \| \
+        /$'[^\0/=]#\/'/ /'[]'/ ':apt-releases:release name:_apt_releases' \| \
+        /$'[^\0/=]#='/ /'[]'/ ':apt-package-versions:package version:_apt_versions_of_binary_package' \| \
       \) \
     \) \| \
     /$'((|auto)(remove|purge)|reinstall)\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
@@ -490,10 +490,10 @@ _apt-get () {
       /$'(install|download|source|build-dep)\0'/ -'subcmd=${match%?}' \
       /$'[^\0]#\0'/ ':packages::_deb_packages -qr "\n\t\- /=+-" "$expl_packages[@]" avail' \# \
       \( \
-	// '%(.|)/%' -'[[ $subcmd = install ]]' /'[]'/ ':files: :_deb_files' \| \
-	// '%(.|)/%' -'[[ $subcmd = build-dep ]]' /'[]'/ ':files: :_deb_files -D' \| \
-	/$'[^\0/=]#\/'/ /'[]'/ ':apt-releases:release name:_apt_releases' \| \
-	/$'[^\0/=]#='/ /'[]'/ ':apt-package-versions:package version:_apt_versions_of_binary_package' \| \
+        // '%(.|)/%' -'[[ $subcmd = install ]]' /'[]'/ ':files: :_deb_files' \| \
+        // '%(.|)/%' -'[[ $subcmd = build-dep ]]' /'[]'/ ':files: :_deb_files -D' \| \
+        /$'[^\0/=]#\/'/ /'[]'/ ':apt-releases:release name:_apt_releases' \| \
+        /$'[^\0/=]#='/ /'[]'/ ':apt-package-versions:package version:_apt_versions_of_binary_package' \| \
       \) \
     \) \| \
     /$'(|auto)(purge|remove)\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
@@ -511,7 +511,7 @@ _apt-get () {
     /$'autoremove\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'autopurge\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'help\0/' \| \
-    /"[]"/	':argument-1::compadd "$expl_action[@]" update upgrade install reinstall remove purge dist-upgrade dselect-upgrade clean autoclean distclean changelog check source build-dep satisfy indextargets autoremove autopurge help markauto unmarkauto download'
+    /"[]"/      ':argument-1::compadd "$expl_action[@]" update upgrade install reinstall remove purge dist-upgrade dselect-upgrade clean autoclean distclean changelog check source build-dep satisfy indextargets autoremove autopurge help markauto unmarkauto download'
 
   _apt-get () {
     local expl_action expl_packages
@@ -590,7 +590,7 @@ _apt-cdrom () {
     -- \
     /$'add\0'/ \| \
     /$'ident\0'/ \| \
-    /"[]"/	':argument-1::compadd "$expl_action[@]" add ident'
+    /"[]"/      ':argument-1::compadd "$expl_action[@]" add ident'
 
   _apt-cdrom () {
     local expl_action expl_mount_point
@@ -616,11 +616,11 @@ _apt-config () {
     -- \
     /$'shell\0'/ \
       \( \
-	/$'[^\0]#\0'/ ':parameters:shell variable to assign:_parameters' \
-	/$'[^\0]#\0'/ ':values:configuration key:compadd - ${(u)${(f)"$(apt-config --empty --no-color --format='%f%n' dump 2>&1)"}%%(::|) *}' \
+        /$'[^\0]#\0'/ ':parameters:shell variable to assign:_parameters' \
+        /$'[^\0]#\0'/ ':values:configuration key:compadd - ${(u)${(f)"$(apt-config --empty --no-color --format='%f%n' dump 2>&1)"}%%(::|) *}' \
       \) \# \| \
     /$'dump\0'/ \| \
-    /"[]"/	':argument-1:action:compadd shell dump'
+    /"[]"/      ':argument-1:action:compadd shell dump'
 
   _apt-config "$@"
 }
@@ -725,7 +725,7 @@ _apt-mark () {
     /$'showauto\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'showmanual\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'showhold\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
-    /"[]"/	':argument-1::compadd "$expl_action[@]" auto manual hold unhold showauto showmanual showhold'
+    /"[]"/      ':argument-1::compadd "$expl_action[@]" auto manual hold unhold showauto showmanual showhold'
 
   _apt-mark () {
     local expl_action expl_packages
@@ -739,16 +739,17 @@ _apt-mark () {
 }
 
 _apt_snapshot_dates() {
-  local -a expl snapshotdates
-  snapshotdates=(
-    ${(u)$(
-      (( $+commands[python3] )) || return 0
-      local timestamp="$(date +%Y%m%d --date=-6month)"
-      local url="http://snapshot.debian.org/mr/timestamp/?archive=debian&after=${timestamp}"
-      python3 -c 'import sys,urllib.request,json;[print(x) for x in json.loads(urllib.request.urlopen(sys.argv[1]).read())["result"]["debian"]]' "$url" 2>/dev/null || :
-    )%T*}
-  )
-  _wanted list expl 'wayback date (yyyymmdd[ThhmmssZ])' compadd -- ${snapshotdates}
+  local -a expl dates
+  # Get last 6 months of dates
+  zmodload -i zsh/datetime && {
+    local i date last=$EPOCHSECONDS
+    for (( i = 0; i < 180; i++ )); do
+      strftime -s date %Y%m%d $last
+      dates+=( $date )
+      last=$(( last - (24 * 60 * 60) ))
+    done
+  }
+  _wanted list expl 'wayback date (yyyymmdd[ThhmmssZ])' compadd -- $dates
 }
 
 _apt "$@"
