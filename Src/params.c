@@ -2231,7 +2231,13 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 		    *ss = 0;
 		}
 		Param p1 = (Param)gethashnode2(paramtab, ref);
-		if (!(p1 && (pm = upscope(p1, pm->base))) ||
+		if (p1) {
+		    int scope = ((pm->node.flags & PM_NAMEREF) ?
+				 ((pm->node.flags & PM_UPPER) ? -(pm->base) :
+				  pm->base) : locallevel);
+		    pm = upscope(p1, scope);
+		}
+		if (!(p1 && pm) ||
 		    ((pm->node.flags & PM_UNSET) &&
 		     !(pm->node.flags & PM_DECLARED)))
 		    return NULL;
@@ -5885,7 +5891,8 @@ scanendscope(HashNode hn, UNUSED(int flags))
 		export_param(pm);
 	} else
 	    unsetparam_pm(pm, 0, 0);
-    } else if ((pm->node.flags & PM_NAMEREF) && pm->base > pm->level)
+    } else if ((pm->node.flags & PM_NAMEREF) &&
+	       pm->base > pm->level && pm->base > locallevel)
 	pm->base = locallevel;
 }
 
@@ -6291,7 +6298,7 @@ resolve_nameref(Param pm, const Asgment stop)
 	    if (pm) {
 		if (!(stop && (stop->flags & (PM_LOCAL)))) {
 		    int scope = ((pm->node.flags & PM_NAMEREF) ?
-				 ((pm->node.flags & PM_UPPER) ? -1 :
+				 ((pm->node.flags & PM_UPPER) ? -(pm->base) :
 				  pm->base) : ((Param)hn)->level);
 		    hn = (HashNode)upscope((Param)hn, scope);
 		}
@@ -6365,6 +6372,7 @@ setscope(Param pm)
 	if (t) {
 	    pm->width = t - refname;
 	    *t = '[';
+	    refname = dupstrpfx(refname, pm->width);
 	}
 	if (basepm) {
 	    if (basepm->node.flags & PM_NAMEREF) {
@@ -6393,11 +6401,19 @@ setscope(Param pm)
 			break;
 		    }
 		}
-	    } else
+	    } else if (!pm->base) {
 		pm->base = basepm->level;
+		if ((pm->node.flags & PM_UPPER) &&
+		    (basepm = upscope(basepm, -(locallevel-1))))
+		    pm->base = basepm->level;
+	    }
 	} else if (pm->base < locallevel && refname &&
-		   (basepm = (Param)getparamnode(realparamtab, refname)))
+		   (basepm = (Param)getparamnode(realparamtab, refname))) {
 	    pm->base = basepm->level;
+	    if ((pm->node.flags & PM_UPPER) &&
+		(basepm = upscope(basepm, -(locallevel-1))))
+		pm->base = basepm->level;
+	}
 	if (pm->base > pm->level) {
 	    if (EMULATION(EMULATE_KSH)) {
 		zerr("%s: global reference cannot refer to local variable",
@@ -6422,7 +6438,7 @@ upscope(Param pm, int reflevel)
 {
     Param up = pm->old;
     while (up && up->level >= reflevel) {
-	if (reflevel < 0 && up->level < locallevel)
+	if (reflevel < 0 && up->level < -(reflevel))
 	    break;
 	pm = up;
 	up = up->old;

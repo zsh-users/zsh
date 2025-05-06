@@ -1,3 +1,12 @@
+2025-05-05  Bart Schaefer  <schaefer@zsh.org>
+
+	* 53557 (plus test): Src/params.c, Test/K01nameref.ztst:
+	Fix one more scoping issue with "typeset -u -n" references
+
+	* 53546 (plus test): Src/params.c, Test/K01nameref.ztst:
+	Fix several errors when using "placeholder" named references
+	declared at scopes surrounding the scope where they are assigned.
+
 2025-05-04  dana@dana.is  <dana@dana.is>
 
 	* Max Coplan: 53535: Util/helpfiles: fix builds with

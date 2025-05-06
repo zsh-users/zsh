@@ -7,6 +7,76 @@
 
  : ${ZTST_continue::=1}
 
+  # The following test allows to assess what different types of named
+  # references refer to during their lifetime depending on where they
+  # were initialized and whether they were defined with or without the
+  # "-u" flag.
+  #
+  # The first parameter determines whether the named references are
+  # defined with or without the flag "-u".
+  #
+  # The second parameter determines where the named references are
+  # initialized. In all cases the named references are defined at the
+  # start of function "g". With value "0" they are initialized at the
+  # same place (in the same statement). With the other values, the
+  # initialization is delayed until later, the greater the value and the
+  # later the initialization.
+
+   function e() {
+     local s=$0 a=($0);
+     f "$@";
+   }
+
+   function f() {
+     local s=$0 a=($0);
+     g "$@";
+   }
+
+   function g() {
+     if (($2)); then local -n $1 rs ra rs1 ra1;
+     else local -n $1 rs=s ra=a rs1="s[1]" ra1="a[1]"; fi;
+     if (($2 == 1)); then rs=s; ra=a; rs1="s[1]"; ra1="a[1]"; fi;
+     echo "$0:1: rs=$rs - ra=$ra - rs1=$rs1 - ra1=$ra1";
+     local s=$0 a=($0);
+     if (($2 == 2)); then rs=s; ra=a; rs1="s[1]"; ra1="a[1]"; fi;
+     echo "$0:2: rs=$rs - ra=$ra - rs1=$rs1 - ra1=$ra1";
+     h "$@";
+     echo "$0:3: rs=$rs - ra=$ra - rs1=$rs1 - ra1=$ra1";
+   }
+
+   function h() {
+     if (($2 == 3)); then rs=s; ra=a; rs1="s[1]"; ra1="a[1]"; fi;
+     echo "$0:1: rs=$rs - ra=$ra - rs1=$rs1 - ra1=$ra1";
+     local s=$0 a=($0);
+     if (($2 == 4)); then rs=s; ra=a; rs1="s[1]"; ra1="a[1]"; fi;
+     echo "$0:2: rs=$rs - ra=$ra - rs1=$rs1 - ra1=$ra1";
+     i "$@";
+     echo "$0:3: rs=$rs - ra=$ra - rs1=$rs1 - ra1=$ra1";
+     # Check that re-entering the same scope doesn't undo scope exit
+     k "$@"
+   }
+
+   function i() {
+     if (($2 == 5)); then rs=s; ra=a; rs1="s[1]"; ra1="a[1]"; fi;
+     echo "$0:1: rs=$rs - ra=$ra - rs1=$rs1 - ra1=$ra1";
+     local s=$0 a=($0);
+     if (($2 == 6)); then rs=s; ra=a; rs1="s[1]"; ra1="a[1]"; fi;
+     echo "$0:2: rs=$rs - ra=$ra - rs1=$rs1 - ra1=$ra1";
+     j "$@";
+     echo "$0:3: rs=$rs - ra=$ra - rs1=$rs1 - ra1=$ra1";
+     k "$@";
+   }
+
+   function j() {
+     echo "$0:1: rs=$rs - ra=$ra - rs1=$rs1 - ra1=$ra1";
+     local s=$0 a=($0);
+     echo "$0:2: rs=$rs - ra=$ra - rs1=$rs1 - ra1=$ra1";
+   }
+
+   functions -c j k
+
+   local s=T a=(T);
+
 %test
 
  typeset -n ptr
@@ -901,6 +971,96 @@ F:previously this could create an infinite recursion and crash
  typeset -nm foo=bar
 1:create nameref by pattern match not allowed
 *?*typeset:1: -m not allowed with -n
+
+ e -u 0
+0:assignment at different scope than declaration, -u 0
+>g:1: rs=f - ra=f - rs1=f - ra1=f
+>g:2: rs=f - ra=f - rs1=f - ra1=f
+>h:1: rs=f - ra=f - rs1=f - ra1=f
+>h:2: rs=f - ra=f - rs1=f - ra1=f
+>i:1: rs=f - ra=f - rs1=f - ra1=f
+>i:2: rs=f - ra=f - rs1=f - ra1=f
+>j:1: rs=f - ra=f - rs1=f - ra1=f
+>j:2: rs=f - ra=f - rs1=f - ra1=f
+>i:3: rs=f - ra=f - rs1=f - ra1=f
+>k:1: rs=f - ra=f - rs1=f - ra1=f
+>k:2: rs=f - ra=f - rs1=f - ra1=f
+>h:3: rs=f - ra=f - rs1=f - ra1=f
+>k:1: rs=f - ra=f - rs1=f - ra1=f
+>k:2: rs=f - ra=f - rs1=f - ra1=f
+>g:3: rs=f - ra=f - rs1=f - ra1=f
+
+ e '' 0
+0:assignment at different scope than declaration, '' 0
+>g:1: rs=f - ra=f - rs1=f - ra1=f
+>g:2: rs=f - ra=f - rs1=f - ra1=f
+>h:1: rs=f - ra=f - rs1=f - ra1=f
+>h:2: rs=f - ra=f - rs1=f - ra1=f
+>i:1: rs=f - ra=f - rs1=f - ra1=f
+>i:2: rs=f - ra=f - rs1=f - ra1=f
+>j:1: rs=f - ra=f - rs1=f - ra1=f
+>j:2: rs=f - ra=f - rs1=f - ra1=f
+>i:3: rs=f - ra=f - rs1=f - ra1=f
+>k:1: rs=f - ra=f - rs1=f - ra1=f
+>k:2: rs=f - ra=f - rs1=f - ra1=f
+>h:3: rs=f - ra=f - rs1=f - ra1=f
+>k:1: rs=f - ra=f - rs1=f - ra1=f
+>k:2: rs=f - ra=f - rs1=f - ra1=f
+>g:3: rs=f - ra=f - rs1=f - ra1=f
+
+ e -u 2
+0:assignment at different scope than declaration, -u 2
+>g:1: rs= - ra= - rs1= - ra1=
+>g:2: rs=f - ra=f - rs1=f - ra1=f
+>h:1: rs=f - ra=f - rs1=f - ra1=f
+>h:2: rs=f - ra=f - rs1=f - ra1=f
+>i:1: rs=f - ra=f - rs1=f - ra1=f
+>i:2: rs=f - ra=f - rs1=f - ra1=f
+>j:1: rs=f - ra=f - rs1=f - ra1=f
+>j:2: rs=f - ra=f - rs1=f - ra1=f
+>i:3: rs=f - ra=f - rs1=f - ra1=f
+>k:1: rs=f - ra=f - rs1=f - ra1=f
+>k:2: rs=f - ra=f - rs1=f - ra1=f
+>h:3: rs=f - ra=f - rs1=f - ra1=f
+>k:1: rs=f - ra=f - rs1=f - ra1=f
+>k:2: rs=f - ra=f - rs1=f - ra1=f
+>g:3: rs=f - ra=f - rs1=f - ra1=f
+
+ e -u 6
+0:assignment at different scope than declaration, -u 6
+>g:1: rs= - ra= - rs1= - ra1=
+>g:2: rs= - ra= - rs1= - ra1=
+>h:1: rs= - ra= - rs1= - ra1=
+>h:2: rs= - ra= - rs1= - ra1=
+>i:1: rs= - ra= - rs1= - ra1=
+>i:2: rs=h - ra=h - rs1=h - ra1=h
+>j:1: rs=h - ra=h - rs1=h - ra1=h
+>j:2: rs=h - ra=h - rs1=h - ra1=h
+>i:3: rs=h - ra=h - rs1=h - ra1=h
+>k:1: rs=h - ra=h - rs1=h - ra1=h
+>k:2: rs=h - ra=h - rs1=h - ra1=h
+>h:3: rs=g - ra=g - rs1=g - ra1=g
+>k:1: rs=h - ra=h - rs1=h - ra1=h
+>k:2: rs=h - ra=h - rs1=h - ra1=h
+>g:3: rs=f - ra=f - rs1=f - ra1=f
+
+ e '' 6
+0:assignment at different scope than declaration, '' 6
+>g:1: rs= - ra= - rs1= - ra1=
+>g:2: rs= - ra= - rs1= - ra1=
+>h:1: rs= - ra= - rs1= - ra1=
+>h:2: rs= - ra= - rs1= - ra1=
+>i:1: rs= - ra= - rs1= - ra1=
+>i:2: rs=i - ra=i - rs1=i - ra1=i
+>j:1: rs=i - ra=i - rs1=i - ra1=i
+>j:2: rs=i - ra=i - rs1=i - ra1=i
+>i:3: rs=i - ra=i - rs1=i - ra1=i
+>k:1: rs=i - ra=i - rs1=i - ra1=i
+>k:2: rs=i - ra=i - rs1=i - ra1=i
+>h:3: rs=h - ra=h - rs1=h - ra1=h
+>k:1: rs=h - ra=h - rs1=h - ra1=h
+>k:2: rs=h - ra=h - rs1=h - ra1=h
+>g:3: rs=g - ra=g - rs1=g - ra1=g
 
 #
 # The following tests are run in interactive mode, using PS1 as an
