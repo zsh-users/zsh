@@ -1560,7 +1560,14 @@ ifzman()
 indent(tt(typeset -n )var(pname)tt(=)var(rname))
 
 initializes a parameter var(pname) as a reference to a second
-parameter var(rname).  With the few exceptions described here, when
+parameter var(rname).  The var(rname) may also be omitted, in which
+case var(pname) is a placeholder which, the first time it is assigned,
+is initialized to an active reference to the assigned var(rname). See
+ifzman(Named References in zmanref(zshparam))\
+ifnzman(noderef(Named References) under noderef(Parameters))
+for more about placeholders.
+
+With the few exceptions described here, when
 var(pname) is used in any of the expansion forms described above, the
 parameter var(rname) is expanded instead.  This is similar to the
 action of the `tt((P))' expansion flag, but when var(rname) has itself
@@ -1577,11 +1584,11 @@ This includes arrays declared, but not initialized, when the option
 tt(TYPESET_TO_UNSET) is in effect.  The var(word) is substituted but
 no assignment occurs.
 
-Also unlike `tt((P))' named references always expand parameters at
-the scope in which var(rname) existed when `tt(typeset -n)' was
-called.  This can be used to expand or assign parameters from an
-earlier scope even if a local of the same name has been declared at
-a later scope.  Example:
+Also unlike `tt((P))' named references always expand parameters at the
+scope in which var(rname) exists when var(pname) is initialized.  This
+can be used to expand or assign parameters from an earlier scope even
+if a local of the same name has been declared at a later scope.
+Example:
 ifzman()
 example(tt(caller=OUTER)
 tt(func LPAR()RPAR() {)
@@ -1600,12 +1607,13 @@ example(tt(before local: OUTER)
 tt(by reference: OUTER)
 tt(after func: RESULT))
 
-To force a named reference to refer to the outer scope, even if a local
-has already been declared, add the tt(-u) option when declaring the
-named reference.  In this case var(rname) should already exist in the
-outer scope, otherwise the behavior of assignment through var(pname)
-is not defined and may change the scope of the reference or fail with
-a status of 1.  Example of correct usage:
+To force a named reference to refer to the outer scope, even if a
+local has already been declared, add the tt(-u) option when declaring
+the named reference.  In this case var(rname) should already exist in
+the outer scope before var(pname) is initialized, otherwise the
+behavior of assignment through var(pname) is not defined and may
+change the scope of the reference or fail with a status of 1.  Example
+of correct usage:
 ifzman()
 example(tt(caller=OUTER)
 tt(func LPAR()RPAR() {)
@@ -1622,6 +1630,13 @@ tt(print after func: $caller))
 Note, however, that named references to em(special) parameters acquire
 the behavior of the special parameter, regardless of the scope where
 the reference is declared.
+
+In the event that the local var(pname) goes out of scope (its declaring
+function returns) before the reference var(rname) goes out of scope,
+the reference may change to another parameter having the same name as
+var(pname), or assignments may fail as described above.  Keep the
+declaration of var(rname) as close as possible to its initialization
+to var(pname) to avoid confusion.
 
 When var(rname) includes an array subscript, the subscript expression
 is interpreted at the time tt(${)var(pname)tt(}) is expanded.  Any

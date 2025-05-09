@@ -694,6 +694,15 @@ assignments to, var(pname) act on the referenced parameter.  This
 is explained in the Named References section of
 ifzman(zmanref(zshexpn))ifnzman(noderef(Parameter Expansion)).
 
+A placeholder var(pname) in a calling function may be initialized in a
+called function to reference a local parameter var(rname).  In this
+case, when the called function returns, var(pname) is no longer
+associated with that local.  However, the initializer var(rname)
+continues to be substituted when `tt($)var(pname)' is used, and
+therefore may become a reference to another parameter in the calling
+function.  It is recommended that placeholders be initialized soon
+after they are declared, to make it clear what they reference.
+
 texinode(Parameters Set By The Shell)(Parameters Used By The Shell)(Named References)(Parameters)
 sect(Parameters Set By The Shell)
 In the parameter lists that follow, the mark `<S>' indicates that the

@@ -1,3 +1,11 @@
+2025-05-09  Bart Schaefer  <schaefer@zsh.org>
+
+	* 53568: Doc/Zsh/expn.yo, Doc/Zsh/params.yo, Src/params.c,
+	Test/K01nameref.ztst: fix additional problems with references
+	whose referent goes out of scope, add corresponding tests, and
+	update documentation to better describe behavior and warn about
+	potentially confusing usage
+
 2025-05-09  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 53532: INSTALL, configure.ac: mark --enable-zsh-mem option

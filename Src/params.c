@@ -5828,7 +5828,9 @@ static void
 scanendscope(HashNode hn, UNUSED(int flags))
 {
     Param pm = (Param)hn;
+    Param hidden = NULL;
     if (pm->level > locallevel) {
+	hidden = pm->old;
 	if ((pm->node.flags & (PM_SPECIAL|PM_REMOVABLE)) == PM_SPECIAL) {
 	    /*
 	     * Removable specials are normal in that they can be removed
@@ -5891,9 +5893,15 @@ scanendscope(HashNode hn, UNUSED(int flags))
 		export_param(pm);
 	} else
 	    unsetparam_pm(pm, 0, 0);
-    } else if ((pm->node.flags & PM_NAMEREF) &&
-	       pm->base > pm->level && pm->base > locallevel)
+    }
+    if (hidden)
+	pm = hidden;
+    if (pm && (pm->node.flags & PM_NAMEREF) &&
+	       pm->base >= pm->level && pm->base >= locallevel) {
 	pm->base = locallevel;
+	if (pm->level < locallevel && (pm->node.flags & PM_UPPER))
+	    pm->node.flags &= ~PM_UPPER;
+    }
 }
 
 
@@ -6404,14 +6412,14 @@ setscope(Param pm)
 	    } else if (!pm->base) {
 		pm->base = basepm->level;
 		if ((pm->node.flags & PM_UPPER) &&
-		    (basepm = upscope(basepm, -(locallevel-1))))
+		    (basepm = upscope(basepm, -locallevel)))
 		    pm->base = basepm->level;
 	    }
 	} else if (pm->base < locallevel && refname &&
 		   (basepm = (Param)getparamnode(realparamtab, refname))) {
 	    pm->base = basepm->level;
 	    if ((pm->node.flags & PM_UPPER) &&
-		(basepm = upscope(basepm, -(locallevel-1))))
+		(basepm = upscope(basepm, -locallevel)))
 		pm->base = basepm->level;
 	}
 	if (pm->base > pm->level) {

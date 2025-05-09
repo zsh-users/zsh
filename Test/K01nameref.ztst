@@ -77,6 +77,61 @@
 
    local s=T a=(T);
 
+   function f1() {
+       typeset var=$0;
+       typeset -n ref1 ref2; typeset -n ref3=ref2;
+       function f2() {
+	   typeset ref2=XX;
+	   function f3() {
+	       typeset var=$0;
+	       function f4() {
+		   typeset var=$0;
+		   ref1=var;
+		   ref3=var; # Initializes ref2 to var
+		   echo "$0: ref1=$ref1 ref2=$ref2 ref3=$ref3";
+	       }
+	       f4;
+	       echo "$0: ref1=$ref1 ref2=$ref2 ref3=$ref3";
+	       function g4() {
+		   typeset var=$0;
+		   function g5() {
+		       typeset var=$0;
+		       echo "$0: ref1=$ref1 ref2=$ref2 ref3=$ref3";
+		   }
+		   g5;
+		   echo "$0: ref1=$ref1 ref2=$ref2 ref3=$ref3";
+	       }
+	       g4;
+	       echo "$0: ref1=$ref1 ref2=$ref2 ref3=$ref3";
+	   }
+	   f3;
+	   echo "$0: ref1=$ref1 ref2=$ref2 ref3=$ref3";
+       }
+       f2;
+       echo "$0: ref1=$ref1 ref2=$ref2 ref3=$ref3";
+       function h2() {
+	   typeset var=$0;
+	   function h3() {
+	       typeset var=$0;
+	       function h4() {
+		   typeset var=$0;
+		   function h5() {
+		       typeset var=$0;
+		       echo "$0: ref1=$ref1 ref2=$ref2 ref3=$ref3";
+		   }
+		   h5;
+		   echo "$0: ref1=$ref1 ref2=$ref2 ref3=$ref3";
+	       }
+	       h4;
+	       echo "$0: ref1=$ref1 ref2=$ref2 ref3=$ref3";
+	   }
+	   h3;
+	   echo "$0: ref1=$ref1 ref2=$ref2 ref3=$ref3";
+       }
+       h2;
+       echo "$0: ref1=$ref1 ref2=$ref2 ref3=$ref3";
+   }
+
 %test
 
  typeset -n ptr
@@ -1039,10 +1094,10 @@ F:previously this could create an infinite recursion and crash
 >i:3: rs=h - ra=h - rs1=h - ra1=h
 >k:1: rs=h - ra=h - rs1=h - ra1=h
 >k:2: rs=h - ra=h - rs1=h - ra1=h
->h:3: rs=g - ra=g - rs1=g - ra1=g
+>h:3: rs=h - ra=h - rs1=h - ra1=h
 >k:1: rs=h - ra=h - rs1=h - ra1=h
 >k:2: rs=h - ra=h - rs1=h - ra1=h
->g:3: rs=f - ra=f - rs1=f - ra1=f
+>g:3: rs=g - ra=g - rs1=g - ra1=g
 
  e '' 6
 0:assignment at different scope than declaration, '' 6
@@ -1061,6 +1116,21 @@ F:previously this could create an infinite recursion and crash
 >k:1: rs=h - ra=h - rs1=h - ra1=h
 >k:2: rs=h - ra=h - rs1=h - ra1=h
 >g:3: rs=g - ra=g - rs1=g - ra1=g
+
+ f1
+0:Transitive references with scoping changes
+>f4: ref1=f4 ref2=XX ref3=f4
+>f3: ref1=f3 ref2=XX ref3=f3
+>g5: ref1=f3 ref2=XX ref3=g4
+>g4: ref1=f3 ref2=XX ref3=g4
+>f3: ref1=f3 ref2=XX ref3=f3
+>f2: ref1=f1 ref2=XX ref3=f1
+>f1: ref1=f1 ref2=f1 ref3=f1
+>h5: ref1=f1 ref2=f1 ref3=f1
+>h4: ref1=f1 ref2=f1 ref3=f1
+>h3: ref1=f1 ref2=f1 ref3=f1
+>h2: ref1=f1 ref2=f1 ref3=f1
+>f1: ref1=f1 ref2=f1 ref3=f1
 
 #
 # The following tests are run in interactive mode, using PS1 as an
