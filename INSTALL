@@ -401,7 +401,10 @@ Memory Routines
 ---------------
 
 Included in this release are alternate malloc and associated functions
-which reduce memory usage on some systems. To use these, add the option
+which reduce memory usage on some systems.  This suite of functions has
+not been maintained for some time and may be removed in a future release.
+
+However, if you still wish to use these, add the option
   --enable-zsh-mem
 when invoking "configure".
 

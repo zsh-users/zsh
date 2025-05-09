@@ -71,7 +71,7 @@ ifdef([zsh-mem],[undefine([zsh-mem])])dnl
 AH_TEMPLATE([ZSH_MEM],
 [Define to 1 if you want to use zsh's own memory allocation routines])
 AC_ARG_ENABLE(zsh-mem,
-AS_HELP_STRING([--enable-zsh-mem],[compile with zsh memory allocation routines]),
+AS_HELP_STRING([--enable-zsh-mem],[compile with zsh memory allocation routines - deprecated]),
 [if test x$enableval = xyes; then
   AC_DEFINE(ZSH_MEM)
 fi])

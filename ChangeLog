@@ -1,3 +1,8 @@
+2025-05-09  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 53532: INSTALL, configure.ac: mark --enable-zsh-mem option
+	as deprecated.
+
 2025-05-05  Bart Schaefer  <schaefer@zsh.org>
 
 	* 53557 (plus test): Src/params.c, Test/K01nameref.ztst:
