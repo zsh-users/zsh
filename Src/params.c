@@ -5893,6 +5893,7 @@ scanendscope(HashNode hn, UNUSED(int flags))
 		export_param(pm);
 	} else
 	    unsetparam_pm(pm, 0, 0);
+	pm = NULL;
     }
     if (hidden)
 	pm = hidden;

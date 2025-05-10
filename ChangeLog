@@ -1,5 +1,7 @@
 2025-05-09  Bart Schaefer  <schaefer@zsh.org>
 
+	* unposted: Src/params.c: fix bad pointer found by valgrind
+
 	* 53568: Doc/Zsh/expn.yo, Doc/Zsh/params.yo, Src/params.c,
 	Test/K01nameref.ztst: fix additional problems with references
 	whose referent goes out of scope, add corresponding tests, and
