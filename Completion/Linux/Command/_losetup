@@ -27,7 +27,7 @@ _arguments -s -S \
   - '(resize)' \
   {-c,--set-capacity}'[reread the size of the file associated with the loop device]' \
   - 'detach' \
-  '(-)'{--delete,--detach,-d}'[detach from specified loop device]' \
+  '(-)'{--detach,-d}'[detach from specified loop device]' \
   "$device" \
   - '(detach-all)' \
   {-D,--detach-all}'[detach all associated loop devices]' \
