@@ -1,3 +1,8 @@
+2025-11-16  dana  <dana@dana.is>
+
+	* 53577: Completion/Unix/Command/_git: improve max-verbose,
+	other descriptions
+
 2025-11-13  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 53964 (+ tiny change): Doc/Zsh/params.yo: mention zsh/random

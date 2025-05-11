@@ -36,6 +36,17 @@
 # use the `use-fallback' style like this:
 #
 #     % zstyle ':completion:*:*:git*:*' use-fallback false
+#
+# To show verbose descriptions for certain refs (the messages associated with
+# branch HEADs and other commits), set the `max-verbose` style:
+#
+#     % zstyle ':completion:*:*:git*:*' max-verbose 99
+#
+# The value specifies the number of matches already added for completion after
+# which descriptions should not be provided. You can also disable descriptions
+# for specific ref types by specifying a tag:
+#
+#     % zstyle ':completion:*:*:git*:remote-branch-names-noprefix' max-verbose 0
 
 # TODO: There is still undocumented configurability in here.
 
@@ -6358,14 +6369,38 @@ __git_describe_branch () {
   local __desc=$3
   shift 3
 
-  integer maxverbose
-  if zstyle -s :completion:$curcontext: max-verbose maxverbose &&
-    (( ${compstate[nmatches]} <= maxverbose )); then
-    local __c
-    local -a __commits
-    for __c in ${(P)__commits_in}; do
-      __commits+=("${__c}:${$(_call_program describe git rev-list -1 --oneline $__c)//:/\\:}")
-    done
+  integer __maxverbose
+  if zstyle -s :completion:$curcontext:$__tag max-verbose __maxverbose &&
+    (( ${compstate[nmatches]} <= __maxverbose )); then
+    local __x __y
+    local -a __cin __revs __descs __commits
+
+    # Calling git rev-list for each individual ref can be slow. We can pass them
+    # all at once instead, but it combines all refs that point to the same rev
+    # into one line in the output, making it difficult to match the results back
+    # to the input. To work around this, we first build a list of individual
+    # revisions that each ref refers to. Then we have rev-list include the full
+    # revision in its output, and we loop through and match everything up
+    __cin=( ${(P)__commits_in} )
+    __revs=( ${(f)"$( _call_program revs git rev-parse ${(q)__cin} )"} )
+
+    if (( $#__revs == $#__cin )); then
+      __descs=( ${${(f)"$( _call_program describe-full-hash \
+        git rev-list --no-walk=unsorted --pretty='"format:%H [%h] %s"' ${(q)__cin}
+      )"}:#commit *} )
+      for __x __y in ${__cin:^__revs}; do
+        __commits+=( $__x:${${__descs[(r)$__y *]}#* } )
+      done
+    # If the above didn't work, the ref names were ambiguous, probably 'bare'
+    # remote branch names. Fall back to the slower method. This won't resolve
+    # anything that rev-parse didn't, but it'll return what it could
+    else
+      for __x in $__cin; do
+        __y=$(_call_program describe git rev-list -1 --format='"[%h] %s"' $__x)
+        __y=${__y#*$'\n'} # Strip off commit header
+        __commits+=("${__x}${__y:+:$__y}")
+      done
+    fi
     _describe -t $__tag $__desc __commits "$@"
   else
     local expl
@@ -6645,7 +6680,7 @@ __git_extract_aliases () {
   local -a tmp
   tmp=(${${(0)"$(_call_program aliases "git config -z --get-regexp '^alias\.'")"}#alias.})
   if (( ${#tmp} > 0 )); then
-      aliases=(${^tmp/$'\n'/:alias for \'}\')
+      aliases=(${${tmp/$'\n'/:alias for: }//[[:space:]]##/ })
   else
       aliases=()
   fi
@@ -7236,7 +7271,10 @@ __git_recent_branches() {
   # 4. Obtain log messages for all of them in one shot.
   # TODO: we'd really like --sort=none here...  but git doesn't support such a thing.
   local z=$'\0'
-  descriptions=( "${(0)"$(_call_program all-descriptions "git --no-pager for-each-ref --format='%(refname)%00%(subject)'" refs/heads/${(q)^branches} "--")"//$'\n'/$z}" )
+  descriptions=( "${(0)"$(_call_program all-descriptions \
+    "git --no-pager for-each-ref --format='%(refname)%00[%(objectname:short)] %(subject)'" \
+      refs/heads/${(q)^branches} "--"
+  )"//$'\n'/$z}" )
 
   # 5. Synthesize the data structure _describe wants.
   local -a branches_colon_descriptions
