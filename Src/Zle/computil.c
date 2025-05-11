@@ -1841,7 +1841,7 @@ ca_inactive(Cadef d, char **xor, int cur, int opts)
 	for (; (x = (opts ? "-" : *xor)); xor++) {
 	    int excludeall = 0;
 	    char *grp = NULL;
-	    size_t grplen;
+	    size_t grplen = 0;
 	    char *next, *sep = x;
 
 	    while (*sep != '+' && *sep != '-' && *sep != ':' && *sep != '*' && !idigit(*sep)) {

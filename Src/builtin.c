@@ -3331,9 +3331,8 @@ add_autoload_function(Shfunc shf, char *funcname)
                     && (shf2->node.flags & PM_LOADDIR) && (shf2->node.flags & PM_ABSPATH_USED)
                     && shf2->filename)
             {
-                if (strlen(shf2->filename) + strlen(funcname) + 1 < PATH_MAX)
+                if (snprintf(buf, PATH_MAX, "%s/%s", shf2->filename, funcname) < PATH_MAX)
                 {
-                    sprintf(buf, "%s/%s", shf2->filename, funcname);
                     /* Set containing directory if the function file
                      * exists (do normal FPATH processing otherwise) */
                     if (!access(buf, R_OK)) {

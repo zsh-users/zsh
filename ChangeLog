@@ -1,5 +1,8 @@
 2025-11-16  dana  <dana@dana.is>
 
+	* 53578 (tweaked): Src/Zle/computil.c, Src/builtin.c,
+	Src/exec.c: silence gcc warnings
+
 	* 53577: Completion/Unix/Command/_git: improve max-verbose,
 	other descriptions
 

@@ -2922,7 +2922,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
     struct multio *mfds[10];
     char *text;
     int save[10];
-    int fil, dfil, is_cursh, do_exec = 0, redir_err = 0, i;
+    int fil, dfil, is_cursh = 0, do_exec = 0, redir_err = 0, i;
     int nullexec = 0, magic_assign = 0, forked = 0, old_lastval;
     int is_shfunc = 0, is_builtin = 0, is_exec = 0, use_defpath = 0;
     /* Various flags to the command. */
@@ -6255,12 +6255,14 @@ getfpfunc(char *s, int *ksh, char **fdir, char **alt_path, int test_only)
 
     pp = alt_path ? alt_path : fpath;
     for (; *pp; pp++) {
-	if (strlen(*pp) + strlen(s) + 1 >= PATH_MAX)
+	if (**pp) {
+	    if (snprintf(buf, PATH_MAX, "%s/%s", *pp, s) >= PATH_MAX)
+		continue;
+	} else if (strlen(s) >= PATH_MAX) {
 	    continue;
-	if (**pp)
-	    sprintf(buf, "%s/%s", *pp, s);
-	else
+	} else {
 	    strcpy(buf, s);
+	}
 	if ((r = try_dump_file(*pp, s, buf, ksh, test_only))) {
 	    if (fdir)
 		*fdir = *pp;
@@ -6408,12 +6410,14 @@ cancd(char *s)
 	    return NULL;
 	if (!nocdpath)
 	    for (cp = cdpath; *cp; cp++) {
-		if (strlen(*cp) + strlen(s) + 1 >= PATH_MAX)
+		if (**cp) {
+		    if (snprintf(sbuf, PATH_MAX, "%s/%s", *cp, s) >= PATH_MAX)
+			continue;
+		} else if (strlen(s) >= PATH_MAX) {
 		    continue;
-		if (**cp)
-		    sprintf(sbuf, "%s/%s", *cp, s);
-		else
+		} else {
 		    strcpy(sbuf, s);
+		}
 		if (cancd2(sbuf)) {
 		    doprintdir = -1;
 		    return dupstring(sbuf);
