@@ -1,3 +1,8 @@
+2025-11-16  dana  <dana@dana.is>
+
+	* 53577: Completion/Unix/Command/_git: improve max-verbose,
+	other descriptions
+
 2025-11-12  Oliver Kiddle  <opk@zsh.org>
 
 	* Heon Jeong: 54008: Src/Zle/compmatch.c: infinite loop running
