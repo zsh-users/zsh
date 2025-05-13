@@ -767,6 +767,18 @@ F:typeset cannot bypass a name in the local scope, even via nameref
 >typeset -a foo=( alpha beta gamma )
 >typeset -g foo=3
 
+ () {
+  # scope with no parameters
+  () {
+    local -nu upref=$1
+    local var=at_upref
+    print -- $upref
+  } var
+ }
+0:up-reference part 15, non-existent parameter in outer scope
+# no output expected
+>
+
  if [[ $options[typesettounset] != on ]]; then
    ZTST_skip='Ignoring zmodload bug that resets TYPESET_TO_UNSET'
    setopt typesettounset
@@ -1088,16 +1100,16 @@ F:previously this could create an infinite recursion and crash
 >h:1: rs= - ra= - rs1= - ra1=
 >h:2: rs= - ra= - rs1= - ra1=
 >i:1: rs= - ra= - rs1= - ra1=
->i:2: rs=h - ra=h - rs1=h - ra1=h
->j:1: rs=h - ra=h - rs1=h - ra1=h
->j:2: rs=h - ra=h - rs1=h - ra1=h
->i:3: rs=h - ra=h - rs1=h - ra1=h
->k:1: rs=h - ra=h - rs1=h - ra1=h
->k:2: rs=h - ra=h - rs1=h - ra1=h
->h:3: rs=h - ra=h - rs1=h - ra1=h
->k:1: rs=h - ra=h - rs1=h - ra1=h
->k:2: rs=h - ra=h - rs1=h - ra1=h
->g:3: rs=g - ra=g - rs1=g - ra1=g
+>i:2: rs=g - ra=g - rs1=g - ra1=g
+>j:1: rs=g - ra=g - rs1=g - ra1=g
+>j:2: rs=g - ra=g - rs1=g - ra1=g
+>i:3: rs=g - ra=g - rs1=g - ra1=g
+>k:1: rs=g - ra=g - rs1=g - ra1=g
+>k:2: rs=g - ra=g - rs1=g - ra1=g
+>h:3: rs=g - ra=g - rs1=g - ra1=g
+>k:1: rs=g - ra=g - rs1=g - ra1=g
+>k:2: rs=g - ra=g - rs1=g - ra1=g
+>g:3: rs=f - ra=f - rs1=f - ra1=f
 
  e '' 6
 0:assignment at different scope than declaration, '' 6

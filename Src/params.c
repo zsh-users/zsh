@@ -5899,9 +5899,8 @@ scanendscope(HashNode hn, UNUSED(int flags))
 	pm = hidden;
     if (pm && (pm->node.flags & PM_NAMEREF) &&
 	       pm->base >= pm->level && pm->base >= locallevel) {
+	/* Should never get here for a -u reference */
 	pm->base = locallevel;
-	if (pm->level < locallevel && (pm->node.flags & PM_UPPER))
-	    pm->node.flags &= ~PM_UPPER;
     }
 }
 
@@ -6307,7 +6306,9 @@ resolve_nameref(Param pm, const Asgment stop)
 	    if (pm) {
 		if (!(stop && (stop->flags & (PM_LOCAL)))) {
 		    int scope = ((pm->node.flags & PM_NAMEREF) ?
-				 ((pm->node.flags & PM_UPPER) ? -(pm->base) :
+				 ((pm->node.flags & PM_UPPER) ?
+				  /* pm->base == 0 means not set yet */
+				  -(pm->base ? pm->base : pm->level) :
 				  pm->base) : ((Param)hn)->level);
 		    hn = (HashNode)upscope((Param)hn, scope);
 		}
@@ -6413,14 +6414,14 @@ setscope(Param pm)
 	    } else if (!pm->base) {
 		pm->base = basepm->level;
 		if ((pm->node.flags & PM_UPPER) &&
-		    (basepm = upscope(basepm, -locallevel)))
+		    (basepm = upscope(basepm, -(pm->level))))
 		    pm->base = basepm->level;
 	    }
 	} else if (pm->base < locallevel && refname &&
 		   (basepm = (Param)getparamnode(realparamtab, refname))) {
 	    pm->base = basepm->level;
 	    if ((pm->node.flags & PM_UPPER) &&
-		(basepm = upscope(basepm, -locallevel)))
+		(basepm = upscope(basepm, -(pm->level))))
 		pm->base = basepm->level;
 	}
 	if (pm->base > pm->level) {

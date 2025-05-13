@@ -23,9 +23,11 @@ declared in an earlier function scope.
 (See noderef(Local Parameters).)
 
 A named parameter declared with the `tt(-n)' option to any of the
-`tt(typeset)' commands becomes a reference to a parameter in scope at
-the time of assignment to the named reference, which may be at a
-different call level than the declaring function.  For this reason,
+`tt(typeset)' acts as a reference to another parameter, which may
+be at a different call level than the declaring function.  When the
+`tt(-u)' option is also given, the referenced parameter is always
+found at a call level above the function where the reference is
+declared, otherwise the reference scope is dynamic.  For this reason,
 it is good practice to declare a named reference as soon as the
 referent parameter is in scope, and as early as possible in the
 function if the reference is to a parameter in a calling scope.

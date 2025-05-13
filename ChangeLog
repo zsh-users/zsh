@@ -1,3 +1,9 @@
+2025-05-12  Bart Schaefer  <schaefer@zsh.org>
+
+	* 53602: Doc/Zsh/func.yo, Src/params.c, Test/K01nameref.ztst:
+	Update "typeset -nu" behavior to always refer to parameters
+	at a call level above the declaration of the named reference.
+
 2025-05-09  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Src/params.c: fix bad pointer found by valgrind
