@@ -1,3 +1,8 @@
+2025-05-14  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: Src/params.c: fix silly bug with overloading of PM_UPPER,
+	to wit, ${(!)ref} would print the referent name in upper case
+
 2025-05-14  dana@dana.is  <dana@dana.is>
 
 	* github #133: Christopher Bock: Completion/Zsh/Command/_which:

@@ -2482,7 +2482,8 @@ getstrvalue(Value v)
 	    s = casemodify(s, CASMOD_LOWER);
 	    break;
 	case PM_UPPER:
-	    s = casemodify(s, CASMOD_UPPER);
+	    if (!(v->pm->node.flags & PM_NAMEREF))
+		s = casemodify(s, CASMOD_UPPER);
 	    break;
 	}
     }
