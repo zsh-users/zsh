@@ -1,5 +1,8 @@
 2025-05-14  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* users/30257: Test/E01options.ztst: Add a test for an ERR_RETURN
+	bug fixed in workers/51076.  Thanks to James Widman.
+
 	* 53607: Src/utils.c, Test/B13whence.ztst: Stop printing
 	/usr/bin/foo -> /usr/bin/foo in 'whence -s'.
 

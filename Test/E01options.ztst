@@ -1536,3 +1536,13 @@ F:If this test fails at the first unsetopt, refer to P01privileged.ztst.
 0:readonly with typeset -p
 F:compare E03posix.ztst
 >typeset -r var=''
+
+  $ZTST_testdir/../Src/zsh -fc "
+  foo(){
+      setopt err_return
+      source <(echo 'if true; then return 42; fi')
+      echo \"This line is printed by zsh 5.9 (but it shouldn't be).\"
+  }
+  foo
+  "
+42:ERR_RETURN inside 'source' and 'if'
