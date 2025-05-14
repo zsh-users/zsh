@@ -32,3 +32,7 @@
     whence -S flip || whence -S loop || whence -s flip || whence -s loop
   )
 1:whence deals with symlink loops gracefully
+
+ whence -s =sh(:P) | grep '.->' | wc -l
+-fD:(workers/53524) whence -s doesn't print arrows for symlink-free paths
+>0
