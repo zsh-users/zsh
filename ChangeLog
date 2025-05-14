@@ -1,3 +1,8 @@
+2025-05-13  dana@dana.is  <dana@dana.is>
+
+	* 53588 (tweaked): Src/Modules/system.c, Test/V14system.ztst:
+	make `zsystem flock` handle optargs in the same word
+
 2025-05-01  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 53529: Test/A04redirect.ztst: Avoid using system area for
