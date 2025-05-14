@@ -1,5 +1,8 @@
 2025-05-14  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Doc/Zsh/options.yo, Test/E01options.ztst: Remove
+	a spurious blank link, which affected the rendered output.
+
 	* users/30257: Test/E01options.ztst: Add a test for an ERR_RETURN
 	bug fixed in workers/51076.  Thanks to James Widman.
 

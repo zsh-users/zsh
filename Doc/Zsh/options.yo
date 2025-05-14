@@ -1769,7 +1769,6 @@ pindex(NOERRRETURN)
 cindex(function return, on error)
 cindex(return from function, on error)
 item(tt(ERR_RETURN))(
-
 If a command has a non-zero exit status, return immediately from the
 enclosing function. Except as explained below, an implicit tt(return)
 statement is executed following the same logic described for
