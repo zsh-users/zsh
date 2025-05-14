@@ -1,3 +1,8 @@
+2025-05-13  dana@dana.is  <dana@dana.is>
+
+	* 53588 (tweaked): Src/Modules/system.c, Test/V14system.ztst:
+	make `zsystem flock` handle optargs in the same word
+
 2025-05-12  Bart Schaefer  <schaefer@zsh.org>
 
 	* 53602: Doc/Zsh/func.yo, Src/params.c, Test/K01nameref.ztst:

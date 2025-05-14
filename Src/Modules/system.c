@@ -572,7 +572,7 @@ bin_zsystem_flock(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		/* variable for fd */
 		if (optptr[1]) {
 		    fdvar = optptr + 1;
-		    optptr += strlen(fdvar) - 1;
+		    optptr += strlen(fdvar);
 		} else if (*args) {
 		    fdvar = *args++;
 		}
@@ -592,7 +592,7 @@ bin_zsystem_flock(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		/* timeout in seconds */
 		if (optptr[1]) {
 		    optarg = optptr + 1;
-		    optptr += strlen(optarg) - 1;
+		    optptr += strlen(optarg);
 		} else if (!*args) {
 		    zwarnnam(nam, "flock: option %c requires a numeric timeout",
 			     opt);
@@ -622,7 +622,7 @@ bin_zsystem_flock(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		/* retry interval in seconds */
 		if (optptr[1]) {
 		    optarg = optptr + 1;
-		    optptr += strlen(optarg) - 1;
+		    optptr += strlen(optarg);
 		} else if (!*args) {
 		    zwarnnam(nam,
 			     "flock: option %c requires "

@@ -148,6 +148,16 @@ F:This timing test might fail due to process scheduling issues unrelated to zsh.
 ?elapsed time seems OK
 F:This timing test might fail due to process scheduling issues unrelated to zsh.
 
+  (
+    zsystem flock -t 0.1 -i 0.1 -f XYZ $tst_dir/file
+    echo $XYZ
+    zsystem flock -t0.1 -i0.1 -fZYX $tst_dir/file
+    echo $ZYX
+  )
+0:regression: zsystem flock optarg parsing
+*><->
+*><->
+
   unset chars REPLY
   print -n a few words | sysread -i 0 -c chars
   ret=$?
