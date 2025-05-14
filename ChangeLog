@@ -1,5 +1,8 @@
 2025-05-14  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 53607: Src/utils.c, Test/B13whence.ztst: Stop printing
+	/usr/bin/foo -> /usr/bin/foo in 'whence -s'.
+
 	* 53524 (cf. 53607): Test/B13whence.ztst: Add an XFAIL test for a
 	'whence -s' bug involving non-symlink arguments.
 

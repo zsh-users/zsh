@@ -1003,11 +1003,23 @@ print_if_link(char *s, int all)
 		}
 	    }
 	} else {
-	    if (chrealpath(&s, 'P', 0)) {
+#ifdef HAVE_MEMCCPY
+	    char s_at_entry[PATH_MAX+1];
+	    if (!memccpy(s_at_entry, s, '\0', sizeof(s_at_entry))) {
+		DPUTS1(1, "path longer than PATH_MAX: %s", s);
+		s_at_entry[PATH_MAX] = '\0';
+	    }
+#else /* HAVE_MEMCCPY */
+	    char *s_at_entry = ztrdup(s);
+#endif /* HAVE_MEMCCPY */
+	    if (chrealpath(&s, 'P', 0) && strcmp(s, s_at_entry)) {
 		printf(" -> ");
 		zputs(*s ? s : "/", stdout);
 		zsfree(s);
 	    }
+#ifndef HAVE_MEMCCPY
+	    zsfree(s_at_entry);
+#endif /* !HAVE_MEMCCPY */
 	}
     }
 }
