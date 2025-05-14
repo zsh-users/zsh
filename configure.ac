@@ -1268,6 +1268,7 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       initgroups nis_list \
 	       setuid seteuid setreuid setresuid setsid \
 	       setgid setegid setregid setresgid \
+	       memccpy \
 	       memcpy memmove strstr strerror strtoul \
 	       getrlimit getrusage \
 	       setlocale \
