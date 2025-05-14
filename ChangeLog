@@ -5,6 +5,8 @@
 
 2025-05-14  dana@dana.is  <dana@dana.is>
 
+	* unposted: NEWS: mention _shadow + mkshadow
+
 	* github #133: Christopher Bock: Completion/Zsh/Command/_which:
 	complete `whence -x`
 
