@@ -1,3 +1,8 @@
+2025-05-16  dana  <dana@dana.is>
+
+	* 53626: Test/B13whence.ztst: make `whence -s` test use `grep -c`
+	instead of `wc -l`
+
 2025-05-14  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 53607: Src/utils.c, Test/B13whence.ztst: Stop printing

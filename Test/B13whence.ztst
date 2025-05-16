@@ -33,6 +33,6 @@
   )
 1:whence deals with symlink loops gracefully
 
- whence -s =sh(:P) | grep '.->' | wc -l
-0:(workers/53524) whence -s doesn't print arrows for symlink-free paths
+ whence -s =sh(:P) | grep -c '.->'
+1:(workers/53524) whence -s doesn't print arrows for symlink-free paths
 >0
