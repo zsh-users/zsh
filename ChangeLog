@@ -8,7 +8,7 @@
 	* unposted: Src/params.c: fix silly bug with overloading of PM_UPPER,
 	to wit, ${(!)ref} would print the referent name in upper case
 
-2025-05-14  dana@dana.is  <dana@dana.is>
+2025-05-14  dana  <dana@dana.is>
 
 	* unposted: NEWS: mention _shadow + mkshadow
 
@@ -29,7 +29,7 @@
 	* 53524 (cf. 53607): Test/B13whence.ztst: Add an XFAIL test for a
 	'whence -s' bug involving non-symlink arguments.
 
-2025-05-13  dana@dana.is  <dana@dana.is>
+2025-05-13  dana  <dana@dana.is>
 
 	* 53588 (tweaked): Src/Modules/system.c, Test/V14system.ztst:
 	make `zsystem flock` handle optargs in the same word
@@ -64,7 +64,7 @@
 	Fix several errors when using "placeholder" named references
 	declared at scopes surrounding the scope where they are assigned.
 
-2025-05-04  dana@dana.is  <dana@dana.is>
+2025-05-04  dana  <dana@dana.is>
 
 	* Max Coplan: 53535: Util/helpfiles: fix builds with
 	interactive manpagers
