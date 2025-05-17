@@ -33,6 +33,7 @@ _sbuild_signing_keys() {
 }
 
 _sbuild() {
+
   _arguments \
     '(-h --help)'{-h,--help}'[show help message]' \
     '(-V --version)'{-V,--version}'[show version information]' \
@@ -67,8 +68,8 @@ _sbuild() {
     '(-j --jobs)'{-j=,--jobs=}'[jobs to run simultaneously]:number of jobs' \
     '--debbuildopt=[option to dpkg-buildpackage]:option' \
     '--debbuildopts=[options to dpkg-buildpackage]:options' \
-    '--dpkg-source-opt=[option to dpkg-source]:option' \
-    '--dpkg-source-opts=[options to dpkg-source]:options' \
+    \*'--dpkg-source-opt=[option to dpkg-source]:option' \
+    \*'--dpkg-source-opts=[options to dpkg-source]:options' \
     '--mail-log-to=[send log to mail]:recipient:_email_addresses -c' \
     '--mailfrom=[mail from]:sender:_email_addresses -c' \
     '(-n --nolog)'{-n,--nolog}'[no build log file]' \
@@ -124,7 +125,7 @@ _sbuild() {
     '--aspcud-criteria=[Optimization for aspcud]:criteria' \
     '(--resolve-alternatives --no-resolve-alternatives)--resolve-alternatives[allow alternatives in Build-Depends*]' \
     '(--resolve-alternatives --no-resolve-alternatives)--no-resolve-alternatives[disallow alternatives in Build-Depends*]' \
-    '--extra-package=[make a package or directory available to the resolver]:package:_files -g "*deb(-.)"' \
+    \*'--extra-package=[make a package or directory available to the resolver]:package:_files -g "*deb(-.)"' \
     '--extra-repository=[add a repository to the resolver]:url' \
     '--extra-repository-key=[add key to the resolver]:key:_files -g "*.asc(-.)"' \
     '--build-path=[place to build the package inside chroot]:path:_files -/' \

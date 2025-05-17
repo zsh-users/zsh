@@ -417,7 +417,8 @@ _apt-cmd () {
       /$'(install|download|source|build-dep)\0'/ -'subcmd=${match%?}' \
       /$'[^\0]#\0'/ ':packages::_deb_packages -qr "\n\t\- /=+-" "$expl_packages[@]" avail' \# \
       \( \
-	// '%(.|)/%' -'[[ $subcmd = install ]]' /'[]'/ ':files: :_deb_files -c' \| \
+	// '%(.|)/%' -'[[ $subcmd = install ]]' /'[]'/ ':files: :_deb_files' \| \
+	// '%(.|)/%' -'[[ $subcmd = build-dep ]]' /'[]'/ ':files: :_deb_files -D' \| \
 	/$'[^\0/=]#\/'/ /'[]'/ ':apt-releases:release name:_apt_releases' \| \
 	/$'[^\0/=]#='/ /'[]'/ ':apt-package-versions:package version:_apt_versions_of_binary_package' \| \
       \) \
@@ -425,11 +426,12 @@ _apt-cmd () {
     /$'((|auto)(remove|purge)|reinstall)\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'upgrade\0'/ \| \
     /$'autoclean\0'/ \| \
+    /$'distclean\0'/ \| \
     /$'changelog\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'full-upgrade\0'/ \| \
     /$'dist-upgrade\0'/ \| \
-    /$'edit-sources\0'/ \| \
-    /"[]"/ ':argument-1::compadd "$expl_action[@]" list search showsrc show depends rdepends policy update install reinstall download source build-dep remove upgrade full-upgrade dist-upgrade edit-sources autoclean changelog autopurge autoremove purge'
+    /$'edit-sources\0'/ /$'[^\0]#\0'/ ':sourcefiles::_values 'sourcefiles' $sources ' \# \| \
+    /"[]"/ ':argument-1::compadd "$expl_action[@]" list search showsrc show depends rdepends policy update install reinstall download source build-dep satisfy remove upgrade full-upgrade dist-upgrade edit-sources autoclean distclean changelog autoremove autopurge purge'
 
   _apt-cmd () {
     local expl_action expl_packages subcmd
@@ -458,7 +460,12 @@ _apt-get () {
     --no-download:bool \
     --no-install-recommends:bool \
     --ignore-hold:bool \
+    --with-new-pkgs:bool \
     --no-upgrade:bool \
+    --only-upgrade:bool \
+    --allow-downgrades:bool \
+    --allow-remove-essential:bool \
+    --allow-change-held-packages:bool \
     --force-yes:bool \
     --print-uris:bool \
     --purge:bool \
@@ -475,27 +482,36 @@ _apt-get () {
     --arch-only:bool \
     --allow-unauthenticated:bool \
     --auto-remove:bool \
+    -S,--snapshot:_snapshotdates \
     -- \
     /$'update\0'/ \| \
     /$'upgrade\0'/ \| \
     \( \
-    /$'install\0'\|$'download\0'\|$'source\0'\|$'build-dep\0'/ \
-      /$'[^\0]#\0'/ ':packages::_deb_packages -qr "\n\t\- /=" "$expl_packages[@]" avail' \# \
+      /$'(install|download|source|build-dep)\0'/ -'subcmd=${match%?}' \
+      /$'[^\0]#\0'/ ':packages::_deb_packages -qr "\n\t\- /=+-" "$expl_packages[@]" avail' \# \
       \( \
-	/$'[^\0/=]#/'/ /'[]'/ ':apt-releases:release name:_apt_releases' \| \
-	/$'[^\0/=]#='/ /'[]'/ ':apt-package-versions:package version:_apt_versions_of_binary_package' \
+	// '%(.|)/%' -'[[ $subcmd = install ]]' /'[]'/ ':files: :_deb_files' \| \
+	// '%(.|)/%' -'[[ $subcmd = build-dep ]]' /'[]'/ ':files: :_deb_files -D' \| \
+	/$'[^\0/=]#\/'/ /'[]'/ ':apt-releases:release name:_apt_releases' \| \
+	/$'[^\0/=]#='/ /'[]'/ ':apt-package-versions:package version:_apt_versions_of_binary_package' \| \
       \) \
     \) \| \
     /$'(|auto)(purge|remove)\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'dist-upgrade\0'/ \| \
     /$'dselect-upgrade\0'/ \| \
     /$'clean\0'/ \| \
+    /$'clean\0'/ \| \
     /$'autoclean\0'/ \| \
+    /$'indextargets\0'/ \| \
+    /$'distclean\0'/ \| \
     /$'changelog\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'check\0'/ \| \
     /$'help\0/' \| \
     /$'(|un)markauto\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
-    /"[]"/	':argument-1::compadd "$expl_action[@]" update upgrade install remove purge dist-upgrade dselect-upgrade clean autoclean changelog check source build-dep autopurge autoremove help markauto unmarkauto download'
+    /$'autoremove\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
+    /$'autopurge\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
+    /$'help\0/' \| \
+    /"[]"/	':argument-1::compadd "$expl_action[@]" update upgrade install reinstall remove purge dist-upgrade dselect-upgrade clean autoclean distclean changelog check source build-dep satisfy indextargets autoremove autopurge help markauto unmarkauto download'
 
   _apt-get () {
     local expl_action expl_packages
@@ -589,15 +605,19 @@ _apt-cdrom () {
 
 _apt-config () {
   _apt_arguments _apt-config \
+    --empty:bool \
+    --format:arbitem \
     -h,--help:bool \
     -v,--version:bool \
+    --audit:bool \
     -c,--config-file:configfile \
     -o,--option:arbitem \
+    --color:bool \
     -- \
     /$'shell\0'/ \
       \( \
 	/$'[^\0]#\0'/ ':parameters:shell variable to assign:_parameters' \
-	/$'[^\0]#\0'/ ':values:configuration key:compadd - ${${(f)"$(apt-config dump 2>&1)"}% *}' \
+	/$'[^\0]#\0'/ ':values:configuration key:compadd - ${(u)${(f)"$(apt-config --empty --no-color --format='%f%n' dump 2>&1)"}%%(::|) *}' \
       \) \# \| \
     /$'dump\0'/ \| \
     /"[]"/	':argument-1:action:compadd shell dump'
@@ -618,6 +638,14 @@ ${${${${(M)tmp:#*release*n=*}#*n=}%%,*}:#now}
     _store_cache APT_releases _apt_releases
   fi
 }
+
+_apt_sources () {
+	local sourcelist sourceparts diretc
+	diretc="${"${"$(apt-config shell x dir::etc)"#*\'}"%\'*}"
+	sourceparts="${"${"$(apt-config shell x dir::etc::sourceparts)"#*\'}"%\'*}"
+	print /${diretc}/$sourceparts/*.{list,sources}(N:t)
+}
+sources=( $(_apt_sources) )
 
 _apt_releases () {
   local update_policy
@@ -706,5 +734,23 @@ _apt-mark () {
 
   _apt-mark "$@"
 }
+
+_snapshotdates() {
+  local expl
+  local -a waybackdates
+
+  getdates() {
+    whence -p python3 &>/dev/null || return 0
+    local timespan='-6month'
+    local timestamp="$(date +%Y%m%d --date="${timespan}")"
+    local url="http://snapshot.debian.org/mr/timestamp/?archive=debian&after=${timestamp}"
+    python3 -c 'import sys,urllib.request,json;[print(x) for x in json.loads(urllib.request.urlopen(sys.argv[1]).read())["result"]["debian"]]' "$url" 2>/dev/null || :
+  }
+  snapshotdates=(
+    ${(u)$(getdates)%T*}
+  )
+  _wanted list expl 'wayback date(s)' compadd ${expl} -- ${snapshotdates}
+}
+
 
 _apt "$@"

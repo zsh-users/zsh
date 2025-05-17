@@ -19,12 +19,14 @@ _dpkg_deb_only_actions=(
 _dpkg_deb_actions=(
   '(--build -b)'{--build,-b}'[build archive]:directory:_files -/'
   '(--contents -c)'{--contents,-c}'[list contents]: :_deb_files'
-  '(--info -I)'{--info,-I}'[show info]: :_deb_files'
-  '(--field -f)'{--field,-f}'[show fields]: :_deb_files'
   '(--control -e)'{--control,-e}'[extract control]: :_deb_files'
   '(--extract -x)'{--extract,-x}'[extract files]: :_deb_files'
   '(--vextract -X)'{--vextract,-X}'[extract and list files]: :_deb_files'
+  '(--raw-extract -R)'{--raw-extract,-R}'[extracts files and control]: :_deb_files'
+  '(--field -f)'{--field,-f}'[show fields]: :_deb_files'
   '--fsys-tarfile[output fs tarfile]: :_deb_files'
+  '--ctrl-tarfile[output ctrl tarfile]: :_deb_files'
+  '(--info -I)'{--info,-I}'[show info]: :_deb_files'
 )
 
 _dpkg_common_actions=(
@@ -39,36 +41,43 @@ _dpkg_actions=(
   '--configure[reconfigure specified packages]:*:package:->configure'
   '(--remove -r)'{--remove,-r}'[remove package]:*:package:->remove'
   '(--purge -P)'{--purge,-P}'[purge package]:*:package:->purge'
+  '(--verify -V)'{--verify,-V}'[verify package]:*:package:->verify'
+  '(--audit -C)'{--audit,-C}'[check for broken pkgs]'
   '--update-avail[update available]:package file:_files'
   '--merge-avail[merge available]:package file:_files'
   '(--record-avail -A)'{--record-avail,-A}'[record available]:*:package files:->record_avail'
   '--forget-old-unavail[forget uninstalled unavailable]'
   '--clear-avail[clear available]'
-  '(--audit -C)'{--audit,-C}'[check for broken pkgs]'
   '--get-selections[get selections]:pattern:'
   '--set-selections[set selections]'
+  '--clear-selections[clear selections]'
   '--yet-to-unpack[list uninstalled]'
-  '--print-architecture[print target architecture]'
-  '--print-installation-architecture'
-  '--print-foreign-architectures[print list of extra architectures]'
+  '--predep-package[predep package]'
   '--add-architecture[add extra architecture]:architecture:->add_architecture'
   '--remove-architecture[remove extra architecture]:architecture:->remove_architecture'
+  '--print-architecture[print target architecture]'
+  '--print-foreign-architectures[print list of extra architectures]'
+  '--assert--[assert feature]:what:(help support-predepends working-epoch long-filenames multi-conrep multi-arch versioned-provides protected-field)'
+  '--validate--[validate thing]:what:(pkgname trigname archname version)'
   '--compare-versions[compare version numbers]:*::expression:= ->compare_versions'
 )
 
 _dpkg_options=(
   '--abort-after[abort after errors]:number of errors:'
-  '--root=[alternative root]:root:_files -/'
-  '--instdir=[change inst root but not data dir]:_files -/'
-  '(--selected-only -O)'{--selected-only,-O}'[skip unselected packages]'
-  '(--skip-same-version -E)'{--skip-same-version,-E}'[skip packages with same version as installed]'
   '(--refuse-downgrade -G)'{--refuse-downgrade,-G}'[skip packages with earlier version than installed]'
   '(--auto-deconfigure -B)'{--auto-deconfigure,-B}'[install can break other packages]'
   '--no-act[show potential actions but do not follow through]'
   '-D+[debug options]:debug options:(h 1 2 3)'
   '--debug=[debug options]:debug options:(help 1 2 3)'
+  --{force,refuse,no-force}'--[forcing options]:what:(all downgrade configure-any hold remove-reinstreq remove-protected remove-essential depends depends-version breaks conflicts confmiss confnew confold confdef confask overwrite overwrite-dir overwrite-diverted statoverride-add statoverride-remove security-mac unsafe-io script-chrootless architecture bad-version bad-path not-root bad-verify)'
   '--ignore-depends=[ignore depends involving package]:package:_deb_packages avail'
-  --{force,refuse,no-force}'--[forcing options]:what:(all downgrade configure-any hold bad-path not-root overwrite overwrite-diverted bad-verify depends-version depends confnew confold confdef confmiss conflicts architecture overwrite-dir remove-reinstreq remove-essential help)'
+  '--no-act[show potential actions but do not follow through]'
+  '--dry-run[show potential actions but do not follow through]'
+  '--simulate[show potential actions but do not follow through]'
+  '--instdir=[change inst root but not data dir]:_files -/'
+  '--root=[alternative root]:root:_files -/'
+  '(--selected-only -O)'{--selected-only,-O}'[skip unselected packages]'
+  '(--skip-same-version -E)'{--skip-same-version,-E}'[skip packages with same version as installed]'
 )
 
 _dpkg_options_recursive=( '(--recursive -R)'{--recursive,-R}'[recursive]' )
@@ -82,11 +91,11 @@ _dpkg_deb_and_query_only_options=(
 )
 
 _dpkg_query_actions=(
-      '(--status -s)'{--status,-s}'[display package status]:*:packages:->status'
-      '(--print-avail -p)'{--print-avail,-p}'[display available details]:packages:_deb_packages avail'
-      '(--listfiles -L)'{--listfiles,-L}'[list owned files]:*:packages:->listfiles'
       '(--list -l)'{--list,-l}'[list packages]:*:packages:->list'
+      '(--status -s)'{--status,-s}'[display package status]:*:packages:->status'
+      '(--listfiles -L)'{--listfiles,-L}'[list owned files]:*:packages:->listfiles'
       '(--search -S)'{--search,-S}'[search for file owner]:*:pattern:->search'
+      '(--print-avail -p)'{--print-avail,-p}'[display available details]:packages:_deb_packages avail'
       '--admindir=[data directory]:directory:_files -/'
 )
 
@@ -147,7 +156,7 @@ case "$state" in
       - nonrecur \
 	'*: :_deb_files'
   ;;
-  remove|status|listfiles)
+  remove|status|listfiles|verify)
     _call_function ret _dpkg_$state && return ret
     _arguments -C -A "-*" -s "$_dpkg_options[@]" \
        '*:package:_deb_packages installed'
