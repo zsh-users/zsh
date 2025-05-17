@@ -8527,9 +8527,10 @@ __git_worktrees () {
       branch="[$branch]"
     fi
 
-    descriptions+=( "${directories[-1]}"$'\t'"$hash $branch" )
+    descriptions+=( "${directories[-1]//(#b)([\\:])/\\${match[1]}}":"$hash $branch" )
   done
-  _wanted directories expl 'working tree' compadd -ld descriptions -S ' ' -f -M 'r:|/=* r:|=*' -a directories
+
+  _describe -t directories 'working tree' descriptions -S ' ' -f -M 'r:|/=* r:|=*'
 }
 
 (( $+functions[__git_difftools] )) ||
