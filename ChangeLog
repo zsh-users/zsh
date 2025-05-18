@@ -1,3 +1,9 @@
+2025-05-18  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* github #134 (+ implement commit review suggestion):
+	Completion/Unix/Command/_git: __git_worktrees: Use a library
+	function
+
 2025-05-17  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Fix a ChangeLog typo reported offlist.

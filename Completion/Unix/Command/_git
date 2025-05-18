@@ -8514,6 +8514,7 @@ __git_worktrees () {
   local -a records=( ${(ps.\n\n.)"$(_call_program directories git worktree list --porcelain)"} )
   local -a directories descriptions
   local i hash branch
+  local match mbegin mend
   for i in $records; do
     directories+=( ${${i%%$'\n'*}#worktree } )
     hash=${${${"${(f)i}"[2]}#HEAD }[1,9]}
@@ -8527,9 +8528,10 @@ __git_worktrees () {
       branch="[$branch]"
     fi
 
-    descriptions+=( "${directories[-1]}"$'\t'"$hash $branch" )
+    descriptions+=( "${directories[-1]//(#b)([\\:])/\\${match[1]}}":"$hash $branch" )
   done
-  _wanted directories expl 'working tree' compadd -ld descriptions -S ' ' -f -M 'r:|/=* r:|=*' -a directories
+
+  _describe -t directories 'working tree' descriptions -S ' ' -f -M 'r:|/=* r:|=*'
 }
 
 (( $+functions[__git_difftools] )) ||
