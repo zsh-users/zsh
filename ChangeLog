@@ -1,5 +1,9 @@
 2025-05-18  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted (mentioned on github #134):
+	Completion/Unix/Command/_git: __git_worktrees: Match the order
+	of $(git worktree list).
+
 	* github #134 (+ implement commit review suggestion):
 	Completion/Unix/Command/_git: __git_worktrees: Use a library
 	function

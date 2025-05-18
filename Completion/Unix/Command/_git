@@ -8520,7 +8520,7 @@ __git_worktrees () {
     hash=${${${"${(f)i}"[2]}#HEAD }[1,9]}
     branch=${${"${(f)i}"[3]}#branch refs/heads/}
 
-    # Simulate the non-porcelain output
+    # Simulate the non-porcelain output of `git worktree list`
     if [[ $branch == detached ]]; then
       # TODO: show a ref that points at $hash here, like vcs_info does?
       branch="(detached HEAD)"
@@ -8531,7 +8531,8 @@ __git_worktrees () {
     descriptions+=( "${directories[-1]//(#b)([\\:])/\\${match[1]}}":"$hash $branch" )
   done
 
-  _describe -t directories 'working tree' descriptions -S ' ' -f -M 'r:|/=* r:|=*'
+  # Use -V so the order matches the output of `git worktree list`.
+  _describe -V -t directories 'working tree' descriptions -S ' ' -f -M 'r:|/=* r:|=*'
 }
 
 (( $+functions[__git_difftools] )) ||
