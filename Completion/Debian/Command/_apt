@@ -412,6 +412,7 @@ _apt-cmd () {
     /$'depends\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'rdepends\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'policy\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
+    /$'(source|build-dep)\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" source' \# \| \
     /$'update\0'/ \| \
     \( \
       /$'(install|download|source|build-dep)\0'/ -'subcmd=${match%?}' \
@@ -487,6 +488,7 @@ _apt-get () {
     /$'update\0'/ \| \
     /$'upgrade\0'/ \| \
     \( \
+      /$'(source|build-dep)\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" source' \# \| \
       /$'(install|download|source|build-dep)\0'/ -'subcmd=${match%?}' \
       /$'[^\0]#\0'/ ':packages::_deb_packages -qr "\n\t\- /=+-" "$expl_packages[@]" avail' \# \
       \( \
