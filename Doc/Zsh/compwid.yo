@@ -545,7 +545,9 @@ This controls the order in which matches are sorted. var(order) is a
 comma-separated list comprising the following possible values.  These values
 can be abbreviated to their initial two or three characters.  Note that the
 order forms part of the group name space so matches with different orderings
-will not be in the same group.
+will not be in the same group; additionally, since ordering flags are not
+respected on the default group, a group name must be given explicitly.  See
+tt(-J) and tt(-V) below.
 
 startitem()
 item(tt(match))(

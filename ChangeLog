@@ -1,3 +1,8 @@
+2025-05-19  dana  <dana@dana.is>
+
+	* with RocketDev: 53633 (see github #135): Doc/Zsh/compwid.yo:
+	add note about `compadd -o` requiring explicit group name
+
 2025-05-18  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted (mentioned on github #134):
