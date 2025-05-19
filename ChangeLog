@@ -1,5 +1,7 @@
 2025-05-19  dana  <dana@dana.is>
 
+	* 53636: Doc/Zsh/params.yo: clarify valid parameter names
+
 	* with RocketDev: 53633 (see github #135): Doc/Zsh/compwid.yo:
 	add note about `compadd -o` requiring explicit group name
 

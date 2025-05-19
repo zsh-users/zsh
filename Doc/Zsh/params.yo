@@ -4,9 +4,13 @@ cindex(parameters)
 cindex(variables)
 sect(Description)
 A parameter has a name, a value, and a number of attributes.
-A name may be any sequence of alphanumeric
-characters and underscores, or the single characters
-`tt(*)', `tt(@)', `tt(#)', `tt(?)', `tt(-)', `tt($)', or `tt(!)'.
+User-assignable parameter names may contain alphanumeric characters,
+underscores, and (per the description of namespaces below) dots.
+They may not begin with a number, except for positional parameters
+(tt($1), tt($2), etc.), whose names consist em(only) of numbers.  There
+are also special shell parameters with single-character names such as
+`tt(*)', `tt(@)', `tt(#)', `tt(?)', `tt(-)', `tt($)', and `tt(!)'.
+These are described below.
 A parameter whose name begins with an alphanumeric or underscore is also
 referred to as a em(variable).
 
