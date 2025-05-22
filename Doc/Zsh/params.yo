@@ -67,8 +67,11 @@ with a `tt(.)' prefix are not listed by the `tt(set)' builtin, nor
 shown by the `tt(typeset)' builtin unless explicitly named or the
 `tt(-m)' option is used.  They provide a convenient way to group
 related variables.  Note that, for support of possible future features,
-the first `tt(.)' is optional, but omitting it is discouraged.  Unlike
-ksh, a namespace need not be declared before it is referenced.
+the first `tt(.)' is optional, but omitting it is discouraged.  Note also
+that a name starting with a `tt(.)' does not refer to the same parameter
+as one that does not, eg, `tt(.foo.bar)' and `tt(foo.bar)' are distinct
+parameters.  Unlike ksh, a namespace need not be declared before it
+is referenced.
 
 In scalar assignment, var(value) is expanded as a single string, in
 which the elements of arrays are joined together; filename expansion is

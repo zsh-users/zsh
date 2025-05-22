@@ -616,9 +616,7 @@ the format `tt(.)var(identifier)tt(.)' This currently has no special
 meaning to the shell, but provides a convenient means of grouping
 related parameters.  Expansions using a namespace em(must) include
 braces (tt({) and tt(})) as shown in the descriptions below, and
-only one namespace prefix is allowed.  Note that, for support of
-possible future features, the first `tt(.)' is optional, but omitting
-it is discouraged.
+only one namespace prefix is allowed.
 
 In the expansions discussed below that require a pattern, the form of
 the pattern is the same as that used for filename generation;

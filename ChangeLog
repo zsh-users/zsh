@@ -1,3 +1,8 @@
+2025-05-22  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 53660: Doc/Zsh/expn.yo, Doc/Zsh/params.yo: Clarify namespaces
+	starting with a .
+
 2025-05-19  dana  <dana@dana.is>
 
 	* 53636: Doc/Zsh/params.yo: clarify valid parameter names
