@@ -1,3 +1,7 @@
+2025-06-03  dana  <dana@dana.is>
+
+	* github #136: Completion/Unix/Command/_col: complete col
+
 2025-05-31  Bart Schaefer  <schaefer@zsh.org>
 
 	* 53713: Src/subst.c: ${ ... } should not clobber $REPLY

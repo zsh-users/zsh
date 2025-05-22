@@ -1,0 +1,26 @@
+#compdef col
+
+local variant
+local -a args=(
+  '(-b --no-backspaces)'{-b,--no-backspaces}'[do not output backspaces]'
+  '(-f --fine)'{-f,--fine}'[permit forward half-line-feeds]'
+  '(-h -x --tabs --spaces)'{-h,--tabs}'[convert spaces to tabs]'
+  '(-l --lines)'{-l+,--lines=}'[buffer at least specified number of lines]: :_numbers -d128 lines'
+  '(-p --pass)'{-p,--pass}'[pass through unknown control sequences]'
+  '(-h -x --tabs --spaces)'{-x,--spaces}'[convert tabs to spaces]'
+  '(-)'{-H,--help}'[display usage information]'
+  '(-)'{-V,--version}'[display version information]'
+)
+
+_pick_variant -r variant util-linux=no-backspaces freebsd=nline $OSTYPE --help
+
+case $variant in
+  util-linux) ;;
+  # Also Darwin, NetBSD, and DragonFly
+  freebsd)    args=( ${args:#*\)(-[HV]|--*)[+=]#\[*} ) ;;
+  openbsd*)   args=( ${args:#*\)(-[HpV]|--*)[+=]#\[*} ) ;;
+  # SUSv2, Solaris, etc
+  *)          args=( ${args:#*\)(-[hHlV]|--*)[+=]#\[*} ) ;;
+esac
+
+_arguments -s -S : $args
