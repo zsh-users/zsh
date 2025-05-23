@@ -707,6 +707,10 @@
 0:modifier ':P' with path too long
 >16001
 
+ print -r ${${:-/a-b=c}:P}
+0:modifier ':P' with tokenised input
+>/a-b=c
+
  foo=a
  value="ac"
  print ${value//[${foo}b-z]/x}

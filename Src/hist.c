@@ -1977,6 +1977,7 @@ chrealpath(char **junkptr, char mode, int use_heap)
     if (**junkptr != '/')
 	return 0;
 
+    untokenize(*junkptr);
     unmetafy(*junkptr, NULL);
 
     lastpos = strend(*junkptr);
