@@ -692,8 +692,7 @@ indent(tt(unset )var(pname))
 An empty reference such as one of
 ifzman()
 example(tt(typeset -n )var(pname)
-tt(typeset -n )var(pname)tt(=)
-tt(typeset -n )var(pname)tt(=""))
+tt(typeset -n )var(pname)tt(=))
 
 acts as a placeholder.  The first non-empty assignment to var(pname)
 initializes the reference, and subsequently any expansions of, or

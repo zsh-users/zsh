@@ -1,3 +1,7 @@
+2025-05-23  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 53664: Doc/Zsh/params.yo: remove a slightly confusing example
+
 2025-05-22  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 53660: Doc/Zsh/expn.yo, Doc/Zsh/params.yo: Clarify namespaces
