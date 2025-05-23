@@ -1,5 +1,8 @@
 2025-11-16  dana  <dana@dana.is>
 
+	* 53671: Src/hist.c, Test/D02glob.ztst: hist: untokenise input
+	to :A and :P
+
 	* 53578 (tweaked): Src/Zle/computil.c, Src/builtin.c,
 	Src/exec.c: silence gcc warnings
 
