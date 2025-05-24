@@ -1,0 +1,10 @@
+#compdef cacaclock
+
+local -a arguments=(
+  '(-d --dateformat)'{-d+,--dateformat=}'[use specified format as strftime argument]: :_date_formats'
+  '(-f --font)'{-f+,--font=}'[use specified font for time display]:font file:_files -g "/usr/share/figlet/*.tlf"'
+  '(-)'{-h,--help}'[display usage help]'
+  '(-)'{-v,--version}'[display version information]'
+)
+
+_arguments $arguments
