@@ -1,3 +1,9 @@
+2025-05-25  dana  <dana@dana.is>
+
+	* github #137 (tweaked): Christopher Bock:
+	Completion/Unix/Command/_cacaclock: completion: add cacaclock
+	(caca-utils)
+
 2025-05-24  dana  <dana@dana.is>
 
 	* 53662: Test/K02parameter.ztst: add extra namespace tests
