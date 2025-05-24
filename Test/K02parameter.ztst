@@ -106,10 +106,20 @@ F:Braces are required
 0:Parse without leading dot (future proofing)
 >empty test
 
+  .k02.a=b
+  k02.a=c
+  print ${.k02.a} ${k02.a}
+0:With and without leading dot are distinct
+>b c
+
   .k=OK
   print ${.k}
 0:Bare namespace is usable (ksh compatibility)
 >OK
+
+  ..k=OK
+127:Bare namespace is not usable with two dots
+?(eval):1: command not found: ..k=OK
 
   .k.=empty
 1:Namespace must precede an identifier, assignment
@@ -146,6 +156,12 @@ F:Braces are required
   print ${.not.2b}
 1:Identifier starting with a digit must be all digits, reference
 ?(eval):1: bad substitution
+
+  .n.s.k=OK
+  print ${.n.s.k}
+127:Nested namespace is not usable
+?(eval):1: command not found: .n.s.k=OK
+?(eval):2: bad substitution
 
   integer .var.d=0
   float .var.f=.2
