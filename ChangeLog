@@ -1,3 +1,8 @@
+2025-05-26  dana  <dana@dana.is>
+
+	* Ling Wang: 53677: Completion/Unix/Command/_gcc: add more -std
+	dialects
+
 2025-05-25  dana  <dana@dana.is>
 
 	* github #137 (tweaked): Christopher Bock:
