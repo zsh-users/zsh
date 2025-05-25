@@ -31,3 +31,21 @@
 >mether pip azer sezar akker conter dick
 >mether pip azer sezar
 >mether pip azer
+
+  () { local -a arr=( a b c ); shift 9 arr }
+  () { local -a .tmp.arr=( a b c ); shift 9 .tmp.arr }
+  () { shift 9 argv } a b c
+  () { shift 9 } a b c
+1:shifting more elements than exist in array
+?(anon):shift: shift count must be <= ${#arr}
+?(anon):shift: shift count must be <= ${#.tmp.arr}
+?(anon):shift: shift count must be <= ${#argv}
+?(anon):shift: shift count must be <= $#
+
+  () { local -i i=3;       shift 9 i; print -r - $i }
+  () { local    s=x;       shift 9 s; print -r - $s }
+  () { local -A h=( a b ); shift 9 h; print -r - ${(kv)h} }
+0:shifting non-array
+>3
+>x
+>a b

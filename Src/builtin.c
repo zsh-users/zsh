@@ -5615,7 +5615,7 @@ bin_shift(char *name, char **argv, Options ops, UNUSED(int func))
         for (; *argv; argv++)
             if ((s = getaparam(*argv))) {
                 if (arrlen_lt(s, num)) {
-		    zwarnnam(name, "shift count must be <= $#");
+		    zwarnnam(name, "shift count must be <= ${#%s}", *argv);
 		    ret++;
 		    continue;
 		}
