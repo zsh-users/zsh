@@ -78,7 +78,7 @@ _rsync_info() {
   local opts
   opts=( ${${(M)${(f)"$(_call_program values $words[1] --info=help)"}:#*Mention*}/ ##Me/[me} )
   (( $#opts )) && opts=( '(ALL NONE HELP)'${^opts}\] )
-  _values -s , 'info option' $opts ALL NONE HELP
+  _values -s , 'info option' $opts ALL NONE HELP PROGRESS2
 }
 
 _rsync_debug() {
