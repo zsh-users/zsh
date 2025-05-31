@@ -1,3 +1,7 @@
+2025-05-31  Bart Schaefer  <schaefer@zsh.org>
+
+	* 53713: Src/subst.c: ${ ... } should not clobber $REPLY
+
 2025-05-26  dana  <dana@dana.is>
 
 	* Ling Wang: 53677: Completion/Unix/Command/_gcc: add more -std
@@ -181,7 +185,7 @@
 	* 53445: Completion/Unix/Type/_path_commands: extra-verbose mode
 	support on some recent Linux and BSD systems
 
-2025-03-31  Bart Schaefer  <schaefer@toltec-ubuntu>
+2025-03-31  Bart Schaefer  <schaefer@zsh.org>
 
 	* 53431: Src/params.c, Test/K01nameref.ztst: fix assignment via
 	named reference to parameters in outer scopes; add tests
@@ -201,7 +205,7 @@
 	* 53394: Src/Zle/zle_keymap.c: drop OSC and DCS sequences in key
 	input as they are likely to be terminal query responses not keys
 
-2025-03-02  Bart Schaefer  <schaefer@toltec-ubuntu>
+2025-03-02  Bart Schaefer  <schaefer@zsh.org>
 
 	* 53368: Src/options.c: ignore no-op changes to EMACS/VI options
 
@@ -415,12 +419,12 @@
 	Completion/Base/Utility/_as_if: complete `as if'
 	a different command were being completed
 
-2024-11-05  Bart Schaefer  <schaefer@toltec-ubuntu>
+2024-11-05  Bart Schaefer  <schaefer@zsh.org>
 
 	* 53209 + comments + test: Src/params.c, Test/D04parameter.ztst:
 	do not unmetafy via string pointers into global parameter table
 
-2024-10-16  Bart Schaefer  <schaefer@toltec-ubuntu>
+2024-10-16  Bart Schaefer  <schaefer@zsh.org>
 
 	* 53146: Src/exec.c: trace flags cannot be copied from an
 	undefined function (cf. workers/45131)
@@ -429,7 +433,7 @@
 
 	* 53134: configure.ac: use -undefined dynamic_lookup on recent macOS
 
-2024-09-21  Bart Schaefer  <schaefer@toltec-ubuntu>
+2024-09-21  Bart Schaefer  <schaefer@zsh.org>
 
 	* 53103: Test/A08time.ztst: fix spurious test failure on Solaris
 

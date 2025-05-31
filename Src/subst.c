@@ -2021,7 +2021,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		/* Future?  Expose global value of $REPLY if any? */
 		/* if (rplyval) setsparam("REPLY", ztrdup(rplyval)); */
 	    } else if (inblank(inchar)) {
-		rplypm = createparam(".zsh.cmdsubst",
+		rplypm = createparam((rplyvar = ".zsh.cmdsubst"),
 				     PM_LOCAL|PM_UNSET|PM_HIDE|
 				     PM_READONLY_SPECIAL);
 		if (rplypm)
