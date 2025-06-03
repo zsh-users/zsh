@@ -1,5 +1,7 @@
 2025-06-03  dana  <dana@dana.is>
 
+	* 53709: Test/D02glob.ztst: add misc. glob-qualifier tests
+
 	* github #136: Completion/Unix/Command/_col: complete col
 
 2025-05-26  dana  <dana@dana.is>
