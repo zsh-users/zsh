@@ -440,7 +440,7 @@ cindex(globbing qualifiers, enable)
 cindex(enable globbing qualifiers)
 item(tt(BARE_GLOB_QUAL) <Z>)(
 In a glob pattern, treat a trailing set of parentheses as a qualifier
-list, if it contains no `tt(|)', `tt(LPAR())' or (if special) `tt(~)'
+list, if it contains no unquoted `tt(|)', `tt(LPAR())' or (if special) `tt(~)'
 characters.  See noderef(Filename Generation).
 )
 pindex(BRACE_CCL)

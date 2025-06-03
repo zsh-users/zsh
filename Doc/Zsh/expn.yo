@@ -2800,8 +2800,8 @@ will be inserted in the argument list.
 
 pindex(BARE_GLOB_QUAL, use of)
 If the option tt(BARE_GLOB_QUAL) is set, then a trailing set of parentheses
-containing no `tt(|)' or `tt(LPAR())' characters (or `tt(~)' if it is special)
-is taken as a set of
+containing no unquoted `tt(|)' or `tt(LPAR())' characters (or `tt(~)' if
+it is special due to tt(EXTENDED_GLOB)) is taken as a set of
 glob qualifiers.  A glob subexpression that would normally be taken as glob
 qualifiers, for example `tt((^x))', can be forced to be treated as part of
 the glob pattern by doubling the parentheses, in this case producing
@@ -2827,6 +2827,10 @@ should be performed; the expression may include glob qualifiers, but
 it is also valid if it is simply tt(LPAR()#q+RPAR()).  This does
 not apply to the right hand side of pattern match operators as the
 syntax already has special significance.
+
+With either syntax, normal quoting and expansion rules apply to the list
+of qualifiers, so that the forms `tt(*(.))', `tt(*(#q"."))', and
+`tt(qual=.;) var(...) tt(*(#q$qual))' are generally equivalent.
 
 A qualifier may be any one of the following:
 
@@ -2945,16 +2949,23 @@ permission.
 )
 xitem(tt(e)var(string))
 item(tt(PLUS())var(cmd))(
-The var(string) will be executed as shell code.  The filename will be
+The var(string) or var(cmd) will be executed as shell code.  The
+filename will be
 included in the list if and only if the code returns a zero status (usually
 the status of the last command).
 
 In the first form, the first character after the `tt(e)'
 will be used as a separator and anything up to the next matching separator
-will be taken  as the var(string); `tt([)', `tt({)', and `tt(<)' match
-`tt(])', `tt(})', and `tt(>)', respectively, while any other character
-matches itself. Note that expansions must be quoted in the var(string)
-to prevent them from being expanded before globbing is done.
+will be taken  as the var(string); `tt(LPAR())', `tt([)', `tt({)', and
+`tt(<)' match `tt(RPAR())', `tt(])', `tt(})', and `tt(>)', respectively,
+while any other character matches itself.
+As with glob qualifiers in general, normal quoting and expansion rules
+apply to the entire var(string).  Thus expansions must be quoted to
+prevent them from being expanded before globbing is done, and quoting
+does not normally protect the end separator if it appears in the code.
+However, if an unquoted metacharacter is used as the separator, its
+quoted/expanded form is protected.
+
 var(string) is then executed as shell code.  The string tt(globqual)
 is appended to the array tt(zsh_eval_context) the duration of
 execution.
