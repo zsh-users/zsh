@@ -1,5 +1,7 @@
 2025-06-03  dana  <dana@dana.is>
 
+	* 53709: Test/D02glob.ztst: add misc. glob-qualifier tests
+
 	* 53709: Doc/Zsh/expn.yo, Doc/Zsh/options.yo: clarify
 	glob-qualifier syntax
 
