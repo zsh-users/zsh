@@ -183,7 +183,7 @@ _networksetup() {
   proxies=(
     ftp FTP
     gopher Gopher
-    socks SOCKS
+    socksfirewall SOCKS
     secureweb HTTPS
     streaming RTSP
     web HTTP

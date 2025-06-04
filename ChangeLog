@@ -1,3 +1,8 @@
+2025-06-04  dana  <dana@dana.is>
+
+	* bryango: github #138: Completion/Darwin/Command/_networksetup:
+	fix socks flags
+
 2025-06-03  dana  <dana@dana.is>
 
 	* 53709: Test/D02glob.ztst: add misc. glob-qualifier tests
