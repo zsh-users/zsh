@@ -1,3 +1,8 @@
+2025-06-05  Mikael Magnusson  <mikachu@gmail.com>
+
+	* unposted: Completion/Unix/Command/_subversion: fix return
+	value in _subversion
+
 2025-06-05  dana  <dana@dana.is>
 
 	* Christopher Bock: github #131:
