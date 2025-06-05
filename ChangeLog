@@ -5,6 +5,9 @@
 
 2025-06-05  dana  <dana@dana.is>
 
+	* Ryan Rotter: 53734, 53735: Completion/Unix/Command/_hostname,
+	Completion/Unix/Command/_trash: update macos completions
+
 	* Christopher Bock: github #131:
 	Completion/Debian/Command/_apt-file,
 	Completion/Debian/Command/_bug,
