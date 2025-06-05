@@ -240,7 +240,7 @@ _svn () {
               (svn:eol-style) compadd - CR LF CRLF native;;
               (svn:mime-type) _mime_types;;
               (*) _message 'property value';;
-            esac
+            esac && ret=0
         esac
 
       else

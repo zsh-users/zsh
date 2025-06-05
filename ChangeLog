@@ -19,6 +19,11 @@
 	Completion/Debian/Command/_which-pkg-broke: complete debmany,
 	dhomepage, dpkg-info, which-pkg-broke
 
+2025-06-05  Mikael Magnusson  <mikachu@gmail.com>
+
+	* unposted: Completion/Unix/Command/_subversion: fix return
+	value in _subversion
+
 2025-06-04  dana  <dana@dana.is>
 
 	* bryango: github #138: Completion/Darwin/Command/_networksetup:
