@@ -2,7 +2,7 @@
 
 local variant
 
-_pick_variant -r variant ali='(Rantakari|hasseg)' steven='(Steven|vanZyl)' other --version
+_pick_variant -r variant ali='(Rantakari|hasseg)' steven='(Steven|vanZyl)' darwin='stopOnError' other --help
 
 case $variant in
   ali)
@@ -51,6 +51,14 @@ case $variant in
       '(actions)*: :_files'
     )
     _arguments -s -S : $args
+    return
+    ;;
+  darwin)
+    _arguments -A '-*' : \
+      '(-v --verbose)'{-v,--verbose}'[display more verbose status]' \
+      '(-s --stopOnError)'{-s,--stopOnError}'[exit with error if any move to trash folder fails]' \
+      '(- *)'{-h,--help}'[display help information]' \
+      '*: :_files'
     return
     ;;
   *) _default ;;

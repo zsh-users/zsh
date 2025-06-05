@@ -45,10 +45,6 @@ case $variant in
   darwin*|freebsd*)
     args+=(
       '(: -d -s)-f[display host name with DNS domain (FQDN)]'
-    )
-    ;| # MATCH AGAIN
-  freebsd*)
-    args+=(
       '(: -f -s)-d[display DNS domain only]'
     )
     ;;
