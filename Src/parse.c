@@ -340,6 +340,7 @@ parse_context_restore(const struct parse_stack *ps, int toplevel)
     inrepeat_ = ps->inrepeat_;
     intypeset = ps->intypeset;
 
+    clear_hdocs();
     hdocs = ps->hdocs;
     eclen = ps->eclen;
     ecused = ps->ecused;
@@ -583,6 +584,7 @@ empty_eprog(Eprog p)
     return (!p || !p->prog || *p->prog == WCB_END());
 }
 
+/**/
 static void
 clear_hdocs(void)
 {
