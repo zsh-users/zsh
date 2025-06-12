@@ -96,7 +96,7 @@ may use the private parameter because those have the same calling scope.)
 enditemize()
 
 Note that this differs from the static scope defined by compiled languages
-derived from C, in that the a new call to the same function creates a new
+derived from C, in that a new call to the same function creates a new
 scope, i.e., the parameter is still associated with the call stack rather
 than with the function definition.  It differs from ksh `tt(typeset -S)'
 because the syntax used to define the function has no bearing on whether

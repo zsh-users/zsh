@@ -2563,7 +2563,7 @@ tt(command) keymap, and if not found there in the main keymap.
 tindex(which-command)
 item(tt(which-command) (tt(ESC-?)) (unbound) (unbound))(
 Push the buffer onto the buffer stack, and execute the
-command `tt(which-command) var(cmd)'. where var(cmd) is the current
+command `tt(which-command) var(cmd)', where var(cmd) is the current
 command.  tt(which-command) is normally aliased to tt(whence).
 )
 tindex(vi-digit-or-beginning-of-line)

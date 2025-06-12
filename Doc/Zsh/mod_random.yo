@@ -1,5 +1,5 @@
 COMMENT(!MOD!zsh/random
-Some High-quality randomness parameters and functions.
+Some high-quality randomness parameters and functions.
 !MOD!)
 The tt(zsh/random) module gets random data from the kernel random pool. If no
 kernel random pool can be found, the module will not load.

@@ -2138,7 +2138,7 @@ pindex(NOKSHTYPESET)
 cindex(argument splitting, in typeset etc.)
 cindex(ksh, argument splitting in typeset)
 item(tt(KSH_TYPESET))(
-This option is now obsolete: a better appropximation to the behaviour of
+This option is now obsolete: a better approximation to the behaviour of
 other shells is obtained with the reserved word interface to
 tt(declare), tt(export), tt(float), tt(integer), tt(local), tt(readonly)
 and tt(typeset).  Note that the option is only applied when the reserved
@@ -2284,7 +2284,7 @@ for example in expressions such as tt($#-) and tt($#*).
 Another difference is that with the option set assignment to an
 unset variable in arithmetic context causes the variable to be created
 as a scalar rather than a numeric type.  So after `tt(unset t; (( t = 3
-)))'. without tt(POSIX_IDENTIFIERS) set tt(t) has integer type, while with
+)))', without tt(POSIX_IDENTIFIERS) set tt(t) has integer type, while with
 it set it has scalar type.
 
 When the option is unset and multibyte character support is enabled (i.e. it

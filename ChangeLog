@@ -1,5 +1,10 @@
 2025-11-12  Oliver Kiddle  <opk@zsh.org>
 
+	* Lawrence Velázquez: 53775: Doc/Zsh/builtins.yo,
+	Doc/Zsh/compwid.yo, Doc/Zsh/mod_ksh93.yo, Doc/Zsh/mod_private.yo,
+	Doc/Zsh/mod_random.yo, Doc/Zsh/options.yo, Doc/Zsh/zle.yo, README:
+	Fix some documentation typos
+
 	* 54071: Completion/Zsh/Type/_ps1234: fix prompt colour completion
 
 	* 54043, 54055 (tweaked to use "reset" as suggested by Mikael):

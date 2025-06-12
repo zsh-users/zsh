@@ -944,7 +944,7 @@ The patterns before the `tt(=)' are used to match substrings of the current
 word.  For each matched substring, the corresponding part of the match pattern
 is broadened with the pattern after the `tt(=)', by means of a logical tt(OR).
 
-Each pattern in a matcher cosists of either
+Each pattern in a matcher consists of either
 
 startitemize()
 itemiz(the empty string or)
@@ -1103,7 +1103,7 @@ anchors, below), then var(match-pat) may also be `tt(*)' or `tt(**)'.  `tt(*)'
 can match any part of a completion that does not contain any substrings
 matching var(anchor), whereas a `tt(**)' can match any part of a completion,
 period.  (Note that this is different from the behavior of `tt(*)' in the
-anchorless forms of `tt(l:)' and `tt(r:)' and and also different from `tt(*)'
+anchorless forms of `tt(l:)' and `tt(r:)' and also different from `tt(*)'
 and `tt(**)' in glob expressions.)
 
 startitem()

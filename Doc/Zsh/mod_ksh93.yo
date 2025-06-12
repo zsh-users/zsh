@@ -132,7 +132,7 @@ em(THIS FEATURE IS NOT YET IMPLEMENTED.)
 )
 item(tt(.sh.math) <K>)(
 This parameter is more accurately considered a namespace.  A function
-defintion of the form
+definition of the form
 ifzman()
 indent(tt(function .sh.math.)var(name)tt( )var(ident)tt( ... { )var(list)tt( }))
 

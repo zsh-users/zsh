@@ -88,7 +88,7 @@ consistent and better aligned with the POSIX-2017 specification of
       echo "This is printed only prior to 5.10."
 
   - The `&&` and `||` operators now always ignore ERR_RETURN in their
-    left operand. Until this version, the operators failed to ignored
+    left operand. Until this version, the operators failed to ignore
     ERR_RETURN in their left operand if they were executed as part of
     a function call or an anonymous function that was itself executed
     in a context where ERR_RETURN is ignored. Example:

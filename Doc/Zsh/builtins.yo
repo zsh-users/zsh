@@ -870,7 +870,7 @@ can also be 0 to suppress all indentation.
 
 The tt(-W) option turns on the option tt(WARN_NESTED_VAR) for the named
 function or functions only.  The option is turned off at the start of
-nested functions (apart from anonoymous functions) unless the called
+nested functions (apart from anonymous functions) unless the called
 function also has the tt(-W) attribute.
 
 The tt(-c) option causes var(oldfn) to be copied to var(newfn).  The
@@ -1631,7 +1631,7 @@ cindex(functions, returning from)
 item(tt(return) [ var(n) ])(
 Causes a shell function or `tt(.)' script to return to
 the invoking script with the return status specified by
-an arithmetic expression var(n).  Also causes a non-interctive
+an arithmetic expression var(n).  Also causes a non-interactive
 shell to exit, allowing files containing shell code to be used
 both as scripts and as autoloadable shell functions.
 For example, the following prints `tt(42)':
