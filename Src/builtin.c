@@ -5834,6 +5834,13 @@ bin_break(char *name, char **argv, UNUSED(Options ops), int func)
 {
     int num = lastval, nump = 0, implicit;
 
+    if (func == BIN_CONTINUE
+	&& *argv && strcmp(*argv, "--print-selections") == 0) {
+	extern int print_selectlist_requested;
+	print_selectlist_requested = 1;
+	argv++;
+    }
+
     /* handle one optional numeric argument */
     implicit = !*argv;
     if (*argv) {

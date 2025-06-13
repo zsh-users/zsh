@@ -334,11 +334,14 @@ module(compvalues)(zsh/computil)
 findex(continue)
 cindex(loops, continuing)
 cindex(continuing loops)
-item(tt(continue) [ var(n) ])(
+item(tt(continue) [ tt(--print-selections) ] [ var(n) ])(
 Resume the next iteration of the enclosing
 tt(for), tt(while), tt(until), tt(select) or
 tt(repeat) loop. If an arithmetic expression var(n) is specified, break out of
 var(n)-1 loops and resume at the var(n)th enclosing loop.
+If the tt (--print-selections) option is specified and the enclosing loop is
+a tt(select) loop, the selection list will be printed at the beginning of the
+next iteration.
 )
 alias(declare)(typeset)
 findex(dirs)

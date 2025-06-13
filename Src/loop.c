@@ -39,6 +39,9 @@ int loops;
  
 /**/
 mod_export int contflag;
+
+/* --print-selections option is specified in the continue buitlin. */
+int print_selectlist_requested;
  
 /* # of break levels */
  
@@ -267,8 +270,12 @@ execselect(Estate state, UNUSED(int do_exec))
     usezle = interact && SHTTY != -1 && isset(USEZLE);
     inp = fdopen(dup(usezle ? SHTTY : 0), "r");
     more = selectlist(args, 0);
+    print_selectlist_requested = 0;
     loop = state->pc;
     for (;;) {
+	if (print_selectlist_requested)
+	    goto print;
+
 	for (;;) {
 	    if (empty(bufstack)) {
 	    	if (usezle) {
@@ -303,7 +310,9 @@ execselect(Estate state, UNUSED(int do_exec))
 		*s = '\0';
 	    if (*str)
 	      break;
+	print:
 	    more = selectlist(args, more);
+	    print_selectlist_requested = 0;
 	}
 	setsparam("REPLY", ztrdup(str));
 	i = atoi(str);
