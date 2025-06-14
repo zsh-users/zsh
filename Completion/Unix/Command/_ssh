@@ -158,10 +158,11 @@ _ssh () {
     if (( $+words[(r)-[IhUDnV]*] )); then
       args=( '-z[specify serial number]:serial number' )
       options=(
-        clear critical\:name extension\:name force-command\:command\:_cmdstring
+        clear 'critical\:name' 'extension\:name' 'force-command\:command\:_cmdstring'
         no-agent-forwarding no-port-forwarding no-pty no-user-rc no-x11-forwarding
         permit-agent-forwarding permit-port-forwarding permit-pty permit-user-rc
-        permit-x11-forwarding source-address\:source\ address
+        permit-x11-forwarding no-touch-required 'source-address\:source\ address'
+        verify-required
       )
     fi
     (( $+words[(r)-[ku]] )) && args=( '-z[specify version number]:version number' ) &&
@@ -172,12 +173,19 @@ _ssh () {
       file=input
       args+=( '*:output file:_files' )
       options=(
-        lines:number
-        'start-line\:line number'
-        checkpoint\:file:_files
-        'memory\:size (mbytes)'
-        'start\:start point (hex-value)'
-        generator\:value
+        'lines\:number'
+        'start-line\:line-number'
+        'checkpoint\:file\:_files'
+        'memory\:mbytes'
+        'start\:hex-value'
+        'generator\:value'
+      )
+    fi
+    if (( $+words[(r)-Y*] )); then
+      options=(
+        'hashalg\:algorithm\:_values\ algorithm\ sha256\ sha512'
+        'print-pubkey'
+        'verify-time\:timestamp'
       )
     fi
     (( $+words[(r)-A] )) && file='prefix for host key'
