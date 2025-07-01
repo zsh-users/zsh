@@ -1,0 +1,60 @@
+#compdef nettop
+
+local curcontext="$curcontext" state state_descr line ret=1
+typeset -A opt_args
+
+local msg='number of samples (0=infinite)'
+local specs=(
+  '-m+[specify the mode]:mode:(tcp udp route)'
+  '*-t+[specify interface type]:interface type:(wifi wired loopback owdl expensive undefined external)'
+  '-n[disable address to name resolution]'
+  '-c[less intensive use of the CPU]'
+  '-d[delta mode]'
+  '-x[extended display of numbers instead of suffixes such as MiB]'
+  '-P[display per-process summaries only]'
+  '-s+[specify delay between updates]: :_numbers -u seconds -d 1 delay'
+  "(-L)-l+[display specified number of samples and exit]:$msg"
+  "(-l)-L+[display specified number of samples in CSV and exit]:$msg"
+  '*-p+[select a particular process]: :->process'
+  '-j+[include the specified columns]: :->columns-off'
+  '-J+[include only the specified columns]: :->columns-all'
+  '-k+[exclude the specified columns]: :->columns-on'
+  '(-)-h[display help message and exit]'
+)
+
+_arguments -s -C : $specs && ret=0
+
+case $state in
+  columns-*)
+    local columns_on=(	# columns included by default
+      interface state bytes_in bytes_out rx_dupe rx_ooo re-tx rtt_avg
+      rcvsize tx_win tc_class tc_mgt cc_algo P C R W
+      arch
+    )
+    local columns_off=(	# not included by default
+      type packets_in packets_out rtt_min rtt_var
+      sndsize sndused rcvused unacked tx_cwin
+      cell_bytes_in cell_bytes_out wifi_bytes_in wifi_bytes_out
+      wired_bytes_in wired_bytes_out
+      uuid epid euuid vuuid closed_tcp closed_udp
+    )
+    case $state in
+      columns-on)
+	_values -s , 'column name' $columns_on && ret=0
+	;;
+      columns-off)
+	_values -s , 'column name' $columns_off && ret=0
+	;;
+      columns-all)
+	_values -s , 'column name' $columns_on $columns_off && ret=0
+	;;
+    esac
+    ;;
+  process)
+    local procs=( ${(@)${(f@)"$(_call_program processes-names
+			        $words[1] -P -l 1 -J '')"}%.[0-9]*} )
+    _alternative 'processes-names:process name:($procs)' \
+		 'processes:pid:_pids' && ret=0
+esac
+
+return ret

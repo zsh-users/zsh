@@ -1,5 +1,7 @@
 2025-06-01  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* 53807: Completion/Darwin/Command/_nettop: new completion
+
 	* 53806: Completion/Unix/Command/_lldb: fix/update _lldb
 
 	* 53805: Completion/Unix/Command/_less: update for less-678
