@@ -1,5 +1,7 @@
 2025-06-01  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* 53806: Completion/Unix/Command/_lldb: fix/update _lldb
+
 	* 53805: Completion/Unix/Command/_less: update for less-678
 
 2025-06-10  Peter Stephenson  <p.stephenson@samsung.com>

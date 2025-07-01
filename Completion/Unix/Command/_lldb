@@ -1,56 +1,79 @@
 #compdef lldb
 
-local curcontext=$curcontext state state_descr line expl ret=1
+local curcontext=$curcontext state state_descr line expl opts
 typeset -A opt_args
-typeset -a opts args
-[[ $EUID = 0 || $_comp_priv_prefix[1] = sudo ]] && opts=( -a )
+[[ $EUID = 0 || $_comp_priv_prefix[1] = sudo ]] && opts='-a'
+# check if '--' is on the command line.
+local has_sep=${words[(I)--]}
 
-args=(
-  '*'{-o+,--one-line}'[run one-line lldb command after loading executable]:lldb command: '
-  '*'{-s+,--source}'[run lldb commands from a file after loading executable]:file:_files'
-  '*'{-O+,--one-line-before-file}'[run one-line lldb command before loading executable]:lldb command'
-  '*'{-S+,--source-before-file}'[run lldb commands from a file before loading executable]:file:_files'
-  '(-k --one-line-on-crash)'{-k+,--one-line-on-crash}'[run one-line lldb command if target crashes in batch mode]:lldb command'
-  '(-K --source-on-crash)'{-K+,--source-on-crash}'[run lldb commands from a file if target crashes in batch mode]:file:_files'
+local args=(
+  '--[end of lldb options]'
+  '(-w --wait-for)'{-w,--wait-for}'[wait for the specified process to launch]'
   '(-b --batch)'{-b,--batch}'[run commands from -s -S -o -O and quit]'
-  '(-Q --source-quietly)'{-Q,--source-quietly}'[suppress output from -s, -S, -o or -O]'
-  '(-e --editor)'{-e,--editor}'[open source files using "external editor" mechanism]'
+  '--local-lldbint[parse .lldbinit in the current directory]'
   '(-x --no-lldbinit)'{-x,--no-lldbinit}'[do not automatically parse .lldbinit files]'
-  '(-X --no-use-colors)'{-X,--no-use-colors}'[do not use colors]'
+  '*'{-O,--one-line-before-file}'[run one-line lldb command before loading executable]:lldb command'
+  '*'{-k,--one-line-on-crash}'[run one-line lldb command if target crashes in batch mode]:lldb command'
+  '*'{-o,--one-line}'[run one-line lldb command after loading executable]:lldb command'
+  '*'{-S,--source-before-file}'[run lldb commands from a file before loading executable]:command file:_files'
+  '*'{-K,--source-on-crash}'[source specified file if target crashes in batch mode]:command file:_files'
+  '(-Q --source-quietly)'{-Q,--source-quietly}'[suppress output from -s, -S, -o or -O]'
+  '*'{-s,--source}'[run lldb commands from a file after loading executable]:command file:_files'
+  '(-a --arch)'{-a,--arch}'[use the specified architecture]:arch'
+  '--capture-path[use the specified file for the reproducer]:reproducer file:_files'
+  '--capture[tell the debugger to capture a reproducer]'
   '(-d --debug)'{-d,--debug}'[print extra information for debugging itself]'
+  '(-e --editor)'{-e,--editor}'[open source files using "external editor" mechanism]'
+  '(- *)'{-h,--help}'[print the usage information]'
+  '(-X --no-use-colors)'{-X,--no-use-colors}'[do not use colors]'
+  '--replay[replay a reproducer from the specified file]:reproducer file:_files'
+  '(- *)'{-v,--version}'[print the current version number]'
+  '(-R --repl-language)'{-R,--repl-language}'[chose the language for REPL]'
   '(-r --repl)'{-r,--repl}'[run lldb in REPL mode]'
-  '(-l --script-language)'{-l+,--script-language}'[use the specified scripting language]:language:(Python Perl Ruby Tcl)'
-  - info
-    '(-)'{-h,--help}'[print the usage information]'
-    '(-)'{-v,--version}'[print the current version number]'
-    '(-)'{-P,--python-path}'[print path to the lldb.py file]'
-  - file
-    '(-f --file)'{-f+,--file}'[specify executable file to debug]:executable:_files -g "*(-*)"'
-    '(-a --arch)'{-a+,--arch}'[use the specified architecture]:arch'
-    '(-c --core)'{-c+,--core}'[specify core file to open]:core file:_files -g "*core*(-.)"'
-    '*::executable and arguments:->exe_args'
-  - name
-    '(-n --attach-name)'{-n+,--attach-name}"[attach to the named process]: :_process_names $opts"
-    '(-w --wait-for)'{-w,--wait-for}'[wait for the specified process to launch]'
-  - pid
-    '(-p --attach-pid)'{-p+,--attach-pid}'[attach to the specified process]:pid:_pids'
+  '(- *)'{-P,--python-path}'[print path to the lldb.py file]'
+  '(-l --script-language)'{-l,--script-language}'[use the specified scripting language]:language'
+
+  '*:: :->target_args'
+
+  + '(target)'
+  '(-- *)'{-c,--core}'[specify core file to open]:core file:_files -g "*core*(-.)"'
+  {-f,--file}'[specify program to debug]:executable:_files -g "*(-*)"'
+  '(-- *)'{-n,--attach-name}"[attach to the named process]: :_process_names $opts"
+  '(-- *)'{-p,--attach-pid}'[attach to the specified process]:pid:_pids'
+  '1:executable:_files -g "*(-*)"'
 )
 
-_arguments -C -s -S : $args && return 0
+_arguments -C -S : $args && return 0
 
 case $state in
-  (exe_args)
-    if [[ -z $opt_args[(I)file-(-f|--file)] ]]; then
-      if [[ $CURRENT -eq 1 ]]; then
-        _wanted executables expl 'executable' _files -g '*(-*)' && ret=0
+  (target_args)
+    local prog=${(v)opt_args[(i)target-(-f|--file)]}
+    if (( !has_sep )); then
+      # lldb requires '--' before the options of the target program.
+      if [[ -n $prog ]]; then
+        _message "'-<TAB>' for lldb options; '-- <TAB>' for $prog args/opts" \
+          && return 0
       else
-	_normal && ret=0
+        # XXX: Although 'lldb prog -option_for_lldb -- -option_for_prog'
+        # is valid, -option_for_lldb is not completed here.
+        _wanted separators expl 'separator' compadd -- -- && return 0
       fi
-    else
-      words=( ${(v)opt_args[(i)file-(-f|--file)]} "$words[@]" )
-      (( CURRENT++ ))
-      _normal && ret=0
     fi
+
+    if [[ -n $prog ]]; then
+      # Add prog at the front of $words
+      words[1]=( "$prog" "$words[1]" )
+      (( CURRENT++ ))
+    fi
+
+    local pos=${words[(i)--]}
+    if (( pos < CURRENT )); then
+      # if there is a '--' before CURRENT, remove it.
+      # Otherwise _normal would not work correctly.
+        words[pos]=()
+        (( CURRENT-- ))
+    fi
+    _normal -p $service && return 0
 esac
 
-return ret
+return 1
