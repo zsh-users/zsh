@@ -38,6 +38,10 @@
 
 	* github #136: Completion/Unix/Command/_col: complete col
 
+2025-06-01  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 53805: Completion/Unix/Command/_less: update for less-678
+
 2025-05-26  dana  <dana@dana.is>
 
 	* Ling Wang: 53677: Completion/Unix/Command/_gcc: add more -std

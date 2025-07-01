@@ -1,7 +1,9 @@
 #compdef less -value-,LESS,-default- -value-,LESSCHARSET,-default-
+# based on less-678
 
-local curcontext="$curcontext" fgbg=foreground ret=1
-local -a state line expl files basic suf
+local curcontext="$curcontext" fgbg=foreground dot=. ret=1
+local -a state state_descr line expl files basic
+typeset -A opt_args
 
 case $service in
   *LESSCHARSET*)
@@ -26,14 +28,16 @@ if compset -P '+[-0-9]#'; then
     G:go\ to\ end\ of\ file
     %:go\ to\ position\ in\ file
     p:go\ to\ position\ in\ file
+    /:start\ at\ the\ first\ line\ matching\ pattern
+    \&:display\ only\ lines\ matching\ pattern
   )'
   return
 fi
 
 _arguments -S -s -A "[-+]*"  \
-  '(-? --help)'{-\?,--help}'[display summary of less commands]' \
-  '(-a --search-skip-screen)'{-a,--search-skip-screen}'[skip current screen in searches]' \
-  '(-A --SEARCH-SKIP-SCREEN)'{-A,--SEARCH-SKIP-SCREEN}"[start searches just after target line]" \
+  '(- *)'{-\?,--help}'[display summary of less commands]' \
+  '(-a --search-skip-screen -A --SEARCH-SKIP-SCREEN)'{-a,--search-skip-screen}'[skip current screen in searches]' \
+  '(-a --search-skip-screen -A --SEARCH-SKIP-SCREEN)'{-A,--SEARCH-SKIP-SCREEN}"[start searches just after target line]" \
   '(-b --buffers)'{-b+,--buffers=}'[specify amount of buffer space used for each file]:buffer space (kilobytes)' \
   '(-B --auto-buffers)'{-B,--auto-buffers}"[don't automatically allocate buffers for pipes]" \
   '(-C --CLEAR-SCREEN -c --clear-screen)'{-c,--clear-screen}'[repaint screen instead of scrolling]' \
@@ -52,6 +56,8 @@ _arguments -S -s -A "[-+]*"  \
   '(-j --jump-target)'{-j+,--jump-target}'[specify screen position of target lines]:position (line)' \
   '(-J --status-column)'{-J,--status-column}'[display status column on the left]' \
   \*{-k+,--lesskey-file=}'[use specified lesskey file]:lesskey file:_files' \
+  '*--lesskey-src=[use specified lesskey source file]:lesskey source file:_files' \
+  '*--lesskey-content=[use specified text as lesskey source]:lesskey source text' \
   '(-K --quit-on-intr)'{-K,--quit-on-intr}'[exit less in response to ctrl-c]' \
   '(-L --no-lessopen)'{-L,--no-lessopen}'[ignore the LESSOPEN environment variable]' \
   '(-M --LONG-PROMPT -m --long-prompt)'{-m,--long-prompt}'[prompt verbosely]' \
@@ -62,40 +68,53 @@ _arguments -S -s -A "[-+]*"  \
   '(* -o --log-file -O --LOG-FILE)'{-O+,--LOG-FILE=}'[copy input to file, overwriting if necessary]:file:_files' \
   '(-p --pattern)'{-p+,--pattern=}'[start at specified pattern]:pattern' \
   \*{-P+,--prompt=}'[specify prompt format]:prompt:->prompts' \
-  '(-Q --QUIET --SILENT -q --quiet --silent)'{-q,--quiet,--silent}'[never use bell]' \
-  '(-q --quiet --silent -Q --QUIET --SILENT)'{-Q,--QUIET,--SILENT}'[limit use of bell]' \
+  '(-Q --QUIET --SILENT -q --quiet --silent)'{-q,--quiet,--silent}'[limit use of bell]' \
+  '(-q --quiet --silent -Q --QUIET --SILENT)'{-Q,--QUIET,--SILENT}'[never use bell]' \
   '(-r -R --raw-control-chars --RAW-CONTROL-CHARS)'{-r,--raw-control-chars}'[display raw control characters]' \
   '(-r -R --raw-control-chars --RAW-CONTROL-CHARS)'{-R,--RAW-CONTROL-CHARS}'[display control chars; keep track of screen effects]' \
   '(-s --squeeze-blank-lines)'{-s,--squeeze-blank-lines}'[squeeze consecutive blank lines down to one]' \
   '(-S --chop-long-lines)'{-S,--chop-long-lines}'[truncate long lines instead of folding]' \
   '(-t --tag)'{-t+,--tag=}'[edit file containing tag]:tag:->tags' \
   '(-T --tag-file)'{-T+,--tag-file=}'[specify tags file]:tags file:_files' \
-  '(-u --underline-special)'{-u,--underline-special}'[send backspaces and carriage returns to the terminal]' \
-  '(-U --UNDERLINE-SPECIAL)'{-U,--UNDERLINE-SPECIAL}'[treat backspaces, tabs and carriage returns as control characters]' \
+  '(-u --underline-special -U --UNDERLINE-SPECIAL)'{-u,--underline-special}'[send backspaces and carriage returns to the terminal]' \
+  '(-u --underline-special -U --UNDERLINE-SPECIAL)'{-U,--UNDERLINE-SPECIAL}'[treat backspaces, tabs and carriage returns as control characters]' \
   '(* -)'{-V,--version}'[display version information]' \
   '(-W --HILITE-UNREAD -w --hilite-unread)'{-w,--hilite-unread}'[highlight first unread line after forward page]' \
   '(-w --hilite-unread -W --HILITE-UNREAD)'{-W,--HILITE-UNREAD}'[highlight first unread line after forward movement]' \
   '(-x --tabs)'{-x+,--tabs=}'[set tab stops]:tab stops' \
   '(-X --no-init)'{-X,--no-init}'[disable use of terminal init string]' \
-  '--no-keypad[disable use of keypad terminal init string]' \
-  '(-y --max-forw-scroll)'{-y,--max-forw-scroll}'[specify forward scroll limit]' \
+  '(-y --max-forw-scroll)'{-y+,--max-forw-scroll=}'[specify forward scroll limit]:lines' \
   '(-z --window)'{-z+,--window=}'[specify scrolling window size]:lines' \
   '(-\" --quotes)'{'-\"+',--quotes=}'[change quoting character]:quoting characters' \
   '(-~ --tilde)'{-~,--tilde}"[don't display tildes after end of file]" \
-  '(-\# --shift)'{'-\#+',--shift=}"[specify amount to move when scrolling horizontally]:number" \
+  '(-\# --shift)'{'-\#+',--shift=}"[specify amount to move when scrolling horizontally]:number of columns or fraction of screen width [.5]" \
   '--exit-follow-on-close[exit F command on a pipe when writer closes pipe]' \
   '--file-size[automatically determine the size of the input file]' \
-  '--header=[set header size]:lines,columns' \
+  '--follow-name[the F command changes file if the input file is renamed]' \
+  '--form-feed[stop scrolling when a form feed character (^L) is reached]' \
+  '--header=[set header size]:lines,columns,first-line' \
   '--incsearch[search file as each pattern character is typed in]' \
   '--intr=[specify interrupt character instead of ^X]:char [^X]' \
   '--line-num-width=[set the width of line number field]:width [7]' \
-  '--modelines=[look for vim modelines]:lines to search' \
-  '--follow-name[the F command changes file if the input file is renamed]' \
-  '--mouse[enable mouse input]' \
+  '--match-shift=[with -S, shift horizontally to make the match visible]:number of columns or fraction of screen width' \
+  '--modelines=[look for vim modelines]:number of lines to search' \
+  '(--MOUSE)--mouse[enable mouse input]' \
+  '(--mouse)--MOUSE[enable mouse input, wheel down moves backwards in the file]' \
+  "--no-edit-warn[don't warn when using v command on a file opened by LESSOPEN]" \
   '--no-histdups[remove duplicates from command history]' \
+  '--no-keypad[disable use of keypad terminal init string]' \
   "--no-number-headers[don't give line numbers to header lines]" \
-  "--no-search-headers[don't search in header lines or columns]" \
+  '--no-paste[use only the 1st line of text from bracketed paste]' \
+  "(--no-search-headers --nosearch-header-columns)--no-search-header-lines[don't search in header lines]" \
+    "(--no-search-headers --nosearch-header-lines)--no-search-header-columns[don't search in header columns]" \
+    "(--no-search-header-lines --nosearch-header-columns)--no-search-headers[don't search in header lines or columns]" \
   "--no-vbell[disable the terminal's visual bell]" \
+  '(--proc-BACKSPACE)--proc-backspace[process backspaces for bold/underline]' \
+  '(--proc-backspace)--proc-BACKSPACE[treat backspaces as control characters]' \
+  '(--proc-RETURN)--proc-return[delete carriage returns before newline]' \
+  '(--proc-return)--proc-RETURN[treat carriage returns as control characters]' \
+  '(--proc-TAB)--proc-tab[expand tabs to spaces]' \
+  '(--proc-tab)--proc-TAB[treat tabs as control characters]' \
   '--redraw-on-quit[redraw final screen when quitting]' \
   '--rscroll=[set the character used to mark truncated lines]:character [>]' \
   '--save-marks[retain marks across invocations of less]' \
@@ -104,12 +123,6 @@ _arguments -S -s -A "[-+]*"  \
     "E[multi-file]" "F[from first line]" "K[highlight]"
     "N[non-matching]" "R[literal]" "W[wrap]" -' \
   '--show-preproc-errors[display a message if preprocessor exits with an error status]' \
-  '--proc-backspace[process backspaces for bold/underline]' \
-  '--SPECIAL-BACKSPACE[treat backspaces as control characters]' \
-  '--proc-return[delete carriage returns before newline]' \
-  '--SPECIAL-RETURN[treat carriage returns as control characters]' \
-  '--proc-tab[expand tabs to spaces]' \
-  '--SPECIAL-TAB[treat tabs as control characters]' \
   '--status-col-width=[set the width of the -J status column]:width [2]' \
   '--status-line[highlight or color the entire line containing a mark]' \
   '--use-backslash[subsequent options use backslash as escape char]' \
@@ -123,23 +136,38 @@ if [[ -n "$state" ]]; then
   case $state in
     colors)
       if compset -P 1 \?; then
-        [[ $IPREFIX[-1] != [a-z] ]] || compset -P 1 + || _describe 'color application' '( +:add\ to\ existing\ attribute )'
-        suf=( -S '' )
-        compset -P 1 '([-a-zA-Z]|*.)' && fgbg=background && suf=()
+        if [[ $IPREFIX[-1] = [dksu] ]]; then
+          compset -P  '+' || \
+            _describe 'add or replace' '( +:add\ to\ existing\ attribute )'
+        fi
+        if compset -P '([-a-zA-Z]|<0-255>.|-.)'; then
+          fgbg=background
+          dot=''
+          compset -P '([-a-zA-Z]|<0-255>)[sudl]#' && \
+            _describe 'attribute' '( s:standout u:underline
+                                     d:bold l:blinking )' && return 0
+        fi
         basic=( B:blue C:cyan G:green K:black M:magenta R:red W:white Y:yellow )
-        _describe -t colors "$fgbg color" \
-            "( -:default ${(j. .)${(@)basic/:/:light\ }} ${(Lj. .)basic} )" "$suf[@]"  && ret=0
+        [[ $IPREFIX[-1] != . ]] && \
+          _describe -t colors "$fgbg color name" \
+            "( -:default ${(j. .)${(@)basic/:/:light\ }} ${(Lj. .)basic} )" \
+            && ret=0
+        [[ $fgbg = foreground || $IPREFIX[-1] = . ]] && \
+          _numbers -S '' -t 8bit-colors -l 0 -m 255 "$fgbg color number" $dot \
+            && ret=0
       else
         _describe 'text' '(
           B:binary\ characters
           C:control\ characters
           E:errors\ and\ informational\ messages
+          H:header\ lines\ and\ columns
           M:mark\ letters\ in\ the\ status\ column
           N:line\ numbers\ enabled\ via\ the\ -N\ option
           P:prompts
           R:the\ rscroll\ character
           S:search\ results
           W:the\ highlight\ enabled\ via\ the\ -w\ option
+          {5,4,3,2,1}:n-th\ parenthesized\ sub-pattern
           d:bold\ text
           k:blinking\ text
           s:standout\ text
