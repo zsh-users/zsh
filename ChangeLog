@@ -1,3 +1,8 @@
+2025-07-13  Bart Schaefer  <schaefer@zsh.org>
+
+	* 53820: Src/hist.c: detect integer overflow when parsing
+	history word designators.
+
 2025-06-01  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 53807: Completion/Darwin/Command/_nettop: new completion

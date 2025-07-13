@@ -1800,6 +1800,11 @@ getargspec(int argc, int marg, int evset)
 	ret = 0;
 	while (idigit(c)) {
 	    ret = ret * 10 + c - '0';
+	    if (ret < 0) {
+		herrflush();
+		zerr("no such word in event");
+		return -2;
+	    }
 	    c = ingetc();
 	}
 	inungetc(c);
