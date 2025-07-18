@@ -44,8 +44,7 @@ login shell and as a shell script command processor.  Of the standard shells,
 zsh most closely resembles bf(ksh) but includes many enhancements.  It
 does not provide compatibility with POSIX or other shells in its
 default operating mode:  see
-ifnzman(the section noderef(Compatibility))\
-ifzman(the section `Compatibility' below).
+sectref(Compatibility)(below).
 
 Zsh has command line editing, builtin spelling correction, programmable
 command completion, shell functions (with autoloading), a history

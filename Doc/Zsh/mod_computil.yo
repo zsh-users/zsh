@@ -5,10 +5,8 @@ completion system.
 cindex(completion, utility)
 The tt(zsh/computil) module adds several builtin commands that are used by
 some of the completion functions in the completion system based on shell
-functions (see 
-ifzman(zmanref(zshcompsys))\
-ifnzman(noderef(Completion System))
-).  Except for tt(compquote) these builtin commands are very
+functions (see nmref(Completion System)(zshcompsys)).
+Except for tt(compquote) these builtin commands are very
 specialised and thus not very interesting when writing your own
 completion functions.  In summary, these builtin commands are:
 

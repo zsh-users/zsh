@@ -14,12 +14,7 @@ and so on, are present, and macros are particularly simple to write as they
 are just ordinary shell functions.
 
 The prerequisite is that the tt(zftp) command, as described in
-ifzman(\
-zmanref(zshmodules)
-)\
-ifnzman(\
-noderef(The zsh/zftp Module)
-), must be available in the
+sectref(The zsh/zftp Module)(zshmodules), must be available in the
 version of tt(zsh) installed at your site.  If the shell is configured to
 load new commands at run time, it probably is: typing `tt(zmodload zsh/zftp)'
 will make sure (if that runs silently, it has worked).  If this is not the
@@ -72,7 +67,7 @@ shell's tt(getopts) builtin, for those functions that handle options you
 must use `tt(-)tt(-)' rather than `tt(-)' to ensure the remaining arguments
 are treated literally (a single `tt(-)' is treated as an argument).
 
-subsect(Opening a connection)
+subsect(Opening a Connection)
 startitem()
 findex(zfparams)
 item(tt(zfparams) [ var(host) [ var(user) [ var(password) ... ] ] ])(
@@ -128,7 +123,7 @@ suitable string.
 )
 enditem()
 
-subsect(Directory management)
+subsect(Directory Management)
 startitem()
 findex(zfcd)
 xitem(tt(zfcd) [ var(dir) ])
@@ -197,7 +192,7 @@ are passed directly to the server.  No pager and no caching is used.
 )
 enditem()
 
-subsect(Status commands)
+subsect(Status Commands)
 startitem()
 findex(zftype)
 item(tt(zftype) [ var(type) ])(
@@ -215,7 +210,7 @@ events, too.
 )
 enditem()
 
-subsect(Retrieving files)
+subsect(Retrieving Files)
 The commands for retrieving files all take at least two options. tt(-G)
 suppresses remote filename expansion which would otherwise be performed
 (see below for a more detailed description of that).  tt(-t) attempts
@@ -268,7 +263,7 @@ directory semantics.
 )
 enditem()
 
-subsect(Sending files)
+subsect(Sending Files)
 startitem()
 findex(zfput)
 item(tt(zfput) [ tt(-r) ] var(file1) ...)(
@@ -320,7 +315,7 @@ then tt(zfpcp) will retry using the second form.
 )
 enditem()
 
-subsect(Closing the connection)
+subsect(Closing the Connection)
 startitem()
 findex(zfclose)
 item(tt(zfclose))(
@@ -328,7 +323,7 @@ Close the connection.
 )
 enditem()
 
-subsect(Session management)
+subsect(Session Management)
 startitem()
 findex(zfsession)
 item(tt(zfsession) [ tt(-lvod) ] [ var(sessname) ])(
@@ -410,7 +405,7 @@ from the zftp functions.
 )
 enditem()
 
-subsect(Other functions)
+subsect(Other Functions)
 Mostly, these functions will not be called directly (apart from
 tt(zfinit)), but are described here for completeness.  You may wish to
 alter tt(zftp_chpwd) and tt(zftp_progress), in particular.
@@ -511,9 +506,7 @@ cindex(zftp function system, styles)
 cindex(styles in zftp functions)
 
 Various styles are available using the standard shell style mechanism,
-described in
-ifzman(zmanref(zshmodules))\
-ifnzman(noderef(The zsh/zutil Module)). Briefly, the
+described in sectref(The zsh/zutil Module)(zshmodules). Briefly, the
 command `tt(zstyle ':zftp:*') var(style) var(value) ...'.
 defines the var(style) to have value var(value); more than one value may be
 given, although that is not useful in the cases described here.  These
@@ -582,7 +575,7 @@ Note that there is also an associative array tt(zfconfig) which contains
 values used by the function system.  This should not be modified or
 overwritten.
 
-subsect(Remote globbing)
+subsect(Remote Globbing)
 cindex(zftp function system, remote globbing)
 
 The commands for retrieving files usually perform filename generation
@@ -606,7 +599,7 @@ typically UNIX servers will provide support for basic glob patterns.  This
 may in some cases be faster, as it avoids retrieving the entire list of
 directory contents.
 
-subsect(Automatic and temporary reopening)
+subsect(Automatic and Temporary Reopening)
 cindex(zftp function system, automatic reopening)
 
 As described for the tt(zfopen) command, a subsequent tt(zfopen) with no

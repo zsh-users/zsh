@@ -97,10 +97,51 @@ def(comment)(1)(\
 COMMENT(--- cross-references ---)
 
 def(manref)(2)(\
-  NOTRANS(\fI)ARG1+NOTRANS(\fP)(ARG2)\
+  bf(ARG1)(ARG2)\
 )
 def(zmanref)(1)(manref(ARG1)(1))
-def(noderef)(1)(the section `ARG1')
+def(noderef)(1)(bf(UPPERCASE(NOTRANS(ARG1))(0)))
+COMMENT( nmref(node)(manpage)
+  Refer to 'node' (texi) or 'manpage' (man).
+)
+def(nmref)(2)(noderef(ARG2))
+COMMENT( sectref(sectname)(manpage)
+  Refer to 'section' in 'manpage' (man), or a node (texi).
+  There should be a node (or anchor) with the name 'sectname'.
+  'manpage' can be "above", "below" or "".
+)
+def(sectref)(2)(\
+  IFEMPTY(ARG2)(\
+    the section noderef(ARG1)\
+  )(\
+    IFSTREQUAL(ARG2)(above)(\
+      noderef(ARG1) above\
+    )(\
+      IFSTREQUAL(ARG2)(below)(\
+        noderef(ARG1) below\
+      )(\
+        noderef(ARG1) in zmanref(ARG2)\
+      )\
+    )\
+  )\
+)
+COMMENT( subref(subsectname)(manpage) )
+def(subref)(2)(\
+  IFEMPTY(ARG2)(\
+    the subsection bf(ARG1)\
+  )(\
+    IFSTREQUAL(ARG2)(above)(\
+      bf(ARG1) above\
+    )(\
+      IFSTREQUAL(ARG2)(below)(\
+        bf(ARG1) below\
+      )(\
+        bf(ARG1) in zmanref(ARG2)\
+      )\
+    )\
+  )\
+)
+def(anchor)(1)()
 
 COMMENT(--- lists ---)
 

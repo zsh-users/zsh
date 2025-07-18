@@ -98,10 +98,8 @@ The date in `var(yy)tt(-)var(mm)tt(-)var(dd)' format.
 )
 item(tt(%D{)var(string)tt(}))(
 The date formatted as var(string) using the tt(strftime) function, with
-zsh extensions as described by
-ifzman(EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
-ifnzman(noderef(Prompt Expansion)).
-)
+zsh extensions as described for tt(%D{)var(string)tt(}) escape sequence in
+sectref(Simple Prompt Escapes)(zshmisc).)
 item(tt(%LPAR())var(x)tt(:)var(true-text)tt(:)var(false-text)tt(RPAR()))(
 Specifies a ternary expression.
 The character following the var(x) is

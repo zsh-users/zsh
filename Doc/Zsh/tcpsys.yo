@@ -6,24 +6,15 @@ sect(Description)
 
 A module tt(zsh/net/tcp) is provided to provide network I/O over
 TCP/IP from within the shell; see its description in
-ifzman(\
-zmanref(zshmodules)\
-)\
-ifnzman(\
-noderef(Zsh Modules)\
-).  This manual page describes a function suite based on the module.  
+sectref(The zsh/net/tcp Module)(zshmodules).
+This manual page describes a function suite based on the module.
 If the module is installed, the functions are usually installed at the
 same time, in which case they will be available for
 autoloading in the default function search path.  In addition to the
 tt(zsh/net/tcp) module, the tt(zsh/zselect) module is used to implement
 timeouts on read operations.  For troubleshooting tips, consult the
 corresponding advice for the tt(zftp) functions described in
-ifzman(\
-zmanref(zshzftpsys)\
-)\
-ifnzman(\
-noderef(Zftp Function System)\
-).
+nmref(Zftp Function System)(zshzftpsys).
 
 There are functions corresponding to the basic I/O operations open, close,
 read and send, named tt(tcp_open) etc., as well as a function
@@ -426,7 +417,7 @@ installed.
 )
 enditem()
 
-subsect(`One-shot' file transfer)
+subsect(`One-shot' File Transfer)
 startitem()
 xitem(tt(tcp_point) var(port))
 item(tt(tcp_shoot) var(host) var(port))(
@@ -542,13 +533,7 @@ findex(tcp_fd_handler)
 item(tt(tcp_fd_handler))(
 This is the function installed by tt(tcp_open) for handling input from
 within the line editor, if that is required.  It is in the format
-documented for the builtin `tt(zle -F)' in
-ifzman(\
-zmanref(zshzle)
-)\
-ifnzman(\
-noderef(Zle Builtins)
-).
+documented for the builtin `tt(zle -F)' in sectref(Zle Builtins)(zshzle).
 
 While active, the function sets the parameter tt(TCP_HANDLER_ACTIVE) to 1.
 This allows shell code called internally (for example, by setting

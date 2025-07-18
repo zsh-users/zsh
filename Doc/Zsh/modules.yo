@@ -8,8 +8,7 @@ shell at build time,
 or can be dynamically linked while the shell is running
 if the installation supports this feature.
 Modules are linked at runtime with the tt(zmodload) command,
-see ifzman(zmanref(zshbuiltins))\
-ifnzman(noderef(Shell Builtin Commands)).
+see nmref(Shell Builtin Commands)(zshbuiltins).
 
 The modules that are bundled with the zsh distribution are:
 

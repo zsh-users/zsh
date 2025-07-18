@@ -93,8 +93,8 @@ Parameters
 menu(Array Parameters)
 menu(Positional Parameters)
 menu(Local Parameters)
-menu(Parameters Set By The Shell)
-menu(Parameters Used By The Shell)
+menu(Parameters Set by the Shell)
+menu(Parameters Used by the Shell)
 
 Options
 

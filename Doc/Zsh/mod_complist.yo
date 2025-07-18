@@ -8,7 +8,7 @@ The tt(zsh/complist) module offers three extensions to completion listings:
 the ability to highlight matches in such a list, the ability to
 scroll through long lists and a different style of menu completion.
 
-subsect(Colored completion listings)
+subsect(Colored Completion Listings)
 Whenever one of the parameters tt(ZLS_COLORS) or tt(ZLS_COLOURS) is set 
 and the tt(zsh/complist) module is loaded or linked into the shell,
 completion lists will be colored.  Note, however, that tt(complist) will
@@ -150,20 +150,17 @@ vt100 compatible terminals such as tt(xterm)s.  On monochrome terminals
 the default values will have no visible effect.  The tt(colors)
 function from the contribution can be used to get associative arrays
 containing the codes for ANSI terminals (see
-ifzman(the section `Other Functions' in zmanref(zshcontrib))\
-ifnzman(noderef(Other Functions))\
-).  For example, after loading tt(colors), one could use
+sectref(Other Functions)(zshcontrib)).
+For example, after loading tt(colors), one could use
 `tt($color[red])' to get the code for foreground color red and
 `tt($color[bg-green])' for the code for background color green.
 
 If the completion system invoked by compinit is used, these
 parameters should not be set directly because the system controls them 
 itself.  Instead, the tt(list-colors) style should be used (see
-ifzman(the section `Completion System Configuration' in zmanref(zshcompsys))\
-ifnzman(noderef(Completion System Configuration))\
-).
+sectref(Completion System Configuration)(zshcompsys)).
 
-subsect(Scrolling in completion listings)
+subsect(Scrolling in Completion Listings)
 To enable scrolling through a completion list, the tt(LISTPROMPT)
 parameter must be set.  Its value will be used as the prompt; if it
 is the empty string, a default prompt will be used.  The value may
@@ -215,7 +212,7 @@ tt(LISTPROMPT) should not be set directly when using the shell
 function based completion system.  Instead, the tt(list-prompt) style
 should be used.
 
-subsect(Menu selection)
+subsect(Menu Selection)
 cindex(completion, selecting by cursor)
 vindex(MENUSELECT)
 tindex(menu-select)
@@ -223,15 +220,12 @@ The tt(zsh/complist) module also offers an alternative style of selecting
 matches from a list, called menu selection, which can be used if the
 shell is set up to return to the last prompt after showing a
 completion list (see the tt(ALWAYS_LAST_PROMPT) option in
-ifzman(zmanref(zshoptions))\
-ifnzman(noderef(Options))\
-).
+nmref(Options)(zshoptions)).
 
 Menu selection can be invoked directly by
 the widget tt(menu-select) defined by this module.  This is a standard
 ZLE widget that can be bound to a key in the usual way as described
-in ifzman(zmanref(zshzle))\
-ifnzman(noderef(Zsh Line Editor)).
+in nmref(Zsh Line Editor)(zshzle).
 
 Alternatively,
 the parameter tt(MENUSELECT) can be set to an integer, which gives the
@@ -406,10 +400,8 @@ tt(undefined-key) is looked up in the keymap currently selected.  This
 is used to ensure that the most important keys used during selection
 (namely the cursor keys, return, and TAB) have sensible defaults.  However,
 keys in the tt(menuselect) keymap can be modified directly using the
-tt(bindkey) builtin command (see
-ifzman(zmanref(zshmodules))\
-ifnzman(noderef(The zsh/zle Module))\
-). For example, to make the return key leave menu selection without
+tt(bindkey) builtin command (see sectref(Zle Builtins)(zshzle)).
+For example, to make the return key leave menu selection without
 accepting the match currently selected one could call
 
 example(bindkey -M menuselect '^M' send-break)

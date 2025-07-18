@@ -113,6 +113,7 @@ findex(disown, use of)
 To avoid having the shell terminate the running jobs, either
 use the manref(nohup)(1) command
 or the tt(disown) builtin.
+anchor(Signals)
 sect(Signals)
 The tt(INT) and tt(QUIT) signals for an invoked
 command are ignored if the command is followed by
@@ -131,8 +132,5 @@ would usually wait for such jobs, an explicit tt(exit) command
 or exit due to the option tt(ERR_EXIT) will cause the shell to
 exit without waiting.  Examples of such asynchronous jobs are
 process substitution, see
-ifzman(the section PROCESS SUBSTITUTION in the zmanref(zshexpn) manual page)\
-ifnzman(noderef(Process Substitution)), and the handler processes for
-multios, see
-ifzman(the section MULTIOS in the zmanref(zshmisc) manual page)\
-ifnzman(the section em(Multios) in noderef(Redirection)).
+sectref(Process Substitution)(zshexpn), and the handler processes for
+multios, see sectref(Multios)(zshmisc).

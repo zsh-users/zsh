@@ -25,14 +25,11 @@ vindex(BAUD, use of)
 vindex(COLUMNS, use of)
 vindex(LINES, use of)
 The parameters tt(BAUD), tt(COLUMNS), and tt(LINES) are also used by the
-line editor. See
-ifzman(em(Parameters Used By The Shell) in zmanref(zshparam))\
-ifnzman(noderef(Parameters Used By The Shell)).
+line editor. See sectref(Parameters Used by the Shell)(zshparam).
 
 vindex(zle_highlight, use of)
 The parameter tt(zle_highlight) is also used by the line editor; see
-ifzman(em(Character Highlighting) below)\
-ifnzman(noderef(Character Highlighting)).  Highlighting
+sectref(Character Highlighting)(below).  Highlighting
 of special characters and the region between the cursor and the
 mark (as set with tt(set-mark-command) in Emacs mode, or by tt(visual-mode)
 in Vi mode) is enabled
@@ -48,9 +45,7 @@ a number, or pressing escape before each digit, and in vi command mode
 by typing the number before entering a command.  Generally the numeric
 argument causes the next command entered to be repeated the specified
 number of times, unless otherwise noted below; this is implemented
-by the tt(digit-argument) widget. See also
-ifzman(the em(Arguments) subsection of the em(Widgets) section )\
-ifnzman(noderef(Arguments))\
+by the tt(digit-argument) widget. See also subref(Arguments)(below)
 for some other ways the numeric argument can be modified.
 
 startmenu()
@@ -137,9 +132,7 @@ without a real command being read.
 
 A key sequence typed by the user can be turned into a command name for use
 in user-defined widgets with the tt(read-command) widget, described in
-ifzman(the subsection `Miscellaneous' of the section `Standard Widgets' below)\
-ifnzman(noderef(Miscellaneous) below)\
-.
+subref(Miscellaneous)(below).
 
 subsect(Local Keymaps)
 cindex(local keymaps)
@@ -467,9 +460,7 @@ specified name, it is overwritten.  When the new
 widget is invoked from within the editor, the specified shell var(function)
 is called.  If no function name is specified, it defaults to
 the same name as the widget.  For further information, see
-ifzman(the section `Widgets' below)\
-ifnzman(noderef(Zle Widgets))\
-.
+sectref(Zle Widgets)(below).
 )
 item(tt(-f) var(flag) [ var(flag)... ])(
 Set various flags on the running widget.  Possible values for var(flag) are:
@@ -499,10 +490,7 @@ Create a user-defined completion widget named var(widget). The
 completion widget will behave like the built-in completion-widget
 whose name is given as var(completion-widget). To generate the
 completions, the shell function var(function) will be called.
-For further information, see
-ifzman(zmanref(zshcompwid))\
-ifnzman(noderef(Completion Widgets))\
-.
+For further information, see nmref(Completion Widgets)(zshcompwid).
 )
 item(tt(-R) [ tt(-c) ] [ var(display-string) ] [ var(string) ... ])(
 Redisplay the command line.  If a var(display-string) is
@@ -603,8 +591,7 @@ unpredictable behavior.
 
 Here is a simple example of using this feature.  A connection to a remote
 TCP port is created using the ztcp command; see 
-ifzman(the description of the tt(zsh/net/tcp) module in zmanref(zshmodules))\
-ifnzman(noderef(The zsh/net/tcp Module)).  Then a handler is installed
+sectref(The zsh/net/tcp Module)(zshmodules).  Then a handler is installed
 which simply prints out any data which arrives on this connection.  Note
 that `select' will indicate that the file descriptor needs handling
 if the remote side has closed the connection; we handle that by testing
@@ -741,12 +728,10 @@ in keymaps are bound to are in fact widgets.  Widgets can be user-defined
 or built in.
 
 The standard widgets built into ZLE are listed in
-ifzman(the section `Standard Widgets' below)\
-ifnzman(noderef(Standard Widgets)).
+sectref(Standard Widgets)(below).
 Other built-in widgets can be defined by other modules (see
-ifzman(zmanref(zshmodules))\
-ifnzman(noderef(Zsh Modules))\
-).  Each built-in widget has two names: its normal canonical name, and the
+nmref(Zsh Modules)(zshmodules)).
+Each built-in widget has two names: its normal canonical name, and the
 same name preceded by a `tt(.)'.  The `tt(.)' name is special: it can't be
 rebound to a different widget.  This makes the widget available even when
 its usual name has been redefined.
@@ -972,8 +957,7 @@ Indicates if the region is currently active.  It can be assigned 0 or 1
 to deactivate and activate the region respectively. A value of 2
 activates the region in line-wise mode with the highlighted text
 extending for whole lines only; see
-ifzman(em(Character Highlighting) below)\
-ifnzman(noderef(Character Highlighting)).
+sectref(Character Highlighting)(below).
 )
 vindex(region_highlight)
 item(tt(region_highlight) (array))(
@@ -995,8 +979,7 @@ itemiz(A start offset in the same units as tt(CURSOR).)
 itemiz(An end offset in the same units as tt(CURSOR).)
 itemiz(A highlight specification in the same format as
 used for contexts in the parameter tt(zle_highlight), see
-ifnzman(noderef(Character Highlighting))\
-ifzman(the section `Character Highlighting' below);
+sectref(Character Highlighting)(below);
 for example, tt(standout) or tt(fg=red,bold).)
 itemiz(Optionally, a string of the form `tt(memo=)var(token)'.
 The var(token) consists of everything between the `tt(=)' and the next
@@ -1010,8 +993,7 @@ in order to remove array elements it have added.
 
 (This example uses the `tt(${)var(name)tt(:#)var(pattern)tt(})' array-grepping
 syntax described in
-ifzman(the section `Parameter Expansion' in zmanref(zshexpn))\
-ifnzman(noderef(Parameter Expansion)).))
+sectref(Parameter Expansion)(zshexpn).))
 enditemize()
 
 For example, 
@@ -1034,8 +1016,7 @@ API promise.  It's mentioned in the "Incompatibilities" section of README.)
 
 The final highlighting on the command line depends on both tt(region_highlight)
 and tt(zle_highlight); see
-ifzman(the section CHARACTER HIGHLIGHTING below)\
-ifnzman(noderef(Character Highlighting)) for details.
+sectref(Character Highlighting)(below) for details.
 )
 vindex(registers)
 item(tt(registers) (associative array))(
@@ -1144,6 +1125,7 @@ example(if [[ $ZLE_STATE == *globalhistory*insert* ]]; then ...; fi)
 )
 enditem()
 
+anchor(Special Widgets)
 subsect(Special Widgets)
 
 There are a few user-defined widgets which are special to the shell.
@@ -1229,8 +1211,8 @@ shown in the list are those based on the VT100, common on many modern
 terminals, but in fact these are not necessarily bound.  In the case of the
 tt(viins) keymap, the initial escape character of the sequences serves also
 to return to the tt(vicmd) keymap: whether this happens is determined by
-the tt(KEYTIMEOUT) parameter, see ifzman(zmanref(zshparam))\
-ifnzman(noderef(Parameters)).
+the tt(KEYTIMEOUT) parameter, see
+sectref(Parameters Used by the Shell)(zshparam).
 startmenu()
 menu(Movement)
 menu(History Control)
@@ -1570,9 +1552,8 @@ item(tt(history-incremental-pattern-search-forward))(
 These widgets behave similarly to the corresponding widgets with
 no tt(-pattern), but the search string typed by the user is treated
 as a pattern, respecting the current settings of the various options
-affecting pattern matching.  See
-ifzman(FILENAME GENERATION in zmanref(zshexpn))\
-ifnzman(noderef(Filename Generation)) for a description of patterns.
+affecting pattern matching.  See sectref(Filename Generation)(zshexpn)
+for a description of patterns.
 If no numeric argument was given lowercase letters in the search
 string may match uppercase letters in the history.  The string may begin
 with `tt(^)' to anchor the search to the beginning of the line.
@@ -2771,9 +2752,7 @@ million colours). In this case, the hex triplet format can be used. This
 consists of a `tt(#)' followed by either a three or six digit hexadecimal
 number describing the red, green and blue components of the colour. Hex
 triplets can also be used with 88 and 256 colour terminals via the
-tt(zsh/nearcolor) module (see ifzman(zmanref(zshmodules))\
-ifnzman(noderef(The zsh/nearcolor Module))\
-).
+tt(zsh/nearcolor) module (see nmref(The zsh/nearcolor Module)(zshmodules)).
 
 Colour is also known as color.
 )

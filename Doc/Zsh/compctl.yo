@@ -134,10 +134,8 @@ the default.  In other words, completion will subsequently use the
 options specified by the tt(-D) flag.
 
 The form with tt(-M) as the first and only option defines global
-matching specifications (see
-ifzman(zshcompwid)\
-ifnzman(noderef(Completion Matching Control))\
-). The match specifications given will be used for every completion
+matching specifications (see sectref(Completion Matching Control)(zshcompwid)).
+The match specifications given will be used for every completion
 attempt (only when using tt(compctl), not with the new completion
 system) and are tried in the order in which they are defined until one 
 generates at least one match. E.g.:
@@ -222,10 +220,7 @@ will complete names of functions, builtins, reserved words or aliases
 whether or not they are disabled.
 )
 item(tt(-o))(
-Names of shell options (see
-ifzman(zmanref(zshoptions))\
-ifnzman(noderef(Options))\
-).
+Names of shell options (see nmref(Options)(zshoptions)).
 )
 item(tt(-v))(
 Names of any variable defined in the shell.
@@ -301,9 +296,8 @@ globbing.  Use the syntax `tt((either|or))' to match alternatives.)
 item(tt(-s) var(subststring))(
 The var(subststring) is split into words and these words are than
 expanded using all shell expansion mechanisms (see
-ifzman(zmanref(zshexpn))\
-ifnzman(noderef(Expansion))\
-).  The resulting words are taken as possible
+nmref(Expansion)(zshexpn)).
+The resulting words are taken as possible
 completions.  The tt(fignore) special parameter is not applied to the
 resulting files.  Note that tt(-g) is faster for filenames.
 )
@@ -540,9 +534,7 @@ item(tt(-M) var(match-spec))(
 This defines additional matching control specifications that should be used
 only when testing words for the list of flags this flag appears in. The format
 of the var(match-spec) string is described in 
-ifzman(zshcompwid)\
-ifnzman(noderef(Completion Matching Control))\
-.
+sectref(Completion Matching Control)(zshcompwid).
 )
 enditem()
 

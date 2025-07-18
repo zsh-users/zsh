@@ -1,3 +1,24 @@
+2025-07-18  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 53821: Doc/Zsh/builtins.yo, Doc/Zsh/calsys.yo, Doc/Zsh/compctl.yo,
+	Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo, Doc/Zsh/cond.yo,
+	Doc/Zsh/contrib.yo, Doc/Zsh/exec.yo, Doc/Zsh/expn.yo,
+	Doc/Zsh/files.yo, Doc/Zsh/func.yo, Doc/Zsh/grammar.yo,
+	Doc/Zsh/intro.yo, Doc/Zsh/invoke.yo, Doc/Zsh/jobs.yo,
+	Doc/Zsh/manual.yo, Doc/Zsh/mod_compctl.yo, Doc/Zsh/mod_complete.yo,
+	Doc/Zsh/mod_complist.yo, Doc/Zsh/mod_computil.yo,
+	Doc/Zsh/mod_datetime.yo, Doc/Zsh/mod_mathfunc.yo,
+	Doc/Zsh/mod_newuser.yo, Doc/Zsh/mod_parameter.yo,
+	Doc/Zsh/mod_private.yo, Doc/Zsh/mod_sched.yo, Doc/Zsh/mod_stat.yo,
+	Doc/Zsh/mod_tcp.yo, Doc/Zsh/mod_watch.yo, Doc/Zsh/mod_zftp.yo,
+	Doc/Zsh/mod_zle.yo, Doc/Zsh/mod_zleparameter.yo,
+	Doc/Zsh/mod_zpty.yo, Doc/Zsh/mod_zutil.yo, Doc/Zsh/modules.yo,
+	Doc/Zsh/options.yo, Doc/Zsh/params.yo, Doc/Zsh/prompt.yo,
+	Doc/Zsh/redirect.yo, Doc/Zsh/roadmap.yo, Doc/Zsh/tcpsys.yo,
+	Doc/Zsh/zftpsys.yo, Doc/Zsh/zle.yo, Doc/zman.yo, Doc/ztexi.yo,
+	Util/zyodl.vim: add missing manpage name in cross reference,
+	many small improvements, with four new yodl macros.
+
 2025-07-13  Bart Schaefer  <schaefer@zsh.org>
 
 	* 53820: Src/hist.c: detect integer overflow when parsing

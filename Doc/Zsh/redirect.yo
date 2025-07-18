@@ -152,8 +152,7 @@ with the terminal (assuming file descriptor 1 had been)
 and then file descriptor 1 would be associated with file var(fname).
 
 The `tt(|&)' command separator described in
-ifzman(em(Simple Commands & Pipelines) in zmanref(zshmisc))\
-ifnzman(noderef(Simple Commands & Pipelines))
+sectref(Simple Commands & Pipelines)(zshmisc)
 is a shorthand for `tt(2>&1 |)'.
 
 The various forms of process substitution, `tt(<LPAR())var(list)tt(RPAR())',
@@ -161,11 +160,7 @@ and `tt(=LPAR())var(list)tt(RPAR())' for input and
 `tt(>LPAR())var(list)tt(RPAR())' for output, are often used together with
 redirection.  For example, if var(word) in an output redirection is of the
 form `tt(>LPAR())var(list)tt(RPAR())' then the output is piped to the
-command represented by var(list).  See
-ifzman(\
-em(Process Substitution) in zmanref(zshexpn))\
-ifnzman(\
-noderef(Process Substitution)).
+command represented by var(list).  See sectref(Process Substitution)(zshexpn).
 sect(Opening file descriptors using parameters)
 cindex(file descriptors, use with parameters)
 cindex(parameters, for using file descriptors)
@@ -220,6 +215,7 @@ Note that the expansion of the variable in the expression tt(>&$myfd)
 occurs at the point the redirection is opened.  This is after the expansion
 of command arguments and after any redirections to the left on the command
 line have been processed.
+anchor(Multios)
 sect(Multios)
 cindex(multios)
 pindex(MULTIOS, use of)

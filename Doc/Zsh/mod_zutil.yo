@@ -46,7 +46,9 @@ zstyle ':weather:*:Sunday:*' preferred-precipitation snow)
 
 Then the plugin would run under the hood a command such as
 
-example(zstyle -s ":weather:${continent}:${day_of_week}:${moon_phase}" preferred-precipitation REPLY)
+example(zstyle -s \ 
+  ":weather:${continent}:${day_of_week}:${moon_phase}" \ 
+  preferred-precipitation REPLY)
 
 in order to retrieve your preference into the scalar variable tt($REPLY).
 On Sundays tt($REPLY) would be set to `tt(snow)'; in Europe it would be set

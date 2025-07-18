@@ -33,14 +33,14 @@ endmenu()
 
 
 texinode(Calendar File and Date Formats)(Calendar System User Functions)()(Calendar Function System)
+anchor(File and Date Formats)
 sect(File and Date Formats)
 
 subsect(Calendar File Format)
 
 The calendar file is by default tt(~/calendar).  This can be configured
-by the tt(calendar-file) style, see
-ifzman(the section STYLES below)\
-ifnzman(noderef(Calendar Styles)).  The basic format consists
+by the tt(calendar-file) style, see sectref(Styles)(below).
+The basic format consists
 of a series of separate lines, with no indentation, each including
 a date and time specification followed by a description of the event.
 
@@ -316,7 +316,7 @@ directly by the user.  The first part describes those functions
 associated with the user's calendar; the second part describes
 the use in glob qualifiers.
 
-subsect(Calendar system functions)
+subsect(Calendar System Functions)
 
 startitem()
 findex(calendar)
@@ -393,9 +393,7 @@ only runs if the shell is at an interactive prompt; a foreground task
 blocks the scheduled task from running until it is finished.
 
 The timed event usually runs the programme tt(calendar_show) to show
-the event, as described in
-ifzman(the section UTILITY FUNCTIONS below)\
-ifnzman(noderef(Calendar Utility Functions)).
+the event, as described in sectref(Utility Functions)(below).
 
 By default, a warning of the event is shown five minutes before it is due.
 The warning period can be configured by the style tt(warn-time) or
@@ -477,8 +475,7 @@ findex(calendar_add)
 item(tt(calendar_add) [ tt(-BL) ] var(event) ...)(
 Adds a single event to the calendar in the appropriate location.
 The event can contain multiple lines, as described in
-ifnzman(noderef(Calendar File and Date Formats))\
-ifzman(the section `Calendar File Format' above).
+sectref(File and Date Formats)(above).
 Using this function ensures that the calendar file is sorted in date
 and time order.  It also makes special arrangements for locking
 the file while it is altered.  The old calendar is left in a file
@@ -607,7 +604,7 @@ left in a file with the suffix tt(.old).
 )
 enditem()
 
-subsect(Glob qualifiers)
+subsect(Glob Qualifiers)
 
 startitem()
 item(tt(age))(
@@ -620,8 +617,7 @@ only the builtin tt(zstat).
 tt(age) selects files having a given modification time for use
 as a glob qualifier.  The format of the date is the same as that
 understood by the calendar system, described in
-ifzman(the section FILE AND DATE FORMATS above)\
-ifnzman(noderef(Calendar File and Date Formats)).
+sectref(File and Date Formats)(above).
 
 The function can take one or two arguments, which can be supplied either
 directly as command or arguments, or separately as shell parameters.
@@ -699,11 +695,11 @@ print *+LPAR()e-after today:12:00-RPAR())
 enditem()
 
 texinode(Calendar Styles)(Calendar Utility Functions)(Calendar System User Functions)(Calendar Function System)
+anchor(Styles)
 sect(Styles)
 
 The zsh style mechanism using the tt(zstyle) command is describe in
-ifzman(zmanref(zshmodules))\
-ifnzman(noderef(The zsh/zutil Module)).  This is the same mechanism
+sectref(The zsh/zutil Module)(zshmodules). This is the same mechanism
 used in the completion system.
 
 The styles below are all examined in the context
@@ -720,8 +716,7 @@ A tt(strftime) format string (see manref(strftime)(3)) with the zsh
 extensions providing various numbers with no leading zero or space
 if the number is a single digit as described for the
 tt(%D{)var(string)tt(}) prompt format in
-ifzman(the section EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
-ifnzman(noderef(Prompt Expansion)).
+sectref(Simple Prompt Escapes)(zshmisc).
 
 This is used for outputting dates in tt(calendar), both to support
 the tt(-v) option and when adding recurring events back to the calendar
@@ -766,6 +761,7 @@ enditem()
 
 
 texinode(Calendar Utility Functions)(Calendar Bugs)(Calendar Styles)(Calendar Function System)
+anchor(Utility functions)
 sect(Utility functions)
 
 startitem()
@@ -805,9 +801,8 @@ findex(calendar_scandate)
 item(tt(calendar_scandate))(
 This is a generic function to parse dates and times that may be
 used separately from the calendar system.  The argument is a date
-or time specification as described in
-ifzman(the section FILE AND DATE FORMATS above)\
-ifnzman(noderef(Calendar File and Date Formats)).  The parameter tt(REPLY)
+or time specification as described in sectref(File and Date Formats)(above).
+The parameter tt(REPLY)
 is set to the number of seconds since the epoch corresponding to that date
 or time.  By default, the date and time may occur anywhere within the given
 argument.

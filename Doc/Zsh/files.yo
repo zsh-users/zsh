@@ -1,5 +1,6 @@
 texinode(Files)(Shell Grammar)(Invocation)(Top)
 chapter(Files)
+anchor(Startup/Shutdown Files)
 sect(Startup/Shutdown Files)
 cindex(files, startup)
 cindex(startup files)
@@ -58,13 +59,7 @@ be executed when zsh is invoked with the `tt(-f)' option.
 ifnzman(includefile(Zsh/filelist.yo))
 
 Any of these files may be pre-compiled with the tt(zcompile) builtin
-command (\
-ifzman(\
-see zmanref(zshbuiltins)\
-)\
-ifnzman(\
-noderef(Shell Builtin Commands)\
-)\
-).  If a compiled file exists (named for the original file plus the
+command (see nmref(Shell Builtin Commands)(zshbuiltins)).
+If a compiled file exists (named for the original file plus the
 tt(.zwc) extension) and it is newer than the original file, the compiled
 file will be used instead.

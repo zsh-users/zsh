@@ -119,13 +119,8 @@ item(tt(parameters))(
 The keys in this associative array are the names of the parameters
 currently defined. The values are strings describing the type of the
 parameter, in the same format used by the tt(t) parameter flag, see
-ifzman(\
-zmanref(zshexpn)
-)\
-ifnzman(\
-noderef(Parameter Expansion)
-)\
-. The value may also be `tt(undefined)' indicating a parameter that
+subref(Parameter Expansion Flags)(zshexpn).
+The value may also be `tt(undefined)' indicating a parameter that
 may be autoloaded from a module but has not yet been referenced.
 When the key is the name of a named reference, the value is
 `tt(nameref-)' prepended to the type of the referenced parameter,

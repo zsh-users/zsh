@@ -115,9 +115,8 @@ named files; no list of file names is allowed in this case.
 item(tt(-F) var(fmt))(
 Supplies a tt(strftime) (see manref(strftime)(3)) string for the
 formatting of the time elements.  The format string supports all of the
-zsh extensions described in
-ifzman(the section EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
-ifnzman(noderef(Prompt Expansion)).
+zsh extensions (see the description of tt(%D{)var(string)tt(})
+prompt escape in sectref(Simple Prompt Escapes)(zshmisc)).
 In particular, tt(-F %s.%N) can be used to show timestamps with nanosecond
 precision if supported by the system.
 The tt(-s) option is implied.

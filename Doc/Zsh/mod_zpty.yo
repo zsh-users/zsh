@@ -21,10 +21,11 @@ made non-blocking.
 
 The shell parameter tt(REPLY) is set to the file descriptor assigned to
 the master side of the pseudo-terminal.  This allows the terminal to be
-monitored with ZLE descriptor handlers (see ifzman(zmanref(zshzle))\
-ifnzman(noderef(Zle Builtins))) or manipulated with tt(sysread) and
-tt(syswrite) (see ifzman(THE ZSH/SYSTEM MODULE in zmanref(zshmodules))\
-ifnzman(noderef(The zsh/system Module))).  em(Warning): Use of tt(sysread)
+monitored with ZLE descriptor handlers (see the description of option
+tt(-F) for tt(zle) builtin in sectref(Zle Builtins)(zshzle))
+or manipulated with tt(sysread) and tt(syswrite) builtins
+(see sectref(The zsh/system Module)(zshmodules)).
+em(Warning): Use of tt(sysread)
 and tt(syswrite) is em(not) recommended; use tt(zpty -r) and tt(zpty -w)
 unless you know exactly what you are doing.
 )

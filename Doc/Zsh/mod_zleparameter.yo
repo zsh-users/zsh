@@ -4,9 +4,7 @@ Access to internals of the Zsh Line Editor via parameters.
 cindex(parameters, special)
 The tt(zsh/zleparameter) module defines two special parameters that can be 
 used to access internal information of the Zsh Line Editor (see
-ifzman(zmanref(zshzle))\
-ifnzman(noderef(Zsh Line Editor))\
-).
+nmref(Zsh Line Editor)(zshzle)).
 
 startitem()
 vindex(keymaps)

@@ -58,7 +58,7 @@ syn match  zyodlNumber  "\d\+"
 syn region zyodlItem    start="\<xitem(" end=")" contains=zyodlSpecial,@zyodlInline
 syn region zyodlItem    start="\<item("  end=")" contains=zyodlSpecial,@zyodlInline
 syn region zyodlExample start="\<example(" end=")" contains=zyodlSpecial,zyodlParenthetical
-syn region zyodlComment start="\<COMMENT(" end=")" contains=zyodlSpecial,@zyodlInline,zyodlParenthetical
+syn region zyodlComment start="\<COMMENT(" end=")" contains=zyodlSpecial,@zyodlInline,zyodlParenthetical,zyodlRef
 " comment that gets output in generated texinfo/roff source
 syn region zyodlComment start="\<comment(" end=")"
 syn region zyodlTitle   start="\<\(chapter\|subsect\|sect\)(" end=")" contains=zyodlSpecial,@zyodlInline,zyodlParenthetical
@@ -67,7 +67,8 @@ syn region zyodlParenthetical start="\w\@<!(" end=")" transparent contained cont
 
 " zyodlCond doesn't contain zyodlParenthetical, since section names (probably) don't have parentheticals.
 syn region zyodlCond    start="\<\(ifzman\|ifnzman\)(" end=")" contains=zyodlRef,zyodlSpecial,@zyodlInline
-syn region zyodlRef     start="\<\(zmanref\|noderef\)(" end=")"
+syn region zyodlRef     start="\<\(zmanref\|noderef\|anchor\)(" end=")"
+syn match  zyodlRef     "\<\(nm\|sect\|sub\)ref([^)]*)([^)]*)"
 
 " zyodlSItemArg2 should use zyodlParenthetical instead of the 'skip='
 syn keyword zyodlKeyword sitem nextgroup=zyodlSItemArg1

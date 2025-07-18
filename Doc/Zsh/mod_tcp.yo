@@ -130,12 +130,8 @@ session table.  If var(fd) is not specified,
 tt(ztcp) will close everything in the session table.
 
 Normally, sockets registered by zftp (see
-ifzman(\
-zmanref(zshmodules)
-)\
-ifnzman(\
-noderef(The zsh/zftp Module)
-)) cannot be closed this way.  In order
+sectref(The zsh/zftp Module)(zshmodules))
+cannot be closed this way.  In order
 to force such a socket closed, use tt(-f).
 
 In order to elicit more verbose output, use tt(-v).

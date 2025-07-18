@@ -156,6 +156,13 @@ def(zmanref)(1)(manref(ARG1)(1))
 def(noderef)(1)(\
   NOTRANS(@ref{)ARG1+NOTRANS(})\
 )
+COMMENT( See comments in zman.yo )
+def(nmref)(2)(noderef(ARG1))
+def(sectref)(2)(noderef(ARG1))
+def(subref)(2)(noderef(ARG1))
+def(anchor)(1)(\
+  NOTRANS(@anchor{)ARG1+NOTRANS(})\
+)
 
 COMMENT(--- lists ---)
 

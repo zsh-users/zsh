@@ -41,17 +41,12 @@ After the first one or two arguments have been appropriated as described above,
 the remaining arguments are assigned to the positional parameters.
 
 For further options, which are common to invocation and the tt(set)
-builtin, see
-ifzman(zmanref(zshoptions))\
-ifnzman(noderef(Options))\
-.
+builtin, see nmref(Options)(zshoptions).
 
 The long option `tt(-)tt(-emulate)' followed (in a separate word) by an
 emulation mode may be passed to the shell.
 The emulation modes are those described for the tt(emulate) builtin,
-see
-ifzman(zmanref(zshbuiltins))\
-ifnzman(noderef(Shell Builtin Commands)).
+see nmref(Shell Builtin Commands)(zshbuiltins).
 The `tt(-)tt(-emulate)' option must precede any other options (which might
 otherwise be overridden), but following options are honoured, so
 may be used to modify the requested emulation mode.  Note that certain

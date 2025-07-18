@@ -13,9 +13,8 @@ is implemented as a builtin to allow full use of shell command line
 editing, file I/O, and job control mechanisms.  Often, users will
 access it via shell functions providing a more powerful interface; a set is
 provided with the tt(zsh) distribution and is described in
-ifzman(zmanref(zshzftpsys))\
-ifnzman(noderef(Zftp Function System))\
-.  However, the tt(zftp) command is entirely usable in its
+nmref(Zftp Function System)(zshzftpsys).
+However, the tt(zftp) command is entirely usable in its
 own right.
 
 All commands consist of the command name tt(zftp) followed by the name

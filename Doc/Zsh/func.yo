@@ -20,7 +20,7 @@ parameter, which extends dynamically to any other functions called by
 the declaring function.  In most cases, local parameters take the
 place of any other parameter having the same name that was assigned or
 declared in an earlier function scope.
-(See noderef(Local Parameters).)
+(See sectref(Local Parameters)(zshparam).)
 
 A named parameter declared with the `tt(-n)' option to any of the
 `tt(typeset)' acts as a reference to another parameter, which may
@@ -66,6 +66,7 @@ findex(functions, use of)
 Function identifiers can be listed with the tt(functions) builtin.
 findex(unfunction, use of)
 Functions can be undefined with the tt(unfunction) builtin.
+anchor(Autoloading Functions)
 sect(Autoloading Functions)
 cindex(autoloading functions)
 cindex(functions, autoloading)
@@ -235,6 +236,7 @@ for example `tt(name=; function $name { )var(...)tt( })', are not
 treated as anonymous functions.  Instead, they are treated as normal
 function definitions where the definition is silently discarded.
 
+anchor(Special Functions)
 sect(Special Functions)
 Certain functions, if defined, have special meaning to the shell.
 
@@ -383,8 +385,8 @@ item(tt(TRAPDEBUG))(
 If the option tt(DEBUG_BEFORE_CMD) is set (as it is by default), executed
 before each command; otherwise executed after each command.  See
 the description of the tt(trap) builtin in
-ifnzman(noderef(Shell Builtin Commands))\
-ifzman(zmanref(zshbuiltins)) for details of additional features provided
+nmref(Shell Builtin Commands)(zshbuiltins)
+for details of additional features provided
 in debug traps.
 )
 findex(TRAPEXIT)

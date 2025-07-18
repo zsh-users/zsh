@@ -15,9 +15,7 @@ The features are contextual, sensitive to the point at which completion is
 started.  Many completions are already provided.
 For this reason, a user can perform a great many tasks without
 knowing any details beyond how to initialize the system, which is
-described
-ifzman(below in INITIALIZATION)\
-ifnzman(in noderef(Initialization)).
+described sectref(Initialization)(below).
 
 The context that decides what completion is to be performed may be
 startitemize()
@@ -49,8 +47,7 @@ Styles modify various operations of the completion system, such as
 output formatting, but also what kinds of completers are used (and in
 what order), or which tags are examined.  Styles may accept arguments
 and are manipulated using the tt(zstyle) command described in
-ifzman(zmanref(zshmodules))\
-ifnzman(noderef(The zsh/zutil Module)).
+sectref(The zsh/zutil Module)(zshmodules).
 
 In summary, tags describe em(what) the completion objects are, and style
 tt(how) they are to be completed.  At various points of execution, the
@@ -58,8 +55,7 @@ completion system checks what styles and/or tags are defined for the
 current context, and uses that to modify its behavior.  The full
 description of context handling, which determines how tags and other
 elements of the context influence the behaviour of styles, is described
-ifzman(below in COMPLETION SYSTEM CONFIGURATION)\
-ifnzman(in noderef(Completion System Configuration)).
+sectref(Completion System Configuration)(below).
 
 When a completion is requested, a dispatcher function is called;
 see the description of tt(_main_complete) in the list of control functions
@@ -210,7 +206,7 @@ tt(complete) which correspond to the bash builtins with the same names.
 It will then be possible to use completion specifications and functions
 written for bash.
 
-subsect(Autoloaded files)
+subsect(Autoloaded Files)
 cindex(completion system, autoloaded functions)
 
 The convention for autoloaded functions used in completion is that they
@@ -274,9 +270,8 @@ completion, namely tt(complete-word), tt(delete-char-or-list),
 tt(expand-or-complete), tt(expand-or-complete-prefix), tt(list-choices),
 tt(menu-complete), tt(menu-expand-or-complete), or
 tt(reverse-menu-complete).  If the tt(zsh/complist) module is loaded (see
-ifzman(zmanref(zshmodules))\
-ifnzman(noderef(The zsh/complist Module))\
-) the widget tt(menu-select) is also available.
+sectref(The zsh/complist Module)(zshmodules))
+the widget tt(menu-select) is also available.
 
 When one of the var(key-sequence)s is typed, the function in the file will
 be invoked to generate the matches.  Note that a key will not be re-bound
@@ -567,9 +562,8 @@ The next few paragraphs explain how a context is composed within the
 completion function suite.  Following that is discussion of how em(styles)
 are defined.  Styles determine such things as how the matches are
 generated, similarly to shell options but with much more control.  They
-are defined with the tt(zstyle) builtin command (\
-ifzman(see zmanref(zshmodules))\
-ifnzman(noderef(The zsh/zutil Module))).
+are defined with the tt(zstyle) builtin command
+(see sectref(The zsh/zutil Module)(zshmodules)).
 
 The context string always consists of a fixed set of fields, separated
 by colons and with a leading colon before the first.  Fields which are
@@ -596,10 +590,7 @@ leading underscore and with other underscores converted to hyphens.  A
 `completer' is in overall control of how completion is to be performed;
 `tt(complete)' is the simplest, but other completers exist to perform
 related tasks such as correction, or to modify the behaviour of a later
-completer.  See
-ifzman(the section `Control Functions' below)\
-ifnzman(noderef(Control Functions)) 
-for more information.  
+completer.  See sectref(Control Functions)(below) for more information.
 )
 itemiz(\
 The var(command) or a special tt(-)var(context)tt(-), just at it appears
@@ -651,9 +642,7 @@ tags in the given order.
 The tt(_complete_help) bindable command shows all the contexts and tags
 available for completion at a particular point.  This provides an easy
 way of finding information for tt(tag-order) and other styles.  It is
-described in
-ifzman(the section `Bindable Commands' below)\
-ifnzman(noderef(Bindable Commands)).
+described in sectref(Bindable Commands)(below).
 
 When looking up styles the completion system uses full context names,
 including the tag.  Looking up the value of a style therefore consists of
@@ -694,9 +683,7 @@ example(zstyle ':completion:*:*:kill:*:jobs' verbose no)
 The tt(-e) option to tt(zstyle) even allows completion function code to
 appear as the argument to a style; this requires some understanding of
 the internals of completion functions (see
-ifzman(see zmanref(zshcompwid))\
-ifnzman(noderef(Completion Widgets)))\
-).  For example,
+nmref(Completion Widgets)(zshcompwid)).  For example,
 
 example(tt(zstyle -e ':completion:*' hosts 'reply=($myhosts)'))
 
@@ -713,9 +700,8 @@ style mechanism uses the most specific possible match for a particular
 style to determine the set of values.  Strings are
 preferred over patterns (for example, `tt(:completion::complete:::foo)' is
 more specific than `tt(:completion::complete:::*')), and longer patterns are
-preferred over the pattern `tt(*)'. See 
-ifzman(zmanref(zmodules))ifnzman(noderef(The zsh/zutil Module))
-for details.
+preferred over the pattern `tt(*)'.  See
+sectref(The zsh/zutil Module)(zshmodules) for details.
 
 Context patterns that use something other than a wildcard (tt(*)) to match the
 middle parts of the context DASH()- the var(completer), var(command), and
@@ -1103,6 +1089,7 @@ for shell options
 )
 enditem()
 
+anchor(Standard Styles)
 subsect(Standard Styles)
 cindex(completion system, styles)
 
@@ -1309,10 +1296,7 @@ kindex(completer, completion style)
 item(tt(completer))(
 The strings given as the value of this style provide the names of the
 completer functions to use. The available completer functions are
-described in
-ifzman(the section `Control Functions' below)\
-ifnzman(noderef(Control Functions))\
-.
+described in sectref(Control Functions)(below).
 
 Each string may be either the name of a completer function or a string
 of the form `var(function)tt(:)var(name)'.  In the first case the
@@ -1628,10 +1612,7 @@ string to display above matches in completion lists.  The sequence
 `tt(%d)' in this string will be replaced with a short description of
 what these matches are.  This string may also contain the output
 attribute sequences understood by tt(compadd -X)
-(see
-ifzman(zmanref(zshcompwid))\
-ifnzman(noderef(Completion Widgets))\
-).
+(see sectref(Completion Builtin Commands)(zshcompwid)).
 
 The style is tested with each tag valid for the current completion
 before it is tested for the tt(descriptions) tag.  Hence different format 
@@ -1654,9 +1635,7 @@ the same descriptions separated by newlines.
 It is possible to use printf-style field width specifiers with `tt(%d)'
 and similar escape sequences.  This is handled by the tt(zformat)
 builtin command from the tt(zsh/zutil) module, see
-ifzman(zmanref(zshmodules))\
-ifnzman(noderef(The zsh/zutil Module))\
-.
+sectref(The zsh/zutil Module)(zshmodules).
 )
 kindex(gain-privileges, completion style)
 item(tt(gain-privileges))(
@@ -1955,9 +1934,7 @@ item(tt(list-colors))(
 If the tt(zsh/complist) module is loaded, this style can be used to set
 color specifications.  This mechanism replaces the use of the
 tt(ZLS_COLORS) and tt(ZLS_COLOURS) parameters described in
-ifzman(the section `The zsh/complist Module' in zmanref(zshmodules))\
-ifnzman(noderef(The zsh/complist Module))\
-, but the syntax is the same.
+sectref(The zsh/complist Module)(zshmodules), but the syntax is the same.
 
 If this style is set for the tt(default) tag, the strings in the value 
 are taken as specifications that are to be used everywhere.  If it is
@@ -2006,9 +1983,8 @@ kindex(list-prompt, completion style)
 item(tt(list-prompt))(
 If this style is set for the tt(default) tag,
 completion lists that don't fit on the screen can be scrolled (see
-ifzman(the description of the tt(zsh/complist) module in zmanref(zshmodules))\
-ifnzman(noderef(The zsh/complist Module))\
-).  The value, if not the empty string, will be displayed after every
+sectref(The zsh/complist Module)(zshmodules)).
+The value, if not the empty string, will be displayed after every
 screenful and the shell will prompt for a key press; if the style is
 set to the empty string,
 a default prompt will be used.
@@ -2092,9 +2068,8 @@ This style is tested separately for each tag valid in the current
 context.  Its value is placed before any match specifications given by the
 tt(matcher-list) style so can override them via the use of an tt(x:)
 specification.  The value should be in the form described in
-ifzman(the section `Completion Matching Control' in zmanref(zshcompwid))\
-ifnzman(noderef(Completion Matching Control))\
-.  For examples of this, see the description of the tt(tag-order) style.
+sectref(Completion Matching Control)(zshcompwid).
+For examples of this, see the description of the tt(tag-order) style.
 
 For notes comparing the use of this and the tt(matcher-list) style, see
 under the description of the tt(tag-order) style.
@@ -2103,9 +2078,7 @@ kindex(matcher-list, completion style)
 item(tt(matcher-list))(
 This style can be set to a list of match specifications that are to
 be applied everywhere. Match specifications are described in
-ifzman(the section `Completion Matching Control' in zmanref(zshcompwid))\
-ifnzman(noderef(Completion Matching Control))\
-.
+sectref(Completion Matching Control)(zshcompwid)).
 The completion system will try them one after another for each completer
 selected.  For example, to try first simple completion and, if that
 generates no matches, case-insensitive completion:
@@ -2262,8 +2235,7 @@ with a number and once with `tt(long)' or `tt(long-list)'.
 Finally, it is possible to activate two special modes of menu selection.
 The word `tt(interactive)' in the value causes interactive mode
 to be entered immediately when menu selection is started; see
-ifzman(the description of the tt(zsh/complist) module in zmanref(zshmodules))\
-ifnzman(noderef(The zsh/complist Module))
+sectref(The zsh/complist Module)(zshmodules)
 for a description of interactive mode.  Including the string
 `tt(search)' does the same for incremental search mode.  To select backward
 incremental search, include the string `tt(search-backward)'.
@@ -2790,9 +2762,7 @@ example(zstyle -e '*:-command-:*' tag-order '
 
 Completion in command position will be attempted only if the string
 typed so far is not empty.  This is tested using the tt(PREFIX)
-special parameter; see
-ifzman(zshcompwid)\
-ifnzman(noderef(Completion Widgets))
+special parameter; see sectref(Completion Special Parameters)(zshcompwid)
 for a description of parameters which are special inside completion widgets.
 Setting tt(reply) to an empty array provides the default
 behaviour of trying all tags at once; setting it to an
@@ -2994,14 +2964,8 @@ findex(_approximate)
 item(tt(_approximate))(
 This is similar to the basic tt(_complete) completer but allows the
 completions to undergo corrections.  The maximum number of errors can be
-specified by the tt(max-errors) style; see the description of
-approximate matching in
-ifzman(\
-zmanref(zshexpn)
-)\
-ifnzman(\
-noderef(Filename Generation)
-)\
+specified by the tt(max-errors) style; see
+sectref(Approximate Matching)(zshexpn)
 for how errors are counted.  Normally this completer will only be tried
 after the normal tt(_complete) completer:
 
@@ -3186,8 +3150,7 @@ completers are called.  The types of aliases which are to be expanded can
 be controlled with the styles tt(regular), tt(global) and tt(disabled).
 
 This function is also a bindable command, see
-ifzman(the section `Bindable Commands' below)\
-ifnzman(noderef(Bindable Commands)).
+sectref(Bindable Commands)(below).
 )
 findex(_extensions)
 item(tt(_extensions))(
@@ -3212,11 +3175,9 @@ item(tt(_history))(
 Complete words from the shell's command  history.  This completer 
 can be controlled by the tt(remove-all-dups), and tt(sort) styles as for the
 tt(_history_complete_word) bindable command, see
-ifzman(the section `Bindable Commands' below)\
-ifnzman(noderef(Bindable Commands))
+sectref(Bindable Commands)(below)
 and
-ifzman(the section `Completion System Configuration' above)\
-ifnzman(noderef(Completion System Configuration)).
+sectref(Completion System Configuration)(above).
 )
 findex(_ignored)
 item(tt(_ignored))(
@@ -3234,8 +3195,7 @@ This completer allows the insertion of matches to be delayed until
 completion is attempted a second time without the word on the line
 being changed.  On the first attempt, only the list of matches will be
 shown.  It is affected by the styles tt(condition) and tt(word), see
-ifzman(the section `Completion System Configuration' above)\
-ifnzman(noderef(Completion System Configuration)).
+sectref(Completion System Configuration)(above).
 )
 findex(_match)
 item(tt(_match))(
@@ -3278,9 +3238,7 @@ list of completions thus generated, instead of producing a new list of
 ordinary contextual completions.
 It should appear in the list of completers before any of
 the widgets which generate matches.  It uses two styles: tt(old-list) and
-tt(old-menu), see
-ifzman(the section `Completion System Configuration' above)\
-ifnzman(noderef(Completion System Configuration)).
+tt(old-menu), see sectref(Completion System Configuration)(above).
 )
 findex(_precommand)
 item(tt(_precommand))(
@@ -5472,12 +5430,10 @@ the same meaning as for tt(_description).
 findex(_widgets)
 item(tt(_widgets) [ tt(-g) var(pattern) ])(
 This function completes names of zle widgets (see
-ifzman(the section `Widgets' in zmanref(zshzle))\
-ifnzman(noderef(Zle Widgets))\
-).  The var(pattern), if present, is matched against values of the tt($widgets)
+sectref(Zle Widgets)(zshzle)).
+The var(pattern), if present, is matched against values of the tt($widgets)
 special parameter, documented in 
-ifzman(the section `The zsh/zleparameter Module' in zmanref(zshmodules))\
-ifnzman(noderef(The zsh/zleparameter Module)).
+sectref(The zsh/zleparameter Module)(zshmodules).
 )
 enditem()
 

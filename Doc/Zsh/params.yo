@@ -80,9 +80,8 @@ not performed unless the option tt(GLOB_ASSIGN) is set.
 When the integer attribute, tt(-i), or a floating point attribute, tt(-E)
 or tt(-F), is set for var(name), the var(value) is subject to arithmetic
 evaluation.  Furthermore, by replacing `tt(=)' with `tt(+=)', a parameter
-can be incremented or appended to.  See noderef(Array Parameters) and
-ifzman(em(Arithmetic Evaluation) LPAR()in zmanref(zshmisc)RPAR())\
-ifnzman(noderef(Arithmetic Evaluation))
+can be incremented or appended to.  See sectref(Array Parameters)(below) and
+sectref(Arithmetic Evaluation)(zshmisc)
 for additional forms of assignment.
 
 Note that assignment may implicitly change the attributes of a parameter.
@@ -92,9 +91,7 @@ pattern to a variable may change its type to an array.
 
 To reference the value of a parameter, write `tt($)var(name)' or
 `tt(${)var(name)tt(})'.  The latter form is required when var(name)
-includes a namespace prefix.  See
-ifzman(em(Parameter Expansion) in zmanref(zshexpn))\
-ifnzman(noderef(Parameter Expansion))
+includes a namespace prefix.  See sectref(Parameter Expansion)(zshexpn)
 for complete details.  That section also explains the effect
 of the difference between scalar and array assignment on parameter
 expansion.
@@ -103,8 +100,8 @@ menu(Array Parameters)
 menu(Positional Parameters)
 menu(Local Parameters)
 menu(Named References)
-menu(Parameters Set By The Shell)
-menu(Parameters Used By The Shell)
+menu(Parameters Set by the Shell)
+menu(Parameters Used by the Shell)
 endmenu()
 texinode(Array Parameters)(Positional Parameters)()(Parameters)
 cindex(array parameters)
@@ -131,7 +128,7 @@ may be in any order.  Note that this syntax is strict: tt([) and tt(]=) must
 not be quoted, and var(key) may not consist of the unquoted string
 tt(]=), but is otherwise treated as a simple string.  The enhanced forms
 of subscript expression that may be used when directly subscripting a
-variable name, described in the section `Array Subscripts' below, are not
+variable name, described in subref(Array Subscripts)(below), are not
 available.
 
 The syntaxes with and without the explicit key may be mixed.  An implicit
@@ -154,8 +151,7 @@ both var(key) and var(value) undergo all forms of expansion
 allowed for single word shell expansions (this does not include filename
 generation); these are as performed by the parameter expansion flag
 tt(LPAR()e+RPAR()) as described in
-ifzman(zmanref(zshexpn))\
-ifnzman(noderef(Parameter Expansion)).
+subref(Parameter Expansion Flags)(zshexpn).
 Nested parentheses may surround var(value) and are included as part of the
 value, which is joined into a plain string; this differs from ksh which
 allows the values themselves to be arrays.  A future version of zsh may
@@ -221,6 +217,7 @@ ifzman()
 indent(tt(set -A) var(name))
 indent(var(name)tt(=LPAR()RPAR()))
 
+anchor(Array Subscripts)
 subsect(Array Subscripts)
 cindex(subscripts)
 Individual elements of an array may be selected using a subscript.  A
@@ -242,8 +239,7 @@ an array element with a subscript that evaluates to zero return an
 empty string, while an attempt to write such an element is treated as
 an error.  For backward compatibility the tt(KSH_ZERO_SUBSCRIPT)
 option can be set to cause subscript values 0 and 1 to be equivalent; see
-the description of the option in ifzman(zmanref(zshoptions))\
-ifnzman(noderef(Description of Options)).
+the description of the option in nmref(Description of Options)(zshoptions).
 
 The same subscripting syntax is used for associative arrays, except that
 no arithmetic expansion is applied to var(exp).  However, the parsing
@@ -259,8 +255,7 @@ appear within double quotes.
 associative arrays, `tt([*])' or `tt([@])' evaluate to all the values,
 in no particular order.  Note that this does not substitute
 the keys; see the documentation for the `tt(k)' flag under
-ifzman(em(Parameter Expansion Flags) in zmanref(zshexpn))\
-ifnzman(noderef(Parameter Expansion))
+subref(Parameter Expansion Flags)(zshexpn)
 for complete details.
 When an array parameter is referenced as `tt($)var(name)' (with no
 subscript) it evaluates to `tt($)var(name)tt([*])', unless the tt(KSH_ARRAYS)
@@ -472,10 +467,8 @@ for either purpose on the left side of an assignment.
 )
 enditem()
 
-See em(Parameter Expansion Flags) (\
-ifzman(zmanref(zshexpn))\
-ifnzman(noderef(Parameter Expansion))\
-) for additional ways to manipulate the results of array subscripting.
+See subref(Parameter Expansion Flags)(zshexpn)
+for additional ways to manipulate the results of array subscripting.
 
 subsect(Subscript Parsing)
 
@@ -491,10 +484,8 @@ example(aa+=('key with "*strange*" characters' 'value string'))
 
 The basic rule to remember when writing a subscript expression is that all
 text between the opening `tt([)' and the closing `tt(])' is interpreted
-em(as if) it were in double quotes (\
-ifzman(see zmanref(zshmisc))\
-ifnzman(noderef(Quoting))\
-).  However, unlike double quotes which normally cannot nest, subscript
+em(as if) it were in double quotes (see sectref(Quoting)(zshmisc)).
+However, unlike double quotes which normally cannot nest, subscript
 expressions may appear inside double-quoted strings or inside other
 subscript expressions (or both!), so the rules have two important
 differences.
@@ -568,8 +559,7 @@ brackets, parentheses, etc., are seen only when the complete expression is
 converted to a pattern.  To match the value of a parameter literally in a
 reverse subscript, rather than as a pattern,
 use `tt(${LPAR()q)tt(RPAR())var(name)tt(})' (\
-ifzman(see zmanref(zshexpn))\
-ifnzman(noderef(Parameter Expansion))\
+sectref(Parameter Expansion)(zshexpn)\
 ) to quote the expanded value.
 
 Note that the `tt(k)' and `tt(K)' flags are reverse subscripting for an
@@ -596,11 +586,11 @@ cindex(parameters, positional)
 sect(Positional Parameters)
 The positional parameters provide access to the command-line arguments
 of a shell function, shell script, or the shell itself; see
-noderef(Invocation), and also noderef(Functions).
+sectref(Invocation)(zsh), and also sectref(Functions)(zshmisc).
 The parameter var(n), where var(n) is a number,
 is the var(n)th positional parameter.
 The parameter `tt($0)' is a special case, see
-noderef(Parameters Set By The Shell).
+sectref(Parameters Set by the Shell)(below).
 
 The parameters tt(*), tt(@) and tt(argv) are
 arrays containing all the positional parameters;
@@ -655,7 +645,7 @@ find the programs in tt(/new/directory) inside a function.
 Note that the restriction in older versions of zsh that local parameters
 were never exported has been removed.
 
-texinode(Named References)(Parameters Set By The Shell)(Local Parameters)(Parameters)
+texinode(Named References)(Parameters Set by the Shell)(Local Parameters)(Parameters)
 cindex(named references)
 cindex(references, named)
 sect(Named References)
@@ -669,8 +659,7 @@ tt(print -r -- ${)var(pname)tt(}))
 
 The `tt((P))' flag method is older and should be used when a script
 needs to be backwards-compatible.  This is described fully in
-the Parameter Expansion Flags section of
-ifzman(zmanref(zshexpn))ifnzman(noderef(Parameter Expansion)).  Zsh
+subref(Parameter Expansion Flags)(zshexpn). Zsh
 versions em(greater than) tt(5.9.0) are required for `tt(typeset -n)'.
 This manual was generated with Zsh tt(version()).
 
@@ -697,8 +686,7 @@ tt(typeset -n )var(pname)tt(=))
 acts as a placeholder.  The first non-empty assignment to var(pname)
 initializes the reference, and subsequently any expansions of, or
 assignments to, var(pname) act on the referenced parameter.  This
-is explained in the Named References section of
-ifzman(zmanref(zshexpn))ifnzman(noderef(Parameter Expansion)).
+is explained in subref(Named References)(zshexpn).
 
 A placeholder var(pname) in a calling function may be initialized in a
 called function to reference a local parameter var(rname).  In this
@@ -709,8 +697,8 @@ therefore may become a reference to another parameter in the calling
 function.  It is recommended that placeholders be initialized soon
 after they are declared, to make it clear what they reference.
 
-texinode(Parameters Set By The Shell)(Parameters Used By The Shell)(Named References)(Parameters)
-sect(Parameters Set By The Shell)
+texinode(Parameters Set by the Shell)(Parameters Used by the Shell)(Named References)(Parameters)
+sect(Parameters Set by the Shell)
 In the parameter lists that follow, the mark `<S>' indicates that the
 parameter is special.  `<Z>' indicates that the parameter does not exist
 when the shell initializes in tt(sh) or tt(ksh) emulation mode.
@@ -958,8 +946,7 @@ varies by platform (and probably isn't accurate to 1 ns regardless),
 and the shell may show more or fewer digits depending on the
 use of tt(typeset).  See
 the documentation for the builtin tt(typeset) in
-ifzman(zmanref(zshbuiltins))\
-ifnzman(noderef(Shell Builtin Commands)) for more details.
+nmref(Shell Builtin Commands)(zshbuiltins) for more details.
 )
 vindex(SHLVL)
 item(tt(SHLVL) <S>)(
@@ -983,8 +970,7 @@ item(tt(TRY_BLOCK_ERROR) <S>)(
 In an tt(always) block, indicates whether the preceding list of code
 caused an error.  The value is 1 to indicate an error, 0 otherwise.
 It may be reset, clearing the error condition.  See
-ifzman(em(Complex Commands) in zmanref(zshmisc))\
-ifnzman(noderef(Complex Commands))
+sectref(Complex Commands)(zshmisc)
 )
 vindex(TRY_BLOCK_INTERRUPT)
 item(tt(TRY_BLOCK_INTERRUPT) <S>)(
@@ -1158,8 +1144,7 @@ hence most users should not use it and should instead rely on
 tt($ZSH_VERSION).
 )
 item(tt(zsh_scheduled_events))(
-See ifzman(the section `The zsh/sched Module' in zmanref(zshmodules))\
-ifnzman(noderef(The zsh/sched Module)).
+See sectref(The zsh/sched Module)(zshmodules).
 )
 vindex(ZSH_SCRIPT)
 item(tt(ZSH_SCRIPT))(
@@ -1178,8 +1163,8 @@ item(tt(ZSH_VERSION))(
 The version number of the release of zsh.
 )
 enditem()
-texinode(Parameters Used By The Shell)()(Parameters Set By The Shell)(Parameters)
-sect(Parameters Used By The Shell)
+texinode(Parameters Used by the Shell)()(Parameters Set by the Shell)(Parameters)
+sect(Parameters Used by the Shell)
 The following parameters are used by the shell.  Again, `<S>' indicates
 that the parameter is special and `<Z>' indicates that the parameter does
 not exist when the shell initializes in tt(sh) or tt(ksh) emulation mode.
@@ -1474,17 +1459,13 @@ xitem(tt(match))
 xitem(tt(mbegin))
 item(tt(mend))(
 Arrays set by the shell when the tt(b) globbing flag is used in pattern
-matches.  See the subsection em(Globbing flags) in
-ifzman(the documentation for em(Filename Generation) in zmanref(zshexpn))\
-ifnzman(noderef(Filename Generation)).
+matches.  See subref(Globbing Flags)(zshexpn).
 )
 xitem(tt(MATCH))
 xitem(tt(MBEGIN))
 item(tt(MEND))(
 Set by the shell when the tt(m) globbing flag is used in pattern
-matches.  See the subsection em(Globbing flags) in
-ifzman(the documentation for em(Filename Generation) in zmanref(zshexpn))\
-ifnzman(noderef(Filename Generation)).
+matches.  See subref(Globbing Flags)(zshexpn).
 )
 vindex(module_path)
 vindex(MODULE_PATH)
@@ -1553,9 +1534,8 @@ vindex(PS1)
 item(tt(PS1) <S>)(
 The primary prompt string, printed before a command is read.
 It undergoes a special form of expansion
-before being displayed; see
-ifzman(EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
-ifnzman(noderef(Prompt Expansion)).  The default is `tt(%m%# )'.
+before being displayed; see sectref(Expansion of Prompt Sequences)(zshmisc).
+The default is `tt(%m%# )'.
 )
 vindex(PS2)
 item(tt(PS2) <S>)(
@@ -1796,9 +1776,7 @@ vindex(ZBEEP)
 item(tt(ZBEEP))(
 If set, this gives a string of characters, which can use all the same codes
 as the tt(bindkey) command as described in
-ifzman(the zsh/zle module entry in zmanref(zshmodules))\
-ifnzman(noderef(The zsh/zle Module))\
-, that will be output to the terminal
+sectref(The zsh/zle Module)(zshmodules), that will be output to the terminal
 instead of beeping.  This may have a visible instead of an audible effect;
 for example, the string `tt(\e[?5h\e[?5l)' on a vt100 or xterm will have
 the effect of flashing reverse video on and off (if you usually use reverse
@@ -1830,8 +1808,7 @@ remains disabled.
 vindex(zle_highlight)
 item(tt(zle_highlight))(
 An array describing contexts in which ZLE should highlight the input text.
-See ifzman(em(Character Highlighting) in zmanref(zshzle))\
-ifnzman(noderef(Character Highlighting)).
+See sectref(Character Highlighting)(zshzle).
 )
 vindex(ZLE_LINE_ABORTED)
 item(tt(ZLE_LINE_ABORTED))(
@@ -1880,8 +1857,7 @@ include `tt(&)' the result is `tt(DIR &)'.
 Note that certain completions may provide their own suffix removal
 or replacement behaviour which overrides the values described here.
 See the completion system documentation in
-ifzman(zmanref(zshcompsys))\
-ifnzman(noderef(Completion System)).
+nmref(Completion System)(zshcompsys).
 )
 vindex(ZLE_RPROMPT_INDENT)
 item(tt(ZLE_RPROMPT_INDENT) <S>)(

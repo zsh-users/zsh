@@ -13,9 +13,9 @@ current system date/time is used; optionally, var(epochtime) may be used to
 specify the number of seconds since the epoch, and var(nanoseconds) may
 additionally be used to specify the number of nanoseconds past the second
 (otherwise that number is assumed to be 0).
-See manref(strftime)(3) for details.  The zsh extensions described in
-ifzman(the section EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
-ifnzman(noderef(Prompt Expansion)) are also available.
+See manref(strftime)(3) for details.  The zsh extensions described
+under tt(%D{)var(string)tt(}) prompt eqcape in
+sectref(Simple Prompt Escapes)(zshmisc) are also available.
 
 startitem()
 item(tt(-n))(

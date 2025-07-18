@@ -38,8 +38,7 @@ distinct expressions.
 
 The functions tt(min), tt(max), and tt(sum) are defined not in this module
 but in the tt(zmathfunc) autoloadable function, described in
-ifzman(the section `Mathematical Functions' in zmanref(zshcontrib))\
-ifnzman(noderef(Mathematical Functions)).
+sectref(Mathematical Functions)(zshcontrib).
 
 The following functions take two floating point arguments: tt(copysign),
 tt(fmod), tt(hypot), tt(nextafter).

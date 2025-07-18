@@ -89,7 +89,7 @@ item(tt(CDABLE_VARS) (tt(-T)))(
 If the argument to a tt(cd) command (or an implied tt(cd) with the
 tt(AUTO_CD) option set) is not a directory, and does not begin with a
 slash, try to expand the expression as if it were preceded by a `tt(~)' (see
-noderef(Filename Expansion)).
+sectref(Filename Expansion)(zshexpn)).
 )
 pindex(CD_SILENT)
 pindex(NO_CD_SILENT)
@@ -146,9 +146,7 @@ item(tt(POSIX_CD) <K> <S>)(
 Modifies the behaviour of tt(cd), tt(chdir) and tt(pushd) commands
 to make them more compatible with the POSIX standard. The behaviour with
 the option unset is described in the documentation for the tt(cd)
-builtin in
-ifzman(zmanref(zshbuiltins))\
-ifnzman(noderef(Shell Builtin Commands)).
+builtin in nmref(Shell Builtin Commands)(zshbuiltins).
 If the option is set, the shell does not test for directories beneath
 the local directory (`tt(.)') until after all directories in tt(cdpath)
 have been tested, and the tt(cd) and tt(chdir) commands do not recognise
@@ -441,7 +439,7 @@ cindex(enable globbing qualifiers)
 item(tt(BARE_GLOB_QUAL) <Z>)(
 In a glob pattern, treat a trailing set of parentheses as a qualifier
 list, if it contains no unquoted `tt(|)', `tt(LPAR())' or (if special) `tt(~)'
-characters.  See noderef(Filename Generation).
+characters.  See sectref(Filename Generation)(zshexpn).
 )
 pindex(BRACE_CCL)
 pindex(NO_BRACE_CCL)
@@ -452,7 +450,7 @@ cindex(expansion, brace, extending)
 item(tt(BRACE_CCL))(
 Expand expressions in braces which would not otherwise undergo brace
 expansion to a lexically ordered list of all the characters.  See
-noderef(Brace Expansion).
+sectref(Brace Expansion)(zshexpn).
 )
 pindex(CASE_GLOB)
 pindex(NO_CASE_GLOB)
@@ -513,7 +511,7 @@ pindex(NOEQUALS)
 cindex(filename expansion, =)
 item(tt(EQUALS) <Z>)(
 Perform tt(=) filename expansion.
-(See noderef(Filename Expansion).)
+(See sectref(Filename Expansion)(zshexpn).)
 )
 pindex(EXTENDED_GLOB)
 pindex(NO_EXTENDED_GLOB)
@@ -544,7 +542,7 @@ cindex(globbing, enabling)
 cindex(enabling globbing)
 item(tt(GLOB) (tt(PLUS()F), ksh: tt(PLUS()f)) <D>)(
 Perform filename generation (globbing).
-(See noderef(Filename Generation).)
+(See sectref(Filename Generation)(zshexpn).)
 )
 pindex(GLOB_ASSIGN)
 pindex(NO_GLOB_ASSIGN)
@@ -604,9 +602,7 @@ item(tt(HIST_SUBST_PATTERN))(
 Substitutions using the tt(:s) and tt(:&) history modifiers are performed
 with pattern matching instead of string matching.  This occurs wherever
 history modifiers are valid, including glob qualifiers and parameters.
-See
-ifzman(the section `Modifiers' in zmanref(zshexpn))\
-ifnzman(noderef(Modifiers)).
+See subref(Modifiers)(zshexpn).
 )
 pindex(IGNORE_BRACES)
 pindex(NO_IGNORE_BRACES)
@@ -650,7 +646,7 @@ pindex(NOKSHGLOB)
 item(tt(KSH_GLOB) <K>)(
 In pattern matching, the interpretation of parentheses is affected by
 a preceding `tt(@)', `tt(*)', `tt(+)', `tt(?)' or `tt(!)'.
-See noderef(Filename Generation).
+See sectref(Filename Generation)(zshexpn).
 )
 pindex(MAGIC_EQUAL_SUBST)
 pindex(NO_MAGIC_EQUAL_SUBST)
@@ -1157,7 +1153,7 @@ item(tt(RCS) (tt(PLUS()f)) <D>)(
 After tt(zshenv()) is sourced on startup, source the
 tt(.zshenv), tt(zprofile()), tt(.zprofile),
 tt(zshrc()), tt(.zshrc), tt(zlogin()), tt(.zlogin), and tt(.zlogout)
-files, as described in noderef(Files).
+files, as described in sectref(Startup/Shutdown Files)(zsh).
 If this option is unset, the tt(zshenv()) file is still sourced, but any
 of the others will not be; it can be set at any time to prevent the
 remaining startup files after the currently executing one from
@@ -1353,9 +1349,7 @@ If this option is not set, a script passed as the first non-option argument
 to the shell must contain the name of the file to open.  If this
 option is set, and the script does not specify a directory path,
 the script is looked for first in the current directory, then in the
-command path.  See
-ifnzman(noderef(Invocation))\
-ifzman(the section INVOCATION in zmanref(zsh)).
+command path.  See sectref(Invocation)(zsh).
 )
 pindex(PRINT_EIGHT_BIT)
 pindex(NO_PRINT_EIGHT_BIT)
@@ -1491,9 +1485,7 @@ such jobs will be killed automatically.
 The check is omitted if the commands run from the previous command line
 included a `tt(jobs)' command, since it is assumed the user is aware that
 there are background or suspended jobs.  A `tt(jobs)' command run from one
-of the hook functions defined in
-ifnzman(the section `Special Functions' in noderef(Functions))\
-ifzman(the section SPECIAL FUNCTIONS in zmanref(zshmisc))
+of the hook functions defined in sectref(Special Functions)(zshmisc)
 is not counted for this purpose.
 )
 pindex(CHECK_RUNNING_JOBS)
@@ -1584,9 +1576,7 @@ pindex(NOPROMPTBANG)
 cindex(prompt, ! expansion)
 item(tt(PROMPT_BANG) <K>)(
 If set, `tt(!)' is treated specially in prompt expansion.
-See
-ifzman(EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
-ifnzman(noderef(Prompt Expansion)).
+See sectref(Expansion of Prompt Sequences)(zshmisc).
 )
 pindex(PROMPT_CR)
 pindex(NO_PROMPT_CR)
@@ -1626,9 +1616,7 @@ pindex(NOPROMPTPERCENT)
 cindex(prompt, % expansion)
 item(tt(PROMPT_PERCENT) <C> <Z>)(
 If set, `tt(%)' is treated specially in prompt expansion.
-See
-ifzman(EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
-ifnzman(noderef(Prompt Expansion)).
+See sectref(Expansion of Prompt Sequences)(zshmisc).
 )
 pindex(PROMPT_SUBST)
 pindex(NO_PROMPT_SUBST)
@@ -1707,8 +1695,7 @@ cindex(operator precedence)
 item(tt(C_PRECEDENCES))(
 This alters the precedence of arithmetic operators to be more
 like C and other programming languages;
-ifnzman(noderef(Arithmetic Evaluation))\
-ifzman(the section ARITHMETIC EVALUATION in zmanref(zshmisc))
+sectref(Arithmetic Evaluation)(zshmisc)
 has an explicit list.
 )
 pindex(DEBUG_BEFORE_CMD)
@@ -1755,9 +1742,7 @@ which the tt(DEBUG) trap is being executed is skipped.  The option is
 restored after the trap exits.
 
 Exiting due to tt(ERR_EXIT) has certain interactions with asynchronous
-jobs noted in
-ifzman(the section JOBS in zmanref(zshmisc))\
-ifnzman(noderef(Jobs & Signals)).
+jobs noted in sectref(Signals)(zshmisc).
 
 Note this behaviour is not disabled in interactive shells ---
 a non-zero status on the command line causes the shell to exit.
@@ -1914,7 +1899,7 @@ pindex(NO_MULTIOS)
 pindex(NOMULTIOS)
 item(tt(MULTIOS) <Z>)(
 Perform implicit bf(tee)s or bf(cat)s when multiple
-redirections are attempted (see noderef(Redirection)).
+redirections are attempted (see sectref(Redirection)(zshmisc)).
 )
 pindex(OCTAL_ZEROES)
 pindex(NO_OCTAL_ZEROES)
@@ -1995,9 +1980,7 @@ cindex(commands, tracing)
 item(tt(XTRACE) (tt(-x), ksh: tt(-x)))(
 Print commands and their arguments as they are executed.  The
 output is preceded by the value of tt($PS4), formatted as described
-in
-ifzman(the section EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
-ifnzman(noderef(Prompt Expansion)).
+in sectref(Expansion of Prompt Sequences)(zshmisc).
 )
 enditem()
 
@@ -2051,9 +2034,8 @@ pindex(CONTINUEONERROR)
 pindex(NOCONTINUEONERROR)
 cindex(error, option to continue script on)
 item(tt(CONTINUE_ON_ERROR))(
-If a fatal error is encountered (see 
-ifnzman(noderef(Errors))\
-ifzman(the section ERRORS in zmanref(zshmisc))), and the code is running
+If a fatal error is encountered (see sectref(Errors)(zshmisc)),
+and the code is running
 in a script, the shell will resume execution at the next statement
 in the script at the top level, in other words outside all functions
 or shell constructs such as loops and conditions.  This mimics the
@@ -2108,7 +2090,7 @@ cindex(csh, redirections with no command)
 item(tt(CSH_NULLCMD) <C>)(
 Do not use the values of tt(NULLCMD) and tt(READNULLCMD) 
 when running redirections with no command.  This make 
-such redirections fail (see noderef(Redirection)).
+such redirections fail (see sectref(Redirection)(zshmisc)).
 )
 pindex(KSH_ARRAYS)
 pindex(NO_KSH_ARRAYS)
@@ -2204,8 +2186,7 @@ item(tt(POSIX_ALIASES) <K> <S>)(
 When this option is set, reserved words are not candidates for
 alias expansion:  it is still possible to declare any of them as an alias,
 but the alias will never be expanded.  Reserved words are described in
-ifnzman(noderef(Reserved Words))\
-ifzman(the section RESERVED WORDS in zmanref(zshmisc)).
+sectref(Reserved Words)(zshmisc).
 
 Alias expansion takes place while text is being read; hence when this
 option is set it does not take effect until the end of any function or
@@ -2393,7 +2374,7 @@ cindex(redirections with no command, sh)
 cindex(redirections with no command, ksh)
 item(tt(SH_NULLCMD) <K> <S>)(
 Do not use the values of tt(NULLCMD) and tt(READNULLCMD) 
-when doing redirections, use `tt(:)' instead (see noderef(Redirection)).
+when doing redirections, use `tt(:)' instead (see sectref(Redirection)(zshmisc)).
 )
 pindex(SH_OPTION_LETTERS)
 pindex(NO_SH_OPTION_LETTERS)
@@ -2417,9 +2398,7 @@ cindex(sh, field splitting style)
 item(tt(SH_WORD_SPLIT) (tt(-y)) <K> <S>)(
 Causes field splitting to be performed on unquoted parameter expansions.
 Note that this option has nothing to do with word splitting.
-(See 
-ifzman(zmanref(zshexpn))\
-ifnzman(noderef(Parameter Expansion)).)
+(See sectref(Parameter Expansion)(zshexpn).)
 )
 pindex(TRAPS_ASYNC)
 pindex(NO_TRAPS_ASYNC)
@@ -2495,7 +2474,7 @@ item(tt(RESTRICTED) (tt(-r)))(
 Enables restricted mode.  This option cannot be changed using
 tt(unsetopt), and setting it inside a function always changes it
 globally regardless of the tt(LOCAL_OPTIONS) option.  See
-noderef(Restricted Shell).
+sectref(Restricted Shell)(zsh).
 )
 pindex(SHIN_STDIN)
 pindex(NO_SHIN_STDIN)
@@ -2727,7 +2706,7 @@ texinode(Single Letter Options)()(Option Aliases)(Options)
 sect(Single Letter Options)
 cindex(options, single letter)
 cindex(single letter options)
-subsect(Default set)
+subsect(Default Set)
 startsitem()
 sitem(tt(-0))(CORRECT)
 sitem(tt(-1))(PRINT_EXIT_VALUE)
@@ -2784,7 +2763,7 @@ sitem(tt(-w))(CHASE_LINKS)
 sitem(tt(-x))(XTRACE)
 sitem(tt(-y))(SH_WORD_SPLIT)
 endsitem()
-subsect(sh/ksh emulation set)
+subsect(sh/ksh Emulation Set)
 startsitem()
 sitem(tt(-C))(em(NO_)CLOBBER)
 sitem(tt(-T))(TRAPS_ASYNC)
@@ -2805,7 +2784,7 @@ sitem(tt(-u))(em(NO_)UNSET)
 sitem(tt(-v))(VERBOSE)
 sitem(tt(-x))(XTRACE)
 endsitem()
-subsect(Also note)
+subsect(Also Note)
 startsitem()
 sitem(tt(-A))(Used by tt(set) for setting arrays)
 sitem(tt(-b))(Used on the command line to specify end of option processing)

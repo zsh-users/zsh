@@ -9,25 +9,21 @@ where in the rest of the manual the documentation is to be found.
 sect(When the shell starts)
 
 When it starts, the shell reads commands from various files.  These can
-be created or edited to customize the shell.  See ifzman(the section
-Startup/Shutdown Files in zmanref(zsh))\
-ifnzman(noderef(Files)).
+be created or edited to customize the shell.  See
+sectref(Startup/Shutdown Files)(zsh).
 
 If no personal initialization files exist for the current user, a function
 is run to help you change some of the most common settings.  It won't
 appear if your administrator has disabled the tt(zsh/newuser) module.
 The function is designed to be self-explanatory.  You can run it by hand
 with `tt(autoload -Uz zsh-newuser-install; zsh-newuser-install -f)'.
-See also
-ifnzman(noderef(User Configuration Functions))\
-ifzman(the section `User Configuration Functions' in zmanref(zshcontrib)).
+See also sectref(User Configuration Functions)(zshcontrib).
 
 
 sect(Interactive Use)
 
 Interaction with the shell uses the builtin Zsh Line Editor, ZLE.  This is
-described in detail in ifzman(zmanref(zshzle))\
-ifnzman(noderef(Zsh Line Editor)).
+described in detail in nmref(Zsh Line Editor)(zshzle).
 
 The first decision a user must make is whether to use the Emacs or Vi
 editing mode as the keys for editing are substantially different.  Emacs
@@ -40,8 +36,8 @@ shells, zsh will not save these lines when the shell exits unless you
 set appropriate variables, and the number of history lines retained by
 default is quite small (30 lines).  See the description of the shell
 variables (referred to in the documentation as parameters) tt(HISTFILE),
-tt(HISTSIZE) and tt(SAVEHIST) in ifzman(zmanref(zshparam))\
-ifnzman(noderef(Parameters Used By The Shell)).  Note that it's
+tt(HISTSIZE) and tt(SAVEHIST) in
+sectref(Parameters Used by the Shell)(zshparam). Note that it's
 currently only possible to read and write files saving history
 when the shell is interactive, i.e. it does not work from scripts.
 
@@ -59,9 +55,7 @@ tt(LC_CTYPE) (to affect only the handling of character sets) is set to
 an appropriate value.  This is true even if you are using a
 single-byte character set including extensions of ASCII such as
 tt(ISO-8859-1) or tt(ISO-8859-15).  See the description of tt(LC_CTYPE)
-in
-ifnzman(noderef(Parameters))\
-ifzman(zmanref(zshparam)).
+in sectref(Parameters Used by the Shell)(zshparam).
 
 subsect(Completion)
 
@@ -84,11 +78,9 @@ completions for many commonly used commands; it is therefore to be
 preferred.
 
 The completion system must be enabled explicitly when the shell starts.
-For more information see
-ifzman(zmanref(zshcompsys))\
-ifnzman(noderef(Completion System)).
+For more information see nmref(Completion System)(zshcompsys).
 
-subsect(Extending the line editor)
+subsect(Extending the Line Editor)
 
 Apart from completion, the line editor is highly extensible by means of
 shell functions.  Some useful functions are provided with the shell; they
@@ -113,24 +105,21 @@ edit the command line with an external editor.
 )
 enditem()
 
-See ifzman(the section `ZLE Functions' in zmanref(zshcontrib))\
-ifnzman(noderef(ZLE Functions)) for descriptions of these.
+See sectref(ZLE Functions)(zshcontrib) for descriptions of these.
 
 sect(Options)
 
 The shell has a large number of options for changing its behaviour.
 These cover all aspects of the shell; browsing the full documentation is
 the only good way to become acquainted with the many possibilities.  See
-ifzman(zmanref(zshoptions))\
-ifnzman(noderef(Options)).
+nmref(Options)(zshoptions).
 
 sect(Pattern Matching)
 
 The shell has a rich set of patterns which are available for file matching
 (described in the documentation as `filename generation' and also known for
 historical reasons as `globbing') and for use when programming.  These are
-described in ifzman(the section `Filename Generation' in zmanref(zshexpn))\
-ifnzman(noderef(Filename Generation)).
+described in sectref(Filename Generation)(zshexpn).
 
 Of particular interest are the following patterns that are not commonly
 supported by other systems of pattern matching:
@@ -158,41 +147,32 @@ sect(General Comments on Syntax)
 Although the syntax of zsh is in ways similar to the Korn shell, and
 therefore more remotely to the original UNIX shell, the Bourne shell,
 its default behaviour does not entirely correspond to those shells.
-General shell syntax is introduced in ifzman(the section `Shell Grammar' in
-zmanref(zshmisc))\
-ifnzman(noderef(Shell Grammar)).
+General shell syntax is introduced in sectref(Shell Grammar)(zshmisc).
 
 One commonly encountered difference is that variables substituted onto the
 command line are not split into words.  See the description of the shell option
-tt(SH_WORD_SPLIT) in
-ifzman(the section `Parameter Expansion' in zmanref(zshexpn))\
-ifnzman(noderef(Parameter Expansion)).
+tt(SH_WORD_SPLIT) in sectref(Parameter Expansion)(zshexpn).
 In zsh, you can either explicitly request the splitting (e.g. tt(${=foo}))
 or use an array when you want a variable to expand to more than one word.  See
-ifzman(the section `Array Parameters' in zmanref(zshparam))\
-ifnzman(noderef(Array Parameters)).
+sectref(Array Parameters)(zshparam).
 
 sect(Programming)
 
 The most convenient way of adding enhancements to the shell is typically
 by writing a shell function and arranging for it to be autoloaded.
-Functions are described in ifzman(the section `Functions' in
-zmanref(zshmisc))\
-ifnzman(noderef(Functions)).  Users changing from the C shell and its
+Functions are described in sectref(Functions)(zshmisc).
+Users changing from the C shell and its
 relatives should notice that aliases are less used in zsh as they don't
 perform argument substitution, only simple text replacement.
 
 A few general functions, other than those for the line editor described
 above, are provided with the shell and are described in
-ifzman(zmanref(zshcontrib))\
-ifnzman(noderef(User Contributions)).  Features include:
+nmref(User Contributions)(zshcontrib).  Features include:
 
 startitem()
 item(tt(promptinit))(
-a prompt theme system for changing prompts easily, see ifzman(the section
-`Prompt Themes'
-)\
-ifnzman(noderef(Prompt Themes))
+a prompt theme system for changing prompts easily, see
+sectref(Prompt Themes)(zshcontrib)
 )
 item(tt(zsh-mime-setup))(
 a MIME-handling system which dispatches commands according to the suffix of

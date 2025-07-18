@@ -26,14 +26,13 @@ endmenu()
 texinode(Utilities)(Recent Directories)()(User Contributions)
 sect(Utilities)
 
+anchor(Accessing On-Line Help)
 subsect(Accessing On-Line Help)
 cindex(helpfiles utility)
 
 The key sequence tt(ESC h) is normally bound by ZLE to execute the
-tt(run-help) widget (see
-ifzman(zmanref(zshzle))\
-ifnzman(noderef(Zsh Line Editor))\
-).  This invokes the tt(run-help) command with the command word from the
+tt(run-help) widget (see nmref(Zsh Line Editor)(zshzle)).
+This invokes the tt(run-help) command with the command word from the
 current input line as its argument.  By default, tt(run-help) is an alias
 for the tt(man) command, so this often fails when the command word is a
 shell builtin or a user-defined function.  By redefining the tt(run-help)
@@ -74,12 +73,12 @@ autoload run-help)
 
 Note that in order for `tt(autoload run-help)' to work, the tt(run-help)
 file must be in one of the directories named in your tt(fpath) array (see
-ifzman(zmanref(zshparam))\
-ifnzman(noderef(Parameters Used By The Shell))\
-).  This should already be the case if you have a standard zsh
+sectref(Parameters Used by the Shell)(zshparam)).
+This should already be the case if you have a standard zsh
 installation; if it is not, copy tt(Functions/Misc/run-help) to an
 appropriate directory.
 
+anchor(Recompiling Functions)
 subsect(Recompiling Functions)
 cindex(functions, recompiling)
 cindex(zrecompile utility)
@@ -168,6 +167,7 @@ Once the digests have been created and your tt(fpath) modified to refer to
 them, you can keep them up to date by running tt(zrecompile) with no
 arguments.
 
+anchor(Keyboard Definition)
 subsect(Keyboard Definition)
 cindex(keyboard definition)
 
@@ -205,9 +205,8 @@ example(source ${ZDOTDIR:-$HOME}/.zkbd/$TERM-$VENDOR-$OSTYPE
 
 Note that in order for `tt(autoload zkbd)' to work, the tt(zkdb) file must
 be in one of the directories named in your tt(fpath) array (see
-ifzman(zmanref(zshparam))\
-ifnzman(noderef(Parameters Used By The Shell))\
-).  This should already be the case if you have a standard zsh
+sectref(Parameters Used by the Shell)(zshparam)).
+This should already be the case if you have a standard zsh
 installation; if it is not, copy tt(Functions/Misc/zkbd) to an
 appropriate directory.
 
@@ -217,10 +216,8 @@ cindex(reporter utility)
 Occasionally you may encounter what appears to be a bug in the shell,
 particularly if you are using a beta version of zsh or a development
 release.  Usually it is sufficient to send a description of the
-problem to one of the zsh mailing lists (see
-ifzman(zmanref(zsh))\
-ifnzman(noderef(Mailing Lists))\
-), but sometimes one of the zsh developers will need to recreate your
+problem to one of the zsh mailing lists (see sectref(Mailing Lists)(zsh)),
+but sometimes one of the zsh developers will need to recreate your
 environment in order to track the problem down.
 
 The script named tt(reporter), found in the tt(Util) directory of the
@@ -254,9 +251,7 @@ tt(reporter), you should edit the results to remove unnecessary commands.
 Note that if you're using the new completion system, you should em(not)
 dump the tt(functions) state to your startup files with tt(reporter); use
 the tt(compdump) function instead (see
-ifzman(zmanref(zshcompsys))\
-ifnzman(noderef(Completion System))\
-).
+nmref(Completion System)(zshcompsys)).
 
 startitem()
 item(tt(reporter) [ var(state) ... ])(
@@ -287,15 +282,15 @@ any prefix, even a single letter; thus tt(a) is the same as tt(aliases),
 tt(z) is the same as tt(zstyles), etc.
 enditem()
 
+anchor(Manipulating Hook Functions)
 subsect(Manipulating Hook Functions)
 cindex(hook function utility)
 
 startitem()
 findex(add-zsh-hook)
 item(tt(add-zsh-hook) [ tt(-L) | tt(-dD) ] [ tt(-Uzk) ] var(hook) var(function))(
-Several functions are special to the shell, as described in the section
-ifnzman(Special Functions, noderef(Functions))\
-ifzman(SPECIAL FUNCTIONS, see zmanref(zshmisc)),
+Several functions are special to the shell, as described in
+sectref(Special Functions)(zshmisc),
 in that they are automatically called at specific points during shell execution.
 Each has an associated array consisting of names of functions to be
 called at the same point; these are so-called `hook functions'.
@@ -329,9 +324,8 @@ options tt(-Uz) are appropriate.
 )
 findex(add-zle-hook-widget)
 item(tt(add-zle-hook-widget) [ tt(-L) | tt(-dD) ] [ tt(-Uzk) ] var(hook) var(widgetname))(
-Several widget names are special to the line editor, as described in the section
-ifnzman(Special Widgets, noderef(Zle Widgets))\
-ifzman(Special Widgets, see zmanref(zshzle)),
+Several widget names are special to the line editor, as described in
+subref(Special Widgets)(zshzle),
 in that they are automatically called at specific points during editing.
 Unlike function hooks, these do not use a predefined array of other names
 to call at the same point; the shell function tt(add-zle-hook-widget)
@@ -486,8 +480,7 @@ subsect(Configuration)
 
 Configuration is by means of the styles mechanism that should be familiar
 from completion; if not, see the description of the tt(zstyle) command in
-ifzman(see zmanref(zshmodules))\
-ifnzman(noderef(The zsh/zutil Module)).  The context for setting styles
+sectref(The zsh/zutil Module)(zshmodules).  The context for setting styles
 should be tt(':chpwd:*') in case the meaning of the context is extended in
 future, for example:
 
@@ -617,7 +610,7 @@ this.
 )
 enditem()
 
-subsect(Use with dynamic directory naming)
+subsect(Use with Dynamic Directory Naming)
 
 It is possible to refer to recent directories using the dynamic directory
 name syntax by using the supplied function tt(zsh_directory_name_cdr)
@@ -630,7 +623,7 @@ When this is done, tt(~[1]) will refer to the most recent
 directory other than $PWD, and so on.  Completion after tt(~[)var(...)
 also works.
 
-subsect(Details of directory handling)
+subsect(Details of Directory Handling)
 
 This section is for the curious or confused; most users will not
 need to know this information.
@@ -658,10 +651,8 @@ cindex(named directories, dynamic, helper function)
 findex(zsh_directory_name_generic)
 sect(Abbreviated dynamic references to directories)
 
-The dynamic directory naming system is described in the subsection
-em(Dynamic named directories) of
-ifzman(the section em(Filename Expansion) in zmanref(zshexpn))\
-ifnzman(noderef(Filename Expansion)).  In this, a reference to
+The dynamic directory naming system is described in
+subref(Dynamic Named Directories)(zshexpn).  In this, a reference to
 tt(~[)var(...)tt(]) is expanded by a function found by the hooks
 mechanism.
 
@@ -785,7 +776,7 @@ actually exist; this allows the system to work across automounted
 file systems.  The error from the command trying to use a non-existent
 directory should be sufficient to indicate the problem.
 
-subsect(Complete example)
+subsect(Complete Example)
 
 Here is a full fictitious but usable autoloadable definition of the
 example function defined by the code above.  So tt(~[gs:p:s]) expands
@@ -1321,7 +1312,7 @@ When quilt is used (either in `addon' mode or as a `standalone' backend),
 this expando is set to the quilt series' tt(patch-format) string.
 The tt(set-patch-format) hook and tt(nopatch-format) style are honoured.
 
-See ifzman(tt(Quilt Support))ifnzman(noderef(vcs_info Quilt Support)) below for details.
+See ifzman(bf(Quilt Support))ifnzman(noderef(vcs_info Quilt Support)) below for details.
 )
 enditem()
 
@@ -1377,7 +1368,7 @@ We regret this coupling, but it was required for backwards compatibility.
 texinode(vcs_info Quilt Support)(vcs_info API)(vcs_info Oddities)(Version Control Information)
 subsect(Quilt Support)
 
-bf(Quilt) is not a version control system, therefore this is not implemented
+em(Quilt) is not a version control system, therefore this is not implemented
 as a backend. It can help keeping track of a series of patches. People use it
 to keep a set of changes they want to use on top of software packages (which
 is tightly integrated into the package build process - the Debian project
@@ -1419,7 +1410,8 @@ the tt(get-unapplied) style in the appropriate context.
 
 tt(vcs_info) allows for very detailed control over how the gathered
 information is presented (see 
-ifzman(the bf(Configuration) and bf(Hooks in vcs_info) sections)\
+ifzman(the bf(Configuration) subsection above
+and bf(Hooks in vcs_info) subsection below)\
 ifnzman(noderef(vcs_info Configuration) and noderef(vcs_info Hooks))),
 all of which are documented below. Note there are a number of
 other patch tracking systems that work on top of a certain version control
@@ -1668,7 +1660,8 @@ tt(${hook_com[applied-string]}) will be
 available as tt(%p) in the tt(patch-format) and tt(nopatch-format) styles.
 This hook is, in concert with tt(set-patch-format), responsible for
 tt(%)-escaping that value for use in the prompt.
-(See ifzman(the bf(Oddities) section)ifnzman(noderef(vcs_info Oddities)).)
+(See ifzman(the bf(Oddities) subsection above)\
+ifnzman(noderef(vcs_info Oddities)).)
 
 COMMENT(This paragraph is repeated above/below)\
 The tt(quilt) backend passes to this hook the inputs
@@ -1691,7 +1684,8 @@ tt(${hook_com[unapplied-string]}) will be available as tt(%u) in the
 tt(patch-format) and tt(nopatch-format) styles.
 This hook is, in concert with tt(set-patch-format), responsible for
 tt(%)-escaping that value for use in the prompt.
-(See ifzman(the bf(Oddities) section)ifnzman(noderef(vcs_info Oddities)).)
+(See ifzman(the bf(Oddities) subsection above)\
+ifnzman(noderef(vcs_info Oddities)).)
 
 COMMENT(This paragraph is repeated above/below)\
 The tt(quilt) backend passes to this hook the inputs
@@ -1778,7 +1772,8 @@ tt(nopatch-format).
 This hook is, in concert with the tt(gen-applied-string) or
 tt(gen-unapplied-string) hooks if they are defined, responsible for
 tt(%)-escaping the final tt(patch-format) value for use in the prompt.
-(See ifzman(the bf(Oddities) section)ifnzman(noderef(vcs_info Oddities)).)
+(See ifzman(the bf(Oddities) subsection above)\
+ifnzman(noderef(vcs_info Oddities)).)
 
 COMMENT(This paragraph is repeated above/below)\
 The tt(quilt) backend passes to this hook the inputs
@@ -1813,7 +1808,7 @@ tt(vcs_info).
 enditem()
 
 If all of this sounds rather confusing, take a look at
-ifzman(the bf(Examples) section below)ifnzman(noderef(vcs_info Examples))
+ifzman(the bf(Examples) subsection below)ifnzman(noderef(vcs_info Examples))
 and also in the tt(Misc/vcs_info-examples) file in the Zsh source.
 They contain some explanatory code.
 
@@ -1841,8 +1836,7 @@ that is really long to have a fixed width, like a hash in a mercurial
 branchformat, you can do this: tt(%12.12i). That'll shrink the 40 character
 hash to its 12 leading characters. The form is actually
 `tt(%)var(min)tt(.)var(max)tt(x)'. More is possible.
-See ifzman(the section `The zsh/zutil Module' in zmanref(zshmodules))\
-ifnzman(noderef(The zsh/zutil Module)) for details.
+See sectref(The zsh/zutil Module)(zshmodules) for details.
 
 Use the quicker tt(bzr) backend
 example(zstyle ':vcs_info:bzr:*' use-simple true)
@@ -1854,7 +1848,7 @@ example(zstyle ':vcs_info:(svn|bzr):*' \
        branchformat '%b%%F{yellow}:%r')
 
 The doubled percent sign is explained in
-ifzman(the bf(Oddities) section)ifnzman(noderef(vcs_info Oddities)).
+ifzman(the bf(Oddities) subsection above)ifnzman(noderef(vcs_info Oddities)).
 
 Alternatively, one can use the raw colour codes directly:
 
@@ -2058,7 +2052,7 @@ beyond the scope of tt(localoptions), should your function need that.
 )
 item(Modify hooks)(
 Use of tt(add-zsh-hook) and tt(add-zle-hook-widget) is recommended (see
-the bf(Manipulating Hook Functions) section above).
+subref(Manipulating Hook Functions)(above)).
 All hooks that follow the naming pattern tt(prompt_)var(theme)tt(_)var(hook)
 are automatically removed when the prompt theme changes or is disabled.
 )
@@ -2091,9 +2085,8 @@ sect(ZLE Functions)
 subsect(Widgets)
 
 These functions all implement user-defined ZLE widgets (see
-ifzman(zmanref(zshzle))\
-ifnzman(noderef(Zsh Line Editor))\
-) which can be bound to keystrokes in interactive shells.  To use them,
+sectref(User-Defined Widgets)(zshzle))
+which can be bound to keystrokes in interactive shells.  To use them,
 your tt(.zshrc) should contain lines of the form
 
 example(autoload var(function)
@@ -2137,8 +2130,8 @@ builtin widgets without the suffix.  By default they behave in a similar
 way.  However, by the use of styles and the function tt(select-word-style),
 the way words are matched can be altered. tt(select-word-match) is intended
 to be used as a text object in vi mode but with custom word styles. For
-comparison, the widgets described in ifzman(zmanref(zshzle) under Text Objects)\
-ifnzman(noderef(Text Objects)) use fixed definitions of words, compatible
+comparison, the widgets described in subref(Text Objects)(zshzle)
+use fixed definitions of words, compatible
 with the tt(vim) editor.
 
 The simplest way of configuring the functions is to use
@@ -2183,8 +2176,7 @@ pattern (note that the outer brackets should not be supplied, only
 those surrounding named ranges).
 
 More control can be obtained using the tt(zstyle) command, as described in
-ifzman(zmanref(zshmodules))\
-ifnzman(noderef(The zsh/zutil Module)).  Each style is looked up in the
+sectref(The zsh/zutil Module)(zshmodules).  Each style is looked up in the
 context tt(:zle:)var(widget) where var(widget) is the name of the
 user-defined widget, not the name of the function implementing it, so in
 the case of the definitions supplied by tt(select-word-style) the
@@ -2356,8 +2348,7 @@ directly.
 )
 tindex(bracketed-paste-magic)
 item(tt(bracketed-paste-magic))(
-The tt(bracketed-paste) widget (see ifzman(the subsection `Miscellaneous' in
-zmanref(zshzle))ifnzman(noderef(Miscellaneous) in noderef(Standard Widgets)))
+The tt(bracketed-paste) widget (see subref(Miscellaneous)(zshzle))
 inserts pasted text literally into the editor buffer rather than interpret
 it as keystrokes.  This disables some common usages where the self-insert
 widget is replaced in order to accomplish some extra processing.  An
@@ -2558,9 +2549,8 @@ This function implements the widgets
 tt(history-beginning-search-backward-end) and
 tt(history-beginning-search-forward-end).  These commands work by first
 calling the corresponding builtin widget (see
-ifzman(`History Control' in zmanref(zshzle))\
-ifnzman(noderef(History Control))\
-) and then moving the cursor to the end of the line.  The original cursor
+sectref(History Control)(zshzle))
+and then moving the cursor to the end of the line.  The original cursor
 position is remembered and restored before calling the builtin widget a
 second time, so that the same search is repeated to look farther through
 the history.
@@ -3253,8 +3243,7 @@ investigate the command word found.  The default is tt(whence -c).
 tindex(zcalc-auto-insert)
 item(tt(zcalc-auto-insert))(
 This function is useful together with the tt(zcalc) function described in
-ifzman(the section `Mathematical Functions')\
-ifnzman(noderef(Mathematical Functions)).
+sectref(Mathematical Functions)(above).
 It should be bound to a key representing a binary operator such
 as `tt(PLUS())', `tt(-)', `tt(*)' or `tt(/)'.  When running in zcalc,
 if the key occurs at the start of the line or immediately following
@@ -3554,9 +3543,8 @@ findex(catch)
 enditem()
 
 The functions are designed to be used together with the tt(always) construct
-described in
-ifzman(zmanref(zshmisc))\
-ifnzman(noderef(Complex Commands)).  This is important as only this
+described in sectref(Complex Commands)(zshmisc).
+This is important as only this
 construct provides the required support for exceptions.  A typical example
 is as follows.
 
@@ -3657,9 +3645,8 @@ tt(copiousoutput); see manref(mailcap)(4) or manref(mailcap)(5)
 (the man page's name varies across platforms).
 
 The functions use the following styles, which are defined with the
-tt(zstyle) builtin command (\
-ifzman(see zmanref(zshmodules))\
-ifnzman(noderef(The zsh/zutil Module))).  They should be defined
+tt(zstyle) builtin command (sectref(The zsh/zutil Module)(zshmodules)).
+They should be defined
 before tt(zsh-mime-setup) is run.  The contexts used all
 start with tt(:mime:), with additional components in some cases.
 It is recommended that a trailing tt(*) (suitably quoted) be appended
@@ -3726,9 +3713,7 @@ will ensure that any files found in that area will be executed as MIME
 types even if they are executable.  As this example shows, the complete
 file name is matched against the pattern, regardless of how the file
 was passed to the handler.  The file is resolved to a full path using
-the tt(:P) modifier described in
-ifzman(the subsection `Modifiers' in zmanref(zshexpn))\
-ifnzman(noderef(Modifiers));
+the tt(:P) modifier described in subref(Modifiers)(zshexpn);
 this means that symbolic links are resolved where possible, so that
 links into other file systems behave in the correct fashion.
 )
@@ -3988,8 +3973,7 @@ item(tt(zcalc) [ tt(-erf) ] [ var(expression) ... ])(
 A reasonably powerful calculator based on zsh's arithmetic evaluation
 facility.  The syntax is similar to that of formulae in most programming
 languages; see
-ifzman(the section `Arithmetic Evaluation' in zmanref(zshmisc))\
-ifnzman(noderef(Arithmetic Evaluation)) for details.
+sectref(Arithmetic Evaluation)(zshmisc) for details.
 
 Non-programmers should note that, as in many other programming
 languages, expressions involving only integers (whether constants
@@ -4009,8 +3993,7 @@ instead of tt($HOME) if it is set.
 
 The mathematical library tt(zsh/mathfunc) will be loaded if it is
 available; see
-ifzman(the section `The zsh/mathfunc Module' in zmanref(zshmodules))\
-ifnzman(noderef(The zsh/mathfunc Module)).  The mathematical functions
+sectref(The zsh/mathfunc Module)(zshmodules).  The mathematical functions
 correspond to the raw system libraries, so trigonometric functions are
 evaluated using radians, and so on.
 
@@ -4216,8 +4199,7 @@ one or more arguments.  The function tt(sum) takes zero or more arguments.
 Arguments can be of different types (ints and floats).
 
 Not to be confused with the tt(zsh/mathfunc) module, described in
-ifzman(the section `The zsh/mathfunc Module' in zmanref(zshmodules))\
-ifnzman(noderef(The zsh/mathfunc Module)).
+sectref(The zsh/mathfunc Module)(zshmodules).
 )
 findex(zmathfuncdef)
 item(tt(zmathfuncdef) [ var(mathfunc) [ var(body) ] ])(
@@ -4306,8 +4288,8 @@ findex(colors)
 item(tt(colors))(
 This function initializes several associative arrays to map color names to
 (and from) the ANSI standard eight-color terminal codes.  These are used
-by the prompt theme system (ifzman(see above)\
-ifnzman(noderef(Prompt Themes))).  You seldom should need to run
+by the prompt theme system (see sectref(Prompt Themes)(above)).
+You seldom should need to run
 tt(colors) more than once.
 
 The eight base colors are: tt(black), tt(red), tt(green), tt(yellow),
@@ -4412,10 +4394,8 @@ invokes that original.
 findex(nslookup)
 item(tt(nslookup) [ var(arg) ... ])(
 This wrapper function for the tt(nslookup) command requires the
-tt(zsh/zpty) module (see
-ifzman(zmanref(zshmodules))\
-ifnzman(noderef(The zsh/zpty Module))\
-).  It behaves exactly like the standard tt(nslookup)
+tt(zsh/zpty) module (see sectref(The zsh/zpty Module)(zshmodules)).
+It behaves exactly like the standard tt(nslookup)
 except that it provides customizable prompts (including a right-side
 prompt) and completion of nslookup commands, host names, etc. (if you use
 the function-based completion system).  Completion styles may be set with
@@ -4451,9 +4431,8 @@ Note that if using POSIX EREs, the tt(^) or word boundary operators
 findex(run-help)
 item(tt(run-help) var(cmd))(
 This function is designed to be invoked by the tt(run-help) ZLE widget,
-in place of the default alias.  See `Accessing On-Line Help'
-ifzman(above)\
-ifnzman((noderef(Utilities))) for setup instructions.
+in place of the default alias.  See subref(Accessing On-Line Help)(above)
+for setup instructions.
 
 In the discussion which follows, if var(cmd) is a file system path, it is
 first reduced to its rightmost component (the file name).
@@ -4673,9 +4652,7 @@ appear in the zsh distribution, but can be created by linking tt(zmv) to
 the names tt(zcp) and tt(zln) in some directory in your tt(fpath).
 )
 item(tt(zkbd))(
-See `Keyboard Definition'
-ifzman(above)\
-ifnzman((noderef(Utilities))).
+See subref(Keyboard Definition)(above).
 )
 findex(zmv)
 redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ ))ifnztexi(    )))
@@ -4758,9 +4735,7 @@ tt(zmv) source file, usually located in one of the directories named in
 your tt(fpath), or in tt(Functions/Misc/zmv) in the zsh distribution.
 )
 item(tt(zrecompile))(
-See `Recompiling Functions'
-ifzman(above)\
-ifnzman((noderef(Utilities))).
+See subref(Recompiling Functions)(above).
 )
 findex(zstyle+)
 item(tt(zstyle+) var(context) var(style) var(value) [ tt(+) var(subcontext) var(style) var(value) ... ])(
@@ -4802,9 +4777,6 @@ item(tt(rprompt))(
 The tt(nslookup) function looks up this style in the context
 `tt(:nslookup)' to set the prompt and the right-side prompt, respectively.
 The usual expansions for the tt(PS1) and tt(RPS1) parameters may be used
-(see
-ifzman(EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
-ifnzman(noderef(Prompt Expansion))\
-).
+(see sectref(Expansion of Prompt Sequences)(zshmisc)).
 )
 enditem()

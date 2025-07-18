@@ -13,15 +13,11 @@ ifnzman(the next chapter, noderef(Completion System)),
 and users with no interest in adding to that system (or, potentially,
 writing their own DASH()- see dictionary entry for `hubris') should skip
 the current section.  The older system based on the tt(compctl) builtin
-command is described in
-ifzman(zmanref(zshcompctl))\
-ifnzman(noderef(Completion Using compctl)).
+command is described in nmref(Completion Using compctl)(zshcompctl).
 
 Completion widgets are defined by the tt(-C) option to the tt(zle)
 builtin command provided by the tt(zsh/zle) module (see
-ifzman(zmanref(zshzle))\
-ifnzman(noderef(The zsh/zle Module))\
-). For example,
+sectref(Zle Builtins)(zshzle)). For example,
 
 example(zle -C complete expand-or-complete completer)
 
@@ -35,10 +31,8 @@ work even if the widget in question has been re-bound.
 
 When this newly defined widget is bound to a key
 using the tt(bindkey) builtin command defined in the tt(zsh/zle) module
-(\
-ifzman(see zmanref(zshzle))\
-ifnzman(noderef(Zsh Line Editor))\
-), typing that key will call the shell function `tt(completer)'. This
+(see sectref(Zle Builtins)(zshzle)),
+typing that key will call the shell function `tt(completer)'. This
 function is responsible for generating completion matches using the
 builtins described below.  As with other ZLE widgets, the function is
 called with its standard input closed.
@@ -60,8 +54,7 @@ sect(Completion Special Parameters)
 
 The parameters tt(ZLE_REMOVE_SUFFIX_CHARS) and tt(ZLE_SPACE_SUFFIX_CHARS)
 are used by the completion mechanism, but are not special. See
-ifzman(em(Parameters Used By The Shell) in zmanref(zshparam))\
-ifnzman(noderef(Parameters Used By The Shell)).
+sectref(Parameters Used by the Shell)(zshparam).
 
 Inside completion widgets, and any functions called from them, some
 parameters have special meaning; outside these functions they are not
@@ -594,10 +587,8 @@ The var(explanation) string will be printed with the list of matches,
 above the group currently selected.
 
 Within the var(explanation), the following sequences may be used to
-specify output attributes
-ifnzman((see noderef(Prompt Expansion)))\
-ifzman(as described in the section EXPANSION OF PROMPT SEQUENCES in
-zmanref(zshmisc)):
+specify output attributes as described in
+sectref(Expansion of Prompt Sequences)(zshmisc):
 `tt(%B)', `tt(%S)', `tt(%U)', `tt(%F)', `tt(%K)' and their lower case
 counterparts, as well as `tt(%H)' and `tt(%{)...tt(%})'.  `tt(%F)',
 `tt(%K)', `tt(%H)' and
@@ -607,11 +598,7 @@ argument to `tt(%{)' should be used instead.)  The sequence `tt(%%)'
 produces a literal `tt(%)'.
 
 These sequences are most often employed by users when customising the
-tt(format) style
-(see
-ifzman(zmanref(zshcompsys))\
-ifnzman(noderef(Completion System))\
-),
+tt(format) style (see subref(Standard Styles)(zshcompsys)),
 but they must also be taken into account when writing completion
 functions, as passing descriptions with unescaped `tt(%)' characters
 to utility functions such as tt(_arguments) and tt(_message) may
@@ -652,8 +639,7 @@ has been accepted and a suffix has been inserted, the function
 var(remove-func) will be called after the next character typed.  It is
 passed the length of the suffix as an argument and can use the special
 parameters available in ordinary (non-completion) zle widgets (see
-ifzman(zmanref(zshzle))\
-ifnzman(noderef(Zsh Line Editor))\
+sectref(User-Defined Widgets)(zshzle)
 ) to analyse and modify the command line.
 )
 item(tt(-f))(
@@ -921,10 +907,8 @@ enditemize()
 
 This narrow pattern can be broadened selectively by passing a em(match
 specification) to the tt(compadd) builtin command through its tt(-M) option
-(see
-ifzman(`Completion Builtin Commands' above)\
-ifnzman(noderef(Completion Builtin Commands))\
-).  A match specification consists of one or more var(matchers) separated by
+(see sectref(Completion Builtin Commands)(above)).
+A match specification consists of one or more var(matchers) separated by
 whitespace.  Matchers in a match specification are applied one at a time, from
 left to right.  Once all matchers have been applied, completions are compared
 to the final match pattern and non-matching ones are discarded.
@@ -934,22 +918,15 @@ itemiz(\
 Note that the tt(-M) option is ignored if the current word contains a glob
 pattern and the shell option tt(GLOB_COMPLETE) is set or if the
 tt(pattern_match) key of the special associative array tt(compstate) is set to
-a non-empty value (see
-ifzman(`Completion Special Parameters' above)\
-ifnzman(noderef(Completion Special Parameters))\
-).\
+a non-empty value (see sectref(Completion Special Parameters)(above)).
 )
 itemiz(\
 Users of the \
 ifzman(completion system (see zmanref(zshcompsys))) \
 ifnzman(noderef(Completion System)) \
 should generally not use the tt(-M) option directly, but rather use the
-tt(matcher-list) and tt(matcher) styles (see the subsection em(Standard Styles)
-in
-ifzman(\
-the documentation for COMPLETION SYSTEM CONFIGURATION in zmanref(zshcompsys))\
-ifnzman(noderef(Completion System Configuration))\
-).\
+tt(matcher-list) and tt(matcher) styles (see
+subref(Standard Styles)(zshcompsys)).
 )
 enditemize()
 
@@ -977,11 +954,8 @@ startitemize()
 itemiz(literal characters (which may be quoted with a `tt(\)'),)
 itemiz(question marks (`tt(?)'),)
 itemiz(\
-bracket expressions (`tt([...])'; see the subsection em(Glob Operators) in
-ifnzman(noderef(Filename Generation))\
-ifzman(the documentation for GLOB OPERATORS in zmanref(zshexpn))\
-), and/or\
-)
+bracket expressions (`tt([...])'; see subref(Glob Operators)(zshexpn)),
+and/or)
 itemiz(brace expressions (see below).)
 enditemize()
 )

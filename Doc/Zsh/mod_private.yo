@@ -13,7 +13,7 @@ cindex(private parameter, creating)
 item(tt(private) [ {tt(PLUS())|tt(-)}tt(AHUahlmrtux) ] \
 [ {tt(PLUS())|tt(-)}tt(EFLRZi) [ var(n) ] ] [ var(name)[tt(=)var(value)] ... ])(
 The tt(private) builtin accepts all the same options and arguments as tt(local)
-(ifzman(zmanref(zshbuiltins))ifnzman(noderef(Shell Builtin Commands))) except
+(nmref(Shell Builtin Commands)(zshbuiltins)) except
 for the `tt(-)tt(T)' option.  Tied parameters may not be made private.
 
 The `tt(-)tt(p)' option is presently disabled because the state of
@@ -24,7 +24,7 @@ outputs a private parameter, it is treated as a local with the
 If used at the top level (outside a function scope), tt(private) creates a
 normal parameter in the same manner as tt(declare) or tt(typeset).  A
 warning about this is printed if tt(WARN_CREATE_GLOBAL) is set
-(ifzman(zmanref(zshoptions))ifnzman(noderef(Options))).  Used inside a
+(nmref(Options)(zshoptions)). Used inside a
 function scope, tt(private) creates a local parameter similar to one
 declared with tt(local), except having special properties noted below.
 

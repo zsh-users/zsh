@@ -9,7 +9,7 @@ cindex(command not found, handling of)
 findex(command_not_found_handler)
 If a command name contains no slashes, the shell attempts to locate
 it.  If there exists a shell function by that name, the function
-is invoked as described in noderef(Functions).  If there exists
+is invoked as described in sectref(Functions)(below).  If there exists
 a shell builtin by that name, the builtin is invoked.
 
 vindex(path, use of)
