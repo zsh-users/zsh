@@ -51,9 +51,9 @@ _sbuild() {
     '(--arch-any --no-arch-any)--arch-any[build Architecture: any packages]' \
     '(--arch-any --no-arch-any)--no-arch-any[do not build Architecture: any packages]' \
     '(-b --batch)'{-b,--batch}'[operate in batchmode]' \
-    '(-c --chroot)'{-c=,--chroot=}'[chroot to use]:chroot' \
+    '(-c --chroot)'{-c,--chroot=}'[chroot to use]:chroot' \
     '(--chroot-mode)--chroot-mode=[chroot mode]:mode:(schroot sudo autopkgtest unshare)' \
-    '(-d --dist)'{-d=,--dist=}'[distribution]:distribution:_sbuild_distributions' \
+    '(-d --dist)'{-d,--dist=}'[distribution]:distribution:_sbuild_distributions' \
     '--archive=[use specified archive]' \
     '(--apt-clean --no-apt-clean)--apt-clean[force apt-get clean]' \
     '(--apt-clean --no-apt-clean)--no-apt-clean[do not apt-get clean]' \
@@ -61,10 +61,10 @@ _sbuild() {
     '(--apt-upgrade --no-apt-upgrade)--no-apt-upgrade[do not apt-get upgrade]' \
     '(--apt-distupgrade --no-apt-distupgrade)--apt-distupgrade[force apt-get distupgrade]' \
     '(--apt-distupgrade --no-apt-distupgrade)--no-apt-distupgrade[do not apt-get distupgrade]' \
-    '(-m --maintainer)'{-m=,--maintainer=}'[maintainer field for .changes]:maintainer:_deb_identities' \
-    '(-e --uploader)'{-e=,--uploader=}'[uploader field for .changes]:uploader:_deb_identities' \
-    '(-k --keyid)'{-k=,--keyid=}'[GPG Key to sign packages]: :_sbuild_signing_keys' \
-    '(-j --jobs)'{-j=,--jobs=}'[jobs to run simultaneously]:number of jobs' \
+    '(-m --maintainer)'{-m,--maintainer=}'[maintainer field for .changes]:maintainer:_deb_identities' \
+    '(-e --uploader)'{-e,--uploader=}'[uploader field for .changes]:uploader:_deb_identities' \
+    '(-k --keyid)'{-k,--keyid=}'[GPG Key to sign packages]: :_sbuild_signing_keys' \
+    '(-j --jobs)'{-j,--jobs=}'[jobs to run simultaneously]:number of jobs' \
     '--debbuildopt=[option to dpkg-buildpackage]:option' \
     '--debbuildopts=[options to dpkg-buildpackage]:options' \
     '--dpkg-source-opt=[option to dpkg-source]:option' \
@@ -73,7 +73,7 @@ _sbuild() {
     '--mailfrom=[mail from]:sender:_email_addresses -c' \
     '(-n --nolog)'{-n,--nolog}'[no build log file]' \
     '--profiles=[profiles for dpkg-buildpackage]:profile list (comma separated)' \
-    '(-p --purge)'{-p=,--purge=}'[purge mode]:purge mode:(never successful always)' \
+    '(-p --purge)'{-p,--purge=}'[purge mode]:purge mode:(never successful always)' \
     '--purge-build=[build purge mode]:purge mode:(never successful always)' \
     '--purge-deps=[deps purge mode]:purge mode:(never successful always)' \
     '--purge-session=[session purge mode]:purge mode:(never successful always)' \
