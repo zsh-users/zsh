@@ -1,3 +1,8 @@
+2025-08-04  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* Frederick Zhang: 53825: Completion/Unix/Command/_git: fix
+	regexp in __git_extract_aliases
+
 2025-07-18  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 53821: Doc/Zsh/builtins.yo, Doc/Zsh/calsys.yo, Doc/Zsh/compctl.yo,
