@@ -1,3 +1,7 @@
+2025-08-07  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 53827: Completion/Debian/Command/_sbuild: fix/update _sbuild
+
 2025-08-04  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* Dima Kogan: 53824: Completion/Debian/Command/_sbuild: short
