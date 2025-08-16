@@ -1,3 +1,7 @@
+2025-08-16  dana  <dana@dana.is>
+
+	* 53808: Doc/Zsh/expn.yo: clarify Yn globqual explanation
+
 2025-08-07  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 53827: Completion/Debian/Command/_sbuild: fix/update _sbuild

@@ -3083,7 +3083,9 @@ enables short-circuit mode: the pattern will expand to at most var(n)
 filenames.  If more than var(n) matches exist, only the first var(n)
 matches in directory traversal order will be considered.
 
-Implies tt(oN) when no tt(o)var(c) qualifier is used.
+Any sorting specified with an tt(o)var(c) or tt(O)var(c) qualifier is
+applied em(after) the var(n) matches are returned; tt(oN) is implied
+otherwise.
 )
 item(tt(o)var(c))(
 specifies how the names of the files should be sorted. The following values
