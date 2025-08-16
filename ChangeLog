@@ -1,5 +1,8 @@
 2025-09-24  Oliver Kiddle  <opk@zsh.org>
 
+	* Christopher Bock: github #141 (tweaked):
+	Completion/Debian/Command/_apt: complete apt why/why-not
+
 	* Eisuke Kawashima: github #139: Completion/Unix/Command/_ssh:
 	fix and improve completion for ssh-keygen
 
