@@ -8312,10 +8312,10 @@ __git_setup_merge_options () {
     '(--log         )--no-log[do not list one-line descriptions of the commits being merged in the log message]'
     '(-n --no-stat)--stat[show a diffstat at the end of the merge]'
     '(--stat -n --no-stat)'{-n,--no-stat}'[do not show diffstat at the end of the merge]'
-    '(         --no-squash)--squash[merge, but do not commit]'
+    '(         --no-squash)--squash[prepare a squashed merge without committing]'
     '--autostash[automatically stash/stash pop before and after]'
     '--signoff[add Signed-off-by: trailer]'
-    '(--squash            )--no-squash[merge and commit]'
+    '(--squash            )--no-squash[do not prepare a squashed merge]'
     '--ff-only[refuse to merge unless HEAD is up to date or merge can be resolved as a fast-forward]'
     '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=-}'[GPG-sign the commit]::key id'
     "(-S --gpg-sign --no-gpg-sign)--no-gpg-sign[don't GPG-sign the commit]"
