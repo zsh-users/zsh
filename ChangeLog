@@ -1,3 +1,8 @@
+2025-08-24  Eric Cook  <llua@gmx.com>
+
+	* unposted: Config/version.mk: Test release: zsh-5.9.0.3-test.
+
+
 2025-08-16  dana  <dana@dana.is>
 
 	* 53808: Doc/Zsh/expn.yo: clarify Yn globqual explanation
