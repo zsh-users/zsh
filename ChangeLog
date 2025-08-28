@@ -1,3 +1,7 @@
+2025-08-28  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 53866: Completion/Unix/Command/_man: fix _man for NetBSD
+
 2025-08-07  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 53827: Completion/Debian/Command/_sbuild: fix/update _sbuild
