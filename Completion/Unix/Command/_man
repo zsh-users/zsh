@@ -169,9 +169,12 @@ _man() {
       typeset -gHA _manpath_cache
     fi
     if [[ -z $_manpath_cache[$MANPATH] ]]; then
-      local mp
+      local -aU mp
       if [[ $variant == netbsd* ]]; then
-        mp=( ${(s.:.)$(command man -p 2>/dev/null)} )
+        # 'man -p' gives a newline-separatd list of
+        #   /usr/pkg/man/man1  /usr/share/man/man8/amd64  etc.
+        # Here we just remove the trailing /man1 or /man8/amd64 etc.
+        mp=( ${${(f)"$(command man -p 2>/dev/null)"}%%/man/*}/man )
       elif [[ $variant != freebsd* ]]; then
         mp=( ${(s.:.)$(command man -w 2>/dev/null)} )
       fi

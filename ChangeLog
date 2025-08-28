@@ -1,7 +1,10 @@
+2025-08-28  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 53866: Completion/Unix/Command/_man: fix _man for NetBSD
+
 2025-08-24  Eric Cook  <llua@gmx.com>
 
 	* unposted: Config/version.mk: Test release: zsh-5.9.0.3-test.
-
 
 2025-08-16  dana  <dana@dana.is>
 
