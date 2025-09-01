@@ -32,6 +32,7 @@ else
     freebsd*|dragonfly*|darwin*|netbsd*|openbsd*)
       opts+=( -A '-*' )
       args+=(
+	'-f+[use specified format for input]:parsing format:_date_formats:new date'
 	"-j[don't try to set date]"
 	'2:format or date:->fmt_date'
       )
@@ -40,11 +41,6 @@ else
       args+=(
         '-n[only set time on current machine]'
         '-R[display in RFC2822 format]'
-      )
-    ;|
-    freebsd*|dragonfly*|darwin*|openbsd*)
-      args+=(
-	'-f+[use specified format for input]:parsing format:_date_formats:new date'
       )
     ;|
     dragonfly*|netbsd*|openbsd*)

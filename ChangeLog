@@ -1,3 +1,10 @@
+2025-09-01  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 53898: Completion/Unix/Command/_date,
+	Completion/Unix/Command/_pgrep, Completion/Unix/Command/_pmap
+	Completion/Unix/Command/_sysctl: update a few completers.
+	_pmap is moved from Linux/Command/ to Unix/Command/.
+
 2025-08-28  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 53866: Completion/Unix/Command/_man: fix _man for NetBSD
