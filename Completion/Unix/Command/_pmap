@@ -1,0 +1,44 @@
+#compdef pmap
+
+if _pick_variant procps=procps-ng unix -V 2>/dev/null; then
+  # based on procps-ng-3.3.15
+  _arguments -s \
+    '(exit -A --range)'{-A+,--range}'[limit results to the specified address range]:low,high: ' \
+    '(exit -q --quiet)'{-q,--quiet}'[do not display some header or footer lines]' \
+    '(exit -p --show-path)'{-p,--show-path}'[show full path to files in the mapping column]' \
+    '(exit)*: :_pids' \
+    + '(format)' \
+    '(exit)'{-d,--device}'[show the device format]' \
+    '(exit)'{-x,--extended}'[show the extended format]' \
+    '(exit)-X[show even more details than -x option]' \
+    '(exit)-XX[show everything the kernel provides]' \
+    '(exit)'{-c,--read-rc}'[read the default configuration]' \
+    '(exit)'{-C+,--read-rc-from=}'[read the configuration from the specified file]: :_files' \
+    + '(exit)' \
+    '(- *)'{-n,--create-rc}'[create new default configuration and exit]' \
+    '(- *)'{-N+,--create-rc-to=}'[create new configuration to the specified file and exit]: :_files' \
+    '(- *)'{-h,--help}'[display help text and exit]' \
+    '(- *)'{-V,--version}'[display version information and exit]'
+elif [[ $OSTYPE = netbsd* ]]; then
+  _arguments -s \
+    '(-E -S -V)-A[dump vm_amap structure found at the specified address]:address:' \
+    "-a[display all information from the process's memory map]" \
+    '-D[enable version debug facilities]:bitmask:' \
+    '-d[dump vm_map and vm_map_entry in a style like ddb(4)]' \
+    '(-A -S -V)-E[dump vm_map_entry structure found at the specified address]:address:' \
+    '-l[dump information in a format like Linux /proc file system]' \
+    '(-N)-M[extract values associated with the name list from the specified core]:core:' \
+    '-m[dump information in the same format as the map pseudo-file in /proc]' \
+    '(-M)-N[extract the name list from the specified system]:system:' \
+    '(-p)-P[print information about pmap itself]' \
+    '(-P)-p[print information about the specified process]: :_pids' \
+    '-R[recurse into submaps]' \
+    '(-A -E -V)-S[dump vmspace structure found at the specified address]:address:' \
+    '-s[Solaris style output format (default)]' \
+    '-t[print entries to the underlying RB tree]' \
+    '(-A -E -S)-V[dump vm_map structure found at the specified address]:address:' \
+    '-v[verbose output]' \
+    '*:pid:_pids'
+else
+  _default
+fi

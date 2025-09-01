@@ -39,7 +39,10 @@ case $OSTYPE in
   freebsd<14->.*)
     args+=(
       '-F[print the format of the variable]'
+      '-J[display only jail prison sysctl variables]'
+      '-j[perform the actions inside the specified jail]:jail id or name:'
       '(-N)-l[show the length of variables along with their values]'
+      '-V[display only VNET sysctl variables]'
     )
   ;|
   freebsd<11->.*)
@@ -79,8 +82,9 @@ case $OSTYPE in
     sysctlvars=( ${${${(f)"$(_call_program sysctl-variables
 				sysctl -a 2>/dev/null)"}%%=*}:# *} )
     _arguments -S -s -A "-*" \
-      '(-A -q *)-a[list all string and integer variables]' \
-      '(-a -q *)-A[list all known variables]' \
+      '(-A -f -q *)-a[list all string and integer variables]' \
+      '(-a -f -q *)-A[list all known variables]' \
+      '(-A -a *)-f[read name=value from specified file]: :_files' \
       '-n[show only values]' \
       '(-a -A)-q[suppress all output when setting a variable]' \
       '*:sysctl variable:_multi_parts -i -S = -q . sysctlvars'
