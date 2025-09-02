@@ -517,6 +517,10 @@ _git-checkout () {
           _alternative remote-branches::__git_remote_branch_names && ret=0
         elif [[ -n ${opt_args[(I)--ours|--theirs|-m|--conflict|--patch|--no-guess]} ]]; then
           _alternative $tree_ish_arg $file_arg && ret=0
+        elif [[ -n ${opt_args[(i)--guess]} ]]; then
+          # --guess is the default but if it has been explicitly specified,
+          # we'll only complete remote branches
+          __git_remote_branch_names_noprefix && ret=0
         else
           _alternative \
             $file_arg \
