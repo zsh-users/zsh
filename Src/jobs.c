@@ -2754,6 +2754,11 @@ static const struct {
     { "IO", SIGIO },
 #endif
 #endif
+#if defined(SIGABRT) && defined(SIGIOT)
+#if SIGABRT == SIGIOT
+    { "IOT", SIGIOT },
+#endif
+#endif
 #if !defined(SIGERR)
     /*
      * If SIGERR is not defined by the operating system, use it

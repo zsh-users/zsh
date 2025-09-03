@@ -1,3 +1,8 @@
+2025-09-03  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 53907: Src/jobs.c: re-apply the patch in 51602 (Handle SIGIOT
+	as an alias to SIGABRT) that was mistakenly reverted by 51604
+
 2025-09-01  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 53898: Completion/Unix/Command/_date,
