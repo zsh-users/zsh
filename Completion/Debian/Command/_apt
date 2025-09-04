@@ -422,14 +422,15 @@ _apt-cmd () {
 	/$'[^\0/=]#='/ /'[]'/ ':apt-package-versions:package version:_apt_versions_of_binary_package' \| \
       \) \
     \) \| \
-    /$'((|auto)(remove|purge)|reinstall)\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
+    /$'((|auto)(remove|purge)|reinstall|why)\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'upgrade\0'/ \| \
     /$'autoclean\0'/ \| \
     /$'changelog\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
+    /$'why-not\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'full-upgrade\0'/ \| \
     /$'dist-upgrade\0'/ \| \
     /$'edit-sources\0'/ \| \
-    /"[]"/ ':argument-1::compadd "$expl_action[@]" list search showsrc show depends rdepends policy update install reinstall download source build-dep remove upgrade full-upgrade dist-upgrade edit-sources autoclean changelog autopurge autoremove purge'
+    /"[]"/ ':argument-1::compadd "$expl_action[@]" list search showsrc show depends rdepends policy update install reinstall download source build-dep remove upgrade full-upgrade dist-upgrade edit-sources autoclean changelog autopurge autoremove purge why why-not'
 
   _apt-cmd () {
     local expl_action expl_packages subcmd
