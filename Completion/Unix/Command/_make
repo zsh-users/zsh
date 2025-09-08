@@ -3,8 +3,43 @@
 # TODO: Based on targets given on the command line, show only variables that
 # are used in those targets and their dependencies.
 
+_make-expandPossibleShellScripts() {
+  local open=$1 close=$2 rest=$3 script
+  # An possible shell call like this: $(shell echo '(((foo{bar})').
+  # As there can be nested (), {}, we need to parse them correctly.
+  local pos=9 in_paren=1 in_squote=0 in_dquote=0
+  # skip `\$\(shell ` part, the stack auto contains one '('
+  while [[ pos -le ${#rest} ]]; do
+    ch=$rest[$pos]
+    pos=$((pos + 1))
+    if [[ $ch == "'" && $in_dquote -eq 0 ]]; then
+      in_squote=$((1 - in_squote))
+    elif [[ $ch == '"' && $in_squote -eq 0 ]]; then
+      in_dquote=$((1 - in_dquote))
+    fi
+
+    if [[ $in_squote -eq 1 || $in_dquote -eq 1 ]]; then
+      continue
+    fi
+
+    if [[ $ch == '(' ]]; then
+      in_paren=$((in_paren + 1))
+    elif [[ $ch == ')' ]]; then
+      in_paren=$((in_paren - 1))
+      if [[ $in_paren -eq 0 ]]; then
+        # The stack is empty, end of shell script
+        script=${rest[9,$((pos - 2))]}  # without `$(shell ` and `)`
+        print -r -- $script
+        return 0
+      fi
+    fi
+  done
+  print -- $rest # Failed in parsing, return original string
+  return 1
+}
+
 _make-expandVars() {
-  local open close var val front='' rest=$1
+  local open close var val script front='' rest=$1
 
   while [[ $rest == (#b)[^$]#($)* ]]; do
     front=$front${rest[1,$mbegin[1]-1]}
@@ -37,32 +72,51 @@ _make-expandVars() {
 
     if [[ -n $open ]]; then
       if [[ $rest == \$$open(#b)([[:alnum:]_]##)(#B)$close* ]]; then
-	var=$match
+        var=$match
+      elif [[ $open == \( && $rest == \$$open(#b)shell\ (*)(#B)$close* ]]; then
+        script=$(_make-expandPossibleShellScripts $open $close $rest)
+        if [[ $? -eq 1 ]]; then
+          # Failed in parsing
+          print -- $front$rest
+          return 1
+        fi
       else  # unmatched () or {}, or bad parameter name
-	print -- $front$rest
-	return 1
+        print -- $front$rest
+        return 1
       fi
     fi
 
-    val=''
-    if [[ -n ${VAR_ARGS[(i)$var]} ]]; then
-      val=${VAR_ARGS[$var]}
+    if [[ -n $script ]]; then
+      # We are expanding a shell script
+
+      # We shall process the makefile script to let escape works correctly
+      cmd=${script//\$\$/\$}
+      cmd=${cmd//\\\#/\#}
+      val=$(sh -c "$cmd")
+      val=${val//$'\n'/ }
+      rest=${rest//\$\(shell $script\)/$val}
     else
-      if [[ -n $opt_args[(I)(-e|--environment-overrides)] ]]; then
-	if [[ $parameters[$var] == scalar-export* ]]; then
-	  val=${(P)var}
-	elif [[ -n ${VARIABLES[(i)$var]} ]]; then
-	  val=${VARIABLES[$var]}
-	fi
+      # We are expanding a simple variable
+      val=''
+      if [[ -n ${VAR_ARGS[(i)$var]} ]]; then
+        val=${VAR_ARGS[$var]}
       else
-	if [[ -n ${VARIABLES[(i)$var]} ]]; then
-	  val=${VARIABLES[$var]}
-	elif [[ $parameters[$var] == scalar-export* ]]; then
-	  val=${(P)var}
-	fi
+        if [[ -n $opt_args[(I)(-e|--environment-overrides)] ]]; then
+          if [[ $parameters[$var] == scalar-export* ]]; then
+            val=${(P)var}
+          elif [[ -n ${VARIABLES[(i)$var]} ]]; then
+            val=${VARIABLES[$var]}
+          fi
+        else
+          if [[ -n ${VARIABLES[(i)$var]} ]]; then
+            val=${VARIABLES[$var]}
+          elif [[ $parameters[$var] == scalar-export* ]]; then
+            val=${(P)var}
+          fi
+        fi
       fi
+      rest=${rest//\$$open$var$close/$val}
     fi
-    rest=${rest//\$$open$var$close/$val}
   done
 
   print -- ${front}${rest}
@@ -71,7 +125,10 @@ _make-expandVars() {
 _make-parseMakefile () {
   local input var val target dep TAB=$'\t' tmp IFS=
 
-  while read input
+  # We need -r to avoid interpreting backslashes, here is an example line:
+  #   echo "1ab2" | sed -E "s/[0-9]*([a-z]+)[0-9]*/\1/"
+  # without -r, the backslash before 1 would be lost.
+  while read -r input
   do
     case "$input " in
       # VARIABLE = value OR VARIABLE ?= value
