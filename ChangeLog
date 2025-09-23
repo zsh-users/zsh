@@ -1,3 +1,8 @@
+2025-09-24  Oliver Kiddle  <opk@zsh.org>
+
+	* 53947: Completion/Unix/Command/_ansible: fix for broken
+	completion of tags and paths with ansible-galaxy
+
 2025-09-03  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 53907: Src/jobs.c: re-apply the patch in 51602 (Handle SIGIOT

@@ -26,7 +26,7 @@ case $service in
       '(-k --ask-pass)--connection-password-file=[specify file containing connection password]:file:_files'
       '--list-hosts[output list of matching hosts]'
       '(-T --timeout)'{-T+,--timeout=}'[override the connection timeout]:timeout (seconds) [10]'
-      '(-c --connection)'{-c+,--connection=}'[specify connection type]:connection type [smart]:->connect-types'
+      '(-c --connection)'{-c+,--connection=}'[specify connection type]:connection type [ssh]:->connect-types'
       '(-u --user)'{-u+,--user=}'[specify remote user for connection]:remote user:_users'
       '--private-key=[specify file to use to authenticate the connection]:private key file:_files'
       '--ssh-common-args=[specify common arguments to pass to sftp/scp/ssh]:ssh option'
@@ -48,14 +48,14 @@ case $service in
   ;|
   ansible|ansible-console|ansible-inventory|ansible-playbook|ansible-pull)
     args+=(
-      --ask-vault-pass{,word}'[ask for vault password]'
+      '(-J --ask-vault-pass --ask-vault-password)'{-J,--ask-vault-pass{,word}}'[ask for vault password]'
       \*{-e+,--extra-vars=}'[set additional variables]:key=value, YAML/JSON or @file:->extra-vars'
       '*--vault-id=[specify vault identity to use]:vault identity'
       --vault-pass{,word}-file='[specify vault password file]:vault password file:_files'
       \*{-i+,--inventory=}'[specify inventory host file or host list]: : _alternative "files\:inventory file\:_files"
 	"hosts\:host\: _sequence _hosts"'
       '!(-i --inventory)--inventory-file=:inventory file:_files'
-      '(-l --limit)'{-l+,--limit=}'[further limit hosts to an additional pattern]:host subset:->hosts'
+      '(-l --limit --host --graph)'{-l+,--limit=}'[further limit hosts to an additional pattern]:host subset:->hosts'
     )
   ;|
   ansible|ansible-console|ansible-inventory)
@@ -65,8 +65,8 @@ case $service in
   ;|
   ansible-playbook|ansible-pull)
     args+=(
-      '(-t --tags)'{-t,--tags}'[only run plays and tasks tagged with these values]:tag:->tags'
-      "--skip-tags[only run plays and tasks whose tags don't match]"
+      \*{-t,--tags}'[only run plays and tasks tagged with these values]:tag:->tags'
+      "*--skip-tags[only run plays and tasks whose tags don't match]"
     )
   ;|
   ansible-playbook|ansible-console)
@@ -98,6 +98,7 @@ case $service in
 	dump\:show\ the\ current\ settings,\ merge\ specified\ configuration
 	view\:display\ the\ current\ config\ file
         init\:create\ initial\ configuration
+        validate\:validate\ the\ configuration\ file\ and\ environment\ variables
       ))'
       '*::args:->config'
     )
@@ -118,15 +119,15 @@ case $service in
   ;;
   ansible-inventory)
     args+=(
-      '--export[when doing an --list, represent in a way that is optimized for export]'
-      '(-y --yaml)--graph[output inventory graph]'
-      '--host[output specific host information]'
+      '--export[when doing --list, represent in a way that is optimized for export]'
+      '(-l --limit -y --yaml)--graph[output inventory graph]'
+      '(1 -l --limit)--host=[output specific host information]:host:->hostsonly'
       '--output=[with --list, specify output file]:file:_files'
       '--list[output all hosts information]'
       '(-y --yaml --vars --graph)--toml[use TOML format instead of JSON]'
       '(-y --yaml)--vars[add variables to the graph display]'
       '(-y --yaml --toml --vars --graph)'{-y,--yaml}'[use YAML format instead of JSON]'
-      ':host or group:->hosts'
+      '(--host)1:group:->hostgroups'
     )
   ;;
   ansible-galaxy)
@@ -196,8 +197,8 @@ case $state in
       ;;
     esac
   ;;
-  hosts)
-    local alts
+  host*)
+    local -a alts suf
     [[ -prefix - ]] && return ret
     compset -P '*[,:](|[&!~])'
     compset -S '[:,]*'
@@ -211,28 +212,24 @@ case $state in
        	_ansible_hosts=( ${${(M)inventory%--[^:]#}#--} )
 	_ansible_groups=( ${${${(M)inventory%@*:}%:}#@} )
       fi
-      [[ $IPREFIX = *[:,] ]] &&
-	alts=( 'operators:operator:_values -S "" operator "![exclude hosts]" "&[intersection of hosts]" "~[regular expression pattern]"' )
-      _alternative $alts \
-	'groups:group:compadd -qS: -a _ansible_groups' \
-	'hosts:host:compadd -qS: -a _ansible_hosts' && ret=0
+      if [[ $state = hosts ]]; then
+        suf=( -qS: )
+        [[ $IPREFIX = *[:,] ]] &&
+          alts=( 'operators:operator:_values -S "" operator "![exclude hosts]" "&[intersection of hosts]" "~[regular expression pattern]"' )
+      fi
+      [[ $state != hostsonly ]] && alts+=( 'groups:group:compadd $suf -a _ansible_groups' )
+      [[ $state != hostgroups ]] && alts+=( 'hosts:host:compadd $suf -a _ansible_hosts' )
+      _alternative $alts && ret=0
     fi
   ;;
   connect-types)
     plug=connection
     state=plugins
   ;;
-  extra-vars)
-    if compset -P '@'; then
-      _files -g "*.(json|yml|yaml|ini)(-.)" && ret=0
-    else
-      _message 'key=value, YAML/JSON or @file'
-    fi
-  ;;
   tags)
     # The recursive glob here is questionable and perhaps there should be a style.
-    _sequence _wanted tags expl tag compadd - \
-        ${(s.,.)${(j.,.)${(M)${(f)"$(cat **/*.yml)"}:# #tags:*}#*: }} && ret=0
+    _sequence _wanted tags expl tag compadd - all untagged tagged \
+        ${(s.,.)${(j.,.)${(M)${(f)"$(cat **/*.yml)"}:# #tags:*}#*:}//[\[\] \"\']/} && ret=0
   ;;
   config)
     ign=''
@@ -261,6 +258,11 @@ case $state in
       list)
         args+=(
           '(-f --format)'{-f+,--format=}'[specify output format]:format:(json yaml)'
+        )
+      ;;
+      validate)
+        args+=(
+          '(-f --format)'{-f+,--format=}'[specify output format]:format:(ini env)'
         )
       ;;
     esac
@@ -329,6 +331,7 @@ case $state in
       *-init)
         args+=(
           '--init-path=[specify path in which the skeleton will be created]:path:_directories'
+          \*{-e+,--extra-vars=}'[set additional variables]:key=value, YAML/JSON or @file:->extra-vars'
         )
       ;|
       role-search)
@@ -386,7 +389,7 @@ case $state in
       ;;
       collection-install)
         args+=(
-          '(-p --collections-path)'{-p+,--collections-path=}'[specify directory containing collections]:_directories'
+          '(-p --collections-path)'{-p+,--collections-path=}'[specify directory containing collections]:path [~/.ansible/collections]:_directories'
           '(-r --requirements-file *)'{-r+,--requirements-file=}'[specify file containing a list of collections to install]:file:_files'
           '--pre[include pre-release versions]'
           '*:collection name:_files'
@@ -401,8 +404,8 @@ case $state in
     (( $#words > 2 )) && ign='!'
     args=(
       "${ign}(-)"{-h,--help}'[display usage information]'
-      --ask-vault-pass{,word}'[ask for vault password]'
-      '--vault-id=[specify vault identity to use]:vault identity'
+      '(-J --ask-vault-pass --ask-vault-password)'{-J,--ask-vault-pass{,word}}'[ask for vault password]'
+      '*--vault-id=[specify vault identity to use]:vault identity'
       --vault-pass{,word}-file='[specify vault password file]:vault password file:_files'
       \*{-v,--verbose}'[verbose mode]'
     )
@@ -410,6 +413,7 @@ case $state in
       create|(de|en)crypt*|edit|rekey)
 	args+=(
 	  '--encrypt-vault-id=[specify vault id to use to encrypt (required if more than one vault-id is provided)]:vault id'
+
 	)
       ;|
       (de|en)crypt*) args+=( '--output=[specify output file name]:file:_files' ) ;|
@@ -417,7 +421,7 @@ case $state in
 	args+=(
 	  '(-p --prompt)'{-p,--prompt}'[prompt for the string to encrypt]'
           "--show-input[don't hide input when prompted for the string to encrypt]"
-	  '(-n --name)'{-n+,--name=}'[specify the variable name]:variable'
+	  \*{-n+,--name=}'[specify the variable name]:variable'
 	  '--stdin-name=[specify the variable name for stdin]:variable'
 	)
       ;|
@@ -428,11 +432,22 @@ case $state in
           '--new-vault-password-file=[specify new vault password file]:vault password file:_files'
         )
       ;|
+      create)
+        args+=( '--skip-tty-check[allow editor to be opened when no tty attached]' )
+      ;;
       (en|de)crypt) args+=( '::file:_files' ) ;;
     esac
     _arguments -s -S $args && ret=0
   ;;
 esac
+
+if [[ $state = extra-vars ]]; then
+  if compset -P '@'; then
+    _files -g "*.(json|yml|yaml|ini)(-.)" && ret=0
+  else
+    _message 'key=value, YAML/JSON or @file'
+  fi
+fi
 
 if [[ $state = plugins ]]; then
   [[ -z $plug ]] && return ret
