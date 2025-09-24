@@ -1,5 +1,8 @@
 2025-09-29  Oliver Kiddle  <opk@zsh.org>
 
+	* Ryan Rotter: github #145: Completion/Unix/Command/_install:
+	update options completion
+
 	* 53970 based on github #131 by Christopher Bock:
 	Completion/Unix/Command/_zfs: complete all dataset properties
 	for zfs allow and support comma separated list for zfs scripts
