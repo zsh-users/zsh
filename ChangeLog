@@ -1,3 +1,8 @@
+2025-09-25  Oliver Kiddle  <opk@zsh.org>
+
+	* 53966: Completion/Linux/Command/_networkmanager:
+	update based on nmcli 1.52.0
+
 2025-09-24  Oliver Kiddle  <opk@zsh.org>
 
 	* Markus Kurtz: github #143: Completion/Unix/Command/_git:

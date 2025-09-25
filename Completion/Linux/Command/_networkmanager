@@ -1,25 +1,25 @@
 #compdef nmcli
 
-# compatible with NetworkManager 1.8.4
-
 _networkmanager() {
   local curcontext="$curcontext" state line
   local nmcli="$words[1]"
 
   _arguments -C \
-    '(-o -overview)-o'{,verview}'[overview mode (hide default values)]' \
-    '(-p -pretty -t -terse)-t'{,erse}'[terse output]' \
-    '(-p -pretty -t -terse)-p'{,retty}'[pretty output]' \
-    '(-m -mode)-m'{,ode}'[output mode]:mode:(tabular multiline)' \
-    '(-c -colors)-c'{,olors}'[whether to use colors in output]:value:(auto yes no)' \
-    '(-f -fields)-f'{,ields}'[specify fields to output]:field:_nm_fields' \
-    '(-f -fields -g -get-values -m -mode -p -pretty -t -terse)-g'{,et-values}'[shortcut for -m tabular -t -f]:field:_nm_fields' \
-    '(-e -escape)-e'{,scape}'[escape column separators in values]:value:(yes no)' \
-    '(-a -ask)-a'{,sk}'[ask for missing parameters]' \
-    '(-s -show-secrets)-s'{,how-secrets}'[allow passwords to be displayed]' \
-    '(-w -wait)-w'{,ait}'[set time limit on wait for operations to finish]:timeout (seconds)' \
-    '(- *)-v'{,ersion}'[show program version]' \
-    '(- *)-h'{,elp}'[print help]' \
+    '(-a --ask)'{-a,--ask}'[ask for missing parameters]' \
+    '(-c --colors)'{-c,--colors}='[whether to use colors in output]:value [auto]:(auto yes no)' \
+    '!--complete-args' \
+    '(-e --escape)'{-e,--escape}='[escape column separators in values]:value:(yes no)' \
+    '(-f --fields)'{-f,--fields}='[specify fields to output]:field:_nm_fields' \
+    '(-f --fields -g -get-values -m -mode -p -pretty -t -terse)'{-g,--get-values}='[shortcut for -m tabular -t -f]:field:_nm_fields' \
+    '(-m --mode)'{-m,--mode}='[output mode]:mode:(tabular multiline)' \
+    '--offline[work without a daemon]' \
+    '(-o --overview)'{-o,--overview}'[overview mode (hide default values)]' \
+    '(-p --pretty -t --terse)'{-p,--pretty}'[pretty output]' \
+    '(-s --show-secrets)'{-s,--show-secrets}'[allow passwords to be displayed]' \
+    '(-p --pretty -t --terse)'{-t,--terse}'[terse output]' \
+    '(-w --wait)'{-w,--wait}='[set time limit on wait for operations to finish]:timeout (seconds)' \
+    '(- *)'{-v,--version}'[display version information]' \
+    '(- *)'{-h,--help}'[display usage information]' \
     '1:command:(general networking radio connection device agent monitor help)' \
     '*::arg:->args'
 
@@ -34,11 +34,10 @@ _networkmanager() {
 }
 
 _nm_fields() {
-  _values -s , 'field to output' \
-    all common \
-    RUNNING VERSION STATE STARTUP CONNECTIVITY NETWORKING WIFI-HW WIFI WWAN-HW WWAN \
-    NAME UUID TYPE TIMESTAMP TIMESTAMP-REAL AUTOCONNECT AUTOCONNECT-PRIORITY READONLY DBUS-PATH ACTIVE DEVICE STATE ACTIVE-PATH SLAVE \
-    DEVICE CONNECTION CON-UUID CON-PATH BSSID SSID MODE CHAN RATE SIGNAL BARS SECURITY
+  local -a fields=( all common
+    ${(f)"$(_call_program fields $nmcli --complete-args --fields \'\')"}
+  )
+  _values -s , 'field' $fields
 }
 
 _nm_general() {
@@ -88,14 +87,14 @@ _nm_connection() {
   local curcontext="$curcontext" state line
 
   _arguments -C \
-    "1:command:(show up down add modify clone edit delete monitor reload load import export help)" \
+    "1:command:(show up down add modify clone edit delete monitor reload load import export migrate help)" \
     "*::arg:->args"
 
   case $line[1] in
     s*)   _nm_connection_show ;;
     u*)   _nm_connection_up ;;
     d*)   _nm_connection_down ;;
-    # TODO: a*) _nm_connection_add ;;
+    a*)   _nm_connection_add ;;
     m*)   _nm_connection_modify ;;
     c*)   _nm_connection_clone ;;
     e*)   _nm_connection_edit ;;
@@ -104,23 +103,46 @@ _nm_connection() {
     l*)   _nm_connection_load ;;
     i*)   _nm_connection_import ;;
     ex*)  _nm_connection_export ;;
+    mi*)  _nm_connection_migrate ;;
   esac
 }
 
 _nm_connection_show() {
-  # TODO: add support for --order
   _arguments \
-    "--active" \
+    '--active[only show active profiles]' \
+    '--order=[sort connections]:order:_sequence -s "\:" compadd - active name type path' \
     "1:connection:_nm_connection_specs"
 }
 
 _nm_connection_up() {
-  # TODO: add support for ifname, ap and passwd-file parameters
-  _arguments "1:connection:_nm_connection_specs"
+  if [[ $CURRENT == 2 ]]; then
+    _nm_connection_specs
+  elif [[ $words[CURRENT-1] = passwd-file ]]; then
+    _files
+  else
+    _values option ifname ap passwd-file
+  fi
 }
 
 _nm_connection_down() {
   _arguments "1:connection:_nm_connection_active"
+}
+
+_nm_connection_add() {
+  local -a props types expl
+  if (( !(CURRENT % 2) )); then
+    props=( ${(f)"$(_call_program properties $nmcli --complete-args connection add \'\')"} )
+    _alternative \
+      'special-options:option:(save type)' \
+      'properties:property:_multi_parts . props'
+  elif [[ $words[CURRENT-1] = save ]]; then
+    _values 'persistent [yes]' yes no
+  elif [[ $words[CURRENT-1] = (connection.|)type ]]; then
+    types=( ${(f)"$(_call_program connection-types $nmcli --complete-args connection add type \'\')"} )
+    _wanted connection-types expl 'connection type' compadd -a types
+  else
+    _message -e values value
+  fi
 }
 
 _nm_connection_modify() {
@@ -130,11 +152,11 @@ _nm_connection_modify() {
   _arguments -A "-*" \
     "--temporary" \
     "1:connection:_nm_connection_specs" \
-    '2:option:->properties' \
-    '3:value' && ret=0
+    '2::remove:(remove):*:setting:->properties' \
+    '3:option:->properties' && ret=0
 
   if [[ -n "$state" ]]; then
-    properties=( ${${(f)"$(_call_program properties $nmcli -t connection show $line[1])"}%%:*} )
+    properties=( ${${(f)"$(_call_program properties $nmcli -t connection show $words[CURRENT-1])"}%%:*} )
     _description properties expl property
     _multi_parts "$expl[@]" . properties && ret=0
   fi
@@ -150,8 +172,16 @@ _nm_connection_clone() {
 }
 
 _nm_connection_edit() {
-  # TODO: add support for adding new connections (type and con-name parameters)
-  _arguments "1:connection:_nm_connection_specs"
+  if [[ $CURRENT == 2 ]]; then
+    _nm_connection_specs
+  elif [[ $words[CURRENT-1] = type ]]; then
+    types=( ${(f)"$(_call_program connection-types $nmcli --complete-args connection add type \'\')"} )
+    _wanted connection-types expl 'connection type' compadd -a types
+  elif [[ $words[CURRENT-1] = con-name ]]; then
+    _message -e names name
+  else
+    _values option type con-name
+  fi
 }
 
 _nm_connection_delete() {
@@ -189,33 +219,35 @@ _nm_connection_specs() {
 _nm_connection_ids() {
   local -a con_ids
   con_ids=(${(f)"$(_call_program nmcli nmcli -t -f name connection)"})
-  _describe 'select connection' con_ids
+  _describe 'connection' con_ids
 }
 
 _nm_connection_active() {
   local -a con_ids
   con_ids=(${(f)"$(_call_program nmcli nmcli -t -f name connection show --active)"})
-  _describe 'select connection' con_ids
+  _describe 'connection' con_ids
 }
 
 _nm_device() {
   local curcontext="$curcontext" state line
 
   _arguments -C \
-    "1:command:(status show set connect reapply modify disconnect delete monitor wifi lldp help)" \
+    "1:command:(status show set up connect reapply modify down disconnect delete monitor wifi lldp checkpoint help)" \
     "*::arg:->args"
 
   case $line[1] in
     sh*)  _nm_device_show ;;
+    u*)   _nm_device_ifnames ;;
     se*)  _nm_device_set ;;
-    c*)   _nm_device_connect ;;
+    co*)  _nm_device_connect ;;
     r*)   _nm_device_reapply ;;
     mod*) _nm_device_modify ;;
-    d*)   _nm_device_disconnect ;;
+    d*)   _nm_device_down ;;
     de*)  _nm_device_delete ;;
     m*)   _nm_device_monitor ;;
     w*)   _nm_device_wifi ;;
     l*)   _nm_device_lldp ;;
+    c*)   _nm_device_checkpoint ;;
   esac
 }
 
@@ -240,11 +272,13 @@ _nm_device_reapply() {
 }
 
 _nm_device_modify() {
-  # TODO: add support for settings
-  _arguments "1:interface:_nm_device_ifnames"
+  local settings
+  settings=( ${(f)"$(_call_program settings $nmcli --complete-args device modify $words[2,CURRENT-1] \'\')"} )
+  _arguments "1:interface:_nm_device_ifnames" \
+    '*:setting:_multi_parts . settings'
 }
 
-_nm_device_disconnect() {
+_nm_device_down() {
   _arguments "*:interface:_nm_device_ifnames"
 }
 
@@ -388,13 +422,13 @@ _nm_device_wifi_show-password() {
 _nm_device_wifi_bssids() {
   local -a bssids
   bssids=(${(f)"$(_call_program nmcli nmcli -t -f bssid device wifi list)"})
-  _describe 'select network' bssids
+  _describe 'network' bssids
 }
 
 _nm_device_wifi_ssids() {
   local -a ssids
   ssids=(${(f)"$(_call_program nmcli nmcli -t -f ssid device wifi list)"})
-  _describe 'select network' ssids
+  _describe 'network' ssids
 }
 
 _nm_device_lldp() {
@@ -404,10 +438,17 @@ _nm_device_lldp() {
     "3:interface:_nm_device_ifnames"
 }
 
+_nm_device_checkpoint() {
+  _arguments \
+    '--timeout=[delay before restoring in the absence of confirmation]:delay (seconds) [15]' \
+    '*:device:_nm_device_ifnames' \
+    '(*)--[command]:program:_command_names -e:*::args: _normal'
+}
+
 _nm_device_ifnames() {
   local -a ifnames
   ifnames=(${(f)"$(_call_program nmcli nmcli -t -f device device)"})
-  _describe 'select device' ifnames
+  _describe 'device' ifnames
 }
 
 _nm_agent() {
