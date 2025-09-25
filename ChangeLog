@@ -1,5 +1,11 @@
 2025-09-25  Oliver Kiddle  <opk@zsh.org>
 
+	* 53967: Completion/BSD/Command/_procstat,
+	Completion/BSD/Command/_jexec, Completion/BSD/Command/_sockstat,
+	Completion/Unix/Command/_sysctl, Completion/Unix/Command/_top,
+	Completion/Unix/Command/_timeout, Completion/Unix/Command/_uniq:
+	update completions affected by FreeBSD 14.3
+
 	* 53966: Completion/Linux/Command/_networkmanager:
 	update based on nmcli 1.52.0
 

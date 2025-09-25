@@ -2,14 +2,13 @@
 
 local args
 
-if [[ $service = g* || $OSTYPE != *(freebsd|netbsd|openbsd)* ]]; then
-  # GNU coreutils or DFly as opposed to Free/Net/OpenBSD implementation
-  args=(
-    '(-v --verbose)'{-v,--verbose}'[indicate when signal is sent upon timeout]'
-    '(- *)--help[display usage information]'
-    '(- *)--version[display version information]'
-  )
-fi
+[[ $service = g* || $OSTYPE != *(netbsd|openbsd)* ]] && args=(
+  '(-v --verbose)'{-v,--verbose}'[indicate when signal is sent upon timeout]'
+)
+[[ $service = g* || $OSTYPE != *(#i)(dragonfly|(free|net|open)bsd)* ]] && args+=(
+  '(- *)--help[display usage information]'
+  '(- *)--version[display version information]'
+)
 
 _arguments -S -A "-" $args \
   '--preserve-status[always exit with the same status as command even if it times out]' \

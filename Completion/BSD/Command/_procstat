@@ -22,6 +22,6 @@ _arguments -s -A "-*" -S \
   '-C[print additional capability information for file descriptors]' \
   '-H[statistics per-thread rather than per-process]' \
   '-n[numeric form for signals]' \
-  '1::command:(advlock argument auxv basic binary cpuset credential environment fd file kstack pargs ptlwpinfo pwdx rlimit rlimitusage rusage sigfastblock signal thread tsignal vm)' \
+  '1::command:(advlock argument auxv basic binary cpuset credential environment fd file kqueue kstack pargs ptlwpinfo pwdx rlimit rlimitusage rusage sigfastblock signal thread tsignal vm)' \
   '2::core file:_path_files -g "*core*(-.)"' \
   '*:process id:_pids'

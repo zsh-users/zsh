@@ -32,6 +32,7 @@ case $OSTYPE in
   freebsd<14->.*)
     args+=(
       '-I[show local address of socket to which the current socket is spliced]'
+      '-f[show the FIB number of each socket]'
     )
   ;|
   freebsd*)
