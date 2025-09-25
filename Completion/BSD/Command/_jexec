@@ -12,8 +12,9 @@ _jexec_normal() {
 _jexec() {
   _arguments -s -S -A "-*" : \
     '-l[execute in a clean environment]' \
-    '(-U)-u[host environment user whom command runs as]:host user:_users' \
-    '(-u)-U[jail environment user whom command runs as]:jail user:_users' \
+    '-d+[specify working directory inside the jail]: :_directories' \
+    '(-U)-u+[host environment user whom command runs as]:host user:_users' \
+    '(-u)-U+[jail environment user whom command runs as]:jail user:_users' \
     '1:jail:_jails' \
     '*:: : _jexec_normal'
 }

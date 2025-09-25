@@ -39,8 +39,8 @@ case $OSTYPE in
   freebsd<14->.*)
     args+=(
       '-F[print the format of the variable]'
-      '-J[display only jail prison sysctl variables]'
-      '-j[perform the actions inside the specified jail]:jail id or name:'
+      '-J[display only jail sysctl variables]'
+      '-j+[perform the actions inside the specified jail]: :_jails'
       '(-N)-l[show the length of variables along with their values]'
       '-V[display only VNET sysctl variables]'
     )

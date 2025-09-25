@@ -3,16 +3,16 @@
 local args
 
 args=(
-  '(-c --count)'{-c,--count}'[prefix lines by the number of occurrences]'
-  '(-d --repeated)'{-d,--repeated}'[only print duplicate lines]'
-  '(--all-repeated)-D-[print all duplicate lines]'
-  '(-D)--all-repeated=-[print all duplicate lines]::delimit method [none]:(none prepend separate)'
+  '(-c --count -u --unique)'{-c,--count}'[prefix lines by the number of occurrences]'
+  '(-d --repeated -u --unique -D --all-repeated)'{-d,--repeated}'[only print a single copy of duplicate lines]'
+  '(--all-repeated -d --repeated -u --unique)-D[print all duplicate lines]'
+  '(-D -d --repeated -u --unique)--all-repeated=-[print all duplicate lines]::delimit method [none]:(none prepend separate)'
   '(-f --skip-fields)'{-f,--skip-fields=}'[avoid comparing initial fields]:number of fields'
   '--group=-[show all items]::group separation [separate]:(separate prepend append both)'
   '(-i --ignore-case)'{-i,--ignore-case}'[ignore differences in case when comparing]'
-  '(-s --skip-chars)'{-s,--skip-chars=}'[avoid comparing initial characters]:number of characters'
-  '(-u --unique)'{-u,--unique}'[only print unique lines]'
-  '(-w --check-chars)'{-w,--check-chars=}'[specify maximum number of characters to compare]:characters'
+  '(-s --skip-chars)'{-s+,--skip-chars=}'[avoid comparing initial characters]:number of characters'
+  '(-u --unique -c --count -d --repeated -D --all-repeated)'{-u,--unique}'[only print unique lines]'
+  '(-w --check-chars)'{-w+,--check-chars=}'[specify maximum number of characters to compare]:characters'
   '(-z --zero-terminated)'{-z,--zero-terminated}'[delimit lines with null character, not newline]'
   '(- *)--help[display help information]'
   '(- *)--version[display version information]'

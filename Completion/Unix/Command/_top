@@ -85,6 +85,7 @@ case $OSTYPE in
       '-w[display approximate swap usage]'
       "-z[don't display system idle process]"
       '-J+[show processes owned by the specified jail]:jail:_jails -0'
+      '-T[display thread ID instead of process ID]'
       '-U+[show processes owned by the specified username]: :_users'
     );;
   openbsd*)
