@@ -1,9 +1,5 @@
------------------
-THE Z SHELL (ZSH)
------------------
-
-Version
--------
+# THE Z SHELL (ZSH)
+## Version
 
 This is version 5.10 of the shell.  This is a security and feature release.
 There are several visible improvements since 5.9, as well as bug fixes.
@@ -12,94 +8,90 @@ All zsh installations are encouraged to upgrade as soon as possible.
 Note in particular the changes highlighted under "Incompatibilities since
 5.9" below.  See NEWS for more information.
 
-Installing Zsh
---------------
-
-The instructions for compiling zsh are in the file INSTALL.  You should
-also check the file MACHINES in the top directory to see if there
+## Installing Zsh
+The instructions for compiling zsh are in the file [INSTALL](https://github.com/zsh-users/zsh/blob/master/INSTALL). You should
+also **check the file** [**MACHINES**](https://github.com/zsh-users/zsh/blob/master/MACHINES) in the top directory to see if there
 are any special instructions for your particular architecture.
 
 Note in particular the zsh/newuser module that guides new users through
 setting basic shell options without the administrator's intervention.  This
-is turned on by default.  See the section AUTOMATIC NEW USER CONFIGURATION
-in INSTALL for configuration information.
+is **turned on** by default. See the section AUTOMATIC NEW USER CONFIGURATION
+in [INSTALL](https://github.com/zsh-users/zsh/blame/master/INSTALL) for configuration information.
 
-Features
---------
-
+## Features
 Zsh is a shell with lots of features.  For a list of some of these, see the
-file FEATURES, and for the latest changes see NEWS.  For more
+file [FEATURES](https://github.com/zsh-users/zsh/blob/master/FEATURES), and for the latest changes see [NEWS](https://github.com/zsh-users/zsh/blob/master/NEWS).  For more
 details, see the documentation.
 
-Incompatibilities since 5.9
----------------------------
-
-The line editor's default keymap is now the "emacs" keymap regardless of the
-value of the environment variables $VISUAL and $EDITOR.  This only affects you
-if your $VISUAL or $EDITOR environment variable is set to a value that
-contains the string "vi".  To get the previous behaviour, add
-
+## Incompatibilities since 5.9
+The line editor's default keymap is now the *emacs* keymap regardless of the
+value of the environment variables `$VISUAL` and `$EDITOR`.  This only affects you
+if your `$VISUAL` or `$EDITOR` environment variable is set to a value that
+contains the string *vi*.  To get the previous behaviour, add
+```Zsh
     bindkey -v
-
-or, if your $VISUAL and $EDITOR environment variables vary,
-
+```
+> or, if your `$VISUAL` and `$EDITOR` environment variables vary,
+```Zsh
     if [[ ${VISUAL} == *vi* || ${EDITOR} == *vi* ]]; then
         bindkey -v
     else
         bindkey -e
     fi
-
-to your .zshrc file.  These snippets are compatible with previous
+```
+to your *.zshrc* file.  These snippets are compatible with previous
 versions of the shell.
 
-The ERR_EXIT and ERR_RETURN options were refined to be more self-
+The `ERR_EXIT` and `ERR_RETURN` options were refined to be more self-
 consistent and better aligned with the POSIX-2017 specification of
 `set -e`:
-
-  - Function calls or anonymous functions prefixed with `!` now never
-    trigger exit or return. Negated function calls or anonymous
-    functions used to trigger exit or return if ERR_EXIT or ERR_RETURN
-    was set and the function call or anonymous function returned a
-    zero exit status. Example:
-
+- Function calls or anonymous functions prefixed with `!` now never
+  trigger exit or return. Negated function calls or anonymous
+  functions used to trigger exit or return if ERR_EXIT or ERR_RETURN
+  was set and the function call or anonymous function returned a
+  zero exit status. 
+- Example:
+```Zsh
       setopt ERR_EXIT
       f() { true }
       ! f
       echo "This is printed only since 5.10."
-
-  - The `always` command now ignores ERR_EXIT and ERR_RETURN, as other
+```
+- The `always` command now ignores `ERR_EXIT` and `ERR_RETURN`, as other
     complex commands do, if its exit status comes from a command
-    executed while the option is ignored. Example:
-
+    executed while the option is ignored. 
+- Example:
+```Zsh
       setopt ERR_EXIT
       { false && true } always { echo "This was and still is printed." }
       echo "This is printed only since 5.10."
-
-  - Function calls, anonymous functions, and the `eval`, `.`, and
-    `source` builtins now never ignore ERR_EXIT and ERR_RETURN on
-    their own. These commands used to ignore ERR_EXIT and ERR_RETURN
-    if their result came from a complex command (if, for, ...) whose
-    result came from a command executed while the option is
-    ignored. Example:
-
+```
+- Function calls, anonymous functions, and the `eval`, `.`, and
+ `source` builtins now never ignore ERR_EXIT and ERR_RETURN on
+  their own. These commands used to ignore ERR_EXIT and ERR_RETURN
+  if their result came from a complex command (if, for, ...) whose
+  result came from a command executed while the option is
+  ignored. 
+- Example:
+```Zsh
       setopt ERR_EXIT
       f() { if true; then false && true; fi }
       f
       echo "This is printed only prior to 5.10."
-
-  - The `&&` and `||` operators now always ignore ERR_RETURN in their
-    left operand. Until this version, the operators failed to ignored
-    ERR_RETURN in their left operand if they were executed as part of
-    a function call or an anonymous function that was itself executed
-    in a context where ERR_RETURN is ignored. Example:
-
+```
+- The `&&` and `||` operators now always ignore `ERR_RETURN` in their
+  left operand. Until this version, the operators failed to ignored
+  `ERR_RETURN` in their left operand if they were executed as part of
+  a function call or an anonymous function that was itself executed
+  in a context where `ERR_RETURN` is ignored. Example:
+```Zsh
       setopt ERR_RETURN
       f() { { false; echo "This is printed only since 5.10." } || true }
       if f; then true; fi
+```
+*PCRE* support is now **PCRE2**.
 
-PCRE support is now PCRE2.
-
-Parameter names may begin with a "." and follow a relaxed implementation
+Parameter names may begin with a **"."** and follow a relaxed implementation
 of ksh namespace syntax.  Expansion of such parameters must use braces,
 that is, in ${.param.name} form.  Parameters so named are excluded from
 `typeset` and `set` output unless explicitly listed in `typeset` arguments
@@ -114,12 +106,12 @@ may change the behavior of some prompt sequences, most notably in
 cases where `esq=${(%)...}` is used to capture an escape sequence.
 
 The `which` and `functions` commands output function definitions in a
-format independent of the MULTI_FUNC_DEF option.
+format independent of the `MULTI_FUNC_DEF` option.
 
 Math context no longer interprets a leading underscore as part of a
 numeric constant.
 
-Nul and characters greater than \x77 are correctly handled by `read -d`.
+Nul and characters greater than `\x77` are correctly handled by `read -d`.
 
 Return values of `sysopen` from the zsh/system module have been updated
 to be more similar to other commands in that module.
