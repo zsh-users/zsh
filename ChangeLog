@@ -1,3 +1,7 @@
+2025-09-25 Çınar Kuzey KUMANLI <root_4rch@proton.me>
+	* 53968: README became README.md
+	Its first 122 lines have got markdown features now.
+
 2025-09-25  Oliver Kiddle  <opk@zsh.org>
 
 	* 53967: Completion/BSD/Command/_procstat,
