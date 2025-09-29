@@ -65,7 +65,7 @@ else
     ;|
     dragonfly*|darwin*)
       args+=(
-	'(-R)-I-[display in ISO 8601 format]::precision [date]:(date hours minutes seconds)'
+	'(-R)-I-[display in ISO 8601 format]::precision [date]:(date hours minutes seconds ns)'
       )
     ;|
     freebsd<-12>.*)
@@ -76,7 +76,7 @@ else
     ;|
     openbsd*|netbsd*) args+=( '-a[gradually skew]' )
     ;|
-    freebsd<14->.*|openbsd*)
+    darwin*|freebsd<14->.*|openbsd*)
       args+=( '-z+[specify timezone for output]:time zone:_time_zone')
     ;|
     freebsd*)
