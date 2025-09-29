@@ -300,12 +300,6 @@ case $OSTYPE in
   ;;
 esac
 
-delegatable_perms+=(
-  allow clone create destroy diff hold key keychange mount promote receive
-  release rename rollback send share snapshot groupquota groupused userprop
-  userused ${ci_ds_props%%:*}
-)
-
 key_properties=(
   'keylocation:location [prompt]:_files -P file\:// -W /'
   'keyformat:format:(raw hex passphrase)'
@@ -315,6 +309,12 @@ key_properties=(
 ro_ds_props+=( $share_ro_properties )
 rw_ds_props+=( $share_rw_properties )
 ci_ds_props+=( $rw_ds_props )
+
+delegatable_perms+=(
+  allow clone create destroy diff hold key keychange mount promote receive
+  release rename rollback send share snapshot groupquota groupused userprop
+  userused ${ci_ds_props%%:*}
+)
 
 ds_propnames=( ${rw_ds_props%%:*} )
 po_propnames=( ${ro_po_props%%:*} ${ci_po_props%%:*} ${rw_po_props%%:*} )
@@ -1080,7 +1080,7 @@ case $service:$words[1] in
   zpool:iostat)
     if [[ $implementation = openzfs ]]; then
       args=(
-        '-c[run scripts on each vdev]:script:_files -W "($ZPOOL_SCRIPTS_PATH /etc/zfs/zpool.d ~/.zpool.d)"'
+        '-c+[run scripts on each vdev]:script:_sequence _files -W "($ZPOOL_SCRIPTS_PATH /etc/zfs/zpool.d ~/.zpool.d)"'
         '-g[display vdev GUIDs instead of normal device names]'
         '-H[suppress headers and tab-delimit fields]'
         '-L[display real paths for vdevs resolving all symbolic links]'
@@ -1249,7 +1249,7 @@ case $service:$words[1] in
       args=(
         '--power[display vdev enclosure slot power status]'
         '-D[display a histogram of deduplication statistics]'
-        '-c[run scripts on each vdev]:script:_files -W "($ZPOOL_SCRIPTS_PATH /etc/zfs/zpool.d ~/.zpool.d)"'
+        '-c+[run scripts on each vdev]:script:_sequence _files -W "($ZPOOL_SCRIPTS_PATH /etc/zfs/zpool.d ~/.zpool.d)"'
         '-e[only show unhealthy vdevs]'
         '-i[display vdev initialization status]'
         '-g[display vdev GUIDs instead of the normal device names]'
