@@ -1,0 +1,28 @@
+#compdef blkid
+
+local ign
+
+(( $#words > 2 )) && ign='!(- *)'
+
+_arguments \
+  "$ign"{-h,--help}'[display usage information]' \
+  "$ign"{-V,--version}'[display version version]' \
+  "$ign"{-L+,--label=}'[convert LABEL to device name]:label' \
+  "$ign"{-U+,--uuid=}'[convert UUID to device name]:uuid' \
+  '(-c --cache-file)'{-c+,--cache-file=}'[read from specified file instead of the default cache file]:cache file (/dev/null means no cache) [/run/blkid/blkid.tab]:_files' \
+  '(-d --no-encoding)'{-d,--no-encoding}"[don't encode non-printing characters]" \
+  '(-D --no-part-details)'{-D,--no-part-details}"[don't print info from partition table]" \
+  '(-g --garbage-collect)'{-g,--garbage-collect}'[garbage collect the blkid cache]' \
+  '(-H --hint)'{-H+,--hint=}'[set hint for probing function]: : _values hint session_offset\:UDF\ multi-session\ offset' \
+  '(-i --info)'{-i,--info}'[gather information about I/O limits]' \
+  '(-k --list-filesystems)'{-k,--list-filesystems}'[list all known filesystems/RAIDs and exit]' \
+  '(-l --list-one)'{-l,--list-one}'[look up only first device with token specified by -t]' \
+  '(-n --match-types)'{-n+,--match-types=}'[filter by filesystem type]: :_sequence _file_systems' \
+  '(-O --offset)'{-O+,--offset=}'[probe at the given offset]: :_numbers -M "m\:{a-zA-Z}={A-Za-z}" offset {K,M,G,T,P,E,Z,Y}{,B,iB}' \
+  '(-o --output)'{-o+,--output=}'[specify output format]:format [full]:(full value list device udev export)' \
+  '(-p --probe)'{-p,--probe}'[probe low-level superblocks]' \
+  \*{-s+,--match-tag=}'[show specified tag(s)]:tag:(none LABEL UUID UUID_SUB TYPE PARTLABEL PARTUUID SEC_TYPE PTUUID PTTYPE ALIGNMENT_OFFSET MINIMUM_IO_SIZE OPTIMAL_IO_SIZE PHYSICAL_SECTOR_SIZE LOGICAL_SECTOR_SIZE)' \
+  '(-S --size)'{-S+,--size=}'[overwrite device size]: :_numbers -M "m\:{a-zA-Z}={A-Za-z}" size {K,M,G,T,P,E,Z,Y}{,B,iB}' \
+  '(-t --match-token)'{-t+,--match-token=}'[find device with a specific token]:token' \
+  '(-u --usages)'{-u+,--usages=}'[filter by usage]:usage:_sequence compadd - {no,}{filesystem,raid,crypto,other}' \
+  '*:device:_files -g "*(-%)"'

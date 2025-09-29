@@ -1,0 +1,677 @@
+#compdef lvchange lvconvert lvcreate lvdisplay lvextend lvm lvmconfig lvmdiskscan lvmdump lvreduce lvremove lvrename lvresize lvs lvscan pvchange pvck pvcreate pvdisplay pvmove pvremove pvresize pvs pvscan vgcfgbackup vgcfgrestore vgchange vgck vgconvert vgcreate vgdisplay vgexport vgextend vgimport vgimportclone vgmerge vgmknodes vgreduce vgremove vgrename vgs vgscan vgsplit
+
+local curcontext="$curcontext" ret=1 cmd=$service
+local -a state line expl vals extra commands args suf
+local -A opt_args
+
+if [[ $service = lvm ]]; then
+  if (( CURRENT == 2 )); then
+    commands=( ${${${${(f)"$(_call_program commands lvm help 2>&1)"}[4,-2]}## #}/ ##/:} )
+    _describe 'command' commands
+    return
+  else
+    cmd=$words[2]
+    curcontext="${curcontext%:*}-$cmd:"
+    shift words
+    ((  CURRENT-- ))
+  fi
+fi
+
+args=(
+  \*{-d,--debug}'[increase debug level]'
+  '(- 1 *)'{-h,--help}'[show usage information]'
+  '(-q --quiet -d --debug -v --verbose)'{-q,--quiet}'[suppress output and log messages]'
+  \*{-v,--verbose}'[increase verbose level]'
+  '(-y --yes)'{-y,--yes}"[don't prompt for confirmation]"
+  '(-t --test)'{-t,--test}"[don't update metadata]"
+  '--commandprofile[specify command profile to use for command config]:command profile'
+  '*--config[override lvm.conf(5) setting]:config string'
+  '--driverloaded=[whether to use device-mapper]:enabled:(y n)'
+  '--nolocking[disable locking]'
+  '--lockopt=[pass options to lvmlockd]:options'
+  '(- 1 *)--longhelp[show long help text]'
+  '--profile=[alias for --commandprofile or --metadataprofile]:string'
+  '(- 1 *)--version[show version information]'
+  '--devicesfile=[specify devices that LVM should use]: :_files -W /etc/lvm/devices'
+  '--devices=[restrict devices that are visible to the command]: :->physical-volumes'
+  "--nohints[don't use hints file to locate devices for PVs]"
+  '--journal=[record information in the systemd journal]:information:((
+    command\:information\ about\ the\ command
+    output\:default\ command\ output
+    debug\:full\ command\ debugging))'
+)
+
+case "$cmd" in
+  lvcreate)
+    args+=(
+      '1: :->qualified-lv'
+      '*: :->physical-volumes'
+    )
+  ;|
+  lvchange|lvconvert|lvdisplay|lvremove|lvresize|lvs|vgmknodes)
+    args+=(
+      '(-S --select)*:logical volume:->qualified-lv'
+    )
+  ;|
+  lvextend|lvresize)
+    args+=(
+      '1:logical volume:->qualified-lv'
+      '*:physical volume:->physical-volumes'
+    )
+  ;|
+  lvreduce)
+    args+=(
+      '1:logical volume:->qualified-lv'
+    )
+  ;|
+  lvrename)
+    args+=(
+      '1:volume group:->volume-groups'
+      '2:logical volume:->logical-volumes'
+      '3:logical volume:->logical-volumes'
+    )
+  ;|
+  pvchange|pvck|pvdisplay|pvmove|pvremove|pvresize|pvs|pvscan|vgimportclone|vgsplit)
+    args+=(
+      '(-S --select)*:physical volume:->physical-volumes'
+    )
+  ;|
+  pvcreate)
+    args+=(
+      '*:physical device:_files -g "*(-%)"'
+    )
+  ;|
+  vgcfgbackup|vgchange|vgck|vgconvert|vgdisplay|vgexport|vgimport|vgremove|vgs)
+    args+=(
+      '(-S --select)*:volume group:->volume-groups'
+    )
+  ;|
+  vgcfgrestore)
+    args+=(
+      '1:volume group:->volume-groups'
+    )
+  ;|
+  vgcreate|vgextend|vgreduce)
+    args+=(
+      '1:volume group:->volume-groups'
+      '*:physical volume:->physical-volumes'
+    )
+  ;|
+  vgmerge|vgrename|vgsplit)
+    args+=(
+      '1:volume group:->volume-groups'
+      '2:volume group:->volume-groups'
+    )
+  ;|
+  lvchange|lvcreate|lvextend|lvreduce|lvremove|lvrename|lvresize|lvs|lvscan|pvchange|pvcreate|pvdisplay|pvmove|pvremove|pvresize|pvs|pvscan|vgcfgbackup|vgchange|vgck|vgconvert|vgcreate|vgexport|vgextend|vgimport|vgmknodes|vgreduce|vgremove|vgrename|vgs|vgscan)
+    args+=(
+      '--reportformat=[set output format for reports]:format:(basic json json_std)'
+    )
+  ;|
+  lvchange|lvconvert|lvextend|lvreduce|lvremove|lvresize|pvchange|pvcreate|pvremove|vgcfgrestore|vgchange|vgconvert|vgcreate|vgextend|vgimport|vgreduce|vgremove|vgrename)
+    args+=(
+      '(-f --force)'{-f,--force}'[override checks, confirmations and protections]'
+    )
+  ;|
+  lvchange|lvcreate|lvextend|lvreduce|lvremove|lvrename|lvresize|pvchange|pvmove|vgchange|vgcreate|vgextend|vgmerge|vgreduce|vgrename|vgsplit)
+    args+=(
+      '(-A --autobackup)'{-A+,--autobackup=}'[backup metadata after a change]:enabled:(y n)'
+    )
+  ;|
+  lvchange|lvdisplay|lvs|lvscan|pvdisplay|pvs|pvscan|vgcfgbackup|vgchange|vgdisplay|vgmknodes|vgs|vgscan)
+    args+=(
+      '--ignorelockingfailure[continue with read-only metadata operations after locking failures]'
+    )
+  ;|
+  lvchange|lvdisplay|lvremove|lvs|pvchange|pvdisplay|pvs|vgchange|vgdisplay|vgexport|vgimport|vgremove|vgs)
+    args+=(
+      '(-S -select *)'{-S+,--select=}'[select objects by criteria]: :->select'
+    )
+  ;|
+  lvchange|lvconvert|lvcreate|lvextend|lvreduce|lvremove|lvrename|lvresize|pvmove|pvscan|vgchange|vgremove)
+    args+=(
+      '--noudevsync[disable udev synchronisation]'
+    )
+  ;|
+  lvchange|lvdisplay|lvmdiskscan|lvs|lvscan|pvdisplay|pvs|vgcfgbackup|vgchange|vgdisplay|vgs)
+    args+=(
+      '--readonly[prevent the command from making changes]'
+    )
+  ;|
+  lvdisplay|lvs|lvscan|pvdisplay|pvs)
+    args+=(
+      '(-a --all)'{-a,--all}'[show information for all]'
+    )
+  ;|
+  pvchange|vgexport|vgimport|vgreduce|vgs)
+    args+=(
+      '(-a --all *)'{-a,--all}'[operate on all]'
+    )
+  ;|
+  lvchange|lvconvert|lvcreate|lvextend|lvresize|pvmove|vgchange|vgcreate|vgsplit)
+    args+=(
+      '--alloc=[set allocation policy for physical extents]:policy:(contiguous cling cling_by_tags normal anywhere inherit)'
+    )
+  ;|
+  lvdisplay|lvs|pvdisplay|pvs|vgcfgbackup|vgdisplay|vgs)
+    args+=(
+      '--foreign[display foreign VGs]'
+    )
+  ;|
+  lvdisplay|lvs|pvdisplay|pvs|vgcreate|vgdisplay|vgs)
+    args+=(
+      '--shared[display shared VGs]'
+    )
+  ;|
+  lvdisplay|lvs|pvdisplay|pvs|vgdisplay|vgs)
+    args+=(
+      '--aligned[align output columns, with --separator]'
+      '--binary[use 0 and 1 instead of descriptive values]'
+      '--configreport=:report name:(log vg lv pv pvseg seg)'
+      '--logonly[suppress command report and display only log report]'
+      '--noheadings[suppress headings line]'
+      '--nosuffix[suppress the suffix on output sizes]'
+      '(-o --options)'{-o+,--options=}'[specify list of fields to display in columns]: :->option-list'
+      '--separator=[specify column separator]:separator'
+      '(-O --sort)'{-O+,--sort=}'[specify list of fields to sort by]:field'
+      '--unbuffered[produce output without sorting or aligning columns]'
+      '--units=[specify units for numbers]:unit:(r R h H b B s S k K m M g G t T p P e E)'
+    )
+  ;|
+  lvchange|lvconvert|lvcreate|lvmconfig|vgchange|vgcreate)
+    args+=(
+      '--metadataprofile=[specify metadata profile to use for command config]:profile'
+    )
+  ;|
+  lvchange|lvconvert|lvcreate|pvcreate|vgcreate|vgextend)
+    args+=(
+      '(-Z --zero)'{-Z+,--zero=}'[control zeroing of first 4KiB of data in the new LV]:enabled [y]:(y n)'
+    )
+  ;|
+  pvck|pvcreate|vgchange|vgconvert|vgcreate|vgextend)
+    args+=(
+      '--pvmetadatacopies=[specify number of metadata areas on PV for storing VG metadata]:copies:(0 1 2)'
+    )
+  ;|
+  pvcreate|vgcfgrestore|vgconvert|vgcreate|vgextend|vgsplit)
+    args+=(
+      '(-M --metadatatype)'{-M+,--metadatatype=}'[specify type of on-disk metadata to use]:type:(lvm2)'
+    )
+  ;|
+
+  lvchange|lvcreate|pvchange|vgchange|vgcreate)
+    args+=(
+      '*--addtag=[add a tag]:tag'
+    )
+  ;|
+  pvck|pvcreate|vgconvert|vgcreate|vgextend)
+    args+=(
+      '--labelsector=[sector to add LVM2 identifier to]:sector [1]:(0 1 2 3)'
+    )
+  ;|
+  lvconvert:lvcreate:lvextend:lvresize)
+    args+=(
+      '--poolmetadatasize=[specify size of the new pool metadata LV]: :_numbers -u m -M "m\:{A-Z}={a-z}" size b s k m g t p e'
+      '(-i --stripes)'{-i+,--stripes=}'[specify number of stripes]:number'
+      '(-I --stripesize)'{-I+,--stripesize=}'[specify amount of data written to a device before moving to the next]: :_numbers -u k -M "m\:{A-Z}={a-z}" size b s k m g t p e'
+      '(-L)--type=[specify LV type]:type [linear]:(linear striped snapshot raid mirror thin thin-pool vdo vdo-pool cache cache-pool writecache error zero)'
+    )
+  ;|
+  lvcreate:lvextend:lvreduce:lvresize)
+    args+=(
+      '(-l --extents)'{-L+,--size=}'[specify size]: :_numbers -u m -M "m\:{A-Z}={a-z}" size b s k m g t p e'
+      '(--size)'{-l+,--extents=}'[specify size in extents]: :_numbers size %'
+    )
+  ;|
+  lvchange|lvcreate|pvscan|vgchange)
+    args+=(
+      '(-a --activate)'{-a+,--activate=}'[control active state of the new LV]:active:(y n ay)'
+    )
+  ;|
+  lvchange|lvcreate|vgchange|vgcreate)
+    args+=(
+      '--setautoactivation=[set the autoactivation property]:enabled:(y n)'
+    )
+  ;|
+  lvchange|vgchange|vgmknodes|vgscan)
+    args+=(
+      '--refresh[if LV is active, reload its metadata]'
+    )
+  ;|
+  lvconvert|lvcreate|pvmove|vgsplit)
+    args+=(
+      '(-n --name)'{-n+,--name=}'[specify logical volume name]:name:->qualified-lv'
+    )
+  ;|
+  lvconvert|lvcreate|vgmerge|vgsplit)
+    args+=(
+      '--poolmetadataspare=[control automatic use of a spare pool metadata LV]:enabled:(y n)'
+    )
+  ;|
+  lvmconfig|pvck|vgcfgbackup|vgcfgrestore)
+    args+=(
+      '(-f --file)'{-f+,--file=}'[write output to named file]: :_files'
+    )
+  ;|
+  pvchange|pvcreate|pvscan|vgchange)
+    args+=(
+      '(-u --uuid)'{-u+,--uuid=}'[specify a UUID for the device]:uuid'
+    )
+  ;|
+  pvcreate|vgconvert|vgcreate|vgextend)
+    args+=(
+      '--metadatasize[specify amount of space used for each VG metadata area]: :_numbers -u m -M "m\:{A-Z}={a-z}" size b s k m g t p e'
+    )
+  ;|
+  lvchange|lvconvert|lvcreate)
+    args+=(
+      '--cachemode=[specify completion criteria for writes to a cache LV]:criterion:(writethrough writeback passthrough)'
+      '--cachepolicy=[specify cache policy for a cache]:policy'
+      '*--cachesettings=[specify tunable values for a cache LV]:setting'
+      '--compression=[control compression state for VDO volume]:enabled:(y n)'
+      '--deduplication=[control dedup state for VDO volume]:enabled:(y n)'
+      '--discards=[specify how the device-mapper thin pool layer should handle discards]:handling:(passdown nopassdown ignore)'
+      '--errorwhenfull=[specify thin pool behavior when data space exhausted]:handling:((y\:error n\:queue))'
+      '--integritysettings=[specify tunable kernel options for dm-integrity]:string'
+      '(-r --readahead)'{-r+,--readahead=}'[set readahead sector count]:sector count'
+      '(-k --setactivationskip)'{-k+,--setactivationskip=}'[persistently set or clear the autoactivation property]:enabled:(y n)'
+      '*--vdosettings=[specify tunable options for a VDO LV]:setting'
+    )
+  ;|
+  lvchange|lvcreate|pvscan)
+    args+=(
+      '(-j --major)'{-j+,--major=}'[set the major number of an LV block device]:number'
+      '--minor=[set the minor number of an LV block device]:number'
+    )
+  ;|
+  lvchange|lvcreate|vgchange)
+    args+=(
+      '(-K --ignoreactivationskip)'{-K,--ignoreactivationskip}'[ignore the "activation skip" LV flag during activation]'
+      "--ignoremonitoring[don't interact with dmeventd]"
+      '--monitor=[monitor LV with dmeventd]:enabled:(y n)'
+    )
+  ;|
+  lvdisplay|pvdisplay|vgdisplay)
+    args+=(
+      '(-c --colon)'{-c,--colon}'[colon separated output]'
+      '(-C --columns)'{-C,--columns}'[display output in columns]'
+    )
+  ;|
+  lvextend|lvreduce|lvresize)
+    args+=(
+      --fs
+      '--fsmode[control file system mounting behavior]:behavior:(manage nochange offline)'
+      '(-n --nofsck)'{-n,--nofsck}"[don't do fsck when resizing the file system with --resizefs]"
+      '(-r --resizefs)'{-r,--resizefs}'[also resize underlying filesystem using fsadm(8)]'
+    )
+  ;|
+  lvs|pvs|vgs)
+    args+=(
+      '--headings[specify type of headings to use in report output]:type:(none abbrev full 0 1 2)'
+      '--nameprefixes[prefix LVM2_ to field names in output]'
+      '--rows[output columns as rows]'
+      "--unquoted[don't quote values in output]"
+    )
+  ;|
+  pvcreate|vgcreate|vgextend)
+    args+=(
+      '--dataalignment=[align start of PV data area with multiple of size]: :_numbers -u k -M "m\:{A-Z}={a-z}" size b s k m g t p e'
+      '--dataalignmentoffset=[offset start of PV data]: :_numbers -u k -M "m\:{A-Z}={a-z}" size b s k m g t p e'
+    )
+  ;|
+  vgchange|vgcreate|vgsplit)
+    args+=(
+      '(-p --maxphysicalvolumes)'{-p+,--maxphysicalvolumes=}'[set maximum number of PVs that can belong to the VG]:number'
+      '--vgmetadatacopies=[number of copies of the VG metadata to keep]: : _alternative
+        "specials\:special\:(all unmanaged)" "copies\: \:_numbers number"'
+    )
+  ;|
+  lvchange|pvchange|vgchange)
+    args+=(
+      '--deltag[delete a tag from an PV, VG or LV]:tag'
+    )
+  ;|
+  lvconvert|lvcreate|lvextend)
+    args+=(
+      '(-m --mirrors)'{-m+,--mirrors=}'[specify number of mirror images]:number'
+    )
+  ;|
+  lvconvert|lvcreate|pvscan)
+    args+=(
+      '(-H --cache)'{-H,--cache}'[handle a cache LV or cache pool]'
+    )
+  ;|
+  lvcreate|lvextend|lvresize)
+    args+=(
+      '--nosync[skip initial synchronisation on mirror/raid creation]'
+    )
+  ;|
+  lvdisplay|lvs|pvs)
+    args+=(
+      '--segments[use default columns that emphasize segment information]'
+    )
+  ;|
+  lvmconfig|vgcfgrestore|vgmerge)
+    args+=(
+      '(-l --list --withsummary --typeconfig)'{-l,--list}'[list config settings with one-line summary comment]'
+    )
+  ;|
+  pvchange|pvcreate|vgextend)
+    args+=(
+      '--metadataignore=[ignore metadata areas on the PV]:ignore:(y n)'
+    )
+  ;|
+  pvdisplay|pvscan|vgdisplay)
+    args+=(
+      '(-s --short)'{-s,--short}'[only display size of the PVs]'
+    )
+  ;|
+  lvchange|lvcreate)
+    args+=(
+      '(-C --contiguous)'{-C+,--contiguous=}'[control contiguous allocation policy]:enabled:(y n)'
+      '--maxrecoveryrate=[set the maximum recovery rate for a raid LV]: :_numbers -u 'k/s' -M "m\:{A-Z}={a-z}" rate b s k m g t p e'
+      '--minrecoveryrate=[set the minimum recovery rate for a raid LV]: :_numbers -u 'k/s' -M "m\:{A-Z}={a-z}" rate b s k m g t p e'
+      '(-p --permission)'{-p+,--permission=}'[set access permission]:permission:(rw r)'
+      '(-M --persistent)'{-M+,--persistent=}'[make minor number persistent]:enabled:(y n)'
+    )
+  ;|
+  lvchange|vgchange)
+    args+=(
+      '--activationmode=[determine if LV activation is allowed when PVs are missing]:mode:(partial degraded complete)'
+      '--detachprofile[detach a metadata profile from a VG or LV]'
+      '(-P --partial)'{-P,--partial}'[activate LVs with missing PV extents]'
+      '--poll=[start background transformation of an LV]:transformation:(y n)'
+      '--sysinit[indicate writable filesystems are not yet available]'
+    )
+  ;|
+  lvconvert|lvcreate)
+    args+=(
+      '--cachedevice=[specify device to use for a cache]: :->physical-volumes'
+      '--cachemetadataformat=[specify cache metadata format used by cache target]:format:(auto 1 2)'
+      '--cachepool=[specify cache volume]: :->qualified-lv'
+      '--cachesize=[specify size of cache to use]: :_numbers -u m -M "m\:{A-Z}={a-z}" size b s k m g t p e'
+      '--cachevol=[specify a cache volume]: :->qualified-lv'
+      '(-c --chunksize)'{-c+,--chunksize=}'[specify size of chunks in a snapshot, cache pool or thin pool]: :_numbers -u k -M "m\:{A-Z}={a-z}" size b s k m g t p e'
+      '--mirrorlog=[specify type of mirror log]:type:(core disk)'
+      '--pooldatavdo:enable:(y n)'
+      '--raidintegrity=[control data integrity checksums for raid images]:enabled:(y n)'
+      '--raidintegrityblocksize=[specify block size to use for integrity on raid]:block size:(512 1024 2048 4096)'
+      '--raidintegritymode=[specify mode for checksum crash consistency]:mode [journal]:(journal bitmap)'
+      '(-R --regionsize)'{-R+,--regionsize=}'[specify size of each raid or mirror synchronisation region]: :_numbers -u m -M "m\:{A-Z}={a-z}" size b s k m g t p e'
+      '(-s --snapshot)'{-s,--snapshot}'[create a snapshot]'
+      '(-T --thin)'{-T,--thin}'[allocate blocks to LV as they are written]'
+      '--thinpool=[specify thin pool LV]:logical volume:->qualified-lv'
+      '--vdopool=[specify name of a VDO pool LV]: :->qualified-lv'
+      '(-V --virtualsize)'{-V+,--virtualsize=}'[specify virtual size for a thin LV]: :_numbers -u m -M "m\:{A-Z}={a-z}" size b s k m g t p e'
+      '(-W --wipesignatures)'{-W+,--wipesignatures=}'[control confirmation prompts when wiping signatures]:wipe:(y n)'
+    )
+  ;|
+  lvconvert|lvextend)
+    args+=(
+      '--usepolicies[perform an operation according to configured policy]'
+    )
+  ;|
+  lvconvert|pvck)
+    args+=(
+      '--repair[replace failed PVs in a raid or mirror LV]'
+    )
+  ;|
+  lvconvert|pvmove)
+    args+=(
+      '(-b --background)'{-b,--background}'[do polling in the background]'
+      '(-i --interval)'{-i+,--interval=}'[report progress at regular intervals]:interval'
+    )
+  ;|
+  lvdisplay|lvs)
+    args+=(
+      '(-H --history)'{-H,--history}'[include historical LVs]'
+    )
+  ;|
+  lvdisplay:pvdisplay)
+    args+=(
+      '(-m --maps)'{-m,--maps}'[display mapping of logical extents to PVs and physical extents]'
+    )
+  ;|
+  pvcreate|pvresize)
+    args+=(
+      '--setphysicalvolumesize=[override auto-detected size of the PV]: :_numbers -u m -M "m\:{A-Z}={a-z}" size b s k m g t p e'
+    )
+  ;|
+  pvcreate|vgconvert)
+    args+=(
+      '--bootloaderareasize=[reserve space for bootloader between LVM metadata and first PE]: :_numbers -u m -M "m\:{A-Z}={a-z}" size b s k m g t p e'
+    )
+  ;|
+  pvs|pvscan)
+    args+=(
+      '(-A --allpvs)'{-A,--allpvs}'[show information on PVs outside the devices file]'
+    )
+  ;|
+  pvscan|vgchange)
+    args+=(
+      '--autoactivation[specify if autoactivation is being used from an event]:string'
+    )
+  ;|
+  vgchange|vgcreate)
+    args+=(
+      '--locktype=[specify VG lock type]:lock type:(sanlock dlm none)'
+      '(-s --physicalextentsize)'{-s+,--physicalextentsize=}'[set physical extent size of PVs in the VG]: :_numbers -u m -M "m\:{A-Z}={a-z}" size b s k m g t p e'
+      '--systemid=[specify system ID that will be given to the new VG]:ID'
+    )
+  ;|
+  vgcreate|vgsplit)
+    args+=(
+      '--maxlogicalvolumes=[set maximum number of LVs allowed in a VG]:number'
+    )
+  ;|
+
+  lvchange)
+    args+=(
+      '--rebuild=[select a PV to rebuild in a raid LV]:physical volume:->physical-volumes'
+      '--resync[initiate mirror synchronization]'
+      '--syncaction=[initiate different types of RAID synchronization]:action:(check repair)'
+      '--writebehind=[maximum number of outstanding writes that are allowed to devices]:max'
+      '--writemostly=[mark a device in a RAID1 LV as write-mostly]:device:->physical-volumes'
+    )
+  ;;
+  lvconvert)
+    args+=(
+      '--merge[alias for --mergethin, --mergemirrors, or --mergesnapshot depending on LV type]'
+      '--mergemirrors[merge LV images that were split from a raid1 LV]'
+      '--mergesnapshot[merge COW snapshot LV into its origin]'
+      '--mergethin[merge thin LV into its origin LV]'
+      '--originname=[specify name to use for external origin LV when converting an LV to a thin LV]: :->logical-volumes'
+      '--poolmetadata=[specify LV to use for storing pool metadata]: :->qualified-lv'
+      '--replace=[replace a specific PV in a raid LV with another PV]: :->physical-volumes'
+      '--splitcache[separates a cache pool from a cache LV]'
+      '--splitmirrors=[splits specified number of images from a raid1 or mirror LV]:number'
+      '--splitsnapshot[separate a COW snapshot from its origin LV]'
+      '--startpoll[start polling an LV to continue processing a conversion]'
+      '--swapmetadata[extract metadata LV from a pool and replaces it with another specified LV]'
+      '--trackchanges[with --splitmirrors, track changes to the original RAID1 LV while split images remain detached]'
+      '--uncache[separate a cache pool from a cache LV]'
+    )
+  ;;
+  lvcreate)
+    args+=(
+      '--vdo[support for Virtual Data Optimizer]'
+    )
+  ;;
+  lvmconfig)
+    args+=(
+      '--atversion=[limit displayed config to settings known by specified LVM version]:version (x.y.z)'
+      '--ignoreadvanced[exclude advanced config settings from output]'
+      '--ignorelocal[ignore the local section from lvmlocal.conf]'
+      '--ignoreunsupported[exclude unsupported config settings from output]'
+      '--mergedconfig[merge config from difference sources for display]'
+      '--showdeprecated[include deprecated config settings]'
+      '--showunsupported[include unsupported config settings]'
+      '--sinceversion=[display config settings introduced since specified version]:version (x.y.z)'
+      '--typeconfig=[print config settings that would be applied to an lvm command]:type:(current default diff full list missing new profilable profilable-command profilable-metadata)'
+      '!--unconfigured'
+      '--validate[validate current config and exit with appropriate return code]'
+      '--valuesonly[when printing settings, print only values without keys]'
+      '--withcomments[displau a full comment for each config node]'
+      '--withgeneralpreamble[include general config file preamble]'
+      '--withlocalpreamble[include local config file preamble]'
+      '--withspaces[add more spaces to output for better readability]'
+      '(-l --list)--withsummary[display a one-line comment for each config node]'
+      '--withversions[display version of introduction for each config node]'
+    )
+  ;;
+  lvmdiskscan)
+    args+=(
+      '(-l --lvmpartition)'{-l,--lvmpartition}'[only report PVs]'
+    )
+  ;;
+  lvremove)
+    args+=(
+      "--nohistory[don't record history of LVs being removed]"
+    )
+  ;;
+  lvscan)
+    args+=(
+      '!(-b --blockdevice)'{-b,--blockdevice}
+    )
+  ;;
+  pvchange)
+    args+=(
+      '(-x --allocatable)'{-x+,--allocatable=}'[enable or disable allocation of physical extents on this PV]:enable:(y n)'
+    )
+  ;;
+  pvck)
+    args+=(
+      '--repairtype[repair headers and metadata on a PV]:type:(pv_header metadata label_header)'
+      '*--settings[specify command specific settings]:setting (key=value)'
+    )
+  ;;
+  pvcreate)
+    args+=(
+      '--norestorefile[allow a uuid to be specified without a metadata backup]'
+      '--restorefile=[extract location and size from a file produced by vgcfgbackup]:file:_files'
+    )
+  ;;
+  pvmove)
+    args+=(
+      '--abort[abort any pvmove operations in progress]'
+      '--atomic[ensure that either all or none of the LVs are moved]'
+    )
+  ;;
+  pvscan)
+    args+=(
+      '--checkcomplete[check if all the devices used by a VG or LV are present]'
+      '(-e --exported)'{-e,--exported}'[only show PVs belonging to exported VGs]'
+      '--listlvs[print a list of LVs that use the device]'
+      '--listvg[print the VG that uses the device]'
+      '(-n --novolumegroup)'{-n,--novolumegroup}'[only show PVs not belonging to any VG]'
+      '--udevoutput[format command output to be imported from a udev rule]'
+      '--vgonline[the first command to see a complete VG will report it uniquely]'
+    )
+  ;;
+  vgchange)
+    args+=(
+      '(--lockstop)--lockstart[start the lockspace of a shared VG in lvmlockd]'
+      '(--lockstart)--lockstop[stop the lockspace of a shared VG in lvmlockd]'
+      '(-l --logicalvolume)'{-l+,--logicalvolume=}'[set maximum number of LVs allowed in a VG]:number'
+      --majoritypvs
+      '(-x --resizeable)'{-x+,--resizeable=}'[enable or disable addition or removal of PVs in a VG]:enable:(y n)'
+    )
+  ;;
+  vgck)
+    args+=(
+      '--updatemetadata[update VG metadata to correct problems]'
+    )
+  ;;
+  vgcreate)
+    args+=(
+      '!(-c --clustered)'{-c+,--clustered=}':enable:(y n)'
+    )
+  ;;
+  vgdisplay)
+    args+=(
+      '(-A --activevolumegroups)'{-A,--activevolumegroups}'[only select active VGs]'
+    )
+  ;;
+  vgextend)
+    args+=(
+      '--restoremissing[add a PV back to a VG where the PV returned after being missing]'
+    )
+  ;;
+  vgimportclone)
+    args+=(
+      '(-n --basevgname)'{-n+,--basevgname=}'[override the base VG name that is used for all VG renames]:base name'
+      '(-i --import)'{-i,--import}'[import exported VGs]'
+      '--importdevices[add devices to the devices file]'
+    )
+  ;;
+  vgreduce)
+    args+=(
+      '--mirrorsonly[only remove missing PVs from mirror LVs]'
+      '--removemissing[remove all missing PVs from the VG]'
+    )
+  ;;
+  vgscan)
+    args+=(
+      '--mknodes[check LVM special files in /dev, create missing ones, remove unused ones]'
+      '--notifydbus[send a notification to D-Bus]'
+    )
+  ;;
+  help)
+    commands=( ${${${${(f)"$(_call_program commands lvm help 2>&1)"},-2}## #}/ ##/:} )
+    _describe 'command' commands
+    return
+  ;;
+esac
+
+_arguments -C -S -s $args && ret=0
+
+case $state in
+  qualified-lv)
+    if compset -P 1 '*/'; then
+      state=logical-volumes
+    else
+      state=volume-groups
+      suf=( -qS/ )
+    fi
+  ;;
+  option-list)
+    state=options
+    compset -P '(*,|[-+\#])' || extra=(
+      '+:append'
+      '-:remove'
+      '#:compact'
+    )
+    suf=( -qS, )
+  ;;
+  select)
+    state=options
+    suf=( -S '' )
+  ;;
+esac
+
+case $state in
+  logical-volumes)
+    vals=( $(_call_program logical-volumes lvs --noheadings -o lv_name) )
+    _wanted logical-volumes expl 'logical volume' compadd "$suf[@]" -a vals && ret=0
+  ;;
+  physical-volumes)
+    if compset -P '*:'; then
+      _message -e ranges range
+    else
+      vals=( $(_call_program physical-volumes pvs --noheadings -o pv_name) )
+      _wanted physical-volumes expl 'physical volume' compadd \
+          -M 'l:|=/dev/ r:|/=* r:|=*' -r ': \t\n\-' "$suf[@]" -a vals && ret=0
+    fi
+  ;;
+  volume-groups)
+    vals=( $(_call_program volume-groups vgs --noheadings -o vg_name) )
+    _wanted volume-groups expl 'volume group' compadd "$suf[@]" -a vals && ret=0
+  ;;
+  options)
+    vals=( ${${${(M)${(f)"$(_call_program options
+        pvs --options help 2>&1)"}:#* - *}## #}/ ##- /:} )
+    _describe -t fields field vals "$suf[@]" -- extra -S '' && ret=0
+  ;;
+esac
+
+return ret
