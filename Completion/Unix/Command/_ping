@@ -183,6 +183,8 @@ case ${variant}:${${service#ping}:-4} in
       '-k+[specify traffic class to use for sending ICMP packets]:traffic class [CTL]:(BK_SYS BK BE RD OAM AV RV VI VO CTL)'
       '--apple-connect[connects the socket to the destination address]'
       '--apple-time[prints the time a packet was received]'
+      '--apple-print-id[display echo ID]'
+      '--apple-print-req[display echo request]'
     )
   ;;
   openbsd*)

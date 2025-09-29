@@ -29,11 +29,11 @@ case $variant in
       '-U[add variables from user and system login.conf(5)]: :->user-class'
     )
   ;|
-  freebsd*|netbsd*)
-    args+=( '-C+[change working directory]:directory:_directories' )
-  ;|
-  freebsd*|darwin*|netbsd*)
-    args+=( '-0[use NUL, not newline after each variable in output]' )
+  darwin*|freebsd*|netbsd*)
+    args+=(
+      '-C+[change working directory]:directory:_directories'
+      '-0[use NUL, not newline after each variable in output]'
+    )
   ;|
   freebsd*|darwin*|dragonfly*|netbsd*|openbsd*)
     args+=(
