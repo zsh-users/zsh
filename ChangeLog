@@ -1,3 +1,8 @@
+2025-09-30  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* Christoph Erhardt: 53981: Completion/Redhat/Command/_dnf5:
+	fix completion of local rpm files
+
 2025-09-29  Oliver Kiddle  <opk@zsh.org>
 
 	* Ryan Rotter: github #145: Completion/Unix/Command/_install:
