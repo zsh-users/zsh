@@ -59,6 +59,8 @@ _git-add () {
     '(-f --force)'{-f,--force}'[allow adding otherwise ignored files]' \
     '(-i --interactive : -)'{-i,--interactive}'[add contents interactively to index]' \
     '(-p --patch)'{-p,--patch}'[like -i but go directly into patch mode for specified files]' \
+    '(-U --unified)'{-U+,--unified=}'[generate diff with given lines of context]:number of lines' \
+    '--inter-hunk-context=[combine patch hunks closer than specified number of lines]:number of lines' \
     '(-e --edit)'{-e,--edit}'[open diff against index in editor]' \
     '(-A --all --no-ignore-removal -u --update --no-all --ignore-removal --renormalize)'{-A,--all,--no-ignore-removal}'[add, modify, and remove index entries to match the working tree]' \
     '(-A --all --no-ignore-removal -u --update --no-all --ignore-removal --renormalize)'{--no-all,--ignore-removal}'[like "--all" but ignore removals]' \
@@ -187,6 +189,13 @@ _git-archive () {
   esac
 
   return ret
+}
+
+(( $+functions[_git-backfill] )) ||
+_git-backfill() {
+  _arguments -S \
+    '--min-batch-size=[specify minimum number of objects to request at a time]:number of objects' \
+    '--sparse[only download objects at a path matching current sparse-checkout]'
 }
 
 (( $+functions[_git-bisect] )) ||
@@ -336,7 +345,7 @@ _git-branch () {
     "($c $m $d : -r --remotes)-a[list both remote-tracking branches and local branches]" \
     "($c $m $d : -v -vv --verbose)"{-v,-vv,--verbose}'[show SHA1 and commit subject line for each head]' \
     "($c $m $d :)--abbrev=[use specified digits to display object names]:digits" \
-    "($c $m $d :)--no-abbrev[don't abbreviate sha1s]" \
+    "($c $m $d :)--no-abbrev[don't abbreviate object names]" \
     "(- :)--show-current[show current branch name]" \
     "($l $m $d)--create-reflog[create the branch's reflog]" \
     "($l $m $d -f --force)"{-f,--force}'[force the creation of a new branch]' \
@@ -472,20 +481,24 @@ _git-checkout () {
 
   _arguments -C -s \
     '(-q --quiet)'{-q,--quiet}'[suppress progress reporting]' \
-    '(-f --force -m --merge --conflict --patch)'{-f,--force}'[force branch switch/ignore unmerged entries]' \
-    '(-q --quiet -2 --ours -3 --theirs --patch)'{-2,--ours}'[check out stage #2 for unmerged paths]' \
-    '(-q --quiet -2 --ours -3 --theirs --patch)'{-3,--theirs}'[check out stage #3 for unmerged paths]' \
-    '(   -B --orphan -2 --ours -3 --theirs --conflict --patch -d --detach)-b+[create a new branch based at given commit]: :__git_branch_names' \
-    '(-b    --orphan -2 --ours -3 --theirs --conflict --patch -d --detach)-B+[create or update branch based at given commit]: :__git_branch_names' \
-    '(--track --no-track --orphan --patch -d --detach)-t[set upstream info for new branch]' \
-    '(-t --no-track --orphan --patch -d --detach)--track=-[set upstream info for new branch]::configuration:(direct inherit)' \
-    '(--patch)--no-track[override the branch.autosetupmerge configuration variable]' \
+    '(-f --force -m --merge --conflict -p --patch -U --unified --inter-hunk-context)'{-f,--force}'[force branch switch/ignore unmerged entries]' \
+    '(-q --quiet -2 --ours -3 --theirs -p --patch -U --unified --inter-hunk-context)'{-2,--ours}'[check out stage #2 for unmerged paths]' \
+    '(-q --quiet -2 --ours -3 --theirs -p --patch -U --unified --inter-hunk-context)'{-3,--theirs}'[check out stage #3 for unmerged paths]' \
+    '(   -B --orphan -2 --ours -3 --theirs --conflict -p --patch -U --unified --inter-hunk-context -d --detach)-b+[create a new branch based at given commit]: :__git_branch_names' \
+    '(-b    --orphan -2 --ours -3 --theirs --conflict -p --patch -U --unified --inter-hunk-context -d --detach)-B+[create or update branch based at given commit]: :__git_branch_names' \
+    '(--orphan -2 --ours -3 --theirs --conflict -p --patch -U --unified --inter-hunk-context -d --detach)-l[create reflog for new branch]' \
+    '(--track --no-track --orphan -p --patch -U --unified --inter-hunk-context -d --detach)-t[set upstream info for new branch]' \
+    '(-t --no-track --orphan -p --patch -U --unified --inter-hunk-context -d --detach)--track=-[set upstream info for new branch]::configuration:(direct inherit)' \
+    '(-p --patch -U --unified --inter-hunk-context)--no-track[override the branch.autosetupmerge configuration variable]' \
     $new_branch_reflog_opt \
-    '(-b -B -t --track --patch --orphan -d --detach)'{-d,--detach}'[detach the HEAD at named commit]' \
-    '(-b -B -t --track --patch -d --detach)--orphan=[create a new orphan branch based at given commit]: :__git_branch_names' \
-    '(-q --quiet -f --force -m --merge --conflict --patch)'{-m,--merge}'[3way merge current branch, working tree and new branch]' \
-    '(-q --quiet -f --force -m --merge --patch)--conflict=[same as --merge, using given merge style]:style:(merge diff3 zdiff3)' \
-    '(-)'{-p,--patch}'[interactively select hunks in diff between given tree-ish and working tree]' \
+    '(-b -B -t --track -p --patch -U --unified --inter-hunk-context --orphan -d --detach)'{-d,--detach}'[detach the HEAD at named commit]' \
+    '(-b -B -t --track -p --patch -U --unified --inter-hunk-context -d --detach)--orphan=[create a new orphan branch based at given commit]: :__git_branch_names' \
+    "--no-overwrite-ignore[don't update ignored files]" \
+    '(-q --quiet -f --force -m --merge --conflict -p --patch -U --unified --inter-hunk-context)'{-m,--merge}'[3way merge current branch, working tree and new branch]' \
+    '(-q --quiet -f --force -m --merge -p --patch -U --unified --inter-hunk-context)--conflict=[same as --merge, using given merge style]:style:(merge diff3 zdiff3)' \
+    '(-f --force -2 --ours -3 --theirs -b -B -t --track --no-track -d --detach --orphan)'{-p,--patch}'[interactively select hunks in diff between given tree-ish and working tree]' \
+    '(-U --unified -f --force -2 --ours -3 --theirs -b -B -t --track --no-track -d --detach --orphan)'{-U+,--unified=}'[generate diff with given lines of context]:number of lines' \
+    '(-f --force -2 --ours -3 --theirs -b -B -t --track --no-track -d --detach --orphan)--inter-hunk-context=[combine patch hunks closer than specified number of lines]:number of lines' \
     "--ignore-skip-worktree-bits[don't limit pathspecs to sparse entries only]" \
     "--no-guess[don't second guess 'git checkout <no-such-branch>']" '!(--no-guess)--guess' \
     "--ignore-other-worktrees[don't check if another worktree is using this branch]" \
@@ -661,12 +674,13 @@ _git-clone () {
     '(--bare)--mirror[clone refs into refs/* instead of refs/remotes/origin/*]' \
     '(-o --origin --bare)'{-o+,--origin=}'[use given remote name instead of "origin"]: :__git_guard_branch-name' \
     '(-b --branch)'{-b+,--branch=}'[point HEAD to the given branch]: :__git_guard_branch-name' \
+    '--revision=[clone and check out single revision]:revision' \
     '(-u --upload-pack)'{-u+,--upload-pack=}'[specify path to git-upload-pack on remote side]:remote path' \
     '--template=[directory to use as a template for the object database]: :_directories' \
     '*'{-c,--config}'[<key>=<value> set a configuration variable in the newly created repository]' \
     '(--bundle-uri)--depth[create a shallow clone, given number of revisions deep]: :__git_guard_number depth' \
     '(--bundle-uri)--shallow-since=[shallow clone since a specific time]:time' \
-    '(--bundle-uri)*--shallow-exclude=[shallow clone excluding commits reachable from specified remote revision]:revision' \
+    '(--bundle-uri)*--shallow-exclude=[shallow clone excluding commits reachable from specified remote ref]:reference' \
     '(--no-single-branch)--single-branch[clone only history leading up to the main branch or the one specified by -b]' \
     '(--single-branch)--no-single-branch[clone history leading up to each branch]' \
     "--no-tags[don't clone any tags and make later fetches not follow them]" \
@@ -734,7 +748,9 @@ _git-commit () {
     "--no-ahead-behind[don't display detailed ahead/behind counts relative to upstream branch]" \
     '(--short             --dry-run)--porcelain[dry run with machine-readable output format]' \
     '(--short --porcelain --dry-run -z --null)'{-z,--null}'[dry run with NULL-separated output format]' \
-    {-p,--patch}'[use the interactive patch selection interface to choose which changes to commit]' \
+    '(-p --patch)'{-p,--patch}'[use the interactive patch selection interface to choose which changes to commit]' \
+    '(-U --unified)'{-U+,--unified=}'[generate diff with given lines of context]:number of lines' \
+    '--inter-hunk-context=[combine patch hunks closer than specified number of lines]:number of lines' \
     '(--reset-author)--author[override the author name used in the commit]:author name' \
     '--date=[override the author date used in the commit]:date' \
     '*--trailer=[add custom trailer]:trailer:__git_trailers_tokens' \
@@ -1024,6 +1040,7 @@ _git-gc () {
     '--cruft[pack unreferenced objects separately]' \
     '(-q --quiet)'{-q,--quiet}'[suppress progress reporting]' \
     '--keep-largest-pack[repack all other packs except the largest pack]' \
+    '--expire-to=[write a cruft pack containing pruned objects to specified directory]: :_directories'
 }
 
 (( $+functions[_git-grep] )) ||
@@ -1413,6 +1430,7 @@ _git-notes () {
             '(--no-separator)--separator=-[insert text between paragraphs]::paragraph break' \
             '(--separator)--no-separator' \
             '--stripspace[remove unnecessary whitespace]' \
+            '(-e --edit)'{-e,--edit}'[edit the note message before adding]' \
             ': :__git_commits' && ret=0
           ;;
         (copy)
@@ -1561,6 +1579,8 @@ _git-range-diff () {
     '(--no-notes)*--notes=[show notes that annotate commit, with optional ref argument show this notes ref instead of the default notes ref(s)]:: :__git_notes_refs' \
     '(--right-only)--left-only[only emit output related to the first range]' \
     '(--left-only)--right-only[only emit output related to the second range]' \
+    '(--remerge-diff)--diff-merges=[specify diff format to be used for merge commits]:format [m]:(off none 1 first-parent separate c combined cc dense-combined r remerge m on)' \
+    '(--diff-merges -p --patch -u)--remerge-diff[produce remerge-diff output for merge commits]' \
     $diff_options \
     '1:range 1:__git_commit_ranges' \
     '2:range 2:__git_commit_ranges' \
@@ -1623,14 +1643,16 @@ _git-reset () {
   typeset -A opt_args
 
   _arguments -C -s -S $endopt \
-      '(       --mixed --hard --merge --keep -p --patch -- *)--soft[do not touch the index file nor the working tree]' \
-      '(--soft         --hard --merge --keep -p --patch -- *)--mixed[reset the index but not the working tree (default)]' \
-      '(--soft         --hard --merge --keep -p --patch -- *)'{-N,--intent-to-add}'[record only the fact that removed paths will be added later]' \
-      '(--soft --mixed        --merge --keep -p --patch -- *)--hard[match the working tree and index to the given tree]' \
-      '(--soft --mixed --hard         --keep -p --patch -- *)--merge[reset out of a conflicted merge]' \
-      '(--soft --mixed --hard --merge        -p --patch -- *)--keep[like --hard, but keep local working tree changes]' \
+      '(       --mixed --hard --merge --keep -p --patch -U --unified --inter-hunk-context -- *)--soft[do not touch the index file nor the working tree]' \
+      '(--soft         --hard --merge --keep -p --patch -U --unified --inter-hunk-context -- *)--mixed[reset the index but not the working tree (default)]' \
+      '(--soft --mixed        --merge --keep -p --patch -U --unified --inter-hunk-context -- *)--hard[match the working tree and index to the given tree]' \
+      '(--soft --mixed --hard         --keep -p --patch -U --unified --inter-hunk-context -- *)--merge[reset out of a conflicted merge]' \
+      '(--soft --mixed --hard --merge        -p --patch -U --unified --inter-hunk-context -- *)--keep[like --hard, but keep local working tree changes]' \
       '--recurse-submodules=-[control recursive updating of submodules]::reset:__git_commits' \
-      '(-p --patch)'{-p,--patch}'[select diff hunks to remove from the index]' \
+      '(-p --patch --soft --mixed -N --intent-to-add --hard --merge --keep)'{-p,--patch}'[select diff hunks to remove from the index]' \
+      '(-U --unified --soft --mixed -N --intent-to-add --hard --merge --keep)'{-U+,--unified=}'[generate diff with given lines of context]:number of lines' \
+      '(--soft --mixed -N --intent-to-add --hard --merge --keep)--inter-hunk-context=[combine patch hunks closer than specified number of lines]:number of lines' \
+      '(-N --intent-to-add --soft --mixed --hard --merge --keep -p --patch -U --unified --inter-hunk-context -- *)'{-N,--intent-to-add}'[record only the fact that removed paths will be added later]' \
       '(-q --quiet)'{-q,--quiet}'[suppress all output]' \
       '--no-refresh[skip refreshing the index after reset]' \
       '(*)--pathspec-from-file=[read pathspec from file]:file:_files' \
@@ -1676,6 +1698,8 @@ _git-restore() {
     '(-2 --ours -3 --theirs -m --merge)'{-2,--ours}'[checkout our version for unmerged files]' \
     '(-2 --ours -3 --theirs -m --merge)'{-3,--theirs}'[checkout their version for unmerged files]' \
     '(-p --patch)'{-p,--patch}'[select hunks interactively]' \
+    '(-U --unified)'{-U+,--unified=}'[generate diff with given lines of context]:number of lines' \
+    '--inter-hunk-context=[combine patch hunks closer than specified number of lines]:number of lines' \
     "--ignore-skip-worktree-bits[don't limit pathspecs to sparse entries only]" \
     '(*)--pathspec-from-file=[read pathspec from file]:file:_files' \
     '(*)--pathspec-file-nul[pathspec elements are separated with NUL character]' \
@@ -1939,6 +1963,8 @@ _git-stash () {
         drop:'remove a single stashed state from the stash list'
         create:'create a stash without storing it in the ref namespace'
         store:'store a stash created with git stash create in the stash ref'
+        export:'export stashes as commits'
+        import:'import stashes from commit'
       )
 
       _describe -t commands command commands && ret=0
@@ -2002,10 +2028,20 @@ _git-stash () {
         (store)
           _arguments -S -s $endopt \
             '(-m --message)'{-m+,--message=}'[specify stash description]:description' \
-            '(-q --quiet)'{-q,--quiet}'[suppress all output]' && ret=0
+            '(-q --quiet)'{-q,--quiet}'[suppress all output]' \
+            ':commit' && ret=0
         ;;
         (create)
           _message -e messages message
+        ;;
+        export)
+          _arguments -S -s $endopt \
+            "--print[don't store commits in the ref namespace but print object IDs]" \
+            '--to-ref=[store commits to the specified ref]:ref' \
+            ':: :__git_stashes' && ret=0
+        ;;
+        import)
+          _message -e commits commit
         ;;
         (*)
           _nothing
@@ -2032,9 +2068,9 @@ _git-status () {
     '(-s --short)--show-stash[show stash information]' \
     '!(--no-ahead-behind)--ahead-behind' \
     "--no-ahead-behind[don't display detailed ahead/behind counts relative to upstream branch]" \
-    '(-u --untracked-files)'{-u-,--untracked-files=-}'[show untracked files]::mode:((no\:"show no untracked files" \
+    '(-u --untracked-files)'{-u-,--untracked-files=-}'[show untracked files]::mode [all]:((no\:"show no untracked files" \
                                                                                      normal\:"show untracked files and directories" \
-                                                                                     all\:"also show untracked files in untracked directories (default)"))' \
+                                                                                     all\:"also show untracked files in untracked directories"))' \
     '--ignore-submodules[ignore changes to submodules]:: :__git_ignore_submodules_whens' \
     '--ignored=-[show ignored files as well]:mode [traditional]:(traditional matching no)' \
     '(-z --null --column --no-column)'{-z,--null}'[use NUL termination on output]' \
@@ -2418,6 +2454,7 @@ _git-worktree() {
             '(--no-track -d --detach)--track[set upstream info for new branch]' \
             "(--track -d --detach)--no-track[don't set upstream info for new branch]" \
             '(-q --quiet)'{-q,--quiet}'[suppress feedback messages]' \
+            '--relative-paths[use relative paths for worktrees]' \
 	    ':path:_directories' $args && ret=0
 	;;
         (prune)
@@ -2437,7 +2474,9 @@ _git-worktree() {
 	  _arguments -C -S $endopt '--reason=[specify reason for locking]:reason' ': :->worktrees' && ret=0
 	;;
 	(move)
-	  _arguments -C \
+          _arguments -C -S $endopt \
+            '(-f --force)'{-f,--force}'[force move even if worktree is dirty or locked]' \
+            '--relative-paths[use relative paths for worktrees]' \
             ': :->worktrees' \
             ':location:_directories' && ret=0
 	;;
@@ -2447,7 +2486,9 @@ _git-worktree() {
             ': :->worktrees' && ret=0
 	;;
         (repair)
-          _directories && ret=0
+          _arguments -C -S $endopt \
+            '--relative-paths[use relative paths for worktrees]' \
+            ':path:_directories' && ret=0
         ;;
 	(unlock)
 	  state=worktrees
@@ -3821,11 +3862,18 @@ _git-fast-export () {
   # TODO: * should be git-rev-arg and git-rev-list arguments.
   _arguments -S -s $endopt \
     '--progress=[insert progress statements]: :__git_guard_number interval' \
-    '--signed-tags=[specify how to handle signed tags]:action:((verbatim\:"silently export"
-                                                                warn\:"export, but warn"
-                                                                warn-strip\:"export as unsigned tags, but warn"
-                                                                strip\:"export as unsigned tags instead"
-                                                                abort\:"abort on signed tags (default)"))' \
+    '--signed-tags=[select handling of signed tags]:mode [abort]:((
+      verbatim\:"silently export"
+      warn-verbatim\:"export, but warn"
+      warn-strip\:"export as unsigned tags, but warn"
+      strip\:"export as unsigned tags instead"
+      abort\:"abort on signed tags"))' \
+    '--signed-commits=[select handling of signed commits]:mode [strip]:((
+      verbatim\:"silently export"
+      warn-verbatim\:"export, but warn"
+      warn-strip\:"export as unsigned tags, but warn"
+      strip\:"export as unsigned tags instead"
+      abort\:"abort on signed tags"))' \
     '--tag-of-filtered-object=[specify how to handle tags whose tagged object is filtered out]:action:((abort\:"abort on such tags"
                                                                                                         drop\:"omit such tags"
                                                                                                         rewrite\:"tag ancestor commit"))' \
@@ -3963,6 +4011,7 @@ _git-reflog () {
           'delete:delete entries from reflog'
           'list:list all refs that have a corresponding reflog'
           'show:show log of ref'
+          'drop:remove reflog for specified references'
           'exists:check whether a ref has a reflog'
 	)
 
@@ -3986,25 +4035,24 @@ _git-reflog () {
               '--verbose[output additional information]' && ret=0
             ;;
           (delete)
-            _arguments -C -S \
+            _arguments -S \
               '(-n --dry-run)'{-n,--dry-run}"[don't update entries; show what would be done]" \
               '--updateref[update ref with SHA-1 of top reflog entry after expiring or deleting]' \
               '--rewrite[adjust reflog entries to ensure old SHA-1 points to new SHA-1 of previous entry after expiring or deleting]' \
               '--verbose[output additional information]' \
-              '*:: :->reflog-entry' && ret=0
-
-            case $state in
-              (reflog-entry)
-                # TODO: __git_ignore_line doesn't work here for some reason.
-                __git_ignore_line __git_reflog_entries && ret=0
-                ;;
-            esac
+              '*:: : __git_ignore_line __git_reflog_entries' && ret=0
             ;;
           (show|--*)
             _arguments -S \
               $revision_options \
               ':: :__git_references' && ret=0
             ;;
+          drop)
+            _arguments -S \
+              '(*)--all[drop reflogs of all references from all worktrees]' \
+              '(*)--single-worktree[limit processing to reflogs from the current working tree]' \
+              '*:: : __git_ignore_line __git_reflog_entries' && ret=0
+          ;;
 	  (exists)
 	    __git_references && ret=0
 	    ;;
@@ -4042,7 +4090,8 @@ _git-refs() {
         migrate)
           _arguments -S -s $endopt \
             '--ref-format=[specify ref format to migrate the ref store to]:ref format:(files reftable)' \
-            "--dry-run[perform the migration, but don't modify the repository]" && ret=0
+            "--dry-run[perform the migration, but don't modify the repository]" \
+            '--no-reflog[discard reflog data rather than migrate it]' && ret=0
         ;;
         verify)
           _arguments -S -s $endopt \
@@ -4171,11 +4220,14 @@ _git-repack () {
     '(-a -k --keep-unreachable)-A[pack all objects into a single pack, but unreachable objects become loose]' \
     '--cruft[pack unreachable cruft objects separately]' \
     '--cruft-expiration=[expire cruft objects older than specified time]: :_git_approxidates' \
+    '--combine-cruft-below-size=[only repack cruft packs smaller than specified size]: : __git_guard_bytes' \
     '--max-cruft-size=[with --cruft, limit the size of new cruft packs]: : __git_guard_bytes "maximum cruft size"' \
     '-d[remove redundant packs after packing]' \
     "--unpack-unreachable=[with -A, don't loosen objects older than specified date]: :_git_approxidates" \
     '-f[pass --no-reuse-delta option to git pack-objects]' \
     '-F[pass --no-reuse-object option to git pack-objects]' \
+    '--name-hash-version=[use the specified name-hash function to group similar objects]:name hash version [1]:(1 2)' \
+    '--path-walk[use the path-walk API to walk objects when possible]' \
     "-n[don't update server information]" \
     '(-q --quiet)'{-q,--quiet}'[pass -q option to git pack-objects]' \
     '(-l --local)'{-l,--local}'[pass --local option to git pack-objects]' \
@@ -4346,6 +4398,7 @@ _git-fsck () {
     "(-v --verbose)--no-progress[don't show progress]" \
     '!(-v --verbose --no-progress)--progress' \
     '--name-objects[show verbose names for reachable objects]' \
+    "--no-references[don't check reference database consistency]" \
     '*: :__git_objects'
 }
 
@@ -4411,6 +4464,7 @@ _git-merge-tree () {
     '(-)--trivial-merge[do a trivial merge only]' \
     '(--no-messages)--messages[also show informational/conflict messages]' \
     "(--messages)--no-messages[don't show informational/conflict messages]" \
+    '--quiet[suppress all output; only exit status wanted]' \
     '-z[separate paths with the NUL character]' \
     '--name-only[list filenames without modes/oids/stages]' \
     '--allow-unrelated-histories[allow merging unrelated histories]' \
@@ -4673,7 +4727,9 @@ _git-cvsserver () {
 _git-imap-send () {
   _arguments -S $endopt \
     '--curl[use libcurl to communicate with the IMAP server]' \
-    - '(out)' \
+    '(-f --folder)'{-f+,--folder=}'[specify the IMAP folder]:folder' \
+    '--list[list all folders on the IMAP server]' \
+    + '(out)' \
     {-v,--verbose}'[be more verbose]' \
     {-q,--quiet}'[be more quiet]'
 }
@@ -4711,6 +4767,7 @@ _git-send-email () {
     '--in-reply-to=[specify contents of first In-Reply-To header]:message-id' \
     '--subject=[specify the initial subject of the email thread]:subject' \
     '--to=[specify the primary recipient of the emails]: :_email_addresses' \
+    '--outlook-id-fix[retrieve munged Message-ID from SMTP server to fix threading]' \
     "--no-xmailer[don't add X-Mailer header]" \
     '--8bit-encoding=[encoding to use for non-ASCII messages]: :__git_encodings' \
     '--compose-encoding=[encoding to use for compose messages]: :__git_encodings' \
@@ -5297,7 +5354,7 @@ _git-pack-objects () {
     '(--revs --stdin-packs)--all[include all refs as well as revisions already specified]' \
     '--reflog[include objects referred by reflog entries]' \
     '--indexed-objects[include objects referred to by the index]' \
-    '(--revs --all --keep-unreachable --pack-loose-unreachable --unpack-unreachable)--stdin-packs[read packs from stdin]' \
+    '(--revs --all --keep-unreachable --pack-loose-unreachable --unpack-unreachable)--stdin-packs=[read packs from stdin]::mode:(follow)' \
     '(: --max-pack-size)--stdout[output pack to stdout]' \
     '--include-tag[include unasked-for annotated tags if object they reference is included]' \
     '(--revs --stdin-packs --unpack-unreachable)--keep-unreachable[add objects unreachable from refs in packs named with --unpacked to resulting pack]' \
@@ -5308,6 +5365,7 @@ _git-pack-objects () {
     '--sparse[use sparse reachability algorithm]' \
     '--include-tag[include tag objects that refer to objects to be packed]' \
     $thin_opt \
+    '--path-walk[use the path-walk API to walk objects when possible]' \
     '--shallow[create packs suitable for shallow fetches]' \
     '--honor-pack-keep[ignore objects in local pack with .keep file]' \
     '--keep-pack=[ignore named pack]:pack' \
@@ -5318,8 +5376,10 @@ _git-pack-objects () {
     '--filter=[omit certain objects from pack file]:filter:_git_rev-list_filters' \
     '--missing=[specify how missing objects are handled]:action:(error allow-any allow-promisor print)' \
     "--exclude-promisor-objects[don't pack objects in promisor packfiles]" \
+    '(--exclude-promisor-objects --missing)--exclude-promisor-objects-best-effort' \
     '--delta-islands[respect islands during delta compression]' \
     '--uri-protocol=[exclude any configured uploadpack.blobpackfileuri with given protocol]:protocol' \
+    '--name-hash-version=[use the specified name-hash function to group similar objects]:name hash version [1]:(1 2)' \
     ':base-name:_files'
 }
 
@@ -5459,6 +5519,7 @@ _git-update-ref () {
     $z_opt \
     '(-d -z --stdin)--no-deref[overwrite ref itself, not what it points to]' \
     '--create-reflog[create a reflog]' \
+    '(-O --batch-updates)'{-O,--batch-updates}'[batch reference updates]' \
     ':symbolic reference:__git_revisions' \
     ':new reference:__git_revisions' \
     '::old reference:__git_revisions'
@@ -5477,15 +5538,14 @@ _git-write-tree () {
 (( $+functions[_git-cat-file] )) ||
 _git-cat-file () {
   _arguments -S -s \
-    '(-t -s -e -p --allow-unknown-type 1)--textconv[show content as transformed by a textconv filter]' \
-    '(-t -s -e -p --allow-unknown-type 1)--filters[show content as transformed by filters]' \
+    '(-t -s -e -p 1)--textconv[show content as transformed by a textconv filter]' \
+    '(-t -s -e -p 1)--filters[show content as transformed by filters]' \
     - query \
-    '(-t -s -e -p --allow-unknown-type 1)--path=[use a specific path for --textconv/--filters]:path:_directories' \
+    '(-t -s -e -p 1)--path=[use a specific path for --textconv/--filters]:path:_directories' \
     '(-s -e -p --textconv --filters 1)-t[show type of given object]' \
     '(-t -e -p --textconv --filters 1)-s[show size of given object]' \
-    '(-e -p --textconv --filters 1)--allow-unknown-type[allow query of broken/corrupt objects of unknown type]' \
-    '(-t -s -p -textconv --filters --allow-unknown-type 1)-e[exit with zero status if object exists]' \
-    '(-t -s -e -textconv --filters --allow-unknown-type 1)-p[pretty-print given object]' \
+    '(-t -s -p -textconv --filters 1)-e[exit with zero status if object exists]' \
+    '(-t -s -e -textconv --filters 1)-p[pretty-print given object]' \
     '(-):object type:(blob commit tag tree)' \
     ': :__git_objects' \
     - batch \
@@ -5496,7 +5556,12 @@ _git-cat-file () {
     '--batch-all-objects[show all objects with --batch or --batch-check]' \
     "--unordered[don't order --batch-all-objects output]" \
     '--buffer[disable flushing of output after each object]' \
-    '-Z[input and output is NUL-delimited instead of newline-delimited]'
+    '-Z[input and output is NUL-delimited instead of newline-delimited]' \
+    '--filter=[omit objects from the list of printed objects]: : _values filter
+      "blob\\\:none[omit all blobs]"
+      "blob\\\:limit[omit blobs larger than given size]\:size"
+      "object\\\:type[omit objects not of requested type]\:type\:(tag commit tree blob)"' \
+    '!--no-filter'
 }
 
 (( $+functions[_git-diff-files] )) ||
@@ -5531,6 +5596,15 @@ _git-diff-index () {
     '--merge-base[use merge base instead of comparing directly]' \
     ': :__git_tree_ishs' \
     '*: :__git_cached_files'
+}
+
+(( $+functions[_git-diff-pairs] )) ||
+_git-diff-pairs() {
+  local -a diff_options
+  __git_setup_diff_options
+
+  _arguments -S \
+    $diff_options
 }
 
 (( $+functions[_git-diff-tree] )) ||
@@ -5595,8 +5669,9 @@ _git-for-each-ref () {
   _arguments -S -s \
     "--omit-empty[don't output a newline after empty formatted refs]" \
     '--count=[maximum number of refs to iterate over]: :__git_guard_number "maximum number of refs"' \
-    '*--sort=[key to sort refs by]: :__git_ref_sort_keys' \
+    '(--start-after)*--sort=[key to sort refs by]: :__git_ref_sort_keys' \
     '--format=-[output format of ref information]:format:__git_format_ref' \
+    '(--sort --stdin)--start-after=[start iteration after the provided marker]:marker:_git_full_references' \
     '--color=-[respect any colors specified in the format]::when:(always never auto)' \
     '--exclude=[exclude refs which match pattern]:pattern:_git_full_references' \
     '*--points-at=[print only refs which point at the given object]:object:__git_commits' \
@@ -5605,13 +5680,13 @@ _git-for-each-ref () {
     '*--contains=[print only refs that contain specified commit]:object:__git_commits' \
     "*--no-contains=[print only refs that don't contain specified commit]:object:__git_commits" \
     '--ignore-case[sorting and filtering are case-insensitive]' \
-    '(1)--stdin[read reference patterns from stdin]' \
+    '(* --start-after)--stdin[read reference patterns from stdin]' \
     '--include-root-refs[also include HEAD ref and pseudorefs]' \
     '(-s --shell -p --perl --python --tcl)'{-s,--shell}'[use string literals suitable for sh]' \
     '(-s --shell -p --perl --python --tcl)'{-p,--perl}'[use string literals suitable for Perl]' \
     '(-s --shell -p --perl          --tcl)'--python'[use string literals suitable for Python]' \
     '(-s --shell -p --perl --python      )'--tcl'[use string literals suitable for Tcl]' \
-    ':: :_git_full_references'
+    '*:reference pattern:_git_full_references'
 }
 
 (( $+functions[_git-for-each-repo] )) ||
@@ -5776,6 +5851,7 @@ _git-rev-list () {
     '(         --bisect-vars --bisect-all)--bisect[show only middlemost commit object]' \
     '(--bisect)--bisect-vars[same as --bisect, displaying shell-evalable code]' \
     '(--bisect)--bisect-all[display all commit objects between included and excluded commits]' \
+    '-z[delimit output objects using NUL bytes]' \
     '*:: :->commit-or-path' && ret=0
 
   case $state in
@@ -6347,6 +6423,7 @@ _git_commands () {
     add:'add file contents to index'
     am:'apply patches from a mailbox'
     archive:'create archive of files from named tree'
+    backfill:'download missing objects in a partial clone'
     bisect:'find, by binary search, change that introduced a bug'
     branch:'list, create, or delete branches'
     bundle:'move objects and refs by archive'
@@ -6453,10 +6530,11 @@ _git_commands () {
     write-tree:'create tree from the current index')
 
   plumbing_interrogator_commands=(
-    cat-file:'provide content or type information for repository objects'
+    cat-file:'provide contents or details of repository objects'
     cherry:'find commits not merged upstream'
     diff-files:'compare files in working tree and index'
     diff-index:'compare content and mode of blobs between index and repository'
+    diff-pairs:'compare content and mode of blob pairs'
     diff-tree:'compare content and mode of blobs found via two tree objects'
     for-each-ref:'output information on each ref'
     for-each-repo:'run a git command on a list of repositories'
@@ -7964,6 +8042,8 @@ __git_setup_log_options () {
     '(--follow             )--no-follow[do not follow renames]'
     '--source[show which ref each commit is reached from]'
     '*-L+[trace evolution of line range, function or regex within a file]: :_git_log_line_ranges'
+    '(--remerge-diff)--diff-merges=[specify diff format to be used for merge commits]:format [m]:(off none 1 first-parent separate c combined cc dense-combined r remerge m on)'
+    '(--diff-merges -p --patch -u)--remerge-diff[produce remerge-diff output for merge commits]'
   )
 }
 
@@ -8015,13 +8095,13 @@ __git_setup_diff_options () {
     '--stat-width=-[generate diffstat with a given width]:width'
     '--stat-graph-width=-[generate diffstat with a given graph width]:width'
     '--stat-count=[generate diffstat with limited lines]:lines'
-    '--compact-summary[generate compact summary in diffstat]'
     '--numstat[generate more machine-friendly diffstat]'
     '--shortstat[generate summary diffstat]'
     '--dirstat=-[generate dirstat by amount of changes]:: :_git_dirstat_params'
     '--cumulative[synonym for --dirstat=cumulative]'
     '--dirstat-by-file=-[generate dirstat by number of files]:: :__git_guard_number limit'
     '--summary[generate condensed summary of extended header information]'
+    '--compact-summary[show a summary of file creations, deletions and changes at the end]'
     '--patch-with-stat[generate patch and prepend its diffstat]'
     '-z[use NUL termination on output]'
     $exclusive_diff_options'--name-only[show only names of changed files]'
@@ -8075,7 +8155,7 @@ __git_setup_diff_options () {
     '--ignore-blank-lines[ignore changes whose lines are all blank]'
     \*{-I+,--ignore-matching-lines=}'[ignore changes whose lines all match regex]:regex'
     '--no-indent-heuristic[disable heuristic that shifts diff hunk boundaries to make patches easier to read]'
-    '--inter-hunk-context=[combine hunks closer than N lines]:number of lines'
+    '--inter-hunk-context=[combine patch hunks closer than specified number of lines]:number of lines'
     '--output-indicator-new=[specify the character to indicate a new line]:character [+]'
     '--output-indicator-old=[specify the character to indicate a old line]:character [-]'
     '--output-indicator-context=[specify the character to indicate a context line]:character [ ]'
@@ -8315,6 +8395,7 @@ __git_setup_merge_options () {
     '(      --no-log)--log=-[add entries from shortlog to merge commit message]::entries to add'
     '(--log         )--no-log[do not list one-line descriptions of the commits being merged in the log message]'
     '(-n --no-stat)--stat[show a diffstat at the end of the merge]'
+    '(--stat)--compact-summary[show a summary of file creations, deletions and changes at the end]'
     '(--stat -n --no-stat)'{-n,--no-stat}'[do not show diffstat at the end of the merge]'
     '(         --no-squash)--squash[prepare a squashed merge without committing]'
     '--autostash[automatically stash/stash pop before and after]'
@@ -8366,7 +8447,7 @@ __git_setup_fetch_options () {
     '--show-forced-updates[check for forced-updates on all updated branches]'
     '--set-upstream[set upstream for git pull/fetch]'
     '--shallow-since=[deepen history of shallow repository based on time]:time' \
-    '*--shallow-exclude=[deepen history of shallow clone by excluding revision]:revision' \
+    '*--shallow-exclude=[deepen history of shallow clone by excluding ref]:reference' \
     '--deepen[deepen history of shallow clone]:number of commits' \
     \*{-o+,--server-option=}'[send specified string to the server when using protocol version 2]:option'
     '--negotiation-tip=[only report refs reachable from specified object to the server]:commit:__git_commits' \
