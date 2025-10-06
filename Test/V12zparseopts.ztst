@@ -112,6 +112,25 @@
 >ret: 0, optv: -a -b -c, argvv: 1 2 3, argv: -x -y -z 7 8 9
 
   () {
+    local -a optv
+    zparseopts -a optv -v argvv - a
+    print -r - ret: $?, optv: $optv, argv: $argv
+  } -a
+0:zparseopts -v with unset parameter
+?(anon):zparseopts:2: no such array: argvv
+>ret: 1, optv: , argv: -a
+
+  () {
+    local -a optv
+    local argvv=1
+    zparseopts -a optv -v argvv - a
+    print -r - ret: $?, optv: $optv, argv: $argv
+  } -a
+0:zparseopts -v with non-array argument
+?(anon):zparseopts:3: no such array: argvv
+>ret: 1, optv: , argv: -a
+
+  () {
     local -a optv aa ab
     zparseopts -a optv - a=aa b:=ab c:- z
     print -r - ret: $?, optv: $optv, aa: $aa, ab: $ab, argv: $argv

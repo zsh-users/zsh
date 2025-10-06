@@ -1953,6 +1953,10 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	}
     }
     params = getaparam((paramsname = paramsname ? paramsname : "argv"));
+    if (!params) {
+	zwarnnam(nam, "no such array: %s", paramsname);
+	return 1;
+    }
     np = cp = pp = ((extract && del) ? arrdup(params) : params);
     for (; (o = *pp); pp++) {
 	/* Not an option. With GNU style, this includes '-' */

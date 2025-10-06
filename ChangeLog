@@ -1,3 +1,8 @@
+2025-10-24  dana  <dana@dana.is>
+
+	* Joshua Krusell: 53988: Src/Modules/zutil.c,
+	Test/V12zparseopts.ztst: fix zparseopts segfault
+
 2025-10-23  Oliver Kiddle  <opk@zsh.org>
 
 	* Christopher Bock: github #131 (with tweaks by dana):
