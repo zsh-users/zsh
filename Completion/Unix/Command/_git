@@ -7099,7 +7099,7 @@ __git_remote_branch_names () {
 __git_remote_branch_names_noprefix () {
   declare -a heads
 
-  branch_names=(${${${${(f)"$(_call_program remote-branch-refs-noprefix git for-each-ref --format='"%(refname)"' refs/remotes 2>/dev/null)"}#refs/remotes/}#*/}:#HEAD})
+  local branch_names=(${${${${(f)"$(_call_program remote-branch-refs-noprefix git for-each-ref --format='"%(refname)"' refs/remotes 2>/dev/null)"}#refs/remotes/}#*/}:#HEAD})
   __git_command_successful $pipestatus || return 1
 
   __git_describe_commit branch_names remote-branch-names-noprefix 'remote branch name' "$@"
