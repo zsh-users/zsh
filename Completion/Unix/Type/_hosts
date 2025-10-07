@@ -41,7 +41,7 @@ if ! zstyle -a ":completion:${curcontext}:hosts" hosts _hosts; then
 
     for khostfile in $khostfiles; do
       if [[ -r $khostfile ]]; then
-        khosts=(${(s/,/j/,/u)${(f)"$(<$khostfile)"}%%[ |#]*})
+        local khosts=(${(s/,/j/,/u)${(f)"$(<$khostfile)"}%%[ |#]*})
 
         # known_hosts syntax supports the host being in the form [hostname]:port
         # The filter below extracts the hostname from lines using this format.
