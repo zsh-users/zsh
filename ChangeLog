@@ -1,5 +1,9 @@
 2025-10-23  Oliver Kiddle  <opk@zsh.org>
 
+	* Kevin Cox: github #147: Completion/Unix/Command/_git,
+	Completion/Unix/Command/_ssh, Completion/Unix/Type/_hosts:
+	Clean up some leaked variables in completion functions
+
 	* 53999: Src/module.c: remove further remnants of ansi2knr
 	support from AIX specific code
 
