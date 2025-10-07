@@ -3,7 +3,7 @@
 # TODO: sshd, ssh-keysign
 
 _ssh () {
-  local curcontext="$curcontext" state line expl suf arg ret=1
+  local curcontext="$curcontext" state line lstate expl suf arg ret=1
   local args sigargs common common_transfer options algopt tmp p1 file cmn cmds sdesc tdesc
   typeset -A opt_args tsizes
 
