@@ -1,3 +1,9 @@
+2025-10-21  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* Mike Gilbert: 53992: Src/utils.c, configure.ac: check for
+	declaration of fpurge() instead of its link-ability (as a
+	workaround of the problem of musl-libc)
+
 2025-10-02  Oliver Kiddle  <opk@zsh.org>
 
 	* 53985: Completion/Unix/Command/_git: update to 2.51

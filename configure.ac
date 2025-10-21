@@ -1250,7 +1250,7 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       select poll \
 	       readlink faccessx fchdir ftruncate \
 	       fstat lstat lchown fchown fchmod \
-	       fpurge fseeko ftello \
+	       fseeko ftello \
 	       mkfifo _mktemp mkstemp \
 	       waitpid wait3 \
 	       sigqueue \
@@ -1291,6 +1291,9 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       getrandom arc4random_buf \
 	       setutxent getutxent endutxent getutent)
 AC_FUNC_STRCOLL
+
+# fpurge exists on musl, but is undeclared in stdio.h and isn't actually required
+AC_CHECK_DECLS([fpurge])
 
 # isinf() and isnan() can exist as either functions or macros.
 AH_TEMPLATE([HAVE_ISINF],

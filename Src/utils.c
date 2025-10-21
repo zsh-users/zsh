@@ -2022,7 +2022,7 @@ redup(int x, int y)
 {
     int ret = y;
 
-#ifdef HAVE_FPURGE
+#if HAVE_DECL_FPURGE
     /* Make sure buffers are cleared when changing descriptor for a
      * FILE object.  No fflush() here because the only way anything
      * can legitimately be left in the buffer is when an error has
