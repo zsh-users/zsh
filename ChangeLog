@@ -1,3 +1,7 @@
+2025-10-23  Oliver Kiddle  <opk@zsh.org>
+
+	* 54000: Completion/BSD/Command/_bectl: new completion
+
 2025-10-21  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* Mike Gilbert: 53992: Src/utils.c, configure.ac: check for

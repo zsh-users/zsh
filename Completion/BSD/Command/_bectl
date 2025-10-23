@@ -1,0 +1,103 @@
+#compdef bectl
+
+local cmd curcontext="$curcontext" ret=1
+local -a state line expl args opts bectl=( $words[1] )
+local -A opt_args
+
+_arguments -C -s -A '-*' \
+  '-h[display usage information]' \
+  '-r+[specify boot environment root]:root:_zfs_dataset' \
+  '1:action:((
+    activate:"set the default boot environment"
+    check:"perform silent sanity check"
+    create:"create new boot environment or snapshot"
+    destroy:"destroy boot environment or snapshot"
+    export:"export boot environment to stdout"
+    import:"import boot environment from stdin"
+    jail:"create a jail of a boot environment"
+    list:"display all boot environments"
+    mount:"mount a boot environment"
+    rename:"rename a boot environment"
+    u{,n}jail:"destroy jail created from a boot environment"
+    u{,n}mount:"unmount a boot environment"
+  ))' \
+  '*:: :->args' && ret=0
+
+if [[ $state = args ]]; then
+  bectl+=( ${(kv)opt_args[(i)-r]} )
+  cmd="$words[1]"
+  curcontext="${curcontext%:*}-$cmd:"
+
+  case $cmd in
+    activate|create|destroy|(ex|im)port|jail|rename|(|u|un)mount)
+      args=( '1: :->boot-environs' )
+    ;|
+
+    activate)
+      args+=(
+        '(-T)-t[apply to the next boot only]'
+        '(-t)-T[remove temporary boot once configuration]'
+      )
+    ;;
+    create)
+      args+=(
+        '-r[create recursive boot environment]'
+        '-e+[clone specified boot environment]: :->boot-environs'
+      )
+    ;;
+    destroy)
+      args+=(
+        '-F[unmount without confirmation]'
+        '-o[destroy the origin as well]'
+      )
+    ;;
+    jail)
+      args+=(
+        '(-U)-b[enable batch mode]'
+        '(-b)-U[persistent jail]'
+        '*-o+[set a jail parameter]:jail parameter'
+        '*-u+[unset a jail parameter]:jail parameter'
+        '*::: : _normal -p $service'
+      )
+    ;;
+    list)
+      opts=( name creation origin used{,by{dataset,refreservation,snapshots}} )
+      args+=(
+        '(-D)-a[display all datasets]'
+        '(-a -s)-D[display full space usage]'
+        '-H[suppress printing of headers]'
+        '(-D)-s[include snapshots]'
+        "(-C)-c+[specify sort key (ascending)]:zfs property:($opts)"
+        "(-c)-C+[specify sort key (descending)]:zfs property:($opts)"
+      )
+    ;;
+    mount)
+      args+=( '2:mount point:_directories' )
+    ;;
+    rename)
+      args+=( '2:new boot environment' )
+    ;;
+    u(|n)jail)
+      args+=( '(*)1::jail:_jails' '*: :->boot-environs' )
+    ;;
+    u(|n)mount)
+      args+=( '-f[force unmount]' )
+    ;;
+  esac
+
+  if (( $#args )); then
+    _arguments -C -A '-*' -s $args
+  else
+    _default
+  fi && ret=0
+fi
+
+if [[ $state = boot-environs ]]; then
+  [[ -prefix *@ ]] && opts=( -s )
+
+  _wanted boot-environs expl "boot environment" \
+      compadd -r "@ \t\n\-" ${${${(f)"$(_call_program boot-environs
+          $bectl $beopts list $opts -H 2>/dev/null)"}#  }%%[[:blank:]]*} && ret=0
+fi
+
+return ret
