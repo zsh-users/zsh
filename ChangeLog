@@ -1,5 +1,8 @@
 2025-11-03  Oliver Kiddle  <opk@zsh.org>
 
+	* Christopher Bock: github #148: Completion/Unix/Command/_fortune:
+	complete fortune databases
+
 	* 54022: Completion/BSD/Command/_fw_update,
 	Completion/BSD/Command/_rcctl, Completion/Unix/Command/_sysctl,
 	Completion/Unix/Command/_watch: completion updates for openbsd 7.8
