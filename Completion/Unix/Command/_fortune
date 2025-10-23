@@ -12,4 +12,4 @@ _arguments \
   '-s[short apothegms only]' \
   '-i[ignore case for -m patterns]' \
   '-w[wait before termination for a time based on msg length]' \
-  '*:databases'
+  '*:fortune db:_files -W /usr/share/games/fortune(|s) -g "*(.:r)"'
