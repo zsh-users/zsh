@@ -1724,42 +1724,42 @@ module_loaded(const char *name)
 static int
 dyn_setup_module(Module m)
 {
-    return ((int (*)_((int,Module, void*))) m->u.handle)(0, m, NULL);
+    return ((int (*)(int,Module, void*)) m->u.handle)(0, m, NULL);
 }
 
 /**/
 static int
 dyn_features_module(Module m, char ***features)
 {
-    return ((int (*)_((int,Module, void*))) m->u.handle)(4, m, features);
+    return ((int (*)(int,Module, void*)) m->u.handle)(4, m, features);
 }
 
 /**/
 static int
 dyn_enables_module(Module m, int **enables)
 {
-    return ((int (*)_((int,Module, void*))) m->u.handle)(5, m, enables);
+    return ((int (*)(int,Module, void*)) m->u.handle)(5, m, enables);
 }
 
 /**/
 static int
 dyn_boot_module(Module m)
 {
-    return ((int (*)_((int,Module, void*))) m->u.handle)(1, m, NULL);
+    return ((int (*)(int,Module, void*)) m->u.handle)(1, m, NULL);
 }
 
 /**/
 static int
 dyn_cleanup_module(Module m)
 {
-    return ((int (*)_((int,Module, void*))) m->u.handle)(2, m, NULL);
+    return ((int (*)(int,Module, void*)) m->u.handle)(2, m, NULL);
 }
 
 /**/
 static int
 dyn_finish_module(Module m)
 {
-    return ((int (*)_((int,Module,void *))) m->u.handle)(3, m, NULL);
+    return ((int (*)(int,Module,void *)) m->u.handle)(3, m, NULL);
 }
 
 /**/

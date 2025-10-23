@@ -252,6 +252,9 @@
 	Completion/Unix/Command/_ssh, Completion/Unix/Type/_hosts:
 	Clean up some leaked variables in completion functions
 
+	* 53999: Src/module.c: remove further remnants of ansi2knr
+	support from AIX specific code
+
 	* 54000: Completion/BSD/Command/_bectl: new completion
 
 2025-10-21  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
