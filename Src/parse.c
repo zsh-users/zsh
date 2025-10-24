@@ -3962,7 +3962,6 @@ incrdumpcount(FuncDump f)
     f->count++;
 }
 
-/**/
 static void
 freedump(FuncDump f)
 {

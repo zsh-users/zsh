@@ -1,5 +1,7 @@
 2025-10-24  Oliver Kiddle  <opk@zsh.org>
 
+	* 54002: Src/parse.c: silence compiler warning for static function
+
 	* 54001: Src/Zle/zle_keymap.c, Src/exec.c, Src/input.c, Src/jobs.c,
 	Src/utils.c: add missing uses of mod_export
 
