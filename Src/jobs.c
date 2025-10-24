@@ -1051,7 +1051,7 @@ should_report_time(Job j)
 }
 
 /**/
-char *
+mod_export char *
 sigmsg(int sig)
 {
     static char *unknown = "unknown signal";
