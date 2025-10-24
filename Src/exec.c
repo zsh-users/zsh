@@ -5323,7 +5323,8 @@ static const char *const ANONYMOUS_FUNCTION_NAME = "(anon)";
  * (though I doubt anyone would ever do that).
  */
 /**/
-int is_anonymous_function_name(const char *name)
+mod_export int
+is_anonymous_function_name(const char *name)
 {
     return !strcmp(name, ANONYMOUS_FUNCTION_NAME);
 }

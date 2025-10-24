@@ -123,7 +123,7 @@ struct remprefstate {
 /**/
 Keymap curkeymap, localkeymap;
 /**/
-char *curkeymapname;
+mod_export char *curkeymapname;
 
 /* the hash table of keymap names */
 

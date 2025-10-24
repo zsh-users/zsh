@@ -1071,7 +1071,7 @@ uid_t cached_uid;
 char *cached_username;
 
 /**/
-char *
+mod_export char *
 get_username(void)
 {
 #ifdef USE_GETPWUID
@@ -2748,7 +2748,7 @@ read_poll(int fd, int *readchar, int polltty, zlong microseconds)
  */
 
 /**/
-long
+mod_export long
 timespec_diff_us(const struct timespec *t1, const struct timespec *t2)
 {
     int reverse = (t1->tv_sec > t2->tv_sec);
@@ -2793,7 +2793,7 @@ zmonotime(time_t *tloc)
  */
 
 /**/
-int
+mod_export int
 zsleep(long us)
 {
 #ifdef HAVE_NANOSLEEP

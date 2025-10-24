@@ -610,7 +610,7 @@ inungetc(int c)
 /* stuff a whole file into memory and return it */
 
 /**/
-off_t
+mod_export off_t
 zstuff(char **out, const char *fn)
 {
     FILE *in;
