@@ -771,7 +771,7 @@ exectry(Estate state, int do_exec)
     contflag = 0;
 
     state->pc = always;
-    execlist(state, 1, do_exec);
+    execlist(state, 1, 0);
 
     if (try_errflag)
 	errflag |= ERRFLAG_ERROR;
