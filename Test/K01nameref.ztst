@@ -1100,15 +1100,15 @@ F:previously this could create an infinite recursion and crash
 >h:1: rs= - ra= - rs1= - ra1=
 >h:2: rs= - ra= - rs1= - ra1=
 >i:1: rs= - ra= - rs1= - ra1=
->i:2: rs=g - ra=g - rs1=g - ra1=g
->j:1: rs=g - ra=g - rs1=g - ra1=g
->j:2: rs=g - ra=g - rs1=g - ra1=g
->i:3: rs=g - ra=g - rs1=g - ra1=g
->k:1: rs=g - ra=g - rs1=g - ra1=g
->k:2: rs=g - ra=g - rs1=g - ra1=g
->h:3: rs=g - ra=g - rs1=g - ra1=g
->k:1: rs=g - ra=g - rs1=g - ra1=g
->k:2: rs=g - ra=g - rs1=g - ra1=g
+>i:2: rs=f - ra=f - rs1=f - ra1=f
+>j:1: rs=f - ra=f - rs1=f - ra1=f
+>j:2: rs=f - ra=f - rs1=f - ra1=f
+>i:3: rs=f - ra=f - rs1=f - ra1=f
+>k:1: rs=f - ra=f - rs1=f - ra1=f
+>k:2: rs=f - ra=f - rs1=f - ra1=f
+>h:3: rs=f - ra=f - rs1=f - ra1=f
+>k:1: rs=f - ra=f - rs1=f - ra1=f
+>k:2: rs=f - ra=f - rs1=f - ra1=f
 >g:3: rs=f - ra=f - rs1=f - ra1=f
 
  e '' 6
@@ -1236,5 +1236,40 @@ F:previously this could create an infinite recursion and crash
 ?(eval):6: Can't add module parameter `SRANDOM': local parameter exists
 ?(eval):zsh/random:6: error when adding parameter `SRANDOM'
 ?(eval):6: autoloading module zsh/random failed to define parameter: SRANDOM
+
+ () {
+   typeset var1=var1
+   typeset var2=var2
+   typeset -n ref1=var1
+   echo "ref1=$ref1";
+   () {
+     typeset -n ref1=var2
+     typeset -n ref2=ref1
+     echo "ref1=$ref1";
+     echo "ref2=$ref2";
+   }
+ }
+0:regression: don't follow references when computing base scope - part 1
+>ref1=var1
+>ref1=var2
+>ref2=var2
+
+ () {
+   typeset var1=var1
+   typeset -n ref1=var1
+   echo ref1=$ref1;
+   () {
+     typeset var2=var2
+     typeset -n ref1
+     typeset -n ref2=ref1
+     ref1=var2
+     echo ref1=$ref1;
+     echo ref2=$ref2;
+   }
+ }
+0:regression: don't follow references when computing base scope - part 2
+>ref1=var1
+>ref1=var2
+>ref2=var2
 
 %clean

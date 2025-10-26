@@ -2239,10 +2239,10 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 		}
 		Param p1 = (Param)gethashnode2(paramtab, ref);
 		if (p1) {
-		    int scope = ((pm->node.flags & PM_NAMEREF) ?
-				 ((pm->node.flags & PM_UPPER) ? -(pm->base) :
-				  pm->base) : locallevel);
-		    pm = upscope(p1, scope);
+		    if (pm->node.flags & PM_UPPER)
+			pm = upscope_upper(p1, pm->level - 1);
+		    else
+			pm = upscope(p1, pm->base);
 		    pm = (Param)loadparamnode(paramtab, pm, ref);
 		}
 		if (!(p1 && pm) ||
@@ -3324,7 +3324,11 @@ assignsparam(char *s, char *val, int flags)
 	}
     }
 
+    if (v->pm->node.flags & PM_NAMEREF)
+	v->pm->node.flags |= PM_NEWREF;
     assignstrvalue(v, val, flags);
+    if (v->pm->node.flags & PM_NAMEREF)
+	v->pm->node.flags &= ~PM_NEWREF;
     unqueue_signals();
     return v->pm;
 }
@@ -6314,12 +6318,13 @@ resolve_nameref(Param pm, const Asgment stop)
 	} else if ((hn = gethashnode2(realparamtab, seek))) {
 	    if (pm) {
 		if (!(stop && (stop->flags & (PM_LOCAL)))) {
-		    int scope = ((pm->node.flags & PM_NAMEREF) ?
-				 ((pm->node.flags & PM_UPPER) ?
-				  /* pm->base == 0 means not set yet */
-				  -(pm->base ? pm->base : pm->level) :
-				  pm->base) : ((Param)hn)->level);
-		    hn = (HashNode)upscope((Param)hn, scope);
+		    if ((pm->node.flags & PM_NAMEREF) &&
+			(pm->node.flags & PM_UPPER))
+			hn = (HashNode)upscope_upper((Param)hn, pm->level - 1);
+		    else
+			hn = (HashNode)upscope((Param)hn,
+					       (pm->node.flags & PM_NAMEREF) ?
+					       (pm->base) : ((Param)hn)->level);
 		}
 		hn = loadparamnode(paramtab, (Param)hn, seek);
 		/* user can't tag a nameref, safe for loop detection */
@@ -6374,12 +6379,37 @@ setscope(Param pm)
 	char *t = refname ? itype_end(refname, INAMESPC, 0) : NULL;
 	int q = queue_signal_level();
 
+	/* Compute pm->width */
 	/* Temporarily change nameref to array parameter itself */
 	if (t && *t == '[')
 	    *t = 0;
 	else
 	    t = 0;
-	stop.name = "";
+	if (t) {
+	    pm->width = t - refname;
+	    *t = '[';
+	    refname = dupstrpfx(refname, pm->width);
+	}
+
+	/* Compute pm->base */
+	if (!(pm->node.flags & PM_UPPER) && refname &&
+	    (basepm = (Param)gethashnode2(realparamtab, refname)) &&
+	    (basepm = (Param)loadparamnode(realparamtab, basepm, refname)) &&
+	    (!(basepm->node.flags & PM_NEWREF) || (basepm = basepm->old))) {
+	    pm->base = basepm->level;
+	}
+	if (pm->base > pm->level) {
+	    if (EMULATION(EMULATE_KSH)) {
+		zerr("%s: global reference cannot refer to local variable",
+		      pm->node.nam);
+		unsetparam_pm(pm, 0, 1);
+	    } else if (isset(WARNNESTEDVAR))
+		zwarn("reference %s in enclosing scope set to local variable %s",
+		      pm->node.nam, refname);
+	}
+
+	/* Check for self references */
+	stop.name = pm->node.nam;
 	stop.value.scalar = NULL;
 	stop.flags = PM_NAMEREF;
 	if (locallevel && !(pm->node.flags & PM_UPPER))
@@ -6387,11 +6417,6 @@ setscope(Param pm)
 	dont_queue_signals();	/* Prevent unkillable loops */
 	basepm = (Param)resolve_nameref(pm, &stop);
 	restore_queue_signals(q);
-	if (t) {
-	    pm->width = t - refname;
-	    *t = '[';
-	    refname = dupstrpfx(refname, pm->width);
-	}
 	if (basepm) {
 	    if (basepm->node.flags & PM_NAMEREF) {
 		if (pm == basepm) {
@@ -6419,27 +6444,7 @@ setscope(Param pm)
 			break;
 		    }
 		}
-	    } else if (!pm->base) {
-		pm->base = basepm->level;
-		if ((pm->node.flags & PM_UPPER) &&
-		    (basepm = upscope(basepm, -(pm->level))))
-		    pm->base = basepm->level;
 	    }
-	} else if (pm->base < locallevel && refname &&
-		   (basepm = (Param)getparamnode(realparamtab, refname))) {
-	    pm->base = basepm->level;
-	    if ((pm->node.flags & PM_UPPER) &&
-		(basepm = upscope(basepm, -(pm->level))))
-		pm->base = basepm->level;
-	}
-	if (pm->base > pm->level) {
-	    if (EMULATION(EMULATE_KSH)) {
-		zerr("%s: global reference cannot refer to local variable",
-		      pm->node.nam);
-		unsetparam_pm(pm, 0, 1);
-	    } else if (isset(WARNNESTEDVAR))
-		zwarn("reference %s in enclosing scope set to local variable %s",
-		      pm->node.nam, refname);
 	}
 	if (refname && upscope(pm, pm->base) == pm &&
 	    strcmp(pm->node.nam, refname) == 0) {
@@ -6456,13 +6461,18 @@ upscope(Param pm, int reflevel)
 {
     Param up = pm->old;
     while (up && up->level >= reflevel) {
-	if (reflevel < 0 && up->level < -(reflevel))
-	    break;
 	pm = up;
 	up = up->old;
     }
-    if (reflevel < 0 && locallevel > 0)
-	return pm->level == locallevel ? up : pm;
+    return pm;
+}
+
+/**/
+mod_export Param
+upscope_upper(Param pm, int reflevel)
+{
+    while (pm && pm->level > reflevel)
+	pm = pm->old;
     return pm;
 }
 

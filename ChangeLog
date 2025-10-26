@@ -1,8 +1,15 @@
 2025-10-26  Bart Schaefer  <schaefer@zsh.org>
 
-	* Philippe: 53732: avoid tail-call exec in always block
+	* Philippe: 53732: Src/loop.c, Test/A01grammar.ztst: avoid tail-call
+	exec in always block
 
-	* Philippe: 53781: fix loading of autoload variable via a reference
+	* Philippe: 53781: Src/params.c, Test/B02typeset.ztst,
+	Test/K01nameref.ztst: fix load of autoload variable via a reference
+
+	* Philippe: 53782: Src/params.c, Test/K01nameref.ztst: changes to
+	handling of nameref base level: avoid changing base on assignment;
+	omit base level for up-scope references; do not follow reference
+	chains when computing base level of new references
 
 2025-10-24  Oliver Kiddle  <opk@zsh.org>
 
