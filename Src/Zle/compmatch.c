@@ -2487,10 +2487,12 @@ join_psfx(Cline ot, Cline nt, Cline *orest, Cline *nrest, int sfx)
 
 	/* We first get the length of the prefix equal in both strings. */
 	if (o->flags & CLF_LINE) {
-	    if ((len = sub_match(&md, o->line, o->llen, sfx)) != o->llen) {
+	    if ((len = sub_match(&md, o->line, o->llen, sfx)) != o->llen
+		    && len >= 0) {
 		join = 1; line = 1; slen = &(o->llen); sstr = &(o->line);
 	    }
-	} else if ((len = sub_match(&md, o->word, o->wlen, sfx)) != o->wlen) {
+	} else if ((len = sub_match(&md, o->word, o->wlen, sfx)) != o->wlen
+		&& len >= 0) {
 	    if (o->line) {
 		memcpy(&md, &omd, sizeof(struct cmdata));
 		o->flags |= CLF_LINE | CLF_DIFF;

@@ -1,5 +1,8 @@
 2025-11-12  Oliver Kiddle  <opk@zsh.org>
 
+	* Heon Jeong: 54008: Src/Zle/compmatch.c: infinite loop running
+	completion with specific multibyte character and locale combination
+
 	* Christopher Bock: 54026: Completion/Debian/Command/_uscan:
 	update uscan options
 
