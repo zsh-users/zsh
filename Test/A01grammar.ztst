@@ -720,6 +720,12 @@
 >always 1
 >try 2
 
+  () { { return 2 } always { return 3 } }
+2:Exit status of always block is ignored
+
+  () { ( { return 2 } always { ( return 3 ) } ) }
+2:Regression test for exit status of always block is ignored also in tailcalls
+
   (
   mywrap() { echo BEGIN; true; echo END }
   mytest() { { exit 3 } always { mywrap }; print Exited before this }

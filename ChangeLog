@@ -1,3 +1,7 @@
+2025-10-26  Bart Schaefer  <schaefer@zsh.org>
+
+	* Philippe: 53732: avoid tail-call exec in always block
+
 2025-10-24  Oliver Kiddle  <opk@zsh.org>
 
 	* 54002: Src/parse.c: silence compiler warning for static function
