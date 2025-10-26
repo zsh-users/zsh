@@ -1179,4 +1179,62 @@ F:previously this could create an infinite recursion and crash
 >typeset PS1=zz
 *?*
 
+ zmodload -u zsh/random
+ echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
+ typeset -n ref=SRANDOM
+ echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
+ echo v=${ref/<->/integer}
+ zmodload -u zsh/random
+ echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
+ echo v=${ref/<->/integer}
+0:Referring and dereferring an autoload variable loads it (direct)
+>z=SRANDOM (zsh/random)
+>z=
+>v=integer
+>z=SRANDOM (zsh/random)
+>v=integer
+
+ zmodload -u zsh/random
+ echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
+ typeset -n ref=SRANDOM[1,20]
+ echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
+ echo v=${ref/<->/integer}
+ zmodload -u zsh/random
+ echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
+ echo v=${ref/<->/integer}
+0:Referring and dereferring an autoload variable loads it (subscript)
+>z=SRANDOM (zsh/random)
+>z=
+>v=integer
+>z=SRANDOM (zsh/random)
+>v=integer
+
+ typeset -n ref=SRANDOM
+ echo v=${ref/<->/integer}
+ zmodload -u zsh/random
+ echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
+ typeset -h SRANDOM=local-variable
+ echo v=${ref/<->/integer}
+ echo NOT REACHED
+1:Dereferring an autoload variable fails to load it if its hidden (direct)
+>v=integer
+>z=SRANDOM (zsh/random)
+?(eval):6: Can't add module parameter `SRANDOM': local parameter exists
+?(eval):zsh/random:6: error when adding parameter `SRANDOM'
+?(eval):6: autoloading module zsh/random failed to define parameter: SRANDOM
+
+ typeset -n ref=SRANDOM[1,20]
+ echo v=${ref/<->/integer}
+ zmodload -u zsh/random
+ echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
+ typeset -h SRANDOM=local-variable
+ echo v=${ref/<->/integer}
+ echo NOT REACHED
+1:Dereferring an autoload variable fails to load it if its hidden (subscript)
+>v=integer
+>z=SRANDOM (zsh/random)
+?(eval):6: Can't add module parameter `SRANDOM': local parameter exists
+?(eval):zsh/random:6: error when adding parameter `SRANDOM'
+?(eval):6: autoloading module zsh/random failed to define parameter: SRANDOM
+
 %clean

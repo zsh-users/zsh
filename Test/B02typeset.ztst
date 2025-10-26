@@ -1120,3 +1120,60 @@
 1:Regression test for {...} parsing in typeset
 ?(eval):typeset:2: not valid in this context: {X}
 ?(eval):typeset:3: not valid in this context: {X}
+
+ zmodload -u zsh/random
+ echo v=${SRANDOM/<->/integer}
+ typeset SRANDOM
+ echo v=${SRANDOM/<->/integer}
+0:Global non -h variable doesn't hide special variable
+>v=integer
+>v=integer
+
+ zmodload -u zsh/random
+ echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
+ typeset -g SRANDOM
+ echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
+ echo v=${SRANDOM/<->/integer}
+0:Global non -h variable doesn't hide autoload variable
+>z=SRANDOM (zsh/random)
+>z=SRANDOM (zsh/random)
+>v=integer
+
+ zmodload -u zsh/random
+ echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
+ typeset -gh SRANDOM
+ echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
+ echo v=${SRANDOM/<->/integer}
+0:Global -h variable doesn't hide autoload variable
+>z=SRANDOM (zsh/random)
+>z=SRANDOM (zsh/random)
+>v=integer
+
+ zmodload -u zsh/random
+ echo v=${SRANDOM/<->/integer}
+ typeset SRANDOM
+ echo v=${SRANDOM/<->/integer}
+0:Local non -h variable doesn't hide special variable
+>v=integer
+>v=integer
+
+ zmodload -u zsh/random
+ echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
+ typeset SRANDOM
+ echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
+ echo v=${SRANDOM/<->/integer}
+0:Local non -h variable hides autoload variable
+F:This is a bug, the non -h variable should not hide the autoload variable
+>z=SRANDOM (zsh/random)
+>z=
+>v=
+
+ zmodload -u zsh/random
+ echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
+ typeset -h SRANDOM
+ echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
+ echo v=${SRANDOM/<->/integer}
+0:Local -h variable hides autoload variable
+>z=SRANDOM (zsh/random)
+>z=
+>v=

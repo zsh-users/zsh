@@ -2,6 +2,8 @@
 
 	* Philippe: 53732: avoid tail-call exec in always block
 
+	* Philippe: 53781: fix loading of autoload variable via a reference
+
 2025-10-24  Oliver Kiddle  <opk@zsh.org>
 
 	* 54002: Src/parse.c: silence compiler warning for static function

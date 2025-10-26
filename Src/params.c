@@ -525,18 +525,18 @@ newparamtable(int size, char const *name)
 
 /**/
 static HashNode
-getparamnode(HashTable ht, const char *nam)
+loadparamnode(HashTable ht, Param pm, const char *nam)
 {
-    HashNode hn = gethashnode2(ht, nam);
-    Param pm = (Param) hn;
-
     if (pm && (pm->node.flags & PM_AUTOLOAD) && pm->u.str) {
+	int level = pm->level;
 	char *mn = dupstring(pm->u.str);
-
-	(void)ensurefeature(mn, "p:", (pm->node.flags & PM_AUTOALL) ? NULL :
-			    nam);
-	hn = gethashnode2(ht, nam);
-	if (!hn) {
+	(void)ensurefeature(mn, "p:", nam);
+	pm = (Param)gethashnode2(ht, nam);
+	while (pm && pm->level > level)
+	    pm = pm->old;
+	if (pm && (pm->level != level || (pm->node.flags & PM_AUTOLOAD)))
+	    pm = NULL;
+	if (!pm) {
 	    /*
 	     * This used to be a warning, but surely if we allow
 	     * stuff to go ahead with the autoload stub with
@@ -546,7 +546,14 @@ getparamnode(HashTable ht, const char *nam)
 		 nam);
 	}
     }
+    return (HashNode)pm;
+}
 
+/**/
+static HashNode
+getparamnode(HashTable ht, const char *nam)
+{
+    HashNode hn = loadparamnode(ht, (Param)gethashnode2(ht, nam), nam);
     if (hn && ht == realparamtab && !(hn->flags & PM_UNSET))
 	hn = resolve_nameref((Param)hn, NULL);
     return hn;
@@ -2236,6 +2243,7 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 				 ((pm->node.flags & PM_UPPER) ? -(pm->base) :
 				  pm->base) : locallevel);
 		    pm = upscope(p1, scope);
+		    pm = (Param)loadparamnode(paramtab, pm, ref);
 		}
 		if (!(p1 && pm) ||
 		    ((pm->node.flags & PM_UNSET) &&
@@ -6313,12 +6321,11 @@ resolve_nameref(Param pm, const Asgment stop)
 				  pm->base) : ((Param)hn)->level);
 		    hn = (HashNode)upscope((Param)hn, scope);
 		}
+		hn = loadparamnode(paramtab, (Param)hn, seek);
 		/* user can't tag a nameref, safe for loop detection */
 		pm->node.flags |= PM_TAGGED;
 	    }
 	    if (hn) {
-		if (hn->flags & PM_AUTOLOAD)
-		    hn = getparamnode(realparamtab, seek);
 		if (!(hn->flags & PM_UNSET))
 		    hn = resolve_nameref((Param)hn, stop);
 	    }
