@@ -3129,14 +3129,10 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 
 	if (on & PM_NAMEREF) {
 	    if (asg->value.scalar &&
-		((pm = (Param)resolve_nameref((Param)hn, asg)) &&
+		((pm = (Param)paramtab->getnode(paramtab, asg->value.scalar)) &&
 		 (pm->node.flags & PM_NAMEREF))) {
 		if (pm->node.flags & PM_SPECIAL) {
 		    zwarnnam(name, "%s: invalid reference", pm->node.nam);
-		    returnval = 1;
-		    continue;
-		} else if (pm->u.str && strcmp(pm->u.str, asg->name) == 0) {
-		    zwarnnam(name, "%s: invalid self reference", asg->name);
 		    returnval = 1;
 		    continue;
 		}

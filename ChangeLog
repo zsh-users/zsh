@@ -17,6 +17,9 @@
 	* Philippe: 53797: Src/params.c, Test/K01nameref.ztst: fix creation
 	of undeclared target variable through reference chain
 
+	* Philippe: 53790: Src/builtin.c, Test/K01nameref.ztst,
+	Test/V10private.ztst: corrections to reference loop detection
+
 2025-10-24  Oliver Kiddle  <opk@zsh.org>
 
 	* 54002: Src/parse.c: silence compiler warning for static function
