@@ -1048,7 +1048,7 @@ createparam(char *name, int flags)
 	    (oldpm = upscope(oldpm, oldpm->base))) {
 	    Param lastpm;
 	    struct asgment stop;
-	    stop.flags = PM_NAMEREF | (flags & PM_LOCAL);
+	    stop.flags = PM_NAMEREF;
 	    stop.name = oldpm->node.nam;
 	    stop.value.scalar = GETREFNAME(oldpm);
 	    lastpm = (Param)resolve_nameref(oldpm, &stop);

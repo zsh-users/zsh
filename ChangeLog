@@ -14,6 +14,9 @@
 	* Philippe: 53796: Src/params.c, Test/K01nameref.ztst: fix local
 	reference chains and detect self-reference across local scopes
 
+	* Philippe: 53797: Src/params.c, Test/K01nameref.ztst: fix creation
+	of undeclared target variable through reference chain
+
 2025-10-24  Oliver Kiddle  <opk@zsh.org>
 
 	* 54002: Src/parse.c: silence compiler warning for static function

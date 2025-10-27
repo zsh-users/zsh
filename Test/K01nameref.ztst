@@ -1179,6 +1179,20 @@ F:previously this could create an infinite recursion and crash
 >typeset PS1=zz
 *?*
 
+ unset var1 var2
+ typeset -n ref1=var1
+ () {
+   typeset -n ref2=ref1
+   typeset -n ref1=var2
+   typeset -i ref2=42
+   typeset -p ref1 ref2 var1 var2
+ }
+1:typeset reference chain to not-yet-defined variable including a hidden reference
+?(anon):typeset:4: no such variable: var2
+>typeset -n ref1=var2
+>typeset -n ref2=ref1
+>typeset -i var1=42
+
  typeset -n ref1
  typeset -n ref2=ref1
  () {
