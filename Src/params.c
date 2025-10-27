@@ -6412,8 +6412,6 @@ setscope(Param pm)
 	stop.name = pm->node.nam;
 	stop.value.scalar = NULL;
 	stop.flags = PM_NAMEREF;
-	if (locallevel && !(pm->node.flags & PM_UPPER))
-	    stop.flags |= PM_LOCAL;
 	dont_queue_signals();	/* Prevent unkillable loops */
 	basepm = (Param)resolve_nameref(pm, &stop);
 	restore_queue_signals(q);

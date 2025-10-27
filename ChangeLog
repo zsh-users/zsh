@@ -11,6 +11,9 @@
 	omit base level for up-scope references; do not follow reference
 	chains when computing base level of new references
 
+	* Philippe: 53796: Src/params.c, Test/K01nameref.ztst: fix local
+	reference chains and detect self-reference across local scopes
+
 2025-10-24  Oliver Kiddle  <opk@zsh.org>
 
 	* 54002: Src/parse.c: silence compiler warning for static function

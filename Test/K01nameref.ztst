@@ -1179,6 +1179,16 @@ F:previously this could create an infinite recursion and crash
 >typeset PS1=zz
 *?*
 
+ typeset -n ref1
+ typeset -n ref2=ref1
+ () {
+   typeset -n ref3=ref2
+   typeset ref2=foo
+   ref1=ref3
+ }
+1:self reference chain including a hidden reference
+?(anon):3: ref3: invalid self reference
+
  zmodload -u zsh/random
  echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
  typeset -n ref=SRANDOM
