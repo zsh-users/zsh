@@ -882,6 +882,21 @@ F:Checking for a bug in zmodload that affects later tests
 >typeset -g var=RESET
 
  unset -n ref
+ unset var1
+ typeset -n ref=var1
+ () {
+   typeset -n ref=var2
+   ref=RESET
+   typeset -p ref var2
+ }
+ typeset -p ref var2
+0:local reference hides same-name global reference
+>typeset -n ref=var2
+>typeset -g var2=RESET
+>typeset -n ref=var1
+>typeset -g var2=RESET
+
+ unset -n ref
  unset one
  typeset -n ref
  typeset one=ONE
@@ -1045,14 +1060,17 @@ F:relies on global TYPESET_TO_UNSET in %prep
  () {
    typeset -n foo; foo=zz
    foo=zz || print -u2 foo: assignment failed
-   print $bar $zz
+   typeset -p bar zz
  }
- () { typeset -n foo; foo=zz; local zz; foo=zz; print $bar $zz }
+ # prior to workers/53676 the assignment failed
+ unset zz
+ () { typeset -n foo; foo=zz; local zz; foo=zz; typeset -p bar zz }
 0:regression: local nameref may not in-scope a global parameter
 F:previously this could create an infinite recursion and crash
->xx
->xx zz
-*?*foo: assignment failed
+>typeset -g bar=xx
+>typeset -g zz=zz
+>typeset -g bar=xx
+>typeset zz=zz
 
  typeset -nm foo=bar
 1:create nameref by pattern match not allowed

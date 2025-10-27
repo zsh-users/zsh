@@ -1044,13 +1044,12 @@ createparam(char *name, int flags)
 	if (oldpm && !(flags & PM_NAMEREF) &&
 	    (oldpm->level == locallevel ?
 	     !(oldpm->node.flags & PM_RO_BY_DESIGN) : !(flags & PM_LOCAL)) &&
-	    (oldpm->node.flags & PM_NAMEREF) &&
-	    (oldpm = upscope(oldpm, oldpm->base))) {
+	    (oldpm->node.flags & PM_NAMEREF)) {
 	    Param lastpm;
 	    struct asgment stop;
 	    stop.flags = PM_NAMEREF;
-	    stop.name = oldpm->node.nam;
-	    stop.value.scalar = GETREFNAME(oldpm);
+	    stop.name = "";
+	    stop.value.scalar = NULL;
 	    lastpm = (Param)resolve_nameref(oldpm, &stop);
 	    if (lastpm) {
 		if (lastpm->node.flags & PM_NAMEREF) {

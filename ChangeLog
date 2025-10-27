@@ -23,6 +23,10 @@
 	* Philippe: 53798: Src/params.c, Src/zsh.h, Test/K01nameref.ztst:
 	report reference loops created when a reference goes out of scope
 
+	* Philippe: 53676 (test tweaked per 54009): Src/params.c,
+	Test/K01nameref.ztst: Revise 52650+51945 to allow assignment to
+	global through nameref without looping
+
 2025-10-24  Oliver Kiddle  <opk@zsh.org>
 
 	* 54002: Src/parse.c: silence compiler warning for static function
