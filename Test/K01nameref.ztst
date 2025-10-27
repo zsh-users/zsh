@@ -1315,4 +1315,43 @@ F:previously this could create an infinite recursion and crash
 >ref1=var2
 >ref2=var2
 
+ typeset -n ref1
+ typeset -n ref2=ref1;
+ () {
+   typeset ref2=foo
+   ref1=ref2
+ }
+ echo reached
+ echo $ref1
+ echo NOT REACHED
+1:expansion of incidental reference loop triggers error
+>reached
+*?*: ref1: invalid self reference
+
+ typeset -n ref1
+ typeset -n ref2=ref1;
+ () {
+   typeset ref2=foo
+   ref1=ref2
+ }
+ echo reached
+ ref1=foo
+ echo NOT REACHED
+1:assignment to incidental reference loop triggers error
+>reached
+*?*: ref1: invalid self reference
+
+ typeset -n ref1
+ typeset -n ref2=ref1;
+ () {
+   typeset ref2=foo
+   ref1=ref2
+ }
+ echo reached
+ typeset -n ref3=ref1
+ echo NOT REACHED
+1:reference to incidental reference loop triggers error
+>reached
+*?*: ref1: invalid self reference
+
 %clean

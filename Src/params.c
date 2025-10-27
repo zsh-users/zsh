@@ -6278,19 +6278,19 @@ resolve_nameref(Param pm, const Asgment stop)
 
     if (pm && (pm->node.flags & PM_NAMEREF)) {
 	char *refname = GETREFNAME(pm);
-	if (pm->node.flags & (PM_UNSET|PM_TAGGED)) {
+	if (pm->node.flags & PM_TAGGED) {
+	    zerr("%s: invalid self reference", pm->node.nam);
+	    return NULL;
+	} else if (pm->node.flags & PM_UNSET) {
 	    /* Semaphore with createparam() */
 	    pm->node.flags &= ~PM_UNSET;
 	    if (pm->node.flags & PM_NEWREF)	/* See setloopvar() */
 		return NULL;
-	    if (refname && *refname && (pm->node.flags & PM_TAGGED))
-		pm->node.flags |= PM_SELFREF;	/* See setscope() */
 	    return (HashNode) pm;
 	} else if (refname) {
-	    if ((pm->node.flags & PM_TAGGED) ||
-		(stop && strcmp(refname, stop->name) == 0)) {
+	    if (stop && strcmp(refname, stop->name) == 0) {
 		/* zwarnnam(refname, "invalid self reference"); */
-		return stop ? (HashNode)pm : NULL;
+		return (HashNode)pm;
 	    }
 	    if (*refname)
 		seek = refname;
@@ -6418,15 +6418,7 @@ setscope(Param pm)
 	if (basepm) {
 	    if (basepm->node.flags & PM_NAMEREF) {
 		if (pm == basepm) {
-		    if (pm->node.flags & PM_SELFREF) {
-			/* Loop signalled by resolve_nameref() */
-			if (upscope(pm, pm->base) == pm) {
-			    zerr("%s: invalid self reference", refname);
-			    unsetparam_pm(pm, 0, 1);
-			    break;
-			}
-			pm->node.flags &= ~PM_SELFREF;
-		    } else if (pm->base == pm->level) {
+		    if (pm->base == pm->level) {
 			if (refname && *refname &&
 			    strcmp(pm->node.nam, refname) == 0) {
 			    zerr("%s: invalid self reference", refname);

@@ -20,6 +20,9 @@
 	* Philippe: 53790: Src/builtin.c, Test/K01nameref.ztst,
 	Test/V10private.ztst: corrections to reference loop detection
 
+	* Philippe: 53798: Src/params.c, Src/zsh.h, Test/K01nameref.ztst:
+	report reference loops created when a reference goes out of scope
+
 2025-10-24  Oliver Kiddle  <opk@zsh.org>
 
 	* 54002: Src/parse.c: silence compiler warning for static function
