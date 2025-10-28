@@ -1,3 +1,8 @@
+2025-10-27  Bart Schaefer  <schaefer@zsh.org>
+
+	* Dan Drake: 53803: Functions/Prompts/prompt_adam1_setup: make
+	adam1 prompt wrap len, ellipsized path elements configurable
+
 2025-10-26  Bart Schaefer  <schaefer@zsh.org>
 
 	* Philippe: 53732: Src/loop.c, Test/A01grammar.ztst: avoid tail-call

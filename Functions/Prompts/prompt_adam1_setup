@@ -22,6 +22,8 @@ prompt_adam1_setup () {
   prompt_adam1_color1=${1:-'blue'}
   prompt_adam1_color2=${2:-'cyan'}
   prompt_adam1_color3=${3:-'green'}
+  prompt_wrap_length=${4:-40}
+  prompt_path_ellipsize_num=${5:-4}
 
   base_prompt="%K{$prompt_adam1_color1}%n@%m%k "
   post_prompt="%b%f%k"
@@ -39,10 +41,10 @@ prompt_adam1_precmd () {
   local prompt_length space_left
 
   base_prompt_expanded_no_color=$(print -P "$base_prompt_no_color")
-  base_prompt_etc=$(print -P "$base_prompt%(4~|...|)%3~")
+  base_prompt_etc=$(print -P "$base_prompt%($((${prompt_path_ellipsize_num} + 1))~|...|)%${prompt_path_ellipsize_num}~")
   prompt_length=${#base_prompt_etc}
-  if [[ $prompt_length -lt 40 ]]; then
-    path_prompt="%B%F{$prompt_adam1_color2}%(4~|...|)%3~%F{white}"
+  if [[ $prompt_length -lt $prompt_wrap_length ]]; then
+    path_prompt="%B%F{$prompt_adam1_color2}%($((${prompt_path_ellipsize_num} + 1))~|...|)%${prompt_path_ellipsize_num}~%F{white}"
   else
     space_left=$(( $COLUMNS - $#base_prompt_expanded_no_color - 2 ))
     path_prompt="%B%F{$prompt_adam1_color3}%${space_left}<...<%~$prompt_newline%F{white}"
