@@ -1,3 +1,7 @@
+2025-10-31  Oliver Kiddle  <opk@zsh.org>
+
+	* 54012: Src/subst.c: fix use of out of scope array variable
+
 2025-10-26  Bart Schaefer  <schaefer@zsh.org>
 
 	* Philippe: 53732: avoid tail-call exec in always block
