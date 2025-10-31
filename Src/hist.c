@@ -2396,7 +2396,7 @@ convamps(char *out, char *in, int inlen)
 }
 
 /**/
-mod_export void
+static void
 checkcurline(Histent he)
 {
     if (he->histnum == curhist && (histactive & HA_ACTIVE)) {

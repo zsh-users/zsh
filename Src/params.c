@@ -56,9 +56,7 @@ mod_export int locallevel;
 /* Variables holding values of special parameters */
  
 /**/
-mod_export
-char **pparams,		/* $argv        */
-     **cdpath,		/* $cdpath      */
+char **cdpath,		/* $cdpath      */
      **fpath,		/* $fpath       */
      **mailpath,	/* $mailpath    */
      **manpath,		/* $manpath     */
@@ -67,16 +65,15 @@ char **pparams,		/* $argv        */
 /**/
 mod_export
 char **path,		/* $path        */
+     **pparams,		/* $argv        */
      **fignore;		/* $fignore     */
  
 /**/
-mod_export
 char *argzero,		/* $0           */
-     *posixzero,	/* $0           */
-     *home,		/* $HOME        */
+     *ifs,		/* $IFS         */
      *nullcmd,		/* $NULLCMD     */
      *oldpwd,		/* $OLDPWD      */
-     *zoptarg,		/* $OPTARG      */
+     *posixzero,	/* $0           */
      *prompt,		/* $PROMPT      */
      *prompt2,		/* $PROMPT2     */
      *prompt3,		/* $PROMPT3     */
@@ -85,14 +82,15 @@ char *argzero,		/* $0           */
      *rprompt,		/* $RPROMPT     */
      *rprompt2,		/* $RPROMPT2    */
      *sprompt,		/* $SPROMPT     */
-     *wordchars;	/* $WORDCHARS   */
+     *wordchars,	/* $WORDCHARS   */
+     *zoptarg,		/* $OPTARG      */
+     *zsh_terminfo,     /* $TERMINFO    */
+     *zsh_terminfodirs; /* $TERMINFO_DIRS */
 /**/
 mod_export
-char *ifs,		/* $IFS         */
+char *home,		/* $HOME        */
      *postedit,		/* $POSTEDIT    */
      *term,		/* $TERM        */
-     *zsh_terminfo,     /* $TERMINFO    */
-     *zsh_terminfodirs, /* $TERMINFO_DIRS */
      *ttystrname,	/* $TTY         */
      *pwd;		/* $PWD         */
 
@@ -953,7 +951,7 @@ createparamtable(void)
 /* assign various functions used for non-special parameters */
 
 /**/
-mod_export void
+static void
 assigngetset(Param pm)
 {
     switch (PM_TYPE(pm->node.flags)) {
@@ -2528,7 +2526,7 @@ setstrvalue(Value v, char *val)
 }
 
 /**/
-mod_export void
+static void
 assignstrvalue(Value v, char *val, int flags)
 {
     if (unset(EXECOPT))
@@ -3480,7 +3478,7 @@ sethparam(char *s, char **val)
  */
 
 /**/
-mod_export Param
+static Param
 assignnparam(char *s, mnumber val, int flags)
 {
     struct value vbuf;
@@ -4105,7 +4103,7 @@ arrvarsetfn(Param pm, char **x)
 }
 
 /**/
-mod_export char *
+char *
 colonarrgetfn(Param pm)
 {
     char ***dptr = (char ***)pm->u.data;
@@ -4113,7 +4111,7 @@ colonarrgetfn(Param pm)
 }
 
 /**/
-mod_export void
+void
 colonarrsetfn(Param pm, char *x)
 {
     char ***dptr = (char ***)pm->u.data;
