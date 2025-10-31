@@ -1,5 +1,8 @@
 2025-10-31  Oliver Kiddle  <opk@zsh.org>
 
+	* LangLangbart: github #149: Completion/Darwin/Command/_say:
+	improve voice name parsing in say completion
+
 	* 54012: Src/subst.c: fix use of out of scope array variable
 
 2025-10-26  Bart Schaefer  <schaefer@zsh.org>

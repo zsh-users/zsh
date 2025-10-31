@@ -77,7 +77,7 @@ case $state in
     ;;
   voices)
     tmp=( ${(f)"$( _call_program voices $words[1] -v '\?' )"} )
-    tmp=( ${tmp%%[[:space:]](#c2,)*} )
+    tmp=( ${tmp%%[[:space:]]##[[:lower:]]##[_-][[:alnum:]]##*} )
     _values voice $tmp && ret=0
     ;;
 esac
