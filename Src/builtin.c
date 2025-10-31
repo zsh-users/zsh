@@ -7428,6 +7428,14 @@ bin_trap(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	return 1;
     }
 
+    if (!*argv) {
+	if (idigit(*arg) || !strncmp(arg, "SIG", 3))
+	    zwarnnam(name, "undefined signal: %s", arg);
+	else
+	    zwarnnam(name, "signal expected");
+	return 1;
+    }
+
     /* set traps */
     for (; *argv; argv++) {
 	Eprog t;

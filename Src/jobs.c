@@ -3054,7 +3054,11 @@ getsigidx(const char *s)
 
     /* check for a signal specified by number */
     x = atoi(s);
-    if (idigit(*s) && x >= 0)
+    if (idigit(*s) && x >= 0 && (x < VSIGCOUNT
+#if defined(SIGRTMIN) && defined(SIGRTMAX)
+	|| (x >= SIGRTMIN && x <= SIGRTMAX)
+#endif
+	))
 	return SIGIDX(x);
 
     /* search for signal by name */

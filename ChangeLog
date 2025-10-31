@@ -1,5 +1,8 @@
 2025-10-31  Oliver Kiddle  <opk@zsh.org>
 
+	* 54013: Src/builtin.c, Src/jobs.c: add a range check on signal
+	numbers passed to trap
+
 	* 54012: Src/subst.c: fix use of out of scope array variable
 
 	* 54007: Src/exec.c, Src/hist.c, Src/init.c, Src/jobs.c, Src/module.c,
