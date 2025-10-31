@@ -1,5 +1,7 @@
 2025-10-31  Oliver Kiddle  <opk@zsh.org>
 
+	* 54012: Src/subst.c: fix use of out of scope array variable
+
 	* 54007: Src/exec.c, Src/hist.c, Src/init.c, Src/jobs.c, Src/module.c,
 	Src/params.c, Src/signals.c, Src/Zle/complete.c, Src/Zle/zle_misc.c,
 	Src/Zle/compresult.c, Src/Zle/zle_keymap.c, Src/Zle/zle_main.c:

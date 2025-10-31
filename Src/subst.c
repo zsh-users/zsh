@@ -1626,6 +1626,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	   int *ret_flags)
 {
     char *aptr = *str, c, cc;
+    char *arr[2];
     char *s = aptr, *fstr, *idbeg, *idend, *ostr = (char *) getdata(n);
     int colf;			/* != 0 means we found a colon after the name */
     /*
@@ -3266,7 +3267,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		}
 		if (arrasg) {
 		    /* This is an array assignment. */
-		    char *arr[2], **t, **a, **p;
+		    char **t, **a, **p;
 		    if (spsep || spbreak) {
 			aval = sepsplit(val, spsep, 0, 1);
 			isarr = nojoin ? 1 : 2;
