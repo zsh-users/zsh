@@ -84,7 +84,9 @@ mod_export int tclen[TC_COUNT];
 /**/
 int tclines, tccolumns;
 /**/
-mod_export int hasam, hasbw, hasxn, hasye;
+mod_export int hasam;
+/**/
+int hasxn;
 
 /* Value of the Co (max_colors) entry: may not be set */
 
@@ -97,7 +99,7 @@ mod_export int tccolours;
 mod_export sigset_t sigchld_mask;
 
 /**/
-mod_export struct hookdef zshhooks[] = {
+struct hookdef zshhooks[] = {
     HOOKDEF("exit", NULL, HOOKF_ALL),
     HOOKDEF("before_trap", NULL, HOOKF_ALL),
     HOOKDEF("after_trap", NULL, HOOKF_ALL),
@@ -815,9 +817,7 @@ init_term(void)
 
 	/* check whether terminal has automargin (wraparound) capability */
 	hasam = tgetflag("am");
-	hasbw = tgetflag("bw");
 	hasxn = tgetflag("xn"); /* also check for newline wraparound glitch */
-	hasye = tgetflag("YE"); /* print in last column does carriage return */
 
 	tclines = tgetnum("li");
 	tccolumns = tgetnum("co");
@@ -870,6 +870,8 @@ init_term(void)
 	rprompt_indent = 1; /* If you change this, update rprompt_indent_unsetfn() */
 	/* The following is an attempt at a heuristic,
 	 * but it fails in some cases */
+	/* int hasbw = tgetflag("bw"); */
+	/* int hasye = tgetflag("YE"); */ /* print in last column does carriage return */
 	/* rprompt_indent = ((hasam && !hasbw) || hasye || !tccan(TCLEFT)); */
 
 	/* if there's no termcap entry for italics, use CSI 3 m */

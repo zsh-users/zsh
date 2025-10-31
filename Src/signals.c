@@ -87,9 +87,9 @@ mod_export volatile int queue_in;
 /* Variables used by trap queueing */
 
 /**/
-mod_export volatile int trap_queueing_enabled, trap_queue_front, trap_queue_rear;
+static volatile int trap_queueing_enabled, trap_queue_front, trap_queue_rear;
 /**/
-mod_export int trap_queue[MAX_QUEUE_SIZE];
+static int trap_queue[MAX_QUEUE_SIZE];
 
 /* Install signal handler for given signal.           *
  * If possible, we want to make sure that interrupted *

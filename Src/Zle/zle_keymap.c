@@ -1500,7 +1500,7 @@ default_bindings(void)
  */
 
 /**/
-mod_export ZLE_INT_T
+static ZLE_INT_T
 getrestchar_keybuf(void)
 {
     char c;

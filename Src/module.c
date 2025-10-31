@@ -1337,7 +1337,7 @@ addmathfunc(MathFunc f)
 /* Delete a single math function */
 
 /**/
-mod_export int
+int
 deletemathfunc(MathFunc f)
 {
     MathFunc p, q;

@@ -1961,7 +1961,7 @@ asklist(void)
 }
 
 /**/
-mod_export int
+static int
 printlist(int over, CLPrintFunc printm, int showall)
 {
     Cmgroup g;

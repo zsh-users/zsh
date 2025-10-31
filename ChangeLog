@@ -1,3 +1,10 @@
+2025-10-31  Oliver Kiddle  <opk@zsh.org>
+
+	* 54007: Src/exec.c, Src/hist.c, Src/init.c, Src/jobs.c, Src/module.c,
+	Src/params.c, Src/signals.c, Src/Zle/complete.c, Src/Zle/zle_misc.c,
+	Src/Zle/compresult.c, Src/Zle/zle_keymap.c, Src/Zle/zle_main.c:
+	remove some uses of mod_export that were likely unintended
+
 2025-10-27  Bart Schaefer  <schaefer@zsh.org>
 
 	* Dan Drake: 53803: Functions/Prompts/prompt_adam1_setup: make

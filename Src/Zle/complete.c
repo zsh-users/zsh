@@ -183,7 +183,7 @@ cpcmatcher(Cmatcher m)
  */
 
 /**/
-mod_export Cpattern
+static Cpattern
 cp_cpattern_element(Cpattern o)
 {
     Cpattern n = zalloc(sizeof(struct cpattern));

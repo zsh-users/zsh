@@ -4828,7 +4828,7 @@ getoutput(char *cmd, int qt)
  */
 
 /**/
-mod_export LinkList
+static LinkList
 readoutput(int in, int qt, int *readerror)
 {
     LinkList ret;

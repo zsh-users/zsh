@@ -126,8 +126,7 @@ mod_export Thingy lbindk, bindk;
 /**/
 int insmode;
 
-/**/
-mod_export int eofchar;
+static int eofchar;
 
 static int eofsent;
 /*
@@ -2048,7 +2047,7 @@ resetprompt(UNUSED(char **args))
 /* same bug called from outside zle */
 
 /**/
-mod_export void
+static void
 zle_resetprompt(void)
 {
     reexpandprompt();

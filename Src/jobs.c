@@ -55,7 +55,7 @@
    when we started without being process group leader */
 
 /**/
-mod_export pid_t origpgrp;
+pid_t origpgrp;
 
 /* the process group of the shell */
 
@@ -98,12 +98,10 @@ mod_export int jobtabsize;
 mod_export int maxjob;
 
 /* If we have entered a subshell, the original shell's job table. */
-/**/
-mod_export struct job *oldjobtab;
+static struct job *oldjobtab;
 
 /* The size of that. */
-/**/
-mod_export int oldmaxjob;
+static int oldmaxjob;
 
 /* shell timings */
  
@@ -1833,7 +1831,7 @@ clearjobtab(int monitor)
 /* In a subshell, decide we want our own job table after all. */
 
 /**/
-mod_export void
+void
 clearoldjobtab(void)
 {
     if (oldjobtab)
