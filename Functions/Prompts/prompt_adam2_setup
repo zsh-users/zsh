@@ -25,7 +25,7 @@ prompt_adam2_setup () {
 
   if [[ $1 == '8bit' ]]; then
     shift
-    if [[ ${LC_ALL:-${LC_CTYPE:-$LANG}} = *UTF-8* ]]; then
+    if [[ ${${LC_ALL:-${LC_CTYPE:-$LANG}}:u} = *(UTF-8|UTF8)* ]]; then
       prompt_gfx_tlc=$'\xe2\x94\x8c'
       prompt_gfx_mlc=$'\xe2\x94\x9c'
       prompt_gfx_blc=$'\xe2\x94\x94'

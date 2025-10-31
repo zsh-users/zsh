@@ -1,3 +1,9 @@
+2025-10-31  Bart Schaefer  <schaefer@zsh.org>
+
+	* Jim Murphy: 53783: Functions/Prompts/prompt_adam2_setup,
+	Functions/Prompts/prompt_special_chars: use case-insensitive
+	search for more variants of language files
+
 2025-10-31  Oliver Kiddle  <opk@zsh.org>
 
 	* LangLangbart: github #149: Completion/Darwin/Command/_say:

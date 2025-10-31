@@ -8,7 +8,7 @@
 
 typeset -gA schars
 
-if [[ ${LC_ALL:-${LC_CTYPE:-$LANG}} = *(UTF-8|utf8)* ]]; then
+if [[ ${${LC_ALL:-${LC_CTYPE:-$LANG}}:u} = *(UTF-8|UTF8)* ]]; then
   schars[300]=$'\xe2\x94\x94'
   schars[304]=$'\xe2\x94\x8c'
   schars[332]=$'\xe2\x94\x8c'
