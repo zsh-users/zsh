@@ -1,5 +1,8 @@
 2025-10-31  Oliver Kiddle  <opk@zsh.org>
 
+	* LangLangbart: github #149: Completion/Darwin/Command/_say:
+	improve voice name parsing in say completion
+
 	* 54013: Src/builtin.c, Src/jobs.c: add a range check on signal
 	numbers passed to trap
 
