@@ -41,7 +41,7 @@ prompt_adam1_precmd () {
   local prompt_length space_left
 
   base_prompt_expanded_no_color=$(print -P "$base_prompt_no_color")
-  base_prompt_etc=$(print -P "$base_prompt_no_color%($((${prompt_path_ellipsize_num} + 1))~|...|)%${prompt_path_ellipsize_num}~")
+  base_prompt_etc=$(print -P "$base_prompt%($((${prompt_path_ellipsize_num} + 1))~|...|)%${prompt_path_ellipsize_num}~")
   prompt_length=${#base_prompt_etc}
   if [[ $prompt_length -lt $prompt_wrap_length ]]; then
     path_prompt="%B%F{$prompt_adam1_color2}%($((${prompt_path_ellipsize_num} + 1))~|...|)%${prompt_path_ellipsize_num}~%F{white}"
