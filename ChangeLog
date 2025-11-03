@@ -1,5 +1,7 @@
 2025-11-03  Oliver Kiddle  <opk@zsh.org>
 
+	* 54020: configure.ac: add library for network support on Haiku OS
+
 	* 54019: configure.ac, Makefile.in, Src/params.c, Test/ztst.zsh,
 	Src/Builtins/rlimits.c, Src/Modules/curses.mdd: AIX support fixes
 

@@ -858,7 +858,7 @@ if test x$enable_cap = xyes; then
 fi
 
 AC_CHECK_LIB(socket, socket)
-AC_SEARCH_LIBS(gethostbyname2, bind)
+AC_SEARCH_LIBS(gethostbyname2, bind network)
 
 case $LIBS in
   *-lbind*)
