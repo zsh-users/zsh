@@ -18,7 +18,8 @@ lsarg=(
 
 if [[ $service == "rcctl" ]]; then
   _arguments -C \
-    '-d[print debug information]' \
+    '(-q)-d[print debug information]' \
+    '(-d)-q[only display the script name and errors]' \
     '-f[forcibly start the daemon]' \
     ':subcommand:('"$actions ${${${+words[(r)-[df]]}#1}/0/$subcmds}"\) \
     '*:: :->subcmd' && return
@@ -48,4 +49,5 @@ case $service in
   ${(~j:|:)actions}|disable|enable)
     _arguments "*:service to ${words[2]}:_services"
     ;;
+  *) _default ;;
 esac

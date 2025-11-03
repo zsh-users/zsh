@@ -36,6 +36,11 @@ case $OSTYPE in
       '(- :)'{-V,--version}'[display version info and exit]' \
       "*:sysctl variable:_multi_parts -i -S = -q $delimiter sysctlvars"
   ;;
+  (free|open)bsd*)
+    args+=(
+      '-f+[specify file of name/value pairs to process first]:file:_files'
+    )
+  ;|
   freebsd<14->.*)
     args+=(
       '-F[print the format of the variable]'
@@ -53,7 +58,6 @@ case $OSTYPE in
   ;|
   freebsd<10->.*)
     args+=(
-      '-f+[specify file of name/value pairs to process first]:file:_files'
       '-T[display only variables that are settable via loader]'
       '-W[display only writable variables that are not statistical]'
     )

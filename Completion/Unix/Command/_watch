@@ -14,7 +14,7 @@ case $variant in
       '(-b --beep)'{-b,--beep}'[beep on non-zero command exit]' \
       '(-c --color)'{-c,--color}'[interpret ANSI color/style sequences]' \
       '(-d --differences)'{-d-,--differences=-}'[highlight changes between updates]::how to highlight:(permanent)' \
-      '(-e --errexit)'{-e,--errexit}'[freeze updates on non-zero command exit]' \
+      '(-e --errexit)'{-e,--errexit}'[pause updating if command exits with a non-zero exit code]' \
       '(-g --chgexit)'{-g,--chgexit}'[exit on command output change]' \
       '(-n --interval)'{-n+,--interval=}'[specify update interval]:update interval (seconds) [2]' \
       '(-p --precise)'{-p,--precise}'[run command at precise intervals]' \
@@ -23,23 +23,32 @@ case $variant in
       '(-t --no-title)'{-t,--no-title}'[disable header]' \
       '(-w --no-wrap)'{-w,--no-wrap}'[disable line wrapping]' \
       '(-x --exec)'{-x,--exec}'[pass command to exec(2) instead of `sh -c`]' \
-      '(-)*::: :->cmd' \
-    && ret=0
-
-    [[ $state == cmd ]] &&
-    if
-      (( CURRENT == 1 )) &&
-      [[ $words[1] == (\"|\'|\$\')* ]] &&
-      [[ -z $opt_args[(i)(-x|--exec)] ]]
-    then
-      _cmdstring && ret=0
-    else
-      _normal -p watch && ret=0
-    fi
-    ;;
+      '(-)*::: :->cmd' && ret=0
+  ;;
+  openbsd*)
+    _arguments -s -A "-*" \
+      '(-l -w)-c[highlight changed characters]' \
+      '-e[pause updating if command exits with a non-zero exit code]' \
+      '(-c -w)-l[highlight changed lines]' \
+      '-s[set the interval between updates]: :_numbers -d 1 -u seconds interval' \
+      '(-c -l)-w[highlight changed words]' \
+      '-x[pass command to execl(3) instead of `sh -c`]' \
+      '(-)*::: :->cmd' && ret=0
+  ;;
   # watch(1) has completely different semantics on freebsd compared to linux, hence:
   (freebsd*|dragonfly*) _watch-snoop "$@" && ret=0 ;;
   (*) _default && ret=0 ;;
 esac
+
+[[ $state == cmd ]] &&
+if
+  (( CURRENT == 1 )) &&
+  [[ $words[1] == (\"|\'|\$\')* ]] &&
+  [[ -z $opt_args[(i)(-x|--exec)] ]]
+then
+  _cmdstring && ret=0
+else
+  _normal -p watch && ret=0
+fi
 
 return ret

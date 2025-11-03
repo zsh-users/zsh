@@ -3,10 +3,12 @@
 _arguments -s -S -A "-*" \
   '(*)-a[install or update firmware for all drivers]' \
   '-d[delete drivers instead of adding them]' \
+  '-D+[specify location of dmesg output used to determine needed firmware]:path [/var/run/dmesg.boot]:_files' \
   '-F[download firmware only]' \
+  '-l[list drivers without installing]' \
   '-n[dry run]' \
   '-p+[use the firmware at specified path]: : _alternative
     "urls\:url\:_urls"
     "directories\:path\:_directories"' \
   '*-v[verbose output]' \
-  '(-a)*:driver:'
+  '(-a)*:driver:compadd $(_call_program drivers $words[1] -l)'
