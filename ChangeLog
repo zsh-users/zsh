@@ -1,3 +1,8 @@
+2025-11-03  Oliver Kiddle  <opk@zsh.org>
+
+	* 54019: configure.ac, Makefile.in, Src/params.c, Test/ztst.zsh,
+	Src/Builtins/rlimits.c, Src/Modules/curses.mdd: AIX support fixes
+
 2025-10-31  Bart Schaefer  <schaefer@zsh.org>
 
 	* Jim Murphy: 53783: Functions/Prompts/prompt_adam2_setup,

@@ -158,8 +158,12 @@ static const resinfo_T known_resources[] = {
     {RLIMIT_NTHR, "maxpthreads", ZLIMTYPE_NUMBER, 1,
 		'r', "threads"},
 # endif
+# if defined(HAVE_RLIMIT_THREADS) && !defined(HAVE_RLIMIT_RTPRIO) && !defined(HAVE_RLIMIT_NTHR) /* AIX */
+    {RLIMIT_THREADS, "threads", ZLIMTYPE_NUMBER, 1,
+		'r', "threads (per process)"},
+# endif
     /* others */
-# if defined(HAVE_RLIMIT_PTHREAD) && !defined(HAVE_RLIMIT_NTHR)	/* IRIX ? */
+# if defined(HAVE_RLIMIT_PTHREAD) && !defined(HAVE_RLIMIT_NTHR) && !defined(HAVE_RLIMIT_THREADS) /* IRIX ? */
     {RLIMIT_PTHREAD, "maxpthreads", ZLIMTYPE_NUMBER, 1,
 		'T', "threads per process"},
 # endif

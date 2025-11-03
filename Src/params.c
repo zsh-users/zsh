@@ -4005,7 +4005,7 @@ strsetfn(Param pm, char *x)
 static char *nullarray = NULL;
 
 /**/
-char **
+mod_export char **
 arrgetfn(Param pm)
 {
     return pm->u.arr ? pm->u.arr : &nullarray;
@@ -6455,7 +6455,7 @@ upscope(Param pm, int reflevel)
 }
 
 /**/
-mod_export Param
+static Param
 upscope_upper(Param pm, int reflevel)
 {
     while (pm && pm->level > reflevel)

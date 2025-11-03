@@ -36,8 +36,6 @@ sdir            = @srcdir@
 sdir_top        = @top_srcdir@
 INSTALL         = @INSTALL@
 
-@DEFS_MK@
-
 # ========== DEPENDENCIES FOR BUILDING ==========
 
 # default target
@@ -45,6 +43,8 @@ all: config.h config.modules
 	@for subdir in Src Doc; do \
 	  (cd $$subdir && $(MAKE) $(MAKEDEFS) $@) || exit 1; \
 	done
+
+@DEFS_MK@
 
 # prepare module configuration
 prep:
