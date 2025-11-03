@@ -1,5 +1,9 @@
 2025-11-03  Oliver Kiddle  <opk@zsh.org>
 
+	* 54022: Completion/BSD/Command/_fw_update,
+	Completion/BSD/Command/_rcctl, Completion/Unix/Command/_sysctl,
+	Completion/Unix/Command/_watch: completion updates for openbsd 7.8
+
 	* 54020: configure.ac: add library for network support on Haiku OS
 
 	* 54019: configure.ac, Makefile.in, Src/params.c, Test/ztst.zsh,
