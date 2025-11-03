@@ -343,7 +343,7 @@ ZTST_diff() {
     ;;
   esac
   shift
-  [[ $OSTYPE != solaris* ]] && diff_arg=( -a )
+  [[ $OSTYPE != (aix|solaris)* ]] && diff_arg=( -a )
       
   if (( diff_pat )); then
     local -a diff_lines1 diff_lines2

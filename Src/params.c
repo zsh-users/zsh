@@ -3839,7 +3839,7 @@ strsetfn(Param pm, char *x)
 static char *nullarray = NULL;
 
 /**/
-char **
+mod_export char **
 arrgetfn(Param pm)
 {
     return pm->u.arr ? pm->u.arr : &nullarray;
