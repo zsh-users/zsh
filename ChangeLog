@@ -1,3 +1,7 @@
+2025-11-03  Oliver Kiddle  <opk@zsh.org>
+
+	* 54020: configure.ac: add library for network support on Haiku OS
+
 2025-10-31  Oliver Kiddle  <opk@zsh.org>
 
 	* LangLangbart: github #149: Completion/Darwin/Command/_say:
