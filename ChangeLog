@@ -1,5 +1,8 @@
 2025-11-12  Oliver Kiddle  <opk@zsh.org>
 
+	* Christopher Bock: 54026: Completion/Debian/Command/_uscan:
+	update uscan options
+
 	* Christopher Bock: 54025: Completion/Debian/Command/_apt:
 	complete apt-mark minimize-manual
 
