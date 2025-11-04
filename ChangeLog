@@ -1,5 +1,8 @@
 2025-11-12  Oliver Kiddle  <opk@zsh.org>
 
+	* Christopher Bock: 54025: Completion/Debian/Command/_apt:
+	complete apt-mark minimize-manual
+
 	* Lawrence Velázquez: 53775: Doc/Zsh/builtins.yo,
 	Doc/Zsh/compwid.yo, Doc/Zsh/mod_ksh93.yo, Doc/Zsh/mod_private.yo,
 	Doc/Zsh/mod_random.yo, Doc/Zsh/options.yo, Doc/Zsh/zle.yo, README:
