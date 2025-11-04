@@ -1,17 +1,43 @@
 #compdef uscan
 
 _arguments \
-  '(--report --no-download --download)'{--report,--no-download}'[report but do not download]' \
-  '--debug[dump downloaded pages to stdout]' \
-  '(--report --no-download --download)--download[report and download]' \
-  '(--pasv --no-pasv)--pasv[force passive mode for ftp]' \
-  '(--pasv --no-pasv)--no-pasv[do not use passive mode for ftp]' \
-  '(--symlink --no-symlink)--symlink[make orig.tar.gz symlinks]' \
-  '(--symlink --no-symlink)--no-symlink[do not make orig.tar.gz symlinks]' \
-  '(--verbose --no-verbose)--verbose[give verbose output]' \
-  '(--verbose --no-verbose)--no-verbose[do not give verbose output]' \
+  '(--conffile --conf-file)'{--conffile,--conf-file}'[add or replace default configuration file]: :_files' \
+  '(--no-conf --noconf)'{--no-conf,--noconf}"[don't read any configuration files]" \
+  "(--verbose)--no-verbose[don't give verbose output]" \
+  '(--verbose -v --no-verbose)'{--verbose,-v}'[give verbose output]' \
+  '(--debug -vv)'{--debug,-vv}'[dump downloaded pages to stdout]' \
+  '(--extra-debug -vvv)'{--extra-debug,-vvv}'[also report remote content during "search" step]' \
+  '(--no-dehs)--dehs[send dehs output(xml) to stdout and other output to stderr]' \
+  '(--dehs)--no-dehs[use traditional output (default)]' \
+  '(--download -d)'{--download,-d}'[download new upstream release(default)]' \
+  '(--force-download -dd)'{--force-download,-dd}'[download new upstream even is up-to-date w/o overwrite]' \
+  '(--overwrite-download -ddd)'{--overwrite-download,-ddd}'[download new upstream even is up-to-date and overwrite]' \
+  '(--no-download --nodownload --skip-signature --report --safe)'{--report,--safe}"[report but don't download]" \
+  '(--no-signature --skip-signature)--signature[download signature and verify (default)]' \
+  "(--signature --skip-signature)--no-signature[don't download signature but verify]" \
+  "(--signature --no-signature)--skip-signature[don't bother download signature nor verify]" \
+  '(--safe --verbose)--report-status[equivalent of setting --verbose --safe]' \
+  '(--no-download --nodownload)'{--no-download,--nodownload}"[don't download and report information]" \
+  '--download-version[specify upstream version to match]:version' \
+  '--download-debversion[specify debian package version to match the release]:debversion' \
+  '--download-current-version[download currently packaged version]' \
   '--check-dirname-level:level:((0\:never\ check\ the\ directory\ name 1\:only\ check\ directory\ name\ if\ we\ had\ to\ change\ directory 2\:always\ check\ the\ directory\ name))' \
   '--check-dirname-regex:perl regex' \
-  '(--no-conf --noconf)'{--no-conf,--noconf}'[do not read any configuration files]' \
-  '--help[display help information]' \
-  '--version[display version information]'
+  '--destdir[path to download to]: :_files -/' \
+  '--package[specify package name]:package' \
+  '--upstream-version[specify upstream version to match]:version' \
+  '--watchfile[specify watch file]:watchfile:_files' \
+  '--bare[disable site specific redirects]' \
+  '--http-header[add spcified header to request]:http-header' \
+  '--no-exclusion[disable automatic exclusion of files]' \
+  "(--symlink)--no-symlink[don't rename nor repack upstream tarball]" \
+  '--timeout[specify request timeout]:timeout:_numbers -u seconds -d 20' \
+  '(--user-agent --useragent)'{--user-agent,--useragent}'[override default user agent]:useragent' \
+  '--log[record md5sum changes]' \
+  '(: -)--help[display help information]' \
+  '(: -)--version[display version information]' \
+  '(--no-symlink)--symlink[make orig.tar.gz symlinks]' \
+  '--rename[instead of symlinking do rename downloaded files]' \
+  '--repack[after download repack to specified compression]' \
+  '--compression[choose repack compression]:compression:((gzip bzip2 lzma xz default))' \
+  '--copyright-file[exclude files mentioned in copyright-file]'
