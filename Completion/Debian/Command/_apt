@@ -691,12 +691,13 @@ _apt-mark () {
     -- \
     /$'auto\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'manual\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
+    /$'minimize-manual\0'/ /$'[^\0]#\0'/ ':::' \# \| \
     /$'hold\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'unhold\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'showauto\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'showmanual\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'showhold\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
-    /"[]"/	':argument-1::compadd "$expl_action[@]" auto manual hold unhold showauto showmanual showhold'
+    /"[]"/	':argument-1::compadd "$expl_action[@]" auto manual minimize-manual hold unhold showauto showmanual showhold'
 
   _apt-mark () {
     local expl_action expl_packages

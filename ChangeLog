@@ -1,5 +1,8 @@
 2025-11-12  Oliver Kiddle  <opk@zsh.org>
 
+	* Christopher Bock: 54025: Completion/Debian/Command/_apt:
+	complete apt-mark minimize-manual
+
 	* 54071: Completion/Zsh/Type/_ps1234: fix prompt colour completion
 
 2025-11-03  Oliver Kiddle  <opk@zsh.org>
