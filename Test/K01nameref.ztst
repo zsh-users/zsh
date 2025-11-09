@@ -753,9 +753,9 @@ F:Same test, should part 5 output look like this?
   outer() { local foo=outer; inner foo; typeset -p foo; }
   foo=3 ; { outer foo } always { typeset -p foo }
  )
-1:up-reference part 11, assignment to enclosing scope, type mismatch
+0:up-reference part 11, assignment to enclosing scope, type mismatch
+>typeset -a foo=( alpha beta gamma )
 >typeset -g foo=3
-?inner: foo: attempt to assign array value to non-array
 
  (
   inner() { local -n var="${1:?}"; unset var; var=(alpha beta gamma); }
@@ -1371,5 +1371,160 @@ F:previously this could create an infinite recursion and crash
 1:reference to incidental reference loop triggers error
 >reached
 *?*: ref1: invalid self reference
+
+ typeset -A -g VAR0=(aa AA)
+ typeset -n -g REF0=VAR0
+ typeset -A -g var0=(aa AA)
+ typeset -A var1=(aa AA)
+ () {
+   typeset -A var2=(aa AA)
+   typeset -n ref0=var0 ref1=var1 ref2=var2
+   # Test initial association
+   typeset -pm VAR0 var\?
+   REF0=(zz ZZ); ref0=(zz ZZ); ref1=(zz ZZ); ref2=(zz ZZ);
+   typeset -pm VAR0 var\?
+   # Test change from association to string
+   REF0=foo; ref0=foo; ref1=foo; ref2=foo;
+   typeset -pm VAR0 var\?
+   REF0=bar; ref0=bar; ref1=bar; ref2=bar;
+   typeset -pm VAR0 var\?
+   # Test change from string to array
+   REF0=(aa AA); ref0=(aa AA); ref1=(aa AA); ref2=(aa AA);
+   typeset -pm VAR0 var\?
+   REF0=(zz ZZ); ref0=(zz ZZ); ref1=(zz ZZ); ref2=(zz ZZ);
+   typeset -pm VAR0 var\?
+   # Test change from array to string
+   REF0=foo; ref0=foo; ref1=foo; ref2=foo;
+   typeset -pm VAR0 var\?
+ }
+0:type changes via assignments to references
+>typeset -g -A VAR0=( [aa]=AA )
+>typeset -g -A var0=( [aa]=AA )
+>typeset -g -A var1=( [aa]=AA )
+>typeset -A var2=( [aa]=AA )
+>typeset -g -A VAR0=( [zz]=ZZ )
+>typeset -g -A var0=( [zz]=ZZ )
+>typeset -g -A var1=( [zz]=ZZ )
+>typeset -A var2=( [zz]=ZZ )
+>typeset -g VAR0=foo
+>typeset -g var0=foo
+>typeset -g var1=foo
+>typeset var2=foo
+>typeset -g VAR0=bar
+>typeset -g var0=bar
+>typeset -g var1=bar
+>typeset var2=bar
+>typeset -g -a VAR0=( aa AA )
+>typeset -g -a var0=( aa AA )
+>typeset -g -a var1=( aa AA )
+>typeset -a var2=( aa AA )
+>typeset -g -a VAR0=( zz ZZ )
+>typeset -g -a var0=( zz ZZ )
+>typeset -g -a var1=( zz ZZ )
+>typeset -a var2=( zz ZZ )
+>typeset -g VAR0=foo
+>typeset -g var0=foo
+>typeset -g var1=foo
+>typeset var2=foo
+
+ typeset -A -g ass0=(aa AA)
+ typeset -A ass1=(aa AA)
+ typeset -a -g arr0=(aa AA)
+ typeset -a arr1=(aa AA)
+ typeset -g str0=foo
+ typeset str1=foo
+ () {
+   typeset -n Ass0=ass0 Ass1=ass1 Arr0=arr0 Arr1=arr1 Str0=str0 Str1=str1
+   typeset ass0 ass1 arr0 arr1 str0 str1
+   { Ass0=foo } always { TRY_BLOCK_ERROR=0 }; echo $?
+   { Ass1=foo } always { TRY_BLOCK_ERROR=0 }; echo $?
+   { Arr0=foo } always { TRY_BLOCK_ERROR=0 }; echo $?
+   { Arr1=foo } always { TRY_BLOCK_ERROR=0 }; echo $?
+   { Str0=(x) } always { TRY_BLOCK_ERROR=0 }; echo $?
+   { Str1=(x) } always { TRY_BLOCK_ERROR=0 }; echo $?
+ }
+ typeset -p ass0 ass1 arr0 arr1 str0 str1
+0:can't change type of hidden variables via assignments to references
+>1
+>1
+>1
+>1
+>1
+>1
+>typeset -g -A ass0=( [aa]=AA )
+>typeset -A ass1=( [aa]=AA )
+>typeset -g -a arr0=( aa AA )
+>typeset -a arr1=( aa AA )
+>typeset -g str0=foo
+>typeset str1=foo
+?(anon):3: can't change type of hidden variable: ass0
+?(anon):4: can't change type of hidden variable: ass1
+?(anon):5: can't change type of hidden variable: arr0
+?(anon):6: can't change type of hidden variable: arr1
+?(anon):7: can't change type of hidden variable: str0
+?(anon):8: can't change type of hidden variable: str1
+
+ typeset -A ass=(aa AA)
+ typeset -a arr=(aa AA)
+ typeset -i int=42
+ typeset str=foo
+ typeset -n Ass=ass Arr=arr Int=int Str=str
+ { typeset Ass=foo } always { TRY_BLOCK_ERROR=0 }; echo $?
+ { typeset Arr=foo } always { TRY_BLOCK_ERROR=0 }; echo $?
+ { typeset Int=(aa AA) } always { TRY_BLOCK_ERROR=0 }; echo $?
+ { typeset Str=(aa AA) } always { TRY_BLOCK_ERROR=0 }; echo $?
+ typeset -p ass arr int str
+0:type changes via plain typeset to references
+F:converting from association/array to string should work here too
+>1
+>1
+>0
+>0
+>typeset -A ass=( [aa]=AA )
+>typeset -a arr=( aa AA )
+>typeset -a int=( aa AA )
+>typeset -a str=( aa AA )
+?(eval):typeset:6: ass: inconsistent type for assignment
+?(eval):typeset:7: arr: inconsistent type for assignment
+
+ typeset var
+ typeset -n ref=var
+ # Change type to string
+ unset var; typeset    var=fubar; typeset    ref=barfu; typeset -p var
+ unset var; typeset -i var=12345; typeset +i ref=barfu; typeset -p var
+ unset var; typeset -a var=(a A); typeset +a ref=barfu; typeset -p var
+ unset var; typeset -A var=(a A); typeset +A ref=barfu; typeset -p var
+ # Change type to integer
+ unset var; typeset    var=fubar; typeset -i ref=56789; typeset -p var
+ unset var; typeset -i var=12345; typeset -i ref=56789; typeset -p var
+ unset var; typeset -a var=(a A); typeset -i ref=56789; typeset -p var
+ unset var; typeset -A var=(a A); typeset -i ref=56789; typeset -p var
+ # Change type to array
+ unset var; typeset    var=fubar; typeset -a ref=(z Z); typeset -p var
+ unset var; typeset -i var=12345; typeset -a ref=(z Z); typeset -p var
+ unset var; typeset -a var=(a A); typeset -a ref=(z Z); typeset -p var
+ unset var; typeset -A var=(a A); typeset -a ref=(z Z); typeset -p var
+ # Change type to association
+ unset var; typeset    var=fubar; typeset -A ref=(z Z); typeset -p var
+ unset var; typeset -i var=12345; typeset -A ref=(z Z); typeset -p var
+ unset var; typeset -a var=(a A); typeset -A ref=(z Z); typeset -p var
+ unset var; typeset -A var=(a A); typeset -A ref=(z Z); typeset -p var
+0:type changes via typed typeset to references
+>typeset var=barfu
+>typeset var=barfu
+>typeset var=barfu
+>typeset var=barfu
+>typeset -i var=56789
+>typeset -i var=56789
+>typeset -i var=56789
+>typeset -i var=56789
+>typeset -a var=( z Z )
+>typeset -a var=( z Z )
+>typeset -a var=( z Z )
+>typeset -a var=( z Z )
+>typeset -A var=( [z]=Z )
+>typeset -A var=( [z]=Z )
+>typeset -A var=( [z]=Z )
+>typeset -A var=( [z]=Z )
 
 %clean

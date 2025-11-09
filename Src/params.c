@@ -2203,6 +2203,7 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
     } else {
 	Param pm;
 	int isvarat;
+	int isrefslice = 0;
 
         isvarat = (t[0] == '@' && !t[1]);
 	if (flags & SCANPM_NONAMEREF)
@@ -2250,6 +2251,7 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 		    flags |= SCANPM_NOEXEC;
 		    *ss = sav;
 		    s = dyncat(ss,*pptr);
+		    isrefslice = 1;
 		} else
 		    s = *pptr;
 	    }
@@ -2264,7 +2266,7 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 		v->isarr = SCANPM_ARRONLY;
 	}
 	v->pm = pm;
-	v->flags = 0;
+	v->flags = isrefslice ? VALFLAG_REFSLICE : 0;
 	v->start = 0;
 	v->end = -1;
 	if (bracks > 0 && (*s == '[' || *s == Inbrack)) {
@@ -3222,12 +3224,18 @@ assignsparam(char *s, char *val, int flags)
 	if (!(v = getvalue(&vbuf, &s, 1))) {
 	    createparam(t, PM_SCALAR);
 	    created = 1;
-	} else if ((((v->pm->node.flags & PM_ARRAY) && !(flags & ASSPM_AUGMENT)) ||
-	    	 (v->pm->node.flags & PM_HASHED)) &&
-		 !(v->pm->node.flags & (PM_SPECIAL|PM_TIED)) && 
-		 unset(KSHARRAYS)) {
-	    unsetparam(t);
-	    createparam(t, PM_SCALAR);
+	} else if ((((v->pm->node.flags & PM_ARRAY) &&
+		     !(v->flags & VALFLAG_REFSLICE) &&
+		     !(flags & ASSPM_AUGMENT)) ||
+		    (v->pm->node.flags & PM_HASHED)) &&
+		   !(v->pm->node.flags & (PM_SPECIAL|PM_TIED)) &&
+		   unset(KSHARRAYS)) {
+	    if (resetparam(v->pm, PM_SCALAR)) {
+		unqueue_signals();
+		zsfree(val);
+		errflag |= ERRFLAG_ERROR;
+		return NULL;
+	    }
 	    /* not regarded as a new creation */
 	    v = NULL;
 	}
@@ -3378,7 +3386,8 @@ assignaparam(char *s, char **val, int flags)
 	    createparam(t, PM_ARRAY);
 	    created = 1;
 	} else if (!(PM_TYPE(v->pm->node.flags) & (PM_ARRAY|PM_HASHED)) &&
-		 !(v->pm->node.flags & (PM_SPECIAL|PM_TIED))) {
+		   !(v->flags & VALFLAG_REFSLICE) &&
+		   !(v->pm->node.flags & (PM_SPECIAL|PM_TIED))) {
 	    int uniq = v->pm->node.flags & PM_UNIQUE;
 	    if ((flags & ASSPM_AUGMENT) && !(v->pm->node.flags & PM_UNSET)) {
 	    	/* insert old value at the beginning of the val array */
@@ -3391,8 +3400,12 @@ assignaparam(char *s, char **val, int flags)
 		free(val);
 		val = new;
 	    }
-	    unsetparam(t);
-	    createparam(t, PM_ARRAY | uniq);
+	    if (resetparam(v->pm, PM_ARRAY | uniq)) {
+		unqueue_signals();
+		freearray(val);
+		errflag |= ERRFLAG_ERROR;
+		return NULL;
+	    }
 	    v = NULL;
 	}
     }
@@ -3600,11 +3613,15 @@ sethparam(char *s, char **val)
     if (!(v = fetchvalue(&vbuf, &s, 1, SCANPM_ASSIGNING))) {
 	createparam(t, PM_HASHED);
 	checkcreate = 1;
-    } else if (!(PM_TYPE(v->pm->node.flags) & PM_HASHED)) {
+    } else if (!(PM_TYPE(v->pm->node.flags) & PM_HASHED) &&
+	       !(v->flags & VALFLAG_REFSLICE)) {
 	if (!(v->pm->node.flags & PM_SPECIAL)) {
-	    unsetparam(t);
-	    /* no WARNCREATEGLOBAL check here as parameter already existed */
-	    createparam(t, PM_HASHED);
+	    if (resetparam(v->pm, PM_HASHED)) {
+		unqueue_signals();
+		freearray(val);
+		errflag |= ERRFLAG_ERROR;
+		return NULL;
+	    }
 	    v = NULL;
 	} else {
 	    zerr("%s: can't change type of a special parameter", t);
@@ -3759,6 +3776,29 @@ setiparam_no_convert(char *s, zlong val)
     char buf[BDIGBUFSIZE];
     convbase(buf, val, 10);
     return assignsparam(s, ztrdup(buf), ASSPM_WARN);
+}
+
+/* Reset a parameter */
+
+/**/
+mod_export int
+resetparam(Param pm, int flags)
+{
+    char *s = pm->node.nam;
+    queue_signals();
+    if (pm != (Param)(paramtab == realparamtab ?
+	       /* getnode2() to avoid autoloading */
+	       paramtab->getnode2(paramtab, s) :
+	       paramtab->getnode(paramtab, s))) {
+	unqueue_signals();
+	zerr("can't change type of hidden variable: %s", s);
+	return 1;
+    }
+    s = dupstring(s);
+    unsetparam_pm(pm, 0, 1);
+    unqueue_signals();
+    createparam(s, flags);
+    return 0;
 }
 
 /* Unset a parameter */
