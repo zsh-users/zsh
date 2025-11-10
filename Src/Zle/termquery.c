@@ -223,8 +223,8 @@ probe_terminal(const char *tquery, seqstate_t *states,
 #endif
     settyinfo(&ti);
 
-    fputs(tquery, shout);
-    fflush(shout);
+    write_loop(SHTTY, tquery, strlen(tquery));
+    notify_pwd(); /* unrelated to the function's main purpose */
 
     while (!finish && *curstate) {
 	int consumed = 0; /* whether an input token has been matched */
@@ -571,6 +571,28 @@ handle_paste(UNUSED(int sequence), UNUSED(int *numbers), UNUSED(int len),
     *(char**) output = base64_decode(capture, clen);
 }
 
+static char*
+url_encode(const char* path, size_t *ulen)
+{
+    char *url = zhalloc(strlen(path) * 3 + 1); /* worst case length triples */
+    const char *in = path;
+    char *out = url;
+
+    for (; *in; in++) {
+        /* In theory, space can be encoded as '+' but not all terminals
+	 * handled that and %20 works reliably.
+	 * ':' as a Windows drive letter should also not be encoded */
+        if (isalnum(*in) || strchr("-._~/", *in))
+            *out++ = *in; /* untouched in encoding */
+        else
+            out += sprintf(out, "%%%02X", *in); /* otherwise %HH */
+    }
+
+    *out = '\0';
+    *ulen = out - url;
+    return url;
+}
+
 /**/
 char *
 system_clipget(char clip)
@@ -588,5 +610,147 @@ void
 system_clipput(char clip, char *content, size_t clen)
 {
     char *encoded = base64_encode(content, clen);
-    fprintf(shout, "\033]52;%c;%s\a", clip, encoded);
+    fprintf(shout, "\033]52;%c;%s\033\\", clip, encoded);
+}
+
+/**/
+static int
+extension_enabled(const char *class, const char *ext, unsigned clen, int def)
+{
+    char **e, **elist = getaparam(EXTVAR);
+
+    for (e = elist; e && *e; e++) {
+	int negate = (**e == '-');
+	if (strncmp(*e + negate, class, clen))
+	    continue;
+
+	if (!*(*e + negate + clen) || !strcmp(*e + negate + clen, ext))
+	    return !negate;
+    }
+    return def;
+}
+
+
+struct extension {
+    char *key, *seq[2];
+    int class, enabled;
+};
+
+static const struct extension editext[] = {
+    { "bracketed-paste", { NULL, NULL}, 0, 1 },
+    { "integration-prompt", { "\033]133;B\033\\" }, 11, 1 },
+#if 0
+    { "modkeys-kitty", { "\033[=5u", "\033[=0u" }, 7, 0 },
+#endif
+    { "modkeys-xterm", { "\033[>4;1m", "\033[>4m" }, 7, 0 }
+};
+
+static void
+collate_seq(int sindex, int dir)
+{
+    char seq[256];
+    char *pos = seq;
+    int max = sizeof(editext) / sizeof(*editext);
+    int i;
+    char **bracket;
+    char **e, **elist = getaparam(EXTVAR);
+
+    for (i = dir > 0 ? 0 : max - 1; i >= 0 && i < max; i += dir) {
+	int enabled = editext[i].enabled;
+	if (i && !editext[i].seq[sindex])
+	    continue;
+	for (e = elist; e && *e; e++) {
+	    int negate = (**e == '-');
+	    if (negate != enabled)
+		continue;
+	    if ((editext[i].class &&
+                !strncmp(*e + negate, editext[i].key, editext[i].class) &&
+		!*(*e + negate + editext[i].class)) ||
+		!strcmp(*e + negate + editext[i].class,
+                    editext[i].key + editext[i].class))
+	    {
+                enabled = !negate;
+		break;
+	    }
+
+	}
+        if (enabled) {
+	    if (i)
+		strucpy(&pos, editext[i].seq[sindex]);
+	    else if ((bracket = getaparam("zle_bracketed_paste")) &&
+		    arrlen(bracket) == 2)
+		strucpy(&pos, bracket[sindex]);
+	}
+    }
+    write_loop(SHTTY, seq, pos - seq);
+}
+
+/**/
+void
+start_edit(void)
+{
+    collate_seq(0, 1);
+}
+
+/**/
+void
+end_edit(void)
+{
+    collate_seq(1, -1);
+}
+
+/**/
+const char **
+prompt_markers(void)
+{
+    static unsigned aid = 0;
+    static char pre[] = "\033]133;A;cl=m;aid=zZZZZZZ\033\\"; /* before the prompt */
+    static const char *const PR = "\033]133;P;k=i\033\\";   /* primary (PS1) */
+    static const char *const SE = "\033]133;P;k=s\033\\";   /* secondary (PS2) */
+    static const char *const RI = "\033]133;P;k=r\033\\";   /* right (RPS1,2) */
+    static const char *markers[] = { pre, PR, SE, RI };
+    static const char *nomark[] = { NULL, NULL, NULL, NULL };
+
+    if (!extension_enabled("integration", "prompt", 11, 1))
+	return nomark;
+
+    if (!aid) {
+	/* hostname and pid should uniquely identify a shell instance */
+	char *h = getsparam("HOST");
+	aid = (h ? hasher(h) : 0) ^ getpid();
+	if (!aid) aid = 1; /* unlikely but just to be safe */
+	/* base64 not required but it is safe, convenient and compact */
+	h = base64_encode((const char *)&aid, sizeof(aid));
+	memcpy(pre + 13, h, 6);
+    }
+
+    return markers;
+}
+
+/**/
+void
+mark_output(int start)
+{
+    static const char START[] = "\033]133;C\033\\";
+    static const char END[] = "\033]133;D\033\\";
+    if (extension_enabled("integration", "output", 11, 1))
+	write_loop(SHTTY, start ? START : END,
+		(start ? sizeof(START) : sizeof(END)) - 1);
+}
+
+/**/
+void
+notify_pwd(void)
+{
+    char *url;
+    size_t ulen;
+
+    if (!extension_enabled("integration", "pwd", 11, 1))
+	return;
+
+    url = url_encode(pwd, &ulen);
+    /* only "localhost" seems to be much use here as the host */
+    write_loop(SHTTY, "\033]7;file://localhost", 20);
+    write_loop(SHTTY, url, ulen);
+    write_loop(SHTTY, "\033\\", 2);
 }

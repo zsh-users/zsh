@@ -3235,7 +3235,10 @@ enum {
     ZLE_CMD_REFRESH,
     ZLE_CMD_SET_KEYMAP,
     ZLE_CMD_GET_KEY,
-    ZLE_CMD_SET_HIST_LINE
+    ZLE_CMD_SET_HIST_LINE,
+    ZLE_CMD_PREEXEC,
+    ZLE_CMD_POSTEXEC,
+    ZLE_CMD_CHPWD
 };
 
 /***************************************/

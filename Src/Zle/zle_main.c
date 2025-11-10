@@ -1215,9 +1215,10 @@ zlecore(void)
 char *
 zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
 {
-    char *s, **bracket;
+    char *s;
     int old_errno = errno;
     int tmout = getiparam("TMOUT");
+    const char **markers = prompt_markers();
 
 #if defined(HAVE_POLL) || defined(HAVE_SELECT)
     /* may not be set, but that's OK since getiparam() returns 0 == off */
@@ -1232,7 +1233,7 @@ zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
 	char *pptbuf;
 	int pptlen;
 
-	pptbuf = unmetafy(promptexpand(lp ? *lp : NULL, 0, NULL, NULL),
+	pptbuf = unmetafy(promptexpand(lp ? *lp : NULL, 0, NULL, NULL, NULL),
 			  &pptlen);
 	pmpt_attr = txtcurrentattrs;
 	write_loop(2, pptbuf, pptlen);
@@ -1270,10 +1271,11 @@ zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
     trashedzle = 0;
     raw_lp = lp;
     txtcurrentattrs = txtpendingattrs = txtunknownattrs = 0;
-    lpromptbuf = promptexpand(lp ? *lp : NULL, 1, NULL, NULL);
+    lpromptbuf = promptexpand(lp ? *lp : NULL, 1,
+	    markers[flags == ZLCON_LINE_CONT ? 2 : 1], NULL, NULL);
     pmpt_attr = txtcurrentattrs;
     raw_rp = rp;
-    rpromptbuf = promptexpand(rp ? *rp : NULL, 1, NULL, NULL);
+    rpromptbuf = promptexpand(rp ? *rp : NULL, 1, markers[2], NULL, NULL);
     rpmpt_attr = txtcurrentattrs;
     prompt_attr = mixattrs(pmpt_attr, rpmpt_attr);
     free_prepostdisplay();
@@ -1344,6 +1346,10 @@ zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
     prefixflag = 0;
     region_active = 0;
 
+    /* semantic prompt marker printed before first prompt */
+    if (*markers)
+	write_loop(2, *markers, strlen(*markers));
+
     zrefresh();
 
     unqueue_signals();	/* Should now be safe to acknowledge SIGWINCH */
@@ -1353,8 +1359,7 @@ zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
     if (zleline && *zleline)
 	redrawhook();
 
-    if ((bracket = getaparam("zle_bracketed_paste")) && arrlen(bracket) == 2)
-	fputs(*bracket, shout);
+    start_edit();
 
     zrefresh();
 
@@ -1365,8 +1370,7 @@ zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
 		  "ZLE_VARED_ABORTED" :
 		  "ZLE_LINE_ABORTED", zlegetline(NULL, NULL));
 
-    if ((bracket = getaparam("zle_bracketed_paste")) && arrlen(bracket) == 2)
-	fputs(bracket[1], shout);
+    end_edit();
 
     if (done && !exit_pending && !errflag)
 	zlecallhook(finish, NULL);
@@ -1895,11 +1899,13 @@ describekeybriefly(UNUSED(char **args))
 	return 1;
     clearlist = 1;
     statusline = "Describe key briefly: _";
+    start_edit();
     zrefresh();
     if (invicmdmode() && region_active && (km = openkeymap("visual")))
         selectlocalmap(km);
     seq = getkeymapcmd(curkeymap, &func, &str);
     selectlocalmap(NULL);
+    end_edit();
     statusline = NULL;
     if(!*seq)
 	return 1;
@@ -1997,6 +2003,7 @@ reexpandprompt(void)
     static int looping;
 
     if (!reexpanding++) {
+	const char **markers = prompt_markers();
 	/*
 	 * If we're displaying a status in the prompt, it
 	 * needs to be the toplevel one, not the one from
@@ -2015,7 +2022,7 @@ reexpandprompt(void)
 	    looping = reexpanding;
 
 	    txtcurrentattrs = txtpendingattrs = txtunknownattrs = 0;
-	    new_lprompt = promptexpand(raw_lp ? *raw_lp : NULL, 1, NULL, NULL);
+	    new_lprompt = promptexpand(raw_lp ? *raw_lp : NULL, 1, markers[0], NULL, NULL);
 	    pmpt_attr = txtcurrentattrs;
 	    free(lpromptbuf);
 	    lpromptbuf = new_lprompt;
@@ -2023,7 +2030,7 @@ reexpandprompt(void)
 	    if (looping != reexpanding)
 		continue;
 
-	    new_rprompt = promptexpand(raw_rp ? *raw_rp : NULL, 1, NULL, NULL);
+	    new_rprompt = promptexpand(raw_rp ? *raw_rp : NULL, 1, markers[2], NULL, NULL);
 	    rpmpt_attr = txtcurrentattrs;
 	    prompt_attr = mixattrs(pmpt_attr, rpmpt_attr);
 	    free(rpromptbuf);
@@ -2176,6 +2183,18 @@ zle_main_entry(int cmd, va_list ap)
 
 	break;
     }
+
+    case ZLE_CMD_PREEXEC:
+	mark_output(1);
+	break;
+
+    case ZLE_CMD_POSTEXEC:
+	mark_output(0);
+	break;
+
+    case ZLE_CMD_CHPWD:
+	notify_pwd();
+	break;
 
     default:
 #ifdef DEBUG

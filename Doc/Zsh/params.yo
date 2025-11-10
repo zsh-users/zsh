@@ -1741,6 +1741,30 @@ startup.  Extensions can be any of the following, where the marks `<D>' and
 `<E>' indicate whether they are disabled or enabled by default:
 
 startitem()
+item(tt(bracketed-paste) <E>)(
+Many terminal emulators have a feature that allows applications to identify
+when text is pasted into the terminal rather than being typed normally.  For
+ZLE, this means that special characters such as tabs and newlines can be
+inserted instead of invoking editor commands. Furthermore, pasted text forms a
+single undo event and if the region is active, pasted text will replace the
+region.
+)
+item(tt(integration-output) <E>)(
+This provides the terminal with semantic information regarding where the output
+from commands start and finish. Some terminals use this information to make it
+easy to select just the output from a single command.
+)
+item(tt(integration-prompt) <E>)(
+This informs the terminal when the shell displays a prompt. This enables a
+variety of terminal features such as displaying markers, allowing you to jump
+to previous commands in the scroll-back buffer and ensuring that right prompts
+are handled correctly when the window is resized. The end of the prompt also
+provides the terminal with a marker for the start of user input.
+)
+item(tt(integration-pwd) <E>)(
+This advises the terminal of the shell's current directory which allows it
+to create new windows with the same current working directory.
+)
 item(tt(query-bg) <E>)(
 Query the terminal background color which is used for tt(.term.bg) and
 tt(.term.mode).
@@ -1758,6 +1782,11 @@ Support for the kitty keyboard handling protocol which enables reporting of a
 wider range of key combinations and resolves problems with ambiguous key
 sequences.  Currently there is only support for detecting whether the terminal
 supports this feature.
+)
+item(tt(modkeys-xterm) <D>)(
+Support for the keyboard handling sequences associated with xterm's
+tt(modifyOtherKeys) X resource. This enables reporting of a wider range of key
+combinations and resolves some problems with ambiguous key sequences.
 )
 xitem(tt(truecolor) <D>)
 item(tt(query-truecolor) <E>)(
@@ -1863,18 +1892,13 @@ vindex(zle_bracketed_paste)
 cindex(bracketed paste)
 cindex(enabling bracketed paste)
 item(tt(zle_bracketed_paste))(
-Many terminal emulators have a feature that allows applications to
-identify when text is pasted into the terminal rather than being typed
-normally. For ZLE, this means that special characters such as tabs
-and newlines can be inserted instead of invoking editor commands.
-Furthermore, pasted text forms a single undo event and if the region is
-active, pasted text will replace the region.
-
-This two-element array contains the terminal escape sequences for
-enabling and disabling the feature. These escape sequences are used to
-enable bracketed paste when ZLE is active and disable it at other times.
-Unsetting the parameter has the effect of ensuring that bracketed paste
-remains disabled.
+This two-element array contains the terminal escape sequences for enabling and
+disabling the bracketed paste feature which allows ZLE to discern text that is
+pasted into the terminal.  These escape sequences are used to enable bracketed
+paste when ZLE is active and disable it at other times.  Unsetting the
+parameter has the effect of ensuring that bracketed paste remains disabled.
+However, see also the tt(.term.extensions) parameter which provides a single
+place to enable or disable terminal features.
 )
 vindex(zle_highlight)
 item(tt(zle_highlight))(

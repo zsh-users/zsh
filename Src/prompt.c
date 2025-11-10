@@ -174,7 +174,7 @@ promptpath(char *p, int npath, int tilde)
 
 /**/
 mod_export char *
-promptexpand(char *s, int ns, char *rs, char *Rs)
+promptexpand(char *s, int ns, const char *marker, char *rs, char *Rs)
 {
     struct buf_vars new_vars;
 
@@ -218,6 +218,11 @@ promptexpand(char *s, int ns, char *rs, char *Rs)
     new_vars.bp1 = NULL;
     new_vars.truncwidth = 0;
 
+    if (marker && *s) {
+	*new_vars.bp++ = Inpar;
+	strucpy(&new_vars.bp, (char *) marker);
+	*new_vars.bp++ = Outpar;
+    }
     putpromptchar(1, '\0');
     addbufspc(2);
     if (new_vars.dontcount)
@@ -321,7 +326,7 @@ parsecolorchar(zattr arg, int is_fg)
 	    *ep = '\0';
 	    /* expand the contents of the argument so you can use
 	     * %v for example */
-	    coll = col = promptexpand(bv->fm, 0, NULL, NULL);
+	    coll = col = promptexpand(bv->fm, 0, NULL, NULL, NULL);
 	    *ep = oc;
 	    arg = match_colour((const char **)&coll, is_fg, 0);
 	    free(col);

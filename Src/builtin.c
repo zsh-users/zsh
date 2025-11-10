@@ -1258,8 +1258,11 @@ cd_new_pwd(int func, LinkNode dir, int quiet)
     /* execute the chpwd function */
     fflush(stdout);
     fflush(stderr);
-    if (!quiet)
+    if (!quiet) {
 	callhookfunc("chpwd", NULL, 1, NULL);
+	if (zle_load_state == 1)
+	    zleentry(ZLE_CMD_CHPWD);
+    }
 
     dirstacksize = getiparam("DIRSTACKSIZE");
     /* handle directory stack sizes out of range */
@@ -4798,7 +4801,7 @@ bin_print(char *name, char **args, Options ops, int func)
 	     */
 	    char *str = unmetafy(
 		promptexpand(metafy(args[n], len[n], META_NOALLOC),
-			     0, NULL, NULL),
+			     0, NULL, NULL, NULL),
 		&len[n]);
 	    args[n] = dupstrpfx(str, len[n]);
 	    free(str);

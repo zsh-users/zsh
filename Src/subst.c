@@ -4001,7 +4001,7 @@ colonsubscript:
 		char *tmps;
 		untokenize(*ap);
 		txtunknownattrs = TXT_ATTR_ALL;
-		tmps = promptexpand(*ap, 0, NULL, NULL);
+		tmps = promptexpand(*ap, 0, NULL, NULL, NULL);
 		*ap = dupstring(tmps);
 		free(tmps);
 	    }
@@ -4011,7 +4011,7 @@ colonsubscript:
 		val = dupstring(val), copied = 1;
 	    untokenize(val);
 	    txtunknownattrs = TXT_ATTR_ALL;
-	    tmps = promptexpand(val, 0, NULL, NULL);
+	    tmps = promptexpand(val, 0, NULL, NULL, NULL);
 	    val = dupstring(tmps);
 	    free(tmps);
 	}

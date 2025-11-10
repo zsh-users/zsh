@@ -1,5 +1,10 @@
 2025-11-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 53404: Doc/Zsh/params.yo, Src/Zle/termquery.c, Src/Zle/zle_main.c,
+	Src/builtin.c, Src/init.c, Src/input.c, Src/loop.c, Src/prompt.c,
+	Src/subst.c, Src/utils.c, Src/zsh.h, Test/X04zlehighlight.ztst,
+	Test/X06termquery.ztst: terminal integration with semantic markers
+
 	* 53379, 53380: Doc/Zsh/params.yo, Test/X04zlehighlight.ztst,
 	Src/prompt.c: autoload nearcolor based on truecolor detection
 

@@ -282,7 +282,7 @@ execselect(Estate state, UNUSED(int do_exec))
 		    /* Keep any user interrupt error status */
 		    errflag = oef | (errflag & ERRFLAG_INT);
 	    	} else {
-		    str = promptexpand(prompt3, 0, NULL, NULL);
+		    str = promptexpand(prompt3, 0, NULL, NULL, NULL);
 		    zputs(str, stderr);
 		    free(str);
 		    fflush(stderr);

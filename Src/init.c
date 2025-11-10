@@ -213,12 +213,17 @@ loop(int toplevel, int justonce)
 		 */
 		errflag &= ~ERRFLAG_ERROR;
 	    }
+	    if (toplevel && zle_load_state == 1)
+		zleentry(ZLE_CMD_PREEXEC);
 	    if (stopmsg)	/* unset 'you have stopped jobs' flag */
 		stopmsg--;
 	    execode(prog, 0, 0, toplevel ? "toplevel" : "file");
 	    tok = toksav;
-	    if (toplevel)
+	    if (toplevel) {
 		noexitct = 0;
+		if (zle_load_state == 1)
+		    zleentry(ZLE_CMD_POSTEXEC);
+	    }
 	}
 	if (ferror(stderr)) {
 	    zerr("write error");
@@ -1803,7 +1808,7 @@ VA_DCL
 
 	lp = va_arg(ap, char **);
 
-	pptbuf = unmetafy(promptexpand(lp ? *lp : NULL, 0, NULL, NULL),
+	pptbuf = unmetafy(promptexpand(lp ? *lp : NULL, 0, NULL, NULL, NULL),
 			  &pptlen);
 	write_loop(2, pptbuf, pptlen);
 	free(pptbuf);

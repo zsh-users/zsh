@@ -1556,7 +1556,7 @@ preprompt(void)
 	    eolmark = "%B%S%#%s%b";
 	opts[PROMPTPERCENT] = 1;
 	txtunknownattrs = TXT_ATTR_ALL;
-	str = promptexpand(eolmark, 1, NULL, NULL);
+	str = promptexpand(eolmark, 1, NULL, NULL, NULL);
 	countprompt(str, &w, 0, -1);
 	opts[PROMPTPERCENT] = percents;
 	zputs(str, shout);
@@ -1726,7 +1726,7 @@ printprompt4(void)
 	opts[XTRACE] = 0;
 	unmetafy(s, &l);
 	s = unmetafy(promptexpand(metafy(s, l, META_NOALLOC),
-				  0, NULL, NULL), &l);
+				  0, NULL, NULL, NULL), &l);
 	opts[XTRACE] = t;
 
 	fprintf(xtrerr, "%s", s);
@@ -3275,7 +3275,7 @@ spckword(char **s, int hist, int cmd, int ask)
 		x = 'n';
 	    } else if (shout) {
 		char *pptbuf;
-		pptbuf = promptexpand(sprompt, 0, best, guess);
+		pptbuf = promptexpand(sprompt, 0, NULL, best, guess);
 		zputs(pptbuf, shout);
 		free(pptbuf);
 		fflush(shout);

@@ -12,7 +12,7 @@
       zpty zsh "${(q)ZTST_testdir}/../Src/zsh -fiV +Z"
       zpty -w zsh "module_path=( ${(j< >)${(@q-)module_path}} \$module_path )"
       zpty -w zsh 'zle_highlight=( fg_start_code:"CDE|3" fg_end_code:"|" bg_start_code:"BCDE|4" bg_end_code:"|" )'
-      zpty -w zsh '.term.extensions=( -query truecolor )'
+      zpty -w zsh '.term.extensions=( -query truecolor -bracketed-paste -integration )'
     }
     zpty_input() {
       zpty ${${(M)2:#nonl}:+-n} -w zsh "$1"
@@ -20,7 +20,7 @@
     zpty_enable_zle() {
       zpty -w zsh "tcfunc() { REPLY=""; }"
       # This line will not be echoed back, behaving like ! -o zle
-      zpty -w zsh "setopt zle; zle -T tc tcfunc; unset zle_bracketed_paste"
+      zpty -w zsh "setopt zle; zle -T tc tcfunc"
     }
     zpty_line() {
       setopt localoptions extendedglob noshwordsplit
