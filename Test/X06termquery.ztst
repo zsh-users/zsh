@@ -1,0 +1,89 @@
+# Tests for handling terminal responses to escape sequences
+%prep
+
+  if zmodload zsh/zpty 2> /dev/null; then
+    termresp() {
+      setopt localoptions extendedglob
+      export PS1= PS2= COLORTERM= TERM=
+      typeset +x -m .term.\*
+      zpty -d
+      zpty zsh "${(q)ZTST_testdir}/../Src/zsh -fiV +Z"
+      zpty -w zsh "module_path=( ${(j< >)${(@q-)module_path}} \$module_path )"
+      zpty -w zsh "setopt zle"
+      zpty -r zsh REPLY $'\e*\r'
+      zpty -n -w zsh "$1"
+      zpty -w zsh "typeset -p -m .term.\*"
+      zpty -w zsh 'exit'
+      { zpty -r zsh } | tr -d '\015' | grep -v '^ '
+      zpty -d
+    }
+  else
+    ZTST_unimplemented='the zsh/zpty module is not available'
+  fi
+
+%test
+
+  termresp $'\e]11;rgb:ffff/ffff/dddd\e\\\e]10;rgb:0000/0000/0000\e\\\e[?0u\eP1+r524742=38\e\\\eP>|foot(1.20.2)\e\\\e[?62;4;22;28c'
+0:foot response to terminal queries
+>typeset .term.id=foot
+>typeset .term.fg='#000000'
+>typeset .term.bg='#ffffdd'
+>typeset .term.version=1.20.2
+>typeset .term.mode=light
+>typeset -a .term.extensions=( modkeys-kitty truecolor )
+
+  termresp $'\e]11;rgb:0/0/0\e\\\e]10;rgb:ff/ff/ff\e\\\eP>|Wayst(0.0.0)\e\\\e[?63;1;4c'
+0:wayst response to terminal queries (shorter colour sequences)
+>typeset .term.id=Wayst
+>typeset .term.fg='#ffffff'
+>typeset .term.bg='#000000'
+>typeset .term.version=0.0.0
+>typeset .term.mode=dark
+
+  termresp $'\e]11;rgb:0000/0000/0000\e\\\e]10;rgb:b2b2/b2b2/b2b2\e\\\eP1+r524742=382F382F38\e\\\eP>|WezTerm 20240203-110809-5046fc22\e\\\e[?65;4;6;18;22c'
+0:WezTerm response to terminal queries (space separates version and longer RGB response)
+>typeset .term.id=WezTerm
+>typeset .term.fg='#b2b2b2'
+>typeset .term.bg='#000000'
+>typeset .term.version=20240203-110809-5046fc22
+>typeset .term.mode=dark
+>typeset -a .term.extensions=( truecolor )
+
+  termresp $'\e]11;rgb:9600/8700/7900\e\e]10;rgb:0000/0000/0000\e\e[?1;2c'
+0:urxvt response to terminal queries (bug in end of colour sequences)
+>typeset .term.fg='#000000'
+>typeset .term.bg='#968779'
+>typeset .term.mode=light
+
+  termresp $'\e]11;rgb:0000/0000/0000\e\\\e]10;rgb:dddd/dddd/dddd\e\\\e[?0u\eP0+r524742\e\\\eP>|kitty(0.36.4)\e\\\e[?62;c'
+0:kitty response to terminal queries (responds with error to RGB request)
+>typeset .term.id=kitty
+>typeset .term.fg='#dddddd'
+>typeset .term.bg='#000000'
+>typeset .term.version=0.36.4
+>typeset .term.mode=dark
+>typeset -a .term.extensions=( modkeys-kitty )
+
+  termresp $'\e]11;rgb:0000/ffff/8c8c\e\\\e]10;rgb:0000/0000/0000\e\\\eP1+r524742=38\e\\\eP>|XTerm(396)\e\\\e[?64;1;2;6;9;15;16;17;18;21;22;28c'
+0:xterm response to terminal queries
+>typeset .term.id=XTerm
+>typeset .term.fg='#000000'
+>typeset .term.bg='#00ff8c'
+>typeset .term.version=396
+>typeset .term.mode=light
+>typeset -a .term.extensions=( truecolor )
+
+  termresp $'echo type\e]11;rgb:0/0/0\aah\e]10;rgb:A/B/C\aea\e[?0u\eP0+r\e\\d\n\e[?0;c'
+0:type-ahead
+>typeahead
+>typeset .term.fg='#0a0b0c'
+>typeset .term.bg='#000000'
+>typeset .term.mode=dark
+>typeset -a .term.extensions=( modkeys-kitty )
+
+  termresp ''
+0:no response - timeout
+
+%clean
+
+  zmodload -ui zsh/zpty

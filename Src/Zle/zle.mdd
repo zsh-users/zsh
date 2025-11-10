@@ -8,7 +8,7 @@ autofeatures="b:bindkey b:vared b:zle"
 objects="zle_bindings.o zle_hist.o zle_keymap.o zle_main.o \
 zle_misc.o zle_move.o zle_params.o zle_refresh.o \
 zle_thingy.o zle_tricky.o zle_utils.o zle_vi.o zle_word.o \
-textobjects.o"
+termquery.o textobjects.o"
 
 headers="zle.h zle_things.h"
 

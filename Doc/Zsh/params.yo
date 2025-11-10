@@ -965,6 +965,40 @@ there is a block of reserved or unused signal numbers before the POSIX
 real-time signals so the array index can't be used as an accurate indicator
 of their signal number. Use, for example, tt(kill -l SIGRTMIN) instead.
 )
+vindex(.term.bg)
+item(tt(.term.bg))(
+The background color of the terminal if the terminal supports the
+necessary interface for retrieving this information.
+
+See also the tt(.term.extensions) parameter.
+)
+vindex(.term.fg)
+item(tt(.term.fg))(
+Like tt(.term.bg) but for the foreground color.
+)
+vindex(.term.id)
+item(tt(.term.id))(
+Like the tt(TERM) parameter, this identifies the terminal but is obtained by
+querying the terminal.  Many terminals name a different common terminal in
+tt(TERM) that they then emulate, often imperfectly.  This allows them to work
+without the need to distribute updates to terminal capability databases.  The
+more accurate identification in this parameter may be useful when configuring
+aspects of the shell differently for specific terminals.
+
+See also the tt(.term.extensions) parameter.
+)
+vindex(.term.version)
+item(tt(.term.version))(
+The version number of the terminal application, set in conjunction with
+tt(.term.id).
+)
+vindex(.term.mode)
+item(tt(.term.mode))(
+Either tt(light) or tt(dark).  In cases where the terminal background color is
+detected and set in tt(.term.bg), this is set to provide a basic indication of
+how light that color is.  This may help with configuring readable color
+combinations.
+)
 vindex(TRY_BLOCK_ERROR)
 item(tt(TRY_BLOCK_ERROR) <S>)(
 In an tt(always) block, indicates whether the preceding list of code
@@ -1694,6 +1728,43 @@ manref(terminfo)(5) to check support on your system.  If set, this
 causes the shell to reinitialise the terminal, making the workaround
 `tt(TERM=$TERM)' unnecessary.  Note that unlike other colon-separated
 arrays this is not tied to a zsh array.
+)
+vindex(.term.extensions)
+item(tt(.term.extensions))(
+An array containing a list of extension features of the terminal to be enabled
+or disabled (prefixed with `tt(-)').  When ZLE starts, it will add entries for
+features that were auto-detected.  This auto-detection uses extensions itself,
+all named with a `tt(query)' prefix.  As these are used when ZLE starts they
+would need to be disabled early in the startup files if they are to be
+disabled.  A value of `tt(-query)' will disable all terminal queries on
+startup.  Extensions can be any of the following, where the marks `<D>' and
+`<E>' indicate whether they are disabled or enabled by default:
+
+startitem()
+item(tt(query-bg) <E>)(
+Query the terminal background color which is used for tt(.term.bg) and
+tt(.term.mode).
+)
+item(tt(query-fg) <E>)(
+Query the terminal foreground color which is used for tt(.term.fg).
+)
+item(tt(query-id) <E>)(
+Query the terminal identification which is used for tt(.term.id) and
+tt(.term.version).
+)
+xitem(tt(modkeys-kitty) <D>)
+item(tt(query-modkeys-kitty) <E>)(
+Support for the kitty keyboard handling protocol which enables reporting of a
+wider range of key combinations and resolves problems with ambiguous key
+sequences.  Currently there is only support for detecting whether the terminal
+supports this feature.
+)
+xitem(tt(truecolor) <E>)
+item(tt(query-truecolor) <E>)(
+Support for 24-bit truecolor escape sequences.  Auto-detection also tries
+termcap and the tt(COLORTERM) environment variable.
+)
+enditem()
 )
 vindex(TIMEFMT)
 item(tt(TIMEFMT))(

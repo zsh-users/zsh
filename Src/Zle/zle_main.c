@@ -2239,6 +2239,10 @@ setup_(UNUSED(Module m))
     comprecursive = 0;
     rdstrs = NULL;
 
+    /* detect terminal color and features */
+    if (shout)
+	query_terminal();
+
     /* initialise the keymap system */
     init_keymaps();
 
