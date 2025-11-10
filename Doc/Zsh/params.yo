@@ -965,6 +965,12 @@ there is a block of reserved or unused signal numbers before the POSIX
 real-time signals so the array index can't be used as an accurate indicator
 of their signal number. Use, for example, tt(kill -l SIGRTMIN) instead.
 )
+vindex(.term.cursor)
+item(tt(.term.cursor))(
+The default color of the cursor.
+
+See also the tt(.term.extensions) parameter.
+)
 vindex(.term.bg)
 item(tt(.term.bg))(
 The background color of the terminal if the terminal supports the
@@ -1731,80 +1737,15 @@ arrays this is not tied to a zsh array.
 )
 vindex(.term.extensions)
 item(tt(.term.extensions))(
-An array containing a list of extension features of the terminal to be enabled
-or disabled (prefixed with `tt(-)').  When ZLE starts, it will add entries for
-features that were auto-detected.  This auto-detection uses extensions itself,
-all named with a `tt(query)' prefix.  As these are used when ZLE starts they
-would need to be disabled early in the startup files if they are to be
-disabled.  A value of `tt(-query)' will disable all terminal queries on
-startup.  Extensions can be any of the following, where the marks `<D>' and
-`<E>' indicate whether they are disabled or enabled by default:
-
-startitem()
-item(tt(bracketed-paste) <E>)(
-Many terminal emulators have a feature that allows applications to identify
-when text is pasted into the terminal rather than being typed normally.  For
-ZLE, this means that special characters such as tabs and newlines can be
-inserted instead of invoking editor commands. Furthermore, pasted text forms a
-single undo event and if the region is active, pasted text will replace the
-region.
+An array containing a list of extension features of the terminal.
+See sectref(Terminal Extensions)(zshzle).
 )
-item(tt(cursor-color) <E>)(
-Support for changing the color of the cursor.
-)
-item(tt(cursor-shape) <E>)(
-Support for changing the shape of the cursor.
-)
-item(tt(integration-output) <E>)(
-This provides the terminal with semantic information regarding where the output
-from commands start and finish. Some terminals use this information to make it
-easy to select just the output from a single command.
-)
-item(tt(integration-prompt) <E>)(
-This informs the terminal when the shell displays a prompt. This enables a
-variety of terminal features such as displaying markers, allowing you to jump
-to previous commands in the scroll-back buffer and ensuring that right prompts
-are handled correctly when the window is resized. The end of the prompt also
-provides the terminal with a marker for the start of user input.
-)
-item(tt(integration-pwd) <E>)(
-This advises the terminal of the shell's current directory which allows it
-to create new windows with the same current working directory.
-)
-item(tt(query-bg) <E>)(
-Query the terminal background color which is used for tt(.term.bg) and
-tt(.term.mode).
-)
-item(tt(query-cursor) <E>)(
-Query the cursor color. This facilitates restoring the cursor to its original
-color if it has been configured via tt(zle_cursorform). The color is also
-assigned to tt(.term.cursor).
-)
-item(tt(query-fg) <E>)(
-Query the terminal foreground color which is used for tt(.term.fg).
-)
-item(tt(query-id) <E>)(
-Query the terminal identification which is used for tt(.term.id) and
-tt(.term.version).
-)
-xitem(tt(modkeys-kitty) <D>)
-item(tt(query-modkeys-kitty) <E>)(
-Support for the kitty keyboard handling protocol which enables reporting of a
-wider range of key combinations and resolves problems with ambiguous key
-sequences.  Currently there is only support for detecting whether the terminal
-supports this feature.
-)
-item(tt(modkeys-xterm) <D>)(
-Support for the keyboard handling sequences associated with xterm's
-tt(modifyOtherKeys) X resource. This enables reporting of a wider range of key
-combinations and resolves some problems with ambiguous key sequences.
-)
-xitem(tt(truecolor) <D>)
-item(tt(query-truecolor) <E>)(
-Support for 24-bit truecolor escape sequences.  Auto-detection also tries
-termcap and the tt(COLORTERM) environment variable.
-)
-enditem()
+vindex(.term.querywait)
+item(tt(.term.querywait))(
+The time the shell waits, in hundredths of seconds, for the response to
+terminal queries.  A value of tt(`0') disables the timeout and the shell will
+wait indefinitely.  If not set, a default of tt(`50') or half a second is
+used.
 )
 vindex(TIMEFMT)
 item(tt(TIMEFMT))(
@@ -1915,8 +1856,8 @@ vindex(zle_cursorform)
 item(tt(zle_cursorform))(
 An array describing contexts in which ZLE should change the shape and color
 of the cursor.
-See ifzman(em(Cursor Form) in zmanref(zshzle))\
-ifnzman(noderef(Cursor Form)).
+See ifzman(em(Cursor Shape and Color) in zmanref(zshzle))\
+ifnzman(noderef(Cursor Shape and Color)).
 )
 vindex(zle_highlight)
 item(tt(zle_highlight))(

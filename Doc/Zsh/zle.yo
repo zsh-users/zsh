@@ -54,6 +54,7 @@ menu(Zle Builtins)
 menu(Zle Widgets)
 menu(User-Defined Widgets)
 menu(Standard Widgets)
+menu(Terminal Extensions)
 menu(Character Highlighting)
 endmenu()
 
@@ -1196,7 +1197,7 @@ This can be used for detecting switches between the vi command
 )
 enditem()
 
-texinode(Standard Widgets)(Character Highlighting)(User-Defined Widgets)(Zsh Line Editor)
+texinode(Standard Widgets)(Terminal Extensions)(User-Defined Widgets)(Zsh Line Editor)
 sect(Standard Widgets)
 cindex(widgets, standard)
 The following is a list of all the standard widgets,
@@ -2612,7 +2613,102 @@ argument, multiple words will be selected.
 )
 enditem()
 
-texinode(Character Highlighting)()(Standard Widgets)(Zsh Line Editor)
+texinode(Terminal Extensions)(Character Highlighting)(Standard Widgets)(Zsh Line Editor)
+sect(Terminal Extensions)
+
+vindex(.term.extensions, setting)
+Modern terminals often carry functionality that is not covered by the
+`terminfo' library.  For these cases, the availability of a feature can be
+asserted by including it in the array parameter tt(.term.extensions).
+Similarly the absence of a feature can be indicated via it's inclusion with a
+`tt(-)' prefix.  Where a feature isn't listed, the status of terminal support
+is unknown and defaults apply as to whether ZLE will use the feature.  This
+is often harmless as terminals ignore extra instructions they don't recognise.
+Even if your terminal does support a particular extension, you may choose to
+list it with an initial `tt(-)' as a way to disable the associated feature.
+Many extensions are named with common prefixes to group related extensions.
+This allows a whole class of extensions to be disabled with a single entry such
+as by adding `tt(-cursor)' to disable cursor shape and color changing.
+
+When ZLE starts, it will add entries for features that were auto-detected.  This
+auto-detection uses extensions itself, all named with a `tt(query)' prefix.  As
+this happens when ZLE starts disabling them needs to be done early in the
+startup files.  A value of `tt(-query)' will disable all terminal queries on
+startup, including those that query terminal properties such as colors rather
+than detecting features.  Populating the array with the status of auto-detected
+features will mean that associated terminal queries are not needed and will be
+skipped.
+
+Extensions can be any of the following, where the marks `<D>' and `<E>'
+indicate whether each one is disabled or enabled by default:
+
+startitem()
+item(tt(bracketed-paste) <E>)(
+Many terminal emulators have a feature that allows applications to identify
+when text is pasted into the terminal rather than being typed normally.  For
+ZLE, this means that special characters such as tabs and newlines can be
+inserted instead of invoking editor commands. Furthermore, pasted text forms a
+single undo event and if the region is active, pasted text will replace the
+region.
+)
+item(tt(cursor-color) <E>)(
+Support for changing the color of the cursor.
+)
+item(tt(cursor-shape) <E>)(
+Support for changing the shape of the cursor.
+)
+item(tt(integration-output) <E>)(
+This provides the terminal with semantic information regarding where the output
+from commands start and finish. Some terminals use this information to make it
+easy to select just the output from a single command.
+)
+item(tt(integration-prompt) <E>)(
+This informs the terminal when the shell displays a prompt. This enables a
+variety of terminal features such as displaying markers, allowing you to jump
+to previous commands in the scroll-back buffer and ensuring that right prompts
+are handled correctly when the window is resized. The end of the prompt also
+provides the terminal with a marker for the start of user input.
+)
+item(tt(integration-pwd) <E>)(
+This advises the terminal of the shell's current directory which allows it
+to create new windows with the same current working directory.
+)
+item(tt(query-bg) <E>)(
+Query the terminal background color which is used for tt(.term.bg) and
+tt(.term.mode).
+)
+item(tt(query-cursorcolor) <E>)(
+Query the cursor color. This facilitates restoring the cursor to its original
+color if it has been configured via tt(zle_cursorform). The color is also
+assigned to tt(.term.cursor).
+)
+item(tt(query-fg) <E>)(
+Query the terminal foreground color which is used for tt(.term.fg).
+)
+item(tt(query-id) <E>)(
+Query the terminal identification which is used for tt(.term.id) and
+tt(.term.version).
+)
+xitem(tt(modkeys-kitty) <D>)
+item(tt(query-modkeys-kitty) <D>)(
+Support for the kitty keyboard handling protocol which enables reporting of a
+wider range of key combinations and resolves problems with ambiguous key
+sequences.  Currently there is only support for detecting whether the terminal
+supports this feature.
+)
+item(tt(modkeys-xterm) <D>)(
+Support for the keyboard handling sequences associated with xterm's
+tt(modifyOtherKeys) X resource. This enables reporting of a wider range of key
+combinations and resolves some problems with ambiguous key sequences.
+)
+xitem(tt(truecolor) <D>)
+item(tt(query-truecolor) <E>)(
+Support for 24-bit truecolor escape sequences.  Auto-detection also tries
+termcap and the tt(COLORTERM) environment variable.
+)
+enditem()
+
+texinode(Character Highlighting)()(Terminal Extensions)(Zsh Line Editor)
 sect(Character Highlighting)
 
 vindex(zle_highlight, setting)
@@ -2855,9 +2951,10 @@ special array parameter tt(region_highlight); see
 ifnzman(noderef(Zle Widgets))\
 ifzman(above).
 
-texinode(Cursor Form)()()(Character Highlighting)
-subsect(Cursor Form)
-cindex(cursor form)
+texinode(Cursor Shape and Color)()()(Character Highlighting)
+subsect(Cursor Shape and Color)
+cindex(cursor shape)
+cindex(cursor color)
 
 vindex(zle_cursorform, setting)
 Some terminals support the ability to change the shape and color of the cursor.
@@ -2870,7 +2967,7 @@ Each element of the array should consist of a word indicating a context
 followed by a colon, then a comma-separated list of properties describing the
 shape and color to apply to the cursor.
 
-The available contexts follow with the default cursor form shown in
+The available contexts follow with the default value shown in
 parentheses. Where no default is given, the terminal's default is applied:
 
 startitem()
@@ -2884,7 +2981,7 @@ mode.
 item(tt(insert) (tt(bar)))(
 Used for vi editing mode.
 )
-item(tt(overwrite) (tt(underline)))(
+item(tt(overwrite))(
 Used when editing text in overwrite mode or with the vi replace command.
 )
 item(tt(pending) (tt(underline)))(
@@ -2897,7 +2994,8 @@ Applied for both tt(regionstart) and tt(regionend) contexts.
 item(tt(regionstart))(
 Used when the region is active and the cursor is positioned at the start of the
 region. The region includes the text under the cursor when it is positioned at
-the start so it is best to choose a cursor form that does not obscure this fact.
+the start so it is best to configure the cursor so that it does not obscure
+this fact.
 )
 item(tt(regionend))(
 Used when the region is active and the cursor is positioned at the end of the
@@ -2910,9 +3008,9 @@ cursor position so the same advice as for tt(regionstart) applies.
 )
 enditem()
 
-The available cursor forms are tt(none), tt(bar), tt(block), tt(underline) and
+The available cursor shapes are tt(none), tt(bar), tt(block), tt(underline) and
 tt(hidden). Additionally, you can specify either tt(blink) or tt(steady) to
 indicate whether the cursor should flash and specify a color as an RGB triplet
-in hexadecimal format with with tt(color=)var(#xxxxxx). The value tt(none)
-applies the terminal's default cursor form. Note that on many terminals, this
-may be different to the initial cursor state from when the shell started.
+in hexadecimal format with tt(color=)var(#xxxxxx). The value tt(none)
+applies the terminal's defaults. Note that on many terminals, this may
+differ from the initial cursor state from when the shell started.

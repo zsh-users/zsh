@@ -426,7 +426,7 @@ enum ztmouttp {
      * there's no general way to fix up if that's wrong.
      */
     ZTM_MAX
-#define	ZMAXTIMEOUT	((time_t)1 << (sizeof(time_t)*8-11))
+#define	ZMAXTIMEOUT	((time_t)1 << (sizeof(int)*8-11))
 };
 
 struct ztmout {

@@ -134,6 +134,7 @@ static char *IDVAR   = ".term.id";
 static char *VERVAR  = ".term.version";
 static char *COLORVAR[]  = { ".term.fg", ".term.bg", ".term.cursor" };
 static char *MODEVAR = ".term.mode";
+static char *WAITVAR = ".term.querywait";
 
 /* Query sequences
  * using ESC\\ as ST instead of BEL because the bell was emitted on
@@ -209,13 +210,19 @@ probe_terminal(const char *tquery, seqstate_t *states,
     int finish = 0, number = 0;
     int ch;
     struct ttyinfo ti, torig;
+    struct value vbuf;
+    Value v = getvalue(&vbuf, &WAITVAR, 0);
+    long timeout = v ? -1 - getintvalue(v) : TIMEOUT;
+
+    if (timeout == -1)
+	timeout = -((long)1 << (sizeof(int)*8-11))*100;
 
     seqstate_t *curstate = states;
 
     gettyinfo(&ti);
     memcpy(&torig, &ti, sizeof(torig));
 #ifdef HAS_TIO
-    ti.tio.c_lflag &= (~ECHO & ~ICANON & ~ISIG);
+    ti.tio.c_lflag &= (~ECHO & ~ICANON);
     ti.tio.c_iflag &= ~ICRNL;
 #else
     ti.sgttyb.sg_flags &= ~ECHO;
@@ -244,7 +251,12 @@ probe_terminal(const char *tquery, seqstate_t *states,
 		memset(current, 0, blen);
 		blen *= 2;
 	    }
-	    if ((ch = getbyte(TIMEOUT, 0, 1)) == EOF)
+            ch = getbyte(timeout, 0, 1);
+	    if (errflag) {
+		errflag = 0;
+		break;
+	    }
+	    if (ch == EOF)
 		break;
 	    *current++ = ch;
 	    illgotten = current;
@@ -444,7 +456,7 @@ handle_color(int bg, int red, int green, int blue)
 
 /* roughly corresponding feature names */
 static const char *features[] =
-	{ "bg", "fg", "cursor", "modkeys-kitty", "truecolor", "id" };
+	{ "bg", "fg", "cursorcolor", "modkeys-kitty", "truecolor", "id" };
 static const char *queries[] =
 	{ TQ_BGCOLOR, TQ_FGCOLOR, TQ_CURSOR, TQ_KITTYKB, TQ_RGB, TQ_XTVERSION, TQ_DA };
 
@@ -494,13 +506,17 @@ query_terminal(void) {
     for (i=0; i < sizeof(queries)/sizeof(*queries); i++) {
 	int last = i >= sizeof(features)/sizeof(*features);
 	int found = (last && tqend == tquery);
+	int enable = 0;
 	char *cterm;
 
 	/* skip if the query or corresponding feature is already in the list */
-	for (f = flist; !last && !found && f && *f; f++)
-	    found = !strcmp(*f + (**f == '-'), features[i]) ||
-		(!strncmp(*f, "-query-", 7) && !strcmp(*f + 7, features[i]));
-	if (found)
+	for (f = flist; !last && !found && f && *f; f++) {
+	    /* just i=3(TQ_KITTYKB) is disabled by default */
+	    enable = i == 3 && strpfx("query-", *f) && !strcmp(*f + 6, features[i]);
+	    found = enable || !strcmp(*f + (**f == '-'), features[i]) ||
+		(strpfx("-query-", *f) && !strcmp(*f + 7, features[i]));
+	}
+	if (found ? !enable : i == 3)
 	    continue;
 	/* if termcap indicates 24-bit color, assume support - even
 	 * though this is only based on the initial $TERM
@@ -706,10 +722,10 @@ prompt_markers(void)
 {
     static unsigned int aid = 0;
     static char pre[] = "\033]133;A;cl=m;aid=zZZZZZZ\033\\"; /* before the prompt */
-    static const char *const PR = "\033]133;P;k=i\033\\";   /* primary (PS1) */
-    static const char *const SE = "\033]133;P;k=s\033\\";   /* secondary (PS2) */
-    static const char *const RI = "\033]133;P;k=r\033\\";   /* right (RPS1,2) */
-    static const char *markers[] = { pre, PR, SE, RI };
+    static const char PR[] = "\033]133;P;k=i\033\\";   /* primary (PS1) */
+    static const char SE[] = "\033]133;P;k=s\033\\";   /* secondary (PS2) */
+    static const char RI[] = "\033]133;P;k=r\033\\";   /* right (RPS1,2) */
+    static const char *markers[] = { PR, SE, RI };
     static const char *nomark[] = { NULL, NULL, NULL, NULL };
 
     if (!extension_enabled("integration", "prompt", 11, 1))
@@ -838,7 +854,6 @@ zle_set_cursorform(void)
 	cursor_forms = zalloc(CURC_DEFAULT * sizeof(*cursor_forms));
     memset(cursor_forms, 0, CURC_DEFAULT * sizeof(*cursor_forms));
     cursor_forms[CURC_INSERT] = CURF_BAR;
-    cursor_forms[CURC_OVERWRITE] = CURF_UNDERLINE;
     cursor_forms[CURC_PENDING] = CURF_UNDERLINE;
 
     for (; atrs && *atrs; atrs++) {
@@ -870,7 +885,7 @@ void
 free_cursor_forms(void)
 {
     if (cursor_forms)
-	zfree(cursor_forms, CURC_DEFAULT * sizeof(*cursor_form));
+	zfree(cursor_forms, CURC_DEFAULT * sizeof(*cursor_forms));
     cursor_forms = 0;
 }
 
