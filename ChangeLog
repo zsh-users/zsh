@@ -1,3 +1,9 @@
+2025-11-10  Bart Schaefer  <schaefer@zsh.org>
+
+	* 54064: Src/params.c, Test/K01nameref.ztst: avoid crash on named
+	references to argv/ARGC, improve syntax checks in valid_nameref().
+	Leaves some edgecase issues unresolved (see tests).
+
 2025-11-10  Oliver Kiddle  <opk@zsh.org>
 
 	* 53402, 54042: Src/Zle/termquery.c, Src/Zle/zle_main.c,

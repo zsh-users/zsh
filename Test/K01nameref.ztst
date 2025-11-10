@@ -531,7 +531,7 @@ F:ksh93 does not implement this either
  unset -n ptr1
  typeset -n ptr1='not[2]good'
 1:invalid nameref
-*?*invalid variable name: not\[2\]good
+*?*invalid name reference: not\[2\]good
 
  unset -n ptr1
  unset hash
@@ -1180,6 +1180,91 @@ F:previously this could create an infinite recursion and crash
 >h3: ref1=f1 ref2=f1 ref3=f1
 >h2: ref1=f1 ref2=f1 ref3=f1
 >f1: ref1=f1 ref2=f1 ref3=f1
+
+#
+# The following two tests are linked, do not separate
+#
+
+ edgelocal() ( local -n x=$1; typeset -p x; print -r $x )
+ edgeupper() ( local -nu x=$1; typeset -p x; print -r $x )
+ for edge in argv ARGC \@ \* \# 0 1 01 \! \? - _
+ do
+  edgelocal $edge
+  edgelocal "$edge""[1]"
+  edgeupper $edge
+ done
+0:references to builtin specials
+F:Subscripting on 1 01 ! ? - should print first character but do not
+>typeset -n x=argv
+>argv
+>typeset -n x='argv[1]'
+>argv[1]
+>typeset -n x=ARGC
+>1
+>typeset -n x='ARGC[1]'
+>1
+>typeset -n x=0
+>edgelocal
+>typeset -n x='0[1]'
+>e
+>typeset -n x=1
+>
+>typeset -n x='1[1]'
+>
+>typeset -n x=01
+>
+>typeset -n x='01[1]'
+>
+>typeset -n x=!
+>0
+>typeset -n x='![1]'
+>
+>typeset -un x=!
+>0
+>typeset -n x='?'
+>0
+>typeset -n x='?[1]'
+>
+>typeset -un x='?'
+>0
+>typeset -n x=-
+>569X
+>typeset -n x='-[1]'
+>
+>typeset -un x=-
+>569X
+>typeset -n x=_
+>x
+>typeset -n x='_[1]'
+>x
+>typeset -un x=_
+>x
+?edgeupper: invalid name reference: argv
+?edgeupper: invalid name reference: ARGC
+?edgelocal: invalid name reference: @
+?edgelocal: invalid name reference: @[1]
+?edgeupper: invalid name reference: @
+?edgelocal: invalid name reference: *
+?edgelocal: invalid name reference: *[1]
+?edgeupper: invalid name reference: *
+?edgelocal: invalid name reference: #
+?edgelocal: invalid name reference: #[1]
+?edgeupper: invalid name reference: #
+?edgeupper: invalid name reference: 0
+?edgeupper: invalid name reference: 1
+?edgeupper: invalid name reference: 01
+
+ edgelocal \$
+ edgelocal '$[1]'
+ edgeupper \$
+ unfunction edgelocal edgeupper
+0qf:references to $$
+F:$$[1] reference should print the first digit of $$ but prints nothing
+>typeset -n x='$'
+>$$
+>typeset -n x='\$[1]'
+>$$[1]
+>$$
 
 #
 # The following tests are run in interactive mode, using PS1 as an

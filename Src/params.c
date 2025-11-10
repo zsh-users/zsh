@@ -1309,7 +1309,6 @@ isident(char *s)
     /* Require balanced [ ] pairs with something between */
     if (!(ss = parse_subscript(++ss, 1, ']')))
 	return 0;
-    untokenize(s);
     return !ss[1];
 }
 
@@ -3247,8 +3246,8 @@ assignsparam(char *s, char *val, int flags)
 	return NULL;
     }
     if (*val && (v->pm->node.flags & PM_NAMEREF)) {
-	if (!valid_refname(val)) {
-	    zerr("invalid variable name: %s", val);
+	if (!valid_refname(val, v->pm->node.flags)) {
+	    zerr("invalid name reference: %s", val);
 	    zsfree(val);
 	    unqueue_signals();
 	    errflag |= ERRFLAG_ERROR;
@@ -6505,30 +6504,48 @@ upscope_upper(Param pm, int reflevel)
 
 /**/
 static int
-valid_refname(char *val)
+valid_refname(char *val, int flags)
 {
-    char *t = itype_end(val, INAMESPC, 0);
+    char *t;
 
-    if (idigit(*val))
-	return 0;
-    if (*t != 0) {
-	if (*t == '[') {
-	    tokenize(t = dupstring(t+1));
-	    while ((t = parse_subscript(t, 0, ']')) && *t++ == Outbrack) {
-		if (*t == Inbrack)
-		    ++t;
-		else
-		    break;
-	    }
-	    if (t && *t) {
-		/* zwarn("%s: stuff after subscript: %s", val, t); */
-		t = NULL;
-	    }
-	} else if (t[1] || !(*t == '!' || *t == '?' ||
-			     *t == '$' || *t == '-' ||
-			     *t == '0' || *t == '_')) {
-	    /* Skipping * @ # because of doshfunc() implementation */
-	    t = NULL;
+    if (flags & PM_UPPER) {
+	/* Upward reference to positionals is doomed to fail */
+	if (idigit(*val))
+	    return 0;
+	t = itype_end(val, INAMESPC, 0);
+	if ((t - val == 4) &&
+	    (!strncmp(val, "argv", 4) ||
+	     !strncmp(val, "ARGC", 4)))
+	    return 0;
+    } else if (idigit(*val)) {
+	t = val;
+	while (*++t)
+	    if (!idigit(*t))
+		break;
+	if (*t && *t != '[')	/* Need to test Inbrack here too? */
+	    return 0;
+    } else
+	t = itype_end(val, INAMESPC, 0);
+
+    if (t == val) {
+	if (!(*t == '!' || *t == '?' ||
+	      *t == '$' || *t == '-' ||
+	      *t == '_'))
+	    return 0;
+	++t;
+    }
+    if (*t == '[') {
+	/* Another bit of isident() to emulate */
+	tokenize(t = dupstring(t+1));
+	while ((t = parse_subscript(t, 0, ']')) && *t++ == Outbrack) {
+	    if (*t == Inbrack)
+		++t;
+	    else
+		break;
+	}
+	if (t && *t) {
+	    /* zwarn("%s: stuff after subscript: %s", val, t); */
+	    return 0;
 	}
     }
     return !!t;
