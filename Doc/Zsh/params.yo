@@ -1759,7 +1759,7 @@ wider range of key combinations and resolves problems with ambiguous key
 sequences.  Currently there is only support for detecting whether the terminal
 supports this feature.
 )
-xitem(tt(truecolor) <E>)
+xitem(tt(truecolor) <D>)
 item(tt(query-truecolor) <E>)(
 Support for 24-bit truecolor escape sequences.  Auto-detection also tries
 termcap and the tt(COLORTERM) environment variable.

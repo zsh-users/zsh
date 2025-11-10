@@ -1836,6 +1836,19 @@ match_named_colour(const char **teststrp)
     return -1;
 }
 
+static int
+truecolor_terminal()
+{
+    char **f, **flist = getaparam(".term.extensions");
+    int result;
+    for (f = flist; f && *f; f++) {
+	result = **f != '-';
+	if (!strcmp(*f + !result, "truecolor"))
+	    return result;
+    }
+    return 0; /* disabled by default */
+}
+
 /*
  * Match just the colour part of a highlight specification.
  * If teststrp is NULL, use the already parsed numeric colour.
@@ -1879,7 +1892,10 @@ match_colour(const char **teststrp, int is_fg, int colour)
 		return TXT_ERROR;
 	    *teststrp = end;
 	    colour = runhookdef(GETCOLORATTR, &color) - 1;
-	    if (colour == -1) { /* no hook function added, try true color (24-bit) */
+	    if (colour == -1 && !truecolor_terminal() &&
+		    !load_module("zsh/nearcolor", NULL, 1))
+		colour = runhookdef(GETCOLORATTR, &color) - 1;
+	    if (colour == -1) { /* use true color (24-bit) */
 		colour = (((color.red << 8) + color.green) << 8) + color.blue;
 		return on | (is_fg ? TXT_ATTR_FG_24BIT : TXT_ATTR_BG_24BIT) |
 			(zattr)colour << shft;

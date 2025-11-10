@@ -1,5 +1,8 @@
 2025-11-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 53379, 53380: Doc/Zsh/params.yo, Test/X04zlehighlight.ztst,
+	Src/prompt.c: autoload nearcolor based on truecolor detection
+
 	* 53377: Doc/Zsh/zle.yo, Src/Zle/termquery.c, Src/Zle/zle_misc.c,
 	Src/Zle/zle_utils.c, Test/X06termquery.ztst: support OSC52 paste
 	sequence with the "* and "+ vi registers
