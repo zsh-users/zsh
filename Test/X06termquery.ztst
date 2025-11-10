@@ -84,6 +84,20 @@
   termresp ''
 0:no response - timeout
 
+# Following three vi-put tests also cover 0, 1 and 2 `=' padding
+# characters in the base64 decoding.
+  termresp $'\e[?0;cbindkey -v\necho \e"*p\e]52;p;YWZ0ZXI=\aa\n'
+0:paste after from clipboard
+>after
+
+  termresp $'\e[?0;cbindkey -v\necho X\e"*P\e]52;p;YmVmb3Jl\aa\n'
+0:paste before from clipboard
+>beforeX
+
+  termresp $'\e[?0;cbindkey -v\necho X\ev"*p\e]52;p;cmVwbGFjZQ==\aa\n'
+0:paste over from clipboard
+>replace
+
 %clean
 
   zmodload -ui zsh/zpty

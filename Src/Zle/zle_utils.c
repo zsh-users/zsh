@@ -937,28 +937,6 @@ cut(int i, int ct, int flags)
   cuttext(zleline + i, ct, flags);
 }
 
-static char*
-base64_encode(const char *src, size_t len) {
-    static const char* base64_table =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-    const unsigned char *end = (unsigned char *)src + len;
-    const unsigned char *in = (unsigned char *)src;
-    char *ret = zhalloc(1 + 4 * ((len + 2) / 3)); /* 4 bytes out for 3 in */
-    char *cur = ret;
-
-    for (; end - in > 0; in += 3, cur += 4) {
-        unsigned int n = *in << 16;
-        cur[3] = end - in > 2 ? base64_table[(n |= in[2]) & 0x3f] : '=';
-        cur[2] = end - in > 1 ? base64_table[((n |= in[1]<<8) >> 6) & 0x3f] : '=';
-        cur[1] = base64_table[(n >> 12) & 0x3f];
-        cur[0] = base64_table[n >> 18];
-    }
-    *cur = '\0';
-
-    return ret;
-}
-
 /*
  * As cut, but explicitly supply the text together with its length.
  */
@@ -975,10 +953,7 @@ cuttext(ZLE_STRING_T line, int ct, int flags)
 	int cutll;
 	char *mbcut = zlelineasstring(line, ct, 0, &cutll, NULL, 1);
 	unmetafy(mbcut, &cutll);
-	mbcut = base64_encode(mbcut, cutll);
-
-	fprintf(shout, "\033]52;%c;%s\a", zmod.flags & MOD_CLIP ? 'c' : 'p',
-		mbcut);
+	system_clipput(zmod.flags & MOD_CLIP ? 'c' : 'p', mbcut, cutll);
     } else if (zmod.flags & MOD_VIBUF) {
 	struct cutbuffer *b = &vibuf[zmod.vibuf];
 

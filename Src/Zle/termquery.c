@@ -79,6 +79,7 @@ typedef const unsigned char seqstate_t;
 #define TINFO "\xc3"
 #define XTID  "\xc4"
 #define XTVER "\xc5"
+#define CLIP  "\xc6"
 
 /* Deterministic finite state automata for parsing terminal response sequences.
  * - alternatives decided by the first character (no back-tracking)
@@ -121,6 +122,12 @@ typedef const unsigned char seqstate_t;
 	    EITHER( ";" \
 	    OR MATCH("u", KITTY ) \
 	    OR MATCH("c", DA) )))
+
+#define OSC52_STATES \
+    "\033]52;" EITHER("p" OR "c") ";" RECORD \
+    REPEAT( \
+	CAPTURE EITHER( "\033" MATCH("\\", CLIP) OR MATCH("\007", CLIP) ) \
+    OR WILDCARD )
 
 static char *EXTVAR  = ".term.extensions";
 static char *IDVAR   = ".term.id";
@@ -191,7 +198,7 @@ find_matching(seqstate_t* pos, int direction)
 static void
 probe_terminal(const char *tquery, seqstate_t *states,
 	void (*handle_seq) (int seq, int *numbers, int len,
-	    char *capture, int clen))
+	    char *capture, int clen, void *output), void *output)
 {
     size_t blen = 256, nlen = 16;
     char *buf = zhalloc(blen);
@@ -201,11 +208,12 @@ probe_terminal(const char *tquery, seqstate_t *states,
     int *num = numbers;
     int finish = 0, number = 0;
     int ch;
-    struct ttyinfo ti;
+    struct ttyinfo ti, torig;
 
     seqstate_t *curstate = states;
 
     gettyinfo(&ti);
+    memcpy(&torig, &ti, sizeof(torig));
 #ifdef HAS_TIO
     ti.tio.c_lflag &= (~ECHO & ~ICANON & ~ISIG);
     ti.tio.c_iflag &= ~ICRNL;
@@ -389,7 +397,7 @@ probe_terminal(const char *tquery, seqstate_t *states,
 	} else {
 	    if (sequence && !(finish = sequence == SEQ))
 		handle_seq(sequence & ~SEQ, numbers, num - numbers,
-			buf + record, capture - record);
+			buf + record, capture - record, output);
 
 	    if ((sequence || (action & 1)) &&
 		(current = start) && /* drop input from sequence */
@@ -409,7 +417,7 @@ probe_terminal(const char *tquery, seqstate_t *states,
     if (current > buf)
 	ungetbytes(buf, current - buf);
 
-    settyinfo(&shttyinfo);
+    settyinfo(&torig);
 }
 
 static void
@@ -440,7 +448,8 @@ static const char *queries[] =
 	{ TQ_BGCOLOR, TQ_FGCOLOR, TQ_KITTYKB, TQ_RGB, TQ_XTVERSION, TQ_DA };
 
 static void
-handle_query(int sequence, int *numbers, int len, char *capture, int clen)
+handle_query(int sequence, int *numbers, int len, char *capture, int clen,
+	UNUSED(void *output))
 {
     char **feat;
 
@@ -499,12 +508,85 @@ query_terminal(void) {
 		((cterm = getsparam("COLORTERM")) &&
 		    (!strcmp(cterm, "truecolor") ||
 			!strcmp(cterm, "24bit")))))
-	    handle_query(3, 0, 0, 0, 0);
+	    handle_query(3, NULL, 0, NULL, 0, NULL);
 	else
 	    struncpy(&tqend, (char *) queries[i], /* collate escape sequences */
 		sizeof(tquery) - (tqend - tquery));
     }
 
     if (tqend != tquery) /* unless nothing left after filtering */
-	probe_terminal(tquery, states, &handle_query);
+	probe_terminal(tquery, states, &handle_query, NULL);
+}
+
+static char*
+base64_encode(const char *src, size_t len) {
+    static const char* base64_table =
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+    const unsigned char *end = (unsigned char *)src + len;
+    const unsigned char *in = (unsigned char *)src;
+    char *ret = zhalloc(1 + 4 * ((len + 2) / 3)); /* 4 bytes out for 3 in */
+    char *cur = ret;
+
+    for (; end - in > 0; in += 3, cur += 4) {
+	unsigned int n = *in << 16;
+	cur[3] = end - in > 2 ? base64_table[(n |= in[2]) & 0x3f] : '=';
+	cur[2] = end - in > 1 ? base64_table[((n |= in[1]<<8) >> 6) & 0x3f] : '=';
+	cur[1] = base64_table[(n >> 12) & 0x3f];
+	cur[0] = base64_table[n >> 18];
+    }
+    *cur = '\0';
+
+    return ret;
+}
+
+static char*
+base64_decode(const char *src, size_t len)
+{
+    int i = 0;
+    unsigned int n;
+    char *buf = hcalloc((3 * len) / 4 + 1);
+    char *b = buf;
+    char c;
+
+    while (len && (c = src[i]) != '=') {
+	n = isdigit(c) ? c - '0' + 52 :
+	    islower(c) ? c - 'a' + 26 :
+	    isupper(c) ? c - 'A' :
+	    (c == '+') ? 62 :
+	    (c == '/') ? 63 : 0;
+	if (i % 4)
+	    *b++ |= n >> (2 * (3 - (i % 4)));
+	if (++i >= len)
+	    break;
+	*b = n << (2 * (i % 4));
+    }
+    return buf;
+}
+
+static void
+handle_paste(UNUSED(int sequence), UNUSED(int *numbers), UNUSED(int len),
+	char *capture, int clen, void *output)
+{
+    *(char**) output = base64_decode(capture, clen);
+}
+
+/**/
+char *
+system_clipget(char clip)
+{
+    static seqstate_t osc52[] = OSC52_STATES;
+    char seq[] = "\033]52;.;?\033\\";
+    char *contents;
+    seq[5] = clip;
+    probe_terminal(seq, osc52, &handle_paste, &contents);
+    return contents;
+}
+
+/**/
+void
+system_clipput(char clip, char *content, size_t clen)
+{
+    char *encoded = base64_encode(content, clen);
+    fprintf(shout, "\033]52;%c;%s\a", clip, encoded);
 }

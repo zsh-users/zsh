@@ -2464,9 +2464,8 @@ appended to the buffer instead of overwriting it. When using the tt("_)
 buffer, nothing happens. This can be useful for deleting text without
 affecting any buffers.
 
-Updating the system clipboard relies on specific support from the terminal.
-Reading it is not possible so a paste command with tt("*) or tt("+) will do
-nothing.
+Accessing and updating the system clipboard relies on specific support from
+the terminal.
 
 If no buffer is specified for a cut or change command, tt("1) is used, and
 the contents of tt("1) to tt("8) are each shifted along one buffer;
