@@ -2674,7 +2674,9 @@ struct ttyinfo {
 #define TCBACKSPACE    34
 #define TCFGCOLOUR     35
 #define TCBGCOLOUR     36
-#define TC_COUNT       37
+#define TCCURINV       37
+#define TCCURVIS       38
+#define TC_COUNT       39
 
 #define tccan(X) (tclen[X])
 

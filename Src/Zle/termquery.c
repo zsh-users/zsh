@@ -132,8 +132,7 @@ typedef const unsigned char seqstate_t;
 static char *EXTVAR  = ".term.extensions";
 static char *IDVAR   = ".term.id";
 static char *VERVAR  = ".term.version";
-static char *BGVAR   = ".term.bg";
-static char *FGVAR   = ".term.fg";
+static char *COLORVAR[]  = { ".term.fg", ".term.bg", ".term.cursor" };
 static char *MODEVAR = ".term.mode";
 
 /* Query sequences
@@ -144,6 +143,7 @@ static char *MODEVAR = ".term.mode";
  * because tmux will need to pass these on. */
 #define TQ_BGCOLOR "\033]11;?\033\\"
 #define TQ_FGCOLOR "\033]10;?\033\\"
+#define TQ_CURSOR  "\033]12;?\033\\"
 
 /* Kitty / fixterms keyboard protocol which allows wider support for keys
  * and modifiers. This clears the screen in terminology. */
@@ -420,32 +420,33 @@ probe_terminal(const char *tquery, seqstate_t *states,
     settyinfo(&torig);
 }
 
+static unsigned memo_cursor;
+
 static void
 handle_color(int bg, int red, int green, int blue)
 {
     char *colour;
 
-    switch (bg) {
-	case 1: /* background color */
-	    /* scale by Rec.709 coefficients for lightness */
-	    setsparam(MODEVAR, ztrdup(
-		    0.2126f * red + 0.7152f * green + 0.0722f * blue <= 127 ?
-		    "dark" : "light"));
-	  /* fall-through */
-	case 0:
-	    colour = zalloc(8);
-	    sprintf(colour, "#%02x%02x%02x", red, green, blue);
-	    setsparam(bg ? BGVAR : FGVAR, colour);
-	    break;
-	default: break;
+    if (bg == 1) {  /* background color */
+	/* scale by Rec.709 coefficients for lightness */
+	setsparam(MODEVAR, ztrdup(
+		0.2126f * red + 0.7152f * green + 0.0722f * blue <= 127 ?
+		"dark" : "light"));
     }
+
+    if (bg == 2)  /* cursor color */
+	memo_cursor = (red << 24) | (green << 16) | (blue << 8);
+
+    colour = zalloc(8);
+    sprintf(colour, "#%02x%02x%02x", red, green, blue);
+    setsparam(COLORVAR[bg], colour);
 }
 
 /* roughly corresponding feature names */
 static const char *features[] =
-	{ "bg", "fg", "modkeys-kitty", "truecolor", "id" };
+	{ "bg", "fg", "cursor", "modkeys-kitty", "truecolor", "id" };
 static const char *queries[] =
-	{ TQ_BGCOLOR, TQ_FGCOLOR, TQ_KITTYKB, TQ_RGB, TQ_XTVERSION, TQ_DA };
+	{ TQ_BGCOLOR, TQ_FGCOLOR, TQ_CURSOR, TQ_KITTYKB, TQ_RGB, TQ_XTVERSION, TQ_DA };
 
 static void
 handle_query(int sequence, int *numbers, int len, char *capture, int clen,
@@ -460,12 +461,12 @@ handle_query(int sequence, int *numbers, int len, char *capture, int clen,
 	    break;
 	case 2: /* kitty keyboard */
 	    feat = zshcalloc(2 * sizeof(char *));
-	    *feat = ztrdup(features[2]);
+	    *feat = ztrdup(features[3]);
 	    assignaparam(EXTVAR, feat, ASSPM_WARN|ASSPM_AUGMENT);
 	    break;
 	case 3: /* truecolor */
 	    feat = zshcalloc(2 * sizeof(char *));
-	    *feat = ztrdup(features[3]);
+	    *feat = ztrdup(features[4]);
 	    assignaparam(EXTVAR, feat, ASSPM_WARN|ASSPM_AUGMENT);
 	    break;
 	case 4: /* id */
@@ -480,7 +481,7 @@ handle_query(int sequence, int *numbers, int len, char *capture, int clen,
 /**/
 void
 query_terminal(void) {
-    char tquery[sizeof(TQ_BGCOLOR TQ_FGCOLOR TQ_KITTYKB TQ_RGB TQ_XTVERSION TQ_DA)];
+    char tquery[sizeof(TQ_BGCOLOR TQ_FGCOLOR TQ_CURSOR TQ_KITTYKB TQ_RGB TQ_XTVERSION TQ_DA)];
     char *tqend = tquery;
     static seqstate_t states[] = QUERY_STATES;
     char **f, **flist = getaparam(EXTVAR);
@@ -504,7 +505,7 @@ query_terminal(void) {
 	/* if termcap indicates 24-bit color, assume support - even
 	 * though this is only based on the initial $TERM
 	 * failing that, check $COLORTERM */
-	if (i == 3 && (tccolours == 1 << 24 ||
+	if (i == 4 && (tccolours == 1 << 24 ||
 		((cterm = getsparam("COLORTERM")) &&
 		    (!strcmp(cterm, "truecolor") ||
 			!strcmp(cterm, "24bit")))))
@@ -624,7 +625,7 @@ extension_enabled(const char *class, const char *ext, unsigned clen, int def)
 	if (strncmp(*e + negate, class, clen))
 	    continue;
 
-	if (!*(*e + negate + clen) || !strcmp(*e + negate + clen, ext))
+	if (!*(*e + negate + clen) || !strcmp(*e + negate + clen + 1, ext))
 	    return !negate;
     }
     return def;
@@ -703,7 +704,7 @@ end_edit(void)
 const char **
 prompt_markers(void)
 {
-    static unsigned aid = 0;
+    static unsigned int aid = 0;
     static char pre[] = "\033]133;A;cl=m;aid=zZZZZZZ\033\\"; /* before the prompt */
     static const char *const PR = "\033]133;P;k=i\033\\";   /* primary (PS1) */
     static const char *const SE = "\033]133;P;k=s\033\\";   /* secondary (PS2) */
@@ -753,4 +754,181 @@ notify_pwd(void)
     write_loop(SHTTY, "\033]7;file://localhost", 20);
     write_loop(SHTTY, url, ulen);
     write_loop(SHTTY, "\033\\", 2);
+}
+
+static unsigned int *cursor_forms;
+static unsigned int cursor_enabled_mask;
+
+static void
+match_cursorform(const char *teststr, unsigned int *cursor_form)
+{
+    static const struct {
+	const char *name;
+	unsigned char value, mask;
+    } shapes[] = {
+	{ "none", 0, 0xff },
+	{ "underline", CURF_UNDERLINE, CURF_SHAPE_MASK },
+	{ "bar", CURF_BAR, CURF_SHAPE_MASK },
+	{ "block", CURF_BLOCK, CURF_SHAPE_MASK },
+	{ "blink",  CURF_BLINK, CURF_STEADY },
+	{ "steady",  CURF_STEADY, CURF_BLINK },
+	{ "hidden", CURF_HIDDEN, 0 }
+    };
+
+    *cursor_form = 0;
+    while (*teststr) {
+	size_t s;
+	int found = 0;
+
+	if (strpfx("color=#", teststr)) {
+	    char *end;
+	    teststr += 7;
+	    zlong col = zstrtol(teststr, &end, 16);
+            if (end - teststr == 4) {
+		unsigned int red = col >> 8;
+		unsigned int green = (col & 0xf0) >> 4;
+		unsigned int blue = (col & 0xf);
+		*cursor_form &= 0xff; /* clear color */
+		*cursor_form |= CURF_COLOR |
+		    ((red << 4 | red) << CURF_RED_SHIFT) |
+		    ((green << 4 | green) << CURF_GREEN_SHIFT) |
+		    ((blue << 4 | blue) << CURF_BLUE_SHIFT);
+		found = 1;
+	    } else if (end - teststr == 6) {
+		*cursor_form |= (col << 8) | CURF_COLOR;
+		found = 1;
+	    }
+	    teststr = end;
+	}
+	for (s = 0; !found && s < sizeof(shapes) / sizeof(*shapes); s++) {
+	    if (strpfx(shapes[s].name, teststr)) {
+		teststr += strlen(shapes[s].name);
+		*cursor_form &= ~shapes[s].mask;
+		*cursor_form |= shapes[s].value;
+		found = 1;
+	    }
+	}
+	if (!found) /* skip an unknown component */
+	    teststr = strchr(teststr, ',');
+	if (!teststr || *teststr != ',')
+	    break;
+	teststr++;
+    }
+}
+
+/**/
+void
+zle_set_cursorform(void)
+{
+    char **atrs = getaparam("zle_cursorform");
+    static int setup = 0;
+    size_t i;
+    static const char *contexts[] = {
+	"edit:",
+	"command:",
+	"insert:",
+	"overwrite:",
+	"pending:",
+	"regionstart:",
+	"regionend:",
+        "visual:"
+    };
+
+    if (!cursor_forms)
+	cursor_forms = zalloc(CURC_DEFAULT * sizeof(*cursor_forms));
+    memset(cursor_forms, 0, CURC_DEFAULT * sizeof(*cursor_forms));
+    cursor_forms[CURC_INSERT] = CURF_BAR;
+    cursor_forms[CURC_OVERWRITE] = CURF_UNDERLINE;
+    cursor_forms[CURC_PENDING] = CURF_UNDERLINE;
+
+    for (; atrs && *atrs; atrs++) {
+	if (strpfx("region:", *atrs)) {
+	    match_cursorform(*atrs + 7, &cursor_forms[CURC_REGION_END]);
+	    cursor_forms[CURC_REGION_START] = cursor_forms[CURC_REGION_END];
+	    continue;
+	}
+	for (i = 0; i < sizeof(contexts) / sizeof(*contexts); i++) {
+	    if (strpfx(contexts[i], *atrs)) {
+		match_cursorform(*atrs + strlen(contexts[i]), &cursor_forms[i]);
+		break;
+	    }
+	}
+    }
+
+    if (!setup || trashedzle) {
+	cursor_enabled_mask = 0;
+	setup = 1;
+	if (!extension_enabled("cursor", "shape", 6, 1))
+	    cursor_enabled_mask |= CURF_SHAPE_MASK | CURF_BLINK | CURF_STEADY;
+	if (!extension_enabled("cursor", "color", 6, 1))
+	    cursor_enabled_mask |= CURF_COLOR_MASK;
+    }
+}
+
+/**/
+void
+free_cursor_forms(void)
+{
+    if (cursor_forms)
+	zfree(cursor_forms, CURC_DEFAULT * sizeof(*cursor_form));
+    cursor_forms = 0;
+}
+
+/**/
+void
+cursor_form(void)
+{
+    char seq[31];
+    char *s = seq;
+    unsigned int want, changed;
+    static unsigned int state = CURF_DEFAULT;
+    enum cursorcontext context = CURC_DEFAULT;
+
+    if (!cursor_forms)
+	return;
+
+    if (trashedzle) {
+	;
+    } else if (!insmode) {
+	context = CURC_OVERWRITE;
+    } else if (vichgflag == 2) {
+	context = CURC_PENDING;
+    } else if (region_active) {
+        if (invicmdmode()) {
+	    context = CURC_VISUAL;
+	} else {
+	    context = mark > zlecs ? CURC_REGION_START : CURC_REGION_END;
+	}
+    } else
+	context = invicmdmode() ? CURC_COMMAND : (vichgflag ? CURC_INSERT : CURC_EDIT);
+    want = (context == CURC_DEFAULT) ? CURF_DEFAULT : cursor_forms[context];
+    if (!(changed = (want ^ state) & ~cursor_enabled_mask))
+	return;
+
+    if (changed & CURF_HIDDEN)
+	 tcout(want & CURF_HIDDEN ? TCCURINV : TCCURVIS);
+    if (changed & CURF_SHAPE_MASK) {
+	char c = '0';
+	switch (want & CURF_SHAPE_MASK) {
+	    case CURF_BAR: c += 2;
+	    case CURF_UNDERLINE: c += 2;
+	    case CURF_BLOCK:
+		c += 2 - !!(want & CURF_BLINK);
+		changed &= ~(CURF_BLINK | CURF_STEADY);
+	}
+	s += sprintf(s, "\033[%c q", c);
+    }
+    if (changed & (CURF_BLINK | CURF_STEADY)) {
+	s += sprintf(s, "\033[?12%c", (want & CURF_BLINK) ? 'h' : 'l');
+    }
+    if (changed & CURF_COLOR_MASK) {
+	if (!(want & CURF_COLOR_MASK))
+	    want = memo_cursor | (want & 0xff);
+	s += sprintf(s, "\033]12;rgb:%02x00/%02x00/%02x00\033\\",
+		want >> CURF_RED_SHIFT, (want >> CURF_GREEN_SHIFT) & 0xff,
+		(want >> CURF_BLUE_SHIFT) & 0xff);
+    }
+    if (s - seq)
+	write_loop(SHTTY, seq, s - seq);
+    state = want;
 }

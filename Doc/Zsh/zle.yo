@@ -2855,3 +2855,64 @@ special array parameter tt(region_highlight); see
 ifnzman(noderef(Zle Widgets))\
 ifzman(above).
 
+texinode(Cursor Form)()()(Character Highlighting)
+subsect(Cursor Form)
+cindex(cursor form)
+
+vindex(zle_cursorform, setting)
+Some terminals support the ability to change the shape and color of the cursor.
+On such terminals, the line editor will use cursor styles appropriate to
+different contexts. This is controlled via the array parameter
+tt(zle_cursorform). To disable all cursor changes, see the tt(.term.extensions)
+parameter.
+
+Each element of the array should consist of a word indicating a context
+followed by a colon, then a comma-separated list of properties describing the
+shape and color to apply to the cursor.
+
+The available contexts follow with the default cursor form shown in
+parentheses. Where no default is given, the terminal's default is applied:
+
+startitem()
+item(tt(command))(
+Used for vi normal mode.
+)
+item(tt(edit))(
+The default form used in the line editor and for editing text in emacs
+mode.
+)
+item(tt(insert) (tt(bar)))(
+Used for vi editing mode.
+)
+item(tt(overwrite) (tt(underline)))(
+Used when editing text in overwrite mode or with the vi replace command.
+)
+item(tt(pending) (tt(underline)))(
+Used where the line editor is waiting for a single key press such as the vi
+operator pending mode widget.
+)
+item(tt(region))(
+Applied for both tt(regionstart) and tt(regionend) contexts.
+)
+item(tt(regionstart))(
+Used when the region is active and the cursor is positioned at the start of the
+region. The region includes the text under the cursor when it is positioned at
+the start so it is best to choose a cursor form that does not obscure this fact.
+)
+item(tt(regionend))(
+Used when the region is active and the cursor is positioned at the end of the
+region. Note that when this is the case, the region does not include the cursor
+position.
+)
+item(tt(visual))(
+Used when vi visual mode is active. The visual selection always includes the
+cursor position so the same advice as for tt(regionstart) applies.
+)
+enditem()
+
+The available cursor forms are tt(none), tt(bar), tt(block), tt(underline) and
+tt(hidden). Additionally, you can specify either tt(blink) or tt(steady) to
+indicate whether the cursor should flash and specify a color as an RGB triplet
+in hexadecimal format with with tt(color=)var(#xxxxxx). The value tt(none)
+applies the terminal's default cursor form. Note that on many terminals, this
+may be different to the initial cursor state from when the shell started.

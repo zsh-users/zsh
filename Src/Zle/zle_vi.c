@@ -186,6 +186,7 @@ getvirange(int wf)
 	virangeflag = 1;
 	wordflag = wf;
 	mark = -1;
+	cursor_form();
 	/* use operator-pending keymap if one exists */
 	Keymap km = openkeymap("viopp");
 	if (km)

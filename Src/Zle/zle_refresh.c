@@ -1024,6 +1024,8 @@ zrefresh(void)
 	tmpalloced = 0;
     }
 
+    zle_set_cursorform();
+
     /* this will create region_highlights if it's still NULL */
     zle_set_highlight();
 
@@ -1666,6 +1668,7 @@ individually */
 
 /* move to the new cursor position */
     moveto(rpms.nvln, rpms.nvcs);
+    cursor_form();
 
 /* swap old and new buffers - better than freeing/allocating every time */
     bufswap();
@@ -2706,4 +2709,6 @@ zle_refresh_finish(void)
 	region_highlights = NULL;
 	n_region_highlights = 0;
     }
+
+    free_cursor_forms();
 }

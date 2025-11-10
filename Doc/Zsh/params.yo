@@ -1749,6 +1749,12 @@ inserted instead of invoking editor commands. Furthermore, pasted text forms a
 single undo event and if the region is active, pasted text will replace the
 region.
 )
+item(tt(cursor-color) <E>)(
+Support for changing the color of the cursor.
+)
+item(tt(cursor-shape) <E>)(
+Support for changing the shape of the cursor.
+)
 item(tt(integration-output) <E>)(
 This provides the terminal with semantic information regarding where the output
 from commands start and finish. Some terminals use this information to make it
@@ -1768,6 +1774,11 @@ to create new windows with the same current working directory.
 item(tt(query-bg) <E>)(
 Query the terminal background color which is used for tt(.term.bg) and
 tt(.term.mode).
+)
+item(tt(query-cursor) <E>)(
+Query the cursor color. This facilitates restoring the cursor to its original
+color if it has been configured via tt(zle_cursorform). The color is also
+assigned to tt(.term.cursor).
 )
 item(tt(query-fg) <E>)(
 Query the terminal foreground color which is used for tt(.term.fg).
@@ -1899,6 +1910,13 @@ paste when ZLE is active and disable it at other times.  Unsetting the
 parameter has the effect of ensuring that bracketed paste remains disabled.
 However, see also the tt(.term.extensions) parameter which provides a single
 place to enable or disable terminal features.
+)
+vindex(zle_cursorform)
+item(tt(zle_cursorform))(
+An array describing contexts in which ZLE should change the shape and color
+of the cursor.
+See ifzman(em(Cursor Form) in zmanref(zshzle))\
+ifnzman(noderef(Cursor Form)).
 )
 vindex(zle_highlight)
 item(tt(zle_highlight))(

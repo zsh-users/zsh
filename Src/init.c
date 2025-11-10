@@ -754,7 +754,7 @@ static char *tccapnams[TC_COUNT] = {
     "cl", "le", "LE", "nd", "RI", "up", "UP", "do",
     "DO", "dc", "DC", "ic", "IC", "cd", "ce", "al", "dl", "ta",
     "md", "mh", "so", "us", "ZH", "me", "se", "ue", "ZR", "ch",
-    "ku", "kd", "kl", "kr", "sc", "rc", "bc", "AF", "AB"
+    "ku", "kd", "kl", "kr", "sc", "rc", "bc", "AF", "AB", "vi", "ve"
 };
 
 /**/

@@ -1,5 +1,9 @@
 2025-11-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 53438: Doc/Zsh/params.yo, Doc/Zsh/zle.yo, Src/Zle/termquery.c,
+	Src/Zle/zle.h, Src/Zle/zle_refresh.c, Src/Zle/zle_vi.c, Src/init.c,
+	Src/zsh.h: support for changing terminal cursor shape and colour
+
 	* 53404: Doc/Zsh/params.yo, Src/Zle/termquery.c, Src/Zle/zle_main.c,
 	Src/builtin.c, Src/init.c, Src/input.c, Src/loop.c, Src/prompt.c,
 	Src/subst.c, Src/utils.c, Src/zsh.h, Test/X04zlehighlight.ztst,

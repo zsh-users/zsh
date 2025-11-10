@@ -470,6 +470,32 @@ struct region_highlight {
  * interaction in Doc/Zsh/zle.yo. */
 #define N_SPECIAL_HIGHLIGHTS	(4)
 
+/* Terminal cursor contexts */
+enum cursorcontext {
+    CURC_EDIT,
+    CURC_COMMAND,
+    CURC_INSERT,
+    CURC_OVERWRITE,
+    CURC_PENDING,
+    CURC_REGION_START,
+    CURC_REGION_END,
+    CURC_VISUAL,
+    CURC_DEFAULT
+};
+
+#define CURF_DEFAULT 0
+#define CURF_UNDERLINE 1
+#define CURF_BAR 2
+#define CURF_BLOCK 3
+#define CURF_SHAPE_MASK 3
+#define CURF_BLINK (1 << 2)
+#define CURF_STEADY (1 << 3)
+#define CURF_HIDDEN (1 << 4)
+#define CURF_COLOR (1 << 5)
+#define CURF_COLOR_MASK ((0xffffffu << 8) | CURF_COLOR)
+#define CURF_RED_SHIFT   24
+#define CURF_GREEN_SHIFT 16
+#define CURF_BLUE_SHIFT  8
 
 #ifdef MULTIBYTE_SUPPORT
 /*
