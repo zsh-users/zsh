@@ -1,5 +1,8 @@
 2025-11-12  Oliver Kiddle  <opk@zsh.org>
 
+	* 54037: Src/Zle/zle_refresh.c: fix to highlight layers where
+	special is assigned a low layer
+
 	* 54036: Src/prompt.c, Src/Zle/complist.c, Src/Zle/zle_refresh.c:
 	fixes related to prompt attribute leftovers
 

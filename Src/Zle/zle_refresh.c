@@ -1223,7 +1223,8 @@ zrefresh(void)
 			if (layer > special_layer)
 			    all_attr = mixattrs(rhp->atr, all_attr);
 		    }
-		} else if (rhp->layer > layer && rhp->layer < nextlayer) {
+		} else if (rhp->layer > layer &&
+			(rhp->layer < nextlayer || nextlayer <= layer)) {
 		    nextlayer = rhp->layer;
 		}
 	    }
