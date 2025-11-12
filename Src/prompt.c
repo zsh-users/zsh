@@ -1709,14 +1709,6 @@ applytextattributes(int flags)
 
 /**/
 mod_export void
-cleartextattributes(int flags)
-{
-    treplaceattrs(0);
-    applytextattributes(flags);
-}
-
-/**/
-mod_export void
 treplaceattrs(zattr newattrs)
 {
     if (newattrs == TXT_ERROR)

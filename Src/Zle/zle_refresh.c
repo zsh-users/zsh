@@ -600,7 +600,8 @@ unset_region_highlight(Param pm, int exp)
 static void
 tcoutclear(int cap)
 {
-    cleartextattributes(0);
+    treplaceattrs((cap == TCCLEAREOL) ? prompt_attr : 0);
+    applytextattributes(0);
     tcout(cap);
 }
 
@@ -983,7 +984,7 @@ zrefresh(void)
 #ifdef MULTIBYTE_SUPPORT
     int width;			/* width of wide character		     */
 #endif
-
+    const REFRESH_ELEMENT zr_pad = { ZWC(' '), prompt_attr };
 
     /* If this is called from listmatches() (indirectly via trashzle()), and *
      * that was called from the end of zrefresh(), then we don't need to do  *
@@ -1197,7 +1198,7 @@ zrefresh(void)
     rpms.sen = *nbuf + winw;
     for (t = tmpline, tmppos = 0; tmppos < tmpll; t++, tmppos++) {
 	zattr base_attr = mixattrs(default_attr, prompt_attr);
-	zattr all_attr;
+	zattr all_attr = 0;
 	struct region_highlight *rhp;
 	int layer, nextlayer = 0;
 	/*
@@ -1495,7 +1496,7 @@ zrefresh(void)
 	rpms.sen = rpms.s + winw - 7;
 	for (; rpms.s < rpms.sen; rpms.s++) {
 	    if (rpms.s->chr == ZWC('\0')) {
-		ZR_memset(rpms.s, zr_sp, rpms.sen - rpms.s);
+		ZR_memset(rpms.s, zr_pad, rpms.sen - rpms.s);
 		/* make sure we don't trigger the WEOF test */
 		rpms.sen->chr = ZWC('\0');
 		break;
@@ -1513,6 +1514,7 @@ zrefresh(void)
 	}
 #endif
 	ZR_memcpy(rpms.sen, zr_end_ellipsis, ZR_END_ELLIPSIS_SIZE);
+	rpms.sen[0].atr = prompt_attr;
 	rpms.sen[1].atr = ellipsis_attr;
 #ifdef MULTIBYTE_SUPPORT
 	/* Extend to the end if we backed off for a wide character */
@@ -1593,7 +1595,7 @@ zrefresh(void)
 	t0 = t0 > ZR_START_ELLIPSIS_SIZE ? ZR_START_ELLIPSIS_SIZE : t0;
 	ZR_memcpy(nbuf[0] + lpromptw, zr_start_ellipsis, t0);
 	(*nbuf + lpromptw)->atr = ellipsis_attr;
-	ZR_memset(nbuf[0] + lpromptw + t0, zr_sp, winw - t0 - lpromptw);
+	ZR_memset(nbuf[0] + lpromptw + t0, zr_pad, winw - t0 - lpromptw);
 	(*nbuf + lpromptw + t0)->atr = prompt_attr;
 	nbuf[0][winw] = nbuf[0][winw + 1] = zr_zr;
     }
@@ -1743,6 +1745,7 @@ refreshline(int ln)
 	ins_last,		/* insert pushed last character off line */
 	nllen, ollen,		/* new and old line buffer lengths	 */
 	rnllen;			/* real new line buffer length		 */
+    const REFRESH_ELEMENT zr_pad = { ZWC(' '), prompt_attr };
 
 /* 0: setup */
     nl = nbuf[ln];
@@ -1789,7 +1792,7 @@ refreshline(int ln)
     } else if (ollen > nllen) { /* make new line at least as long as old */
 	p1 = zhalloc((ollen + 1) * sizeof(*p1));
 	ZR_memcpy(p1, nl, nllen);
-	ZR_memset(p1 + nllen, zr_sp, ollen - nllen);
+	ZR_memset(p1 + nllen, zr_pad, ollen - nllen);
 	p1[ollen] = zr_zr;
 	nl = p1;
 	nllen = ollen;
@@ -1805,13 +1808,18 @@ refreshline(int ln)
     else {
 	col_cleareol = -1;
 	if (tccan(TCCLEAREOL) && (nllen == winw || put_rpmpt != oput_rpmpt)) {
-	    for (i = nllen; i && ZR_equal(zr_sp, nl[i - 1]); i--)
+	    zattr a = nl[nllen - 1].atr;
+	    for (i = nllen; i && nl[i - 1].chr == ' ' && nl[i - 1].atr == a; i--)
 		;
-	    for (j = ollen; j && ZR_equal(ol[j - 1], zr_sp); j--)
-		;
-	    if ((j > i + tclen[TCCLEAREOL])	/* new buf has enough spaces */
-		|| (nllen == winw && ZR_equal(zr_sp, nl[winw - 1])))
+	    if (nllen == winw && i < nllen) {
 		col_cleareol = i;
+            } else {
+		a = ol[ollen - 1].atr;
+		for (j = ollen; j && ol[j - 1].chr == ' ' && ol[j - 1].atr == a; j--)
+		    ;
+		if ((j > i + tclen[TCCLEAREOL]))	/* new buf has enough spaces */
+		    col_cleareol = i;
+	    }
 	}
     }
 
@@ -1917,7 +1925,7 @@ refreshline(int ln)
 		else {
 		    vcs += i;
 		    while (i-- > 0)
-			zputc(&zr_sp);
+			zputc(&zr_pad);
 		}
 		return;
 	    }
@@ -1961,10 +1969,11 @@ refreshline(int ln)
 			    /*
 			     * Some terminals will output the current
 			     * attributes into cells added at the end by
-			     * deletions, so turn off text attributes.
+			     * deletions, so apply the text area attributes.
 			     */
 			    if (first) {
-				cleartextattributes(0);
+				treplaceattrs(prompt_attr);
+				applytextattributes(0);
 				first = 0;
 			    }
 			    tc_delchars(i);

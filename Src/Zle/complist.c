@@ -2049,6 +2049,8 @@ complistmatches(UNUSED(Hookdef dummy), Chdata dat)
 	if (mlistp && !*mlistp)
 	    mlistp = "%SAt %p: Hit TAB for more, or the character to insert%s";
 	trashzle();
+	treplaceattrs(0); /* complist does it's own attributes so wipe any zle residue */
+	applytextattributes(0);
 	showinglist = listshown = 0;
 
 	lastlistlen = 0;

@@ -1,3 +1,8 @@
+2025-11-12  Oliver Kiddle  <opk@zsh.org>
+
+	* 54036: Src/prompt.c, Src/Zle/complist.c, Src/Zle/zle_refresh.c:
+	fixes related to prompt attribute leftovers
+
 2025-11-10  Bart Schaefer  <schaefer@zsh.org>
 
 	* 54064: Src/params.c, Test/K01nameref.ztst: avoid crash on named
