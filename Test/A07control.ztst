@@ -163,3 +163,19 @@
   done
 4:Last status from loop body is kept even with other funny business going on
 >1
+
+  PS3=
+  printf "1\n2\n3\n" | select n in a b c; do
+    echo $REPLY
+    case $REPLY in
+      (1) continue;;
+      (2) continue --print-selections;;
+      (3) break;;
+    esac
+  done 2>&1
+0:Redraw the menu of select with continue --print-selections
+>1) a  2) b  3) c  
+>1
+>2
+>1) a  2) b  3) c  
+>3
