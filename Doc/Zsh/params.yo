@@ -926,6 +926,12 @@ The values of tt(RANDOM) form an intentionally-repeatable pseudo-random
 sequence; subshells that reference tt(RANDOM) will result
 in identical pseudo-random values unless the value of tt(RANDOM) is
 referenced or seeded in the parent shell in between subshell invocations.
+
+tt(RANDOM) uses the system's library function manref(rand)(3).
+If higher degree of randomness is required, please consider using
+the autoloadable parameter tt(SRANDOM) from
+ifzman(the tt(zsh/random) module (see zmanref(zshmodules)))\
+ifnzman(noderef(The zsh/random Module)).
 )
 vindex(SECONDS)
 item(tt(SECONDS) <S>)(

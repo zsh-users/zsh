@@ -1,3 +1,8 @@
+2025-11-13  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 53964 (+ tiny change): Doc/Zsh/params.yo: mention zsh/random
+	module in the description of the parameter RANDOM
+
 2025-11-12  Oliver Kiddle  <opk@zsh.org>
 
 	* Heon Jeong: 54008: Src/Zle/compmatch.c: infinite loop running
