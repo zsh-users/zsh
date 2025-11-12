@@ -1277,7 +1277,7 @@ zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
     raw_rp = rp;
     rpromptbuf = promptexpand(rp ? *rp : NULL, 1, markers[2], NULL, NULL);
     rpmpt_attr = txtcurrentattrs;
-    prompt_attr = mixattrs(pmpt_attr, rpmpt_attr);
+    prompt_attr = mixattrs(pmpt_attr, pmpt_attr, rpmpt_attr);
     free_prepostdisplay();
 
     zlereadflags = flags;
@@ -2032,7 +2032,7 @@ reexpandprompt(void)
 
 	    new_rprompt = promptexpand(raw_rp ? *raw_rp : NULL, 1, markers[2], NULL, NULL);
 	    rpmpt_attr = txtcurrentattrs;
-	    prompt_attr = mixattrs(pmpt_attr, rpmpt_attr);
+	    prompt_attr = mixattrs(pmpt_attr, pmpt_attr, rpmpt_attr);
 	    free(rpromptbuf);
 	    rpromptbuf = new_rprompt;
 	} while (looping != reexpanding);

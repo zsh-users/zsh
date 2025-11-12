@@ -2503,7 +2503,7 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 		    break;
 		case 'H':
 		    if (p[1] == '{') {
-			p = parsehighlight(p + 2, '}', &atr);
+			p = parsehighlight(p + 2, '}', &atr, NULL);
 			--p;
 			if (atr != TXT_ERROR)
 			    treplaceattrs(atr);

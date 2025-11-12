@@ -1183,7 +1183,7 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		    break;
 		case ZWC('H'):
 		    if (*p == '{') {
-			p = parsehighlight(p + 1, '}', &atr);
+			p = parsehighlight(p + 1, '}', &atr, NULL);
 			if (atr != TXT_ERROR && dopr)
 			    treplaceattrs(atr);
 		    }

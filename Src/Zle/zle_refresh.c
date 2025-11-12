@@ -208,7 +208,7 @@ int predisplaylen, postdisplaylen;
  * and for ellipsis continuation markers.
  */
 
-static zattr default_attr, special_attr, ellipsis_attr;
+static zattr default_attr, special_attr, special_mask, ellipsis_attr;
 
 /*
  * Layer applied to highlighting for special characters
@@ -359,28 +359,33 @@ zle_set_highlight(void)
 		paste_attr_set = region_attr_set =
 		    isearch_attr_set = suffix_attr_set = 1;
 	    } else if (strpfx("default:", *atrs)) {
-		match_highlight(*atrs + 8, &default_attr, NULL);
+		match_highlight(*atrs + 8, &default_attr, NULL, NULL);
 	    } else if (strpfx("special:", *atrs)) {
-		match_highlight(*atrs + 8, &special_attr, &special_layer);
+		match_highlight(*atrs + 8, &special_attr, &special_mask,
+			&special_layer);
 		special_attr_set = 1;
 	    } else if (strpfx("region:", *atrs)) {
 		match_highlight(*atrs + 7, &(region_highlights[0].atr),
+                        &(region_highlights[0].atrmask),
 			&(region_highlights[0].layer));
 		region_attr_set = 1;
 	    } else if (strpfx("isearch:", *atrs)) {
 		match_highlight(*atrs + 8, &(region_highlights[1].atr),
+                        &(region_highlights[1].atrmask),
 			&(region_highlights[1].layer));
 		isearch_attr_set = 1;
 	    } else if (strpfx("suffix:", *atrs)) {
 		match_highlight(*atrs + 7, &(region_highlights[2].atr),
+                        &(region_highlights[2].atrmask),
 			&(region_highlights[2].layer));
 		suffix_attr_set = 1;
 	    } else if (strpfx("paste:", *atrs)) {
 		match_highlight(*atrs + 6, &(region_highlights[3].atr),
+                        &(region_highlights[3].atrmask),
 			&(region_highlights[3].layer));
 		paste_attr_set = 1;
 	    } else if (strpfx("ellipsis:", *atrs)) {
-		match_highlight(*atrs + 9, &ellipsis_attr, NULL);
+		match_highlight(*atrs + 9, &ellipsis_attr, NULL, NULL);
 		ellipsis_attr_set = 1;
 	    }
 	}
@@ -388,15 +393,15 @@ zle_set_highlight(void)
 
     /* Default attributes */
     if (!special_attr_set)
-	special_attr = TXTSTANDOUT;
+	special_attr = special_mask = TXTSTANDOUT;
     if (!region_attr_set)
-	region_highlights[0].atr = TXTSTANDOUT;
+	region_highlights[0].atr = region_highlights[0].atrmask = TXTSTANDOUT;
     if (!isearch_attr_set)
-	region_highlights[1].atr = TXTUNDERLINE;
+	region_highlights[1].atr = region_highlights[1].atrmask = TXTUNDERLINE;
     if (!suffix_attr_set)
-	region_highlights[2].atr = TXTBOLDFACE;
+	region_highlights[2].atr = region_highlights[2].atrmask = TXTBOLDFACE;
     if (!paste_attr_set)
-	region_highlights[3].atr = TXTSTANDOUT;
+	region_highlights[3].atr = region_highlights[3].atrmask = TXTSTANDOUT;
     if (!ellipsis_attr_set)
 	ellipsis_attr = TXTBGCOLOUR | ((zattr) 3 << TXT_ATTR_BG_COL_SHIFT) |
 		TXTFGCOLOUR | ((zattr) 4 << TXT_ATTR_FG_COL_SHIFT);
@@ -442,7 +447,7 @@ get_region_highlight(UNUSED(Param pm))
 	int offset;
 	const char memo_equals[] = " memo=";
 	int alloclen = sprintf(digbuf, "%d %d", rhp->start, rhp->end) +
-	    output_highlight(rhp->atr, NULL) +
+	    output_highlight(rhp->atr, rhp->atrmask, NULL) +
 	    2; /* space and terminating NUL */
 	if (rhp->flags & ZRH_PREDISPLAY)
 	    alloclen++; /* "P" */
@@ -461,7 +466,7 @@ get_region_highlight(UNUSED(Param pm))
 	offset = sprintf(*arrp, "%s%s ",
 		(rhp->flags & ZRH_PREDISPLAY) ? "P" : "",
 		digbuf);
-	(void)output_highlight(rhp->atr, *arrp + offset);
+	(void)output_highlight(rhp->atr, rhp->atrmask, *arrp + offset);
 
 	if (rhp->layer != 10)
 	    strcat(*arrp, layerbuf);
@@ -537,7 +542,8 @@ set_region_highlight(UNUSED(Param pm), char **aval)
 	    strp++;
 
 	rhp->layer = 10; /* default */
-	strp = (char*) match_highlight(strp, &rhp->atr, &rhp->layer);
+	strp = (char*) match_highlight(strp, &rhp->atr, &rhp->atrmask,
+		&rhp->layer);
 
 	while (inblank(*strp))
 	    strp++;
@@ -1155,6 +1161,9 @@ zrefresh(void)
 		zputs("\n", shout);	/* works with both hasam and !hasam */
 	    /* lpromptbuf includes literal escapes so we need to update for it */
 	    txtcurrentattrs = txtpendingattrs = pmpt_attr;
+	    /* Unknown attributes remain so but if sequences were embedded
+	     * directly in the prompt, let's not needlessly reset them. */
+	    txtunknownattrs = 0;
 	}
 	if (clearflag) {
 	    zputc(&zr_cr);
@@ -1197,7 +1206,7 @@ zrefresh(void)
     rpms.s = nbuf[rpms.ln = 0] + lpromptw;
     rpms.sen = *nbuf + winw;
     for (t = tmpline, tmppos = 0; tmppos < tmpll; t++, tmppos++) {
-	zattr base_attr = mixattrs(default_attr, prompt_attr);
+	zattr base_attr = mixattrs(default_attr, default_attr, prompt_attr);
 	zattr all_attr = 0;
 	struct region_highlight *rhp;
 	int layer, nextlayer = 0;
@@ -1219,9 +1228,10 @@ zrefresh(void)
 			offset = predisplaylen; /* increment over it */
 		    if (rhp->start + offset <= tmppos &&
 			tmppos < rhp->end + offset) {
-			base_attr = mixattrs(rhp->atr, base_attr);
+			base_attr = mixattrs(rhp->atr, rhp->atrmask, base_attr);
 			if (layer > special_layer)
-			    all_attr = mixattrs(rhp->atr, all_attr);
+			    all_attr = mixattrs(rhp->atr, rhp->atrmask,
+				    all_attr);
 		    }
 		} else if (rhp->layer > layer &&
 			(rhp->layer < nextlayer || nextlayer <= layer)) {
@@ -1229,7 +1239,7 @@ zrefresh(void)
 		}
 	    }
 	    if (special_layer == layer) {
-		all_attr = mixattrs(special_attr, base_attr);
+		all_attr = mixattrs(special_attr, special_mask, base_attr);
 	    }
 	} while (nextlayer > layer);
 
@@ -2467,7 +2477,7 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 		}
 	    }
 	}
-	all_attr = mixattrs(special_attr, base_attr);
+	all_attr = mixattrs(special_attr, special_mask, base_attr);
 
 	if (t0 == tmpcs)
 	    nvcs = vp - vbuf;

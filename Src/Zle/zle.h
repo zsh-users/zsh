@@ -433,8 +433,10 @@ enum {
  * and mark.
  */
 struct region_highlight {
-    /* Attributes turned on in the region */
+    /* Attributes for the region */
     zattr atr;
+    /* Explicitly set attributes for the region */
+    zattr atrmask;
     /* Priority for this region relative to others that overlap */
     int layer;
     /* Start of the region */

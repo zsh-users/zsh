@@ -1,5 +1,11 @@
 2025-11-12  Oliver Kiddle  <opk@zsh.org>
 
+	* 54043, 54055 (tweaked to use "reset" as suggested by Mikael):
+	Doc/Zsh/zle.yo, Src/prompt.c, Src/Modules/hlgroup.c,
+	Src/Modules/watch.c, Src/Zle/complist.c, Src/Zle/zle.h,
+	Src/Zle/zle_main.c, Src/Zle/zle_refresh.c, Src/Zle/zle_tricky.c:
+	allow highlighing attributes to be turned back off
+
 	* 54037: Src/Zle/zle_refresh.c: fix to highlight layers where
 	special is assigned a low layer
 

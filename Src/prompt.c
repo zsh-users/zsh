@@ -277,7 +277,7 @@ zattrescape(zattr atr, int *len)
 /* Parse the argument for %H */
 /**/
 mod_export char *
-parsehighlight(char *arg, char endchar, zattr *atr)
+parsehighlight(char *arg, char endchar, zattr *atr, zattr *mask)
 {
     static int entered = 0;
     char *var = ".zle.hlgroups";
@@ -294,7 +294,7 @@ parsehighlight(char *arg, char endchar, zattr *atr)
 	if (ht && (node = (Param) ht->getnode(ht, arg))) {
 	    attrs = node->gsu.s->getfn(node);
 	    entered = 1;
-	    if (match_highlight(attrs, atr, 0) == attrs)
+	    if (match_highlight(attrs, atr, mask, NULL) == attrs)
 		*atr = TXT_ERROR;
 	} else
 	    *atr = TXT_ERROR;
@@ -639,7 +639,7 @@ putpromptchar(int doprint, int endchar)
 		break;
 	    case 'H':
 		if (bv->fm[1] == '{') {
-		    bv->fm = parsehighlight(bv->fm + 2, '}', &atr);
+		    bv->fm = parsehighlight(bv->fm + 2, '}', &atr, NULL);
 		    --bv->fm;
 		    if (atr != TXT_ERROR) {
 			treplaceattrs(atr);
@@ -1757,23 +1757,27 @@ tunsetattrs(zattr newattrs)
 	txtpendingattrs &= ~TXT_ATTR_BG_MASK;
 }
 
-/* Merge two attribute sets. In an case where attributes might conflict
- * choose those from the first parameter.  Foreground and background
- * colours are taken together - less likely to end up with unreadable
- * combinations. */
+/* Merge two attribute sets.
+ * secondary is the background base attributes
+ * primary is attributes to be overlaid, taking precedence.
+ * mask indicates those attributes in primary that were explicitly
+ * set allowing an explicitly disabled attribute in primary to take
+ * precedence. */
 
 /**/
 mod_export zattr
-mixattrs(zattr primary, zattr secondary)
+mixattrs(zattr primary, zattr mask, zattr secondary)
 {
-    zattr result = secondary;
-    /* take colours from primary */
-    if (primary & (TXTFGCOLOUR|TXTBGCOLOUR))
-        result &= ~TXT_ATTR_COLOUR_MASK;
-    /* take font weight from primary */
-    if (primary & TXT_ATTR_FONT_WEIGHT)
-        result &= ~TXT_ATTR_FONT_WEIGHT;
-    return result | primary;
+    zattr select = mask & TXT_ATTR_ALL;
+
+    if (mask & TXTFGCOLOUR)
+	select |= TXT_ATTR_FG_MASK;
+    if (mask & TXTBGCOLOUR)
+	select |= TXT_ATTR_BG_MASK;
+    if (mask & TXT_ATTR_FONT_WEIGHT)
+	select |= TXT_ATTR_FONT_WEIGHT;
+
+    return (primary & select) | (secondary & ~select);
 }
 
 /*****************************************************************************
@@ -1797,7 +1801,7 @@ struct highlight {
 };
 
 static const struct highlight highlights[] = {
-    { "none", 0, TXT_ATTR_ALL },
+    { "reset", 0, TXT_ATTR_ALL },
     { "bold", TXTBOLDFACE, TXTFAINT },
     { "faint", TXTFAINT, TXTBOLDFACE },
     { "standout", TXTSTANDOUT, 0 },
@@ -1923,15 +1927,17 @@ match_colour(const char **teststrp, int is_fg, int colour)
 /*
  * Match a set of highlights in the given teststr.
  * Set *on_var to reflect the values found.
+ * Set *setmask to explicitly set attributes
  * Set *layer to the layer
  * Return a pointer to the first character not consumed.
  */
 
 /**/
 mod_export const char *
-match_highlight(const char *teststr, zattr *on_var, int *layer)
+match_highlight(const char *teststr, zattr *on_var, zattr *setmask, int *layer)
 {
     int found = 1;
+    zattr mask = 0;
 
     *on_var = 0;
     while (found && *teststr) {
@@ -1941,7 +1947,7 @@ match_highlight(const char *teststr, zattr *on_var, int *layer)
 	found = 0;
 	if (strpfx("hl=", teststr)) {
 	    teststr += 3;
-	    teststr = parsehighlight((char *)teststr, ',', &atr);
+	    teststr = parsehighlight((char *)teststr, ',', &atr, &mask);
 	    if (atr != TXT_ERROR)
 		*on_var = atr;
 	    found = 1;
@@ -1958,6 +1964,7 @@ match_highlight(const char *teststr, zattr *on_var, int *layer)
 	    /* skip out of range colours but keep scanning attributes */
 	    if (atr != TXT_ERROR)
 		*on_var |= atr;
+	    mask |= is_fg ? TXTFGCOLOUR : TXTBGCOLOUR;
 	} else if (layer && strpfx("layer=", teststr)) {
 	    teststr += 6;
 	    *layer = (int) zstrtol(teststr, (char **) &teststr, 10);
@@ -1967,7 +1974,8 @@ match_highlight(const char *teststr, zattr *on_var, int *layer)
 		break;
 	    found = 1;
 	} else {
-	    for (hl = highlights; hl->name; hl++) {
+	    int turn_off = 0;
+	    for (hl = highlights; !found && hl->name; hl++) {
 		if (strpfx(hl->name, teststr)) {
 		    const char *val = teststr + strlen(hl->name);
 
@@ -1976,14 +1984,25 @@ match_highlight(const char *teststr, zattr *on_var, int *layer)
 		    else if (*val && *val != ' ')
 			break;
 
-		    *on_var |= hl->mask_on;
-		    *on_var &= ~hl->mask_off;
+		    if (turn_off) {
+			*on_var &= ~hl->mask_on & ~hl->mask_off;
+		    } else {
+			*on_var |= hl->mask_on;
+			*on_var &= ~hl->mask_off;
+		    }
+		    mask |= hl->mask_on | hl->mask_off;
 		    teststr = val;
 		    found = 1;
 		}
+		/* delayed this to the end of the first iteration because
+		 * "noclear" isn't valid */
+		if (hl == highlights && (turn_off = strpfx("no", teststr)))
+		    teststr += 2;
 	    }
 	}
     }
+    if (setmask)
+	*setmask = mask;
 
     return teststr;
 }
@@ -2038,22 +2057,28 @@ output_colour(int colour, int fg_bg, int truecol, char *buf)
 
 /**/
 mod_export int
-output_highlight(zattr atr, char *buf)
+output_highlight(zattr atr, zattr mask, char *buf)
 {
     const struct highlight *hp;
     int atrlen = 0, len;
     char *ptr = buf;
 
-    if (atr & TXTFGCOLOUR) {
-	len = output_colour(txtchangeget(atr, TXT_ATTR_FG_COL),
-			    COL_SEQ_FG,
-			    (atr & TXT_ATTR_FG_24BIT),
-			    ptr);
-	atrlen += len;
-	if (buf)
-	    ptr += len;
+    if (mask == TXT_ATTR_ALL) {
+	zattr threebits = ~atr & TXT_ATTR_ALL;
+	threebits &= threebits - 1; /* can't be both bold and faint */
+	threebits &= threebits - 1; /* strip next bit to allow one "no" entry */
+
+	if (threebits) { /* more remain - shorter to start with "none" */
+	    mask &= atr; /* mark unset bits from atr as done */
+	    atrlen = 4;
+	    if (buf) {
+		strcpy(ptr, "reset");
+		ptr += 5;
+	    }
+	}
     }
-    if (atr & TXTBGCOLOUR) {
+
+    if (mask & TXTFGCOLOUR) {
 	if (atrlen) {
 	    atrlen++;
 	    if (buf) {
@@ -2061,21 +2086,58 @@ output_highlight(zattr atr, char *buf)
 		ptr++;
 	    }
 	}
-	len = output_colour(txtchangeget(atr, TXT_ATTR_BG_COL),
-			    COL_SEQ_BG,
-			    (atr & TXT_ATTR_BG_24BIT),
-			    ptr);
-	atrlen += len;
-	if (buf)
-	    ptr += len;
+	if (atr & TXTFGCOLOUR) {
+	    len = output_colour(txtchangeget(atr, TXT_ATTR_FG_COL), COL_SEQ_FG,
+		    (atr & TXT_ATTR_FG_24BIT), ptr);
+	    atrlen += len;
+	    if (buf)
+		ptr += len;
+	} else {
+	    atrlen += 10;
+	    if (buf) {
+		strcpy(ptr, "fg=default");
+		ptr += 10;
+	    }
+	}
     }
+    if (mask & TXTBGCOLOUR) {
+	if (atrlen) {
+	    atrlen++;
+	    if (buf) {
+		strcpy(ptr, ",");
+		ptr++;
+	    }
+	}
+	if (atr & TXTBGCOLOUR) {
+	    len = output_colour(txtchangeget(atr, TXT_ATTR_BG_COL), COL_SEQ_BG,
+		    (atr & TXT_ATTR_BG_24BIT), ptr);
+	    atrlen += len;
+	    if (buf)
+		ptr += len;
+	} else {
+	    atrlen += 10;
+	    if (buf) {
+		strcpy(ptr, "bg=default");
+		ptr += 10;
+	    }
+	}
+    }
+
     for (hp = highlights; hp->name; hp++) {
-	if (hp->mask_on & atr) {
+	if (hp->mask_on & mask && !(hp->mask_off & mask & atr)) {
+	    mask &= ~hp->mask_off;
 	    if (atrlen) {
 		atrlen++;
 		if (buf) {
 		    strcpy(ptr, ",");
 		    ptr++;
+		}
+	    }
+	    if (!(hp->mask_on & atr)) {
+		atrlen += 2;
+		if (buf) {
+		    strcpy(ptr, "no");
+		    ptr += 2;
 		}
 	    }
 	    len = strlen(hp->name);

@@ -43,7 +43,7 @@ convertattr(char *attrstr, int sgr)
     char *r, *s;
     int len;
 
-    match_highlight(attrstr, &atr, NULL);
+    match_highlight(attrstr, &atr, NULL, NULL);
     s = zattrescape(atr, sgr ? NULL : &len);
 
     if (sgr) {
