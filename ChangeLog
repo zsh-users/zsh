@@ -1,5 +1,7 @@
 2025-11-12  Oliver Kiddle  <opk@zsh.org>
 
+	* 54071: Completion/Zsh/Type/_ps1234: fix prompt colour completion
+
 	* 54043, 54055 (tweaked to use "reset" as suggested by Mikael):
 	Doc/Zsh/zle.yo, Src/prompt.c, Src/Modules/hlgroup.c,
 	Src/Modules/watch.c, Src/Zle/complist.c, Src/Zle/zle.h,

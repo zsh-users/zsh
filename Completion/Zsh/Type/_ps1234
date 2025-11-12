@@ -52,7 +52,7 @@ if compset -P '%[FK]'; then
     grp="$expl[expl[(i)-J]+1]"
     compadd "$expl[@]" "$suf[@]" $pre {0..$cols}
     for c in {0..$cols}; do
-      _comp_colors+=( "($grp)=${c}=${${${(%):-%F{$c\}}#?\[}%m}" )
+      _comp_colors+=( "($grp)=${c}=${${${${(%):-%F{$c\}}#?\[}%m}//:/;}" )
     done
   else
     _message -e terminal-colors "number"
