@@ -4364,7 +4364,7 @@ x2024-02-19  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 2021-02-16  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* 47876: Justtine Tunney: Src/exec.c: Add more cases where
+	* 47876: Justine Tunney: Src/exec.c: Add more cases where
 	shell scripts can be recognised from the first line as
 	described by POSIX.
 
@@ -5091,12 +5091,12 @@ x2024-02-19  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 	* 45796: Src/subst.c, Test/D04parameter.ztst: Support
 	${name:offset:length} with an empty offset
 
-2020-05-09: Eitan Adler <lists@eitanadler.com>
+2020-05-09  Eitan Adler <lists@eitanadler.com>
 
 	* noraj: gitlab !13: Completion/Unix/Type/_tar_archive: libarchive and
 	GNU tar can uncompress zstandard (zstd) based files
 
-2020-05-07: Eitan Adler <lists@eitanadler.com>
+2020-05-07  Eitan Adler <lists@eitanadler.com>
 
 	* unposted: Completion/Unix/Type/_tar_archive: libarchive based
 	tar can uncompress zip files
