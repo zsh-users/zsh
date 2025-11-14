@@ -4328,7 +4328,7 @@ x2024-02-19  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 2021-02-16  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* 47876: Justtine Tunney: Src/exec.c: Add more cases where
+	* 47876: Justine Tunney: Src/exec.c: Add more cases where
 	shell scripts can be recognised from the first line as
 	described by POSIX.
 
