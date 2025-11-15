@@ -1,5 +1,8 @@
 2025-11-17  Oliver Kiddle  <opk@zsh.org>
 
+	* Christopher Bock: 54080 (tweaked): Completion/Debian/Command/_bts:
+	update tags in bts completion
+
 	* 54034: Completion/compinit: ignore completer filenames with funny
 	characters in them
 

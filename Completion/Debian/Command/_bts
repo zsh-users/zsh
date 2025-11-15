@@ -2,6 +2,16 @@
 
 local expl first=1
 
+local -a tags
+tags=(patch wontfix moreinfo unreproducible help security upstream pending
+	confirmed ipv6 lfs d-i l10n newcomer a11y ftbfs fixed-upstream fixed
+	fixed-in-experimental potato woody sarge etch lenny squeeze wheezy
+	jessie stretch buster bullseye bookworm trixie forky duke sid
+	experimental sarge-ignore etch-ignore lenny-ignore squeeze-ignore
+	wheezy-ignore jessie-ignore stretch-ignore buster-ignore
+	bullseye-ignore bookworm-ignore trixie-ignore forky-ignore
+	duke-ignore)
+
 _arguments -A "-*" \
   '(-o --offline)'{-o,--offline}'[use cached bugs]' \
   '(--online --no-offline)'{--online,--no-offline}'[do not use cached bugs]' \
@@ -92,19 +102,9 @@ case "$words[1]" in
     elif [[ CURRENT -eq 3 ]]; then
       _wanted operator expl 'operator' compadd - '+' '-' '='
     elif [[ CURRENT -eq 4 ]]; then
-      _wanted tag expl 'tag' \
-	 compadd patch wontfix moreinfo unreproducible help pending \
-	 fixed security upstream confirmed fixed-upstream \
-	 fixed-in-experimental d-i ipv6 lfs l10n potato woody sarge \
-	 sarge-ignore etch etch-ignore lenny lenny-ignore squeeze \
-	 squeeze-ignore wheezy wheezy-ignore sid experimental
+      _wanted tags expl 'tag' compadd -a tags
     else
-      _wanted tag expl 'tag' \
-	 compadd patch wontfix moreinfo unreproducible help pending \
-	 fixed security upstream confirmed fixed-upstream \
-	 fixed-in-experimental d-i ipv6 lfs l10n potato woody sarge \
-	 sarge-ignore etch etch-ignore lenny lenny-ignore squeeze \
-	 squeeze-ignore wheezy wheezy-ignore sid experimental
+      _wanted tags expl 'tag' compadd -a tags
       _wanted sep expl 'separator' compadd -S ' ' , .
     fi
   ;;
