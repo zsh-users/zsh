@@ -1,5 +1,8 @@
 2025-11-17  Oliver Kiddle  <opk@zsh.org>
 
+	* Christopher Bock: 54084: Completion/Zsh/Command/_which: use
+	_numbers for whence -x
+
 	* 54074, 54082: Doc/Zsh/zle.yo, Src/prompt.c, Src/Zle/termquery.c,
 	Src/Zle/zle_main.c, Src/Zle/zle_refresh.c, Src/Modules/nearcolor.c,
 	Test/X04zlehighlight.ztst: add an opaque key for use in

@@ -11,7 +11,7 @@ cargs=( \
   '*:commands:->command' )
 farg='-f[output contents of functions]'
 aarg='-a[print all occurrences in path]'
-xarg='-x+[specify spaces to use for indentation in function expansion]:spaces'
+xarg='-x+[specify spaces to use for indentation in function expansion]: :_numbers -u spaces -d 8'
 
 case ${service} in
   whence)
