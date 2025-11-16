@@ -189,6 +189,9 @@
 	* Arseny Maslennikov: 54091: Completion/Unix/Command/_git:
 	add support for more pretty format specifiers
 
+	* Christopher Bock: 54084: Completion/Zsh/Command/_which: use
+	_numbers for whence -x
+
 	* Christopher Bock: 54085: Completion/Unix/Command/_tput:
 	complete tput -v option on Linux
 
