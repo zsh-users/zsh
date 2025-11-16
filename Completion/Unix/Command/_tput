@@ -4,6 +4,7 @@ local -a args
 case $OSTYPE in
   *linux*)
     args=(
+     '-v[verbose, show warnings]'
       - set1
       '-S[allows more than one capability per invocation of tput]'
       - set2
