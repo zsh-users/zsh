@@ -1,5 +1,7 @@
 2025-11-17  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Src/prompt.c: silence compiler warning on new code
+
 	* Christopher Bock: 54085: Completion/Unix/Command/_tput:
 	complete tput -v option on Linux
 

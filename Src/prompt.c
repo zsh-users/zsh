@@ -1764,7 +1764,7 @@ tunsetattrs(zattr newattrs)
 	txtpendingattrs &= ~TXT_ATTR_BG_MASK;
 }
 
-void
+static void
 map256toRGB(zattr *atr, int shift, zattr set24)
 {
     unsigned colour, red, green, blue;
@@ -1932,7 +1932,7 @@ match_named_colour(const char **teststrp)
 
 /**/
 static int
-truecolor_terminal()
+truecolor_terminal(void)
 {
     char **f, **flist = getaparam(".term.extensions");
     int result;
