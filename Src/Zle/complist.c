@@ -1186,7 +1186,9 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 			p = parsehighlight(p + 1, '}', &atr, NULL);
 			if (atr != TXT_ERROR && dopr)
 			    treplaceattrs(atr);
-		    }
+		    } else
+			treplaceattrs(0);
+
 		    break;
 		case ZWC('{'):
 		    if (arg)

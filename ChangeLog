@@ -1,5 +1,9 @@
 2025-11-17  Oliver Kiddle  <opk@zsh.org>
 
+	* 54075: Doc/Zsh/prompt.yo, Src/Modules/watch.c, Src/Zle/complist.c,
+	Src/Zle/zle_tricky.c, Src/prompt.c: allow highlighting to be reset
+	in prompts using %H without following braces
+
 	* 54034: Completion/compinit: ignore completer filenames with funny
 	characters in them
 

@@ -378,7 +378,8 @@ watchlog2(int inout, WATCH_STRUCT_UTMP *u, char *fmt, int prnt, int fini)
 			fmt = parsehighlight(fmt + 1, '}', &atr, NULL);
 			if (atr && atr != TXT_ERROR)
 			    treplaceattrs(atr);
-		    }
+		    } else
+			treplaceattrs(0);
 		    break;
 		case 'K':
 		    if (*fmt == '{') {

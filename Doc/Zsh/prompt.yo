@@ -256,6 +256,7 @@ braces so, for example tt(%H{error}) will use the highlighting specification
 for the `error' group.  If the key is not found in the associative array then
 it has no effect.  Highlighting specifications are in the same format as for
 the tt(zle_highlight) parameter.
+If the following braces are absent, attributes are reset to the defaults.
 )
 item(tt(%{)...tt(%}))(
 Include a string as a literal escape sequence.

@@ -2507,7 +2507,8 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 			--p;
 			if (atr != TXT_ERROR)
 			    treplaceattrs(atr);
-		    }
+		    } else
+			treplaceattrs(0);
 		    break;
 		case '{':
 		    if (arg)
