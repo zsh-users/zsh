@@ -520,7 +520,7 @@ if [[ -z "$_i_done" ]]; then
   for _i_dir in $fpath; do
     [[ $_i_dir = . ]] && continue
     (( $_i_wdirs[(I)$_i_dir] )) && continue
-    for _i_file in $_i_dir/^([^_]*|*~|*.zwc)(N); do
+    for _i_file in $_i_dir/^([^_]*|*[\;\|\&]*|*~|*.zwc)(N); do
       _i_name="${_i_file:t}"
       (( $+_i_test[$_i_name] + $_i_wfiles[(I)$_i_file] )) && continue
       _i_test[$_i_name]=yes

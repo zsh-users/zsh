@@ -1,3 +1,8 @@
+2025-11-17  Oliver Kiddle  <opk@zsh.org>
+
+	* 54034: Completion/compinit: ignore completer filenames with funny
+	characters in them
+
 2025-11-16  dana  <dana@dana.is>
 
 	* 53671: Src/hist.c, Test/D02glob.ztst: hist: untokenise input
