@@ -1,5 +1,7 @@
 2025-11-17  Oliver Kiddle  <opk@zsh.org>
 
+	* 54083: Src/Zle/zle_keymap.c: fix for cursor shape in viopp mode
+
 	* 54075: Doc/Zsh/prompt.yo, Src/Modules/watch.c, Src/Zle/complist.c,
 	Src/Zle/zle_tricky.c, Src/prompt.c: allow highlighting to be reset
 	in prompts using %H without following braces

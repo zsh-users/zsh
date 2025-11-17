@@ -1623,8 +1623,13 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
 
 	    /* can be patient with vi commands that need a motion operator: *
 	     * they wait till a key is pressed for the movement anyway      */
-	    timeout = !(!virangeflag && !region_active && f && f->widget &&
-		    f->widget->flags & ZLE_VIOPER);
+	    if (!(timeout = !(!virangeflag && !region_active && f && f->widget &&
+		    f->widget->flags & ZLE_VIOPER))) {
+		int nochg = vichgflag;
+		vichgflag = 2;
+		cursor_form();
+		vichgflag = nochg;
+	    }
 #ifdef MULTIBYTE_SUPPORT
 	    if ((f == Th(z_selfinsert) || f == Th(z_selfinsertunmeta)) &&
 		!lastchar_wide_valid && !ispfx) {
