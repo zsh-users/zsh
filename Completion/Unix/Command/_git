@@ -8270,12 +8270,16 @@ __git_format_placeholders() {
 	N:'name (use .mailmap)'
 	e:'email'
 	E:'email (use .mailmap)'
+	l:'email local part'
+	L:'email local part (use .mailmap)'
 	d:'date'
 	D:'date, RFC2822 style'
 	r:'date, relative'
 	t:'date, UNIX timestamp'
 	i:'date, like ISO 8601'
 	I:'date, strict ISO 8601'
+	s:'date, YYYY-MM-DD'
+	h:'date, human'
       )
       placeholders=( $match[1]$^placeholders )
     else
