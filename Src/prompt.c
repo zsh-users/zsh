@@ -45,6 +45,11 @@ mod_export zattr txtpendingattrs;
 /**/
 mod_export zattr txtunknownattrs;
 
+/* detected default attributes for the terminal if any */
+
+/**/
+mod_export zattr memo_term_color;
+
 /* the command stack for use with %_ in prompts */
 
 /**/
@@ -1759,6 +1764,32 @@ tunsetattrs(zattr newattrs)
 	txtpendingattrs &= ~TXT_ATTR_BG_MASK;
 }
 
+void
+map256toRGB(zattr *atr, int shift, zattr set24)
+{
+    unsigned colour, red, green, blue;
+
+    if (*atr & set24)
+	return;
+
+    if ((colour = ((*atr >> shift) & 0xff)) < 16)
+	return;
+
+    if (colour >= 16 && colour < 232) {
+	colour -= 16;
+	blue = !!colour * 0x37 + 40 * (colour % 6);
+	colour /= 6;
+	green = !!colour * 0x37 + 40 * (colour % 6);
+	colour /= 6;
+	red = !!colour * 0x37 + 40 * colour;
+    } else {
+	red = green = blue = 8 + 10 * (colour - 232);
+    }
+
+    *atr &= ~((zattr) 0xffffff << shift);
+    *atr |= set24 | (zattr) ((((red << 8) + green) << 8) + blue) << shift;
+}
+
 /* Merge two attribute sets.
  * secondary is the background base attributes
  * primary is attributes to be overlaid, taking precedence.
@@ -1770,16 +1801,76 @@ tunsetattrs(zattr newattrs)
 mod_export zattr
 mixattrs(zattr primary, zattr mask, zattr secondary)
 {
-    zattr select = mask & TXT_ATTR_ALL;
+    zattr mix = 0; /* attributes resulting from colour mixing */
+    zattr keep;    /* attributes from secondary */
+    zattr replace = mask & TXT_ATTR_ALL; /* attributes from primary */
+    zattr toset = TXT_ATTR_FG_MASK;
+    zattr isset = TXTFGCOLOUR;
+    zattr istrue = TXT_ATTR_FG_24BIT;
+    unsigned int shift = TXT_ATTR_FG_COL_SHIFT;
+    int opacity, i;
 
-    if (mask & TXTFGCOLOUR)
-	select |= TXT_ATTR_FG_MASK;
-    if (mask & TXTBGCOLOUR)
-	select |= TXT_ATTR_BG_MASK;
     if (mask & TXT_ATTR_FONT_WEIGHT)
-	select |= TXT_ATTR_FONT_WEIGHT;
+	replace |= TXT_ATTR_FONT_WEIGHT;
+    if (mask & TXTFGCOLOUR)
+	replace |= TXT_ATTR_FG_MASK;
+    if (mask & TXTBGCOLOUR)
+	replace |= TXT_ATTR_BG_MASK;
+    keep = ~replace;
 
-    return (primary & select) | (secondary & ~select);
+    do {
+	if (mask & isset && (opacity = (mask >> shift) & 127)) {
+	    zattr argb, brgb;
+	    /* we may know the default colours from the startup query */
+	    zattr aatt = (primary & isset) ? primary : memo_term_color;
+	    zattr batt = (secondary & isset) ? secondary : memo_term_color;
+
+	    keep &= ~toset;
+	    replace &= ~toset;
+
+	    if (tccolours == 256) {
+		map256toRGB(&aatt, shift, istrue);
+		map256toRGB(&batt, shift, istrue);
+	    }
+
+	    /* can only mix if we now have truecolor */
+	    if (aatt & batt & istrue) {
+		mix |= istrue | isset;
+		for (i = 0; i < 24; i += 8) {
+		    argb = (aatt >> (shift + i)) & 0xff;
+		    brgb = (batt >> (shift + i)) & 0xff;
+		    mix |= ((argb * (100 - opacity) + brgb * opacity) / 100)
+			<< (shift + i);
+		}
+		if (!truecolor_terminal() && (!empty(GETCOLORATTR->funcs) ||
+			!load_module("zsh/nearcolor", NULL, 1))) {
+		    struct color_rgb color = {
+			(mix >> (shift + 16)) & 0xff,
+			(mix >> (shift + 8)) & 0xff,
+			(mix >> shift) & 0xff
+		    };
+		    int color_idx = runhookdef(GETCOLORATTR, &color) - 1;
+		    if (color_idx >= 0) {
+		        mix &= ~toset;
+			mix |= isset | ((zattr) color_idx << shift);
+		    }
+		}
+	    } else if (opacity <= 50)
+		replace |= toset;
+	    else
+		keep |= toset;
+	}
+
+	if (isset == TXTBGCOLOUR)
+	    break;
+
+	shift = TXT_ATTR_BG_COL_SHIFT;
+	toset = TXT_ATTR_BG_COL_MASK;
+	isset = TXTBGCOLOUR;
+        istrue = TXT_ATTR_BG_24BIT;
+    } while (1);
+
+    return (primary & replace) | (secondary & keep) | mix;
 }
 
 /*****************************************************************************
@@ -1839,6 +1930,7 @@ match_named_colour(const char **teststrp)
     return -1;
 }
 
+/**/
 static int
 truecolor_terminal()
 {
@@ -1964,12 +2056,37 @@ match_highlight(const char *teststr, zattr *on_var, zattr *setmask, int *layer)
 		break;
 	    found = 1;
 	    /* skip out of range colours but keep scanning attributes */
-	    if (atr != TXT_ERROR)
+	    if (atr != TXT_ERROR) {
+		*on_var &=  is_fg ? (zattr) ~TXT_ATTR_FG_MASK : (zattr) ~TXT_ATTR_BG_MASK;
 		*on_var |= atr;
-	    mask |= is_fg ? TXTFGCOLOUR : TXTBGCOLOUR;
+		mask |= is_fg ? TXTFGCOLOUR : TXTBGCOLOUR;
+	    }
 	} else if (layer && strpfx("layer=", teststr)) {
 	    teststr += 6;
 	    *layer = (int) zstrtol(teststr, (char **) &teststr, 10);
+	    if (*teststr == ',')
+		teststr++;
+	    else if (*teststr && *teststr != ' ')
+		break;
+	    found = 1;
+	} else if (strpfx("opacity=", teststr)) {
+	    teststr += 8;
+	    zulong opacity = zstrtol(teststr, (char **) &teststr, 10);
+	    if (opacity > 100)
+		break;
+	    if (*teststr == '%')
+		teststr++;
+	    /* invert sense so 0 is fully opaque */
+	    mask |= (100 - opacity) << TXT_ATTR_FG_COL_SHIFT;
+	    if (*teststr == '/') {
+		teststr++;
+		opacity = zstrtol(teststr, (char **) &teststr, 10);
+		if (opacity > 100)
+		    break;
+		if (*teststr == '%')
+		    teststr++;
+	    }
+	    mask |= (100 - opacity) << TXT_ATTR_BG_COL_SHIFT;
 	    if (*teststr == ',')
 		teststr++;
 	    else if (*teststr && *teststr != ' ')
@@ -2156,6 +2273,30 @@ output_highlight(zattr atr, zattr mask, char *buf)
 	    strcpy(ptr, "none");
 	return 4;
     }
+
+    if (mask & (TXT_ATTR_FG_COL_MASK | TXT_ATTR_BG_COL_MASK)) {
+	unsigned fg_op, bg_op;
+        char tmp[13];
+	size_t len;
+
+	if (atrlen) {
+	    atrlen++;
+	    if (buf) {
+		strcpy(ptr, ",");
+		ptr++;
+	    }
+	}
+	atrlen += 8;
+	fg_op = (mask >> TXT_ATTR_FG_COL_SHIFT) & 127;
+	bg_op = (mask >> TXT_ATTR_BG_COL_SHIFT) & 127;
+	len = sprintf(buf ? ptr : tmp, "opacity=%u%%", 100 - fg_op);
+	atrlen += len;
+	if (buf)
+	    ptr += len;
+	if (fg_op != bg_op)
+	    atrlen += sprintf(buf ? ptr : tmp, "/%u%%", 100 - bg_op);
+    }
+
     return atrlen;
 }
 

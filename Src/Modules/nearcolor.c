@@ -146,7 +146,7 @@ mapRGBto256(int red, int green, int blue)
 static int
 getnearestcolor(UNUSED(Hookdef dummy), Color_rgb col)
 {
-    /* we add 1 to the colours so that colour 0 (black) is
+    /* we add 1 to the colours so that colour 0 (default) is
      * distinguished from runhookdef() indicating that no
      * hook function is registered */
     if (tccolours == 256)

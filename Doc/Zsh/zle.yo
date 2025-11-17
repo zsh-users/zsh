@@ -2905,7 +2905,14 @@ With the other fields 30 applies by default for tt(special), 20 for tt(region)
 and tt(isearch) and 15 for tt(paste). Highlighting defined in
 tt(region_highlight) defaults to layer 10 and would take precedence over
 highlighting for any fields of tt(zle_highlight) that are assigned to the same
-layer.)
+layer.
+)
+item(tt(opacity=)var(fg)tt(%)[tt(/)var(bg)tt(%)])(
+Instead of replacing colors in higher layers, the colors can be mixed. The
+opacity is specified as a percentage where tt(0%) is fully transparent and
+tt(100%) represents the default behavior of replacing the underlying colour.
+If a single value is specified, it applies to both foreground and background.
+)
 enditem()
 
 In addition, the simple highlighting types can be prefixed with tt("no") to

@@ -439,15 +439,25 @@ handle_color(int bg, int red, int green, int blue)
 {
     char *colour;
 
-    if (bg == 1) {  /* background color */
-	/* scale by Rec.709 coefficients for lightness */
-	setsparam(MODEVAR, ztrdup(
-		0.2126f * red + 0.7152f * green + 0.0722f * blue <= 127 ?
-		"dark" : "light"));
+    switch (bg) {
+	case 0:  /* foreground color */
+	    memo_term_color &= ~TXT_ATTR_FG_MASK;
+	    memo_term_color |= TXT_ATTR_FG_24BIT | (zattr) ((((red << 8)
+		    + green) << 8) + blue) << TXT_ATTR_FG_COL_SHIFT;
+	    break;
+	case 1:  /* background color */
+	    memo_term_color &= ~TXT_ATTR_BG_MASK;
+	    memo_term_color |= TXT_ATTR_BG_24BIT | (zattr) ((((red << 8)
+		    + green) << 8) + blue) << TXT_ATTR_BG_COL_SHIFT;
+	    /* scale by Rec.709 coefficients for lightness */
+	    setsparam(MODEVAR, ztrdup(
+		    0.2126f * red + 0.7152f * green + 0.0722f * blue <= 127 ?
+		    "dark" : "light"));
+	    break;
+        case 2:  /* cursor color */
+	    memo_cursor = (red << 24) | (green << 16) | (blue << 8);
+	    break;
     }
-
-    if (bg == 2)  /* cursor color */
-	memo_cursor = (red << 24) | (green << 16) | (blue << 8);
 
     colour = zalloc(8);
     sprintf(colour, "#%02x%02x%02x", red, green, blue);

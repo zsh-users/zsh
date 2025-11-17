@@ -94,6 +94,46 @@
 >0mCDE|32|true
 
   zpty_start
+  zpty_input 'zle-line-pre-redraw() { BUFFER=": abcde" region_highlight=( "2 5 faint,bold" ) }'
+  zpty_input 'zle -N zle-line-pre-redraw'
+  zpty_enable_zle
+  zpty_input $'\C-a'
+  zpty_line 1 p
+  zpty_stop
+0:later highlight attribute takes precedence over earlier one that contradicts
+>0m: 1mabc0mde
+
+  zpty_start
+  zpty_input 'zle-line-pre-redraw() { BUFFER=": abcde" region_highlight=( "2 5 faint,unrecognised,bold" ) }'
+  zpty_input 'zle -N zle-line-pre-redraw'
+  zpty_enable_zle
+  zpty_input $'\C-a'
+  zpty_line 1 p
+  zpty_stop
+0:unrecognised highlight attribute and any subsequent ones ignored
+>0m: 2mabc0mde
+
+  zpty_start
+  zpty_input 'zle-line-pre-redraw() { BUFFER=": abcd" region_highlight=( "2 5 bold" "3 4 nobold" ) }'
+  zpty_input 'zle -N zle-line-pre-redraw'
+  zpty_enable_zle
+  zpty_input $'\C-a'
+  zpty_line 1 p
+  zpty_stop
+0:disable highlight attribute with "no" prefix
+>0m: 1ma0mb1mc0md
+
+  zpty_start
+  zpty_input 'zle-line-pre-redraw() { BUFFER=": abcdefg" region_highlight=( "2 5 faint,layer=14" "3 4 bold,layer=12" ) }'
+  zpty_input 'zle -N zle-line-pre-redraw'
+  zpty_enable_zle
+  zpty_input $'\C-a'
+  zpty_line 1 p
+  zpty_stop
+0:use layers to override precedence of ordering
+>0m: 2mabc0mdefg
+
+  zpty_start
   zpty_input 'rh_widget() { region_highlight+=( "0 4 fg=green memo=someplugin" ); typeset -p region_highlight }'
   zpty_input 'zle -N rh_widget'
   zpty_input 'bindkey "\C-a" rh_widget'
@@ -161,6 +201,18 @@
 >0mCDE|3232|true
 
   zpty_start
+  zpty_input 'zmodload zsh/nearcolor'
+  zpty_input 'rh_widget() { BUFFER="true"; region_highlight+=( "0 4 fg=#000000,bg=#ffffff" ); }'
+  zpty_input 'zle -N rh_widget'
+  zpty_input 'bindkey "\C-a" rh_widget'
+  zpty_enable_zle
+  zpty_input $'\C-a'  # emits newline, which executes BUFFER="true" command
+  zpty_line 1 p       # the line of interest, preserving escapes ("p")
+  zpty_stop
+0:basic region_highlight with near-color using extremes - all black and all white
+>0mCDE|316|BCDE|4231|true
+
+  zpty_start
   zpty_input 'rh_widget() { BUFFER="true"; region_highlight+=( "0 4 fg=green" ); rh2; }'
   zpty_input 'rh2() { region_highlight+=( "1 2 fg=red" ); }' # `r' in red; the above line would be too long
   zpty_input 'zle -N rh_widget'
@@ -207,6 +259,38 @@
   zpty_stop
 0:zle $widgetname -f nolast
 >0m0m: clear-screen
+
+  zpty_start
+  zpty_input '.term.extensions[(r)truecolor]=-truecolor'
+  zpty_input 'zle-line-pre-redraw() { BUFFER=": abc" region_highlight=( "2 4 fg=230" "3 5 fg=132,opacity=50%" ) }'
+  zpty_input 'zle -N zle-line-pre-redraw'
+  zpty_enable_zle
+  zpty_input $'\C-a'
+  zpty_line 1 p
+  zpty_stop
+0:overlapping backgrounds with opacity and nearcolor
+>0m: CDE|3230|aCDE|3181|bCDE|3132|c
+
+  zpty_start
+  zpty_input '.term.extensions[(r)truecolor]=-truecolor'
+  zpty_input 'zle-line-pre-redraw() { BUFFER=": abcde" region_highlight=( "3 4 fg=149,opacity=80"  "5 6 fg=182,opacity=49" ) }'
+  zpty_input 'zle -N zle-line-pre-redraw'
+  zpty_enable_zle
+  zpty_input $'\C-a'
+  zpty_line 1 p
+  zpty_stop
+0:opacity with an unknown base colour
+>0m: aCDE|3149|b0mcde
+
+  zpty_start
+  zpty_input 'zle-line-pre-redraw() { BUFFER=": abcde" region_highlight=( "2 7 bg=#d5e7c2,fg=#00005f,bold" "4 6 bg=#e0ff50,fg=#e00020,opacity=60/40" ) }'
+  zpty_input 'zle -N zle-line-pre-redraw'
+  zpty_enable_zle
+  zpty_input $'\C-a'
+  zpty_line 1 p
+  zpty_stop
+0:foreground and background opacity
+>0m: 1m38;2;0;0;95m48;2;213;231;194mab38;2;134;0;57m48;2;217;240;148mcd38;2;0;0;95m48;2;213;231;194me
 
 %clean
 

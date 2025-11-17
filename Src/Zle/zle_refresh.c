@@ -208,7 +208,7 @@ int predisplaylen, postdisplaylen;
  * and for ellipsis continuation markers.
  */
 
-static zattr default_attr, special_attr, special_mask, ellipsis_attr;
+static zattr default_attr, default_mask, special_attr, special_mask, ellipsis_attr;
 
 /*
  * Layer applied to highlighting for special characters
@@ -330,7 +330,7 @@ zle_set_highlight(void)
     int ellipsis_attr_set = 0;
     struct region_highlight *rhp;
 
-    special_attr = default_attr = 0;
+    special_attr = default_attr = special_mask = default_mask = 0;
     if (!region_highlights) {
 	region_highlights = (struct region_highlight *)
 	    zshcalloc(N_SPECIAL_HIGHLIGHTS*sizeof(struct region_highlight));
@@ -354,12 +354,12 @@ zle_set_highlight(void)
 	for (; *atrs; atrs++) {
 	    if (!strcmp(*atrs, "none")) {
 		/* reset attributes for consistency... usually unnecessary */
-		special_attr = default_attr = 0;
+		special_attr = default_attr = special_mask = default_mask = 0;
 		special_attr_set = 1;
 		paste_attr_set = region_attr_set =
 		    isearch_attr_set = suffix_attr_set = 1;
 	    } else if (strpfx("default:", *atrs)) {
-		match_highlight(*atrs + 8, &default_attr, NULL, NULL);
+		match_highlight(*atrs + 8, &default_attr, &default_mask, NULL);
 	    } else if (strpfx("special:", *atrs)) {
 		match_highlight(*atrs + 8, &special_attr, &special_mask,
 			&special_layer);
@@ -1206,7 +1206,7 @@ zrefresh(void)
     rpms.s = nbuf[rpms.ln = 0] + lpromptw;
     rpms.sen = *nbuf + winw;
     for (t = tmpline, tmppos = 0; tmppos < tmpll; t++, tmppos++) {
-	zattr base_attr = mixattrs(default_attr, default_attr, prompt_attr);
+	zattr base_attr = mixattrs(default_attr, default_mask, prompt_attr);
 	zattr all_attr = 0;
 	struct region_highlight *rhp;
 	int layer, nextlayer = 0;
@@ -2452,7 +2452,7 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 
     for (t0 = 0; t0 < tmpll; t0++) {
 	unsigned ireg;
-	zattr base_attr = 0;
+	zattr base_attr = mixattrs(default_attr, default_attr, prompt_attr);
 	zattr all_attr;
 	struct region_highlight *rhp;
 	/*
