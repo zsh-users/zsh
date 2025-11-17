@@ -1,5 +1,8 @@
 2025-11-17  Oliver Kiddle  <opk@zsh.org>
 
+	* Arseny Maslennikov: 54091: Completion/Unix/Command/_git:
+	add support for more pretty format specifiers
+
 	* unposted: Src/prompt.c: silence compiler warning on new code
 
 	* Christopher Bock: 54085: Completion/Unix/Command/_tput:
