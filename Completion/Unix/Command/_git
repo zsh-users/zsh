@@ -8228,7 +8228,10 @@ __git_setup_diff_stage_options () {
 __git_format_placeholders() {
   local sep
   local -a disp names placeholders expl
-  _describe -t formats format '( oneline:"<hash> <title>"
+  local -a builtin_fmts user_fmts custom_fmts
+
+  builtin_fmts=(
+    oneline:"<hash> <title>"
     short:"commit hash plus author and title headers"
     medium:"like short plus author date header and full message"
     full:"like medium with committer header instead of date"
@@ -8236,8 +8239,26 @@ __git_format_placeholders() {
     reference:"<abbrev hash> (<title>, <short author date>)"
     email:"email patch format"
     mboxrd:"like email with From lines in message quoted with >"
-    raw:"entire commit object" )' -- '( format:"specify own format" )' -S ':' && return
-  compset -P 'format:'
+    raw:"entire commit object"
+  )
+
+  __git_config_get_regexp '^pretty\.' user_fmts
+  user_fmts=( ${${${user_fmts//:/\\:}#pretty.}/$'\n'/:} )
+
+  custom_fmts=(
+    format:"specify own format (separator semantics)"
+    tformat:"specify own format (terminator semantics)"
+  )
+
+  _alternative \
+    'formats:: _describe -t formats "built-in format" builtin_fmts' \
+    'user-formats:: _describe -t user-formats "user format" user_fmts' \
+    'custom-formats:: _describe -t custom-formats "custom format" custom_fmts -qS:' \
+  && return
+
+  # @todo: still unsupported: more complicated place-holders like %C() and
+  # %(describe:), and the %-x %+x syntax
+  compset -P '(t|)format:'
     compset -P '(%[^acgCG]|%?[^%]|[^%])#'
     if compset -P '%C'; then
       _wanted colors expl color compadd reset red green blue
@@ -8251,6 +8272,7 @@ __git_format_placeholders() {
 	'GK:signing key'
 	'GF:fingerprint of signing key'
 	'GP:fingerprint of primary key whose subkey was used to sign'
+	'GT:trust level of signing key'
       )
       disp=( -l )
     elif [[ -prefix %g ]]; then

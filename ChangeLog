@@ -1,3 +1,8 @@
+2025-11-22  dana  <dana@dana.is>
+
+	* 54092 (tweaked): Completion/Unix/Command/_git: improve format
+	completion
+
 2025-11-17  Oliver Kiddle  <opk@zsh.org>
 
 	* Arseny Maslennikov: 54091: Completion/Unix/Command/_git:
