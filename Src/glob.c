@@ -1723,10 +1723,12 @@ zglob(LinkList list, LinkNode np, int nountok)
 		    char *os = --s;
 		    struct value v;
 
-		    v.isarr = SCANPM_WANTVALS;
+		    v.scanflags = SCANPM_WANTVALS;
 		    v.pm = NULL;
+		    v.start = 0;
 		    v.end = -1;
-		    v.flags = 0;
+		    v.valflags = 0;
+		    v.arr = NULL;
 		    if (getindex(&s, &v, 0) || s == os) {
 			zerr("invalid subscript");
 			restore_globstate(saved);

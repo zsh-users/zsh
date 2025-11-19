@@ -1,5 +1,11 @@
 2025-11-24  Oliver Kiddle  <opk@zsh.org>
 
+	* Philippe: 54093 (tweaked per 54101): Src/Modules/db_gdbm.c,
+	Src/Modules/mapfile.c, Src/Modules/parameter.c,
+	Src/Modules/zutil.c, Src/Zle/complete.c, Src/Zle/zle_main.c,
+	Src/Zle/zle_params.c, Src/builtin.c, Src/glob.c, Src/params.c,
+	Src/subst.c, Src/zsh.h: Cleanup isarr fields and variables
+
 	* 54104: Src/parse.c, Src/zsh.h: fix bug with packing strings
 	into wordcode
 

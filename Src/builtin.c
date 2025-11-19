@@ -3927,10 +3927,10 @@ bin_unset(char *name, char **argv, Options ops, int func)
 	    } else if (PM_TYPE(pm->node.flags) == PM_SCALAR ||
 		       PM_TYPE(pm->node.flags) == PM_ARRAY) {
 		struct value vbuf;
-		vbuf.isarr = (PM_TYPE(pm->node.flags) == PM_ARRAY ?
-			      SCANPM_ARRONLY : 0);
+		vbuf.scanflags =
+		    (PM_TYPE(pm->node.flags) == PM_ARRAY ? SCANPM_ARRONLY : 0);
 		vbuf.pm = pm;
-		vbuf.flags = 0;
+		vbuf.valflags = 0;
 		vbuf.start = 0;
 		vbuf.end = -1;
 		vbuf.arr = 0;
@@ -3941,7 +3941,8 @@ bin_unset(char *name, char **argv, Options ops, int func)
 			setstrvalue(&vbuf, ztrdup(""));
 		    } else {
 			/* start is after the element for reverse index */
-			int start = vbuf.start - !!(vbuf.flags & VALFLAG_INV);
+			int start =
+			    vbuf.start - !!(vbuf.valflags & VALFLAG_INV);
 			if (arrlen_gt(vbuf.pm->u.arr, start)) {
 			    char *arr[2];
 			    arr[0] = "";

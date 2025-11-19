@@ -744,8 +744,12 @@ struct multio {
 struct value {
     Param pm;		/* parameter node                      */
     char **arr;		/* cache for hash turned into array */
-    int isarr;
-    int flags;		/* flags defined below                 */
+    int scanflags;	/* set of SCANPM flags as well as an is-array
+			 * marker. The field must be non-zero iff the
+			 * value struct represents an array or an
+			 * associative array. For plain arrays, use
+			 * SCANPM_ARRONLY. */
+    int valflags;	/* flags defined below                 */
     int start;		/* first element of array slice, or -1 */
     int end;		/* 1-rel last element of array slice, or -1 */
 };
@@ -1965,11 +1969,7 @@ struct tieddata {
 #define SCANPM_NOEXEC     (1<<11) /* No command substitutions, etc. */
 #define SCANPM_NONAMESPC  (1<<12) /* namespace syntax not allowed */
 #define SCANPM_NONAMEREF  (1<<13) /* named references are not followed */
-
-/* "$foo[@]"-style substitution
- * Only sign bit is significant
- */
-#define SCANPM_ISVAR_AT   ((int)(((unsigned int)-1)<<15))
+#define SCANPM_ISVAR_AT   (1<<14) /* "$foo[@]"-style substitution */
 
 /*
  * Flags for doing matches inside parameter substitutions, i.e.

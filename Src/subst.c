@@ -640,7 +640,7 @@ multsub(char **s, int pf_flags, char ***a, int *isarr, char *sep,
 	 * our caller (if they provided for that result). */
 	if (a && (l > 1 || foo.list.flags & LF_ARRAY)) {
 	    *a = r;
-	    *isarr = SCANPM_MATCHMANY;
+	    *isarr = 1;
 	    return 0;
 	}
 	*s = sepjoin(r, sep, 1);
@@ -1649,7 +1649,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
      * (I mean the one explicitly marked as such).  The value 2
      * indicates an array has come from splitting a scalar.  We use
      * that to override the usual rule that in double quotes we don't
-     * remove empty elements (so "${(s.:):-foo::bar}" produces two
+     * remove empty elements (so "${(s.:.):-foo::bar}" produces two
      * words).  This seems to me to be quite the wrong thing to do,
      * but it looks like code may be relying on it.  So we require (@)
      * as well before we keep the empty fields (look for assignments
@@ -2802,7 +2802,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 			       ((unset(KSHARRAYS) || inbrace) ? 1 : -1)),
 			      scanflags)) ||
 	     (v->pm && (v->pm->node.flags & PM_UNSET)) ||
-	     (v->flags & VALFLAG_EMPTY)))
+	     (v->valflags & VALFLAG_EMPTY)))
 	    vunset = 1;
 	if (wantt) {
 	    /*
@@ -2893,7 +2893,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	    else
 		pm->u.str = val;
 	    v = (Value) hcalloc(sizeof *v);
-	    v->isarr = isarr;
+	    v->scanflags = isarr ? SCANPM_ARRONLY : 0;
 	    v->pm = pm;
 	    v->end = -1;
 	    if (getindex(&s, v, qt ? SCANPM_DQUOTED : 0) || s == os)
@@ -2905,21 +2905,22 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	 * array (aval) value.  TODO: move val and aval into
 	 * a structure with a discriminator.  Hope we can make
 	 * more things array values at this point and dearrayify later.
-	 * v->isarr tells us whether the stuff from down below looks
+	 * v->scanflags tells us whether the stuff from down below looks
 	 * like an array.
 	 *
 	 * I think we get to discard the existing value of isarr
 	 * here because it's already been taken account of, either
 	 * in the subexp stuff or immediately above.
 	 */
-	if ((isarr = v->isarr)) {
+	if ((isarr =
+	     (v->scanflags & SCANPM_ISVAR_AT) ? -1 : v->scanflags ? 1 : 0)) {
 	    /*
-	     * No way to get here with v->flags & VALFLAG_INV, so
+	     * No way to get here with v->valflags & VALFLAG_INV, so
 	     * getvaluearr() is called by getarrvalue(); needn't test
 	     * PM_HASHED.
 	     */
-	    if (v->isarr == SCANPM_WANTINDEX) {
-		isarr = v->isarr = 0;
+	    if (v->scanflags == SCANPM_WANTINDEX) {
+		isarr = v->scanflags = 0;
 		val = dupstring(v->pm->node.nam);
 	    } else
 		aval = getarrvalue(v);
@@ -2942,9 +2943,9 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 
 		if (v->start < 0) {
 		    tmplen = arrlen(v->pm->gsu.a->getfn(v->pm));
-		    v->start += tmplen + ((v->flags & VALFLAG_INV) ? 1 : 0);
+		    v->start += tmplen + ((v->valflags & VALFLAG_INV) ? 1 : 0);
 		}
-		if (!(v->flags & VALFLAG_INV))
+		if (!(v->valflags & VALFLAG_INV))
 		    if (v->start < 0 ||
 			(tmplen != -1
 			 ? v->start >= tmplen
@@ -2960,7 +2961,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		 * if we allow them to applied on every call, so
 		 * set the flag that allows them to be substituted.
 		 */
-		v->flags |= VALFLAG_SUBST;
+		v->valflags |= VALFLAG_SUBST;
 		val = getstrvalue(v);
 	    }
 	}
@@ -3010,8 +3011,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
      * substitution is in quotes) always good enough?  Potentially
      * we may be OK by now --- all potential `@'s and subexpressions
      * have been handled, including any [@] index which comes up
-     * by virtue of v->isarr being set to SCANPM_ISVAR_AT which
-     * is now in isarr.
+     * by virtue of v->scanflags being set to SCANPM_ISVAR_AT which
+     * is now in isarr being set to -1.
      *
      * However, if we are replacing multsub() with something that
      * doesn't mangle arrays, we may need to delay this step until after

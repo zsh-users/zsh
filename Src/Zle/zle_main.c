@@ -1735,7 +1735,7 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
 	    zwarnnam(name, "not an identifier: `%s'", args[0]);
 	    return 1;
 	}
-	if (v->isarr) {
+	if (v->scanflags) {
 	    /* Array: check for separators and quote them. */
 	    char **arr = getarrvalue(v), **aptr, **tmparr, **tptr;
 	    tptr = tmparr = (char **)zhalloc(sizeof(char *)*(arrlen(arr)+1));

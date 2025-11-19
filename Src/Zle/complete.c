@@ -1377,7 +1377,7 @@ set_compstate(Param pm, HashTable ht)
 	    for (cp = compkparams,
 		 pp = compkpms; cp->name; cp++, pp++)
 		if (!strcmp(hn->nam, cp->name)) {
-		    v.isarr = v.flags = v.start = 0;
+		    v.scanflags = v.valflags = v.start = 0;
 		    v.end = -1;
 		    v.arr = NULL;
 		    v.pm = (Param) hn;

@@ -840,7 +840,7 @@ set_registers(Param pm, HashTable ht)
     for (i = 0; i < ht->hsize; i++)
         for (hn = ht->nodes[i]; hn; hn = hn->next) {
             struct value v;
-            v.isarr = v.flags = v.start = 0;
+            v.scanflags = v.valflags = v.start = 0;
             v.end = -1;
             v.arr = NULL;
             v.pm = (Param) hn;

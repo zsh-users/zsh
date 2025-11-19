@@ -517,7 +517,7 @@ gdbmhashsetfn(Param pm, HashTable ht)
             int umlen = 0;
             char *umkey, *umval;
 
-	    v.isarr = v.flags = v.start = 0;
+	    v.scanflags = v.valflags = v.start = 0;
 	    v.end = -1;
 	    v.arr = NULL;
 	    v.pm = (Param) hn;

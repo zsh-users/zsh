@@ -1716,7 +1716,7 @@ zalloc_default_array(char ***aval, char *assoc, int keep, int num)
 	struct value vbuf;
 	Value v = fetchvalue(&vbuf, &assoc, 0,
 			     SCANPM_WANTKEYS|SCANPM_WANTVALS|SCANPM_MATCHMANY);
-	if (v && v->isarr) {
+	if (v && v->scanflags) {
 	    char **dp, **dval = getarrvalue(v);
 	    int dnum = (dval ? arrlen(dval) : 0) + 1;
 	    *aval = (char **) zalloc(((num * 2) + dnum) * sizeof(char *));

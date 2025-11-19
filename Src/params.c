@@ -649,10 +649,11 @@ scanparamvals(HashNode hn, int flags)
 	if (!(flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)))
 	    return;
     }
-    v.isarr = (PM_TYPE(v.pm->node.flags) & (PM_ARRAY|PM_HASHED));
-    v.flags = 0;
+    v.scanflags = 0;
+    v.valflags = 0;
     v.start = 0;
     v.end = -1;
+    v.arr = NULL;
     paramvals[numparamvals] = getstrvalue(&v);
     if (flags & SCANPM_MATCHVAL) {
 	if (pattry(scanprog, paramvals[numparamvals])) {
@@ -695,7 +696,7 @@ getvaluearr(Value v)
     else if (PM_TYPE(v->pm->node.flags) == PM_ARRAY)
 	return v->arr = v->pm->gsu.a->getfn(v->pm);
     else if (PM_TYPE(v->pm->node.flags) == PM_HASHED) {
-	v->arr = paramvalarr(v->pm->gsu.h->getfn(v->pm), v->isarr);
+	v->arr = paramvalarr(v->pm->gsu.h->getfn(v->pm), v->scanflags);
 	/* Can't take numeric slices of associative arrays */
 	v->start = 0;
 	v->end = numparamvals + 1;
@@ -719,7 +720,7 @@ issetvar(char *name)
 
     if (!(v = getvalue(&vbuf, &name, 1)) || *name)
 	return 0; /* no value or more chars after the variable name */
-    if (v->isarr & ~SCANPM_ARRONLY)
+    if (v->scanflags & ~SCANPM_ARRONLY)
 	return v->end > 1; /* for extracted elements, end gives us a count */
 
     slice = v->start != 0 || v->end != -1;
@@ -1318,7 +1319,7 @@ isident(char *s)
  *
  * *inv is set to indicate if the subscript is reversed (output)
  * v is the Value for the parameter being accessed (input; note
- *  v->isarr may be modified, and if v is a hash the parameter will
+ *  v->scanflags may be modified, and if v is a hash the parameter will
  *  be updated to the element of the hash)
  * a2 is 1 if this is the second subscript of a range (input)
  * *w is only set if we need to find the end of a word (input; should
@@ -1340,7 +1341,7 @@ isident(char *s)
 /**/
 static zlong
 getarg(char **str, int *inv, Value v, int a2, zlong *w,
-       int *prevcharlen, int *nextcharlen, int flags)
+       int *prevcharlen, int *nextcharlen, int scanflags)
 {
     int hasbeg = 0, word = 0, rev = 0, ind = 0, down = 0, l, i, ishash;
     int keymatch = 0, needtok = 0, arglen, len, inpar = 0;
@@ -1464,23 +1465,23 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 	down = !down;
 	num = -num;
     }
-    if (v->isarr & SCANPM_WANTKEYS)
-	*inv = (ind || !(v->isarr & SCANPM_WANTVALS));
-    else if (v->isarr & SCANPM_WANTVALS)
+    if (v->scanflags & SCANPM_WANTKEYS)
+	*inv = (ind || !(v->scanflags & SCANPM_WANTVALS));
+    else if (v->scanflags & SCANPM_WANTVALS)
 	*inv = 0;
     else {
-	if (v->isarr) {
+	if (v->scanflags) {
 	    if (ind) {
-		v->isarr |= SCANPM_WANTKEYS;
-		v->isarr &= ~SCANPM_WANTVALS;
+		v->scanflags |= SCANPM_WANTKEYS;
+		v->scanflags &= ~SCANPM_WANTVALS;
 	    } else if (rev)
-		v->isarr |= SCANPM_WANTVALS;
+		v->scanflags |= SCANPM_WANTVALS;
 	    /*
 	     * This catches the case where we are using "k" (rather
 	     * than "K") on a hash.
 	     */
 	    if (!down && keymatch && ishash)
-		v->isarr &= ~SCANPM_MATCHMANY;
+		v->scanflags &= ~SCANPM_MATCHMANY;
 	}
 	*inv = ind;
     }
@@ -1541,7 +1542,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 	s = dupstring(s);
 	if (parsestr(&s))
 	    return 0;
-	if (flags & SCANPM_NOEXEC)
+	if (scanflags & SCANPM_NOEXEC)
 	    opts[EXECOPT] = 0;
 	singsub(&s);
 	opts[EXECOPT] = exe;
@@ -1551,7 +1552,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 	if (ishash) {
 	    HashTable ht = v->pm->gsu.h->getfn(v->pm);
 	    if (!ht) {
-		if (flags & SCANPM_CHECKING)
+		if (scanflags & SCANPM_CHECKING)
 		    return 0;
 		ht = newparamtable(17, v->pm->node.nam);
 		v->pm->gsu.h->setfn(v->pm, ht);
@@ -1563,7 +1564,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 		v->pm = createparam(s, PM_SCALAR|PM_UNSET);
 		paramtab = tht;
 	    }
-	    v->isarr = (*inv ? SCANPM_WANTINDEX : 0);
+	    v->scanflags = (*inv ? SCANPM_WANTINDEX : 0);
 	    v->start = 0;
 	    *inv = 0;	/* We've already obtained the "index" (key) */
 	    *w = v->end = -1;
@@ -1573,7 +1574,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 	    if (isset(KSHARRAYS) && r >= 0)
 		r++;
 	}
-	if (word && !v->isarr) {
+	if (word && !v->scanflags) {
 	    s = t = getstrvalue(v);
 	    i = wordcount(s, sep, 0);
 	    if (r < 0)
@@ -1592,7 +1593,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 		*w = (zlong)(s - t);
 
 	    return (a2 ? s : d + 1) - t;
-	} else if (!v->isarr && !word) {
+	} else if (!v->scanflags && !word) {
 	    int lastcharlen = 1;
 	    s = getstrvalue(v);
 	    /*
@@ -1640,7 +1641,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 	    }
 	}
     } else {
-	if (!v->isarr && !word && !quote_arg) {
+	if (!v->scanflags && !word && !quote_arg) {
 	    l = strlen(s);
 	    if (a2) {
 		if (!l || *s != '*') {
@@ -1662,7 +1663,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 	    if (quote_arg) {
 		untokenize(s);
 		/* Scalar (e) needs implicit asterisk tokens */
-		if (!v->isarr && !word) {
+		if (!v->scanflags && !word) {
 		    l = strlen(s);
 		    d = (char *) hcalloc(l + 2);
 		    if (a2) {
@@ -1682,27 +1683,27 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 	} else
 	    pprog = NULL;
 
-	if (v->isarr) {
+	if (v->scanflags) {
 	    if (ishash) {
 		scanprog = pprog;
 		scanstr = s;
 		if (keymatch)
-		    v->isarr |= SCANPM_KEYMATCH;
+		    v->scanflags |= SCANPM_KEYMATCH;
 		else {
 		    if (!pprog)
 			return 1;
 		    if (ind)
-			v->isarr |= SCANPM_MATCHKEY;
+			v->scanflags |= SCANPM_MATCHKEY;
 		    else
-			v->isarr |= SCANPM_MATCHVAL;
+			v->scanflags |= SCANPM_MATCHVAL;
 		}
 		if (down)
-		    v->isarr |= SCANPM_MATCHMANY;
+		    v->scanflags |= SCANPM_MATCHMANY;
 		if ((ta = getvaluearr(v)) &&
-		    (*ta || ((v->isarr & SCANPM_MATCHMANY) &&
-			     (v->isarr & (SCANPM_MATCHKEY | SCANPM_MATCHVAL |
-					  SCANPM_KEYMATCH))))) {
-		    *inv = (v->flags & VALFLAG_INV) ? 1 : 0;
+		    (*ta || ((v->scanflags & SCANPM_MATCHMANY) &&
+			     (v->scanflags & (SCANPM_MATCHKEY | SCANPM_MATCHVAL |
+					      SCANPM_KEYMATCH))))) {
+		    *inv = (v->valflags & VALFLAG_INV) ? 1 : 0;
 		    *w = v->end;
 		    scanprog = NULL;
 		    return 1;
@@ -1967,19 +1968,20 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
  * v: In/Out parameter.  Its .start and .end members (at least) will be updated
  * with the parsed indices.
  *
- * flags: can be either SCANPM_DQUOTED or zero.  Other bits are not used.
+ * scanflags: can be a combination of SCANPM_DQUOTED, SCANPM_NOEXEC, and
+ * SCANPM_CHECKING.  Other bits are not used.
  */
 
 /**/
 int
-getindex(char **pptr, Value v, int flags)
+getindex(char **pptr, Value v, int scanflags)
 {
     int start, end, inv = 0;
     char *s = *pptr, *tbrack;
 
     *s++ = '[';
     /* Error handled after untokenizing */
-    s = parse_subscript(s, flags & SCANPM_DQUOTED, ']');
+    s = parse_subscript(s, scanflags & SCANPM_DQUOTED, ']');
     /* Now we untokenize everything except inull() markers so we can check *
      * for the '*' and '@' special subscripts.  The inull()s are removed  *
      * in getarg() after we know whether we're doing reverse indexing.    */
@@ -1999,8 +2001,8 @@ getindex(char **pptr, Value v, int flags)
     }
     s = *pptr + 1;
     if ((s[0] == '*' || s[0] == '@') && s + 1 == tbrack) {
-	if ((v->isarr || IS_UNSET_VALUE(v)) && s[0] == '@')
-	    v->isarr |= SCANPM_ISVAR_AT;
+	if ((v->scanflags || IS_UNSET_VALUE(v)) && s[0] == '@')
+	    v->scanflags |= SCANPM_ISVAR_AT;
 	v->start = 0;
 	v->end = -1;
 	s += 2;
@@ -2009,10 +2011,10 @@ getindex(char **pptr, Value v, int flags)
 	int startprevlen, startnextlen;
 
 	start = getarg(&s, &inv, v, 0, &we, &startprevlen, &startnextlen,
-		       flags);
+		       scanflags);
 
 	if (inv) {
-	    if (!v->isarr && start != 0) {
+	    if (!v->scanflags && start != 0) {
 		char *t, *p;
 		t = getstrvalue(v);
 		/*
@@ -2064,9 +2066,9 @@ getindex(char **pptr, Value v, int flags)
 	    }
 	    if (start > 0 && (isset(KSHARRAYS) || (v->pm->node.flags & PM_HASHED)))
 		start--;
-	    if (v->isarr != SCANPM_WANTINDEX) {
-		v->flags |= VALFLAG_INV;
-		v->isarr = 0;
+	    if (v->scanflags != SCANPM_WANTINDEX) {
+		v->valflags |= VALFLAG_INV;
+		v->scanflags = 0;
 		v->start = start;
 		v->end = start + 1;
 	    }
@@ -2083,7 +2085,7 @@ getindex(char **pptr, Value v, int flags)
 
 	    if ((com = (*s == ','))) {
 		s++;
-		end = getarg(&s, &inv, v, 1, &dummy, NULL, NULL, flags);
+		end = getarg(&s, &inv, v, 1, &dummy, NULL, NULL, scanflags);
 	    } else {
 		end = we ? we : start;
 	    }
@@ -2118,18 +2120,18 @@ getindex(char **pptr, Value v, int flags)
 		     * for setting elements.  Set the indexes
 		     * to a range that returns empty for other accesses.
 		     */
-		    v->flags |= VALFLAG_EMPTY;
+		    v->valflags |= VALFLAG_EMPTY;
 		    start = -1;
 		    com = 1;
 		}
 	    }
 	    if (s == tbrack) {
 		s++;
-		if (v->isarr && !com &&
-		    (!(v->isarr & SCANPM_MATCHMANY) ||
-		     !(v->isarr & (SCANPM_MATCHKEY | SCANPM_MATCHVAL |
-				   SCANPM_KEYMATCH))))
-		    v->isarr = 0;
+		if (v->scanflags && !com &&
+		    (!(v->scanflags & SCANPM_MATCHMANY) ||
+		     !(v->scanflags & (SCANPM_MATCHKEY | SCANPM_MATCHVAL |
+				       SCANPM_KEYMATCH))))
+		    v->scanflags = 0;
 		v->start = start;
 		v->end = end;
 	    } else
@@ -2151,12 +2153,12 @@ getvalue(Value v, char **pptr, int bracks)
 
 /**/
 mod_export Value
-fetchvalue(Value v, char **pptr, int bracks, int flags)
+fetchvalue(Value v, char **pptr, int bracks, int scanflags)
 {
     char *s, *t, *ie;
     char sav, c;
     int ppar = 0;
-    int itype = (flags & SCANPM_NONAMESPC) ? IIDENT : INAMESPC;
+    int itype = (scanflags & SCANPM_NONAMESPC) ? IIDENT : INAMESPC;
 
     s = t = *pptr;
 
@@ -2189,12 +2191,10 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
     if ((sav = *s))
 	*s = '\0';
     if (ppar) {
-	if (v)
-	    memset(v, 0, sizeof(*v));
-	else
-	    v = (Value) hcalloc(sizeof *v);
+	if (!v)
+	    v = (Value) zhalloc(sizeof *v);
+	memset(v, 0, sizeof(*v));
 	v->pm = argvparam;
-	v->flags = 0;
 	v->start = ppar - 1;
 	v->end = ppar;
 	if (sav)
@@ -2205,7 +2205,7 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 	int isrefslice = 0;
 
         isvarat = (t[0] == '@' && !t[1]);
-	if (flags & SCANPM_NONAMEREF)
+	if (scanflags & SCANPM_NONAMEREF)
 	    pm = (Param) paramtab->getnode2(paramtab, *t == '0' ? "0" : t);
 	else
 	    pm = (Param) paramtab->getnode(paramtab, *t == '0' ? "0" : t);
@@ -2220,11 +2220,7 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 	if (!pm || ((pm->node.flags & PM_UNSET) &&
 		    !(pm->node.flags & PM_DECLARED)))
 	    return NULL;
-	if (v)
-	    memset(v, 0, sizeof(*v));
-	else
-	    v = (Value) hcalloc(sizeof *v);
-	if ((pm->node.flags & PM_NAMEREF) && !(flags & SCANPM_NONAMEREF)) {
+	if ((pm->node.flags & PM_NAMEREF) && !(scanflags & SCANPM_NONAMEREF)) {
 	    char *refname = GETREFNAME(pm);
 	    if (refname && *refname) {
 		/* only happens for namerefs pointing to array elements */
@@ -2247,7 +2243,7 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 		     !(pm->node.flags & PM_DECLARED)))
 		    return NULL;
 		if (ss) {
-		    flags |= SCANPM_NOEXEC;
+		    scanflags |= SCANPM_NOEXEC;
 		    *ss = sav;
 		    s = dyncat(ss,*pptr);
 		    isrefslice = 1;
@@ -2255,27 +2251,30 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 		    s = *pptr;
 	    }
 	}
+	if (!v)
+	    v = (Value) zhalloc(sizeof *v);
+	memset(v, 0, sizeof(*v));
 	if (PM_TYPE(pm->node.flags) & (PM_ARRAY|PM_HASHED)) {
-	    /* Overload v->isarr as the flag bits for hashed arrays. */
-	    v->isarr = flags | (isvarat ? SCANPM_ISVAR_AT : 0);
+	    /* Overload v->scanflags as the flag bits for hashed arrays. */
+	    v->scanflags = scanflags | (isvarat ? SCANPM_ISVAR_AT : 0);
 	    /* If no flags were passed, we need something to represent *
 	     * `true' yet differ from an explicit WANTVALS.  Use a     *
 	     * special flag for this case.                             */
-	    if (!v->isarr)
-		v->isarr = SCANPM_ARRONLY;
+	    if (!v->scanflags)
+		v->scanflags = SCANPM_ARRONLY;
 	}
 	v->pm = pm;
-	v->flags = isrefslice ? VALFLAG_REFSLICE : 0;
-	v->start = 0;
+	if (isrefslice)
+	    v->valflags = VALFLAG_REFSLICE;
 	v->end = -1;
 	if (bracks > 0 && (*s == '[' || *s == Inbrack)) {
-	    if (getindex(&s, v, flags)) {
+	    if (getindex(&s, v, scanflags)) {
 		*pptr = s;
 		return v;
 	    }
-	} else if (!(flags & SCANPM_ASSIGNING) && v->isarr &&
+	} else if (!(scanflags & SCANPM_ASSIGNING) && v->scanflags &&
 		   itype_end(t, INAMESPC, 1) != t && isset(KSHARRAYS))
-	    v->end = 1, v->isarr = 0;
+	    v->end = 1, v->scanflags = 0;
     }
     if (!bracks && *s)
 	return NULL;
@@ -2323,7 +2322,7 @@ getstrvalue(Value v)
     if (!v)
 	return hcalloc(1);
 
-    if ((v->flags & VALFLAG_INV) && !(v->pm->node.flags & PM_HASHED)) {
+    if ((v->valflags & VALFLAG_INV) && !(v->pm->node.flags & PM_HASHED)) {
 	sprintf(buf, "%d", v->start);
 	s = dupstring(buf);
 	return s;
@@ -2331,8 +2330,8 @@ getstrvalue(Value v)
 
     switch(PM_TYPE(v->pm->node.flags)) {
     case PM_HASHED:
-	/* (!v->isarr) should be impossible unless emulating ksh */
-	if (!v->isarr && EMULATION(EMULATE_KSH)) {
+	/* (!v->scanflags) should be impossible unless emulating ksh */
+	if (!v->scanflags && EMULATION(EMULATE_KSH)) {
 	    s = dupstring("[0]");
 	    if (getindex(&s, v, 0) == 0)
 		s = getstrvalue(v);
@@ -2340,7 +2339,7 @@ getstrvalue(Value v)
 	} /* else fall through */
     case PM_ARRAY:
 	ss = getvaluearr(v);
-	if (v->isarr)
+	if (v->scanflags)
 	    s = sepjoin(ss, NULL, 1);
 	else {
 	    if (v->start < 0)
@@ -2367,7 +2366,7 @@ getstrvalue(Value v)
 	break;
     }
 
-    if (v->flags & VALFLAG_SUBST) {
+    if (v->valflags & VALFLAG_SUBST) {
 	if (v->pm->node.flags & (PM_LEFT|PM_RIGHT_B|PM_RIGHT_Z)) {
 	    size_t fwidth = v->pm->width ? (unsigned int)v->pm->width : MB_METASTRLEN(s);
 	    switch (v->pm->node.flags & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) {
@@ -2534,7 +2533,7 @@ getarrvalue(Value v)
 	return arrdup(nular);
     else if (IS_UNSET_VALUE(v))
 	return arrdup(&nular[1]);
-    if (v->flags & VALFLAG_INV) {
+    if (v->valflags & VALFLAG_INV) {
 	char buf[DIGBUFSIZE];
 
 	s = arrdup(nular);
@@ -2583,9 +2582,9 @@ getintvalue(Value v)
 {
     if (!v)
 	return 0;
-    if (v->flags & VALFLAG_INV)
+    if (v->valflags & VALFLAG_INV)
 	return v->start;
-    if (v->isarr) {
+    if (v->scanflags) {
 	char **arr = getarrvalue(v);
 	if (arr) {
 	    char *scal = sepjoin(arr, NULL, 1);
@@ -2610,9 +2609,9 @@ getnumvalue(Value v)
 
     if (!v) {
 	mn.u.l = 0;
-    } else if (v->flags & VALFLAG_INV) {
+    } else if (v->valflags & VALFLAG_INV) {
 	mn.u.l = v->start;
-    } else if (v->isarr) {
+    } else if (v->scanflags) {
 	char **arr = getarrvalue(v);
 	if (arr) {
 	    char *scal = sepjoin(arr, NULL, 1);
@@ -2639,10 +2638,13 @@ export_param(Param pm)
 #if 0	/* Requires changes elsewhere in params.c and builtin.c */
 	if (EMULATION(EMULATE_KSH) /* isset(KSHARRAYS) */) {
 	    struct value v;
-	    v.isarr = 1;
-	    v.flags = 0;
+	    v.pm = NULL;
+	    v.scanflags = (PM_TYPE(v.pm->node.flags) & PM_HASHED) ?
+		SCANPM_WANTVALS : SCANPM_ARRONLY;
+	    v.valflags = 0;
 	    v.start = 0;
 	    v.end = -1;
+	    v.arr = NULL;
 	    val = getstrvalue(&v);
 	} else
 #endif
@@ -2682,12 +2684,12 @@ assignstrvalue(Value v, char *val, int flags)
 	return;
     }
     if ((v->pm->node.flags & PM_HASHED) &&
-	(v->isarr & (SCANPM_MATCHMANY|SCANPM_ARRONLY))) {
+	(v->scanflags & (SCANPM_MATCHMANY|SCANPM_ARRONLY))) {
 	zerr("%s: attempt to set slice of associative array", v->pm->node.nam);
 	zsfree(val);
 	return;
     }
-    if (v->flags & VALFLAG_EMPTY) {
+    if (v->valflags & VALFLAG_EMPTY) {
 	zerr("%s: assignment to invalid subscript range", v->pm->node.nam);
 	zsfree(val);
 	return;
@@ -2707,7 +2709,7 @@ assignstrvalue(Value v, char *val, int flags)
             z = v->pm->gsu.s->getfn(v->pm);
             zlen = strlen(z);
 
-	    if ((v->flags & VALFLAG_INV) && unset(KSHARRAYS))
+	    if ((v->valflags & VALFLAG_INV) && unset(KSHARRAYS))
 		v->start--, v->end--;
 	    if (v->start < 0) {
 		v->start += zlen;
@@ -2897,7 +2899,7 @@ setarrvalue(Value v, char **val)
 	     v->pm->node.nam);
 	return;
     }
-    if (v->flags & VALFLAG_EMPTY) {
+    if (v->valflags & VALFLAG_EMPTY) {
 	zerr("%s: assignment to invalid subscript range", v->pm->node.nam);
 	freearray(val);
 	return;
@@ -2926,7 +2928,7 @@ setarrvalue(Value v, char **val)
 
 	q = old;
 
-	if ((v->flags & VALFLAG_INV) && unset(KSHARRAYS)) {
+	if ((v->valflags & VALFLAG_INV) && unset(KSHARRAYS)) {
 	    if (v->start > 0)
 		v->start--;
 	    v->end--;
@@ -3224,7 +3226,7 @@ assignsparam(char *s, char *val, int flags)
 	    createparam(t, PM_SCALAR);
 	    created = 1;
 	} else if ((((v->pm->node.flags & PM_ARRAY) &&
-		     !(v->flags & VALFLAG_REFSLICE) &&
+		     !(v->valflags & VALFLAG_REFSLICE) &&
 		     !(flags & ASSPM_AUGMENT)) ||
 		    (v->pm->node.flags & PM_HASHED)) &&
 		   !(v->pm->node.flags & (PM_SPECIAL|PM_TIED)) &&
@@ -3314,7 +3316,7 @@ assignsparam(char *s, char *val, int flags)
 	      kshappend:
 		/* treat slice as the end element */
 		v->start = sstart = v->end > 0 ? v->end - 1 : v->end;
-		v->isarr = 0;
+		v->scanflags = 0;
 		var = getstrvalue(v);
 		v->start = sstart;
 		copy = val;
@@ -3385,7 +3387,7 @@ assignaparam(char *s, char **val, int flags)
 	    createparam(t, PM_ARRAY);
 	    created = 1;
 	} else if (!(PM_TYPE(v->pm->node.flags) & (PM_ARRAY|PM_HASHED)) &&
-		   !(v->flags & VALFLAG_REFSLICE) &&
+		   !(v->valflags & VALFLAG_REFSLICE) &&
 		   !(v->pm->node.flags & (PM_SPECIAL|PM_TIED))) {
 	    int uniq = v->pm->node.flags & PM_UNIQUE;
 	    if ((flags & ASSPM_AUGMENT) && !(v->pm->node.flags & PM_UNSET)) {
@@ -3613,7 +3615,7 @@ sethparam(char *s, char **val)
 	createparam(t, PM_HASHED);
 	checkcreate = 1;
     } else if (!(PM_TYPE(v->pm->node.flags) & PM_HASHED) &&
-	       !(v->flags & VALFLAG_REFSLICE)) {
+	       !(v->valflags & VALFLAG_REFSLICE)) {
 	if (!(v->pm->node.flags & PM_SPECIAL)) {
 	    if (resetparam(v->pm, PM_HASHED)) {
 		unqueue_signals();
