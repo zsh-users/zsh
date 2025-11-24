@@ -7243,6 +7243,10 @@ testlex(void)
 	tok = INPAR;
     else if (!strcmp(*testargs, ")"))
 	tok = OUTPAR;
+    else if (!strcmp(*testargs, "<"))
+	tok = INANG;
+    else if (!strcmp(*testargs, ">"))
+	tok = OUTANG;
     else
 	tok = STRING;
     testargs++;

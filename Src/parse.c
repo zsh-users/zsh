@@ -2495,6 +2495,8 @@ par_cond_2(void)
 	    /* three arguments: if the second argument is a binary operator, *
 	     * perform that binary test on the first and the third argument  */
 	    if (!strcmp(*testargs, "=")  ||
+		!strcmp(*testargs, "<") ||
+		!strcmp(*testargs, ">") ||
 		!strcmp(*testargs, "==") ||
 		!strcmp(*testargs, "!=") ||
 		(IS_DASH(**testargs) && get_cond_num(*testargs + 1) >= 0)) {
@@ -2658,6 +2660,12 @@ par_cond_triple(char *a, char *b, char *c)
 
     if ((b[0] == Equals || b[0] == '=') && !b[1]) {
 	ecadd(WCB_COND(COND_STREQ, 0));
+	ecstr(a);
+	ecstr(c);
+	ecadd(ecnpats++);
+    } else if ((t0 = (b[0] == '>' || b[0] == Outang) ||
+		b[0] == '<' || b[0] == Inang) && !b[1]) {
+	ecadd(WCB_COND(t0 ? COND_STRGTR : COND_STRLT, 0));
 	ecstr(a);
 	ecstr(c);
 	ecadd(ecnpats++);
