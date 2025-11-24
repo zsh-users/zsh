@@ -8,7 +8,7 @@
 local variant type=base${service//[^2346]/}
 
 _pick_variant -r variant \
-  gnu='Free Soft' fourmilab=fourmi darwin=-D unix --version
+  gnu='(Free Soft|uutils)' fourmilab=fourmi darwin=-D unix --version
 
 case $variant in
   gnu)
@@ -19,7 +19,7 @@ case $variant in
       '(enc -d --decode)'{-d,--decode}"[decode input from $type]" \
       '(enc -i --ignore-garbage)'{-i,--ignore-garbage}'[ignore irrelevant characters when decoding]' \
       + '(enc)' \
-      '(dec)'{-w+,--wrap=}'[wrap encoded lines at specified number of columns]:number of columns' \
+      '(dec)'{-w+,--wrap=}'[wrap encoded lines at specified number of columns]:number of columns [76]' \
       + in \
       '1:input file:_files'
     return

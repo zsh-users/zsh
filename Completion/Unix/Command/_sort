@@ -19,7 +19,7 @@ args=(
   \*{-k+,--key=}'[specified start and end fields for key]:key field'
 )
 
-_pick_variant -r variant gnu=GNU $OSTYPE --version
+_pick_variant -r variant gnu='(GNU|uutils)' $OSTYPE --version
 case $variant in
   dragonfly*|netbsd*|openbsd*|freebsd*|darwin*|gnu)
     args+=(

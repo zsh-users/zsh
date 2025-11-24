@@ -2,7 +2,7 @@
 
 local -a args
 
-if _pick_variant gnu='Free Soft' unix --version; then
+if _pick_variant gnu='(Free Soft|uutils)' unix --version; then
   args=(
     '(-)--help[display help information]'
     '(-)--version[display version information]'

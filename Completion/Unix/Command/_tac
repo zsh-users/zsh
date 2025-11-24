@@ -1,7 +1,7 @@
 #compdef tac gtac
 
 # NetBSD (at least) has its own bare-bones version of this tool
-_pick_variant gnu='Free Soft' unix --version || {
+_pick_variant gnu='(Free Soft|uutils)' unix --version || {
   _default
   return
 }

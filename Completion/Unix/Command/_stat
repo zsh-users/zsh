@@ -10,7 +10,7 @@ local expl variant ret=1
 local -a context line state state_descr args aopts=( -A '-*' )
 local -A opt_args
 
-_pick_variant -r variant -b zsh gnu='Free Soft' $OSTYPE --version
+_pick_variant -r variant -b zsh gnu='(Free Soft|uutils)' $OSTYPE --version
 
 case $variant in
   zsh)

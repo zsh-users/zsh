@@ -25,7 +25,7 @@
 
 local -a args
 
-_pick_variant gnu='Free Soft' unix --version && {
+_pick_variant gnu='(Free Soft|uutils)' unix --version && {
   args=(
     '*: :_files'
     '(: -)--help[display help information]'

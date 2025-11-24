@@ -4,7 +4,7 @@ local variant ret=1
 local -a context line state state_descr args
 local -A opt_args
 
-_pick_variant -r variant gnu='Free Soft' unix --version
+_pick_variant -r variant gnu='(Free Soft|uutils)' unix --version
 
 variant+=-$OSTYPE
 

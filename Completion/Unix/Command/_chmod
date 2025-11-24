@@ -8,7 +8,7 @@ aopts=( -A '-[^gorstuwxX]*' )
 
 args=( '*: :->files' '1: :_file_modes' )
 
-_pick_variant -r variant -b zsh gnu=Free\ Soft $OSTYPE --version
+_pick_variant -r variant -b zsh gnu='(Free Soft|uutils)' $OSTYPE --version
 case "$variant" in
   zsh)
     # Assign, not append because zf_chmod only supports octal modes.

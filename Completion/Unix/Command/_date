@@ -6,7 +6,7 @@ local -a opts args
 
 opts=( -s -w -C )
 
-if _pick_variant gnu="Free Software Foundation" unix --version; then
+if _pick_variant gnu='(Free Soft|uutils)' unix --version; then
   local d='(-d --date -f --file -r --reference -s --set --resolution)'
   local f='(-I --iso-8601 -R --rfc-email --rfc-3339 --resolution)'
   args=(

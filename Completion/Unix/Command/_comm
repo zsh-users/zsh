@@ -10,7 +10,7 @@ args=(
   '2:file to compare:_files'
 )
 
-if _pick_variant gnu=GNU unix --version; then
+if _pick_variant gnu='(GNU|uutils)' unix --version; then
   aopts=( )
   args+=(
     '(--nocheck-order)--check-order[check input is correctly sorted]'

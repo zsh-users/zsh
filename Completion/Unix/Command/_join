@@ -12,7 +12,7 @@ args=(
   '(-j -2 -j2)'{-j2,-2+}'[join on specified field of second file]:field number'
   '1:file:_files' '2:file:_files'
 )
-_pick_variant -r variant gnu=GNU $OSTYPE --version
+_pick_variant -r variant gnu='(GNU|uutils)' $OSTYPE --version
 case $variant in
   gnu)
     args+=(

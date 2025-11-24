@@ -2,7 +2,7 @@
 
 local args variant
 
-_pick_variant -r variant gnu=GNU $OSTYPE --version
+_pick_variant -r variant gnu='(GNU|uutils)' $OSTYPE --version
 
 case $variant in
   gnu)

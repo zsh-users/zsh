@@ -9,7 +9,7 @@ args=(
   '(-l --lines)'{-l,--lines}'[print line counts]'
 )
 
-if _pick_variant gnu=GNU unix --version; then
+if _pick_variant gnu='(GNU|uutils)' unix --version; then
   args+=(
     '(*)--files0-from=[read NUL-terminated file list from specified file]:file:_files'
     '(-L --max-line-length)'{-L,--max-line-length}'[print longest line lengths]'

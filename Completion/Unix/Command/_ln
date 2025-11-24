@@ -9,7 +9,7 @@ args=(
   '-s[create symbolic links instead of hard links]'
 )
 
-_pick_variant -r variant -b zsh gnu=gnu $OSTYPE --help
+_pick_variant -r variant -b zsh gnu='(GNU|uutils)' $OSTYPE --version
 case $variant; in
   gnu)
     opts=()

@@ -7,9 +7,9 @@ local wopt="[specify maximum line width]:width [75]"
 local sopt="[don't join short lines\: split only]"
 
 args=( -A "-*" "(1 2)-w+$wopt" '*:file:_files' )
-_pick_variant -r variant gnu=GNU $OSTYPE --version
+_pick_variant -r variant gnu='GNU' uutils=uutils $OSTYPE --version
 case $variant in
-  gnu)
+  uutils|gnu)
     args=(
       '(-c --crown-margin)'{-c,--crown-margin}$copt
       '(-w --width)'{-w+,--width=}$wopt
@@ -21,6 +21,16 @@ case $variant in
       '(- *)--help[display help information]'
       '(- *)--version[display version information]'
       '*:file:_files'
+    )
+  ;|
+  uutils)
+    args+=(
+      '(-m --preserve-headers)'{-m,--preserve-headers}'[preserve mail headers in the input]'
+      '(-P --skip-prefix)'{-P+,--skip-prefix=}'[preserve lines beginning with given prefix]:prefix'
+      '(-x --exact-prefix)'{-x,--exact-prefix}'[with -p, match at the beginning of the line with no preceding whitespace]'
+      '(-X --exact-skip-prefix)'{-X,--exact-skip-prefix}'[with -P, match at the beginning of the line with no preceding whitespace]'
+      '(-q --quick)'{-q,--quick}'[break lines more quickly at the expense of a more ragged appearance]'
+      '(-T --tab-width)'{-T,--tab-width}'[specify width to treat tabs]:width [8]'
     )
   ;;
   solaris*)

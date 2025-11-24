@@ -9,7 +9,7 @@ descr=(
   -s '[squeeze repeated instances of character to a single instance]'
 )
 
-_pick_variant -r variant gnu=GNU $OSTYPE --version
+_pick_variant -r variant gnu='(GNU|uutils)' $OSTYPE --version
 case $variant in
   gnu)
     args=(

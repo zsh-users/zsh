@@ -3,7 +3,7 @@
 local curcontext=$curcontext state state_descr line expl opts args ret=1
 typeset -A opt_args
 
-if _pick_variant gnu=GNU unix --version; then
+if _pick_variant gnu='(GNU|uutils)' unix --version; then
   args=(
     '(-n --lines -c --bytes)'{-c+,--bytes=}'[print the first (or with -, all but the last) specified bytes]:number of bytes:->number'
     '(-n --lines -c --bytes)'{-n+,--lines=}'[print the first (or with -, all but the last) specified lines]:number of lines:->number'

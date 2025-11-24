@@ -6,7 +6,7 @@ local -a args
 all="convert all whitespace, instead of just initial whitespace"
 tabs="[use comma separated list of tab positions]:list of tab positions"
 
-if _pick_variant gnu="Free Soft" unix --version; then
+if _pick_variant gnu='(Free Soft|uutils)' unix --version; then
   if [[ $service = *un* ]]; then
     args=(
       "(-a --help --version)--all[$all]"

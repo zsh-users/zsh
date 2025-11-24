@@ -38,7 +38,7 @@ case $LANG in
   ;;
 esac
 
-if _pick_variant gnu="Free Soft" unix --version; then
+if _pick_variant gnu='(Free Soft|uutils)' unix --version; then
   _arguments -s \
     '(-)'{--all,-a}'['$_uname_args[all]']' \
     '(--kernel-name -s)'{--kernel-name,-s}'['$_uname_args[kernel-name]']' \

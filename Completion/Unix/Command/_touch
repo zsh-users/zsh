@@ -1,7 +1,7 @@
 #compdef touch gtouch
 
 local args variant
-_pick_variant -r variant gnu=GNU $OSTYPE --version
+_pick_variant -r variant gnu='(GNU|uutils)' $OSTYPE --version
 
 args=(
   '-a[change access time (atime)]'

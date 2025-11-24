@@ -9,7 +9,7 @@ if [[ $words[2] = -(-|+|)[0-9]## ]]; then
   fi
   compset -n 2  # Ignore the 1st arg
 else
-  if _pick_variant gnu=GNU unix --version; then
+  if _pick_variant gnu='(GNU|uutils)' unix --version; then
     specs+=(
       '(-)'{-n+,--adjustment=}'[adjust niceness]:niceness increment'
       '(* -)--help[display help and exit]'

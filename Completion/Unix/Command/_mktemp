@@ -3,7 +3,7 @@
 local variant
 local -a args
 
-_pick_variant -r variant busybox=BusyBox gnu='Free Soft' $OSTYPE --version
+_pick_variant -r variant busybox=BusyBox gnu='(Free Soft|uutils)' $OSTYPE --version
 
 args=(
   '(-d --directory)'{-d,--directory}'[make directory instead of file]'

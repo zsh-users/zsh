@@ -14,7 +14,7 @@ args=(
 )
 
 # Filter out non-GNU options if applicable
-_pick_variant gnu='Free Soft' unix --version ||
+_pick_variant gnu='(Free Soft|uutils)' unix --version ||
 args=( ${(@M)args:#(|*\))-[ai]\[*} )
 
 _arguments -s -S : $args '*: :_files' && ret=0

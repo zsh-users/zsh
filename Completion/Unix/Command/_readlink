@@ -24,7 +24,7 @@ args=(
 )
 
 # Filter out non-GNU options if applicable
-if _pick_variant gnu='Free Soft' unix --version; then
+if _pick_variant gnu='(Free Soft|uutils)' unix --version; then
   aopts=( )
 else
   case $OSTYPE in

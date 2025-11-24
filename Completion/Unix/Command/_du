@@ -1,6 +1,6 @@
 #compdef du gdu
 
-if _pick_variant gnu=Free\ Soft unix --version /dummy/no-such-file; then
+if _pick_variant gnu='(Free Soft|uutils)' unix --version /dummy/no-such-file; then
   local context state line expl ret=1
 
   _arguments -s \

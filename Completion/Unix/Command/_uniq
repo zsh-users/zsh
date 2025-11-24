@@ -18,7 +18,7 @@ args=(
   '(- *)--version[display version information]'
 )
 
-if ! _pick_variant gnu=Free\ Soft unix --version; then
+if ! _pick_variant gnu='(Free Soft|uutils)' unix --version; then
   local optchars="cdufs"
   if [[ "$OSTYPE" == (darwin|dragonfly|freebsd|openbsd)* ]]; then
     optchars+=i

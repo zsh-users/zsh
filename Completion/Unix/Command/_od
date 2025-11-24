@@ -21,7 +21,7 @@ args=(
   '-s[output decimal shorts (-t d2)]'
 )
 
-if _pick_variant gnu=GNU unix --version; then
+if _pick_variant gnu='(GNU|uutils)' unix --version; then
   # -h -B -I and -L are obsolescent and undocumented
   args=( ${(R)args:#(|\*)(|\(*\))-[hBIL]*} )
   args+=(

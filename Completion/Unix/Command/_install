@@ -19,7 +19,7 @@ common_args=(
   '*: :_files'
 )
 
-if _pick_variant gnu='Free Soft' unix --version; then
+if _pick_variant gnu='(Free Soft|uutils)' unix --version; then
   # Hide Linux-specific options on non-Linux platforms
   [[ $OSTYPE == linux* ]] || lx='!'
   args+=(
