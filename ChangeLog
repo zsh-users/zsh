@@ -1,5 +1,8 @@
 2025-11-24  Oliver Kiddle  <opk@zsh.org>
 
+	* 54104: Src/parse.c, Src/zsh.h: fix bug with packing strings
+	into wordcode
+
 	* 54103: Src/builtin.c, Src/parse.c, Test/C02cond.ztst:
 	support > and < comparisons via the test builtin
 

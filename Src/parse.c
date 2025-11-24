@@ -446,7 +446,9 @@ ecstrcode(char *s)
 	long cmp;
 
 	for (pp = &ecstrs; (p = *pp); ) {
-	    if (!(cmp = p->nfunc - ecnfunc) && !(cmp = (((long)p->hashval) - ((long)val))) && !(cmp = strcmp(p->str, s))) {
+	    if (!(cmp = p->nfunc - ecnfunc) &&
+		    !(cmp = (int) (p->hashval - val)) &&
+		    !(cmp = strcmp(p->str, s))) {
 		/* Re-use the existing string. */
 		return p->offs;
             }
