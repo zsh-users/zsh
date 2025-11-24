@@ -2,7 +2,7 @@
 
 local args variant aopts=( -A '-*' )
 
-_pick_variant -r variant -b zsh gnu=GNU $OSTYPE --version
+_pick_variant -r variant -b zsh gnu='(GNU|uutils)' $OSTYPE --version
 case $variant; in
   gnu)
     aopts=()

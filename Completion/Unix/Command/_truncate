@@ -4,7 +4,7 @@ local curcontext=$curcontext variant rs ret=1
 local -a state state_descr line specs optA
 typeset -A opt_args
 
-_pick_variant -r variant gnu=GNU $OSTYPE --version
+_pick_variant -r variant gnu='(GNU|uutils)' $OSTYPE --version
 [[ $variant != gnu ]] && rs='-r -s' # -r/-s mutually exclusive
 
 # common specs

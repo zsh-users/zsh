@@ -10,7 +10,7 @@ buf=( err in out )
 opt='[set initial buffering for std${buf[i]}]: : _alternative
   "sizes\: \: _numbers -u bytes size k M G"
   "modes\:mode\:((0\:unbuffered L\:line\ buffered'
-if _pick_variant gnu=GNU freebsd --version; then
+if _pick_variant gnu='(GNU|uutils)' freebsd --version; then
   gnu=1
   args=(
     '(- *)--help[display usage information]'

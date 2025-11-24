@@ -32,7 +32,7 @@ case $LANG in
   ;;
 esac
 
-if _pick_variant gnu="Free Soft" unix --version; then
+if _pick_variant gnu='(Free Soft|uutils)' unix --version; then
   _arguments \
     '(--bytes -b)'{--bytes=,-b+}'['$_cut_args[bytes]']:list' \
     '(--characters -c)'{--characters=,-c+}'['$_cut_args[characters]']:list' \

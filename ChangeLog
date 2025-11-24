@@ -1,3 +1,34 @@
+2025-11-24  Oliver Kiddle  <opk@zsh.org>
+
+	* 54094: Completion/Unix/Command/_base64,
+	Completion/Unix/Command/_basename, Completion/Unix/Command/_cat,
+	Completion/Unix/Command/_chmod, Completion/Unix/Command/_chown,
+	Completion/Unix/Command/_chroot, Completion/Unix/Command/_cksum,
+	Completion/Unix/Command/_comm, Completion/Unix/Command/_cp,
+	Completion/Unix/Command/_csplit, Completion/Unix/Command/_cut,
+	Completion/Unix/Command/_date, Completion/Unix/Command/_dd,
+	Completion/Unix/Command/_df, Completion/Unix/Command/_du,
+	Completion/Unix/Command/_env, Completion/Unix/Command/_fmt,
+	Completion/Unix/Command/_fold, Completion/Unix/Command/_head,
+	Completion/Unix/Command/_id, Completion/Unix/Command/_install,
+	Completion/Unix/Command/_join, Completion/Unix/Command/_ln,
+	Completion/Unix/Command/_ls, Completion/Unix/Command/_mkdir,
+	Completion/Unix/Command/_mkfifo, Completion/Unix/Command/_mknod,
+	Completion/Unix/Command/_mktemp, Completion/Unix/Command/_mv,
+	Completion/Unix/Command/_nice, Completion/Unix/Command/_nl,
+	Completion/Unix/Command/_od, Completion/Unix/Command/_paste,
+	Completion/Unix/Command/_pr, Completion/Unix/Command/_readlink,
+	Completion/Unix/Command/_rm, Completion/Unix/Command/_rmdir,
+	Completion/Unix/Command/_seq, Completion/Unix/Command/_sort,
+	Completion/Unix/Command/_split, Completion/Unix/Command/_stat,
+	Completion/Unix/Command/_stdbuf, Completion/Unix/Command/_tac,
+	Completion/Unix/Command/_tail, Completion/Unix/Command/_tee,
+	Completion/Unix/Command/_touch, Completion/Unix/Command/_tr,
+	Completion/Unix/Command/_truncate, Completion/Unix/Command/_tty,
+	Completion/Unix/Command/_uname, Completion/Unix/Command/_unexpand,
+	Completion/Unix/Command/_uniq, Completion/Unix/Command/_wc,
+	Completion/Unix/Command/_who: handle rust coreutils in completions
+
 2025-11-22  dana  <dana@dana.is>
 
 	* 54092 (tweaked): Completion/Unix/Command/_git: improve format

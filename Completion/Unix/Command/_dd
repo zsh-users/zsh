@@ -4,7 +4,7 @@ local -a vals conv flags units
 local variant
 
 units=( w:word b:block k:1024 m g t )
-_pick_variant -r variant gnu=GNU $OSTYPE --version
+_pick_variant -r variant gnu='(GNU|uutils)' $OSTYPE --version
 
 vals=(
   '(ibs obs)bs[block size]: :_numbers -u bytes "block size" $units'

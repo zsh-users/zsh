@@ -2,7 +2,7 @@
 
 local arguments is_gnu datef
 
-if ! _pick_variant gnu=gnu unix --help; then
+if ! _pick_variant gnu='(GNU|uutils)' unix --version; then
   arguments=(
     '(-A)-a[list entries starting with .]'
     '(-a)-A[list all except . and ..]'

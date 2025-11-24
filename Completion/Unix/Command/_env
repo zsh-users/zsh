@@ -3,7 +3,7 @@
 local context state line variant ign ret=1
 local -a args suf
 
-_pick_variant -r variant gnu=Free\ Soft $OSTYPE --version
+_pick_variant -r variant gnu='(Free Soft|uutils)' $OSTYPE --version
 case $variant in
   gnu)
     (( $#words > 2 )) && ign='!'

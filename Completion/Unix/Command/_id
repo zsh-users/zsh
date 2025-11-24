@@ -2,7 +2,7 @@
 
 local args choices
 
-if _pick_variant gnu=GNU $OSTYPE --version; then
+if _pick_variant gnu='(GNU|uutils)' $OSTYPE --version; then
   choices='--help --version -Z --context -g --group -G --groups -u --user'
   _arguments \
     "($choices)"{-Z,--context}'[print only security context]' \

@@ -14,7 +14,7 @@ specs=(
   '(hv)*: :->patterns'
 )
 
-if _pick_variant gnu=GNU unix --version; then
+if _pick_variant gnu='(GNU|uutils)' unix --version; then
   # GNU coreutils 8.32
   specs+=(
     '(hv -b --suffix-format -n --digits)'{-b+,--suffix-format=}'[specify format for numbers in output file names]:format [%%02d]: '

@@ -5,7 +5,7 @@ local -a state state_descr line specs optA
 typeset -A opt_args
 
 # take care of '+FIRST_PAGE[:LAST_PAGE]' (GNU) or '+FIRST_PAGE' (POSIX)
-if _pick_variant -r variant gnu=GNU $OSTYPE --version; then
+if _pick_variant -r variant gnu='(GNU|uutils)' $OSTYPE --version; then
   msg='FIRST_PAGE[:LAST_PAGE]'
 else
   msg='first page'

@@ -4,7 +4,7 @@ local curcontext="$curcontext" variant ret=1
 local -A opt_args
 local -a state line args
 
-_pick_variant -r variant gnu=GNU $OSTYPE --version
+_pick_variant -r variant gnu='(GNU|uutils)' $OSTYPE --version
 
 args=(
   '-a+[generate suffixes of specified length]:length [2]' \

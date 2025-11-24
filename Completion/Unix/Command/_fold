@@ -3,7 +3,7 @@
 local variant
 local -a args
 
-_pick_variant -r variant busybox=BusyBox gnu='Free Soft' unix --version
+_pick_variant -r variant busybox=BusyBox gnu='(Free Soft|uutils)' unix --version
 
 args=(
   '(-b --bytes)'{-b,--bytes}'[count bytes rather than columns]'

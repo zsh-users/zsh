@@ -7,13 +7,15 @@ args=(
   '(-p --parents)'{-p,--parents}'[remove each component of the specified paths]'
 )
 
-_pick_variant -r variant -b zsh gnu=GNU $OSTYPE --version
+_pick_variant -r variant -b zsh gnu='(GNU|uutils)' $OSTYPE --version
 case $variant; in
   gnu)
     aopts=()
     args+=(
       '--ignore-fail-on-non-empty[ignore failure if directory is non-empty]'
       '(-v --verbose)'{-v,--verbose}'[be verbose]'
+      '(- *)--help[display usage information]'
+      '(- *)--version[display version information]'
     )
     ;;
   zsh)

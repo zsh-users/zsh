@@ -2,7 +2,7 @@
 
 local -a args
 
-if _pick_variant gnu=GNU unix --version; then
+if _pick_variant gnu='(GNU|uutils)' unix --version; then
   args=(
     '(-A --show-all)'{-A,--show-all}'[equivalent to -vET]'
     '(-b --number-nonblank -n --number)'{-b,--number-nonblank}'[number nonempty output lines, overrides -n]'

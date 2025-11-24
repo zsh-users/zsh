@@ -1,6 +1,6 @@
 #compdef cp gcp
 
-if _pick_variant gnu=GNU unix --version; then
+if _pick_variant gnu='(GNU|uutils)' unix --version; then
   _arguments -s -S \
     '(-a --archive)'{-a,--archive}'[archive mode, same as -dR --preserve=all]' \
     "--attributes-only[don't copy file data, just attributes]" \

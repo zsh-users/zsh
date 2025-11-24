@@ -3,7 +3,7 @@
 local curcontext="$curcontext" state line expl ret=1 variant
 local suf usr grp req deref pattern arg args aopts=( -A '-*' )
 
-_pick_variant -r variant -b zsh gnu=Free\ Soft $OSTYPE --version
+_pick_variant -r variant -b zsh gnu='(Free Soft|uutils)' $OSTYPE --version
 case "$variant" in
   gnu)
     aopts=()

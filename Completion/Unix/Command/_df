@@ -3,7 +3,7 @@
 local curcontext="$curcontext" state state_descr line args spec ret=1
 local -A opt_args
 
-if _pick_variant gnu=GNU unix --version; then
+if _pick_variant gnu='(GNU|uutils)' unix --version; then
   args=(
     '--total[produce a grand total]'
     '(-T --print-type)'{-T,--print-type}'[print file system type]'

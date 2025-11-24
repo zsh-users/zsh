@@ -16,7 +16,7 @@ args=(
   '(-w --number-width)'{-w+,--number-width=}'[specify number of columns for line numbers]:columns'
 )
 
-if _pick_variant gnu=GNU unix --version; then
+if _pick_variant gnu='(GNU|uutils)' unix --version; then
   args+=(
     '(- *)--help[display help information]'
     '(- *)--version[display version information]'
