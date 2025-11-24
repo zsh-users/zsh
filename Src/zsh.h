@@ -846,7 +846,7 @@ struct eccstr {
     int nfunc;
 
     /* Hash of str. */
-    int hashval;
+    unsigned hashval;
 };
 
 /*
