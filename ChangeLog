@@ -1,3 +1,7 @@
+2025-11-27  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted (c.f. Bart: 54112): Src/params.c: remove Unicode
+
 2025-11-24  Oliver Kiddle  <opk@zsh.org>
 
 	* Philippe: 54093 (tweaked per 54101): Src/Modules/db_gdbm.c,

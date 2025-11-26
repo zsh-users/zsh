@@ -2192,7 +2192,7 @@ fetchvalue(Value v, char **pptr, int bracks, int scanflags)
 	*s = '\0';
     if (ppar) {
 	if (!v)
-	    v = (Value) zhalloc(sizeof *v);
+	    v = (Value) zhalloc(sizeof *v);
 	memset(v, 0, sizeof(*v));
 	v->pm = argvparam;
 	v->start = ppar - 1;
@@ -2252,7 +2252,7 @@ fetchvalue(Value v, char **pptr, int bracks, int scanflags)
 	    }
 	}
 	if (!v)
-	    v = (Value) zhalloc(sizeof *v);
+	    v = (Value) zhalloc(sizeof *v);
 	memset(v, 0, sizeof(*v));
 	if (PM_TYPE(pm->node.flags) & (PM_ARRAY|PM_HASHED)) {
 	    /* Overload v->scanflags as the flag bits for hashed arrays. */
