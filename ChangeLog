@@ -1,5 +1,7 @@
 2025-11-30  Oliver Kiddle  <opk@zsh.org>
 
+	* Christopher Bock: 54117: update apt completion
+
 	* 54119: Src/Zle/termquery.c: fix OSC52 clipboard get with
 	empty clipboard
 
