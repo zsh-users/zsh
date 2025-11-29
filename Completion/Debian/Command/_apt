@@ -398,6 +398,7 @@ _apt-cmd () {
     -c,--config-file:configfile \
     -o,--option:arbitem \
     -t,--target-release:release \
+    -S,--snapshot:_apt_snapshot_dates \
     -- \
     /$'list\0'/ \( \
       \( \
@@ -412,12 +413,14 @@ _apt-cmd () {
     /$'depends\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'rdepends\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'policy\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
+    /$'(source|build-dep)\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" source' \# \| \
     /$'update\0'/ \| \
     \( \
       /$'(install|download|source|build-dep)\0'/ -'subcmd=${match%?}' \
       /$'[^\0]#\0'/ ':packages::_deb_packages -qr "\n\t\- /=+-" "$expl_packages[@]" avail' \# \
       \( \
-	// '%(.|)/%' -'[[ $subcmd = install ]]' /'[]'/ ':files: :_deb_files -c' \| \
+	// '%(.|)/%' -'[[ $subcmd = install ]]' /'[]'/ ':files: :_deb_files' \| \
+	// '%(.|)/%' -'[[ $subcmd = build-dep ]]' /'[]'/ ':files: :_deb_files -D' \| \
 	/$'[^\0/=]#\/'/ /'[]'/ ':apt-releases:release name:_apt_releases' \| \
 	/$'[^\0/=]#='/ /'[]'/ ':apt-package-versions:package version:_apt_versions_of_binary_package' \| \
       \) \
@@ -426,11 +429,12 @@ _apt-cmd () {
     /$'why\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \| \
     /$'upgrade\0'/ \| \
     /$'autoclean\0'/ \| \
+    /$'distclean\0'/ \| \
     /$'changelog\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'why-not\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \| \
     /$'full-upgrade\0'/ \| \
     /$'dist-upgrade\0'/ \| \
-    /$'edit-sources\0'/ \| \
+    /$'edit-sources\0'/ /$'[^\0]#\0'/ ': ::_apt_sources' \# \| \
     /"[]"/ ':argument-1::compadd "$expl_action[@]" list search showsrc show depends rdepends policy update install reinstall download source build-dep remove upgrade full-upgrade dist-upgrade edit-sources autoclean changelog autopurge autoremove purge why why-not'
 
   _apt-cmd () {
@@ -460,7 +464,12 @@ _apt-get () {
     --no-download:bool \
     --no-install-recommends:bool \
     --ignore-hold:bool \
+    --with-new-pkgs:bool \
     --no-upgrade:bool \
+    --only-upgrade:bool \
+    --allow-downgrades:bool \
+    --allow-remove-essential:bool \
+    --allow-change-held-packages:bool \
     --force-yes:bool \
     --print-uris:bool \
     --purge:bool \
@@ -477,27 +486,37 @@ _apt-get () {
     --arch-only:bool \
     --allow-unauthenticated:bool \
     --auto-remove:bool \
+    -S,--snapshot:_apt_snapshot_dates \
     -- \
     /$'update\0'/ \| \
     /$'upgrade\0'/ \| \
     \( \
-    /$'install\0'\|$'download\0'\|$'source\0'\|$'build-dep\0'/ \
-      /$'[^\0]#\0'/ ':packages::_deb_packages -qr "\n\t\- /=" "$expl_packages[@]" avail' \# \
+      /$'(source|build-dep)\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" source' \# \| \
+      /$'(install|download|source|build-dep)\0'/ -'subcmd=${match%?}' \
+      /$'[^\0]#\0'/ ':packages::_deb_packages -qr "\n\t\- /=+-" "$expl_packages[@]" avail' \# \
       \( \
-	/$'[^\0/=]#/'/ /'[]'/ ':apt-releases:release name:_apt_releases' \| \
-	/$'[^\0/=]#='/ /'[]'/ ':apt-package-versions:package version:_apt_versions_of_binary_package' \
+	// '%(.|)/%' -'[[ $subcmd = install ]]' /'[]'/ ':files: :_deb_files' \| \
+	// '%(.|)/%' -'[[ $subcmd = build-dep ]]' /'[]'/ ':files: :_deb_files -D' \| \
+	/$'[^\0/=]#\/'/ /'[]'/ ':apt-releases:release name:_apt_releases' \| \
+	/$'[^\0/=]#='/ /'[]'/ ':apt-package-versions:package version:_apt_versions_of_binary_package' \| \
       \) \
     \) \| \
     /$'(|auto)(purge|remove)\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'dist-upgrade\0'/ \| \
     /$'dselect-upgrade\0'/ \| \
     /$'clean\0'/ \| \
+    /$'clean\0'/ \| \
     /$'autoclean\0'/ \| \
+    /$'indextargets\0'/ \| \
+    /$'distclean\0'/ \| \
     /$'changelog\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'check\0'/ \| \
     /$'help\0/' \| \
     /$'(|un)markauto\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
-    /"[]"/	':argument-1::compadd "$expl_action[@]" update upgrade install remove purge dist-upgrade dselect-upgrade clean autoclean changelog check source build-dep autopurge autoremove help markauto unmarkauto download'
+    /$'autoremove\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
+    /$'autopurge\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
+    /$'help\0/' \| \
+    /"[]"/	':argument-1::compadd "$expl_action[@]" update upgrade install reinstall remove purge dist-upgrade dselect-upgrade clean autoclean distclean changelog check source build-dep satisfy indextargets autoremove autopurge help markauto unmarkauto download'
 
   _apt-get () {
     local expl_action expl_packages
@@ -591,15 +610,19 @@ _apt-cdrom () {
 
 _apt-config () {
   _apt_arguments _apt-config \
+    --empty:bool \
+    --format:arbitem \
     -h,--help:bool \
     -v,--version:bool \
+    --audit:bool \
     -c,--config-file:configfile \
     -o,--option:arbitem \
+    --color:bool \
     -- \
     /$'shell\0'/ \
       \( \
 	/$'[^\0]#\0'/ ':parameters:shell variable to assign:_parameters' \
-	/$'[^\0]#\0'/ ':values:configuration key:compadd - ${${(f)"$(apt-config dump 2>&1)"}% *}' \
+	/$'[^\0]#\0'/ ':values:configuration key:compadd - ${(u)${(f)"$(apt-config --empty --no-color --format='%f%n' dump 2>&1)"}%%(::|) *}' \
       \) \# \| \
     /$'dump\0'/ \| \
     /"[]"/	':argument-1:action:compadd shell dump'
@@ -619,6 +642,17 @@ ${${${${(M)tmp:#*release*n=*}#*n=}%%,*}:#now}
     typeset -U _apt_releases
     _store_cache APT_releases _apt_releases
   fi
+}
+
+_apt_sources () {
+  local diretc=etc/apt sourceparts=sources.list.d
+  local -a expl
+
+  eval "$(apt-config shell diretc dir::etc 2> /dev/null)"
+  eval "$(apt-config shell sourceparts dir::etc::sourceparts 2> /dev/null)"
+
+  _description files expl 'source file'
+  _files "${(@)expl}" -W /$diretc/$sourceparts -g '*.(list|sources)(.:t)'
 }
 
 _apt_releases () {
@@ -708,6 +742,20 @@ _apt-mark () {
   }
 
   _apt-mark "$@"
+}
+
+_apt_snapshot_dates() {
+  local -a expl dates
+  # Get last 6 months of dates
+  zmodload -i zsh/datetime && {
+    local i date last=$EPOCHSECONDS
+    for (( i = 0; i < 180; i++ )); do
+      strftime -s date %Y%m%d $last
+      dates+=( $date )
+      last=$(( last - (24 * 60 * 60) ))
+    done
+  }
+  _wanted list expl 'wayback date (yyyymmdd[ThhmmssZ])' compadd -- $dates
 }
 
 _apt "$@"
