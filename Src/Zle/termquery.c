@@ -626,7 +626,7 @@ system_clipget(char clip)
 {
     static seqstate_t osc52[] = OSC52_STATES;
     char seq[] = "\033]52;.;?\033\\";
-    char *contents;
+    char *contents = NULL;
     seq[5] = clip;
     probe_terminal(seq, osc52, &handle_paste, &contents);
     return contents;

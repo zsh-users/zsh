@@ -1,3 +1,8 @@
+2025-11-30  Oliver Kiddle  <opk@zsh.org>
+
+	* 54119: Src/Zle/termquery.c: fix OSC52 clipboard get with
+	empty clipboard
+
 2025-11-27  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted (c.f. Bart: 54112): Src/params.c: remove Unicode
