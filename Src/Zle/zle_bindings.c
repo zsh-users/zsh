@@ -385,7 +385,7 @@ int vicmdbind[128] = {
     /* \ */ z_undefinedkey,
     /* ] */ z_undefinedkey,
     /* ^ */ z_vifirstnonblank,
-    /* _ */ z_undefinedkey,
+    /* _ */ z_vifirstnonblank,
     /* ` */ z_vigotomark,
     /* a */ z_viaddnext,
     /* b */ z_vibackwardword,

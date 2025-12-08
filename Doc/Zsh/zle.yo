@@ -1328,7 +1328,7 @@ Read a character from the keyboard, and move to
 the position just after the previous occurrence of it in the line.
 )
 tindex(vi-first-non-blank)
-item(tt(vi-first-non-blank) (unbound) (tt(^)) (unbound))(
+item(tt(vi-first-non-blank) (unbound) (tt(_ ^)) (unbound))(
 Move to the first non-blank character in the line.
 )
 tindex(vi-forward-word)

@@ -1,5 +1,8 @@
 2025-12-16  Oliver Kiddle  <opk@zsh.org>
 
+	* Aidan Van Duyne: 54143: Src/Zle/zle_bindings.c,
+	Doc/Zsh/zle.yo: Bind '_' to vi-first-non-blank in vicmd keymap
+
 	* 54147: Src/Zle/termquery.c: avoid buffer overflow with
 	terminal sequences
 
