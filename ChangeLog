@@ -1,5 +1,8 @@
 2026-04-05  dana  <dana@dana.is>
 
+	* 54144: Src/Zle/termquery.c: termquery: don't warn about
+	creating .term.* params
+
 	* 53299: Src/Modules/zutil.c, Test/V12zparseopts.ztst:
 	zparseopts: improve accuracy of bad-option message
 
