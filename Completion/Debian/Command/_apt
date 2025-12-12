@@ -393,12 +393,45 @@ _apt_consume_long () {
 
 _apt-cmd () {
   _apt_arguments _apt-cmd_sm \
+    -S,--snapshot:_apt_snapshot_datesg \
+    -V,--verbose-versions:bool \
+    -b,--compile,--build:bool \
+    -c,--config-file:configfileg \
+    -d,--download-only:bool \
+    -f,--fix-broken:bool \
     -h,--help:bool \
+    -m,--ignore-missing,--fix-missing:bool \
+    -o,--option:arbitemg \
+    -q,--quiet,--silent:intlevelg \
+    -s,--simulate,--just-print,--dry-run,--recon,--no-act:bool \
+    -t,--target-release,--default-release:releaseg \
+    -u,--show-upgraded:bool \
     -v,--version:bool \
-    -c,--config-file:configfile \
-    -o,--option:arbitem \
-    -t,--target-release:release \
-    -S,--snapshot:_apt_snapshot_dates \
+    -y,--yes,--assume-yes:bool \
+    --allow-change-held-packages:bool \
+    --allow-downgrades:bool \
+    --allow-remove-essential:bool \
+    --allow-unauthenticated:bool \
+    --arch-only:bool \
+    --auto-remove:bool \
+    --diff-only:bool \
+    --dsc-only:bool \
+    --force-yes:bool \
+    --ignore-hold:bool \
+    --list-cleanup:bool \
+    --mark-auto:bool,--markauto:bool \
+    --no-download:bool \
+    --no-install-recommends:bool \
+    --no-remove:bool \
+    --no-upgrade:bool \
+    --only-source:bool \
+    --only-upgrade:bool \
+    --print-uris:bool \
+    --purge:bool \
+    --reinstall:bool \
+    --tar-only:bool \
+    --trivial-only:bool \
+    --with-new-pkgs:bool \
     -- \
     /$'list\0'/ \( \
       \( \
@@ -450,43 +483,45 @@ _apt-cmd () {
 
 _apt-get () {
   _apt_arguments _apt-get_sm \
-    -h,--help:bool \
-    -v,--version:bool \
-    -q,--quiet,--silent:intlevel \
-    -d,--download-only:bool \
-    -b,--compile,--build:bool \
-    -s,--simulate,--just-print,--dry-run,--recon,--no-act:bool \
-    -y,--yes,--assume-yes:bool \
-    -f,--fix-broken:bool \
-    -u,--show-upgraded:bool \
+    -S,--snapshot:_apt_snapshot_datesg \
     -V,--verbose-versions:bool \
+    -b,--compile,--build:bool \
+    -c,--config-file:configfileg \
+    -d,--download-only:bool \
+    -f,--fix-broken:bool \
+    -h,--help:bool \
     -m,--ignore-missing,--fix-missing:bool \
-    --no-download:bool \
-    --no-install-recommends:bool \
-    --ignore-hold:bool \
-    --with-new-pkgs:bool \
-    --no-upgrade:bool \
-    --only-upgrade:bool \
+    -o,--option:arbitemg \
+    -q,--quiet,--silent:intlevelg \
+    -s,--simulate,--just-print,--dry-run,--recon,--no-act:bool \
+    -t,--target-release,--default-release:releaseg \
+    -u,--show-upgraded:bool \
+    -v,--version:bool \
+    -y,--yes,--assume-yes:bool \
+    --allow-change-held-packages:bool \
     --allow-downgrades:bool \
     --allow-remove-essential:bool \
-    --allow-change-held-packages:bool \
+    --allow-unauthenticated:bool \
+    --arch-only:bool \
+    --auto-remove:bool \
+    --diff-only:bool \
+    --dsc-only:bool \
     --force-yes:bool \
+    --ignore-hold:bool \
+    --list-cleanup:bool \
+    --mark-auto:bool,--markauto:bool \
+    --no-download:bool \
+    --no-install-recommends:bool \
+    --no-remove:bool \
+    --no-upgrade:bool \
+    --only-source:bool \
+    --only-upgrade:bool \
     --print-uris:bool \
     --purge:bool \
-    --list-cleanup:bool \
     --reinstall:bool \
-    -c,--config-file:configfile \
-    -o,--option:arbitem \
-    -t,--target-release,--default-release:release \
-    --trivial-only:bool \
-    --no-remove:bool \
-    --only-source:bool \
-    --diff-only:bool \
     --tar-only:bool \
-    --arch-only:bool \
-    --allow-unauthenticated:bool \
-    --auto-remove:bool \
-    -S,--snapshot:_apt_snapshot_dates \
+    --trivial-only:bool \
+    --with-new-pkgs:bool \
     -- \
     /$'update\0'/ \| \
     /$'upgrade\0'/ \| \

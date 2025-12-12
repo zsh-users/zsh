@@ -1,3 +1,8 @@
+2025-12-16  Oliver Kiddle  <opk@zsh.org>
+
+	* Christopher Bock: 54148: Completion/Debian/Command/_apt:
+	use same set of options for apt as with apt-get
+
 2025-11-30  Oliver Kiddle  <opk@zsh.org>
 
 	* Christopher Bock: 54117: update apt completion
