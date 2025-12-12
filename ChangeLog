@@ -1,5 +1,8 @@
 2025-12-16  Oliver Kiddle  <opk@zsh.org>
 
+	* Christopher Bock: 54148: Completion/Debian/Command/_apt:
+	use same set of options for apt as with apt-get
+
 	* Aidan Van Duyne: 54143: Src/Zle/zle_bindings.c,
 	Doc/Zsh/zle.yo: Bind '_' to vi-first-non-blank in vicmd keymap
 
