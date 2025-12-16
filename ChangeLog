@@ -1,3 +1,8 @@
+2025-12-16  Oliver Kiddle  <opk@zsh.org>
+
+	* 54147: Src/Zle/termquery.c: avoid buffer overflow with
+	terminal sequences
+
 2025-11-30  Oliver Kiddle  <opk@zsh.org>
 
 	* Christopher Bock: 54117: update apt completion

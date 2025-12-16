@@ -703,10 +703,10 @@ collate_seq(int sindex, int dir)
 	}
         if (enabled) {
 	    if (i)
-		strucpy(&pos, editext[i].seq[sindex]);
+		struncpy(&pos, editext[i].seq[sindex], seq + sizeof(seq) - pos - 1);
 	    else if ((bracket = getaparam("zle_bracketed_paste")) &&
 		    arrlen(bracket) == 2)
-		strucpy(&pos, bracket[sindex]);
+		struncpy(&pos, bracket[sindex], seq + sizeof(seq) - pos - 1);
 	}
     }
     write_loop(SHTTY, seq, pos - seq);
