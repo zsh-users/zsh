@@ -541,6 +541,10 @@
 >No file beginning with z
 >Normal string if nullglob not set
 
+  echo > glob.tmp/nonexistent(N)
+1:redirect to a non-matching pattern is an error even with flag (N)
+?(eval):1: redirection failed (no match): glob.tmp/nonexistent(N)
+
   (
     setopt extended_glob no_nomatch
     cd glob.tmp
