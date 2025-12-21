@@ -1,3 +1,9 @@
+2025-12-21  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 53959+54149: Src/glob.c, Test/D02glob.ztst: when redirecting
+	to/from a pattern (MULTIOS) and if there is no match, issue an
+	error even if NULL_GLOB is in effect.
+
 2025-12-16  Oliver Kiddle  <opk@zsh.org>
 
 	* Christopher Bock: 54148: Completion/Debian/Command/_apt:

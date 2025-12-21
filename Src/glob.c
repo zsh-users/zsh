@@ -1202,6 +1202,9 @@ checkglobqual(char *str, int sl, int nobareglob, char **sp)
     return ret;
 }
 
+/* notify zglob() that it is called from expandredir() */
+static int in_expandredir = 0;
+
 /* Main entry point to the globbing code for filename globbing. *
  * np points to a node in the list which will be expanded  *
  * into a series of nodes.                                      */
@@ -1882,6 +1885,14 @@ zglob(LinkList list, LinkNode np, int nountok)
 	    matchct = 1;
 	}
     }
+    else if (in_expandredir) {
+	/* if completing for redirection, we can't remove the pattern
+	 * even if NULL_GLOB is in effect */
+	zerr("redirection failed (no match): %s", ostr);
+	zfree(matchbuf, 0);
+	restore_globstate(saved);
+	return;
+    }
 
     if (!(gf_sortlist[0].tp & GS_NONE)) {
 	/*
@@ -2148,8 +2159,11 @@ xpandredir(struct redir *fn, LinkList redirtab)
     /* ...which undergoes all the usual shell expansions */
     prefork(&fake, isset(MULTIOS) ? 0 : PREFORK_SINGLE, NULL);
     /* Globbing is only done for multios. */
-    if (!errflag && isset(MULTIOS))
+    if (!errflag && isset(MULTIOS)) {
+	in_expandredir = 1;
 	globlist(&fake, 0);
+	in_expandredir = 0;
+    }
     if (errflag)
 	return 0;
     if (nonempty(&fake) && !nextnode(firstnode(&fake))) {
