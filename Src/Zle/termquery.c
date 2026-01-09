@@ -777,11 +777,16 @@ write_urlencoded(const char *path_components)
 void
 notify_pwd(void)
 {
+    const char *hostnam;
+
     if (!extension_enabled("integration", "pwd", 11, 1))
 	return;
 
-    /* only "localhost" seems to be much use here as the host */
-    write_loop(SHTTY, "\033]7;file://localhost", 20);
+    if ((hostnam = getsparam("HOST")) == NULL || strchr(hostnam, '/') != NULL)
+	return;
+
+    write_loop(SHTTY, "\033]7;file://", 11);
+    write_urlencoded(hostnam);
     write_urlencoded(pwd);
     write_loop(SHTTY, "\033\\", 2);
 }

@@ -1,5 +1,8 @@
 2026-04-05  Oliver Kiddle  <opk@zsh.org>
 
+	* Johannes Altmanninger: 54155: Src/Zle/termquery.c:
+	specify $HOST in OSC7 working directory report
+
 	* Johannes Altmanninger: 54154: Src/Zle/termquery.c:
 	extract function for URL-encoding and writing to TTY
 
