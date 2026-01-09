@@ -765,20 +765,24 @@ mark_output(int start)
 		(start ? sizeof(START) : sizeof(END)) - 1);
 }
 
+static void
+write_urlencoded(const char *path_components)
+{
+    size_t enc_len;
+    const char *enc = url_encode(path_components, &enc_len);
+    write_loop(SHTTY, enc, enc_len);
+}
+
 /**/
 void
 notify_pwd(void)
 {
-    char *url;
-    size_t ulen;
-
     if (!extension_enabled("integration", "pwd", 11, 1))
 	return;
 
-    url = url_encode(pwd, &ulen);
     /* only "localhost" seems to be much use here as the host */
     write_loop(SHTTY, "\033]7;file://localhost", 20);
-    write_loop(SHTTY, url, ulen);
+    write_urlencoded(pwd);
     write_loop(SHTTY, "\033\\", 2);
 }
 
