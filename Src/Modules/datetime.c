@@ -190,7 +190,7 @@ bin_strftime(char *nam, char **argv, Options ops, int func)
     char *tz = getsparam("TZ");
 
     startparamscope();
-    if (tz && *tz) {
+    if (tz) {
 	Param pm = createparam("TZ", PM_LOCAL|PM_SCALAR|PM_EXPORTED);
 	if (pm)
 	    pm->level = locallevel; /* because createparam() doesn't */

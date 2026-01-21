@@ -1,5 +1,9 @@
 2026-04-05  dana  <dana@dana.is>
 
+	* 54159: Doc/Zsh/mod_datetime.yo, README,
+	Src/Modules/datetime.c, Test/V09datetime.ztst: strftime:
+	respect empty TZ
+
 	* 54144: Src/Zle/termquery.c: termquery: don't warn about
 	creating .term.* params
 

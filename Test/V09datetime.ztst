@@ -134,3 +134,13 @@
   strftime -n 'one line%n' 2> /dev/null
 0:-n option
 >one line
+
+# most platforms treat a set-but-empty TZ as UTC. however, it's not actually
+# required by POSIX, so we'll only test on systems we can be fairly sure about
+  if [[ $OSTYPE != (darwin|freebsd|netbsd|openbsd|linux-gnu)* ]]; then
+    ZTST_skip='unsure of empty-TZ behaviour'
+  else
+    ( unset TZ; TZ= strftime '%F %T' 1234567890 )
+  fi
+0:empty TZ respected
+>2009-02-13 23:31:30

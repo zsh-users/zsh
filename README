@@ -128,6 +128,10 @@ Tied parameters created with the zsh/db/gdbm module may not be re-tied
 as locals in nested function scope.  This prevents database corruption
 when a function scope ends.
 
+The zsh/datetime module's strftime builtin now exports a set-but-empty
+TZ parameter (as in `TZ= strftime ...`) for use by the underlying
+library.  On most systems, this is equivalent to setting TZ to UTC.
+
 Incompatibilities between 5.8.1 and 5.9
 ---------------------------------------
 

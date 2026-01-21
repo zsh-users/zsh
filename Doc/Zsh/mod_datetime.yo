@@ -33,7 +33,7 @@ function tt(strptime); see manref(strptime)(3).  This means that zsh
 format extensions are not available, but for reverse lookup they are not
 required.
 
-In most implementations of tt(strftime) any timezone in the
+In most implementations of tt(strptime) any timezone in the
 var(timestring) is ignored and the local timezone declared by the tt(TZ)
 environment variable is used; other parameters are set to zero if not
 present.
