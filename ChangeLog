@@ -1,5 +1,8 @@
 2026-04-05  dana  <dana@dana.is>
 
+	* Christopher Bock: github #153: Completion/Unix/Command/_zfs:
+	_zfs update zpool-prop's
+
 	* 54159: Doc/Zsh/mod_datetime.yo, README,
 	Src/Modules/datetime.c, Test/V09datetime.ztst: strftime:
 	respect empty TZ
