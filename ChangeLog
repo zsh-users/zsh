@@ -6,6 +6,11 @@
 	* 54276: Completion/Unix/Command/_zfs: fix to add full list
 	of compression algorithms as completion matches
 
+2026-04-05  dana  <dana@dana.is>
+
+	* Christopher Bock: github #153: Completion/Unix/Command/_zfs:
+	_zfs update zpool-prop's
+
 2026-04-03  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* Eisuke Kawashima: github #163: Completion/Unix/Command/_ssh:
