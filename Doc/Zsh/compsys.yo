@@ -2078,7 +2078,7 @@ kindex(matcher-list, completion style)
 item(tt(matcher-list))(
 This style can be set to a list of match specifications that are to
 be applied everywhere. Match specifications are described in
-sectref(Completion Matching Control)(zshcompwid)).
+sectref(Completion Matching Control)(zshcompwid).
 The completion system will try them one after another for each completer
 selected.  For example, to try first simple completion and, if that
 generates no matches, case-insensitive completion:

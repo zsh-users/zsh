@@ -1,3 +1,8 @@
+2026-02-04  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* unposted: Doc/Zsh/compsys.yo: fix a format error introduced
+	by worker/53821
+
 2025-12-21  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 53959+54149: Src/glob.c, Test/D02glob.ztst: when redirecting
