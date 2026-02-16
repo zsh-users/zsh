@@ -1940,8 +1940,6 @@ struct tieddata {
 #define PM_NAMEDDIR     (1<<29) /* has a corresponding nameddirtab entry    */
 #define PM_NAMEREF      (1<<30) /* pointer to a different parameter         */
 
-#define PM_NEWREF	PM_SINGLE	/* Overload in for-loop namerefs    */
-
 /* The option string corresponds to the first of the variables above */
 #define TYPESET_OPTSTR "aiEFALRZlurtxUhHT"
 

@@ -522,7 +522,7 @@ newparamtable(int size, char const *name)
 }
 
 /**/
-static HashNode
+static Param
 loadparamnode(HashTable ht, Param pm, const char *nam)
 {
     if (pm && (pm->node.flags & PM_AUTOLOAD) && pm->u.str) {
@@ -544,17 +544,17 @@ loadparamnode(HashTable ht, Param pm, const char *nam)
 		 nam);
 	}
     }
-    return (HashNode)pm;
+    return pm;
 }
 
 /**/
 static HashNode
 getparamnode(HashTable ht, const char *nam)
 {
-    HashNode hn = loadparamnode(ht, (Param)gethashnode2(ht, nam), nam);
-    if (hn && ht == realparamtab && !(hn->flags & PM_UNSET))
-	hn = resolve_nameref((Param)hn, NULL);
-    return hn;
+    Param pm = loadparamnode(ht, (Param)gethashnode2(ht, nam), nam);
+    if (pm && ht == realparamtab && !(pm->node.flags & PM_UNSET))
+	pm = resolve_nameref(pm);
+    return (HashNode)pm;
 }
 
 /* Copy a parameter hash table */
@@ -1044,12 +1044,14 @@ createparam(char *name, int flags)
 	    (oldpm->level == locallevel ?
 	     !(oldpm->node.flags & PM_RO_BY_DESIGN) : !(flags & PM_LOCAL)) &&
 	    (oldpm->node.flags & PM_NAMEREF)) {
-	    Param lastpm;
-	    struct asgment stop;
-	    stop.flags = PM_NAMEREF;
-	    stop.name = "";
-	    stop.value.scalar = NULL;
-	    lastpm = (Param)resolve_nameref(oldpm, &stop);
+	    /**
+	     * Here we only have to deal with namerefs that refer to
+	     * not-yet-defined or unset variable. All other namerefs
+	     * have already been taken care of by the resolve_nameref
+	     * in typeset_single. It's unclear why these can't be
+	     * handled there too.
+	     **/
+	    Param lastpm = resolve_nameref_rec(oldpm, NULL, 1);
 	    if (lastpm) {
 		if (lastpm->node.flags & PM_NAMEREF) {
 		    char *refname = GETREFNAME(lastpm);
@@ -2231,13 +2233,8 @@ fetchvalue(Value v, char **pptr, int bracks, int scanflags)
 		    *ss = 0;
 		}
 		Param p1 = (Param)gethashnode2(paramtab, ref);
-		if (p1) {
-		    if (pm->node.flags & PM_UPPER)
-			pm = upscope_upper(p1, pm->level - 1);
-		    else
-			pm = upscope(p1, pm->base);
-		    pm = (Param)loadparamnode(paramtab, pm, ref);
-		}
+		if (p1)
+		    pm = loadparamnode(paramtab, upscope(p1, pm), ref);
 		if (!(p1 && pm) ||
 		    ((pm->node.flags & PM_UNSET) &&
 		     !(pm->node.flags & PM_DECLARED)))
@@ -3330,11 +3327,7 @@ assignsparam(char *s, char *val, int flags)
 	}
     }
 
-    if (v->pm->node.flags & PM_NAMEREF)
-	v->pm->node.flags |= PM_NEWREF;
     assignstrvalue(v, val, flags);
-    if (v->pm->node.flags & PM_NAMEREF)
-	v->pm->node.flags &= ~PM_NEWREF;
     unqueue_signals();
     return v->pm;
 }
@@ -6308,12 +6301,17 @@ printparamnode(HashNode hn, int printflags)
 }
 
 /**/
-mod_export HashNode
-resolve_nameref(Param pm, const Asgment stop)
+mod_export Param
+resolve_nameref(Param pm)
 {
-    HashNode hn = (HashNode)pm;
-    const char *seek = stop ? stop->value.scalar : NULL;
+    return resolve_nameref_rec(pm, NULL, 0);
+}
 
+/**/
+static Param
+resolve_nameref_rec(Param pm, const Param stop, int keep_lastref)
+{
+    Param hn = pm;
     if (pm && (pm->node.flags & PM_NAMEREF)) {
 	char *refname = GETREFNAME(pm);
 	if (pm->node.flags & PM_TAGGED) {
@@ -6322,63 +6320,25 @@ resolve_nameref(Param pm, const Asgment stop)
 	} else if (pm->node.flags & PM_UNSET) {
 	    /* Semaphore with createparam() */
 	    pm->node.flags &= ~PM_UNSET;
-	    if (pm->node.flags & PM_NEWREF)	/* See setloopvar() */
-		return NULL;
-	    return (HashNode) pm;
-	} else if (refname) {
-	    if (stop && strcmp(refname, stop->name) == 0) {
-		/* zwarnnam(refname, "invalid self reference"); */
-		return (HashNode)pm;
-	    }
-	    if (*refname)
-		seek = refname;
+	    return pm;
+	}
+	/* pm->width is the offset of any subscript */
+	/* If present, it has to be the end of any chain, see fetchvalue() */
+	if (refname && *refname && !pm->width) {
+	    queue_signals();
+	    if ((hn = (Param)gethashnode2(realparamtab, refname))) {
+		if ((hn = loadparamnode(paramtab, upscope(hn, pm), refname)) &&
+		    hn != stop && !(hn->node.flags & PM_UNSET)) {
+		    /* user can't tag a nameref, safe for loop detection */
+		    pm->node.flags |= PM_TAGGED;
+		    hn = resolve_nameref_rec(hn, stop, keep_lastref);
+		    pm->node.flags &= ~PM_TAGGED;
+		}
+	    } else if (keep_lastref)
+		hn = pm;
+	    unqueue_signals();
 	}
     }
-    else if (pm) {
-	if (!(stop && (stop->flags & PM_NAMEREF)))
-	    return (HashNode)pm;
-	if (!(pm->node.flags & PM_NAMEREF))
-	    return (pm->level < locallevel ? NULL : (HashNode)pm);
-    }
-    if (seek) {
-	queue_signals();
-	/* pm->width is the offset of any subscript */
-	if (pm && (pm->node.flags & PM_NAMEREF) && pm->width) {
-	    if (stop) {
-		if (stop->flags & PM_NAMEREF)
-		    hn = (HashNode)pm;
-		else
-		    hn = NULL;
-	    } else {
-		/* this has to be the end of any chain */
-		hn = (HashNode)pm;	/* see fetchvalue() */
-	    }
-	} else if ((hn = gethashnode2(realparamtab, seek))) {
-	    if (pm) {
-		if (!(stop && (stop->flags & (PM_LOCAL)))) {
-		    if ((pm->node.flags & PM_NAMEREF) &&
-			(pm->node.flags & PM_UPPER))
-			hn = (HashNode)upscope_upper((Param)hn, pm->level - 1);
-		    else
-			hn = (HashNode)upscope((Param)hn,
-					       (pm->node.flags & PM_NAMEREF) ?
-					       (pm->base) : ((Param)hn)->level);
-		}
-		hn = loadparamnode(paramtab, (Param)hn, seek);
-		/* user can't tag a nameref, safe for loop detection */
-		pm->node.flags |= PM_TAGGED;
-	    }
-	    if (hn) {
-		if (!(hn->flags & PM_UNSET))
-		    hn = resolve_nameref((Param)hn, stop);
-	    }
-	    if (pm)
-		pm->node.flags &= ~PM_TAGGED;
-	} else if (stop && (stop->flags & PM_NAMEREF))
-	    hn = (pm && (pm->node.flags & PM_NEWREF)) ? NULL : (HashNode)pm;
-	unqueue_signals();
-    }
-
     return hn;
 }
 
@@ -6397,10 +6357,7 @@ setloopvar(char *name, char *value)
       pm->base = pm->width = 0;
       SETREFNAME(pm, ztrdup(value));
       pm->node.flags &= ~PM_UNSET;
-      pm->node.flags |= PM_NEWREF;
       setscope(pm);
-      if (!errflag)
-	  pm->node.flags &= ~PM_NEWREF;
   } else
       setsparam(name, ztrdup(value));
 }
@@ -6410,9 +6367,8 @@ static void
 setscope(Param pm)
 {
     queue_signals();
-    if (pm->node.flags & PM_NAMEREF) do {
-	Param basepm;
-	struct asgment stop;
+    if (pm->node.flags & PM_NAMEREF) {
+	Param basepm = NULL;
 	char *refname = GETREFNAME(pm);
 	char *t = refname ? itype_end(refname, INAMESPC, 0) : NULL;
 	int q = queue_signal_level();
@@ -6433,7 +6389,7 @@ setscope(Param pm)
 	if (!(pm->node.flags & PM_UPPER) && refname &&
 	    (basepm = (Param)gethashnode2(realparamtab, refname)) &&
 	    (basepm = (Param)loadparamnode(realparamtab, basepm, refname)) &&
-	    (!(basepm->node.flags & PM_NEWREF) || (basepm = basepm->old))) {
+	    (basepm != pm || !basepm->old || (basepm = basepm->old))) {
 	    pm->base = basepm->level;
 	}
 	if (pm->base > pm->level) {
@@ -6447,60 +6403,27 @@ setscope(Param pm)
 	}
 
 	/* Check for self references */
-	stop.name = pm->node.nam;
-	stop.value.scalar = NULL;
-	stop.flags = PM_NAMEREF;
-	dont_queue_signals();	/* Prevent unkillable loops */
-	basepm = (Param)resolve_nameref(pm, &stop);
-	restore_queue_signals(q);
-	if (basepm) {
-	    if (basepm->node.flags & PM_NAMEREF) {
-		if (pm == basepm) {
-		    if (pm->base == pm->level) {
-			if (refname && *refname &&
-			    strcmp(pm->node.nam, refname) == 0) {
-			    zerr("%s: invalid self reference", refname);
-			    unsetparam_pm(pm, 0, 1);
-			    break;
-			}
-		    }
-		} else if ((t = GETREFNAME(basepm))) {
-		    if (basepm->base <= basepm->level &&
-			strcmp(pm->node.nam, t) == 0) {
-			zerr("%s: invalid self reference", refname);
-			unsetparam_pm(pm, 0, 1);
-			break;
-		    }
-		}
-	    }
+	if (refname && *refname && !pm->width && basepm != pm) {
+	    dont_queue_signals();	/* Prevent unkillable loops */
+	    basepm = resolve_nameref_rec(pm, pm, 0);
+	    restore_queue_signals(q);
 	}
-	if (refname && upscope(pm, pm->base) == pm &&
-	    strcmp(pm->node.nam, refname) == 0) {
+	if (pm == basepm) {
 	    zerr("%s: invalid self reference", refname);
 	    unsetparam_pm(pm, 0, 1);
 	}
-    } while (0);
+    }
     unqueue_signals();
 }
 
 /**/
 static Param
-upscope(Param pm, int reflevel)
+upscope(Param pm, const Param ref)
 {
-    Param up = pm->old;
-    while (up && up->level >= reflevel) {
-	pm = up;
-	up = up->old;
-    }
-    return pm;
-}
-
-/**/
-static Param
-upscope_upper(Param pm, int reflevel)
-{
-    while (pm && pm->level > reflevel)
-	pm = pm->old;
+    if (ref->node.flags & PM_UPPER)
+	while (pm->level > ref->level - 1 && (pm = pm->old));
+    else
+	for (; pm->old && pm->old->level >= ref->base; pm = pm->old);
     return pm;
 }
 

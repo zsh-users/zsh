@@ -469,6 +469,14 @@ F:unexpected side-effects of previous tests
  }
 0:regression: not a self reference (test 2)
 
+ typeset ptr2=foo
+ () {
+   typeset -n ptr1=ptr2
+   typeset -n ptr2=ptr1
+ }
+0:regression: not a self reference (test 3)
+
+
  unset -n ptr2
  typeset -n ptr2='path[2]'
  print -r -- $ptr2
@@ -1611,5 +1619,39 @@ F:converting from association/array to string should work here too
 >typeset -A var=( [z]=Z )
 >typeset -A var=( [z]=Z )
 >typeset -A var=( [z]=Z )
+
+ typeset ptr1=foo
+ () {
+   typeset -n ptr1
+   typeset -n ptr2=ptr1
+   ptr1=ptr2
+   echo ptr1=$ptr1
+ }
+1:regression: reference loop with same name enclosing variable
+?(anon):3: ptr2: invalid self reference
+
+ typeset -n ref=ref[1]
+1:self reference with subscript
+*?*: ref: invalid self reference
+
+ typeset var=foo
+ typeset -n ref=var
+ () {
+   typeset -n ref
+   ref=""
+   ref=ref
+   echo $ref
+ }
+0:reference always prefers enclosing variable over itself
+>foo
+
+ typeset -n ref1
+ () {
+   typeset -n ref2=ref3
+   ref1=ref2
+   typeset -nu ref3=ref1
+ }
+1:self reference via upper reference
+?(anon):3: ref1: invalid self reference
 
 %clean

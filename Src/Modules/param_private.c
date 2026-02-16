@@ -606,7 +606,7 @@ getprivatenode(HashTable ht, const char *nam)
     /* resolve nameref after skipping private parameters */
     if (pm && (pm->node.flags & PM_NAMEREF) &&
 	(pm->u.str || (pm->node.flags & PM_UNSET)))
-	pm = (Param) resolve_nameref(pm, NULL);
+	pm = resolve_nameref(pm);
 
     return (HashNode)pm;
 }
