@@ -2628,6 +2628,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	 */
 	switch (PM_TYPE(pm->node.flags)) {
 	case PM_SCALAR:
+	case PM_NAMEREF:
 	    pm->gsu.s->setfn(pm, ztrdup(""));
 	    break;
 	case PM_INTEGER:

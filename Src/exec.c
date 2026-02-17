@@ -4517,6 +4517,7 @@ restore_params(LinkList restorelist, LinkList removelist)
 		tpm->node.flags = pm->node.flags;
 		switch (PM_TYPE(pm->node.flags)) {
 		case PM_SCALAR:
+		case PM_NAMEREF:
 		    tpm->gsu.s->setfn(tpm, pm->u.str);
 		    break;
 		case PM_INTEGER:

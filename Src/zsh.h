@@ -1883,7 +1883,7 @@ struct tieddata {
 #define PM_HASHED	(1<<4)	/* association                              */
 
 #define PM_TYPE(X) \
-  (X & (PM_SCALAR|PM_INTEGER|PM_EFLOAT|PM_FFLOAT|PM_ARRAY|PM_HASHED))
+  (X & (PM_SCALAR|PM_INTEGER|PM_EFLOAT|PM_FFLOAT|PM_ARRAY|PM_HASHED|PM_NAMEREF))
 
 #define PM_LEFT		(1<<5)	/* left justify, remove leading blanks      */
 #define PM_RIGHT_B	(1<<6)	/* right justify, fill with leading blanks  */

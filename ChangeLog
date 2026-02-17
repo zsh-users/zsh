@@ -1,5 +1,11 @@
 2026-02-16  Bart Schaefer  <schaefer@zsh.org>
 
+	* Philippe: 53776: Src/builtin.c, Src/exec.c, Src/module.c,
+	Src/params.c,  Src/subst.c,  Src/zsh.h, Src/Modules/param_private.c,
+	Src/Modules/parameter.c, Src/Zle/complete.c,  Src/Zle/computil.c,
+	Src/Zle/zle_params.c: Treat PM_NAMEREF as first-class PM_TYPE,
+	enabling rejection of array initializers for namerefs
+
 	* Philippe: 54122: Src/builtin.c, Test/K01nameref.ztst: avoid
 	warnings for valid nameref options
 

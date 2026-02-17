@@ -49,15 +49,14 @@ paramtypestr(Param pm)
 	if (pm->node.flags & PM_AUTOLOAD)
 	    return dupstring("undefined");
 
-	/* For simplicity we treat PM_NAMEREF as PM_TYPE(PM_SCALAR) */
-	switch (PM_TYPE(f)|(f & PM_NAMEREF)) {
+	switch (PM_TYPE(f)) {
 	case PM_SCALAR:  val = "scalar"; break;
+	case PM_NAMEREF: val = "nameref"; break;
 	case PM_ARRAY:   val = "array"; break;
 	case PM_INTEGER: val = "integer"; break;
 	case PM_EFLOAT:
 	case PM_FFLOAT:  val = "float"; break;
 	case PM_HASHED:  val = "association"; break;
-	case PM_NAMEREF: val = "nameref"; break;
 	}
 	DPUTS(!val, "BUG: type not handled in parameter");
 	val = dupstring(val);

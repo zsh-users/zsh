@@ -1085,6 +1085,7 @@ addparamdef(Paramdef d)
 	 */
 	switch (PM_TYPE(pm->node.flags)) {
 	case PM_SCALAR:
+	case PM_NAMEREF:
 	    pm->gsu.s = d->gsu ? (GsuScalar)d->gsu : &varscalar_gsu;
 	    break;
 

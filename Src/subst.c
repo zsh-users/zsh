@@ -2813,14 +2813,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 			       !(v->pm->node.flags & PM_UNSET))) {
 		int f = v->pm->node.flags;
 
-		switch (PM_TYPE(f)|(f & PM_NAMEREF)) {
+		switch (PM_TYPE(f)) {
 		case PM_SCALAR:  val = "scalar"; break;
+		case PM_NAMEREF: val = "nameref"; break;
 		case PM_ARRAY:   val = "array"; break;
 		case PM_INTEGER: val = "integer"; break;
 		case PM_EFLOAT:
 		case PM_FFLOAT:  val = "float"; break;
 		case PM_HASHED:  val = "association"; break;
-		case PM_NAMEREF: val = "nameref"; break;
 		}
 		val = dupstring(val);
 		if (v->pm->level)

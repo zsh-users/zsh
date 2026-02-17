@@ -207,6 +207,7 @@ makezleparams(int ro)
 	pm->u.data = zp->data;
 	switch(PM_TYPE(zp->type)) {
 	    case PM_SCALAR:
+	    case PM_NAMEREF:
 		pm->gsu.s = zp->gsu;
 		break;
 	    case PM_ARRAY:

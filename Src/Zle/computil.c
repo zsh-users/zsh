@@ -3699,6 +3699,7 @@ bin_compquote(char *nam, char **args, Options ops, UNUSED(int func))
 	if ((v = getvalue(&vbuf, &name, 0))) {
 	    switch (PM_TYPE(v->pm->node.flags)) {
 	    case PM_SCALAR:
+	    case PM_NAMEREF:
 		setstrvalue(v, ztrdup(comp_quote(getstrvalue(v), 
 						 OPT_ISSET(ops,'p'))));
 		break;

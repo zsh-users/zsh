@@ -1308,6 +1308,7 @@ addcompparams(struct compparam *cp, Param *pp)
 	if ((pm->u.data = cp->var)) {
 	    switch(PM_TYPE(cp->type)) {
 	    case PM_SCALAR:
+	    case PM_NAMEREF:
 		pm->gsu.s = &compvarscalar_gsu;
 		break;
 	    case PM_INTEGER:

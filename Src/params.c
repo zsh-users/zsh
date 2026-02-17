@@ -977,6 +977,7 @@ assigngetset(Param pm)
 {
     switch (PM_TYPE(pm->node.flags)) {
     case PM_SCALAR:
+    case PM_NAMEREF:
 	pm->gsu.s = &stdscalar_gsu;
 	break;
     case PM_INTEGER:
@@ -1230,6 +1231,7 @@ copyparam(Param tpm, Param pm, int fakecopy)
     }
     switch (PM_TYPE(pm->node.flags)) {
     case PM_SCALAR:
+    case PM_NAMEREF:
 	tpm->u.str = ztrdup(pm->gsu.s->getfn(pm));
 	break;
     case PM_INTEGER:
@@ -2355,6 +2357,7 @@ getstrvalue(Value v)
 		      v->pm->base, v->pm->node.flags, NULL);
 	break;
     case PM_SCALAR:
+    case PM_NAMEREF:
 	s = v->pm->gsu.s->getfn(v->pm);
 	break;
     default:
@@ -2694,6 +2697,7 @@ assignstrvalue(Value v, char *val, int flags)
     v->pm->node.flags &= ~PM_UNSET;
     switch (PM_TYPE(v->pm->node.flags)) {
     case PM_SCALAR:
+    case PM_NAMEREF:
 	if (v->start == 0 && v->end == -1) {
 	    v->pm->gsu.s->setfn(v->pm, val);
 	    if ((v->pm->node.flags & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) &&
@@ -2850,6 +2854,7 @@ setnumvalue(Value v, mnumber val)
     }
     switch (PM_TYPE(v->pm->node.flags)) {
     case PM_SCALAR:
+    case PM_NAMEREF:
     case PM_ARRAY:
 	if ((val.type & MN_INTEGER) || outputradix) {
 	    if (!(val.type & MN_INTEGER))
@@ -3260,6 +3265,7 @@ assignsparam(char *s, char *val, int flags)
 	if (v->start == 0 && v->end == -1) {
 	    switch (PM_TYPE(v->pm->node.flags)) {
 	    case PM_SCALAR:
+	    case PM_NAMEREF:
 		v->start = INT_MAX;  /* just append to scalar value */
 		break;
 	    case PM_INTEGER:
@@ -3296,6 +3302,7 @@ assignsparam(char *s, char *val, int flags)
 	} else {
 	    switch (PM_TYPE(v->pm->node.flags)) {
 	    case PM_SCALAR:
+	    case PM_NAMEREF:
     		if (v->end > 0)
 		    v->start = v->end;
 		else
@@ -3943,6 +3950,7 @@ stdunsetfn(Param pm, UNUSED(int exp))
 {
     switch (PM_TYPE(pm->node.flags)) {
 	case PM_SCALAR:
+	case PM_NAMEREF:
 	    if (pm->gsu.s->setfn)
 		pm->gsu.s->setfn(pm, NULL);
 	    break;
@@ -5915,6 +5923,7 @@ scanendscope(HashNode hn, UNUSED(int flags))
 	    if (!(tpm->node.flags & (PM_NORESTORE|PM_READONLY)))
 		switch (PM_TYPE(pm->node.flags)) {
 		case PM_SCALAR:
+		case PM_NAMEREF:
 		    pm->gsu.s->setfn(pm, tpm->u.str);
 		    break;
 		case PM_INTEGER:
@@ -6024,6 +6033,7 @@ printparamvalue(Param p, int printflags)
      * on the type of the parameter       */
     switch (PM_TYPE(p->node.flags)) {
     case PM_SCALAR:
+    case PM_NAMEREF:
 	/* string: simple output */
 	if (p->gsu.s->getfn && (t = p->gsu.s->getfn(p)))
 	    quotedzputs(t, stdout);

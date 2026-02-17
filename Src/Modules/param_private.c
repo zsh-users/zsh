@@ -100,6 +100,7 @@ makeprivate(HashNode hn, UNUSED(int flags))
 		    /* why have a union if we need this switch anyway? */
 		    switch (PM_TYPE(pm->node.flags)) {
 		    case PM_SCALAR:
+		    case PM_NAMEREF:
 			pm->gsu.s->setfn(pm, tpm->u.str);
 			tpm->u.str = NULL;
 			break;
@@ -138,6 +139,7 @@ makeprivate(HashNode hn, UNUSED(int flags))
 	struct gsu_closure *gsu = zalloc(sizeof(struct gsu_closure));
 	switch (PM_TYPE(pm->node.flags)) {
 	case PM_SCALAR:
+	case PM_NAMEREF:
 	    gsu->g = (void *)(pm->gsu.s);
 	    gsu->u.s = scalar_private_gsu;
 	    pm->gsu.s = (GsuScalar)gsu;
@@ -180,6 +182,7 @@ is_private(Param pm)
 {
     switch (PM_TYPE(pm->node.flags)) {
     case PM_SCALAR:
+    case PM_NAMEREF:
 	if (!pm->gsu.s || pm->gsu.s->unsetfn != pps_unsetfn)
 	    return 0;
 	break;
