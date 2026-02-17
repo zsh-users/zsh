@@ -2713,7 +2713,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	else
 	    continue;
 	if (OPT_MINUS(ops,'n')) {
-	    if ((on|off) & ~(PM_READONLY|PM_UPPER|PM_HIDEVAL)) {
+	    if (bit & ~(PM_READONLY|PM_UPPER|PM_HIDEVAL)) {
 		zwarnnam(name, "-%c not allowed with -n", optval);
 		/* return 1; */
 	    }

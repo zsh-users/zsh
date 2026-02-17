@@ -1,5 +1,8 @@
 2026-02-16  Bart Schaefer  <schaefer@zsh.org>
 
+	* Philippe: 54122: Src/builtin.c, Test/K01nameref.ztst: avoid
+	warnings for valid nameref options
+
 	* Philippe: 54063: Src/Modules/param_private.c, Src/builtin.c,
 	Src/params.c, Src/zsh.h, Test/K01nameref.ztst: Simplifications
 	for resolve_nameref() and setscope()

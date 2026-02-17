@@ -1084,6 +1084,11 @@ F:previously this could create an infinite recursion and crash
 1:create nameref by pattern match not allowed
 *?*typeset:1: -m not allowed with -n
 
+ typeset -nariu ref=var
+1:regression: warn about invalid nameref options but never about valid ones
+*?*typeset:1: -a not allowed with -n
+*?*typeset:1: -i not allowed with -n
+
  e -u 0
 0:assignment at different scope than declaration, -u 0
 >g:1: rs=f - ra=f - rs1=f - ra1=f
