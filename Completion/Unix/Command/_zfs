@@ -30,6 +30,7 @@ ro_po_props=( # readonly
   'dedupratio[deduplication ratio]'
   'free[space unallocated]'
   'health[health status]'
+  'name[pool name]'
   'size[total size]'
 )
 ci_po_props=( # only set at create or import
@@ -45,7 +46,6 @@ rw_po_props=(
   'dedupditto[threshold for number of copies]:value [0]'
   'delegation[delegated administration]:value:(on off)'
   'failmode[failure-mode behavior]:value:(wait continue panic)'
-  "listshares[show shares in 'zfs list']:value:(on off)"
   "listsnaps[show snapshots in 'zfs list']:value:(on off)"
   'version[pool version]:version'
 )
@@ -126,11 +126,13 @@ case $service:$implementation in
       'bcloneratio[block cloning ratio for saved space]'
       'bclonesaved[amount of storage spared by use of block cloning]'
       'bcloneused[amount of storage used by cloned blocks]'
+      'dedup_table_size[size of dedup table on-disk]'
+      'dedupcached[size of dedup table in arc]'
       'expandsize[uninitialized space within the pool]'
       'fragmentation[amount of fragmentation in the pool]'
       'freeing[amount of space remaining to be reclaimed]'
-      'used[amount of storage space used within the pool]'
       'load_guid[unique identifier generated when pool is loaded]'
+      'used[amount of storage space used within the pool]'
     )
     ci_po_props+=(
       'ashift[pool sector size exponent]:exponent:((9\:512 10\:1024 11\:2048 12\:4096 13\:8192 14\:16384 15\:32768 16\:65536))'
@@ -138,6 +140,10 @@ case $service:$implementation in
     rw_po_props+=(
       'autotrim[periodically trim recently freed space]:value:(on off)'
       'comment[text string that is available even if the pool becomes faulted]:value'
+      "compatibility:compatibility feature set: _alternative \
+        ':toggle:(off legacy)' \
+        ':feature set:_sequence _files -W /usr/share/zfs/compatibility.d'"
+      'dedup_table_quota[limit of on-disk table]:value:(auto none)'
       'multihost[perform pool activity check during import]:value:(on off)'
       'feature@'
     )
@@ -223,6 +229,7 @@ case $service:$implementation in
     rw_po_props+=(
       'clustered[pool is imported as a global pool in Oracle Solaris Cluster]:value:(on off)'
       'scrubinternal[time interval between scheduled scrubs]:interval'
+      "listshares[show shares in 'zfs list']:value:(on off)"
     )
     ro_ds_props+=( keychangedate rekeydate effective{read,write}limit )
     rw_ds_props+=(
