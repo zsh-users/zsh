@@ -362,7 +362,7 @@ _git-branch () {
     "($l $m $d -f --force)"{-f,--force}'[force the creation of a new branch]' \
     "($l $m $d --track)-t[setup configuration so that pull merges from the start point]" \
     "($l $m $d -t)--track=-[setup configuration so that pull merges from the start point]::upstream tracking:(direct inherit)" \
-    "($l $m $d)--no-track[override the branch.autosetupmerge configuration variable]" \
+    "($l $m $d)--no-track[override the branch.autoSetupMerge configuration variable]" \
     "($l $m $d -u --set-upstream --set-upstream-to --unset-upstream)"{-u+,--set-upstream-to=}'[set up configuration so that pull merges]:remote branch:__git_remote_branch_names' \
     "($l $m $d -u --set-upstream --set-upstream-to --unset-upstream)--unset-upstream[remove upstream configuration]" \
     "($l $m $d)*--contains=[only list branches that contain the specified commit]: :__git_committishs" \
@@ -500,7 +500,7 @@ _git-checkout () {
     '(--orphan -2 --ours -3 --theirs --conflict -p --patch -U --unified --inter-hunk-context -d --detach)-l[create reflog for new branch]' \
     '(--track --no-track --orphan -p --patch -U --unified --inter-hunk-context -d --detach)-t[set upstream info for new branch]' \
     '(-t --no-track --orphan -p --patch -U --unified --inter-hunk-context -d --detach)--track=-[set upstream info for new branch]::configuration:(direct inherit)' \
-    '(-p --patch -U --unified --inter-hunk-context)--no-track[override the branch.autosetupmerge configuration variable]' \
+    '(-p --patch -U --unified --inter-hunk-context)--no-track[override the branch.autoSetupMerge configuration variable]' \
     $new_branch_reflog_opt \
     '(-b -B -t --track -p --patch -U --unified --inter-hunk-context --orphan -d --detach)'{-d,--detach}'[detach the HEAD at named commit]' \
     '(-b -B -t --track -p --patch -U --unified --inter-hunk-context -d --detach)--orphan=[create a new orphan branch based at given commit]: :__git_branch_names' \
@@ -2667,6 +2667,10 @@ __git_config_option-or-value () {
     'branch.*.description:branch description:branch description:->string'
     branch.sort:"default sorting order for 'git branch' output::__git_ref_sort_keys"
     checkout.defaultRemote:'assumed remote name when specifying an unqualified remote branch name:remote name:__git_remotes'
+    checkout.guess:'provides the default value for the --guess or --no-guess option in git checkout and git switch::->bool:true'
+    checkout.workers:'the number of parallel workers to use when updating the working tree::->int:1'
+    checkout.thresholdForParallelism:'the minimum number of files for which parallel checkout should be attempted::->int:100'
+    clone.defaultRemoteName:'the name of the remote to create when cloning a repository::->string:origin'
     cvsexportcommit.cvsdir:'the default location of the CVS checkout to use for the export:cvs export dir:_directories'
     column.ui:'specify whether supported commands should output in columns.::->column:never'
     column.branch:'specify whether to output branch listing in git branch in columns::_git_column_layouts:never'
@@ -2733,8 +2737,8 @@ __git_config_option-or-value () {
     am.keepcr:'keep CR characters when splitting mails::->bool:false'
     apply.ignorewhitespace:'ignore whitespace changes::->apply.ignorewhitespace:no'
     apply.whitespace:'default value for the --whitespace option::->apply.whitespace:error'
-    branch.autosetupmerge:'set up new branches for git pull::->bool:true'
-    branch.autosetuprebase:'rebase new branches of merge for autosetupmerge::->branch.autosetuprebase:never'
+    branch.autoSetupMerge:'tells git branch, git switch and git checkout to set up new branches so that git-pull(1) will appropriately merge from the starting point branch::->branch.autoSetupMerge:true'
+    branch.autosetuprebase:'rebase new branches of merge for autoSetupMerge::->branch.autosetuprebase:never'
     'branch.*.remote:what remote git fetch and git push should fetch form/push to::__git_remotes'
     'branch.*.merge:default refspec to be marked for merging::__git_remote_references'
     'branch.*.mergeoptions:default options for merging::->branch.mergeoptions'
@@ -2801,6 +2805,7 @@ __git_config_option-or-value () {
     commit.template:'template file for commit messages:template:_files'
     'diff.*.binary:make the diff driver treat files as binary::->bool:false'
     'diff.*.cachetextconv:make the diff driver cache the text conversion outputs::->bool:false'
+    'diff.*.trustExitCode:expect diff.external command to return exit code 0 if it considers the input files to be equal or 1 if it considers them to be different::->bool:false'
     'diff.*.command:custom diff driver command::_cmdstring'
     'diff.*.textconv:command to generate the text-converted version of a file::_cmdstring'
     'diff.*.wordregex:regular expression that the diff driver should use to split words in a line:regular expression:->string'
@@ -2820,6 +2825,7 @@ __git_config_option-or-value () {
     diff.orderfile:'file to read patch order glob patterns from:order file:_files'
     diff.renameLimit:'number of files to consider when detecting copy/renames:limit (number of files):->int'
     diff.renames:'try to detect renames::->diff.renames:true'
+    diff.trustExitCode:'expect diff.external command to return exit code 0 if it considers the input files to be equal or 1 if it considers them to be different::->bool:false'
     diff.ignoreSubmodules:'ignore submodules::->bool:false'
     diff.statNameWidth:'limit on width of filename part in --stat output:width:->int'
     diff.statGraphWidth:'width of the graph part in --stat output:width:->int'
@@ -2965,6 +2971,7 @@ __git_config_option-or-value () {
     http.getanyfile:'allow clients to read any file within repository::->bool:true'
     http.uploadpack:'serve git fetch-pack and git ls-remote clients::->bool:true'
     http.receivepack:'serve git send-pack clients::->bool:true'
+    http.proxyAuthMethod:'method with which to authenticate against the HTTP proxy::->http.proxyAuthMethod:anyauth'
     'http.*.cookiefile:file containing cookie lines which should be used in the Git http session::_files'
     'http.*.lowSpeedLimit:limit controlling when to abort an HTTP transfer:speed limit:->int'
     'http.*.lowSpeedTime:limit controlling when to abort an HTTP transfer:time limit (seconds):->int'
@@ -3059,11 +3066,13 @@ __git_config_option-or-value () {
     pull.octopus:'default merge strategy to use when pulling multiple branches::__git_merge_strategies'
     pull.rebase:'rebase branches on top of the fetched branch, instead of merging::->pull.rebase:false'
     pull.twohead:'default merge strategy to use when pulling a single branch::__git_merge_strategies'
+    push.autoSetupRemote:'assume --set-upstream on default push when no upstream tracking exists for the current branch::->bool:false'
     push.default:'action git push should take if no refspec is given::->push.default:simple'
     push.followTags:'enable --follow-tags option by default::->bool:false'
     push.gpgSign:'GPG-sign pushes::->bool:false'
     push.recurseSubmodules:'ensure all submodule commits are available on a remote-tracking branch'
     push.pushOption:'transmit strings to server to pass to pre/post-receive hooks::->string'
+    push.useForceIfIncludes:'assume --force-if-includes as an option to git-push::->bool:false'
     rebase.stat:'show a diffstat of what changed upstream since last rebase::->bool:false'
     rebase.autoSquash:'autosquash by default::->bool:false'
     rebase.autoStash:'autostash by default::->bool:false'
@@ -3087,6 +3096,7 @@ __git_config_option-or-value () {
     'remote.*.promisor:use this remote to fetch promisor objects::->bool:false'
     'remote.*.pushurl:push URL of a remote repository::__git_any_repositories'
     'remote.*.proxy:URL of proxy to use for a remote repository::_urls'
+    'remote.*.proxyAuthMethod:method to use for authenticating against the proxy in use::->http.proxyAuthMethod:anyauth'
     "remote.*.pruneTags:maintain one-to-one correspondence with remote's tag refs::->bool:false"
     'remote.*.prune:remove any remote tracking branches that no longer exist remotely::->bool:false'
     'remote.*.fetch:default set of refspecs for git fetch::__git_ref_specs_fetchy'
@@ -3105,6 +3115,8 @@ __git_config_option-or-value () {
     rerere.autoupdate:'update index after resolution::->bool:false'
     rerere.enabled:'record resolved conflicts::->bool'
     reset.quiet:'pass --quiet by default::->bool:false'
+    safe.bareRepository:'specifies which bare repositories Git will work with::->safe.bareRepository:all'
+    safe.directory:'specify Git-tracked directories that are considered safe even if they are owned by someone other than the current user::_path_files -/'
     sendemail.identity:'default identity::__git_sendemail_identities'
     sendemail.smtpencryption:'encryption method to use::->sendemail.smtpencryption'
     sendemail.aliasesfile:'file containing email aliases:email aliases file:_files'
@@ -3162,6 +3174,10 @@ __git_config_option-or-value () {
     sendemail.assume8bitEncoding:'encoding to use for non-ASCII messages::__git_encodings'
     sequence.editor:'text editor used by git rebase -i::_cmdstring'
     showbranch.default:'default set of branches for git show-branch::->branch'
+    stash.index:'implicitly supply --index to git stash apply and pop::->bool:false'
+    stash.showIncludeUntracked:'show the untracked files of a stash entry::->bool:false'
+    stash.showPatch:'show the stash entry in patch form::->bool:false'
+    stash.showStat:'show a diffstat of the stash entry::->bool:true'
     status.aheadBehind:"display detailed ahead/behind counts relative to upstream branch::->bool:true"
     status.relativePaths:'show paths relative to current directory::->bool:false'
     status.showStash:'show number of stashes::->bool:false'
@@ -3177,7 +3193,11 @@ __git_config_option-or-value () {
     'submodule.*.url:URL to update from::__git_any_repositories'
     'submodule.*.update:update strategy to use::->submodule.update:none'
     'submodule.*.ignore:ignore modifications to submodules with git status and git diff-*::->submodule.ignore'
+    'submodule.*.active:the submodule is of interest to git commands::->bool:true'
     submodule.recurse:'recurse into submodules by default (for most git commands)::->bool:false'
+    submodule.fetchJobs:'how many submodules are fetched/cloned at the same time::->int:1'
+    submodule.alternateLocation:'how the submodules obtain alternates when submodules are cloned::->submodule.alternateLocation:no'
+    submodule.alternateErrorStrategy:'how to treat errors with the alternates for a submodule as computed via submodule.alternateLocation::->submodule.alternateErrorStrategy:die'
     ssh.variant:'SSH command flavour:flavour id:compadd ssh simple plink putty tortoiseplink'
     svn.noMetadata:'disable git-svn-id: lines at end of commits::->bool:false'
     svn.useSvmProps:'use remappings of URLs and UUIDs from mirrors::->bool:false'
@@ -3220,6 +3240,7 @@ __git_config_option-or-value () {
     versionsort.suffix:'specify sort order of suffixes applied to tags:suffix'
     web.browser:'web browser to use::__git_browsers'
     worktree.guessRemote:'with add, if branch matches remote track it::->bool:true'
+    worktree.useRelativePaths:'use relative path::->bool:false'
 
     {fetch.fsck.skipList,receive.fsck.skipList,fsck.skipList}:'ignore objects broken in a non-fatal way:path to a list of objects:_files'
   )
@@ -3467,8 +3488,10 @@ __git_config_option-or-value () {
           remotes:'remotes groups'
           repack:'repack options'
           rerere:'git rerere options'
+          safe:'safe directories'
           sendemail:'git send-email options'
           showbranch:'showbranch options'
+          stash:'git stash options'
           status:'git status options'
           submodule:'git submodule options'
           tar:'git tar-tree options'
@@ -3564,6 +3587,14 @@ __git_config_option-or-value () {
               ;;
             (branch)
               __git_branch_names && ret=0
+              ;;
+            (branch.autoSetupMerge)
+              __git_config_values -- "$current" "$parts[5]" \
+                false:'no automatic setup is done' \
+                true:'automatic setup is done when the starting point is a remote-tracking branch' \
+                always:'automatic setup is done when the starting point is either a local branch or remote-tracking branch' \
+                inherit:'if the starting point has a tracking configuration, it is copied to the new branch' \
+                simple:'automatic setup is done only when the starting point is a remote-tracking branch and the new branch has the same name as the remote branch.' && ret=0
               ;;
             (branch.autosetuprebase)
               __git_config_values -- "$current" "$parts[5]" \
@@ -3727,6 +3758,10 @@ __git_config_option-or-value () {
                 'path::_files -/' \
                 'url::_urls' && ret=0
               ;;
+            (http.proxyAuthMethod)
+              __git_config_values -- "$current" "$parts[5]" \
+                anyauth: basic: digest: negotiate: ntlm: && ret=0
+              ;;
             (imap.authMethod)
               __git_config_values -- "$current" "$parts[5]" \
                 CRAM-MD5:'use CRAM-MD5' && ret=0
@@ -3790,6 +3825,11 @@ __git_config_option-or-value () {
                 --tags:'automatically follow tags' \
                 --no-tags:'do not automatically follow tags' && ret=0
               ;;
+            (safe.bareRepository)
+              __git_config_values -- "$current" "$parts[5]" \
+                all:'all bare repositories' \
+                explicit:'bare repositories specified via the top-level --git-dir command-line option, or the GIT_DIR environment variable' && ret=0
+              ;;
             (sendemail.aliasfiletype)
               __git_config_values -- "$current" "$parts[5]" \
                 elm:'elm(1)' \
@@ -3812,6 +3852,14 @@ __git_config_option-or-value () {
                 no:'do not show untracked files' \
                 normal:'show untracked files and directories' \
                 all:'show all individual files in directories' && ret=0
+              ;;
+            (submodule.alternateLocation)
+              __git_config_values -- "$current" "$parts[5]" \
+                no: superproject: && ret=0
+              ;;
+            (submodule.alternateErrorStrategy)
+              __git_config_values -- "$current" "$parts[5]" \
+                ignore: info: die: && ret=0
               ;;
             (refname|string)
               # TODO: Something better?
