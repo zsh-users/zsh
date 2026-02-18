@@ -1,5 +1,8 @@
 2026-04-05  dana  <dana@dana.is>
 
+	* Bao Trinh: github #156: Completion/Unix/Command/_git: fix
+	--git-dir and --work-tree options when used with parameters
+
 	* Christopher Bock: github #153: Completion/Unix/Command/_zfs:
 	_zfs update zpool-prop's
 
