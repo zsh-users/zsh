@@ -1,5 +1,8 @@
 2026-04-05  Oliver Kiddle  <opk@zsh.org>
 
+	* Ronan Pigott: 54208: Completion/Unix/Command/_cp:
+	allow multiple --preserve flags
+
 	* Johannes Altmanninger: 54155: Src/Zle/termquery.c:
 	specify $HOST in OSC7 working directory report
 

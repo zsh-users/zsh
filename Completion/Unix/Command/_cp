@@ -16,8 +16,8 @@ if _pick_variant gnu='(GNU|uutils)' unix --version; then
     '(-n --no-clobber -i --interactive)'{-n,--no-clobber}"[don't overwrite an existing file]" \
     '(-P --no-dereference)'{-P,--no-dereference}'[never follow symbolic links]' \
     '-p[same as --preserve=mode,ownership,timestamps]' \
-    '--preserve=-[preserve specified attributes]:: :_values -s , attribute mode timestamps ownership links context xattr all' \
-    "--no-preserve=[don't preserve specified attributes]: :_values -s , attribute mode timestamps ownership links context xattr all" \
+    '*--preserve=-[preserve specified attributes]:: :_values -s , attribute mode timestamps ownership links context xattr all' \
+    "*--no-preserve=[don't preserve specified attributes]: :_values -s , attribute mode timestamps ownership links context xattr all" \
     '--parents[append source path to target directory]' \
     '(-R -r --recursive)'{-R,-r,--recursive}'[copy directories recursively]' \
     '--reflink=-[control clone/CoW copies]::when to perform a lightweight copy:(always auto)' \
