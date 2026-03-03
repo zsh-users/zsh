@@ -7503,7 +7503,7 @@ bin_let(UNUSED(char *name), char **argv, UNUSED(Options ops), UNUSED(int func))
     /* Errors in math evaluation in let are non-fatal. */
     errflag &= ~ERRFLAG_ERROR;
     /* should test for fabs(val.u.d) < epsilon? */
-    return (val.type == MN_INTEGER) ? val.u.l == 0 : val.u.d == 0.0;
+    return (val.type == MN_INTEGER) ? val.u.l == 0 : (val.u.d == 0.0 || isnan(val.u.d));
 }
 
 /* umask command.  umask may be specified as octal digits, or in the  *
