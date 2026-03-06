@@ -1,0 +1,18 @@
+#compdef papers
+
+_arguments -s -S : \
+  + '(help)' \
+  '(- : *)--version[display version information]' \
+  '(- : *)'{-h,--help}'[display help information]' \
+  '(- : *)--help-all[display all help information]' \
+  '(- : *)--help-gapplication[display help information for GApplication options]' \
+  + '(mode)' \
+  {-f,--fullscreen}'[run in fullscreen mode]' \
+  {-s,--presentation}'[run in presentation mode]' \
+  + '(page)' \
+  {-p,--page-label=}'[specify page label of document to display]:page label:' \
+  {-i,--page-index=}'[specify page number of document to display]:page index:' \
+  {-n,--named-dest=}'[specify named destination to display]:named destination:' \
+  + etc \
+  '--gapplication-service[enter GApplication service mode]' \
+  '*:document file:_files -g "*.(#i)(cb7|cbr|cbt|cbz|djv|djvu|pdf|tif|tiff)(-.)"'

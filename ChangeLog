@@ -1,3 +1,8 @@
+2026-05-18  dana  <dana@dana.is>
+
+	* Michael Kuhn: github #160 (tweaked):
+	Completion/X/Command/_papers: New Papers completion
+
 2026-05-18  Oliver Kiddle  <opk@zsh.org>
 
 	* github #172: gi1242: Completion/X/Command/_sioyek: Completion
