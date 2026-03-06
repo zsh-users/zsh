@@ -19,6 +19,11 @@
 	* 54576: Completion/Unix/Command/_git: adapt git config completon
 	to new sub-commands
 
+2026-05-18  dana  <dana@dana.is>
+
+	* Michael Kuhn: github #160 (tweaked):
+	Completion/X/Command/_papers: New Papers completion
+
 2026-05-16  dana  <dana@dana.is>
 
 	* unposted: Util/zsh-merge-changelog: zsh-merge-changelog: find
