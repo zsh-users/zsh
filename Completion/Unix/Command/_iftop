@@ -4,7 +4,7 @@ _interfaces () {
   local disp expl sep
   _description interfaces expl 'network interface'
   _net_interfaces "$expl[@]"
-  if zstyle -t ":completion:${curcontext}:interfaces" verbose; then
+  if zstyle -T ":completion:${curcontext}:interfaces" verbose; then
     zstyle -s ":completion:${curcontext}:interfaces" list-separator sep || sep=--
     disp=( "any $sep capture on all interfaces" )
     compadd "$expl[@]" -ld disp any

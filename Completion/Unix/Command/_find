@@ -158,7 +158,7 @@ _arguments -C $args \
 if [[ $state = times ]]; then
   if ! compset -P '[+-]' || [[ -prefix '[0-9]' ]]; then
     compstate[list]+=' packed'
-    if zstyle -t ":completion:${curcontext}:senses" verbose; then
+    if zstyle -T ":completion:${curcontext}:senses" verbose; then
       zstyle -s ":completion:${curcontext}:senses" list-separator sep || sep=--
       default=" [default exactly]"
       disp=( "+ $sep before (older files)" "- $sep since (newer files)" )

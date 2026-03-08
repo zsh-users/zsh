@@ -1,3 +1,11 @@
+2026-03-09  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 54185 + 54209: Completion/Unix/Command/_find,
+	Completion/Unix/Command/_git, Completion/Unix/Command/_iftop,
+	Completion/Unix/Command/_tcpdump, Completion/Zsh/Type/_globquals,
+	Completion/Zsh/Type/_parameters, Test/Y01completion.ztst: set
+	default value of verbose style to true
+
 2026-02-21  Bart Schaefer  <schaefer@zsh.org>
 
 	* dana: 54203: Test/A08time.ztst: replace "read -t" with "zselect"
