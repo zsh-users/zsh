@@ -279,7 +279,7 @@ F:regression test workers/31611
 >NO:{path}
 >NO:{paths}
 
-  comptesteval 'zstyle -d ":completion:*:parameters" verbose'
+  comptesteval 'zstyle ":completion:*:parameters" verbose no'
   comptest $': $ba\t'
 0:parameter values not shown without verbose
 >line: {: $ba}{}

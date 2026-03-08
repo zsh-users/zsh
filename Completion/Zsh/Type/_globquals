@@ -120,14 +120,14 @@ while [[ -n $PREFIX ]]; do
       if ! compset -P '[Mwhmsd]' && [[ -z $PREFIX ]]; then
 	tdisp=( seconds minutes hours days weeks Months )
 	tmatch=( s m h d w M )
-	if zstyle -t ":completion:${curcontext}:time-specifiers" verbose; then
+	if zstyle -T ":completion:${curcontext}:time-specifiers" verbose; then
 	  zstyle -s ":completion:${curcontext}:time-specifiers" list-separator sep || sep=--
           print -v tdisp -f "%s ${sep//(#m)[%\\]/$MATCH$MATCH} %s" ${tmatch:^^tdisp}
 	fi
 	alts+=( "time-specifiers:time specifier:compadd -E 0 -d tdisp -S '' -a tmatch" )
       fi
       if ! compset -P '[-+]' && [[ -z $PREFIX ]]; then
-	if zstyle -t ":completion:${curcontext}:senses" verbose; then
+	if zstyle -T ":completion:${curcontext}:senses" verbose; then
 	  zstyle -s ":completion:${curcontext}:senses" list-separator sep || sep=--
 	  default=" [default exactly]"
           sdisp=( "+ $sep before (older files)" "- $sep since (newer files)" )
