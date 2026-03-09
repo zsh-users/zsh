@@ -1,5 +1,9 @@
 2026-05-16  dana  <dana@dana.is>
 
+	* sph: github #161 (tweaked): Doc/Zsh/contrib.yo,
+	Functions/Misc/zkbd: allow zkbd to generate config in a custom
+	directory
+
 	* Michael Baikov: github #170 (tweaked): Doc/Zsh/compwid.yo:
 	Clarify the documentation about -d flag in compadd
 
