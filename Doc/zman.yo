@@ -104,7 +104,7 @@ def(noderef)(1)(bf(UPPERCASE(NOTRANS(ARG1))(0)))
 COMMENT( nmref(node)(manpage)
   Refer to 'node' (texi) or 'manpage' (man).
 )
-def(nmref)(2)(noderef(ARG2))
+def(nmref)(2)(zmanref(ARG2))
 COMMENT( sectref(sectname)(manpage)
   Refer to 'section' in 'manpage' (man), or a node (texi).
   There should be a node (or anchor) with the name 'sectname'.
