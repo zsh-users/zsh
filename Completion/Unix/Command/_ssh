@@ -42,7 +42,7 @@ _ssh () {
       '(-P)-b+[specify interface to transmit on]:bind address:_bind_addresses' \
       '-D+[specify a dynamic port forwarding]:dynamic port forwarding:->dynforward' \
       '-e+[set escape character]:escape character (or `none'\''):' \
-      '-E+[append log output to file instead of stderr]:_files' \
+      '-E+[append log output to file instead of stderr]:log file:_files' \
       '(-n)-f[go to background]' \
       '-g[allow remote hosts to connect to local forwarded ports]' \
       '-G[output configuration and exit]' \
