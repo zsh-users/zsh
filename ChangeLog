@@ -1,5 +1,8 @@
 2026-04-30  Oliver Kiddle  <opk@zsh.org>
 
+	* Ryan Rotter: 54218: Completion/Unix/Command/_ip: add some
+	missing flags
+
 	* Philippe Altherr: 54383: Src/Modules/watch.c, Src/module.c,
 	Test/V01zmodload.ztst: Fix WATCH/watch tying
 
