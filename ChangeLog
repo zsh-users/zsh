@@ -1,5 +1,8 @@
 2026-04-30  Oliver Kiddle  <opk@zsh.org>
 
+	* Ryan Rotter: 54218: Completion/Unix/Command/_ip: add some
+	missing flags
+
 	* Christopher Bock: github #168: Completion/Debian/Command/_apt:
 	add apt history commands
 

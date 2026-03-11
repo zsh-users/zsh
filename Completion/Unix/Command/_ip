@@ -225,6 +225,7 @@ local -a addr_show_cmds
 # TODO: broadcast can take + or =
 _regex_words addr-show-commands "addr show commands" \
   'dev:specify device:$subcmd_dev' \
+  'up:limit display to running devices' \
   's*cope:specify scope for address:$subcmd_scope' \
   't*o:limit to given IP address/prefix:$subcmd_ipaddr' \
   'la*bel:list tags matching glob patter:$subcmd_string' \
@@ -553,6 +554,8 @@ _regex_words options "ip options" \
   '-M:family MPLS' \
   '-0:link protocol, no networking' \
   '-o*neline:output one record per line' \
+  '-j*son:output results in JSON' \
+  '-p*retty:pretty print JSON' \
   '-t*imestamp:display current time when using monitor option' \
   '-ts*hort:display current time in shorter format when using monitor option' \
   '-r*esolve:use system resolver for DNS names'
