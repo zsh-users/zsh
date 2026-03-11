@@ -1,5 +1,7 @@
 2026-03-09  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* unposted: Doc/zman.yo: fix an error in nmref()
+
 	* 54185 + 54209: Completion/Unix/Command/_find,
 	Completion/Unix/Command/_git, Completion/Unix/Command/_iftop,
 	Completion/Unix/Command/_tcpdump, Completion/Zsh/Type/_globquals,
