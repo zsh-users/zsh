@@ -56,6 +56,17 @@ The ERR_EXIT and ERR_RETURN options were refined to be more self-
 consistent and better aligned with the POSIX-2017 specification of
 `set -e`:
 
+  - The EXIT trap is now correctly executed when ERR_EXIT triggers
+    inside a function.  Previously, `starttrapscope()` hid the EXIT
+    trap on function entry, and the ERR_EXIT code path called
+    `realexit()` without restoring it. Example:
+
+      setopt ERR_EXIT
+      trap 'echo exiting' EXIT
+      f() { false }
+      f
+      # "exiting" is printed only since 5.10.
+
   - Function calls or anonymous functions prefixed with `!` now never
     trigger exit or return. Negated function calls or anonymous
     functions used to trigger exit or return if ERR_EXIT or ERR_RETURN
