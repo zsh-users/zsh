@@ -5823,6 +5823,25 @@ mod_export volatile int exit_pending;
 /**/
 mod_export volatile int exit_level;
 
+/*
+ * Set up exit_pending unwind: instead of exiting immediately,
+ * force all active functions to return so that endtrapscope()
+ * runs at each level and all saved EXIT traps are executed.
+ */
+
+/**/
+mod_export void
+set_exit_pending(int val)
+{
+    if (trap_state)
+	trap_state = TRAP_STATE_FORCE_RETURN;
+    retflag = 1;
+    breaks = loops;
+    exit_pending = 1;
+    exit_level = locallevel;
+    exit_val = val;
+}
+
 /* we have printed a 'you have stopped (running) jobs.' message */
 
 /**/
@@ -5905,13 +5924,7 @@ bin_break(char *name, char **argv, UNUSED(Options ops), int func)
 	     * a bad job.
 	     */
 	    if (stopmsg || (zexit(0, ZEXIT_DEFERRED), !stopmsg)) {
-		if (trap_state) 
-		    trap_state = TRAP_STATE_FORCE_RETURN;
-		retflag = 1;
-		breaks = loops;
-		exit_pending = 1;
-		exit_level = locallevel;
-		exit_val = num;
+		set_exit_pending(num);
 	    }
 	} else
 	    zexit(num, ZEXIT_NORMAL);
