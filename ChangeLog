@@ -1,5 +1,8 @@
 2026-03-24  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* 54170: Src/Zle/compresult.c: be sure to skip dummy matches
+	when completing (to avoid core dump)
+
 	* 54241 + 54242: Completion/Unix/Type/_path_commands,
 	Completion/Zsh/Type/_parameters, Doc/Zsh/compsys.yo,
 	Test/Y01completion.ztst: use extra-verbose style for displaying

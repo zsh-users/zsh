@@ -1201,6 +1201,48 @@ do_single(Cmatch m)
     }
 }
 
+/*
+ * get a "valid" (= need not be skipped) match from minfo.group.
+ * if next==1, get the next valid match even if *m is already valid.
+ */
+
+static Cmatch*
+valid_match(Cmatch* m, int next)
+{
+    while (next ||
+	    (menuacc && !hasbrpsfx(*m, minfo.prebr, minfo.postbr)) ||
+	    ((*m)->flags & CMF_DUMMY) ||
+	    (((*m)->flags & (CMF_NOLIST | CMF_MULT)) &&
+	    (!(*m)->str || !*(*m)->str))) {
+	if (zmult > 0) {
+	    if (!*++(m)) {
+		do {
+		    if (!(minfo.group = (minfo.group)->next)) {
+			minfo.group = amatches;
+#ifdef ZSH_HEAP_DEBUG
+			if (memory_validate(minfo.group->heap_id)) {
+			    HEAP_ERROR(minfo.group->heap_id);
+			}
+#endif
+		    }
+		} while (!(minfo.group)->mcount);
+		m = minfo.group->matches;
+	    }
+	} else {
+	    if (m == (minfo.group)->matches) {
+		do {
+		    if (!(minfo.group = (minfo.group)->prev))
+			minfo.group = lmatches;
+		} while (!(minfo.group)->mcount);
+		m = (minfo.group)->matches + (minfo.group)->mcount - 1;
+	    } else
+		m--;
+	}
+	next = 0;
+    }
+    return m;
+}
+
 /* Do completion, given that we are in the middle of a menu completion.  We *
  * don't need to generate a list of matches, because that's already been    *
  * done by previous commands.  We will either list the completions, or      *
@@ -1227,36 +1269,7 @@ do_menucmp(int lst)
 
     /* Otherwise go to the next match in the array... */
     while (zmult) {
-	do {
-	    if (zmult > 0) {
-		if (!*++(minfo.cur)) {
-		    do {
-			if (!(minfo.group = (minfo.group)->next)) {
-			    minfo.group = amatches;
-#ifdef ZSH_HEAP_DEBUG
-			    if (memory_validate(minfo.group->heap_id)) {
-				HEAP_ERROR(minfo.group->heap_id);
-			    }
-#endif
-			}
-		    } while (!(minfo.group)->mcount);
-		    minfo.cur = minfo.group->matches;
-		}
-	    } else {
-		if (minfo.cur == (minfo.group)->matches) {
-		    do {
-			if (!(minfo.group = (minfo.group)->prev))
-			    minfo.group = lmatches;
-		    } while (!(minfo.group)->mcount);
-		    minfo.cur = (minfo.group)->matches + (minfo.group)->mcount - 1;
-		} else
-		    minfo.cur--;
-	    }
-	} while ((menuacc &&
-		!hasbrpsfx(*(minfo.cur), minfo.prebr, minfo.postbr)) ||
-		((*minfo.cur)->flags & CMF_DUMMY) ||
-		(((*minfo.cur)->flags & (CMF_NOLIST | CMF_MULT)) &&
-		(!(*minfo.cur)->str || !*(*minfo.cur)->str)));
+	minfo.cur = valid_match(minfo.cur, 1);
 	zmult -= (0 < zmult) - (zmult < 0);
     }
     /* ... and insert it into the command line. */
@@ -1424,7 +1437,7 @@ do_ambig_menu(void)
 	/* group-numbers in compstate[insert] */
     }
 #endif
-    mc = (minfo.group)->matches + insmnum;
+    mc = valid_match((minfo.group)->matches + insmnum, 0);
     if (iforcemenu != -1)
         do_single(*mc);
     minfo.cur = mc;
