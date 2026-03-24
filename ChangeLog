@@ -1,3 +1,8 @@
+2026-06-01  dana  <dana@dana.is>
+
+	* Lukáš Zaoral: unposted: Src/Zle/zle_tricky.c: fix segfault in
+	_IO_putc via set_colour_attribute
+
 2026-05-31  dana  <dana@dana.is>
 
 	* unposted: Config/version.mk: post-release version bump

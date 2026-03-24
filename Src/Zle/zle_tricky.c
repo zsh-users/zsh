@@ -2490,15 +2490,17 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 			    p--;
 		    } else
 			atr = match_colour(NULL, is_fg, arg);
-		    if (atr != TXT_ERROR)
+		    if (atr != TXT_ERROR && dopr)
 			set_colour_attribute(atr, is_fg ? COL_SEQ_FG :
 					     COL_SEQ_BG, 0);
 		    break;
 		case 'f':
-		    set_colour_attribute(TXTNOFGCOLOUR, COL_SEQ_FG, 0);
+		    if (dopr)
+			set_colour_attribute(TXTNOFGCOLOUR, COL_SEQ_FG, 0);
 		    break;
 		case 'k':
-		    set_colour_attribute(TXTNOBGCOLOUR, COL_SEQ_BG, 0);
+		    if (dopr)
+			set_colour_attribute(TXTNOBGCOLOUR, COL_SEQ_BG, 0);
 		    break;
 		case '{':
 		    if (arg)
