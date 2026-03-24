@@ -1,3 +1,10 @@
+2026-03-24  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 54241 + 54242: Completion/Unix/Type/_path_commands,
+	Completion/Zsh/Type/_parameters, Doc/Zsh/compsys.yo,
+	Test/Y01completion.ztst: use extra-verbose style for displaying
+	parameter values when completing parameter names
+
 2026-03-09  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 54185 + 54209: Completion/Unix/Command/_find,

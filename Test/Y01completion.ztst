@@ -260,10 +260,10 @@ F:regression test workers/31611
   comptesteval "typeset -a bar=({$'\\0'..$'\\C-?'})"
   comptesteval 'typeset -A bat=( "$bar[@]" )'
   comptesteval 'typeset bay="$bar"'
-  comptesteval 'zstyle ":completion:*:parameters" verbose yes'
+  comptesteval 'zstyle ":completion:*:parameters" extra-verbose yes'
   comptesteval 'zstyle ":completion:*" fake-parameters bar bat bay'
   comptest $': $ba\t'
-0:verbose shows parameter values
+0:extra-verbose shows parameter values
 >line: {: $ba}{}
 >DESCRIPTION:{parameter}
 >NO:{bar  -- ( '^@' '^A' '^B' '^C' '^D' '^E' '^F' '^G' '^H' '\t' '\n' '^K' '^L' '}

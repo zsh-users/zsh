@@ -57,7 +57,7 @@ _call_whatis() {
 _path_commands() {
 local need_desc expl ret=1
 
-if zstyle -t ":completion:${curcontext}:" extra-verbose; then
+if zstyle -t ":completion:${curcontext}:commands" extra-verbose; then
   local update_policy first
   if [[ $+_command_descriptions -eq 0 ]]; then
     first=yes

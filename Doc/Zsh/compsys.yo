@@ -1391,9 +1391,12 @@ However, menu completion can be used to cycle through all matches.
 )
 kindex(extra-verbose, completion style)
 item(tt(extra-verbose))(
-If set, the completion listing is more verbose at the cost of
-a probable decrease in completion speed.  Completion performance
-will suffer if this style is set to `true'.
+If this style set to `true', the completion listing is still more verbose.
+
+Currently, it is used for tt(commands) and tt(parameters) tags.
+If it is `true' for the tt(commands) (or tt(parameters)) tag, short
+descriptions of the commands (or the values of the parameters) are
+displayed along with the command (or parameter) names.
 )
 kindex(fake, completion style)
 item(tt(fake))(
