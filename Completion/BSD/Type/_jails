@@ -3,15 +3,43 @@
 # Options:
 #
 # -0        include jid 0 as a match for the host system
+# -c        include configured (not yet running) jails from jail.conf
 # -o param  jail parameter to complete instead of jid -
 #              e.g. name, path, ip4.addr, host.hostname
 
-local addhost host param desc=1
+local addhost host param desc=1 configured
 local -a jails args expl
-zparseopts -D -K -E 0=addhost o:=param
+zparseopts -D -K -E 0=addhost c=configured o:=param
 param=${param[2]:-name}
 
 jails=( ${${(f)"$(_call_program jails jls $param name)"}/ /:} )
+
+if [[ -n $configured ]]; then
+  local jail_conf line f
+  local -a conf_files cjails
+  jail_conf=$(_call_program jail-conf sysrc -n jail_conf)
+
+  # Read main config and follow .include directives
+  if [[ -r $jail_conf ]]; then
+    while IFS= read -r line; do
+      if [[ $line =~ '^\s*\.include\s+"([^"]+)"' ]]; then
+        conf_files+=( ${~match[1]}(N) )
+      fi
+    done < $jail_conf
+    conf_files+=( $jail_conf )
+  fi
+
+  # Extract jail block names: lines matching "name {"
+  for f in ${(u)conf_files}; do
+    [[ -r $f ]] || continue
+    cjails+=( ${${(M)${(f)"$(< $f)"}:#[a-zA-Z]*[[:space:]]\{*}%%[[:space:]]*} )
+  done
+
+  # Merge, deduplicate, exclude wildcard blocks
+  jails+=( ${cjails:#\*} )
+  jails=( ${(u)jails} )
+fi
+
 case $param in
   jid) host=0 ;;
   name)

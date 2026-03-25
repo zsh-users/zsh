@@ -1,7 +1,7 @@
 #compdef -p */(init|rc[0-9S]#).d/*
 
-local cmds script
-local -a flags
+local cmds script state
+local -a flags line
 
 _compskip=all
 
@@ -122,4 +122,14 @@ cmds=( $(_init_d_get_cmds) ) || return 1
 (( $#cmds )) || zstyle -a ":completion:${curcontext}:commands" commands cmds ||
     cmds=(start stop)
 
-_arguments -s -A "-*" $flags ':init.d command:_sub_commands $cmds'
+local svcname=$words[1]
+
+if (( $+functions[_init_d-$svcname] )); then
+  _arguments -C -s -A "-*" $flags \
+    ':init.d command:_sub_commands $cmds' \
+    '*:: :->svcargs' && return
+
+  [[ $state == svcargs ]] && _init_d-$svcname $line[1]
+else
+  _arguments -s -A "-*" $flags ':init.d command:_sub_commands $cmds'
+fi
