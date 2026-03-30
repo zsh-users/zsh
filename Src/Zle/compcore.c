@@ -1240,6 +1240,15 @@ check_param(char *s, int set, int test)
 		    ie = itype_end(e, INAMESPC, 0);
 	    } while (ie != e);
 	}
+	else if (*e == '.')
+	    /*
+	     * *e == '.' and itype_end(e, INAMESPC, 0) == e.
+	     * This means the name starts with '.' followed by a
+	     * non-IIDENT char or by NULL. When completing, we can
+	     * consider the single '.' as a valid (but incomplete)
+	     * name and put the end of the name at e+1.
+	     */
+	    e++;
 
 	/* Now make sure that the cursor is inside the name. */
 	if (offs <= e - s && offs >= b - s) {

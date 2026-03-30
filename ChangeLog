@@ -1,5 +1,8 @@
 2026-03-30  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* 54252: Src/Zle/compcore.c: allow single dot as a valid (yet
+	incomplete) parameter name
+
 	* 54251: Completion/Zsh/Type/_parameters: complete names with
 	dot (such as .namespace.param) only after ${
 
