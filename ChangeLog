@@ -1,3 +1,8 @@
+2026-03-30  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 54251: Completion/Zsh/Type/_parameters: complete names with
+	dot (such as .namespace.param) only after ${
+
 2026-03-26  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* Stéphane Blondon: 54246: Completion/Zsh/Function/_zcalc:
