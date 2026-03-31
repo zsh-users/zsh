@@ -485,6 +485,24 @@ static initparam argvparam_pm = IPDEF9("", &pparams, NULL, \
 
 static Param argvparam;
 
+/*
+ * Lists of references to nested variables ("Param" instances) indexed
+ * by scope. Whenever the "base" scope of a named reference is set to
+ * refer to a variable more deeply nested than the reference itself
+ * ("base > level"), the "base" scope has to be updated once the
+ * "base" scope ends. The "scoperefs" lists keep track of these
+ * references. Since "Param" instances get reused when variables with
+ * the same name are redefined in the same scope, listed "Param"
+ * instances may no longer be references when the scope ends or may
+ * refer to a different "base" scope. A given "Param" instance may
+ * also be included in multiple lists at the same time or multiple
+ * times in the same list. Non of that is harmful as long as only
+ * instances that are still references referring to the ending scope
+ * are updated when the scope ends.
+ */
+static LinkList *scoperefs = NULL;
+static int scoperefs_num = 0;
+
 /* "parameter table" - hash table containing the parameters
  *
  * realparamtab always points to the shell's global table.  paramtab is sometimes
@@ -5855,6 +5873,7 @@ static int lc_update_needed;
 mod_export void
 endparamscope(void)
 {
+    LinkList refs = locallevel < scoperefs_num ? scoperefs[locallevel] : NULL;
     queue_signals();
     locallevel--;
     /* This pops anything from a higher locallevel */
@@ -5882,6 +5901,13 @@ endparamscope(void)
 	clear_mbstate();    /* LC_CTYPE may have changed */
     }
 #endif /* USE_LOCALE */
+    /* Reset scope of namerefs that refer to dead variables */
+    for (Param pm; refs && (pm = (Param)getlinknode(refs));) {
+	if ((pm->node.flags & PM_NAMEREF) && !(pm->node.flags & PM_UNSET) &&
+	    !(pm->node.flags & PM_UPPER) && pm->base > locallevel) {
+	    setscope_base(pm, locallevel);
+	}
+    }
     unqueue_signals();
 }
 
@@ -5890,9 +5916,7 @@ static void
 scanendscope(HashNode hn, UNUSED(int flags))
 {
     Param pm = (Param)hn;
-    Param hidden = NULL;
     if (pm->level > locallevel) {
-	hidden = pm->old;
 	if ((pm->node.flags & (PM_SPECIAL|PM_REMOVABLE)) == PM_SPECIAL) {
 	    /*
 	     * Removable specials are normal in that they can be removed
@@ -5956,14 +5980,6 @@ scanendscope(HashNode hn, UNUSED(int flags))
 		export_param(pm);
 	} else
 	    unsetparam_pm(pm, 0, 0);
-	pm = NULL;
-    }
-    if (hidden)
-	pm = hidden;
-    if (pm && (pm->node.flags & PM_NAMEREF) &&
-	       pm->base >= pm->level && pm->base >= locallevel) {
-	/* Should never get here for a -u reference */
-	pm->base = locallevel;
     }
 }
 
@@ -6405,7 +6421,7 @@ setscope(Param pm)
 	    (basepm = (Param)gethashnode2(realparamtab, refname)) &&
 	    (basepm = (Param)loadparamnode(realparamtab, basepm, refname)) &&
 	    (basepm != pm || !basepm->old || (basepm = basepm->old))) {
-	    pm->base = basepm->level;
+	    setscope_base(pm, basepm->level);
 	}
 	if (pm->base > pm->level) {
 	    if (EMULATION(EMULATE_KSH)) {
@@ -6429,6 +6445,25 @@ setscope(Param pm)
 	}
     }
     unqueue_signals();
+}
+
+/**/
+static void
+setscope_base(Param pm, int base)
+{
+    if ((pm->base = base) > pm->level) {
+	LinkList refs;
+	if (base >= scoperefs_num) {
+	    int old_num = scoperefs_num;
+	    int new_num = scoperefs_num = MAX(2 * base, 8);
+	    scoperefs = zrealloc(scoperefs, new_num * sizeof(refs));
+	    memset(scoperefs + old_num, 0, (new_num - old_num) * sizeof(refs));
+	}
+	refs = scoperefs[base];
+	if (!refs)
+	    refs = scoperefs[base] = znewlinklist();
+	zpushnode(refs, pm);
+    }
 }
 
 /**/

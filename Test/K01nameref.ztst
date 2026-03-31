@@ -1247,8 +1247,8 @@ F:previously this could create an infinite recursion and crash
 0:Transitive references with scoping changes
 >f4: ref1=f4 ref2=XX ref3=f4
 >f3: ref1=f3 ref2=XX ref3=f3
->g5: ref1=f3 ref2=XX ref3=g4
->g4: ref1=f3 ref2=XX ref3=g4
+>g5: ref1=f3 ref2=XX ref3=f3
+>g4: ref1=f3 ref2=XX ref3=f3
 >f3: ref1=f3 ref2=XX ref3=f3
 >f2: ref1=f1 ref2=XX ref3=f1
 >f1: ref1=f1 ref2=f1 ref3=f1
@@ -1884,5 +1884,88 @@ F:converting from association/array to string should work here too
 >typeset -i var=42
 ># d:reference to not-yet-defined - local - ref1
 >typeset -i var=42
+
+ typeset -n ref1
+ typeset -n ref2
+ typeset -n ref3=ref2
+ typeset var=aaa
+ () {
+   typeset -i ref2=123 # Hides the reference ref2 in this scope and nested scopes
+   typeset var=bbb
+   () {
+     typeset var=ccc
+     ref1=var
+     ref3=var # From now on ref1 and ref3 should always refer to the same variable
+     echo A:ref1=$ref1 ref2=$ref2 ref3=$ref3
+   } # Both top-level references ref1 and ref2 should be rebound
+   echo B:ref1=$ref1 ref2=$ref2 ref3=$ref3
+   () {
+     typeset var=ddd # No reference should refer to this variable
+     echo C:ref1=$ref1 ref2=$ref2 ref3=$ref3
+   }
+   echo D:ref1=$ref1 ref2=$ref2 ref3=$ref3
+ } # Both top-level references ref1 and ref2 should be rebound
+ echo E:ref1=$ref1 ref2=$ref2 ref3=$ref3
+ () {
+   typeset var=eee # No reference should refer to this variable
+   echo F:ref1=$ref1 ref2=$ref2 ref3=$ref3
+ }
+ echo G:ref1=$ref1 ref2=$ref2 ref3=$ref3
+0:hidden reference refers to a nested variable
+>A:ref1=ccc ref2=123 ref3=ccc
+>B:ref1=bbb ref2=123 ref3=bbb
+>C:ref1=bbb ref2=123 ref3=bbb
+>D:ref1=bbb ref2=123 ref3=bbb
+>E:ref1=aaa ref2=aaa ref3=aaa
+>F:ref1=aaa ref2=aaa ref3=aaa
+>G:ref1=aaa ref2=aaa ref3=aaa
+
+ typeset ref
+ typeset var1=var1@scope1
+ typeset var2=var2@scope1
+ () { # enter scope 2
+   typeset var1=var1@scope2
+   typeset var2=var2@scope2
+   typeset -g -n ref=var1; echo A:$ref # ref added to scope 2
+   typeset -g -n ref=var2; echo B:$ref # ref added to scope 2
+   () { # enter scope 3
+     typeset var1=var1@scope3
+     typeset -g -n ref=var1; echo C:$ref # ref added to scope 3
+     () { # enter scope 4
+       typeset var1=var1@scope4
+       typeset var2=var2@scope4
+       typeset -g -n ref=var1; echo D:$ref # ref added to scope 4
+       typeset -g -n ref=var2; echo E:$ref # ref added to scope 4
+     } # leave scope 4: ref rebound to var2 in scope 2 and added to scope 2
+     echo F:$ref
+   } # leave scope 3: ref remains bound to var2 in scope 2
+   echo G:$ref
+   unset -n ref # ref is unset
+   echo H:$ref
+ } # leave scope 2: ref remains unset
+ echo I:$ref
+0:reference refers successively to multiple variables in multiple nested scopes
+>A:var1@scope2
+>B:var2@scope2
+>C:var1@scope3
+>D:var1@scope4
+>E:var2@scope4
+>F:var2@scope2
+>G:var2@scope2
+>H:
+>I:
+
+ typeset ref
+ () { # enter scope 2
+   typeset var=var
+   typeset -g -n ref=var; echo A:$ref # ref added to scope 2
+   unset -n ref
+   typeset -g -i16 ref=255; echo B:$ref # ref becomes an integer in base 16
+ } # leave scope 2: ref remains an integer in base 16
+ echo C:$ref
+0:reference referring to a nested variable becomes an integer
+>A:var
+>B:16#FF
+>C:16#FF
 
 %clean
