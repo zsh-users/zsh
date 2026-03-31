@@ -1927,7 +1927,10 @@ struct tieddata {
 #define PM_DONTIMPORT	(1<<22)	/* do not import this variable              */
 #define PM_DECLARED	(1<<22) /* explicitly named with typeset            */
 #define PM_RESTRICTED	(1<<23) /* cannot be changed in restricted mode     */
-#define PM_UNSET	(1<<24)	/* has null value                           */
+#define PM_UNSET	(1<<24)	/* If PM_DECLARED is also present, parameter
+				 * has null value. Otherwise, parameter was
+				 * unset.
+				 */
 #define PM_DEFAULTED	(PM_DECLARED|PM_UNSET)
 #define PM_REMOVABLE	(1<<25)	/* special can be removed from paramtab     */
 #define PM_AUTOLOAD	(1<<26) /* autoloaded from module                   */

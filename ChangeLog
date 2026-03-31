@@ -1,3 +1,9 @@
+2026-03-31  Bart Schaefer  <schaefer@zsh.org>
+
+	* Philippe: 54261: Src/builtin.c, Src/params.c, Src/zsh.h,
+	Test/K01nameref.ztst, Test/V10private.ztst: `unset -n` removes
+	named-reference-ness of a parameter when removing the referent.
+
 2026-03-30  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 54252: Src/Zle/compcore.c: allow single dot as a valid (yet

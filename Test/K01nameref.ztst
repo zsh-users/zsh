@@ -132,6 +132,68 @@
        echo "$0: ref1=$ref1 ref2=$ref2 ref3=$ref3";
    }
 
+ # Helper function to test assigning and typesetting named references
+ # in different contexts.
+ #
+ # Runs the code passed in "$1" for all combinations of the following
+ # variables:
+ #
+ # - K: Kind of target reference. The assigned/typeset reference is
+ #   one of the following kind:
+ #   - "i": unInitialized reference:
+ #     e.g., "ref0" in "typeset -n ref0"
+ #   - "s": unSet reference:
+ #     e.g., "ref0" in "typeset -n ref0; unset ref0"
+ #   - "d": reference to not-yet-Defined variable:
+ #     e.g., "ref0" in "typeset -n ref0=var" where "var" isn't defined
+ #
+ # - G: Global vs local references
+ #   - "-g": All test variables/references are global ones.
+ #   - ""  : All test variables/references are local ones.
+ #
+ # - N: direct vs indirect references
+ #   - "0": The target reference "ref0" is directly assigned/typeset.
+ #   - "1": The target reference "ref0" is assigned/typeset via a
+ #          named reference "ref1" that refers to "ref0".
+ test-setting-ref() {
+   local K G N;
+   for K in i s d; do
+     for G in -g ""; do
+       for N in 0 1; do
+         test-setting-ref-aux $1
+       done
+     done
+   done
+   unset -n ref0 ref1 var
+ }
+ # Helper function for the function test-setting-ref defined above.
+ #
+ # Runs the code passed in "$1" for the context specified by the
+ # variables "K", "G", and "N".
+ test-setting-ref-aux() {
+   unset -n ref0 ref1 var
+   # In several contexts different code paths are involved depending
+   # on whether the target reference "ref0" is assigned/typeset
+   # directly or via a named reference that refers to it. However, it
+   # doesn't seem to make a difference whether the chain of references
+   # is short or long. Therefore only chains of one reference are
+   # tested. One can manually double check that longer chains work the
+   # same by replacing the following line by one of the commented one
+   # just below and checking that all tests still pass.
+   ((N < 1)) || typeset $G -n ref1=ref0
+   # ((N < 1)) || typeset $G -n refX=ref0 ref1=refX
+   # ((N < 1)) || typeset $G -n refX=ref0 refY=refX ref1=refY
+   local kind print
+   case $K in
+     i) kind="uninitialized reference"     ; check=ref0; typeset $G -n ref0;;
+     s) kind="unset reference"             ; check=ref0; typeset $G -n ref0; unset -n ref0;;
+     d) kind="reference to not-yet-defined"; check=var ; typeset $G -n ref0=var;;
+     *) echo "Unrecognized case: $case"; return;;
+   esac
+   echo "# $K:$kind - ${${G:-local}/-g/global} - ref$N"
+   { eval ${(e)1}; typeset -p $check } always { TRY_BLOCK_ERROR=0 } 2>&1
+ }
+
 %test
 
  typeset -n ptr
@@ -187,11 +249,13 @@
 >typeset -n ptr=gvar
 
  typeset -n ptr
+ typeset -p ptr
  typeset -t ptr
  typeset -p ptr
 0:change type of a placeholder
 F:Other type changes are fatal errors, should this also be?
->typeset -n ptr=''
+>typeset -n ptr
+>typeset -n ptr
 *?*ptr: can't change type of a named reference
 
  typeset -n ptr=var
@@ -1658,5 +1722,167 @@ F:converting from association/array to string should work here too
  }
 1:self reference via upper reference
 ?(anon):3: ref1: invalid self reference
+
+ # The call to "test-setting-ref 'ref$N=str'" expands to the
+ # equivalent of the following:
+ #
+ # # Test uninitialized references
+ # typeset -g -n ref0          ;                ref0=str; typeset -p ref0; unset -n ref0
+ # typeset -g -n ref0 ref1=ref0;                ref1=str; typeset -p ref0; unset -n ref0 ref1
+ # typeset    -n ref0          ;                ref0=str; typeset -p ref0; unset -n ref0
+ # typeset    -n ref0 ref1=ref0;                ref1=str; typeset -p ref0; unset -n ref0 ref1
+ # # Test unset references
+ # typeset -g -n ref0          ; unset -n ref0; ref0=str; typeset -p ref0; unset -n ref0
+ # ...
+ # # Test references to not-yet-defined variables
+ # typeset -g -n ref0=var      ;                ref0=str; typeset -p var ; unset -n ref0 var
+ # ...
+ test-setting-ref 'ref$N=str'
+0:assign not fully defined reference with string
+># i:uninitialized reference - global - ref0
+>typeset -g -n ref0=str
+># i:uninitialized reference - global - ref1
+>typeset -g -n ref0=str
+># i:uninitialized reference - local - ref0
+>typeset -n ref0=str
+># i:uninitialized reference - local - ref1
+>typeset -n ref0=str
+># s:unset reference - global - ref0
+>typeset -g ref0=str
+># s:unset reference - global - ref1
+>typeset -g ref0=str
+># s:unset reference - local - ref0
+>typeset ref0=str
+># s:unset reference - local - ref1
+>typeset ref0=str
+># d:reference to not-yet-defined - global - ref0
+>typeset -g var=str
+># d:reference to not-yet-defined - global - ref1
+>typeset -g var=str
+># d:reference to not-yet-defined - local - ref0
+>typeset -g var=str
+># d:reference to not-yet-defined - local - ref1
+>typeset -g var=str
+
+ test-setting-ref 'ref$N=( foo bar )'
+0:assign not fully defined reference with array
+># i:uninitialized reference - global - ref0
+>(eval):1: ref0: can't change type of a named reference
+>typeset -g -n ref0
+># i:uninitialized reference - global - ref1
+>(eval):1: ref1: can't change type of a named reference
+>typeset -g -n ref0
+># i:uninitialized reference - local - ref0
+>(eval):1: ref0: can't change type of a named reference
+>typeset -n ref0
+># i:uninitialized reference - local - ref1
+>(eval):1: ref1: can't change type of a named reference
+>typeset -n ref0
+># s:unset reference - global - ref0
+>typeset -g -a ref0=( foo bar )
+># s:unset reference - global - ref1
+>typeset -g -a ref0=( foo bar )
+># s:unset reference - local - ref0
+>typeset -a ref0=( foo bar )
+># s:unset reference - local - ref1
+>typeset -a ref0=( foo bar )
+># d:reference to not-yet-defined - global - ref0
+>typeset -g -a var=( foo bar )
+># d:reference to not-yet-defined - global - ref1
+>typeset -g -a var=( foo bar )
+># d:reference to not-yet-defined - local - ref0
+>typeset -g -a var=( foo bar )
+># d:reference to not-yet-defined - local - ref1
+>typeset -g -a var=( foo bar )
+
+ test-setting-ref 'typeset $G ref$N=str'
+0:typeset not fully defined reference with string
+># i:uninitialized reference - global - ref0
+>typeset -g -n ref0=str
+># i:uninitialized reference - global - ref1
+>typeset -g -n ref0=str
+># i:uninitialized reference - local - ref0
+>typeset -n ref0=str
+># i:uninitialized reference - local - ref1
+>typeset -n ref0=str
+># s:unset reference - global - ref0
+>typeset -g ref0=str
+># s:unset reference - global - ref1
+>typeset -g ref0=str
+># s:unset reference - local - ref0
+>typeset ref0=str
+># s:unset reference - local - ref1
+>typeset ref0=str
+># d:reference to not-yet-defined - global - ref0
+>typeset -g var=str
+># d:reference to not-yet-defined - global - ref1
+>typeset -g var=str
+># d:reference to not-yet-defined - local - ref0
+>typeset var=str
+># d:reference to not-yet-defined - local - ref1
+>typeset var=str
+
+ test-setting-ref 'typeset $G -a ref$N=( foo bar )'
+0:typeset not fully defined reference with array
+># i:uninitialized reference - global - ref0
+>(eval):typeset:1: ref0: can't change type of a named reference
+>typeset -g -n ref0
+># i:uninitialized reference - global - ref1
+>(eval):typeset:1: ref0: can't change type of a named reference
+>typeset -g -n ref0
+># i:uninitialized reference - local - ref0
+>(eval):typeset:1: ref0: can't change type of a named reference
+>typeset -n ref0
+># i:uninitialized reference - local - ref1
+>(eval):typeset:1: ref0: can't change type of a named reference
+>typeset -n ref0
+># s:unset reference - global - ref0
+>typeset -g -a ref0=( foo bar )
+># s:unset reference - global - ref1
+>typeset -g -a ref0=( foo bar )
+># s:unset reference - local - ref0
+>typeset -a ref0=( foo bar )
+># s:unset reference - local - ref1
+>typeset -a ref0=( foo bar )
+># d:reference to not-yet-defined - global - ref0
+>typeset -g -a var=( foo bar )
+># d:reference to not-yet-defined - global - ref1
+>typeset -g -a var=( foo bar )
+># d:reference to not-yet-defined - local - ref0
+>typeset -a var=( foo bar )
+># d:reference to not-yet-defined - local - ref1
+>typeset -a var=( foo bar )
+
+ typeset i42=42
+ test-setting-ref 'typeset $G -i ref$N=i42'
+0:typeset not fully defined reference with integer
+># i:uninitialized reference - global - ref0
+>(eval):typeset:1: ref0: can't change type of a named reference
+>typeset -g -n ref0
+># i:uninitialized reference - global - ref1
+>(eval):typeset:1: ref0: can't change type of a named reference
+>typeset -g -n ref0
+># i:uninitialized reference - local - ref0
+>(eval):typeset:1: ref0: can't change type of a named reference
+>typeset -n ref0
+># i:uninitialized reference - local - ref1
+>(eval):typeset:1: ref0: can't change type of a named reference
+>typeset -n ref0
+># s:unset reference - global - ref0
+>typeset -g -i ref0=42
+># s:unset reference - global - ref1
+>typeset -g -i ref0=42
+># s:unset reference - local - ref0
+>typeset -i ref0=42
+># s:unset reference - local - ref1
+>typeset -i ref0=42
+># d:reference to not-yet-defined - global - ref0
+>typeset -g -i var=42
+># d:reference to not-yet-defined - global - ref1
+>typeset -g -i var=42
+># d:reference to not-yet-defined - local - ref0
+>typeset -i var=42
+># d:reference to not-yet-defined - local - ref1
+>typeset -i var=42
 
 %clean

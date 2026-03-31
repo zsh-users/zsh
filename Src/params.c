@@ -1044,7 +1044,9 @@ createparam(char *name, int flags)
 	if (oldpm && !(flags & PM_NAMEREF) &&
 	    (oldpm->level == locallevel ?
 	     !(oldpm->node.flags & PM_RO_BY_DESIGN) : !(flags & PM_LOCAL)) &&
-	    (oldpm->node.flags & PM_NAMEREF)) {
+	    (oldpm->node.flags & PM_NAMEREF) &&
+	    (!(oldpm->node.flags & PM_UNSET) ||
+	     (oldpm->node.flags & PM_DECLARED))) {
 	    /**
 	     * Here we only have to deal with namerefs that refer to
 	     * not-yet-defined or unset variable. All other namerefs
@@ -1054,14 +1056,18 @@ createparam(char *name, int flags)
 	     **/
 	    Param lastpm = resolve_nameref_rec(oldpm, NULL, 1);
 	    if (lastpm) {
-		if (lastpm->node.flags & PM_NAMEREF) {
+		if (lastpm->node.flags & PM_NAMEREF &&
+		    (!(lastpm->node.flags & PM_UNSET) ||
+		     (lastpm->node.flags & PM_DECLARED))) {
 		    char *refname = GETREFNAME(lastpm);
 		    if (refname && *refname) {
+			/* nameref pointing to a not-yet-defined variable */
 			name = refname;
 			oldpm = NULL;
 		    } else {
+			/* nameref pointing to an uninitialized nameref */
 			if (!(lastpm->node.flags & PM_READONLY)) {
-			    if (flags) {
+			    if (flags & ~PM_LOCAL) {
 				/* Only plain scalar assignment allowed */
 				zerr("%s: can't change type of named reference",
 				     name);	/* Differs from ksh93u+ */
@@ -3386,6 +3392,10 @@ assignaparam(char *s, char **val, int flags)
 	if (!(v = fetchvalue(&vbuf, &s, 1, SCANPM_ASSIGNING))) {
 	    createparam(t, PM_ARRAY);
 	    created = 1;
+	} else if (v->pm->node.flags & PM_NAMEREF) {
+	    zwarn("%s: can't change type of a named reference", t);
+	    unqueue_signals();
+	    return NULL;
 	} else if (!(PM_TYPE(v->pm->node.flags) & (PM_ARRAY|PM_HASHED)) &&
 		   !(v->valflags & VALFLAG_REFSLICE) &&
 		   !(v->pm->node.flags & (PM_SPECIAL|PM_TIED))) {
@@ -6321,35 +6331,30 @@ resolve_nameref(Param pm)
 static Param
 resolve_nameref_rec(Param pm, const Param stop, int keep_lastref)
 {
-    Param hn = pm;
-    if (pm && (pm->node.flags & PM_NAMEREF)) {
-	char *refname = GETREFNAME(pm);
-	if (pm->node.flags & PM_TAGGED) {
-	    zerr("%s: invalid self reference", pm->node.nam);
-	    return NULL;
-	} else if (pm->node.flags & PM_UNSET) {
-	    /* Semaphore with createparam() */
-	    pm->node.flags &= ~PM_UNSET;
-	    return pm;
-	}
+    Param ref = pm;
+    char *refname;
+    if (!pm || !(pm->node.flags & PM_NAMEREF) || (pm->node.flags & PM_UNSET)
 	/* pm->width is the offset of any subscript */
 	/* If present, it has to be the end of any chain, see fetchvalue() */
-	if (refname && *refname && !pm->width) {
-	    queue_signals();
-	    if ((hn = (Param)gethashnode2(realparamtab, refname))) {
-		if ((hn = loadparamnode(paramtab, upscope(hn, pm), refname)) &&
-		    hn != stop && !(hn->node.flags & PM_UNSET)) {
-		    /* user can't tag a nameref, safe for loop detection */
-		    pm->node.flags |= PM_TAGGED;
-		    hn = resolve_nameref_rec(hn, stop, keep_lastref);
-		    pm->node.flags &= ~PM_TAGGED;
-		}
-	    } else if (keep_lastref)
-		hn = pm;
-	    unqueue_signals();
-	}
+	|| pm->width || !(refname = GETREFNAME(pm)) || !*refname)
+	return pm;
+    if (pm->node.flags & PM_TAGGED) {
+	zerr("%s: invalid self reference", pm->node.nam);
+	return NULL;
     }
-    return hn;
+    queue_signals();
+    if ((pm = (Param)gethashnode2(realparamtab, refname))) {
+	if ((pm = loadparamnode(paramtab, upscope(pm, ref), refname)) &&
+	    pm != stop && !(pm->node.flags & PM_UNSET)) {
+	    /* user can't tag a nameref, safe for loop detection */
+	    ref->node.flags |= PM_TAGGED;
+	    pm = resolve_nameref_rec(pm, stop, keep_lastref);
+	    ref->node.flags &= ~PM_TAGGED;
+	}
+    } else if (keep_lastref)
+	pm = ref;
+    unqueue_signals();
+    return pm;
 }
 
 /**/

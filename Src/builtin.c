@@ -2038,6 +2038,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	if ((pm = resolve_nameref(pm)))
 	    pname = pm->node.nam;
 	if (pm && (pm->node.flags & PM_NAMEREF) &&
+	    (!(pm->node.flags & PM_UNSET) || (pm->node.flags & PM_DECLARED)) &&
 	    (on & ~(PM_NAMEREF|PM_LOCAL|PM_READONLY))) {
 	    /* Changing type of PM_SPECIAL|PM_AUTOLOAD is a fatal error.  *
 	     * Should this be a fatal error as well, rather than warning? */
