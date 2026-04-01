@@ -5905,7 +5905,8 @@ endparamscope(void)
     for (Param pm; refs && (pm = (Param)getlinknode(refs));) {
 	if ((pm->node.flags & PM_NAMEREF) && !(pm->node.flags & PM_UNSET) &&
 	    !(pm->node.flags & PM_UPPER) && pm->base > locallevel) {
-	    setscope_base(pm, locallevel);
+	    pm->base = 0;
+	    setscope(pm);
 	}
     }
     unqueue_signals();

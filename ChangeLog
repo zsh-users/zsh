@@ -1,5 +1,8 @@
 2026-03-31  Bart Schaefer  <schaefer@zsh.org>
 
+	* Philippe: 54048: Src/params.c, Test/K01nameref.ztst: consistently
+	re-bind named references when returning from greater locallevel
+
 	* Philippe: 54262: Src/params.c, Test/K01nameref.ztst: track
 	and revert hidden references in chains that extend across
 	locallevel scopes

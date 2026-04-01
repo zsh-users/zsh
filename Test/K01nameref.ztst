@@ -1258,6 +1258,81 @@ F:previously this could create an infinite recursion and crash
 >h2: ref1=f1 ref2=f1 ref3=f1
 >f1: ref1=f1 ref2=f1 ref3=f1
 
+ () {
+   typeset -n ref1 ref2
+   local var=l1
+   () {
+     () {
+       local var=l3
+       ref1=var
+       echo A1: ref1=$ref1 ref2=$ref2
+     }
+     ref2=var
+     # At this point, "ref1" and "ref2" refer to the same variable
+     # "var". Going forward, they should behave the same.
+     echo A2: ref1=$ref1 ref2=$ref2
+     () {
+       local var=l3
+       echo A3: ref1=$ref1 ref2=$ref2
+     }
+     echo A4: ref1=$ref1 ref2=$ref2
+     local var=l2
+     echo A5: ref1=$ref1 ref2=$ref2
+   }
+   echo A6: ref1=$ref1 ref2=$ref2
+ }
+ () {
+   typeset -n ref1 ref2
+   () {
+     () {
+       local var=l3
+       ref1=var
+       echo B1: ref1=$ref1 ref2=$ref2
+     }
+     ref2=var
+     # At this point, "ref1" and "ref2" refer to the same undefined
+     # variable "var". Going forward, they should behave the same.
+     echo B2: ref1=$ref1 ref2=$ref2
+     () {
+       () {
+         local var=l4
+         echo B3: ref1=$ref1 ref2=$ref2
+       }
+       local var=l3
+       echo B4: ref1=$ref1 ref2=$ref2
+     }
+     local var=l2
+     echo B5: ref1=$ref1 ref2=$ref2
+     () {
+       () {
+         local var=l4
+         echo B6: ref1=$ref1 ref2=$ref2
+       }
+       local var=l3
+       echo B7: ref1=$ref1 ref2=$ref2
+     }
+     echo B8: ref1=$ref1 ref2=$ref2
+   }
+   local var=l1
+   echo B9: ref1=$ref1 ref2=$ref2
+ }
+0:rebound nameref behaves the same as newly bound one
+>A1: ref1=l3 ref2=
+>A2: ref1=l1 ref2=l1
+>A3: ref1=l1 ref2=l1
+>A4: ref1=l1 ref2=l1
+>A5: ref1=l1 ref2=l1
+>A6: ref1=l1 ref2=l1
+>B1: ref1=l3 ref2=
+>B2: ref1= ref2=
+>B3: ref1=l4 ref2=l4
+>B4: ref1=l3 ref2=l3
+>B5: ref1=l2 ref2=l2
+>B6: ref1=l2 ref2=l2
+>B7: ref1=l2 ref2=l2
+>B8: ref1=l2 ref2=l2
+>B9: ref1=l1 ref2=l1
+
 #
 # The following two tests are linked, do not separate
 #
@@ -1500,39 +1575,12 @@ F:$$[1] reference should print the first digit of $$ but prints nothing
  () {
    typeset ref2=foo
    ref1=ref2
+   echo reached
  }
- echo reached
- echo $ref1
  echo NOT REACHED
-1:expansion of incidental reference loop triggers error
+1:incidental reference loop triggers error
 >reached
-*?*: ref1: invalid self reference
-
- typeset -n ref1
- typeset -n ref2=ref1;
- () {
-   typeset ref2=foo
-   ref1=ref2
- }
- echo reached
- ref1=foo
- echo NOT REACHED
-1:assignment to incidental reference loop triggers error
->reached
-*?*: ref1: invalid self reference
-
- typeset -n ref1
- typeset -n ref2=ref1;
- () {
-   typeset ref2=foo
-   ref1=ref2
- }
- echo reached
- typeset -n ref3=ref1
- echo NOT REACHED
-1:reference to incidental reference loop triggers error
->reached
-*?*: ref1: invalid self reference
+*?*: ref2: invalid self reference
 
  typeset -A -g VAR0=(aa AA)
  typeset -n -g REF0=VAR0
