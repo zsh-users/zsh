@@ -8916,8 +8916,8 @@ _git() {
         ;;
       (option-or-argument)
         curcontext=${curcontext%:*:*}:git-$words[1]:
-        (( $+opt_args[--git-dir] )) && local -x GIT_DIR=${(Q)${~opt_args[--git-dir]}}
-        (( $+opt_args[--work-tree] )) && local -x GIT_WORK_TREE=${(Q)${~opt_args[--work-tree]}}
+        (( $+opt_args[--git-dir] )) && local -x GIT_DIR=${(eQ)${~opt_args[--git-dir]}}
+        (( $+opt_args[--work-tree] )) && local -x GIT_WORK_TREE=${(eQ)${~opt_args[--work-tree]}}
 	if ! _call_function ret _git-$words[1]; then
 	  if [[ $words[1] = \!* ]]; then
 	    words[1]=${words[1]##\!}
