@@ -1,0 +1,18 @@
+#autoload
+
+# Complete jail names for "service jail <action> [jail ...]"
+# Called by _init_d when the service script is "jail".
+# $1 is the action (start, stop, restart, etc.)
+
+local action=$1
+
+case $action in
+  *stop|console|status)
+    # Only running jails make sense
+    _jails
+    ;;
+  *)
+    # Show configured jails (includes running)
+    _jails -c
+    ;;
+esac
