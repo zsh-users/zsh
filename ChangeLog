@@ -1,5 +1,8 @@
 2026-04-03  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* Eisuke Kawashima: github #155: Completion/Unix/Command/_git:
+	update git completion
+
 	* Christopher Bock: github #152: Completion/Debian/Command/_apt:
 	_apt fix typos
 
