@@ -1,3 +1,8 @@
+2026-04-03  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* Christopher Bock: github #152: Completion/Debian/Command/_apt:
+	_apt fix typos
+
 2026-03-31  Bart Schaefer  <schaefer@zsh.org>
 
 	* Philippe: 54048: Src/params.c, Test/K01nameref.ztst: consistently
