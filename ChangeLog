@@ -1,5 +1,8 @@
 2026-04-03  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* Eisuke Kawashima: github #163: Completion/Unix/Command/_ssh:
+	fix completion of ssh (option -E)
+
 	* Eisuke Kawashima: github #155: Completion/Unix/Command/_git:
 	update git completion
 
