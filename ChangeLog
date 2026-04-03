@@ -1,3 +1,8 @@
+2026-04-03  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* Christopher Bock: github #152: Completion/Debian/Command/_apt:
+	_apt fix typos
+
 2026-03-24  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 54241 + 54242: Completion/Unix/Type/_path_commands,

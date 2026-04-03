@@ -393,18 +393,18 @@ _apt_consume_long () {
 
 _apt-cmd () {
   _apt_arguments _apt-cmd_sm \
-    -S,--snapshot:_apt_snapshot_datesg \
+    -S,--snapshot:_apt_snapshot_dates \
     -V,--verbose-versions:bool \
     -b,--compile,--build:bool \
-    -c,--config-file:configfileg \
+    -c,--config-file:configfile \
     -d,--download-only:bool \
     -f,--fix-broken:bool \
     -h,--help:bool \
     -m,--ignore-missing,--fix-missing:bool \
-    -o,--option:arbitemg \
-    -q,--quiet,--silent:intlevelg \
+    -o,--option:arbitem \
+    -q,--quiet,--silent:intlevel \
     -s,--simulate,--just-print,--dry-run,--recon,--no-act:bool \
-    -t,--target-release,--default-release:releaseg \
+    -t,--target-release,--default-release:release \
     -u,--show-upgraded:bool \
     -v,--version:bool \
     -y,--yes,--assume-yes:bool \
@@ -483,18 +483,18 @@ _apt-cmd () {
 
 _apt-get () {
   _apt_arguments _apt-get_sm \
-    -S,--snapshot:_apt_snapshot_datesg \
+    -S,--snapshot:_apt_snapshot_dates \
     -V,--verbose-versions:bool \
     -b,--compile,--build:bool \
-    -c,--config-file:configfileg \
+    -c,--config-file:configfile \
     -d,--download-only:bool \
     -f,--fix-broken:bool \
     -h,--help:bool \
     -m,--ignore-missing,--fix-missing:bool \
-    -o,--option:arbitemg \
-    -q,--quiet,--silent:intlevelg \
+    -o,--option:arbitem \
+    -q,--quiet,--silent:intlevel \
     -s,--simulate,--just-print,--dry-run,--recon,--no-act:bool \
-    -t,--target-release,--default-release:releaseg \
+    -t,--target-release,--default-release:release \
     -u,--show-upgraded:bool \
     -v,--version:bool \
     -y,--yes,--assume-yes:bool \
