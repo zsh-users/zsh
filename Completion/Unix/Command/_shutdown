@@ -1,9 +1,10 @@
 #compdef shutdown
 
 local -a args
+local state
 
 if [[ -d /etc/systemd ]]; then
-  _arguments \
+  _arguments -C \
     '--help[display usage information]' \
     '(-H --halt)'{-H,--halt}'[halt the machine]' \
     '(-P --poweroff -h)'{-P,--poweroff,-h}'[power-off the machine (default)]' \
@@ -11,8 +12,19 @@ if [[ -d /etc/systemd ]]; then
     "(--no-wall)-k[don't shutdown, just write wall message]" \
     "(-k)--no-wall[don't send a wall message]" \
     '-c[cancel pending shutdown]' \
-    '1: :_guard "^-*" "time (now/hh\:mm/+mins)"' \
+    '1:time:->time' \
     '*:warning message'
+
+  case $state in
+    time)
+      _values -s ' ' 'shutdown time' \
+        'now[shutdown immediately]' \
+        '+1[shutdown in 1 minute]' \
+        '+5[shutdown in 5 minutes]' \
+        '+10[shutdown in 10 minutes]'
+      ;;
+  esac
+
   return
 fi
 
@@ -23,7 +35,7 @@ case $OSTYPE in
       '-r[reboot the system]'
       '-k[kick everybody off]'
       '-n[prevent file system cache from being flushed]'
-      '1: :_guard "^-*" "time (now/hh\:mm/+mins)"'
+      '1:time:->time'
       '*:warning message'
     )
   ;|
@@ -74,4 +86,14 @@ case $OSTYPE in
   ;;
 esac
 
-_arguments $args
+_arguments -C $args
+
+case $state in
+  time)
+    _values -s ' ' 'shutdown time' \
+      'now[shutdown immediately]' \
+      '+1[shutdown in 1 minute]' \
+      '+5[shutdown in 5 minutes]' \
+      '+10[shutdown in 10 minutes]'
+  ;;
+esac
