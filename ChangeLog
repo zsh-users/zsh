@@ -1,3 +1,8 @@
+2026-04-07  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* unposted: Doc/Zsh/expn.yo: fix a reference to Arithmetic
+	Evaluation.
+
 2026-04-05  dana  <dana@dana.is>
 
 	* Bao Trinh: github #156: Completion/Unix/Command/_git: fix

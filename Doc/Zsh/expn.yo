@@ -1971,7 +1971,7 @@ A string of the form `tt($[)var(exp)tt(])' or
 with the value of the arithmetic expression var(exp).  var(exp) is
 subjected to em(parameter expansion), em(command substitution)
 and em(arithmetic expansion) before it is evaluated.
-See noderef(Arithmetic Evaluation).
+See sectref(Arithmetic Evaluation)(zshmisc).
 texinode(Brace Expansion)(Filename Expansion)(Arithmetic Expansion)(Expansion)
 sect(Brace Expansion)
 cindex(brace expansion)
