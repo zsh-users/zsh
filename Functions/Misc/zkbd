@@ -9,11 +9,10 @@
 }
 
 emulate -RL zsh
-local zkbd term key seq
+local zkbd override term key seq
 
-zparseopts -D -F -- d:=rawdir || return 1
-[[ -n "$rawdir" ]] && zkbd="${rawdir[2]}"
-[[ ! -d "$zkbd" ]] && zkbd="${ZDOTDIR:-$HOME}/.zkbd"
+zparseopts -D -F -- d:=override || return 1
+zkbd="${override[2]}:-${ZDOTDIR:-$HOME}/.zkbd}"
 [[ -d $zkbd ]] || mkdir $zkbd || return 1
 
 trap 'unfunction getmbkey getseq; command rm -f $zkbd/$TERM.tmp' 0
