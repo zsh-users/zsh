@@ -190,10 +190,10 @@ ordinary, such as a Delete key that sends neither tt(^H) nor tt(^?).
 
 The keystrokes read by tt(zkbd) are recorded as a definition for an
 associative array named tt(key), written to a file in the subdirectory
-tt(.zkbd) within either your tt(HOME) or tt(ZDOTDIR) directory.  The name
-of the file is composed from the tt(TERM), tt(VENDOR) and tt(OSTYPE)
-parameters, joined by hyphens. This may be overridden with the option tt(-d)
-if you plan to keep it elsewhere: tt(zkbd -d /path/to/zkbd).
+tt(.zkbd) within either your tt(HOME) or tt(ZDOTDIR) directory. Alternatively,
+you can tell tt(zkbd) the directory to write new files into with the tt(-d)
+option, eg. tt(zkbd -d $ZCACHEDIR/zkbd).  The name of the file is composed from
+the tt(TERM), tt(VENDOR) and tt(OSTYPE) parameters, joined by hyphens.
 
 You may read this file into your tt(.zshrc) or another startup file with
 the `tt(source)' or `tt(.)' commands, then reference the tt(key) parameter
