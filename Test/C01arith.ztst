@@ -494,7 +494,7 @@
 
   ( unsetopt unset
   let noexist==0 )
-1:Arithmetic, NO_UNSET part 3
+2:Arithmetic, NO_UNSET part 3
 ?(eval):2: noexist: parameter not set
 
   print $(( "6+2" / "1+3" ))

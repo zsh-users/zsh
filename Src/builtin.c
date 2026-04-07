@@ -7501,8 +7501,11 @@ bin_let(UNUSED(char *name), char **argv, UNUSED(Options ops), UNUSED(int func))
 
     while (*argv)
 	val = matheval(*argv++);
-    /* Errors in math evaluation in let are non-fatal. */
-    errflag &= ~ERRFLAG_ERROR;
+    if (errflag) {
+	/* Errors in math evaluation in let are non-fatal. */
+	errflag &= ~ERRFLAG_ERROR;
+	return 2;
+    }
     /* should test for fabs(val.u.d) < epsilon? */
     return (val.type == MN_INTEGER) ? val.u.l == 0 : val.u.d == 0.0;
 }

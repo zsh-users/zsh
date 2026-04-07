@@ -1,5 +1,8 @@
 2026-04-07  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* 54285: Src/builtin.c, Test/C01arith.ztst: 'let' builtin
+	should return 2 if error occurred
+
 	* unposted: Doc/Zsh/expn.yo: fix a reference to Arithmetic
 	Evaluation.
 
