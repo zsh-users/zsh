@@ -3343,15 +3343,23 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
                      */
                     errflag |= ERRFLAG_HARD;
                     if (!interact) {
-                        if (mypid == getpid()) {
+                        if (locallevel > forklevel) {
                             /*
-                             * paranoia: don't check for jobs, but there
-                             * shouldn't be any if not interactive.
+                             * Inside a function: use the same unwind
+                             * mechanism as the exit builtin so that
+                             * endtrapscope() runs at each level and
+                             * all saved EXIT traps are executed.
+                             */
+                            set_exit_pending(1);
+                        } else {
+                            /*
+                             * Not inside a function: zexit() runs the
+                             * EXIT trap and handles both main process
+                             * and subshell (_exit) cases.
                              */
                             stopmsg = 1;
                             zexit(1, ZEXIT_NORMAL);
-                        } else
-                            _exit(1);
+                        }
                     }
                 }
 		return NULL;
