@@ -1,3 +1,8 @@
+2026-04-08  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 54319: Completion/compinit: turn off AUTO_NAME_DIRS option
+	in completion
+
 2026-04-05  Oliver Kiddle  <opk@zsh.org>
 
 	* Ronan Pigott: 54208: Completion/Unix/Command/_cp:

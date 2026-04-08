@@ -147,6 +147,7 @@ _comp_options=(
        unset
     NO_allexport
     NO_aliases
+    NO_autonamedirs
     NO_cshnullglob
     NO_cshjunkiequotes
     NO_errexit
