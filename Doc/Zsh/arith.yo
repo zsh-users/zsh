@@ -25,6 +25,8 @@ arithmetic expansion performed as for an argument of tt(let).  More
 precisely, `tt(LPAR()LPAR())var(...)tt(RPAR()RPAR())' is equivalent to
 `tt(let ")var(...)tt(")'.  The return status is 0 if the arithmetic value
 of the expression is non-zero, 1 if it is zero, and 2 if an error occurred.
+Floating point exceptions (division by zero, overflow, etc.) are ignored and
+not considered as errors.
 
 For example, the following statement
 

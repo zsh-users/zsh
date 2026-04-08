@@ -1,3 +1,8 @@
+2026-04-08  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 54295: Doc/Zsh/arith.yo: document that floating point
+	exceptions are ignored
+
 2026-04-08  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 54319: Completion/compinit: turn off AUTO_NAME_DIRS option
