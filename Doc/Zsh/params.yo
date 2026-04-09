@@ -1083,7 +1083,7 @@ the shell.
 )
 item(tt(cmdsubst))(
 Command substitution using of the tt(`)var(...)tt(`),
-tt($+LPAR())var(...)tt(RPAR()),tt(${{)var(name)tt(}) var(...)tt(}),
+tt($+LPAR())var(...)tt(RPAR()), tt(${{)var(name)tt(}) var(...)tt(}),
 tt(${|)var(...)tt(}), or tt(${ )var(...)tt( }) constructs.
 )
 item(tt(equalsubst))(

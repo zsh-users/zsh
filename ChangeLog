@@ -1,3 +1,8 @@
+2026-04-09  Mikael Magnusson  <mikachu@gmail.com>
+
+	* unposted: Doc/Zsh/params.yo: missing space in list of cmdsubst
+	constructs
+
 2026-04-08  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 54295: Doc/Zsh/arith.yo: document that floating point
