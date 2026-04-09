@@ -1115,13 +1115,13 @@ item(tt(globsort))(
 Code executed to order files by the tt(o) glob qualifier.
 )
 item(tt(insubst))(
-The tt(<LPAR())var(...)tt(RPAR()) form of process substitution.
+The tt(>LPAR())var(...)tt(RPAR()) form of process substitution.
 )
 item(tt(loadautofunc))(
 Code read directly from a file to define an autoloaded function.
 )
 item(tt(outsubst))(
-The tt(>LPAR())var(...)tt(RPAR()) form of process substitution.
+The tt(<LPAR())var(...)tt(RPAR()) form of process substitution.
 )
 item(tt(sched))(
 Code executed by the tt(sched) builtin.

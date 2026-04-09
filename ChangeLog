@@ -1,5 +1,8 @@
 2026-05-15  dana  <dana@dana.is>
 
+	* 54325: Doc/Zsh/params.yo: swap eval contexts for <(...) and
+	>(...)
+
 	* Charles Blake + dana: 54425+54429+54449: Completion/compinit:
 	compdef -[kK]: avoid forking
 
