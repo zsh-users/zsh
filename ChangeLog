@@ -1,5 +1,9 @@
 2026-06-04  dana  <dana@dana.is>
 
+	* Philippe Altherr: 54328: Doc/Zsh/options.yo, Src/params.c,
+	Src/utils.c: Only ever turn global parameters into named
+	directories
+
 	* unposted: Test/A06assign.ztst: add regression test for w/54340
 
 	* Philippe Altherr: 54340: Src/params.c: Remove partial

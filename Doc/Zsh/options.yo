@@ -240,7 +240,7 @@ pindex(AUTONAMEDIRS)
 pindex(NOAUTONAMEDIRS)
 cindex(directories, named)
 item(tt(AUTO_NAME_DIRS))(
-Any parameter that is set to the absolute name of a directory
+Any global parameter that is set to the absolute name of a directory
 immediately becomes a name for that directory, that will be used
 by the `tt(%~)'
 and related prompt sequences, and will be available when completion

@@ -3910,11 +3910,6 @@ unsetparam_pm(Param pm, int altflag, int exp)
     if (pm->old) {
 	oldpm = pm->old;
 	paramtab->addnode(paramtab, oldpm->node.nam, oldpm);
-	if ((PM_TYPE(oldpm->node.flags) == PM_SCALAR) &&
-	    !(pm->node.flags & PM_HASHELEM) &&
-	    (oldpm->node.flags & PM_NAMEDDIR) &&
-	    oldpm->gsu.s == &stdscalar_gsu)
-	    adduserdir(oldpm->node.nam, oldpm->u.str, 0, 0);
 	if (oldpm->node.flags & PM_EXPORTED) {
 	    /*
 	     * Re-export the old value which we removed in typeset_single().
@@ -4033,7 +4028,7 @@ strsetfn(Param pm, char *x)
 	if (pm->u.str) zsfree(pm->u.str);
 	pm->u.str = x;
     }
-    if (!(pm->node.flags & PM_HASHELEM) &&
+    if (!(pm->node.flags & PM_HASHELEM) && !pm->level &&
 	((pm->node.flags & PM_NAMEDDIR) || isset(AUTONAMEDIRS))) {
 	pm->node.flags |= PM_NAMEDDIR;
 	adduserdir(pm->node.nam, x, 0, 0);

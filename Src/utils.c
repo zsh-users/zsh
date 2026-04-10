@@ -1258,7 +1258,7 @@ getnameddir(char *name)
     /* Check if there is a scalar parameter with this name whose value *
      * begins with a `/'.  If there is, add it to the hash table and   *
      * return the new value.                                           */
-    if ((pm = (Param) paramtab->getnode(paramtab, name)) &&
+    if ((pm = (Param) paramtab->getnode(paramtab, name)) && !pm->level &&
 	    (PM_TYPE(pm->node.flags) == PM_SCALAR) &&
 	    (str = getsparam(name)) && *str == '/') {
 	pm->node.flags |= PM_NAMEDDIR;
