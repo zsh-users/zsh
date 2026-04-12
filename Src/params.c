@@ -2763,24 +2763,18 @@ assignstrvalue(Value v, char *val, int flags)
             newsize = v->start + vlen + (zlen - v->end);
 
             /* Does new size differ? */
-            if (newsize != zlen || v->pm->gsu.s->setfn != strsetfn) {
+            if (newsize != zlen ||
+		v->pm->gsu.s->setfn != strsetfn || z != v->pm->u.str) {
                 x = (char *) zalloc(newsize + 1);
                 strncpy(x, z, v->start);
                 strcpy(x + v->start, val);
                 strcat(x + v->start, z + v->end);
                 v->pm->gsu.s->setfn(v->pm, x);
             } else {
-		Param pm = v->pm;
                 /* Size doesn't change, can limit actions to only
                  * overwriting bytes in already allocated string */
 		memcpy(z + v->start, val, vlen);
-		/* Implement remainder of strsetfn */
-		if (!(pm->node.flags & PM_HASHELEM) &&
-		    ((pm->node.flags & PM_NAMEDDIR) ||
-		     isset(AUTONAMEDIRS))) {
-		    pm->node.flags |= PM_NAMEDDIR;
-		    adduserdir(pm->node.nam, z, 0, 0);
-		}
+		v->pm->gsu.s->setfn(v->pm, z);
             }
             zsfree(val);
 	}
@@ -2965,10 +2959,7 @@ setarrvalue(Value v, char **val)
 	}
 
 	if (pre_assignment_length == post_assignment_length
-	    && v->pm->gsu.a->setfn == arrsetfn
-	    /* ... and isn't something that arrsetfn() treats specially */
-	    && 0 == (v->pm->node.flags & (PM_SPECIAL|PM_UNIQUE))
-	    && NULL == v->pm->ename)
+	    && v->pm->gsu.a->setfn == arrsetfn && old == v->pm->u.arr)
 	{
 	    /* v->start is 0-based */
 	    p = old + v->start;
@@ -2978,13 +2969,13 @@ setarrvalue(Value v, char **val)
 		/* Give away ownership of the string */
 		*p++ = *r++;
 	    }
+	    v->pm->gsu.a->setfn(v->pm, old);
 	} else {
             /* arr+=( ... )
              * arr[${#arr}+x,...]=( ... ) */
             if (post_assignment_length > pre_assignment_length &&
                     pre_assignment_length <= v->start &&
-                    pre_assignment_length > 0 &&
-                    v->pm->gsu.a->setfn == arrsetfn)
+                    v->pm->gsu.a->setfn == arrsetfn && old == v->pm->u.arr)
             {
                 p = new = (char **) zrealloc(old, sizeof(char *)
                                            * (post_assignment_length + 1));
@@ -4038,15 +4029,15 @@ strgetfn(Param pm)
 mod_export void
 strsetfn(Param pm, char *x)
 {
-    zsfree(pm->u.str);
-    pm->u.str = x;
+    if (pm->u.str != x) {
+	if (pm->u.str) zsfree(pm->u.str);
+	pm->u.str = x;
+    }
     if (!(pm->node.flags & PM_HASHELEM) &&
 	((pm->node.flags & PM_NAMEDDIR) || isset(AUTONAMEDIRS))) {
 	pm->node.flags |= PM_NAMEDDIR;
 	adduserdir(pm->node.nam, x, 0, 0);
     }
-    /* If you update this function, you may need to update the
-     * `Implement remainder of strsetfn' block in assignstrvalue(). */
 }
 
 /* Function to get value of an array parameter */
@@ -4066,16 +4057,15 @@ arrgetfn(Param pm)
 mod_export void
 arrsetfn(Param pm, char **x)
 {
-    if (pm->u.arr && pm->u.arr != x)
-	freearray(pm->u.arr);
+    if (pm->u.arr != x) {
+	if (pm->u.arr) freearray(pm->u.arr);
+	pm->u.arr = x;
+    }
     if (pm->node.flags & PM_UNIQUE)
 	uniqarray(x);
-    pm->u.arr = x;
     /* Arrays tied to colon-arrays may need to fix the environment */
     if (pm->ename && x)
 	arrfixenv(pm->ename, x);
-    /* If you extend this function, update the list of conditions in
-     * setarrvalue(). */
 }
 
 /* Function to get value of an association parameter */
