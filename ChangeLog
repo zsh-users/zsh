@@ -1,3 +1,8 @@
+2026-04-13  dana  <dana@dana.is>
+
+	* dana + Jun T: 54329 + 54339: Doc/Makefile.in, Doc/intro.ms:
+	replace pdfroff by `groff -Tpdf`
+
 2026-04-08  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 54319: Completion/compinit: turn off AUTO_NAME_DIRS option
