@@ -1177,3 +1177,12 @@ F:This is a bug, the non -h variable should not hide the autoload variable
 >z=SRANDOM (zsh/random)
 >z=
 >v=
+
+ () {
+   typeset -F f1=nan f2=inf f3=-inf
+   typeset -p f1 f2 f3
+ }
+0:float NaN/Inf output formatting
+>typeset -F f1=NaN
+>typeset -F f2=Inf
+>typeset -F f3=-Inf

@@ -5752,7 +5752,12 @@ convfloat(double dval, int digits, int flags, FILE *fout)
     setlocale(LC_NUMERIC, "POSIX");
 #endif
     if (fout) {
-	fprintf(fout, fmt, digits, dval);
+	if (isinf(dval))
+	    fprintf(fout, (dval < 0.0) ? "-Inf" : "Inf");
+	else if (isnan(dval))
+	    fprintf(fout, "NaN");
+	else
+	    fprintf(fout, fmt, digits, dval);
 	ret = NULL;
     } else {
 	VARARR(char, buf, 512 + digits);

@@ -132,6 +132,10 @@ The zsh/datetime module's strftime builtin now exports a set-but-empty
 TZ parameter (as in `TZ= strftime ...`) for use by the underlying
 library.  On most systems, this is equivalent to setting TZ to UTC.
 
+The typeset builtin now prints the floating-point values NaN, Inf, and
+-Inf using that capitalisation, which matches the capitalisation used by
+arithmetic expansion.  (Previously they were printed in lowercase.)
+
 Incompatibilities between 5.8.1 and 5.9
 ---------------------------------------
 

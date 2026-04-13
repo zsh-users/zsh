@@ -1,3 +1,8 @@
+2026-04-13  dana  <dana@dana.is>
+
+	* 54313: README, Src/params.c, Test/B02typeset.ztst: convfloat:
+	use consistent capitalisation for NaN, Inf, and -Inf
+
 2026-04-13  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 54327: Completion/Zsh/Type/_parameters: names with dot are
