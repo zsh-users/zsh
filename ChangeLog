@@ -1,5 +1,10 @@
 2026-04-13  dana  <dana@dana.is>
 
+	* 54318: Doc/Zsh/arith.yo, Doc/Zsh/mod_mathfunc.yo,
+	Functions/Misc/zmathfuncdef, NEWS, Src/Modules/mathfunc.c,
+	Test/V03mathfunc.ztst: mathfunc: add isnan() and isinf(). also
+	document NaN + Inf
+
 	* 54313: README, Src/params.c, Test/B02typeset.ztst: convfloat:
 	use consistent capitalisation for NaN, Inf, and -Inf
 

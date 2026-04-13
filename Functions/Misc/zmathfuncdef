@@ -61,7 +61,7 @@ if ! zmodload -e zsh/mathfunc; then
   mathfuncs=(abs acos acosh asin asinh atan atanh cbrt ceil cos cosh erf erfc
     exp expm1 fabs float floor gamma int j0 j1 lgamma log log10 log1p logb
     sin sinh sqrt tan tanh y0 y1 signgam copysign fmod hypot nextafter jn yn
-    ldexp scalb rand48)
+    ldexp scalb rand48 ilogb isinf isnan log2 rint)
   mathfuncpat="(${(j.|.)mathfuncs})"
   bodysearch=$body
   while [[ $bodysearch = (#b)(*[^[:alnum]]|)([[:alnum:]]##)\((*) ]]; do

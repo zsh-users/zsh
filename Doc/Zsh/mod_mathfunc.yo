@@ -27,8 +27,8 @@ tt(floor), tt(gamma), tt(j0), tt(j1), tt(lgamma), tt(log), tt(log10),
 tt(log1p), tt(log2), tt(logb), tt(sin), tt(sinh), tt(sqrt), tt(tan),
 tt(tanh), tt(y0), tt(y1).  The tt(atan) function can optionally take a
 second argument, in which case it behaves like the C function tt(atan2).
-The tt(ilogb) function takes a single floating point argument, but
-returns an integer.
+The tt(ilogb), tt(isinf), and tt(isnan) functions take a single floating
+point argument, but return an integer.
 
 The function tt(signgam) takes no arguments, and returns an integer, which
 is the C variable of the same name, as described in manref(gamma)(3).  Note

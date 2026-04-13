@@ -57,6 +57,8 @@ MF_GAMMA,
 MF_HYPOT,
 MF_ILOGB,
 MF_INT,
+MF_ISINF,
+MF_ISNAN,
 MF_J0,
 MF_J1,
 MF_JN,
@@ -135,6 +137,8 @@ static struct mathfunc mftab[] = {
   NUMMATHFUNC("hypot", math_func, 2, 2, MF_HYPOT),
   NUMMATHFUNC("ilogb", math_func, 1, 1, MF_ILOGB | TFLAG(TF_NOASS)),
   NUMMATHFUNC("int", math_func, 1, 1, MF_INT | TFLAG(TF_NOASS)),
+  NUMMATHFUNC("isinf", math_func, 1, 1, MF_ISINF | TFLAG(TF_NOASS)),
+  NUMMATHFUNC("isnan", math_func, 1, 1, MF_ISNAN | TFLAG(TF_NOASS)),
   NUMMATHFUNC("j0", math_func, 1, 1, MF_J0),
   NUMMATHFUNC("j1", math_func, 1, 1, MF_J1),
   NUMMATHFUNC("jn", math_func, 2, 2, MF_JN | TFLAG(TF_INT1)),
@@ -306,6 +310,16 @@ math_func(UNUSED(char *name), int argc, mnumber *argv, int id)
   case MF_INT:
       ret.type = MN_INTEGER;
       ret.u.l = (zlong)argd;
+      break;
+
+  case MF_ISINF:
+      ret.type = MN_INTEGER;
+      ret.u.l = (zlong) isinf(argd);
+      break;
+
+  case MF_ISNAN:
+      ret.type = MN_INTEGER;
+      ret.u.l = (zlong) isnan(argd);
       break;
 
   case MF_J0:

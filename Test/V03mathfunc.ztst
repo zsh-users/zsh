@@ -145,3 +145,11 @@ F:This test fails if your math library doesn't have erand48().
   print -r - "$a, $b, $c"
 0:log2
 >-1.00000, 0.58496, 6.62936
+
+  () {
+    local -F n=nan i1=inf i2=-inf
+    (( isnan(Nan) && isinf(Inf) && isinf(-Inf) )) &&
+    (( isnan(n) && isinf(i1) && isinf(i2) )) &&
+    (( !isnan(Inf) && !isinf(NaN) ))
+  }
+0:isinf, isnan

@@ -72,6 +72,8 @@ The new completion helper _shadow can be used to temporarily wrap or
 substitute a function. The contrib function mkshadow makes it easier
 to use outside of completion contexts.
 
+The zsh/mathfunc module now provides isnan() and isinf() functions.
+
 Changes since 5.8.1
 -------------------
 
