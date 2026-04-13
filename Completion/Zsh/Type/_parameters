@@ -14,8 +14,8 @@ local -a expl pattern=( -g \* ) normal described verbose faked fakes tmp
 zstyle -t ":completion:${curcontext}:parameters" prefix-needed &&
     [[ $PREFIX != [_.]* ]] &&
         pfilt='[_.]*'
-# names containing a dot are allowed only within ${ }
-[[ $IPREFIX != \${* ]] && pfilt+='|*.*'
+# names containing a dot are not allowed after '$'
+[[ $IPREFIX = *\$ ]] && pfilt+='|*.*'
 
 _description parameters expl parameter
 zparseopts -D -K -E g:=pattern

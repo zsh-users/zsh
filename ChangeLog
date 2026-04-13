@@ -1,3 +1,8 @@
+2026-04-13  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 54327: Completion/Zsh/Type/_parameters: names with dot are
+	allowed except just after $
+
 2026-04-09  Mikael Magnusson  <mikachu@gmail.com>
 
 	* unposted: Doc/Zsh/params.yo: missing space in list of cmdsubst
