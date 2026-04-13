@@ -1,5 +1,8 @@
 2026-04-13  dana  <dana@dana.is>
 
+	* dana + Jun T: 54329 + 54339: Doc/Makefile.in, Doc/intro.ms:
+	replace pdfroff by `groff -Tpdf`
+
 	* 54318: Doc/Zsh/arith.yo, Doc/Zsh/mod_mathfunc.yo,
 	Functions/Misc/zmathfuncdef, NEWS, Src/Modules/mathfunc.c,
 	Test/V03mathfunc.ztst: mathfunc: add isnan() and isinf(). also

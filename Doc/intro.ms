@@ -47,6 +47,7 @@
 .de Sh
 .NH
 .XN \\$1
+.pdfbookmark 1 \\*[SN-DOT] \\$1
 ..
 .\}
 .\"
