@@ -1616,12 +1616,22 @@ sublist_done:
 		    !(noerrexit & NOERREXIT_EXIT);
 		if (errexit) {
 		    errflag = 0;
-		    if (sigtrapped[SIGEXIT])
-			dotrap(SIGEXIT);
-		    if (mypid != getpid())
-			_realexit();
-		    else
-			realexit();
+		    if (locallevel > forklevel) {
+			/*
+			 * Inside a function: use the same unwind
+			 * mechanism as the exit builtin so that
+			 * endtrapscope() runs at each level and
+			 * all saved EXIT traps are executed.
+			 */
+			set_exit_pending(lastval);
+		    } else {
+			if (sigtrapped[SIGEXIT])
+			    dotrap(SIGEXIT);
+			if (mypid != getpid())
+			    _realexit();
+			else
+			    realexit();
+		    }
 		}
 		if (errreturn) {
 		    retflag = 1;

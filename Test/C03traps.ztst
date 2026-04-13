@@ -1014,6 +1014,172 @@ F:Must be tested with a top-level script rather than source or function
 >one
 >one
 
+  (setopt nounset; trap 'echo EXIT' EXIT; echo $unset)
+1:EXIT trap called when NOUNSET triggers at top level
+*?*unset: parameter not set
+>EXIT
+
+  (trap 'echo EXIT' EXIT; echo "a${unsetvar:?oops}z")
+1:EXIT trap called when ${var:?} triggers at top level
+*?*unsetvar: oops
+>EXIT
+
+  (setopt err_exit; trap 'echo EXIT' EXIT; false)
+1:EXIT trap called when ERR_EXIT triggers at top level
+>EXIT
+
+  (setopt err_exit; trap 'echo EXIT' EXIT; f() { false; }; f)
+1:EXIT trap called when ERR_EXIT triggers inside function
+>EXIT
+
+  (setopt err_exit
+  trap 'echo A' EXIT
+  f1() {
+    trap 'echo B' EXIT
+    f2() {
+      trap 'echo C' EXIT
+      false
+    }
+    f2
+  }
+  f1)
+1:nested EXIT traps all called when ERR_EXIT triggers inside function
+>C
+>B
+>A
+
+  (trap 'echo EXIT' EXIT; f() { echo "a${unsetvar:?oops}z"; }; f)
+1:EXIT trap called when ${var:?} triggers inside function
+*?*unsetvar: oops
+>EXIT
+
+  (trap 'echo A' EXIT
+  f1() {
+    trap 'echo B' EXIT
+    f2() {
+      trap 'echo C' EXIT
+      echo "a${unsetvar:?oops}z"
+    }
+    f2
+  }
+  f1)
+1:nested EXIT traps all called when ${var:?} triggers inside function
+*?*unsetvar: oops
+>C
+>B
+>A
+
+  (setopt nounset; trap 'echo EXIT' EXIT; f() { echo $unset; }; f)
+1:EXIT trap called when NOUNSET triggers inside function
+*?*unset: parameter not set
+>EXIT
+
+  (setopt nounset
+  trap 'echo A' EXIT
+  f1() {
+    trap 'echo B' EXIT
+    f2() {
+      trap 'echo C' EXIT
+      echo $unset
+    }
+    f2
+  }
+  f1)
+1:nested EXIT traps all called when NOUNSET triggers inside function
+*?*unset: parameter not set
+>C
+>B
+>A
+
+  (setopt nounset; trap 'echo EXIT' EXIT; f() { echo $(( unset )); }; f)
+1:EXIT trap called when NOUNSET triggers in math context inside function
+*?*unset: parameter not set
+>EXIT
+
+  (setopt posix_traps err_exit
+  trap 'echo A' EXIT
+  f() { trap 'echo B' EXIT; false; }
+  f)
+1:POSIX_TRAPS with ERR_EXIT fires global (overridden) EXIT trap
+>B
+
+  (setopt posix_traps err_exit
+  trap 'echo A' EXIT
+  f() { trap 'echo B' EXIT; }
+  f
+  false)
+1:POSIX_TRAPS with ERR_EXIT fires global EXIT trap after function override
+>B
+
+  (setopt err_exit
+  trap 'echo EXIT' EXIT
+  f() { false; }
+  f || true
+  echo continued)
+0:ERR_EXIT suppressed by || does not exit, EXIT trap fires on normal exit
+>continued
+>EXIT
+
+  (setopt err_exit
+  f1() {
+    trap 'echo F1' EXIT
+    f2() {
+      f3() { trap 'echo F3' EXIT; false; }
+      f3
+    }
+    f2
+  }
+  f1)
+1:ERR_EXIT nested EXIT traps fire even when middle function has no trap
+>F3
+>F1
+
+  (setopt err_exit
+  trap 'echo A' EXIT
+  f() {
+    trap 'echo B; exit 42' EXIT
+    false
+  }
+  f)
+42:exit in function EXIT trap overrides exit status
+>B
+>A
+
+  (setopt err_exit
+  trap 'echo A; exit 42' EXIT
+  f() {
+    trap 'echo B; exit 7' EXIT
+    false
+  }
+  f)
+42:exit in nested EXIT traps uses outermost trap exit value
+>B
+>A
+
+  (trap '' EXIT
+  setopt err_exit
+  f() { false; }
+  f)
+1:ignored EXIT trap with ERR_EXIT does not interfere
+
+  (setopt err_exit
+  f() {
+    trap 'echo B' EXIT
+    (false)
+  }
+  f)
+1:ERR_EXIT from subshell failure inside function fires function EXIT trap
+>B
+
+  (setopt nounset
+  trap 'echo EXIT' EXIT
+  f() { echo $unset; }
+  f || true
+  echo continued)
+1:NOUNSET hard error not caught by ||, EXIT trap fires
+*?*unset: parameter not set
+>EXIT
+
   ( set -o ERR_RETURN; f() { false; echo NOT REACHED;  }; f || true; echo OK )
   ( set -o ERR_RETURN; f() { true && false; echo NOT REACHED;  }; f || true; echo OK )
   ( set -o ERR_RETURN; f() { true && { false }; echo NOT REACHED;  }; f || true; echo OK )
