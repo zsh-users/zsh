@@ -42,7 +42,7 @@ if [[ -n $state ]]; then
       fi
     fi
   fi
-  if [[ -z $IPREFIX ]]; then
+  if [[ -z $IPREFIX ]] && (( ! $+opt_args[-r] )); then
     compset -S '=*' || suf=( -qS = )
     alts+=(
       'parameters:parameter:compadd -r "\n\t\- =" - persist allow.{set_hostname,sysvipc,raw_sockets,chflags,mount{,.devfs,.fdescfs,.nullfs,.procfs,.linprocfs,.linsysfs,.tmpfs,.zfs},quotas,socket_af} mount.{devfs,fdescfs,procfs}'
