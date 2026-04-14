@@ -1,0 +1,12 @@
+#autoload
+
+# Complete jail names for "service jail <action> [jail ...]".
+
+case $1 in
+  *stop|*restart|console|status)
+    _jails
+    ;;
+  *)
+    _jails -c
+    ;;
+esac
