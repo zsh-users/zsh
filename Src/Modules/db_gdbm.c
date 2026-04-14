@@ -150,7 +150,7 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
 	 * We need to do this before attempting to open the DB
 	 * in case this variable is already tied to a DB.
 	 *
-	 * This can fail if the variable is readonly or restricted.
+	 * This can fail if the variable is readonly.
 	 * We could call unsetparam() and check errflag instead
 	 * of the return status.
 	 */

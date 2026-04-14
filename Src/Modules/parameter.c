@@ -150,17 +150,12 @@ scanpmparameters(UNUSED(HashTable ht), ScanFunc func, int flags)
 static void
 setpmcommand(Param pm, char *value)
 {
-    if (isset(RESTRICTED)) {
-	zwarn("restricted: %s", value);
-	zsfree(value);
-    } else {
-	Cmdnam cn = zshcalloc(sizeof(*cn));
+    Cmdnam cn = zshcalloc(sizeof(*cn));
 
-	cn->node.flags = HASHED;
-	cn->u.cmd = value;
+    cn->node.flags = HASHED;
+    cn->u.cmd = value;
 
-	cmdnamtab->addnode(cmdnamtab, ztrdup(pm->node.nam), &cn->node);
-    }
+    cmdnamtab->addnode(cmdnamtab, ztrdup(pm->node.nam), &cn->node);
 }
 
 /**/

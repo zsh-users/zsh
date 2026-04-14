@@ -1837,8 +1837,8 @@ pindex(NOLOCALOPTIONS)
 item(tt(LOCAL_OPTIONS) <K>)(
 If this option is set at the point of return from a shell function,
 most options (including this one) which were in force upon entry to
-the function are restored; options that are not restored are
-tt(PRIVILEGED) and tt(RESTRICTED).  Otherwise, only this option,
+the function are restored; the tt(PRIVILEGED) option is not restored.
+Otherwise, only this option,
 and the tt(LOCAL_LOOPS), tt(XTRACE) and tt(PRINT_EXIT_VALUE) options are
 restored.  Hence if this is explicitly unset by a shell function the
 other options in force at the point of return will remain so.
@@ -2465,16 +2465,6 @@ tt(ENV) variable is ignored. This option cannot be changed using the
 tt(-m) option of tt(setopt) and tt(unsetopt), and changing it inside a
 function always changes it globally regardless of the tt(LOCAL_OPTIONS)
 option.
-)
-pindex(RESTRICTED)
-pindex(NO_RESTRICTED)
-pindex(NORESTRICTED)
-cindex(restricted shell)
-item(tt(RESTRICTED) (tt(-r)))(
-Enables restricted mode.  This option cannot be changed using
-tt(unsetopt), and setting it inside a function always changes it
-globally regardless of the tt(LOCAL_OPTIONS) option.  See
-sectref(Restricted Shell)(zsh).
 )
 pindex(SHIN_STDIN)
 pindex(NO_SHIN_STDIN)

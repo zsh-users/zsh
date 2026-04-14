@@ -451,7 +451,7 @@ zhandler(int sig)
  
     case SIGINT:
         if (!handletrap(SIGINT)) {
-	    if ((isset(PRIVILEGED) || isset(RESTRICTED)) &&
+	    if (isset(PRIVILEGED) &&
 		isset(INTERACTIVE) && (noerrexit & NOERREXIT_SIGNAL))
 		zexit(SIGINT, ZEXIT_SIGNAL);
             errflag |= ERRFLAG_INT;

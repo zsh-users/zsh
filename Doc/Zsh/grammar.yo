@@ -531,7 +531,6 @@ itemiz(Execution of incorrectly positioned loop control structures
 (tt(continue), tt(break)))
 itemiz(Attempts to use regular expression with no regular expression
 module available)
-itemiz(Disallowed operations when the tt(RESTRICTED) options is set)
 itemiz(Failure to create a pipe needed for a pipeline)
 itemiz(Failure to create a multio)
 itemiz(Failure to autoload a module needed for a declared shell feature)

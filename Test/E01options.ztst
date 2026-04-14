@@ -1013,24 +1013,6 @@
 >one'quoted'expression
 >anotherquotedexpression
 
-# too lazy to test jobs -Z and ARGV0.
-  (setopt restricted; cd /)
-  (setopt restricted; PATH=/bin:/usr/bin)
-  (setopt restricted; /bin/ls)
-  (setopt restricted; hash ls=/bin/ls)
-  (setopt restricted; print ha >outputfile)
-  (setopt restricted; exec ls)
-  (setopt restricted; unsetopt restricted)
-  :
-0:RESTRICTED option
-?(eval):cd:1: restricted
-?(eval):2: PATH: restricted
-?(eval):3: /bin/ls: restricted
-?(eval):hash:4: restricted: /bin/ls
-?(eval):5: writing redirection not allowed in restricted mode
-?(eval):exec:6: ls: restricted
-?(eval):unsetopt:7: can't change option: restricted
-
 # ' emacs deconfusion
 
   fn() {

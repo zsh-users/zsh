@@ -84,7 +84,7 @@ Zsh/filelist.yo Zsh/files.yo \
 Zsh/func.yo Zsh/grammar.yo Zsh/manual.yo \
 Zsh/index.yo Zsh/intro.yo Zsh/invoke.yo Zsh/jobs.yo Zsh/metafaq.yo \
 Zsh/modules.yo Zsh/modlist.yo Zsh/modmenu.yo Zsh/manmodmenu.yo $(MODDOCSRC) \
-Zsh/options.yo Zsh/params.yo Zsh/prompt.yo Zsh/redirect.yo Zsh/restricted.yo \
+Zsh/options.yo Zsh/params.yo Zsh/prompt.yo Zsh/redirect.yo \
 Zsh/seealso.yo Zsh/tcpsys.yo Zsh/zftpsys.yo Zsh/zle.yo
 
 # ========== DEPENDENCIES FOR BUILDING ==========
@@ -219,7 +219,7 @@ $(MAN): zmacros.yo zman.yo
 
 zsh.1 zshall.1: Zsh/intro.yo Zsh/metafaq.yo Zsh/invoke.yo Zsh/files.yo \
                 Zsh/filelist.yo Zsh/filelist.yo Zsh/seealso.yo \
-                Zsh/compat.yo Zsh/restricted.yo
+                Zsh/compat.yo
 
 zshbuiltins.1: Zsh/builtins.yo
 

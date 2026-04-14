@@ -105,8 +105,6 @@ can be stacked after the `tt(-b)' and will take effect as normal.
 
 startmenu()
 menu(Compatibility)
-menu(Restricted Shell)
 endmenu()
 
 includefile(Zsh/compat.yo)
-includefile(Zsh/restricted.yo)

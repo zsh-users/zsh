@@ -21,5 +21,5 @@ noglob _arguments -s -S \
   {-,+}d[no-globalrcs] {-,+}e[errexit] {-,+}f[no-rcs] {-,+}g[histignorespace] \
   {-,+}h[histignoredups] {-,+}i[interactive] {-,+}k[interactivecomments] \
   {-,+}l[login] {-,+}m[monitor] {-,+}n[no-exec] {-,+}p[privileged] \
-  {-,+}r[restricted] {-,+}t[singlecommand] {-,+}u[no-unset] {-,+}v[verbose] \
+  {-,+}t[singlecommand] {-,+}u[no-unset] {-,+}v[verbose] \
   {-,+}w[chaselinks] {-,+}x[xtrace] {-,+}y[shwordsplit]

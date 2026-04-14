@@ -2425,10 +2425,6 @@ bin_fg(char *name, char **argv, Options ops, int func)
     if (OPT_ISSET(ops,'Z')) {
 	int len;
 
-	if(isset(RESTRICTED)) {
-	    zwarnnam(name, "-Z is restricted");
-	    return 1;
-	}
 	if(!argv[0] || argv[1]) {
 	    zwarnnam(name, "-Z requires one argument");
 	    return 1;

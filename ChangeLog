@@ -1,3 +1,14 @@
+2026-04-14  Oliver Kiddle  <opk@zsh.org>
+
+	* 54181, 54331: Completion/Zsh/Command/_set,
+	Doc/Makefile.in, Doc/Zsh/builtins.yo, Doc/Zsh/compat.yo,
+	Doc/Zsh/grammar.yo, Doc/Zsh/invoke.yo, Doc/Zsh/manual.yo,
+	Doc/Zsh/options.yo, Doc/Zsh/restricted.yo, README,
+	Src/Modules/db_gdbm.c, Src/Modules/parameter.c, Src/builtin.c,
+	Src/exec.c, Src/init.c, Src/jobs.c, Src/options.c, Src/params.c,
+	Src/signals.c, Test/E01options.ztst, configure.ac:
+	remove support for restricted shell
+
 2026-04-13  dana  <dana@dana.is>
 
 	* dana + Jun T: 54329 + 54339: Doc/Makefile.in, Doc/intro.ms:

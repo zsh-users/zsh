@@ -240,7 +240,6 @@ static struct optname optns[] = {
 {{NULL, "rcs",		      OPT_ALL},			 RCS},
 {{NULL, "recexact",	      0},			 RECEXACT},
 {{NULL, "rematchpcre",	      0},			 REMATCHPCRE},
-{{NULL, "restricted",	      OPT_SPECIAL},		 RESTRICTED},
 {{NULL, "rmstarsilent",	      OPT_BOURNE},		 RMSTARSILENT},
 {{NULL, "rmstarwait",	      0},			 RMSTARWAIT},
 {{NULL, "sharehistory",	      OPT_KSH},			 SHAREHISTORY},
@@ -357,7 +356,7 @@ static short zshletters[LAST_OPT - FIRST_OPT + 1] = {
     /* o */  0,			/* long option name follows */
     /* p */  PRIVILEGED,
     /* q */  0,
-    /* r */  RESTRICTED,
+    /* r */  0,                 /* formerly RESTRICTED */
     /* s */  SHINSTDIN,
     /* t */  SINGLECOMMAND,
     /* u */ -UNSET,
@@ -434,7 +433,7 @@ static short kshletters[LAST_OPT - FIRST_OPT + 1] = {
     /* o */  0,
     /* p */  PRIVILEGED,
     /* q */  0,
-    /* r */  RESTRICTED,
+    /* r */  0,
     /* s */  SHINSTDIN,
     /* t */  SINGLECOMMAND,
     /* u */ -UNSET,
@@ -727,25 +726,6 @@ optlookupc(char c)
     return optletters[c - FIRST_OPT];
 }
 
-/**/
-static void
-restrictparam(char *nam)
-{
-    Param pm = (Param) paramtab->getnode(paramtab, nam);
-
-    if (pm) {
-	pm->node.flags |= PM_SPECIAL | PM_RESTRICTED;
-	return;
-    }
-    createparam(nam, PM_SCALAR | PM_UNSET | PM_SPECIAL | PM_RESTRICTED);
-}
-
-/* list of restricted parameters which are not otherwise special */
-static char *rparams[] = {
-    "SHELL", "HISTFILE", "LD_LIBRARY_PATH", "LD_AOUT_LIBRARY_PATH",
-    "LD_PRELOAD", "LD_AOUT_PRELOAD", NULL
-};
-
 /* Set or unset an option, as a result of user request.  The option *
  * number may be negative, indicating that the sense is reversed    *
  * from the usual meaning of the option.                            */
@@ -760,16 +740,7 @@ dosetopt(int optno, int value, int force, char *new_opts)
 	optno = -optno;
 	value = !value;
     }
-    if (optno == RESTRICTED) {
-	if (isset(RESTRICTED))
-	    return value ? 0 : -1;
-	if (value) {
-	    char **s;
-
-	    for (s = rparams; *s; s++)
-		restrictparam(*s);
-	}
-    } else if(!force && optno == EXECOPT && !value && interact) {
+    if (!force && optno == EXECOPT && !value && interact) {
 	/* cannot set noexec when interactive */
 	return -1;
     } else if(!force && (optno == INTERACTIVE || optno == SHINSTDIN ||

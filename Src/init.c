@@ -255,8 +255,6 @@ loop(int toplevel, int justonce)
     return LOOP_OK;
 }
 
-static int restricted;
-
 /* original argv[0]. This is already metafied */
 static char *argv0;
 
@@ -494,8 +492,6 @@ parseopts(char *nam, char ***argvp, char *new_opts, char **cmdp,
 		if (!(optno = optlookup(*argv))) {
 		    WARN_OPTION("no such option: %s", *argv);
 		    return 1;
-		} else if (optno == RESTRICTED && toplevel) {
-		    restricted = action;
 		} else if ((optno == EMACSMODE || optno == VIMODE) && !toplevel) {
 		    WARN_OPTION("can't change option: %s", *argv);
 		} else {
@@ -524,8 +520,6 @@ parseopts(char *nam, char ***argvp, char *new_opts, char **cmdp,
 	    	if (!(optno = optlookupc(**argv))) {
 		    WARN_OPTION("bad option: -%c", **argv);
 		    return 1;
-		} else if (optno == RESTRICTED && toplevel) {
-		    restricted = action;
 		} else if ((optno == EMACSMODE || optno == VIMODE) &&
 			   !toplevel) {
 		    WARN_OPTION("can't change option: %s", *argv);
@@ -1529,12 +1523,10 @@ run_init_scripts(void)
 void
 init_misc(char *cmd, char *zsh_name)
 {
-#ifndef RESTRICTED_R
-    if ( restricted )
-#else
-    if (*zsh_name == 'r' || restricted)
-#endif
-	dosetopt(RESTRICTED, 1, 0, opts);
+    if (*zsh_name == 'r') {
+	zerrnam(zsh_name, "no support for restricted mode");
+	exit(1);
+    }
     if (cmd) {
 	if (SHIN >= 10)
 	    close(SHIN);

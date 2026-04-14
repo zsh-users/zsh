@@ -841,10 +841,6 @@ bin_cd(char *nam, char **argv, Options ops, int func)
 {
     LinkNode dir;
 
-    if (isset(RESTRICTED)) {
-	zwarnnam(nam, "restricted");
-	return 1;
-    }
     doprintdir = (doprintdir == -1);
 
     chasinglinks = OPT_ISSET(ops,'P') ||
@@ -2250,10 +2246,6 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 		paramtab->printnode(&pm->node, PRINT_INCLUDEVALUE|with_ns);
 	    return pm;
 	}
-	if ((pm->node.flags & PM_RESTRICTED) && isset(RESTRICTED)) {
-	    zerrnam(cname, "%s: restricted", pname);
-	    return pm;
-	}
 	if ((pm->node.flags & PM_READONLY) && !(off & PM_READONLY) &&
 	    /* It seems as though these checks should not be specific to
 	     * PM_NAMEREF, but changing that changes historic behavior */
@@ -2388,10 +2380,6 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 
     if (newspecial != NS_NONE) {
 	Param tpm, pm2;
-	if ((pm->node.flags & PM_RESTRICTED) && isset(RESTRICTED)) {
-	    zerrnam(cname, "%s: restricted", pname);
-	    return pm;
-	}
 	if (pm->node.flags & PM_SINGLE) {
 	    zerrnam(cname, "%s: can only have a single instance", pname);
 	    return pm;
@@ -2633,12 +2621,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    pm->gsu.s->setfn(pm, ztrdup(""));
 	    break;
 	case PM_INTEGER:
-	    /*
-	     * Restricted integers are dangerous to initialize to 0,
-	     * so don't do that.
-	     */
-	    if (!(pm->old->node.flags & PM_RESTRICTED))
-		pm->gsu.i->setfn(pm, 0);
+	    pm->gsu.i->setfn(pm, 0);
 	    break;
 	case PM_EFLOAT:
 	case PM_FFLOAT:
@@ -3098,8 +3081,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	    for (i = 0; i < paramtab->hsize; i++) {
 		for (pm = (Param) paramtab->nodes[i]; pm;
 		     pm = (Param) pm->node.next) {
-		    if (((pm->node.flags & PM_RESTRICTED) && isset(RESTRICTED)) ||
-			(pm->node.flags & PM_UNSET))
+		    if (pm->node.flags & PM_UNSET)
 			continue;
 		    if (pattry(pprog, pm->node.nam))
 			addlinknode(pmlist, pm);
@@ -3857,9 +3839,7 @@ bin_unset(char *name, char **argv, Options ops, int func)
 		    for (pm = (Param) paramtab->nodes[i]; pm; pm = next) {
 			/* record pointer to next, since we may free this one */
 			next = (Param) pm->node.next;
-			if ((!(pm->node.flags & PM_RESTRICTED) ||
-			     unset(RESTRICTED)) &&
-			    pattry(pprog, pm->node.nam)) {
+			if (pattry(pprog, pm->node.nam)) {
 			    if (!OPT_ISSET(ops,'n') &&
 				(pm->node.flags & PM_NAMEREF) && pm->u.str)
 				unsetparam(pm->u.str);
@@ -3912,10 +3892,7 @@ bin_unset(char *name, char **argv, Options ops, int func)
 	 */
 	if (!pm)
 	    continue;
-	else if ((pm->node.flags & PM_RESTRICTED) && isset(RESTRICTED)) {
-	    zerrnam(name, "%s: restricted", pm->node.nam);
-	    returnval = 1;
-	} else if (ss) {
+	else if (ss) {
 	    if ((pm->node.flags & PM_NAMEREF) &&
 		(!(pm = resolve_nameref(pm)) || pm->width)) {
 		/* warning? */
@@ -4317,34 +4294,28 @@ bin_hash(char *name, char **argv, Options ops, UNUSED(int func))
 	    returnval = 1;
 	    break;
         } else if (ASG_VALUEP(asg)) {
-	    if(isset(RESTRICTED)) {
-		zwarnnam(name, "restricted: %s", asg->value.scalar);
-		returnval = 1;
-	    } else {
-		/* The argument is of the form foo=bar, *
-		 * so define an entry for the table.    */
-		if(OPT_ISSET(ops,'d')) {
-		    /* shouldn't return NULL if asg->name is not NULL */
-		    if (*itype_end(asg->name, IUSER, 0)) {
-			zwarnnam(name,
-				 "invalid character in directory name: %s",
-				 asg->name);
-			returnval = 1;
-			continue;
-		    } else {
-			Nameddir nd = hn = zshcalloc(sizeof *nd);
-			nd->node.flags = 0;
-			nd->dir = ztrdup(asg->value.scalar);
-		    }
+	    /* The argument is of the form foo=bar, *
+	     * so define an entry for the table.    */
+	    if (OPT_ISSET(ops, 'd')) {
+		/* shouldn't return NULL if asg->name is not NULL */
+		if (*itype_end(asg->name, IUSER, 0)) {
+		    zwarnnam(name, "invalid character in directory name: %s",
+			    asg->name);
+		    returnval = 1;
+		    continue;
 		} else {
-		    Cmdnam cn = hn = zshcalloc(sizeof *cn);
-		    cn->node.flags = HASHED;
-		    cn->u.cmd = ztrdup(asg->value.scalar);
+		    Nameddir nd = hn = zshcalloc(sizeof *nd);
+		    nd->node.flags = 0;
+		    nd->dir = ztrdup(asg->value.scalar);
 		}
-		ht->addnode(ht, ztrdup(asg->name), hn);
-		if(OPT_ISSET(ops,'v'))
-		    ht->printnode(hn, 0);
+	    } else {
+		Cmdnam cn = hn = zshcalloc(sizeof *cn);
+		cn->node.flags = HASHED;
+		cn->u.cmd = ztrdup(asg->value.scalar);
 	    }
+	    ht->addnode(ht, ztrdup(asg->name), hn);
+	    if (OPT_ISSET(ops, 'v'))
+		ht->printnode(hn, 0);
 	} else if (!(hn = ht->getnode2(ht, asg->name))) {
 	    /* With no `=value' part to the argument, *
 	     * work out what it ought to be.          */

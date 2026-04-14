@@ -570,8 +570,7 @@ change.
 
 The var(flags) may be any of the invocation-time flags described in
 sectref(Invocation)(zsh),
-except that `tt(-o EMACS)' and `tt(-o VI)' may not be used.  Flags such
-as `tt(+r)'/`tt(+o RESTRICTED)' may be prohibited in some circumstances.
+except that `tt(-o EMACS)' and `tt(-o VI)' may not be used.
 
 If tt(-c) var(arg) appears in var(flags), var(arg) is evaluated while the
 requested emulation is temporarily in effect.  In this case the emulation

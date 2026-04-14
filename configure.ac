@@ -248,20 +248,6 @@ AC_ARG_ENABLE(dynamic,
 AS_HELP_STRING([--disable-dynamic],[turn off dynamically loaded binary modules]),
 [dynamic="$enableval"], [dynamic=yes])
 
-dnl Do you want to disable restricted on r* commands
-ifdef([restricted-r],[undefine([restricted-r])])dnl
-AH_TEMPLATE([RESTRICTED_R],
-[Undefine this if you don't want to get a restricted shell
- when zsh is exec'd with basename that starts with r.
- By default this is defined.])
-AC_ARG_ENABLE(restricted-r,
-AS_HELP_STRING([--disable-restricted-r],[turn off r* invocation for restricted shell]),
-[if test x$enableval = xyes; then
-  AC_DEFINE(RESTRICTED_R)
-fi],
-AC_DEFINE(RESTRICTED_R)
-)
-
 dnl Do you want to disable use of locale functions
 AH_TEMPLATE([CONFIG_LOCALE],
 [Undefine if you don't want local features.  By default this is defined.])

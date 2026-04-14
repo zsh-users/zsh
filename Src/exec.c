@@ -35,8 +35,6 @@
 enum {
     /* Export the variable for "VAR=val cmd ..." */
     ADDVAR_EXPORT =   1 << 0,
-    /* Apply restrictions for variable */
-    ADDVAR_RESTRICT = 1 << 1,
     /* Variable list is being restored later */
     ADDVAR_RESTORE =  1 << 2
 };
@@ -731,10 +729,6 @@ execute(LinkList args, int flags, int defpath)
     int eno = 0, ee;
 
     arg0 = (char *) peekfirst(args);
-    if (isset(RESTRICTED) && (strchr(arg0, '/') || defpath)) {
-	zerr("%s: restricted", arg0);
-	_exit(1);
-    }
 
     /* If the parameter STTY is set in the command's environment, *
      * we first run the stty command with the value of this       *
@@ -755,7 +749,7 @@ execute(LinkList args, int flags, int defpath)
 
     /* If ARGV0 is in the commands environment, we use *
      * that as argv[0] for this external command       */
-    if (unset(RESTRICTED) && (z = zgetenv("ARGV0"))) {
+    if ((z = zgetenv("ARGV0"))) {
 	setdata(firstnode(args), (void *) ztrdup(z));
 	/*
 	 * Note we don't do anything with the parameter structure
@@ -2588,14 +2582,6 @@ addvars(Estate state, Wordcode pc, int addflags)
 		fputc(' ', xtrerr);
 	    }
 	    if ((addflags & ADDVAR_EXPORT) && !strchr(name, '[')) {
-		if ((addflags & ADDVAR_RESTRICT) && isset(RESTRICTED) &&
-		    (pm = (Param) paramtab->removenode(paramtab, name)) &&
-		    (pm->node.flags & PM_RESTRICTED)) {
-		    zerr("%s: restricted", pm->node.nam);
-		    zsfree(val);
-		    state->pc = opc;
-		    return;
-		}
 		if (strcmp(name, "STTY") == 0) {
 		    zsfree(STTYval);
 		    STTYval = ztrdup(val);
@@ -2604,7 +2590,7 @@ addvars(Estate state, Wordcode pc, int addflags)
 		opts[ALLEXPORT] = 1;
 		if (isset(KSHARRAYS))
 		    unsetparam(name);
-	    	pm = assignsparam(name, val, myflags);
+		pm = assignsparam(name, val, myflags);
 		opts[ALLEXPORT] = allexp;
 	    } else
 	    	pm = assignsparam(name, val, myflags);
@@ -3418,15 +3404,6 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 			shelltime(&shti, &chti, &then, 1);
 		    return;
 		}
-	    } else if (isset(RESTRICTED) && (cflags & BINF_EXEC) && do_exec) {
-		zerrnam("exec", "%s: restricted",
-			(char *) getdata(firstnode(args)));
-		lastval = 1;
-		if (forked)
-		    _realexit();
-		if (how & Z_TIMED)
-		    shelltime(&shti, &chti, &then, 1);
-		return;
 	    }
 
 	    /*
@@ -3781,10 +3758,6 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 	    if (errflag) {
 		closemnodes(mfds);
 		fixfds(save);
-		execerr();
-	    }
-	    if (isset(RESTRICTED) && IS_WRITE_FILE(fn->type)) {
-		zwarn("writing redirection not allowed in restricted mode");
 		execerr();
 	    }
 	    if (unset(EXECOPT))
@@ -4314,7 +4287,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 	    }
 	    if (type == WC_SIMPLE || type == WC_TYPESET) {
 		if (varspc) {
-		    int addflags = ADDVAR_EXPORT|ADDVAR_RESTRICT;
+		    int addflags = ADDVAR_EXPORT;
 		    if (forked)
 			addflags |= ADDVAR_RESTORE;
 		    addvars(state, varspc, addflags);
@@ -4463,8 +4436,7 @@ save_params(Estate state, Wordcode pc, LinkList *restore_p, LinkList *remove_p)
 		tpm = (Param) zshcalloc(sizeof *tpm);
 		tpm->node.nam = ztrdup(pm->node.nam);
 		copyparam(tpm, pm, 0);
-	    } else if (!(pm->node.flags & PM_READONLY) &&
-		       (unset(RESTRICTED) || !(pm->node.flags & PM_RESTRICTED))) {
+	    } else if (!(pm->node.flags & PM_READONLY)) {
 		/*
 		 * In this case we're just saving parts of
 		 * the parameter in a temporary, so use heap allocation
@@ -6114,9 +6086,8 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	    /* take care of SUNKEYBOARDHACK but not of EMACS/VI */
 	    if (funcsave->opts[SUNKEYBOARDHACK] != opts[SUNKEYBOARDHACK])
 		keyboardhackchar = funcsave->opts[SUNKEYBOARDHACK] ? '`' : '\0';
-	    /* restore all shell options except PRIVILEGED and RESTRICTED */
+	    /* restore all shell options except PRIVILEGED */
 	    funcsave->opts[PRIVILEGED] = opts[PRIVILEGED];
-	    funcsave->opts[RESTRICTED] = opts[RESTRICTED];
 	    memcpy(opts, funcsave->opts, sizeof(opts));
 	    emulation = funcsave->emulation;
 	    if (init_typtab)

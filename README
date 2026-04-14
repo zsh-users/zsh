@@ -52,6 +52,11 @@ or, if your $VISUAL and $EDITOR environment variables vary,
 to your .zshrc file.  These snippets are compatible with previous
 versions of the shell.
 
+Restricted mode has been removed.  This was associated with the option
+RESTRICTED (-r).  This was an outdated way to restrict what users may do and
+was very difficult to apply safely.  Furthermore, modern systems have better,
+safer and more reliable ways to confine user actions.
+
 The ERR_EXIT and ERR_RETURN options were refined to be more self-
 consistent and better aligned with the POSIX-2017 specification of
 `set -e`:

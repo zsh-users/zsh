@@ -296,18 +296,18 @@ static initparam special_params[] ={
 #define IPDEF1(A,B,C) {{NULL,A,PM_INTEGER|PM_SPECIAL|C},BR(NULL),GSU(B),10,0,NULL,NULL,NULL,0}
 IPDEF1("#", pound_gsu, PM_READONLY_SPECIAL),
 IPDEF1("ERRNO", errno_gsu, PM_UNSET),
-IPDEF1("GID", gid_gsu, PM_DONTIMPORT | PM_RESTRICTED),
-IPDEF1("EGID", egid_gsu, PM_DONTIMPORT | PM_RESTRICTED),
-IPDEF1("HISTSIZE", histsize_gsu, PM_RESTRICTED),
+IPDEF1("GID", gid_gsu, PM_DONTIMPORT),
+IPDEF1("EGID", egid_gsu, PM_DONTIMPORT),
+IPDEF1("HISTSIZE", histsize_gsu, 0),
 IPDEF1("RANDOM", random_gsu, 0),
-IPDEF1("SAVEHIST", savehist_gsu, PM_RESTRICTED),
+IPDEF1("SAVEHIST", savehist_gsu, 0),
 IPDEF1("SECONDS", intseconds_gsu, 0),
-IPDEF1("UID", uid_gsu, PM_DONTIMPORT | PM_RESTRICTED),
-IPDEF1("EUID", euid_gsu, PM_DONTIMPORT | PM_RESTRICTED),
+IPDEF1("UID", uid_gsu, PM_DONTIMPORT),
+IPDEF1("EUID", euid_gsu, PM_DONTIMPORT),
 IPDEF1("TTYIDLE", ttyidle_gsu, PM_READONLY_SPECIAL),
 
 #define IPDEF2(A,B,C) {{NULL,A,PM_SCALAR|PM_SPECIAL|C},BR(NULL),GSU(B),0,0,NULL,NULL,NULL,0}
-IPDEF2("USERNAME", username_gsu, PM_DONTIMPORT|PM_RESTRICTED),
+IPDEF2("USERNAME", username_gsu, PM_DONTIMPORT),
 IPDEF2("-", dash_gsu, PM_READONLY_SPECIAL),
 IPDEF2("histchars", histchars_gsu, PM_DONTIMPORT),
 IPDEF2("HOME", home_gsu, PM_UNSET),
@@ -315,7 +315,7 @@ IPDEF2("TERM", term_gsu, PM_UNSET),
 IPDEF2("TERMINFO", terminfo_gsu, PM_UNSET),
 IPDEF2("TERMINFO_DIRS", terminfodirs_gsu, PM_UNSET),
 IPDEF2("WORDCHARS", wordchars_gsu, 0),
-IPDEF2("IFS", ifs_gsu, PM_DONTIMPORT | PM_RESTRICTED),
+IPDEF2("IFS", ifs_gsu, PM_DONTIMPORT),
 IPDEF2("_", underscore_gsu, PM_DONTIMPORT),
 IPDEF2("KEYBOARD_HACK", keyboard_hack_gsu, PM_DONTIMPORT),
 IPDEF2("0", argzero_gsu, 0),
@@ -396,12 +396,12 @@ IPDEF8("CDPATH", &cdpath, "cdpath", PM_TIED),
 IPDEF8("FIGNORE", &fignore, "fignore", PM_TIED),
 IPDEF8("FPATH", &fpath, "fpath", PM_TIED),
 IPDEF8("MAILPATH", &mailpath, "mailpath", PM_TIED),
-IPDEF8("PATH", &path, "path", PM_RESTRICTED|PM_TIED),
+IPDEF8("PATH", &path, "path", PM_TIED),
 IPDEF8("PSVAR", &psvar, "psvar", PM_TIED),
 IPDEF8("ZSH_EVAL_CONTEXT", &zsh_eval_context, "zsh_eval_context", PM_READONLY_SPECIAL|PM_TIED),
 
 /* MODULE_PATH is not imported for security reasons */
-IPDEF8("MODULE_PATH", &module_path, "module_path", PM_DONTIMPORT|PM_RESTRICTED|PM_TIED),
+IPDEF8("MODULE_PATH", &module_path, "module_path", PM_DONTIMPORT|PM_TIED),
 
 #define IPDEF10(A,B) {{NULL,A,PM_ARRAY|PM_SPECIAL},BR(NULL),GSU(B),10,0,NULL,NULL,NULL,0}
 
@@ -430,8 +430,8 @@ IPDEF9("psvar", &psvar, "PSVAR", PM_TIED),
 
 IPDEF9("zsh_eval_context", &zsh_eval_context, "ZSH_EVAL_CONTEXT", PM_TIED|PM_READONLY_SPECIAL),
 
-IPDEF9("module_path", &module_path, "MODULE_PATH", PM_TIED|PM_RESTRICTED),
-IPDEF9("path", &path, "PATH", PM_TIED|PM_RESTRICTED),
+IPDEF9("module_path", &module_path, "MODULE_PATH", PM_TIED),
+IPDEF9("path", &path, "PATH", PM_TIED),
 
 /* These are known to zsh alone. */
 
@@ -449,12 +449,12 @@ IPDEF8("CDPATH", &cdpath, NULL, 0),
 IPDEF8("FIGNORE", &fignore, NULL, 0),
 IPDEF8("FPATH", &fpath, NULL, 0),
 IPDEF8("MAILPATH", &mailpath, NULL, 0),
-IPDEF8("PATH", &path, NULL, PM_RESTRICTED),
+IPDEF8("PATH", &path, NULL, 0),
 IPDEF8("PSVAR", &psvar, NULL, 0),
 IPDEF8("ZSH_EVAL_CONTEXT", &zsh_eval_context, NULL, PM_READONLY_SPECIAL),
 
 /* MODULE_PATH is not imported for security reasons */
-IPDEF8("MODULE_PATH", &module_path, NULL, PM_DONTIMPORT|PM_RESTRICTED),
+IPDEF8("MODULE_PATH", &module_path, NULL, PM_DONTIMPORT),
 
 {{NULL,NULL,0},BR(NULL),NULL_GSU,0,0,NULL,NULL,NULL,0},
 };
@@ -1108,10 +1108,6 @@ createparam(char *name, int flags)
 	if (oldpm && (oldpm->level == locallevel || !(flags & PM_LOCAL))) {
 	    if (isset(POSIXBUILTINS) && (oldpm->node.flags & PM_READONLY)) {
 		zerr("read-only variable: %s", name);
-		return NULL;
-	    }
-	    if ((oldpm->node.flags & PM_RESTRICTED) && isset(RESTRICTED)) {
-		zerr("%s: restricted", name);
 		return NULL;
 	    }
 	    if (!(oldpm->node.flags & PM_UNSET) ||
@@ -2702,11 +2698,6 @@ assignstrvalue(Value v, char *val, int flags)
 	zsfree(val);
 	return;
     }
-    if ((v->pm->node.flags & PM_RESTRICTED) && isset(RESTRICTED)) {
-	zerr("%s: restricted", v->pm->node.nam);
-	zsfree(val);
-	return;
-    }
     if ((v->pm->node.flags & PM_HASHED) &&
 	(v->scanflags & (SCANPM_MATCHMANY|SCANPM_ARRONLY))) {
 	zerr("%s: attempt to set slice of associative array", v->pm->node.nam);
@@ -2872,10 +2863,6 @@ setnumvalue(Value v, mnumber val)
 	zerr("read-only variable: %s", v->pm->node.nam);
 	return;
     }
-    if ((v->pm->node.flags & PM_RESTRICTED) && isset(RESTRICTED)) {
-	zerr("%s: restricted", v->pm->node.nam);
-	return;
-    }
     switch (PM_TYPE(v->pm->node.flags)) {
     case PM_SCALAR:
     case PM_NAMEREF:
@@ -2911,11 +2898,6 @@ setarrvalue(Value v, char **val)
 	return;
     if (v->pm->node.flags & PM_READONLY) {
 	zerr("read-only variable: %s", v->pm->node.nam);
-	freearray(val);
-	return;
-    }
-    if ((v->pm->node.flags & PM_RESTRICTED) && isset(RESTRICTED)) {
-	zerr("%s: restricted", v->pm->node.nam);
 	freearray(val);
 	return;
     }
@@ -3865,10 +3847,6 @@ unsetparam_pm(Param pm, int altflag, int exp)
 	zerr("read-only %s: %s",
 	     (pm->node.flags & PM_NAMEREF) ? "reference" : "variable",
 	     pm->node.nam);
-	return 1;
-    }
-    if ((pm->node.flags & PM_RESTRICTED) && isset(RESTRICTED)) {
-	zerr("%s: restricted", pm->node.nam);
 	return 1;
     }
 
