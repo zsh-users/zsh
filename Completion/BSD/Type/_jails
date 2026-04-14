@@ -3,41 +3,48 @@
 # Options:
 #
 # -0        include jid 0 as a match for the host system
-# -c        include configured (not yet running) jails from jail.conf
+# -c        complete configured jails that aren't currently running
+# -f file   override config file (default: sysrc -n jail_conf)
 # -o param  jail parameter to complete instead of jid -
 #              e.g. name, path, ip4.addr, host.hostname
 
 local addhost host param desc=1 configured
-local -a jails args expl
-zparseopts -D -K -E 0=addhost c=configured o:=param
+local -a jails args expl fopt match mbegin mend
+zparseopts -D -K -E 0=addhost c=configured f:=fopt o:=param
 param=${param[2]:-name}
 
 jails=( ${${(f)"$(_call_program jails jls $param name)"}/ /:} )
 
 if [[ -n $configured ]]; then
-  local jail_conf line f
-  local -a conf_files cjails
-  jail_conf=$(_call_program jail-conf sysrc -n jail_conf)
+  setopt localoptions extendedglob
+  local jail_conf line f include_pat
+  local -a conf_files cjails running_names raw
+  include_pat="(#b)[[:space:]]#.include[[:space:]]##[\"']([^\"']##)[\"']*"
 
-  # Read main config and follow .include directives
+  if (( $#fopt )); then
+    jail_conf=${fopt[2]}
+  else
+    jail_conf=$(_call_program sysrc sysrc -n jail_conf)
+  fi
+
+  # Follow .include directives (accepts both "..." and '...' paths)
   if [[ -r $jail_conf ]]; then
     while IFS= read -r line; do
-      if [[ $line =~ '^\s*\.include\s+"([^"]+)"' ]]; then
-        conf_files+=( ${~match[1]}(N) )
-      fi
+      [[ $line = ${~include_pat} ]] && conf_files+=( ${~match[1]}(N) )
     done < $jail_conf
     conf_files+=( $jail_conf )
   fi
 
-  # Extract jail block names: lines matching "name {"
+  # Extract jail block names: lines matching "name {" (optionally indented)
   for f in ${(u)conf_files}; do
     [[ -r $f ]] || continue
-    cjails+=( ${${(M)${(f)"$(< $f)"}:#[a-zA-Z]*[[:space:]]\{*}%%[[:space:]]*} )
+    raw=( ${(M)${(f)"$(< $f)"}:#[[:space:]]#[^#[:space:]]##[[:space:]]#\{*} )
+    cjails+=( ${${raw##[[:space:]]#}%%[[:space:]]#\{*} )
   done
 
-  # Merge, deduplicate, exclude wildcard blocks
-  jails+=( ${cjails:#\*} )
-  jails=( ${(u)jails} )
+  # Replace jails with configured-minus-running; exclude wildcard blocks
+  running_names=( ${jails%:*} )
+  jails=( ${(u)${cjails:#\*}:|running_names} )
 fi
 
 case $param in

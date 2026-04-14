@@ -1,7 +1,7 @@
 #compdef jail
 
 local curcontext="$curcontext" ret=1
-local -a state state_descr line jails running alts suf
+local -a state state_descr line alts suf
 local -A opt_args
 
 _arguments -C -s \
@@ -35,9 +35,11 @@ if [[ -n $state ]]; then
     if (( $+opt_args[-r] || $+opt_args[-m] )); then
       alts=( 'jails:jail:_jails' )
     elif (( $+opt_args[-c] )); then
-      running=( ${${(f)"$(_call_program jails jls name)"}/ /:} )
-      jails=( ${${(M)${(f)"$(<${opt_args[-f]:-/etc/jail.conf})"}:#[a-z]# #\{#(#e)}%% *} )
-      alts=( "jails:jail:compadd - ${jails:|running}" )
+      if (( $+opt_args[-f] )); then
+        alts=( "jails:jail:_jails -c -f ${(q-)opt_args[-f]}" )
+      else
+        alts=( 'jails:jail:_jails -c' )
+      fi
     fi
   fi
   if [[ -z $IPREFIX ]]; then
