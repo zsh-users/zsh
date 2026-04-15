@@ -1,3 +1,8 @@
+2026-04-28  dana  <dana@dana.is>
+
+	* Matt Koscica: github #167: Completion/Unix/Command/_tmux:
+	include new options added between 3.4 and next-3.7
+
 2026-04-13  dana  <dana@dana.is>
 
 	* dana + Jun T: 54329 + 54339: Doc/Makefile.in, Doc/intro.ms:
