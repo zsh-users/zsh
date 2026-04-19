@@ -54,11 +54,17 @@ NTP, etc. For the most part this is transparent to users. However, as a
 side effect, some features like $SECONDS and the time keyword gained
 (nominal) nanosecond precision.
 
-The zsh/zutil module's zparseopts builtin learnt a -v option which can
-be used to specify the array of arguments to parse instead of $@.
+The zsh/zutil module's zparseopts builtin learnt the following:
 
-The zparseopts builtin also learnt a -G option which enables GNU-style
-argument parsing ('--opt=arg', etc.).
+  - a new -G option enables GNU-style argument parsing
+    ('--opt=arg', etc.)
+
+  - a new -n option sets the program name for usage errors
+
+  - a new -v option specifies the array of arguments to parse instead
+    of $@
+
+  - a single empty option spec signifies that no options are recognised
 
 The module zsh/pcre has been updated to use the pcre2 library.
 
