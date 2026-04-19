@@ -1739,6 +1739,7 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     char *o, *p, *n, **pp, **aval, **ap, *assoc = NULL, **cp, **np;
     char *paramsname = NULL, **params;
+    char *progname = scriptname ? scriptname : (argzero ? argzero : nam);
     int del = 0, flags = 0, extract = 0, fail = 0, gnu = 0, keep = 0;
     Zoptdesc sopts[256], d;
     Zoptarr a, defarr = NULL;
@@ -1807,6 +1808,16 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		    break;
 		}
 		flags |= ZOF_MAP;
+		break;
+	    case 'n':
+		if (o[2])
+		    progname = o + 2;
+		else if (*args)
+		    progname = *args++;
+		else {
+		    zwarnnam(nam, "missing program name");
+		    return 1;
+		}
 		break;
 	    case 'a':
 		if (defarr) {
@@ -1981,9 +1992,9 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		if (!(d = sopts[(unsigned char) *o])) {
 		    if (fail) {
 			if (*o != '-' || o > *pp + 1)
-			    zwarnnam(nam, "bad option: -%c", *o);
+			    fprintf(stderr, "%s: bad option: -%c\n", progname, *o);
 			else
-			    zwarnnam(nam, "bad option: -%s", o);
+			    fprintf(stderr, "%s: bad option: -%s\n", progname, o);
 			return 1;
 		    }
 		    o = NULL;
@@ -2002,8 +2013,8 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 			       (!(d->flags & (ZOF_GNUL | ZOF_GNUS)) &&
 			        pp[1] && pp[1][0] != '-')) {
 			if (!pp[1]) {
-			    zwarnnam(nam, "missing argument for option: -%s",
-				    d->name);
+			    fprintf(stderr, "%s: missing argument for option: -%s\n",
+				    progname, d->name);
 			    return 1;
 			}
 			add_opt_val(d, *++pp);
@@ -2045,8 +2056,8 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 			 (!(d->flags & (ZOF_GNUL | ZOF_GNUS)) &&
 			  pp[1] && pp[1][0] != '-')) {
 		    if (!pp[1]) {
-			zwarnnam(nam, "missing argument for option: -%s",
-				d->name);
+			fprintf(stderr, "%s: missing argument for option: -%s\n",
+				progname, d->name);
 			return 1;
 		    }
 		    add_opt_val(d, *++pp);

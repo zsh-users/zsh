@@ -17,6 +17,18 @@
 
 %test
 
+  () { zparseopts -F } -x
+  () { zparseopts -F - } -x
+  () { zparseopts -F -- } -x
+  () { zparseopts -F - a } -x
+  () { zparseopts -F a } -x
+1:zparseopts without option specs, without array
+?(anon):zparseopts: missing option descriptions
+?(anon): bad option: -x
+?(anon): bad option: -x
+?(anon):zparseopts: no default array defined: a
+?(anon):zparseopts: no default array defined: a
+
   () {
     local -a optv
     zparseopts -a optv - a b: c:- z
@@ -65,15 +77,15 @@
     } $=1
   done
 0:zparseopts -F
-?(anon):zparseopts:2: bad option: -x
+?(anon): bad option: -x
 >ret: 1, optv: , argv: -a -x -z
-?(anon):zparseopts:2: bad option: -x
+?(anon): bad option: -x
 >ret: 1, optv: , argv: -ax -z
-?(anon):zparseopts:2: bad option: --x
+?(anon): bad option: --x
 >ret: 1, optv: , argv: -a --x -z
-?(anon):zparseopts:2: bad option: -x
+?(anon): bad option: -x
 >ret: 1, optv: , argv: -axy
-?(anon):zparseopts:2: bad option: --
+?(anon): bad option: --
 >ret: 1, optv: , argv: -a-xy
 
   for 1 in '-a 1 2 3' '1 2 3'; do
@@ -218,7 +230,7 @@
     print -r - ret: $?, optv: $optv, argv: $argv
   } -ab1 -c
 0:missing optarg
-?(anon):zparseopts:2: missing argument for option: -c
+?(anon): missing argument for option: -c
 >ret: 1, optv: , argv: -ab1 -c
 
   for spec in -foo: -foo:- -foo::; do
@@ -253,11 +265,11 @@
     } --foobar 1 2 3
   done
 0:zparseopts -G, single parameter, without =
-?(anon):zparseopts:2: bad option: --foobar
+?(anon): bad option: --foobar
 >ret: 1, optv: , argv: --foobar 1 2 3
-?(anon):zparseopts:2: bad option: --foobar
+?(anon): bad option: --foobar
 >ret: 1, optv: , argv: --foobar 1 2 3
-?(anon):zparseopts:2: bad option: --foobar
+?(anon): bad option: --foobar
 >ret: 1, optv: , argv: --foobar 1 2 3
 
   for spec in -foo: -foo:- -foo::; do
@@ -352,15 +364,15 @@
 >ret: 0, gopt: , optv: -foobar, argv: 1 2 3
 >ret: 0, gopt: , optv: -foo=bar, argv: 1 2 3
 >ret: 0, gopt: , optv: -foobar, argv: 1 2 3
-?(anon):zparseopts:2: bad option: -f
+?(anon): bad option: -f
 >ret: 1, gopt: -G, optv: , argv: -foobar 1 2 3
 >ret: 0, gopt: -G, optv: -foo bar, argv: 1 2 3
 >ret: 0, gopt: -G, optv: -foo bar, argv: 1 2 3
-?(anon):zparseopts:2: bad option: -f
+?(anon): bad option: -f
 >ret: 1, gopt: -G, optv: , argv: -foobar 1 2 3
 >ret: 0, gopt: -G, optv: -foo=bar, argv: 1 2 3
 >ret: 0, gopt: -G, optv: -foo=bar, argv: 1 2 3
-?(anon):zparseopts:2: bad option: -f
+?(anon): bad option: -f
 >ret: 1, gopt: -G, optv: , argv: -foobar 1 2 3
 >ret: 0, gopt: -G, optv: -foo=bar, argv: 1 2 3
 >ret: 0, gopt: -G, optv: -foo=, argv: bar 1 2 3
@@ -382,10 +394,31 @@
     done
   done
 0:only -- acts as explicit parsing terminator with -G
-?(anon):zparseopts:2: bad option: --baz
+?(anon): bad option: --baz
 >ret: 1, term: -, optv: , argv: --foo x --bar - --baz
 >ret: 0, term: -, gopt: , optv: --foo, argv: --bar
 >ret: 0, term: -, gopt: -G, optv: --foo, argv: - --bar
 >ret: 0, term: --, optv: --foo --bar, argv: x -- --baz
 >ret: 0, term: --, gopt: , optv: --foo, argv: --bar
 >ret: 0, term: --, gopt: -G, optv: --foo, argv: --bar
+
+  fn1() {
+    zparseopts -F - a
+  }
+  fn2() {
+    local -a optv
+    zparseopts -a optv -F - a
+  }
+  fn3() {
+    local -a optv
+    zparseopts -a optv -nprog -F - a
+    zparseopts -a optv -n prog -F - a
+  }
+  fn1 -x
+  fn2 -x
+  fn3 -x
+1:zparseopts -n, internal vs external usage errors
+?fn1:zparseopts:1: no default array defined: a
+?fn2: bad option: -x
+?prog: bad option: -x
+?prog: bad option: -x
