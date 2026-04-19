@@ -1,5 +1,8 @@
 2026-04-19  dana  <dana@dana.is>
 
+	* 54362: Doc/Zsh/mod_zutil.yo, Src/Modules/zutil.c,
+	Test/V12zparseopts.ztst: zparseopts: support empty optspec
+
 	* 54361 (tweaked): Completion/Zsh/Command/_zparseopts,
 	Doc/Zsh/mod_zutil.yo, Src/Modules/zutil.c,
 	Test/V12zparseopts.ztst: zparseopts: print friendlier usage

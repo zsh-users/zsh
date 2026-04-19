@@ -239,7 +239,11 @@ into the var(array) specified with the tt(-a) option; if the optional
 `tt(=)var(array)' is given, it is instead copied into that array, which
 should be declared as a normal array and never as an associative array.
 
-Note that it is an error to give any var(spec) without an
+At least one var(spec) must be given.  If a single spec is given which
+is either an empty string or a single hyphen (as in
+tt(zparseopts -D -F '')), it signifies that no options are recognised.
+(This is useful for future-proofing functions that might gain options
+later.)  Otherwise, it is an error to give any var(spec) without an
 `tt(=)var(array)' unless one of the tt(-a) or tt(-A) options is used.
 
 Unless the tt(-E) option is given, parsing stops at the first string
@@ -300,8 +304,14 @@ var(spec) wins. (This is not an issue with GNU-style parsing.)
 
 The options of tt(zparseopts) itself cannot be stacked because, for
 example, the stack `tt(-DEK)' is indistinguishable from a var(spec) for
-the GNU-style long option `tt(-)tt(-DEK)'.  The options of tt(zparseopts)
-itself are:
+the GNU-style long option `tt(-)tt(-DEK)'.
+
+Nevertheless, it is strongly recommended to distinguish GNU-style long
+option var(spec)s from tt(zparseopts)'s own options by preceding them by
+a `tt(-)', `tt(--)', or short option tt(spec), as in
+tt(zparseopts -a opts - -foo).  In the future this may become mandatory.
+
+The options of tt(zparseopts) itself are:
 
 startitem()
 item(tt(-a) var(array))(

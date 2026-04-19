@@ -17,12 +17,29 @@
 
 %test
 
+  () { zparseopts -D -F ''; print -r - ${(q+)@} } - foo
+  () { zparseopts -D -F ''; print -r - ${(q+)@} } -x
+  () { zparseopts -D -F - ''; print -r - ${(q+)@} } - foo
+  () { zparseopts -D -F - ''; print -r - ${(q+)@} } -x
+  () { zparseopts -D -F - -; print -r - ${(q+)@} } - foo
+  () { zparseopts -D -F - -; print -r - ${(q+)@} } -x
+0:zparseopts with empty option spec (no options recognised)
+>foo
+?(anon): bad option: -x
+>-x
+>foo
+?(anon): bad option: -x
+>-x
+>foo
+?(anon): bad option: -x
+>-x
+
   () { zparseopts -F } -x
   () { zparseopts -F - } -x
   () { zparseopts -F -- } -x
   () { zparseopts -F - a } -x
   () { zparseopts -F a } -x
-1:zparseopts without option specs, without array
+1:zparseopts without option specs, without array (may change in future)
 ?(anon):zparseopts: missing option descriptions
 ?(anon): bad option: -x
 ?(anon): bad option: -x

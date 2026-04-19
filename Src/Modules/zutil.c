@@ -1882,10 +1882,15 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    break;
 	}
     }
-    if (!o) {
+
+    /* allow a single '' or - spec to signify no options recognised */
+    if (o && *args && !args[1] && (!**args || !strcmp(*args, "-"))) {
+	args++;
+    } else if (!o) {
 	zwarnnam(nam, "missing option descriptions");
 	return 1;
     }
+
     while ((o = dupstring(*args++))) {
 	int f = 0;
 	if (!*o) {
