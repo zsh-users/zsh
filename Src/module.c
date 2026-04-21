@@ -1085,6 +1085,9 @@ addparamdef(Paramdef d)
 	 */
 	switch (PM_TYPE(pm->node.flags)) {
 	case PM_SCALAR:
+	    if (pm->node.flags & PM_TIED)
+		pm->ename = ztrdup(casemodify(pm->node.nam, CASMOD_LOWER));
+	    /* fall-through */
 	case PM_NAMEREF:
 	    pm->gsu.s = d->gsu ? (GsuScalar)d->gsu : &varscalar_gsu;
 	    break;
@@ -1099,6 +1102,8 @@ addparamdef(Paramdef d)
 	    break;
 
 	case PM_ARRAY:
+	    if (pm->node.flags & PM_TIED)
+		pm->ename = ztrdup(casemodify(pm->node.nam, CASMOD_UPPER));
 	    pm->gsu.a = d->gsu ? (GsuArray)d->gsu : &vararray_gsu;
 	    break;
 

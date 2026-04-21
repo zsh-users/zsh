@@ -236,6 +236,17 @@
  fi
 0d:Autoload a module via a math function
 
+ if [[ $mods[(r)zsh/watch] == zsh/watch ]]; then
+   zmodload -u zsh/watch
+   WATCH=foo:bar
+   typeset -p WATCH watch
+ else
+   ZTST_skip="zsh/watch module not available"
+ fi
+0:Autoload tied parameters
+>typeset -g -T WATCH watch=( foo bar )
+>typeset -g -aT WATCH watch=( foo bar )
+
 # Test module aliases
 
  zmodload -A example=zsh/example
