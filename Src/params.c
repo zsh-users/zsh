@@ -2752,6 +2752,8 @@ assignstrvalue(Value v, char *val, int flags)
 #endif
 		}
 	    }
+	    if (v->end < v->start)
+		v->end = v->start;
 	    else if (v->end > zlen)
 		v->end = zlen;
 

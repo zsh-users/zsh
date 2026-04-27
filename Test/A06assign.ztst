@@ -133,6 +133,12 @@
 >1 2 42 43 44 5
 >1 2 42 100 99 5
 
+ array=(1 2 3 4 5)
+ array[4,2]=(42 43 44)
+ print $array
+0:Replacement of slice with end index preceding start index
+>1 2 3 42 43 44 4 5
+
 # (subsection: append to array)
 
  array=( )
@@ -707,6 +713,12 @@
  print $a
 0:overwrite [-2,-1] characters in short string
 >ax
+
+ a="abcdefgh"
+ a[6,3]="xyz"
+ print $a
+0:overwrite [6,3] characters in short string
+>abcdexyzfgh
 
  a="a"
  a[-1]="xx"
