@@ -1642,7 +1642,9 @@ checkmailpath(char **s)
 	    char buf[PATH_MAX * 2 + 1], **arr, **ap;
 	    int buflen, ct = 1;
 
-	    if (lock) {
+	    if (!lock)
+		zerr("%e: %s", errno, *s);
+	    else {
 		char *fn;
 
 		pushheap();
