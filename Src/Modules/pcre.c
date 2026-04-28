@@ -134,7 +134,7 @@ pcre_callout(pcre2_callout_block_8 *block, UNUSED(void *callout_data))
     Eprog prog;
     int ret=0;
 
-    if (!block->callout_number &&
+    if (!block->callout_number && block->callout_string &&
 	    ((prog = parse_string((char *) block->callout_string, 0))))
     {
 	int ef = errflag, lv = lastval;
