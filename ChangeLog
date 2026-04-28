@@ -1,5 +1,8 @@
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54542: Src/Modules/zutil.c: Coverity CID 1692320 fix leak
+	of match1
+
 	* 54541: Src/utils.c: Coverity CID 1255748 check return value
 	from stat()
 
