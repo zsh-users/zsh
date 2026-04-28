@@ -1369,8 +1369,10 @@ rmatch(RParseResult *sm, char *subj, char *var1, char *var2, int comp)
 	    next = br->state;
 	    if (next->pattern && !next->patprog) {
 	        tokenize(next->pattern);
-		if (!(next->patprog = patcompile(next->pattern, 0, NULL)))
+		if (!(next->patprog = patcompile(next->pattern, 0, NULL))) {
+		    freematch(&match1);
 		    return 3;
+		}
 	    }
 	    if (next->pattern && pattry(next->patprog, subj) &&
 		(!next->guard || (execstring(next->guard, 1, 0,
