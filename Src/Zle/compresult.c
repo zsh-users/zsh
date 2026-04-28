@@ -1774,8 +1774,6 @@ calclist(int showall)
                                  width < zterm_columns && nth < g->dcount;
                                  nth++, tline++) {
 
-                                m = *p;
-
                                 if (tline == tlines) {
                                     tcol++;
                                     tline = 0;

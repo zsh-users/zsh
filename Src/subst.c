@@ -3844,7 +3844,7 @@ colonsubscript:
      */
     if (getlen) {
 	long len = 0;
-	char buf[14];
+	char buf[DIGBUFSIZE];
 
 	if (isarr) {
 	    char **ctr;

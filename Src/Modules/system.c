@@ -357,7 +357,7 @@ bin_sysopen(char *nam, char **args, Options ops, UNUSED(int func))
 	    for (o = sizeof(openopts)/sizeof(*openopts) - 1; o >= 0 &&
 		strcasecmp(openopts[o].name, opt); o--) {}
 	    if (o < 0) {
-		zwarnnam(nam, "unsupported option: %s\n", opt);
+		zwarnnam(nam, "unsupported option: %s", opt);
 		return 1;
 	    }
 #if defined(FD_CLOEXEC) && !defined(O_CLOEXEC)

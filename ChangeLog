@@ -1,5 +1,9 @@
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54545: Src/Modules/system.c, Src/Zle/compresult.c, Src/glob.c,
+	Src/subst.c, Src/utils.c: A few very minor things coverity
+	complained about
+
 	* 54544: Src/Modules/zpty.c: Coverity CID 439086 fix potential
 	leak of prog in ptyread()
 

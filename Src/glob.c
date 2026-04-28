@@ -3021,6 +3021,9 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 		imd.repllist = (fl & SUB_LIST) ? znewlinklist() : newlinklist();
 		if (repllistp)
 		     *repllistp = imd.repllist;
+		else {
+		    DPUTS((fl & SUB_LIST), "leaking a linklist");
+		}
 	    }
 	    ioff = 0;		/* offset into string */
 	    umlen = umltot;
