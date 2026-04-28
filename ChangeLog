@@ -6,6 +6,9 @@
 	* 54402: Src/Modules/pcre.c: Fix crash in pcre_callout with
 	numerical callout 0
 
+	* 54403: Doc/Zsh/mod_pcre.yo: Add some more details on pcre
+	callouts
+
 2026-04-19  dana  <dana@dana.is>
 
 	* 54362: Doc/Zsh/mod_zutil.yo, Src/Modules/zutil.c,

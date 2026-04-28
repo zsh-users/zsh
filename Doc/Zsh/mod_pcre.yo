@@ -66,17 +66,25 @@ while [[ $? -eq 0 ]] do
     pcre_match -b -n $b[2] -- $string
 done
 print -l $accum)
-)
-enditem()
-
-If the regular expression contains callouts, these are executed as shell code.
-During the execution of the callout, the string the regular expression is
-matching against is available in the parameter tt(.pcre.subject). If there is a
-non-zero return status from the shell code, the callout does not match.
 
 The option tt(-d) uses the alternative breadth-first DFA search algorithm of
 pcre. This sets tt(match), or the array given with tt(-a), to all the matches
 found from the same start point in the subject.
+
+If the regular expression contains string callouts, these are executed as
+shell code, while numerical callouts are ignored. During the execution of the
+callout, the string the regular expression is matching against is available
+in the parameter tt(.pcre.subject). The parameter tt(.pcre.pos) contains the
+position in that string that is currently being matched against. If there is
+a non-zero return status from the shell code, the callout does not match. Note
+that callouts are not available in the below -pcre-match test condition. It is
+also likely not a good idea to call any pcre related builtins from a callout. As
+an example, the following will print out `tt(bar)':
+
+example(pcre_compile 'foo(?C"echo ${.pcre.subject[${.pcre.pos},-1]}")'
+pcre_match foobar)
+)
+enditem()
 
 The tt(zsh/pcre) module makes available the following test condition:
 
