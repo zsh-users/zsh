@@ -1,0 +1,209 @@
+#compdef 7z 7za 7zr 7zz
+
+# this covers both the official 7-zip and the now deprecated p7zip (but not the
+# p7zip command, which is a gzip-like wrapper)
+#
+# notes:
+# - seemingly all 7zip commands, options, and option arguments are
+#   case-insensitive. we only partially support this
+# - most options only work with certain commands. the html documentation lists
+#   which ones, but it was so consistently wrong or contradictory that i gave up
+#   on trying to separate them. do not blindly trust the documentation on this
+
+local ret=1
+local -a context line state state_descr args
+local -A opt_args
+
+args=(
+  '*-ai-[specify archives to include]: :->file-refs'
+  "(2)-an[don't take archive name on command line (with -ai)]"
+  '-ao-[specify overwrite mode]:overwrite mode:((
+    a\:"overwrite existing files without prompt"
+    s\:"skip extracting files that already exist"
+    t\:"auto-rename existing files"
+    u\:"auto-rename extracting files"
+  ))'
+  '*-ax-[specify archives to exclude]: :->file-refs'
+  '-bb-[specify output log level]::log level:((
+    0\:"disable log"
+    1\:"show names of processed files"
+    2\:"show names of additional files processed internally"
+    3\:"show information about additional operations"
+  ))'
+  '-bd[disable progress indicator]'
+  '*-bs-[specify output stream]: :->output-streams'
+  '-bt[show execution time statistics]'
+  '*-i-[specify files to include]: :->file-refs'
+  '*-m-[specify compression method parameter]:method parameter' # @todo complete these
+  '-o-[specify output directory]:output directory:_files -/'
+  '-p-[specify password]:password'
+  "-r-[recurse into subdirectories (or specify)]::recursion method:((
+    -\:\"don't recurse into subdirectories\"
+    0\:'recurse into subdirectories only for wildcard names'
+  ))"
+  '-sa-[specify archive naming mode]:archive naming mode:((
+    a\:"always add archive type extension"
+    e\:"use file name exactly as given"
+    s\:"add archive type extension only if file name has no extension"
+  ))'
+  '-scc-[specify charset for console input/output]: :->charsets-io'
+  '-scrc-[specify hash function]: :->hash-functions'
+  '-scs-[specify charset for list files]: :->charsets-listfile'
+  '-sdel[delete files after adding to archive]'
+  '-seml-[send archive by e-mail (specify behaviour)]::e-mail behaviour:((
+    .\:"delete archive after attaching to e-mail"
+  ))'
+  '-sfx-[create SFX archive]:: :->sfx-modules'
+  '-si-[compress data from stdin (specify file name)]::file name in archive:_files'
+  '-slt[show technical information]'
+  '-snc[extract as alternate stream if : in file name]'
+  '-snh[store hard links as links (tar and WIM only)]'
+  '-sni[store NTFS security information (WIM only)]'
+  '-snl[store symbolic links as links (tar and WIM only)]'
+  "-sns-[store NTFS alternate streams (or specify) (WIM only)]::alternate-streams behaviour:((
+    -\:\"don't store NTFS alternate streams\"
+  ))"
+  "-snt-[replace trailing dots and spaces in file names (or specify)]::trailing-character behaviour:((
+    -\:\"don't replace trailing dots and spaces in file names\"
+  ))"
+  '-so[write data to stdout]'
+  '-spd[disable wildcard matching for file names]'
+  '-spe[eliminate duplication of root folder]'
+  '-spf-[use fully qualified (absolute) file paths (or specify)]::absolute-file-path behaviour::((
+    2\:"use full path without leading slash or drive letter"
+  ))'
+  '-ssc-[enable case-sensitive mode (or specify)]::case-sensitive mode:((
+    -\:"disable case-sensitive mode"
+  ))'
+  '-sse[stop archive creation if unable to open input file]'
+  "-ssp[don't change access time of source files]"
+  '-ssw[compress files open for writing by other programs]'
+  '-stl[set archive time stamp from most recently modified file]'
+  '-stm-[specify CPU thread affinity mask]:affinity mask (hexadecimal)'
+  '-stx-[exclude specified archive type]: :->archive-types'
+  '-t-[specify archive type]: :->archive-types'
+  '-u-[specify update options]:update options' # @todo complete these
+  '-v-[create volume of specified size]: :_numbers -u bytes "volume size" b k m g'
+  '-w-[use temporary work directory (or specify)]::work directory:_files -/'
+  '*-x-[specify files to exclude]: :->file-refs'
+  '-y[assume yes to all queries]'
+  '1:command:((
+    a\:"add files to archive"
+    b\:"benchmark"
+    d\:"delete files from archive"
+    e\:"extract files from archive (without full paths)"
+    h\:"calculate hash values for files"
+    i\:"show information about supported formats"
+    l\:"list contents of archive"
+    rn\:"rename files in archive"
+    t\:"test integrity of archive"
+    u\:"update files in archive"
+    x\:"extract files (with full paths)"
+  ))'
+  '(-an)2:archive file:_files'
+  '*: :_files' # @todo complete more specifically, handle list files
+)
+
+_arguments -S : $args && ret=0
+
+case $state in
+  archive-types)
+    local -a formats=( "${(@f)"$( _call_program 7z-info $words[1] i )"}" )
+    formats=( "${(@)formats[(r)*Formats:*,-1]}" )
+    formats=( ${formats[2,(r)]} )
+
+    # 'C' appears in fourth column if compression is supported
+    [[ ${(L)words[(rn:2:)^-*]} == (a|d|rn|u) ]] &&
+    formats=( ${(M)formats:#???C*} )
+
+    # new (?) format
+    if [[ -n ${(M)formats:#*....*} ]]; then
+      formats=( ${formats/#?(#c28)/} )
+    # old/p7zip format
+    else
+      formats=( ${formats/#?(#c17)/} )
+    fi
+    formats=( ${formats%%[[:space:]]*} )
+
+    (( $#formats )) || formats=( 7z bzip2 gzip tar xz zip )
+    formats=( ${formats//:/\\:} )
+
+    # @todo also complete the various -t* and -t# modes
+    _describe \
+      -t formats \
+      'archive type' \
+      formats \
+      -M 'm:{a-z}={A-Z}' \
+    && ret=0
+    ;;
+
+  charsets-io)
+    _describe \
+      -t charsets \
+      'character set' \
+      '( UTF-8 WIN DOS )' \
+      -M 'm:{a-z}={A-Z}' \
+    && ret=0
+    ;;
+
+  charsets-listfile)
+    _describe \
+      -t charsets \
+      'character set (or Windows code-page number)' \
+      '( UTF-8 UTF-16LE UTF-16BE WIN DOS )' \
+      -M 'm:{a-z}={A-Z}' \
+    && ret=0
+    ;;
+
+  file-refs)
+    # @todo complete this properly
+    if compset -P 1 '*[@!]'; then
+      _files && ret=0
+    else
+      _describe -t file-refs 'file-ref type' '(
+        "@:list file"
+        "!:file name or wildcard"
+      )' && ret=0
+    fi
+    ;;
+
+  hash-functions)
+    local -a hashers=( "${(@f)"$( _call_program 7z-info $words[1] i )"}" )
+    hashers=( "${(@)hashers[(r)*Hashers:*,-1]}" )
+    hashers=( ${hashers[2,(r)]} )
+    hashers=( ${hashers##*[[:space:]]} )
+    (( $#hashers )) || hashers=( CRC32 CRC64 SHA1 SHA256 BLAKE2sp )
+    hashers+=( \* )
+    hashers=( ${hashers//:/\\:} )
+    _describe -t hashers 'hash function' hashers -M 'm:{a-z}={A-Z}' && ret=0
+    ;;
+
+  output-streams)
+    if compset -P '?'; then
+      _describe -t stream-dests 'output stream destination' '(
+        0:disabled
+        1:stdout
+        2:stderr
+      )' && ret=0
+    else
+      _describe -t stream-types 'output stream type' '(
+        "e:error messages"
+        "o:standard output messages"
+        "p:progress information"
+      )' && ret=0
+    fi
+    ;;
+
+  sfx-modules)
+    # sfx modules should be in the same directory as the 7zip executable. on
+    # some systems they live in some lib directory so we look there too
+    local -aU sfxes=(
+      ${${(Q)words[1]}:c:h}/*.sfx(#q.N:t)
+      ${${(Q)words[1]}:c:P:h}/*.sfx(#q.N:t)
+      {,/opt,/usr}{,/local}/lib/7zip/*.sfx(#q.N:t)
+    )
+    _describe -t sfx-modules 'SFX modules' sfxes && ret=0
+    ;;
+esac
+
+return ret
