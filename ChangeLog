@@ -9,6 +9,9 @@
 	* 54403: Doc/Zsh/mod_pcre.yo: Add some more details on pcre
 	callouts
 
+	* 54406: Doc/Zsh/arith.yo, Doc/Zsh/mod_pcre.yo: Fix my yodl code
+	and another instance in arith.yo
+
 2026-04-19  dana  <dana@dana.is>
 
 	* 54362: Doc/Zsh/mod_zutil.yo, Src/Modules/zutil.c,

@@ -144,7 +144,7 @@ provided by the tt(zsh/mathfunc) module
 or compare it to the string tt(NaN):
 
 example(% zmodload zsh/mathfunc
-% (( isnan(0.0 / 0) )) && print is nan
+% LPAR()LPAR() isnan+LPAR()0.0 / 0+RPAR() RPAR()RPAR() && print is nan
 is nan
 % typeset -F f=nan && [[ $f == NaN ]] && print is nan
 is nan)
