@@ -209,7 +209,7 @@ probe_terminal(const char *tquery, seqstate_t *states,
     int *num = numbers;
     int finish = 0, number = 0;
     int ch;
-    struct ttyinfo ti, torig;
+    struct ttyinfo ti = { 0 }, torig;
     struct value vbuf;
     Value v = getvalue(&vbuf, &WAITVAR, 0);
     long timeout = v ? -1 - getintvalue(v) : TIMEOUT;
