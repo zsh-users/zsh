@@ -1,5 +1,7 @@
 2026-04-28  dana  <dana@dana.is>
 
+	* 54394: Completion/Unix/Command/_7zip: add _7zip
+
 	* Matt Koscica: github #167: Completion/Unix/Command/_tmux:
 	include new options added between 3.4 and next-3.7
 
