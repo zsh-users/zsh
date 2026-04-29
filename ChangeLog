@@ -1,3 +1,7 @@
+2026-04-29  dana  <dana@dana.is>
+
+	* unposted: Completion/Zsh/Command/_compinit: add _compinit
+
 2026-04-28  dana  <dana@dana.is>
 
 	* 54394: Completion/Unix/Command/_7zip: add _7zip

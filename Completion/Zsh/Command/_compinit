@@ -1,0 +1,9 @@
+#compdef compinit
+
+_arguments : \
+  '(-i -u)-C[bypass security and dump-file checks]' \
+  '-d+[automatically create dump file / specify dump-file path]::dump file:_files' \
+  "(-w)-D[don't automatically create dump file]" \
+  '(-C -u)-i[ignore insecure files]' \
+  "(-C -i)-u[don't check for insecure files]" \
+  '(-D)-w[explain why dump file is created]'
