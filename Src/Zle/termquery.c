@@ -507,7 +507,24 @@ query_terminal(void) {
     char *tqend = tquery;
     static seqstate_t states[] = QUERY_STATES;
     char **f, **flist = getaparam(EXTVAR);
+    char *envid = getsparam("TERM_PROGRAM");
+    int badapple = 0;
     size_t i;
+
+    /* If TERM_PROGRAM is set in the environment, use that and
+     * skip the XTVERSION query */
+    if (envid) {
+	char *envver;
+	handle_query(4, NULL, 0, envid, strlen(envid), NULL);
+	if ((envver = getsparam("TERM_PROGRAM_VERSION"))) {
+	    handle_query(5, NULL, 0, envver, strlen(envver), NULL);
+	    /* Older macOS terminal doesn't consume RGB queries,
+	     * nor does it support truecolor. Given that it's widely
+	     * used, we handle it explicitly. */
+	    badapple = !strcmp(envid, "Apple_Terminal") &&
+		zstrtol(envver, NULL, 10) < 470;
+	}
+    }
 
     for (f = flist; f && *f; f++)
 	if (!strcmp(*f, "-query"))
@@ -536,7 +553,7 @@ query_terminal(void) {
 		    (!strcmp(cterm, "truecolor") ||
 			!strcmp(cterm, "24bit")))))
 	    handle_query(3, NULL, 0, NULL, 0, NULL);
-	else
+	else if ((i != 4 || !badapple) && (i != 5 || !envid))
 	    struncpy(&tqend, (char *) queries[i], /* collate escape sequences */
 		sizeof(tquery) - (tqend - tquery));
     }

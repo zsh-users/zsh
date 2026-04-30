@@ -5,6 +5,7 @@
     termresp() {
       setopt localoptions extendedglob
       export PS1= PS2= COLORTERM= TERM=
+      typeset +x TERM_PROGRAM
       typeset +x -m .term.\*
       zpty -d
       zpty zsh "${(q)ZTST_testdir}/../Src/zsh -fiV +Z"

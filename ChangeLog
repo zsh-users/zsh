@@ -1,3 +1,9 @@
+2026-04-30  Oliver Kiddle  <opk@zsh.org>
+
+	* 54404: Src/Zle/termquery.c, Test/X06termquery.ztst: skip
+	the RGB terminal query on older versions of the Apple terminal
+	which fail to consume the sequence
+
 2026-04-29  dana  <dana@dana.is>
 
 	* unposted: Completion/Linux/Command/_opkg: guard zparseopts
