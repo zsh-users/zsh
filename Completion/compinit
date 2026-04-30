@@ -345,7 +345,7 @@ compdef() {
         [[ $2 = .menu-select ]] && zmodload -i zsh/complist
 	zle -C "$1" "$2" "$func"
 	if [[ -n $new ]]; then
-	  bindkey "$3" | IFS=$' \t' read -A opt
+	  opt=( ${(z)${ bindkey "$3" }} )
 	  [[ $opt[-1] = undefined-key ]] && bindkey "$3" "$1"
 	else
 	  bindkey "$3" "$1"
@@ -372,8 +372,8 @@ compdef() {
       # And bind the keys...
       for i; do
         if [[ -n $new ]]; then
-	   bindkey "$i" | IFS=$' \t' read -A opt
-	   [[ $opt[-1] = undefined-key ]] || continue
+	  opt=( ${(z)${ bindkey "$i" }} )
+	  [[ $opt[-1] = undefined-key ]] || continue
 	fi
         bindkey "$i" "$func"
       done

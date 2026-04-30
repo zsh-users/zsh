@@ -1,5 +1,8 @@
 2026-05-15  dana  <dana@dana.is>
 
+	* Charles Blake + dana: 54425+54429+54449: Completion/compinit:
+	compdef -[kK]: avoid forking
+
 	* unposted: Util/zsh-merge-changelog: find more context
 
 2026-05-14  Oliver Kiddle  <opk@zsh.org>
