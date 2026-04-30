@@ -66,6 +66,9 @@ The zsh/zutil module's zparseopts builtin learnt the following:
 
   - a single empty option spec signifies that no options are recognised
 
+A new contrib function zgetopt was added. It wraps `zparseopts -G` to
+provide an interface similar to util-linux's getopt(1).
+
 The module zsh/pcre has been updated to use the pcre2 library.
 
 The new zsh/random module defines an SRANDOM parameter, zrand_float()

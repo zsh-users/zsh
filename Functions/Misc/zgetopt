@@ -1,0 +1,178 @@
+#!/bin/zsh -f
+
+# wrapper around zparseopts which gives it an interface similar to util-linux's
+# getopt(1). see zshcontrib(1) for documentation
+
+emulate -L zsh -o extended_glob
+zmodload -i zsh/zutil || return 3
+
+local caller=${funcstack[2]:-${ZSH_ARGZERO:t}}
+local errname=$caller:${0:t}
+local optspec pat i posix=0
+local -a match mbegin mend optvv argvv
+local -a array lopts sopts name
+local -a specs no_arg_opts req_arg_opts opt_arg_opts tmp
+
+# same as leading + in short-opts spec
+(( $+POSIXLY_CORRECT )) && posix=1
+
+zparseopts -n $errname -D -F -G - \
+  {A,-array}:-=array \
+  {l,-longoptions,-long-options}+:-=lopts \
+  {n,-name}:-=name \
+  {o,-options}:-=sopts \
+|| {
+  print -ru2 "usage: ${0:t} [-A <array>] [-l <spec>] [-n <name>] [-o <spec>] -- <arg> ..."
+  return 2
+}
+
+name=( ${(@)name/#(-n|--name=)/} )
+[[ -n $name ]] || name=( $caller )
+
+(( $#array )) && array=( "${(@)array/#(-A|--array=)/}" )
+
+if [[ $zsh_eval_context[-1] == shfunc ]]; then
+  [[ $array == *[^A-Za-z0-9_.]* ]] && {
+    print -ru2 - "$errname: invalid array name: $array"
+    return 2
+  }
+  (( $#array )) || array=( argv )
+
+elif [[ -n $array ]]; then
+  print -ru2 - "$errname: -A option not meaningful unless called as function"
+  return 2
+fi
+
+# getopt requires a short option spec; we'll require either short or long
+(( $#sopts || $#lopts )) || {
+  print -ru2 - "$errname: missing option spec"
+  return 2
+}
+
+optspec=${(@)sopts/#(-o|--options=)/}
+sopts=( )
+
+for (( i = 1; i <= $#optspec; i++ )); do
+  # leading '+': act POSIXLY_CORRECT
+  if [[ $i == 1 && $optspec[i] == + ]]; then
+    posix=1
+  # leading '-': should leave operands interspersed with options, but this is
+  # not really possible with zparseopts
+  elif [[ $i == 1 && $optspec[i] == - ]]; then
+    print -ru2 - "$errname: optspec with leading - (disable operand collection) not supported"
+    return 2
+  # special characters: [+=\\] because they're special to zparseopts, ':'
+  # because it's special to getopt, '-' because it's the parsing terminator
+  elif [[ $optspec[i] == [+:=\\-] ]]; then
+    print -ru2 - "$errname: invalid short-option name: $optspec[i]"
+    return 2
+  # 'a'
+  elif [[ $optspec[i+1] != : ]]; then
+    sopts+=( $optspec[i] )
+  # 'a:'
+  elif [[ $optspec[i+2] != : ]]; then
+    sopts+=( $optspec[i]: )
+    (( i += 1 ))
+  # 'a::'
+  elif [[ $optspec[i+3] != : ]]; then
+    sopts+=( $optspec[i]:: )
+    (( i += 2 ))
+  fi
+done
+
+lopts=( ${(@)lopts/#(-l|--long(|-)options=)/} )
+lopts=( ${(@s<,>)lopts} )
+
+# don't allow characters that are special to zparseopts in long-option specs.
+# see above
+pat='(*[+=\\]*|:*|*:::##|*:[^:]*)'
+[[ -n ${(@M)lopts:#$~pat} ]] && {
+  print -ru2 - "$errname: invalid long-option spec: ${${(@M)lopts:#$~pat}[1]}"
+  return 2
+}
+
+lopts=( ${(@)lopts/#/-} )
+specs=( $sopts $lopts )
+
+# used below to identify options with optional optargs
+no_arg_opts=( ${(@)${(@M)specs:#*[^:]}/#/-} )
+req_arg_opts=( ${(@)${(@)${(@M)specs:#*[^:]:}/#/-}/%:#} )
+opt_arg_opts=( ${(@)${(@)${(@M)specs:#*::}/#/-}/%:#} )
+
+# getopt returns all instances of each option given, so add +
+specs=( ${(@)specs/%(#b)(:#)/+$match[1]} )
+
+# if we've got nothing now, the user probably gave -o '' or sth. pass an
+# explicit '' to zparseopts
+(( $#specs )) || specs=( '' )
+
+# POSIXLY_CORRECT: stop parsing options after first non-option argument
+if (( posix )); then
+  argvv=( "$@" )
+  zparseopts -n $name -a optvv -v argvv -D -F -G - "${(@)specs}" || return 1
+
+# default: permute options following non-option arguments
+else
+  zparseopts -n $name -a optvv -D -E -F -G - "${(@)specs}" || return 1
+  # -D + -E leaves an explicit -- in argv where-ever it might appear
+  local seen
+  while (( $# )); do
+    [[ -z $seen && $1 == -- ]] && seen=1 && shift && continue
+    argvv+=( "$1" )
+    shift
+  done
+fi
+
+# getopt outputs all optargs as separate parameters, even missing optional ones,
+# so we scan through and add/separate those if needed
+(( $#opt_arg_opts )) && {
+  local cur next
+  local -a old_optvv=( "${(@)optvv}" )
+  optvv=( )
+
+  for (( i = 1; i <= $#old_optvv; i++ )); do
+    cur=$old_optvv[i]
+    next=$old_optvv[i+1]
+    # option with no optarg
+    if [[ -n ${no_arg_opts[(r)$cur]} ]]; then
+      optvv+=( $cur )
+    # option with required optarg -- will appear in next element
+    elif [[ -n ${req_arg_opts[(r)$cur]} ]]; then
+      optvv+=( $cur "$next" )
+      (( i++ ))
+    # long option with optional optarg -- will appear in same element delimited
+    # by = (even if missing)
+    elif [[ $cur == *=* && -n ${opt_arg_opts[(r)${cur%%=*}]} ]]; then
+      optvv+=( ${cur%%=*} "${cur#*=}" )
+    # short option with optional optarg -- will appear in same element with no
+    # delimiter (thus the option appears alone if the optarg is missing)
+    elif [[ -n ${opt_arg_opts[(r)${(M)cur#-?}]} ]]; then
+      optvv+=( ${(M)cur#-?} "${cur#-?}" )
+    # ???
+    else
+      print -ru2 - "$errname: parse error, please report!"
+      print -ru2 - "$errname: specs: ${(j< >)${(@q+)specs}}"
+      print -ru2 - "$errname: old_optvv: ${(j< >)${(@q+)old_optvv}}"
+      print -ru2 - "$errname: cur: $cur"
+      optvv+=( $cur ) # i guess?
+    fi
+  done
+}
+
+# called as function, assign to array. use EXIT trap to assign in caller's
+# context
+if [[ -n $array ]]; then
+  trap "$array=( ${(j< >)${(@q+)optvv}} -- ${(j< >)${(@q+)argvv}} )" EXIT
+
+# called as function, print
+elif [[ $zsh_eval_context[-1] == shfunc ]]; then
+  print -r - "${(@q+)optvv}" -- "${(@q+)argvv}"
+
+# called as a script, print. use unconditional single-quoting. this is ugly but
+# it's the closest to what getopt does and it offers compatibility with legacy
+# shells
+else
+  print -r - "${(@qq)optvv}" -- "${(@qq)argvv}"
+fi
+
+return 0
