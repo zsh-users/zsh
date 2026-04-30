@@ -1,4 +1,4 @@
-#compdef gs ghostscript
+#compdef gs ghostscript gsnd
 
 local -a specs names device
 

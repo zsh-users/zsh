@@ -1,5 +1,9 @@
 2026-04-30  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/Unix/Command/_ghostscript,
+	Completion/Unix/Type/_pspdf: ghostscript completion does a
+	better job of handling gsnd
+
 	* unposted: Completion/Unix/Command/_lua: complete also for
 	FreeBSD's flua
 
