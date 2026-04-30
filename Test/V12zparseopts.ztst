@@ -34,15 +34,15 @@
 ?(anon): bad option: -x
 >-x
 
-  () { zparseopts -F } -x
-  () { zparseopts -F - } -x
   () { zparseopts -F -- } -x
+  () { zparseopts -F - } -x
+  () { zparseopts -F - a } -x
   () { zparseopts -F - a } -x
   () { zparseopts -F a } -x
-1:zparseopts without option specs, without array (may change in future)
+1:zparseopts without option specs, without array
 ?(anon):zparseopts: missing option descriptions
-?(anon): bad option: -x
-?(anon): bad option: -x
+?(anon):zparseopts: missing option descriptions
+?(anon):zparseopts: no default array defined: a
 ?(anon):zparseopts: no default array defined: a
 ?(anon):zparseopts: no default array defined: a
 
@@ -446,3 +446,50 @@
 ?fn2: bad option: -x
 ?prog: bad option: -x
 ?prog: bad option: -x
+
+  () { zparseopts -DF - '' } -x
+  () {
+    local -a optv
+    zparseopts -DFa optv - a
+    typeset -p optv
+  } -a
+0:zparseopts option stacking
+?(anon): bad option: -x
+>typeset -a optv=( -a )
+
+  () {
+    local -a optv
+    zparseopts -DFa optv -x
+  }
+  () {
+    local -a optv
+    zparseopts -DFa optv - -D
+    typeset -p optv
+  } --D
+  () {
+    local -a optv
+    zparseopts -DFa optv - -DFa
+    typeset -p optv
+  } --DFa
+0:zparseopts long-option spec guarding
+?(anon):zparseopts:2: bad option: -x
+>typeset -a optv=( --D )
+>typeset -a optv=( --DFa )
+
+  () { zparseopts -a }
+  () { zparseopts -A }
+  () { zparseopts -n }
+  () { zparseopts -v }
+  () { zparseopts -a '' }
+  () { zparseopts -A '' }
+  () { zparseopts -n '' }
+  () { zparseopts -v '' }
+1:zparseopts missing/empty optargs
+?(anon):zparseopts: argument expected: -a
+?(anon):zparseopts: argument expected: -A
+?(anon):zparseopts: argument expected: -n
+?(anon):zparseopts: argument expected: -v
+?(anon):zparseopts: missing array name for -a
+?(anon):zparseopts: missing array name for -A
+?(anon):zparseopts: missing program name for -n
+?(anon):zparseopts: missing array name for -v

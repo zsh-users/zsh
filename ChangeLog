@@ -1,5 +1,9 @@
 2026-04-29  dana  <dana@dana.is>
 
+	* 54376: Doc/Zsh/mod_zutil.yo, NEWS, README,
+	Src/Modules/zutil.c, Test/V12zparseopts.ztst: zparseopts: use
+	standard option parsing
+
 	* 54381: Doc/Zsh/mod_zutil.yo, README, Src/Modules/zutil.c,
 	Test/V12zparseopts.ztst: zparseopts -M: use last as-given
 	option name in arrays

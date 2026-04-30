@@ -230,7 +230,7 @@ item(tt(zregexparse))(
 This implements some internals of the tt(_regex_arguments) function.
 )
 findex(zparseopts)
-item(tt(zparseopts) [ tt(-D) tt(-E) tt(-F) tt(-G) tt(-K) tt(-M) ] [ tt(-a) var(array) ] [ tt(-A) var(assoc) ] [ tt(-n) var(name) ] [ tt(-v) var(argv) ] [ tt(-) ] var(spec) ...)(
+item(tt(zparseopts) [ tt(-DEFGKM) ] [ tt(-a) var(array) ] [ tt(-A) var(assoc) ] [ tt(-n) var(name) ] [ tt(-v) var(argv) ] [ tt(-) ] var(spec) ...)(
 This builtin simplifies the parsing of options in positional parameters,
 i.e. the set of arguments given by tt($*).  Each var(spec) describes one
 option and must be of the form `var(opt)[tt(=)var(array)]'.  If an option
@@ -241,7 +241,7 @@ should be declared as a normal array and never as an associative array.
 
 At least one var(spec) must be given.  If a single spec is given which
 is either an empty string or a single hyphen (as in
-tt(zparseopts -D -F '')), it signifies that no options are recognised.
+tt(zparseopts -DF '')), it signifies that no options are recognised.
 (This is useful for future-proofing functions that might gain options
 later.)  Otherwise, it is an error to give any var(spec) without an
 `tt(=)var(array)' unless one of the tt(-a) or tt(-A) options is used.
@@ -302,14 +302,9 @@ ambiguities may arise when at least one overlapping var(spec) takes an
 argument, as in `tt(-foo: -foobar)'. In that case, the last matching
 var(spec) wins. (This is not an issue with GNU-style parsing.)
 
-The options of tt(zparseopts) itself cannot be stacked because, for
-example, the stack `tt(-DEK)' is indistinguishable from a var(spec) for
-the GNU-style long option `tt(-)tt(-DEK)'.
-
-Nevertheless, it is strongly recommended to distinguish GNU-style long
-option var(spec)s from tt(zparseopts)'s own options by preceding them by
-a `tt(-)', `tt(--)', or short option tt(spec), as in
-tt(zparseopts -a opts - -foo).  In the future this may become mandatory.
+In order to distinguish GNU-style long option var(spec)s from
+tt(zparseopts)'s own options, they em(must) be preceded by a `tt(-)',
+`tt(--)', or short option tt(spec), as in tt(zparseopts -Ga opts - -foo).
 
 The options of tt(zparseopts) itself are:
 
@@ -451,5 +446,13 @@ to have the effect of
 
 example(foo=(-a)
 bar=(-a '' -b xyz))
+)
+
+The following is a useful general-purpose pattern:
+
+example(local -A opts
+zparseopts -DFGA opts - x -long: || return
+(( $+opts[-x] )) && ... # handle -x
+(( $+opts[--long] )) && ... # handle --long, optarg in $opts[--long]
 )
 enditem()

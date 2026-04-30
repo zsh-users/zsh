@@ -1735,12 +1735,12 @@ zalloc_default_array(char ***aval, char *assoc, int keep, int num)
 }
 
 static int
-bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
+bin_zparseopts(char *nam, char **args, Options ops, UNUSED(int func))
 {
     char *o, *p, *n, **pp, **aval, **ap, *assoc = NULL, **cp, **np;
     char *paramsname = NULL, **params;
     char *progname = scriptname ? scriptname : (argzero ? argzero : nam);
-    int del = 0, flags = 0, extract = 0, fail = 0, gnu = 0, keep = 0;
+    int flags = 0, del, extract, fail, gnu, keep;
     Zoptdesc sopts[256], d;
     Zoptarr a, defarr = NULL;
     Zoptval v;
@@ -1749,144 +1749,57 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     opt_arrs = NULL;
     memset(sopts, 0, 256 * sizeof(Zoptdesc));
 
-    while ((o = *args++)) {
-	if (*o == '-') {
-	    switch (o[1]) {
-	    case '\0':
-		o = NULL;
-		break;
-	    case '-':
-		if (o[2])
-		    args--;
-		/* else unreachable, default parsing removes "--" */
-		o = NULL;
-		break;
-	    case 'D':
-		if (o[2]) {
-		    args--;
-		    o = NULL;
-		    break;
-		}
-		del = 1;
-		break;
-	    case 'E':
-		if (o[2]) {
-		    args--;
-		    o = NULL;
-		    break;
-		}
-		extract = 1;
-		break;
-	    case 'F':
-		if (o[2]) {
-		    args--;
-		    o = NULL;
-		    break;
-		}
-		fail = 1;
-		break;
-	    case 'G':
-		if (o[2]) {
-		    args--;
-		    o = NULL;
-		    break;
-		}
-		gnu = 1;
-		break;
-	    case 'K':
-		if (o[2]) {
-		    args--;
-		    o = NULL;
-		    break;
-		}
-		keep = 1;
-		break;
-	    case 'M':
-		if (o[2]) {
-		    args--;
-		    o = NULL;
-		    break;
-		}
-		flags |= ZOF_MAP;
-		break;
-	    case 'n':
-		if (o[2])
-		    progname = o + 2;
-		else if (*args)
-		    progname = *args++;
-		else {
-		    zwarnnam(nam, "missing program name");
-		    return 1;
-		}
-		break;
-	    case 'a':
-		if (defarr) {
-		    zwarnnam(nam, "default array given more than once");
-		    return 1;
-		}
-		if (o[2])
-		    n = o + 2;
-		else if (*args)
-		    n = *args++;
-		else {
-		    zwarnnam(nam, "missing array name");
-		    return 1;
-		}
-		defarr = (Zoptarr) zhalloc(sizeof(*defarr));
-		defarr->name = n;
-		defarr->num = 0;
-		defarr->vals = defarr->last = NULL;
-		defarr->next = NULL;
-		opt_arrs = defarr;
-		break;
-	    case 'A':
-		if (assoc) {
-		    zwarnnam(nam, "associative array given more than once");
-		    return 1;
-		}
-		if (o[2]) 
-		    assoc = o + 2;
-		else if (*args)
-		    assoc = *args++;
-		else {
-		    zwarnnam(nam, "missing array name");
-		    return 1;
-		}
-		break;
-	    case 'v':
-		if (paramsname) {
-		    zwarnnam(nam, "argv array given more than once");
-		    return 1;
-		}
-		if (o[2])
-		    paramsname = o + 2;
-		else if (*args)
-		    paramsname = *args++;
-		else {
-		    zwarnnam(nam, "missing array name");
-		    return 1;
-		}
-		break;
-	    default:
-		/* Anything else is an option description */
-		args--;
-		o = NULL;
-		break;
-	    }
-	    if (!o) {
-		o = "";
-		break;
-	    }
-	} else {
-	    args--;
-	    break;
+    del = OPT_ISSET(ops, 'D');
+    extract = OPT_ISSET(ops, 'E');
+    fail = OPT_ISSET(ops, 'F');
+    gnu = OPT_ISSET(ops, 'G');
+    keep = OPT_ISSET(ops, 'K');
+    flags |= OPT_ISSET(ops, 'M') ? ZOF_MAP : 0;
+
+    if (OPT_ISSET(ops, 'a')) {
+	if (!*OPT_ARG(ops, 'a')) {
+	    zwarnnam(nam, "missing array name for -a");
+	    return 1;
 	}
+	defarr = (Zoptarr) zhalloc(sizeof(*defarr));
+	defarr->name = OPT_ARG(ops, 'a');
+	defarr->num = 0;
+	defarr->vals = defarr->last = NULL;
+	defarr->next = NULL;
+	opt_arrs = defarr;
+    }
+    if (OPT_ISSET(ops, 'A')) {
+	if (!*OPT_ARG(ops, 'A')) {
+	    zwarnnam(nam, "missing array name for -A");
+	    return 1;
+	}
+	assoc = OPT_ARG(ops, 'A');
+    }
+    if (OPT_ISSET(ops, 'n')) {
+	if (!*OPT_ARG(ops, 'n')) {
+	    zwarnnam(nam, "missing program name for -n");
+	    return 1;
+	}
+	progname = OPT_ARG(ops, 'n');
+    }
+    if (OPT_ISSET(ops, 'v')) {
+	if (!*OPT_ARG(ops, 'v')) {
+	    zwarnnam(nam, "missing array name for -v");
+	    return 1;
+	}
+	paramsname = OPT_ARG(ops, 'v');
+    }
+
+    params = getaparam((paramsname = paramsname ? paramsname : "argv"));
+    if (!params) {
+	zwarnnam(nam, "no such array: %s", paramsname);
+	return 1;
     }
 
     /* allow a single '' or - spec to signify no options recognised */
-    if (o && *args && !args[1] && (!**args || !strcmp(*args, "-"))) {
+    if (*args && !args[1] && (!**args || !strcmp(*args, "-"))) {
 	args++;
-    } else if (!o) {
+    } else if (!*args) {
 	zwarnnam(nam, "missing option descriptions");
 	return 1;
     }
@@ -1968,11 +1881,7 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    return 1;
 	}
     }
-    params = getaparam((paramsname = paramsname ? paramsname : "argv"));
-    if (!params) {
-	zwarnnam(nam, "no such array: %s", paramsname);
-	return 1;
-    }
+
     np = cp = pp = ((extract && del) ? arrdup(params) : params);
     for (; (o = *pp); pp++) {
 	/* Not an option. With GNU style, this includes '-' */
@@ -2150,7 +2059,7 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 
 static struct builtin bintab[] = {
     BUILTIN("zformat", 0, bin_zformat, 3, -1, 0, NULL, NULL),
-    BUILTIN("zparseopts", 0, bin_zparseopts, 1, -1, 0, NULL, NULL),
+    BUILTIN("zparseopts", 0, bin_zparseopts, 0, -1, 0, "a:A:DEFGKMn:v:", NULL),
     BUILTIN("zregexparse", 0, bin_zregexparse, 3, -1, 0, "c", NULL),
     BUILTIN("zstyle", 0, bin_zstyle, 0, -1, 0, NULL, NULL),
 };

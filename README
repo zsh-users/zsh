@@ -145,6 +145,10 @@ The zsh/zutil module's zparseopts builtin now always uses the last
 option name as given when storing it in an array.  (Previously, options
 mapped with -M would sometimes be stored using the first name given.)
 
+Also, as a consequence of the zparseopts builtin now using standard
+argument parsing for its own options, long-option specs must be guarded
+using -- or similar.
+
 Incompatibilities between 5.8.1 and 5.9
 ---------------------------------------
 
