@@ -1,0 +1,111 @@
+# Tests for _regex_arguments.
+
+%prep
+  if [[ $OSTYPE = cygwin ]]; then
+    ZTST_unimplemented="the zsh/zpty module does not work on Cygwin"
+  elif ( zmodload zsh/zpty 2>/dev/null ); then
+    . $ZTST_srcdir/comptest
+    mkdir comp.tmp
+    cd comp.tmp
+    comptestinit -z $ZTST_testdir/../Src/zsh &&
+    {
+      word=$'[^\0]#\0'
+      comptesteval \
+        'compdef _tst tst' \
+	'setopt extended_glob' # running _regex_arguments outside of completion below
+      tst_regex() { comptesteval "_regex_arguments _tst /$'[^\0]#\0'/ ${${(@q)*}}" }
+    }
+  else
+    ZTST_unimplemented="the zsh/zpty module is not available"
+  fi
+
+%test
+ tst_regex /one/ ':first:first:(one)'
+ comptesteval "functions _tst >/tmp/hello"
+ comptest $'tst \t'
+0:standalone spec
+>line: {tst one }{}
+
+ tst_regex \( /'one '/ ':fixed:fixed:(one)' \| /'two '/ ':second:second:compadd two' \| /'[0-9]## '/ ': _message -e numbers number' \| /'0x[0-9a-f]## '/ ':hex:hex:' \)
+ comptest $'tst \t'
+0:simple alternation, use of _message for description with no matches
+>line: {tst }{}
+>DESCRIPTION:{fixed}
+>NO:{one}
+>DESCRIPTION:{second}
+>NO:{two}
+>DESCRIPTION:{number}
+
+ tst_regex /$'rpc\0'/ \
+   \(\
+     /"$word"/ ':programs:program:compadd -qS, mountd nisd' \
+   \|\
+     /$'[^,\0]##,[^,\0]##,'/ /$'[^,\0]##\0'/ ':procedures:procedure:' \
+   \|\
+     /$'[^,\0]##,'/ /$'[^,\0]##\0'/ ':versions:version:' \
+   \)
+  comptest $'tst rpc m\t\t1,\t'
+0:optional fields after a suffix
+>line: {tst rpc mountd,}{}
+>line: {tst rpc mountd,}{}
+>DESCRIPTION:{version}
+>line: {tst rpc mountd,1,}{}
+>DESCRIPTION:{procedure}
+
+ tst_regex \( /$'[0-9]##,'/ ':numbers:number:compadd -qS, 1 2' \) \# /$'end\0'/ ':end:end:(end)' /next/ ':next:next:(next)'
+ comptest $'tst \t1\t2,e\t\t'
+0:simple repetition, note zero repititions allowed
+>line: {tst }{}
+>DESCRIPTION:{number}
+>NO:{1}
+>NO:{2}
+>DESCRIPTION:{end}
+>NO:{end}
+>line: {tst 1,}{}
+>line: {tst 1,2,end }{}
+>line: {tst 1,2,end next }{}
+
+ tst_regex \( /--/+ /$'(on|fix)='/ $'/[^\0]##\0/' ':names:boolean value:(false true)' \|\
+    /"[]"/ ':options:option:compadd -qS= - --on --fix' \) \# /next/ ':next:next:(next)'
+ comptest $'tst --\ton=t\t\t'
+0:non-matching pattern to separate matches from consuming patterns
+>line: {tst --}{}
+>DESCRIPTION:{option}
+>NO:{--fix}
+>NO:{--on}
+>line: {tst --on=true }{}
+>line: {tst --on=true --}{}
+
+ tst_regex \
+   \(\
+     /$'(true|false)\0'/ -'last=bool' ':names:boolean:(false true)' \
+   \|\
+     /$'(val|opt)\0'/ -'last=${match[1]%?}' ':opts:option:(val opt)' \
+   \) \# \
+   /$'[^\0]##\0'/ ':last:last:compadd - $last'
+ comptest $'tst true \tv\t \tfalse f\t'
+0:use guard and $match to reference prior argument
+>line: {tst true }{}
+>DESCRIPTION:{boolean}
+>NO:{false}
+>NO:{true}
+>DESCRIPTION:{option}
+>NO:{opt}
+>NO:{val}
+>DESCRIPTION:{last}
+>NO:{bool}
+>line: {tst true val }{}
+>line: {tst true val }{}
+>DESCRIPTION:{boolean}
+>NO:{false}
+>NO:{true}
+>DESCRIPTION:{option}
+>NO:{opt}
+>NO:{val}
+>DESCRIPTION:{last}
+>NO:{val}
+>line: {tst true val false false }{}
+
+%clean
+
+  zmodload -ui zsh/zpty

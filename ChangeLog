@@ -1,5 +1,8 @@
 2026-04-30  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Test/Y04regexargs.ztst: minimal tests of
+	_regex_arguments
+
 	* unposted: Completion/Unix/Command/_sudo: fix for approximate
 	completion/correction
 
