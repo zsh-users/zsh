@@ -1654,9 +1654,9 @@ add_opt_val(Zoptdesc d, char *arg)
     if (!v) {
 	v = (Zoptval) zhalloc(sizeof(*v));
 	v->next = v->onext = NULL;
-	v->name = n;
 	new = 1;
     }
+    v->name = n; // insert the last given name into arrays
     v->arg = arg;
     if ((d->flags & ZOF_ARG) && !(d->flags & (ZOF_OPT | ZOF_SAME))) {
 	v->str = NULL;

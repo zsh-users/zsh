@@ -127,13 +127,20 @@
 >ret: 0, opts: -a '' -b 1 -z '', argv: 1 2 3
 >ret: 0, opts: -b 1 -z '', argv: 1 2 3
 
-  () {
+  fn() {
     local -a optv
     local -A opts
     zparseopts -D -M -a optv -A opts - a:=-aaa -aaa:
     print -r - ret: $?, optv: $optv, opts: "$( order_assoc opts )", argv: $argv
-  } --aaa foo -a bar 1 2 3
+  }
+  fn -a foo 1 2 3
+  fn --aaa foo 1 2 3
+  fn --aaa foo -a bar 1 2 3
+  fn -a foo --aaa bar 1 2 3
 0:zparseopts -M
+>ret: 0, optv: -a foo, opts: --aaa foo, argv: 1 2 3
+>ret: 0, optv: --aaa foo, opts: --aaa foo, argv: 1 2 3
+>ret: 0, optv: -a bar, opts: --aaa bar, argv: 1 2 3
 >ret: 0, optv: --aaa bar, opts: --aaa bar, argv: 1 2 3
 
   () {

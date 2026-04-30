@@ -396,7 +396,10 @@ item(tt(-M))(
 This changes the assignment rules to implement a map among equivalent
 option names.  If any var(spec) uses the `tt(=)var(array)' form, the
 string var(array) is interpreted as the name of another var(spec),
-which is used to choose where to store the values.  If no other var(spec)
+which is used to choose where to store the values.
+Values stored in an associative array (tt(-A)) use the name of the
+mapped-to option, whereas values stored in an array use the last
+as-given option name.  If no other var(spec)
 is found, the values are stored as usual.  This changes only the way the
 values are stored, not the way tt($*) is parsed, so results may be
 unpredictable if the `var(name)tt(+)' specifier is used inconsistently.

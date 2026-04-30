@@ -1,5 +1,9 @@
 2026-04-29  dana  <dana@dana.is>
 
+	* 54381: Doc/Zsh/mod_zutil.yo, README, Src/Modules/zutil.c,
+	Test/V12zparseopts.ztst: zparseopts -M: use last as-given
+	option name in arrays
+
 	* 54395: Doc/Zsh/contrib.yo, Functions/Misc/zgetopt, NEWS,
 	Test/Z04zgetopt.ztst: contrib: add zgetopt (again)
 

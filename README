@@ -141,6 +141,10 @@ The typeset builtin now prints the floating-point values NaN, Inf, and
 -Inf using that capitalisation, which matches the capitalisation used by
 arithmetic expansion.  (Previously they were printed in lowercase.)
 
+The zsh/zutil module's zparseopts builtin now always uses the last
+option name as given when storing it in an array.  (Previously, options
+mapped with -M would sometimes be stored using the first name given.)
+
 Incompatibilities between 5.8.1 and 5.9
 ---------------------------------------
 
