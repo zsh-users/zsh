@@ -1,5 +1,8 @@
 2026-04-30  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/X/Command/_nedit: nedit-client is
+	also commonly used as as the name for nc
+
 	* unposted: Completion/Unix/Command/_ghostscript,
 	Completion/Unix/Type/_pspdf: ghostscript completion does a
 	better job of handling gsnd

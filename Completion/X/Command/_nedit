@@ -1,4 +1,4 @@
-#compdef nedit nedit-nc=nc ncl=nc
+#compdef nedit nedit-nc=nc ncl=nc nedit-client=nc
 
 local state line expl nedit_common curcontext="$curcontext" ret=1
 typeset -A opt_args
