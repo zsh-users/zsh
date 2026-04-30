@@ -181,7 +181,7 @@ _opkg_dest_path() {
 _opkg_pkg_all() {
   local -a upd copts
 
-  zparseopts -a upd -D -E -update
+  zparseopts -a upd -D -E - -update
   copts=( "$@" )
 
   { (( ! $#_opkg_cache_pkg_all )) || _cache_invalid opkg-pkg-all } &&
@@ -207,7 +207,7 @@ _opkg_pkg_all() {
 _opkg_pkg_inst() {
   local -a upd copts
 
-  zparseopts -a upd -D -E -update
+  zparseopts -a upd -D -E - -update
   copts=( "$@" )
 
   { (( ! $#_opkg_cache_pkg_inst )) || _cache_invalid opkg-pkg-inst } &&
@@ -233,7 +233,7 @@ _opkg_pkg_inst() {
 _opkg_pkg_new() {
   local -a upd copts
 
-  zparseopts -a upd -D -E -update
+  zparseopts -a upd -D -E - -update
   copts=( "$@" )
 
   { (( ! $#_opkg_cache_pkg_new )) || _cache_invalid opkg-pkg-new } &&
@@ -257,7 +257,7 @@ _opkg_pkg_new() {
 _opkg_pkg_upgr() {
   local -a upd copts
 
-  zparseopts -a upd -D -E -update
+  zparseopts -a upd -D -E - -update
   copts=( "$@" )
 
   { (( ! $#_opkg_cache_pkg_upgr )) || _cache_invalid opkg-pkg-upgr } &&
