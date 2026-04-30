@@ -1,4 +1,4 @@
-#compdef lua -P lua[0-9.-]##
+#compdef lua flua -P lua[0-9.-]##
 
 # Complete lua library names. We go out of our way here to support sub-modules
 # (of the format foo.bar.baz), even though the way `lua -l` handles those isn't
