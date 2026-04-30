@@ -1,5 +1,8 @@
 2026-04-30  Oliver Kiddle  <opk@zsh.org>
 
+	* Christopher Bock: github #168: Completion/Debian/Command/_apt:
+	add apt history commands
+
 	* unposted: Completion/X/Command/_nedit: nedit-client is
 	also commonly used as as the name for nc
 
