@@ -1,5 +1,8 @@
 2026-04-30  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/Unix/Command/_lua: complete also for
+	FreeBSD's flua
+
 	* unposted: Completion/Unix/Command/_sudo: fix for approximate
 	completion/correction
 
