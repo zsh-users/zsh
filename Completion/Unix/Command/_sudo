@@ -85,7 +85,7 @@ if [[ $state = normal ]]; then
       'options:option:(-s --shell -l --login)' \
       'parameters: :_parameters -g "*export*~*readonly*" -qS=' && ret=0
   else
-    _normal
+    _normal && ret=0
   fi
 fi
 
