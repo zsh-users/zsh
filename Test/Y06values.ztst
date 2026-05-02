@@ -1,0 +1,238 @@
+# tests for _values
+
+%prep
+
+  if ( zmodload -s zsh/zpty ); then
+    source $ZTST_srcdir/comptest
+    mkdir comp.tmp
+    cd comp.tmp
+    comptestinit -z $ZTST_testdir/../Src/zsh && {
+      comptesteval 'compdef _tst tst'
+      tst_values() { comptesteval "_tst() { _values ${${(@q+)@}} }" }
+    }
+  else
+    ZTST_unimplemented='the zsh/zpty module is not available'
+  fi
+
+%test
+
+  tst_values desc a b
+  comptest $'tst \t'
+0:basic value
+>line: {tst }{}
+>DESCRIPTION:{desc}
+>NO:{a}
+>NO:{b}
+
+  tst_values desc a b
+  comptest $'tst a \t'
+0:basic value, next word
+>line: {tst a }{}
+>DESCRIPTION:{desc}
+>NO:{a}
+>NO:{b}
+
+  tst_values desc 'a[adesc]' 'b[bdesc]'
+  comptest $'tst \t'
+0:basic value with description
+>line: {tst }{}
+>DESCRIPTION:{desc}
+>NO:{a  -- adesc}
+>NO:{b  -- bdesc}
+
+  tst_values desc 'a\[b' '\!x' '\*y' '\(z' '\\\.\:\]\&'
+  comptest $'tst \t'
+0:display of escaped char in value name
+>line: {tst }{}
+>DESCRIPTION:{desc}
+>NO:{!x}
+>NO:{(z}
+>NO:{*y}
+>NO:{\.:]&}
+>NO:{a[b}
+
+  tst_values desc '!a' b c
+  comptest $'tst \t'
+0:display of hidden value
+>line: {tst }{}
+>DESCRIPTION:{desc}
+>NO:{b}
+>NO:{c}
+
+  tst_values -s, desc a b c
+  comptest $'tst b,\t'
+0:basic sequence
+>line: {tst b,}{}
+>DESCRIPTION:{desc}
+>NO:{a}
+>NO:{c}
+
+  tst_values -s, desc a b c d e
+  comptest $'tst \'a,b,c,\t'
+  comptest $'tst "a,b,c,\t'
+0:sequence in quotes
+>line: {tst 'a,b,c,}{}
+>DESCRIPTION:{desc}
+>NO:{d}
+>NO:{e}
+>line: {tst "a,b,c,}{}
+>DESCRIPTION:{desc}
+>NO:{d}
+>NO:{e}
+
+  tst_values -s, desc '!a' b c
+  comptest $'tst a,\t'
+0:sequence continues after hidden value
+>line: {tst a,}{}
+>DESCRIPTION:{desc}
+>NO:{b}
+>NO:{c}
+
+  tst_values -s, desc '\*a' b c
+  comptest $'tst \\*a,\t'
+0:sequence continues after value with escaped meta char
+>line: {tst \*a,}{}
+>DESCRIPTION:{desc}
+>NO:{b}
+>NO:{c}
+
+  tst_values -s, desc '\:a' b c
+  comptest $'tst :a,\t'
+0:sequence continues after value with escaped non-meta char
+>line: {tst :a,}{}
+>DESCRIPTION:{desc}
+>NO:{b}
+>NO:{c}
+
+  tst_values -s, desc '*a' b c
+  comptest $'tst a,a,\t'
+0:multi value offered again
+>line: {tst a,a,}{}
+>DESCRIPTION:{desc}
+>NO:{a}
+>NO:{b}
+>NO:{c}
+
+  tst_values -s, desc '(b c)a' b c d e
+  comptest $'tst a,\t'
+0:xor value not offered
+>line: {tst a,}{}
+>DESCRIPTION:{desc}
+>NO:{d}
+>NO:{e}
+
+  tst_values -s, desc '(d\:e)a' b c 'd\:e'
+  comptest $'tst a,\t'
+0:xor value with escaped char not offered
+>line: {tst a,}{}
+>DESCRIPTION:{desc}
+>NO:{b}
+>NO:{c}
+
+  tst_values desc 'a:val'
+  comptest $'tst a=\t'
+  tst_values desc 'a:val:'
+  comptest $'tst a=\t'
+0:value with argument not enumerated
+>line: {tst a=}{}
+>DESCRIPTION:{val}
+>line: {tst a=}{}
+>DESCRIPTION:{val}
+
+  tst_values desc 'a:val:(x y z)'
+  comptest $'tst a=\t'
+0:value with argument enumerated
+>line: {tst a=}{}
+>DESCRIPTION:{val}
+>NO:{x}
+>NO:{y}
+>NO:{z}
+
+# _arguments requires the ':'s to be escaped but i guess it's unnecessary here
+  tst_values desc 'a:val:((x:descx y:descy z:descz))'
+  comptest $'tst a=\t'
+0:value with argument enumerated with description
+>line: {tst a=}{}
+>DESCRIPTION:{val}
+>NO:{x  -- descx}
+>NO:{y  -- descy}
+>NO:{z  -- descz}
+
+# this is the syntax required by _arguments (see above)
+  tst_values desc 'a:val:((x\:descx y\:descy z\:descz))'
+  comptest $'tst a=\t'
+0:value with argument enumerated with description, escaped colon
+>line: {tst a=}{}
+>DESCRIPTION:{val}
+>NO:{x  -- descx}
+>NO:{y  -- descy}
+>NO:{z  -- descz}
+
+# should be the same as above
+  tst_values desc 'a:val:((x\\:descx y\\:descy z\\:descz))'
+  comptest $'tst a=\t'
+0:value with argument enumerated with description, escaped colon with \\
+>line: {tst a=}{}
+>DESCRIPTION:{val}
+>NO:{x  -- descx}
+>NO:{y  -- descy}
+>NO:{z  -- descz}
+
+  tst_values desc 'a:val:(("x\\:x":descx y\:descy z\:descz))'
+  comptest $'tst a=\t'
+0:value with argument enumerated with description, escaped colon in arg name
+>line: {tst a=}{}
+>DESCRIPTION:{val}
+>NO:{x:x  -- descx}
+>NO:{y    -- descy}
+>NO:{z    -- descz}
+
+  tst_values desc 'a:val:((x:x:descx y\:descy z\:descz))'
+  comptest $'tst a=\t'
+0:value with argument enumerated with description, un-escaped colon in arg desc
+>line: {tst a=}{}
+>DESCRIPTION:{val}
+>NO:{x  -- x:descx}
+>NO:{y  -- descy}
+>NO:{z  -- descz}
+
+  tst_values desc 'a: :{ _message msg }'
+  comptest $'tst a=\t'
+0:value with argument eval string, braces
+>line: {tst a=}{}
+>MESSAGE:{msg}
+
+  tst_values desc 'a: : _message msg'
+  comptest $'tst a=\t'
+0:value with argument eval string, leading space
+>line: {tst a=}{}
+>MESSAGE:{msg}
+
+  tst_values -s: -S. desc 'a:val:(x y z)' b c
+  comptest $'tst b:a.\t'
+0:-s and -S
+>line: {tst b:a.}{}
+>DESCRIPTION:{val}
+>NO:{x}
+>NO:{y}
+>NO:{z}
+
+  tst_values -w desc a b c
+  comptest $'tst b \t'
+0:-w without -s
+>line: {tst b }{}
+>DESCRIPTION:{desc}
+>NO:{a}
+>NO:{c}
+
+  tst_values -ws, desc a b c d
+  comptest $'tst b,c \t'
+0:-w with -s
+>line: {tst b,c }{}
+>DESCRIPTION:{desc}
+>NO:{a}
+>NO:{d}
+
+%clean
+
+  zmodload -ui zsh/zpty

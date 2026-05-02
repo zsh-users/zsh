@@ -149,6 +149,11 @@ Also, as a consequence of the zparseopts builtin now using standard
 argument parsing for its own options, long-option specs must be guarded
 using -- or similar.
 
+The _values completion helper now understands the leading '!' spec form
+supported by _arguments, bringing it in line with the documentation.  As
+a consequence, a leading '!' in a value name must now be escaped if it
+should be taken literally, as in: _values desc '!hidden' '\!literal'
+
 Incompatibilities between 5.8.1 and 5.9
 ---------------------------------------
 

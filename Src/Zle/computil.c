@@ -1079,6 +1079,28 @@ bslashcolon(char *s)
     return r;
 }
 
+/* add backslashes before colons *and* other backslashes. this is suitable for
+ * re-escaping something that was un-escaped with rembslash(). basically it
+ * ensures that _describe handles a literal '\' correctly */
+
+static char *
+bslashcolon2(char *s)
+{
+    char *p, *r;
+
+    r = p = zhalloc((2 * strlen(s)) + 1);
+
+    while (*s) {
+	if (*s == ':' || *s == '\\')
+	    *p++ = '\\';
+	*p++ = *s++;
+    }
+    *p = '\0';
+
+    return r;
+}
+
+
 /* Get an index into the single array used in struct cadef
  * opt is the option letter and pre is either - or +
  * we only keep an array for the 94 ASCII characters from ! to ~ so
@@ -2944,6 +2966,7 @@ struct cvval {
     int type;			/* CVV_* below */
     Caarg arg;			/* argument definition */
     int active;			/* still allowed */
+    int not;			/* don't complete this value (`!...') */
 };
 
 #define CVV_NOARG 0
@@ -2989,7 +3012,7 @@ parse_cvdef(char *nam, char **args)
     Cvval val, *valp;
     Caarg arg;
     char **oargs = args, sep = '\0', asep = '=', *name, *descr, *p, *q, **xor, c;
-    int xnum, multi, vtype, hassep = 0, words = 0;
+    int xnum, multi, vtype, hassep = 0, words = 0, not = 0;
 
     while (args && args[0] && args[1] &&
            args[0][0] == '-' &&
@@ -3031,6 +3054,8 @@ parse_cvdef(char *nam, char **args)
 	p = dupstring(*args);
 	xnum = 0;
 
+	if ((not = (*p == '!')))
+	    p++;
 	/* xor list? */
 	if (*p == '(') {
 	    LinkList list = newlinklist();
@@ -3049,7 +3074,7 @@ parse_cvdef(char *nam, char **args)
 
 		sav = *p;
 		*p = '\0';
-		addlinknode(list, dupstring(q));
+		addlinknode(list, rembslash(q));
 		xnum++;
 		*p = sav;
 	    }
@@ -3133,17 +3158,18 @@ parse_cvdef(char *nam, char **args)
 		xor = (char **) zalloc(2 * sizeof(char *));
 		xor[1] = NULL;
 	    }
-	    xor[xnum] = ztrdup(name);
+	    xor[xnum] = ztrdup(rembslash(name));
 	}
 	*valp = val = (Cvval) zalloc(sizeof(*val));
 	valp = &((*valp)->next);
 
 	val->next = NULL;
-	val->name = ztrdup(name);
+	val->name = ztrdup(rembslash(name));
 	val->descr = ztrdup(descr);
 	val->xor = xor;
 	val->type = vtype;
 	val->arg = arg;
+	val->not = not;
     }
     return ret;
 }
@@ -3571,21 +3597,23 @@ bin_compvalues(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    char *str;
 
 	    for (p = cv_laststate.d->vals; p; p = p->next) {
-		if (p->active) {
+		if (p->active && !p->not) {
 		    switch (p->type) {
 		    case CVV_NOARG: l = noarg; break;
 		    case CVV_ARG:   l = arg;   break;
 		    default:        l = opt;   break;
 		    }
 		    if (p->descr) {
-			int len = strlen(p->name) + strlen(p->descr) + 2;
+			// see note on bslashcolon2()
+			char *n = bslashcolon2(p->name);
+			size_t len = strlen(n) + strlen(p->descr) + 2;
 
 			str = (char *) zhalloc(len);
-			strcpy(str, p->name);
+			strcpy(str, n);
 			strcat(str, ":");
 			strcat(str, p->descr);
 		    } else
-			str = p->name;
+			str = bslashcolon2(p->name);
 		    addlinknode(l, str);
 		}
 	    }
