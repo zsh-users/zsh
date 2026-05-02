@@ -1,5 +1,8 @@
 2026-05-02  dana  <dana@dana.is>
 
+	* 54437 (tweaked): Src/lex.c, Test/D04parameter.ztst: lex: fix
+	<-> in parameter flags
+
 	* 54424: Doc/Zsh/params.yo, NEWS, Test/D04parameter.ztst:
 	ZSH_EXEPATH: improve documentation, add test
 

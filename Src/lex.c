@@ -1198,7 +1198,7 @@ gettokstr(int c, int sub)
 		break;
 	    }
 	    hungetc(e);
-	    if(isnumglob()) {
+	    if (!in_brace_param && isnumglob()) {
 		add(Inang);
 		while ((c = hgetc()) != '>')
 		    add(c);

@@ -788,6 +788,23 @@
 0:${(r...)...}
 >why?! in?!! goodn name? am?!! I?!!! doing this?
 
+  print -r - ${(l<3><->):-}
+  print -r - ${(l<3><1->):-}
+  # these cases weren't affected by the fix for this, but just in case
+  str=abc123xyz
+  print -r - ${str//<->/.}
+  print -r - ${str//<1->/.}
+  arr=( abc 123 xyz )
+  print -r - ${arr[(r)<->]}
+  print -r - ${arr[(r)<1->]}
+0:regression test for <-> in flags
+>---
+>-1-
+>abc.xyz
+>abc.xyz
+>123
+>123
+
   array=(I\'m simply putting a brave face on)
   print ${(j:--:)array}
 0:${(j)...}
