@@ -1,5 +1,8 @@
 2026-05-06  dana  <dana@dana.is>
 
+	* 54454: Completion/Base/Utility/_values: auto-remove argument
+	separator
+
 	* 54451: README, Src/Zle/computil.c, Test/Y06values.ztst:
 	compvalues: support leading '!' in spec, handle escaping better
 
