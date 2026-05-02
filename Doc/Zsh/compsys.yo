@@ -4404,16 +4404,22 @@ Multiple groups separated by tt(-)tt(-) can be supplied, potentially with
 different completion options var(opt)s.
 
 The var(descr) is taken as a string to display above the matches if the
-tt(format) style for the tt(descriptions) tag is set.  This is followed by
-one or two names of arrays followed by options to pass to tt(compadd).  The
-array var(name1) contains the possible completions with their descriptions in
-the form `var(completion)tt(:)var(description)'.  Any literal colons in
-var(completion) must be quoted with a backslash.  If a var(name2) is
+tt(format) style for the tt(descriptions) tag is set.
+
+This is followed by one or two names of arrays.  Alternatively, the arrays
+may be given inline, following the rules described below, using the syntax
+tt(LPAR())var(item) var(...)tt(RPAR()).  (There is no separate
+tt(LPAR()LPAR())var(...)tt(RPAR()RPAR()) form as with tt(_arguments).)
+
+The array var(name1) contains the possible completions with their (optional)
+descriptions in the form `var(completion)tt(:)var(description)'.  Any literal
+colons in var(completion) must be quoted with a backslash.  If a var(name2) is
 given, it should have the same number of elements as var(name1); in this
 case the corresponding elements are added as possible completions instead
 of the var(completion) strings from var(name1).  The completion list
-will retain the descriptions from var(name1).  Finally, a set of
-completion options can appear.
+will retain the descriptions from var(name1).
+
+Finally, a set of options to pass to tt(compadd) can appear.
 
 If the option `tt(-o)' appears before the first argument, the matches added
 will be treated as names of command options (N.B. not shell options),
