@@ -1,8 +1,37 @@
 #compdef infocmp -value-,TERM,-default-
 
-local desc expl
+local entry
+local -aU desc
+local -a terms names
 
-desc=( $TERMINFO ~/.terminfo $TERMINFO_DIRS /usr/{,share/}{,lib/}terminfo /{etc,lib}/terminfo )
+desc=(
+  $TERMINFO ~/.terminfo $TERMINFO_DIRS /usr/{,share/}{,lib/}terminfo
+  /{etc,lib}/terminfo
+)
+desc=( $desc(N:P) ) # may have symlinks to the same path
+terms=( $desc/*/^*+?*(N:t) ) # entries named with a + are common includes
 
-_wanted terminals expl 'terminal name' \
-    compadd "$@" - $desc/*/*(N:t)
+if [[ $OSTYPE = (freebsd|dragonfly)* ]]; then
+  while read entry; do
+    [[ "$entry" != [^[:blank:]\#\*_]*:* ]] && continue
+
+    names=( ${${(s:|:)entry%%:*}##[[:blank:]]#} )
+    if [[ $#names -gt 1 && $names[-1] = *\ * ]]; then
+      terms+=( ${^names[1,-2]:#*[ +]?*}:${names[-1]} )
+    else
+      terms+=( ${names:#*\ *} )
+    fi
+  done < /etc/termcap
+
+elif [[ $OSTYPE = netbsd* ]]; then
+  grep $'^[^#\t]*,$' /usr/share/misc/terminfo | while read entry; do
+    names=( ${(s:|:)entry%,} )
+    if [[ $#names -gt 1 && $names[-1] = *\ * ]]; then
+      terms+=( ${^names[1,-2]:#*[ +]?*}:${names[-1]} )
+    else
+      terms+=( ${names:#*\ *} )
+    fi
+  done
+fi
+
+_describe -t terminals 'terminal name' terms "$@"
