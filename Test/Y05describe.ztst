@@ -1,0 +1,97 @@
+# tests for _describe
+
+%prep
+
+  if ( zmodload -s zsh/zpty ); then
+    source $ZTST_srcdir/comptest
+    mkdir comp.tmp
+    cd comp.tmp
+    comptestinit -z $ZTST_testdir/../Src/zsh && {
+      comptesteval 'compdef _tst tst'
+      tst_describe() { comptesteval "_tst() { _describe ${${(@q+)@}} }" }
+    }
+  else
+    ZTST_unimplemented='the zsh/zpty module is not available'
+  fi
+
+%test
+
+  tst_describe desc '(a b:descb "c\:c:descc")'
+  comptest $'tst \t'
+0:name1 as (...), description, escaped colon in name
+>line: {tst }{}
+>DESCRIPTION:{desc}
+>NO:{b    -- descb}
+>NO:{c:c  -- descc}
+>NO:{a}
+
+  tst_describe desc '(( a b:descb "c\:c:descc" ))'
+  comptest $'tst \t'
+0:name1 as ((...)) not supported
+>line: {tst  }{}
+
+  tst_describe desc '(a b:descb "c\:c:descc")' '(ax bx:descbx "cx\:cx:desccx")'
+  comptest $'tst \t\t'
+0:name2 as (...)
+>line: {tst }{}
+>DESCRIPTION:{desc}
+>NO:{b    -- descb}
+>NO:{c:c  -- descc}
+>NO:{a}
+>line: {tst bx}{}
+
+  tst_describe desc '(a b c)' -- '(x y z)'
+  comptest $'tst \t'
+0:multiple groups
+>line: {tst }{}
+>DESCRIPTION:{desc}
+>NO:{a}
+>NO:{b}
+>NO:{c}
+>NO:{x}
+>NO:{y}
+>NO:{z}
+
+  comptesteval '_tst() {
+    local -a name1=( a b:descb "c\:c:descc" )
+    local -a name2=( ax bx:descbx "cx\:cx:desccx" )
+    _describe desc name1 name2
+  }'
+  comptest $'tst \t\t'
+0:arrays by name
+>line: {tst }{}
+>DESCRIPTION:{desc}
+>NO:{b    -- descb}
+>NO:{c:c  -- descc}
+>NO:{a}
+>line: {tst bx}{}
+
+  tst_describe desc '(b c a)' -oreverse
+  comptest $'tst \t'
+0:compadd options, basic
+>line: {tst }{}
+>DESCRIPTION:{desc}
+>NO:{c}
+>NO:{b}
+>NO:{a}
+
+  tst_describe desc \
+    '(b c a)' '(bx cx ax)' -oreverse \
+    -- \
+    '(y z x)' '(yx zx xx)' -onosort
+  comptest $'tst \t\t'
+0:compadd options, complex
+>line: {tst }{}
+>DESCRIPTION:{desc}
+>NO:{c}
+>NO:{b}
+>NO:{a}
+>DESCRIPTION:{desc}
+>NO:{y}
+>NO:{z}
+>NO:{x}
+>line: {tst cx}{}
+
+%clean
+
+  zmodload -ui zsh/zpty

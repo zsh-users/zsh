@@ -1,5 +1,7 @@
 2026-05-02  dana  <dana@dana.is>
 
+	* unposted: Test/Y05describe.ztst: add basic tests for _describe
+
 	* unposted: Test/Z04zgetopt.ztst: zgetopt: make sure zsh/zutil
 	loads
 
