@@ -1,3 +1,10 @@
+2026-05-03  Mikael Magnusson  <mikachu@gmail.com>
+
+	* unposted: Completion/Cygwin/Command/_cygcheck,
+	Completion/Linux/Command/_acpi, Completion/Unix/Command/_myrepos,
+	Completion/Unix/Command/_tex: remove the 'this' from 'show this
+	help and exit' in completers
+
 2026-05-02  Mikael Magnusson  <mikachu@gmail.com>
 
 	* unposted: Completion/Unix/Command/_mpc: fix typo for -h flag

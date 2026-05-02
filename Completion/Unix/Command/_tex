@@ -24,6 +24,6 @@ _arguments : \
     '-src-specials=-[insert source specials in certain places of the DVI file]:WHERE:_values -s , WHERE cr display hbox math par parend vbox' \
     '-translate-file=-[use the TCX file TCXNAME]:TCXNAME:' \
     '-8bit[make all characters printable by default]' \
-    '-help[display this help and exit]' \
+    '-help[display help and exit]' \
     '-version[output version information and exit]' \
     '*:TeX or LaTeX file:_files -g "*.(tex|TEX|texinfo|texi|dtx)(-.)"'
