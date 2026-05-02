@@ -1,3 +1,10 @@
+2026-05-04  dana  <dana@dana.is>
+
+	* 54448: Completion/Linux/Command/_btrfs,
+	Completion/Unix/Command/_base64, Completion/Unix/Command/_tree,
+	Completion/Zsh/Command/_emulate: update base64, btrfs, emulate,
+	tree
+
 2026-05-03  Mikael Magnusson  <mikachu@gmail.com>
 
 	* unposted: Completion/Cygwin/Command/_cygcheck,

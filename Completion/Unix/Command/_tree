@@ -1,22 +1,29 @@
 #compdef tree
 
+# tree has its own weird option-parsing method that requires arguments to short
+# options to appear in the next word... except for -L (as of 2.2.1)
 _arguments -s -S \
   '-a[show all files, including hidden ones]' \
   '-d[list directories only]' \
   '-l[follow symlinks that point to directories]' \
   '-f[print full path prefix for each file]' \
   '-x[stay on current filesystem]' \
-  '-L[specify max tree depth to descend]:level' \
+  '-L+[specify max tree depth to descend]: :_numbers -l1 depth' \
   '-R[recursively cross down the tree and execute tree again]' \
-  '-P[only list files matching a pattern]:pattern:_files' \
-  "-I[don't list files matching a pattern]:pattern:_files" \
+  '-P[only list files matching specified pattern]:pattern:_files' \
+  "-I[don't list files matching specified pattern]:pattern:_files" \
+  '--gitignore[respect .gitignore files for filtering]' \
+  '*--gitfile=[use specified file as gitignore file]:gitignore file:_files' \
   '--ignore-case[ignore case when pattern matching]' \
   '--matchdirs[include directory names in -P pattern matching]' \
+  '--metafirst[print file meta-data at beginning of line]' \
+  '--info[print file comments found in .info files]' \
+  '*--infofile=[use specified file as info file]:info file:_files' \
   '--noreport[omit file and directory report at end]' \
-  '--charset=[character set for HTML and for line drawing]:charset' \
-  "--filelimit=[don't descend directories with more than specified number of entries]:entries" \
-  '--timefmt=[use specified time format]:format:_date_formats' \
-  '-o[output to specified file]:file:_files' \
+  '--charset=[specify character set for HTML and line drawing]:charset' \
+  "--filelimit=[don't descend directories with more than specified number of entries]: :_numbers entries" \
+  '--timefmt=[use specified time format]: :_date_formats' \
+  '-o[output to specified file]: :_files' \
   '--du[print directory sizes]' \
   '--prune[exclude empty directories from the output]' \
   '(-N)-q[print non-printable characters as question mark, not caret]' \
@@ -32,24 +39,33 @@ _arguments -s -S \
   '-F[append descriptive character to end, like ls -F]' \
   '--inodes[print inode numbers]' \
   '--device[print device number to which file or directory belongs]' \
-  '(--sort -t -c -U)-v[sort the output as version]' \
+  '(--sort -t -c -U)-v[sort output as version]' \
   '(-v --sort -c -U)-t[sort output by modification time]' \
   '(-v --sort -t -U)-c[sort output by change time]' \
   '(-v --sort -t -c -r --dirsfirst)-U[leave files unsorted]' \
   '(-U)-r[sort in reversed order]' \
-  '(-v -t -c -U)--sort[sort in specified order]:order:(name version size mtime ctime)' \
-  '(-U)--dirsfirst[list directories before files]' \
+  '(-v -t -c -U)--sort=[sort in specified order]:order:(name version size mtime ctime none)' \
+  '(-U --filesfirst)--dirsfirst[list directories before files]' \
+  '(-U --dirsfirst)--filesfirst[list files before directories]' \
   "-i[don't print indentation lines]" \
-  '(-S -X)-A[use ANSI line graphics hack when printing indentation lines]' \
-  '(-A -X)-S[use console (CP437) line graphics]' \
-  '(-C)-n[turn colorization off always, over-ridden by the -C option]' \
+  '(-S -H -J -X)-A[use ANSI line graphics hack when printing indentation lines]' \
+  '(-A)-S[equivalent to --charset=IBM437]' \
+  '(-C)-n[turn colorization off always]' \
   '(-n)-C[turn colorization on always]' \
-  '(-A -S -n -C -J -H -T --nolinks)-X[XML output]' \
-  '(-A -S -n -C -X -H -T --nolinks)-J[JSON output]' \
-  '(-n -C -X)-H[turn on HTML output]:base HREF' \
-  '(-n -C -X)-T[title for HTML output]:title' \
-  '(-n -C -X)--nolinks[turn off hyperlinks in HTML output]' \
-  '--fromfile[read paths from specified files]' \
-  '(-)--version[version of tree]' \
-  '(-)--help[verbose usage listing]' \
-  '*:directory:_files -/'
+  '(-A -J -H -T --nolinks)-X[turn on XML output]' \
+  '(-A -X -H -T --nolinks)-J[turn on JSON output]' \
+  '(-A -J -X)-H[turn on HTML output]:base HREF' \
+  '(-A -J -X)--hintro=[use specified file as HTML intro]:HTML intro file:_files' \
+  '(-A -J -X)--houtro=[use specified file as HTML outro]:HTML outro file:_files' \
+  '(-A -J -X)-T[specify title for HTML output]:title' \
+  '(-A -J -X --hyperlink)--nolinks[turn off hyperlinks in HTML output]' \
+  '(-H -J -X --nolinks)--hyperlink[turn on OSC 8 hyperlinks]' \
+  '(-H -J -X --nolinks)--scheme=[specify schema used for OSC 8 hyperlinks]:schema [file\://]' \
+  '(-H -J -X --nolinks)--authority=[specify authority (host name) used for OSC 8 hyperlinks]: :_hosts' \
+  '(--fromtabfile)--fromfile[read paths from specified files]:paths file:_files' \
+  '(--fromfile)--fromtabfile[read tab-indented paths from specified files]:paths file:_files' \
+  '--fflinks[process symbolic link information with in files (with --from*file)]' \
+  '--opt-toggle[turn on option toggling]' \
+  '(- :)--version[display version information]' \
+  '(- :)--help[display help information]' \
+  '*: :_directories'
