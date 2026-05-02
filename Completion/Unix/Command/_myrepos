@@ -61,7 +61,7 @@ case $state in
       "offline:advise mr that it is in offline mode"
       "online:advise mr that it is in online mode"
       "remember:remember a command to be run later"
-      "help:display this help."
+      "help:display help."
     )
 
     mr_alias=(

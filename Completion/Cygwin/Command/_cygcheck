@@ -18,7 +18,7 @@ _arguments -C -s -S \
   '(* -)'{-l,--list-package}'[list contents of the specified package (or all packages if none given)]:*:package:->package' \
   '(* -)'{-p,--package-query}'[search for the specified regexp in the entire cygwin.com package repository (requires internet connectivity)]:regexp:' \
   '(-V --version -k --keycheck -f --find-package -l --list-package -p --package-query -c --check-setup -d --dump-only -v --verbose)'{-v,--verbose}'[produce more verbose output]' \
-  '(-V --version -k --keycheck -f --find-package -l --list-package -p --package-query -c --check-setup -d --dump-only -h --help)'{-h,--help}'[annotate output with explanatory comments when given with another command, otherwise print this help]' \
+  '(-V --version -k --keycheck -f --find-package -l --list-package -p --package-query -c --check-setup -d --dump-only -h --help)'{-h,--help}'[annotate output with explanatory comments when given with another command, otherwise print generic help]' \
   '(* -)'{-V,--version}'[print the version of cygcheck and exit]' \
   '(-)*:program: _command_names -e' && return
 

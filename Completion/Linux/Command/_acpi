@@ -14,5 +14,5 @@ _arguments -s \
     '(-c --celsius -f --fahrenheit -k --kelvin)'{-f,--fahrenheit}'[use Fahrenheit as the temperature scale]' \
     '(-c --celsius -f --fahrenheit -k --kelvin)'{-k,--kelvin}'[use Kelvin as the temperature scale]' \
     '(-d --directory)'{-d,--directory}'[path to ACPI info (/proc/acpi)]:directory:_files -/' \
-    '(-h --help)'{-h,--help}'[display this help and exit]' \
+    '(-h --help)'{-h,--help}'[display help and exit]' \
     '(-v --version)'{-v,--version}'[output version information and exit]'
