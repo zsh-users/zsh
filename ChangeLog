@@ -1,3 +1,8 @@
+2026-05-02  dana  <dana@dana.is>
+
+	* unposted: Test/Z04zgetopt.ztst: zgetopt: make sure zsh/zutil
+	loads
+
 2026-05-02  Mikael Magnusson  <mikachu@gmail.com>
 
 	* unposted: Completion/Unix/Command/_mpc: fix typo for -h flag
