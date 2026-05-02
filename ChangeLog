@@ -2,6 +2,12 @@
 
 	* unposted: Completion/Unix/Command/_mpc: fix typo for -h flag
 
+2026-05-02  dana  <dana@dana.is>
+
+	* 54423 (tweaked): Completion/Zsh/Command/_compinit,
+	Completion/compinit, Doc/Zsh/compsys.yo: compinit: improve and
+	document -w
+
 2026-04-30  Oliver Kiddle  <opk@zsh.org>
 
 	* Ryan Rotter: 54218: Completion/Unix/Command/_ip: add some
