@@ -1175,6 +1175,9 @@ the argument passed to the option.  Otherwise it is not set.
 vindex(ZSH_EXEPATH)
 item(tt(ZSH_EXEPATH))(
 Full pathname of the executable file of the current zsh process.
+This value should be accurate on Linux, macOS, FreeBSD, DragonflyBSD,
+NetBSD, Solaris, Cygwin, and their derivatives.  On other systems, it is
+determined from tt(argv[0]), which is not always accurate.
 )
 vindex(ZSH_NAME)
 item(tt(ZSH_NAME))(

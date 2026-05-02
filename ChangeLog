@@ -1,5 +1,8 @@
 2026-05-02  dana  <dana@dana.is>
 
+	* 54424: Doc/Zsh/params.yo, NEWS, Test/D04parameter.ztst:
+	ZSH_EXEPATH: improve documentation, add test
+
 	* 54423 (tweaked): Completion/Zsh/Command/_compinit,
 	Completion/compinit, Doc/Zsh/compsys.yo: compinit: improve and
 	document -w

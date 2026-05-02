@@ -20,8 +20,8 @@ The parameter expansion flag ! was added for the referred-to name of a
 named reference.
 
 The parameter ZSH_EXEPATH expands to the full path of the current zsh
-process, reliably on Linux, Mac, {Net,Free,Dragonfly}BSD and falls
-back to argv[0] elsewhere.
+process, reliably on Linux, Mac, {Net,Free,Dragonfly}BSD, Solaris, and
+Cygwin, and falls back to argv[0] elsewhere.
 
 The default keymap is now emacs. Users of the vi keymaps please check
 README to see if you are affected.

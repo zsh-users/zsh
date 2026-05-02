@@ -2864,3 +2864,24 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 0:regression for workers/53179 unicode ZDOTDIR
 F:output ignorable as long as not an error
 *>*
+
+  argv0=/not/a/real/path
+  exepath=$(
+    ARGV0=$argv0 $ZTST_testdir/../Src/zsh -fc 'print -r - $ZSH_EXEPATH'
+  )
+  if
+    [[ $OSTYPE == (darwin|dragonfly|freebsd|netbsd)* ]] || # via library call
+    [[ $OSTYPE == (cygwin|linux|solaris)* && -e /proc/self ]] # via procfs
+  then
+    [[ $exepath == (/*)#/Src/zsh ]] && print -rn 'match: '
+    print -r - $exepath
+  # on any other system without procfs, we should have argv[0] verbatim since
+  # it's already absolute
+  elif [[ ! -e /proc/$$ ]]; then
+    [[ $exepath == $argv0 ]] && print -rn 'match: '
+    print -r - $exepath
+  else
+    ZTST_skip='ZSH_EXEPATH not reliable'
+  fi
+-:ZSH_EXEPATH
+*>match: /*
