@@ -1,3 +1,8 @@
+2026-05-10  Oliver Kiddle  <opk@zsh.org>
+
+	* 54445: Completion/Unix/Type/_terminals: parse termcap
+	and full terminfo source formats to support more systems
+
 2026-05-09  Bart Schaefer  <schaefer@zsh.org>
 
 	* Philippe Altherr: 54374: Src/exec.c Test/C03traps.ztst: Run
