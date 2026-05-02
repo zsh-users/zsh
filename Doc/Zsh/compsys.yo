@@ -167,7 +167,8 @@ change, it is easiest to delete the dump file by hand so that
 tt(compinit) will re-create it the next time it is run.  The check
 performed to see if there are new functions can be omitted by giving
 the option tt(-C).  In this case the dump file will only be created if
-there isn't one already.
+there isn't one already.  Use option tt(-w) to explain why a dump file
+isn't loaded and/or why it's regenerated.
 
 The dumping is actually done by another function, tt(compdump), but you
 will only need to run this yourself if you change the configuration

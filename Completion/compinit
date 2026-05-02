@@ -461,6 +461,7 @@ if [[ -n "$_i_check" ]]; then
         if ! read -q \
 "?zsh compinit: insecure $_i_q, run compaudit for list.
 Ignore insecure $_i_q and continue [y] or abort compinit [n]? "; then
+	  print -u2
 	  print -u2 "$0: initialization aborted"
           unfunction compinit compdef
           unset _comp_dumpfile _comp_secure compprefuncs comppostfuncs \
@@ -468,6 +469,7 @@ Ignore insecure $_i_q and continue [y] or abort compinit [n]? "; then
 
           return 1
         fi
+        print -u2
       fi
       fpath=(${fpath:|_i_wdirs})
       (( $#_i_wfiles )) && _i_files=( "${(@)_i_files:#(${(j:|:)_i_wfiles%.zwc})}"  )
@@ -484,6 +486,8 @@ autoload -RUz compdump compinstall
 
 _i_done=''
 
+[[ _i_why -eq 1 ]] && print -ru2 "Using dump file: $_comp_dumpfile"
+
 if [[ -f "$_comp_dumpfile" ]]; then
   if [[ -n "$_i_check" ]]; then
     IFS=$' \t' read -rA _i_line < "$_comp_dumpfile"
@@ -493,7 +497,7 @@ if [[ -f "$_comp_dumpfile" ]]; then
       builtin . "$_comp_dumpfile"
       _i_done=yes
     elif [[ _i_why -eq 1 ]]; then
-      print -nu2 "Loading dump file skipped, regenerating"
+      print -nu2 "Loading dump file skipped"
       local pre=" because: "
       if [[ _i_autodump -ne 1 ]]; then
         print -nu2 $pre"-D flag given"
@@ -513,8 +517,9 @@ if [[ -f "$_comp_dumpfile" ]]; then
     _i_done=yes
   fi
 elif [[ _i_why -eq 1 ]]; then
-  print -u2 "No existing compdump file found, regenerating"
+  print -u2 "No existing dump file found"
 fi
+
 if [[ -z "$_i_done" ]]; then
   typeset -A _i_test
 
@@ -547,6 +552,7 @@ if [[ -z "$_i_done" ]]; then
   # If autodumping was requested, do it now.
 
   if [[ $_i_autodump = 1 ]]; then
+    [[ _i_why -eq 1 ]] && print -u2 "Regenerating dump file"
     compdump
   fi
 fi
