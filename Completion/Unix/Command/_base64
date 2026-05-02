@@ -8,7 +8,12 @@
 local variant type=base${service//[^2346]/}
 
 _pick_variant -r variant \
-  gnu='(Free Soft|uutils)' fourmilab=fourmi darwin=-D unix --version
+  gnu='(Free Soft|uutils)' freebsd=FreeBSD netbsd='<wrap>' fourmilab=fourmi unix --version
+
+# as of macOS 13, Apple's base64 is based on FreeBSD's, and it reports that way,
+# but it's moderately customised so that it supports roughly the same options as
+# the base64 shell script they provided previously
+[[ $variant == (freebsd|unix) && $OSTYPE == darwin* ]] && variant=darwin
 
 case $variant in
   gnu)
@@ -27,15 +32,40 @@ case $variant in
   darwin)
     _arguments -s -S : \
       '(: -)'{-h,--help}'[display help information]' \
+      '(: -)--version[display version information]' \
       + '(dec)' \
-      '(enc)'{-D,--decode}"[decode input from $type]" \
+      '(enc)'{-d,-D,--decode}"[decode input from $type]" \
       + '(enc)' \
-      '(dec)'{-b+,--break=}'[wrap encoded lines at specified number of columns]:number of columns' \
+      '(dec)'{-b+,-w+,--break=,--wrap=}'[wrap encoded lines at specified number of columns]:number of columns' \
+      '!(dec)--breaks=:number of columns' \
       + '(out)' \
       {-o+,--output=}'[specify output file]:output file:_files' \
       + '(in)' \
-      {-i+,--input=}'[specify input file]:input file:_files' \
+      {-i+,--input=}'[specify input file]:input file:_files'
+    return
+    ;;
+  freebsd)
+    _arguments -s -S -A '-*' : \
+      '(: -)--help[display help information]' \
+      '(: -)--version[display version information]' \
+      + dec \
+      '(enc -d --decode)'{-d,--decode}"[decode input from $type]" \
+      '!(enc)'{-i,--ignore-garbage} \
+      + '(enc)' \
+      '(dec)'{-w+,--wrap=}'[wrap encoded lines at specified number of columns]:number of columns' \
+      + in \
       '1:input file:_files'
+    return
+    ;;
+  netbsd)
+    _arguments -s -S -A '-*' : \
+      + dec \
+      '(enc -d -D)'{-d,-D}"[decode input from $type]" \
+      '(enc)-i[ignore irrelevant characters when decoding]' \
+      + '(enc)' \
+      '(dec)'{-b+,-w+}'[wrap encoded lines at specified number of columns]:number of columns' \
+      + in \
+      '*:input file:_files'
     return
     ;;
   fourmilab)

@@ -155,9 +155,9 @@ while (( $#state )); do
             '-c-[compress files while defragmenting]::compression algorithm:(zlib lzo zstd)'
             '-r[defragment files recursively]'
             '-f[flush after defragmenting]'
-            '-s[start position]: :_numbers -u bytes -d "beginning of file" offset K M G T P E'
-            '-l[defragment limited number of bytes]: :_numbers -u bytes length K M G T P E'
-            '-t[defragment only extents up to a certain size]: :_numbers -u bytes -d 32M "maximum extent size" K M G T P E'
+            '-s+[start position]: :_numbers -u bytes -d "beginning of file" offset K M G T P E'
+            '-l+[defragment limited number of bytes]: :_numbers -u bytes length K M G T P E'
+            '-t+[defragment only extents up to a certain size]: :_numbers -u bytes -d 32M "maximum extent size" K M G T P E'
             '*:file:_files'
           )
         ;;
@@ -213,8 +213,8 @@ while (( $#state )); do
             '-d[print separate statistics for each device]'
             '-r[read only mode]'
             '-R[raw print mode]'
-            '-c[set ioprio class]:class:(( 0\:none 1\:realtime 2\:best-effort 3\:idle))'
-            '-n[set ioprio classdata]:classdata:(0 1 2 3 4 5 6 7)'
+            '-c+[set ioprio class]:class:(( 0\:none 1\:realtime 2\:best-effort 3\:idle))'
+            '-n+[set ioprio classdata]:classdata:(0 1 2 3 4 5 6 7)'
             '1:path or device:_files'
           )
           [[ ${${(P)group}[cmd]} == start ]] && args+=(
@@ -246,7 +246,7 @@ while (( $#state )); do
         property:get) args+=( '2:property:(ro label compression)' );&
         property:list)
           args+=(
-            '-t[specify object type]:object type:(subvol filesystem inode device)'
+            '-t+[specify object type]:object type:(subvol filesystem inode device)'
             '1: : _guard "^-*" object'
           )
         ;;
