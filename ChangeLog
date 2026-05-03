@@ -1,3 +1,7 @@
+2026-05-03  dana  <dana@dana.is>
+
+	* unposted: Completion/Unix/Command/_echo: add _echo
+
 2026-05-03  Mikael Magnusson  <mikachu@gmail.com>
 
 	* unposted: Completion/Cygwin/Command/_cygcheck,
