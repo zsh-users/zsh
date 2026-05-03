@@ -1,0 +1,32 @@
+#compdef echo gecho
+
+local variant
+local -a args
+
+_pick_variant -r variant -b zsh gnu='Free Soft' $OSTYPE --version
+
+args=(
+  # these are only interpreted as options when they're the only arg
+  + gnu-hv
+  '(-)--help[display help information]'
+  '(-)--version[display version information]'
+  + other
+  '(gnu-hv -E)-e[interpret escape sequences]'
+  "(gnu-hv -e)-E[don't interpret escape sequences]"
+  "(gnu-hv)-n[don't output trailing newline]"
+)
+
+case $variant in
+  gnu) ;; # pass
+  zsh|openbsd*)
+    args=( ${args:#(|\(*\))--*} )
+    ;;
+  darwin*|dragonfly*|netbsd*|freebsd*)
+    args=( ${args:#(|\(*\))(--|-[eE]\[)*} )
+    ;;
+  *)
+    args=( )
+    ;;
+esac
+
+_arguments -s -A '' : $args '*:string:_default'

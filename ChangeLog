@@ -5,6 +5,10 @@
 	Completion/Unix/Command/_tex: remove the 'this' from 'show this
 	help and exit' in completers
 
+2026-05-03  dana  <dana@dana.is>
+
+	* unposted: Completion/Unix/Command/_echo: add _echo
+
 2026-05-02  Mikael Magnusson  <mikachu@gmail.com>
 
 	* unposted: Completion/Unix/Command/_mpc: fix typo for -h flag
