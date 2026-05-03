@@ -71,14 +71,14 @@ _layouts () {
 if (( $+words[(r)-(A|-assemble)] )); then
 	args=(
 		'(--bitmap)'--bitmap='[bitmap file to use with the array]::bitmap file:_files'
-		'(--uuid -u)'{--uuid=,-u}'[UUID of array to assemble]:UUID'
-		'(--super-minor -m)'{--super-minor=,-m}'[minor number to look for in super-block]:minor number'
-		'(--name -N)'{--name=,-N}'[array name to look for in super-block]:array name'
-		'(--config -c)'{--config=,-c}'[config file]::config file:_files'
+		'(--uuid -u)'{--uuid=,-u+}'[UUID of array to assemble]:UUID'
+		'(--super-minor -m)'{--super-minor=,-m+}'[minor number to look for in super-block]:minor number'
+		'(--name -N)'{--name=,-N+}'[array name to look for in super-block]:array name'
+		'(--config -c)'{--config=,-c+}'[config file]::config file:_files'
 		'(--scan -s)'{--scan,-s}'[scan config file for missing information]'
 		'(--run -R)'{--run,-R}'[try to start the array even if not enough devices for a full array are present]'
 		'(--force -f)'{--force,-f}'[assemble the array even if some superblocks appear out-of-date]'
-		'(--update -U)'{--update=,-U}'[update superblock]::update the superblock:(sparc2.2 summaries uuid resync byteorder super-minor)'
+		'(--update -U)'{--update=,-U+}'[update superblock]::update the superblock:(sparc2.2 summaries uuid resync byteorder super-minor)'
 	)
 fi
 

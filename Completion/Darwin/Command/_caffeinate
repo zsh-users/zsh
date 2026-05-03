@@ -6,7 +6,7 @@ _arguments -s -S : \
   '-m[prevent disk idle sleep]' \
   '-s[prevent system sleep (AC power only)]' \
   '-u[declare that user is active]' \
-  '(:)-t[specify assertion timeout value]:timeout (seconds)' \
-  '(:)-w[wait for specified PID]: :_pids' \
+  '(:)-t+[specify assertion timeout value]:timeout (seconds)' \
+  '(:)-w+[wait for specified PID]: :_pids' \
   '(-)1: : _command_names -e' \
   '(-)*::command argument'
