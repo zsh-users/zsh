@@ -76,7 +76,7 @@ _man() {
     [[ $variant == (freebsd)* ]] && args+=(
       '(: -)-h[display help information]'
       # @todo Could enumerate these
-      '-m[search manual of specified architecture]:architecture'
+      '-m+[search manual of specified architecture]:architecture'
       '-o[use non-localized man pages]'
       '(-a)-S+[specify manual sections to search]: :->sects'
     )
@@ -135,7 +135,7 @@ _man() {
     [[ $variant == openbsd* ]] && args+=(
       "(${(j< >)modes})-l+[format and display specified file]:*:::manual file:_files"
       # @todo Could enumerate these
-      '-S[search manual of specified architecture]:architecture'
+      '-S+[search manual of specified architecture]:architecture'
     )
     [[ $variant == solaris* ]] && args+=(
       "(${(j< >)modes})-l[display file locations]"

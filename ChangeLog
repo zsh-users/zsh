@@ -1,5 +1,9 @@
 2026-05-03  dana  <dana@dana.is>
 
+	* unposted: Completion/Darwin/Command/_caffeinate,
+	Completion/Linux/Command/_mdadm, Completion/Unix/Command/_man:
+	add missing + to some short-option specs
+
 	* unposted: Completion/Unix/Command/_echo: add _echo
 
 2026-05-03  Mikael Magnusson  <mikachu@gmail.com>
