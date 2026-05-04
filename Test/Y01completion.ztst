@@ -75,9 +75,9 @@
 >line: {: ~zuser2}{}
 >line: {: ~zuser1}{}
 
-  comptest $'echo ;:\C-b\C-b\t'
+  comptest $'ls ;:\C-b\C-b\t'
 0:directories and files before separator
->line: {echo }{;:}
+>line: {ls }{;:}
 >DESCRIPTION:{file}
 >DI:{dir1}
 >DI:{dir2}

@@ -7,6 +7,9 @@
 
 2026-05-03  dana  <dana@dana.is>
 
+	* unposted: Test/Y01completion.ztst: Y01: fix test broken by
+	_echo
+
 	* unposted: Completion/Darwin/Command/_caffeinate,
 	Completion/Linux/Command/_mdadm, Completion/Unix/Command/_man:
 	add missing + to some short-option specs
