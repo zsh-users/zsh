@@ -31,8 +31,9 @@ else
         ;;
     # Otherwise, let's ask darcs for all possible options
     *)
-      _wanted args expl 'arg for darcs command' \
-        compadd -- $( darcs ${words[2]} --list-option )
+        local -a darcs_opts
+        darcs_opts=( ${(@)${(f)"$(darcs ${words[2]} --list-options)"}//;/:} )
+        _describe -t args 'arg for darcs command' darcs_opts
       ;;
   esac
 fi
