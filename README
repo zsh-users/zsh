@@ -154,6 +154,12 @@ supported by _arguments, bringing it in line with the documentation.  As
 a consequence, a leading '!' in a value name must now be escaped if it
 should be taken literally, as in: _values desc '!hidden' '\!literal'
 
+The getopts builtin no longer interprets arguments beginning with a +
+as potential options during parsing when the POSIX_BUILTINS option is
+enabled.  Additionally, as a consequence of learning the related -p
+option, an opt spec beginning with a hyphen must be guarded by - or --.
+(Note that the effect of a hyphen in the opt spec is unspecified.)
+
 Incompatibilities between 5.8.1 and 5.9
 ---------------------------------------
 

@@ -988,16 +988,16 @@ tt(read -zr).
 )
 findex(getopts)
 cindex(options, processing)
-item(tt(getopts) var(optstring) var(name) [ var(arg) ... ])(
+item(tt(getopts) [ tt(-p) ] var(optstring) var(name) [ var(arg) ... ])(
 Checks the var(arg)s for legal options.  If the var(arg)s are omitted,
-use the positional parameters.  A valid option argument
+the positional parameters are used.  A valid option argument
 begins with a `tt(PLUS())' or a `tt(-)'.  An argument not beginning with
 a `tt(PLUS())' or a `tt(-)', or the argument `tt(-)tt(-)', ends the options.
 Note that a single `tt(-)' is not considered a valid option argument.
 var(optstring) contains the letters that tt(getopts)
 recognizes.  If a letter is followed by a `tt(:)', that option
-requires an argument.  The options can be
-separated from the argument by blanks.
+requires an argument.  The argument may appear either immediately
+following the option in the same word, or in the next word.
 
 Each time it is invoked, tt(getopts) places the option letter it finds
 in the shell parameter var(name), prepended with a `tt(PLUS())' when
@@ -1007,15 +1007,17 @@ is stored in tt(OPTARG).
 vindex(OPTIND, use of)
 vindex(OPTARG, use of)
 
+When the terminator `tt(-)tt(-)' is encountered, tt(OPTIND) is
+incremented such that it can be tt(shift)ed away with the options.  This
+is not true of other non-option arguments, including a single `tt(-)'.
+
 The first option to be examined may be changed by explicitly assigning
 to tt(OPTIND).  tt(OPTIND) has an initial value of tt(1), and is
 normally set to tt(1) upon entry to a shell function and restored
-upon exit.  (The tt(POSIX_BUILTINS) option disables this, and also changes
-the way the value is calculated to match other shells.)  tt(OPTARG)
-is not reset and retains its value from the most recent call to
-tt(getopts).  If either of tt(OPTIND) or tt(OPTARG) is explicitly
-unset, it remains unset, and the index or option argument is not
-stored.  The option itself is still stored in var(name) in this case.
+upon exit.  tt(OPTARG) is not reset and retains its value from the most
+recent call to tt(getopts).  If either of tt(OPTIND) or tt(OPTARG) is
+explicitly unset, it remains unset, and the index or option argument is
+not stored.  The option itself is still stored in var(name) in this case.
 
 A leading `tt(:)' in var(optstring) causes tt(getopts) to store the
 letter of any invalid option in tt(OPTARG), and to set var(name) to
@@ -1023,6 +1025,14 @@ letter of any invalid option in tt(OPTARG), and to set var(name) to
 missing.  Otherwise, tt(getopts) sets var(name) to `tt(?)' and prints
 an error message when an option is invalid.  The exit status is
 nonzero when there are no more options.
+
+When either the tt(POSIX_BUILTINS) option is enabled or the tt(-p)
+option is given to tt(getopts) itself, tt(getopts) behaves in a more
+POSIX-compatible manner.  Specifically, handling of
+`tt(PLUS())'-prefixed options is disabled (they are treated as
+non-options) and the value of tt(OPTIND) is calculated differently.
+Additionally, with tt(POSIX_BUILTINS) (but not with tt(-p)), the value
+of tt(OPTIND) is not kept local to the calling function.
 )
 findex(hash)
 item(tt(hash) [ tt(-Ldfmrv) ] [ var(name)[tt(=)var(value)] ] ...)(

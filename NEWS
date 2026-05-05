@@ -86,6 +86,9 @@ to use outside of completion contexts.
 
 The zsh/mathfunc module now provides isnan() and isinf() functions.
 
+The getopts builtin learnt a -p option to make it behave like the
+POSIX_BUILTINS option has been temporarily enabled.
+
 Changes since 5.8.1
 -------------------
 

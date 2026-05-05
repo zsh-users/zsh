@@ -125,3 +125,64 @@
 0:OPTIND calculation with and without POSIX_BUILTINS (workers/42248)
 >no_posix_builtins: <1><1><2><1><1><3><5><7><6>
 >posix_builtins: <1><1><2><2><2><3><6><7><7>
+
+  for 1 in no_posix_builtins posix_builtins; do (
+    setopt $1
+    print -rn - $1:
+    set -- -a -b +b -c
+    while getopts :abc opt; do
+      case $opt in
+        a|b|+b|c) print -rn - " $opt" ;;
+        ?)        print -rn - " ?$OPTARG" ;;
+      esac
+    done
+    print
+  ); done
+0:POSIX_BUILTINS disables '+' variant handling
+>no_posix_builtins: a b +b c
+>posix_builtins: a b
+
+  (
+    setopt no_posix_builtins
+    for 1 in -a +a -x +x; do
+      () { local opt; getopts :abc opt; print -r - $opt } $1
+    done
+    for 1 in -a +a -x +x; do
+      () { local opt; getopts -p :abc opt; print -r - $opt } $1
+    done
+  )
+0:-p works like POSIX_BUILTINS
+>a
+>+a
+>?
+>?
+>a
+>
+>?
+>
+
+  # not enough arguments
+  () { getopts }
+  () { getopts '' }
+  () { getopts x }
+  () { getopts - x }
+  () { getopts -p - x }
+  () { getopts -p -- x }
+  # invalid option to getopts
+  () { getopts -x x }
+  () { getopts -x x y }
+  () { getopts -x - x y }
+  # guarded spec
+  () { getopts - -x y }
+  # argv on command line
+  () { getopts x y a b c }
+-:option parsing
+?(anon):getopts: not enough arguments
+?(anon):getopts: not enough arguments
+?(anon):getopts: not enough arguments
+?(anon):getopts: not enough arguments
+?(anon):getopts: not enough arguments
+?(anon):getopts: not enough arguments
+?(anon):getopts: bad option: -x
+?(anon):getopts: bad option: -x
+?(anon):getopts: bad option: -x

@@ -76,7 +76,7 @@ static struct builtin builtins[] =
     BUILTIN("float", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "E:%F:%HL:%R:%Z:%ghlp:%rtux", "E"),
     BUILTIN("functions", BINF_PLUSOPTS, bin_functions, 0, -1, 0, "ckmMstTuUWx:z", NULL),
     BUILTIN("getln", 0, bin_read, 0, -1, 0, "ecnAlE", "zr"),
-    BUILTIN("getopts", 0, bin_getopts, 2, -1, 0, NULL, NULL),
+    BUILTIN("getopts", 0, bin_getopts, 2, -1, 0, "p", NULL),
     BUILTIN("hash", BINF_MAGICEQUALS, bin_hash, 0, -1, 0, "Ldfmrv", NULL),
 
 #ifdef ZSH_HASH_DEBUG
@@ -5669,12 +5669,17 @@ int optcind;
 
 /**/
 int
-bin_getopts(UNUSED(char *name), char **argv, UNUSED(Options ops), UNUSED(int func))
+bin_getopts(UNUSED(char *name), char **argv, Options ops, UNUSED(int func))
 {
-    int lenstr, lenoptstr, quiet, lenoptbuf;
+    int lenstr, lenoptstr, quiet, lenoptbuf, posix;
     char *optstr = unmetafy(*argv++, &lenoptstr), *var = *argv++;
     char **args = (*argv) ? argv : pparams;
     char *str, optbuf[2] = " ", *p, opch;
+
+    // note that resetting + restoring OPTIND happens in doshfunc(), so using -p
+    // or enabling POSIX_BUILTINS inside a function that calls getopts is not
+    // exactly the same as enabling POSIX_BUILTINS before the function is called
+    posix = isset(POSIXBUILTINS) || OPT_ISSET(ops, 'p');
 
     /* zoptind keeps count of the current argument number.  The *
      * user can set it to zero to start a new option parse.     */
@@ -5703,7 +5708,7 @@ bin_getopts(UNUSED(char *name), char **argv, UNUSED(Options ops), UNUSED(int fun
 	str = unmetafy(dupstring(args[zoptind - 1]), &lenstr);
     }
     if(!optcind) {
-	if(lenstr < 2 || (*str != '-' && *str != '+'))
+	if (lenstr < 2 || (*str != '-' && (posix || *str != '+')))
 	    return 1;
 	if(lenstr == 2 && str[0] == '-' && str[1] == '-') {
 	    zoptind++;
@@ -5723,7 +5728,7 @@ bin_getopts(UNUSED(char *name), char **argv, UNUSED(Options ops), UNUSED(int fun
     if(opch == ':' || !(p = memchr(optstr, opch, lenoptstr))) {
 	p = "?";
 	/* Keep OPTIND correct if the user doesn't return after the error */
-	if (isset(POSIXBUILTINS)) {
+	if (posix) {
 	    optcind = 0;
 	    zoptind++;
 	}
@@ -5744,7 +5749,7 @@ bin_getopts(UNUSED(char *name), char **argv, UNUSED(Options ops), UNUSED(int fun
 	if(optcind == lenstr) {
 	    if(!args[zoptind]) {
 		/* Fix OPTIND as above */
-		if (isset(POSIXBUILTINS)) {
+		if (posix) {
 		    optcind = 0;
 		    zoptind++;
 		}
