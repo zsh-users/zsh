@@ -142,14 +142,23 @@
 
 # can't be bothered with -S
 
-  print -ru $ZTST_fd 'This test may take two seconds...'
-  touch $newnewnew
-  if (( isnfs )); then
+  zmodload -s zsh/datetime && {
+    t= &&
+    strftime -s t %m%d%H%M.%S $(( EPOCHSECONDS + 2 )) &&
+    touch -t $t -- $newnewnew &&
+    touch -at $t -- $unmodified
+  } 2> /dev/null || {
+    print -ru $ZTST_fd 'This test will take two seconds...' &&
+    sleep 2 &&
+    touch -- $newnewnew &&
+    touch -a -- $unmodified
+  }
+  if (( $? )); then
+    ZTST_skip='[[ -N file ]] not tested; touch failed'
+  elif (( isnfs )); then
     ZTST_skip="[[ -N file ]] not supported with NFS"
   elif ! zmodload -F zsh/stat b:zstat 2> /dev/null; then
     ZTST_skip='[[ -N file ]] not tested; zsh/stat not available'
-  elif ! { sleep 2; touch -a $unmodified 2> /dev/null }; then
-    ZTST_skip='[[ -N file ]] not tested; touch failed'
   elif [[ "$(zstat +atime $unmodified)" == "$(zstat +mtime $unmodified)" ]]; then
     ZTST_skip='[[ -N file ]] not supported on this file system'
   else

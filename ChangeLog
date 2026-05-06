@@ -1,5 +1,8 @@
 2026-05-06  dana  <dana@dana.is>
 
+	* 54484: Test/C02cond.ztst: fix -nt test on low-resolution file
+	systems
+
 	* 54471: Doc/Zsh/builtins.yo, Doc/Zsh/options.yo, NEWS, README,
 	Src/builtin.c, Test/B10getopts.ztst: getopts: don't look for +o
 	with posix_builtins, add -p
