@@ -9,6 +9,9 @@
 	Src/Zle/zle_params.c, Src/Zle/zle_utils.c, Src/Zle/zle_vi.c:
 	Make sure zleline is null-terminated
 
+	* 54481: Src/Zle/zle_misc.c: Move variable into scope where
+	it's used
+
 2026-05-10  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/Linux/Command/_selinux: complete files

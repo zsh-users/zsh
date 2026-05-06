@@ -853,11 +853,11 @@ whatcursorposition(UNUSED(char **args))
     char msg[100];
     char *s = msg, *mbstr;
     int bol = findbol(), len;
-    ZLE_CHAR_T c = zleline[zlecs];
 
     if (zlecs == zlell)
 	strucpy(&s, "EOF");
     else {
+	ZLE_CHAR_T c = zleline[zlecs];
 	strucpy(&s, "Char: ");
 	switch (c) {
 	case ZWC(' '):
