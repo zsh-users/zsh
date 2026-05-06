@@ -2636,7 +2636,7 @@ as by adding `tt(-cursor)' to disable cursor shape and color changing.
 
 When ZLE starts, it will add entries for features that were auto-detected.  This
 auto-detection uses extensions itself, all named with a `tt(query)' prefix.  As
-this happens when ZLE starts disabling them needs to be done early in the
+this happens when ZLE starts, disabling them needs to be done early in the
 startup files.  A value of `tt(-query)' will disable all terminal queries on
 startup, including those that query terminal properties such as colors rather
 than detecting features.  Populating the array with the status of auto-detected

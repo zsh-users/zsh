@@ -1,5 +1,8 @@
 2026-05-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 54486: Doc/Zsh/zle.yo, Src/Zle/termquery.c: fix reading
+	outside string issue reported by valgrind
+
 	* 54445: Completion/Unix/Type/_terminals: parse termcap
 	and full terminfo source formats to support more systems
 

@@ -707,11 +707,11 @@ collate_seq(int sindex, int dir)
 	    int negate = (**e == '-');
 	    if (negate != enabled)
 		continue;
-	    if ((editext[i].class &&
-                !strncmp(*e + negate, editext[i].key, editext[i].class) &&
-		!*(*e + negate + editext[i].class)) ||
+	    if ((!editext[i].class ||
+                !strncmp(*e + negate, editext[i].key, editext[i].class)) &&
+		((editext[i].class && !*(*e + negate + editext[i].class)) ||
 		!strcmp(*e + negate + editext[i].class,
-                    editext[i].key + editext[i].class))
+                    editext[i].key + editext[i].class)))
 	    {
                 enabled = !negate;
 		break;
