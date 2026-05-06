@@ -2,6 +2,11 @@
 
 	* 54518: Util/zsh-merge-changelog: add git merge driver
 
+2026-05-11  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 54480: Src/Zle/zle_vi.c: Wrong memcmp variant used in
+	getvirange()
+
 2026-05-10  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/Linux/Command/_selinux: complete files
