@@ -867,6 +867,7 @@ pushlineoredit(char **args)
 	ZS_memcpy(zleline, zhline, ics);
 	zlell += ics;
 	zlecs += ics;
+	zleline[zlell] = ZWC('\0');
 	free(zhline);
     }
     ret = pushline(args);

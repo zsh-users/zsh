@@ -1193,6 +1193,7 @@ quoteline(UNUSED(char **args))
     sizeline(len);
     ZS_memcpy(zleline, str, len);
     zlecs = zlell = len;
+    zleline[zlell] = ZWC('\0');
     return 0;
 }
 

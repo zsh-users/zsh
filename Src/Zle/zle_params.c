@@ -247,8 +247,10 @@ set_buffer(UNUSED(Param pm), char *x)
     if(x) {
 	setline(x, 0);
 	zsfree(x);
-    } else
+    } else {
 	viinsbegin = zlecs = zlell = 0;
+	zleline[zlell] = ZWC('\0');
+    }
     fixsuffix();
     menucmp = 0;
 }
@@ -342,6 +344,7 @@ set_lbuffer(UNUSED(Param pm), char *x)
     ZS_memmove(zleline + len, zleline + zlecs, zlell - zlecs);
     ZS_memcpy(zleline, y, len);
     zlell = zlell - zlecs + len;
+    zleline[zlell] = ZWC('\0');
     zlecs = len;
     zsfree(x);
     if (len)
@@ -371,6 +374,7 @@ set_rbuffer(UNUSED(Param pm), char *x)
     else
 	y = ZWS(""), len = 0;
     sizeline(zlell = zlecs + len);
+    zleline[zlell] = ZWC('\0');
     ZS_memcpy(zleline + zlecs, y, len);
     zsfree(x);
     if (len)

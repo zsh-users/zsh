@@ -511,6 +511,7 @@ stringaszleline(char *instr, int incs, int *outll, int *outsz, int *outcs)
 	if (outcs && inptr <= instr + incs)
 	    *outcs = outptr - outstr;
 	*outll = outptr - outstr;
+	outstr[*outll] = ZWC('\0');
     } else {
 	*outstr = ZWC('\0');
 	*outll = 0;
