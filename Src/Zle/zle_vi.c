@@ -235,6 +235,7 @@ getvirange(int wf)
 	if (histline != hist1 || zlell != lastll || ZS_memcmp(zleline, lastline, zlell)) {
 	    histline = hist1;
 	    ZS_memcpy(zleline, lastline, zlell = lastll);
+	    zleline[zlell] = ZWC('\0');
 	    zlecs = pos;
 	    mark = mpos;
 	    virangeflag = 0;
