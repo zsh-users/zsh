@@ -5818,6 +5818,7 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	    Shfunc shcopy = (Shfunc)zhalloc(sizeof(struct shfunc));
 	    memcpy(shcopy, shfunc, sizeof(struct shfunc));
 	    shcopy->node.nam = dupstring(shfunc->node.nam);
+	    shcopy->filename = dupstring(shfunc->filename);
 	    shfunc = shcopy;
 	    name = shfunc->node.nam;
 	}

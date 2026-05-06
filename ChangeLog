@@ -37,6 +37,8 @@
 
 2026-05-11  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54479: Src/exec.c: Fix use-after-free when handling TRAPEXIT
+
 	* 54499: Doc/Zsh/manual.yo, Doc/ztexi.yo: Add missing detailmenu
 	texi markup
 
