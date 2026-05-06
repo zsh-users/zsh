@@ -4,6 +4,9 @@
 
 2026-05-11  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54481: Src/Zle/zle_misc.c: Move variable into scope where
+	it's used
+
 	* 54483: Src/Zle/zle_hist.c, Src/Zle/zle_misc.c,
 	Src/Zle/zle_params.c, Src/Zle/zle_utils.c, Src/Zle/zle_vi.c:
 	Make sure zleline is null-terminated
