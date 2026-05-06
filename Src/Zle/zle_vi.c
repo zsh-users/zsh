@@ -233,7 +233,7 @@ getvirange(int wf)
 	/* It is an error to use a non-movement command to delimit the *
 	 * range.  We here reject the case where the command modified  *
 	 * the line, or selected a different history line.             */
-	if (histline != hist1 || zlell != lastll || memcmp(zleline, lastline, zlell)) {
+	if (histline != hist1 || zlell != lastll || ZS_memcmp(zleline, lastline, zlell)) {
 	    histline = hist1;
 	    ZS_memcpy(zleline, lastline, zlell = lastll);
 	    zlecs = pos;
