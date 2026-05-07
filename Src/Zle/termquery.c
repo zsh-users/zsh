@@ -619,7 +619,7 @@ static char*
 url_encode(const char* path, size_t *ulen)
 {
     char *url = zhalloc(strlen(path) * 3 + 1); /* worst case length triples */
-    const char *in = path;
+    const unsigned char *in = (unsigned char*)path;
     char *out = url;
 
     for (; *in; in++) {

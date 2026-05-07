@@ -12,6 +12,9 @@
 	* 54481: Src/Zle/zle_misc.c: Move variable into scope where
 	it's used
 
+	* 54490: Src/Zle/termquery.c: Fix buffer overflow and wrong
+	behavior in url_encode
+
 2026-05-10  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/Linux/Command/_selinux: complete files
