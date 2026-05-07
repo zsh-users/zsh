@@ -457,6 +457,8 @@ handle_color(int bg, int red, int green, int blue)
         case 2:  /* cursor color */
 	    memo_cursor = (red << 24) | (green << 16) | (blue << 8);
 	    break;
+	default: /* invalid color */
+	    return;
     }
 
     colour = zalloc(8);
