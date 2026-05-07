@@ -567,7 +567,7 @@ _tmux-list-windows() {
   [[ -n ${tmux_describe} ]] && print "list windows of a session" && return
   _arguments -s \
     '-a[list all windows the tmux server possesses]' \
-    '-F[specify output format]:format:__tmux-formats' \
+    '-F+[specify output format]:format:__tmux-formats' \
     '-f+[filter items]:filter format:__tmux-formats' \
     '-t+[specify session]:session:__tmux-sessions'
 }
@@ -764,7 +764,7 @@ _tmux-respawn-pane() {
     '-c+[specify a new working directory for the pane]:directory:_directories' \
     '*-e[specify environment variable]:environment variable:_parameters -g "*export*" -qS=' \
     '-k[kill window if it is in use]' \
-    '-t+[specify target pane]:pane:__tmux-pane' \
+    '-t+[specify target pane]:pane:__tmux-panes' \
     ':command:_cmdambivalent'
 }
 
@@ -886,7 +886,7 @@ _tmux-server-access() {
 }
 
 _tmux-set-buffer() {
-  [[ -n ${tmux_describe} ]] && print "set contents of a paster buffer" && return
+  [[ -n ${tmux_describe} ]] && print "set contents of a paste buffer" && return
   _arguments -s -A "-*" -S \
     '-a[append to rather than overwriting target buffer]' \
     '-b+[specify target buffer index]:pane:__tmux-buffers' \
@@ -999,7 +999,7 @@ _tmux-show-hooks() {
 
 _tmux-show-buffer() {
   [[ -n ${tmux_describe} ]] && print "display the contents of a paste buffer" && return
-  _arguments '-b[specify target buffer index]:pane:->buffer'
+  _arguments '-b[specify target buffer index]:buffer:__tmux-buffers'
 }
 
 _tmux-show-environment() {

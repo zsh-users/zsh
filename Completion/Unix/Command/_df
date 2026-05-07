@@ -88,7 +88,7 @@ elif [[ "$OSTYPE" == (darwin|dragonfly|freebsd|netbsd*|openbsd)* ]]; then
         '(-P -G -N)-f[display only the available free]'
         '(-G -i -P)-G[display all fields in statvfs]'
         '(-G -P)-N[suppress the header line normally output]'
-        '-W[print widge name instead of the device]'
+        '-W[print wedge name instead of the device]'
       )
       ;;
   esac

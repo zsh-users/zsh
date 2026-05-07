@@ -293,8 +293,8 @@ if (( ! $+_fs_any )); then
       'sync[do I/O synchronously]'
     )
     _fs_cdfs=(
-      '(nodefperm)defperm[ignore permission bits]'
-      '(defperm)defperm[use permission bits]'
+      '(defperm)nodefperm[ignore permission bits]'
+      '(nodefperm)defperm[use permission bits]'
       'noversion[strip off version extension]'
       'rrip[use RRIP extensions]'
     )

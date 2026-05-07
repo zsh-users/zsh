@@ -45,7 +45,6 @@ case $variant in
       "$ordering"{-R,--random-sort}'[sort by random hash of keys]'
       "$ordering"{-V,--version-sort}'[sort version numbers]'
       "$ordering--sort=[specify comparator]:comparator:(general-numeric human-numeric month numeric random version)"
-      '(-i --ignore-nonprinting)'{-i,--ignore-nonprinting}'[consider only printable characters]'
       '--random-source=[get random bytes from file]:file:_files'
       '--batch-size=[maximum inputs to merge]:number'
       '--compress-program=[specify program to compress temporary files with]:program:(gzip bzip2 lzop xz)'

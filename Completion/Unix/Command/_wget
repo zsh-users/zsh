@@ -55,7 +55,7 @@ _arguments -C -s \
   '--prefer-family=[connect first to addresses of specified family]:address family:(IPv6 IPv4 none)' \
   '(--http-user --ftp-user)--user[set both ftp and http user]:user' \
   '(--http-password --ftp-password)--password[set both ftp and http password]:password' \
-  '(--password --http-password --ftp-password)--ask-password:[prompt for passwords]' \
+  '(--password --http-password --ftp-password)--ask-password[prompt for passwords]' \
   '--use-askpass=:command:_command_names -e' \
   '--no-iri[turn off IRI support]' \
   '--local-encoding=[specify local encoding for IRIs]:encoding' \
@@ -105,7 +105,7 @@ _arguments -C -s \
   '--certificate=[specify client certificate]:client certificate file:_files' \
   '--certificate-type=[specify client certificate type]:certificate type:(PEM DER)' \
   '--private-key=[specify private key file]:key file:_files' \
-  '--private-key-type=[specify private key type]:key type:key type:(PEM DER)' \
+  '--private-key-type=[specify private key type]:key type:(PEM DER)' \
   "--ca-certificate=[specify file with bundle of CA's]:file:_files" \
   "--ca-directory=[specify dir where hash list of CA's are stored]:directory:_directories" \
   '--crl-file=[specify file with bundle of CRLs]:file:_files' \

@@ -1,5 +1,16 @@
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54532: Completion/Unix/Command/_ansible,
+	Completion/Unix/Command/_df, Completion/Unix/Command/_ffmpeg,
+	Completion/Unix/Command/_find, Completion/Unix/Command/_ip,
+	Completion/Unix/Command/_lsof, Completion/Unix/Command/_mount,
+	Completion/Unix/Command/_netstat, Completion/Unix/Command/_rsync,
+	Completion/Unix/Command/_sed, Completion/Unix/Command/_sort,
+	Completion/Unix/Command/_subversion,
+	Completion/Unix/Command/_sudo, Completion/Unix/Command/_tmux,
+	Completion/Unix/Command/_wget, Completion/Zsh/Command/_zstyle:
+	completers: various small fixes
+
 	* 54531: Completion/BSD/Command/_kdump,
 	Completion/BSD/Command/_ktrace, Completion/Linux/Command/_ipset,
 	Completion/Linux/Command/_iptables,

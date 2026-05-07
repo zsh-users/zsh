@@ -66,8 +66,8 @@ case $service in
   ;|
   ansible-playbook|ansible-pull)
     args+=(
-      \*{-t,--tags}'[only run plays and tasks tagged with these values]:tag:->tags'
-      "*--skip-tags[only run plays and tasks whose tags don't match]"
+      \*{-t,--tags=}'[only run plays and tasks tagged with these values]:tag:->tags'
+      "*--skip-tags=[only run plays and tasks whose tags don't match]:tag:->tags"
     )
   ;|
   ansible-playbook|ansible-console)

@@ -79,7 +79,7 @@ _svn () {
 	  usage=${${(M)${(f)"$(_call_program options svn help $dash_v -- $cmd)"}:#usage:*}#usage:*$cmd] }
 	  _store_cache svn-${cmd}-usage usage
 	fi
-	if _cache_invalid svn-${cmd}-usage || \
+	if _cache_invalid svn-${cmd}-args || \
 	    ! _retrieve_cache svn-${cmd}-args;
 	then
 	  args=(
@@ -119,7 +119,7 @@ _svn () {
 	  _store_cache svn-${cmd}-args args
 	fi
 
-        case $cmd in;
+        case $cmd in
           (add)
             args+=(
               '*:file: _svn_modified "addable"'

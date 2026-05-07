@@ -88,7 +88,7 @@ elif _pick_variant -r variant gnu=GNU unix --version; then
       'v:fail if GNU extensions not supported or older than specified version'
     )
     cmds_end+=(
-      "e:execute a command and include it's output"
+      "e:execute a command and include its output"
       'F:print the filename of the current input file'
       'Q:quit'
       'z:empty the pattern space'
