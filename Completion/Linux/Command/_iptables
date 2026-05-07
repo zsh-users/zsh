@@ -29,7 +29,7 @@ ropts=(
 )
 
 prev=( ${words[1,CURRENT-1]} )
-case ${prev[${prev[(I)-p|--proto|--protocol]}+1]}; in
+case ${prev[${prev[(I)-p|--proto|--protocol]}+1]} in
   tcp)
     args=(
       '--tcp-flags[match based on TCP flags in a packet]: :->tcp-flags: :->tcp-flags'
@@ -46,7 +46,7 @@ case ${prev[${prev[(I)-p|--proto|--protocol]}+1]}; in
   icmp) args=( '--icmp-type[match specified ICMP type]:*^!:ICMP type:->icmp-types' ) ;;
 esac
 
-case ${prev[${prev[(I)-j|--jump]}+1]}; in
+case ${prev[${prev[(I)-j|--jump]}+1]} in
   DNAT) args+=( '(--to --to-destination)'{--to,--to-destination}':address' ) ;;
   DSCP)
     args+=(
@@ -91,7 +91,7 @@ typeset -U args
 while
   (( i=words[(ib.i.)-m|--match]+1 ))
 (( i<CURRENT )); do
-  case ${words[i]}; in
+  case ${words[i]} in
     addrtype)
       args+=(
         '--src-type[match if the source address is of given type]:type:->address-types'

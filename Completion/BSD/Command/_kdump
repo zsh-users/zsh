@@ -37,7 +37,7 @@ local args=(
   '-t[select which tracepoints to display]: :_ktrace_points'
 )
 
-case $OSTYPE; in
+case $OSTYPE in
   freebsd*|netbsd*)
     args+=(
       '(-R -T)-E[display elapsed timestamps]'

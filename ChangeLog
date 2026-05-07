@@ -1,5 +1,13 @@
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54531: Completion/BSD/Command/_kdump,
+	Completion/BSD/Command/_ktrace, Completion/Linux/Command/_ipset,
+	Completion/Linux/Command/_iptables,
+	Completion/Unix/Command/_darcs, Completion/Unix/Command/_ln,
+	Completion/Unix/Command/_mv, Completion/Unix/Command/_rm,
+	Completion/Unix/Command/_rmdir: completers: remove spurious ;
+	in "case $foo; in"
+
 	* 54530: Completion/Base/Completer/_all_matches,
 	Doc/Zsh/compsys.yo: Fix typo in default value for avoid-completer
 

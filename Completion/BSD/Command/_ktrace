@@ -13,7 +13,7 @@ local args=(
   '*:: : _normal -p ktrace'
 )
 
-case $OSTYPE; in
+case $OSTYPE in
   openbsd*)
     args+=(
       '-B[process relocations immediately]'

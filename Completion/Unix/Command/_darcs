@@ -20,7 +20,7 @@ if (($CURRENT == 2)); then
   _wanted command expl 'darcs command' \
     compadd -- $( darcs --commands )
 else
-  case "${words[$CURRENT]}"; in
+  case "${words[$CURRENT]}" in
     # If it looks like an URL...
     ht*|ft*)
         _arguments '*:URL:_urls'
