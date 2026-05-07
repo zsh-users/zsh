@@ -7,7 +7,7 @@ startitem()
 findex(zsocket)
 cindex(sockets)
 cindex(sockets, Unix domain)
-item(tt(zsocket) [ tt(-altv) ] [ tt(-d) var(fd) ] [ var(args) ])(
+item(tt(zsocket) [ tt(-alstv) ] [ tt(-d) var(fd) ] [ var(args) ])(
 tt(zsocket) is implemented as a builtin to allow full use of shell
 command line editing, file I/O, and job control mechanisms.
 )
@@ -33,6 +33,11 @@ File descriptors can be closed with normal shell syntax when no longer
 needed, for example:
 
 example(exec {REPLY}>&-)
+
+The tt(zsocket -s var(fd)) command may also be used to shut down a
+socket fd before closing it. This will send an EOF to the other side,
+while this side can still read their subsequent response before closing
+the connection fully, for example.
 )
 enditem()
 

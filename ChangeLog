@@ -23,6 +23,9 @@
 	* 54493: Src/Modules/socket.c: socket: fix some issues with
 	socket name
 
+	* 54494: Doc/Zsh/mod_socket.yo, Src/Modules/socket.c: Add zsocket
+	-s to shutdown() a socket fd
+
 2026-05-10  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/Linux/Command/_selinux: complete files

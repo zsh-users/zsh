@@ -229,6 +229,17 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	if (verbose)
 	    printf("new connection from %s is on fd %d\n", soun.sun_path, sfd);
     }
+    else if (OPT_ISSET(ops,'s'))
+    {
+	if (!args[0]) {
+	    zwarnnam(nam, "-s requires an argument");
+	    return 1;
+	}
+
+	int err = shutdown(atoi(args[0]), SHUT_WR);
+	if (err)
+	    zwarn("shutdown failed: %e", errno);
+    }
     else
     {
 	if (!args[0]) {
@@ -282,7 +293,7 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 }
 
 static struct builtin bintab[] = {
-    BUILTIN("zsocket", 0, bin_zsocket, 0, 3, 0, "ad:ltv", NULL),
+    BUILTIN("zsocket", 0, bin_zsocket, 0, 3, 0, "ad:lstv", NULL),
 };
 
 static struct features module_features = {
