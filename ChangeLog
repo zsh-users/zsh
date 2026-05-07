@@ -20,6 +20,9 @@
 	* 54492: Src/Zle/termquery.c: is* classification functions take
 	unsigned char
 
+	* 54493: Src/Modules/socket.c: socket: fix some issues with
+	socket name
+
 2026-05-10  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/Linux/Command/_selinux: complete files
