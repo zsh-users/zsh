@@ -593,7 +593,7 @@ base64_decode(const char *src, size_t len)
     unsigned int n;
     char *buf = hcalloc((3 * len) / 4 + 1);
     char *b = buf;
-    char c;
+    unsigned char c;
 
     while (len && (c = src[i]) != '=') {
 	n = isdigit(c) ? c - '0' + 52 :

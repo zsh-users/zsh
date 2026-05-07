@@ -17,6 +17,9 @@
 
 	* 54491: Src/Zle/termquery.c: Don't read COLORVAR out of bounds
 
+	* 54492: Src/Zle/termquery.c: is* classification functions take
+	unsigned char
+
 2026-05-10  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/Linux/Command/_selinux: complete files
