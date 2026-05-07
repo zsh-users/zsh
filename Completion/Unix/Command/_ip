@@ -258,7 +258,7 @@ _regex_words addr-show-commands "addr show commands" \
   'up:limit display to running devices' \
   's*cope:specify scope for address:$subcmd_scope' \
   't*o:limit to given IP address/prefix:$subcmd_ipaddr' \
-  'la*bel:list tags matching glob patter:$subcmd_string' \
+  'la*bel:list tags matching glob pattern:$subcmd_string' \
   'dynamic:list addresses from stateless configuration (IPv6)' \
   'permanent:list non-dynamic addresses (IPv6)' \
   'tentative:list addresses failing duplicate address detection (IPv6)' \
@@ -306,7 +306,7 @@ _regex_words \
   'a*dd: add an address labels:$addrlabel_add_cmds' \
   'd*el: delete an address labels:$addrlabel_del_cmds' \
   'l*ist: list address labels' \
-  'f*lush: flush adderss labels'
+  'f*lush: flush address labels'
 addrlabel_cmds=("$reply[@]")
 
 #
@@ -431,7 +431,7 @@ route_cmds=("$reply[@]")
 
 local -a rule_add_cmds
 _regex_words rule-add-commands 'ip rule add/delete commands' \
-  'ty*xpe:type of rule:$subcmd_ruletypes' \
+  'ty*pe:type of rule:$subcmd_ruletypes' \
   'fr*om:select source prefix:$subcmd_ipaddr' \
   'to:select destination prefix:$subcmd_ipaddr' \
   'iif:select input interface (device):$subcmd_dev' \

@@ -339,7 +339,7 @@ while (( $#state )); do
 	ctop=c
 	;;
 
-	(:chwpd:*)
+	(:chpwd:*)
 	ctop=d
 	;;
 

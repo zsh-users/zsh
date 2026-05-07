@@ -209,9 +209,9 @@ _rsync() {
     '--force-change[affect user-/system-immutable files/dirs]' \
     '--force-uchange[affect user-immutable files/dirs]' \
     '--force-schange[affect system-immutable files/dirs]' \
-    "--max-delete=[don't delete more than NUM files]: :_numbers -f -u bytes size B K M G T P" \
+    "--max-delete=[don't delete more than the specified number of files]:number" \
     "--max-size=[don't transfer any file larger than specified size]: :_numbers -f -u bytes size B K M G T P" \
-    '--min-size=[do not transfer any file smaller than specified size]:number' \
+    "--min-size=[don't transfer any file smaller than specified size]: :_numbers -f -u bytes size B K M G T P" \
     '--max-alloc=[set limit to individual memory allocation]: :_numbers -f -u bytes -d 1g size B K M G T P' \
     '(-P)--partial[keep partially transferred files]' \
     '--no-partial[turn off --partial]' \
@@ -278,8 +278,8 @@ _rsync() {
     '(--usermap --groupmap --chown)--chown=[simple username/groupname mapping]:user and/or group:_rsync_users_groups' \
     '*'{-M+,--remote-option=}'[send option to the remote side only]:option string' \
     '--preallocate[preallocate the full length of new files]' \
-    '--iconv=[request charset conversion of filenames]:number' \
-    '--checksum-seed=:number' \
+    '--iconv=[request charset conversion of filenames]:convert specification' \
+    '--checksum-seed=[set checksum seed (advanced)]:number' \
     '--read-batch=[read a batched update from the specified file]:file:_files'
 }
 

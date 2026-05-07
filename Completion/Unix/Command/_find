@@ -162,7 +162,7 @@ if [[ $state = times ]]; then
       zstyle -s ":completion:${curcontext}:senses" list-separator sep || sep=--
       default=" [default exactly]"
       disp=( "+ $sep before (older files)" "- $sep since (newer files)" )
-      smatch=( - + )
+      smatch=( + - )
     else
       disp=( before exactly since )
       smatch=( + '' - )

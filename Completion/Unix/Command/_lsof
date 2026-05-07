@@ -119,7 +119,7 @@ case $state in
   states)
     if compset -P 1 '*:'; then
       _sequence _wanted states expl state compadd - -M 'm:{a-z}={A-Z}' \
-          CLOSED IDLE BOUND LISTEN ESTABLISHED SYN_SENT SYN_RCDV ESTABLISHED \
+          CLOSED IDLE BOUND LISTEN ESTABLISHED SYN_SENT SYN_RCVD \
           CLOSE_WAIT FIN_WAIT1 CLOSING LAST_ACK FIN_WAIT_2 TIME_WAIT && ret=0
     else
       compset -S ':*' || suf=( -qS : )

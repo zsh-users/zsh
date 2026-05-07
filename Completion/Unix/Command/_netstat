@@ -14,7 +14,7 @@ case $OSTYPE in
   linux-gnu)
     families=(
       '(-4 --inet)'{-4,--inet}
-      '(-6 --inet)'{-4,--inet6}
+      '(-6 --inet)'{-6,--inet6}
       '(-A --protocol)'{-A+,--protocol=}':protocol:_sequence compadd - inet inet6 unix ipx ax25 netrom ddp bluetooth'
       --unix -x --ip --tcpip --ax25 --x25 --rose --ash
       --bluetooth --ipx --netrom --ddp --appletalk --econet --ec

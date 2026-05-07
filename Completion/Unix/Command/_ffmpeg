@@ -23,8 +23,8 @@ typeset -A opt_args
 
 (( $+functions[_ffmpeg_scodecs] )) || _ffmpeg_scodecs() {
     local scodecs
-    scodecs=(copy ${${(M)${(f)"$(_call_program video-codecs $words[1] -codecs 2>/dev/null)"}:#[[:space:]][D[:space:]][E[:space:]]S[S[:space:]][D[:space:]][T[:space:]][[:space:]][^[:space:]]##*}//(#b)????????([^[:space:]]##)*/$match[1]})
-    _wanted ffmpeg-video-codecs expl 'force video codec (''copy'' to copy stream)' compadd -a scodecs
+    scodecs=(copy ${${(M)${(f)"$(_call_program subtitle-codecs $words[1] -codecs 2>/dev/null)"}:#[[:space:]][D[:space:]][E[:space:]]S[S[:space:]][D[:space:]][T[:space:]][[:space:]][^[:space:]]##*}//(#b)????????([^[:space:]]##)*/$match[1]})
+    _wanted ffmpeg-subtitle-codecs expl 'force subtitle codec (''copy'' to copy stream)' compadd -a scodecs
 }
 
 (( $+functions[_ffmpeg_formats] )) || _ffmpeg_formats() {
