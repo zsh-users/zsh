@@ -49,6 +49,7 @@ menu(Functions Index)
 menu(Editor Functions Index)
 menu(Style and Tag Index)
 
+startdetailmenu()
  --- The Detailed Node Listing ---
 
 Introduction
@@ -176,6 +177,7 @@ menu(Mathematical Functions)
 menu(User Configuration Functions)
 menu(Other Functions)
 
+enddetailmenu()
 endmenu()
 texinode(The Z Shell Manual)(Introduction)(Top)(Top)
 chapter(The Z Shell Manual)

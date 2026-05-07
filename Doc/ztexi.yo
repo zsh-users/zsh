@@ -256,6 +256,12 @@ def(endmenu)(0)(\
 def(menu)(1)(\
   * ARG1+NOTRANS(::)\
 )
+def(startdetailmenu)(0)(\
+  NOTRANS(@detailmenu)\
+)
+def(enddetailmenu)(0)(\
+  NOTRANS(@end detailmenu)\
+)
 
 COMMENT(--- indices ---)
 

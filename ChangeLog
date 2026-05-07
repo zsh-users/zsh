@@ -29,6 +29,9 @@
 	* 54495: Doc/Zsh/mod_tcp.yo, Src/Modules/tcp.c, Src/Modules/tcp.h:
 	Add ztcp -s to shutdown() a tcp fd
 
+	* 54499: Doc/Zsh/manual.yo, Doc/ztexi.yo: Add missing detailmenu
+	texi markup
+
 2026-05-10  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/Linux/Command/_selinux: complete files
