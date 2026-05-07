@@ -1,3 +1,8 @@
+2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 54530: Completion/Base/Completer/_all_matches,
+	Doc/Zsh/compsys.yo: Fix typo in default value for avoid-completer
+
 2026-05-15  dana  <dana@dana.is>
 
 	* 54325: Doc/Zsh/params.yo: swap eval contexts for <(...) and

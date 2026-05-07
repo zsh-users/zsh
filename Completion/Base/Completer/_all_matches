@@ -28,7 +28,7 @@ _all_matches_end() {
   local not
 
   zstyle -s "$_all_matches_context" avoid-completer not ||
-      not=( _expand _old_list _correct _approximate )
+      not=( _expand _oldlist _correct _approximate )
 
   if [[ "$compstate[nmatches]" -gt 1 && $not[(I)(|_)$_completer] -eq 0 ]]; then
     local expl
