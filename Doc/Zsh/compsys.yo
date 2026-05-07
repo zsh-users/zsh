@@ -1222,7 +1222,7 @@ generated.  Its value is a list of names of completers.  If any of
 these is the name of the completer that generated the matches in this
 completion, the string will not be added.
 
-The default value for this style is `tt(_expand _old_list _correct
+The default value for this style is `tt(_expand _oldlist _correct
 _approximate)', i.e. it contains the completers for which a string
 with all matches will almost never be wanted.
 )

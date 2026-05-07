@@ -6,6 +6,11 @@
 	* github #169: Completion/Unix/Command/_darcs: update _darcs
 	from up-stream
 
+2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 54530: Completion/Base/Completer/_all_matches,
+	Doc/Zsh/compsys.yo: Fix typo in default value for avoid-completer
+
 2026-05-15  dana  <dana@dana.is>
 
 	* unposted: Util/zsh-merge-changelog: find more context
