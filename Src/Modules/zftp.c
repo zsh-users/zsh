@@ -82,10 +82,6 @@ union zftp_sockaddr {
 #endif
 };
 
-#ifdef USE_LOCAL_H_ERRNO
-int h_errno;
-#endif
-
 /*
  * For FTP block mode
  *
@@ -119,8 +115,8 @@ struct zfheader {
 enum {
     ZFHD_MARK = 16,		/* restart marker */
     ZFHD_ERRS = 32,		/* suspected errors in block */
-    ZFHD_EOFB = 64,		/* block is end of record */
-    ZFHD_EORB = 128		/* block is end of file */
+    ZFHD_EOFB = 64,		/* block is end of file */
+    ZFHD_EORB = 128		/* block is end of record */
 };
 
 typedef int (*readwrite_t)(int, char *, off_t, int);
@@ -2102,7 +2098,7 @@ zftp_params(UNUSED(char *name), char **args, UNUSED(int flags))
 	/* maybe user CTRL-c'd in the middle somewhere */
 	for (aptr = newarr; *aptr; aptr++)
 	    zsfree(*aptr);
-	zfree(newarr, len+1);
+	zfree(newarr, (len+1)*sizeof(char *));
 	return 1;
     }
     if (zfsess->userparams)
@@ -2191,7 +2187,7 @@ zftp_login(char *name, char **args, UNUSED(int flags))
 	int cnt;
 	for (cnt = 0; *args; args++)
 	    cnt++;
-	zwarnnam(name, "warning: %d command arguments not used\n", cnt);
+	zwarnnam(name, "warning: %d command arguments not used", cnt);
     }
     zfstatusp[zfsessno] |= ZFST_LOGI;
     zfsetparam("ZFTP_USER", ztrdup(user), ZFPM_READONLY);
@@ -2480,7 +2476,7 @@ zftp_mode(char *name, char **args, UNUSED(int flags))
     cmd[5] = (char) nt;
     if (zfsendcmd(cmd) > 2)
 	return 1;
-    zfstatusp[zfsessno] &= ZFST_MMSK;
+    zfstatusp[zfsessno] &= ~ZFST_MMSK;
     zfstatusp[zfsessno] |= (nt == 'S') ? ZFST_STRE : ZFST_BLOC;
     zfsetparam("ZFTP_MODE", ztrdup(str), ZFPM_READONLY);
     return 0;
@@ -2875,10 +2871,10 @@ freesession(Zftp_session sptr)
 {
     char **ps, **pd;
     zsfree(sptr->name);
-    for (ps = zfparams, pd = zfsess->params; *ps; ps++, pd++)
+    for (ps = zfparams, pd = sptr->params; *ps; ps++, pd++)
 	if (*pd)
 	    zsfree(*pd);
-    zfree(zfsess->params, sizeof(zfparams));
+    zfree(sptr->params, sizeof(zfparams));
     if (sptr->userparams)
 	freearray(sptr->userparams);
     zfree(sptr, sizeof(struct zftp_session));
