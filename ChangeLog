@@ -4,6 +4,9 @@
 
 2026-05-11  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54493: Src/Modules/socket.c: socket: fix some issues with
+	socket name
+
 	* 54481: Src/Zle/zle_misc.c: Move variable into scope where
 	it's used
 

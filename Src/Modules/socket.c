@@ -58,7 +58,7 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 {
     int err=1, verbose=0, test=0, targetfd=0;
     ZSOCKLEN_T len;
-    struct sockaddr_un soun;
+    struct sockaddr_un soun = { 0 };
     int sfd;
 
     if (OPT_ISSET(ops,'v'))
@@ -90,6 +90,10 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	}
 
 	localfn = args[0];
+	if (strlen(localfn) >= sizeof(soun.sun_path)) {
+	    zwarnnam(nam, "socket path too long: %d > %d", strlen(localfn), sizeof(soun.sun_path) -1 );
+	    return 1;
+	}
 
 	sfd = socket(PF_UNIX, SOCK_STREAM, 0);
 
@@ -229,6 +233,11 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
     {
 	if (!args[0]) {
 	    zwarnnam(nam, "zsocket requires an argument");
+	    return 1;
+	}
+
+	if (strlen(args[0]) >= sizeof(soun.sun_path)) {
+	    zwarnnam(nam, "socket path too long: %d > %d", strlen(args[0]), sizeof(soun.sun_path) -1 );
 	    return 1;
 	}
 
