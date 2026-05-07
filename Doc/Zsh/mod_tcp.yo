@@ -7,7 +7,7 @@ startitem()
 findex(ztcp)
 cindex(TCP)
 cindex(sockets, TCP)
-item(tt(ztcp) [ tt(-acflLtv) ] [ tt(-d) var(fd) ] [ var(args) ])(
+item(tt(ztcp) [ tt(-acflLstv) ] [ tt(-d) var(fd) ] [ var(args) ])(
 tt(ztcp) is implemented as a builtin to allow full use of shell
 command line editing, file I/O, and job control mechanisms.
 
@@ -24,7 +24,7 @@ startitem()
 item(File descriptor)(
 The file descriptor in use for the connection.  For normal inbound (tt(I))
 and outbound (tt(O)) connections this may be read and written by the usual
-shell mechanisms.  However, it should only be close with `tt(ztcp -c)'.
+shell mechanisms.  However, it should only be closed with `tt(ztcp -c)'.
 )
 item(Connection type)(
 A letter indicating how the session was created:
@@ -41,6 +41,9 @@ An inbound connection accepted with `tt(ztcp -a)'.
 )
 item(tt(O))(
 An outbound connection created with `tt(ztcp) var(host) var(...)'.
+)
+item(tt(S))(
+A connection that has been shut down with `tt(ztcp -s)'.
 )
 enditem()
 
@@ -122,12 +125,32 @@ subsect(Closing Connections)
 cindex(sockets, closing TCP)
 
 startitem()
+item(tt(ztcp) tt(-s) var(fd))(
+tt(ztcp -s) will shut down the socket associated
+with var(fd). This means a graceful termination
+of the connection is initiated, flushing unsent
+data (due to Nagle's algorithm, for example). To
+complete it, you should also drain any remaining
+data on the fd by reading it. Afterwards you should
+use tt(ztcp -c) to close the fd. If you close it
+without first using tt(ztcp -s) and draining the
+data, the kernel may reset the connection, causing
+data you sent to not be received by the other end.
+
+Note that this is only useful for inbound and
+outbound connections, not for listening sockets.
+)
+enditem()
+
+startitem()
 xitem(tt(ztcp) tt(-cf) [ tt(-v) ] [ var(fd) ])
 item(tt(ztcp) tt(-c) [ tt(-v) ] [ var(fd) ])(
 tt(ztcp -c) will close the socket associated
 with var(fd).  The socket will be removed from the
 session table.  If var(fd) is not specified,
 tt(ztcp) will close everything in the session table.
+
+See also the previous tt(ztcp -s) entry.
 
 Normally, sockets registered by zftp (see
 sectref(The zsh/zftp Module)(zshmodules))
@@ -166,6 +189,8 @@ prints `tt(This is a message)'.
 
 To tidy up, on tt(host1):
 example(ztcp -c $listenfd
+ztcp -s $fd
 ztcp -c $fd)
 and on tt(host2)
-example(ztcp -c $fd)
+example(ztcp -s $fd
+ztcp -c $fd)

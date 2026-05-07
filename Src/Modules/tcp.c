@@ -279,6 +279,29 @@ zts_byfd(int fd)
     return NULL;
 }
 
+/**/
+mod_export int
+tcp_shutdown(Tcp_session sess)
+{
+    if (sess && sess->fd != -1)
+    {
+	if (sess->flags & ZTCP_LISTEN) {
+	    zwarn("can't shutdown a listening socket");
+	    return 1;
+	}
+	if (sess->flags & ZTCP_SHUTDOWN) {
+	    zwarn("session is already shutdown");
+	    return 1;
+	}
+	int err = shutdown(sess->fd, SHUT_WR);
+	if (err)
+	    zwarn("shutdown failed: %e", errno);
+	sess->flags |= ZTCP_SHUTDOWN;
+	return 0;
+    }
+    return -1;
+}
+
 static void
 tcp_cleanup(void)
 {
@@ -366,6 +389,22 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	}
     }
 
+    if (OPT_ISSET(ops,'s')) {
+	targetfd = atoi(args[0]);
+	if(!targetfd) {
+	    zwarnnam(nam, "%s is an invalid argument to -s", args[0]);
+	    return 1;
+	}
+
+	sess = zts_byfd(targetfd);
+	if (sess) {
+	    tcp_shutdown(sess);
+	    return 0;
+	} else {
+	    zwarnnam(nam, "fd %s not found in tcp table", args[0]);
+	    return 1;
+	}
+    }
 
     if (OPT_ISSET(ops,'c')) {
 	if (!args[0]) {
@@ -373,12 +412,12 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	}
 	else {
 	    targetfd = atoi(args[0]);
-	    sess = zts_byfd(targetfd);
 	    if(!targetfd) {
 		zwarnnam(nam, "%s is an invalid argument to -c", args[0]);
 		return 1;
 	    }
 
+	    sess = zts_byfd(targetfd);
 	    if (sess)
 	    {
 		if ((sess->flags & ZTCP_ZFTP) && !force)
@@ -594,6 +633,8 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 			    schar = 'Z';
 			else if (sess->flags & ZTCP_LISTEN)
 			    schar = 'L';
+			else if (sess->flags & ZTCP_SHUTDOWN)
+			    schar = 'S';
 			else if (sess->flags & ZTCP_INBOUND)
 			    schar = 'I';
 			else
@@ -606,7 +647,8 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 			printf("%s:%d %s %s:%d is on fd %d%s\n",
 			       localname, ntohs(sess->sock.in.sin_port),
 			       ((sess->flags & ZTCP_LISTEN) ? "-<" :
-				((sess->flags & ZTCP_INBOUND) ? "<-" : "->")),
+				((sess->flags & ZTCP_SHUTDOWN) ? "<>" :
+				 ((sess->flags & ZTCP_INBOUND) ? "<-" : "->"))),
 			       remotename, ntohs(sess->peer.in.sin_port),
 			       sess->fd,
 			       (sess->flags & ZTCP_ZFTP) ? " ZFTP" : "");
@@ -696,7 +738,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 }
 
 static struct builtin bintab[] = {
-    BUILTIN("ztcp", 0, bin_ztcp, 0, 3, 0, "acd:flLtv", NULL),
+    BUILTIN("ztcp", 0, bin_ztcp, 0, 3, 0, "acd:flLstv", NULL),
 };
 
 static struct features module_features = {

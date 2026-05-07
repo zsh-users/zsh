@@ -26,6 +26,9 @@
 	* 54494: Doc/Zsh/mod_socket.yo, Src/Modules/socket.c: Add zsocket
 	-s to shutdown() a socket fd
 
+	* 54495: Doc/Zsh/mod_tcp.yo, Src/Modules/tcp.c, Src/Modules/tcp.h:
+	Add ztcp -s to shutdown() a tcp fd
+
 2026-05-10  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/Linux/Command/_selinux: complete files
