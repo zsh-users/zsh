@@ -45,9 +45,9 @@ hash=(	'--hashsize[the initial hash size aligned to a power of 2]:hashsize [1024
 	'--resize[ratio of increasing hash size after unsuccessful <probes> of double-hashing, altering discouraged]:percent'
 )
 
-case $words[offset+2]; in
+case $words[offset+2] in
   -N|--create)
-	case $words[offset+4]; in
+	case $words[offset+4] in
 	  bitmap\:ip)
 	  	args=(  $from_to
 			'--netmask[store network addresses instead of IP addresses]:CIDR'
