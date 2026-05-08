@@ -659,16 +659,17 @@ system_clipput(char clip, char *content, size_t clen)
 
 /**/
 static int
-extension_enabled(const char *class, const char *ext, unsigned clen, int def)
+extension_enabled(const char *prefix, const char *ext, unsigned plen, int def)
 {
-    char **e, **elist = getaparam(EXTVAR);
+    char dash, **e, **elist = getaparam(EXTVAR);
 
     for (e = elist; e && *e; e++) {
 	int negate = (**e == '-');
-	if (strncmp(*e + negate, class, clen))
+	if (strncmp(*e + negate, prefix, plen))
 	    continue;
 
-	if (!*(*e + negate + clen) || !strcmp(*e + negate + clen + 1, ext))
+	if (!(dash = *(*e + negate + plen)) ||
+		(dash == '-' && !strcmp(*e + negate + plen + 1, ext)))
 	    return !negate;
     }
     return def;
@@ -677,7 +678,7 @@ extension_enabled(const char *class, const char *ext, unsigned clen, int def)
 
 struct extension {
     char *key, *seq[2];
-    int class, enabled;
+    int prefix, enabled;
 };
 
 static const struct extension editext[] = {
@@ -707,11 +708,11 @@ collate_seq(int sindex, int dir)
 	    int negate = (**e == '-');
 	    if (negate != enabled)
 		continue;
-	    if ((!editext[i].class ||
-                !strncmp(*e + negate, editext[i].key, editext[i].class)) &&
-		((editext[i].class && !*(*e + negate + editext[i].class)) ||
-		!strcmp(*e + negate + editext[i].class,
-                    editext[i].key + editext[i].class)))
+	    if ((!editext[i].prefix ||
+                !strncmp(*e + negate, editext[i].key, editext[i].prefix)) &&
+		((editext[i].prefix && !*(*e + negate + editext[i].prefix)) ||
+		!strcmp(*e + negate + editext[i].prefix,
+                    editext[i].key + editext[i].prefix)))
 	    {
                 enabled = !negate;
 		break;
@@ -906,12 +907,14 @@ zle_set_cursorform(void)
 	}
     }
 
-    if (!setup || trashedzle) {
+    if (trashedzle)
+	setup = 0;
+    else if (!setup) {
 	cursor_enabled_mask = 0;
 	setup = 1;
-	if (!extension_enabled("cursor", "shape", 6, 1))
+	if (extension_enabled("cursor", "shape", 6, 1))
 	    cursor_enabled_mask |= CURF_SHAPE_MASK | CURF_BLINK | CURF_STEADY;
-	if (!extension_enabled("cursor", "color", 6, 1))
+	if (extension_enabled("cursor", "color", 6, 1))
 	    cursor_enabled_mask |= CURF_COLOR_MASK;
     }
 }
@@ -953,7 +956,7 @@ cursor_form(void)
     } else
 	context = invicmdmode() ? CURC_COMMAND : (vichgflag ? CURC_INSERT : CURC_EDIT);
     want = (context == CURC_DEFAULT) ? CURF_DEFAULT : cursor_forms[context];
-    if (!(changed = (want ^ state) & ~cursor_enabled_mask))
+    if (!(changed = (want ^ state) & cursor_enabled_mask))
 	return;
 
     if (changed & CURF_HIDDEN)

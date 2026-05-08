@@ -1,5 +1,8 @@
 2026-05-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 54506: Src/Zle/termquery.c: fix checking of dash following
+	the prefix in terminal extensions
+
 	* 54486: Doc/Zsh/zle.yo, Src/Zle/termquery.c: fix reading
 	outside string issue reported by valgrind
 
