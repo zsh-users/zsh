@@ -1,5 +1,8 @@
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54546: Src/hist.c: Remove incorrect array access that was also
+	never used
+
 	* 54545: Src/Modules/system.c, Src/Zle/compresult.c, Src/glob.c,
 	Src/subst.c, Src/utils.c: A few very minor things coverity
 	complained about
