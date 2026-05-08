@@ -405,7 +405,7 @@ iaddtoline(int c)
 	    excs = zlemetacs;
     }
     exlast = inbufct;
-    zleentry(ZLE_CMD_ADD_TO_LINE, itok(c) ? ztokens[c - Pound] : c);
+    zleentry(ZLE_CMD_ADD_TO_LINE, c);
 }
 
 
