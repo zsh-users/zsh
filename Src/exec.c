@@ -5654,16 +5654,17 @@ loadautofn(Shfunc shf, int fksh, int autol, int current_fpath)
 	    prog->flags |= EF_RUN;
 
 	    freeeprog(shf->funcdef);
-	    if (prog->flags & EF_MAP)
-		shf->funcdef = prog;
-	    else
+	    if (prog->flags & EF_HEAP)
 		shf->funcdef = dupeprog(prog, 0);
+	    else
+		shf->funcdef = prog;
 	    shf->node.flags &= ~PM_UNDEFINED;
 	    loadautofnsetfile(shf, fdir);
 	} else {
 	    VARARR(char, n, strlen(shf->node.nam) + 1);
 	    strcpy(n, shf->node.nam);
 	    execode(prog, 1, 0, "evalautofunc");
+	    freeeprog(prog);
 	    shf = (Shfunc) shfunctab->getnode(shfunctab, n);
 	    if (!shf || (shf->node.flags & PM_UNDEFINED)) {
 		/* We're not actually in the function; decrement locallevel */
@@ -5678,8 +5679,10 @@ loadautofn(Shfunc shf, int fksh, int autol, int current_fpath)
 	freeeprog(shf->funcdef);
 	if (prog->flags & EF_MAP)
 	    shf->funcdef = stripkshdef(prog, shf->node.nam);
-	else
+	else {
 	    shf->funcdef = dupeprog(stripkshdef(prog, shf->node.nam), 0);
+	    freeeprog(prog);
+	}
 	shf->node.flags &= ~PM_UNDEFINED;
 	loadautofnsetfile(shf, fdir);
     }
