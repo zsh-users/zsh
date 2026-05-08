@@ -8,6 +8,9 @@
 
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54538: Src/exec.c: Coverity CID 1637382 bsiz can overflow when
+	reading a large heredoc
+
 	* 54536: Src/exec.c: Coverity CID 1255827 Fix leak of prog
 	in loadautofn()
 

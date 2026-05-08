@@ -4497,7 +4497,8 @@ char *
 gethere(char **strp, int typ)
 {
     char *buf;
-    int bsiz, qt = 0, strip = 0;
+    int qt = 0, strip = 0;
+    size_t bsiz;
     char *s, *t, *bptr, c;
     char *str = *strp;
 
@@ -4524,7 +4525,7 @@ gethere(char **strp, int typ)
 	    if (bptr >= buf + bsiz - 2) {
 		ptrdiff_t toff = t - buf;
 		ptrdiff_t bptroff = bptr - buf;
-		char *newbuf = realloc(buf, 2 * bsiz);
+		char *newbuf = (bsiz <= SIZE_MAX / 2 ) ? realloc(buf, 2 * bsiz) : NULL;
 		if (!newbuf) {
 		    /* out of memory */
 		    zfree(buf, bsiz);
