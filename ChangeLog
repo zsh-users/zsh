@@ -1,5 +1,9 @@
 2026-05-11  dana  <dana@dana.is>
 
+	* 54501: Completion/Unix/Command/_chdman,
+	Completion/Unix/Command/_fish, Completion/Unix/Command/_nano:
+	add chdman, fish, nano
+
 	* 54500: Completion/Unix/Command/_chown,
 	Completion/Unix/Command/_cpio: support user:group syntax only
 

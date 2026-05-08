@@ -1,0 +1,195 @@
+#compdef chdman
+
+local ret=1 words1=$words[1]
+local -a opts args context state state_descr line expl
+local -a create_common_opts extract_common_opts ld_common_opts
+local -a meta_common_opts input_bytes_hunks_opts
+local -A opt_args
+
+opts=(
+  '(--input -i)'{--input,-i}'[specify input file]:input file:_files'
+  '(--inputparent -ip)'{--inputparent,-ip}'[specify parent file for input CHD]:input parent file:_files'
+  '(--output -o)'{--output,-o}'[specify output file]:output file:_files'
+  '(--outputbin -ob)'{--outputbin,-ob}'[specify output file for binary data]:output binary file:_files'
+  '(--splitbin -sb)'{--splitbin,-sb}'[output one binary file per track]'
+  '(--force -f)'{--force,-f}'[overwrite existing file]' # note same short option as --fix
+  '(--outputparent -op)'{--outputparent,-op}'[specify parent file for output CHD]:output parent file:_files'
+  '(--inputstartbyte -isb)'{--inputstartbyte,-isb}'[specify starting byte offset within input]: :\
+    _numbers -u bytes "start byte" k m g'
+  '(--inputstarthunk -ish)'{--inputstarthunk,-ish}'[specify starting hunk offset within input]: :\
+    _numbers -u hunks "start hunk" k m g'
+  '(--inputstartframe -isf)'{--inputstartframe,-isf}'[specify starting frame within input]: :\
+    _numbers -u frames "start frame" k m g'
+  '(--inputbytes -ib)'{--inputbytes,-ib}'[specify effective length of input in bytes]: :\
+    _numbers -u bytes "input length" k m g'
+  '(--inputhunks -ih)'{--inputhunks,-ih}'[specify effective length of input in hunks]: :\
+    _numbers -u hunks "input length" k m g'
+  '(--inputframes -if)'{--inputframes,-if}'[specify effective length of input in frames]: :\
+    _numbers -u frames "input length" k m g'
+  '(--hunksize -hs)'{--hunksize,-hs}'[specify size of each hunk in bytes]: :\
+    _numbers -u bytes -l 16 -m $((1024*1024)) "hunk size" k m g'
+  '(--unitsize -us)'{--unitsize,-us}'[specify size of each unit in bytes]: :\
+    _numbers -u bytes "unit size" k m g'
+  '(--compression -c)'{--compression,-c}'[specify compression codecs to use]: :->codecs'
+  '(--ident -id)'{--ident,-id}'[specify ident file to provide CHS information]:ident file:_files'
+  '(--chs -chs)'{--chs,-chs}'[specify CHS information directly]:cylinders,heads,sectors:'
+  '(--sectorsize -ss)'{--sectorsize,-ss}'[specfiy size of each hard disk sector]: :\
+    _numbers -u bytes "sector size" k m g'
+  '(--tag -t)'{--tag,-t}'[specify metadata tag]:4-character metadata tag:'
+  '(--index -ix)'{--index,-ix}'[specify indexed instance of metadata tag]:index:'
+  '(--valuetext -vt)'{--valuetext,-vt}'[specify metadata value as text]:metadata value:'
+  '(--valuefile -vf)'{--valuefile,-vf}'[specify file containing metadata value]:metadata value file:_files'
+  '(--numprocessors -np)'{--numprocessors,-np}'[specify max number of processors to use during compression]: :\
+    _numbers -u processors -l1 "processor limit"'
+  '(--nochecksum -nocs)'{--nochecksum,-nocs}'[excluded added metadata from SHA-1]'
+  '(--fix -f)'{--fix,-f}'[fix SHA-1 if incorrect]' # note same short option as --force
+  '(--verbose -v)'{--verbose,-v}'[output additional information]'
+  '(--size -s)'{--size,-s}'[specify size of output file]: :\
+    _numbers -u bytes "output file size" k m g'
+  '(--template -tp)'{--template,-tp}'[specify hard disk template]: :->templates'
+)
+create_common_opts=(
+  ${(M)opts:#(|*\))--(output|outputparent|force|input|hunksize|compression|numprocessors)\[*}
+  ${(M)opts:#(|*\))-(o|op|f|i|hs|c|np)\[*~*-f*fix*}
+)
+extract_common_opts=(
+  ${(M)opts:#(|*\))--(output|force|input|inputparent)\[*}
+  ${(M)opts:#(|*\))-(o|f|i|ip)\[*~*-f*fix*}
+)
+ld_common_opts=(
+  ${(M)opts:#(|*\))--(inputstartframe|inputframes)\[*}
+  ${(M)opts:#(|*\))-(isf|if)\[*}
+)
+meta_common_opts=(
+  ${(M)opts:#(|*\))--(input|tag|index)\[*}
+  ${(M)opts:#(|*\))-(i|t|ix)\[*}
+)
+input_bytes_hunks_opts=(
+  ${(M)opts:#(|*\))--(inputstartbyte|inputstarthunk|inputbytes|inputhunks)\[*}
+  ${(M)opts:#(|*\))-(isb|ish|ib|ih)\[*}
+)
+
+if (( CURRENT < 3 )); then
+  args=( ': :->commands' )
+else
+  case $words[2] in
+    help) args=( ': :->commands' ) ;;
+    info) args=(
+      ${(M)opts:#(|*\))--(input|verbose)\[*}
+      ${(M)opts:#(|*\))-(i|v)\[*}
+    ) ;;
+    verify) args=(
+      ${(M)opts:#(|*\))--(input|inputparent)\[*}
+      ${(M)opts:#(|*\))-(i|ip)\[*}
+    ) ;;
+    createraw|createdvd) args=(
+      $create_common_opts
+      $input_bytes_hunks_opts
+      ${(M)opts:#(|*\))--(unitsize)\[*}
+      ${(M)opts:#(|*\))-(us)\[*}
+    ) ;;
+    createhd) args=(
+      $create_common_opts
+      $input_bytes_hunks_opts
+      ${(M)opts:#(|*\))--(unitsize|chs|sectorsize|template|ident)\[*}
+      ${(M)opts:#(|*\))-(us|chs|ss|tp|id)\[*}
+    ) ;;
+    createcd) args=( $create_common_opts ) ;;
+    createld) args=( $create_common_opts $ld_common_opts ) ;;
+    extractraw|extractdvd|extracthd) args=(
+      $extract_common_opts
+      $input_bytes_hunks_opts
+    ) ;;
+    extractcd) args=(
+      $extract_common_opts
+      ${(M)opts:#(|*\))--(outputbin)\[*}
+      ${(M)opts:#(|*\))-(ob)\[*}
+    ) ;;
+    extractld) args=( $extract_common_opts $ld_common_opts ) ;;
+    copy) args=(
+      $create_common_opts
+      $input_bytes_hunks_opts
+      ${(M)opts:#(|*\))--(inputparent)\[*}
+      ${(M)opts:#(|*\))-(ip)\[*}
+    ) ;;
+    addmeta) args=(
+      $meta_common_opts
+      ${(M)opts:#(|*\))--(valuetext|valuefile|nochecksum)\[*}
+      ${(M)opts:#(|*\))-(vt|vf|nocs)\[*}
+    ) ;;
+    delmeta) args=( $meta_common_opts ) ;;
+    dumpmeta) args=(
+      $meta_common_opts
+      ${(M)opts:#(|*\))--(output|force)\[*}
+      ${(M)opts:#(|*\))-(o|f)\[*~*-f*fix*}
+    ) ;;
+  esac
+  shift words
+  (( CURRENT-- ))
+fi
+
+_arguments : $args && ret=0
+
+case $state in
+  commands)
+    _describe -t commands command '(
+      "help:display usage information"
+      "info:display CHD information"
+      "verify:verify CHD integrity"
+      "createraw:create raw CHD"
+      "createhd:create hard disk CHD"
+      "createcd:create CD CHD"
+      "createdvd:create DVD CHD"
+      "createld:create LaserDisc CHD"
+      "extractraw:extract raw file from CHD"
+      "extracthd:extract hard disk file from CHD"
+      "extractcd:extract CD file from CHD"
+      "extractdvd:extract DVD file from CHD"
+      "extractld:extract LaserDisc AVI from CHD"
+      "copy:copy data from one CHD to another"
+      "addmeta:add metadata to CHD"
+      "delmeta:remove metadata from CHD"
+      "dumpmeta:dump metadata from CHD"
+      "listtemplates:list hard disk templates"
+    )' && ret=0
+    ;;
+
+  codecs)
+    local -a codecs
+
+    case $words[1] in # was $words[2]
+      *ld) codecs=(
+        'avhu[A/V Huffman]'
+      ) ;;
+      *cd) codecs=(
+        'cdfl[CD FLAC]' 'cdlz[CD LZMA]' 'cdzl[CD Deflate]' 'cdzs[CD Zstandard]'
+      ) ;;
+      *) codecs=(
+        'flac[FLAC]' 'huff[Huffman]' 'lzma[LZMA]' 'zlib[Deflate]' 'zstd[Zstandard]'
+      ) ;;
+    esac
+
+    _alternative \
+      'codecs-none:no codec:(( none\:uncompressed ))' \
+      "codecs: :_values -s, 'compression codec' ${(j< >)${(@q+)codecs}}" \
+    && ret=0
+    ;;
+
+  templates)
+    local -a tpls tmp=( ${(f)"$(
+      _call_program templates $words1 listtemplates
+    )"} )
+    tmp=( ${(@)${(@)tmp//[[:space:]]##/ }# } )
+    tmp=( ${(@M)tmp:#<-> *} )
+
+    for 1 in $tmp; do
+      tmp=( ${(z)1} )
+      # id : mfg model (c,h,s)
+      tpls+=( "${tmp[1]}:$tmp[2] $tmp[3] (${(j<,>)${(@)tmp[4,6]}})" )
+    done
+
+    _describe -2V -t templates 'hard disk template' tpls && ret=0
+    ;;
+esac
+
+return ret

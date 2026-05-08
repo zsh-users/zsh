@@ -1,0 +1,87 @@
+#compdef nano rnano
+
+local -a args context state state_descr line expl
+local -A opt_args
+
+args=(
+  '(-A --smarthome)'{-A,--smarthome}'[enable smart home key]'
+  '(-B --backup)'{-B,--backup}'[save backups of existing files]'
+  '(-C --backupdir)'{-C+,--backupdir=}'[save uniquely numbered backups to specified directory]:backup directory:_directories'
+  '(-D --boldtext)'{-D,--boldtext}'[use bold instead of reverse video text]'
+  '(-E --tabstospaces)'{-E,--tabstospaces}'[convert typed tabs to spaces]'
+  '(-F --multibuffer)'{-F,--multibuffer}'[read file into new buffer by default]'
+  '(-G --locking)'{-G,--locking}'[use vim-style lock files]'
+  '(-H --historylog)'{-H,--historylog}'[remember search/replace strings]'
+  '(-I --ignorercfiles)'{-I,--ignorercfiles}"[don't look at nanorc files]"
+  '(-J --guidestripe)'{-J+,--guidestripe=}'[show vertical stripe at specified column]: :_numbers -l1 "column number"'
+  '(-K --rawsequences)'{-K,--rawsequences}'[interpret escape sequences directly instead of via ncurses]'
+  '(-L --nonewlines)'{-L,--nonewlines}"[don't automatically add EOF newline]"
+  '(-M --trimblanks)'{-M,--trimblanks}'[trim trailing whitespaces when hard-wrapping]'
+  '(-N --noconvert -u --unix)'{-N,--noconvert}"[don't convert files from DOS/Mac format]"
+  '(-O --bookstyle)'{-O,--bookstyle}'[when justifying, leading whitespace means new paragraph]'
+  '(-P --positionlog)'{-P,--positionlog}'[remember cursor position]'
+  '(-Q --quotestr)'{-Q+,--quotestr=}'[specify regular expression to match quoting]:quoting regex [^([ \t]*([!#%%\:;>|}]|//))+]'
+  '(-R --restricted)'{-R,--restricted}'[restrict access to the file system]'
+  '(-S --softwrap)'{-S,--softwrap}'[soft-wrap long lines]'
+  '(-T --tabsize)'{-T+,--tabsize=}'[specify tab width]: :_numbers -u columns -l1 -d8 "tab width"'
+  '(-c --constantshow -U --quickblank)'{-U,--quickblank}'[hide status-bar messages after next keystroke]'
+  '(- : *)'{-V,--version}'[display version information]'
+  '(-W --wordbounds -X --wordchars)'{-W,--wordbounds}'[detect word boundaries more accurately]'
+  '(-W --wordbounds -X --wordchars)'{-X+,--wordchars=}'[specify word characters]:word characters'
+  '(-Y --syntax)'{-Y+,--syntax=}'[specify syntax-highlighting definition]: :->syntaxes'
+  '(-Z --zap)'{-Z,--zap}'[let Backspace/Delete erase marked region]'
+  '(-a --atblanks)'{-a,--atblanks}'[when soft wrapping, wrap at whitespace]'
+  '(-b --breaklonglines -w --nowrap)'{-b,--breaklonglines}'[automatically hard-wrap long lines]'
+  '(-c --constantshow -U --quickblank)'{-c,--constantshow}'[constantly report cursor position in status bar]'
+  '(-d --rebinddelete)'{-d,--rebinddelete}'[fix Backspace/Delete confusion problem]'
+  '(-e --emptyline)'{-e,--emptyline}'[keep line below title bar empty]'
+  '(-f --rcfile)'{-f+,--rcfile=}'[use only specified file for configuring nano]:rc file:_files'
+  '(-g --showcursor)'{-g,--showcursor}'[show cursor in file browser and help viewer]'
+  '(- : *)'{-h,--help}'[display help information]'
+  '(-i --autoindent)'{-i,--autoindent}'[automatically indent new lines]'
+  '(-j --jumpyscrolling)'{-j,--jumpyscrolling}'[scroll per half-screen, not per line]'
+  '(-k --cutfromcursor)'{-k,--cutfromcursor}"[make 'cut text' (^k) cut from cursor to end of line]"
+  '(-l --linenumbers)'{-l,--linenumbers}'[show line numbers]'
+  '(-m --mouse)'{-m,--mouse}'[enable mouse support]'
+  '(-n --noread)'{-n,--noread}'[only write to named files (do not read)]'
+  '(-o --operatingdir)'{-o+,--operatingdir=}'[specify operating directory]:operating directory:_directories'
+  '(-p --preserve -/ --modernbindings)'{-p,--preserve}'[preserve XON (^q) and XOFF (^s)]'
+  '(-q --indicator)'{-q,--indicator}'[show position indicator (scroll bar)]'
+  '(-r --fill)'{-r+,--fill=}'[specify width for hard-wrap and justify]: :_numbers -u columns -Nd-8 "wrap width"'
+  '(-s --speller)'{-s+,--speller=}'[specify spell-checking program]:spell-checking program/command:_cmdstring'
+  '(-t --saveonexit)'{-t,--saveonexit}'[save changes on exit without prompting]'
+  '(-N --noconvert -u --unix)'{-u,--unix}'[save files by default in Unix format]'
+  '(-v --view)'{-v,--view}'[disallow editing (read-only mode)]'
+  '(-b --breaklonglines -w --nowrap)'{-w,--nowrap}"[don't hard-wrap long lines]"
+  '(-x --nohelp)'{-x,--nohelp}"[don't show help lines at bottom]"
+  '(-y --afterends)'{-y,--afterends}'[make Ctrl+Right and Ctrl+Delete stop at word ends]'
+  '(- : *)'{-z,--listsyntaxes}'[list names of available syntax definitions]'
+  '(-! --magic)'{-!,--magic}'[use libmagic to determine syntax if necessary]'
+  '(-@ --colonparsing)'{-@,--colonparsing}'[accept filename:linenumber notation on command line]'
+  '(-% --stateflags)'{-%,--stateflags}'[show state flags in title bar]'
+  '(-_ --minibar)'{-_,--minibar}'[hide title bar and show mini bar at bottom]'
+  '(-0 --zero)'{-0,--zero}'[hide UI, use whole terminal]'
+  '(-/ --modernbindings)'{-/,--modernbindings}'[use better-known key bindings]'
+  '*: :->files'
+)
+
+_arguments -s -S : $args && ret=0
+
+case $state in
+  syntaxes)
+    local -a tmp
+    tmp=( ${(f)"$( _call_program syntaxes $words[1] --listsyntaxes )"} )
+    tmp=( ${tmp:#(#i)*available syntax*} )
+    tmp=( ${(@Z<n>)tmp} )
+    _wanted volume-names expl 'syntax' compadd -a - tmp && ret=0
+    ;;
+
+  files)
+    _alternative \
+      'line-pattern: :_guard "(|+*)" "+line[,column] or +[crCR]{/|?}pattern"' \
+      'files: :_files' \
+    && ret=0
+    ;;
+esac
+
+return ret
