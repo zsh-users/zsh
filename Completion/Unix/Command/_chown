@@ -74,19 +74,13 @@ _arguments -C -s -S -0 $aopts "$args[@]" '*: :->files' && ret=0
 
 case $state in
   owner)
-    if [[ $service = chgrp ]] || compset -P '*[:.]'; then
+    if [[ $service = chgrp ]] || compset -P '*:'; then
       if (( EGID && $+commands[groups] && ! $+_comp_priv_prefix )); then  # except for sudo
        _wanted groups expl 'group' compadd -- $(groups) && return 0
       fi
       _groups && ret=0
     else
-      if compset -S '[.:]*'; then
-        suf=()
-      elif [[ $OSTYPE = irix* ]]; then
-	suf=( -qS '.' )
-      else
-	suf=( -qS ':' )
-      fi
+      compset -S ':*' || suf=( -qS: )
       _users "$suf[@]" && ret=0
     fi
   ;;
@@ -102,9 +96,9 @@ case $state in
     if [[ $service = chgrp ]]; then
       grp=${line[1]}
     else
-      usr=${line[1]%%[.:]*}
+      usr=${line[1]%%:*}
       usr=${${(M)usr:#[0-9]#}:-${userdirs[$usr]:+.$usr.}}
-      grp=${${(M)line[1]%%[.:]*}#?}
+      grp=${${(M)line[1]%%:*}#?}
     fi
     [[ -n $grp ]] && grp="${${(M)grp:#[0-9]#}:-.$grp.}"
     req=( ${usr:+\^u$usr} ${grp:+\^g$grp} )

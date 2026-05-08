@@ -120,13 +120,12 @@ if [[ $state = afile ]]; then
 	'users:user name:_users -qS@' && ret=0
   fi
 elif [[ $state = user ]]; then
-  if compset -P '*[:.]'; then
+  if compset -P '*:'; then
     _groups && ret=0
   else
-    local suf=.
-    [[ $OSTYPE = (solaris|hpux)* ]] && suf=:
-    compset -S '.*' && unset suf
-    _users -S "$suf" -q && ret=0
+    local suf
+    compset -S ':*' || suf=( -qS: )
+    _users $suf && ret=0
   fi
 fi
 
