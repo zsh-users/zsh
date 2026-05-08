@@ -1,5 +1,8 @@
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54536: Src/exec.c: Coverity CID 1255827 Fix leak of prog
+	in loadautofn()
+
 	* 54535: Src/builtin.c: Coverity CID 1500747 0-initialize ti
 
 	* 54548: Src/Modules/zftp.c: zftp: fix some mistakes
