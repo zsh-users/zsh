@@ -6572,6 +6572,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 #endif
 	if (isatty(readfd)) {
 	    struct ttyinfo ti;
+	    memset(&ti, 0, sizeof(struct ttyinfo));
 	    fdgettyinfo(readfd, &ti);
 	    if (! resettty) {
 	      saveti = ti;
