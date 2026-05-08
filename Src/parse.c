@@ -3331,7 +3331,7 @@ write_dump(int dfd, LinkList progs, int map, int hlen, int tlen)
 	fdmagic(pre) = (other ? FD_OMAGIC : FD_MAGIC);
 	fdsetflags(pre, ((map ? FDF_MAP : 0) | other));
 	fdsetother(pre, tlen);
-	strcpy(fdversion(pre), ZSH_VERSION);
+	strncpy(fdversion(pre), ZSH_VERSION, sizeof(wordcode) * (FD_PRELEN - 2) - 1);
 	write_loop(dfd, (char *)pre, FD_PRELEN * sizeof(wordcode));
 
 	for (node = firstnode(progs); node; incnode(node)) {
