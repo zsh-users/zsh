@@ -1,5 +1,8 @@
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54544: Src/Modules/zpty.c: Coverity CID 439086 fix potential
+	leak of prog in ptyread()
+
 	* 54543: Src/Zle/termquery.c: Coverity CID 1692315 memcpy of
 	uninitialized member winsize
 
