@@ -1,0 +1,78 @@
+#compdef fish
+
+local MATCH MBEGIN MEND ret=1
+local -a args context line state state_descr
+local -A opt_args
+
+args=(
+  # unlike most shells, fish's -c is a normal option-with-optarg which can be
+  # interleaved with other options and can even be given multiple times.
+  # obviously we can't complete command strings reliably here but we'll try
+  '(1)*'{-c+,--command=}'[execute specified command string]: :_cmdstring'
+  '*'{-C+,--init-command=}'[execute specified command before other input]: :_cmdstring'
+  '(-d --debug)'{-d+,--debug=}'[enable debug output for specified categories]: :->debug'
+  '(-o --debug-output)'{-o+,--debug-output=}'[specify debug output file]:debug output file:_files'
+  '(-f --features)'{-f+,--features=}'[enable specified feature flags]: :->feature'
+  '(-i --interactive)'{-i,--interactive}'[act as interactive shell]'
+  '(-l --login)'{-l,--login}'[act as login shell]'
+  '(-N --no-config)'{-N,--no-config}'[do not read configuration files]'
+  '(-n --no-execute)'{-n,--no-execute}'[check syntax only (do not execute commands)]'
+  '(-p --profile)'{-p+,--profile=}'[specify profile output file]:profile output file:_files'
+  '--profile-startup=[specify start-up profile output file]:profile output file:_files'
+  '(-P --private)'{-P,--private}'[enable private mode (no history)]'
+  '--print-rusage-self[output getrusage() stats on exit]'
+  '(- : *)--print-debug-categories[display debug categories]'
+  '(- : *)'{-v,--version}'[display version information]'
+  '(- : *)'{-h,--help}'[display usage information]'
+  '(-)1:script file:_files'
+  '(-)*:argument:_files'
+)
+
+_arguments -s -S -A '-*' : $args && ret=0
+
+case $state in
+  debug)
+    local -a tmp=( ${(f)"$(
+      _call_program debug-categories $words[1] --print-debug-categories
+    )"} )
+    tmp=( ${${tmp/[[:space:]]##/\[}/%/\]} )
+    tmp=( ${tmp/(#m)\[[A-Z][^A-Z]/${(L)MATCH}} )
+    tmp=( ${tmp/.\]/\]} )
+    _values -s, 'debug category' $tmp && ret=0
+    ;;
+
+  feature)
+    local name def ver desc
+    local -a flags_on flags_off versions flags tmp
+
+    while IFS=$'\t ' read -r name def ver desc; do
+      desc=${${desc/#(#m)[A-Z][^A-Z]/${(L)MATCH}}//(#m)[]\\]/\\$MATCH}
+      if [[ $def == on ]]; then
+        flags_on+=( $name"[$desc ($ver, defaults on)]" )
+      else
+        flags_off+=( $name"[$desc ($ver, defaults off)]" )
+      fi
+      versions+=( $ver"[all features introduced in fish $ver]" )
+    done < <(
+      _call_program feature-flags $words[1] -NPc '"status features"'
+    )
+
+    # if an individual flag is already on, show the no- variant, and vice versa
+    flags+=( no-$^flags_on $flags_off )
+    # always show both for these 'groups'
+    flags+=( {no-,}all'[all features]' {no-,}${(u)versions} )
+
+    # only show redundant variants of individual flags when necessary
+    tmp=( no-$^flags_off )
+    [[ ${PREFIX##*,} == n* ]] || tmp=( '!'$^tmp )
+    flags+=( $tmp )
+
+    tmp=( ${(M)flags_on:#${${PREFIX##*,}[1]:----}*} )
+    (( $#tmp )) || tmp=( '!'$^flags_on )
+    flags+=( $tmp )
+
+    _values -s, 'feature flag' $flags && ret=0
+    ;;
+esac
+
+return ret
