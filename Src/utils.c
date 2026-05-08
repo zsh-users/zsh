@@ -7385,8 +7385,7 @@ lchdir(char const *path, struct dirsav *d, int hard)
 #endif
     } else {
 	level = 0;
-	if (!d->dev && !d->ino) {
-	    stat(".", &st1);
+	if (!d->dev && !d->ino && !stat(".", &st1)) {
 	    d->dev = st1.st_dev;
 	    d->ino = st1.st_ino;
 	}
