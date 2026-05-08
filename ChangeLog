@@ -1,5 +1,8 @@
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54538: Src/exec.c: Coverity CID 1637382 bsiz can overflow when
+	reading a large heredoc
+
 	* 54537: Src/exec.c: Coverity CID 1372427 buffer overrun in
 	zexecve()
 
