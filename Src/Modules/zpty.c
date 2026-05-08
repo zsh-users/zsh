@@ -690,6 +690,8 @@ ptyread(char *nam, Ptycmd cmd, char **args, int noblock, int mustmatch)
 	) {
 	cmd->old = (char *) zalloc(cmd->olen = used);
 	memcpy(cmd->old, buf, cmd->olen);
+	if (prog)
+	    freepatprog(prog);
 
 	return 1;
     }

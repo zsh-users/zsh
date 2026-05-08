@@ -8,6 +8,9 @@
 
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54544: Src/Modules/zpty.c: Coverity CID 439086 fix potential
+	leak of prog in ptyread()
+
 	* 54542: Src/Modules/zutil.c: Coverity CID 1692320 fix leak
 	of match1
 
