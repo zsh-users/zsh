@@ -2819,6 +2819,7 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 		    while (*++argv) {
 			status = zstrtol(*argv, &signame, 10);
 			if (signame == *argv) {
+			    int rtsig;
 			    signame = casemodify(signame, CASMOD_UPPER);
 			    if (!strncmp(signame, "SIG", 3))
 				signame += 3;
@@ -2836,8 +2837,8 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 				    }
 			    }
 #if defined(SIGRTMIN) && defined(SIGRTMAX)
-			    if (sig > SIGCOUNT && (sig = rtsigno(signame))) {
-				printf("%d\n", sig);
+			    if (sig > SIGCOUNT && (rtsig = rtsigno(signame))) {
+				printf("%d\n", rtsig);
 			    } else
 #endif
 			    if (sig > SIGCOUNT) {
