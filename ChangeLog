@@ -1,5 +1,8 @@
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54539: Src/parse.c: Coverity CID 1692314 avoid overflowing
+	version field in dump header
+
 	* 54538: Src/exec.c: Coverity CID 1637382 bsiz can overflow when
 	reading a large heredoc
 
