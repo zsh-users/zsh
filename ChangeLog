@@ -1,5 +1,8 @@
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54537: Src/exec.c: Coverity CID 1372427 buffer overrun in
+	zexecve()
+
 	* 54536: Src/exec.c: Coverity CID 1255827 Fix leak of prog
 	in loadautofn()
 

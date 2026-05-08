@@ -504,7 +504,7 @@ static int
 zexecve(char *pth, char **argv, char **newenvp)
 {
     int eno;
-    static char buf[PATH_MAX * 2+1];
+    static char buf[PATH_MAX * 2+2+1+1]; /* enough room if pwd fits in PATH_MAX */
     char **eep;
 
     unmetafy(pth, NULL);
@@ -516,7 +516,8 @@ zexecve(char *pth, char **argv, char **newenvp)
     if (*pth == '/')
 	strcpy(buf + 2, pth);
     else
-	sprintf(buf + 2, "%s/%s", unmeta(pwd), pth);
+	/* not checking for truncation because what would we do? */
+	snprintf(buf + 2, sizeof(buf) - 2, "%s/%s", unmeta(pwd), pth);
     zputenv(buf);
 #ifndef FD_CLOEXEC
     closedumps();
