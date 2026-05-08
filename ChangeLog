@@ -1,5 +1,8 @@
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54541: Src/utils.c: Coverity CID 1255748 check return value
+	from stat()
+
 	* 54540: Src/jobs.c: Coverity CID 1637388 avoid clobbering sig
 
 	* 54539: Src/parse.c: Coverity CID 1692314 avoid overflowing
