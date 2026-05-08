@@ -111,6 +111,7 @@ menu(Zle Widgets)
 menu(User-Defined Widgets)
 menu(Standard Widgets)
 menu(Character Highlighting)
+menu(Cursor Shape and Color)
 
 Completion Widgets
 

@@ -1,8 +1,8 @@
 .nr PI 0
 .nr LL 6.5i
 .if \n(.g \{\
-.if "\*(.T"ascii" .ftr C R
-.if "\*(.T"latin1" .ftr C R
+.if "\*(.T"ascii" .ftr CR R
+.if "\*(.T"latin1" .ftr CR R
 .if "\*(.T"html" .nr HTML 1
 .nr De \n[.ss]
 .\}
@@ -16,7 +16,7 @@
 .ie \n[HTML] \{\
 .de Ds
 .DS I .5i
-.ft C
+.ft CR
 ..
 .de De
 .DE
@@ -31,7 +31,7 @@
 .el \{\
 .de Ds
 .DS I .5i
-.ft C
+.ft CR
 .ps 9
 .vs 11
 .ss 11
@@ -105,11 +105,11 @@ The text will frequently mention options that you can set to change
 the behaviour of \fBzsh\fP.  You can set these options with the
 command
 .Ds
-%\0setopt\0\fIoptionname\fC
+%\0setopt\0\fIoptionname\f(CR
 .De
 and unset them again with
 .Ds
-%\0unsetopt\0\fIoptionname\fC
+%\0unsetopt\0\fIoptionname\f(CR
 .De
 Case is ignored in option names, as are embedded underscores.
 .Sh "Filename Generation"
@@ -135,7 +135,7 @@ foo.c\0\0q.c
 .De
 Also, if the \fIEXTENDEDGLOB\fP option is set,
 some new features are activated.
-For example, the \fC^\fP character negates the pattern following it:
+For example, the \f(CR^\fP character negates the pattern following it:
 .Ds
 %\0setopt\0extendedglob
 %\0ls\0-d\0^*.c
@@ -153,7 +153,7 @@ file.pro\0\0\0foo.o\0\0\0\0\0\0main.o\0\0\0\0\0q.c\0\0\0\0\0\0\0\0run234\0\0\0\0
 \&.rhosts\0\0\0bar.o\0\0\0\0\0file.h\0\0\0\0file.pro\0\0foo.o\0\0\0\0\0main.h\0\0\0\0main.o
 .De
 An expression of the form
-\fC<\fIx\fR\-\fIy\fC>\fR
+\f(CR<\fIx\fR\-\fIy\f(CR>\fR
 matches a range of integers:
 .Ds
 %\0ls\0run<200-300>
@@ -168,7 +168,7 @@ run303
 run123\0\0run2\0\0\0\0run234\0\0run240\0\0run303
 .De
 The \fINUMERICGLOBSORT\fP option will sort files with numbers
-according to the number.  This will not work with \fCls\fP as it
+according to the number.  This will not work with \f(CRls\fP as it
 resorts its arguments:
 .Ds
 %\0setopt\0numericglobsort
@@ -182,7 +182,7 @@ bar.o\0\0foo.c\0\0foo.o
 %\0ls\0*.(c|o|pro)
 bar.o\0\0\0\0\0file.pro\0\0foo.c\0\0\0\0\0foo.o\0\0\0\0\0main.o\0\0\0\0q.c
 .De
-Also, the string \fC**/\fP forces a recursive search of
+Also, the string \f(CR**/\fP forces a recursive search of
 subdirectories:
 .Ds
 %\0ls\0-R
@@ -214,8 +214,8 @@ stuff/xxx/foobar\0\0stuff/yyy/frobar
 .De
 .PP
 It is possible to exclude certain files from the patterns using
-the ~ character.  A pattern of the form \fC*.c~bar.c\fP lists all
-files matching \fC*.c\fP, except for the file \fCbar.c\fP.
+the ~ character.  A pattern of the form \f(CR*.c~bar.c\fP lists all
+files matching \f(CR*.c\fP, except for the file \f(CRbar.c\fP.
 .Ds
 %\0ls\0*.c
 foo.c\0\0\0\0foob.c\0\0\0\0bar.c
@@ -229,7 +229,7 @@ One can add a number of \fIqualifiers\fP to the end of
 any of these patterns, to restrict matches to certain
 file types.  A qualified pattern is of the form
 .DS
-\fIpattern\fC(\fR...\fC)\fR
+\fIpattern\f(CR(\fR...\f(CR)\fR
 .De
 with single-character qualifiers inside the parentheses.
 .Ds
@@ -254,12 +254,12 @@ bar.o\0\0\0\0\0\0\0foo*\0\0\0\0\0\0\0\0link@\0\0\0\0\0\0\0morestuff/\0\0run123\0
 file.h\0\0\0\0\0\0foo.c\0\0\0\0\0\0\0main.h\0\0\0\0\0\0pipe\0\0\0\0\0\0\0\0run2\0\0\0\0\0\0\0\0run303
 file.pro\0\0\0\0foo.o\0\0\0\0\0\0\0main.o\0\0\0\0\0\0q.c\0\0\0\0\0\0\0\0\0run234\0\0\0\0\0\0stuff/
 .De
-Note that \fC*(x)\fP and \fC*(*)\fP both match executables.
-\fC*(X)\fP matches files executable by others, as opposed to
-\fC*(x)\fP, which matches files executable by the owner.
-\fC*(R)\fP and \fC*(r)\fP match readable files;
-\fC*(W)\fP and \fC*(w)\fP, which checks for writable files.
-\fC*(W)\fP is especially important, since it checks for world-writable
+Note that \f(CR*(x)\fP and \f(CR*(*)\fP both match executables.
+\f(CR*(X)\fP matches files executable by others, as opposed to
+\f(CR*(x)\fP, which matches files executable by the owner.
+\f(CR*(R)\fP and \f(CR*(r)\fP match readable files;
+\f(CR*(W)\fP and \f(CR*(w)\fP, which checks for writable files.
+\f(CR*(W)\fP is especially important, since it checks for world-writable
 files:
 .Ds
 %\0l\0*(w)
@@ -274,12 +274,12 @@ lrwxrwxrwx\0\01\0pfalstad\0\0\0\0\0\0\010\0May\023\018:12\0link\0->\0/usr/bin/
 .De
 If you want to have all the files of a certain type as well as all
 symbolic links pointing to files of that type, prefix the qualifier
-with a \fC-\fP:
+with a \f(CR-\fP:
 .Ds
 %\0l\0*(-/)
 link@\0\0\0\0\0\0\0morestuff/\0\0stuff/
 .De
-You can filter out the symbolic links with the \fC^\fP character:
+You can filter out the symbolic links with the \f(CR^\fP character:
 .Ds
 %\0l\0*(W^@)
 run240
@@ -288,7 +288,7 @@ foo*\0\0\0\0\0\0\0\0link@\0\0\0\0\0\0\0morestuff/\0\0stuff/
 %\0l\0*(x^@/)
 foo*
 .De
-To find all plain files, you can use \fC.\fP:
+To find all plain files, you can use \f(CR.\fP:
 .Ds
 %\0l\0*(.)
 Makefile\0\0file.h\0\0\0\0foo*\0\0\0\0\0\0foo.o\0\0\0\0\0main.o\0\0\0\0run123\0\0\0\0run234\0\0\0\0run303
@@ -302,8 +302,8 @@ pipe
 %\0l\0-l\0*(p)
 prw-r--r--\0\01\0pfalstad\0\0\0\0\0\0\0\00\0May\023\018:12\0pipe
 .De
-\fC*(U)\fP matches all files owned by you.
-To search for all files not owned by you, use \fC*(^U)\fP:
+\f(CR*(U)\fP matches all files owned by you.
+To search for all files not owned by you, use \f(CR*(^U)\fP:
 .Ds
 %\0l\0-l\0*(^U)
 -rw-------\0\01\0subbarao\0\0\0\0\0\0\029\0May\023\018:13\0sub
@@ -332,30 +332,30 @@ If \fBZDOTDIR\fP is not set, then the value of \fBHOME\fP is used;
 this is the usual case.
 .\".KE    <--- missing .KS or .KF above
 .PP
-\&\fC.zshenv\fP is sourced on all invocations of the shell,
-unless the \fC-f\fP option is set.  It should contain commands to set
+\&\f(CR.zshenv\fP is sourced on all invocations of the shell,
+unless the \f(CR-f\fP option is set.  It should contain commands to set
 the command search path, plus other important environment
 variables.
-\&\fC.zshenv\fP should not contain commands that produce output
+\&\f(CR.zshenv\fP should not contain commands that produce output
 or assume the shell is attached to a tty.
 .PP
-\&\fC.zshrc\fP is sourced in interactive shells.  It should contain
+\&\f(CR.zshrc\fP is sourced in interactive shells.  It should contain
 commands to set up aliases, functions, options, key bindings, etc.
 .PP
-\&\fC.zlogin\fP is sourced in login shells.  It should contain
+\&\f(CR.zlogin\fP is sourced in login shells.  It should contain
 commands that should be executed only in login shells.
-\&\fC.zlogout\fP is sourced when login shells exit.
-\&\fC.zprofile\fP is similar to \fC.zlogin\fP, except that it is sourced before
-\&\fC.zshrc\fP.
-\&\fC.zprofile\fP is meant as an alternative to \fC.zlogin\fP for
+\&\f(CR.zlogout\fP is sourced when login shells exit.
+\&\f(CR.zprofile\fP is similar to \f(CR.zlogin\fP, except that it is sourced before
+\&\f(CR.zshrc\fP.
+\&\f(CR.zprofile\fP is meant as an alternative to \f(CR.zlogin\fP for
 ksh fans;
 the two are not intended to be used together, although this
 could certainly be done if desired.
-\&\fC.zlogin\fP is not the place for alias definitions, options, environment
+\&\f(CR.zlogin\fP is not the place for alias definitions, options, environment
 variable settings, etc.;
 as a general rule, it should not change the shell environment
 at all.  Rather, it should be used to set the terminal type
-and run a series of external commands (\fCfortune\fP, \fCmsgs\fP, etc).
+and run a series of external commands (\f(CRfortune\fP, \f(CRmsgs\fP, etc).
 .Sh "Shell Functions"
 .PP
 \fBzsh\fP also allows you to create your own commands by defining shell
@@ -368,7 +368,7 @@ functions.  For example:
 pfalstad:*:3564:35:Paul\0John\0Falstad:/u/pfalstad:/usr/princeton/bin/zsh
 .De
 This function looks up a user in the NIS password map.
-The \fC$1\fP expands to the first argument to \fCyp\fP.
+The \f(CR$1\fP expands to the first argument to \f(CRyp\fP.
 The function could have been equivalently defined in one of the following
 ways:
 .Ds
@@ -412,8 +412,8 @@ pfalstad:*:3564:35:Paul\0John\0Falstad:/u/pfalstad:/usr/princeton/bin/zsh
 subbarao:*:3338:35:Kartik\0Subbarao:/u/subbarao:/usr/princeton/bin/zsh
 sukthnkr:*:1267:35:Rahul\0Sukthankar:/u/sukthnkr:/usr/princeton/bin/tcsh
 .De
-The \fCfor i\fP loops through each of the function's arguments,
-setting \fCi\fP equal to each of them in turn.
+The \f(CRfor i\fP loops through each of the function's arguments,
+setting \f(CRi\fP equal to each of them in turn.
 We can also make the function do something sensible
 if no arguments are given:
 .Ds
@@ -428,9 +428,9 @@ usage:\0yp\0name\0...
 pfalstad:*:3564:35:Paul\0John\0Falstad:/u/pfalstad:/usr/princeton/bin/zsh
 sukthnkr:*:1267:35:Rahul\0Sukthankar:/u/sukthnkr:/usr/princeton/bin/tcsh
 .De
-\fC$#\fP is the number of arguments supplied to the function.
+\f(CR$#\fP is the number of arguments supplied to the function.
 If it is equal to zero, we print a usage message; otherwise,
-we loop through the arguments, and \fCypmatch\fP all of them.
+we loop through the arguments, and \f(CRypmatch\fP all of them.
 .\".KE    <--- missing .KS or .KF above
 .PP
 Here's a function that selects a random line from a file:
@@ -449,16 +449,16 @@ SunOS\0Release\04.1.1\0(PHOENIX)\0#19:\0Tue\0May\014\019:03:15\0EDT\01991
 
 %
 .De
-\fCrandline\fP has a local variable, \fCz\fP, that holds the number of
-lines in the file.  \fC$[RANDOM % z + 1]\fP expands to a random number
-between 1 and \fCz\fP.  An expression of the form \fC$[\fR...\fC]\fR
+\f(CRrandline\fP has a local variable, \f(CRz\fP, that holds the number of
+lines in the file.  \f(CR$[RANDOM % z + 1]\fP expands to a random number
+between 1 and \f(CRz\fP.  An expression of the form \f(CR$[\fR...\f(CR]\fR
 expands to the value of the arithmetic expression within the brackets,
 and the \fBRANDOM\fP variable returns a random number each time it
-is referenced.  \fC%\fP is the modulus operator, as in C.
-Therefore, \fCsed -n $[RANDOM%z+1]p\fP picks a random line from its
-input, from 1 to \fCz\fP.
+is referenced.  \f(CR%\fP is the modulus operator, as in C.
+Therefore, \f(CRsed -n $[RANDOM%z+1]p\fP picks a random line from its
+input, from 1 to \f(CRz\fP.
 .PP
-Function definitions can be viewed with the \fCfunctions\fP builtin:
+Function definitions can be viewed with the \f(CRfunctions\fP builtin:
 .Ds
 %\0functions\0randline
 randline\0()\0{
@@ -508,12 +508,12 @@ Note that this could also have been implemented as an alias:
 -rwxr-xr-x\0\01\0pfalstad\0\0\0\0\0\0\029\0May\024\004:38\0foo
 .De
 .PP
-Instead of defining a lot of functions in your \fC.zshrc\fP,
+Instead of defining a lot of functions in your \f(CR.zshrc\fP,
 all of which you may not use,
-it is often better to use the \fCautoload\fP builtin.
+it is often better to use the \f(CRautoload\fP builtin.
 The idea is, you create a directory where function
 definitions are stored, declare the names in
-your \fC.zshrc\fP, and tell the shell where to look for them.
+your \f(CR.zshrc\fP, and tell the shell where to look for them.
 Whenever you reference a function, the shell
 will automatically load it into memory.
 .Ds
@@ -537,7 +537,7 @@ yp\0()\0{
 \0\0\0\0\0\0\0\0ypmatch\0$1\0passwd.byname
 }
 .De
-This idea has other benefits.  By adding a \fC#!\fP header
+This idea has other benefits.  By adding a \f(CR#!\fP header
 to the files, you can make them double as shell scripts.
 (Although it is faster to use them as functions, since a
 separate process is not created.)
@@ -557,7 +557,7 @@ ypmatch\0$1\0passwd.byname
 sukthnkr:*:1267:35:Rahul\0Sukthankar:/u/sukthnkr:/usr/princeton/bin/tcsh
 .De
 Now other people, who may not use \fBzsh\fP, or who don't want to
-copy all of your \fC.zshrc\fP, may use these functions as shell
+copy all of your \f(CR.zshrc\fP, may use these functions as shell
 scripts.
 .Sh "Directories"
 .PP
@@ -569,7 +569,7 @@ phoenix%\0PROMPT='%~>\0'
 ~/src>
 .De
 the shell will print the current directory in the prompt,
-using the \fC~\fP character.
+using the \f(CR~\fP character.
 However, \fBzsh\fP is smarter than most other shells in this respect:
 .Ds
 ~/src>\0cd\0~subbarao
@@ -585,10 +585,10 @@ However, \fBzsh\fP is smarter than most other shells in this respect:
 ~foo/news/nntp/inews>
 .De
 Note that \fBzsh\fP prints \fIother\fP users' directories 
-in the form \fC~user\fP.  Also note that you can
+in the form \f(CR~user\fP.  Also note that you can
 set a parameter and use it as a directory name;
-\fBzsh\fP will act as if \fCfoo\fP is a user
-with the login directory \fC/usr/princeton/common/src\fP.
+\fBzsh\fP will act as if \f(CRfoo\fP is a user
+with the login directory \f(CR/usr/princeton/common/src\fP.
 This is convenient, especially if you're sick of seeing
 prompts like this:
 .Ds
@@ -602,10 +602,10 @@ directory a short name, like this:
 /usr/princeton/common/src/news/nntp/inews
 ~inews>
 .De
-When you reference a directory in the form \fC~inews\fP,
+When you reference a directory in the form \f(CR~inews\fP,
 the shell assumes that you want the directory displayed
-in this form; thus simply typing \fCecho ~inews\fP or
-\fCcd ~inews\fP causes the prompt to be shortened.
+in this form; thus simply typing \f(CRecho ~inews\fP or
+\f(CRcd ~inews\fP causes the prompt to be shortened.
 You can define a shell function for this purpose:
 .Ds
 ~inews>\0namedir\0()\0{\0$1=$PWD\0;\0\0:\0~$1\0}
@@ -616,25 +616,25 @@ You can define a shell function for this purpose:
 ~spool>\0cd\0.msgs
 ~spool/.msgs>
 .De
-You may want to add this one-line function to your \fC.zshrc\fP.
+You may want to add this one-line function to your \f(CR.zshrc\fP.
 
 \fBzsh\fP can also put the current directory in your title bar,
 if you are using a windowing system.
-One way to do this is with the \fCchpwd\fP function, which is
+One way to do this is with the \f(CRchpwd\fP function, which is
 automatically executed by the shell whenever you change
 directory.  If you are using xterm, this will work:
 .Ds
 chpwd\0()\0{\0print\0-Pn\0'^[]2;%~^G'\0}
 .De
-The \fC-P\fP option tells \fCprint\fP to treat its arguments like a prompt
-string; otherwise the \fC%~\fP would not be expanded.
-The \fC-n\fP option suppresses the terminating newline, as with \fCecho\fP.
+The \f(CR-P\fP option tells \f(CRprint\fP to treat its arguments like a prompt
+string; otherwise the \f(CR%~\fP would not be expanded.
+The \f(CR-n\fP option suppresses the terminating newline, as with \f(CRecho\fP.
 .PP
-If you are using an IRIS \fCwsh\fP, do this:
+If you are using an IRIS \f(CRwsh\fP, do this:
 .Ds
 chpwd\0()\0{\0print\0-Pn\0'\e2201.y%~\e234'\0}
 .De
-The \fCprint -D\fP command has other uses.  For example, to
+The \f(CRprint -D\fP command has other uses.  For example, to
 print the current directory to standard output in short form,
 you can do this:
 .Ds
@@ -649,8 +649,8 @@ and to print each component of the path in short form:
 .Sh "Directory Stacks"
 .PP
 If you use csh, you may know about directory stacks.
-The \fCpushd\fP command puts the current directory on the
-stack, and changes to a new directory; the \fCpopd\fP command
+The \f(CRpushd\fP command puts the current directory on the
+stack, and changes to a new directory; the \f(CRpopd\fP command
 pops a directory off the stack and changes to it.
 .Ds
 phoenix%\0cd\0
@@ -671,7 +671,7 @@ Z\0/etc>\0popd\0
 /tmp\0~
 .De
 \fBzsh\fP's directory stack commands work similarly.  One
-difference is the way \fCpushd\fP is handled if no arguments
+difference is the way \f(CRpushd\fP is handled if no arguments
 are given.  As in csh, this exchanges the top two elements
 of the directory stack:
 .Ds
@@ -726,15 +726,15 @@ by setting a few more options and parameters:
 /tmp>\0cd\0-4
 ~>
 .De
-Note that \fC~2\fP expanded to the second directory in the
-history list, and that \fCcd -3\fP recalled the third
+Note that \f(CR~2\fP expanded to the second directory in the
+history list, and that \f(CRcd -3\fP recalled the third
 directory in the list.
 .PP
 You may be wondering what all those options do.
-\fIAUTOPUSHD\fP made \fCcd\fP act like \fCpushd\fP.
-(\fCalias cd=pushd\fP is not sufficient, for various reasons.)
-\fIPUSHDMINUS\fP swapped the meaning of \fCcd +1\fP and
-\fCcd -1\fP; we want them to mean the opposite of what they mean in csh,
+\fIAUTOPUSHD\fP made \f(CRcd\fP act like \f(CRpushd\fP.
+(\f(CRalias cd=pushd\fP is not sufficient, for various reasons.)
+\fIPUSHDMINUS\fP swapped the meaning of \f(CRcd +1\fP and
+\f(CRcd -1\fP; we want them to mean the opposite of what they mean in csh,
 because it makes more sense in this scheme, and it's easier to type:
 .Ds
 ~>\0dh
@@ -755,7 +755,7 @@ because it makes more sense in this scheme, and it's easier to type:
 /usr/pub>
 .De
 \fIPUSHDSILENT\fP keeps the shell from printing
-the directory stack each time we do a \fCcd\fP,
+the directory stack each time we do a \f(CRcd\fP,
 and \fIPUSHDTOHOME\fP we mentioned earlier:
 .Ds
 /usr/pub>\0unsetopt\0pushdsilent
@@ -794,10 +794,10 @@ from getting too large, much like \fIHISTSIZE\fP:
 .PP
 Command substitution in \fBzsh\fP can take two forms.
 In the traditional form, a command enclosed in
-backquotes (\fC`\fP...\fC`\fP) is replaced on the command line with its output.
+backquotes (\f(CR`\fP...\f(CR`\fP) is replaced on the command line with its output.
 This is the form used by the older shells.
 Newer shells (like \fBzsh\fP) also provide another form,
-\fC$(\fR...\fC)\fR.  This form is much easier to nest.
+\f(CR$(\fR...\f(CR)\fR.  This form is much easier to nest.
 .Ds
 %\0ls\0-l\0`echo\0/vmunix`
 -rwxr-xr-x\0\01\0root\0\0\0\0\0\01209702\0May\014\019:04\0/vmunix
@@ -833,7 +833,7 @@ crw-rw-rw-\0\01\0root\0\0\0\0\0\020,\0\028\0May\023\018:35\0/dev/ttyqc
 %\0ls\0-l\0=rn
 -rwxr-xr-x\0\01\0root\0\0\0\0\0\0\0172032\0Mar\0\06\018:40\0/usr/princeton/bin/rn
 .De
-A command name with a \fC=\fP prepended is replaced with its full
+A command name with a \f(CR=\fP prepended is replaced with its full
 pathname.  This can be very convenient.  If it's not convenient
 for you, you can turn it off:
 .Ds
@@ -858,11 +858,11 @@ subbarao\0ttyt7\0\0\0May\023\015:02\0\0\0(mad55sx15.Prince)
 subbarao\0ttyu6\0\0\0May\023\015:04\0\0\0(mad55sx15.Prince)
 shgchan\0\0ttyvb\0\0\0May\023\016:51\0\0\0(gaudi.Princeton.)
 .De
-A command of the form \fC=(\fR...\fC)\fR is replaced with the name of a \fIfile\fP
+A command of the form \f(CR=(\fR...\f(CR)\fR is replaced with the name of a \fIfile\fP
 containing its output.  (A command substitution, on the other
 hand, is replaced with the output itself.)
-\fCprint -l\fP is like \fCecho\fP, excepts that it prints its arguments
-one per line, the way \fCfgrep\fP expects them:
+\f(CRprint -l\fP is like \f(CRecho\fP, excepts that it prints its arguments
+one per line, the way \f(CRfgrep\fP expects them:
 .Ds
 %\0print\0-l\0foo\0bar
 foo
@@ -930,26 +930,26 @@ when the command is finished.
 ---
 >\0strfile*
 .De
-If you read \fBzsh\fP's man page, you may notice that \fC<(\fR...\fC)\fR
+If you read \fBzsh\fP's man page, you may notice that \f(CR<(\fR...\f(CR)\fR
 is another form of process substitution which is similar to
-\fC=(\fR...\fC)\fR.
+\f(CR=(\fR...\f(CR)\fR.
 There is an important difference between the two.
-In the \fC<(\fR...\fC)\fR case, the shell creates a named pipe (FIFO)
+In the \f(CR<(\fR...\f(CR)\fR case, the shell creates a named pipe (FIFO)
 instead of a file.  This is better, since it does not
 fill up the file system; but it does not work in all cases.
-In fact, if we had replaced \fC=(\fR...\fC)\fR with \fC<(\fR...\fC)\fR in 
+In fact, if we had replaced \f(CR=(\fR...\f(CR)\fR with \f(CR<(\fR...\f(CR)\fR in 
 the examples above, all of them would have stopped working
-except for \fCfgrep -f <(\fR...\fC)\fR.
+except for \f(CRfgrep -f <(\fR...\f(CR)\fR.
 You can not edit a pipe, or open it as a mail folder;
-\fCfgrep\fP, however, has no problem with reading
+\f(CRfgrep\fP, however, has no problem with reading
 a list of words from a pipe.
-You may wonder why \fCdiff <(foo) bar\fP doesn't work, since
-\fCfoo | diff - bar\fP works; this is because \fCdiff\fP creates
+You may wonder why \f(CRdiff <(foo) bar\fP doesn't work, since
+\f(CRfoo | diff - bar\fP works; this is because \f(CRdiff\fP creates
 a temporary file if it notices that one of its arguments
-is \fC-\fP, and then copies its standard input to the temporary
+is \f(CR-\fP, and then copies its standard input to the temporary
 file.
 .PP
-\fC>(\fR...\fC)\fR is just like \fC<(\fR...\fC)\fR except that the
+\f(CR>(\fR...\f(CR)\fR is just like \f(CR<(\fR...\f(CR)\fR except that the
 command between the parentheses will get its input from the named
 pipe.
 .Ds
@@ -979,13 +979,13 @@ too, works with pipes.
 .Ds
 %\0cut\0-d:\0-f1\0/etc/passwd\0|\0sort\0<newnames
 .De
-The sort will get as its standard input first the output of \fCcut\fP
-and then the contents of \fCnewnames\fP.
+The sort will get as its standard input first the output of \f(CRcut\fP
+and then the contents of \f(CRnewnames\fP.
 .PP
 Suppose you would like to watch the standard output of a command on
 your terminal, but want to pipe the standard error to another command.
 An easy way to do this in \fBzsh\fP is by redirecting the standard
-error using \fC2> >(\fR...\fC)\fR.
+error using \f(CR2> >(\fR...\f(CR)\fR.
 .Ds
 %\0find\0/\0-name\0games\02>\0>(grep\0-v\0'Permission'\0>\0realerrors)
 .De
@@ -1057,8 +1057,8 @@ nicecolors\0\0etc/\0\0\0\0\0\0\0\0scr/\0\0\0\0\0\0\0\0tmp/\0\0\0\0\0\0\0\0iris/\
 %\0nrable
 Mailboxes/\0\0mail/\0\0\0\0\0\0\0notes
 .De
-(The pattern \fC*(R)\fP matches all readable files in the current
-directory, and \fC*(^R)\fP matches all unreadable files.)
+(The pattern \f(CR*(R)\fP matches all readable files in the current
+directory, and \f(CR*(^R)\fP matches all unreadable files.)
 .PP
 Most other shells have aliases of this kind (\fIcommand\fP aliases).
 However, \fBzsh\fP also has \fIglobal\fP aliases, which are substituted
@@ -1083,8 +1083,8 @@ Connected\0to\0wuarchive.wustl.edu.
 Here are some more interesting uses.
 .Ds
 %\0alias\0-g\0M='|\0more'\0GF='|\0fgrep\0-f\0~/.friends'
-%\0who\0M\0\0\0#\0\fIpipes\0the\0output\0of\0\fCwho\fI\0through\0\fCmore
-%\0who\0GF\0\0#\0\fIsee\0if\0your\0friends\0are\0on\fC
+%\0who\0M\0\0\0#\0\fIpipes\0the\0output\0of\0\f(CRwho\fI\0through\0\f(CRmore
+%\0who\0GF\0\0#\0\fIsee\0if\0your\0friends\0are\0on\f(CR
 %\0w\0GF\0\0\0\0#\0\fIsee\0what\0your\0friends\0are\0doing
 .De
 Another example makes use of \fBzsh\fP's process substitution.
@@ -1093,13 +1093,13 @@ If you run NIS, and you miss being able to do this:
 %\0grep\0pfalstad\0/etc/passwd
 .De
 you can define an alias that will seem more natural
-than \fCypmatch pfalstad passwd\fP:
+than \f(CRypmatch pfalstad passwd\fP:
 .Ds
 %\0alias\0-g\0PASS='<(ypcat\0passwd)'
 %\0grep\0pfalstad\0PASS
 pfalstad:*:3564:35:Paul\0John\0Falstad:/u/pfalstad:/usr/princeton/bin/zsh
 .De
-If you're really crazy, you can even call it \fC/etc/passwd\fP:
+If you're really crazy, you can even call it \f(CR/etc/passwd\fP:
 .Ds
 %\0alias\0-g\0/etc/passwd='<(ypcat\0passwd)'
 %\0grep\0pfalstad\0/etc/passwd
@@ -1107,13 +1107,13 @@ pfalstad:*:3564:35:Paul\0John\0Falstad:/u/pfalstad:/usr/princeton/bin/zsh
 .De
 The last example shows one of the perils of global aliases;
 they have a lot of potential to cause confusion.
-For example, if you defined a global alias called \fC|\fP (which is
+For example, if you defined a global alias called \f(CR|\fP (which is
 possible), \fBzsh\fP would begin to act very strangely; every pipe
 symbol would be replaced with the text of your alias.
 To some extent, global aliases are like macros in C;
 discretion is advised in using them and in choosing names for them.
 Using names in all caps is not a bad idea, especially
-for aliases which introduce shell metasyntax (like \fCM\fP and \fCGF\fP
+for aliases which introduce shell metasyntax (like \f(CRM\fP and \f(CRGF\fP
 above).
 .PP
 Note that \fBzsh\fP aliases are not like csh aliases.  The syntax for
@@ -1124,12 +1124,12 @@ For example, if you try:
 alias\0rm\0mv\0'\e!*\0/tmp/wastebasket'
 .De
 no aliases will be defined, but \fBzsh\fP will not report an error.
-In csh, this line defines an alias that makes \fCrm\fP safe---files
-that are \fCrm\fP'd will be moved to a temporary directory instead of
+In csh, this line defines an alias that makes \f(CRrm\fP safe---files
+that are \f(CRrm\fP'd will be moved to a temporary directory instead of
 instantly destroyed.  In \fBzsh\fP's syntax, however, this line asks
-the shell to print any existing alias definitions for \fCrm\fP,
-\fCmv\fP, or \fC!*\ /tmp/wastebasket\fP.  Since there are none, most
-likely, the shell will not print anything, although \fCalias\fP will
+the shell to print any existing alias definitions for \f(CRrm\fP,
+\f(CRmv\fP, or \f(CR!*\ /tmp/wastebasket\fP.  Since there are none, most
+likely, the shell will not print anything, although \f(CRalias\fP will
 return a nonzero exit code.  The proper syntax is this:
 .Ds
 alias\0rm='mv\0\e!*\0/tmp/wastebasket'
@@ -1139,7 +1139,7 @@ However, this won't work either:
 %\0rm\0foo.dvi
 zsh:\0no\0matches\0found:\0!*
 .De
-While this makes \fCrm\fP safe, it is certainly not what the user
+While this makes \f(CRrm\fP safe, it is certainly not what the user
 intended.  In \fBzsh\fP, you must use a shell function for this:
 .Ds
 %\0unalias\0rm
@@ -1168,35 +1168,35 @@ on\0()\0{\0last\0-2\0$1\0;\0who\0|\0grep\0$1\0}
 .De
 The first two aliases were converted to regular \fBzsh\fP aliases, while
 the third, since it needed to handle arguments, was converted to
-a function.  \fCc2z\fP can convert most aliases to \fBzsh\fP format without
+a function.  \f(CRc2z\fP can convert most aliases to \fBzsh\fP format without
 any problems.  However, if you're using some really arcane csh tricks,
-or if you have an alias with a name like \fCdo\fP (which is reserved
+or if you have an alias with a name like \f(CRdo\fP (which is reserved
 in \fBzsh\fP), you may have to fix some of the aliases by hand.
 .PP
-The \fCc2z\fP script checks your csh setup, and produces a list
+The \f(CRc2z\fP script checks your csh setup, and produces a list
 of \fBzsh\fP commands which replicate your aliases and parameter settings
 as closely as possible.  You could include its output in your
-startup file, \fC.zshrc\fP.
+startup file, \f(CR.zshrc\fP.
 .Sh "History"
 .PP
 There are several ways to manipulate history in \fBzsh\fP.
-One way is to use csh-style \fC!\fP history:
+One way is to use csh-style \f(CR!\fP history:
 .Ds
 %\0/usr/local/bin/!:0\0!-2*:s/foo/bar/\0>>!$
 .De
 If you don't want to use this, you can turn it off
-by typing \fCsetopt nobanghist\fP.  If you are afraid of accidentally
+by typing \f(CRsetopt nobanghist\fP.  If you are afraid of accidentally
 executing the wrong command you can set the \fIHISTVERIFY\fP option.
 If this option is set, commands that result from history expansion
 will not be executed immediately, but will be put back into the editor
 buffer for further consideration.
 .PP
-If you're not familiar with \fC!\fP history, here follows some
-explanation.  History substitutions always start with a \fC!\fP,
-commonly called \*Qbang\*U.  After the \fC!\fP comes an (optional)
+If you're not familiar with \f(CR!\fP history, here follows some
+explanation.  History substitutions always start with a \f(CR!\fP,
+commonly called \*Qbang\*U.  After the \f(CR!\fP comes an (optional)
 designation of which \*Qevent\*U (command) to use, then a colon, and
 then a designation of what word of that command to use.  For example,
-\fC!-\fIn\fR refers to the command \fIn\fP commands ago.
+\f(CR!-\fIn\fR refers to the command \fIn\fP commands ago.
 .Ds
 %\0ls
 foo\0\0bar
@@ -1208,7 +1208,7 @@ baz\0\0bam
 No word designator was used, which means that the whole command
 referred to was repeated.  Note that the shell will echo the result of
 the history substitution.  The word designator can, among other
-things, be a number indicating the argument to use, where \fC0\fP is
+things, be a number indicating the argument to use, where \f(CR0\fP is
 the command.
 .Ds
 %\0/usr/bin/ls\0foo
@@ -1218,13 +1218,13 @@ foo
 bar
 .De
 In this example, no event designator was used, which tells \fBzsh\fP
-to use the previous command.  A \fC$\fP specifies the last argument
+to use the previous command.  A \f(CR$\fP specifies the last argument
 .Ds
 %\0mkdir\0/usr/local/lib/emacs/site-lisp/calc
 %\0cd\0!:$
 cd\0/usr/local/lib/emacs/site-lisp/calc
 .De
-If you use more words of the same command, only the first \fC!\fP
+If you use more words of the same command, only the first \f(CR!\fP
 needs an event designator.
 .Ds
 %\0make\0prig\0>>\0make.log
@@ -1241,7 +1241,7 @@ behaviour, set the \fICSHJUNKIEHISTORY\fP option.
 %\0!-2:0\0prog2\0>>\0!:$
 make\0prog2\0>>\0cshjunkiehistory
 .De
-Another way to use history is to use the \fCfc\fP command.  For
+Another way to use history is to use the \f(CRfc\fP command.  For
 example, if you type an erroneous command:
 .Ds
 %\0for\0i\0in\0`cat\0/etc/clients`\0
@@ -1253,9 +1253,9 @@ zsh:\0command\0not\0found:\0rpu
 zsh:\0command\0not\0found:\0rpu
 \&\fR...
 .De
-typing \fCfc\fP will execute an editor on this command, allowing
-you to fix it.  (The default editor is \fCvi\fP, by the way,
-not \fCed\fP).
+typing \f(CRfc\fP will execute an editor on this command, allowing
+you to fix it.  (The default editor is \f(CRvi\fP, by the way,
+not \f(CRed\fP).
 .Ds
 %\0fc
 49
@@ -1278,7 +1278,7 @@ for\0i\0in\0`cat\0/etc/clients`\0
 \0\0\0\0\0\0bonnet\0\0\0\0up\0\02\0days,\021:18,\0\0\0\0load\0average:\00.93,\00.80,\00.50
 \&\fR...
 .De
-A variant of the \fCfc\fP command is \fCr\fP, which redoes the last
+A variant of the \f(CRfc\fP command is \f(CRr\fP, which redoes the last
 command, with optional changes:
 .Ds
 %\0echo\0foo
@@ -1297,10 +1297,10 @@ bar
 .PP
 \fBzsh\fP's command line editor, \fBZLE\fP, is quite powerful.
 It is designed to emulate either emacs or vi; the default
-is emacs.  To set the bindings for vi mode, type \fCbindkey -v\fP.  If
+is emacs.  To set the bindings for vi mode, type \f(CRbindkey -v\fP.  If
 your \fBEDITOR\fP or \fBVISUAL\fP environment variable is vi,
 \fBzsh\fP will use vi emulation by default.  You can then switch to
-emacs mode with \fCbindkey -e\fP.
+emacs mode with \f(CRbindkey -e\fP.
 .PP
 In addition to basic editing, the shell allows you to 
 recall previous lines in the history.  In emacs mode,
@@ -1313,15 +1313,15 @@ Mailboxes\0\0\0bin\0\0\0\0\0\0\0\0\0func\0\0\0\0\0\0\0\0nicecolors\0\0scr\0\0\0\
 News\0\0\0\0\0\0\0\0etc\0\0\0\0\0\0\0\0\0iris\0\0\0\0\0\0\0\0notes\0\0\0\0\0\0\0src
 %\0echo\0foobar
 foobar
-%\0\fI^P\fC
-%\0echo\0foobar\fI^P\fC
+%\0\fI^P\f(CR
+%\0echo\0foobar\fI^P\f(CR
 %\0ls\0~_
 .De
-Pressing \fI^P\fP once brings up the previous line (\fCecho foobar\fP);
-pressing it again brings up the line before that (\fCls ~\fP).
+Pressing \fI^P\fP once brings up the previous line (\f(CRecho foobar\fP);
+pressing it again brings up the line before that (\f(CRls ~\fP).
 The cursor is left at the end of the line, allowing you to
 edit the line if desired before executing it.
-In many cases, \fBZLE\fP eliminates the need for the \fCfc\fP command,
+In many cases, \fBZLE\fP eliminates the need for the \f(CRfc\fP command,
 since it is powerful enough to handle even multiline commands:
 .Ds
 %\0for\0i\0in\0a\0b\0c\0d\0e
@@ -1333,7 +1333,7 @@ b
 c
 d
 e
-%\0\fI^P\fC
+%\0\fI^P\f(CR
 %\0for\0i\0in\0a\0b\0c\0d\0e\0
 \0do\0
 \0echo\0$i\0
@@ -1363,13 +1363,13 @@ Also, you can search the history for a certain command using
 (part of the) word at the beginning of the current line.  Hitting
 \fIESC-P\fP another time gets you the command before that, etc.
 .Ds
-%\0set\0\fIESC-P\fC
-%\0setopt\0autolist\0\fIESC-P\fC
+%\0set\0\fIESC-P\f(CR
+%\0setopt\0autolist\0\fIESC-P\f(CR
 %\0setopt\0nocorrect_
 .De
 Another way is to do an incremental search, emacs-style:
 .Ds
-%\0\fI^R\fC
+%\0\fI^R\f(CR
 %\0_
 i-search:
 
@@ -1381,16 +1381,16 @@ i-search:\0le
 .De
 Suppose you have retrieved an old history event in one of these ways
 and would like to execute several consecutive old commands starting
-with this one.  \fC^O\fP will execute the current command and then put
+with this one.  \f(CR^O\fP will execute the current command and then put
 the next command from the history into the editor buffer.  Typing
-\fC^O\fP several times will therefore reexecute several consecutive
+\f(CR^O\fP several times will therefore reexecute several consecutive
 commands from the history.  Of course, you can edit some of those
 commands in between.
 .PP
 In addition to completion (see below), \fITAB\fP performs expansion if
 possible.
 .Ds
-%\0ls\0*.c\fITAB\fC
+%\0ls\0*.c\fITAB\f(CR
 %\0ls\0foofile.c\0fortune.c\0rnd.c\0strfile.c\0unstr.c_
 .De
 For example, suppose you have a bunch of weird files in an important
@@ -1400,26 +1400,26 @@ directory:
 \0\0*\0*\0*\0\0\0\0\0\0\0;\0&\0%\0$??foo\0\0dspfok\0\0\0\0\0\0\0\0foo.c
 \0\0!"foo"!\0\0\0\0\0\0\0`\0\e\0`\0\0\0\0\0\0\0\0\0foo\0\0\0\0\0\0\0\0\0\0\0rrr
 .De
-You want to remove them, but you don't want to damage \fCfoo.c\fP.
+You want to remove them, but you don't want to damage \f(CRfoo.c\fP.
 Here is one way to do this:
 .Ds
-%\0rm\0*\fITAB\fC
+%\0rm\0*\fITAB\f(CR
 %\0rm\0\e\0\e\0\e*\e\0\e*\e\0\e*\e\0\e\0\e\0\0\e!\e"foo\e"\e!\0\e;\e\0\e&\e\0%\e\0\e$'
 ''
 'foo\0\e`\e\0\e\e\e\0\e`\0dspfok\0foo\0foo.c\0rrr_
 .De
-When you expand \fC*\fP, \fBzsh\fP inserts the names of all the files
+When you expand \f(CR*\fP, \fBzsh\fP inserts the names of all the files
 into the editing buffer, with proper shell quoting.
-Now, just move back and remove \fCfoo.c\fP from the buffer:
+Now, just move back and remove \f(CRfoo.c\fP from the buffer:
 .Ds
 %\0rm\0\e\0\e\0\e*\e\0\e*\e\0\e*\e\0\e\0\e\0\0\e!\e"foo\e"\e!\0\e;\e\0\e&\e\0%\e\0\e$'
 ''
 'foo\0\e`\e\0\e\e\e\0\e`\0dspfok\0foo\0\kxr\l'|\nxu\(ul'rr
 .De
 and press return.
-Everything except \fCfoo.c\fP will be deleted from the directory.  If
+Everything except \f(CRfoo.c\fP will be deleted from the directory.  If
 you do not want to actually expand the current word, but would like to
-see what the matches are, type \fC^Xg\fP.
+see what the matches are, type \f(CR^Xg\fP.
 .Ds
 %\0rm\0f*\fI^Xg\fP
 foo\0\0\0\0foo.c
@@ -1431,23 +1431,23 @@ Here's another trick; let's say you have typed this command in:
 .De
 and you forget which library you want.  You need to escape
 out for a minute and check by typing
-\fCls /usr/lib\fP, or some other such command;
+\f(CRls /usr/lib\fP, or some other such command;
 but you don't want to retype the whole command again,
 and you can't press return now because the current command
 is incomplete.
 In \fBzsh\fP, you can put the line on the \fIbuffer stack\fP, using
 \fIESC-Q\fP, and type some other commands.  The next time a prompt is printed,
-the \fCgcc\fP line will be popped off the stack and put
+the \f(CRgcc\fP line will be popped off the stack and put
 in the editing buffer automatically; you can then enter the
 proper library name and press return (or, \fIESC-Q\fP again and look
 for some other libraries whose names you forgot).
 .PP
 A similar situation: what if you forget the option to gcc that
 finds bugs using AI techniques?  You could either use \fIESC-Q\fP
-again, and type \fCman gcc\fP, or you could press \fIESC-H\fP, which
+again, and type \f(CRman gcc\fP, or you could press \fIESC-H\fP, which
 essentially does the same thing; it puts the current line on
-the buffer stack, and executes the command \fCrun-help gcc\fP,
-where \fCrun-help\fP is an alias for \fCman\fP.
+the buffer stack, and executes the command \f(CRrun-help gcc\fP,
+where \f(CRrun-help\fP is an alias for \f(CRman\fP.
 .PP
 Another interesting command is \fIESC-A\fP.  This executes the
 current line, but retains it in the buffer, so that it appears
@@ -1473,12 +1473,12 @@ press \fIESC-'\fP (escape-quote):
 .Ds
 %\0'don'\e''t\0do\0that;\0type\0'\e''rm\0-rf\0\e*'\e'',\0with\0a\0\e\0before\0the\0*.'
 .De
-then move to the beginning and add the \fCecho\fP command.
+then move to the beginning and add the \f(CRecho\fP command.
 .Ds
 %\0echo\0'don'\e''t\0do\0that;\0type\0'\e''rm\0-rf\0\e*'\e'',\0with\0a\0\e\0before\0the\0*.'
 don't\0do\0that;\0type\0'rm\0-rf\0\e*',\0with\0a\0\e\0before\0the\0*.
 .De
-Let's say you want to create an alias to do this \fCecho\fP command.
+Let's say you want to create an alias to do this \f(CRecho\fP command.
 This can be done by recalling the line with \fI^P\fP and pressing
 \fIESC-'\fP again:
 .Ds
@@ -1494,12 +1494,12 @@ an alias.
 don't\0do\0that;\0type\0'rm\0-rf\0\e*',\0with\0a\0\e\0before\0the\0*.
 .De
 If one of these fancy editor commands changes your command line in a
-way you did not intend, you can undo changes with \fC^_\fP, if you can
-get it out of your keyboard, or \fC^X^U\fP, otherwise.
+way you did not intend, you can undo changes with \f(CR^_\fP, if you can
+get it out of your keyboard, or \f(CR^X^U\fP, otherwise.
 .PP
 Another use of the editor is to edit the value of variables.
 For example, an easy way to change your path is to use
-the \fCvared\fP command:
+the \f(CRvared\fP command:
 .Ds
 %\0vared\0PATH
 >\0/u/pfalstad/scr:/u/pfalstad/bin/sun4:/u/maruchck/scr:/u/subbarao/bin:/u/maruc
@@ -1513,16 +1513,16 @@ of the edit buffer will be assigned to \fBPATH\fP.
 Another great \fBzsh\fP feature is completion.  If you hit \fITAB\fP, \fBzsh\fP
 will complete all kinds of stuff.  Like commands or filenames:
 .Ds
-%\0comp\fITAB\fC
+%\0comp\fITAB\f(CR
 %\0compress\0_
 
-%\0ls\0nic\fITAB\fC
+%\0ls\0nic\fITAB\f(CR
 %\0ls\0nicecolors\0_
 
-%\0ls\0/usr/pr\fITAB\fC
+%\0ls\0/usr/pr\fITAB\f(CR
 %\0ls\0/usr/princeton/_
 
-%\0ls\0-l\0=com\fITAB\fC
+%\0ls\0-l\0=com\fITAB\f(CR
 %\0ls\0-l\0=compress\0_
 .De
 If the completion is ambiguous, the editor will beep.  If you find
@@ -1531,36 +1531,36 @@ can even be done in the middle of words.  To use this, you will have
 to set the \fICOMPLETEINWORD\fP option:
 .Ds
 %\0setopt\0completeinword
-%\0ls\0/usr/p\kxt\l'|\nxu\(ul'on\fITAB\fC
+%\0ls\0/usr/p\kxt\l'|\nxu\(ul'on\fITAB\f(CR
 %\0ls\0/usr/prince\kxt\l'|\nxu\(ul'on/
 %\0setopt\0alwaystoend
-%\0ls\0/usr/p\kxt\l'|\nxu\(ul'on\fITAB\fC
+%\0ls\0/usr/p\kxt\l'|\nxu\(ul'on\fITAB\f(CR
 %\0ls\0/usr/princeton/_
 .De
 You can list possible completions by pressing \fI^D\fP:
 .Ds
-%\0ls\0/vmu\fITAB\0\(embeep\(em\fC
+%\0ls\0/vmu\fITAB\0\(embeep\(em\f(CR
 %\0ls\0/vmunix_
-%\0ls\0/vmunix\fI^D\fC
+%\0ls\0/vmunix\fI^D\f(CR
 vmunix\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0vmunix.old\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0
 vmunix.new.kernelmap.old\0\0vmunix.org
 .De
 Or, you could just set the \fIAUTOLIST\fP option:
 .Ds
 %\0setopt\0autolist
-%\0ls\0/vmu\fITAB\0\(embeep\(em\fC
+%\0ls\0/vmu\fITAB\0\(embeep\(em\f(CR
 vmunix\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0vmunix.old\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0
 vmunix.new.kernelmap.old\0\0vmunix.org
 %\0ls\0/vmunix_
 .De
 If you like to see the types of the files in these lists, like in
-\fCls\ -F\fP, you can set the \fILISTTYPES\fP option.  Together with
+\f(CRls\ -F\fP, you can set the \fILISTTYPES\fP option.  Together with
 \fIAUTOLIST\fP you can use \fILISTAMBIGUOUS\fP.  This will only list
 the possibilities if there is no unambiguous part to add:
 .Ds
 %\0setopt\0listambiguous
-%\0ls\0/vmu\fITAB\0\(embeep\(em\fC
-%\0ls\0/vmunix_\fITAB\0\(embeep\(em\fC
+%\0ls\0/vmu\fITAB\0\(embeep\(em\f(CR
+%\0ls\0/vmunix_\fITAB\0\(embeep\(em\f(CR
 vmunix\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0vmunix.old\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0
 vmunix.new.kernelmap.old\0\0vmunix.org
 .De
@@ -1570,12 +1570,12 @@ continue to edit the line you were editing, with the completion
 listing appearing beneath it.
 .PP
 Another interesting option is \fIMENUCOMPLETE\fP.  This affects the
-way \fITAB\fP works.  Let's look at the \fC/vmunix\fP example again:
+way \fITAB\fP works.  Let's look at the \f(CR/vmunix\fP example again:
 .Ds
 %\0setopt\0menucomplete
-%\0ls\0/vmu\fITAB\fC
-%\0ls\0/vmunix\fITAB\fC
-%\0ls\0/vmunix.new.kernelmap.old\fITAB\fC
+%\0ls\0/vmu\fITAB\f(CR
+%\0ls\0/vmunix\fITAB\f(CR
+%\0ls\0/vmunix.new.kernelmap.old\fITAB\f(CR
 %\0ls\0/vmunix.old_
 .De
 Each time you press \fITAB\fP, it displays the next possible completion.
@@ -1593,10 +1593,10 @@ exact matches to be accepted, even if there are other possible
 completions:
 .Ds
 %\0setopt\0recexact
-%\0ls\0/vmu\fITAB\0\(embeep\(em\fC
+%\0ls\0/vmu\fITAB\0\(embeep\(em\f(CR
 vmunix\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0vmunix.old\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0
 vmunix.new.kernelmap.old\0\0vmunix.org
-%\0ls\0/vmunix_\fITAB\fC
+%\0ls\0/vmunix_\fITAB\f(CR
 %\0ls\0/vmunix\0_
 .De
 To facilitate the typing of pathnames, a slash will be added whenever
@@ -1608,25 +1608,25 @@ slashes when you type a space or return after them.
 The \fIfignore\fP variable lists suffixes of files to ignore
 during completion.
 .Ds
-%\0ls\0foo\fITAB\0\(embeep\(em\fC
+%\0ls\0foo\fITAB\0\(embeep\(em\f(CR
 foofile.c\0\0foofile.o
 %\0fignore=(\0.o\0\e~\0.bak\0.junk\0)
 %\0ls\0foo\fITAB\fP
 %\0ls\0foofile.c\0_
 .De
-Since \fCfoofile.o\fP has a suffix that is in the \fCfignore\fP list,
-it was not considered a possible completion of \fCfoo\fP.
+Since \f(CRfoofile.o\fP has a suffix that is in the \f(CRfignore\fP list,
+it was not considered a possible completion of \f(CRfoo\fP.
 .PP
 Username completion is also supported:
 .Ds
-%\0ls\0~pfal\fITAB\fC
+%\0ls\0~pfal\fITAB\f(CR
 %\0ls\0~pfalstad/_
 .De
 and parameter name completion:
 .Ds
-%\0echo\0$ORG\fITAB\fC
+%\0echo\0$ORG\fITAB\f(CR
 %\0echo\0$ORGANIZATION\0_
-%\0echo\0${ORG\fITAB\fC
+%\0echo\0${ORG\fITAB\f(CR
 %\0echo\0${ORGANIZATION\0_
 .De
 Note that in the last example a space is added after the completion as
@@ -1637,65 +1637,65 @@ brace after such a completion.
 .PP
 There is also option completion:
 .Ds
-%\0setopt\0nocl\fITAB\fC
+%\0setopt\0nocl\fITAB\f(CR
 %\0setopt\0noclobber\0_
 .De
 and binding completion:
 .Ds
-%\0bindkey\0'^X^X'\0pu\fITAB\fC
+%\0bindkey\0'^X^X'\0pu\fITAB\f(CR
 %\0bindkey\0'^X^X'\0push-line\0_
 .De
-The \fCcompctl\fP command is used to control completion of the
+The \f(CRcompctl\fP command is used to control completion of the
 arguments of specific commands.  For example, to specify that certain
-commands take other commands as arguments, you use \fCcompctl -c\fP:
+commands take other commands as arguments, you use \f(CRcompctl -c\fP:
 .Ds
 %\0compctl\0-c\0man\0nohup
-%\0man\0upt\fITAB\fC
+%\0man\0upt\fITAB\f(CR
 %\0man\0uptime\0_
 .De
 To specify that a command should complete filenames, you should use
-\fCcompctl -f\fP.  This is the default.  It can be combined with \fC-c\fP,
+\f(CRcompctl -f\fP.  This is the default.  It can be combined with \f(CR-c\fP,
 as well.
 .Ds
 %\0compctl\0-cf\0echo
-%\0echo\0upt\fITAB\fC
+%\0echo\0upt\fITAB\f(CR
 %\0echo\0uptime\0_
 
-%\0echo\0fo\fITAB\fC
+%\0echo\0fo\fITAB\f(CR
 %\0echo\0foo.c
 .De
-Similarly, use \fC-o\fP to specify options, \fC-v\fP to specify
-variables, and \fC-b\fP to specify bindings.
+Similarly, use \f(CR-o\fP to specify options, \f(CR-v\fP to specify
+variables, and \f(CR-b\fP to specify bindings.
 .Ds
 %\0compctl\0-o\0setopt\0unsetopt
 %\0compctl\0-v\0typeset\0vared\0unset\0export
 %\0compctl\0-b\0bindkey
 .De
-You can also use \fC-k\fP to specify a custom list of keywords to use
-in completion.  After the \fC-k\fP comes either the name of an array
+You can also use \f(CR-k\fP to specify a custom list of keywords to use
+in completion.  After the \f(CR-k\fP comes either the name of an array
 or a literal array to take completions from.
 .Ds
 %\0ftphosts=(ftp.uu.net\0wuarchive.wustl.edu)
 %\0compctl\0-k\0ftphosts\0ftp
-%\0ftp\0wu\fITAB\fC
+%\0ftp\0wu\fITAB\f(CR
 %\0ftp\0wuarchive.wustl.edu\0_
 
 %\0compctl\0-k\0'(cpirazzi\0subbarao\0sukthnkr)'\0mail\0finger
-%\0finger\0cp\fITAB\fC
+%\0finger\0cp\fITAB\f(CR
 %\0finger\0cpirazzi\0_
 .De
 To better specify the files to complete for a command, use the
-\fC-g\fP option which takes any glob pattern as an argument.  Be sure
+\f(CR-g\fP option which takes any glob pattern as an argument.  Be sure
 to quote the glob patterns as otherwise they will be expanded when the
-\fCcompctl\fP command is run.
+\f(CRcompctl\fP command is run.
 .Ds
 %\0ls
 letter.tex\0\0letter.dvi\0\0letter.aux\0\0letter.log\0\0letter.toc
 %\0compctl\0-g\0'*.tex'\0latex
 %\0compctl\0-g\0'*.dvi'\0xdvi\0dvips
-%\0latex\0l\fITAB\fC
+%\0latex\0l\fITAB\f(CR
 %\0latex\0letter.tex\0_
-%\0xdvi\0l\fITAB\fC
+%\0xdvi\0l\fITAB\f(CR
 %\0xdvi\0letter.dvi\0_
 .De
 Glob patterns can include qualifiers within parentheses.  To rmdir
@@ -1706,43 +1706,43 @@ them:
 %\0compctl\0-g\0'*(/)'\0rmdir
 .De
 RCS users like to run commands on files which are not in the current
-directory, but in the RCS subdirectory where they all get \fC,v\fP
+directory, but in the RCS subdirectory where they all get \f(CR,v\fP
 suffixes.  They might like to use
 .Ds
 %\0compctl\0-g\0'RCS/*(:t:s/\e,v//)'\0co\0rlog\0rcs
 %\0ls\0RCS
 builtin.c,v\0\0lex.c,v\0\0\0\0\0\0zle_main.c,v
-%\0rlog\0bu\fITAB\fC
+%\0rlog\0bu\fITAB\f(CR
 %\0rlog\0builtin.c\0_
 .De
-The \fC:t\fP modifier keeps only the last part of the pathname and the
-\fC:s/\e,v//\fP will replace any \fC,v\fP by nothing.
+The \f(CR:t\fP modifier keeps only the last part of the pathname and the
+\f(CR:s/\e,v//\fP will replace any \f(CR,v\fP by nothing.
 .PP
-The \fC-s\fP flag is similar to \fC-g\fP, but it uses all expansions,
+The \f(CR-s\fP flag is similar to \f(CR-g\fP, but it uses all expansions,
 instead of just globbing, like brace expansion, parameter substitution
 and command substitution.
 .Ds
 %\0compctl\0-s\0'$(setopt)'\0unsetopt
 .De
 will only complete options which are actually set to be arguments to
-\fCunsetopt\fP.
+\f(CRunsetopt\fP.
 .PP
 Sometimes a command takes another command as its argument.  You can
 tell \fBzsh\fP to complete commands as the first argument to such a
 command and then use the completion method of the second command.  The
-\fC-l\fP flag with a null-string argument is used for this.
+\f(CR-l\fP flag with a null-string argument is used for this.
 .Ds
 %\0compctl\0-l\0''\0nohup\0exec
-%\0nohup\0comp\fITAB\fC
+%\0nohup\0comp\fITAB\f(CR
 %\0nohup\0compress\0_
-%\0nohup\0compress\0fil\fITAB\fC
+%\0nohup\0compress\0fil\fITAB\f(CR
 %\0nohup\0compress\0filename\0_
 .De
 Sometimes you would like to run really complicated commands to find
 out what the possible completions are.  To do this, you can specify a
 shell function to be called that will assign the possible completions
 to a variable called reply.  Note that this variable must be an array.
-Here's another (much slower) way to get the completions for \fCco\fP
+Here's another (much slower) way to get the completions for \f(CRco\fP
 and friends:
 .Ds
 %\0function\0getrcs\0{
@@ -1756,31 +1756,31 @@ and friends:
 .De
 Some command arguments use a prefix that is not a part of the things
 to complete.  The kill builtin command takes a signal name after a
-\fC-\fP.  To make such a prefix be ignored in the completion process,
-you can use the \fC-P\fP flag.
+\f(CR-\fP.  To make such a prefix be ignored in the completion process,
+you can use the \f(CR-P\fP flag.
 .Ds
 %\0compctl\0-P\0-\0-k\0signals\0kill
 %\0kill\0-H\fITAB\fP
 %\0kill\0-HUP\0_
 .De
-TeX is usually run on files ending in \fC.tex\fP, but also sometimes
+TeX is usually run on files ending in \f(CR.tex\fP, but also sometimes
 on other files.  It is somewhat annoying to specify that the arguments
-of TeX should end in \fC.tex\fP and then not be able to complete these
+of TeX should end in \f(CR.tex\fP and then not be able to complete these
 other files.  Therefore you can specify things like \*QComplete to
-files ending in \fC.tex\fP if available, otherwise complete to any
+files ending in \f(CR.tex\fP if available, otherwise complete to any
 filename.\*U.  This is done with \fIxor\fPed completion:
 .Ds
 %\0compctl\0-g\0'*.tex'\0+\0-f\0tex
 .De
-The \fC+\fP tells the editor to only take the next thing into account
+The \f(CR+\fP tells the editor to only take the next thing into account
 if the current one doesn't generate any matches.  If you have not
 changed the default completion, the above example is in fact
 equivalent to
 .Ds
 %\0compctl\0-g\0'*.tex'\0+\0tex
 .De
-as a lone \fC+\fP at the end is equivalent to specifying the default
-completion after the \fC+\fP.  This form of completion is also
+as a lone \f(CR+\fP at the end is equivalent to specifying the default
+completion after the \f(CR+\fP.  This form of completion is also
 frequently used if you want to run some command only on a certain type
 of files, but not necessarily in the current directory.  In this case
 you will want to complete both files of this type and directories.
@@ -1797,8 +1797,8 @@ typed part of the argument.
 If you play with completion, you will soon notice that you would like
 to specify what to complete, depending on what flags you give to the
 command and where you are on the command line.  For example, a command
-could take any filename argument after a \fC-f\fP flag, a username
-after a \fC-u\fP flag and an executable after a \fC-x\fP flag.  This
+could take any filename argument after a \f(CR-f\fP flag, a username
+after a \f(CR-u\fP flag and an executable after a \f(CR-x\fP flag.  This
 section will introduce you to the ways to specify these things.  To
 many people it seems rather difficult at first, but taking the trouble
 to understand it can save you lots of typing in the end.  Even I keep
@@ -1806,13 +1806,13 @@ being surprised when \fBzsh\fP manages to complete a small or even
 empty prefix to the right file in a large directory.
 .PP
 To tell \fBzsh\fP about these kinds of completion, you use \*Qextended
-completion\*U by specifying the \fC-x\fP flag to compctl.  The
-\fC-x\fP flag takes a list of patterns/flags pairs.  The patterns
+completion\*U by specifying the \f(CR-x\fP flag to compctl.  The
+\f(CR-x\fP flag takes a list of patterns/flags pairs.  The patterns
 specify when to complete and the flags specify what.  The flags are
-simply those mentioned above, like \fC-f\fP or \fC-g \fIglob
+simply those mentioned above, like \f(CR-f\fP or \f(CR-g \fIglob
 pattern\fR.
 .PP
-As an example, the \fCr[\fIstring1\fC,\fIstring2\fC]\fR pattern
+As an example, the \f(CRr[\fIstring1\f(CR,\fIstring2\f(CR]\fR pattern
 matches if the cursor is after something that starts with
 \fIstring1\fP and before something that starts with \fIstring2\fP.
 The \fIstring2\fP is often something that you do not want to match
@@ -1826,13 +1826,13 @@ foo1\0\0\0bar1\0\0\0foo.Z\0\0bar.Z
 %\0compress\0-d\0f\fITAB\fP
 %\0compress\0-d\0foo.Z\0_
 .De
-In the above example, if the cursor is after the \fC-d\fP the pattern
-will match and therefore \fBzsh\fP uses the \fC-g *.Z\fP flag that will only
-complete files ending in \fC.Z\fP.  Otherwise, if no pattern matches,
-it will use the flags before the \fC-x\fP and in this case complete
-every file that does not end in \fC.Z\fP.
+In the above example, if the cursor is after the \f(CR-d\fP the pattern
+will match and therefore \fBzsh\fP uses the \f(CR-g *.Z\fP flag that will only
+complete files ending in \f(CR.Z\fP.  Otherwise, if no pattern matches,
+it will use the flags before the \f(CR-x\fP and in this case complete
+every file that does not end in \f(CR.Z\fP.
 .PP
-The \fCs[\fIstring\fC]\fR pattern matches if the current word starts
+The \f(CRs[\fIstring\f(CR]\fR pattern matches if the current word starts
 with \fIstring\fP.  The \fIstring\fP itself is not considered to be
 part of the completion.
 .Ds
@@ -1840,74 +1840,74 @@ part of the completion.
 %\0kill\0-H\fITAB\fP
 %\0kill\0-HUP\0_
 .De
-The \fCtar\fP command takes a tar file as an argument after the
-\fC-f\fP option.  The \fCc[\fIoffset\fC,\fIstring\fC]\fR pattern
+The \f(CRtar\fP command takes a tar file as an argument after the
+\f(CR-f\fP option.  The \f(CRc[\fIoffset\f(CR,\fIstring\f(CR]\fR pattern
 matches if the word in position \fIoffset\fP relative to the current
 word is \fIstring\fP.  More in particular, if \fIoffset\fP is -1, it
 matches if the previous word is \fIstring\fP.  This suggests
 .Ds
 %\0compctl\0-f\0-x\0'c[-1,-f]'\0-g\0'*.tar'\0--\0tar
 .De
-But this is not enough.  The \fC-f\fP option could be the last of a
-longer string of options.  \fCC[\fR...\fC,\fR...\fC]\fR is just like
-\fCc[\fR...\fC,\fR...\fC]\fR, except that it uses glob-like pattern
+But this is not enough.  The \f(CR-f\fP option could be the last of a
+longer string of options.  \f(CRC[\fR...\f(CR,\fR...\f(CR]\fR is just like
+\f(CRc[\fR...\f(CR,\fR...\f(CR]\fR, except that it uses glob-like pattern
 matching for \fIstring\fP.  So
 .Ds
 %\0compctl\0-f\0-x\0'C[-1,-*f]'\0-g\0'*.tar'\0--\0tar
 .De
-will complete tar files after any option string ending in an \fCf\fP.
+will complete tar files after any option string ending in an \f(CRf\fP.
 But we'd like even more.  Old versions of tar used all options as the
 first argument, but without the minus sign.  This might be
 inconsistent with option usage in all other commands, but it is still
-supported by newer versions of \fCtar\fP.  So we would also like to
-complete tar files if the first argument ends in an \fCf\fP and we're
+supported by newer versions of \f(CRtar\fP.  So we would also like to
+complete tar files if the first argument ends in an \f(CRf\fP and we're
 right behind it.
 .PP
 We can `and' patterns by putting them next to each other with a space
 between them.  We can `or' these sets by putting comma's between them.
-We will also need some new patterns.  \fCp[\fInum\fC]\fR will match if
+We will also need some new patterns.  \f(CRp[\fInum\f(CR]\fR will match if
 the current argument (the one to be completed) is the \fInum\fPth
-argument.  \fCW[\fIindex\fC,\fIpattern\fC]\fR will match if the
+argument.  \f(CRW[\fIindex\f(CR,\fIpattern\f(CR]\fR will match if the
 argument in place \fIindex\fP matches the \fIpattern\fP.  This gives
 us
 .Ds
 %\0compctl\0-f\0-x\0'C[-1,-*f]\0,\0W[1,*f]\0p[2]'\0-g\0'*.tar'\0--\0tar
 .De
 In words: If the previous argument is an option string that ends in an
-\fCf\fP, or the first argument ended in an \fCf\fP and it is now the
-second argument, then complete only filenames ending in \fC.tar\fP.
+\f(CRf\fP, or the first argument ended in an \f(CRf\fP and it is now the
+second argument, then complete only filenames ending in \f(CR.tar\fP.
 .PP
 All the above examples used only one set of patterns with one
 completion flag.  You can use several of these pattern/flag pairs
-separated by a \fC-\fP.  The first matching pattern will be used.
-Suppose you have a version of \fCtar\fP that supports compressed files
-by using a \fC-Z\fP option.  Leaving the old tar syntax aside for a
-moment, we would like to complete files ending in \fC.tar.Z\fP if a
-\fC-Z\fP option has been used and files ending in \fC.tar\fP
-otherwise, all this only after a \fC-f\fP flag.  Again, the \fC-Z\fP
+separated by a \f(CR-\fP.  The first matching pattern will be used.
+Suppose you have a version of \f(CRtar\fP that supports compressed files
+by using a \f(CR-Z\fP option.  Leaving the old tar syntax aside for a
+moment, we would like to complete files ending in \f(CR.tar.Z\fP if a
+\f(CR-Z\fP option has been used and files ending in \f(CR.tar\fP
+otherwise, all this only after a \f(CR-f\fP flag.  Again, the \f(CR-Z\fP
 can be alone or it can be part of a longer option string, perhaps the
-same as that of the \fC-f\fP flag.  Here's how to do it; note the
+same as that of the \f(CR-f\fP flag.  Here's how to do it; note the
 backslash and the secondary prompt which are not part of the
-\fCcompctl\fP command.
+\f(CRcompctl\fP command.
 .Ds
 %\0compctl\0-f\0-x\0'C[-1,-*Z*f]\0,\0R[-*Z*,---]\0C[-1,-*f]'\0-g\0'*.tar.Z'\0-\0\e
 >\0'C[-1,-*f]'\0-g\0'*.tar'\0--\0tar
 .De
 The first pattern set tells us to match if either the previous
-argument was an option string including a \fCZ\fP and ending in an
-\fCf\fP or there was an option string with a \fCZ\fP somewhere and the
-previous word was any option string ending in an \fCf\fP.  If this is
+argument was an option string including a \f(CRZ\fP and ending in an
+\f(CRf\fP or there was an option string with a \f(CRZ\fP somewhere and the
+previous word was any option string ending in an \f(CRf\fP.  If this is
 the case, we need a compressed tar file.  Only if this is not the case
 the second pattern set will be considered.  By the way,
-\fCR[\fIpattern1\fC,\fIpattern2\fC]\fR is just like
-\fCr[\fR...\fC,\fR...\fC]\fR except that it uses pattern matching with
+\f(CRR[\fIpattern1\f(CR,\fIpattern2\f(CR]\fR is just like
+\f(CRr[\fR...\f(CR,\fR...\f(CR]\fR except that it uses pattern matching with
 shell metacharacters instead of just strings.
 .PP
-You will have noticed the \fC--\fP before the command name.  This ends
-the list of pattern/flag pairs of \fC-x\fP.  It is usually used just
+You will have noticed the \f(CR--\fP before the command name.  This ends
+the list of pattern/flag pairs of \f(CR-x\fP.  It is usually used just
 before the command name, but you can also use an extended completion
-as one part of a list of xored completions, in which case the \fC--\fP
-appears just before one of the \fC+\fP signs.
+as one part of a list of xored completions, in which case the \f(CR--\fP
+appears just before one of the \f(CR+\fP signs.
 .PP
 Note the difference between using extended completion as part of a
 list of xored completions as in
@@ -1918,38 +1918,38 @@ foo\0\0bar
 %\0compress\0-d\0f\fITAB\fP
 %\0compress\0-d\0foo\0_
 .De
-and specifying something before the \fC-x\fP as in
+and specifying something before the \f(CR-x\fP as in
 .Ds
 %\0compctl\0-g\0'^*.Z'\0-x\0'r[-d,---]'\0-g\0'*.Z'\0--\0compress
 %\0compress\0-d\0f\fITAB\fP
 %\0compress\0-d\0f_
 .De
-In the first case, the alternative glob pattern (\fC^*.Z\fP) will be
+In the first case, the alternative glob pattern (\f(CR^*.Z\fP) will be
 used if the first part does not generate any possible completions,
 while in the second case the alternative glob pattern will only be
-used if the \fCr[\fR...\fC]\fR pattern doesn't match.
+used if the \f(CRr[\fR...\f(CR]\fR pattern doesn't match.
 .Sh "Bindings"
 .PP
 Each of the editor commands we have seen was actually a function bound
 by default to a certain key.  The real names of the commands are:
 .Ds
-\fCexpand-or-complete\0\0\0\fITAB\fR
-\fCpush-line\0\0\0\0\0\0\0\0\0\0\0\0\fIESC-Q\fR
-\fCrun-help\0\0\0\0\0\0\0\0\0\0\0\0\0\fIESC-H\fR
-\fCaccept-and-hold\0\0\0\0\0\0\fIESC-A\fR
-\fCquote-line\0\0\0\0\0\0\0\0\0\0\0\fIESC-'\fR
+\f(CRexpand-or-complete\0\0\0\fITAB\fR
+\f(CRpush-line\0\0\0\0\0\0\0\0\0\0\0\0\fIESC-Q\fR
+\f(CRrun-help\0\0\0\0\0\0\0\0\0\0\0\0\0\fIESC-H\fR
+\f(CRaccept-and-hold\0\0\0\0\0\0\fIESC-A\fR
+\f(CRquote-line\0\0\0\0\0\0\0\0\0\0\0\fIESC-'\fR
 .De
 These bindings are arbitrary; you could change them if you want.
-For example, to bind \fCaccept-line\fP to \fI^Z\fP:
+For example, to bind \f(CRaccept-line\fP to \fI^Z\fP:
 .Ds
 %\0bindkey\0'^Z'\0accept-line
 .De
-Another idea would be to bind the delete key to \fCdelete-char\fP;
+Another idea would be to bind the delete key to \f(CRdelete-char\fP;
 this might be convenient if you use \fI^H\fP for backspace.
 .Ds
 %\0bindkey\0'^?'\0delete-char
 .De
-Or, you could bind \fI^X\fP\fI^H\fP to \fCrun-help\fP:
+Or, you could bind \fI^X\fP\fI^H\fP to \f(CRrun-help\fP:
 .Ds
 %\0bindkey\0'^X^H'\0run-help
 .De
@@ -1961,22 +1961,22 @@ Other examples:
 >\0'
 %\0bindkey\0'^Q'\0push-line-or-edit
 .De
-\fCuniversal-argument\fP multiplies the next command by 4.
+\f(CRuniversal-argument\fP multiplies the next command by 4.
 Thus \fI^X\fP\fI^Z\fP\fI^W\fP might delete the last four words on the line.
-If you bind space to \fCmagic-space\fP, then csh-style history
+If you bind space to \f(CRmagic-space\fP, then csh-style history
 expansion is done on the line whenever you press the space bar.
 .PP
 Something that often happens is that I am typing a multiline command
 and discover an error in one of the previous lines.  In this case,
-\fCpush-line-or-edit\fP will put the entire multiline construct into
+\f(CRpush-line-or-edit\fP will put the entire multiline construct into
 the editor buffer.  If there is only a single line, it is equivalent
-to \fCpush-line\fP.
+to \f(CRpush-line\fP.
 .PP
-The \fC-s\fP flag to \fCbindkey\fP specifies that you are binding the key
-to a string, not a command.  Thus \fCbindkey -s '^T' 'uptime\en'\fP
+The \f(CR-s\fP flag to \f(CRbindkey\fP specifies that you are binding the key
+to a string, not a command.  Thus \f(CRbindkey -s '^T' 'uptime\en'\fP
 lets you VMS lovers get the load average whenever you press \fI^T\fP.
 .PP
-If you have a NeXT keyboard, the one with the \fC|\fP and \fC\e\fP keys
+If you have a NeXT keyboard, the one with the \f(CR|\fP and \f(CR\e\fP keys
 very inconveniently placed, the following
 bindings may come in handy:
 .Ds
@@ -1985,10 +1985,10 @@ bindings may come in handy:
 .De
 Now you can type \fIALT-/\fP to get a backslash, and \fIALT-=\fP to
 get a vertical bar.  This only works inside \fBzsh\fP, of course;
-\fCbindkey\fP has no effect on the key mappings inside \fCtalk\fP
-or \fCmail\fP, etc.
+\f(CRbindkey\fP has no effect on the key mappings inside \f(CRtalk\fP
+or \f(CRmail\fP, etc.
 .PP
-Some people like to bind \fC^S\fP and \fC^Q\fP to editor commands.
+Some people like to bind \f(CR^S\fP and \f(CR^Q\fP to editor commands.
 Just binding these has no effect, as the terminal will catch them and
 use them for flow control.  You could unset them as stop and start
 characters, but most people like to use these for external commands.
@@ -2003,12 +2003,12 @@ In \fBzsh\fP, parameters are set like this:
 %\0echo\0$foo
 bar
 .De
-Spaces before or after the \fC=\fP are frowned upon:
+Spaces before or after the \f(CR=\fP are frowned upon:
 .Ds
 %\0foo\0=\0bar
 zsh:\0command\0not\0found:\0foo
 .De
-Also, \fCset\fP doesn't work for setting parameters:
+Also, \f(CRset\fP doesn't work for setting parameters:
 .Ds
 %\0set\0foo=bar
 %\0set\0foo\0=\0bar
@@ -2017,9 +2017,9 @@ Also, \fCset\fP doesn't work for setting parameters:
 %
 .De
 Note that no error message was printed.  This is because both
-of these commands were perfectly valid; the \fCset\fP builtin
+of these commands were perfectly valid; the \f(CRset\fP builtin
 assigns its arguments to the \fIpositional parameters\fP
-(\fC$1\fP, \fC$2\fP, etc.).
+(\f(CR$1\fP, \f(CR$2\fP, etc.).
 .Ds
 %\0set\0foo=bar
 %\0echo\0$1
@@ -2039,11 +2039,11 @@ function like this:
 %\0echo\0$foo\0$fuu
 bar\0brrr
 .De
-But then, of course you can't use the form of \fCset\fP with
-options, like \fCset -F\fP (which turns off filename generation).
-Also, the \fCset\fP command by itself won't list all the parameters
+But then, of course you can't use the form of \f(CRset\fP with
+options, like \f(CRset -F\fP (which turns off filename generation).
+Also, the \f(CRset\fP command by itself won't list all the parameters
 like it should.
-To get around that you need a \fCcase\fP statement:
+To get around that you need a \f(CRcase\fP statement:
 .Ds
 %\0set\0()\0{
 >\0\0\0\0case\0$1\0in
@@ -2076,7 +2076,7 @@ bar
 %\0echo\0${foo+set}
 set
 .De
-Also, csh-style \fC:\fP modifiers may be appended to a parameter
+Also, csh-style \f(CR:\fP modifiers may be appended to a parameter
 substitution.
 .Ds
 %\0echo\0$PWD
@@ -2097,15 +2097,15 @@ c
 .De
 The equivalent constructs in ksh (which are also supported in \fBzsh\fP)
 are a bit more general and easier to remember.
-When the shell expands \fC${foo#\fR\fIpat\fR\fC}\fR,
+When the shell expands \f(CR${foo#\fR\fIpat\fR\f(CR}\fR,
 it checks to see if \fIpat\fP matches a substring at the beginning
 of the value
-of \fCfoo\fP.  If so, it removes that portion of \fCfoo\fP, using the shortest
+of \f(CRfoo\fP.  If so, it removes that portion of \f(CRfoo\fP, using the shortest
 possible match.
-With \fC${foo##\fR\fIpat\fR\fC}\fR, the longest possible match is removed.
-\fC${foo%\fR\fIpat\fR\fC}\fR and \fC${foo%%\fR\fIpat\fR\fC}\fR remove the match
+With \f(CR${foo##\fR\fIpat\fR\f(CR}\fR, the longest possible match is removed.
+\f(CR${foo%\fR\fIpat\fR\f(CR}\fR and \f(CR${foo%%\fR\fIpat\fR\f(CR}\fR remove the match
 from the end.
-Here are the ksh equivalents of the \fC:\fP modifiers:
+Here are the ksh equivalents of the \f(CR:\fP modifiers:
 .Ds
 %\0echo\0${PWD%/*}
 /home/learning/pf/zsh/zsh2.00
@@ -2139,9 +2139,9 @@ bar.c\0\0\0\0bar.h\0\0\0\0bar.o\0\0\0\0bar.pro
 There is yet another syntax to modify substituted parameters.  You can
 add certain modifiers in parentheses after the opening brace like:
 .Ds
-${(\fImodifiers\fC)\fIparameter\fC}
+${(\fImodifiers\f(CR)\fIparameter\f(CR}
 .De
-For example, \fCo\fP sorts the words resulting from the expansion:
+For example, \f(CRo\fP sorts the words resulting from the expansion:
 .Ds
 %\0echo\0${path}
 /usr/bin\0/usr/bin/X11\0/etc
@@ -2183,7 +2183,7 @@ exec.c\0\0glob.c\0\0init.c
 %\0ls\0$srcs
 exec.c\0\0glob.c\0\0init.c
 .De
-Another way to get the \fC$srcs\fP trick to work is to use an array:
+Another way to get the \f(CR$srcs\fP trick to work is to use an array:
 .Ds
 %\0unset\0srcs
 %\0srcs=(\0glob.c\0exec.c\0init.c\0)\0\0
@@ -2228,7 +2228,7 @@ accessed.  Here are some examples:
 %\0false;\0echo\0$status
 1
 .De
-(\fC$?\fP and \fC$status\fP are equivalent.)
+(\f(CR$?\fP and \f(CR$status\fP are equivalent.)
 .Ds
 %\0echo\0$HOST\0$HOSTTYPE
 dendrite\0sun4
@@ -2241,7 +2241,7 @@ dendrite\0sun4
 %\0ls\0$OLDPWD/.getwd\0
 /tmp/.getwd
 .De
-\fC~+\fP and \fC~-\fP are short for \fC$PWD\fP and \fC$OLDPWD\fP, respectively.
+\f(CR~+\fP and \f(CR~-\fP are short for \f(CR$PWD\fP and \f(CR$OLDPWD\fP, respectively.
 .Ds
 %\0ls\0~-/.getwd
 /tmp/.getwd
@@ -2261,8 +2261,8 @@ zsh\0v2.00.03
 pf
 .De
 .PP
-The \fCcdpath\fP variable sets the search path for the \fCcd\fP command.
-If you do not specify \fC.\fP somewhere in the path, it is assumed to
+The \f(CRcdpath\fP variable sets the search path for the \f(CRcd\fP command.
+If you do not specify \f(CR.\fP somewhere in the path, it is assumed to
 be the first component.
 .Ds
 %\0cdpath=(\0/usr\0~\0~/zsh\0)
@@ -2311,7 +2311,7 @@ The same is true of \fBCDPATH\fP and \fBcdpath\fP:
 In general, predefined parameters with names in all lowercase are
 arrays; assignments to them take the form:
 .Ds
-\fIname\fR\fC=(\fR\0\fIelem\fR\0...\0\fC)\fR
+\fIname\fR\f(CR=(\fR\0\fIelem\fR\0...\0\f(CR)\fR
 .De
 Predefined parameters with names in all uppercase are strings.  If
 there is both an array and a string version of the same parameter, the
@@ -2362,7 +2362,7 @@ In \fBzsh\fP, if you say
 .Ds
 %\0>file
 .De
-the command \fCcat\fP is normally assumed:
+the command \f(CRcat\fP is normally assumed:
 .Ds
 %\0>file
 foo!\0\0\0\0
@@ -2377,14 +2377,14 @@ foo!
 .De
 However, this is not csh or sh compatible.  To correct this,
 change the value of the parameter \fBNULLCMD\fP,
-which is \fCcat\fP by default.
+which is \f(CRcat\fP by default.
 .Ds
 %\0NULLCMD=:
 %\0>file
 %\0ls\0-l\0file
 -rw-r--r--\0\01\0pfalstad\0\0\0\0\0\0\0\00\0May\024\005:41\0file
 .De
-If \fCNULLCMD\fP is unset, the shell reports an error if no
+If \f(CRNULLCMD\fP is unset, the shell reports an error if no
 command is specified (like csh).
 .Ds
 %\0unset\0NULLCMD
@@ -2393,9 +2393,9 @@ zsh:\0redirection\0with\0no\0command
 .De
 Actually, \fBREADNULLCMD\fP is used whenever you have a null command
 reading input from a single file.  Thus, you can set \fBREADNULLCMD\fP
-to \fCmore\fP or \fCless\fP rather than \fCcat\fP.  Also, if you
-set \fBNULLCMD\fP to \fC:\fP for sh compatibility, you can still read
-files with \fC< file\fP if you leave \fBREADNULLCMD\fP set to \fCmore\fP.
+to \f(CRmore\fP or \f(CRless\fP rather than \f(CRcat\fP.  Also, if you
+set \fBNULLCMD\fP to \f(CR:\fP for sh compatibility, you can still read
+files with \f(CR< file\fP if you leave \fBREADNULLCMD\fP set to \f(CRmore\fP.
 .Sh "Prompting"
 .PP
 The default prompt for \fBzsh\fP is:
@@ -2403,8 +2403,8 @@ The default prompt for \fBzsh\fP is:
 phoenix%\0echo\0$PROMPT
 %m%#\0
 .De
-The \fC%m\fP stands for the short form of the current hostname,
-and the \fC%#\fP stands for a \fC%\fP or a \fC#\fP, depending on whether
+The \f(CR%m\fP stands for the short form of the current hostname,
+and the \f(CR%#\fP stands for a \f(CR%\fP or a \f(CR#\fP, depending on whether
 the shell is running as root or not.
 \fBzsh\fP supports many other control sequences
 in the \fBPROMPT\fP variable.
@@ -2418,7 +2418,7 @@ in the \fBPROMPT\fP variable.
 %\0PROMPT='%h\0%~>\0'
 6\0~/etc/TeX/zsh>\0
 .De
-\fC%h\fP\0represents\0the\0number\0of\0current\0history\0event.
+\f(CR%h\fP\0represents\0the\0number\0of\0current\0history\0event.
 .Ds
 %\0PROMPT='%h\0%~\0%M>\0'
 10\0~/etc/TeX/zsh\0apple-gunkies.gnu.ai.mit.edu>\0
@@ -2433,7 +2433,7 @@ in the \fBPROMPT\fP variable.
 pfalstad\0Fri\024\0ttyp0>
 .De
 \fBPROMPT2\fP is used in multiline commands, like for-loops.  The
-\fC%_\fP escape sequence was made especially for this prompt.  It is
+\f(CR%_\fP escape sequence was made especially for this prompt.  It is
 replaced by the kind of command that is being entered.
 .Ds
 %\0PROMPT2='%_>\0'
@@ -2457,7 +2457,7 @@ of the screen.
 p0\06:15\0phoenix[5]\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0~/etc/TeX/zsh
 .De
 These special escape sequences can also be used with the
-\fC-P\fP option to \fCprint\fP:
+\f(CR-P\fP option to \f(CRprint\fP:
 .Ds
 %\0print\0-P\0%h\0tty%l
 15\0ttyp1
@@ -2479,22 +2479,22 @@ Normally, this is done by specifying a list of usernames.
 .Ds
 %\0watch=(\0pfalstad\0subbarao\0sukthnkr\0egsirer\0)
 .De
-The \fClog\fP command reports all people logged in
+The \f(CRlog\fP command reports all people logged in
 that you are watching for.
 .Ds
 %\0log
 pfalstad\0has\0logged\0on\0p0\0from\0mickey.
 pfalstad\0has\0logged\0on\0p5\0from\0mickey.
-%\0\fR...\fC
+%\0\fR...\f(CR
 subbarao\0has\0logged\0on\0p8\0from\0phoenix.
-%\0\fR...\fC
+%\0\fR...\f(CR
 subbarao\0has\0logged\0off\0p8\0from\0phoenix.
-%\0\fR...\fC
+%\0\fR...\f(CR
 sukthnkr\0has\0logged\0on\0p8\0from\0dew.
-%\0\fR...\fC
+%\0\fR...\f(CR
 sukthnkr\0has\0logged\0off\0p8\0from\0dew.
 .De
-If you specify hostnames with an \fC@\fP prepended,
+If you specify hostnames with an \f(CR@\fP prepended,
 the shell will watch for all users logging in from
 the specified host.
 .Ds
@@ -2504,7 +2504,7 @@ djthongs\0has\0logged\0on\0q2\0from\0phoenix.
 pfalstad\0has\0logged\0on\0p0\0from\0mickey.
 pfalstad\0has\0logged\0on\0p5\0from\0mickey.
 .De
-If you give a tty name with a \fC%\fP prepended, the shell
+If you give a tty name with a \f(CR%\fP prepended, the shell
 will watch for all users logging in on that tty.
 .Ds
 %\0watch=(\0%ttyp0\0%console\0)
@@ -2559,7 +2559,7 @@ eps\0logged\0on\0at\04:19pm\0Thu\023.
 pfalstad\0logged\0on\0at\03:39am\0Fri\024.
 pfalstad\0logged\0on\0at\03:42am\0Fri\024.
 .De
-If you have a \fC.friends\fP file in your home directory,
+If you have a \f(CR.friends\fP file in your home directory,
 a convenient way to make \fBzsh\fP watch for all your friends
 is to do this:
 .Ds
@@ -2567,7 +2567,7 @@ is to do this:
 %\0echo\0$watch
 subbarao\0maruchck\0root\0sukthnkr\0\fR...
 .De
-If watch is set to \fCall\fP, then all users logging in or out
+If watch is set to \f(CRall\fP, then all users logging in or out
 will be reported.
 .Sh "Options"
 .PP
@@ -2585,7 +2585,7 @@ of a directory, and it will become the current directory.
 %\0pwd
 /etc
 .De
-With \fICDABLEVARS\fP, if the argument to \fCcd\fP is the name of a
+With \fICDABLEVARS\fP, if the argument to \f(CRcd\fP is the name of a
 parameter whose value is a valid directory, it will become
 the current directory.
 .Ds
@@ -2609,10 +2609,10 @@ zsh:\0correct\0`x.v11r4'\0to\0`X.V11R4'\0[nyae]?\0n
 zsh:\0correct\0to\0`/etc/paswd'\0to\0`/etc/passwd'\0[nyae]?\0y
 /etc/passwd
 .De
-If you press \fCy\fP
+If you press \f(CRy\fP
 when the shell asks you if you want to correct a word, it will
-be corrected.  If you press \fCn\fP, it will be left alone.
-Pressing \fCa\fP aborts the command, and pressing \fCe\fP brings the line
+be corrected.  If you press \f(CRn\fP, it will be left alone.
+Pressing \f(CRa\fP aborts the command, and pressing \f(CRe\fP brings the line
 up for editing again, in case you agree the word is spelled wrong
 but you don't like the correction.
 .PP
@@ -2633,7 +2633,7 @@ in csh.
 %\0ls\0'foo
 zsh:\0unmatched\0'
 .De
-\fIGLOBDOTS\fP lets files beginning with a \fC.\fP be matched without
+\fIGLOBDOTS\fP lets files beginning with a \f(CR.\fP be matched without
 explicitly specifying the dot. This can also be specified for a particular
 pattern by appending (D) to it.
 .Ds
@@ -2678,7 +2678,7 @@ xyze\0xyae\0xbde\0xcde
 %\0echo\0x{y{z,a},{b,c}d}e
 x{y{z,a},{b,c}d}e
 .De
-\fIIGNOREEOF\fP forces the user to type \fCexit\fP or \fClogout\fP,
+\fIIGNOREEOF\fP forces the user to type \f(CRexit\fP or \f(CRlogout\fP,
 instead of just pressing \fI^D\fP.
 .Ds
 %\0setopt\0ignoreeof
@@ -2686,7 +2686,7 @@ instead of just pressing \fI^D\fP.
 zsh:\0use\0'exit'\0to\0exit.
 .De
 \fIINTERACTIVECOMMENTS\fP turns on interactive comments;
-comments begin with a \fC#\fP.
+comments begin with a \f(CR#\fP.
 .Ds
 %\0setopt\0interactivecomments
 %\0date\0#\0this\0is\0a\0comment
@@ -2702,9 +2702,9 @@ overwriting an existing file.
 zsh:\0file\0exists:\0/u/pfalstad/.zshrc
 .De
 If you really do want to clobber a file, you can use the
-\fC>!\fP operator.
-To make things easier in this case, the \fC>\fP is stored in
-the history list as a \fC>!\fP:
+\f(CR>!\fP operator.
+To make things easier in this case, the \f(CR>\fP is stored in
+the history list as a \f(CR>!\fP:
 .Ds
 %\0cat\0/dev/null\0>!\0~/.zshrc
 %\0cat\0/etc/motd\0>\0~/.zshrc
@@ -2726,10 +2726,10 @@ single quotes in a singly quoted string:
 .De
 Finally,
 \fISUNKEYBOARDHACK\fP wins the award for the strangest option.
-If a line ends with \fC`\fP, and there are an odd number of them
-on the line, the shell will ignore the trailing \fC`\fP.  This
+If a line ends with \f(CR`\fP, and there are an odd number of them
+on the line, the shell will ignore the trailing \f(CR`\fP.  This
 is provided for keyboards whose RETURN key is too small,
-and too close to the \fC`\fP key.
+and too close to the \f(CR`\fP key.
 .Ds
 %\0setopt\0sunkeyboardhack
 %\0date`

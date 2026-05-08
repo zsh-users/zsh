@@ -56,6 +56,7 @@ menu(User-Defined Widgets)
 menu(Standard Widgets)
 menu(Terminal Extensions)
 menu(Character Highlighting)
+menu(Cursor Shape and Color)
 endmenu()
 
 texinode(Keymaps)(Zle Builtins)()(Zsh Line Editor)
@@ -2712,7 +2713,7 @@ termcap and the tt(COLORTERM) environment variable.
 )
 enditem()
 
-texinode(Character Highlighting)()(Terminal Extensions)(Zsh Line Editor)
+texinode(Character Highlighting)(Cursor Shape and Color)(Terminal Extensions)(Zsh Line Editor)
 sect(Character Highlighting)
 
 vindex(zle_highlight, setting)
@@ -2977,8 +2978,8 @@ special array parameter tt(region_highlight); see
 ifnzman(noderef(Zle Widgets))\
 ifzman(above).
 
-texinode(Cursor Shape and Color)()()(Character Highlighting)
-subsect(Cursor Shape and Color)
+texinode(Cursor Shape and Color)()(Character Highlighting)(Zsh Line Editor)
+sect(Cursor Shape and Color)
 cindex(cursor shape)
 cindex(cursor color)
 

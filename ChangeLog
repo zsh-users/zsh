@@ -1,5 +1,8 @@
 2026-05-11  dana  <dana@dana.is>
 
+	* 54504: Doc/Zsh/manual.yo, Doc/Zsh/zle.yo, Doc/intro.ms: fix
+	more warnings
+
 	* 54501: Completion/Unix/Command/_chdman,
 	Completion/Unix/Command/_fish, Completion/Unix/Command/_nano:
 	add chdman, fish, nano
