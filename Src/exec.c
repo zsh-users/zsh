@@ -724,7 +724,7 @@ static void
 execute(LinkList args, int flags, int defpath)
 {
     Cmdnam cn;
-    char buf[MAXCMDLEN+1], buf2[MAXCMDLEN+1];
+    char buf[MAXCMDLEN], buf2[MAXCMDLEN];
     char *s, *z, *arg0;
     char **argv, **pp, **newenvp = NULL;
     int eno = 0, ee;
@@ -785,9 +785,9 @@ execute(LinkList args, int flags, int defpath)
     }
 #endif
     child_unblock();
-    if ((int) strlen(arg0) >= PATH_MAX) {
+    if ((int) ztrlen(arg0) >= PATH_MAX) {
 	zerr("command too long: %s", arg0);
-	_exit(1);
+	_exit(127);
     }
     for (s = arg0; *s; s++)
 	if (*s == '/') {
@@ -803,10 +803,10 @@ execute(LinkList args, int flags, int defpath)
 
     /* for command -p, search the default path */
     if (defpath) {
-	char pbuf[PATH_MAX+1];
+	char pbuf[MAXCMDLEN];
 	char *dptr;
 
-	if (!search_defpath(arg0, pbuf, PATH_MAX)) {
+	if (!search_defpath(arg0, pbuf, MAXCMDLEN)) {
 	    if (commandnotfound(arg0, args) == 0)
 		_realexit();
 	    zerr("command not found: %s", arg0);
@@ -823,28 +823,43 @@ execute(LinkList args, int flags, int defpath)
     } else {
 
 	if ((cn = (Cmdnam) cmdnamtab->getnode(cmdnamtab, arg0))) {
-	    char nn[PATH_MAX+1], *dptr;
+	    char nn[MAXCMDLEN], *dptr;
 
-	    if (cn->node.flags & HASHED)
-		strcpy(nn, cn->u.cmd);
-	    else {
-		for (pp = path; pp < cn->u.name; pp++)
+	    if (cn->node.flags & HASHED) {
+		if (snprintf(nn, sizeof(nn), "%s", cn->u.cmd) >= (int)sizeof(nn) ||
+		    ztrlen(nn) >= PATH_MAX)
+		{
+		    zerr("command too long: %s", arg0);
+		    _exit(127);
+		}
+	    } else {
+		for (pp = path; pp < cn->u.name; pp++) {
 		    if (!**pp || (**pp == '.' && (*pp)[1] == '\0')) {
 			ee = zexecve(arg0, argv, newenvp);
 			if (isgooderr(ee, *pp))
 			    eno = ee;
 		    } else if (**pp != '/') {
 			z = buf;
-			strucpy(&z, *pp);
+			struncpy(&z, *pp, sizeof(buf) - 1);
 			*z++ = '/';
+			if ((z - buf) + strlen(arg0) >= sizeof(buf))
+			    continue;
 			strcpy(z, arg0);
+			if (ztrlen(buf) >= PATH_MAX)
+			    continue;
 			ee = zexecve(buf, argv, newenvp);
 			if (isgooderr(ee, *pp))
 			    eno = ee;
 		    }
-		strcpy(nn, cn->u.name ? *(cn->u.name) : "");
-		strcat(nn, "/");
-		strcat(nn, cn->node.nam);
+		}
+		if (snprintf(nn, sizeof(nn), "%s/%s",
+			     cn->u.name ? *(cn->u.name) : "",
+			     cn->node.nam) >= (int)sizeof(nn) ||
+		    ztrlen(nn) >= PATH_MAX)
+		{
+		    eno = ENAMETOOLONG;
+		    goto execute_skip_exec;
+		}
 	    }
 	    ee = zexecve(nn, argv, newenvp);
 
@@ -853,6 +868,7 @@ execute(LinkList args, int flags, int defpath)
 	    if (isgooderr(ee, *nn ? nn : "/"))
 		eno = ee;
 	}
+execute_skip_exec:
 	for (pp = path; *pp; pp++)
 	    if (!(*pp)[0] || ((*pp)[0] == '.' && !(*pp)[1])) {
 		ee = zexecve(arg0, argv, newenvp);
@@ -860,9 +876,13 @@ execute(LinkList args, int flags, int defpath)
 		    eno = ee;
 	    } else {
 		z = buf;
-		strucpy(&z, *pp);
+		struncpy(&z, *pp, sizeof(buf) - 1);
 		*z++ = '/';
+		if ((z - buf) + strlen(arg0) >= sizeof(buf))
+		    continue;
 		strcpy(z, arg0);
+		if (ztrlen(buf) >= PATH_MAX)
+		    continue;
 		ee = zexecve(buf, argv, newenvp);
 		if (isgooderr(ee, *pp))
 		    eno = ee;
@@ -910,7 +930,7 @@ findcmd(char *arg0, int docopy, int default_path)
     cn = (Cmdnam) cmdnamtab->getnode(cmdnamtab, arg0);
     if (!cn && isset(HASHCMDS) && !isrelative(arg0))
 	cn = hashcmd(arg0, path);
-    if ((int) strlen(arg0) > PATH_MAX)
+    if ((int) ztrlen(arg0) >= PATH_MAX)
 	return NULL;
     if ((s = strchr(arg0, '/'))) {
 	RET_IF_COM(arg0);
@@ -920,32 +940,42 @@ findcmd(char *arg0, int docopy, int default_path)
 	}
     }
     if (cn) {
-	char nn[PATH_MAX+1];
+	char nn[MAXCMDLEN];
 
-	if (cn->node.flags & HASHED)
-	    strcpy(nn, cn->u.cmd);
-	else {
-	    for (pp = path; pp < cn->u.name; pp++)
+	if (cn->node.flags & HASHED) {
+	    if (snprintf(nn, sizeof(nn), "%s", cn->u.cmd) >= (int)sizeof(nn)) {
+		nn[0] = '\0';
+	    }
+	} else {
+	    for (pp = path; pp < cn->u.name; pp++) {
 		if (**pp != '/') {
 		    z = buf;
 		    if (**pp) {
-			strucpy(&z, *pp);
+			struncpy(&z, *pp, sizeof(buf) - 1);
 			*z++ = '/';
+			if ((z - buf) + strlen(arg0) >= sizeof(buf))
+			    continue;
 		    }
 		    strcpy(z, arg0);
 		    RET_IF_COM(buf);
 		}
-	    strcpy(nn, cn->u.name ? *(cn->u.name) : "");
-	    strcat(nn, "/");
-	    strcat(nn, cn->node.nam);
+	    }
+	    if (snprintf(nn, sizeof(nn), "%s/%s",
+			 cn->u.name ? *(cn->u.name) : "",
+			 cn->node.nam) >= (int)sizeof(nn))
+	    {
+		nn[0] = '\0';
+	    }
 	}
 	RET_IF_COM(nn);
     }
     for (pp = path; *pp; pp++) {
 	z = buf;
 	if (**pp) {
-	    strucpy(&z, *pp);
+	    struncpy(&z, *pp, sizeof(buf) - 1);
 	    *z++ = '/';
+	    if ((z - buf) + strlen(arg0) >= sizeof(buf))
+		continue;
 	}
 	strcpy(z, arg0);
 	RET_IF_COM(buf);
