@@ -1,3 +1,8 @@
+2026-05-09  Bart Schaefer  <schaefer@zsh.org>
+
+	* Philippe Altherr: 54374: Src/exec.c Test/C03traps.ztst: Run
+	ZERR trap on zsh errors as well as external command errors
+
 2026-05-06  dana  <dana@dana.is>
 
 	* 54484: Test/C02cond.ztst: fix -nt test on low-resolution file
