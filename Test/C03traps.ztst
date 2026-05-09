@@ -361,6 +361,81 @@
 >trap
 >Working 0
 
+  ok() {   true         } # All good
+  ko() {   false        } # Just a non-zero status
+  KO() { { : $KO } 2>&1 } # A Zsh error
+  fn() {
+    echo "$1"
+    set -u;
+    case $1 in
+      *-TRAP-ok) TRAPZERR() { echo "ok 1"; ok; echo "ok 2" };;
+      *-trap-ok) trap        'echo "ok 1"; ok; echo "ok 2"' ZERR;;
+      *-TRAP-KO) TRAPZERR() { echo "ok 1"; KO; echo "KO 2" };;
+      *-trap-KO) trap        'echo "ok 1"; KO; echo "KO 2"' ZERR;;
+      *        ) echo "Unrecognized id: $1";
+    esac
+    case $1 in
+      ko-*-*) ko; echo "ok 3";;
+      KO-*-*) KO; echo "KO 3";;
+      *     ) echo "Unrecognized id: $1";
+    esac
+  }
+  (fn ko-TRAP-ok; echo "ok 4"); echo "\$?=$?"
+  (fn ko-trap-ok; echo "ok 4"); echo "\$?=$?"
+  (fn ko-TRAP-KO; echo "ok 4"); echo "\$?=$?"
+  (fn ko-trap-KO; echo "ok 4"); echo "\$?=$?"
+  (fn KO-TRAP-ok; echo "KO 4"); echo "\$?=$?"
+  (fn KO-trap-ok; echo "KO 4"); echo "\$?=$?"
+  (fn KO-TRAP-KO; echo "KO 4"); echo "\$?=$?"
+  (fn KO-trap-KO; echo "KO 4"); echo "\$?=$?"
+0:DDD
+>ko-TRAP-ok
+>ok 1
+>ok 2
+>ok 3
+>ok 4
+>$?=0
+>ko-trap-ok
+>ok 1
+>ok 2
+>ok 3
+>ok 4
+>$?=0
+>ko-TRAP-KO
+>ok 1
+>KO: KO: parameter not set
+F:Shouldn't the error in the trap prevent any further execution?
+>ok 3
+>ok 4
+>$?=0
+>ko-trap-KO
+>ok 1
+>KO: KO: parameter not set
+F:Shouldn't the error in the trap prevent any further execution?
+>ok 3
+>ok 4
+>$?=0
+>KO-TRAP-ok
+>KO: KO: parameter not set
+>ok 1
+>ok 2
+>$?=1
+>KO-trap-ok
+>KO: KO: parameter not set
+>ok 1
+>ok 2
+>$?=1
+>KO-TRAP-KO
+>KO: KO: parameter not set
+>ok 1
+>KO: KO: parameter not set
+>$?=1
+>KO-trap-KO
+>KO: KO: parameter not set
+>ok 1
+>KO: KO: parameter not set
+>$?=1
+
    { trap 'echo This subshell is exiting' EXIT; } | cat
 0: EXIT trap set in current shell at left of pipeline
 >This subshell is exiting

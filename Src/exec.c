@@ -1566,7 +1566,10 @@ sublist_done:
 	if (!this_noerrexit && !donetrap && !this_donetrap) {
 	    if (sigtrapped[SIGZERR] && lastval &&
 		!(noerrexit & NOERREXIT_EXIT)) {
+		int eflag = errflag;
+		errflag = 0;
 		dotrap(SIGZERR);
+		errflag = eflag;
 		donetrap = 1;
 	    }
 	    if (lastval) {
