@@ -1,5 +1,8 @@
 2026-05-10  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/Linux/Command/_selinux: complete files
+	after semanage fcontext -e
+
 	* 54506: Src/Zle/termquery.c: fix checking of dash following
 	the prefix in terminal extensions
 
