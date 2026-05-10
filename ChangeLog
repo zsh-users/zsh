@@ -4,6 +4,9 @@
 
 2026-05-10  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/Linux/Command/_selinux: complete files
+	after semanage fcontext -e
+
 	* 54445: Completion/Unix/Type/_terminals: parse termcap
 	and full terminfo source formats to support more systems
 
