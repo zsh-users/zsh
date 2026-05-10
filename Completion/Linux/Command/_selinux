@@ -548,7 +548,7 @@ case $service in
           ;;
           fcontext)
             args+=(
-              '(-e --equal)'{-e+,--equal=}'[substitute target path with sourcepath when generating default label]:equal'
+              '(-e --equal)'{-e+,--equal=}'[substitute target path with source path when generating default label]:equivalent path:_files'
               '(-f --ftype)'{-f+,--ftype=}'[specify file type]:file type:((
                 f\:regular\ file
                 d\:directory
