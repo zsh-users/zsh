@@ -27,6 +27,9 @@
 
 2026-05-25  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54601: Src/Zle/complist.c: fix complist interactive mode
+	overwriting buffer
+
 	* 54600: Src/builtin.c: fix metafy stuff in add_autoload_function
 
 	* 54599: Src/exec.c: use correct buf size in cancd

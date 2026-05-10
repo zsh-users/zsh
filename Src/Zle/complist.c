@@ -2633,6 +2633,7 @@ domenuselect(Hookdef dummy, Chdata dat)
     	}
 	do_last_key = 0;
 
+	int was_inter = (mode == MM_INTER);
 	if (!cmd || cmd == Th(z_sendbreak)) {
 	    zbeep();
             molbeg = -1;
@@ -2815,8 +2816,12 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    Menustack s = (Menustack) zhalloc(sizeof(*s));
 	    int ol;
 
-	    if (mode == MM_INTER)
-		do_single(*minfo.cur);
+	    if (mode == MM_INTER) {
+		Cmatch *cur = minfo.cur;
+		minfo.cur = NULL;
+		do_single(*cur);
+		minfo.cur = cur;
+	    }
 	    mode = 0;
 	    s->prev = u;
 	    u = s;
@@ -3400,6 +3405,8 @@ domenuselect(Hookdef dummy, Chdata dat)
 		acc = 1;
 	    break;
 	}
+	if (was_inter)
+	    minfo.cur = NULL;
 	do_single(**p);
 	mselect = (**p)->gnum;
     }
@@ -3416,7 +3423,12 @@ domenuselect(Hookdef dummy, Chdata dat)
         clearlist = listshown = 1;
     if (acc && validlist && minfo.cur) {
 	menucmp = lastambig = hasoldlist = 0;
-	do_single(*(minfo.cur));
+	if (mode == MM_INTER) {
+	    Cmatch *cur = minfo.cur;
+	    minfo.cur = NULL;
+	    do_single(*cur);
+	} else
+	    do_single(*(minfo.cur));
     }
     if (wasnext || broken) {
 	menucmp = 1;
