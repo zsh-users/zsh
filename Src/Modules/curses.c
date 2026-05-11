@@ -260,7 +260,7 @@ zcurses_validate_window(char *win, int criteria)
 {
     LinkNode target;
 
-    if (win==NULL || strlen(win) < 1) {
+    if (win==NULL || !*win) {
 	zc_errno = ZCURSES_EINVALID;
 	return NULL;
     }
@@ -378,6 +378,7 @@ zcurses_colorget(const char *nam, char *colorpair)
 
 	++next_cp;
 	if (next_cp >= COLOR_PAIRS || init_pair(next_cp, f, b) == ERR)  {
+	    --next_cp;
 	    zsfree(cp);
 	    return NULL;
 	}
@@ -385,6 +386,7 @@ zcurses_colorget(const char *nam, char *colorpair)
 	cpn = (Colorpairnode)zshcalloc(sizeof(struct colorpairnode));
 	
 	if (!cpn) {
+	    --next_cp;
 	    zsfree(cp);
 	    return NULL;
 	}
@@ -507,7 +509,7 @@ zccmd_addwin(const char *nam, char **args)
 
     if (zcurses_validate_window(args[0], ZCURSES_UNUSED) == NULL &&
 	zc_errno) {
-	zerrnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0], 0);
+	zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0]);
 	return 1;
     }
 
@@ -527,8 +529,7 @@ zccmd_addwin(const char *nam, char **args)
 
 	node = zcurses_validate_window(args[5], ZCURSES_USED);
 	if (node == NULL) {
-	    zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0],
-		     0);
+	    zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[5]);
 	    zsfree(w->name);
 	    zfree(w, sizeof(struct zc_win));
 	    return 1;
@@ -622,6 +623,9 @@ zccmd_delwin(const char *nam, char **args)
     if (w->name)
 	zsfree(w->name);
 
+    if (w->children)
+	freelinklist(w->children, (FreeFunc)NULL);
+
     zfree((ZCWin)remnode(zcurses_windows, node), sizeof(struct zc_win));
 
     return ret;
@@ -641,8 +645,7 @@ zccmd_refresh(const char *nam, char **args)
 
 	    node = zcurses_validate_window(args[0], ZCURSES_USED);
 	    if (node == NULL) {
-		zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0],
-			 0);
+		zwarnnam(nam, "%s: %s", zcurses_strerror(zc_errno), args[0]);
 		return 1;
 	    }
 
@@ -727,6 +730,7 @@ zccmd_char(const char *nam, char **args)
 #ifdef HAVE_SETCCHAR
     wchar_t c;
     cchar_t cc;
+    size_t ret;
 #endif
 
     node = zcurses_validate_window(args[0], ZCURSES_USED);
@@ -738,7 +742,8 @@ zccmd_char(const char *nam, char **args)
     w = (ZCWin)getdata(node);
 
 #ifdef HAVE_SETCCHAR
-    if (mbrtowc(&c, args[1], MB_CUR_MAX, NULL) < 1)
+    ret = mbrtowc(&c, args[1], MB_CUR_MAX, NULL);
+    if (ret == 0 || ret == MB_INVALID || ret == MB_INCOMPLETE)
 	return 1;
 
     if (setcchar(&cc, &c, A_NORMAL, 0, NULL)==ERR)
@@ -964,12 +969,10 @@ zccmd_bg(const char *nam, char **args)
 	    } else {
 		switch(onoff) {
 		    case ZCURSES_ATTRON:
-			if (wattron(w->win, zca->number) == ERR)
-			    ret = 1;
+			ch |= zca->number;
 			break;
 		    case ZCURSES_ATTROFF:
-			if (wattroff(w->win, zca->number) == ERR)
-			    ret = 1;
+			ch &= ~zca->number;
 			break;
 		}
 	    }
@@ -998,12 +1001,10 @@ zccmd_scroll(const char *nam, char **args)
     w = (ZCWin)getdata(node);
 
     if (!strcmp(args[1], "on")) {
-	if (scrollok(w->win, TRUE) == ERR)
-	    return 1;
+	scrollok(w->win, TRUE);
 	w->flags |= ZCWF_SCROLL;
     } else if (!strcmp(args[1], "off")) {
-	if (scrollok(w->win, FALSE) == ERR)
-	    return 1;
+	scrollok(w->win, FALSE);
 	w->flags &= ~ZCWF_SCROLL;
     } else {
 	char *endptr;
@@ -1050,17 +1051,13 @@ zccmd_input(const char *nam, char **args)
 
     w = (ZCWin)getdata(node);
 
-    if (nargs >= 3) {
-	keypad(w->win, TRUE);
-    } else {
-	keypad(w->win, FALSE);
-    }
+    keypad(w->win, nargs >= 3);
 
     if (nargs >= 4) {
 #ifdef NCURSES_MOUSE_VERSION
 	if (!(zcurses_flags & ZCF_MOUSE_ACTIVE) ||
 	    (zcurses_flags & ZCF_MOUSE_MASK_CHANGED)) {
-	    if (mousemask(zcurses_mouse_mask, NULL) == (mmask_t)ERR) {
+	    if (!mousemask(zcurses_mouse_mask, NULL)) {
 		zwarnnam(nam, "current mouse mode is not supported");
 		return 1;
 	    }
@@ -1112,10 +1109,8 @@ zccmd_input(const char *nam, char **args)
     switch (ret) {
     case OK:
 	ret = wctomb(instr, (wchar_t)wi);
-	if (ret == 0) {
-	    instr[0] = Meta;
-	    instr[1] = '\0' ^ 32;
-	    instr[2] = '\0';
+	if (ret <= 0) {
+	    return 1;
 	} else {
 	    (void)metafy(instr, ret, META_NOALLOC);
 	}
@@ -1306,8 +1301,7 @@ zccmd_mouse(const char *nam, char **args)
 		zwarnnam(nam, "mouse delay requires an integer argument");
 		return 1;
 	    }
-	    if (mouseinterval((int)delay) != OK)
-		ret = 1;
+	    mouseinterval((int)delay);
 	} else {
 	    char *arg = *args;
 	    int onoff = 1;
@@ -1373,8 +1367,7 @@ zccmd_position(const char *nam, char **args)
     }
     array[6] = NULL;
 
-    setaparam(args[1], array);
-    return 0;
+    !setaparam(args[1], array);
 }
 
 
@@ -1412,8 +1405,11 @@ zccmd_querychar(const char *nam, char **args)
 
     if (getcchar(&cc, &c, &attrs, &cp, NULL) == ERR)
 	return 1;
-    /* Hmmm... I always get 0 for cp, whereas the following works... */
-    cp = PAIR_NUMBER(winch(w->win));
+    /* only overwrite with workaround if we do get 0, the winch method
+     * is limited to 256 color pairs */
+    if (!cp)
+	/* Hmmm... I always get 0 for cp, whereas the following works... */
+	cp = PAIR_NUMBER(winch(w->win));
 
     count = wctomb(instr, c);
     if (count == -1)
@@ -1423,6 +1419,7 @@ zccmd_querychar(const char *nam, char **args)
     inc = winch(w->win);
     /* I think the following is correct, the manual is a little terse */
     cp = PAIR_NUMBER(inc);
+    attrs = inc & A_ATTRIBUTES;
     inc &= A_CHARTEXT;
     if (imeta(inc)) {
 	instr[0] = Meta;
@@ -1432,7 +1429,6 @@ zccmd_querychar(const char *nam, char **args)
   	instr[0] = (unsigned char) inc;
 	instr[1] = '\0';
     }
-    attrs = inc;
 #endif
 
     /*
@@ -1568,10 +1564,10 @@ static int
 bin_zcurses(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     char **saargs;
-    struct zcurses_subcommand *zcsc;
+    const struct zcurses_subcommand *zcsc;
     int num_args;
 
-    struct zcurses_subcommand scs[] = {
+    static const struct zcurses_subcommand scs[] = {
 	{"init", zccmd_init, 0, 0},
 	{"addwin", zccmd_addwin, 5, 6},
 	{"delwin", zccmd_delwin, 1, 1},
