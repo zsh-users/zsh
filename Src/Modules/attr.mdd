@@ -7,6 +7,6 @@ fi
 '
 load=no
 
-autofeatures="b:zgetattr b:zsetattr b:zdelattr"
+autofeatures="b:zgetattr b:zsetattr b:zdelattr b:zlistattr"
 
 objects="attr.o"

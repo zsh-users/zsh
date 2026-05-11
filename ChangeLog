@@ -8,6 +8,9 @@
 
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54549: Src/Modules/attr.c, Src/Modules/attr.mdd: attr: various
+	minor issues
+
 	* 54546: Src/hist.c: Remove incorrect array access that was also
 	never used
 
