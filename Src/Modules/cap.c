@@ -37,14 +37,14 @@ bin_cap(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 {
     int ret = 0;
     cap_t caps;
-    if(*argv) {
+    if (*argv) {
 	unmetafy(*argv, NULL);
 	caps = cap_from_text(*argv);
-	if(!caps) {
+	if (!caps) {
 	    zwarnnam(nam, "invalid capability string");
 	    return 1;
 	}
-	if(cap_set_proc(caps)) {
+	if (cap_set_proc(caps)) {
 	    zwarnnam(nam, "can't change capabilities: %e", errno);
 	    ret = 1;
 	}
@@ -52,15 +52,18 @@ bin_cap(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 	char *result = NULL;
 	ssize_t length;
 	caps = cap_get_proc();
-	if(caps)
+	if (caps)
 	    result = cap_to_text(caps, &length);
-	if(!caps || !result) {
+	if (!caps || !result) {
 	    zwarnnam(nam, "can't get capabilities: %e", errno);
 	    ret = 1;
 	} else
 	    puts(result);
+	if (result)
+	    cap_free(result);
     }
-    cap_free(caps);
+    if (caps)
+	cap_free(caps);
     return ret;
 }
 
@@ -75,14 +78,17 @@ bin_getcap(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 	cap_t caps;
 
 	caps = cap_get_file(unmetafy(dupstring(*argv), NULL));
-	if(caps)
+	if (caps)
 	    result = cap_to_text(caps, &length);
 	if (!caps || !result) {
 	    zwarnnam(nam, "%s: %e", *argv, errno);
 	    ret = 1;
 	} else
 	    printf("%s %s\n", *argv, result);
-	cap_free(caps);
+	if (result)
+	    cap_free(result);
+	if (caps)
+	    cap_free(caps);
     } while(*++argv);
     return ret;
 }
@@ -95,13 +101,13 @@ bin_setcap(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 
     unmetafy(*argv, NULL);
     caps = cap_from_text(*argv++);
-    if(!caps) {
+    if (!caps) {
 	zwarnnam(nam, "invalid capability string");
 	return 1;
     }
 
     do {
-	if(cap_set_file(unmetafy(dupstring(*argv), NULL), caps)) {
+	if (cap_set_file(unmetafy(dupstring(*argv), NULL), caps)) {
 	    zwarnnam(nam, "%s: %e", *argv, errno);
 	    ret = 1;
 	}
