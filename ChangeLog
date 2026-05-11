@@ -1,3 +1,7 @@
+2026-05-11  dana  <dana@dana.is>
+
+	* 54518: Util/zsh-merge-changelog: add git merge driver
+
 2026-05-10  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/Linux/Command/_selinux: complete files
