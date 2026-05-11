@@ -60,9 +60,9 @@ bin_clone(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	if (setsid() != mypid)
 	    zwarnnam(nam, "failed to create new session: %e", errno);
 #elif defined(TIOCNOTTY)
-	    if (ioctl(SHTTY, TIOCNOTTY, 0))
-	    zwarnnam(*args, "%e", errno);
-	    setpgrp(0L, mypid);
+	if (ioctl(SHTTY, TIOCNOTTY, 0))
+	    zwarnnam(nam, "%e", errno);
+	setpgrp(0L, mypid);
 #endif
 	dup2(ttyfd,0);
 	dup2(ttyfd,1);
