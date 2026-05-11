@@ -2037,32 +2037,45 @@ join_strs(int la, char *sa, int lb, char *sb)
 			    bp = &sa;
 			    blp = &la;
 			}
-			/* Now try to build a string that matches the other
-			 * string. */
+                        /* Now try to build a string that matches the other string. */
 			if ((bl = bld_line(mp, line, *ap, *bp, *blp, 0))) {
-			    /* Found one, put it into the return string. */
-			    char *convstr =
-				zlelineasstring(line, mp->llen, 0, &convlen,
-						NULL, 0);
-			    if (rr <= convlen) {
-				ptrdiff_t diff = rp - rs;
-				int alloclen = (convlen > 20) ? convlen : 20;
+			    /*
+			     * Verify the built line also matches *ap (the
+			     * matched string), not just *bp.  This prevents
+			     * adding characters that only match one string
+			     * when the matcher pattern is too generic
+			     * (e.g. {a-zA-Z} matching any letter).
+			     */
+			    VARARR(ZLE_CHAR_T, line2, mp->llen);
+			    int bl2;
 
-				rs = realloc(rs, (rl += alloclen));
-				rr += alloclen;
-				rp = rs + diff;
-			    }
-			    memcpy(rp, convstr, convlen);
-			    rp += convlen;
-			    rr -= convlen;
-			    /* HERE: multibyte chars */
-			    *ap += mp->wlen;
-			    *alp -= mp->wlen;
+			    if ((bl2 = bld_line(mp, line2, *bp, *ap, *alp, 0))
+				&& bl2 == bl) {
+				/* Found one, put it into the return string. */
+				char *convstr =
+				    zlelineasstring(line, mp->llen, 0, &convlen,
+						    NULL, 0);
+				if (rr <= convlen) {
+				    ptrdiff_t diff = rp - rs;
+				    int alloclen = (convlen > 20) ? convlen : 20;
 
-			    *bp += bl;
-			    *blp -= bl;
-			    t = 1;
-			    free(convstr);
+				    rs = realloc(rs, (rl += alloclen));
+				    rr += alloclen;
+				    rp = rs + diff;
+				}
+				memcpy(rp, convstr, convlen);
+				rp += convlen;
+				rr -= convlen;
+				/* HERE: multibyte chars */
+				*ap += mp->wlen;
+				*alp -= mp->wlen;
+
+				*bp += bl;
+				*blp -= bl;
+				t = 1;
+				free(convstr);
+			    } else
+				t = 0;
 			} else
 			    t = 0;
 		    }
