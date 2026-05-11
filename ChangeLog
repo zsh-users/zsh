@@ -1,3 +1,8 @@
+2026-05-16  dana  <dana@dana.is>
+
+	* Michael Baikov: github #170 (tweaked): Doc/Zsh/compwid.yo:
+	Clarify the documentation about -d flag in compadd
+
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 54525: Src/init.c: interrupt during redirect to fifo doesn't
