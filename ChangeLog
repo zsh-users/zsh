@@ -8,6 +8,8 @@
 
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54550: Src/Modules/cap.c: cap: fix leaks
+
 	* 54549: Src/Modules/attr.c, Src/Modules/attr.mdd: attr: various
 	minor issues
 
