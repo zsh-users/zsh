@@ -1,0 +1,125 @@
+#!/usr/bin/env zsh
+
+# this is a git merge driver that magically fixes conflicts in the ChangeLog
+# file (for simple additions at least). useful for back-porting
+#
+# to use, add this to your .git/config:
+#
+#   [merge "zsh-merge-changelog"]
+#     name = merge the zsh changelog somewhat reasonably
+#     driver = Util/zsh-merge-changelog %O %A %B %L %P
+#
+# and add this to your .git/info/attributes:
+#
+#   /ChangeLog merge=zsh-merge-changelog
+#
+# note: currently the ChangeLog is still updated even when the rest of the merge
+# would be a no-op
+#
+# original script written by Mikachu
+
+emulate -L zsh -o extended_glob -o warn_create_global
+
+eputs() {
+  [[ $1 == (-|--) ]] && shift
+  print -rlu2 - "${ZSH_ARGZERO:t}: $1" "${@[2,-1]}"
+}
+
+main() {
+  local tmp=${TMPDIR:-/tmp}/${ZSH_ARGZERO:t}.$$.$RANDOM
+  local diff line ctx_after header data datb idx color
+  local -a out orig
+
+  diff=$( git diff --no-index -U30 -- $1 $3 )
+
+  for line in ${${(f)diff}[5,-1]}; do
+    case $line in
+      @@*) ;;
+      ' '*)
+        (( $#out )) && ctx_after=1
+        # commit header from context (entry added under existing header)
+        (( ! $#out )) && [[ $line == ' '<->-<->-<->* ]] && header=$line[2,-1]
+        ;;
+      +*)
+        (( ctx_after )) && {
+          eputs 'unable to handle non-consecutive addition'
+          return 1
+        }
+        [[ -n $header ]] && {
+          out+=( $header '' )
+          header=
+        }
+        out+=( "$line[2,-1]" )
+        ;;
+      -*)
+        eputs 'unable to handle deletion'
+        return 1
+        ;;
+      *)
+        eputs 'unexpected line in diff:' $line
+        return 1
+        ;;
+    esac
+  done
+
+  (( $#out )) || {
+    eputs 'no changed lines found'
+    return 1
+  }
+  [[ $out[1] == <->-<->-<->* && $out[2] == '' ]] || {
+    eputs 'commit header not found'
+    return 1
+  }
+
+  trap "rm -f -- ${(q+)tmp}" EXIT HUP INT
+
+  orig=( "${(@f)"$( < $2 )"}" )
+
+  data=${(M)orig[1]##<->-<->-<->}
+  [[ -n $data ]] || {
+    eputs 'failed to get latest date in original change log'
+    return 1
+  }
+  datb=${(M)out[1]##<->-<->-<->}
+
+  # new entry later than last -- just prepend
+  if [[ $datb > $data ]]; then
+    print -rl - "${(@)out}" "${(@)orig}" > $tmp || return
+
+  # header already present in file -- re-use it. this always inserts above the
+  # existing entries, so it might not be the same order it was in originally.
+  # but it's fine
+  elif [[ -n ${(M)orig:#$out[1]} ]]; then
+    idx=$orig[(ie)$out[1]]
+    print -rl - \
+      "${(@)orig[1,idx]}" \
+      "${(@)out[2,-1]}" \
+      "${(@)orig[idx+2,-1]}" \
+    > $tmp || return
+
+  # insert in the middle somewhere
+  else
+    for (( idx = 1; idx <= $#orig; idx++ )); do
+      data=${(M)orig[idx]##<->-<->-<->}
+      [[ -n $data && $datb > $data ]] || continue
+      print -rl - \
+        "${(@)orig[1,idx-1]}" \
+        "${(@)out}" \
+        "${(@)orig[idx,-1]}" \
+      > $tmp || return
+      break
+    done
+  fi
+
+  [[ -t 2 ]] && color=--color=always
+  out=( "${(@f)"$( git diff --no-index $color -U4 -- $2 $tmp )"}" )
+  out=( "${(@)out[3,-1]}" )
+  out[1]=${out[1]/a\/[^[:cntrl:]]##/a/$5}
+  out[2]=${out[2]/b\/[^[:cntrl:]]##/b/$5}
+  eputs 'fixed ChangeLog entry:' "${(F)out}"
+
+  [[ -n $ZMC_FAIL ]] && return 1 # for testing
+  cp -- $tmp $2
+}
+
+main "$@"

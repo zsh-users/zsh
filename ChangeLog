@@ -1,5 +1,7 @@
 2026-05-11  dana  <dana@dana.is>
 
+	* 54518: Util/zsh-merge-changelog: add git merge driver
+
 	* 54504: Doc/Zsh/manual.yo, Doc/Zsh/zle.yo, Doc/intro.ms: fix
 	more warnings
 
