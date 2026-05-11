@@ -68,7 +68,7 @@ xsetxattr(const char *path, const char *name, const void *value,
           size_t size, int flags, int symlink)
 {
 #ifdef XATTR_EXTRA_ARGS
-    return setxattr(path, name, value, size, 0, flags | symlink ? XATTR_NOFOLLOW : 0);
+    return setxattr(path, name, value, size, 0, flags | (symlink ? XATTR_NOFOLLOW : 0));
 #else
     switch (symlink) {
     case 0:
@@ -98,7 +98,8 @@ static int
 bin_getattr(char *nam, char **argv, Options ops, UNUSED(int func))
 {
     int ret = 0;
-    int val_len = 0, attr_len = 0, slen;
+    int slen;
+    ssize_t val_len = 0, attr_len = 0;
     char *value, *file = argv[0], *attr = argv[1], *param = argv[2];
     int symlink = OPT_ISSET(ops, 'h');
 
@@ -169,7 +170,8 @@ static int
 bin_listattr(char *nam, char **argv, Options ops, UNUSED(int func))
 {
     int ret = 0;
-    int val_len, list_len = 0, slen;
+    int slen;
+    ssize_t val_len, list_len = 0;
     char *value, *file = argv[0], *param = argv[1];
     int symlink = OPT_ISSET(ops, 'h');
 
