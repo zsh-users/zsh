@@ -73,11 +73,13 @@ matchgetfn(Param pm)
     if (zsh_match && *zsh_match) {
 	if (isset(KSHARRAYS)) {
 	    char **ap =
-		(char **) zalloc(sizeof(char *) * (arrlen(zsh_match)+1));
+		(char **) zalloc(sizeof(char *) * (arrlen(zsh_match)+2));
+	    char *match;
 	    pm->u.arr = ap;
-	    *ap++ = ztrdup(getsparam("MATCH"));
+	    match = ztrdup(getsparam("MATCH"));
+	    *ap++ = match ? match : ztrdup("");
 	    while (*zsh_match)
-		*ap = ztrdup(*zsh_match++);
+		*ap++ = ztrdup(*zsh_match++);
 	} else
 	    pm->u.arr = zarrdup(zsh_match);
     } else if (isset(KSHARRAYS)) {
@@ -159,7 +161,7 @@ ksh93_wrapper(Eprog prog, FuncWrap w, char *name)
 #define LOCAL_NAMEREF (PM_LOCAL|PM_UNSET|PM_NAMEREF)
     if ((pm = createparam(".sh.command", LOCAL_NAMEREF))) {
 	pm->level = locallevel;	/* Why is this necessary? */
-	/* Force scoping by assignent hack */
+	/* Force scoping by assignment hack */
 	setloopvar(".sh.command", "ZSH_DEBUG_CMD");
 	pm->node.flags |= PM_READONLY;
     }
