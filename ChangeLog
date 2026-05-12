@@ -8,6 +8,9 @@
 
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54564: Src/Modules/termcap.c, Src/Modules/terminfo.c: termcap,
+	terminfo: reset u, fix metafy confusion
+
 	* 54563: Src/Modules/stat.c, Src/Modules/system.c: stat, system:
 	minor fixes
 
