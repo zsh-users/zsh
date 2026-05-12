@@ -51,7 +51,7 @@ static char *boolcodes[] = {
 
 /**/
 static int
-ztgetflag(char *s)
+ztgetflag(const char *s)
 {
     char **b;
 
@@ -82,11 +82,20 @@ bin_echotc(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     char *s, buf[2048], *t, *u;
     int num, argct;
 
-    s = *argv++;
     if (termflags & TERM_BAD)
 	return 1;
     if ((termflags & TERM_UNKNOWN) && (isset(INTERACTIVE) || !init_term()))
 	return 1;
+
+    s = *argv++;
+    for (t = s; *t; t++) {
+	/* ncurses helpfully just crashes if you pass it nonascii */
+	if ((unsigned char)*t > 0x7f) {
+	    zwarnnam(name, "no such capability: %s", s);
+	    return 1;
+	}
+    }
+
     /* if the specified termcap has a numeric value, display it */
     if ((num = tgetnum(s)) != -1) {
 	printf("%d\n", num);
@@ -143,8 +152,9 @@ static struct builtin bintab[] = {
 static HashNode
 gettermcap(UNUSED(HashTable ht), const char *name)
 {
-    int len, num;
-    char *tcstr, buf[2048], *u, *nameu;
+    int num;
+    char *tcstr, buf[2048], *u;
+    const char *t;
     Param pm = NULL;
 
     /* This depends on the termcap stuff in init.c */
@@ -153,18 +163,21 @@ gettermcap(UNUSED(HashTable ht), const char *name)
     if ((termflags & TERM_UNKNOWN) && (isset(INTERACTIVE) || !init_term()))
 	return NULL;
 
-    
-    nameu = dupstring(name);
-    unmetafy(nameu, &len);
+    for (t = name; *t; t++) {
+	/* ncurses helpfully just crashes if you pass it nonascii */
+	if ((unsigned char)*t > 0x7f) {
+	    return NULL;
+	}
+    }
 
     pm = (Param) hcalloc(sizeof(struct param));
-    pm->node.nam = nameu;
+    pm->node.nam = dupstring(name);
     pm->node.flags = PM_READONLY;
     u = buf;
 
     /* logic in the following cascade copied from echotc, above */
 
-    if ((num = tgetnum(nameu)) != -1) {
+    if ((num = tgetnum(name)) != -1) {
 	pm->gsu.i = &nullsetinteger_gsu;
 	pm->u.val = num;
 	pm->node.flags |= PM_INTEGER;
@@ -172,7 +185,7 @@ gettermcap(UNUSED(HashTable ht), const char *name)
     }
 
     pm->gsu.s = &nullsetscalar_gsu;
-    switch (ztgetflag(nameu)) {
+    switch (ztgetflag(name)) {
     case -1:
 	break;
     case 0:
@@ -184,7 +197,7 @@ gettermcap(UNUSED(HashTable ht), const char *name)
 	pm->node.flags |= PM_SCALAR;
 	return &pm->node;
     }
-    if ((tcstr = tgetstr(nameu, &u)) != NULL && tcstr != (char *)-1) {
+    if ((tcstr = tgetstr(name, &u)) != NULL && tcstr != (char *)-1) {
 	pm->u.str = dupstring(tcstr);
 	pm->node.flags |= PM_SCALAR;
     } else {
@@ -201,7 +214,7 @@ scantermcap(UNUSED(HashTable ht), ScanFunc func, int flags)
 {
     Param pm = NULL;
     int num;
-    char **capcode, *tcstr, buf[2048], *u;
+    char **capcode, *tcstr, buf[2048];
 
 #ifndef HAVE_NUMCODES
     static char *numcodes[] = {
@@ -252,7 +265,6 @@ scantermcap(UNUSED(HashTable ht), ScanFunc func, int flags)
 #endif
 
     pm = (Param) hcalloc(sizeof(struct param));
-    u = buf;
 
     pm->node.flags = PM_READONLY | PM_SCALAR;
     pm->gsu.s = &nullsetscalar_gsu;
@@ -286,6 +298,7 @@ scantermcap(UNUSED(HashTable ht), ScanFunc func, int flags)
 	     zstrcodes
 #endif
 	     ; *capcode; capcode++) {
+	char *u = buf;
 	if ((tcstr = (char *)tgetstr(*capcode,&u)) != NULL &&
 	    tcstr != (char *)-1) {
 	    pm->u.str = dupstring(tcstr);

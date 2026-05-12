@@ -68,12 +68,20 @@ bin_echoti(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     long pars[] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
     char *strcap[] = { "pfkey", "pfloc", "pfx", "pln", "pfxl", NULL };
 
-    s = *argv++;
     /* This depends on the termcap stuff in init.c */
     if (termflags & TERM_BAD)
 	return 1;
     if ((termflags & TERM_UNKNOWN) && (isset(INTERACTIVE) || !init_term()))
 	return 1;
+
+    s = *argv++;
+    for (t = s; *t; t++) {
+	/* ncurses helpfully just crashes if you pass it nonascii */
+	if ((unsigned char)*t > 0x7f) {
+	    zwarnnam(name, "no such terminfo capability: %s", s);
+	    return 1;
+	}
+    }
     /* if the specified capability has a numeric value, display it */
     if (((num = tigetnum(s)) != -1) && (num != -2)) {
 	printf("%d\n", num);
@@ -111,7 +119,7 @@ bin_echoti(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     /* get the arguments */
     for (arg=0; argv[arg]; arg++) {
 	if (strarg && arg > 0)
-            pars[arg] = (long) argv[arg];
+            pars[arg] = (long) unmetafy(dupstring(argv[arg]), NULL);
 	else
             pars[arg] = atoi(argv[arg]);
     }
@@ -134,8 +142,9 @@ static struct builtin bintab[] = {
 static HashNode
 getterminfo(UNUSED(HashTable ht), const char *name)
 {
-    int len, num;
-    char *tistr, *nameu;
+    int num;
+    char *tistr;
+    const char *t;
     Param pm = NULL;
 
     /* This depends on the termcap stuff in init.c */
@@ -144,22 +153,26 @@ getterminfo(UNUSED(HashTable ht), const char *name)
     if ((termflags & TERM_UNKNOWN) && (isset(INTERACTIVE) || !init_term()))
 	return NULL;
 
-    nameu = dupstring(name);
-    unmetafy(nameu, &len);
+    for (t = name; *t; t++) {
+	/* ncurses helpfully just crashes if you pass it nonascii */
+	if ((unsigned char)*t > 0x7f) {
+	    return NULL;
+	}
+    }
 
     pm = (Param) hcalloc(sizeof(struct param));
-    pm->node.nam = nameu;
+    pm->node.nam = dupstring(name);
     pm->node.flags = PM_READONLY;
 
-    if (((num = tigetnum(nameu)) != -1) && (num != -2)) {
+    if (((num = tigetnum(name)) != -1) && (num != -2)) {
 	pm->u.val = num;
 	pm->node.flags |= PM_INTEGER;
 	pm->gsu.i = &nullsetinteger_gsu;
-    } else if ((num = tigetflag(nameu)) != -1) {
+    } else if ((num = tigetflag(name)) != -1) {
 	pm->u.str = num ? dupstring("yes") : dupstring("no");
 	pm->node.flags |= PM_SCALAR;
 	pm->gsu.s = &nullsetscalar_gsu;
-    } else if ((tistr = (char *)tigetstr(nameu)) != NULL && tistr != (char *)-1) {
+    } else if ((tistr = (char *)tigetstr(name)) != NULL && tistr != (char *)-1) {
 	pm->u.str = metafy(tistr, -1, META_HEAPDUP);
 	pm->node.flags |= PM_SCALAR;
 	pm->gsu.s = &nullsetscalar_gsu;
