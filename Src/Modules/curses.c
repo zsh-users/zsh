@@ -284,8 +284,14 @@ zcurses_validate_window(char *win, int criteria)
 static int
 zcurses_free_window(ZCWin w)
 {
-    if (!(w->flags & ZCWF_PERMANENT) && delwin(w->win)!=OK)
-	return 1;
+    int ret = 0;
+
+    if (!(w->flags & ZCWF_PERMANENT) && delwin(w->win)!=OK) {
+	DPUTS2(1, "BUG: Failed to delete ncurses window %s with %d children",
+		w->name ? w->name : "(null)",
+		w->children ? countlinknodes(w->children) : 0);
+	ret = 1;
+    }
 
     if (w->name)
 	zsfree(w->name);
@@ -295,7 +301,7 @@ zcurses_free_window(ZCWin w)
 
     zfree(w, sizeof(struct zc_win));
 
-    return 0;
+    return ret;
 }
 
 static struct zcurses_namenumberpair *
@@ -556,7 +562,9 @@ zccmd_addwin(const char *nam, char **args)
 	return 1;
     }
 
-    zinsertlinknode(zcurses_windows, lastnode(zcurses_windows), (void *)w);
+    /* prepend window so that freelinklist will free children before parents,
+     * otherwise they will be leaked */
+    zinsertlinknode(zcurses_windows, (LinkNode)zcurses_windows, (void *)w);
 
     return 0;
 }
@@ -839,6 +847,14 @@ zccmd_endwin(UNUSED(const char *nam), UNUSED(char **args))
 	 * doing stuff with shttyinfo when we shouldn't really be.
 	 */
 	gettyinfo(&shttyinfo);
+	freelinklist(zcurses_windows, (FreeFunc) zcurses_free_window);
+	zcurses_windows = znewlinklist();
+	if (zcurses_colorpairs) {
+	    deletehashtable(zcurses_colorpairs);
+	    zcurses_colorpairs = NULL;
+	}
+	next_cp = 0;
+	zc_color_phase = 0;
     }
     return 0;
 }
@@ -1667,14 +1683,14 @@ static char **
 zcurses_windowsgetfn(UNUSED(Param pm))
 {
     LinkNode node;
-    char **arr, **arrptr;
+    char **arr;
     int count = countlinknodes(zcurses_windows);
 
-    arrptr = arr = (char **)zhalloc((count+1) * sizeof(char *));
+    arr = (char **)zhalloc((count+1) * sizeof(char *)) + count;
+    *arr = NULL;
 
     for (node = firstnode(zcurses_windows); node; incnode(node))
-	*arrptr++ = dupstring(((ZCWin)getdata(node))->name);
-    *arrptr = NULL;
+	*--arr = dupstring(((ZCWin)getdata(node))->name);
 
     return arr;
 }
@@ -1770,9 +1786,8 @@ boot_(UNUSED(Module m))
 int
 cleanup_(Module m)
 {
+    zccmd_endwin(NULL, NULL);
     freelinklist(zcurses_windows, (FreeFunc) zcurses_free_window);
-    if (zcurses_colorpairs)
-	deletehashtable(zcurses_colorpairs);
     return setfeatureenables(m, &module_features, NULL);
 }
 

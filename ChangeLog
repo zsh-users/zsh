@@ -8,6 +8,9 @@
 
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54553: Src/Modules/curses.c: curses: free subwindows before
+	parents or they don't get freed at all
+
 	* 54552: Src/Modules/curses.c: curses: fix a few issues
 
 	* 54551: Src/Modules/clone.c: clone: minor style issue
