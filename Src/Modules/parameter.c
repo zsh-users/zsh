@@ -40,7 +40,7 @@ static int incleanup;
 
 /**/
 static char *
-paramtypestr(Param pm)
+paramtypestr(Param pm, int append)
 {
     char *val = NULL;
     int f = pm->node.flags;
@@ -91,6 +91,13 @@ paramtypestr(Param pm)
     } else
 	val = dupstring("");
 
+    if (append) {
+	if ((pm->node.flags & PM_NAMEREF) && pm->u.str && *(pm->u.str) &&
+		(pm = (Param) realparamtab->getnode(realparamtab, pm->node.nam)) &&
+		!(pm->node.flags & PM_UNSET)) {
+	    val = zhtricat(val, "-", paramtypestr(pm, 0));
+	}
+    }
     return val;
 }
 
@@ -106,12 +113,7 @@ getpmparameter(UNUSED(HashTable ht), const char *name)
     pm->gsu.s = &nullsetscalar_gsu;
     if ((rpm = (Param) realparamtab->getnode2(realparamtab, name)) &&
 	!(rpm->node.flags & PM_UNSET)) {
-	pm->u.str = paramtypestr(rpm);
-	if ((rpm->node.flags & PM_NAMEREF) && rpm->u.str && *(rpm->u.str) &&
-	    (rpm = (Param) realparamtab->getnode(realparamtab, name)) &&
-	    !(rpm->node.flags & PM_UNSET)) {
-	    pm->u.str = zhtricat(pm->u.str, "-", paramtypestr(rpm));
-	}
+	pm->u.str = paramtypestr(rpm, 1);
     } else {
 	pm->u.str = dupstring("");
 	pm->node.flags |= (PM_UNSET|PM_SPECIAL);
@@ -139,7 +141,7 @@ scanpmparameters(UNUSED(HashTable ht), ScanFunc func, int flags)
 	    if (func != scancountparams &&
 		((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
 		 !(flags & SCANPM_WANTKEYS)))
-		pm.u.str = paramtypestr((Param) hn);
+		pm.u.str = paramtypestr((Param) hn, 1);
 	    func(&pm.node, flags);
 	}
 }
@@ -962,6 +964,7 @@ setpmoptions(Param pm, HashTable ht)
 	for (hn = ht->nodes[i]; hn; hn = hn->next) {
 	    struct value v;
 	    char *val;
+	    int n;
 
 	    v.scanflags = v.valflags = v.start = 0;
 	    v.end = -1;
@@ -971,8 +974,9 @@ setpmoptions(Param pm, HashTable ht)
 	    val = getstrvalue(&v);
 	    if (!val || (strcmp(val, "on") && strcmp(val, "off")))
 		zwarn("invalid value: %s", val);
-	    else if (dosetopt(optlookup(hn->nam),
-			      (val && strcmp(val, "off")), 0, opts))
+	    else if (!(n = optlookup(hn->nam)))
+		zwarn("no such option: %s", hn->nam);
+	    else if (dosetopt(n, (val && strcmp(val, "off")), 0, opts))
 		zwarn("can't change option: %s", hn->nam);
 	}
     /* See setpmcommands() above */
@@ -1288,7 +1292,7 @@ getpmjobtext(UNUSED(HashTable ht), const char *name)
 
     selectjobtab(&jtab, &jmax);
 
-    job = strtod(name, &pend);
+    job = strtol(name, &pend, 10);
     /* Non-numeric keys are looked up by job name */
     if (*pend)
 	job = getjob(name, NULL);
@@ -1362,7 +1366,8 @@ pmjobstate(Job jtab, int job)
 	    state = "running";
 	else if (WIFEXITED(pn->status)) {
 	    if (WEXITSTATUS(pn->status))
-		sprintf((state = buf2), "exit %d", (pn->status));
+		sprintf((state = buf2), "exit %d",
+			WEXITSTATUS(pn->status));
 	    else
 		state = "done";
 	} else if (WIFSTOPPED(pn->status))
@@ -1396,7 +1401,7 @@ getpmjobstate(UNUSED(HashTable ht), const char *name)
 
     selectjobtab(&jtab, &jmax);
 
-    job = strtod(name, &pend);
+    job = strtol(name, &pend, 10);
     if (*pend)
 	job = getjob(name, NULL);
     if (job >= 1 && job <= jmax &&
@@ -1468,7 +1473,7 @@ getpmjobdir(UNUSED(HashTable ht), const char *name)
 
     selectjobtab(&jtab, &jmax);
 
-    job = strtod(name, &pend);
+    job = strtol(name, &pend, 10);
     if (*pend)
 	job = getjob(name, NULL);
     if (job >= 1 && job <= jmax &&
@@ -2086,9 +2091,12 @@ static Groupset get_all_groups(void)
     for (gaptr = gs->array; gaptr < gs->array + gs->num; gaptr++) {
 	grptr = getgrgid(gaptr->gid);
 	if (!grptr) {
-	    return NULL;
-	}
-	gaptr->name = dupstring(grptr->gr_name);
+	    /* a group we're in has been deleted from /etc/groups */
+	    char buf[DIGBUFSIZE];
+	    convbase(buf, (zlong)gaptr->gid, 10);
+	    gaptr->name = dupstring(buf);
+	} else
+	    gaptr->name = dupstring(grptr->gr_name);
     }
 
     return gs;

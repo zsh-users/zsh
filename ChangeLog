@@ -1,5 +1,8 @@
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54560: Src/Modules/parameter.c: parameter: Fix some issues in
+	the parameter module
+
 	* 54559: Src/Modules/nearcolor.c: nearcolor was missing the
 	third grayscale entry in 88 color mode
 
