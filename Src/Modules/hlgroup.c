@@ -124,6 +124,8 @@ scangroup(ScanFunc func, int flags, int sgr)
 	     PM_TYPE(v->pm->node.flags) != PM_HASHED)
 	return;
     hlg = v->pm->gsu.h->getfn(v->pm);
+    if (!hlg)
+	return;
 
     memset((void *)&pm, 0, sizeof(struct param));
     pm.node.flags = PM_SCALAR;
@@ -131,6 +133,8 @@ scangroup(ScanFunc func, int flags, int sgr)
 
     for (i = 0; i < hlg->hsize; i++)
 	for (hn = hlg->nodes[i]; hn; hn = hn->next) {
+	    if (((Param) hn)->node.flags & PM_UNSET)
+		continue;
 	    pm.u.str = convertattr(((Param) hn)->u.str, sgr);
 	    pm.node.nam = hn->nam;
 	    func(&pm.node, flags);

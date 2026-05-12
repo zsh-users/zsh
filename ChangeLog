@@ -1,5 +1,8 @@
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54555: Src/Modules/hlgroup.c: fix in 52783 was incomplete,
+	add same check in scangroup()
+
 	* 54554: Src/Modules/curses.c: curses: use setcchar in zccmd_bg
 	if available
 
