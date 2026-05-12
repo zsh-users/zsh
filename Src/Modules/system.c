@@ -686,7 +686,8 @@ bin_zsystem_flock(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     else
 	flags = O_RDWR | O_NOCTTY;
     if ((flock_fd = open(unmeta(args[0]), flags)) < 0) {
-	zwarnnam(nam, "failed to open %s for writing: %e", args[0], errno);
+	zwarnnam(nam, "failed to open %s for %sing: %e", args[0],
+		 readlock ? "read" : "writ", errno);
 	return 1;
     }
     flock_fd = movefd(flock_fd);

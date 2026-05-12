@@ -1,5 +1,8 @@
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54563: Src/Modules/stat.c, Src/Modules/system.c: stat, system:
+	minor fixes
+
 	* 54562: Doc/Zsh/mod_random.yo, Src/Modules/random.c,
 	Src/Modules/random_real.c: random: Fix some bugs in the random
 	module
