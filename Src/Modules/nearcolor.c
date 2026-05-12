@@ -37,13 +37,19 @@ struct cielab {
 };
 typedef struct cielab *Cielab;
 
+static inline double
+square(double a)
+{
+    return a*a;
+}
+
 static double
 deltae(Cielab lab1, Cielab lab2)
 {
     /* taking square root unnecessary as we're just comparing values */
-    return pow(lab1->L - lab2->L, 2) +
-	pow(lab1->a - lab2->a, 2) +
-	pow(lab1->b - lab2->b, 2);
+    return square(lab1->L - lab2->L) +
+	square(lab1->a - lab2->a) +
+	square(lab1->b - lab2->b);
 }
 
 static void
@@ -73,7 +79,7 @@ RGBtoLAB(int red, int green, int blue, Cielab lab)
 static int
 mapRGBto88(int red, int green, int blue)
 {
-    int component[] = { 0, 0x8b, 0xcd, 0xff, 0x2e, 0x5c, 0x8b, 0xa2, 0xb9, 0xd0, 0xe7 };
+    int component[] = { 0, 0x8b, 0xcd, 0xff, 0x2e, 0x5c, 0x73, 0x8b, 0xa2, 0xb9, 0xd0, 0xe7 };
     struct cielab orig, next;
     double nextl, bestl = -1;
     int r, g, b;
@@ -83,7 +89,7 @@ mapRGBto88(int red, int green, int blue)
     RGBtoLAB(red, green, blue, &orig);
 
     /* try every one of the 72 colours */
-    for (r = 0; r < 11; r++) {
+    for (r = 0; r < 12; r++) {
 	for (g = 0; g <= 3; g++) {
 	    for (b = 0; b <= 3; b++) {
 		if (r > 3) g = b = r; /* advance inner loops to the block of greys */
@@ -99,7 +105,7 @@ mapRGBto88(int red, int green, int blue)
 	}
     }
 
-    return (comp_r > 3) ? 77 + comp_r :
+    return (comp_r > 3) ? 76 + comp_r :
         16 + (comp_r * 16) + (comp_g * 4) + comp_b;
 }
 

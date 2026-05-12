@@ -1,5 +1,8 @@
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54559: Src/Modules/nearcolor.c: nearcolor was missing the
+	third grayscale entry in 88 color mode
+
 	* 54558: Src/Modules/ksh93.c: ksh93: .sh.match handling with
 	KSHARRAYS set was totally broken
 
