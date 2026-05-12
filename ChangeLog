@@ -8,6 +8,9 @@
 
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54557: Src/Modules/langinfo.c: langinfo: fix some metafy
+	confusion
+
 	* 54556: Src/Modules/langinfo.mdd: langinfo.mdd check was
 	always true
 
