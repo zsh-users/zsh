@@ -241,7 +241,7 @@ watch3ary(int inout, WATCH_STRUCT_UTMP *u, char *fmt, int prnt)
 static char *
 watchlog2(int inout, WATCH_STRUCT_UTMP *u, char *fmt, int prnt, int fini)
 {
-    char buf[40], buf2[80];
+    char buf[256], buf2[80];
     time_t timet;
     struct tm *tm;
     char *fm2;
@@ -332,7 +332,7 @@ watchlog2(int inout, WATCH_STRUCT_UTMP *u, char *fmt, int prnt, int fini)
 		    case 'D':
 			if (fm2[1] == '{') {
 			    char *dd, *ss;
-			    int n = 79;
+			    int n = sizeof(buf2)-1;
 
 			    for (ss = fm2 + 2, dd = buf2;
 				 n-- && *ss && *ss != '}'; ++ss, ++dd)
@@ -349,7 +349,8 @@ watchlog2(int inout, WATCH_STRUCT_UTMP *u, char *fmt, int prnt, int fini)
 		    }
 		    timet = getlogtime(u, inout);
 		    tm = localtime(&timet);
-		    len = ztrftime(buf, 40, fm2, tm, 0L);
+		    /* metafy may double the length in the worst case */
+		    len = ztrftime(buf, sizeof(buf)/2, fm2, tm, 0L);
 		    if (len > 0)
 			metafy(buf, len, META_NOALLOC);
 		    applytextattributes(TSC_RAW);
