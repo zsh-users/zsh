@@ -384,7 +384,7 @@ liitem(const char *name)
     nlcode = &nl_vals[0];
 
     for (element = (char **)nl_names; *element; element++, nlcode++) {
-	if ((!strcmp(*element, name)))
+	if (!strcmp(*element, name))
 	    return nlcode;
     }
 
@@ -395,23 +395,19 @@ liitem(const char *name)
 static HashNode
 getlanginfo(UNUSED(HashTable ht), const char *name)
 {
-    int len;
     nl_item *elem;
     char *listr, *nameu;
     Param pm = NULL;
 
     nameu = dupstring(name);
-    unmetafy(nameu, &len);
+    unmetafy(nameu, NULL);
 
     pm = (Param) hcalloc(sizeof(struct param));
-    pm->node.nam = nameu;
+    pm->node.nam = dupstring(name);
     pm->node.flags = PM_READONLY | PM_SCALAR;
     pm->gsu.s = &nullsetscalar_gsu;
 
-    if(name)
-	elem = liitem(name);
-    else
-	elem = NULL;
+    elem = liitem(nameu);
 
     if (elem && (listr = nl_langinfo(*elem))) {
 	pm->u.str = dupstring(listr);
@@ -445,7 +441,6 @@ scanlanginfo(UNUSED(HashTable ht), ScanFunc func, int flags)
 	    func(&pm->node, flags);
 	}
     }
-    
 }
 
 static struct paramdef partab[] = {
