@@ -1,5 +1,8 @@
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54561: Src/Modules/regex.c: regex: regfree on pattern where
+	regcomp failed could be undefined behavior
+
 	* 54560: Src/Modules/parameter.c: parameter: Fix some issues in
 	the parameter module
 
