@@ -1,5 +1,8 @@
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54554: Src/Modules/curses.c: curses: use setcchar in zccmd_bg
+	if available
+
 	* 54553: Src/Modules/curses.c: curses: free subwindows before
 	parents or they don't get freed at all
 
