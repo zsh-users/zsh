@@ -1,5 +1,9 @@
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54562: Doc/Zsh/mod_random.yo, Src/Modules/random.c,
+	Src/Modules/random_real.c: random: Fix some bugs in the random
+	module
+
 	* 54561: Src/Modules/regex.c: regex: regfree on pattern where
 	regcomp failed could be undefined behavior
 

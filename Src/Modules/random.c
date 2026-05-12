@@ -82,12 +82,15 @@ getrandom_buffer(void *buf, size_t len)
 		zwarn("Unable to get random data: %e.", errno);
 		return -1;
 	    }
+	    continue;
 	}
-#ifndef HAVE_ARC4RANDOM_BUF
+#ifdef HAVE_ARC4RANDOM_BUF
+    } while (0);
+#else
 	bufptr += ret;
 	val    += ret;
+    } while (val < len);
 #endif
-    } while (ret < len);
     return ret;
 }
 
@@ -110,17 +113,11 @@ get_bound_random_buffer(uint32_t *buffer, size_t count, uint32_t max)
     size_t i; /* loop counter */
 
     getrandom_buffer((void*) buffer, count*sizeof(uint32_t));
-    if (max == UINT32_MAX)
-	return;
 
     for(i=0;i<count;i++) {
 	multi_result = ((uint64_t) buffer[i]) * (uint64_t) max;
 	leftover = (uint32_t) multi_result;
 
-	/*
-	 * The following if statement should (according to Google's Gemini)
-	 * only be executed with a probability of 1/2**32 or 2.33e-10
-	 */
 	if(leftover < max) {
 	    threshold= -max % max;
 	    while (leftover < threshold) {
@@ -162,30 +159,37 @@ math_zrand_int(UNUSED(char *name), int argc, mnumber *argv, UNUSED(int id))
 {
     mnumber ret;
     uint32_t i;
-    zlong lower=0, upper=UINT32_MAX,incl=0, diff;
+    zlong lower = 0,
+	  upper = UINT32_MAX,
+	  incl = 0,
+	  diff = UINT32_MAX;
 
     ret.type = MN_INTEGER;
 
     switch (argc) {
-	case 0: ret.u.l=get_srandom(NULL);
-		return ret;
-		break;
+	case 0: incl = 1; break;
 	case 3: incl = (argv[2].u.l != 0)?1:0;
 	case 2: lower = argv[1].u.l;
 	case 1: upper = argv[0].u.l;
 	default: diff = upper-lower+incl;
     }
 
-    if (lower < 0 || lower >= UINT32_MAX) {
-	zwarn("Lower bound (%z) out of range: 0-4294967295",lower);
+    if (lower < 0 || lower > UINT32_MAX) {
+	zwarn("lower bound (%z) out of range: 0-4294967295",lower);
+	ret.u.l = 0; return ret;
     } else if (upper < lower) {
-	zwarn("Upper bound (%z) must be greater than Lower Bound (%z)",upper,lower);
-    } else if (upper < 0 || upper >= UINT32_MAX) {
-	zwarn("Upper bound (%z) out of range: 0-4294967295",upper);
+	zwarn("upper bound (%z) must be greater than lower bound (%z)",upper,lower);
+	ret.u.l = 0; return ret;
+    } else if (upper < 0 || upper > UINT32_MAX) {
+	zwarn("upper bound (%z) out of range: 0-4294967295", upper);
+	ret.u.l = 0; return ret;
     }
 
-    if ( diff == 0 ) {
+    if (diff == 0) {
 	ret.u.l=upper; /* still not convinced this shouldn't be an error. */
+    } else if (upper == UINT32_MAX && lower == 0 && incl == 1) {
+	ret.u.l = get_srandom(NULL);
+	return ret;
     } else {
 	get_bound_random_buffer(&i,1,(uint32_t) diff);
 	ret.u.l=i+lower;
@@ -253,9 +257,8 @@ setup_(UNUSED(Module m))
 	return 1;
     }
 
-    errno=0;
     if (!(S_ISCHR(st.st_mode)) ) {
-	zwarn("Error getting kernel random pool: %e.", errno);
+	zwarn("Error getting kernel random pool: /dev/urandom is not a character device");
 	return 1;
     }
 #endif /* USE_URANDOM */

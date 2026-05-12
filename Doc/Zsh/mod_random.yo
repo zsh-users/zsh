@@ -24,22 +24,24 @@ Returns a random floating point number between 0 and 1 inclusive.
 enditem()
 
 startitem()
-item(tt(zrand_int)+LPAR()tt(upper), tt(lower), tt(inclusive)RPAR()) (
-Returns a random integer between tt(lower) and tt(upper). All parameters are
-optional.  If none are specified it is equivalent to
-tt(SRANDOM).
+item(tt(zrand_int)+LPAR()var(upper), var(lower), var(inclusive)RPAR()) (
+Returns a random integer between var(lower) and var(upper). All parameters
+are optional.  If none are specified it is equivalent to tt(SRANDOM). Note
+that this is equivalent to passing the default values except that it
+is inclusive.
 
-tt(upper) is the upper bound on the resultant number and defaults to
-4,294,967,295.
+var(upper) is the upper bound on the resultant number and defaults to
+4,294,967,295. It is exclusive by default, unless var(inclusive) is passed.
 
-tt(lower) is the lower bound and defaults to 0.
+var(lower) is the lower bound and defaults to 0.
 
 The defaults of these two arguments are also the maximum and minimum to which
 either can be set.
 
-tt(inclusive) is a flag that controls whether the result is ever equal to
-tt(upper).  By default it is not. If this argument is set to a non-zero value
-then it may be.
+var(inclusive) is a flag that controls whether the var(upper) bound is
+exclusive or inclusive. Passing any non-zero value makes it inclusive,
+otherwise it is exclusive when the var(upper) bound is specified. The
+var(lower) bound is always inclusive.
 
 This is to facilitate a construct like tt($a[zrand_int+LPAR()$#a+RPAR()+1]) rather
 than tt($a[zrand_int+LPAR()$#a-1+RPAR()+1]).
@@ -50,7 +52,7 @@ be an array index range error for it to also potentially return 16 ($#a). You
 could, however, use the construct tt(zrand_int+LPAR()16,1,1+RPAR()) instead of
 adding 1 to achieve the same result, but it is more verbose.
 
-Most statistics algorithms seem to also expect 0 to tt(upper)-1, so this was
+Most statistics algorithms seem to also expect 0 to var(upper)-1, so this was
 deemed the most commonly desired case and chosen as the default.
 )
 enditem()
