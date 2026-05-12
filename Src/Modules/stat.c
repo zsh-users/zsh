@@ -191,14 +191,14 @@ static void
 stattimeprint(time_t tim, long nsecs, char *outbuf, int flags)
 {
     if (flags & STF_RAW) {
-	sprintf(outbuf, "%ld", (unsigned long)tim);
+	sprintf(outbuf, "%ld", (long)tim);
 	if (flags & STF_STRING)
 	    strcat(outbuf, " (");
     }
     if (flags & STF_STRING) {
 	char *oend = outbuf + strlen(outbuf);
-	/* Where the heck does "40" come from? */
-	ztrftime(oend, 40, timefmt, (flags & STF_GMT) ? gmtime(&tim) :
+	/* the buffer is PATH_MAX+9 long, but we already printed some stuff */
+	ztrftime(oend, PATH_MAX - DIGBUFSIZE - 10, timefmt, (flags & STF_GMT) ? gmtime(&tim) :
 			   localtime(&tim), nsecs);
 	if (flags & STF_RAW)
 	    strcat(oend, ")");
