@@ -77,7 +77,7 @@ zcond_regex_match(char **a, int id)
 	r = regcomp(&re, rhre, rcflags);
 	if (r) {
 	    zregex_regerrwarn(r, &re, "failed to compile regex");
-	    break;
+	    goto CLEAN_BASEMETA;
 	}
 	/* re.re_nsub is number of parenthesized groups, we also need
 	 * 1 for the 0 offset, which is the entire matched portion
