@@ -932,7 +932,14 @@ zccmd_bg(const char *nam, char **args)
     ZCWin w;
     char **attrs;
     int ret = 0;
+#ifdef HAVE_SETCCHAR
+    cchar_t cc;
+    wchar_t wch = L' ';
+    attr_t  bg_attrs = A_NORMAL;
+    short   bg_cp = 0;
+#else
     chtype ch = 0;
+#endif
 
     if (!args[0])
 	return 1;
@@ -945,12 +952,20 @@ zccmd_bg(const char *nam, char **args)
 
     w = (ZCWin)getdata(node);
 
-    for(attrs = args+1; *attrs; attrs++) {
+    for (attrs = args+1; *attrs; attrs++) {
 	if (strchr(*attrs, '/')) {
 	    Colorpairnode cpn;
 	    if ((cpn = zcurses_colorget(nam, *attrs)) == NULL)
 		ret = 1;
-	    else if (cpn->colorpair >= 256) {
+	    else
+#ifdef HAVE_SETCCHAR
+		bg_cp = (short)cpn->colorpair;
+	} else if (**attrs == '@') {
+	    wch = (wchar_t)(unsigned char)((*attrs)[1] == Meta
+			    ? (*attrs)[2] ^ 32
+			    : (*attrs)[1]);
+#else
+	    if (cpn->colorpair >= 256) {
 		/* pretty unlikely, but... */
 		zwarnnam(nam, "bg color pair %s has index (%d) too large (max 255)",
 			 cpn->node.nam, cpn->colorpair);
@@ -960,6 +975,7 @@ zccmd_bg(const char *nam, char **args)
 	    }
 	} else if (**attrs == '@') {
 	    ch |= (*attrs)[1] == Meta ? (*attrs)[2] ^ 32 : (*attrs)[1];
+#endif
 	} else {
 	    char *ptr;
 	    int onoff;
@@ -983,6 +999,25 @@ zccmd_bg(const char *nam, char **args)
 		zwarnnam(nam, "attribute `%s' not known", ptr);
 		ret = 1;
 	    } else {
+#ifdef HAVE_SETCCHAR
+		switch (onoff) {
+		    case ZCURSES_ATTRON:
+			bg_attrs |= zca->number;
+			break;
+		    case ZCURSES_ATTROFF:
+			bg_attrs &= ~zca->number;
+			break;
+		}
+	    }
+	}
+    }
+
+    if (ret == 0) {
+	if (setcchar(&cc, &wch, bg_attrs, bg_cp, NULL) == ERR)
+	    return 1;
+	return wbkgrnd(w->win, &cc) != OK;
+    }
+#else
 		switch(onoff) {
 		    case ZCURSES_ATTRON:
 			ch |= zca->number;
@@ -997,6 +1032,7 @@ zccmd_bg(const char *nam, char **args)
 
     if (ret == 0)
 	return wbkgd(w->win, ch) != OK;
+#endif
     return ret;
 }
 
