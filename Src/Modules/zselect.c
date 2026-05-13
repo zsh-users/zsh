@@ -47,6 +47,10 @@ handle_digits(char *nam, char *argptr, fd_set *fdset, int *fdmax)
 	return 1;
     }
     fd = (int)zstrtol(argptr, &endptr, 10);
+    if (fd < 0 || fd >= FD_SETSIZE) {
+	zwarnnam(nam, "file descriptor out of range [0-%d]: %d", FD_SETSIZE-1, fd);
+	return 1;
+    }
     if (*endptr) {
 	zwarnnam(nam, "garbage after file descriptor: %s", endptr);
 	return 1;

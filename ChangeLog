@@ -8,6 +8,9 @@
 
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54567: Src/Modules/zselect.c: zselect: don't pass fd>=FD_SETSIZE
+	to FD_SET
+
 	* 54566: Src/Modules/zpty.c: zpty: fix some issues
 
 	* 54565: Src/Modules/watch.c: watch: increase a quite tight
