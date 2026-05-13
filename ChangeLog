@@ -1,5 +1,12 @@
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54569: Src/Zle/complist.c, Src/Zle/termquery.c,
+	Src/Zle/zle_hist.c, Src/Zle/zle_keymap.c, Src/Zle/zle_main.c,
+	Src/Zle/zle_misc.c, Src/Zle/zle_move.c, Src/Zle/zle_params.c,
+	Src/Zle/zle_refresh.c, Src/Zle/zle_thingy.c, Src/Zle/zle_tricky.c,
+	Src/Zle/zle_utils.c, Src/Zle/zle_vi.c, Src/Zle/zle_word.c: zle:
+	various issues
+
 	* 54568: Doc/Zsh/mod_zutil.yo, Src/Modules/zutil.c: zformat:
 	fix some misparse and overrun issues
 

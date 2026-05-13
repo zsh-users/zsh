@@ -989,7 +989,7 @@ bin_bindkey_meta(char *name, char *kmname, Keymap km, UNUSED(char **argv), UNUSE
 
 /* Change key bindings.  func can be:              *
  *   'r'  bind sequences to undefined-key          *
- *   's'  bind sequneces to specified send-strings *
+ *   's'  bind sequences to specified send-strings *
  *   0    bind sequences to specified functions    *
  * If the -R option is used, bind to key ranges    *
  * instead of single key sequences.                */
@@ -1675,8 +1675,8 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
 	    if (keybuf[keybuflen - 1] == '\007' || /* BEL sometimes used */
 		(keybuf[keybuflen - 2] == '\033' &&
 		 keybuf[keybuflen - 1] == '\\') ||
-		(keybuf[keybuflen - 2] == Meta && /* ST can be 0x9b */
-		 (unsigned char) keybuf[keybuflen - 1] == (0x9b ^ 32)))
+		(keybuf[keybuflen - 2] == Meta && /* ST can be 0x9c */
+		 (unsigned char) keybuf[keybuflen - 1] == (0x9c ^ 32)))
 	    {
 		keybuflen = oscdcs - 2; /* discard */
 		timeout = oscdcs = 0;

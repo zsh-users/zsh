@@ -2251,7 +2251,7 @@ inststrlen(char *str, int move, int len)
 	free(zlestr);
 	zsfree(instr);
 	if (move)
-	    zlecs += len;
+	    zlecs += zlelen;
     }
     return len;
 }
@@ -2884,6 +2884,7 @@ magicspace(char **args)
     ZLE_STRING_T bangq;
     ZLE_CHAR_T zlebangchar[1];
     int ret;
+    int bangq_off;
 #ifdef MULTIBYTE_SUPPORT
     mbstate_t mbs;
 #endif
@@ -2910,8 +2911,12 @@ magicspace(char **args)
 	    break;
     }
 
+    /* selfinsert can call spaceinline which can realloc zleline, we can't
+     * use the bangq pointer after that */
+    bangq_off = (bangq < zleline + zlell) ? (int)(bangq - zleline) : -1;  
+
     if (!(ret = selfinsert(args)) &&
-	(!bangq || bangq + 2 > zleline + zlecs))
+	(bangq_off < 0 || bangq_off + 2 > zlecs))
 	doexpandhist();
     return ret;
 }
@@ -2929,7 +2934,7 @@ static int cmdwb, cmdwe;
 
 /**/
 static char *
-getcurcmd(void)
+getcurcmd(int trackpos)
 {
     int curlincmd;
     char *s = NULL;
@@ -2957,6 +2962,17 @@ getcurcmd(void)
     strinend();
     inpop();
     errflag &= ~ERRFLAG_ERROR;
+    if (s && trackpos) {
+	/* cmdwb and cmdwe are indices in zlemetaline, but we need indices
+	 * into zleline, so do a little trick: use cmdwe as the length and
+	 * cmdwb as the 'cursor position', this gives us both conversions
+	 * in a single call to stringaszleline */
+	char *prefix = zalloc(cmdwe + 1);
+	memcpy(prefix, zlemetaline, cmdwe);
+	prefix[cmdwe] = '\0';
+	free(stringaszleline(prefix, cmdwb, &cmdwe, NULL, &cmdwb));
+	free(prefix);
+    }
     unmetafy_line();
     zcontext_restore();
 
@@ -2974,7 +2990,7 @@ processcmd(UNUSED(char **args))
     int m = zmult, na = noaliases;
 
     noaliases = 1;
-    s = getcurcmd();
+    s = getcurcmd(0);
     noaliases = na;
     if (!s)
 	return 1;
@@ -3005,7 +3021,7 @@ expandcmdpath(UNUSED(char **args))
     ZLE_STRING_T zlestr;
 
     noaliases = 1;
-    s = getcurcmd();
+    s = getcurcmd(1);
     noaliases = na;
     if (!s)
 	return 1;
@@ -3026,8 +3042,8 @@ expandcmdpath(UNUSED(char **args))
     ZS_strncpy(zleline + zlecs, zlestr, strll);
     free(zlestr);
     zlecs = oldcs;
-    if (zlecs >= cmdwe - 1)
-	zlecs += cmdwe - cmdwb + strlen(str);
+    if (zlecs >= cmdwb)
+	zlecs += strll - (cmdwe - cmdwb);
     if (zlecs > zlell)
 	zlecs = zlell;
     return 0;

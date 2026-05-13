@@ -402,7 +402,7 @@ bin_zle_list(UNUSED(char *name), char **args, Options ops, UNUSED(char func))
 
 	for (; *args && !ret; args++) {
 	    HashNode hn = thingytab->getnode2(thingytab, *args);
-	    if (!(t = (Thingy) hn) ||
+	    if (!(t = (Thingy) hn) || !t->widget ||
 		(!OPT_ISSET(ops,'a') && (t->widget->flags & WIDGET_INT)))
 		ret = 1;
 	    else if (OPT_ISSET(ops,'L')) {
@@ -704,7 +704,7 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 {
     Thingy t;
     struct modifier modsave = zmod;
-    int ret, saveflag = 0, setbindk = 0, setlbindk = 0, remetafy;
+    int ret = 1, saveflag = 0, setbindk = 0, setlbindk = 0, remetafy;
     char *wname = *args++, *keymap_restore = NULL, *keymap_tmp;
 
     if (!wname)
@@ -739,9 +739,7 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 		flag = args[0][1] ? args[0]+1 : args[1];
 		if (flag == NULL || strcmp(flag, "nolast")) {
 		    zwarnnam(name, "%s", "'nolast' expected after -f");
-		    if (remetafy)
-			metafy_line();
-		    return 1;
+		    goto cleanup_zle_call;
 		}
 		if (!args[0][1])
 		    *++args = skip_this_arg;
@@ -752,9 +750,7 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 		num = args[0][1] ? args[0]+1 : args[1];
 		if (!num) {
 		    zwarnnam(name, "number expected after -%c", **args);
-		    if (remetafy)
-			metafy_line();
-		    return 1;
+		    goto cleanup_zle_call;
 		}
 		if (!args[0][1])
 		    *++args = skip_this_arg;
@@ -771,17 +767,13 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 		keymap_tmp = args[0][1] ? args[0]+1 : args[1];
 		if (!keymap_tmp) {
 		    zwarnnam(name, "keymap expected after -%c", **args);
-		    if (remetafy)
-			metafy_line();
-		    return 1;
+		    goto cleanup_zle_call;
 		}
 		if (!args[0][1])
 		    *++args = skip_this_arg;
 		keymap_restore = dupstring(curkeymapname);
 		if (selectkeymap(keymap_tmp, 0)) {
-		    if (remetafy)
-			metafy_line();
-		    return 1;
+		    goto cleanup_zle_call;
 		}
 		break;
 	    case 'w':
@@ -789,9 +781,7 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 		break;
 	    default:
 		zwarnnam(name, "unknown option: %s", *args);
-		if (remetafy)
-		    metafy_line();
-		return 1;
+		goto cleanup_zle_call;
 	    }
 	}
 	args++;
@@ -805,6 +795,7 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
     setlbindk |= t->widget && (t->widget->flags & ZLE_NOLAST) == ZLE_NOLAST;
     ret = execzlefunc(t, args, setbindk, setlbindk);
     unrefthingy(t);
+cleanup_zle_call:
     if (saveflag)
 	zmod = modsave;
     if (keymap_restore)
@@ -1014,7 +1005,7 @@ bin_zle_transform(char *name, char **args, Options ops, UNUSED(char func))
 }
 
 /*******************/
-/* initialiasation */
+/* initialisation */
 /*******************/
 
 /**/

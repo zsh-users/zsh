@@ -754,6 +754,14 @@ unset_killring(Param pm, int exp)
 static void
 set_register(Param pm, char *value)
 {
+    set_register_buf(pm, value);
+    zsfree(value);
+}
+
+/**/
+static void
+set_register_buf(Param pm, char *value)
+{
     int n = 0;
     int offset = -1;
     Cutbuffer vbuf;
@@ -771,8 +779,12 @@ set_register(Param pm, char *value)
     }
 
     vbuf = &vibuf[*pm->node.nam - offset];
+    if (vbuf->buf)
+	free(vbuf->buf);
     if (*value)
 	vbuf->buf = stringaszleline(value, 0, &n, NULL, NULL);
+    else
+	vbuf->buf = NULL;
     vbuf->len = n;
 }
 
@@ -780,7 +792,7 @@ set_register(Param pm, char *value)
 static void
 unset_register(Param pm, UNUSED(int exp))
 {
-    set_register(pm, "");
+    set_register_buf(pm, "");
 }
 
 /**/
@@ -850,7 +862,7 @@ set_registers(Param pm, HashTable ht)
             v.arr = NULL;
             v.pm = (Param) hn;
 
-	    set_register(v.pm, getstrvalue(&v));
+	    set_register_buf(v.pm, getstrvalue(&v));
         }
     if (ht != pm->u.hash)
 	deleteparamtable(ht);
@@ -948,20 +960,16 @@ get_context(UNUSED(Param pm))
     switch (zlecontext) {
     case ZLCON_LINE_CONT:
 	return "cont";
-	break;
 
     case ZLCON_SELECT:
 	return "select";
-	break;
 
     case ZLCON_VARED:
 	return "vared";
-	break;
 
     case ZLCON_LINE_START:
     default:
 	return "start";
-	break;
     }
 }
 

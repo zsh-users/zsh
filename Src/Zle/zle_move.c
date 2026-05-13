@@ -274,7 +274,7 @@ backwardmetafiedchar(char *start, char *endptr, convchar_t *retchr)
      */
 #endif
     if (endptr > start) {
-	if (endptr > start - 1 && endptr[-2] == Meta)
+	if (endptr > start + 1 && endptr[-2] == Meta)
 	{
 	    if (retchr)
 		*retchr = (convchar_t)(endptr[-1] ^ 32);
@@ -642,6 +642,8 @@ vimatchbracket(UNUSED(char **args))
 	    DECCS();
 	else
 	    INCCS();
+	if (zlecs < 0 && zlecs >= zlell)
+	    break;
 	if (zleline[zlecs] == oth)
 	    ct--;
 	else if (zleline[zlecs] == me)

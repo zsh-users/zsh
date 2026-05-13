@@ -539,7 +539,7 @@ historysearchforward(char **args)
 		;
 	    if (histpos < zlell)
 		histpos++;
-	    CCRIGHT();
+	    CCRIGHTPOS(histpos);
 	    srch_str = zlelineasstring(zleline, histpos, 0, NULL, NULL, 0);
 	}
 	free(line);

@@ -361,7 +361,7 @@ viinsert(UNUSED(char **args))
 
 /*
  * Go to vi insert mode when we first start the line editor.
- * Iniialises some other stuff.
+ * Initialises some other stuff.
  */
 
 /**/
@@ -837,11 +837,12 @@ viindent(UNUSED(char **args))
     }
     oldcs = zlecs;
     /* add a tab to the beginning of each line within range */
-    while (zlecs <= c2 + 1) {
+    while (zlecs <= c2) {
 	if (zleline[zlecs] == '\n') { /* leave blank lines alone */
 	    ++zlecs;
 	} else {
 	    spaceinline(1);
+	    c2++;
 	    zleline[zlecs] = '\t';
 	    zlecs = findeol() + 1;
 	}
@@ -874,8 +875,10 @@ viunindent(UNUSED(char **args))
     oldcs = zlecs;
     /* remove a tab from the beginning of each line within range */
     while (zlecs < c2) {
-	if (zleline[zlecs] == '\t')
+	if (zleline[zlecs] == '\t') {
 	    foredel(1, 0);
+	    c2--;
+	}
 	zlecs = findeol() + 1;
     }
     /* go back to the first line of the range */
@@ -1002,11 +1005,12 @@ viswapcase(UNUSED(char **args))
 int
 vicapslockpanic(UNUSED(char **args))
 {
+    ZLE_INT_T ch;
     clearlist = 1;
     zbeep();
     statusline = "press a lowercase key to continue";
     zrefresh();
-    while (!ZC_ilower(getfullchar(0)));
+    while (!ZC_ilower(ch = getfullchar(0)) && ch != ZLEEOF);
     statusline = NULL;
     return 0;
 }

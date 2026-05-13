@@ -755,7 +755,7 @@ prompt_markers(void)
     static const char PR[] = "\033]133;P;k=i\033\\";   /* primary (PS1) */
     static const char SE[] = "\033]133;P;k=s\033\\";   /* secondary (PS2) */
     static const char RI[] = "\033]133;P;k=r\033\\";   /* right (RPS1,2) */
-    static const char *markers[] = { PR, SE, RI };
+    static const char *markers[] = { pre, PR, SE, RI };
     static const char *nomark[] = { NULL, NULL, NULL, NULL };
 
     if (!extension_enabled("integration", "prompt", 11, 1))
@@ -934,7 +934,7 @@ free_cursor_forms(void)
 void
 cursor_form(void)
 {
-    char seq[31];
+    char seq[32];
     char *s = seq;
     unsigned int want, changed;
     static unsigned int state = CURF_DEFAULT;

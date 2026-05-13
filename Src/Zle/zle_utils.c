@@ -68,21 +68,24 @@ sizeline(int sz)
 {
     int cursz = (zlemetaline != NULL) ? metalinesz : linesz;
 
+    if (cursz >= sz)
+	return;
+
     while (sz > cursz) {
 	if (cursz < 256)
 	    cursz = 256;
 	else
 	    cursz *= 4;
+    }
 
-	if (zlemetaline != NULL) {
-	    /* One spare character for the NULL */
-	    zlemetaline = realloc(zlemetaline, cursz + 1);
-	} else {
-	    /* One spare character for the NULL, one for the newline */
-	    zleline =
-		(ZLE_STRING_T)realloc(zleline,
-				      (cursz + 2) * ZLE_CHAR_SIZE);
-	}
+    if (zlemetaline != NULL) {
+	/* One spare character for the NULL */
+	zlemetaline = realloc(zlemetaline, cursz + 1);
+    } else {
+	/* One spare character for the NULL, one for the newline */
+	zleline =
+	    (ZLE_STRING_T)realloc(zleline,
+				  (cursz + 2) * ZLE_CHAR_SIZE);
     }
 
     if (zlemetaline != NULL)
@@ -367,7 +370,8 @@ zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outllp,
  *
  * Memory for the returned string is permanently allocated.  *outsz may
  * be longer than the *outll returned.  Hence it should be freed with
- * zfree(outstr, *outsz) or free(outstr), not zfree(outstr, *outll).
+ * zfree(outstr, (*outsz + 2) * ZLE_CHAR_SIZE) or free(outstr),
+ * not zfree(outstr, *outll).
  */
 
 /**/
@@ -572,6 +576,7 @@ free_region_highlights_memos(void)
 	 rhp < region_highlights + n_region_highlights;
 	 rhp++) {
 	zfree((char*) rhp->memo, 0);
+	rhp->memo = NULL;
     }
 }
 
@@ -701,8 +706,8 @@ zle_restore_positions(void)
 	     oldrhp;
 	     nreg++, oldrhp = oldrhp->next)
 	    ;
+	free_region_highlights_memos();
 	if (nreg + N_SPECIAL_HIGHLIGHTS != n_region_highlights) {
-	    free_region_highlights_memos();
 	    n_region_highlights = nreg + N_SPECIAL_HIGHLIGHTS;
 	    region_highlights = (struct region_highlight *)
 		zrealloc(region_highlights,
@@ -754,6 +759,7 @@ zle_free_positions(void)
     oldrhp = oldpos->regions;
     while (oldrhp) {
 	struct zle_region *nextrhp = oldrhp->next;
+	zsfree((char *)oldrhp->memo);
 	zfree(oldrhp, sizeof(*oldrhp));
 	oldrhp = nextrhp;
     }
@@ -1108,7 +1114,7 @@ foredel(int ct, int flags)
     if (flags & CUT_RAW) {
 	if (zlemetaline != NULL) {
 	    shiftchars(zlemetacs, ct);
-	} else if (flags & CUT_RAW) {
+	} else {
 	    shiftchars(zlecs, ct);
 	    CCRIGHT();
 	}

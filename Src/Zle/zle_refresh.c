@@ -40,7 +40,7 @@
  * nmw_ind is the next free element, i.e. nmwbuf[nmw_ind] will be the next
  * element to be written (we never insert into omwbuf).  We initialise
  * nmw_ind to 1 to avoid the index stored in the character looking like a
- * NULL.  This wastees a word but it's safer than messing with pointers.
+ * NULL.  This wastes a word but it's safer than messing with pointers.
  *
  * The layout of the buffer is as a string of entries that consist of multiple
  * elements of the allocated array with no boundary (the code keeps track of
@@ -492,12 +492,12 @@ set_region_highlight(UNUSED(Param pm), char **aval)
     struct region_highlight *rhp;
 
     len = aval ? arrlen(aval) : 0;
+    free_region_highlights_memos();
     if (n_region_highlights != len + N_SPECIAL_HIGHLIGHTS) {
 	/* no null termination, but include special highlighting at start */
 	int newsize = len + N_SPECIAL_HIGHLIGHTS;
 	int diffsize = newsize - n_region_highlights;
 
-	free_region_highlights_memos();
 	region_highlights = (struct region_highlight *)
 	    zrealloc(region_highlights,
 		     sizeof(struct region_highlight) * newsize);
@@ -688,7 +688,7 @@ static int more_start,		/* more text before start of screen?	    */
 static int
     omw_size,			/* allocated size of omwbuf */
     nmw_size,			/* allocated size of nmwbuf */
-    nmw_ind;			/* next insert point in nmw_ind */
+    nmw_ind;			/* next insert point in nmwbuf */
 #endif
 
 /*
@@ -1491,7 +1491,7 @@ zrefresh(void)
 	     */
 	    snextline(&rpms);
 	}
-	zfree(outputline, outsz);
+	zfree(outputline, (outsz+2) * ZLE_CHAR_SIZE);
 	free(statusdup);
     }
     *rpms.s = zr_zr;
@@ -1556,7 +1556,7 @@ zrefresh(void)
 	 * Ensure we don't start overwriting in the middle of a wide
 	 * character.
 	 */
-	while(rpms.sen > nbuf[rpms.tosln - 1] && rpms.sen->chr == WEOF) {
+	while(rpms.sen > nbuf[rpms.tosln] && rpms.sen->chr == WEOF) {
 	    extra_ellipsis++;
 	    rpms.sen--;
 	}
@@ -2452,7 +2452,7 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 
     for (t0 = 0; t0 < tmpll; t0++) {
 	unsigned ireg;
-	zattr base_attr = mixattrs(default_attr, default_attr, prompt_attr);
+	zattr base_attr = mixattrs(default_attr, default_mask, prompt_attr);
 	zattr all_attr;
 	struct region_highlight *rhp;
 	/*

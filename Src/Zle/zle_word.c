@@ -356,7 +356,7 @@ vibackwardwordend(char **args)
 	zmult = n;
 	return ret;
     }
-    while (n-- && zlecs > 1) {
+    while (n-- && zlecs) {
 	int cc = wordclass(zleline[zlecs]);
 	DECCS();
 	while (zlecs) {

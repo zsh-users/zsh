@@ -2244,7 +2244,7 @@ setmstatus(char *status, char *sline, int sll, int scs,
         strcpy(status, "interactive: ");
         if (pl > h - 3) {
             strcat(status, "...");
-            strcat(status, p + pl - h - 3);
+            strcat(status, p + pl - h + 3);
         } else
             strcat(status, p);
 

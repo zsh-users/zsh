@@ -1272,10 +1272,10 @@ zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
     raw_lp = lp;
     txtcurrentattrs = txtpendingattrs = txtunknownattrs = 0;
     lpromptbuf = promptexpand(lp ? *lp : NULL, 1,
-	    markers[flags == ZLCON_LINE_CONT ? 2 : 1], NULL, NULL);
+	    markers[context == ZLCON_LINE_CONT ? 2 : 1], NULL, NULL);
     pmpt_attr = txtcurrentattrs;
     raw_rp = rp;
-    rpromptbuf = promptexpand(rp ? *rp : NULL, 1, markers[2], NULL, NULL);
+    rpromptbuf = promptexpand(rp ? *rp : NULL, 1, markers[3], NULL, NULL);
     rpmpt_attr = txtcurrentattrs;
     prompt_attr = mixattrs(pmpt_attr, pmpt_attr & TXT_ATTR_ALL, rpmpt_attr);
     free_prepostdisplay();
@@ -2022,7 +2022,8 @@ reexpandprompt(void)
 	    looping = reexpanding;
 
 	    txtcurrentattrs = txtpendingattrs = txtunknownattrs = 0;
-	    new_lprompt = promptexpand(raw_lp ? *raw_lp : NULL, 1, markers[0], NULL, NULL);
+	    new_lprompt = promptexpand(raw_lp ? *raw_lp : NULL, 1,
+		    markers[zlecontext == ZLCON_LINE_CONT ? 2 : 1], NULL, NULL);
 	    pmpt_attr = txtcurrentattrs;
 	    free(lpromptbuf);
 	    lpromptbuf = new_lprompt;
@@ -2030,7 +2031,7 @@ reexpandprompt(void)
 	    if (looping != reexpanding)
 		continue;
 
-	    new_rprompt = promptexpand(raw_rp ? *raw_rp : NULL, 1, markers[2], NULL, NULL);
+	    new_rprompt = promptexpand(raw_rp ? *raw_rp : NULL, 1, markers[3], NULL, NULL);
 	    rpmpt_attr = txtcurrentattrs;
 	    prompt_attr = mixattrs(pmpt_attr, pmpt_attr & TXT_ATTR_ALL, rpmpt_attr);
 	    free(rpromptbuf);
@@ -2051,7 +2052,7 @@ resetprompt(UNUSED(char **args))
     return redisplay(NULL);
 }
 
-/* same bug called from outside zle */
+/* same but called from outside zle */
 
 /**/
 static void

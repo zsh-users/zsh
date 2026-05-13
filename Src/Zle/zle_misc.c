@@ -76,7 +76,7 @@ doinsert(ZLE_STRING_T zstr, int len)
 	count = len * m;
 #endif
 	/*
-	 * Ensure we replace a complete combining characterfor each
+	 * Ensure we replace a complete combining character for each
 	 * character we overwrite. Switch to inserting at first newline.
 	 */
 	for (i = count; pos < zlell && zleline[pos] != ZWC('\n') && i--; ) {
@@ -626,6 +626,7 @@ viputbefore(UNUSED(char **args))
 	kct = -1;
 	yankcs = zlecs;
 	pastebuf(&kbuf, n, 0);
+	free(kbuf.buf);
 	return 0;
     } else if (zmod.flags & MOD_VIBUF)
 	kctbuf = &vibuf[zmod.vibuf];
@@ -662,6 +663,7 @@ viputafter(UNUSED(char **args))
 	kct = -1;
 	yankcs = zlecs;
 	pastebuf(&kbuf, n, 1);
+	free(kbuf.buf);
 	return 0;
     } else if (zmod.flags & MOD_VIBUF)
 	kctbuf = &vibuf[zmod.vibuf];
@@ -684,9 +686,11 @@ putreplaceselection(UNUSED(char **args))
     Cutbuffer putbuf;
     int clear = 0;
     int pos = 2;
+    int isvibuf;
 
     if (invicmdmode())
 	startvichange(-1);
+    isvibuf = zmod.flags & MOD_VIBUF;
     if (n < 0 || zmod.flags & MOD_NULL)
 	return 1;
     if (zmod.flags & MOD_OSSEL) {
@@ -697,8 +701,9 @@ putreplaceselection(UNUSED(char **args))
         prevbuf.buf = stringaszleline(pbuf, 0, &x, NULL, NULL);
         prevbuf.len = x;
         prevbuf.flags = 0;
+	clear = 1; /* stringaszleline returns permanent memory */
     } else {
-	putbuf = (zmod.flags & MOD_VIBUF) ? &vibuf[zmod.vibuf] : &cutbuf;
+	putbuf = isvibuf ? &vibuf[zmod.vibuf] : &cutbuf;
 	if (!putbuf->buf)
 	    return 1;
 	memcpy(&prevbuf, putbuf, sizeof(prevbuf));
@@ -706,6 +711,14 @@ putreplaceselection(UNUSED(char **args))
 	/* if "9 was specified, prevent killregion from freeing it */
 	if (zmod.vibuf == 35) {
 	    putbuf->buf = 0;
+	    clear = 1;
+	} else if (!isvibuf) {
+	    /* when putbuf is pointing at cutbuf, we can't clear putbuf->buf
+	     * because that's where we want to put the stuff, but valgrind will be
+	     * quite sad if killregion reallocs it, so I think we need to copy it */
+	    ZLE_STRING_T newbuf = (ZLE_STRING_T)zalloc(prevbuf.len * ZLE_CHAR_SIZE);
+	    ZS_memcpy(newbuf, prevbuf.buf, prevbuf.len);
+	    prevbuf.buf = newbuf;
 	    clear = 1;
 	}
     }
@@ -792,7 +805,7 @@ bracketedstring(void)
     int next, timeout;
 
     while (endesc[endpos]) {
-	if (current + 1 >= psize)
+	if (current + 2 >= psize)
 	    pbuf = zrealloc(pbuf, psize *= 2);
 	if ((next = getbyte(1L, &timeout, 1)) == EOF)
 	    break;
