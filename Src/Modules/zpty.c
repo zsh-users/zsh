@@ -292,6 +292,7 @@ get_pty(int master, int *retfd)
 		}
 	    }
 	}
+	return 1; /* don't try to open a slave if we got no master */
     }
     name[5] = 't';
     if ((sfd = open(name, O_RDWR|O_NOCTTY)) >= 0) {
@@ -436,12 +437,15 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 	zexit(lastval, ZEXIT_NORMAL);
     }
 #ifndef USE_CYGWIN_FIX
-    master = movefd(master);
-    if (master == -1) {
-	zerrnam(nam, "cannot duplicate fd %d: %e", master, errno);
-	scriptname = oscriptname;
-	ineval = oineval;
-	return 1;
+    {
+	int orig_master = master;
+	master = movefd(master);
+	if (master == -1) {
+	    zerrnam(nam, "cannot duplicate fd %d: %e", orig_master, errno);
+	    scriptname = oscriptname;
+	    ineval = oineval;
+	    return 1;
+	}
     }
 #else
     addmodulefd(master, FDT_INTERNAL);
@@ -529,7 +533,7 @@ deleteallptycmds(void)
 static void
 checkptycmd(Ptycmd cmd)
 {
-    char c;
+    unsigned char c;
     int r;
 
     if (cmd->read != -1 || cmd->fin)
@@ -581,14 +585,19 @@ ptyread(char *nam, Ptycmd cmd, char **args, int noblock, int mustmatch)
 	buf = (char *) zhalloc((blen = 256) + 1);
     }
     if (cmd->read != -1) {
-	buf[used] = (char) cmd->read;
-	buf[used + 1] = '\0';
-	seen = used = 1;
+	int readchar = cmd->read;
 	cmd->read = -1;
+	if (imeta(readchar)) {
+	    buf[used++] = Meta;
+	    buf[used++] = (char) (readchar ^ 32);
+	} else
+	    buf[used++] = (char) readchar;
+	buf[used] = '\0';
+	seen = 1;
     }
     do {
 	if (noblock && cmd->read == -1) {
-	    int pollret;
+	    int pollret = -1;
 	    /*
 	     * Check there is data available.  Borrowed from
 	     * poll_read() in utils.c and simplified.
@@ -604,6 +613,7 @@ ptyread(char *nam, Ptycmd cmd, char **args, int noblock, int mustmatch)
 			 (SELECT_ARG_2_T) &foofd, NULL, NULL, &expire_tv);
 #else
 #ifdef FIONREAD
+	    int val;
 	    if (ioctl(cmd->fd, FIONREAD, (char *) &val) == 0)
 		pollret = (val > 0);
 #endif
@@ -617,9 +627,13 @@ ptyread(char *nam, Ptycmd cmd, char **args, int noblock, int mustmatch)
 		 * character.  cmd->read stores the character read.
 		 */
 		long mode;
+		unsigned char c;
 
-		if (setblock_fd(0, cmd->fd, &mode))
-		    pollret = read(cmd->fd, &cmd->read, 1);
+		if (setblock_fd(0, cmd->fd, &mode)) {
+		    pollret = read(cmd->fd, &c, 1);
+		    if (pollret == 1)
+			cmd->read = (int) c;
+		}
 		if (mode != -1)
 		    fcntl(cmd->fd, F_SETFL, mode);
 	    }
@@ -688,8 +702,10 @@ ptyread(char *nam, Ptycmd cmd, char **args, int noblock, int mustmatch)
 #endif
 #endif
 	) {
-	cmd->old = (char *) zalloc(cmd->olen = used);
-	memcpy(cmd->old, buf, cmd->olen);
+	if (used) {
+	    cmd->old = (char *) zalloc(cmd->olen = used);
+	    memcpy(cmd->old, buf, cmd->olen);
+	}
 	if (prog)
 	    freepatprog(prog);
 
