@@ -8,6 +8,9 @@
 
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54568: Doc/Zsh/mod_zutil.yo, Src/Modules/zutil.c: zformat:
+	fix some misparse and overrun issues
+
 	* 54567: Src/Modules/zselect.c: zselect: don't pass fd>=FD_SETSIZE
 	to FD_SET
 
