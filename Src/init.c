@@ -127,7 +127,7 @@ loop(int toplevel, int justonce)
 	if (isset(SHINSTDIN)) {
 	    setblock_stdin();
 	    if (interact && toplevel) {
-	        int hstop = stophist;
+	        int hstop = stophist, q;
 		stophist = 3;
 		/*
 		 * Reset all errors including the interrupt error status
@@ -136,6 +136,9 @@ loop(int toplevel, int justonce)
 		 * precaution to ensure we get back to the command line
 		 * no matter what.
 		 */
+		q = queue_signal_level();
+		dont_queue_signals();
+		restore_queue_signals(q);
 		errflag = 0;
 		preprompt();
 		if (stophist != 3)
