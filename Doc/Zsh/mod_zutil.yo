@@ -178,7 +178,7 @@ can be achieved by giving a negative minimum field width.  If a maximum
 field width is specified, the var(string) will be truncated after that
 many characters.  After all `tt(%)' sequences for the given var(spec)s
 have been processed, the resulting string is stored in the parameter
-var(param).
+var(param).  The sequence `tt(%%)' can be used to produce a literal tt(%).
 
 The tt(%)-escapes also understand ternary expressions in the form used by
 prompts.  The tt(%) is followed by a `tt(LPAR())' and then an ordinary

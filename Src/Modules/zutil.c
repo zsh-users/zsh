@@ -880,10 +880,10 @@ static char *zformat_substring(char* instr, char **specs, char **outp,
 		 * vice versa... unless we are already skipping.
 		 */
 		if (!(s = zformat_substring(s+1, specs, outp, ousedp,
-			    olenp, endcharl, presence, skip || actval)))
+			    olenp, endcharl, presence, skip || actval)) || !*s)
 		    return NULL;
 		if (!(s = zformat_substring(s+1, specs, outp, ousedp,
-			    olenp, ')', presence, skip || !actval)))
+			    olenp, ')', presence, skip || !actval)) || !*s)
 		    return NULL;
 	    } else if (skip) {
 		continue;
@@ -978,6 +978,7 @@ bin_zformat(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    /* Parse the specs in argv. */
 	    for (ap = args + 2; *ap; ap++) {
 		if (!ap[0][0] || ap[0][0] == '-' || ap[0][0] == '.' ||
+		    ap[0][0] == '%' || ap[0][0] == ')' ||
 		    idigit(ap[0][0]) || ap[0][1] != ':') {
 		    zwarnnam(nam, "invalid argument: %s", *ap);
 		    return 1;
@@ -986,8 +987,11 @@ bin_zformat(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    }
 	    out = (char *) zhalloc(olen = 128);
 
-	    zformat_substring(args[1], specs, &out, &oused, &olen, '\0',
-		    presence, 0);
+	    if (!zformat_substring(args[1], specs, &out, &oused, &olen, '\0',
+			presence, 0)) {
+		zwarnnam(nam, "malformed format string");
+		return 1;
+	    }
 	    out[oused] = '\0';
 
 	    setsparam(args[0], ztrdup(out));
