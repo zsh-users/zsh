@@ -8,6 +8,9 @@
 
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54525: Src/init.c: interrupt during redirect to fifo doesn't
+	run precmd
+
 	* 54568: Doc/Zsh/mod_zutil.yo, Src/Modules/zutil.c: zformat:
 	fix some misparse and overrun issues
 
