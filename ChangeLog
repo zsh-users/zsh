@@ -1,5 +1,8 @@
 2026-05-18  Oliver Kiddle  <opk@zsh.org>
 
+	* github #172: gi1242: Completion/X/Command/_sioyek: Completion
+	for "sioyek" (PDF viewer)
+
 	* unposted: Completion/Unix/Command/_init_d: complete network
 	interfaces for the netif service given new workings for jails
 
