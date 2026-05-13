@@ -8,6 +8,8 @@
 
 2026-05-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54566: Src/Modules/zpty.c: zpty: fix some issues
+
 	* 54565: Src/Modules/watch.c: watch: increase a quite tight
 	bound on format length
 
