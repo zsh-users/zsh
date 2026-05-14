@@ -9,6 +9,7 @@ _arguments -s -S \
   '(H -f --first-ttl)'{-f+,--first-ttl=}'[specify TTL to start]:TTL [1]' \
   '(H -m --max-ttl)'{-m+,--max-ttl=}'[specify maximum number of hops to probe]:hops [30]' \
   '(H -U --max-unknown)'{-U+,--max-unknown=}'[specify maximum unknown hosts]:maximum [5]' \
+  '(H -E --max-display-path)'{-E+,--max-display-path=}'[specify maximum number of ECMP paths to display]:ECMP paths [8]' \
   '(H -P --port)'{-P+,--port=}'[specify target port for TCP, SCTP or UDP]:port' \
   '(H -L --localport -T --tcp -S --sctp)'{-L+,--localport=}'[specify source port number for UDP]' \
   '(H -s --psize 2)'{-s+,--psize=}'[packet size]:packet size (bytes)' \
@@ -41,6 +42,8 @@ _arguments -s -S \
     "I[interarrival jitter]"' \
   '(H -z --aslookup -y --ipinfo)'{-y+,--ipinfo=}'[select IP information in output]:information:((0\:display\ AS\ number 1\:display\ IP\ prefix 2\:display\ country\ code 3\:display\ RIR 4\:display\ allocation\ date))' \
   '(H -y --ipinfo -z --aslookup)'{-z,--aslookup}'[display AS number]' \
+  '(H)--ipinfo_provider4=[specify provider for IPv4 AS lookups]:domain [origin.asn.cymru.com]' \
+  '(H)--ipinfo_provider6=[specify provider for IPv6 AS lookups]:domain [origin6.asn.cymru.com]' \
   '(H)1:destination host:_hosts' \
   '(H)2:packet size (bytes)' \
   + '(H)' \

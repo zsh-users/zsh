@@ -17,7 +17,6 @@ _arguments -s -S $args \
   '(-I --fineta -F --format)'{-I,--fineta}'[show absolute estimated time of arrival]' \
   '(-r --rate -F --format)'{-r,--rate}'[show data transfer rate counter]' \
   '(-a --average-rate -F --format)'{-a,--average-rate}'[show data transfer average rate counter]' \
-  '(-m --average-rate-window)'{-m+,--average-rate-window=}'[compute average rate over period]:duration (seconds) [30]' \
   '(-b --bytes -8 --bits -F --format)'{-b,--bytes}'[show number of bytes transferred]' \
   '(-8 --bits -b --bytes -F --format)'{-8,--bits}'[show number of bits transferred]' \
   '(-k --si)'{-k,--si}'[treat suffixes as multiples of 1000 rather than 1024]' \
@@ -33,10 +32,11 @@ _arguments -s -S $args \
   '(-l --line-mode -R --remote)'{-l,--line-mode}'[count lines instead of bytes]' \
   '(-0 --null -l --line-mode)'{-0,--null}'[lines are null-terminated]' \
   '(-i --interval)'{-i+,--interval=}'[update every after specified interval]:interval (seconds) [1]' \
-  '(-m --average-rate-window)'{-m,--average-rate-window}'[compute average rate over past period]:period (seconds) [30]' \
+  '(-m --average-rate-window)'{-m,--average-rate-window}'[compute average rate over period]:period (seconds) [30]' \
   '(-w --width)'{-w+,--width}'[assume terminal is specified characters wide]:width' \
   '(-H --height)'{-H+,--height=}'[assume terminal is specified rows high]:height' \
   '(-N --name)'{-N+,--name=}'[prefix visual information with given name]:name' \
+  '(-u --bar-style)'{-u+,--bar-style=}'[set default bar style]:name [plain]:(plain block granular shaded)' \
   '(-x --extra-display)'{-x+,--extra-display=}'[also send progress to destination]:destination:_sequence - compadd windowtitle processtitle' \
   '(-v --stats)'{-v,--stats}'[output transfer statistics at the end]' \
   '(-f --force -R --remote)'{-f,--force}'[output even if standard error is not a terminal]' \
@@ -70,6 +70,8 @@ case $state in
       'a:average data transfer rate'
       'b:bytes transferred so far'
       'T:percentage of transfer buffer in use'
+      'A:last written'
+      'L:previous line'
       'N:name prefix'
       '%:literal %'
     )

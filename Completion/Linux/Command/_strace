@@ -24,7 +24,9 @@ _arguments -C -s \
   '(-z -Z --successful-only --failed-only)'{-Z,--failed-only}'[trace only system calls that return an error]' \
   '(-a --columns)'{-a+,--columns=}'[align return values in a specific column]:column number [40]' \
   '(-i --instruction-pointer -c --summary-only)'{-i,--instruction-pointer}'[print instruction pointer at time of syscall]' \
-  '(-c --summary-only -k --stack-traces)'{-k,--stack-traces}'[obtain stack trace between each syscall]' \
+  '(-c --summary-only)*-k[obtain stack trace between each syscall]' \
+  '(-c --summary-only -k)--stack-trace=-[obtain stack trace between each syscall]::symbol' \
+  '(-c --summary-only)--stack-trace-frame-limit=[specify limit on stack trace frames to print]:frames [256]' \
   '(-n --syscall-number)'{-n,--syscall-number}'[print syscall number]' \
   '(-o --output)'{-o+,--output=}'[send trace output to the specified file]:output file:->file-pipe' \
   '(-A --output-append-mode)'{-A,--output-append-mode}'[open the file provided with the -o option in append mode]' \
@@ -51,11 +53,12 @@ _arguments -C -s \
   '(-X --const-print-style)'{-X+,--const-print-style=}'[set the format for printing of named constants and flags]:format:(raw abbrev verbose)' \
   '(-c --summary-only -yy --decode-fds)-y[print paths associated with file descriptor arguments]' \
   '(-c --summary-only -y --decode-fds)-yy[print protocol specific information associated with socket file descriptors]' \
-  '(-c --summary-only -y -yy)--decode-fds=-[print information associated with file descriptors]::information [none]:_sequence compadd - none all path socket dev pidfd signalfd' \
+  '(-c --summary-only -y -yy)--decode-fds=-[print information associated with file descriptors]::information [none]:_sequence compadd - none all path socket dev eventfd pidfd signalfd' \
   '(-c --summary-only -Y)--decode-pids=[print information associated with process IDs]:information [none]:_sequence compadd - none comm pidns' \
   '!(-c --summary-only -Y --decode-pids)--pidns-translation' \
   '(-c --summary-only --decode-pids)-Y[print command names for PIDs]' \
-  '(-c --summary-only -C --summary -i --instruction-pointer -k --stack-traces -r --relative-timestamps -ff -t -tt -ttt --absolute-timestamps -T --syscall-times -y -yy --decode-fds)'{-c,--summary-only}'[count time, calls, and errors for each system call and report a summary]' \
+  '--always-show-pid' \
+  '(-c --summary-only -C --summary -i --instruction-pointer -k --stack-trace --stack-trace-frame-limit -r --relative-timestamps -ff -t -tt -ttt --absolute-timestamps -T --syscall-times -y -yy --decode-fds)'{-c,--summary-only}'[count time, calls, and errors for each system call and report a summary]' \
   '(-c --summary-only -C --summary)'{-C,--summary}'[count time, calls, and errors for each system call and report a summary in addition to regular output]' \
   '(-O --summary-syscall-overhead)'{-O+,--summary-syscall-overhead=}'[specify overhead for tracing system calls]:overhead (microseconds)' \
   '(-S --summary-sort-by)'{-S+,--summary-sort-by=}'[sort the output of the histogram (-c option) by the specified criterion]:sort criterion [time]:(time min-time max-time avg-time calls errors name nothing)' \
@@ -66,6 +69,11 @@ _arguments -C -s \
   '(-d --debug)'{-d,--debug}'[show debug output of strace itself on standard error]' \
   '(- 1 *)'{-h,--help}'[display help information]' \
   '--seccomp-bpf[enable seccomp-bpf filtering]' \
+  '--secontext=[print SELinux contexts]: : _values -s, format
+    "(none mismatch full)all[equivalent to full,mismatch]"
+    "(all none)full[print the full context instead of the type only]"
+    "(all none)mismatch[print expected context when actual is not matching]"
+    "(all none mismatch full)none[equivalent to not specifying the option at all]"' \
   '--tips=-[show strace tips, tricks, and tweaks before exit]:tip [id\:random,format\:compact]' \
   '(- 1 *)'{-V,--version}'[display version information]' \
   '(-):command name: _command_names -e' \
@@ -87,7 +95,8 @@ case $state in
       'status[trace system calls with given return status]:status:->status' \
       'quiet[suppress various information messages]:message [none]:_sequence compadd - none attach exit path-resolution personality thread-execve superseded' \
       'kvm[print the exit reason of kvm vcpu]: :(vcpu)' \
-      'decode-fds[print information associated with file descriptors]:information [none]:_sequence compadd - none all path socket dev pidfd signalfd' \
+      'decode-fds[print information associated with file descriptors]:information [none]:_sequence compadd - none all path socket dev eventfd pidfd signalfd' \
+      'secontext' \
       'decode-pids[print information associated with process IDs]:information [none]:_sequence compadd - none comm pidns' && ret=0
     if [[ $state = status ]]; then
       _values -s , 'return status [all]' \

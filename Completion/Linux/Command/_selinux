@@ -148,6 +148,7 @@ case $service in
       '(-o --output -M --module-package)'{-o+,--output=}'[append output to file]:file:_files'
       '(-D --dontaudit)'{-D,--dontaudit}'[generate policy with dontaudit rules]'
       '(-R --reference)'{-R,--reference}'[use installed macros in generated policy]'
+      '(-C --cil)'{-C,--cil}'[generate CIL output]'
       '!(-R --reference -N --noreference)'{-N,--noreference}
       '(-v --verbose)'{-v,--verbose}'[explain generated output]'
       '(-e --explain)'{-e,--explain}'[fully explain generated output]'
@@ -196,7 +197,7 @@ case $service in
     args+=(
       "${ign}(-)"{-V,--version}'[show policy versions created by this program]'
       '-m[build a policy module instead of a base module]'
-      '-c+[build a policy module targeting a modular policy version]:version (4-21)'
+      '-c+[build a policy module targeting a modular policy version]:version (4-22)'
     )
   ;;
 

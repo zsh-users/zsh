@@ -70,6 +70,7 @@ _git-add () {
     '(-f --force)'{-f,--force}'[allow adding otherwise ignored files]' \
     '(-i --interactive : -)'{-i,--interactive}'[add contents interactively to index]' \
     '(-p --patch)'{-p,--patch}'[like -i but go directly into patch mode for specified files]' \
+    "--no-auto-advance[don't advance to next file when selecting hunks interactively]" \
     '(-U --unified)'{-U+,--unified=}'[generate diff with given lines of context]:number of lines' \
     '--inter-hunk-context=[combine patch hunks closer than specified number of lines]:number of lines' \
     '(-e --edit)'{-e,--edit}'[open diff against index in editor]' \
@@ -515,6 +516,7 @@ _git-checkout () {
     "--ignore-other-worktrees[don't check if another worktree is using this branch]" \
     '--recurse-submodules=-[control recursive updating of submodules]::checkout:__git_commits' \
     '--no-overlay[remove files from index or working tree that are not in the tree-ish]' \
+    "--no-auto-advance[don't advance to next file when selecting hunks interactively]" \
     '(-q --quiet --progress)--no-progress[suppress progress reporting]' \
     '--progress[force progress reporting]' \
     '(*)--pathspec-from-file=[read pathspec from file]:file:_files' \
@@ -1011,6 +1013,7 @@ _git-format-patch () {
     '--from=[add From: header to email headers]: :_email_addresses' \
     '*--add-header=[add an arbitrary header to email headers]:header' \
     '--cover-letter[generate a cover letter template]' \
+    '(--cover-letter)--commit-list-format=[format commit list in the cover letter]:format:(short-log modern)' \
     '--notes=[append notes for the commit after the three-dash line]:: :__git_notes_refs' \
     '(            --no-signature --signature-file)--signature=[add a signature]:signature' \
     '(--signature                --signature-file)--no-signature[do not add a signature]' \
@@ -1219,6 +1222,49 @@ _git-gui () {
   return ret
 }
 
+(( $+functions[_git-history] )) ||
+_git-history() {
+  local curcontext=$curcontext ret=1
+  local -a state line common
+  declare -A opt_args
+
+  _arguments -C \
+    ': :->command' \
+    '*:: :->option-or-argument' && ret=0
+
+  case $state in
+    (command)
+      declare -a commands
+
+      commands=(
+        'reword:rewrite commit message of specified commit'
+        'split:interactively split up commit'
+      )
+
+      _describe -t commands command commands && ret=0
+    ;;
+    (option-or-argument)
+      curcontext=${curcontext%:*}-$line[1]:
+      common=(
+        "--dry-run[don't update any references]"
+        '--update-refs=[control which references will be updates]:references [branches]:(branches head)'
+        ':commit:__git_commits'
+      )
+
+      case $line[1] in
+        reword) _arguments -S -s $endopt $common && ret=0 ;;
+        split)
+          _arguments -S -s $endopt $common \
+            '*: :__git_ignore_line_inside_arguments __git_tree_files ${PREFIX:-.} ${(Q)line[1]}' && ret=0
+        ;;
+        *) _default && ret=0 ;;
+      esac
+    ;;
+  esac
+
+  return ret
+}
+
 (( $+functions[_git-init] )) ||
 _git-init () {
   _arguments -S -s $endopt \
@@ -1300,7 +1346,8 @@ _git-log () {
 
 (( $+functions[_git-maintenance] )) ||
 _git-maintenance() {
-  local curcontext="$curcontext" state state_descr line ret=1
+  local curcontext="$curcontext" ret=1
+  local -a state state_descr line args
   local -A opt_args
 
   _arguments -C \
@@ -1324,16 +1371,27 @@ _git-maintenance() {
     (option-or-argument)
       curcontext=${curcontext%:*}-$line[1]:
       case $line[1] in
-        (run)
+        run)
           _arguments -S $endopt \
             '--auto[run tasks based on the state of the repository]' \
+            '--detach[perform maintenance in the background]' \
             '--schedule=[run tasks based on frequency]:frequency (seconds)' \
             "--quiet[don't report progress or other information to stderr]" \
             '*--task=[run a specific task]:task:(gc commit-graph prefetch loose-objects incremental-repack pack-refs)' && ret=0
         ;;
-        (start)
+        start)
           _arguments \
-            '--scheduler=:scheduler:(auto crontab systemd-timer launchctl schtasks)'
+            '--scheduler=:scheduler:(auto crontab systemd-timer launchctl schtasks)' && ret=0
+        ;;
+        unregister)
+          args=( '(-f --force)'{-f,--force}'[return success even if repository was not registered]' )
+        ;&
+        register)
+          _arguments -S $endopt $args \
+            '--config-file=[use given config file]:config file:_files' && ret=0
+        ;;
+        stop) _message 'no more arguments' ;;
+        *) _default && ret=0 ;;
       esac
     ;;
   esac
@@ -1591,6 +1649,7 @@ _git-range-diff () {
     '(--right-only)--left-only[only emit output related to the first range]' \
     '(--left-only)--right-only[only emit output related to the second range]' \
     '(--remerge-diff)--diff-merges=[specify diff format to be used for merge commits]:format [m]:(off none 1 first-parent separate c combined cc dense-combined r remerge m on)' \
+    '--max-memory=[specify maximum memory for cost matrix]:memory [4G]' \
     '(--diff-merges -p --patch -u)--remerge-diff[produce remerge-diff output for merge commits]' \
     $diff_options \
     '1:range 1:__git_commit_ranges' \
@@ -1638,6 +1697,7 @@ _git-rebase () {
     "(--autostash --no-autostash)--no-autostash[don't stash uncommitted changes before rebasing and apply them afterwards]" \
     '(--root)--fork-point[use merge-base --fork-point to refine upstream]' \
     '--signoff[add Signed-off-by: trailer to the commit message]' \
+    '(--force-rebase)*--trailer=[add custom trailer to every rebased commit]:trailer:__git_trailers_tokens' \
     '--no-ff[cherry-pick all rebased commits with --interactive, otherwise synonymous to --force-rebase]' \
     '(--keep-base)--onto=[start new branch with HEAD equal to given revision]:newbase:__git_revisions' \
     "(--apply --whitespace -C)--reschedule-failed-exec[automatically re-schedule any 'exec' that fails]" \
@@ -1661,6 +1721,7 @@ _git-reset () {
       '(--soft --mixed --hard --merge        -p --patch -U --unified --inter-hunk-context -- *)--keep[like --hard, but keep local working tree changes]' \
       '--recurse-submodules=-[control recursive updating of submodules]::reset:__git_commits' \
       '(-p --patch --soft --mixed -N --intent-to-add --hard --merge --keep)'{-p,--patch}'[select diff hunks to remove from the index]' \
+    "--no-auto-advance[don't advance to next file when selecting hunks interactively]" \
       '(-U --unified --soft --mixed -N --intent-to-add --hard --merge --keep)'{-U+,--unified=}'[generate diff with given lines of context]:number of lines' \
       '(--soft --mixed -N --intent-to-add --hard --merge --keep)--inter-hunk-context=[combine patch hunks closer than specified number of lines]:number of lines' \
       '(-N --intent-to-add --soft --mixed --hard --merge --keep -p --patch -U --unified --inter-hunk-context -- *)'{-N,--intent-to-add}'[record only the fact that removed paths will be added later]' \
@@ -1903,6 +1964,7 @@ _git-sparse-checkout() {
         reapply:'reapply the sparsity pattern rules to paths in the working tree'
         disable:'disable the config setting, and restore all files in the working directory'
         check-rules:'check whether sparsity rules match one or more paths'
+        clean:'remove files outside of the sparse-checkout definition'
       )
 
       _describe -t commands command commands && ret=0
@@ -1910,7 +1972,7 @@ _git-sparse-checkout() {
     (option-or-argument)
       curcontext=${curcontext%:*}-$line[1]:
       case $line[1] in
-        init)
+        init|reapply)
           _arguments \
             '--cone[allow for better performance with a limited set of patterns]' \
             '--no-sparse-index[rewrite index to not be sparse]' && ret=0
@@ -1928,6 +1990,12 @@ _git-sparse-checkout() {
            '-z[terminate input and output files by a NUL character]' \
            '--cone[interpret rules file patterns as cone mode patterns]' \
            '--rules-file=[use patterns in specified file]:file:_files' && ret=0
+        ;;
+        clean)
+          _arguments \
+            '(-f --force)'{-f,--force}'[remove files]' \
+            '--dry-run[list the directories that would be removed without deleting them]' \
+            '--verbose[list every file considered for removal]'
         ;;
       esac
     ;;
@@ -2237,12 +2305,16 @@ _git-submodule () {
 _git-subtree () {
   local curcontext="$curcontext" state state_descr line ret=1
   declare -A opt_args
+  local -a common=(
+    '(-q --quiet)'{-q,--quiet}'[suppress progress output]'
+    '(-d --debug)'{-d,--debug}'[show debug messages]'
+    '(-P --prefix)'{-P+,--prefix=}'[the path to the subtree in the repository to manipulate]: :_directories'
+    '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=-}'[GPG-sign the commit]::key id'
+    "(-S --gpg-sign --no-gpg-sign)--no-gpg-sign[don't GPG-sign the commit]"
+  )
 
   # TODO: -P should only complete paths inside the current repository.
-  _arguments -C \
-    '(-q --quiet)'{-q,--quiet}'[suppress progress output]' \
-    '(-P --prefix)'{-P+,--prefix=}'[the path to the subtree in the repository to manipulate]: :_directories' \
-    '(-d --debug)'{-d,--debug}'[show debug messages]' \
+  _arguments -C $common \
     ': :->command' \
     '*::: := ->option-or-argument' && ret=0
 
@@ -2263,7 +2335,7 @@ _git-subtree () {
       curcontext=${curcontext%:*}-$line[1]:
       case $line[1] in
         (add)
-          _arguments \
+          _arguments $common \
             '(-q --quiet)'{-q,--quiet}'[suppress progress output]' \
             '(-m --message)'{-m+,--message=}'[use the given message as the commit message for the merge commit]:message' \
             '(-P --prefix)'{-P+,--prefix=}'[the path to the subtree in the repository to manipulate]: :_directories' \
@@ -2276,35 +2348,27 @@ _git-subtree () {
           # __git_ref_specs.
 	;;
         (merge)
-          _arguments -S \
-            '(-q --quiet)'{-q,--quiet}'[suppress progress output]' \
-            '(-P --prefix)'{-P+,--prefix=}'[the path to the subtree in the repository to manipulate]: :_directories' \
+          _arguments -S $common \
             '(-m --message)'{-m+,--message=}'[use the given message as the commit message for the merge commit]:message' \
             '--squash[import only a single commit from the subproject]' \
             ': :__git_references' && ret=0
 	;;
         (pull)
-          _arguments -S \
-            '(-q --quiet)'{-q,--quiet}'[suppress progress output]' \
-            '(-P --prefix)'{-P+,--prefix=}'[the path to the subtree in the repository to manipulate]: :_directories' \
+          _arguments -S $common \
             '(-m --message)'{-m+,--message=}'[use the given message as the commit message for the merge commit]:message' \
             '--squash[import only a single commit from the subproject]' \
             ': :__git_any_repositories' \
             ':: :__git_ref_specs' && ret=0
 	;;
         (push)
-          _arguments -S \
-            '(-q --quiet)'{-q,--quiet}'[suppress progress output]' \
-            '(-P --prefix)'{-P+,--prefix=}'[the path to the subtree in the repository to manipulate]: :_directories' \
+          _arguments -S $common \
             '(-m --message)'{-m+,--message=}'[use the given message as the commit message for the merge commit]:message' \
             ': :__git_any_repositories' \
             ':: :__git_ref_specs' && ret=0
 	;;
         (split)
-          _arguments -S \
+          _arguments -S $common \
 	    '--annotate[add a prefix to commit message of new commits]:prefix' \
-            '(-q --quiet)'{-q,--quiet}'[suppress progress output]' \
-            '(-P --prefix)'{-P+,--prefix=}'[specify path to the subtree in the repository to manipulate]: :_directories' \
             '(-b --branch)'{-b,--branch=}'[create a new branch]' \
             '--onto=[try connecting new tree to an existing one]: :__git_ref_specs' \
             '(-m --message)'{-m+,--message=}'[specify commit message for the merge]:message' \
@@ -2472,12 +2536,12 @@ _git-worktree() {
           _arguments -s -S $endopt \
 	    '(-n --dry-run)'{-n,--dry-run}"[don't remove, show only]" \
 	    '(-v --verbose)'{-v,--verbose}'[report pruned objects]' \
-            '--expire=[expire objects older than specified time]: :_git_approxidates' && ret=0
+            '--expire=[prune missing working trees older than specified time]: :_git_approxidates' && ret=0
 	;;
         (list)
           _arguments -S $endopt \
             '(-v --verbose --porcelain -z)'{-v,--verbose}'[output additional information about worktrees]' \
-            "--expire=[add 'prunable' annotation to worktrees older than specified time]: :_git_approxidates" \
+            "--expire=[add 'prunable' annotation to missing worktrees older than specified time]: :_git_approxidates" \
             '(-v)--porcelain[machine-readable output]' \
             '(-v)-z[terminate each line with a NUL rather than a newline]' && ret=0
 	;;
@@ -2810,7 +2874,7 @@ __git_config_option-or-value () {
     'diff.*.textconv:command to generate the text-converted version of a file::_cmdstring'
     'diff.*.wordregex:regular expression that the diff driver should use to split words in a line:regular expression:->string'
     'diff.*.xfuncname:regular expression that the diff driver should use to recognize the hunk header:regular expression:->string'
-    diff.algorithm:'default diff algorithm::->diff.algorithm:default'
+    diff.algorithm:"default diff algorithm::_git_diff_algorithms"
     diff.autorefreshindex:'run git update-index --refresh before git diff::->bool:true'
     diff.colorMoved:"color moved lines in diffs::__git_color_moved"
     diff.colorMovedWS:"ignore whitespace when detecting moved lines::__git_color_movedws"
@@ -3689,14 +3753,6 @@ __git_config_option-or-value () {
                 __git_guard_number 'number of days'
               fi
               ;;
-            (diff.algorithm)
-              __git_config_values -- "$current" "$parts[5]" \
-                default:'basic greedy diff algorithm' \
-                myers:'basic greedy diff algorithm' \
-                minimal:'spend extra time to make sure the smallest possible diff is produced' \
-                patience:'generate diffs with patience algorithm' \
-                histogram:'generate diffs with histogram algorithm' && ret=0
-              ;;
             (diff.renames)
               __git_config_booleans "$current" "$parts[5]" "$parts[2]" \
                 {copies,copy}:'try to detect both renames and copies' && ret=0
@@ -4072,6 +4128,7 @@ _git-reflog () {
           'show:show log of ref'
           'drop:remove reflog for specified references'
           'exists:check whether a ref has a reflog'
+          'write:write reflog entry for a reference'
 	)
 
         _alternative \
@@ -4114,7 +4171,10 @@ _git-reflog () {
           ;;
 	  (exists)
 	    __git_references && ret=0
-	    ;;
+	  ;;
+          write)
+            _arguments ': :__git_references' ':old oid' ':new oid' ':message' && ret=0
+	  ;;
         esac
     esac
 
@@ -4138,6 +4198,9 @@ _git-refs() {
       commands=(
         'migrate:migrate ref store between different formats'
         'verify:verify reference database consistency'
+        'list:list references in the repository, alias for git-for-each-ref'
+        'exists:check whether given reference exists'
+        'optimize:optimize references to improve repository performance, alias for git-pack-refs'
       )
 
       _describe -t commands command commands && ret=0
@@ -4157,6 +4220,9 @@ _git-refs() {
             '--strict[enable stricter error checking]' \
             '--verbose[when verifying the reference database consistency, be chatty]' && ret=0
         ;;
+        list) _git-for-each-ref && ret=0 ;;
+        exists) __git_references && ret=0 ;;
+        optimize) _git-pack-refs && ret=0 ;;
         *) _default && ret=0 ;;
       esac
     ;;
@@ -4363,6 +4429,7 @@ _git-blame () {
     '(-n --show-number)'{-n,--show-number}'[show the line number in the original commit]' \
     '-s[suppress author name and timestamp]' \
     '-w[ignore whitespace when finding lines]' \
+    '--diff-algorithm=[choose a diff algorithm to use when computing blame]: :_git_diff_algorithms' \
     '--ignore-rev=[ignore specified revision when blaming]:revision:__git_revisions' \
     '--ignore-revs-file=[ignore revisions from file]:file:_files' \
     '(--color-by-age)--color-lines[color redundant metadata from previous line differently]' \
@@ -4841,10 +4908,14 @@ _git-send-email () {
     '--smtp-server-port=[specify port to connect to SMTP server on]:smtp port:_ports' \
     '--smtp-server-option=[specify the outgoing SMTP server option to use]:SMTP server option' \
     '--smtp-ssl-cert-path=[path to ca-certificates (directory or file)]:ca certificates path:_files' \
+    '--smtp-ssl-client-cert=[path to client certificate file]: :_files' \
+    '--smtp-ssl-client-key=[path to the private key file for the client certificate]: :_files' \
     '--smtp-user=[specify user to use for SMTP-AUTH]:smtp user:_users' \
     '(--no-smtp-auth)--smtp-auth=[specify allowed AUTH mechanisms]:space-separated list of mechanisms' \
     '(--smtp-auth)--no-smtp-auth[disable SMTP authentication]' \
     '--smtp-debug=[enable or disable debug output]:smtp debug:((0\:"disable" 1\:"enable"))' \
+    '--imap-sent-folder=[IMAP folder where a copy of the emails should be sent]:IMAP folder' \
+    '--use-imap-only[only copy emails instead of actually sending them]' \
     '--batch-size=[specify maximum number of messages per connection]:number' \
     '--relogin-delay=[specify delay between successive logins]:delay (seconds)' \
     '--cc-cmd=[specify command to generate Cc\: header with]:Cc\: command:_cmdstring' \
@@ -5328,11 +5399,7 @@ _git-merge-file () {
     '(       --theirs --union)--ours[resolve conflicts favoring our side of the lines]' \
     '(--ours          --union)--theirs[resolve conflicts favoring their side of the lines]' \
     '(--ours --theirs        )--union[resolve conflicts favoring both sides of the lines]' \
-    '--diff-algorithm=[choose a diff algorithm]:diff algorithm:((default\:"basic greedy diff algorithm"
-      myers\:"basic greedy diff algorithm"
-      minimal\:"spend extra time to make sure the smallest possible diff is produced"
-      patience\:"generate diffs with patience algorithm"
-      histogram\:"generate diffs with histogram algorithm"))' \
+    '--diff-algorithm=[choose a diff algorithm]: :_git_diff_algorithms' \
     '--marker-size[specify length of conflict markers]: :__git_guard_number "marker length"' \
     '--object-id[use object IDs instead of filenames]' \
     '(--zdiff3)--diff3[show conflicts in "diff3" style]' \
@@ -5377,10 +5444,13 @@ _git-multi-pack-index() {
   _arguments \
     '--object-dir=[specify location of git objects]:directory:_directories' \
     '(--progress)--no-progress[turn progress off]' '!(--no-progress)--progress' \
+    '--preferred-pack=[break ties in favor of specified pack]:pack' \
+    '--bitmap[write a multi-pack bitmap]' \
     '--stdin-packs[write a multi-pack index containing only pack index basenames provided on stdin]' \
     '--refs-snapshot=[specify a file which contains a "refs snapshot" taken prior to repacking]:file:_files' \
+    '--incremental[write an incremental MIDX file]' \
     '--batch-size=[during repack, select packs so as to have pack files of at least the specified size]:size' \
-    '1:verb:(write verify expire repack)'
+    '1:verb:(write compact verify expire repack)'
 }
 
 (( $+functions[_git-pack-objects] )) ||
@@ -5492,6 +5562,21 @@ _git-read-tree () {
     '1:first tree-ish to be read/merged:__git_tree_ishs' \
     '2::second tree-ish to be read/merged:__git_tree_ishs' \
     '3::third tree-ish to be read/merged:__git_tree_ishs'
+}
+
+(( $+functions[_git-replay] )) ||
+_git-replay() {
+  _arguments -S $endopt \
+    '(--advance --revert)--contained[update all branches that point to commits in given range]' \
+    '(--advance --revert)--onto=[replay onto given commit]: :__git_revisions' \
+    '(--onto --revert)--advance=[advance given branch]: :__git_branches' \
+    '(--onto --advance)--revert=[revert commits onto given branch]: :__git_branches' \
+    '--ref=[specify reference to update with result]: :__git_ref_specs' \
+    '--ref-action=[control ref update behavior]:behavior:((
+      update\:"update directly using atomic transaction"
+      print\:"output update-ref commands for pipeline use"
+    ))' \
+    ':revision range:__git_commit_ranges'
 }
 
 (( $+functions[_git-symbolic-ref] )) ||
@@ -6280,7 +6365,10 @@ _git-hook() {
   _arguments $args \
     '--ignore-missing[ignore any missing hook by quietly returning zero]' \
     "--to-stdin=[specify file which will be redirected to hook's stdin]:file:_files" \
-    '1:subcommand:(run)' \
+    '--allow-unknown-hook-name' \
+    '-z[terminate output lines with NUL instead of newlines]' \
+    '--show-scope[prefix each hook name with a config scope]' \
+    '1:subcommand:(run list)' \
     '2:hook name:compadd $gitdir/hooks/*(x\:t)'
 }
 
@@ -6523,6 +6611,7 @@ _git_commands () {
     gc:'cleanup unnecessary files and optimize local repository'
     grep:'print lines matching a pattern'
     gui:'run portable graphical interface to git'
+    history:'rewrite history'
     init:'create empty git repository or re-initialize an existing one'
     log:'show commit logs'
     maintenance:'run tasks to optimize Git repository data'
@@ -6533,7 +6622,7 @@ _git_commands () {
     push:'update remote refs along with associated objects'
     range-diff:'compare two commit ranges'
     rebase:'forward-port local commits to the updated upstream head'
-    reset:'reset current HEAD to specified state'
+    reset:'reset HEAD or the index to a known state'
     restore:'restore working tree files'
     revert:'revert existing commits'
     rm:'remove files from the working tree and from the index'
@@ -6545,7 +6634,7 @@ _git_commands () {
     submodule:'initialize, update, or inspect submodules'
     subtree:'split repository into subtrees and merge them'
     switch:'switch branches'
-    tag:'create, list, delete or verify tag object signed with GPG'
+    tag:'create, list, delete or verify tags'
     worktree:'manage multiple working dirs attached to the same repository'
   )
   ancillary_manipulator_commands=(
@@ -6606,6 +6695,7 @@ _git_commands () {
     pack-objects:'create packed archive of objects'
     prune-packed:'remove extra objects that are already in pack files'
     read-tree:'read tree information into directory index'
+    replay:'replay commits on a new base, works with bare repos too'
     symbolic-ref:'read and modify symbolic references'
     unpack-objects:'unpack objects from packed archive'
     update-index:'register file contents in the working directory to the index'
@@ -6779,6 +6869,17 @@ __git_date_formats () {
   _describe -t date-formats 'date format' date_formats -- '( format\:custom\ format )' -S :
 }
 
+(( $+functions[_git_diff_algorithms] )) ||
+_git_diff_algorithms() {
+  _describe -t diff-algorithms 'diff algorithm' '(
+    default\:"basic greedy diff algorithm"
+    myers\:"basic greedy diff algorithm"
+    minimal\:"spend extra time to produce smallest possible diff"
+    patience\:"generate diffs with patience algorithm"
+    histogram\:"generate diffs with histogram algorithm"
+  )'
+}
+
 (( $+functions[_git_diff_filters] )) ||
 _git_diff_filters() {
   local sep
@@ -6849,7 +6950,7 @@ _git_strategy_options() {
     renormalize no-renormalize \
     'find-renames::similarity threshold' \
     subtree:path \
-    'diff-algorithm:algorithm:(patience minimal histogram myers)'
+    'diff-algorithm:algorithm:_git_diff_algorithms'
 }
 
 (( $+functions[__git_encodings] )) ||
@@ -8172,11 +8273,7 @@ __git_setup_diff_options () {
     '(--minimal --patience --histogram --diff-algorithm)--patience[generate diffs with patience algorithm]'
     '(--minimal --patience --histogram --diff-algorithm)--histogram[generate diffs with histogram algorithm]'
     '(--minimal --patience --histogram --diff-algorithm)*--anchored=[generate diffs using the "anchored diff" algorithm]:text'
-    '(--minimal --patience --histogram --diff-algorithm)--diff-algorithm=[choose a diff algorithm]:diff algorithm:((default\:"basic greedy diff algorithm"
-                                                                                                                    myers\:"basic greedy diff algorithm"
-                                                                                                                    minimal\:"spend extra time to make sure the smallest possible diff is produced"
-                                                                                                                    patience\:"generate diffs with patience algorithm"
-                                                                                                                    histogram\:"generate diffs with histogram algorithm"))'
+    '(--minimal --patience --histogram --diff-algorithm)--diff-algorithm=[choose a diff algorithm]: :_git_diff_algorithms' \
     '--stat=-[generate diffstat instead of patch]:: :__git_guard_diff-stat-width'
     '--stat-width=-[generate diffstat with a given width]:width'
     '--stat-graph-width=-[generate diffstat with a given graph width]:width'
@@ -8208,6 +8305,7 @@ __git_setup_diff_options () {
     "(--color-moved-ws)--no-color-moved-ws=[don't ignore whitespace when performing move detection]"
     "--ita-invisible-in-index[hide 'git add -N' entries from the index]"
     "!(--ita-invisible-in-index)--ita-visible-in-index"
+    '--max-depth=[specify maximum tree depth to recurse]:depth'
     '--no-renames[turn off rename detection]'
     $exclusive_diff_options'--check[warn if changes introduce trailing whitespace or space/tab indents]'
     '--full-index[show full object name of pre- and post-image blob]'
@@ -8225,7 +8323,7 @@ __git_setup_diff_options () {
     '--diff-filter=-[select certain kinds of files for diff]: :_git_diff_filters'
     '-S-[look for differences that add or remove the given string]:string'
     '-G-[look for differences whose added or removed line matches the given regex]:pattern'
-    '--pickaxe-all[when -S finds a change, show all changes in that changeset]'
+    '--pickaxe-all[when -G or -S find a change, show all changes in that changeset]'
     '--pickaxe-regex[treat argument of -S as regular expression]'
     '-O-[output patch in the order of glob-pattern lines in given file]: :_files'
     '--rotate-to=[show the change in specified path first]:path:_directories'

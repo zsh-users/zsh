@@ -2,7 +2,7 @@
 
 local curcontext="$curcontext" state line
 local -a cmd common_{own_malloc,read_varinfo,report_errors,partial}
-local -a args args_{addrcheck,drd,memcheck,cachegrind,helgrind,lackey,massif,none,exp_{bbv,dhat,sgcheck}}
+local -a args args_{{addr,mem}check,drd,{cache,call,hel}grind,lackey,massif,none,exp_{bbv,dhat,sgcheck}}
 
 cmd=(
   '1: : _command_names -e'
@@ -127,6 +127,38 @@ args_cachegrind=(
   '--cachegrind-out-file=-[specify output file name]:file name [cachegrind.out.%%p]:_files'
 )
 
+args_callgrind=(
+  '--callgrind-out-file=-[specify output file name]:file name [callgrind.out.%%p]:_files'
+  '--dump-line=-[perform event counting at source line granularity]:enable [yes]:(yes no)'
+  '--dump-instr=-[perform event counting at instruction granularity]:enable [no]:(yes no)'
+  '--compress-strings=-[identify file and function names by numbers]:enable [yes]:(yes no)'
+  '--compress-pos=-[compress positions in profile dump]:enable [yes]:(yes no)'
+  '--compress-dumps=-[concatenate all dumps into same file]:enable [no]:(yes no)'
+  '--dump-every-bb=-[specify dump period in basic blocks]:blocks [0, never]'
+  '*--dump-before=-[dump when entering specified function]:function'
+  '*--zero-before=-[zero all costs when entering specified function]:function'
+  '*--dump-after=-[dump when leaving specified function]:function'
+  '--instr-atstart=-[do instrumentation at callgrind start]:enable [yes]:(yes no)'
+  '--collect-atstart=-[collect at process/thread start]:enable [yes]:(yes no)'
+  '*--toggle-collect=-[toggle collection on enter/leave specified function]:function'
+  '--collect-jumps=-[collect jumps]:enable [no]:(yes no)'
+  '--collect-bus=-[collect global bus events]:enable [no]:(yes no)'
+  '--collect-systime=-[collect system call time info]:enable [no]:(no yes msec usec nsec)'
+  '--separate-threads=-[separate data per thread]:enable [no]:(yes no)'
+  '--separate-callers=-[separate functions by call chain length]:length [0]'
+  '--separate-recs=-[separate function recursions up to level]:level [2]'
+  '--skip-plt=-[ignore calls to/from PLT sections]:enable [yes]:(yes no)'
+  '--skip-direct-rec=-[ignore direct recursio]:enable [yes]:(yes no)'
+  '*--fn-skip=-[ignore calls to/from specified function]:function'
+  '--branch-sim=-[collect branch prediction stats]:enable [no]:(yes no)'
+  '--cache-sim=-[collect cache stats]:enable [no]:(yes no)'
+  '--simulate-wb=-[count write-back events]:enable [no]:(yes no)'
+  '--simulate-hwpref=-[simulate hardware prefetch]:enable [no]:(yes no)'
+  '--cacheuse=-[collect cache block use]:enable [no]:(yes no)'
+  '--I1=-[set I1 cache manually]:size,assoc,line_size'
+  '--D1=-[set D1 cache manually]:size,assoc,line_size'
+)
+
 args_helgrind=(
   $common_own_malloc
   $common_read_varinfo
@@ -217,7 +249,8 @@ _arguments -C ${(P)args} $cmd \
   '--vgdb=-[activate gdbserver]:enable [yes]:(yes no full)' \
   '--vgdb-error=-[invoke gdbserver after specified number of errors]:errors [999999999]:errors' \
   '--vgdb-stop-at=-[invoke gdbserver for given events]:event:_sequence compadd - startup exit abexit valgrindabexit all none' \
-  '--track-fds=-[track open file descriptors]:enable [no]:(yes no all)' \
+  '--track-fds=-[track open file descriptors]:enable [no]:(yes no all bad)' \
+  '--modify-fds=-[modify newly open file descriptors]:enable:(yes no high)' \
   '--time-stamp=-[add timestamps to log messages]:enable:(yes no)' \
   '--log-fd=-[log messages to specified file descriptor]:file descriptor:_file_descriptors' \
   '--log-file=-[log messages to specified file with pid appended]:file:_files' \

@@ -6,8 +6,7 @@ _pdfwithhandle()
     _files "$@" -g '(#i)*.pdf'
 }
 
-local expl
-local -a opts operations
+local -a expl opts operations
 
 opts=(output encrypt_40bit encrypt_128bit allow owner_pw user_pw flatten
 	compress uncompress keep_first_id keep_final_id drop_xfa verbose
@@ -22,15 +21,13 @@ case $words[CURRENT-1] in
 	;;
 
     (allow)
-	#_description permissions expl "permission"
-	#compadd $expl \
 	_values -s , permission \
 	    Printing DegradedPrinting ModifyContents Assembly CopyContents \
 	    ScreenReaders ModifyAnnotations FillIn AllFeatures
 	;;
 
     (attach_files)
-	_files "$@"
+	_files
 	;;
 
     (fill_form)
@@ -51,11 +48,9 @@ case $words[CURRENT-1] in
 esac && return 0
 
 if [[ -n $words[(r)(${(j:|:)operations})] ]]; then
-    _description options expl "option"
-    compadd $@ $expl $opts
+  _wanted options expl "option" compadd -a opts
 else
-    _tags files operations
-    _alternative \
-	'files:PDF file:_pdfwithhandle' \
-	"operations:operation:($operations)"
+  _alternative \
+    'files:PDF file:_pdfwithhandle' \
+    "operations:operation:compadd -a operations"
 fi

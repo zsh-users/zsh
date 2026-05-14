@@ -30,7 +30,7 @@ _arguments -S -s : \
   '(-r --raw-output -j --join-output)--raw-output0[like -r, with NUL after each output]' \
   '(-r --raw-output --raw-output0 -j --join-output)'{-j,--join-output}"[like -r, without newlines between outputs]" \
   '(-f --from-file)'{-f,--from-file}'[read filter from file]: :_files' \
-  '-L+[prepend a directory to the module search path]:_directories' \
+  \*{-L+,--library-path}'[prepend a directory to the module search path]:_directories' \
   '(-e --exit-status)'{-e,--exit-status}'[report "false" and "null" results via exit code]' \
   '*--arg[pre-set a variable to a string]:variable name: :value (string)' \
   '*--argjson[pre-set a variable to an object]:variable name: :value (JSON)' \
