@@ -685,7 +685,8 @@ putreplaceselection(UNUSED(char **args))
     int clear = 0;
     int pos = 2;
 
-    startvichange(-1);
+    if (invicmdmode())
+	startvichange(-1);
     if (n < 0 || zmod.flags & MOD_NULL)
 	return 1;
     if (zmod.flags & MOD_OSSEL) {
