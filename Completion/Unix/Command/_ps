@@ -36,12 +36,8 @@ args=(
   '*-U+[select processes by real user]:user:_sequence -s , _users'
   '-o+[specify output format]:property:_sequence -s , _ps_props -'
 
-  '-c[show scheduler properties]'
   '-f[full listing]'
-  '-j[show session ID and process group ID]'
   '-l[long listing]'
-  '-L[show information about each light weight process]'
-  '-y[show RSS in place of ADDR (used with -l)]'
 )
 
 bsd=(
@@ -51,15 +47,10 @@ bsd=(
   'x[include processes with no controlling terminal]'
   '(j l s u X)v[output in virtual memory format]'
   '*w[wide output]'
-  'L[display all format specifiers]'
-  'S[include child process data with the parent]'
-  'T[select processes attached to current terminal]'
 )
 bsdarg=(
   '*p[select processes by ID]'
   '*t[select processes by attached terminal]'
-  'O[specify additional output fields]'
-  'o[specify output format]'
 )
 
 case $OSTYPE in
@@ -76,11 +67,30 @@ case $OSTYPE in
       '-Z[show zone with which process is associated]'
     )
   ;;
-  linux-gnu|dragonfly*|freebsd*|netbsd*|openbsd*)
+  ^aix*)
+    args+=(
+      '-L[show information about each light weight process]'
+      '-c[show scheduler properties]'
+      '-j[show session ID and process group ID]'
+      '-y[show RSS in place of ADDR (used with -l)]'
+    )
+    bsd+=(
+      'L[display all format specifiers]'
+      'S[include child process data with the parent]'
+      'T[select processes attached to current terminal]'
+    )
+    bsdarg+=(
+      'O[specify additional output fields]'
+      'o[specify output format]'
+    )
+  ;|
+  linux-gnu|aix*|dragonfly*|freebsd*|netbsd*|openbsd*)
     bsd+=(
       'e[show environment after command]'
       '(j l s v X)u[output in resource usage format]'
     )
+  ;|
+  linux-gnu|dragonfly*|freebsd*|netbsd*|openbsd*)
     bsdarg+=(
       'N[set namelist file for WCHAN display]'
       '*U[select processes by effective user]'
@@ -89,10 +99,14 @@ case $OSTYPE in
   linux-gnu|dragonfly*|freebsd*|openbsd*)
     bsd+=( 'H[show threads as if they were processes]' )
   ;|
+  aix*|darwin*|dragonfly*|freebsd*|netbsd*|openbsd*)
+    bsd+=(
+      'c[show just executable name for command]'
+    )
+  ;|
   darwin*|dragonfly*|freebsd*|netbsd*|openbsd*)
     bsd+=(
       'A[select every process]'
-      'c[show just executable name for command]'
       'h[repeat header lines, one per page of output]'
       '(r)m[sort by memory usage]'
       '(m)r[sort by CPU usage]'
@@ -110,15 +124,32 @@ case $OSTYPE in
   darwin*|freebsd*)
     bsd+=( 'X[skip processes with no controlling terminal]' )
   ;|
-  freebsd*|dragonfly*)
-    bsd+=( 'f[show command and environment for swapped out processes]' )
-  ;|
   netbsd*|openbsd*)
     bsdarg+=( 'W[extract swap information from specified file]' )
   ;|
   freebsd*|netbsd*)
     bsd+=(
       'd[show process hierarchy]'
+    )
+  ;|
+  aix*)
+    args+=(
+      '-M[list 64 bit processes]'
+      "-N[don't gather thread statistics]"
+      '-L+[show process descendants]:pid list:_sequence _pids'
+      '-T+[show process tree rooted at given pid]:pid:_pids'
+      '-P[display project info]'
+      "-X[don't truncate user and group names]"
+      '-Z[display page size settings]'
+      '-k[list kernel processes]'
+      '-c+[filter by workload management class]:class list'
+      '-m[list kernel threads]'
+    )
+    bsd+=(
+      'g[display all processes]'
+      'n[numerical output]'
+      's[display kernel stack size of each process]'
+      "X[don't truncate user and group names]"
     )
   ;|
   darwin*)
@@ -143,12 +174,18 @@ case $OSTYPE in
     fi
   ;;
   dragonfly*)
-    bsd+=( 'R[subsort by parent/child chain]' )
+    bsd+=(
+      'R[subsort by parent/child chain]'
+      'f[show command and environment for swapped out processes]'
+    )
   ;;
   freebsd*)
     bsd+=(
-      '*J[select processes by jail ID]'
       'Z[show mac label]'
+    )
+    bsdarg+=(
+      'D[expand list of selected processes based on process tree]'
+      '*J[select processes by jail ID]'
     )
   ;;
   netbsd*) bsd+=( '(j l u v)s[output in thread format]' ) ;;
@@ -205,8 +242,9 @@ case $OSTYPE in
   ;;
 esac
 
-if (( CURRENT > 1 )) && [[ $OSTYPE != (solaris*|linux-gnu) ||
-              ( $OSTYPE = linux-gnu && $words[CURRENT-1] != -* ) ]]; then
+if (( CURRENT > 1 )) && [[ $OSTYPE != (aix*|solaris*|linux-gnu) ||
+      ( $OSTYPE = (aix*|linux-gnu) && $words[CURRENT-1] != -* ) ]]
+then
   case $words[CURRENT-1] in
     *k)
       local sopt
@@ -215,6 +253,7 @@ if (( CURRENT > 1 )) && [[ $OSTYPE != (solaris*|linux-gnu) ||
 		_sequence -s , _ps_props $sopt - && return ;;
     *g) [[ $OSTYPE = darwin* ]] && _wanted -C option-g-1 processes \
 		expl 'process ID' _sequence -s , _pids && return ;;
+    *D) _wanted directions expl direction compadd up down both && return ;;
     *G) _sequence -s , _groups && return ;;
     *J) _sequence _jails -0 && return ;;
     *[MNW]) _files && return ;;

@@ -43,8 +43,8 @@ if [[ -n $state ]]; then
   if [[ -z $IPREFIX ]]; then
     compset -S '=*' || suf=( -qS = )
     alts+=(
-      'parameters:parameter:compadd -r "\n\t\- =" - persist allow.{set_hostname,sysvipc,raw_sockets,chflags,mount{,.devfs,.fdescfs,.nullfs,.procfs,.linprocfs,.linsysfs,.tmpfs,.zfs},quotas,socket_af} mount.{devfs,fdescfs,procfs}'
-      'parameters:parameter:compadd $suf - jid name path ip{4,6}{,.addr{,sel}} vnet host.hostname host securelevel devfs_ruleset children.{max,cur} enforce_statfs cpuset.id osrelease osreldate command exec.{{,pre,post}{start,stop},clean,jail_user,system{,_jail}_user,timeout,consolelog,fib} stop.timeout {vnet.,}interface ip_hostname mount{,.fstab} depend'
+      'parameters:parameter:compadd -r "\n\t\- =" - persist allow.{set_hostname,sysvipc,raw_sockets,chflags,mount{,.devfs,.fdescfs,.fusefs,.nullfs,.procfs,.linprocfs,.linsysfs,.tmpfs,.zfs},vmm,quotas,read_msgbuf,socket_af,mlock,nfsd,reserved_ports,unprivileged_{parent_tampering,proc_debug},suser,extattr,adjtime,settime,routing,setaudit} linux linux.{osrelease,oss_version} mount.{devfs,fdescfs,procfs}'
+      'parameters:parameter:compadd $suf - jid name path ip{4,6}{,.addr,saddrsel} vnet host.hostname host securelevel devfs_ruleset children.{max,cur} enforce_statfs cpuset.id osrelease osreldate meta env command exec.{{,pre,post}{start,stop},clean,jail_user,system{,_jail}_user,timeout,consolelog,fib} stop.timeout {vnet.,}interface ip_hostname mount{,.fstab} depend zfs.dataset'
     )
   fi
   (( $#alts )) && _alternative $alts && ret=0

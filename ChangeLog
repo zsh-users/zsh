@@ -1,3 +1,15 @@
+2026-05-14  Oliver Kiddle  <opk@zsh.org>
+
+	* 54526: Completion/BSD/Command/_ipfw, Completion/BSD/Command/_mdo,
+	Completion/BSD/Command/_jls, Completion/BSD/Command/_jail,
+	Completion/BSD/Command/_pfctl, Completion/BSD/Command/_sockstat,
+	Completion/Unix/Command/_column, Completion/Unix/Command/_id,
+	Completion/Unix/Command/_ls, Completion/Unix/Command/_ps,
+	Completion/Unix/Command/_service, Completion/Unix/Command/_timeout,
+	Completion/Unix/Command/_zdump, Completion/Unix/Command/_zfs,
+	Completion/Unix/Type/_date_formats:
+	update completions for FreeBSD 14.4 and 15.0
+
 2026-05-11  dana  <dana@dana.is>
 
 	* 54518: Util/zsh-merge-changelog: add git merge driver

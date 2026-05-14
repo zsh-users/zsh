@@ -284,7 +284,7 @@ actions=(
         \| $'/port_range[ \t\0]/'
           '/[0-9]#-/' ': _message -e ports lower'
           $word ': _message -e ports upper'
-        \| $word ':parameters:config parameter:$ca ip if log deny_in same_ports unreg_only unreg_cgn reset reverse proxy_only skip_global redirect_port redirect_addr redirect_proto port_range'
+        \| $word ':parameters:config parameter:$ca ip if log deny_in same_ports unreg_only unreg_cgn udp_eim reset reverse proxy_only skip_global redirect_port redirect_addr redirect_proto port_range'
         \) \#
       \| $'/show[ \t\0]/' $word ':actions:action:(config log)'
       \| '/[]/' ':commands:command:$ca config show' \)

@@ -69,6 +69,8 @@ rw_ds_props=(
   'compression:value:($comp_algorithms)'
   'copies:value:(1 2 3)'
   'dedup:value:($dedup_algorithms)'
+  'defaultuserquota:->quotas'
+  'defaultgroupquota: :->quotas'
   'devices:value:(on off)'
   'encryption:value:(off on aes128-ccm aes-192-ccm aes-256-ccm aes-128-gcm aes-192-gcm aes-256-gcm)'
   'exec:value:(on off)'
@@ -79,7 +81,7 @@ rw_ds_props=(
       'paths:mountpoint:_directories -W / -P /'"
   'multilevel:value:(on off)'
   'nbmand:value:(on off)'
-  {prefetch,primarycache}':value:(all none metadata)'
+  {prefetch,primarycache,secondarycache}':value:(all none metadata)'
   'quota: :->quotas'
   'readonly:value:(on off)'
   'recordsize:value:(512 1K 2K 4K 8K 16K 32K 64K 128K 256K 512K 1M)'
@@ -89,7 +91,6 @@ rw_ds_props=(
       'properties:property:(auto none)'"
   'reservation: :->quotas'
   'rstchown:value:(on off)'
-  'secondarycache:value:(all none metadata)'
   'setuid:value:(on off)'
   'shadow:value' # TODO: complete URI|none
   'share:share properties'
@@ -128,9 +129,11 @@ case $service:$implementation in
       'bcloneused[amount of storage used by cloned blocks]'
       'dedup_table_size[size of dedup table on-disk]'
       'dedupcached[size of dedup table in arc]'
+      'encryptionroot'
       'expandsize[uninitialized space within the pool]'
       'fragmentation[amount of fragmentation in the pool]'
       'freeing[amount of space remaining to be reclaimed]'
+      'last_scrubbed_txg[transaction group (TXG) up to which the most recent scrub operated]'
       'load_guid[unique identifier generated when pool is loaded]'
       'used[amount of storage space used within the pool]'
     )
@@ -150,8 +153,20 @@ case $service:$implementation in
     rw_ds_props+=(
       'aclmode:value:(discard groupmask passthrough restricted)'
       'acltype:value:(off noacl nfsv4 posix posixacl)'
+      'defaultprojectquota:->quotas'
+      'defaultprojectobjquota:->quotas'
+      'defaultgroupobjquota:->quotas'
+      'defaultuserobjquota:->quotas'
+      'dnodesize:value:(legacy auto 1k 2k 4k 8k 16k)'
+      'direct:value:(disabled standard always)'
+      'groupobjquota@'
       'mlslabel:value:(none)' # TODO: list sensitivity labels
-      'redundant_metadata:value:(all most)'
+      'overlay:value:(on off)'
+      'projectquota@' 'projectobjquota@'
+      'redundant_metadata:value:(all most some none)'
+      'snapdev:value:(hidden visible)'
+      'special_small_blocks:size [0]'
+      'userobjquota@'
       'vscan:value:(on off)'
       'xattr:value:(on off dir sa)'
       "filesystem_limit: :{if [[ -prefix [0-9]## ]]; then _message -e 'number'; elif [[ -prefix n ]]; then compadd none; else _message -e limits 'number or none'; fi}"
@@ -166,8 +181,8 @@ case $service:$implementation in
     )
     ro_ds_props+=(
       createtxg clones filesystem_count guid logicalreferenced logicalused
-      receive_resume_token refcompressratio snapshot_count snapshots_changed
-      volblocksize written
+      objsetid receive_resume_token redact_snaps refcompressratio
+      snapshot_count snapshots_changed volblocksize written
     )
     delegatable_perms=(
       bookmark load-key change-key userobjquota userobjused groupobjquota
@@ -240,8 +255,6 @@ case $service:$implementation in
       "defaultwritelimit: : _alternative \
           'sizes: :_guard \[0-9\]\#\(\|\[BKMGTPEZ\]\) size\ \(bytes\ per\ second\)' \
           'properties:property:(none)'"
-      'defaultuserquota:->quotas'
-      'defaultgroupquota: :->quotas'
       'keysource:value:->keysources'
     )
     ci_ds_props+=(
@@ -256,13 +269,13 @@ case $service:$implementation in
   zfs:openzfs)
     subcmds+=(
       bookmark change-key load-key program project projectspace redact
-      unload-key wait
+      rewrite unload-key wait version
     )
   ;|
   zpool:openzfs)
     subcmds+=(
-      checkpoint events labelclear initialize reopen resilver sync trim wait
-      version
+      checkpoint events labelclear initialize reopen resilver sync prefetch
+      trim wait version
     )
   ;|
   zfs:solaris)
@@ -282,8 +295,9 @@ case $service:$implementation in
   ;;
   zpool:*)
     subcmds+=(
-      add attach clear create destroy detach export get history import iostat
-      list offline online reguid remove replace scrub set split status upgrade
+      add attach clear create destroy ddtprune detach export get history
+      import iostat list offline online reguid remove replace scrub set
+      split status upgrade
     )
   ;;
   zstream:*)
@@ -292,15 +306,18 @@ case $service:$implementation in
 esac
 
 case $OSTYPE in
-  solaris*)
+  solaris*|linux-gnu)
     rw_ds_props+=( 'zoned:value:(on off)' )
-  ;;
+  ;|
   freebsd*)
     [[ $OSTYPE = freebsd<-12>.* ]] && subcmds+=( remap )
     rw_ds_props+=( 'jailed:value:(on off)' )
   ;;
   linux-gnu)
-    rw_ds_props+=( 'relatime:value:(on off)' )
+    rw_ds_props+=(
+      'relatime:value:(on off)'
+      'volthreading:value:(on off)'
+    )
     ci_ds_props+=(
       {,fs,def,root}'context:SELinux context:_selinux_contexts -a file_type'
     )
@@ -508,7 +525,11 @@ case $service:$words[1] in
     if [[ $implementation = solaris ]]; then
       args=( '-I+[specify dataset states to display instead of normal datasets]:dataset state:_sequence compadd - receiving resumable hidden all' )
     else
-      args=( '-p[use exact (parsable) numeric output]' )
+      args=(
+        '(-j --json)'{-j,--json}'[output in JSON format]'
+        '--json-int[output numbers in integer format instead of strings]'
+        '-p[use exact (parsable) numeric output]'
+      )
     fi
     _arguments -A "-*" -S $args \
       '(-d)-r[recursively display children]' \
@@ -604,6 +625,17 @@ case $service:$words[1] in
       '*:file:_files'
   ;;
 
+  zfs:rewrite)
+    _arguments -A "-*" -S -s \
+      '-P[rewrite physical blocks only so snapshots and incremental streams are unaffected]' \
+      '-l+[specify maximum number of bytes to write]:maximum (bytes)' \
+      '-o+[specify starting offset]:offset (bytes)' \
+      '-r[recurse into directories]' \
+      '-v[print names of all successfully rewritten files]' \
+      "-x[don't cross file system boundaries]" \
+      '*:file or directory:_files'
+  ;;
+
   zfs:mount)
     [[ $OSTYPE != freebsd* ]] && args=( '-O[overlay mount]' )
     [[ $implementation = openzfs ]] && args+=(
@@ -611,6 +643,7 @@ case $service:$words[1] in
       '(-a)-R[mount filesystems along with all their children]'
     )
     _arguments -A "-*" -S $args \
+      '(- :)'{-j,--json}'[show all mounted file systems in JSON format]' \
       '-o+[specify temporary file system options]: :_values -s , "option" {,no}{atime,dev,exec,relatime,suid,xattr} ro rw' \
       '-v[report mount progress]' \
       '-f[force mount]' \
@@ -898,6 +931,11 @@ case $service:$words[1] in
       ':property:($delegatable_perms $ro_ds_props ${rw_ds_props%%:*})'
   ;;
 
+  (zfs|zpool):version)
+    _arguments -A "-*" -S \
+      '-j[output in JSON format]'
+  ;;
+
   zpool:(clear|online))
     [[ $OSTYPE = linux* ]] && args=(
       "--power[power on the device's slot in the storage enclosure]"
@@ -991,6 +1029,13 @@ case $service:$words[1] in
       '*: :->virtual-devices'
   ;;
 
+  zpool:ddtprune)
+    _arguments -A "-*" -S \
+      '(-p)-d[prune entries based on age]:age (days)' \
+      '(-d)-p[prune to target percentage of unique entries]:target (percentage)' \
+      ':pool:_zfs_pool'
+  ;;
+
   zpool:destroy)
     _arguments -A "-*" -S \
       '-f[force active datasets to be unmounted]' \
@@ -1020,9 +1065,17 @@ case $service:$words[1] in
   ;;
 
   zpool:get)
-    [[ $implementation = solaris ]] && args=(
-      '-s+[specify sources to display]: :_values -s , "source" local default none'
-    )
+    if [[ $implementation = openzfs ]]; then
+      args=(
+        '(-j --json)'{-j,--json}'[output in JSON format]'
+        '--json-int[output numbers in integer format instead of strings]'
+        --json-pool-key-guid
+      )
+    else
+      args=(
+        '-s+[specify sources to display]: :_values -s , "source" local default none'
+      )
+    fi
     _arguments -A "-*" -S $args \
       '-H[suppress headers and tab-delimit fields]' \
       '-p[display numbers in parseable (exact) values]' \
@@ -1076,6 +1129,7 @@ case $service:$words[1] in
 
   zpool:initialize)
     _arguments -A "-*" -S \
+      '(-a --all : *)'{-a,--all}'[begin, cancel, suspend initializing on all pools]' \
       '(-s --suspend -c --cancel)'{-c,--cancel}'[cancel initializing on specified devices]' \
       '(-s --suspend -c --cancel)'{-s,--suspend}'[suspend initializing on specified devices]' \
       '(-u --uninit)'{-u,--uninit}'[clear initialization state on specified devices]' \
@@ -1130,6 +1184,9 @@ case $service:$words[1] in
   zpool:list)
     [[ $implementation = openzfs ]] && args=(
       '-g[display vdev GUIDs instead of normal device names]'
+      '(-j --json)'{-j,--json}'[output in JSON format]'
+      '--json-int[output numbers in integer format instead of strings]'
+      --json-pool-key-guid
       '-L[display real paths for vdevs resolving all symbolic links]'
       '-p[display numbers in parsable (exact) values]'
       '-P[display full paths for vdevs instead of only the last component of the path]'
@@ -1167,10 +1224,19 @@ case $service:$words[1] in
   ;;
 
   zpool:online)
-    _arguments -C -A "-*" -S $args \
+    _arguments -C -A "-*" -S \
       '-e[expand device to use all available space]' \
       ':pool:_zfs_pool' \
       '*:virtual device:->pool-devices'
+  ;;
+
+  zpool:prefetch)
+    _arguments -A "-*" -S \
+      '-t+[metadata type]:metadata type:((
+        brt\:block\ reference\ table
+        ddt\:deduplication\ table
+      ))' \
+      ':pool:_zfs_pool'
   ;;
 
   zpool:reopen)
@@ -1180,7 +1246,9 @@ case $service:$words[1] in
   ;;
 
   zpool:reguid)
-    _zfs_pool
+    _arguments -A "-*" -S \
+      '-g+[set pool guid]:guid (64-bit decimal)' \
+      ':pool:_zfs_pool'
   ;;
 
   zpool:remove)
@@ -1215,6 +1283,10 @@ case $service:$words[1] in
 
   zpool:scrub)
     [[ $implementation = openzfs ]] && args=(
+      '(-a --all *)'{-a,--all}'[begin, pause, stop scrub on all pools]'
+      '-C[continue scrub from last saved txg]'
+      '-S+[specify start date for transactions]:date (YYYY-MM-DD HH\:MM):_dates'
+      '-E+[specify end date for transactions]:date (YYYY-MM-DD HH\:MM):_dates'
       '(-s)-p[pause scrubbing]'
       '-w[wait until scrub has completed before returning]'
       '-e[only scrub files with known data errors]'
@@ -1259,6 +1331,9 @@ case $service:$words[1] in
         '-c+[run scripts on each vdev]:script:_sequence _files -W "($ZPOOL_SCRIPTS_PATH /etc/zfs/zpool.d ~/.zpool.d)"'
         '-e[only show unhealthy vdevs]'
         '-i[display vdev initialization status]'
+        '(-j --json)'{-j,--json}'[output in JSON format]'
+        '--json-int[output numbers in integer format instead of strings]'
+        --json-flat-vdevs --json-pool-key-guid
         '-g[display vdev GUIDs instead of the normal device names]'
         '-L[display real paths for vdevs resolving all symbolic links]'
         '-p[display numbers in parsable (exact) values and times in nanoseconds]'
@@ -1280,6 +1355,7 @@ case $service:$words[1] in
 
   zpool:trim)
     _arguments -C -A "-*" -S \
+      '(-a --all 1 *)'{-a,--all}'[perform TRIM on all pools]' \
       '(-d --secure)'{-d,--secure}'[initiate a secure TRIM]' \
       '(-r --rate)'{-r,--rate}'[set rate at which the TRIM operation progresses]:rate (bytes per second)' \
       '(-c --cancel)'{-c,--cancel}'[cancel trimming]' \

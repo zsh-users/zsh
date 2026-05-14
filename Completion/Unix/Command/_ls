@@ -108,6 +108,12 @@ if ! _pick_variant gnu='(GNU|uutils)' unix --version; then
       '-Z[display MAC label]'
     )
   fi
+  if [[ $OSTYPE = freebsd<15->.* ]]; then
+    arguments+=(
+      '(--group-directories-first)--group-directories=:order:(first last)'
+      '(--group-directories)--group-directories-first'
+    )
+  fi
   if [[ $OSTYPE = darwin* ]]; then
     arguments+=(
       '-@[display extended attribute keys and sizes in long listing]'
@@ -118,14 +124,18 @@ if ! _pick_variant gnu='(GNU|uutils)' unix --version; then
       '-%[distinguish dataless files and directories with a %]'
     )
   fi
-  if [[ $OSTYPE = solaris* ]]; then
+  if [[ $OSTYPE = (aix|solaris)* ]]; then
     arguments+=(
       '(-q)-b[print octal escapes for control characters]'
       '(-l -1 -C -m -x)-o[long listing but without group information]'
       '(-l -t -s -r -a)-f[interpret each argument as a directory]'
+      '-H[follow symlinks on the command line]'
+    )
+  fi
+  if [[ $OSTYPE = solaris* ]]; then
+    arguments+=(
       '(-E -l)-e[long listing with full and consistent date/time]'
       '(-e -l)-E[long listing with ISO format date/time]'
-      '-H[follow symlinks on the command line]'
       '-v[long listing with verbose ACL information]'
       '-V[long listing with compact ACL information]'
       '-@[long listing with marker for extended attribute information]'

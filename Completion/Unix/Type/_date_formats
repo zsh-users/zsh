@@ -59,7 +59,7 @@ specs=(
 )
 
 case $OSTYPE in
-  linux-gnu)
+  freebsd*|linux-gnu)
     [[ $1 == zsh ]] || # %N is handled below in this case
     specs+=( 'N:fractional part of seconds since epoch, in nanoseconds' )
   ;|

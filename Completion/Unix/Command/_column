@@ -18,6 +18,12 @@ _pick_variant -r variant \
 --version
 
 case $variant in
+  freebsd*)
+    args=(
+      '-l+[specify maximum number of input columns]:columns'
+    )
+  ;|
+
   util-linux)
     aopts=()
     args=(

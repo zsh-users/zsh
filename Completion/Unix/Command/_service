@@ -11,14 +11,18 @@ zstyle -T  ":completion:${ctx}" tag-order && \
 
 case $OSTYPE in
   freebsd<14->.*)
-    args=( '-E+[set environment variable before executing the rc.d script]:variable:_parameters -g "*export*~*readonly*" -S=' )
+    args=(
+      '(-l -r)-d[enable debugging of rc.d scripts]'
+      '-E+[set environment variable before executing the rc.d script]:variable:_parameters -g "*export*~*readonly*" -S='
+      '(-l -r)-q[quiet]'
+    )
   ;&
   freebsd<11->.*)
     args+=( '-j+[perform actions in specified jail]:jail:_jails' )
   ;&
   freebsd*|dragonfly*)
     actions=(
-      '(*)-r[show the results of boot time rcorder]'
+      '(* -q -d)-r[show the results of boot time rcorder]'
       '(*)-R[restart all enabled local services]'
     )
   ;&
@@ -28,7 +32,7 @@ case $OSTYPE in
       '*::service argument:_init_d' \
       + '(actions)' $actions \
       '(*)-e[show services that are enabled]' \
-      '(*)-l[list all scripts in /etc/rc.d and the local startup directory]' \
+      '(* -q -d)-l[list all scripts in /etc/rc.d and the local startup directory]' \
       ':service name:_services'
   ;;
   *)

@@ -1,6 +1,26 @@
 #compdef zdump
 
-_arguments \
-  '-v[lowest possible]' \
-  '-c[cutoff]:cutoff year:' \
+local -a args
+
+case $OSTYPE in
+  aix*|(net|free)bsd*|linux*|solaris*)
+    args+=( '(-)--version[display version information]' )
+  ;|
+  aix*|(net|free)bsd*|linux*)
+    args+=( '(-)--help[display usage information]' )
+  ;|
+  (net|free)bsd*|linux*)
+    args+=( '-i[output a description of time intervals]' )
+  ;|
+  aix*|(free|net|open)bsd*|linux*)
+    args+=(
+      '(-c)-t[cut off interval output at the given times]:cut off (seconds since epoch)'
+      '(-v)-V[like -v, but omit times relative to the extreme time values]'
+    )
+  ;|
+esac
+
+_arguments -S $args \
+  '(-V)-v[print time at lowest possible time value]' \
+  '(-t)-c[cut off interval output at the given years]:cutoff years [-500,2500]' \
   '*:time zone:_time_zone'
