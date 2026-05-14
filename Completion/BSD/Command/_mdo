@@ -1,0 +1,48 @@
+#compdef mdo
+
+local environ e cmd cpp sep
+local -a _comp_priv_prefix suf reset
+local curcontext="$curcontext" state line expl
+local -A opt_args
+
+zstyle -a ":completion:${curcontext}:" environ environ
+
+for e in "${environ[@]}"
+do local -x "$e"
+done
+
+cmd="$words[1]"
+cpp='_comp_priv_prefix=( $cmd ${(kv)opt_args} )'
+_arguments -s -S -A '-*' : \
+  '(- *)-h[display usage information]' \
+  '--euid=[override effective user]:user:_users' \
+  '--egid=[override effective group]:group:_groups' \
+  '-G+[set supplementary groups]:group:_sequence _groups' \
+  '-g+[set primary group]:group:_groups' \
+  '-i[keep current primary and supplementary groups]' \
+  '(-u -i)-k[use current credentials as baseline]' \
+  '--ruid=[override real user]:user:_users' \
+  '--rgid=[override real group]:group:_groups' \
+  '-s+[incrementally modify the supplementary groups set]: :->group-mods' \
+  '--svuid=[override saved user]:user:_users' \
+  '--svgid=[override saved group]:group:_groups' \
+  '-u+[run command as specified user]: :_users' \
+  "(-)1: :{ $cpp; _command_names -e }" \
+  "*:: :{ $cpp; _normal }" && return
+
+if [[ $state = group-mods ]]; then
+  line=(
+    $opt_args[-g] ${(s.,.)opt_args[-G]}
+    ${${(s.,.)${(M)PREFIX##*,}}#[-+@]}
+    ${${(s.,.)${(M)SUFFIX%%,*}}#[-+@]}
+  )
+  compset -P '*,' || reset=( @ )
+  compset -S ',*' || suf=( -qS, )
+  if ! compset -P '[-+@]'; then
+    zstyle -s ":completion:${curcontext}:modifiers" list-separator sep || sep=--
+    _wanted modifiers expl 'group modifier' compadd -S "" -d \
+        "(-\ $sep\ exclude +\ $sep\ include @\ $sep\ reset)" - - + $reset
+  else
+    _wanted groups expl group _groups $suf -F line
+  fi
+fi

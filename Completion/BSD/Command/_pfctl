@@ -94,6 +94,7 @@ case $OSTYPE in
     args+=(
       '-M[kill matching states in the opposite direction]'
       '-P[display ports numerically]'
+      "-S[don't perform domain name resolution]"
     )
   ;;
 esac

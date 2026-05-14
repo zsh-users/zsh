@@ -44,8 +44,10 @@ else
     freebsd*)
       args+=(
 	'(-)-A[print process audit user ID]'
-	'(-)-M[print MAC label of the current process]'
+        '(- 1)-M[print MAC label of the current process]'
         '(-)-c[print current login class]'
+        '(-)-d[print home directory]'
+        '(-)-s[print shell]'
       )
     ;|
     darwin*|dragonfly*|freebsd*|netbsd*|openbsd*)

@@ -31,8 +31,14 @@ case $OSTYPE in
   ;|
   freebsd<14->.*)
     args+=(
+      '-b[show TCP black box logging socket state]'
       '-I[show local address of socket to which the current socket is spliced]'
       '-f[show the FIB number of each socket]'
+    )
+  ;|
+  freebsd<15->.*)
+    args+=(
+      '-A[show address of associated protocol control block (PCB)]'
     )
   ;|
   freebsd*)
