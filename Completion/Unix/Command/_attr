@@ -2,11 +2,9 @@
 
 case $service in
   attr)
-    local -a list
-    [[ $OSTYPE = irix* ]] &&
-        list=( '(-g -s -r -V)-l[list extended attributes associated with file]' )
     _arguments -s -S "$list[@]" \
       '(-l -r -s -V)-g[get extended attribute for file]:attribute name' \
+      '(-g -s -r -V)-l[list extended attributes associated with file]' \
       '(-l -g -s -q -V)-r[remove given attribute from file]:attribute name' \
       '(-l -g -r)-s[set named attribute for file]:attribute name' \
       '(-r)-q[quiet output]' \

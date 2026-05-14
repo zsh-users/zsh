@@ -21,12 +21,12 @@ local -a subcmd_string
 subcmd_string=(/$'[^\0]#\0'/ ':string:arbitrary string:( )')
 
 local -a subcmd_number
-subcmd_number=(/$'[0-9]##\0'/ ':number:decimal number:( )')
+subcmd_number=(/$'[0-9]##\0'/ ': _message -e numbers "decimal number"')
 
 local xp='[[:xdigit:]][[:xdigit:]]'
 local -a subcmd_lladdr
 subcmd_lladdr=(/"${xp}:${xp}:${xp}:${xp}:${xp}:${xp}"$'\0'/ 
-':lladdress:link layer (MAC) address:( )')
+  ': _message -e lladdresses "link layer (MAC) address"')
 
 local -a subcmd_ipaddr
 subcmd_ipaddr=(
@@ -57,7 +57,7 @@ _regex_words scope "IP address scope" \
 subcmd_scope=("$reply[@]")
 
 local -a subcmd_nud
-_regex_words nud "Neighbour Unreachability Detection state" \
+_regex_words nud "neighbour unreachability detection state" \
   'permanent:valid forever' \
   'noarp:valid, not validated, removed if expired' \
   'reachable:valid until reachability timeout' \
@@ -65,7 +65,7 @@ _regex_words nud "Neighbour Unreachability Detection state" \
 subcmd_nud=("$reply[@]")
 
 local -a subcmd_rttype
-_regex_words route-type "Route type" \
+_regex_words route-type "route type" \
   'unicast:real point-to-point route' \
   'unreachable:generate Host Unreachable messages' \
   'blackhole:silently discard' \
@@ -85,12 +85,12 @@ local -a subcmd_route
 subcmd_route=("(" $subcmd_rttype "|" ")" $subcmd_ipaddr)
 
 local -a subcmd_tos
-_regex_words tos "type of service" \
+_regex_words tos "service type" \
   'lowdelay:low latency' \
   'throughput:high bulk throughput' \
   'reliability:high reliability'
 subcmd_tos=("(" "$reply[@]" "|"
-  /$'(|0x)[[:xdigit:]]##\0'/ ":hex-number:8-bit hex number:( )" ")")
+  /$'(|0x)[[:xdigit:]]##\0'/ ":hex-numbers:8-bit hex number:( )" ")")
 
 local -a subcmd_lockmtu
 subcmd_lockmtu=("(" /$'lock\0'/ ":lock:lock:(lock)" "|" ")" $subcmd_number )
@@ -123,7 +123,7 @@ local -a subcmd_rtrealm subcmd_rtrealms
 _regex_words -t / rtrealm 'routing realm' \
   'cosmos:everywhere'
 subcmd_rtrealms=("(" "$reply[@]" "|" /$'[0-9]##/'/
-  ':number:decimal number:( )' ")")
+  ':numbers:decimal number:( )' ")")
 
 _regex_words rtrealm 'routing realm' \
   'cosmos:everywhere'
@@ -160,22 +160,46 @@ _regex_words tunnelmode 'tunnel mode' \
   'gre:Generic Route Encapsulation - IPv4/IPv6 in IPv4 tunnel'
 subcmd_tunnelmode=("$reply[@]")
 
-local -a subcmd_files
-subcmd_files=(/$'[^\0]##\0'/ ':file:file name:_files')
+local -a subcmd_linktype
+subcmd_linktype=(/$'[^\0]##\0'/ ':link-types:link type:(bridge bond dummy hsr ifb ipoib macvlan macvtap vcan veth vlan vxlan ip6tnl ipip sit gre gretap ip6gre ip6gretap vti nlmon ipvlan lowpan geneve macsec vrf)')
 
+local -a subcmd_files
+subcmd_files=(/$'[^\0]##\0'/ ':files:file:_files')
 
 #
 # The ip top-level commands.  First link
 #
+
+local -a link_common_cmds
+link_common_cmds=(
+  'txq*ueuelen:specify length of transmit queue:$subcmd_number' \
+  'ad*dress:specify unicast link layer (MAC) address:$subcmd_lladdr' \
+  'br*oadcast:specify broadcast link layer (MAC) address:$subcmd_lladdr' \
+  'm*tu:specify maximum transmit unit:$subcmd_number'
+)
+local -a link_add_cmds
+_regex_words \
+  link-add-commands 'link add command' $link_common_cmds \
+    'link:specify device:$subcmd_dev' \
+    'name:specify name' \
+    'type:specify type:$subcmd_linktype' \
+    'numtxqueues:specify number of transmit queues:$subcmd_number' \
+    'numrxqueues:specify number of receive queues:$subcmd_number' \
+    'index:specify desired index' \
+    'group:multicast IP address to join:$subcmd_lladdr'
+link_add_cmds=( "$reply[@]" "#" )
+
 local -a link_set_cmds
 _regex_words \
-  link-set-commands 'link set commands' \
+  link-set-commands 'link set command' \
   'dev:specify device:$subcmd_dev' \
   'u*p:change state to up' \
   'do*wn:change state to down' \
   'ar*p:change ARP flag on device:$subcmd_onoff' \
   'mu*lticast:change MULTICAST flag on device:$subcmd_onoff' \
+  'allmulticast:change allmulticast flag on device:$subcmd_onoff' \
   'pr*omisc:set promiscuous mode:$subcmd_onoff' \
+  'protodown:change the PROTODOWN state on the device:$subcmd_onoff' \
   'dy*namic:change DYNAMIC flag on device:$subcmd_onoff' \
   'n*ame:change name of device:$subcmd_string' \
   'txq*ueuelen:specify length of transmit queue:$subcmd_number' \
@@ -189,7 +213,7 @@ _regex_words \
 link_set_cmds=("(" $subcmd_dev "|" ")" "$reply[@]" "#" )
 
 local -a link_show_cmds
-_regex_words link-show-commands 'link show commands' \
+_regex_words link-show-commands 'link show command' \
   'dev:specify device:$subcmd_dev' \
   'up:limit display to running devices'
 link_show_cmds=("(" $subcmd_dev "|" ")" "$reply[@]" "#" )
@@ -197,15 +221,16 @@ link_show_cmds=("(" $subcmd_dev "|" ")" "$reply[@]" "#" )
 local -a link_cmds
 _regex_words \
   link-commands "link command" \
+  'a*dd:add virtual link:$link_add_cmds' \
   'h*elp:show help for command' \
   'se*t:change device attributes:$link_set_cmds' \
   'sh*ow:display device attributes:$link_show_cmds'
 link_cmds=("$reply[@]")
 
-
 #
 # addr
 #
+
 local -a addr_add_cmds
 # TODO: broadcast can take + or =
 _regex_words addr-add-commands "addr add/remove/change/replace commands" \
@@ -214,7 +239,12 @@ _regex_words addr-add-commands "addr add/remove/change/replace commands" \
   'p*eer:specify peer IP address (point-to-point):$subcmd_ipaddr' \
   'b*roadcast:specify broadcast IP address:$subcmd_ipaddr' \
   'la*bel:specify tag for device:$subcmd_string' \
-  's*cope:specify scope for address:$subcmd_scope'
+  's*cope:specify scope for address:$subcmd_scope' \
+  'valid_lft:specify valid lifetime of this address' \
+  'preferred_lft:specify valid lifetime of this address' \
+  'home:designate this address as the "home address" (IPv6)' \
+  'mngtmpaddr:manage temporary addresses created from this one as template on behalf of Privacy Extensions'
+
 # can complete IP address with no keyword
 addr_add_cmds=("(" $subcmd_ipaddr "|" ")" "$reply[@]" "#" )
 
@@ -282,6 +312,7 @@ addrlabel_cmds=("$reply[@]")
 #
 # neigh
 #
+
 local -a neigh_add_cmds
 _regex_words neigh-add-commands "neighbour add command" \
   't*o:add new neighbour IP address:$subcmd_ipaddr' \
@@ -321,6 +352,7 @@ neigh_cmds=("$reply[@]")
 #
 # route
 #
+
 local -a route_add_cmds
 _regex_words route-add-commands "route add/change/replace command" \
   'to:route destination prefix:$subcmd_route' \
@@ -393,10 +425,10 @@ _regex_words \
   'g*et:get a single network route:$route_get_cmds'
 route_cmds=("$reply[@]")
 
-
 #
 # rule
 #
+
 local -a rule_add_cmds
 _regex_words rule-add-commands 'ip rule add/delete commands' \
   'ty*xpe:type of rule:$subcmd_ruletypes' \
@@ -423,10 +455,10 @@ _regex_words \
   's*how:list routing rules'
 rule_cmds=("$reply[@]")
 
-
 #
 # tunnel
 #
+
 local -a tunnel_add_cmds
 _regex_words tunnel-add-commands 'tunnel add/change/delete commands' \
   'na*me:select tunnel device name:$subcmd_dev' \
@@ -461,10 +493,10 @@ _regex_words \
   's*how:list IP tunnels'
 tunnel_cmds=("$reply[@]")
 
-
 #
 # maddr
 #
+
 local -a maddr_add_cmds
 _regex_words maddr-add-commands "maddr add/delete command" \
   'a*ddress:select link layer (MAC) address:$subcmd_lladdr' \
@@ -486,10 +518,10 @@ _regex_words \
   's*how:list multicast addresses:$maddr_show_cmds'
 maddr_cmds=("$reply[@]")
 
-
 #
 # mroute
 #
+
 local -a mroute_show_cmds
 _regex_words mroute-show-commands "mroute show command" \
   'to:select destination prefix:$subcmd_ipaddr' \
@@ -504,10 +536,10 @@ _regex_words \
   's*how:list multicast routing cache entries:$mroute_show_cmds'
 mroute_cmds=("$reply[@]")
 
-
 #
 # monitor
 #
+
 local -a monitor_cmds
 _regex_words \
   monitor-commands "monitor command" \
@@ -518,7 +550,6 @@ _regex_words \
   'route:monitor changes to routes' \
   'file:read rtmon-generated log:$subcmd_files'
 monitor_cmds=("$reply[@]")
-
 
 #
 # Global argument handling
@@ -531,20 +562,18 @@ args=(
     /$'[^\0]#\0'/
 )
 
-# TODO:
-# -b*atch <FILENAME>
-# -force (for batch mode)
-# -l*oops <COUNT>
-# -n*etns <NETNS>
-# -rc, -rcvbuf<SIZE>
-_regex_words options "ip options" \
-  '-h*uman:output statistics with human readable values' \
+_regex_words options "ip option" \
+  '-V*ersion:display version information' \
+  '-h*uman-readable:output statistics with human readable values' \
+  '-b*atch:read commands from specified file:$subcmd_files' \
+  '-force:do not terminate on errors in batch mode' \
   '-i*ec:print human readable rates in IEC units (ie. 1K = 1024)' \
   '-s*tatistics:output statistics' \
   '-d*etails:output more detailed information' \
   '-c*olor:color output' \
   '-br*ief:brief output' \
   '-a*ll:executes specified command over all objects' \
+  '-l*oops:specify maximum loops ip address flush logic will attempt:$subcmd_number' \
   '-f*amily:select protocol family:$subcmd_family' \
   '-4:IPv4' \
   '-6:IPv6' \
@@ -556,9 +585,17 @@ _regex_words options "ip options" \
   '-o*neline:output one record per line' \
   '-j*son:output results in JSON' \
   '-p*retty:pretty print JSON' \
+  '-r*esolve:use system resolver for DNS names' \
+  '-n*etns:switch to specified network namespace:$subcmd_string' \
+  '-N*umeric:print numbers instead of converting to text forms' \
+  '-a*ll:execute specified command over all objects' \
+  '-c*olor:use color output' \
   '-t*imestamp:display current time when using monitor option' \
-  '-ts*hort:display current time in shorter format when using monitor option' \
-  '-r*esolve:use system resolver for DNS names'
+  '-ts*hort:like -timestamp, but use shorter format' \
+  '-rc*vbuf:set the netlink socket receive buffer size:$subcmd_number' \
+  '-iec:print human readable rates in IEC units' \
+  '-j*son:output results in JSON format' \
+  '-echo:request the kernel to send applied changes back'
 args+=("$reply[@]" "#")
 
 _regex_words \
@@ -569,10 +606,23 @@ _regex_words \
   'r*oute:manage routing table:$route_cmds' \
   'ru*le:manage routing policy database:$rule_cmds' \
   'n*eigh:manage neighbour/ARP tables:$neigh_cmds' \
+  'nt*able:manage the neighbor cache operation' \
   't*unnel:configure tunnel:$tunnel_cmds' \
+  'net*ns:manage network namespaces' \
+  'l2*tp:tunnel ethernet over IP (L2TPv3)' \
+  'f*ou:UDP receive port configuration' \
+  'mac*sec:MACsec device configuration' \
+  'tcp_metrics:manage TCP metrics' \
+  'token:manage tokenized interface identifiers' \
+  'netc*onf:network configuration monitoring' \
+  ila ioam mptcp nexthop vrf sr stats \
   'm*addr:manage multicast addresses:$maddr_cmds' \
   'mr*oute:manage multicast routing cache:$mroute_cmds' \
-  'mo*nitor:monitor state:$monitor_cmds'
+  'mru*le:multicast routing policy database' \
+  'mo*nitor:monitor state:$monitor_cmds' \
+  'tunt*ap:manage TUN/TAP devices' \
+  'x*frm:manage IPSec policies' \
+  'help'
 args+=("$reply[@]")
 
 _regex_arguments _ip "${args[@]}"

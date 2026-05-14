@@ -11,6 +11,7 @@ _arguments -s -C \
   '--debug-loglevel=[set debug level]:debug level:(error debug data all)' \
   '--debug-logfile=[name of file to write debug info to]:file:_files' \
   '(-q --quiet)'{-q,--quiet}'[quiet output]' \
+  '(-q --quiet)--parsable[simple parsable output]' \
   '--hook-script=[hook script to call after downloads, captures, etc.]:file:_files' \
   '--stdout[send file to stdout]' \
   '--stdout-size[print filesize before data]' \
@@ -41,8 +42,8 @@ _arguments -s -C \
   '--keep[keep images on camera after capturing]' \
   '--keep-raw[keep the RAW images on the camera with --capture-image-and-download]' \
   '--no-keep[remove images from camera after capturing]' \
-  '--wait-event=-[wait for event from camera]::count' \
-  '--wait-event-and-download=-[wait for event from camera and download new images]::count' \
+  '--wait-event=-[wait for event from camera]:: :_numbers -u events -d forever wait\ time s\:seconds ms\:milliseconds' \
+  '--wait-event-and-download=-[wait for event from camera and download new images]:: :_numbers -u events -d forever wait\ time s\:seconds ms\:milliseconds' \
   '--capture-preview[capture a quick preview]' \
   '--show-preview[capture a quick preview and display using ASCII art]' \
   '(-B --bulb)'{-B,--bulb=}'[set bulb exposure time]:exposure time (seconds)' \
@@ -54,7 +55,7 @@ _arguments -s -C \
   '--capture-image-and-download[capture an image and download it]' \
   '--capture-movie=-[capture a movie]:count or seconds' \
   '--capture-sound[capture an audio clip]' \
-  '--capture-tethered=-[wait for shutter release on the camera and download]::count' \
+  '--capture-tethered=-[wait for shutter release on the camera and download]:: :_numbers -u events wait\ time s\:seconds ms\:milliseconds' \
   '(-l --list-folders)'{-l,--list-folders}'[list folders in folder]' \
   '(-L --list-files)'{-L,--list-files}'[list files in folder]' \
   '(-m --mkdir)'{-m,--mkdir=}'[create a directory]:directory' \
@@ -75,6 +76,7 @@ _arguments -s -C \
   '(-D --delete-all-files)'{-D,--delete-all-files}'[delete all files in folder]' \
   '(-u --upload-file)'{-u,--upload-file=}'[upload a file to camera]:file:_files' \
   '--filename=[specify pattern to save file as]:pattern:_date_formats' \
+  '--filenumber=[specify the number %n in the filename pattern starts at]:starting number [1]' \
   '(-f --folder)'{-f,--folder=}'[specify camera folder]:folder [/]' \
   '(-R --recurse --no-recurse)'{-R,--recurse}'[recursion (default for download)]' \
   '(-R --recurse)--no-recurse[no recursion (default for deletion)]' \

@@ -1,5 +1,16 @@
 2026-05-14  Oliver Kiddle  <opk@zsh.org>
 
+	* 54528: Completion/Linux/Command/_valgrind,
+	Completion/Linux/Command/_selinux, Completion/Linux/Command/_strace,
+	Completion/Unix/Command/_ansible, Completion/Unix/Command/_attr,
+	Completion/Unix/Command/_diffstat, Completion/Unix/Command/_dig,
+	Completion/Unix/Command/_entr, Completion/Unix/Command/_git,
+	Completion/Unix/Command/_gphoto2, Completion/Unix/Command/_ip,
+	Completion/Unix/Command/_jq, Completion/Unix/Command/_mtr,
+	Completion/Unix/Command/_pandoc, Completion/Unix/Command/_pv,
+	Completion/Unix/Command/_sqlite, Completion/X/Command/_pdftk:
+	completion option updates and minor cleanups
+
 	* 54526: Completion/BSD/Command/_ipfw, Completion/BSD/Command/_mdo,
 	Completion/BSD/Command/_jls, Completion/BSD/Command/_jail,
 	Completion/BSD/Command/_pfctl, Completion/BSD/Command/_sockstat,

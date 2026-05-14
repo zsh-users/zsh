@@ -9,10 +9,10 @@ _pandoc_format() {
   local format=${PREFIX%%(+|-)*}
   if compset -P '*(+|-)'; then
     local pm=${IPREFIX[-1]}   # '+' or '-'
-    local -a extensions=(${${$(pandoc --list-extensions=$format):#$pm*}#(+|-)})
+    local -a extensions=( ${${$(_call_program extensions pandoc --list-extensions=$format):#$pm*}#(+|-)} )
     _wanted extensions expl 'extension' compadd -S '+' -r '-+ ' -a extensions
   else
-    local -a formats=( $(pandoc --list-$inout[2]-formats) )
+    local -a formats=( $(_call_program formats pandoc --list-$inout[2]-formats) )
     _wanted formats expl 'format' compadd -S '+' -r '-+ ' -a formats
   fi
 }
@@ -22,15 +22,19 @@ _pandoc_format() {
 _pandoc_all_formats(){
   local -a expl
   local -aU formats
-  formats=( $(pandoc --list-input-formats) $(pandoc --list-output-formats) )
-  _wanted formats expl 'format' compadd -a formats
+  formats=(
+    $(_call_program input-formats pandoc --list-input-formats)
+    $(_call_program output-formats pandoc --list-output-formats)
+  )
+  _description formats expl 'format'
+  compadd "$expl[@]" "$@" -a formats
 }
 
 # pdf engine choice
 (( $+functions[_pandoc_pdf_engine] )) ||
 _pandoc_pdf_engine(){
   _alternative \
-    'engines:engine:(pdflatex lualatex xelatex latexmk tectonic wkhtmltopdf weasyprint prince context pdfroff)' \
+    'engines:engine:(pdflatex lualatex xelatex latexmk tectonic wkhtmltopdf weasyprint pagedjs-cli prince context groff pdfroff typst)' \
     'engine-executables:engine executable:_files -g "*(#q*)"'
 }
 
@@ -43,7 +47,7 @@ _pandoc_pdf_engine_opts(){
       _tex
       ;;
     *)
-      _message "Options for ${pdf_engine}"
+      _message "option for ${pdf_engine}"
       ;;
   esac
 }
@@ -79,7 +83,7 @@ _pandoc_template(){
 (( $+functions[_pandoc_highlight_style] )) ||
 _pandoc_highlight_style(){
   _alternative \
-    'styles:style:( $(pandoc --list-highlight-styles) )' \
+    'styles:style:( $(_call_program styles pandoc --list-highlight-styles) )' \
     'style-files:style file:_files -g "*.theme(-.)"'
 }
 
@@ -195,7 +199,8 @@ _arguments -s \
   '--abbreviations=[specify a custom abbreviations file]:file:_files ' \
   {-s,--standalone}'[produce output with an appropriate header and footer]' \
   '--template=[use specified file as a custom template for the generated document. Implies --standalone]: :_pandoc_template' \
-  {\*-V+,\*--variable=}'[set the variable KEY to the value VALUE]:key\:value: ' \
+  {\*-V+,\*--variable=}'[set a template variable]:key\:value' \
+  \*--variable-json='[set a template variable to the value specified by a JSON string]:key\:json' \
   '(- :)'{-D+,--print-default-template=}'[print the system default template for an output]:format:( $(pandoc --list-output-formats) )' \
   '(- :)--print-default-data-file=[print a system default data file]:file: ' \
   '--eol=[manually specify line endings (crlf|lf|native)]: :_pandoc_eol' \
@@ -217,6 +222,7 @@ _arguments -s \
   '--no-check-certificate[disable the certificate verification]' \
   '--self-contained[produce a standalone HTML file with no external dependencies, using data: URIs to incorporate the contents of linked scripts, stylesheets, images, and videos. Implies --standalone]' \
   '--embed-resources=-[produce a standalone HTML document with no external dependencies]::enable:(true false)' \
+  '--link-images=-[include links to images instead of embedding the images in ODT]::enable:(true false)' \
   '--html-q-tags[use <q> tags for quotes in HTML]' \
   '--ascii[use only ASCII characters in output, supported only for HTML and DocBook output]' \
   '--reference-links[use reference-style links, rather than inline links]' \
@@ -224,7 +230,9 @@ _arguments -s \
   '--markdown-headings[specify style for level1 and 2 headings in markdown output]:style [atx]:(setext atx)' \
   '--list-tables=-[render tables as list tables in RST output]::enable(true false)' \
   '--top-level-division=[treat top-level headers as given division type in LaTeX, ConTeXt, DocBook and TEI output]:top level division:(default section chapter part)' \
-  {-N,--number-sections}'[number section headings in LaTeX, ConTeXt, HTML, or EPUB output]' \
+  '(--lof --list-of-figures)'{--lof=-,--list-of-figures=-}'[include an automatically generated list of figures]::enable:(true false)' \
+  '(--lot --list-of-tables)'{--lot=-,--list-of-tables=-}'[include an automatically generated list of tables]::enable:(true false)' \
+  '(-N --number-sections)'{-N-,--number-sections=-}'[number section headings in LaTeX, ConTeXt, HTML, or EPUB output]::enable:(true false)' \
   '--number-offset=[specify offset for section headings in HTML output (ignored in other output formats)]:number[number,...] [0]' \
   '--listings[use the listings package for LaTeX code blocks]' \
   {-i,--incremental}'[make list items in slide shows display incrementally (one by one)]' \

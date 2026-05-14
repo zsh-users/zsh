@@ -47,6 +47,7 @@ options+=(
   $^dashes'-bail[stop after hitting an error]'
   $^dashes'-cmd[run specified command before reading stdin]:sqlite meta-command'
   $^dashes'-deserialize[open the database using sqlite3_deserialize()]'
+  $^dashes'-escape[set rendering of control characters in output]:escape [ascii]:(symbol ascii off)'
   '(-*batch -*interactive)'$^dashes'-batch[force batch I/O]'
   '(-*batch -*interactive)'$^dashes'-interactive[force interactive I/O]'
   $^dashes'-lookaside[specify size and number of entries for lookaside memory]:size (bytes): :entries'

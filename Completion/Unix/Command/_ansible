@@ -50,11 +50,12 @@ case $service in
     args+=(
       '(-J --ask-vault-pass --ask-vault-password)'{-J,--ask-vault-pass{,word}}'[ask for vault password]'
       \*{-e+,--extra-vars=}'[set additional variables]:key=value, YAML/JSON or @file:->extra-vars'
+      '--flush-cache[clear fact cache for every host in inventory]'
       '*--vault-id=[specify vault identity to use]:vault identity'
       --vault-pass{,word}-file='[specify vault password file]:vault password file:_files'
       \*{-i+,--inventory=}'[specify inventory host file or host list]: : _alternative "files\:inventory file\:_files"
 	"hosts\:host\: _sequence _hosts"'
-      '!(-i --inventory)--inventory-file=:inventory file:_files'
+      '!*--inventory-file=:inventory file:_files'
       '(-l --limit --host --graph)'{-l+,--limit=}'[further limit hosts to an additional pattern]:host subset:->hosts'
     )
   ;|
