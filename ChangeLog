@@ -1,5 +1,7 @@
 2026-05-14  Oliver Kiddle  <opk@zsh.org>
 
+	* 54527: Src/Zle/zle_misc.c: don't start a vi change from emacs mode
+
 	* 54528: Completion/Linux/Command/_valgrind,
 	Completion/Linux/Command/_selinux, Completion/Linux/Command/_strace,
 	Completion/Unix/Command/_ansible, Completion/Unix/Command/_attr,
