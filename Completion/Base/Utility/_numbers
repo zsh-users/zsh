@@ -37,7 +37,8 @@
 # _description is called with the x token set to make the completed
 # list of suffixes available to the normal format style
 
-local desc tag range suffixes suffix suffixfmt pat='<->' partial=''
+local MATCH MBEGIN MEND
+local desc tag range suffixes suffix suffixfmt pad pat='<->' partial=''
 local -a expl formats
 local -a default max min keep tags units
 local -i i
@@ -56,7 +57,9 @@ desc="${1:-number}" tag="${tags[2]:-numbers}"
 if (( $#argv )) && compset -P "$pat"; then
   zstyle -s ":completion:${curcontext}:units" list-separator sep || sep=--
   _description -V units expl unit
-  disp=( ${${argv#:}/:/ $sep } )
+  pad=${#${(O)${${argv%%:*}//?/.}}[1]} # length of longest suffix
+  disp=( ${${argv#:}/(#m)[^:]##/${(pr<$pad>< >)MATCH}} ) # pad suffixes
+  disp=( ${disp/:/ $sep } )
   compadd -M 'r:|/=* r:|=*' -d disp "$keep[@]" "$expl[@]" - ${${argv#:}%%:*}
   return
 elif [[ -prefix $~pat || $PREFIX = $~partial ]]; then

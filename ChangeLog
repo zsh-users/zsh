@@ -1,3 +1,7 @@
+2026-05-21  dana  <dana@dana.is>
+
+	* 54574: Completion/Base/Utility/_numbers: align descriptions
+
 2026-05-18  Oliver Kiddle  <opk@zsh.org>
 
 	* github #172: gi1242: Completion/X/Command/_sioyek: Completion
