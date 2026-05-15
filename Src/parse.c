@@ -3882,10 +3882,14 @@ check_dump_file(char *file, struct stat *sbuf, char *name, int *ksh,
 #ifdef USE_MMAP
 
 	if (f) {
-	    Eprog prog = (Eprog) zalloc(sizeof(*prog));
+	    Eprog prog;
 	    Patprog *pp;
-	    int np;
+	    size_t np;
 
+	    if (h->npats > h->len / sizeof(wordcode))
+		return NULL;
+
+	    prog = (Eprog) zalloc(sizeof(*prog));
 	    prog->flags = EF_MAP;
 	    prog->len = h->len;
 	    prog->npats = np = h->npats;
@@ -3917,7 +3921,12 @@ check_dump_file(char *file, struct stat *sbuf, char *name, int *ksh,
 	{
 	    Eprog prog;
 	    Patprog *pp;
-	    int np, fd, po = h->npats * sizeof(Patprog);
+	    int fd;
+	    size_t np, po;
+
+	    if (h->npats > h->len / sizeof(wordcode))
+		return NULL;
+	    po = h->npats * sizeof(Patprog);
 
 	    if ((fd = open(file, O_RDONLY)) < 0 ||
 		lseek(fd, ((h->start * sizeof(wordcode)) +

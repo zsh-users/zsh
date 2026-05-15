@@ -1,5 +1,8 @@
 2026-05-21  dana  <dana@dana.is>
 
+	* Michael Ridgway: 54571: Src/parse.c, Test/B14zwc.ztst: bound
+	h->npats in .zwc loader
+
 	* unposted: Test/D07multibyte.ztst: add regression test for
 	w/54583
 
