@@ -1,0 +1,16 @@
+#compdef papers
+
+_arguments -s -S \
+  - '(help)' \
+  '--version[show the version of the program]' \
+  {-h,--help}'[show help options]' \
+  '--help-all[show all help options]' \
+  '--help-gapplication[show GApplication options]' \
+  - normal \
+  '--gapplication-service[enter GApplication service mode (use from D-Bus service files)]' \
+  '(-p --page-label -i --page-index -n --named-dest)'{-p,--page-label=}'[specify the page label of the document to display]:page label:' \
+  '(-p --page-label -i --page-index -n --named-dest)'{-i,--page-index=}'[specify the page number of the document to display]:page index:' \
+  '(-p --page-label -i --page-index -n --named-dest)'{-n,--named-dest=}'[specify named destination to display]:named destination:' \
+  '(-f --fullscreen -s --presentation)'{-f,--fullscreen}'[run papers in fullscreen mode]' \
+  '(-f --fullscreen -s --presentation)'{-s,--presentation}'[run papers in presentation mode]' \
+  '*:document file:_files -g "*.(#i)(cb7|cbr|cbt|cbz|djv|djvu|pdf|tif|tiff)(-.)"' \
