@@ -520,8 +520,12 @@ item(tt(-d) var(array))(
 This adds per-completion display strings. The var(array) should contain one
 element per var(completion) given. The completion code will then display the
 first element instead of the first var(completion), and so on. The
-var(array) may be given as the name of an array parameter or directly
-as a space-separated list of words in parentheses.
+var(array) may be given as the name of an array parameter, or directly
+as a literal array enclosed in parentheses. A literal array is a space or
+comma separated list of words; quotes have no special meaning and
+backslashes can be used for escaping (for example, tt('(foo\ bar)') produces
+one element, tt(foo bar), while tt('(foo bar)') produces two elements,
+tt(foo) and tt(bar)).
 
 If there are fewer display strings than var(completions), the leftover
 var(completions) will be displayed unchanged and if there are more display
