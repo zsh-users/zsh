@@ -1,3 +1,7 @@
+2026-05-15  dana  <dana@dana.is>
+
+	* unposted: Util/zsh-merge-changelog: find more context
+
 2026-05-14  Oliver Kiddle  <opk@zsh.org>
 
 	* 54527: Src/Zle/zle_misc.c: don't start a vi change from emacs mode
