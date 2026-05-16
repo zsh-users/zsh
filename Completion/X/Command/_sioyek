@@ -1,0 +1,29 @@
+#compdef sioyek
+
+_arguments -S \
+  '--new-instance[create a new instance of sioyek when opening a file]' \
+  '--instance-name[select a specific sioyek instance by name]:name: ' \
+  '--new-window[open file in a new window within same instance]' \
+  '--reuse-window[force reuse of current window]' \
+  '--nofocus[do not bring instance to foreground]' \
+  '--version[print sioyek version]' \
+  '--page[which page to open]:page number: ' \
+  '--focus-text[set a visual mark on line including text]:text: ' \
+  '--focus-text-page[page to use for focus-text]:page number: ' \
+  '--inverse-search[command to execute for inverse search]:command: ' \
+  '--execute-command[command to execute on running instance]:command: ' \
+  '--execute-command-data[optional data for execute-command]:data: ' \
+  '--forward-search-file[forward search on file]:file:_files' \
+  '--forward-search-line[forward search on line]:line: ' \
+  '--forward-search-column[forward search on column]:column: ' \
+  '--zoom[set zoom level]:zoom level: ' \
+  '--xloc[set x position within page]:x-coordinate: ' \
+  '--yloc[set y position within page]:y-coordinate: ' \
+  '--window-id[apply command to specific window id]:window id: ' \
+  '--shared-database-path[path for shared bookmarks/highlights]:database path:_files' \
+  '--verbose[print extra information]' \
+  '--wait-for-response[wait for command to finish before returning]' \
+  '--no-auto-config[disable all config files except those next to executable]' \
+  '(-h --help)'{-h,--help}'[display help information]' \
+  '--help-all[display help including generic Qt options]' \
+  '*:pdf file:_files -g "*.pdf(-.)"'
