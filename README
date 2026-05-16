@@ -102,6 +102,29 @@ consistent and better aligned with the POSIX-2017 specification of
       f() { { false; echo "This is printed only since 5.10." } || true }
       if f; then true; fi
 
+EXIT traps are now correctly executed when the shell exits due to
+ERR_EXIT, `${var:?}', or NO_UNSET (set -u) triggering inside a
+function.  Previously, these code paths bypassed the function scope
+unwind, so EXIT traps saved by `starttrapscope()' on function entry
+were never restored or executed.  Examples:
+
+    setopt ERR_EXIT
+    trap 'echo exiting' EXIT
+    f() { false }
+    f
+    # "exiting" is printed only since 5.10.
+
+    trap 'echo exiting' EXIT
+    f() { : ${unset:?oops} }
+    f
+    # "exiting" is printed only since 5.10.
+
+    setopt NO_UNSET
+    trap 'echo exiting' EXIT
+    f() { echo $unset }
+    f
+    # "exiting" is printed only since 5.10.
+
 PCRE support is now PCRE2.
 
 Parameter names may begin with a "." and follow a relaxed implementation
