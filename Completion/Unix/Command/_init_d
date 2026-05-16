@@ -124,12 +124,20 @@ cmds=( $(_init_d_get_cmds) ) || return 1
 
 local svcname=$words[1]
 
-if (( $+functions[_init_d-$svcname] )); then
-  _arguments -C -s -A "-*" $flags \
-    ':init.d command:_sub_commands $cmds' \
-    '*:: :->svcargs' && return
+_arguments -C -s -A "-*" $flags \
+  ':init.d command:_sub_commands $cmds' \
+  '*:: :->svcargs' && return
 
-  [[ $state == svcargs ]] && _init_d-$svcname $line[1]
-else
-  _arguments -s -A "-*" $flags ':init.d command:_sub_commands $cmds'
+if [[ $state == svcargs ]]; then
+  case $svcname in
+    jail)
+      case $line[1] in
+        *stop|*restart|console|status) _jails ;;
+        *) _jails -c ;;
+      esac
+      ;;
+    *)
+      _call_function _ret _init_d-$svcname $line[1]
+      ;;
+  esac
 fi

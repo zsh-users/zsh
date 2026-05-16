@@ -16,8 +16,7 @@ param=${param[2]:-name}
 jails=( ${${(f)"$(_call_program jails jls $param name)"}/ /:} )
 
 if [[ -n $configured ]]; then
-  setopt localoptions extendedglob
-  local jail_conf line f include_pat
+  local jail_conf line f include_pat content
   local -a conf_files cjails running_names raw
   include_pat="(#b)[[:space:]]#.include[[:space:]]##[\"']([^\"']##)[\"']*"
 
@@ -35,10 +34,13 @@ if [[ -n $configured ]]; then
     conf_files+=( $jail_conf )
   fi
 
-  # Extract jail block names: lines matching "name {" (optionally indented)
+  # Extract jail block names: lines matching "name {" (optionally indented).
+  # Collapse "name\n{" forms to "name {" first so the same pattern catches both.
   for f in ${(u)conf_files}; do
     [[ -r $f ]] || continue
-    raw=( ${(M)${(f)"$(< $f)"}:#[[:space:]]#[^#[:space:]]##[[:space:]]#\{*} )
+    content=$(< $f)
+    content=${content//$'\n'[[:space:]]#\{/' {'}
+    raw=( ${(M)${(f)content}:#[[:space:]]#[^#[:space:]]##[[:space:]]#\{*} )
     cjails+=( ${${raw##[[:space:]]#}%%[[:space:]]#\{*} )
   done
 
