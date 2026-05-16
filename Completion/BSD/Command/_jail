@@ -1,7 +1,7 @@
 #compdef jail
 
 local curcontext="$curcontext" ret=1
-local -a state state_descr line jails running alts suf
+local -a state state_descr line alts suf
 local -A opt_args
 
 _arguments -C -s \
@@ -32,15 +32,17 @@ if [[ -n $state ]]; then
       *) _message -e values 'value' ;;
     esac
   elif compset -P name= || [[ $#line = 1 ]]; then
-    if (( $+opt_args[-r] || $+opt_args[-m] )); then
+    if (( $+opt_args[-r] || $+opt_args[-R] || $+opt_args[-m] )); then
       alts=( 'jails:jail:_jails' )
     elif (( $+opt_args[-c] )); then
-      running=( ${${(f)"$(_call_program jails jls name)"}/ /:} )
-      jails=( ${${(M)${(f)"$(<${opt_args[-f]:-/etc/jail.conf})"}:#[a-z]# #\{#(#e)}%% *} )
-      alts=( "jails:jail:compadd - ${jails:|running}" )
+      if (( $+opt_args[-f] )); then
+        alts=( "jails:jail:_jails -c -f ${(q-)opt_args[-f]}" )
+      else
+        alts=( 'jails:jail:_jails -c' )
+      fi
     fi
   fi
-  if [[ -z $IPREFIX ]]; then
+  if [[ -z $IPREFIX ]] && (( ! $+opt_args[-r] && ! $+opt_args[-R] )); then
     compset -S '=*' || suf=( -qS = )
     alts+=(
       'parameters:parameter:compadd -r "\n\t\- =" - persist allow.{set_hostname,sysvipc,raw_sockets,chflags,mount{,.devfs,.fdescfs,.fusefs,.nullfs,.procfs,.linprocfs,.linsysfs,.tmpfs,.zfs},vmm,quotas,read_msgbuf,socket_af,mlock,nfsd,reserved_ports,unprivileged_{parent_tampering,proc_debug},suser,extattr,adjtime,settime,routing,setaudit} linux linux.{osrelease,oss_version} mount.{devfs,fdescfs,procfs}'
