@@ -69,7 +69,9 @@ if [[ -n $state ]]; then
         shift words
         (( CURRENT-- ))
       done
-      _normal -p env && ret=0
+      _alternative \
+        'parameters:environment variable:_parameters -g "*export*" -qS=' \
+        'normal:: _normal -p env' && ret=0
     ;;
     user-class)
       if compset -P 1 '*/'; then
