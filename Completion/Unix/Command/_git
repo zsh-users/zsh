@@ -2591,56 +2591,71 @@ _tig () {
 
 (( $+functions[_git-config] )) ||
 _git-config () {
+  local curcontext="$curcontext" ret=1
+  local -a state state_descr line
+  local -a location filter display type include default comment
+  local -A opt_args
   local name_arg value_arg
-  local curcontext=$curcontext state line ret=1
-  declare -A opt_args
 
   if (( words[(I)--get-regexp] )); then
     name_arg=':name regex'
-  elif (( words[(I)--get-colorbool] )); then
-    name_arg=':: :->is-a-tty'
   elif (( words[(I)--get-color] )); then
     name_arg='::default'
   elif (( words[(I)--remove-section|--rename-section] )); then
-    name_arg=': :->section'
+    name_arg=': : __git_config_sections -b "(|)" "^" section-names "section name"'
   elif (( words[(I)--get|--get-all] )); then
-    name_arg=': :->gettable-option'
+    name_arg=': :->gettable-options'
   else
-    name_arg=': :->option'
+    name_arg=': :->commands-options'
   fi
 
   if (( words[(I)--rename-section] )); then
-    value_arg=': :->section'
+    value_arg=': : __git_config_sections -b "(|)" "^" section-names "section name"'
   else
-    value_arg=': :->value'
+    value_arg='*::: := ->values'
   fi
 
-  _arguments -C -S -s $endopt \
-    '(         --system --local --worktree -f --file --blob)--global[use user-global config file]' \
-    '(--global          --local --worktree -f --file --blob)--system[use system-wide config file]' \
-    '(--global --system         --worktree -f --file --blob)--local[use local config file]' \
-    '(--global --system --local            -f --file --blob)--worktree[use per-worktree config file]' \
-    '(--global --system --local --worktree           --blob)'{-f+,--file=}'[use given config file]:config file:_files' \
-    '(--global --system --local --worktree -f --file)--blob=[read config from given blob object]:blob:__git_blobs' \
-    '(-t --type --bool --int --bool-or-int --bool-or-str --path --expiry-date)'{-t+,--type=}'[ensure that incoming and outgoing values are canonicalize-able as the given type]:type:(bool int bool-or-int bool-or-str path expiry-date color)' \
-    '(-t --type --int --bool-or-int --bool-or-str --path --expiry-date)--bool[setting is a boolean]' \
-    '(-t --type --bool --bool-or-int --bool-or-str --path --expiry-date)--int[setting is an integer]' \
-    '(-t --type --bool --int --bool-or-str --path --expiry-date)--bool-or-int[setting is a boolean or integer]' \
-    '(-t --type --bool --int --bool-or-int --path --expiry-date)--bool-or-str[setting is a boolean or string]' \
-    '(-t --type --bool --int --bool-or-int --bool-or-str --expiry-date)--path[setting is a path]' \
-    '(-t --type --bool --int --bool-or-int --bool-or-str --path)--expiry-date[setting is an expiry date]' \
-    '(-z --null)'{-z,--null}'[end values with NUL and newline between key and value]' \
-    '--fixed-value[use string equality when comparing values]' \
-    '(--get --get-all --get-urlmatch --replace-all --add --unset --unset-all --rename-section --remove-section -e --edit --get-color --get-colorbool)--name-only[show variable names only]' \
-    '(--includes)'--no-includes"[don't respect \"include.*\" directives]" \
-    '(--no-includes)'--includes'[respect "include.*" directives in config files when looking up values]' \
-    '(--global --system --local -f --file --blob --get-urlmatch --replace-all --add --unset --unset-all --rename-section --remove-section -e --edit --get-color --get-colorbool --show-scope)--show-origin[show origin of config]' \
-    '(--global --system --local -f --file --blob --get-urlmatch --replace-all --add --unset --unset-all --rename-section --remove-section -e --edit --get-color --get-colorbool --show-origin)--show-scope[show scope of config (worktree, local, global, system, command)]' \
-    '(2 --add -e --edit -l --list --name-only --rename-section --remove-section --replace-all --unset --unset-all)--default=[with --get, use specified default value when entry is missing]:default' \
-    '--comment=[specify human-readable comment string]:comment' \
+  location=(
+    '(--system --local --worktree -f --file --blob)--global[use user-global config file]'
+    '(--global --local --worktree -f --file --blob)--system[use system-wide config file]'
+    '(--global --system --worktree -f --file --blob)--local[use local config file]'
+    '(--global --system --local -f --file --blob)--worktree[use per-worktree config file]'
+    '(--global --system --local --worktree --blob)'{-f+,--file=}'[use given config file]:config file:_files'
+    '(--global --system --local --worktree -f --file)--blob=[read config from given blob object]:blob:__git_blobs'
+  )
+  filter=(
+    '--fixed-value[use string equality when comparing values]'
+  )
+  display=(
+    '(-z --null)'{-z,--null}'[end values with NUL and newline between key and value]'
+    '(--get --get-all --get-urlmatch --replace-all --add --unset --unset-all --rename-section --remove-section -e --edit --get-color --get-colorbool)--name-only[show variable names only]'
+    '(--global --system --local -f --file --blob --get-urlmatch --replace-all --add --unset --unset-all --rename-section --remove-section -e --edit --get-color --get-colorbool --show-scope)--show-origin[show origin of config]'
+    '(--global --system --local -f --file --blob --get-urlmatch --replace-all --add --unset --unset-all --rename-section --remove-section -e --edit --get-color --get-colorbool --show-origin)--show-scope[show scope of config (worktree, local, global, system, command)]'
+    '--show-names[show config keys in addition to their values]'
+  )
+  type=(
+    '(-t --type --bool --int --bool-or-int --bool-or-str --path --expiry-date)'{-t+,--type=}'[ensure that incoming and outgoing values are canonicalize-able as the given type]:type:(bool int bool-or-int bool-or-str path expiry-date color)'
+    '(-t --type --int --bool-or-int --bool-or-str --path --expiry-date)--bool[setting is a boolean]'
+    '(-t --type --bool --bool-or-int --bool-or-str --path --expiry-date)--int[setting is an integer]'
+    '(-t --type --bool --int --bool-or-str --path --expiry-date)--bool-or-int[setting is a boolean or integer]'
+    '(-t --type --bool --int --bool-or-int --path --expiry-date)--bool-or-str[setting is a boolean or string]'
+    '(-t --type --bool --int --bool-or-int --bool-or-str --expiry-date)--path[setting is a path]'
+    '(-t --type --bool --int --bool-or-int --bool-or-str --path)--expiry-date[setting is an expiry date]'
+  )
+  include=(
+    '(--includes)'--no-includes"[don't respect \"include.*\" directives]"
+    '(--no-includes)'--includes'[respect "include.*" directives in config files when looking up values]'
+  )
+  default=(
+    '(2 --add -e --edit -l --list --name-only --rename-section --remove-section --replace-all --unset --unset-all)--default=[with --get, use specified default value when entry is missing]:default'
+  )
+  comment=(
+    '--comment=[specify human-readable comment string]:comment'
+  )
+
+  _arguments -C -S -s $endopt $location $filter $display $type $include $default \
     $name_arg \
     $value_arg \
-    '::value regex' \
     - '(actions)' \
       '(2 --name-only)--get[get the first matching value of the key]' \
       '(2 --name-only)--get-all[get all matching values of the key]' \
@@ -2654,25 +2669,79 @@ _git-config () {
       '(3 --bool --int --bool-or-int --bool-or-str --path -z --null --name-only --show-origin)--remove-section[remove the given section]' \
       '(: --bool --int --bool-or-int --bool-or-str --path)'{-l,--list}'[list all variables set in config file]' \
       '(-e --edit --bool --int --bool-or-int --bool-or-str --path -z --null --name-only --show-origin)'{-e,--edit}'[open config file for editing]' \
-      '(2 3 --bool --int --bool-or-int --bool-or-str --path -z --null --name-only --show-origin)--get-color[find color setting]: :->gettable-color-option' \
-      '(2 3 --bool --int --bool-or-int --bool-or-str --path -z --null --name-only --show-origin)--get-colorbool[check if color should be used]: :->gettable-colorbool-option' && ret=0
-  __git_config_option-or-value "$@" && ret=0
+      '(2 3 --bool --int --bool-or-int --bool-or-str --path -z --null --name-only --show-origin)--get-color[find color setting]: :->gettable-color-options' \
+      '(2 3 --bool --int --bool-or-int --bool-or-str --path -z --null --name-only --show-origin)--get-colorbool[check if color should be used]: :->gettable-colorbool-options:stdout is tty:(true false auto)' && ret=0
+
+  filter+=(
+    '--all[return all values for multi-valued config options]'
+    '--value=[show config with values matching the pattern]:pattern'
+  )
+
+  case $state/$line[1] in
+    values/(list|get|set|unset|re(name|move)-section|edit))
+      curcontext=${curcontext%:*}-$line[1]:
+    ;|
+    values/list)
+      _arguments $location $display $type $include && ret=0
+    ;;
+    values/get)
+      _arguments $location $display $type $filter $include $default \
+        '--regexp[interpret the name as a regular expression]' \
+        '--url=[show config matching the given URL]:url:_urls' && ret=0
+    ;;
+    values/set)
+      _arguments $location $type $filter $comment \
+        '--append[add a new line without altering any existing values]' && ret=0
+    ;;
+    values/unset)
+      _arguments $location $type $filter && ret=0
+    ;;
+    values/rename-section)
+      _arguments $location \
+        ': : __git_config_sections -b "(|)" "^" section-names "old section name"' \
+        ': : __git_config_sections -b "(|)" "^" section-names "new name"' && ret=0
+    ;;
+    values/remove-section)
+      _arguments $location \
+        ': : __git_config_sections -b "(|)" "^" section-names "section"' && ret=0
+    ;;
+    values/edit)
+      _arguments $location && ret=0
+    ;;
+    commands-options/*)
+      _alternative \
+        'commands:command:((
+          list:"list variables along with their values"
+          get:"emit the value for the specified key"
+          set:"set value for one or more config options"
+          unset:"remove value for one or more config options"
+          rename-section:"rename given section to a new name"
+          remove-section:"remove given section from the configuration file"
+          edit:"open editor to modify specified config file"
+        ))' \
+        'option-names: : __git_config_option-or-value' && ret=0
+    ;;
+    *)
+      __git_config_option-or-value "$@" && ret=0
+    ;;
+  esac
+
   return ret
 }
 
 (( $+functions[__git_config_option] )) ||
 __git_config_option () {
-  local -A opt_args=()
+  local -A opt_args
   local -a line=( ${words[CURRENT]%%=*} )
-  local state=option
+  local state=options
   __git_config_option-or-value "$@"
 }
 
 (( $+functions[__git_config_value] )) ||
 __git_config_value () {
-  local -A opt_args=()
+  local -A opt_args
   local -a line=( ${words[CURRENT]%%=*} ${words[CURRENT]#*=} )
-  local state=value
+  local state=values
   __git_config_option-or-value "$@"
 }
 
@@ -3356,18 +3425,7 @@ __git_config_option-or-value () {
   }
 
   case $state in
-    (section)
-      __git_config_sections -b '(|)' '^' section-names 'section name' $* && ret=0
-      ;;
-    (is-a-tty)
-      declare -a values
-      values=(
-        true
-        false
-        auto)
-      _describe -t values 'stdout is a tty' values && ret=0
-      ;;
-    (option)
+    (commands-|)options)
       local label=option
       declare -a sections sections_and_options options
 
@@ -3586,16 +3644,16 @@ __git_config_option-or-value () {
         sections_and_options -M 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' -qS . -- \
         options -M 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' "$@" && ret=0
       ;;
-    (gettable-option)
+    (gettable-options)
       _wanted git-options expl option compadd -M 'r:|.=* r:|=*' -a - git_present_options && ret=0
       ;;
-    (gettable-colorbool-option)
+    (gettable-colorbool-options)
       __git_config_sections -b '(|)' -a '(|)' '^color\.[^.]+$' gettable-colorbool-options option && ret=0
       ;;
-    (gettable-color-option)
+    (gettable-color-options)
       __git_config_sections -b '(|)' -a '(|)' '^color\.[^.]+\..*$' gettable-color-options option && ret=0
       ;;
-    (value)
+    (values)
       local current=${${(0)"$(_call_program current "git config $opt_args[(I)--system|--global|--local]" ${(kv)opt_args[(I)-f|--file]} "-z --get ${(q)line[1]}")"}#*$'\n'}
       case $line[1] in
         (alias.*)

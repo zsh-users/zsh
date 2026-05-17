@@ -1,3 +1,8 @@
+2026-05-18  Oliver Kiddle  <opk@zsh.org>
+
+	* 54576: Completion/Unix/Command/_git: adapt git config completon
+	to new sub-commands
+
 2026-05-16  dana  <dana@dana.is>
 
 	* unposted: Util/zsh-merge-changelog: zsh-merge-changelog: find
