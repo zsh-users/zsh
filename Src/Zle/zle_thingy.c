@@ -287,7 +287,7 @@ addzlefunction(char *name, ZleIntFunc ifunc, int flags)
     if(name[0] == '.')
 	return NULL;
     dotn[0] = '.';
-    strcpy(dotn + 1, name);
+    memcpy(dotn + 1, name, strlen(name) + 1);
     t = (Thingy) thingytab->getnode(thingytab, dotn);
     if(t && (t->flags & TH_IMMORTAL))
 	return NULL;

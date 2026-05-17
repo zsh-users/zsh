@@ -1596,7 +1596,7 @@ try_load_module(char const *name)
     for (pp = module_path; !ret && *pp; pp++) {
 	if (l + (**pp ? strlen(*pp) : 1) > PATH_MAX)
 	    continue;
-	sprintf(buf, "%s/%s.%s", **pp ? *pp : ".", name, DL_EXT);
+	snprintf(buf, sizeof(buf), "%s/%s.%s", **pp ? *pp : ".", name, DL_EXT);
 	unmetafy(buf, NULL);
 	if (*buf) /* dlopen(NULL) returns a handle to the main binary */
 	    ret = dlopen(buf, RTLD_LAZY | RTLD_GLOBAL);
@@ -1780,8 +1780,8 @@ module_func(Module m, const char *name)
     VARARR(char, buf, strlen(name) + strlen(m->node.nam)*2 + 1);
     char const *p;
     char *q;
-    strcpy(buf, name);
-    q = strchr(buf, 0);
+    memcpy(buf, name, strlen(name) + 1);
+    q = buf + strlen(name);
     for(p = m->node.nam; *p; p++) {
 	if(*p == '/') {
 	    *q++ = 'Q';
@@ -3472,7 +3472,7 @@ autofeatures(const char *cmdnam, const char *module, char **features,
 	    fchar = prefchar;
 	    fnam = *features;
 	    feature = zhalloc(strlen(fnam) + 3);
-	    sprintf(feature, "%c:%s", fchar, fnam);
+	    snprintf(feature, strlen(fnam) + 3, "%c:%s", fchar, fnam);
 	} else {
 	    feature = *features;
 	    if (*feature == '-') {
