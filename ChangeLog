@@ -1,5 +1,8 @@
 2026-05-18  Oliver Kiddle  <opk@zsh.org>
 
+	* 54578: Completion/Base/Utility/_numbers: relacement for 52373
+	without breaking use of the format style with a unit-suffixes tag
+
 	* 54577: Completion/Unix/Command/_env: restore environment variable
 	completion to env
 
