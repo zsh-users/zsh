@@ -1,5 +1,8 @@
 2026-05-16  dana  <dana@dana.is>
 
+	* github #169: Completion/Unix/Command/_darcs: update _darcs
+	from up-stream
+
 	* sph: github #161 (tweaked): Doc/Zsh/contrib.yo,
 	Functions/Misc/zkbd: allow zkbd to generate config in a custom
 	directory
