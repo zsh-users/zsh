@@ -1,3 +1,8 @@
+2026-05-16  dana  <dana@dana.is>
+
+	* github #169: Completion/Unix/Command/_darcs: update _darcs
+	from up-stream
+
 2026-05-15  dana  <dana@dana.is>
 
 	* unposted: Util/zsh-merge-changelog: find more context
