@@ -1,5 +1,8 @@
 2026-05-16  dana  <dana@dana.is>
 
+	* unposted: Util/zsh-merge-changelog: zsh-merge-changelog: find
+	even more context
+
 	* github #169: Completion/Unix/Command/_darcs: remove _darcs
 
 	* github #169: Completion/Unix/Command/_darcs: update _darcs
