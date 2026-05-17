@@ -23,7 +23,7 @@ if [[ -n $configured ]]; then
   if (( $#fopt )); then
     jail_conf=${fopt[2]}
   else
-    jail_conf=$(_call_program sysrc sysrc -n jail_conf)
+    jail_conf=$(_call_program paths sysrc -n jail_conf)
   fi
 
   # Follow .include directives (accepts both "..." and '...' paths)

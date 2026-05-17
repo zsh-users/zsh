@@ -33,12 +33,12 @@ if [[ -n $state ]]; then
     esac
   elif compset -P name= || [[ $#line = 1 ]]; then
     if (( $+opt_args[-r] || $+opt_args[-R] || $+opt_args[-m] )); then
-      alts=( 'jails:jail:_jails' )
+      alts=( 'jails:: _jails' )
     elif (( $+opt_args[-c] )); then
       if (( $+opt_args[-f] )); then
-        alts=( "jails:jail:_jails -c -f ${(q-)opt_args[-f]}" )
+        alts=( "jails:: _jails -c -f ${(q-)opt_args[-f]}" )
       else
-        alts=( 'jails:jail:_jails -c' )
+        alts=( 'jails:: _jails -c' )
       fi
     fi
   fi
