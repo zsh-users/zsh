@@ -1,5 +1,8 @@
 2026-05-21  dana  <dana@dana.is>
 
+	* 54579: Doc/Zsh/mod_zutil.yo: clarify zformat -F ternary
+	behaviour
+
 	* 54574: Completion/Base/Utility/_numbers: align descriptions
 
 2026-05-18  dana  <dana@dana.is>

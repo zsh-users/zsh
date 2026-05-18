@@ -207,9 +207,11 @@ expression.
 
 With tt(-F) instead of tt(-f), ternary expressions choose between the
 `true' or `false' text on the basis of whether the format specifier is
-present and non-empty.  A test number indicates a minimum width for the
-value given in the format specifier. Negative numbers reverse this,
-so the test is for whether the value exceeds a maximum width.
+present and non-empty.  If a test number is provided, it tests the width
+of the value given in the format specifier DASH()- with a positive
+number the condition is true when the width is em(greater than) that
+number, and with a negative number the condition is true when the width
+is em(less than or equal to) the absolute value of that number.
 
 The form, using the tt(-a) option, can be used for aligning
 strings.  Here, the var(spec)s are of the form
