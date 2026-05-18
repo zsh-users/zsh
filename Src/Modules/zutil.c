@@ -844,6 +844,14 @@ static char *zformat_substring(char* instr, char **specs, char **outp,
 	    } else if (*s == '.' || testit)
 		s++;
 
+	    // next char isn't a legal spec char -- unwind, treat the sequence
+	    // literally
+	    if (!testit && (!*s || *s == '%' || *s == ')' || *s == '-' || *s == '.')) {
+		// but swallow the % if this is %% or %)
+		start += (s - start == 1 && (*s == '%' || *s == ')'));
+		s = start;
+	    }
+
 	    if (testit && (unsigned char) *s) {
 		int actval, testval, endcharl;
 
@@ -972,15 +980,12 @@ bin_zformat(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    char **ap, *specs[256] = {0}, *out;
 	    int olen, oused = 0;
 
-	    specs['%'] = "%";
-	    specs[')'] = ")";
-
 	    /* Parse the specs in argv. */
 	    for (ap = args + 2; *ap; ap++) {
 		if (!ap[0][0] || ap[0][0] == '-' || ap[0][0] == '.' ||
 		    ap[0][0] == '%' || ap[0][0] == ')' ||
 		    idigit(ap[0][0]) || ap[0][1] != ':') {
-		    zwarnnam(nam, "invalid argument: %s", *ap);
+		    zwarnnam(nam, "invalid spec: %s", *ap);
 		    return 1;
 		}
 		specs[(unsigned char) ap[0][0]] = ap[0] + 2;
@@ -989,7 +994,7 @@ bin_zformat(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 
 	    if (!zformat_substring(args[1], specs, &out, &oused, &olen, '\0',
 			presence, 0)) {
-		zwarnnam(nam, "malformed format string");
+		zwarnnam(nam, "malformed format string: %s", args[1]);
 		return 1;
 	    }
 	    out[oused] = '\0';
