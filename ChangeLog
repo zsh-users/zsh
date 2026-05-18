@@ -1,5 +1,9 @@
 2026-05-18  Oliver Kiddle  <opk@zsh.org>
 
+	* Nick Price: github #166: Completion/Unix/Command/_init_d,
+	Completion/BSD/Command/_jail, Completion/BSD/Type/_jails:
+	complete names of non-running FreeBSD jails
+
 	* 54578: Completion/Base/Utility/_numbers: relacement for 52373
 	without breaking use of the format style with a unit-suffixes tag
 
