@@ -129,13 +129,10 @@ _arguments -C -s -A "-*" $flags \
   '*:: :->svcargs' && ret=0
 
 if [[ $state == svcargs ]]; then
-  case $svcname in
-    jail)
-      case $line[1] in
-        *stop|*restart|console|status) _jails && ret=0 ;;
-        *) _jails -c && ret=0 ;;
-      esac
-      ;;
+  case $svcname:$line[1] in
+    jail:(*stop|*restart|console|status)) _jails && ret=0 ;;
+    jail:*) _jails -c && ret=0 ;;
+    netif:*) _net_interfaces && ret=0 ;;
     *)
       _call_function ret _init_d-$svcname $line[1]
       ;;

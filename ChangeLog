@@ -1,5 +1,8 @@
 2026-05-18  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/Unix/Command/_init_d: complete network
+	interfaces for the netif service given new workings for jails
+
 	* Nick Price: github #166: Completion/Unix/Command/_init_d,
 	Completion/BSD/Command/_jail, Completion/BSD/Type/_jails:
 	complete names of non-running FreeBSD jails
