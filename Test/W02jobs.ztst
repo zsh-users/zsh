@@ -274,6 +274,19 @@
 #*>disown: warning: job is suspended*
 
   zpty_start
+  zpty_input 'sleep 2 &; sleep 3 &; sleep 4 &; disown -a; jobs'
+  zpty_stop
+0:disown -a
+*>\[1] <->
+*>\[2] <->
+*>\[3] <->
+
+  zpty_start
+  zpty_input '( sleep 2 &; sleep 3 &; sleep 4 &; disown -a; jobs ); :'
+  zpty_stop
+0:disown -a in sub-shell
+
+  zpty_start
   zpty_input 'sleep 2 &; sleep 3 &|; jobs; disown'
   zpty_input 'sleep 2 &; sleep 3 &!; jobs; disown'
   zpty_stop

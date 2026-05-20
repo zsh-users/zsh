@@ -1,5 +1,8 @@
 2026-05-23  dana  <dana@dana.is>
 
+	* 54585: Doc/Zsh/builtins.yo, Src/builtin.c, Src/jobs.c,
+	Test/W02jobs.ztst: disown: add -a option
+
 	* 54584: Src/jobs.c, Test/W02jobs.ztst,
 	Test/W03jobparameters.ztst: jobs: update curjob in sub-shells
 

@@ -2419,6 +2419,12 @@ int
 bin_fg(char *name, char **argv, Options ops, int func)
 {
     int job, lng, firstjob = -1, retval = 0, ofunc = func;
+    int disown_all = (func == BIN_DISOWN && OPT_ISSET(ops, 'a'));
+
+    if (disown_all && *argv) {
+	zwarnnam(name, "argument not meaningful with -a: %s", *argv);
+	return 1;
+    }
 
     if (OPT_ISSET(ops,'Z')) {
 	int len;
@@ -2483,10 +2489,12 @@ bin_fg(char *name, char **argv, Options ops, int func)
          * will prevent zexit from complaining about stopped jobs */
 	stopmsg = 2;
     if (!*argv) {
+	if (disown_all) {
+	    firstjob = 0;
 	/* This block handles all of the default cases (no arguments).  bg,
 	fg and disown act on the current job, and jobs and wait act on all the
 	jobs. */
- 	if (func == BIN_FG || func == BIN_BG || func == BIN_DISOWN) {
+	} else if (func == BIN_FG || func == BIN_BG || func == BIN_DISOWN) {
 	    /* W.r.t. the above comment, we'd better have a current job at this
 	    point or else. */
 	    if (curjob == -1 || (jobtab[curjob].stat & STAT_NOPRINT)) {
@@ -2574,7 +2582,7 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	}
 	/* The only type of argument allowed now is a job spec.  Check it. */
 	job = (*argv) ? getjob(*argv, name) : firstjob;
-	firstjob = -1;
+	firstjob = (disown_all && job <= maxjob) ? job + 1 : -1;
 	if (job == -1) {
 	    retval = 127;
 	    break;
@@ -2582,6 +2590,8 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	jstat = oldjobtab ? oldjobtab[job].stat : jobtab[job].stat;
 	if (!(jstat & STAT_INUSE) ||
 	    (jstat & STAT_NOPRINT)) {
+	    if (disown_all)
+		continue;
 	    if (!isset(POSIXBUILTINS))
 		zwarnnam(name, "%s: no such job", *argv);
 	    unqueue_signals();

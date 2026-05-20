@@ -464,13 +464,14 @@ enditem()
 )
 findex(disown)
 cindex(jobs, disowning)
-xitem(tt(disown) [ var(job) ... ])
+xitem(tt(disown) [ tt(-a) | var(job) ... ])
 xitem(var(job) ... tt(&|))
 item(var(job) ... tt(&!))(
 Remove the specified var(job)s from the job table; the shell will
 no longer report their status, and will not complain if you
 try to exit an interactive shell with them running or stopped.
 If no var(job) is specified, disown the current job.
+With tt(-a), disown all jobs.
 
 If the var(job)s are currently stopped and the tt(AUTO_CONTINUE) option
 is not set, a warning is printed containing information about how to

@@ -58,7 +58,7 @@ static struct builtin builtins[] =
     BUILTIN("declare", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%klmnp:%rtuxz", NULL),
     BUILTIN("dirs", 0, bin_dirs, 0, -1, 0, "clpv", NULL),
     BUILTIN("disable", 0, bin_enable, 0, -1, BIN_DISABLE, "afmprs", NULL),
-    BUILTIN("disown", 0, bin_fg, 0, -1, BIN_DISOWN, NULL, NULL),
+    BUILTIN("disown", 0, bin_fg, 0, -1, BIN_DISOWN, "a", NULL),
     BUILTIN("echo", BINF_SKIPINVALID, bin_print, 0, -1, BIN_ECHO, "neE", "-"),
     BUILTIN("emulate", 0, bin_emulate, 0, -1, 0, "lLR", NULL),
     BUILTIN("enable", 0, bin_enable, 0, -1, BIN_ENABLE, "afmprs", NULL),
