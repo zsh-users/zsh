@@ -193,6 +193,104 @@
 *>\[2]  ? interrupt*sleep*
 *>\[1]  ? kill*sleep*
 
+  zpty_start
+  zpty_input jobs
+  zpty_input '( jobs ); :'
+  zpty_stop
+0:jobs with no jobs
+
+  zpty_start
+  zpty_input 'sleep 2 &; ( jobs ); disown'
+  zpty_stop
+0:jobs in sub-shell with job in parent shell
+*>\[1] <->
+*>\[1]  + * sleep 2
+
+  zpty_start
+  zpty_input '( sleep 2 &; jobs ); :'
+  zpty_stop
+0:jobs in sub-shell with job in same shell
+*>\[2]  + * sleep 2
+
+  zpty_start
+  zpty_input 'sleep 2 &; jobs; ( sleep 3 &; jobs ); jobs; disown'
+  zpty_stop
+0:jobs in sub-shell with job in parent + same shell
+*>\[1] <->
+*>\[1]  + * sleep 2
+*>\[2]  + * sleep 3
+*>\[1]  + * sleep 2
+
+  zpty_start
+  zpty_input '( sleep 2 &; sleep 3 &; jobs ); :'
+  zpty_stop
+0:jobs in sub-shell with two jobs in same shell
+*>\[2]  - * sleep 2
+*>\[3]  + * sleep 3
+
+  zpty_start
+  zpty_input 'sleep 2 &; sleep 3 &; disown; jobs; disown'
+  zpty_stop
+0:disown current job
+*>\[1] <->
+*>\[2] <->
+*>\[1]  + * sleep 2
+
+  zpty_start
+  zpty_input disown
+  zpty_stop
+0:disown with no jobs
+>disown: no current job
+
+  zpty_start
+  zpty_input 'sleep 2 &; ( disown ); jobs; disown'
+  zpty_stop
+0:disown in sub-shell with job in parent shell
+*>\[1] <->
+*>disown: can't manipulate jobs in subshell
+*>\[1]  + * sleep 2
+
+  zpty_start
+  zpty_input '( sleep 3 &; disown; jobs ); :'
+  zpty_stop
+0:disown in sub-shell with job in same shell
+
+  zpty_start
+  zpty_input 'sleep 2 &; ( sleep 3 &; disown; jobs ); jobs; disown'
+  zpty_stop
+0:disown in sub-shell with job in parent + same shell
+*>\[1] <->
+*>\[1]  + * sleep 2
+
+# @todo apparently testing suspended jobs with zpty is error-prone. see above
+#  zpty_start
+#  zpty_input 'sleep 3 &'
+#  zpty_input 'kill -STOP ${${=${ jobs -p }}[3]}'
+#  zpty_input 'disown'
+#  zpty_stop
+#0:disown with stopped job
+#*>\[1] <->
+#*>\[1] * suspended * sleep 3
+#*>disown: warning: job is suspended*
+
+  zpty_start
+  zpty_input 'sleep 2 &; sleep 3 &|; jobs; disown'
+  zpty_input 'sleep 2 &; sleep 3 &!; jobs; disown'
+  zpty_stop
+0:background and disown with &| and &!
+*>\[1] <->
+*>\[1] * sleep 2
+*>\[1] <->
+*>\[1] * sleep 2
+
+  zpty_start
+  zpty_input '( fg ); :'
+  zpty_input '( bg ); :'
+  zpty_stop
+0:fg + bg in sub-shell
+*>fg: no job control in this shell
+*>bg: no job control in this shell
+
 %clean
 
   zmodload -ui zsh/zpty

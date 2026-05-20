@@ -1896,21 +1896,19 @@ spawnjob(void)
     Process pn;
 
     DPUTS(thisjob == -1, "No valid job in spawnjob.");
-    /* if we are not in a subshell */
-    if (!subsh) {
-	if (curjob == -1 || !(jobtab[curjob].stat & STAT_STOPPED)) {
-	    curjob = thisjob;
-	    setprevjob();
-	} else if (prevjob == -1 || !(jobtab[prevjob].stat & STAT_STOPPED))
-	    prevjob = thisjob;
-	if (jobbing && jobtab[thisjob].procs) {
-	    FILE *fout = shout ? shout : stdout;
-	    fprintf(fout, "[%d]", thisjob);
-	    for (pn = jobtab[thisjob].procs; pn; pn = pn->next)
-		fprintf(fout, " %ld", (long) pn->pid);
-	    fprintf(fout, "\n");
-	    fflush(fout);
-	}
+    if (curjob == -1 || !(jobtab[curjob].stat & STAT_STOPPED)) {
+	curjob = thisjob;
+	setprevjob();
+    } else if (prevjob == -1 || !(jobtab[prevjob].stat & STAT_STOPPED))
+	prevjob = thisjob;
+
+    if (!subsh && jobbing && jobtab[thisjob].procs) {
+	FILE *fout = shout ? shout : stdout;
+	fprintf(fout, "[%d]", thisjob);
+	for (pn = jobtab[thisjob].procs; pn; pn = pn->next)
+	    fprintf(fout, " %ld", (long) pn->pid);
+	fprintf(fout, "\n");
+	fflush(fout);
     }
     if (!hasprocs(thisjob))
 	deletejob(jobtab + thisjob, 0);
@@ -2460,7 +2458,7 @@ bin_fg(char *name, char **argv, Options ops, int func)
 
     if ((func == BIN_FG || func == BIN_BG) && !jobbing) {
 	/* oops... maybe bg and fg should have been disabled? */
-	zwarnnam(name, "no job control in this shell.");
+	zwarnnam(name, "no job control in this shell");
 	return 1;
     }
 
