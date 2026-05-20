@@ -377,13 +377,13 @@ selectlist(LinkList l, size_t start)
 	do {
 #ifdef MB_METASTRWIDTH
 	    size_t t2 = MB_METASTRWIDTH(*ap) + 2;
-	    (void) unmetafy(*ap, NULL);
 #else
 	    size_t t2 = strlen(*ap) + 2;
 #endif
-	    int t3;
+	    int t3 = ap - arr + 1;
 
-	    fprintf(stderr, "%d) %s", t3 = ap - arr + 1, *ap);
+	    fprintf(stderr, "%d) ", t3);
+	    zputs(*ap, stderr);
 	    while (t3)
 		t2++, t3 /= 10;
 	    for (; t2 < fw; t2++)
