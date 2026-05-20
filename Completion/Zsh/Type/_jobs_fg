@@ -1,3 +1,8 @@
 #compdef disown fg
 
-_jobs "$@"
+local -a ca_args=( "$@" )
+local -a args=( '(-)*: :_jobs' )
+
+[[ $service == disown ]] && args+=( '(: *)-a[disown all jobs]' )
+
+_arguments -s -S -A '-*' -O ca_args : $args

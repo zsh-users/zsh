@@ -1,5 +1,7 @@
 2026-05-23  dana  <dana@dana.is>
 
+	* unposted: Completion/Zsh/Type/_jobs_fg: complete disown -a
+
 	* 54585: Doc/Zsh/builtins.yo, Src/builtin.c, Src/jobs.c,
 	Test/W02jobs.ztst: disown: add -a option
 
