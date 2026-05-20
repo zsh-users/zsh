@@ -1,5 +1,8 @@
 2026-05-21  dana  <dana@dana.is>
 
+	* LY: 54583: Src/loop.c: loop.c: stop destructive unmetafy in
+	selectlist()
+
 	* 54580: Src/Modules/zutil.c, Test/V13zformat.ztst: zformat:
 	better handle literal % in format string
 
