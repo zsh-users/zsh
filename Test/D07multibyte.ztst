@@ -643,3 +643,15 @@ F:support character sets outside the portable 7-bit range.
 0:(workers/50150) zsh/stat with Unicode and metafication
 >50150-Ą 0
 >50150-é 0
+
+  (
+    COLUMNS=80 LINES=3 PS3='> '
+    select REPLY in ⚃; do # U+2683
+      print -r - ${(V)REPLY}
+    done
+  )
+0:workers/54583: select with multi-byte word
+<1
+?1) ⚃  
+?> > 
+>⚃
