@@ -2046,7 +2046,7 @@ join_strs(int la, char *sa, int lb, char *sb)
 						NULL, 0);
 			    if (rr <= convlen) {
 				ptrdiff_t diff = rp - rs;
-				int alloclen = (convlen > 20) ? convlen : 20;
+				int alloclen = (convlen >= 20) ? convlen + 1 : 20;
 
 				rs = realloc(rs, (rl += alloclen));
 				rr += alloclen;
@@ -2088,7 +2088,7 @@ join_strs(int la, char *sa, int lb, char *sb)
 	    lb--;
 	}
     }
-    if (la || lb)
+    if (la || lb || !rp)
 	return NULL;
 
     *rp = '\0';

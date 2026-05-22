@@ -1,5 +1,7 @@
 2026-05-25  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54593: Src/Zle/compmatch.c: fix two edge cases in join_strs
+
 	* 54592: Src/Zle/computil.c, Src/module.c: fix two dead
 	assignments reported 15 years ago by clang
 
