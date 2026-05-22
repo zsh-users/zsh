@@ -1,5 +1,8 @@
 2026-05-23  dana  <dana@dana.is>
 
+	* 54591: Src/Modules/termcap.c, Src/Modules/terminfo.c,
+	Src/jobs.c: fix new compiler warnings
+
 	* unposted: NEWS, README: update for w/54580, w/54584, w/54585
 
 	* unposted: Completion/Zsh/Type/_jobs_fg: complete disown -a
