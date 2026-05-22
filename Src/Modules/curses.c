@@ -1419,7 +1419,7 @@ zccmd_position(const char *nam, char **args)
     }
     array[6] = NULL;
 
-    !setaparam(args[1], array);
+    return !setaparam(args[1], array);
 }
 
 
