@@ -59,7 +59,7 @@ ztgetflag(const char *s)
      * off, but other curses variants can't, so we fudge it. *
      * This feature of ncurses appears to have gone away as  *
      * of NCURSES_MAJOR_VERSION == 5, so don't rely on it.   */
-    switch (tgetflag(s)) {
+    switch (tgetflag((char *) s)) {
     case -1:
 	break;
     case 0:
@@ -177,7 +177,7 @@ gettermcap(UNUSED(HashTable ht), const char *name)
 
     /* logic in the following cascade copied from echotc, above */
 
-    if ((num = tgetnum(name)) != -1) {
+    if ((num = tgetnum((char *) name)) != -1) {
 	pm->gsu.i = &nullsetinteger_gsu;
 	pm->u.val = num;
 	pm->node.flags |= PM_INTEGER;
@@ -197,7 +197,7 @@ gettermcap(UNUSED(HashTable ht), const char *name)
 	pm->node.flags |= PM_SCALAR;
 	return &pm->node;
     }
-    if ((tcstr = tgetstr(name, &u)) != NULL && tcstr != (char *)-1) {
+    if ((tcstr = tgetstr((char *) name, &u)) != NULL && tcstr != (char *)-1) {
 	pm->u.str = dupstring(tcstr);
 	pm->node.flags |= PM_SCALAR;
     } else {
