@@ -1,5 +1,8 @@
 2026-05-21  dana  <dana@dana.is>
 
+	* unposted: Src/parse.c, Test/A09zwc.ztst, Test/B14zwc.ztst:
+	add error message and improve tests for w/54571
+
 	* Michael Ridgway: 54571: Src/parse.c, Test/B14zwc.ztst: bound
 	h->npats in .zwc loader
 
