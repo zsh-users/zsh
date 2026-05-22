@@ -1,0 +1,39 @@
+# tests for .zwc loading
+
+%prep
+
+  mkdir zwc.tmp
+  print 'print victim ran' >zwc.tmp/victim
+  zcompile zwc.tmp/victim
+  cp zwc.tmp/{victim,orig}.zwc
+  chmod u+w zwc.tmp/*.zwc
+  # on little-endian systems, the first magic number will be \x07\x06\x05\x04;
+  # on big-endian ones, the reverse
+  zwc_order=little
+  () {
+    local LC_ALL=C
+    [[ ${${"$( < zwc.tmp/orig.zwc )"}[1]} == $'\x07' ]] || zwc_order=big
+  }
+
+%test
+
+  ( cp zwc.tmp/{orig,victim}.zwc
+    source zwc.tmp/victim )
+0:Unmodified .zwc loads and runs
+>victim ran
+
+# FDHead.npats sits at byte offset FD_PRELEN*4 + sizeof(wordcode)*2 = 56.
+# 0x40000000 (npats ~= 1 billion) is the value from the original
+# crash report; with the bound check in check_dump_file it must be
+# rejected, rather than triggering an out-of-bounds write or absurd allocation.
+  ( cp zwc.tmp/{orig,victim}.zwc
+    if [[ $zwc_order == little ]]; then
+      printf '\x00\x00\x00\x40'
+    else
+      printf '\x40\x00\x00\x00'
+    fi |
+    dd of=zwc.tmp/victim.zwc bs=1 seek=56 count=4 conv=notrunc 2>/dev/null
+    source zwc.tmp/victim )
+0:workers/54571: Malformed .zwc with implausible npats does not crash the shell
+?(eval):8: zwc.tmp/victim.zwc: invalid description: victim
+>victim ran

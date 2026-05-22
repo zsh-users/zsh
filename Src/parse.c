@@ -3886,8 +3886,10 @@ check_dump_file(char *file, struct stat *sbuf, char *name, int *ksh,
 	    Patprog *pp;
 	    size_t np;
 
-	    if (h->npats > h->len / sizeof(wordcode))
+	    if (h->npats > h->len / sizeof(wordcode)) {
+		zwarn("%s: invalid description: %s", file, name);
 		return NULL;
+	    }
 
 	    prog = (Eprog) zalloc(sizeof(*prog));
 	    prog->flags = EF_MAP;
@@ -3924,8 +3926,11 @@ check_dump_file(char *file, struct stat *sbuf, char *name, int *ksh,
 	    int fd;
 	    size_t np, po;
 
-	    if (h->npats > h->len / sizeof(wordcode))
+	    if (h->npats > h->len / sizeof(wordcode)) {
+		zwarn("%s: invalid description: %s", file, name);
 		return NULL;
+	    }
+
 	    po = h->npats * sizeof(Patprog);
 
 	    if ((fd = open(file, O_RDONLY)) < 0 ||
