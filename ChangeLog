@@ -1,3 +1,8 @@
+2026-05-22  Mikael Magnusson  <mikachu@gmail.com>
+
+	* unposted: Src/Modules/curses.c: fix missing return keyword
+	in 54552
+
 2026-05-21  dana  <dana@dana.is>
 
 	* unposted: Src/parse.c, Test/A09zwc.ztst, Test/B14zwc.ztst:
