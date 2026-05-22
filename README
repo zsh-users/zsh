@@ -5,12 +5,11 @@ THE Z SHELL (ZSH)
 Version
 -------
 
-This is version 5.9 of the shell.  This is a security and feature release.
-There are several visible improvements since 5.8.1, as well as bug fixes.
+This is version 5.9.1 of the shell.  This is a security and bug-fix release.
 All zsh installations are encouraged to upgrade as soon as possible.
 
 Note in particular the changes highlighted under "Incompatibilities since
-5.8.1" below.  See NEWS for more information.
+5.9" below.  See NEWS for more information.
 
 Installing Zsh
 --------------
@@ -30,6 +29,11 @@ Features
 Zsh is a shell with lots of features.  For a list of some of these, see the
 file FEATURES, and for the latest changes see NEWS.  For more
 details, see the documentation.
+
+Incompatibilities since 5.9
+---------------------------
+
+PCRE support is now PCRE2.
 
 Incompatibilities since 5.8.1
 -----------------------------

@@ -4,6 +4,19 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
+Changes since 5.9
+-----------------
+
+POSIX real-time signals (SIGRTMIN etc) are now supported by the kill
+and trap builtins, TRAP* functions, and the signals parameter, where
+available.
+
+The kill builtin learnt a new option -q to send the signal via
+sigqueue(3) along with an arbitrary integer value, where available.
+
+The kill builtin also learnt a new -L option to print a list of all
+known signal numbers and their names.
+
 Changes since 5.8.1
 -------------------
 
