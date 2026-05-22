@@ -54,6 +54,16 @@ NTP, etc. For the most part this is transparent to users. However, as a
 side effect, some features like $SECONDS and the time keyword gained
 (nominal) nanosecond precision.
 
+POSIX real-time signals (SIGRTMIN etc) are now supported by the kill
+and trap builtins, TRAP* functions, and the signals parameter, where
+available.
+
+The kill builtin learnt a new option -q to send the signal via
+sigqueue(3) along with an arbitrary integer value, where available.
+
+The kill builtin also learnt a new -L option to print a list of all
+known signal numbers and their names.
+
 The zsh/zutil module's zparseopts builtin learnt the following:
 
   - a new -G option enables GNU-style argument parsing

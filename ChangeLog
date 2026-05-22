@@ -1,3 +1,7 @@
+2026-05-22  dana  <dana@dana.is>
+
+	* unposted: NEWS: update for w/52326 and w/52594
+
 2026-05-22  Mikael Magnusson  <mikachu@gmail.com>
 
 	* unposted: Src/Modules/curses.c: fix missing return keyword
