@@ -6420,7 +6420,7 @@ cancd(char *s)
     char *t;
 
     if (*s != '/') {
-	char sbuf[PATH_MAX+1], **cp;
+	char sbuf[MAXCMDLEN], **cp;
 
 	if (cancd2(s))
 	    return s;
@@ -6429,9 +6429,9 @@ cancd(char *s)
 	if (!nocdpath)
 	    for (cp = cdpath; *cp; cp++) {
 		if (**cp) {
-		    if (snprintf(sbuf, PATH_MAX, "%s/%s", *cp, s) >= PATH_MAX)
+		    if (snprintf(sbuf, sizeof(sbuf), "%s/%s", *cp, s) >= sizeof(sbuf))
 			continue;
-		} else if (strlen(s) >= PATH_MAX) {
+		} else if (ztrlen(s) >= PATH_MAX) {
 		    continue;
 		} else {
 		    strcpy(sbuf, s);
