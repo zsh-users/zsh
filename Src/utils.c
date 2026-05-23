@@ -758,12 +758,13 @@ zwcwidth(wint_t wc)
 char *
 pathprog(char *prog, char **namep)
 {
-    char **pp, ppmaxlen = 0, *buf, *funmeta;
+    char **pp, *buf, *funmeta;
+    size_t ppmaxlen = 0;
     struct stat st;
 
     for (pp = path; *pp; pp++)
     {
-	int len = strlen(*pp);
+	size_t len = strlen(*pp);
 	if (len > ppmaxlen)
 	    ppmaxlen = len;
     }
