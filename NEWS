@@ -108,6 +108,10 @@ spec, etc) to work where they previously didn't.
 
 The disown builtin learnt a new -a option to disown all jobs.
 
+The zsh/zutil module's zformat builtin learnt two new options, -q and
+-Q, to escape '%' characters in format strings and/or specs so further
+processing can be applied to the result.
+
 Changes since 5.8.1
 -------------------
 
