@@ -1,5 +1,8 @@
 2026-05-23  dana  <dana@dana.is>
 
+	* unposted: Config/version.mk, Etc/FAQ.yo: Test release:
+	5.9.0.4-test.
+
 	* 54591: Src/Modules/termcap.c, Src/Modules/terminfo.c,
 	Src/jobs.c: fix new compiler warnings
 
