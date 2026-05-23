@@ -6259,29 +6259,34 @@ runshfunc(Eprog prog, FuncWrap wrap, char *name)
 Eprog
 getfpfunc(char *s, int *ksh, char **fdir, char **alt_path, int test_only)
 {
-    char **pp, buf[PATH_MAX+1];
+    char **pp, buf[PATH_MAX];
     off_t len;
     off_t rlen;
     char *d;
     Eprog r;
     int fd;
 
+    char *su = unmeta(s);
+    if (su != s) su = dupstring(su);
     pp = alt_path ? alt_path : fpath;
+    char *ppu = "";
     for (; *pp; pp++) {
 	if (**pp) {
-	    if (snprintf(buf, PATH_MAX, "%s/%s", *pp, s) >= PATH_MAX)
+	    ppu = unmeta(*pp);
+	    if (ppu != *pp) ppu = dupstring(ppu);
+	    if (snprintf(buf, PATH_MAX, "%s/%s", ppu, su) >= PATH_MAX)
 		continue;
-	} else if (strlen(s) >= PATH_MAX) {
+	} else if (strlen(su) >= PATH_MAX) {
 	    continue;
 	} else {
-	    strcpy(buf, s);
+	    strcpy(buf, su);
+	    ppu = "";
 	}
-	if ((r = try_dump_file(*pp, s, buf, ksh, test_only))) {
+	if ((r = try_dump_file(ppu, s, buf, ksh, test_only))) {
 	    if (fdir)
-		*fdir = *pp;
+		*fdir = ppu;
 	    return r;
 	}
-	unmetafy(buf, NULL);
 	if (!access(buf, R_OK) && (fd = open(buf, O_RDONLY | O_NOCTTY)) != -1) {
 	    struct stat st;
 	    if (!fstat(fd, &st) && S_ISREG(st.st_mode) &&
@@ -6289,7 +6294,7 @@ getfpfunc(char *s, int *ksh, char **fdir, char **alt_path, int test_only)
 		if (test_only) {
 		    close(fd);
 		    if (fdir)
-			*fdir = *pp;
+			*fdir = ppu;
 		    return &dummy_eprog;
 		}
 		d = (char *) zalloc(len + 1);
@@ -6306,7 +6311,7 @@ getfpfunc(char *s, int *ksh, char **fdir, char **alt_path, int test_only)
 		    scriptname = oldscriptname;
 
 		    if (fdir)
-			*fdir = *pp;
+			*fdir = ppu;
 
 		    zfree(d, len + 1);
 

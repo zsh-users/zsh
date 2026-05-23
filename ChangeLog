@@ -1,5 +1,7 @@
 2026-05-25  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54598: Src/exec.c: fix getfpfunc metafication
+
 	* 54597: Src/exec.c: hashcmd could reject valid paths to hash
 	if they had metafied characters
 
