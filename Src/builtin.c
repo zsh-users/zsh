@@ -3298,7 +3298,7 @@ add_autoload_function(Shfunc shf, char *funcname)
         Shfunc shf2;
         Funcstack fs;
         const char *calling_f = NULL;
-        char buf[PATH_MAX+1];
+        char buf[PATH_MAX*4];
 
         /* Find calling function */
         for (fs = funcstack; fs; fs = fs->prev) {
@@ -3315,10 +3315,11 @@ add_autoload_function(Shfunc shf, char *funcname)
                     && (shf2->node.flags & PM_LOADDIR) && (shf2->node.flags & PM_ABSPATH_USED)
                     && shf2->filename)
             {
-                if (snprintf(buf, PATH_MAX, "%s/%s", shf2->filename, funcname) < PATH_MAX)
+                if (snprintf(buf, sizeof(buf), "%s/%s", shf2->filename, funcname) < sizeof(buf))
                 {
                     /* Set containing directory if the function file
                      * exists (do normal FPATH processing otherwise) */
+                    unmetafy(buf, NULL);
                     if (!access(buf, R_OK)) {
                         dircache_set(&shf->filename, NULL);
                         dircache_set(&shf->filename, shf2->filename);
