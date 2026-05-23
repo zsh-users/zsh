@@ -1493,7 +1493,9 @@ matheval(char *s)
 	x.u.l = 0;
 	return x;
     }
+    zsh_eval_context_push("math");
     x = mathevall(s, MPREC_TOP, &junk);
+    zsh_eval_context_pop();
     mtok = xmtok;
     if (*junk)
 	zerr("bad math expression: illegal character: %c", *junk);
@@ -1531,7 +1533,9 @@ mathevalarg(char *s, char **ss)
 	zerr("bad math expression: empty string");
 	return (zlong)0;
     }
+    zsh_eval_context_push("math");
     x = mathevall(s, MPREC_ARG, ss);
+    zsh_eval_context_pop();
     if (mtok == COMMA)
 	(*ss)--;
     mtok = xmtok;

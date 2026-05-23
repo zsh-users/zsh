@@ -112,6 +112,9 @@ The zsh/zutil module's zformat builtin learnt two new options, -q and
 -Q, to escape '%' characters in format strings and/or specs so further
 processing can be applied to the result.
 
+A 'math' context now appears in $zsh_eval_context within arithmetic
+constructs.  This can be used to create dual-purpose math functions.
+
 Changes since 5.8.1
 -------------------
 

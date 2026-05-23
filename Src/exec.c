@@ -263,6 +263,11 @@ static int doneps4;
 static char *STTYval;
 static char *blank_env[] = { NULL };
 
+/* total allocated elements in zsh_eval_context array */
+static int zsh_eval_context_len;
+/* number of in-use elements in zsh_eval_context array */
+static int zsh_eval_context_alen;
+
 /* Execution functions. */
 
 static int (*execfuncs[WC_COUNT-WC_CURSH]) (Estate, int) = {
@@ -1273,30 +1278,44 @@ execstring(char *s, int dont_change_job, int exiting, char *context)
     popheap();
 }
 
+/* append a context to the zsh_eval_context array */
+
+/**/
+mod_export void
+zsh_eval_context_push(char *context)
+{
+    if (!zsh_eval_context_len) {
+	zsh_eval_context_len = 16;
+	zsh_eval_context_alen = 0;
+	zsh_eval_context = (char **)zalloc(zsh_eval_context_len *
+					   sizeof(*zsh_eval_context));
+    } else if (zsh_eval_context_len == zsh_eval_context_alen + 1) {
+	zsh_eval_context_len *= 2;
+	zsh_eval_context = zrealloc(zsh_eval_context,
+				    zsh_eval_context_len *
+				    sizeof(*zsh_eval_context));
+    }
+    zsh_eval_context[zsh_eval_context_alen] = context;
+    zsh_eval_context[++zsh_eval_context_alen] = NULL;
+}
+
+/* remove the last context from the zsh_eval_context array */
+
+/**/
+mod_export void
+zsh_eval_context_pop(void)
+{
+    if (zsh_eval_context_alen)
+	zsh_eval_context[--zsh_eval_context_alen] = NULL;
+}
+
 /**/
 mod_export void
 execode(Eprog p, int dont_change_job, int exiting, char *context)
 {
     struct estate s;
-    static int zsh_eval_context_len;
-    int alen;
 
-    if (!zsh_eval_context_len) {
-	zsh_eval_context_len = 16;
-	alen = 0;
-	zsh_eval_context = (char **)zalloc(zsh_eval_context_len *
-					   sizeof(*zsh_eval_context));
-    } else {
-	alen = arrlen(zsh_eval_context);
-	if (zsh_eval_context_len == alen + 1) {
-	    zsh_eval_context_len *= 2;
-	    zsh_eval_context = zrealloc(zsh_eval_context,
-					zsh_eval_context_len *
-					sizeof(*zsh_eval_context));
-	}
-    }
-    zsh_eval_context[alen] = context;
-    zsh_eval_context[alen+1] = NULL;
+    zsh_eval_context_push(context);
 
     s.prog = p;
     s.pc = p->prog;
@@ -1311,7 +1330,7 @@ execode(Eprog p, int dont_change_job, int exiting, char *context)
      * zsh_eval_context may have been altered by a recursive
      * call, but that's OK since we're using the global value.
      */
-    zsh_eval_context[alen] = NULL;
+    zsh_eval_context_pop();
 }
 
 /* Execute a simplified command. This is used to execute things that

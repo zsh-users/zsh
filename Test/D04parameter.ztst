@@ -1649,11 +1649,96 @@
    print $zsh_eval_context[1]
    [[ $ZSH_EVAL_CONTEXT = ${(j.:.)zsh_eval_context} ]] || print Not equal!
    (( icontext = ${#zsh_eval_context} + 1 ))
-   contextfn() { print $(print $zsh_eval_context[icontext,-1]); }
+   contextfn() { print -r - $zsh_eval_context[icontext,-1] }
+   functions -M contextfn
    contextfn
+   () { contextfn }
+   () { trap contextfn EXIT }
+   eval contextfn
+   print -r - $( contextfn )
+   print -r - ${ contextfn }
+   : ${| contextfn }
+   (( contextfn(0) ))
+   : $(( contextfn(0) ))
+   let 'contextfn(0)'
+   : /(e*contextfn*)
+   : /(o+contextfn)
+   cat <( contextfn )
+   cat < <( contextfn )
+   cat =( contextfn )
+   : >( contextfn )
+   : > >( contextfn )
+   source <( <<< contextfn )
+   $ZTST_testdir/../Src/zsh -fc 'print -r - $zsh_eval_context'
+   () { () { print -r - $( : $(( contextfn(0) )) ) } }
 0:$ZSH_EVAL_CONTEXT and $zsh_eval_context
 >toplevel
->shfunc cmdsubst
+>shfunc
+>shfunc shfunc
+>trap shfunc
+>eval shfunc
+>cmdsubst shfunc
+>cmdsubst shfunc
+>cmdsubst shfunc
+>math shfunc
+>math shfunc
+>math shfunc
+>globqual shfunc
+>globsort shfunc
+>outsubst shfunc
+>outsubst shfunc
+>equalsubst shfunc
+>insubst shfunc
+>insubst shfunc
+>file shfunc
+>cmdarg
+>shfunc shfunc cmdsubst math shfunc
+
+  (( icontext = ${#zsh_eval_context} + 1 ))
+  contextfn() {
+    print -r - $#zsh_eval_context[icontext,-1] $zsh_eval_context[icontext,-1]
+  }
+  cmd='() { eval contextfn }'
+  repeat 48 cmd="() { $cmd }"
+  eval $cmd
+0:zsh_eval_context resizing
+*>52 eval shfunc * shfunc eval shfunc
+
+  (( icontext = ${#zsh_eval_context} + 1 ))
+  context1() {
+    print -r - $zsh_eval_context[icontext,-1]
+    context2
+  }
+  context2() {
+    print -r - $zsh_eval_context[icontext,-1]
+  }
+  functions -M context1
+  functions -M context2
+  echo '((...))'
+  (( context1(context2()) ))
+  echo '$((...))'
+  : $(( context1(context2()) ))
+  echo let
+  let 'context1(context2())'
+  echo subscript
+  arr=( ) exp='context1()+2'
+  : $arr[$exp]
+0:more math context
+>((...))
+>math shfunc
+>math shfunc
+>math shfunc shfunc
+>$((...))
+>math shfunc
+>math shfunc
+>math shfunc shfunc
+>let
+>math shfunc
+>math shfunc
+>math shfunc shfunc
+>subscript
+>math shfunc
+>math shfunc shfunc
 
    foo="123456789"
    print ${foo:3}

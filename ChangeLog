@@ -1,5 +1,8 @@
 2026-05-27  dana  <dana@dana.is>
 
+	* 54603 (tweaked): Doc/Zsh/params.yo, Src/exec.c, Src/math.c,
+	Test/D04parameter.ztst: zsh_eval_context: add math context
+
 	* unposted: Doc/Zsh/mod_zutil.yo, Src/Modules/zutil.c,
 	Test/V13zformat.ztst: zformat: pass through %) with -q
 
