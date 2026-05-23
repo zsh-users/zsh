@@ -1003,7 +1003,7 @@ mod_export Cmdnam
 hashcmd(char *arg0, char **pp)
 {
     Cmdnam cn;
-    char *s, buf[PATH_MAX+1];
+    char *s, buf[MAXCMDLEN];
     char **pq;
 
     if (*arg0 == '/')
@@ -1011,9 +1011,9 @@ hashcmd(char *arg0, char **pp)
     for (; *pp; pp++)
 	if (**pp == '/') {
 	    s = buf;
-	    struncpy(&s, *pp, PATH_MAX);
+	    struncpy(&s, *pp, sizeof(buf) - 1);
 	    *s++ = '/';
-	    if ((s - buf) + strlen(arg0) >= PATH_MAX)
+	    if ((s - buf) + strlen(arg0) >= sizeof(buf))
 		continue;
 	    strcpy(s, arg0);
 	    if (iscom(buf))

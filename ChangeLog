@@ -27,6 +27,9 @@
 
 2026-05-25  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54597: Src/exec.c: hashcmd could reject valid paths to hash
+	if they had metafied characters
+
 	* 54596: Src/utils.c: pathprog used a signed char as a buffer size
 
 	* 54595: Src/exec.c: overflow check in isreallycom
