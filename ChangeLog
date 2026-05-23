@@ -1,5 +1,8 @@
 2026-05-25  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54609 + 54606: Src/Zle/complist.c: additional fixes for
+	interactive menu selection
+
 	* 54601: Src/Zle/complist.c: fix complist interactive mode
 	overwriting buffer
 
