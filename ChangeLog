@@ -1,5 +1,7 @@
 2026-05-25  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54596: Src/utils.c: pathprog used a signed char as a buffer size
+
 	* 54595: Src/exec.c: overflow check in isreallycom
 
 	* 54594: Src/exec.c: fix two very similar coverity issues
