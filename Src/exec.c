@@ -966,13 +966,15 @@ isreallycom(Cmdnam cn)
     char fullnam[MAXCMDLEN];
 
     if (cn->node.flags & HASHED)
-	strcpy(fullnam, cn->u.cmd);
+	if (snprintf(fullnam, sizeof(fullnam), "%s", cn->u.cmd)
+		>= (int)sizeof(fullnam))
+	    return 0;
     else if (!cn->u.name)
 	return 0;
     else {
-	strcpy(fullnam, *(cn->u.name));
-	strcat(fullnam, "/");
-	strcat(fullnam, cn->node.nam);
+	if (snprintf(fullnam, sizeof(fullnam), "%s/%s",
+		    *(cn->u.name), cn->node.nam) >= (int)sizeof(fullnam))
+	    return 0;
     }
     return iscom(fullnam);
 }
