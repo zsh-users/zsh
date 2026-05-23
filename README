@@ -160,6 +160,11 @@ enabled.  Additionally, as a consequence of learning the related -p
 option, an opt spec beginning with a hyphen must be guarded by - or --.
 (Note that the effect of a hyphen in the opt spec is unspecified.)
 
+The zsh/zutil module's zformat builtin now interprets the sequences %%
+and %) differently.  Previously they were implemented via implicit
+specs, which could lead to unexpected behaviour in some (uncommon)
+circumstances.
+
 Incompatibilities between 5.8.1 and 5.9
 ---------------------------------------
 

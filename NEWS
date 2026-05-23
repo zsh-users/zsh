@@ -99,6 +99,12 @@ The zsh/mathfunc module now provides isnan() and isinf() functions.
 The getopts builtin learnt a -p option to make it behave like the
 POSIX_BUILTINS option has been temporarily enabled.
 
+The shell now keeps track of the 'current' job inside subshells.  This
+enables some job-control features (disown without arguments, the %% job
+spec, etc) to work where they previously didn't.
+
+The disown builtin learnt a new -a option to disown all jobs.
+
 Changes since 5.8.1
 -------------------
 
