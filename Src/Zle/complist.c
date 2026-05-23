@@ -2772,9 +2772,13 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    metafy_line();
 	    iforcemenu = 0;
 
-            if (cmd != Th(z_acceptandinfernexthistory))
+            if (cmd != Th(z_acceptandinfernexthistory)) {
                 modeline = setmstatus(status, saveline, savell, savecs,
                                       &modecs, &modell, &modelen);
+		/* if we are completing a quoted word, by this point we've
+		 * lost track of this, so put we back where it should be */
+		we = savecs;
+	    }
 
 	    if (nmatches < 1 || !minfo.cur || !*(minfo.cur)) {
 		nolist = 1;
@@ -3277,6 +3281,7 @@ domenuselect(Hookdef dummy, Chdata dat)
                 strncpy(zlemetaline, origline, origll);
                 zlemetacs = origcs;
                 minfo.len = modelen;
+                we = wb + modelen;
             } else {
                 mode = 0;
                 comprecursive = 1;
