@@ -588,9 +588,7 @@ instmatch(Cmatch m, int *scs)
 
     /* Ignored prefix. */
     if (m->ipre) {
-	char *p = m->ipre + (menuacc ? m->qipl : 0);
-
-	inststrlen(p, 1, (l = strlen(p)));
+	inststrlen(m->ipre, 1, (l = strlen(m->ipre)));
 	r += l;
     }
     /* -P prefix. */

@@ -1,5 +1,8 @@
 2026-05-25  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54609: Src/Zle/compresult.c: fix accept-and-hold completion
+	for words with leading quotes
+
 	* 54609 + 54606: Src/Zle/complist.c: additional fixes for
 	interactive menu selection
 
