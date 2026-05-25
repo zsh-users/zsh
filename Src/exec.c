@@ -1005,13 +1005,13 @@ isreallycom(Cmdnam cn)
 {
     char fullnam[MAXCMDLEN];
 
-    if (cn->node.flags & HASHED)
+    if (cn->node.flags & HASHED) {
 	if (snprintf(fullnam, sizeof(fullnam), "%s", cn->u.cmd)
 		>= (int)sizeof(fullnam))
 	    return 0;
-    else if (!cn->u.name)
+    } else if (!cn->u.name) {
 	return 0;
-    else {
+    } else {
 	if (snprintf(fullnam, sizeof(fullnam), "%s/%s",
 		    *(cn->u.name), cn->node.nam) >= (int)sizeof(fullnam))
 	    return 0;
