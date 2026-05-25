@@ -25,6 +25,10 @@
 
 	* unposted: NEWS: mention _as_if (w/53174)
 
+2026-05-26  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 54615: Src/exec.c: fix ambiguous dangling from 54595
+
 2026-05-25  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 54609: Src/Zle/compresult.c: fix accept-and-hold completion
