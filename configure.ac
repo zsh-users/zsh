@@ -2903,7 +2903,7 @@ dnl config.status, and only change when configure is rerun.
 dnl So we need to run the autoconf tests here and store the results.
 dnl We then generate config.modules, preserving any user-generated
 dnl information, from config.status.
-for modfile in `cd ${srcdir}; echo */*.mdd */*/*.mdd`; do
+for modfile in `cd ${srcdir}; echo Src/*.mdd Src/*/*.mdd`; do
   name=
   link=
   load=
