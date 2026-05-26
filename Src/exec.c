@@ -888,7 +888,7 @@ findcmd(char *arg0, int docopy, int default_path)
 	return NULL;
     }
     cn = (Cmdnam) cmdnamtab->getnode(cmdnamtab, arg0);
-    if (!cn && isset(HASHCMDS) && !isrelative(arg0))
+    if (!cn && isset(HASHCMDS))
 	cn = hashcmd(arg0, path);
     if ((int) ztrlen(arg0) >= PATH_MAX)
 	return NULL;
@@ -1006,7 +1006,7 @@ hashcmd(char *arg0, char **pp)
     char *s, buf[MAXCMDLEN];
     char **pq;
 
-    if (*arg0 == '/')
+    if ((*arg0 == '/') || !strncmp(arg0, "./", 2) || !strncmp(arg0, "../", 3))
         return NULL;
     for (; *pp; pp++)
 	if (**pp == '/') {
