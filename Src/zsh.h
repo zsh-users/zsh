@@ -1293,8 +1293,8 @@ enum {
 struct cmdnam {
     struct hashnode node;
     union {
-	char **name;		/* full pathname for external commands */
-	char *cmd;		/* file name for hashed commands       */
+	char **name;		/* pointer into path array for external commands */
+	char *cmd;		/* file name for hashed commands */
     }
     u;
 };
