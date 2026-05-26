@@ -1,3 +1,13 @@
+2026-05-26  Oliver Kiddle  <opk@zsh.org>
+
+	* 54589: Src/Modules/socket.c, Src/Modules/zftp.c,
+	Src/Modules/zpty.c, Src/Zle/compcore.c, Src/Zle/compctl.c,
+	Src/Zle/complist.c, Src/Zle/compmatch.c, Src/Zle/compresult.c,
+	Src/Zle/computil.c, Src/Zle/zle_keymap.c, Src/Zle/zle_tricky.c,
+	Src/builtin.c, Src/exec.c, Src/glob.c, Src/init.c, Src/params.c,
+	Src/prompt.c, Src/sort.c, Src/subst.c: remove dead code
+	identified by scan-build
+
 2026-05-25  dana  <dana@dana.is>
 
 	* Josh Triplett: unposted: Completion/Debian/Command/_dak,

@@ -693,7 +693,7 @@ search_defpath(char *cmd, char *pbuf, int plen)
 {
     char *ps = DEFAULT_PATH, *pe = NULL, *s;
 
-    for (ps = DEFAULT_PATH; ps; ps = pe ? pe+1 : NULL) {
+    for (; ps; ps = pe ? pe+1 : NULL) {
 	pe = strchr(ps, ':');
 	if (*ps == '/') {
 	    s = pbuf;
@@ -1532,9 +1532,9 @@ execlist(Estate state, int dont_change_job, int exiting)
 	    case WC_SUBLIST_AND:
 		/* If the return code is non-zero, we skip pipelines until *
 		 * we find a sublist followed by ORNEXT.                   */
-		if ((ret = ((WC_SUBLIST_FLAGS(code) & WC_SUBLIST_SIMPLE) ?
+		if (((WC_SUBLIST_FLAGS(code) & WC_SUBLIST_SIMPLE) ?
 			    execsimple(state) :
-			    execpline(state, code, Z_SYNC, 0))) || breaks) {
+			    execpline(state, code, Z_SYNC, 0)) || breaks) {
 		    state->pc = next;
 		    code = *state->pc++;
 		    next = state->pc + WC_SUBLIST_SKIP(code);
@@ -1565,7 +1565,7 @@ execlist(Estate state, int dont_change_job, int exiting)
 	    case WC_SUBLIST_OR:
 		/* If the return code is zero, we skip pipelines until *
 		 * we find a sublist followed by ANDNEXT.              */
-		if (!(ret = ((WC_SUBLIST_FLAGS(code) & WC_SUBLIST_SIMPLE) ?
+		if (!(((WC_SUBLIST_FLAGS(code) & WC_SUBLIST_SIMPLE) ?
 			     execsimple(state) :
 			     execpline(state, code, Z_SYNC, 0))) || breaks) {
 		    state->pc = next;
@@ -2721,11 +2721,8 @@ execsubst(LinkList strs)
 {
     if (strs) {
 	prefork(strs, esprefork, NULL);
-	if (esglob && !errflag) {
-	    LinkList ostrs = strs;
+	if (esglob && !errflag)
 	    globlist(strs, 0);
-	    strs = ostrs;
-	}
     }
 }
 
@@ -5272,7 +5269,7 @@ static int
 execarith(Estate state, UNUSED(int do_exec))
 {
     char *e;
-    mnumber val = zero_mnumber;
+    mnumber val;
     int htok = 0;
 
     if (isset(XTRACE)) {

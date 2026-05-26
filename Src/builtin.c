@@ -6592,8 +6592,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
     if (OPT_ISSET(ops,'t')) {
 	zlong timeout = 0;
 	if (OPT_HASARG(ops,'t')) {
-	    mnumber mn = zero_mnumber;
-	    mn = matheval(OPT_ARG(ops,'t'));
+	    mnumber mn = matheval(OPT_ARG(ops,'t'));
 	    if (errflag)
 		return 1;
 	    if (mn.type == MN_FLOAT) {

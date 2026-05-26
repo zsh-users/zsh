@@ -1462,8 +1462,6 @@ printcompctl(char *s, Compctl cc, int printflags, int ispat)
 
 	while (cc2) {
 	    /* loop over conditions */
-	    c = cc2->cond;
-
 	    printf(" '");
 	    for (c = cc2->cond; c;) {
 		/* loop over or's */
@@ -2886,7 +2884,7 @@ sep_comp_string(char *ss, char *s, int noffs)
 	return 1;
     owb = offs;
     offs = soffs;
-    if ((p = check_param(ns, 0, 1))) {
+    if (check_param(ns, 0, 1)) {
 	for (p = ns; *p; p++)
 	    if (*p == Dnull)
 		*p = '"';
@@ -3609,8 +3607,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 					} else {
 					    /* Otherwise ignore the path we *
 					     * prepended to the pattern.    */
-					    while ((p2 = p3 =
-						    (char *)ugetnode(l))) {
+					    while ((p3 = (char *) ugetnode(l))) {
 						for (ns = sf1; *p3 && ns; p3++)
 						    if (*p3 == '/')
 							ns--;

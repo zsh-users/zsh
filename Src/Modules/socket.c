@@ -56,7 +56,7 @@
 static int
 bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 {
-    int err=1, verbose=0, test=0, targetfd=0;
+    int verbose=0, test=0, targetfd=0;
     ZSOCKLEN_T len;
     struct sockaddr_un soun = { 0 };
     int sfd;
@@ -236,8 +236,7 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	    return 1;
 	}
 
-	int err = shutdown(atoi(args[0]), SHUT_WR);
-	if (err)
+	if (shutdown(atoi(args[0]), SHUT_WR))
 	    zwarn("shutdown failed: %e", errno);
     }
     else
@@ -262,7 +261,7 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	soun.sun_family = AF_UNIX;
 	strncpy(soun.sun_path, args[0], sizeof(soun.sun_path)-1);
 	
-	if ((err = connect(sfd, (struct sockaddr *)&soun, sizeof(struct sockaddr_un)))) {
+	if (connect(sfd, (struct sockaddr *)&soun, sizeof(struct sockaddr_un))) {
 	    zwarnnam(nam, "connection failed: %e", errno);
 	    close(sfd);
 	    return 1;

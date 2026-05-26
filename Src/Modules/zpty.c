@@ -534,11 +534,10 @@ static void
 checkptycmd(Ptycmd cmd)
 {
     unsigned char c;
-    int r;
 
     if (cmd->read != -1 || cmd->fin)
 	return;
-    if ((r = read(cmd->fd, &c, 1)) <= 0) {
+    if (read(cmd->fd, &c, 1) <= 0) {
 	if (kill(cmd->pid, 0) < 0) {
 	    cmd->fin = 1;
 	    zclose(cmd->fd);

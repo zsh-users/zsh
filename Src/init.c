@@ -548,10 +548,8 @@ parseopts(char *nam, char ***argvp, char *new_opts, char **cmdp,
     }
  doneargv:
     *argvp = argv;
-    if (emulate_required) {
+    if (emulate_required)
 	parseopts_setemulate(top_emulation, flags);
-	emulate_required = 0;
-    }
     return 0;
 }
 

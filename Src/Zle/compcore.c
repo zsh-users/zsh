@@ -1176,7 +1176,7 @@ check_param(char *s, int set, int test)
     if (found &&
 	p[1] != Inpar && p[1] != Inbrack && p[1] != Snull) {
 	/* This is a parameter expression, not $(...), $[...], $'...'. */
-	char *b = p + 1, *e = b, *ie;
+	char *b = p + 1, *e, *ie;
 	int br = 1, nest = 0;
 
 	if (*b == Inbrace) {
@@ -1719,7 +1719,7 @@ set_comp_sep(void)
 	return 1;
     owb = offs;
     offs = soffs;
-    if ((p = check_param(ns, 0, 1))) {
+    if (check_param(ns, 0, 1)) {
 	for (p = ns; *p; p++)
 	    if (*p == Dnull)
 		*p = '"';

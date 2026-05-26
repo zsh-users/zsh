@@ -1778,7 +1778,6 @@ getkeycmd(void)
     if(!func) {
 	if (++hops == 20) {
 	    zerr("string inserting another one too many times");
-	    hops = 0;
 	    return NULL;
 	}
 	ungetbytes_unmeta(str, strlen(str));

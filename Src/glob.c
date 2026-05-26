@@ -849,7 +849,6 @@ qgetmodespec(char **s)
     if ((c = *p) == '=' || c == Equals || c == '+' || c == '-' ||
 	c == '?' || c == Quest || (c >= '0' && c <= '7')) {
 	end = 0;
-	c = 0;
     } else {
 	end = (c == '<' ? '>' :
 	       (c == '[' ? ']' :

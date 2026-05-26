@@ -255,7 +255,7 @@ strmetasort(char **array, int sortwhat, int *unmetalenp)
     for (arrptr = array, sortptrarrptr = sortptrarr, sortarrptr = sortarr;
 	 *arrptr; arrptr++, sortptrarrptr++, sortarrptr++) {
 	char *metaptr;
-	int needlen, needalloc;
+	int needlen;
 	*sortptrarrptr = sortarrptr;
 	sortarrptr->orig = *arrptr;
 
@@ -286,8 +286,7 @@ strmetasort(char **array, int sortwhat, int *unmetalenp)
 	 * Either we're going to need to copy it to transform it,
 	 * or we need to unmetafy it.
 	 */
-	if ((needalloc = (sortwhat &
-			  (SORTIT_IGNORING_CASE|SORTIT_IGNORING_BACKSLASHES)))
+	if ((sortwhat & (SORTIT_IGNORING_CASE|SORTIT_IGNORING_BACKSLASHES))
 	    || *metaptr == Meta) {
 	    char *s, *t, *src = *arrptr, *dst;
 	    int len;

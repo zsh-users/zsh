@@ -3481,7 +3481,6 @@ cv_parse_word(Cvdef d)
                         more[-1] = sav;
                     } else {
                         zaddlinknode(state.vals, tricat(arg, compsuffix, ""));
-                        nosfx = 1;
                     }
                 } else
                     zaddlinknode(state.vals, ztrdup(""));
@@ -4694,10 +4693,9 @@ cfp_opt_pats(char **pats, char *matcher)
 		    for (s = add; *s && !idigit(*s); s++);
 		    *s = '\0';
 		} else if (*q == '[') {
-		    int not;
 		    char *x = ++q;
 
-		    if ((not = (*x == '!' || *x == '^')))
+		    if (*x == '!' || *x == '^')
 			x++;
 		    for (; *x; x++) {
 			if (x[1] == '-' && x[2]) {

@@ -538,7 +538,7 @@ parambeg(char *s)
 	 * This is really a parameter expression (not $(...) or $[...]
 	 * or $'...').
 	 */
-	char *b = p + 1, *e = b;
+	char *b = p + 1, *e;
 	int n = 0, br = 1;
 
 	if (*b == Inbrace) {
@@ -1655,7 +1655,7 @@ get_comp_string(void)
 	     * so start at the beginning of the line and continue
 	     * until cspos.
 	     */
-	    wptr = cptr = zlemetaline;
+	    wptr = zlemetaline;
 	    for (;;) {
 		cptr = itype_end(wptr, IIDENT, 0);
 		if (cptr == wptr) {
@@ -1678,7 +1678,7 @@ get_comp_string(void)
 	    char *sqbr = zlemetaline + wb - 1, *cptr, *wptr;
 
 	    /* Need to search forward for word characters */
-	    cptr = wptr = zlemetaline;
+	    wptr = zlemetaline;
 	    for (;;) {
 		cptr = itype_end(wptr, IIDENT, 0);
 		if (cptr == wptr) {
@@ -1706,7 +1706,7 @@ get_comp_string(void)
     }
     /* This variable will hold the current word in quoted form. */
     offs = zlemetacs - wb;
-    if ((p = parambeg(s))) {
+    if (parambeg(s)) {
 	for (p = s; *p; p++)
 	    if (*p == Dnull)
 		*p = '"';

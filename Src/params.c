@@ -1131,7 +1131,6 @@ createparam(char *name, int flags)
 
 	    pm = oldpm;
 	    pm->base = pm->width = 0;
-	    oldpm = pm->old;
 	} else {
 	    pm = (Param) zshcalloc(sizeof *pm);
 	    if ((pm->old = oldpm)) {

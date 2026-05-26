@@ -963,10 +963,9 @@ do_single(Cmatch m)
     int l, sr = 0, scs;
     int havesuff = 0;
     int partest = (m->ripre || ((m->flags & CMF_ISPAR) && parpre));
-    char *str = m->orig, *ppre = m->ppre, *psuf = m->psuf, *prpre = m->prpre;
+    char *str = m->orig, *psuf = m->psuf, *prpre = m->prpre;
 
     if (!prpre) prpre = "";
-    if (!ppre) ppre = "";
     if (!psuf) psuf = "";
 
     fixsuffix();
@@ -1136,7 +1135,6 @@ do_single(Cmatch m)
 	    /*{{*/
 	    /* Otherwise, add a `,' suffix, and let `}' remove it. */
 	    zlemetacs = scs;
-	    havesuff = 1;
 	    inststrlen(",", 1, 1);
 	    minfo.insc++;
 	    makesuffix(1);
@@ -2121,7 +2119,7 @@ printlist(int over, CLPrintFunc printm, int showall)
 		q = p;
 		while (n && i--) {
 		    wid = (g->widths ? g->widths[mc] : g->width);
-		    if (!(m = *q)) {
+		    if (!*q) {
 			printm(g, NULL, mc, ml, (!i), wid);
 			break;
 		    }

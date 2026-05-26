@@ -670,7 +670,7 @@ doiscol(int pos)
 static int
 clprintfmt(char *p, int ml)
 {
-    int cc = 0, i = 0, ask, beg;
+    int cc = 0, i = 0, ask;
 
     initiscol();
 
@@ -696,7 +696,7 @@ clprintfmt(char *p, int ml)
 	    chrlen--;
 	    p++;
 	}
-	if ((beg = !(cc % zterm_columns)))
+	if (!(cc % zterm_columns))
 	    ml++;
 	if (mscroll && !(cc % zterm_columns) &&
 	    !--mrestlines && (ask = asklistscroll(ml)))
@@ -1072,7 +1072,7 @@ static int
 compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 {
     char *p, nc[2*DIGBUFSIZE + 12], nbuf[2*DIGBUFSIZE + 12];
-    int l = 0, cc = 0, m, ask, beg, stat;
+    int l = 0, cc = 0, m, beg, stat;
 
     if ((stat = !fmt)) {
 	if (mlbeg >= 0) {
@@ -1301,7 +1301,7 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		    ml++;
                     fputs(" \010", shout);
                 }
-		if (mscroll && beg && !--mrestlines && (ask = asklistscroll(ml))) {
+		if (mscroll && beg && !--mrestlines && asklistscroll(ml)) {
 		    *stop = 1;
 		    if (stat && n)
 			mfirstl = -1;
@@ -1624,7 +1624,7 @@ compprintlist(int showall)
 		q = p;
 		while (n && i-- && !errflag) {
 		    wid = (g->widths ? g->widths[mc] : g->width);
-		    if (!(m = *q)) {
+		    if (!*q) {
 			if (clprintm(g, NULL, mc, ml, (!i), wid))
 			    goto end;
 			break;

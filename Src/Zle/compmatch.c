@@ -189,7 +189,7 @@ free_cline(Cline l)
 Cline
 cp_cline(Cline l, int deep)
 {
-    Cline r = NULL, *p = &r, t, lp = NULL;
+    Cline r = NULL, *p = &r, t;
 
     while (l) {
 	if ((t = freecl))
@@ -203,7 +203,7 @@ cp_cline(Cline l, int deep)
 	    if (t->suffix)
 		t->suffix = cp_cline(t->suffix, 0);
 	}
-	*p = lp = t;
+	*p = t;
 	p = &(t->next);
 	l = l->next;
     }

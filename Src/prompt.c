@@ -1956,7 +1956,7 @@ truecolor_terminal(void)
 mod_export zattr
 match_colour(const char **teststrp, int is_fg, int colour)
 {
-    int shft, named = 0, tc;
+    int shft, tc;
     zattr on;
 
     if (is_fg) {
@@ -1997,7 +1997,7 @@ match_colour(const char **teststrp, int is_fg, int colour)
 	    } else if (colour <= -2) {
 		return TXT_ERROR;
 	    }
-	} else if ((named = ialpha(**teststrp))) {
+	} else if (ialpha(**teststrp)) {
 	    colour = match_named_colour(teststrp);
 	    if (colour == 8) /* default */
 		return 0;

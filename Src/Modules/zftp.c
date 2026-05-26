@@ -2034,7 +2034,7 @@ zfgetinfo(char *prompt, int noecho)
     }
 
     if (fgets(instr, 256, stdin) == NULL)
-	instr[len = 0] = '\0';
+	instr[0] = '\0';
     else if (instr[len = strlen(instr)-1] == '\n')
 	instr[len] = '\0';
 
@@ -2559,7 +2559,7 @@ zftp_getput(char *name, char **args, int flags)
     for (; *args; args++) {
 	char *ln, *rest = NULL;
 	off_t startat = 0;
-	if (progress && (shfunc = getshfunc("zftp_progress"))) {
+	if (progress && getshfunc("zftp_progress")) {
 	    off_t sz = -1;
 	    /*
 	     * This calls the SIZE command to get the size for remote

@@ -242,7 +242,7 @@ stringsubst(LinkList list, LinkNode node, int pf_flags, int *ret_flags,
     char *str  = str3, c;
 
     while (!errflag && (c = *str)) {
-	if (((c = *str) == Inang || c == OutangProc ||
+	if ((c == Inang || c == OutangProc ||
 	     (str == str3 && c == Equals))
 	    && str[1] == Inpar) {
 	    char *subst, *rest, *snew, *sptr;
@@ -2348,7 +2348,6 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 			postmul = untok_and_escape(s + arglen, escapes,
 						   tok_arg);
 		    *t = sav;
-		    sav = *s;
 		    s = t + arglen;
 		    /* again, continue only if another start delimiter */
 		    if (memcmp(del0, s, dellen)) {
