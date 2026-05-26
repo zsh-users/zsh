@@ -1,5 +1,7 @@
 2026-06-04  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54620: Src/exec.c: fix check for when to hash commands
+
 	* 54617: Src/Modules/parameter.c, Src/zsh.h,
 	Test/V06parameter.ztst: fix lookup in $commands array when
 	hashlistall is unset
