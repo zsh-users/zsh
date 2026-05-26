@@ -217,10 +217,20 @@ getpmcommand(UNUSED(HashTable ht), const char *name)
     Cmdnam cmd;
     Param pm = NULL;
 
-    if (!(cmd = (Cmdnam) cmdnamtab->getnode(cmdnamtab, name)) &&
-	isset(HASHLISTALL)) {
-	cmdnamtab->filltable(cmdnamtab);
-	cmd = (Cmdnam) cmdnamtab->getnode(cmdnamtab, name);
+    if (!(cmd = (Cmdnam) cmdnamtab->getnode(cmdnamtab, name))) {
+	if (isset(HASHLISTALL)) {
+	    cmdnamtab->filltable(cmdnamtab);
+	    cmd = (Cmdnam) cmdnamtab->getnode(cmdnamtab, name);
+	} else {
+	    /* this will return the path even if hashcmds is disabled,
+	     * and store it in the hash if it is enabled */
+	    char *found = findcmd((char*)name, 1, 0);
+	    if (found) {
+		cmd = (Cmdnam) hcalloc(sizeof(*cmd));
+		cmd->u.cmd = found;
+		cmd->node.flags = HASHED;
+	    }
+	}
     }
     pm = (Param) hcalloc(sizeof(struct param));
     pm->node.nam = dupstring(name);

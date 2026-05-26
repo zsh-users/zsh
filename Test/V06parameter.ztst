@@ -92,6 +92,25 @@
 >foo
 >bar
 
+  for 1 in hash_cmds no_hash_cmds; do
+    (
+      setopt no_hash_list_all $1
+      : > ls
+      chmod +x ls
+      rm=$commands[rm]
+      path=( $PWD )
+      rehash
+      a=$commands[ls]
+      $rm ls
+      b=$commands[ls]
+      [[ $a == $b ]]
+      print -r - $? $a:$b
+    )
+  done
+-:workers/54617: $commands look-up with no_hash_list_all
+*>0 */ls:*/ls
+*>1 */ls:
+
 %clean
 
  rm -f autofn functrace.zsh rocky3.zsh sourcedfile myfunc

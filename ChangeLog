@@ -1,3 +1,9 @@
+2026-06-04  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 54617: Src/Modules/parameter.c, Src/zsh.h,
+	Test/V06parameter.ztst: fix lookup in $commands array when
+	hashlistall is unset
+
 2026-06-04  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Src/zsh.h: remove further remnant of restricted mode
