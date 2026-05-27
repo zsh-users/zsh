@@ -9,6 +9,9 @@
 
 2026-06-04  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54624: Src/Zle/complete.c: parse_class would underallocate if
+	posix character classes are used
+
 	* 54620: Src/exec.c: fix check for when to hash commands
 
 	* 54617: Src/Modules/parameter.c, Src/zsh.h,

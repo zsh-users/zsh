@@ -496,9 +496,16 @@ parse_class(Cpattern p, char *iptr)
     }
 
     /* find end of class.  End character can appear literally first. */
-    for (optr = iptr; optr == iptr || *optr != endchar; optr++)
+    for (optr = iptr; optr == iptr || *optr != endchar; optr++) {
 	if (!*optr)
 	    return optr;
+	/* skip POSIX class names like [:alpha:] */
+	if (endchar == ']' && *optr == '[' && optr[1] == ':') {
+	    char *nptr = strchr(optr+2, ':');
+	    if (nptr && nptr[1] == ']')
+		optr = nptr + 1;
+	}
+    }
     /*
      * We can always fit the parsed class within the same length
      * because of the tokenization (including a null byte).
