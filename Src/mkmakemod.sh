@@ -28,6 +28,7 @@
 #   headers         extra headers for this module (default none)
 #   hdrdeps         extra headers on which the .mdh depends (default none)
 #   otherincs       extra headers that are included indirectly (default none)
+#   libs            extra libraries to link this module against (default none)
 #
 # The .mdd file may also include a Makefile.in fragment between lines
 # `:<<\Make' and `Make' -- this will be copied into Makemod.in.
@@ -186,7 +187,7 @@ if $first_stage; then
 
 	unset name moddeps nozshdep alwayslink hasexport
 	unset autofeatures autofeatures_emu
-	unset objects proto headers hdrdeps otherincs
+	unset objects proto headers hdrdeps otherincs libs
 	. $top_srcdir/$the_subdir/${mddname}.mdd
 	q_name=`echo $name | sed 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`
 	test -n "${moddeps+set}" || moddeps=
@@ -324,7 +325,7 @@ if $first_stage; then
 	    echo
 	    echo "${mddname}.\$(DL_EXT): \$(MODDOBJS_${mddname}) ${mddname}.export $exportdeps \$(@LINKMODS@_${mddname})"
 	    echo '	rm -f $@'
-	    echo "	\$(DLLINK) \$(@E@XPIMP_$mddname) \$(@E@NTRYOPT) \$(MODDOBJS_${mddname}) \$(@LINKMODS@_${mddname}) \$(LIBS) "
+	    echo "	\$(DLLINK) \$(@E@XPIMP_$mddname) \$(@E@NTRYOPT) \$(MODDOBJS_${mddname}) \$(@LINKMODS@_${mddname}) \$(LIBS) ${libs} "
 	    echo
 	fi
 	echo "${mddname}.mdhi: ${mddname}.mdhs \$(INCS_${mddname})"

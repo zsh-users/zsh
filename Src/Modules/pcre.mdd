@@ -5,3 +5,5 @@ load=no
 autofeatures="b:pcre_compile b:pcre_study b:pcre_match"
 
 objects="pcre.o"
+
+libs="@PCRE_LIBS@"

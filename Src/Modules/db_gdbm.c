@@ -46,12 +46,6 @@ static void myfreeparamnode(HashNode hn);
 
 static int no_database_action = 0;
 
-/*
- * Make sure we have all the bits I'm using for memory mapping, otherwise
- * I don't know what I'm doing.
- */
-#if defined(HAVE_GDBM_H) && defined(HAVE_GDBM_OPEN)
-
 #include <gdbm.h>
 
 static char *backtype = "db/gdbm";
@@ -817,7 +811,3 @@ myfreeparamnode(HashNode hn)
     }
     zfree(pm, sizeof(struct param));
 }
-
-#else
-# error no gdbm
-#endif /* have gdbm */

@@ -1,3 +1,10 @@
+2026-06-07  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 54669: Src/Modules/cap.c, Src/Modules/cap.mdd,
+	Src/Modules/db_gdbm.c, Src/Modules/db_gdbm.mdd,
+	Src/Modules/pcre.mdd, Src/mkmakemod.sh, configure.ac: add
+	--disable-link-all-libs configure option
+
 2026-06-06  dana  <dana@dana.is>
 
 	* unposted: NEWS: better document hlgroups, termquery, etc

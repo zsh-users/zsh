@@ -1,5 +1,5 @@
 name=zsh/db/gdbm
-link='if test "x$ac_cv_lib_gdbm_gdbm_open" = xyes && test "x$ac_cv_header_gdbm_h" = xyes; then
+link='if test "x$enable_gdbm" = xyes; then
   echo dynamic
 else
   echo no
@@ -10,3 +10,5 @@ load=no
 autofeatures="b:ztie b:zuntie b:zgdbmpath p:zgdbm_tied"
 
 objects="db_gdbm.o"
+
+libs="@GDBM_LIBS@"

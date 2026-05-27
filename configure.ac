@@ -438,8 +438,15 @@ AS_HELP_STRING([--enable-cap],[enable the search for POSIX capabilities (may req
 
 # Default off for licensing reasons
 AC_ARG_ENABLE(gdbm,
-AS_HELP_STRING([--enable-gdbm],[enable the search for the GDBM library (see the zsh/db/gdbm module)]),
-[gdbm="$enableval"], [gdbm=no])
+AS_HELP_STRING([--enable-gdbm],[enable the search for the GDBM library (see the zsh/db/gdbm module)]))
+
+dnl
+dnl link all libraries in main shell
+dnl
+AC_ARG_ENABLE(link-all-libs,
+AS_HELP_STRING([--disable-link-all-libs],
+  [do not link module-only libraries into the main binary]),
+[enable_link_all_libs=$enableval], [enable_link_all_libs=yes])
 
 dnl ------------------
 dnl CHECK THE COMPILER
@@ -719,7 +726,6 @@ AC_ARG_WITH(term-lib,
 AS_HELP_STRING([--with-term-lib=LIBS],[search space-separated LIBS for terminal handling]),
 [if test "x$withval" != xno && test "x$withval" != x ; then
   termcap_curses_order="$withval"
-  AC_SEARCH_LIBS(tigetstr, [$termcap_curses_order])
 else
   termcap_curses_order="$ncursesw_test $ncurses_test tinfow tinfo termcap curses"
 fi],
@@ -931,9 +937,18 @@ elif test x$zsh_cv_decl_ospeed_must_define = xyes; then
   AC_DEFINE(MUST_DEFINE_OSPEED)
 fi
 
-if test x$gdbm != xno; then
+if test x$enable_gdbm = xyes; then
   AC_CHECK_HEADERS(gdbm.h)
+  save_LIBS=$LIBS
+  LIBS=
   AC_CHECK_LIB(gdbm, gdbm_open)
+  GDBM_LIBS=$LIBS
+  LIBS=$save_LIBS
+  if test x$enable_link_all_libs = xyes; then
+    LIBS="$GDBM_LIBS $LIBS"
+    GDBM_LIBS=
+  fi
+  AC_SUBST(GDBM_LIBS)
 fi
 
 AC_CHECK_HEADERS(sys/xattr.h)
@@ -1268,7 +1283,7 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       grantpt unlockpt ptsname \
 	       htons ntohs \
 	       regcomp regexec regerror regfree \
-	       gdbm_open getxattr \
+	       getxattr \
 	       realpath canonicalize_file_name \
 	       symlink getcwd \
 	       cygwin_conv_path \
@@ -1320,8 +1335,16 @@ if test x$zsh_cv_func_realpath_accepts_null = xyes; then
 fi
 
 if test x$enable_pcre = xyes; then
-  LIBS="`$PCRE_CONFIG --libs8` $LIBS"
+  save_LIBS=$LIBS
+  PCRE_LIBS="`$PCRE_CONFIG --libs8`"
+  LIBS="$PCRE_LIBS $LIBS"
   AC_CHECK_FUNCS(pcre2_compile_8)
+  LIBS=$save_LIBS
+  if test x$enable_link_all_libs = xyes; then
+    LIBS="$PCRE_LIBS $LIBS"
+    PCRE_LIBS=
+  fi
+  AC_SUBST(PCRE_LIBS)
 fi
 
 if test x$enable_cap = xyes; then
@@ -3051,7 +3074,13 @@ if test "x$dynamic" = xyes; then
 module linker flags       : ${LDFLAGS} ${LIBLDFLAGS} ${DLLDFLAGS}"
 fi
 echo "\
-library flags             : ${LIBS}
+library flags             : ${LIBS}"
+if test x$enable_link_all_libs != xyes; then
+echo "\
+gdbm module library flags : ${GDBM_LIBS}
+pcre module library flags : ${PCRE_LIBS}"
+fi
+echo "\
 installation basename     : ${tzsh_name}
 binary install path       : ${zshbin2}
 man page install path     : ${zshman2}

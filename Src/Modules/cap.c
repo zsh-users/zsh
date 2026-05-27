@@ -30,8 +30,6 @@
 #include "cap.mdh"
 #include "cap.pro"
 
-#ifdef HAVE_CAP_GET_PROC
-
 static int
 bin_cap(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 {
@@ -115,14 +113,6 @@ bin_setcap(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
     cap_free(caps);
     return ret;
 }
-
-#else /* !HAVE_CAP_GET_PROC */
-
-# define bin_cap    bin_notavail
-# define bin_getcap bin_notavail
-# define bin_setcap bin_notavail
-
-#endif /* !HAVE_CAP_GET_PROC */
 
 /* module paraphernalia */
 
