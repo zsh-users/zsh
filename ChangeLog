@@ -1,5 +1,7 @@
 2026-05-27  dana  <dana@dana.is>
 
+	* unposted: Config/version.mk: bump to 5.9.999.3-test
+
 	* unposted: Etc/creating-a-release.txt: document new version
 	sequence
 
