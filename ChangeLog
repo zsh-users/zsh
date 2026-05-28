@@ -1,5 +1,8 @@
 2026-05-27  dana  <dana@dana.is>
 
+	* unposted: Etc/creating-a-release.txt: document new version
+	sequence
+
 	* unposted: NEWS: mention _as_if (w/53174)
 
 2026-05-26  Mikael Magnusson  <mikachu@gmail.com>

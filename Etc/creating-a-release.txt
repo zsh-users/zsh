@@ -1,6 +1,6 @@
 To create a zsh release:
 
-- Be satisfied that 'master' is releaseable.
+- Be satisfied that the branch you're working from is releaseable.
   (No recent destabilizing changes, `make check` passes, etc)
 
 - Bump or update:
@@ -11,17 +11,20 @@ To create a zsh release:
 	README (first two paragraphs, 'incompatibilities since' sections)
 	NEWS ('changes since' sections)
 
-  The version-number sequence is as follows:
+  The version-number sequence for master releases is as follows:
 
-	5.8, 5.8.0.1-dev, 5.8.0.2-test, 5.8.1, 5.8.1.1-dev, 5.8.1.2-test, 5.9
+	5.8, 5.8.999.1-dev, 5.8.999.2-test, 5.9, 5.9.999.1-dev, ...
+
+  The version-number sequence for release-branch releases is as follows:
+
+	5.8, 5.8.0.1-dev, 5.8.0.2-test, 5.8.1, 5.8.1.1-dev, ...
 
   Please note:
 
 	- All version numbers in this document are examples only and may not
 	  reflect the actual version history of the shell.
-	- A slightly different ordering of version-number components was used
-	  prior to zsh 5.8. All subsequent releases should use the scheme
-	  described above.
+	- The versioning scheme has changed a few times in the shell's history.
+	  The current scheme was introduced following the release of zsh 5.9.1.
 	- Usually there is only one -dev version (1-dev), but there may be more
 	  if for example there is a wordcode compatibility break, in which case
 	  the sequence would be something like 1-dev, 2-dev, 3-test, .... No
@@ -52,10 +55,32 @@ To create a zsh release:
 
 - If the tagged release is a stable release (as opposed to a test release):
 
-	vi Config/version.mk # bump to 5.9.0.1-dev and tomorrow's date
+	vi Config/version.mk # bump to x.y.z.1-dev and tomorrow's date
 	git commit -am "Post-release version bump." &&
 		zshdev-add-nnnnn-and-changelog unposted
 		# or local equivalent (see above)
+
+  "x.y.z.1-dev" will be different depending on whether the release was produced
+  from master or a release branch. Refer to the version sequence above.
+
+- If the tagged release is a stable release of a new major version produced from
+  master (the version string is like "5.9"), create a release branch for the
+  development of minor updates to that version:
+
+	git checkout zsh-5.9          # tag you just created
+	git switch -c zsh-5.9-patches # release branch
+
+  Then bump the version number there too (see previous step).
+
+  In summary, for a stable release of a new major version like "5.9":
+
+  - Bump 5.8.999.2-test to 5.9 (and update README etc) in master
+  - Tag zsh-5.9 in master
+  - Bump 5.9 to 5.9.999.1-dev in master
+  - Create zsh-5.9-patches branch from zsh-5.9 tag
+  - Bump 5.9 to 5.9.0.1-dev in zsh-5.9-patches
+
+- Remember to push all of these changes, including the tag.
 
 - Create tarball:
 
