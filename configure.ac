@@ -683,10 +683,10 @@ fi
 AH_TEMPLATE([WINSIZE_IN_PTEM],
 [Define if your should include sys/stream.h and sys/ptem.h.])
 AC_CACHE_CHECK(for streams headers including struct winsize,
-ac_cv_winsize_in_ptem,
+zsh_cv_winsize_in_ptem,
 [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/stream.h>
-#include <sys/ptem.h>]], [[struct winsize wsz]])],[ac_cv_winsize_in_ptem=yes],[ac_cv_winsize_in_ptem=no])])
-if test x$ac_cv_winsize_in_ptem = xyes; then
+#include <sys/ptem.h>]], [[struct winsize wsz]])],[zsh_cv_winsize_in_ptem=yes],[zsh_cv_winsize_in_ptem=no])])
+if test x$zsh_cv_winsize_in_ptem = xyes; then
   AC_DEFINE(WINSIZE_IN_PTEM)
 fi
 
@@ -770,11 +770,11 @@ This is probably a library called 'curses' or 'ncurses'.  You may
 need to install a package called 'curses-devel' or 'ncurses-devel' on your
 system."], 255))
 AC_CHECK_HEADERS(curses.h, [],
-[AC_CACHE_CHECK(for Solaris 8 curses.h mistake, ac_cv_header_curses_solaris,
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <curses.h>]], [[]])],[ac_cv_header_curses_h=yes
-ac_cv_header_curses_solaris=yes],[ac_cv_header_curses_h=no
-ac_cv_header_curses_solaris=no]))
-if test x$ac_cv_header_curses_solaris = xyes; then
+[AC_CACHE_CHECK(for Solaris 8 curses.h mistake, zsh_cv_header_curses_solaris,
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <curses.h>]], [[]])],
+  [zsh_cv_header_curses_solaris=yes],
+  [zsh_cv_header_curses_solaris=no]))
+if test x$zsh_cv_header_curses_solaris = xyes; then
 AC_DEFINE(HAVE_CURSES_H)
 fi])
 
@@ -835,9 +835,18 @@ AC_CACHE_CHECK(if we need to ignore ncurses, zsh_cv_ignore_ncurses,
             zsh_cv_ignore_ncurses=yes
           ;;
         esac
+        LIBS="$LIBS_save"
     esac
   ;;
 esac])
+
+dnl Ensure the ncurses library is in LIBS on cached runs where the above code was skipped
+if test x$zsh_cv_ignore_ncurses = xno; then
+  case $LIBS in
+    *-lncurses*|*-lcurses*) ;;
+    *) AC_SEARCH_LIBS(initscr, [ncursesw ncurses curses]) ;;
+  esac
+fi
 
 AC_SEARCH_LIBS(getpwnam, nsl)
 
@@ -2274,11 +2283,11 @@ dnl We need to open it read/write, so make sure it is writeable.
 dnl Yet another test which won't work when cross-compiling.
 dnl ---------------
 AC_CACHE_CHECK(if your system has /dev/ptmx,
-ac_cv_have_dev_ptmx,
+zsh_cv_have_dev_ptmx,
 [if test -w /dev/ptmx; then
-  ac_cv_have_dev_ptmx=yes
+  zsh_cv_have_dev_ptmx=yes
 else
-  ac_cv_have_dev_ptmx=no
+  zsh_cv_have_dev_ptmx=no
 fi])
 
 dnl --------
@@ -2293,18 +2302,18 @@ dnl these is by defining _GNU_SOURCE.
 dnl -------
 AH_TEMPLATE([USE_DEV_PTMX],
 [Define to 1 if all the kit for using /dev/ptmx for ptys is available.])
-if test x$ac_cv_have_dev_ptmx = xyes -o x$ac_cv_func_posix_openpt = xyes && \
+if test x$zsh_cv_have_dev_ptmx = xyes -o x$ac_cv_func_posix_openpt = xyes && \
    test x$ac_cv_func_grantpt = xyes && \
    test x$ac_cv_func_unlockpt = xyes && \
    test x$ac_cv_func_ptsname = xyes; then
    AC_CACHE_CHECK([if /dev/ptmx is usable],
-   ac_cv_use_dev_ptmx,
+   zsh_cv_use_dev_ptmx,
    [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#if defined(__linux) || defined(__CYGWIN__)
 #define _GNU_SOURCE 1
 #endif
 #include <stdlib.h>
-int ptsname();]], [[]])],[ac_cv_use_dev_ptmx=no],[ac_cv_use_dev_ptmx=yes])])
-   if test x$ac_cv_use_dev_ptmx = xyes; then
+int ptsname();]], [[]])],[zsh_cv_use_dev_ptmx=no],[zsh_cv_use_dev_ptmx=yes])])
+   if test x$zsh_cv_use_dev_ptmx = xyes; then
      AC_DEFINE(USE_DEV_PTMX)
    fi
 fi
@@ -2712,11 +2721,15 @@ int main(int argc, char *argv[])
   changequote([, ])
 
 AC_CACHE_CHECK(if we can use -rdynamic, zsh_cv_rdynamic_available,
-old_LDFLAGS="$LDFLAGS"
+[old_LDFLAGS="$LDFLAGS"
 LDFLAGS="$LDFLAGS -rdynamic"
-AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])],[zsh_cv_rdynamic_available=yes
-EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-rdynamic}"],[zsh_cvs_rdynamic_available=no])
-LDFLAGS="$old_LDFLAGS")
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])],
+  [zsh_cv_rdynamic_available=yes],
+  [zsh_cv_rdynamic_available=no])
+LDFLAGS="$old_LDFLAGS"])
+if test x$zsh_cv_rdynamic_available = xyes; then
+  EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-rdynamic}"
+fi
   AC_CACHE_CHECK(if your dlsym() needs a leading underscore,
    zsh_cv_func_dlsym_needs_underscore,
    [echo failed >conftestval && cat >conftest.c <<EOM

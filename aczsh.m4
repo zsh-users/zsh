@@ -472,7 +472,7 @@ fi
 ])
 
 dnl
-dnl zsh_SYS_DYNAMIC_STRIP_EXE
+dnl zsh_SYS_DYNAMIC_STRIP_LIB
 dnl   Check whether it is safe to strip dynamically loaded libraries.
 dnl
 

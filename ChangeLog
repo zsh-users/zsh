@@ -1,5 +1,7 @@
 2026-06-07  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54668: aczsh.m4, configure.ac: various configure.ac cleanups
+
 	* 54669: Src/Modules/cap.c, Src/Modules/cap.mdd,
 	Src/Modules/db_gdbm.c, Src/Modules/db_gdbm.mdd,
 	Src/Modules/pcre.mdd, Src/mkmakemod.sh, configure.ac: add
