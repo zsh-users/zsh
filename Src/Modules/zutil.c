@@ -849,13 +849,9 @@ static char *zformat_substring(char* instr, char **specs, char **outp,
 	    // next char isn't a legal spec char -- unwind, treat the sequence
 	    // literally
 	    if (!testit && (!*s || *s == '%' || *s == ')' || *s == '-' || *s == '.')) {
-		// but swallow the % if this is %% or %)
-		if (!quote) {
-		   start += (s - start == 1 && (*s == '%' || *s == ')'));
-		// if quoting, only swallow with %). admittedly this is confusing
-		} else {
-		   start += (s - start == 1 && *s == ')');
-		}
+		// but swallow the % if no -q and this is %% or %)
+		if (!quote)
+		    start += (s - start == 1 && (*s == '%' || *s == ')'));
 		s = start;
 	    }
 

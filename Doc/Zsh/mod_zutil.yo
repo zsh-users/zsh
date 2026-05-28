@@ -223,8 +223,9 @@ number, and with a negative number the condition is true when the width
 is em(less than or equal to) the absolute value of that number.
 
 With tt(-q), `tt(%)' characters in the var(spec)s are escaped as they
-are inserted into the formatted string, and pre-escaped `tt(%)'
-characters in the format string are left as they are.  For example:
+are inserted into the formatted string, and pre-escaped `tt(%)' and
+`tt(RPAR())` characters in the format string are left as they are.  For
+example:
 
 example(zformat -qF REPLY '%%foo%% %B%d%b' d:%bar%)
 
@@ -248,8 +249,8 @@ ensuring that the widths are correct em(after) that processing.
 Additionally, with tt(-F), ternary-expression test numbers are compared
 against the em(pre-escaped) spec lengths.
 
-tt(-Q) is like tt(-q) except that it interprets pre-escaped `tt(%)'
-characters in the format string as normal.
+tt(-Q) is like tt(-q) except that it interprets pre-escaped `tt(%)' and
+`tt(RPAR())` characters in the format string as normal.
 
 The form using the tt(-a) option can be used for aligning
 strings.  Here, the var(spec)s are of the form

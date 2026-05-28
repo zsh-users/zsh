@@ -299,11 +299,11 @@
     zformat -Fq$1   REPLY '%%x %) %. %X %D %d' d:%foo% D:%bar% && print -r - $REPLY
   done
 0:-q with and without optarg
->%%x ) %. %X %%bar%% %%foo%%
->%%x ) %. %X %bar% %foo%
->%%x ) %. %X %bar% %%foo%%
->%%x ) %. %X %%bar%% %%foo%%
->%%x ) %. %X %%bar%% %%foo%%
+>%%x %) %. %X %%bar%% %%foo%%
+>%%x %) %. %X %bar% %foo%
+>%%x %) %. %X %bar% %%foo%%
+>%%x %) %. %X %%bar%% %%foo%%
+>%%x %) %. %X %%bar%% %%foo%%
 
   zformat -Fq REPLY '%(x.%%/%d.%%/%D)' x:1 d:%foo% D:%bar% && print -r - $REPLY
   zformat -Fq REPLY '%(X.%%/%d.%%/%D)' x:1 d:%foo% D:%bar% && print -r - $REPLY
