@@ -17,6 +17,9 @@ sigqueue(3) along with an arbitrary integer value, where available.
 The kill builtin also learnt a new -L option to print a list of all
 known signal numbers and their names.
 
+The new completion helper _as_if can be used to complete one command as
+if it were another command with particular arguments.
+
 Changes since 5.8.1
 -------------------
 
