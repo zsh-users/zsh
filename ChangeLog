@@ -1,3 +1,7 @@
+2026-05-27  dana  <dana@dana.is>
+
+	* unposted: NEWS: mention _as_if (w/53174)
+
 2026-05-26  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 54613: configure.ac: restrict mdd search to Src/ since that's

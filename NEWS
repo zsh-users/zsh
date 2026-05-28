@@ -90,6 +90,9 @@ and zrand_int() math functions.
 The shell keyword time now works on builtins, assignments, and
 current-shell actions.
 
+The new completion helper _as_if can be used to complete one command as
+if it were another command with particular arguments.
+
 The new completion helper _shadow can be used to temporarily wrap or
 substitute a function. The contrib function mkshadow makes it easier
 to use outside of completion contexts.
