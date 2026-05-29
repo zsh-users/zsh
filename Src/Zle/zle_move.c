@@ -51,7 +51,7 @@ alignmultiwordleft(int *pos, int setpos)
     int loccs = *pos;
 
     /* generic nothing to do test */
-    if (!isset(COMBININGCHARS) || loccs == zlell || loccs == 0)
+    if (!isset(COMBININGCHARS) || loccs >= zlell || loccs <= 0)
 	return 0;
 
     /* need to be on combining character */
@@ -642,7 +642,7 @@ vimatchbracket(UNUSED(char **args))
 	    DECCS();
 	else
 	    INCCS();
-	if (zlecs < 0 && zlecs >= zlell)
+	if (zlecs < 0 || zlecs >= zlell)
 	    break;
 	if (zleline[zlecs] == oth)
 	    ct--;

@@ -1,3 +1,8 @@
+2026-08-14  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 55082: Src/Zle/zle_move.c: fix zlecs bounds checks in
+	vimatchbracket and alignmultiwordleft
+
 2026-08-13  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 55076: Src/exec.c: _exit in zexecve when the interpreter
