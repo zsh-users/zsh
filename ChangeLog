@@ -1,3 +1,11 @@
+2026-05-29  dana  <dana@dana.is>
+
+	* 54625: .cvsignore, Completion/.cvsignore, Config/.cvsignore,
+	Doc/.cvsignore, Doc/Zsh/.cvsignore, Doc/help/.cvsignore,
+	Etc/.cvsignore, Functions/.cvsignore, Src/.cvsignore,
+	Src/Builtins/.cvsignore, Src/Modules/.cvsignore,
+	Src/Zle/.cvsignore, Test/.cvsignore: remove .cvsignore
+
 2026-05-27  dana  <dana@dana.is>
 
 	* 54603 (tweaked): Doc/Zsh/params.yo, Src/exec.c, Src/math.c,
