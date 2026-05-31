@@ -96,6 +96,15 @@
 
 %test
 
+# --version is technically an option
+  v=$( $ZTST_testdir/../Src/zsh --version )
+  print -r - $v
+  # patchlevel should appear in output if different from version
+  [[ $ZSH_PATCHLEVEL == zsh-$ZSH_VERSION-0-* ]] ||
+  [[ $v == *\[$ZSH_PATCHLEVEL\]* ]]
+0:zsh --version output
+*>zsh * \(*\)
+
   # setopt should move on to the next operation in the face of an error, but
   # preserve the >0 return code
   unsetopt aliases

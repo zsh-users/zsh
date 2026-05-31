@@ -41,7 +41,7 @@ signames.c: signames1.awk signames2.awk ../config.h @SIGNAL_H@
 sigcount.h: signames.c
 	grep 'define.*SIGCOUNT' signames.c > $@
 
-init.o: bltinmods.list zshpaths.h zshxmods.h
+init.o: bltinmods.list zshpaths.h zshxmods.h patchlevel.h
 
 init.o params.o parse.o: version.h
 

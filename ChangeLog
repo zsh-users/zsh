@@ -1,5 +1,8 @@
 2026-06-01  dana  <dana@dana.is>
 
+	* 54644: Src/init.c, Src/zsh.mdd, Test/E01options.ztst: init:
+	add patchlevel to --version output
+
 	* Wesley Schwengle: 49374: Src/init.c: Show patchlevel in
 	version string
 

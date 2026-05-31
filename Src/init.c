@@ -35,6 +35,14 @@
 #include "init.pro"
 
 #include "version.h"
+#ifdef CUSTOM_PATCHLEVEL
+#define ZSH_PATCHLEVEL CUSTOM_PATCHLEVEL
+#else
+#include "patchlevel.h"
+#ifndef ZSH_PATCHLEVEL
+#define ZSH_PATCHLEVEL "unknown"
+#endif
+#endif
 
 #if defined(HAVE_SYS_SYSCTL_H) && !defined(__linux)
 #include <sys/sysctl.h>
@@ -435,14 +443,15 @@ parseopts(char *nam, char ***argvp, char *new_opts, char **cmdp,
 		/* GNU-style long options */
 		++*argv;
 		if (!strcmp(*argv, "version")) {
-#ifdef CUSTOM_PATCHLEVEL
-		    printf("zsh %s (%s-%s-%s/%s)\n",
-			    ZSH_VERSION, MACHTYPE, VENDOR, OSTYPE, CUSTOM_PATCHLEVEL);
-#else
-		    printf("zsh %s (%s-%s-%s)\n",
-			    ZSH_VERSION, MACHTYPE, VENDOR, OSTYPE);
-#endif
-
+		    // omit patchlevel for a tagged release, which looks like:
+		    // zsh-x.y.z-0-gabcdef
+		    static const char *pfx = "zsh-" ZSH_VERSION "-0-";
+		    if (strncmp(ZSH_PATCHLEVEL, pfx, strlen(pfx)))
+			printf("zsh %s [%s] (%s-%s-%s)\n",
+				ZSH_VERSION, ZSH_PATCHLEVEL, MACHTYPE, VENDOR, OSTYPE);
+		    else
+			printf("zsh %s (%s-%s-%s)\n",
+				ZSH_VERSION, MACHTYPE, VENDOR, OSTYPE);
 		    LAST_OPTION(0);
 		}
 		if (!strcmp(*argv, "help")) {
