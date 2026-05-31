@@ -26,7 +26,7 @@ _diff_palette() {
 }
 
 if _pick_variant -r variant -c $cmd gnu=GNU unix -v ||
-  [[ $OSTYPE = (freebsd<12->|darwin<22->).* ]]; then
+  [[ $OSTYPE = (freebsd<12->.|darwin<22->.|netbsd)* ]]; then
   (( $#words > 2 )) && ign='!'
 
   # output formats
