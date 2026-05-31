@@ -1,5 +1,8 @@
 2026-05-30  dana  <dana@dana.is>
 
+	* unposted: Completion/Unix/Command/_imagemagick: support .heic
+	extension
+
 	* unposted: Completion/Unix/Type/_diff_options: assume diff
 	under netbsd is gnu-like
 
