@@ -128,11 +128,11 @@
 0:`exec' with -l option
 >-zsh
 
-  (exec -a /bin/SPLATTER /bin/sh -c 'echo $0')
+  (exec -a /bin/SPLATTER $ZTST_testdir/../Src/zsh -fc 'echo $0')
 0:`exec' with -a option
 >/bin/SPLATTER
 
-  (exec -a/bin/SPLOOSH /bin/sh -c 'echo $0')
+  (exec -a/bin/SPLOOSH $ZTST_testdir/../Src/zsh -fc 'echo $0')
 0:`exec' with -a option, no space
 >/bin/SPLOOSH
 
@@ -144,7 +144,7 @@
 
   (
     opts=(-a /bin/WHOOOSH)
-    exec $opts /bin/sh -c 'echo $0'
+    exec $opts $ZTST_testdir/../Src/zsh -fc 'echo $0'
   )
 0:`exec' with -a option from expansion
 >/bin/WHOOOSH

@@ -4,6 +4,10 @@
 
 2026-06-01  dana  <dana@dana.is>
 
+	* 54645: Test/A01grammar.ztst, Test/D03procsubst.ztst,
+	Test/V09datetime.ztst: fix some failures with
+	alpine/busybox/musl
+
 	* Lukáš Zaoral: unposted: Src/Zle/zle_tricky.c: fix segfault in
 	_IO_putc via set_colour_attribute
 

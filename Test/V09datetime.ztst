@@ -79,8 +79,8 @@
 >1973^@03^@03
 
 # We assume '%@' is not a valid format on any OSs.
-# The result can be '%@' (Linux), '@' (BSDs) or an error (Cygwin).
-  [[ $(strftime '%@' 0 2> /dev/null) == (%|)@ || $? != 0 ]]
+# The result can be '%@' (Linux), '@' (BSDs), '' (musl), or an error (Cygwin).
+  [[ $(strftime '%@' 0 2> /dev/null) == ((%|)@|) || $? != 0 ]]
 0:bad format specifier
 
 # This test may fail at 23:59:59.xxx on New Year's Eve :/
