@@ -1,3 +1,9 @@
+2026-06-01  dana  <dana@dana.is>
+
+	* 54645: Test/A01grammar.ztst, Test/D03procsubst.ztst,
+	Test/V09datetime.ztst: fix some failures with
+	alpine/busybox/musl
+
 2026-05-30  dana  <dana@dana.is>
 
 	* unposted: Completion/Unix/Command/_imagemagick: support .heic
