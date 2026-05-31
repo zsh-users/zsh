@@ -1,5 +1,7 @@
 2026-05-31  dana  <dana@dana.is>
 
+	* unposted: Config/version.mk: post-release version bump
+
 	* unposted: Config/version.mk: release 5.9.1
 
 2026-05-30  dana  <dana@dana.is>
