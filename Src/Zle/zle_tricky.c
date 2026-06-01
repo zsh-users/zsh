@@ -1766,9 +1766,9 @@ get_comp_string(void)
 	 * \! in double quotes is extracted by the history code before normal
 	 * parsing, so sanitize it here, too.
 	 */
-        if (instring == QT_DOUBLE) {
+        if (instring == QT_DOUBLE && isset(BANGHIST) && bangchar) {
             for (q = s; *q; q++)
-                if (*q == '\\' && q[1] == '!')
+                if (*q == '\\' && (unsigned char)q[1] == bangchar)
                     *q = Bnull;
         }
     }
