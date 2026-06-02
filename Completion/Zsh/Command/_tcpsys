@@ -21,7 +21,7 @@ case $service in
   else
     argargs+=(':host:_hosts' ':port:_ports' '*:session:->session')
   fi
-  _arguments -C $argargs
+  _arguments -C -s -S : $argargs
   ;;
 esac
 

@@ -1,6 +1,6 @@
 #compdef jobs
 
-_arguments -C -s \
+_arguments -C -s -S -S : \
   "(-d -l -p -r -s *)-Z[specify string to replace shell's argument and environment with]:string" \
   '(-Z)-d[show directory from which each job was started]' \
   '(-Z)-l[list process IDs]' \

@@ -1,6 +1,6 @@
 #compdef dirs
 
-_arguments -s \
+_arguments -s -S -S : \
   '(-)-c[clear the directory stack]' \
   '(* -c)-l[display directory names in full]' \
   '(* -c)-v[display numbered list of directory stack]' \

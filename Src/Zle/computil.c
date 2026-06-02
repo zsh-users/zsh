@@ -921,7 +921,8 @@ struct cadef {
     char *nonarg;		/* pattern for non-args (-A argument) */
 };
 
-#define CDF_SEP 1		/* -S was specified: -- terminates options */
+#define CDF_SEP  1		/* -S was specified: -- terminates options */
+#define CDF_ZSEP 2		/* -S -S was specified: - terminates options */
 
 /* Description for an option. */
 
@@ -1255,7 +1256,7 @@ parse_cadef(char *nam, char **args)
 	    if (*p == 's')
 		single = 1;
 	    else if (*p == 'S')
-		flags |= CDF_SEP;
+		flags |= (flags & CDF_SEP) ? CDF_ZSEP : CDF_SEP;
 	    else if (*p == 'A') {
 		if (p[1]) {
 		    nonarg = p + 1;
@@ -2118,8 +2119,9 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
 	    ca_inactive(d, argxor, cur - 1, 0);
 	    argxor = NULL;
 	}
-	if ((d->flags & CDF_SEP) && cur != compcurrent && state.actopts &&
-		!strcmp(line, "--")) {
+	if (cur != compcurrent && state.actopts &&
+		(((d->flags & CDF_SEP) && !strcmp(line, "--")) ||
+		((d->flags & CDF_ZSEP) && !strcmp(line, "-")))) {
 	    ca_inactive(d, NULL, cur, 1);
 	    state.actopts = 0;
 	    continue;

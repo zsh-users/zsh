@@ -10,7 +10,7 @@
 local state expl line curcontext="$curcontext" ret=1
 typeset -A opt_args
 
-_arguments -C -s -S \
+_arguments -C -s -S -S : \
   '(-v -a -M -l -D -A -N -p)-e[select emacs keymap and bind it to main]' \
   '(-e -a -M -l -D -A -N -p)-v[select viins keymap and bind it to main]' \
   '(-e -v -M -l -D -A -N -p)-a[select vicmd keymap]' \

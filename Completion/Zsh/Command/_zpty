@@ -3,7 +3,7 @@
 local state line list names expl sep curcontext="$curcontext"
 typeset -A opt_args
 
-_arguments -C -s -S \
+_arguments -C -s -S -S -A '-*' : \
   '(-r -w -t -n -L -d)-e[echo input characters]' \
   '(-r -w -t -n -L -d)-b[io to pseudo-terminal blocking]' \
   '(-r -w -t -n -L -e -b)-d[delete command]:*:name:->name' \

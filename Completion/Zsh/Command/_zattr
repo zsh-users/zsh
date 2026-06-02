@@ -4,24 +4,24 @@ local context state line expl ret=1 REPLY
 
 case $service in
 zgetattr)
-_arguments \
+_arguments -S -S : \
   '1:file:_files' \
   '2:attribute:->attrs' \
   '3:parameter'
 ;;
 zsetattr)
-_arguments \
+_arguments -S -S : \
   '1:file:_files' \
   '2:attribute:->attrs' \
   '3:value'
 ;;
 zdelattr)
-_arguments \
+_arguments -S -S : \
   '1:file:_files' \
   '2:attribute:->attrs'
 ;;
 zlistattr)
-_arguments \
+_arguments -S -S : \
   '1:file:_files' \
   '2:parameter'
 ;;

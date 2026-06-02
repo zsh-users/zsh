@@ -4,7 +4,7 @@ local ret=1
 local -a context line state state_descr alts opts
 local -A opt_args
 
-_arguments -A '-*' : \
+_arguments -S -S -A '-*' : \
   '-a+[specify array in which to store parsed options]:array:_parameters -g "*array*~*readonly*"' \
   '-A+[specify association in which to store parsed options]:association:_parameters -g "*association*~*readonly*"' \
   '-D[remove parsed options from positional parameters]' \

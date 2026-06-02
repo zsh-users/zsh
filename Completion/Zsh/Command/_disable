@@ -6,7 +6,7 @@ ali_arr=(${(k)aliases} ${(k)galiases})
 sali_arr=(${(k)saliases})
 func_arr=(${(k)functions})
 
-_arguments -C -s -A "-*" -S \
+_arguments -C -s -A "-*" -S -S : \
   "(-f -r -s -p)-a[act on regular or global aliases]:*:regular or global alias:compadd -k ali_arr" \
   "(-a -r -s -p)-f[act on functions]:*:function:compadd -k func_arr" \
   "(-a -f -s -p)-r[act on reserved words]:*:reserved-word:compadd -k reswords" \

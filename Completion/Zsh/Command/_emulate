@@ -1,6 +1,6 @@
 #compdef emulate
 
-_arguments -s -S -A '-*' : \
+_arguments -s -S -S -A '-*' : \
   '(2 3)-l[list options to be set or unset]' \
   '(2 3)-L[set local_options and local_traps as well]' \
   '-R[reset all options instead of only those needed for script portability]' \

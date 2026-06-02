@@ -3702,6 +3702,10 @@ example(foobar -x -- -y)
 
 the `tt(-x)' is considered an option, the `tt(-y)' is considered an
 argument, and the `tt(-)tt(-)' is considered to be neither.
+
+If this option is given twice (as tt(-S -S)), a single `tt(-)' is also
+treated this way.  This is useful for completing zsh's own builtins as
+well as functions that use tt(zparseopts) for option parsing.
 )
 item(tt(-A) var(pat))(
 Do not complete options after the first non-option

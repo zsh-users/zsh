@@ -4,7 +4,7 @@ local suf comp state line expl curcontext="$curcontext" ret=1 NORMARG
 typeset -A opt_args
 suf=()
 
-_arguments -n -C -S -s \
+_arguments -n -C -S -S -s -A '-*' : \
   '(-R -P -i -u -d -a -b -c -I -p -f -e -F -m)-A[create module aliases]' \
   '(-)-R[remove module aliases]' \
   '(-A -R -F -L -m -P -l -e)-u[unload module]' \

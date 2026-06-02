@@ -19,7 +19,7 @@ if [[ $service = print ]]; then
     rest='*: :_default'
   fi
 
-  _arguments -C -s -A "-*" -S \
+  _arguments -C -s -A "-*" -S -S : \
     '-r[ignore escape conventions of echo]' \
     '(-r -b -f -m -s -S -l -N -o -O -i -c -u -p -z -D -P)-R[emulate BSD echo (no escapes, -n & -e flags only)]' \
     '-b[recognise bindkey escape sequences]' \

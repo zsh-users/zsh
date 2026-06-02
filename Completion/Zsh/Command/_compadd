@@ -88,7 +88,7 @@ case $service in
   ;;
 esac
 
-_arguments -C -s -S -A "-*" $args && ret=0
+_arguments -C -s -S -S -A "-*" : $args && ret=0
 
 if [[ -n $state ]]; then
   if (( $+opt_args[-a] )); then

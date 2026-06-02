@@ -1,6 +1,6 @@
 #compdef command
 
-_arguments \
+_arguments -S : \
   '-v[indicate result of command search]:*:command:_path_commands' \
   '-V[show result of command search in verbose form]:*:command:_path_commands' \
   '(-)-p[use default PATH to find command]' \

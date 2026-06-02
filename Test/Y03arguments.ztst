@@ -373,19 +373,34 @@
 
  tst_arguments -S -x ':word:()'
  comptest $'tst -- -\t'
-0:disallowed option after --
+0:-S: disallowed option after --
 >line: {tst -- -}{}
 
  tst_arguments -S -x ':word:()'
+ comptest $'tst - -\t'
+0:-S: allowed option after -
+>line: {tst - -x }{}
+
+ tst_arguments -S -x ':word:()'
  comptest $'tst - --\eB\C-b\t'
-0:allowed option before --
+0:-S: allowed option before --
 >line: {tst -x }{ --}
 
  tst_arguments -S '1:one' '2:two'
  comptest $'tst -- -- \t'
-0:only first of duplicate -- is ignored
+0:-S: only first of duplicate -- is ignored
 >line: {tst -- -- }{}
 >DESCRIPTION:{two}
+
+ tst_arguments -S -S -x ':word:()'
+ comptest $'tst -- -\t'
+0:-S -S: disallowed option after --
+>line: {tst -- -}{}
+
+ tst_arguments -S -S -x ':word:()'
+ comptest $'tst - -\t'
+0:-S -S: disallowed option after -
+>line: {tst - -}{}
 
  tst_arguments -x :word
  comptest $'tst word -\t'

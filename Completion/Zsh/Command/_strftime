@@ -6,7 +6,7 @@ if (( words[(I)-r] )); then
   two='date string'
 fi
 
-_arguments -S -A '-*' -s \
+_arguments -S -S -A '-*' -s : \
   '-n[omit trailing newline]' \
   '-q[run quietly]' \
   '(3)-r[reverse lookup using strptime]' \

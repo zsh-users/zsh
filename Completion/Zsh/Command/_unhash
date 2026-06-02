@@ -1,6 +1,6 @@
 #compdef unhash
 
-_arguments -s -S \
+_arguments -s -S -S : \
   '(-a -f -s *)-d[remove named directories]:*:named directory:compadd -k nameddirs' \
   '(-d -f -s *)-a[remove aliases]:*:alias:_aliases' \
   '(-a -d -f *)-s[remove suffix aliases]:*:suffix alias:_aliases -s s' \

@@ -9,7 +9,7 @@ common_args=( \
 
 case ${service} in
   hash)
-    _arguments -C -s -S \
+    _arguments -C -s -S -S : \
       '(-f -m -v)-r[empty hash table]' \
       '(-f -r)-m[treat arguments as patterns]' \
       '(-f -r -m)-v[list entries as they are added]' \
@@ -18,7 +18,7 @@ case ${service} in
       '(-d -f -r -m -v -L)*:hash:->hashval' && ret=0
   ;;
   rehash)
-    _arguments -C -s ${common_args[@]} && return 0
+    _arguments -C -s -S -S : ${common_args[@]} && return 0
   ;;
 esac
 

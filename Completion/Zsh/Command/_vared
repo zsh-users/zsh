@@ -1,6 +1,6 @@
 #compdef vared
 
-_arguments -s -A "-*" \
+_arguments -s -S -S -A "-*" : \
   '(-a)-A[edit associative array]' \
   '(-A)-a[edit array parameter]' \
   "-c[create parameter or change type]" \

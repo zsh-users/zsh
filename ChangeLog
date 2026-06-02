@@ -1,5 +1,30 @@
 2026-06-08  dana  <dana@dana.is>
 
+	* 54659: Completion/Zsh/Command/_alias,
+	Completion/Zsh/Command/_bindkey,
+	Completion/Zsh/Command/_command,
+	Completion/Zsh/Command/_compadd, Completion/Zsh/Command/_dirs,
+	Completion/Zsh/Command/_disable,
+	Completion/Zsh/Command/_emulate,
+	Completion/Zsh/Command/_enable, Completion/Zsh/Command/_exec,
+	Completion/Zsh/Command/_fc, Completion/Zsh/Command/_hash,
+	Completion/Zsh/Command/_jobs_builtin,
+	Completion/Zsh/Command/_kill, Completion/Zsh/Command/_print,
+	Completion/Zsh/Command/_prompt, Completion/Zsh/Command/_read,
+	Completion/Zsh/Command/_set, Completion/Zsh/Command/_strftime,
+	Completion/Zsh/Command/_tcpsys,
+	Completion/Zsh/Command/_typeset,
+	Completion/Zsh/Command/_unhash, Completion/Zsh/Command/_vared,
+	Completion/Zsh/Command/_which, Completion/Zsh/Command/_zattr,
+	Completion/Zsh/Command/_zcompile, Completion/Zsh/Command/_zed,
+	Completion/Zsh/Command/_zle, Completion/Zsh/Command/_zmodload,
+	Completion/Zsh/Command/_zmv,
+	Completion/Zsh/Command/_zparseopts,
+	Completion/Zsh/Command/_zpty, Completion/Zsh/Command/_zsocket,
+	Completion/Zsh/Function/__arguments, Doc/Zsh/compsys.yo,
+	Src/Zle/computil.c, Test/Y03arguments.ztst: comparguments:
+	support zsh-style '-' terminator with -S -S
+
 	* unposted: Functions/Misc/zgetopt: try funcstack for function
 	name
 

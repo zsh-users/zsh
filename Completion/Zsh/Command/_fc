@@ -12,7 +12,7 @@ words=( "${(@)words[1,CURRENT-1]:#*=*}" "${(@)words[CURRENT,-1]}" )
 (( CURRENT -= cur ))
 
 fc_common=(
-  -s -S
+  -s -S -S :
   '(-A -R -W -p -P)-I[include internal (new) events only]'
   '(-A -R -W -p -P)-L[include local events only]'
   '(-A -R -W -p -P)-r[reverse order of the events]'

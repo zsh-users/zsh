@@ -15,7 +15,7 @@ compwids=(accept-and-menu-complete
 
 opts=(-A -C -D -F -L -M -N -R -T -U -a -c -l -r \* :)
 
-_arguments -s -S \
+_arguments -s -S -S : \
     "($opts)-A[define widget alias]:old widget:->widget :new widget:->widget" \
     "($opts)-C[define completion widget]:new widget name:->comp-widget :completion widget:->builtin-comp-widget :widget shell function:->function" \
     "($opts)-D[delete widget]:*:widget:->widget" \
@@ -36,14 +36,14 @@ _arguments -s -S \
     '(-)*::widget args:->args' && ret=0
 
 [[ $state == listing ]] &&
-  _arguments -s -S '!-l' \
+  _arguments -s -S -S : '!-l' \
     "(-a)-L[list as commands]" \
     "(-L)-a[list all widgets]" \
     '*:widget name:->widget' && ret=0
 
 case "$state[1]" in
   (args)
-    _arguments \
+    _arguments -s -S : \
       '(-N)-n[numeric prefix]:number:' \
       '(-n)-N[reset numeric prefix]' \
       '-K[specify temporary keymap]:keymap:compadd -a keymaps' \
@@ -67,7 +67,7 @@ case "$state[1]" in
       compadd -M 'r:|-=* r:|=*' -k "widgets[(I)(.|)(${(j(|))compwids})]" && ret=0
     ;;
   (redisplay)
-    _arguments -s -S '!-R' \
+    _arguments -s -S -S : '!-R' \
       "-c[clear listing]" \
       ":status line" "*:strings to list" && ret=0
     ;;

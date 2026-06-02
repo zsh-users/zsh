@@ -1,6 +1,6 @@
 #compdef set
 
-noglob _arguments -s -S \
+noglob _arguments -s -S -S : \
   - list '+[list names of parameters]' - others \
   '-o+[set specified option]:option:_options' \
   '+o+[unset specified option]:option:_options' \

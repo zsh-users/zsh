@@ -15,14 +15,14 @@ xarg='-x+[specify spaces to use for indentation in function expansion]: :_number
 
 case ${service} in
   whence)
-    _arguments -C -s -A "-*" -S \
+    _arguments -C -s -A "-*" -S -S : \
       '(-c -w)-v[verbose output]' \
       '(-v -w)-c[csh-like output]' \
       "${cargs[@]}" "$farg" "$aarg" "$xarg" && ret=0
   ;;
-  where) _arguments -C -s -A "-*" -S "${cargs[@]}" "$xarg" && ret=0;;
-  which) _arguments -C -s -A "-*" -S "${cargs[@]}" "$aarg" "$xarg" && ret=0;;
-  type) _arguments -C -s -A "-*" -S "${cargs[@]}" "$aarg" "$farg" && ret=0;;
+  where) _arguments -C -s -A "-*" -S -S : "${cargs[@]}" "$xarg" && ret=0;;
+  which) _arguments -C -s -A "-*" -S -S : "${cargs[@]}" "$aarg" "$xarg" && ret=0;;
+  type) _arguments -C -s -A "-*" -S -S : "${cargs[@]}" "$aarg" "$farg" && ret=0;;
 esac
 
 if [[ "$state" = command ]]; then
