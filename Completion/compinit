@@ -77,38 +77,16 @@ setopt extendedglob
 typeset _i_dumpfile _i_files _i_line _i_done _i_dir _i_autodump=1
 typeset _i_tag _i_file _i_addfiles _i_fail=ask _i_check=yes _i_name _i_why
 
-while [[ $# -gt 0 && $1 = -[dDiuCw] ]]; do
-  case "$1" in
-  -d)
-    _i_autodump=1
-    shift
-    if [[ $# -gt 0 && "$1" != -[dfQC] ]]; then
-      _i_dumpfile="$1"
-      shift
-    fi
-    ;;
-  -D)
-    _i_autodump=0
-    shift
-    ;;
-  -i)
-    _i_fail=ign
-    shift
-    ;;
-  -u)
-    _i_fail=use
-    shift
-    ;;
-  -C)
-    _i_check=
-    shift
-    ;;
-  -w)
-    _i_why=1
-    shift
-    ;;
-  esac
-done
+# note: for historical reasons it must be possible to give the optional arg to
+# -d in the next parameter. zparseopts handles this by default
+local -A _i_opth
+zparseopts -A _i_opth -D -F - C d:: D i u w || return
+(( $+_i_opth[-C] )) && _i_check=
+(( $+_i_opth[-d] )) && _i_autodump=1 _i_dumpfile=$_i_opth[-d]
+(( $+_i_opth[-D] )) && _i_autodump=0
+(( $+_i_opth[-i] )) && _i_fail=ign
+(( $+_i_opth[-u] )) && _i_fail=use
+(( $+_i_opth[-w] )) && _i_why=1
 
 # The associative arrays containing the definitions for the commands and
 # services.
