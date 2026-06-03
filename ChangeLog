@@ -2,6 +2,11 @@
 
 	* unposted: NEWS: fix 5.9 changes header
 
+2026-06-04  Oliver Kiddle  <opk@zsh.org>
+
+	* Shohei YOSHIDA: 54663: Completion/Unix/Command/_ruby:
+	update JIT flags
+
 2026-06-01  dana  <dana@dana.is>
 
 	* 54645: Test/A01grammar.ztst, Test/D03procsubst.ztst,
