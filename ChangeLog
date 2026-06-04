@@ -1,3 +1,8 @@
+2026-06-10  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 54674: Src/subst.c, Test/D04parameter.ztst: ::= didn't respect
+	parameter flags
+
 2026-06-08  dana  <dana@dana.is>
 
 	* unposted: NEWS: document COLUMNS+LINES change from w/54676

@@ -82,6 +82,19 @@
 >wasnull2d
 >wasnull2d
 
+  typeset -Z3 zerothree
+  print ${zerothree::=15}
+  typeset -E3 ethree
+  five=5
+  print ${ethree::=five}
+  typeset -a -U uniquearr
+  typeset -a duplicates=(1 2 1 1 2 3)
+  print ${(A)uniquearr::=$duplicates}
+0:::= respects expansion flags
+>015
+>5.00e+00
+>1 2 3
+
   unset array
   print ${#${(A)=array=word}}
 0:${#${(A)=array=word}} counts array elements

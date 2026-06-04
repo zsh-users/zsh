@@ -3300,13 +3300,23 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 			Param pm = sethparam(idbeg, a);
 			if (pm)
 			    aval = paramvalarr(pm->gsu.h->getfn(pm), hkeys|hvals);
-		    } else
-			setaparam(idbeg, a);
+		    } else {
+			Param pm = setaparam(idbeg, a);
+			if (pm)
+			    aval = pm->gsu.a->getfn(pm);
+		    }
 		    isarr = 1;
 		    arrasg = 0;
 		} else {
 		    untokenize(val);
-		    setsparam(idbeg, ztrdup(val));
+		    Param pm = setsparam(idbeg, ztrdup(val));
+		    if (pm) {
+			struct value vbuf = { 0 };
+			vbuf.pm = pm;
+			vbuf.end = -1;
+			vbuf.valflags = VALFLAG_SUBST;
+			val = getstrvalue(&vbuf);
+		    }
 		}
 		*idend = sav;
 		copied = 1;
