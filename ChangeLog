@@ -1,5 +1,7 @@
 2026-06-04  dana  <dana@dana.is>
 
+	* unposted: Test/A06assign.ztst: add regression test for w/54340
+
 	* Philippe Altherr: 54340: Src/params.c: Remove partial
 	duplication of strsetfn and arrsetfn
 

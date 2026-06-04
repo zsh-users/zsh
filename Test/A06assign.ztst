@@ -762,3 +762,10 @@
  )
 0:regression workers/53033: assigning $! to array element
 *>typeset -g -a x=\( <-> \)
+
+  (
+    typeset -a a
+    a[1]=()
+    a=( a b c )
+  )
+0:regression workers/54340
