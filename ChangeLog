@@ -24,6 +24,10 @@
 	Test/V06parameter.ztst: fix lookup in $commands array when
 	hashlistall is unset
 
+2026-06-04  dana  <dana@dana.is>
+
+	* unposted: Completion/compdump: guard arguments to mv
+
 2026-06-01  dana  <dana@dana.is>
 
 	* 54645: Test/A01grammar.ztst, Test/D03procsubst.ztst,
