@@ -2322,11 +2322,14 @@ dnl -----------------
 dnl multibyte support
 dnl -----------------
 AC_ARG_ENABLE(multibyte,
-AS_HELP_STRING([--enable-multibyte],[support multibyte characters]),
-[zsh_cv_c_unicode_support=$enableval],
-[AC_CACHE_VAL(zsh_cv_c_unicode_support,
-  AC_MSG_NOTICE([checking for functions supporting multibyte characters])
-  [zfuncs_absent=
+AS_HELP_STRING([--enable-multibyte],[support multibyte characters]))
+
+if test "x$enable_multibyte" = xno; then
+  zsh_use_multibyte=no
+else
+  AC_CACHE_VAL(zsh_cv_c_unicode_capable,
+    [AC_MSG_NOTICE([checking for functions supporting multibyte characters])
+     zfuncs_absent=
 dnl
 dnl Note that iswblank is not included and checked separately.
 dnl As iswblank() was added to C long after the others, we still
@@ -2342,14 +2345,21 @@ wmemcpy wmemmove wmemset; do
     done
     if test x"$zfuncs_absent" = x; then
       AC_MSG_NOTICE([all functions found, multibyte support enabled])
-      zsh_cv_c_unicode_support=yes
+      zsh_cv_c_unicode_capable=yes
+      zsh_cv_c_unicode_missing=
     else
       # Warns at the end of configure
       AC_MSG_NOTICE([missing functions, multibyte support disabled])
-      zsh_cv_c_unicode_support=no
+      zsh_cv_c_unicode_capable=no
+      zsh_cv_c_unicode_missing=$zfuncs_absent
     fi
-  ])
-])
+   ])
+  zsh_use_multibyte=$zsh_cv_c_unicode_capable
+  if test "x$enable_multibyte" = xyes && test "x$zsh_cv_c_unicode_capable" = xno; then
+    AC_MSG_ERROR([--enable-multibyte requested but required functions are missing:$zsh_cv_c_unicode_missing])
+  fi
+fi
+
 AH_TEMPLATE([MULTIBYTE_SUPPORT],
 [Define to 1 if you want support for multibyte character sets.])
 
@@ -2367,7 +2377,7 @@ fi])
 AH_TEMPLATE([BROKEN_ISPRINT],
 [Define to 1 if the isprint() function is broken under UTF-8 locale.])
 
-if test x$zsh_cv_c_unicode_support = xyes; then
+if test x$zsh_use_multibyte = xyes; then
   AC_DEFINE(MULTIBYTE_SUPPORT)
 
   dnl Test if wcwidth() and/or iswprint() is broken for
@@ -3107,14 +3117,14 @@ fi
 echo "See config.modules for installed modules and functions.
 "
 
-if test x$zsh_cv_c_unicode_support != xyes; then
-  if test "x$zfuncs_absent" = x; then
+if test x$zsh_use_multibyte != xyes; then
+  if test "x$enable_multibyte" = xno; then
     # The user opted out.
     AC_MSG_WARN([You have chosen to build without multibyte support.])
     AC_MSG_WARN([This configuration may not be suitable for production use. It is known to cause errors in 'make test'. We strongly recommend to re-run configure with --enable-multibyte.])
   else
     # Some requisite functions are missing.
-    AC_MSG_WARN([Multibyte support cannot be enabled: some standard library functions are missing: $zfuncs_absent])
+    AC_MSG_WARN([Multibyte support cannot be enabled: some standard library functions are missing: $zsh_cv_c_unicode_missing])
     AC_MSG_WARN([This configuration may not be suitable for production use. It is known to cause errors in 'make test'. If your system provides those functions, we recommend to re-run configure appropriately.])
     # If your system doesn't have those functions, consider patching the
     # test suite and sending the patch to zsh-workers@ for inclusion.

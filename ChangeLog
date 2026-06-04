@@ -1,5 +1,9 @@
 2026-06-07  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54670: configure.ac: don't cache the user saying
+	--disable-multibyte as meaning multibyte support was detected
+	broken
+
 	* 54668: aczsh.m4, configure.ac: various configure.ac cleanups
 
 	* 54669: Src/Modules/cap.c, Src/Modules/cap.mdd,
