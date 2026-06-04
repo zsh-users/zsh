@@ -1,5 +1,7 @@
 2026-06-04  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Src/zsh.h: remove further remnant of restricted mode
+
 	* Shohei YOSHIDA: 54663: Completion/Unix/Command/_ruby:
 	update JIT flags
 
