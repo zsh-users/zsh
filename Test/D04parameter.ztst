@@ -2460,6 +2460,27 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 >different
 >string
 
+  foo="abcdef"
+  print 1${foo/#abc/REPLACED}
+  print 2${foo/%abc/REPLACED}
+  print 3${foo/#%abc/REPLACED}
+  print 4${foo/#def/REPLACED}
+  print 5${foo/%def/REPLACED}
+  print 6${foo/#%def/REPLACED}
+  print 7${foo/#bc/REPLACED}
+  print 8${foo/%bc/REPLACED}
+  print 9${foo/#%bc/REPLACED}
+0:Respect anchors
+>1REPLACEDdef
+>2abcdef
+>3abcdef
+>4abcdef
+>5abcREPLACED
+>6abcdef
+>7abcdef
+>8abcdef
+>9abcdef
+
   my_width=6
   my_index=1
   my_options=Option1

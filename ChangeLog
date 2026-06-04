@@ -1,5 +1,8 @@
 2026-06-07  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54671: Src/glob.c, Test/D04parameter.ztst: fix anchored pattern
+	with --disable-multibyte
+
 	* 54670: configure.ac: don't cache the user saying
 	--disable-multibyte as meaning multibyte support was detected
 	broken
