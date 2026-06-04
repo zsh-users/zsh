@@ -1,5 +1,7 @@
 2026-06-04  dana  <dana@dana.is>
 
+	* unposted: Completion/compdump: guard arguments to mv
+
 	* unposted: README, Test/E01options.ztst: add regression test,
 	update README for w/54328
 
