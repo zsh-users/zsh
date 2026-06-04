@@ -1,5 +1,8 @@
 2026-06-04  dana  <dana@dana.is>
 
+	* unposted: README, Test/E01options.ztst: add regression test,
+	update README for w/54328
+
 	* Philippe Altherr: 54328: Doc/Zsh/options.yo, Src/params.c,
 	Src/utils.c: Only ever turn global parameters into named
 	directories

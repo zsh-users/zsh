@@ -165,6 +165,12 @@ and %) differently.  Previously they were implemented via implicit
 specs, which could lead to unexpected behaviour in some (uncommon)
 circumstances.
 
+Local parameters are no longer converted to named directories.  For
+example, the following now emits an error (assuming there is no other
+candidate for ~b):
+
+  () { local b=/bin; cd ~b }
+
 Incompatibilities between 5.8.1 and 5.9
 ---------------------------------------
 
