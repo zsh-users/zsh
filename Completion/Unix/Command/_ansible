@@ -208,10 +208,15 @@ case $state in
     else
       local -a inventory
       typeset -ga _ansible_hosts _ansible_groups
+      typeset -g _ansible_inventory_last_cwd
+      if [[ $PWD != $_ansible_inventory_last_cwd ]]; then
+        unset _ansible_hosts _ansible_groups
+      fi
       if (( !$#_ansible_hosts || !$#_ansible_groups )); then
        	inventory=( ${(f)"$(_call_program groups ansible-inventory --graph)"} )
        	_ansible_hosts=( ${${(M)inventory%--[^:]#}#--} )
 	_ansible_groups=( ${${${(M)inventory%@*:}%:}#@} )
+        _ansible_inventory_last_cwd=$PWD
       fi
       if [[ $state = hosts ]]; then
         suf=( -qS: )
