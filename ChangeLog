@@ -2,6 +2,11 @@
 
 	* unposted: NEWS: fix 5.9 changes header
 
+2026-06-07  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 54671: Src/glob.c, Test/D04parameter.ztst: fix anchored pattern
+	with --disable-multibyte
+
 2026-06-04  Oliver Kiddle  <opk@zsh.org>
 
 	* Shohei YOSHIDA: 54663: Completion/Unix/Command/_ruby:
