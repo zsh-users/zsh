@@ -1,5 +1,8 @@
 2026-06-10  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54683: Src/Zle/zle_refresh.c: fix for ctrl-r with combining
+	characters or nonprintable wide chars
+
 	* 54674: Src/subst.c, Test/D04parameter.ztst: ::= didn't respect
 	parameter flags
 

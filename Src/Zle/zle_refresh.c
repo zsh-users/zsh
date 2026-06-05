@@ -1437,26 +1437,60 @@ zrefresh(void)
 #ifdef MULTIBYTE_SUPPORT
 	    if (WC_ISPRINT(*u)) {
 		int width = WCWIDTH(*u);
-		/* Handle wide characters as above */
-		if (width > rpms.sen - rpms.s) {
-		    do {
-			*rpms.s++ = zr_sp;
-		    } while (rpms.s < rpms.sen);
-		    nbuf[rpms.ln][winw + 1] = zr_nl;
-		    snextline(&rpms);
-		}
-		if (width > rpms.sen - rpms.s) {
-		    rpms.s->chr = ZWC('?');
-		    rpms.s->atr = all_attr;
-		    rpms.s++;
-		} else {
-		    rpms.s->chr = *u;
-		    rpms.s->atr = 0;
-		    rpms.s++;
-		    while (--width > 0) {
-			rpms.s->chr = WEOF;
-			rpms.s->atr = 0;
+		if (width > 0) {
+		    int ichars = 1;
+		    if (isset(COMBININGCHARS) && IS_BASECHAR(*u)) {
+			for (ichars = 1; u + ichars < outputline + outll; ichars++)
+			    if (!IS_COMBINING(u[ichars]))
+				break;
+		    }
+		    /* Handle wide characters as above */
+		    if (width > rpms.sen - rpms.s) {
+			do {
+			    *rpms.s++ = zr_sp;
+			} while (rpms.s < rpms.sen);
+			nbuf[rpms.ln][winw + 1] = zr_nl;
+			snextline(&rpms);
+		    }
+		    if (width > rpms.sen - rpms.s) {
+			rpms.s->chr = ZWC('?');
+			rpms.s->atr = all_attr;
 			rpms.s++;
+		    } else {
+			rpms.s->atr = 0;
+			if (ichars > 1)
+			    addmultiword(rpms.s, u, ichars);
+			else
+			    rpms.s->chr = *u;
+			rpms.s++;
+			while (--width > 0) {
+			    rpms.s->chr = WEOF;
+			    rpms.s->atr = 0;
+			    rpms.s++;
+			}
+		    }
+		    u += ichars - 1;
+		} else {
+		    /* either the COMBINING_CHARS option is off,
+		       or there was no base character, then render as special */
+		    char dispchars[11];
+		    char *dispptr = dispchars;
+		    wchar_t wc;
+		    if ((unsigned)*u > 0xffffU)
+			sprintf(dispchars, "<%.08x>", (unsigned)*u);
+		    else
+			sprintf(dispchars, "<%.04x>", (unsigned)*u);
+		    while (*dispptr) {
+			if (mbtowc(&wc, dispptr, 1) == 1) {
+			    rpms.s->chr = wc;
+			    rpms.s->atr = all_attr;
+			    rpms.s++;
+			    if (rpms.s == rpms.sen) {
+				nbuf[rpms.ln][winw + 1] = zr_nl;
+				snextline(&rpms);
+			    }
+			}
+			dispptr++;
 		    }
 		}
 	    }
@@ -1475,9 +1509,32 @@ zrefresh(void)
 		rpms.s->atr = all_attr;
 		rpms.s++;
 	    } else {
+#ifdef MULTIBYTE_SUPPORT
+		/* non-printable wide char */
+		char dispchars[11];
+		char *dispptr = dispchars;
+		wchar_t wc;
+		if ((unsigned)*u > 0xffffU)
+		    sprintf(dispchars, "<%.08x>", (unsigned)*u);
+		else
+		    sprintf(dispchars, "<%.04x>", (unsigned)*u);
+		while (*dispptr) {
+		    if (mbtowc(&wc, dispptr, 1) == 1) {
+			rpms.s->chr = wc;
+			rpms.s->atr = all_attr;
+			rpms.s++;
+			if (rpms.s == rpms.sen) {
+			    nbuf[rpms.ln][winw + 1] = zr_nl;
+			    snextline(&rpms);
+			}
+		    }
+		    dispptr++;
+		}
+#else
 		rpms.s->chr = *u;
 		rpms.s->atr = 0;
 		rpms.s++;
+#endif
 	    }
 	    if (rpms.s == rpms.sen) {
 		nbuf[rpms.ln][winw + 1] = zr_nl;	/* text wrapped */
