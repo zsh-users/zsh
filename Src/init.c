@@ -1288,6 +1288,23 @@ setupvals(char *cmd, char *runscript, char *zsh_name)
     condtab = NULL;
     wrappers = NULL;
 
+    zterm_columns_preserve = zterm_lines_preserve = 0;
+
+    // preserve COLUMNS and LINES from environment when non-interactive
+    if (!isset(INTERACTIVE)) {
+	char *e, *p;
+	zlong v;
+
+	if ((e = zgetenv("COLUMNS")) && (v = zstrtol(e, &p, 10)) > 0 && !*p) {
+	    zterm_columns = v;
+	    zterm_columns_preserve = 1;
+	}
+	if ((e = zgetenv("LINES")) && (v = zstrtol(e, &p, 10)) > 0 && !*p) {
+	    zterm_lines = v;
+	    zterm_lines_preserve = 1;
+	}
+    }
+
 #ifdef TIOCGWINSZ
     adjustwinsize(0);
 #else

@@ -1,5 +1,9 @@
 2026-06-08  dana  <dana@dana.is>
 
+	* 54676: Doc/Zsh/params.yo, Src/init.c, Src/params.c,
+	Src/utils.c, Test/D04parameter.ztst: preserve COLUMNS + LINES
+	from the environment
+
 	* unposted: NEWS: fix 5.9 changes header
 
 	* 54659: Completion/Zsh/Command/_alias,

@@ -3008,3 +3008,20 @@ F:output ignorable as long as not an error
   fi
 -:ZSH_EXEPATH
 *>match: /*
+
+  for 1 in '' -m; do
+    COLUMNS=47 LINES=47 $ZTST_testdir/../Src/zsh $1 -fc '
+      echo $COLUMNS $LINES
+      COLUMNS=74 LINES=74
+      echo $COLUMNS $LINES
+      command true
+      echo $COLUMNS $LINES
+    '
+  done
+-:COLUMNS and LINES preserved from environment when non-interactive
+>47 47
+>74 74
+>74 74
+>47 47
+>74 74
+>74 74

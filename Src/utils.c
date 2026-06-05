@@ -1837,7 +1837,7 @@ adjustlines(int signalled)
     int oldlines = zterm_lines;
 
 #ifdef TIOCGWINSZ
-    if (signalled || zterm_lines <= 0)
+    if ((signalled && !zterm_lines_preserve) || zterm_lines <= 0)
 	zterm_lines = shttyinfo.winsize.ws_row;
     else
 	shttyinfo.winsize.ws_row = zterm_lines;
@@ -1862,7 +1862,7 @@ adjustcolumns(int signalled)
     int oldcolumns = zterm_columns;
 
 #ifdef TIOCGWINSZ
-    if (signalled || zterm_columns <= 0)
+    if ((signalled && !zterm_columns_preserve) || zterm_columns <= 0)
 	zterm_columns = shttyinfo.winsize.ws_col;
     else
 	shttyinfo.winsize.ws_col = zterm_columns;

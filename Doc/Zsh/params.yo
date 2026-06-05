@@ -1265,6 +1265,12 @@ vindex(COLUMNS)
 item(tt(COLUMNS) <S>)(
 The number of columns for this terminal session.
 Used for printing select lists and for the line editor.
+If the shell is non-interactive and a legal value is imported from the
+environment, it is preserved.  Otherwise, the value is reset on start-up
+and in response to certain events such as the receipt of a tt(SIGWINCH)
+signal.  Explicitly setting it to an illegal value such as tt(0) also
+resets it.  (Unsetting the parameter does not have this effect; it
+simply `hides' the value that the shell is tracking internally.)
 )
 vindex(CORRECT_IGNORE)
 item(tt(CORRECT_IGNORE))(
@@ -1471,6 +1477,7 @@ vindex(LINES)
 item(tt(LINES) <S>)(
 The number of lines for this terminal session.
 Used for printing select lists and for the line editor.
+See tt(COLUMNS).
 )
 vindex(LISTMAX)
 item(tt(LISTMAX))(

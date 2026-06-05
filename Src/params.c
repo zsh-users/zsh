@@ -107,6 +107,11 @@ mod_export zlong
      ppid,		/* $PPID        */
      zsh_subshell;	/* $ZSH_SUBSHELL */
 
+// whether COLUMNS and LINES should be preserved because they were imported from
+// the environment into a non-interactive shell
+/**/
+mod_export int zterm_columns_preserve, zterm_lines_preserve;
+
 /* $FUNCNEST    */
 /**/
 mod_export
