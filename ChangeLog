@@ -1,5 +1,7 @@
 2026-06-10  dana  <dana@dana.is>
 
+	* 54677: Test/runtests.zsh, Test/ztst.zsh: improve readability
+
 	* unposted: Src/jobs.c, Test/B11kill.ztst: kill: fix -l
 	argument error, add tests
 

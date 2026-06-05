@@ -148,7 +148,9 @@ ZTST_testfailed() {
   if [[ -n $ZTST_message ]]; then
     print -r "Was testing: $ZTST_message"
   fi
+  [[ -n $ZTST_failcolour ]] && print -rnP "%F{$ZTST_failcolour}"
   print -r "$ZTST_testname: test failed."
+  [[ -n $ZTST_failcolour ]] && print -rnP %f
   if [[ -n $ZTST_failmsg ]]; then
     print -r "The following may (or may not) help identifying the cause:
 $ZTST_failmsg"
@@ -165,7 +167,9 @@ ZTST_testxpassed() {
   if [[ -n $ZTST_message ]]; then
     print -r "Was testing: $ZTST_message"
   fi
+  [[ -n $ZTST_failcolour ]] && print -rnP "%F{$ZTST_failcolour}"
   print -r "$ZTST_testname: test XPassed."
+  [[ -n $ZTST_failcolour ]] && print -rnP %f
   if [[ -n $ZTST_failmsg ]]; then
     print -r "The following may (or may not) help identifying the cause:
 $ZTST_failmsg"
@@ -326,7 +330,6 @@ ZTST_diff() {
   emulate -L zsh
   setopt extendedglob
 
-  local -a diff_arg
   local diff_out
   integer diff_pat diff_ret
 
@@ -343,8 +346,38 @@ ZTST_diff() {
     ;;
   esac
   shift
-  [[ $OSTYPE != (aix|solaris)* ]] && diff_arg=( -a )
-      
+
+  (( $+functions[ZTST_do_diff] )) ||
+  ZTST_do_diff() {
+    local MATCH MBEGIN MEND ret
+    local -a out cmd
+
+    cmd=( command diff -u )
+    [[ $OSTYPE != (aix|solaris)* ]] && cmd+=( -a )
+
+    out=( ${(f)"$( $cmd "$@" )"} ) || ret=$?
+
+    # massage + colourise diff
+    (( ret )) && {
+      local B=${(%):-%B} b=${(%):-%b} f=${(%):-%f}
+      local Fr=${(%):-'%F{red}'} Fg=${(%):-'%F{green}'} Fc=${(%):-'%F{cyan}'}
+
+      [[ -n $ZTST_failcolour ]] || B= b= Fr= Fg= Fc= f=
+
+      out[1]=${out[1]/#---*/$B--- expected$b}
+      out[2]=${out[2]/#+++*/$B+++ actual$b}
+
+      (( $#B )) && {
+	out=( ${(@)out/#(#m)@@*/$Fc$MATCH$f} )
+	out=( ${(@)out/#(#m)-*/$Fr$MATCH$f} )
+	out=( ${(@)out/#(#m)+*/$Fg$MATCH$f} )
+      }
+    }
+
+    print -rl - $out
+    return ret
+  }
+
   if (( diff_pat )); then
     local -a diff_lines1 diff_lines2
     integer failed i l
@@ -365,30 +398,19 @@ ZTST_diff() {
       done
     fi
     if (( failed )); then
-      for (( l = 1; l <= ${#diff_lines1}; ++l )); do
-	if (( l == i )); then
-	  p="-"
-	else
-	  p=" "
-	fi
-	print -r -- "$p<${diff_lines1[l]}"
-      done
-      for (( l = 1; l <= ${#diff_lines2}; ++l )); do
-	if (( l == i )); then
-	  p="+"
-	else
-	  p=" "
-	fi
-	print -r -- "$p>${diff_lines2[l]}"
-      done
+      diff_out=$( ZTST_do_diff \
+	<( print -rl - "${(@)diff_lines1}" ) \
+	<( print -rl - "${(@)diff_lines2}" )
+      )
       diff_ret=1
     fi
   else
-    diff_out=$(diff $diff_arg "$@")
+    diff_out=$(ZTST_do_diff "$@")
     diff_ret="$?"
-    if [[ "$diff_ret" != "0" ]]; then
-      print -r -- "$diff_out"
-    fi
+  fi
+
+  if [[ "$diff_ret" != "0" ]]; then
+    print -r -- "$diff_out"
   fi
 
   return "$diff_ret"
@@ -526,7 +548,7 @@ $(<$ZTST_terr)"
 	rm -rf $ZTST_out
 	print -r -- "${(e)substlines}" >$ZTST_out
       fi
-      if [[ $ZTST_flags != *d* ]] && ! $ZTST_diff $diff_out -u $ZTST_out $ZTST_tout; then
+      if [[ $ZTST_flags != *d* ]] && ! $ZTST_diff $diff_out $ZTST_out $ZTST_tout; then
         if (( expected_to_fail )); then
           ZTST_verbose 1 "Test failed, as expected."
           continue
@@ -542,7 +564,7 @@ $(<$ZTST_terr)}"
 	rm -rf $ZTST_err
 	print -r -- "${(e)substlines}" >$ZTST_err
       fi
-      if [[ $ZTST_flags != *D* ]] && ! $ZTST_diff $diff_err -u $ZTST_err $ZTST_terr; then
+      if [[ $ZTST_flags != *D* ]] && ! $ZTST_diff $diff_err $ZTST_err $ZTST_terr; then
         if (( expected_to_fail )); then
           ZTST_verbose 1 "Test failed, as expected."
           continue
