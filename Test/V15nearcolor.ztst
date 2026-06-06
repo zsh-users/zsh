@@ -1,0 +1,80 @@
+# tests for the zsh/nearcolor module
+
+%prep
+
+  if ! zmodload -s zsh/nearcolor; then
+    ZTST_unimplemented='the zsh/nearcolor module is not available'
+  elif ! zmodload -s zsh/terminfo; then
+    ZTST_unimplemented='the zsh/terminfo module is not available'
+  elif ! ( TERM=xterm-88color; [[ $terminfo[colors] == 88 ]] ) 2> /dev/null; then
+    ZTST_unimplemented='the xterm-88color terminal definition is not available'
+  elif ! ( TERM=xterm-256color; [[ $terminfo[colors] == 256 ]] ) 2> /dev/null; then
+    ZTST_unimplemented='the xterm-256color terminal definition is not available'
+  fi
+  typeset -a .term.extensions=( )
+
+%test
+
+  for 1 in xterm-{88,256}color; do
+    for 2 in '' -truecolor; do (
+      TERM=$1
+      typeset -a .term.extensions=( $2 )
+      zmodload -iu zsh/nearcolor
+      zmodload | grep -q zsh/nearcolor && echo unexpectedly loaded
+      : ${(%):-'%F{#123456}'}
+      zmodload | grep zsh/nearcolor
+    ); done
+  done
+0:automatically loaded without truecolor extension
+>zsh/nearcolor
+>zsh/nearcolor
+>zsh/nearcolor
+>zsh/nearcolor
+
+  for 1 in xterm-{88,256}color; do (
+    TERM=$1
+    typeset -a .term.extensions=( truecolor )
+    zmodload -iu zsh/nearcolor
+    zmodload | grep -q zsh/nearcolor && echo unexpectedly loaded
+    : ${(%):-'%F{#123456}'}
+    zmodload | grep -q zsh/nearcolor && echo unexpectedly loaded
+  ); done
+1:not automatically loaded with truecolor extension
+
+# see https://github.com/exg/rxvt-unicode/blob/5865a435983be27c/src/init.C#L213
+  (
+    TERM=xterm-88color
+    for 1 in 123456 654321 8a6cb4 8bffcd a5e02d cccccc d0d0d0 f00 0f0 00f; do
+      print -r - $1 ${(V)${(%):-"%F{#$1}"}}
+    done
+  )
+0:88-colour conversion
+>123456 ^[[38;5;80m
+>654321 ^[[38;5;81m
+>8a6cb4 ^[[38;5;38m
+>8bffcd ^[[38;5;46m
+>a5e02d ^[[38;5;40m
+>cccccc ^[[38;5;58m
+>d0d0d0 ^[[38;5;86m
+>f00 ^[[38;5;64m
+>0f0 ^[[38;5;28m
+>00f ^[[38;5;19m
+
+# see https://github.com/exg/rxvt-unicode/blob/5865a435983be27c/src/init.C#L293
+  (
+    TERM=xterm-256color
+    for 1 in 123456 654321 87af5f 8a6cb4 a5e02d cccccc d0d0d0 f00 0f0 00f; do
+      print -r - $1 ${(V)${(%):-"%F{#$1}"}}
+    done
+  )
+0:256-colour conversion
+>123456 ^[[38;5;24m
+>654321 ^[[38;5;95m
+>87af5f ^[[38;5;107m
+>8a6cb4 ^[[38;5;97m
+>a5e02d ^[[38;5;148m
+>cccccc ^[[38;5;252m
+>d0d0d0 ^[[38;5;252m
+>f00 ^[[38;5;196m
+>0f0 ^[[38;5;46m
+>00f ^[[38;5;21m

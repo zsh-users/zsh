@@ -23,10 +23,14 @@ it will be compared against each of the available colours and the
 closest will be selected. The first sixteen colours are never matched in
 this process due to being unpredictable.
 
-It isn't possible to reliably detect support for true colour in the
-terminal emulator. It is therefore recommended to be selective in
-loading the tt(zsh/nearcolor) module. For example, the following
-checks the tt(COLORTERM) environment variable:
+The use of a hex triplet will automatically load the tt(zsh/nearcolor)
+module if the terminal doesn't support 24-bit colour. This behaviour can
+be modified via the tt(.term.extensions) parameter DASH()- see
+sectref(Terminal Extensions)(zshzle).
+
+The module can also be loaded manually. It is recommended to be
+selective in doing so. For example, the following checks the
+tt(COLORTERM) environment variable:
 
 example([[ $COLORTERM = *LPAR()24bit|truecolor+RPAR()* ]] || \
     zmodload zsh/nearcolor)
