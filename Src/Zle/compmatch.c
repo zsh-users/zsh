@@ -1250,8 +1250,6 @@ comp_match(char *pfx, char *sfx, char *w, Patprog cp, Cline *clp, int qu,
 	} else
 	    *exact = !strcmp(pfx, w);
     }
-    if (!qu)
-	hasunqu = 1;
 
     return r;
 }

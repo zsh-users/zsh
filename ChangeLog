@@ -1,5 +1,9 @@
 2026-06-10  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54687: Src/Zle/compcore.c, Src/Zle/compctl.c,
+	Src/Zle/compmatch.c, Src/Zle/compresult.c, Src/Zle/zle_tricky.c:
+	fix brace completion
+
 	* 54686: Src/Zle/zle_utils.c: count lines in showmsg more
 	correctly
 

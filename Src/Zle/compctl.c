@@ -2039,6 +2039,13 @@ addmatch(char *s, char *t)
     }
     if (!ms)
 	return;
+
+    /* when inserting braces on the command line, always use the quoted length */
+    for (bp = brbeg; bp; bp = bp->next)
+	bp->curpos = bp->qpos;
+    for (bp = brend; bp; bp = bp->next)
+	bp->curpos = bp->qpos;
+
     add_match_data(isalt, ms, s, lc, ipre, ripre, isuf, 
 		   (incompfunc ? dupstring(curcc->prefix) : curcc->prefix),
 		   prpre, 

@@ -2205,7 +2205,7 @@ get_comp_string(void)
 		    char sav = *lastp;
 
 		    *lastp = '\0';
-		    untokenize(lastprebr = ztrdup(s));
+		    untokenize(lastprebr = ztrdup(quotename(s)));
 		    *lastp = sav;
 		}
 		if ((lastpostbr = ztrdup(firsts)))

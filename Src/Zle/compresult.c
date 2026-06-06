@@ -186,7 +186,7 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
 
 	if ((brp = brbeg)) {
 	    for (bp = brbeg; bp; bp = bp->next) {
-		bp->curpos = (hasunqu ? bp->pos : bp->qpos);
+		bp->curpos = bp->qpos;
 		olen -= strlen(bp->str);
 	    }
 	}
@@ -195,7 +195,7 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
 		olen -= strlen(bp->str);
 
 	    for (bp = brend; bp; bp = bp->next)
-		bp->curpos = olen - (hasunqu ? bp->pos : bp->qpos);
+		bp->curpos = olen - bp->qpos;
 	}
 	while (brp && !brp->curpos) {
 	    inststrlen(brp->str, 1, -1);

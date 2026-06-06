@@ -83,7 +83,7 @@ mod_export int menuacc;
 /* Brace insertion stuff. */
 
 /**/
-int hasunqu, useqbr, brpcs, brscs;
+int useqbr, brpcs, brscs;
 
 /* Flags saying in what kind of string we are. */
 
@@ -307,7 +307,6 @@ do_completion(UNUSED(Hookdef dummy), Compldat dat)
     *compqstack = (instring == QT_NONE) ? QT_BACKSLASH : (char)instring;
     compqstack[1] = '\0';
 
-    hasunqu = 0;
     useline = (wouldinstab ? -1 : (lst != COMP_LIST_COMPLETE));
     useexact = isset(RECEXACT);
     zsfree(compexactstr);
