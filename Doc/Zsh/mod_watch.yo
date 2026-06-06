@@ -40,7 +40,8 @@ vindex(WATCHFMT)
 item(tt(WATCHFMT))(
 The format of login/logout reports if the tt(watch) parameter is set.
 Default is `tt(%n has %a %l from %m)'.
-Recognizes the following escape sequences:
+Recognizes the following escape sequences, many of which are described
+further in sectref(Simple Prompt Escapes)(zshmisc):
 
 startitem()
 item(tt(%n))(
@@ -70,6 +71,10 @@ Start (stop) using a different foreground color.
 )
 item(tt(%K{)var(color)tt(}) LPAR()tt(%k)RPAR())(
 Start (stop) using a different background color.
+)
+item(tt(%H{)var(group)tt(}))(
+Change all character visual attributes using a highlighting
+specification from the tt(.zle.hlgroups) associative array.
 )
 item(tt(%S) LPAR()tt(%s)RPAR())(
 Start (stop) standout mode.
