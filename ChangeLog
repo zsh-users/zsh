@@ -1,5 +1,7 @@
 2026-06-06  dana  <dana@dana.is>
 
+	* unposted: NEWS: better document hlgroups, termquery, etc
+
 	* unposted: Doc/Zsh/mod_watch.yo: mention support for %H in
 	WATCHFMT (w/52646)
 

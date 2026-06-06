@@ -28,16 +28,29 @@ README to see if you are affected.
 
 In region_highlight and zle_highlight, italic and faint can be
 specified as font attributes for terminals that support them.
+Additionally, a layer number can be specified using layer= to indicate
+precedence where highlighted regions overlap, and colours can be mixed
+with a previous layer's using opacity=.
 
-Highlighting groups can be referenced in region_highlight,
-zle_highlight, WATCHFMT and completion explanation strings for
-common attribute combinations and a layer can be specified to
-indicate precedence where highlighted regions overlap.
-Highlighting groups are also supported in the prompt via a new %H
-prompt escape.
+Highlighting groups with arbitrary text attribute combinations can be
+defined via the .zle.hlgroups parameter. These groups can be referenced
+by name in region_highlight and zle_highlight via hl=, and in prompt
+expansion, WATCHFMT, and completion explanation strings via the %H
+escape sequence.
 
 Ellipsis markers shown by the line editor to indicate where the line
 doesn't fit in the terminal can be highlighted.
+
+The shell now keeps track of various terminal settings and capabilities,
+such as support for 24-bit colour, via .term.extensions and related
+parameters. By default the terminal is queried to determine the
+appropriate values when ZLE starts.
+
+The zsh/nearcolor module is automatically loaded when an RGB hex triplet
+is used and the terminal doesn't support 24-bit colour.
+
+The shape and colour of the terminal cursor can be controlled, similarly
+to highlight regions, via the zle_cursorform parameter.
 
 The ERR_EXIT and ERR_RETURN options were refined to be more self-
 consistent and better aligned with the POSIX-2017 specification of
