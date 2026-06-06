@@ -591,24 +591,26 @@ bin_setopt(char *nam, char **args, UNUSED(Options ops), int isun)
     /* loop through command line options (begins with "-" or "+") */
     while (*args && (**args == '-' || **args == '+')) {
 	action = (**args == '-') ^ isun;
-	if(!args[0][1])
+	if (!args[0][1])
 	    *args = "--";
-	while (*++*args) {
-	    if(**args == Meta)
-		*++*args ^= 32;
+	++*args;
+	while (**args) {
+	    int sz;
+	    convchar_t arg = unmeta_one(*args, &sz);
+	    *args += sz;
 	    /* The pseudo-option `--' signifies the end of options. */
-	    if (**args == '-') {
+	    if (arg == '-') {
 		args++;
 		goto doneoptions;
-	    } else if (**args == 'o') {
-		if (!*++*args)
+	    } else if (arg == 'o') {
+		if (!**args)
 		    args++;
 		if (!*args) {
 		    zwarnnam(nam, "string expected after -o");
 		    inittyptab();
 		    return 1;
 		}
-		if(!(optno = optlookup(*args))) {
+		if (!(optno = optlookup(*args))) {
 		    zwarnnam(nam, "no such option: %s", *args);
 		    retval |= 1;
 		} else if (dosetopt(optno, action, 0, opts)) {
@@ -616,14 +618,14 @@ bin_setopt(char *nam, char **args, UNUSED(Options ops), int isun)
 		    retval |= 1;
 		}
 		break;
-	    } else if(**args == 'm') {
+	    } else if (arg == 'm') {
 		match = 1;
 	    } else {
-		if (!(optno = optlookupc(**args))) {
-		    zwarnnam(nam, "bad option: -%c", **args);
+		if (!(optno = optlookupc(arg))) {
+		    zwarnnam(nam, "bad option: -%c", arg);
 		    retval |= 1;
 		} else if (dosetopt(optno, action, 0, opts)) {
-		    zwarnnam(nam, "can't change option: -%c", **args);
+		    zwarnnam(nam, "can't change option: -%c", arg);
 		    retval |= 1;
 		}
 	    }
@@ -718,7 +720,7 @@ optlookup(char const *name)
 
 /**/
 int
-optlookupc(char c)
+optlookupc(convchar_t c)
 {
     if(c < FIRST_OPT || c > LAST_OPT)
 	return 0;

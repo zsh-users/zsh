@@ -1,3 +1,11 @@
+2026-06-14  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 54710: Src/Builtins/rlimits.c, Src/Builtins/sched.c,
+	Src/Modules/stat.c, Src/Modules/system.c, Src/Modules/zftp.c,
+	Src/Zle/complete.c, Src/Zle/zle_thingy.c, Src/builtin.c,
+	Src/exec.c, Src/glob.c, Src/math.c, Src/options.c,
+	Test/B12limit.ztst: handle multibyte arguments in error messages
+
 2026-06-10  dana  <dana@dana.is>
 
 	* 54677: Test/runtests.zsh, Test/ztst.zsh: improve readability

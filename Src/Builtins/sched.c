@@ -194,9 +194,10 @@ bin_sched(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 	} else if (!strcmp(arg, "o")) {
 	    flags |= SCHEDFLAG_TRASH_ZLE;
 	} else {
-	    if (*arg)
-		zwarnnam(nam, "bad option: -%c", *arg);
-	    else
+	    if (*arg) {
+		convchar_t warg = unmeta_one(arg, NULL);
+		zwarnnam(nam, "bad option: -%c", warg);
+	    } else
 		zwarnnam(nam, "option expected");
 	    return 1;
 	}

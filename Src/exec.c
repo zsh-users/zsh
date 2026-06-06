@@ -3300,7 +3300,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 			    cflags |= BINF_DASH;
 			    break;
 			default:
-			    zerr("unknown exec flag -%c", *cmdopt);
+			    convchar_t opt = unmeta_one(cmdopt, NULL);
+			    zerr("unknown exec flag -%c", opt);
 			    lastval = 1;
 			    errflag |= ERRFLAG_ERROR;
 			    if (forked)

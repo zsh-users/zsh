@@ -236,7 +236,7 @@ free_resinfo(void)
 
 /**/
 static int
-find_resource(char c)
+find_resource(convchar_t c)
 {
     int i;
     for (i=0; i<RLIM_NLIMITS; ++i) {
@@ -738,13 +738,14 @@ bin_ulimit(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    return 1;
 	}
 	res = -1;
-	if (options && *options == '-') {
+	if (options && *options++ == '-') {
 	    argv++;
-	    while (*++options) {
-		if(*options == Meta)
-		    *++options ^= 32;
+	    while (*options) {
+		int sz;
+		convchar_t opt = unmeta_one(options, &sz);
+		options += sz;
 		res = -1;
-		switch (*options) {
+		switch (opt) {
 		case 'H':
 		    hard = 1;
 		    continue;
@@ -752,8 +753,8 @@ bin_ulimit(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		    soft = 1;
 		    continue;
 		case 'N':
-		    if (options[1]) {
-			number = options + 1;
+		    if (*options) {
+			number = options;
 		    } else if (*argv) {
 			number = *argv++;
 		    } else {
@@ -768,7 +769,7 @@ bin_ulimit(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		    /*
 		     * fake it so it looks like we just finished an option...
 		     */
-		    while (options[1])
+		    while (*options)
 			options++;
 		    break;
 		case 'a':
@@ -781,15 +782,15 @@ bin_ulimit(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		    nres = RLIM_NLIMITS;
 		    continue;
 		default:
-		    res = find_resource(*options);
+		    res = find_resource(opt);
 		    if (res < 0) {
 			/* unrecognised limit */
-			zwarnnam(name, "bad option: -%c", *options);
+			zwarnnam(name, "bad option: -%c", opt);
 			return 1;
 		    }
 		    break;
 		}
-		if (options[1]) {
+		if (*options) {
 		    resmask |= 1 << res;
 		    nres++;
 		}

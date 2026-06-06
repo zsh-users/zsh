@@ -3093,7 +3093,10 @@ bin_zftp(char *name, char **args, UNUSED(Options ops), UNUSED(int func))
 		break;
 
 	    default:
-		zwarnnam(name, "preference %c not recognized", *ptr);
+		int sz;
+		convchar_t p = unmeta_one(ptr, &sz);
+		ptr += sz - 1;
+		zwarnnam(name, "preference %c not recognized", p);
 		break;
 	    }
 	}

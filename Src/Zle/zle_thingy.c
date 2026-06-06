@@ -780,7 +780,7 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 		setbindk = 1;
 		break;
 	    default:
-		zwarnnam(name, "unknown option: %s", *args);
+		zwarnnam(name, "bad option: %s", *args);
 		goto cleanup_zle_call;
 	    }
 	}

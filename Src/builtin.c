@@ -387,9 +387,8 @@ execbuiltin(LinkList args, LinkList assigns, Builtin bn)
 		/* The above loop may have exited on an invalid option.  (We  *
 		 * assume that any option requiring metafication is invalid.) */
 		if (*arg) {
-		    if(*arg == Meta)
-			*++arg ^= 32;
-		    zwarnnam(name, "bad option: %c%c", "+-"[sense], *arg);
+		    convchar_t warg = unmeta_one(arg, NULL);
+		    zwarnnam(name, "bad option: %c%c", "+-"[sense], warg);
 		    return 1;
 		}
 		arg = *++argv;
@@ -619,18 +618,20 @@ bin_set(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	hadplus |= !action;
 	if(!args[0][1])
 	    *args = "--";
-	while (*++*args) {
-	    if(**args == Meta)
-		*++*args ^= 32;
-	    if(**args != '-' || action)
+	++*args;
+	while (**args) {
+	    int sz;
+	    convchar_t arg = unmeta_one(*args, &sz);
+	    *args += sz;
+	    if(arg != '-' || action)
 		hadopt = 1;
 	    /* The pseudo-option `--' signifies the end of options. */
-	    if (**args == '-') {
+	    if (arg == '-') {
 		hadend = 1;
 		args++;
 		goto doneoptions;
-	    } else if (**args == 'o') {
-		if (!*++*args)
+	    } else if (arg == 'o') {
+		if (!**args)
 		    args++;
 		if (!*args) {
 		    printoptionstates(hadplus);
@@ -642,8 +643,8 @@ bin_set(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		else if(dosetopt(optno, action, 0, opts))
 		    zerrnam(nam, "can't change option: %s", *args);
 		break;
-	    } else if(**args == 'A') {
-		if(!*++*args)
+	    } else if(arg == 'A') {
+		if(!**args)
 		    args++;
 		array = action ? 1 : -1;
 		arrayname = *args;
@@ -655,13 +656,13 @@ bin_set(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		    goto doneoptions;
 		}
 		break;
-	    } else if (**args == 's')
+	    } else if (arg == 's')
 		sort = action ? 1 : -1;
 	    else {
-	    	if (!(optno = optlookupc(**args)))
-		    zerrnam(nam, "bad option: -%c", **args);
+	    	if (!(optno = optlookupc(arg)))
+		    zerrnam(nam, "bad option: -%c", arg);
 		else if(dosetopt(optno, action, 0, opts))
-		    zerrnam(nam, "can't change option: -%c", **args);
+		    zerrnam(nam, "can't change option: -%c", arg);
 	    }
 	}
 	args++;

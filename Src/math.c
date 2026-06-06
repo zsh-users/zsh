@@ -1100,8 +1100,10 @@ callmathfunc(char *o)
 			break;
 		}
 	    }
-	    if (*a && !errflag)
-		zerr("bad math expression: illegal character: %c", *a);
+	    if (*a && !errflag) {
+		convchar_t wa = unmeta_one(a, NULL);
+		zerr("bad math expression: illegal character: %c", wa);
+	    }
 	    if (!errflag) {
 		if (argc >= f->minargs && (f->maxargs < 0 ||
 					   argc <= f->maxargs)) {
@@ -1497,8 +1499,10 @@ matheval(char *s)
     x = mathevall(s, MPREC_TOP, &junk);
     zsh_eval_context_pop();
     mtok = xmtok;
-    if (*junk)
-	zerr("bad math expression: illegal character: %c", *junk);
+    if (*junk) {
+	convchar_t j = unmeta_one(junk, NULL);
+	zerr("bad math expression: illegal character: %c", j);
+    }
     return x;
 }
 

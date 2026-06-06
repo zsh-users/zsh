@@ -653,7 +653,8 @@ bin_zsystem_flock(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		break;
 
 	    default:
-		zwarnnam(nam, "flock: unknown option: %c", *optptr);
+		convchar_t opt = unmeta_one(optptr, NULL);
+		zwarnnam(nam, "flock: bad option: %c", opt);
 		return 1;
 	    }
 	    optptr++;

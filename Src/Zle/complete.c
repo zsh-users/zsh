@@ -269,9 +269,10 @@ parse_cmatcher(char *name, char *s)
 	case 'M': fl = CMF_LINE; break;
 	case 'x': break;
 	default:
-	    if (name)
-		zwarnnam(name, "unknown match specification character `%c'",
-			 *s);
+	    if (name) {
+		convchar_t c = unmeta_one(s, NULL);
+		zwarnnam(name, "unknown match specification character `%c'", c);
+	    }
 	    return pcm_err;
 	}
 	if (s[1] != ':') {
@@ -796,7 +797,8 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		argv++;
 		goto ca_args;
 	    default:
-		zwarnnam(name, "bad option: -%c", *p);
+		convchar_t c = unmeta_one(p, NULL);
+		zwarnnam(name, "bad option: -%c", c);
 		zsfree(mstr);
 		zfree(dat.dpar, dparsize);
 		return 1;
@@ -1163,7 +1165,8 @@ bin_compset(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     case 'S': test = CVT_SUFPAT; break;
     case 'q': return set_comp_sep();
     default:
-	zwarnnam(name, "bad option -%c", argv[0][1]);
+	convchar_t c = unmeta_one(&argv[0][1], NULL);
+	zwarnnam(name, "bad option: -%c", c);
 	return 1;
     }
     if (argv[0][2]) {

@@ -450,7 +450,8 @@ bin_stat(char *name, char **args, Options ops, UNUSED(int func))
 		    ops->ind['s'] = 1;
 		    break;
 		} else {
-		    zwarnnam(name, "bad option: -%c", *arg);
+		    convchar_t warg = unmeta_one(arg, NULL);
+		    zwarnnam(name, "bad option: -%c", warg);
 		    return 1;
 		}
 	    }

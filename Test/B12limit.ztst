@@ -1,6 +1,7 @@
 
 %prep
 
+  ZSH_TEST_LANG=$(ZTST_find_UTF8)
   if ! zmodload zsh/rlimits 2>/dev/null
   then
     ZTST_unimplemented="the zsh/rlimits module was disabled by configure (see config.modules)"
@@ -26,3 +27,27 @@ F:report this to zsh-workers mailing list.
   }
 0:check if limit option letters are unique
 
+  ulimit -z
+1:bad option letter
+?(eval):ulimit:1: bad option: -z
+
+  ulimit -N
+1:missing number after -N
+?(eval):ulimit:1: number required after -N
+
+  ulimit -N abc
+1:invalid number after -N
+?(eval):ulimit:1: invalid number: abc
+
+  ulimit -at
+1:resource option combined with -a
+?(eval):ulimit:1: no limits allowed with -a
+
+  if [[ -z $ZSH_TEST_LANG ]]; then
+    ZTST_skip='no UTF-8 locale'
+  else
+    LANG=$ZSH_TEST_LANG
+    ulimit -の
+  fi
+1:bad multibyte option letter
+?(eval):ulimit:5: bad option: -の
