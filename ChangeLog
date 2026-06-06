@@ -1,5 +1,7 @@
 2026-06-14  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54711: Src/builtin.c: print invalid option to getopts correctly
+
 	* 54710: Src/Builtins/rlimits.c, Src/Builtins/sched.c,
 	Src/Modules/stat.c, Src/Modules/system.c, Src/Modules/zftp.c,
 	Src/Zle/complete.c, Src/Zle/zle_thingy.c, Src/builtin.c,

@@ -5659,6 +5659,7 @@ bin_getopts(UNUSED(char *name), char **argv, Options ops, UNUSED(int func))
     char *optstr = unmetafy(*argv++, &lenoptstr), *var = *argv++;
     char **args = (*argv) ? argv : pparams;
     char *str, optbuf[2] = " ", *p, opch;
+    convchar_t wopch;
 
     // note that resetting + restoring OPTIND happens in doshfunc(), so using -p
     // or enabling POSIX_BUILTINS inside a function that calls getopts is not
@@ -5700,7 +5701,9 @@ bin_getopts(UNUSED(char *name), char **argv, Options ops, UNUSED(int func))
 	}
 	optcind++;
     }
-    opch = str[optcind++];
+    opch = str[optcind];
+    MB_CHARINIT();
+    optcind += MB_CHARLENCONV(str + optcind, lenstr - optcind, &wopch);
     if(str[0] == '+') {
 	optbuf[0] = '+';
 	lenoptbuf = 2;
@@ -5722,7 +5725,7 @@ bin_getopts(UNUSED(char *name), char **argv, Options ops, UNUSED(int func))
 	    zoptarg = metafy(optbuf, lenoptbuf, META_DUP);
 	} else {
 	    zwarn("bad option: %c%c",
-		  "?-+"[lenoptbuf], opch);
+		  "?-+"[lenoptbuf], wopch);
 	    zoptarg=ztrdup("");
 	}
 	return 0;
@@ -5745,7 +5748,7 @@ bin_getopts(UNUSED(char *name), char **argv, Options ops, UNUSED(int func))
 		    setsparam(var, ztrdup("?"));
 		    zoptarg = ztrdup("");
 		    zwarn("argument expected after %c%c option",
-			  "?-+"[lenoptbuf], opch);
+			  "?-+"[lenoptbuf], wopch);
 		}
 		return 0;
 	    }
