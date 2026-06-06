@@ -1369,6 +1369,11 @@ patcomppiece(int *flagp, int paren)
 	    }
 	}
 	slen = (patparse - str0) - nmeta;
+#ifdef MULTIBYTE_SUPPORT
+	if ((patglobflags & GF_MULTIBYTE) && slen > 1)
+	    /* for multibyte single characters, treat x# as (x)# */
+	    flags &= ~P_SIMPLE;
+#endif
 	/* First add length, which is a long */
 	patadd((char *)&slen, 0, sizeof(long), 0);
 	/*
@@ -3348,10 +3353,14 @@ patmatch(Upat prog)
 			    return 0;
 			/* Yes, just position appropriately and test. */
 			patinput += ptlen - P_LS_LEN(next);
-			/*
-			 * Here we will need to be careful that patinput is not
-			 * in the middle of a multibyte character.
-			 */
+#ifdef MULTIBYTE_SUPPORT
+			/* Make sure we aren't in the middle of
+			 * a multibyte character */
+			if ((patglobflags & GF_MULTIBYTE) &&
+			    ptlen < P_LS_LEN(next) &&
+			    !charstart[patinput - start])
+			    return 0;
+#endif
 			/* Continue loop with P_EXACTLY test. */
 			break;
 		    }
