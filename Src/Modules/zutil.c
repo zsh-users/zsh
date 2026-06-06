@@ -1988,10 +1988,19 @@ bin_zparseopts(char *nam, char **args, Options ops, UNUSED(int func))
 	    while (*++o) {
 		if (!(d = sopts[(unsigned char) *o])) {
 		    if (fail) {
-			if (*o != '-' || o > *pp + 1)
-			    fprintf(stderr, "%s: bad option: -%c\n", progname, *o);
-			else
+			if (*o != '-' || o > *pp + 1) {
+			    convchar_t wc = unmeta_one(o, NULL);
+			    fprintf(stderr, "%s: bad option: -", progname);
+#ifdef MULTIBYTE_SUPPORT
+			    mb_charinit();
+			    zputs(wcs_nicechar(wc, NULL, NULL), stderr);
+#else
+			    zputs(nicechar(wc), stderr);
+#endif
+			    fputc('\n', stderr);
+			} else {
 			    fprintf(stderr, "%s: bad option: -%s\n", progname, o);
+			}
 			return 1;
 		    }
 		    o = NULL;
