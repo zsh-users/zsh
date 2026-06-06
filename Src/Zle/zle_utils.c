@@ -1335,7 +1335,7 @@ showmsg(char const *msg)
 	    p++;
 
 	    putc('\n', shout);
-	    up += 1 + cc / zterm_columns;
+	    up += 1 + (cc - 1) / zterm_columns;
 	    cc = 0;
 	} else {
 	    /*
@@ -1386,7 +1386,7 @@ showmsg(char const *msg)
 	    c = *++p ^ 32;
 	if(c == '\n') {
 	    putc('\n', shout);
-	    up += 1 + cc / zterm_columns;
+	    up += 1 + (cc - 1) / zterm_columns;
 	    cc = 0;
 	} else {
 	    char const *n = nicechar(c);
@@ -1395,7 +1395,7 @@ showmsg(char const *msg)
 	}
     }
 #endif
-    up += cc / zterm_columns;
+    up += (cc - 1) / zterm_columns;
 
     if (clearflag) {
 	putc('\r', shout);

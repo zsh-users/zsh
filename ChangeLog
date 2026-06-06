@@ -1,5 +1,8 @@
 2026-06-10  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54686: Src/Zle/zle_utils.c: count lines in showmsg more
+	correctly
+
 	* 54683: Src/Zle/zle_refresh.c: fix for ctrl-r with combining
 	characters or nonprintable wide chars
 
