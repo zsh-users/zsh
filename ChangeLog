@@ -1,5 +1,9 @@
 2026-06-10  Mikael Magnusson  <mikachu@gmail.com>
 
+	* Stephane Chazelas: 54695: Doc/Zsh/contrib.yo,
+	Functions/Misc/regexp-replace: regexp-replace and ^, word boundary
+	or look-behind operators (and more).
+
 	* 54707: Src/builtin.c: fix autoload +X nonexist leaving funcdef
 	at dummy
 

@@ -4406,7 +4406,7 @@ the context prefix `tt(:completion:nslookup)'.
 See also the tt(pager), tt(prompt) and tt(rprompt) styles below.
 )
 findex(regexp-replace)
-item(tt(regexp-replace) var(var) var(regexp) var(replace))(
+item(tt(regexp-replace) var(var) var(regexp) [ var(replace) ])(
 Use regular expressions to perform a global search and replace operation
 on a variable.  POSIX extended regular expressions (ERE) are used,
 unless the option tt(RE_MATCH_PCRE) has been set, in which case
@@ -4416,7 +4416,8 @@ library).
 
 var(var) is the name of the variable containing the string to be matched.
 The variable will be modified directly by the function.  The
-variables tt(MATCH), tt(MBEGIN), tt(MEND), tt(match), tt(mbegin), tt(mend)
+variables tt(MATCH), tt(MBEGIN), tt(MEND), tt(match), tt(mbegin), tt(mend),
+as well as any variables starting with tt(_regexp_replace)
 should be avoided as these are used by the regular expression code.
 
 var(regexp) is the regular expression to match against the string.
@@ -4424,6 +4425,7 @@ var(regexp) is the regular expression to match against the string.
 var(replace) is the replacement text.  This can contain parameter, command
 and arithmetic expressions which will be replaced:  in particular, a
 reference to tt($MATCH) will be replaced by the text matched by the pattern.
+If not given, matches are replaced with nothing.
 
 The return status is 0 if at least one match was performed, else 1.
 
