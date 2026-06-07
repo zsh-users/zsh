@@ -60,6 +60,7 @@ while true; do
   else
     list=(
       "s:substitute string"
+      "S:substitute pattern"
       "&:repeat substitution"
       )
     if (( ! global )); then
