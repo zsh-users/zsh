@@ -383,7 +383,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
      * cct is a temporary just to hold flags; it never needs freeing.
      */
     struct compctl cct;
-    char **argv = *av, argv_end[2] = "x";
+    char **argv = *av, argv_end[1] = "";
     int ready = 0, hx = 0;
 
     /* Handle `compctl + foo ...' specially:  turn it into
@@ -412,10 +412,12 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
     for (; !ready && argv[0] && argv[0][0] == '-' && (argv[0][1] || !first);) {
 	if (!argv[0][1])
 	    *argv = "-+";
-	while (!ready && *++(*argv)) {
-	    if(**argv == Meta)
-		*++*argv ^= 32;
-	    switch (**argv) {
+	++*argv;
+	while (!ready && **argv) {
+	    int sz;
+	    convchar_t arg = unmeta_one(*argv, &sz);
+	    *argv += sz;
+	    switch (arg) {
 	    case 'f':
 		cct.mask |= CC_FILES;
 		break;
@@ -511,15 +513,15 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		    char *p;
 
 		    if (cl) {
-			zwarnnam(name, "illegal option -%c", **argv);
+			zwarnnam(name, "illegal option -%c", arg);
 			return 1;
 		    }
-		    if ((*argv)[1]) {
-			p = (*argv) + 1;
+		    if (**argv) {
+			p = *argv;
 			*argv = argv_end;
 		    } else if (!argv[1]) {
 			zwarnnam(name, "retry specification expected after -%c",
-				 **argv);
+				 arg);
 			return 1;
 		    } else {
 			p = *++argv;
@@ -539,8 +541,8 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 			cct.mask2 = CC_DEFCONT;
 			break;
 		    default:
-			zwarnnam(name, "invalid retry specification character `%c'",
-				 *p);
+			convchar_t s = unmeta_one(p, NULL);
+			zwarnnam(name, "invalid retry specification character `%c'", s);
 			return 1;
 		    }
 		    if (p[1]) {
@@ -551,11 +553,11 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		}
 		break;
 	    case 'k':
-		if ((*argv)[1]) {
-		    cct.keyvar = (*argv) + 1;
+		if (**argv) {
+		    cct.keyvar = *argv;
 		    *argv = argv_end;
 		} else if (!argv[1]) {
-		    zwarnnam(name, "variable name expected after -%c", **argv);
+		    zwarnnam(name, "variable name expected after -%c", arg);
 		    return 1;
 		} else {
 		    cct.keyvar = *++argv;
@@ -563,11 +565,11 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		}
 		break;
 	    case 'K':
-		if ((*argv)[1]) {
-		    cct.func = (*argv) + 1;
+		if (**argv) {
+		    cct.func = *argv;
 		    *argv = argv_end;
 		} else if (!argv[1]) {
-		    zwarnnam(name, "function name expected after -%c", **argv);
+		    zwarnnam(name, "function name expected after -%c", arg);
 		    return 1;
 		} else {
 		    cct.func = *++argv;
@@ -580,11 +582,11 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 	    case 'X':
 		cct.mask &= ~CC_EXPANDEXPL;
 	    expl:
-		if ((*argv)[1]) {
-		    cct.explain = (*argv) + 1;
+		if (**argv) {
+		    cct.explain = *argv;
 		    *argv = argv_end;
 		} else if (!argv[1]) {
-		    zwarnnam(name, "string expected after -%c", **argv);
+		    zwarnnam(name, "string expected after -%c", arg);
 		    return 1;
 		} else {
 		    cct.explain = *++argv;
@@ -592,23 +594,23 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		}
 		break;
 	    case 'y':
-		if ((*argv)[1]) {
-		    cct.ylist = (*argv) + 1;
+		if (**argv) {
+		    cct.ylist = *argv;
 		    *argv = argv_end;
 		} else if (!argv[1]) {
 		    zwarnnam(name, "function/variable expected after -%c",
-			     **argv);
+			     arg);
 		} else {
 		    cct.ylist = *++argv;
 		    *argv = argv_end;
 		}
 		break;
 	    case 'P':
-		if ((*argv)[1]) {
-		    cct.prefix = (*argv) + 1;
+		if (**argv) {
+		    cct.prefix = *argv;
 		    *argv = argv_end;
 		} else if (!argv[1]) {
-		    zwarnnam(name, "string expected after -%c", **argv);
+		    zwarnnam(name, "string expected after -%c", arg);
 		    return 1;
 		} else {
 		    cct.prefix = *++argv;
@@ -616,11 +618,11 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		}
 		break;
 	    case 'S':
-		if ((*argv)[1]) {
-		    cct.suffix = (*argv) + 1;
+		if (**argv) {
+		    cct.suffix = *argv;
 		    *argv = argv_end;
 		} else if (!argv[1]) {
-		    zwarnnam(name, "string expected after -%c", **argv);
+		    zwarnnam(name, "string expected after -%c", arg);
 		    return 1;
 		} else {
 		    cct.suffix = *++argv;
@@ -628,11 +630,11 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		}
 		break;
 	    case 'g':
-		if ((*argv)[1]) {
-		    cct.glob = (*argv) + 1;
+		if (**argv) {
+		    cct.glob = *argv;
 		    *argv = argv_end;
 		} else if (!argv[1]) {
-		    zwarnnam(name, "glob pattern expected after -%c", **argv);
+		    zwarnnam(name, "glob pattern expected after -%c", arg);
 		    return 1;
 		} else {
 		    cct.glob = *++argv;
@@ -640,12 +642,12 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		}
 		break;
 	    case 's':
-		if ((*argv)[1]) {
-		    cct.str = (*argv) + 1;
+		if (**argv) {
+		    cct.str = *argv;
 		    *argv = argv_end;
 		} else if (!argv[1]) {
 		    zwarnnam(name, "command string expected after -%c",
-			     **argv);
+			     arg);
 		    return 1;
 		} else {
 		    cct.str = *++argv;
@@ -654,13 +656,13 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		break;
 	    case 'l':
 		if (cl) {
-		    zwarnnam(name, "illegal option -%c", **argv);
+		    zwarnnam(name, "illegal option -%c", arg);
 		    return 1;
-		} else if ((*argv)[1]) {
-		    cct.subcmd = (*argv) + 1;
+		} else if (**argv) {
+		    cct.subcmd = *argv;
 		    *argv = argv_end;
 		} else if (!argv[1]) {
-		    zwarnnam(name, "command name expected after -%c", **argv);
+		    zwarnnam(name, "command name expected after -%c", arg);
 		    return 1;
 		} else {
 		    cct.subcmd = *++argv;
@@ -669,13 +671,13 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		break;
 	    case 'h':
 		if (cl) {
-		    zwarnnam(name, "illegal option -%c", **argv);
+		    zwarnnam(name, "illegal option -%c", arg);
 		    return 1;
-		} else if ((*argv)[1]) {
-		    cct.substr = (*argv) + 1;
+		} else if (**argv) {
+		    cct.substr = *argv;
 		    *argv = argv_end;
 		} else if (!argv[1]) {
-		    zwarnnam(name, "command name expected after -%c", **argv);
+		    zwarnnam(name, "command name expected after -%c", arg);
 		    return 1;
 		} else {
 		    cct.substr = *++argv;
@@ -683,11 +685,11 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		}
 		break;
 	    case 'W':
-		if ((*argv)[1]) {
-		    cct.withd = (*argv) + 1;
+		if (**argv) {
+		    cct.withd = *argv;
 		    *argv = argv_end;
 		} else if (!argv[1]) {
-		    zwarnnam(name, "path expected after -%c", **argv);
+		    zwarnnam(name, "path expected after -%c", arg);
 		    return 1;
 		} else {
 		    cct.withd = *++argv;
@@ -695,11 +697,11 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		}
 		break;
 	    case 'J':
-		if ((*argv)[1]) {
-		    cct.gname = (*argv) + 1;
+		if (**argv) {
+		    cct.gname = *argv;
 		    *argv = argv_end;
 		} else if (!argv[1]) {
-		    zwarnnam(name, "group name expected after -%c", **argv);
+		    zwarnnam(name, "group name expected after -%c", arg);
 		    return 1;
 		} else {
 		    cct.gname = *++argv;
@@ -707,11 +709,11 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		}
 		break;
 	    case 'V':
-		if ((*argv)[1]) {
-		    cct.gname = (*argv) + 1;
+		if (**argv) {
+		    cct.gname = *argv;
 		    *argv = argv_end;
 		} else if (!argv[1]) {
-		    zwarnnam(name, "group name expected after -%c", **argv);
+		    zwarnnam(name, "group name expected after -%c", arg);
 		    return 1;
 		} else {
 		    cct.gname = *++argv;
@@ -730,9 +732,9 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 	    case 'M':
 		if (cclist & COMP_LIST) {
 		    cclist |= COMP_LISTMATCH;
-		} else if ((*argv)[1]) {
+		} else if (**argv) {
 		    if ((cct.matcher =
-			 parse_cmatcher(name, (cct.mstr = (*argv) + 1))) ==
+			 parse_cmatcher(name, (cct.mstr = *argv))) ==
 			pcm_err) {
 			cct.matcher = NULL;
 			cct.mstr = NULL;
@@ -741,7 +743,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		    *argv = argv_end;
 		} else if (!argv[1]) {
 		    zwarnnam(name, "matching specification expected after -%c",
-			     **argv);
+			     arg);
 		    return 1;
 		} else {
 		    if ((cct.matcher =
@@ -755,16 +757,16 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		}
 		break;
 	    case 'H':
-		if ((*argv)[1])
-		    cct.hnum = atoi((*argv) + 1);
+		if (**argv)
+		    cct.hnum = atoi(*argv);
 		else if (argv[1])
 		    cct.hnum = atoi(*++argv);
 		else {
-		    zwarnnam(name, "number expected after -%c", **argv);
+		    zwarnnam(name, "number expected after -%c", arg);
 		    return 1;
 		}
 		if (!argv[1]) {
-		    zwarnnam(name, "missing pattern after -%c", **argv);
+		    zwarnnam(name, "missing pattern after -%c", arg);
 		    return 1;
 		}
 		cct.hpat = *++argv;
@@ -776,7 +778,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		break;
 	    case 'C':
 		if (cl) {
-		    zwarnnam(name, "illegal option -%c", **argv);
+		    zwarnnam(name, "illegal option -%c", arg);
 		    return 1;
 		}
 		if (first && !hx) {
@@ -788,7 +790,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		break;
 	    case 'D':
 		if (cl) {
-		    zwarnnam(name, "illegal option -%c", **argv);
+		    zwarnnam(name, "illegal option -%c", arg);
 		    return 1;
 		}
 		if (first && !hx) {
@@ -801,7 +803,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		break;
  	    case 'T':
 		if (cl) {
-		    zwarnnam(name, "illegal option -%c", **argv);
+		    zwarnnam(name, "illegal option -%c", arg);
 		    return 1;
 		}
 		if (first && !hx) {
@@ -813,7 +815,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
  		break;
 	    case 'L':
 		if (cl) {
-		    zwarnnam(name, "illegal option -%c", **argv);
+		    zwarnnam(name, "illegal option -%c", arg);
 		    return 1;
 		}
 		if (!first || hx) {
@@ -828,7 +830,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		    return 1;
 		}
 		if (!argv[1]) {
-		    zwarnnam(name, "condition expected after -%c", **argv);
+		    zwarnnam(name, "condition expected after -%c", arg);
 		    return 1;
 		}
 		if (first) {
@@ -845,10 +847,10 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		}
 		break;
 	    default:
-		if (!first && (**argv == '-' || **argv == '+') && !argv[0][1])
-		    (*argv)--, argv--, ready = 1;
+		if (!first && (arg == '-' || arg == '+') && !**argv)
+		    *argv -= sz + 1, argv--, ready = 1;
 		else {
-		    zwarnnam(name, "bad option: -%c", **argv);
+		    zwarnnam(name, "bad option: -%c", arg);
 		    return 1;
 		}
 	    }

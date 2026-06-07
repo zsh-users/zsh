@@ -1,5 +1,8 @@
 2026-06-14  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54715: Src/Zle/compctl.c: compctl: print multibyte errors
+	correctly (phew)
+
 	* 54714: Src/Modules/zutil.c, Src/glob.c, Src/utils.c, Src/zsh.h:
 	add MB_NICECHAR and use it
 
