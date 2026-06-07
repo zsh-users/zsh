@@ -1928,6 +1928,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 
 			/* Parsed OK, execute for each name */
 			for (tmpptr = matchbuf; tmpptr < matchptr; tmpptr++) {
+			    unsetparam("REPLY");
 			    setsparam("REPLY", ztrdup(tmpptr->name));
 			    execode(prog, 1, 0, "globsort");
 			    if (!errflag)
@@ -3923,6 +3924,7 @@ qualsheval(char *name, UNUSED(struct stat *buf), UNUSED(off_t days), char *str)
 	int cshglob = badcshglob;
 
 	unsetparam("reply");
+	unsetparam("REPLY");
 	setsparam("REPLY", ztrdup(name));
 	badcshglob = 0;
 

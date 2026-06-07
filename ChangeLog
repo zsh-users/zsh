@@ -1,5 +1,8 @@
 2026-06-10  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54696: Src/glob.c: unset REPLY before e:: and oe:: so things
+	don't break if it had acquired a weird type
+
 	* 54691: Src/subst.c, Test/D04parameter.ztst: fix :W and :w
 	duplicating input
 
