@@ -3392,7 +3392,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		    if (haserr)
 			shtokenize(s);
 		} else if (haserr || errflag) {
-		    zerr("parse error in ${...%c...} substitution", s[-1]);
+		    zerr("parse error in ${...%c...} substitution", s[-1] == Pound ? '#' : s[-1]);
 		    return NULL;
 		}
 	    }

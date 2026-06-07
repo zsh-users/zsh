@@ -1,5 +1,7 @@
 2026-06-14  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54712: Src/subst.c: handle the Pound token in error message
+
 	* 54711: Src/builtin.c: print invalid option to getopts correctly
 
 	* 54710: Src/Builtins/rlimits.c, Src/Builtins/sched.c,
