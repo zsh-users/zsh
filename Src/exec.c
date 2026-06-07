@@ -753,10 +753,12 @@ execute(LinkList args, int flags, int defpath)
 	zsfree(s);
     }
 
+    argv = makecline(args, flags & BINF_DASH);
+
     /* If ARGV0 is in the commands environment, we use *
      * that as argv[0] for this external command       */
     if ((z = zgetenv("ARGV0"))) {
-	setdata(firstnode(args), (void *) ztrdup(z));
+	argv[0] = ztrdup(z);
 	/*
 	 * Note we don't do anything with the parameter structure
 	 * for ARGV0: that's OK since we're about to exec or exit
@@ -771,10 +773,9 @@ execute(LinkList args, int flags, int defpath)
     /* Else if the pre-command `-' was given, we add `-' *
      * to the front of argv[0] for this command.         */
 	sprintf(buf2, "-%s", arg0);
-	setdata(firstnode(args), (void *) ztrdup(buf2));
+	argv[0] = ztrdup(buf2);
     }
 
-    argv = makecline(args);
     if (flags & BINF_CLEARENV)
 	newenvp = blank_env;
 
@@ -2098,7 +2099,7 @@ execpline2(Estate state, wordcode pcode,
 
 /**/
 static char **
-makecline(LinkList list)
+makecline(LinkList list, int dash)
 {
     LinkNode node;
     char **argv, **ptr;
@@ -2111,6 +2112,7 @@ makecline(LinkList list)
 	if (!doneps4)
 	    printprompt4();
 
+	if (dash) fputs("- ", xtrerr);
 	for (node = firstnode(list); node; incnode(node)) {
 	    *ptr++ = (char *)getdata(node);
 	    quotedzputs(getdata(node), xtrerr);
