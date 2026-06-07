@@ -1,5 +1,8 @@
 2026-06-10  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54692: Src/subst.c: untokenize string sent to matheval for
+	(#) flag
+
 	* 54691: Src/subst.c, Test/D04parameter.ztst: fix :W and :w
 	duplicating input
 

@@ -1494,6 +1494,8 @@ substevalchar(char *ptr)
     int saved_errflag = errflag;
 
     errflag = 0;
+    ptr = dupstring(ptr);
+    untokenize(ptr);
     ires = mathevali(ptr);
 
     if (errflag) {  /* not a valid numerical expression */
