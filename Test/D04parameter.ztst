@@ -1773,6 +1773,14 @@
 >
 >
 
+   wu='aa bb cc'
+   echo $wu:wu
+   W=FOOBAR
+   echo $W:W_B_l
+0:repeated upper/lowercase modifiers
+>AA BB CC
+>fooBar
+
 # This used to cause uncontrolled behaviour, but at best
 # you got the wrong output so the check is worth it.
    args() { print $#; }

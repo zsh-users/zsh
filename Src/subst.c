@@ -4473,7 +4473,6 @@ modify(char **str, char **ptr, int inbrace)
 		    *e = '\0';
 		    if (c != 'l' && c != 'u')
 			copy = dupstring(tt);
-		    *e = tc;
 		    switch (c) {
                     case 'a':
 			chabspath(&copy);
@@ -4537,6 +4536,7 @@ modify(char **str, char **ptr, int inbrace)
 			copy = xsymlink(copy, 1);
 			break;
 		    }
+		    *e = tc;
 		    tc = *tt;
 		    *tt = '\0';
 		    nl = al + strlen(t) + strlen(copy);
