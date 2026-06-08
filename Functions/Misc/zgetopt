@@ -6,12 +6,15 @@
 emulate -L zsh -o extended_glob
 zmodload -i zsh/zutil || return 3
 
+local func=${funcstack[1]:-${0:t}}
 local caller=${funcstack[2]:-${ZSH_ARGZERO:t}}
-local errname=$caller:${0:t}
+local errname=$caller:$func
 local optspec pat i posix=0
 local -a match mbegin mend optvv argvv
 local -a array lopts sopts name
 local -a specs no_arg_opts req_arg_opts opt_arg_opts tmp
+
+[[ $zsh_eval_context[-1] == toplevel ]] && errname=$func
 
 # same as leading + in short-opts spec
 (( $+POSIXLY_CORRECT )) && posix=1
@@ -22,7 +25,7 @@ zparseopts -n $errname -D -F -G - \
   {n,-name}:-=name \
   {o,-options}:-=sopts \
 || {
-  print -ru2 "usage: ${0:t} [-A <array>] [-l <spec>] [-n <name>] [-o <spec>] -- <arg> ..."
+  print -ru2 "usage: $func [-A <array>] [-l <spec>] [-n <name>] [-o <spec>] -- <arg> ..."
   return 2
 }
 
@@ -31,7 +34,7 @@ name=( ${(@)name/#(-n|--name=)/} )
 
 (( $#array )) && array=( "${(@)array/#(-A|--array=)/}" )
 
-if [[ $zsh_eval_context[-1] == shfunc ]]; then
+if [[ $zsh_eval_context[-1] != toplevel ]]; then
   [[ $array == *[^A-Za-z0-9_.]* ]] && {
     print -ru2 - "$errname: invalid array name: $array"
     return 2
@@ -165,7 +168,7 @@ if [[ -n $array ]]; then
   trap "$array=( ${(j< >)${(@q+)optvv}} -- ${(j< >)${(@q+)argvv}} )" EXIT
 
 # called as function, print
-elif [[ $zsh_eval_context[-1] == shfunc ]]; then
+elif [[ $zsh_eval_context[-1] != toplevel ]]; then
   print -r - "${(@q+)optvv}" -- "${(@q+)argvv}"
 
 # called as a script, print. use unconditional single-quoting. this is ugly but

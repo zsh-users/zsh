@@ -8,13 +8,13 @@
 
 %test
 
-  zgetopt -A '' -- a b c
   zgetopt -A '' -o '' -- a b c
   zgetopt -A '' -l '' -- a b c
-0:-o or -l required
+  zgetopt -A '' -- a b c
+2:-o or -l required (usage error)
+>-- a b c
+>-- a b c
 ?(eval):zgetopt: missing option spec
->-- a b c
->-- a b c
 
   zgetopt -A '' -o - -- a b c
   zgetopt -A '' -o -a -- a b c
@@ -198,3 +198,25 @@
     arg_p "string with quotes and space: '' \"\" "
 0:example from util-linux's getopt-example.bash
 >-a --a-long -b arg_bs1 -b arg_bs2 --b-long arg_bl1 --b-long arg_bl2 -c arg_cs1 -c '' --c-long arg_cl1 --c-long '' -- not_arg_cs1 not_arg_cl2 arg_p 'string with quotes and space: '\'\'' "" '
+
+  (
+    unfunction zgetopt
+    autoload -Uz zgetopt
+    zgetopt
+  )
+  (
+    unfunction zgetopt
+    autoload -Uz zgetopt
+    zgetopt -o abc -- -ab
+    print -r - ${(q+)argv}
+  )
+-:result immediately after auto-load
+?(eval):zgetopt: missing option spec
+>-a -b --
+
+  (
+    setopt no_function_argzero
+    zgetopt
+  )
+-:error name with no_function_argzero
+?(eval):zgetopt: missing option spec
