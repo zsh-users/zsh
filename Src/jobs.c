@@ -523,6 +523,10 @@ update_job(Job jn)
 		 * fg/bg is the superjob) a SIGCONT if we need it.
 		 */
 		sjn->stat |= STAT_CHANGED | STAT_STOPPED;
+		if (!(sjn->stat & STAT_DONE)) {
+		    prevjob = curjob;
+		    curjob = i;
+		}
 		if (isset(NOTIFY) && (sjn->stat & STAT_LOCKED) &&
 		    !(sjn->stat & STAT_NOPRINT)) {
 		    /*
@@ -701,13 +705,15 @@ setprevjob(void)
 
     for (i = maxjob; i; i--)
 	if ((jobtab[i].stat & STAT_INUSE) && (jobtab[i].stat & STAT_STOPPED) &&
-	    !(jobtab[i].stat & STAT_SUBJOB) && i != curjob && i != thisjob) {
+	    !(jobtab[i].stat & (STAT_SUBJOB | STAT_NOPRINT)) &&
+	    i != curjob && i != thisjob) {
 	    prevjob = i;
 	    return;
 	}
 
     for (i = maxjob; i; i--)
-	if ((jobtab[i].stat & STAT_INUSE) && !(jobtab[i].stat & STAT_SUBJOB) &&
+	if ((jobtab[i].stat & STAT_INUSE) &&
+	    !(jobtab[i].stat & (STAT_SUBJOB | STAT_NOPRINT)) &&
 	    i != curjob && i != thisjob) {
 	    prevjob = i;
 	    return;
@@ -2073,7 +2079,7 @@ getjob(const char *s, const char *prog)
     if (*s == '%' || *s == '+' || !*s) {
 	if (curjob == -1) {
 	    if (prog && !isset(POSIXBUILTINS))
-		zwarnnam(prog, "no current job");
+		zwarnnam(prog, "%%%c: no such job", *s ? *s : '%');
 	    returnval = -1;
 	    goto done;
 	}
@@ -2084,7 +2090,7 @@ getjob(const char *s, const char *prog)
     if (*s == '-') {
 	if (prevjob == -1) {
 	    if (prog && !isset(POSIXBUILTINS))
-		zwarnnam(prog, "no previous job");
+		zwarnnam(prog, "%%-: no such job");
 	    returnval = -1;
 	    goto done;
 	}
@@ -2638,15 +2644,21 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	    }
 	    /* It's time to shuffle the jobs around!  Reset the current job,
 	    and pick a sensible secondary job. */
-	    if (curjob == job) {
-		curjob = prevjob;
-		prevjob = (func == BIN_BG) ? -1 : job;
-	    }
-	    if (prevjob == job || prevjob == -1)
-		setprevjob();
-	    if (curjob == -1) {
-		curjob = prevjob;
-		setprevjob();
+	    {
+		/* Exclude this job from setprevjob() consideration. */
+		int saved_thisjob = thisjob;
+		thisjob = job;
+		if (curjob == job) {
+		    curjob = prevjob;
+		    prevjob = (func == BIN_BG) ? -1 : job;
+		}
+		if (prevjob == job || prevjob == -1)
+		    setprevjob();
+		if (curjob == -1) {
+		    curjob = prevjob;
+		    setprevjob();
+		}
+		thisjob = saved_thisjob;
 	    }
 	    if (func != BIN_WAIT)
 		/* for bg and fg -- show the job we are operating on */

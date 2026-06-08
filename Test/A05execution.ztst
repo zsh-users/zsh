@@ -375,7 +375,7 @@ F:anonymous function, and a descriptor leak when backgrounding a pipeline
 ?(eval):wait:13: job not found: ?bar
 
 # Test 'wait' for unknown job/process ID (POSIX mode).
-  (setopt POSIX_BUILTINS
+  () { setopt localoptions POSIX_BUILTINS
   wait 1
   echo $?
   wait %%
@@ -388,16 +388,15 @@ F:anonymous function, and a descriptor leak when backgrounding a pipeline
   echo $?
   wait %foo
   echo $?
-  wait %\?bar)
+  wait %\?bar
+  }
 127:'wait' exit status for unknown ID (POSIX mode)
 >127
->0
 >127
 >127
 >127
 >127
-# TBD: the 0 above is believed to be bogus and should also be turned
-# into 127 when the ccorresponding bug is fixed in the main shell.
+>127
 
   sleep 2 & pid=$!
   kill -STOP $pid

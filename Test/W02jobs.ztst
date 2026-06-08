@@ -304,6 +304,32 @@
 *>fg: no job control in this shell
 *>bg: no job control in this shell
 
+# The following test exercises a bug where setprevjob() could pick an
+# internal NOPRINT job (e.g. a builtin's own job entry) as the previous
+# job.  This happened when a function superjob was involved, because the
+# superjob's subjob was excluded but the builtin job was not.
+# The function's child stops itself, triggering the superjob mechanism.
+# Then fg %- resumes the superjob (which exits since the child is done).
+# Afterwards, the remaining sleep job should still be accessible.
+  zpty_start
+  zpty_input "f() { sh -c 'kill -TSTP 0' }"
+  zpty_input 'f'
+  zpty_line			# consume stopped message from f
+  zpty_input 'sleep 100 &'
+  zpty_line			# consume [N] PID
+  zpty_input 'kill -STOP %sleep'
+  zpty_line			# consume stopped message from kill
+  zpty_input 'fg %-'
+  zpty_line			# consume continued message
+  zpty_input 'jobs'
+  zpty_stop
+0:fg %- with function superjob does not pick internal job as previous
+*>zsh:*(stopped|suspended)*
+*>\[[0-9]##\] [0-9]##
+*>\[[0-9]##\]  + (stopped|suspended)*sleep*
+*>\[[0-9]##\]    continued*
+*>\[[0-9]##\]  - (stopped|suspended)*sleep*
+
 %clean
 
   zmodload -ui zsh/zpty
