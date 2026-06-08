@@ -1,3 +1,7 @@
+2026-06-08  Mikael Magnusson  <mikachu@gmail.com>
+
+	* unposted: Src/Modules/ksh93.c: fix NULL termination in ksh93
+
 2026-06-07  Mikael Magnusson  <mikachu@gmail.com>
 
 	* unposted: Completion/Zsh/Type/_history_modifiers: add :S from

@@ -80,6 +80,7 @@ matchgetfn(Param pm)
 	    *ap++ = match ? match : ztrdup("");
 	    while (*zsh_match)
 		*ap++ = ztrdup(*zsh_match++);
+	    *ap = NULL;
 	} else
 	    pm->u.arr = zarrdup(zsh_match);
     } else if (isset(KSHARRAYS)) {
