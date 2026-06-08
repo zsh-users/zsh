@@ -603,7 +603,7 @@ F:ksh93 does not implement this either
  unset -n ptr1
  typeset -n ptr1='not[2]good'
 1:invalid nameref
-*?*invalid name reference: not\[2\]good
+*?*invalid variable name: not\[2\]good
 
  unset -n ptr1
  unset hash
@@ -1053,6 +1053,19 @@ F:Checking for a bug in zmodload that affects later tests
 >
 *?*reference ref*to local variable one
 
+ typeset -n ref=var
+ {
+   for ref in valid1 inv@lid valid2; do typeset -p ref; done
+ } always { TRY_BLOCK_ERROR=0 }
+ typeset -nr ref=var
+ {
+   for ref in valid3 valid4; do typeset -p ref; done
+ } always { TRY_BLOCK_ERROR=0 }
+1:for-loop variable is a reference, part 5, errors
+>typeset -n ref=valid1
+*?*invalid variable name: inv@lid
+*?*read-only reference: ref
+
  unset -n ref
  typeset -n ref
  () {
@@ -1391,20 +1404,20 @@ F:Subscripting on 1 01 ! ? - should print first character but do not
 >x
 >typeset -un x=_
 >x
-?edgeupper: invalid name reference: argv
-?edgeupper: invalid name reference: ARGC
-?edgelocal: invalid name reference: @
-?edgelocal: invalid name reference: @[1]
-?edgeupper: invalid name reference: @
-?edgelocal: invalid name reference: *
-?edgelocal: invalid name reference: *[1]
-?edgeupper: invalid name reference: *
-?edgelocal: invalid name reference: #
-?edgelocal: invalid name reference: #[1]
-?edgeupper: invalid name reference: #
-?edgeupper: invalid name reference: 0
-?edgeupper: invalid name reference: 1
-?edgeupper: invalid name reference: 01
+?edgeupper: invalid variable name: argv
+?edgeupper: invalid variable name: ARGC
+?edgelocal: invalid variable name: @
+?edgelocal: invalid variable name: @[1]
+?edgeupper: invalid variable name: @
+?edgelocal: invalid variable name: *
+?edgelocal: invalid variable name: *[1]
+?edgeupper: invalid variable name: *
+?edgelocal: invalid variable name: #
+?edgelocal: invalid variable name: #[1]
+?edgeupper: invalid variable name: #
+?edgeupper: invalid variable name: 0
+?edgeupper: invalid variable name: 1
+?edgeupper: invalid variable name: 01
 
  edgelocal \$
  edgelocal '$[1]'

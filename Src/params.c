@@ -3249,7 +3249,7 @@ assignsparam(char *s, char *val, int flags)
     }
     if (*val && (v->pm->node.flags & PM_NAMEREF)) {
 	if (!valid_refname(val, v->pm->node.flags)) {
-	    zerr("invalid name reference: %s", val);
+	    zerr("invalid variable name: %s", val);
 	    zsfree(val);
 	    unqueue_signals();
 	    errflag |= ERRFLAG_ERROR;
@@ -6347,6 +6347,10 @@ setloopvar(char *name, char *value)
 	  zerr("read-only reference: %s", pm->node.nam);
 	  return;
       }
+      if (!valid_refname(value, pm->node.flags)) {
+	  zerr("invalid variable name: %s", value);
+	  return;
+      }
       pm->base = pm->width = 0;
       SETREFNAME(pm, ztrdup(value));
       pm->node.flags &= ~PM_UNSET;
@@ -6485,5 +6489,5 @@ valid_refname(char *val, int flags)
 	    return 0;
 	}
     }
-    return !!t;
+    return !*t;
 }
