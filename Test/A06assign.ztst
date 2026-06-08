@@ -769,3 +769,17 @@
     a=( a b c )
   )
 0:regression workers/54340
+
+ (
+   typeset s  # Creates a string with pm->u.str = NULL
+   s[1]=""    # Value from pm->gsu.s->getfn() may not be stored in pm->u.str
+   s="abcde"  # Frees pm->u.str => Crashes if it contained value from pm->gsu.s->getfn()
+ )
+0:string assignments don't take ownership of non-freeable pointers
+
+ (
+   typeset -a a  # Creates an array with pm->u.arr = NULL
+   a[1]=()       # Value from pm->gsu.a->getfn() may not be stored in pm->u.arr
+   a=( a b c )   # Frees pm->u.arr => Crashes if it contained value from pm->gsu.a->getfn()
+ )
+0:array assignments don't take ownership of non-freeable pointers
