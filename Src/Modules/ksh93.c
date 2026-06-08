@@ -267,18 +267,8 @@ boot_(Module m)
 int
 cleanup_(Module m)
 {
-    struct paramdef *p;
-
     deletewrapper(m, wrapper);
 
-    /* Clean up namerefs, otherwise deleteparamdef() is confused */
-    for (p = partab; p < partab + sizeof(partab)/sizeof(*partab); ++p) {
-	if (p->flags & PM_NAMEREF) {
-	    HashNode hn = gethashnode2(paramtab, p->name);
-	    if (hn)
-		((Param)hn)->node.flags &= ~PM_NAMEREF;
-	}
-    }
     return setfeatureenables(m, &module_features, NULL);
 }
 

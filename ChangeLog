@@ -1,5 +1,8 @@
 2026-06-10  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54704 + 54728: Src/Modules/ksh93.c: remove obsolete workaround
+	in ksh93 module
+
 	* 54696: Src/glob.c: unset REPLY before e:: and oe:: so things
 	don't break if it had acquired a weird type
 
