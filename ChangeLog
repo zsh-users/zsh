@@ -1,5 +1,8 @@
 2026-06-10  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54707: Src/builtin.c: fix autoload +X nonexist leaving funcdef
+	at dummy
+
 	* 54705: Src/Modules/ksh93.c: ksh93: fix use after free of
 	.sh.edchar
 

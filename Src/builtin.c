@@ -3163,11 +3163,11 @@ eval_autoload(Shfunc shf, char *name, Options ops, int func)
     if (!(shf->node.flags & PM_UNDEFINED))
 	return 1;
 
-    if (shf->funcdef) {
-	freeeprog(shf->funcdef);
-	shf->funcdef = &dummy_eprog;
-    }
     if (OPT_MINUS(ops,'X')) {
+	if (shf->funcdef) {
+	    freeeprog(shf->funcdef);
+	    shf->funcdef = &dummy_eprog;
+	}
 	char *fargv[3];
 	fargv[0] = quotestring(name, QT_SINGLE_OPTIONAL);
 	fargv[1] = "\"$@\"";
