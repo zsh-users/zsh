@@ -1,3 +1,14 @@
+2026-06-08  Bart Schaefer  <schaefer@zsh.org>
+
+	* Mikel Ward: 54294: Src/jobs.c, Test/A05execution.ztst,
+	Test/W02jobs.ztst: Fix %- (prevjob) picking wrong job after resuming
+
+	* Philippe Altherr: 54278: Src/params.c, Test/K01nameref.ztst:
+	Detect invalid variable names in reference initializers
+
+	* Philippe Altherr: 54277: Src/params.c: reference loops are detected
+	at create time, remove loop tagging
+
 2026-06-08  Mikael Magnusson  <mikachu@gmail.com>
 
 	* unposted: Src/Modules/ksh93.c: fix NULL termination in ksh93
