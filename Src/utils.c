@@ -342,12 +342,8 @@ zerrmsg(FILE *file, const char *fmt, va_list ap)
 		break;
 	    case 'c':
 		num = va_arg(ap, int);
-#ifdef MULTIBYTE_SUPPORT
-		mb_charinit();
-		zputs(wcs_nicechar(num, NULL, NULL), file);
-#else
-		zputs(nicechar(num), file);
-#endif
+		MB_CHARINIT();
+		zputs(MB_NICECHAR(num), file);
 		break;
 	    case 'e':
 		/* print the corresponding message for this errno */

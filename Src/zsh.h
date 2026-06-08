@@ -3285,6 +3285,8 @@ typedef wint_t convchar_t;
 #define MB_CHARLENCONV(str, len, cp)	mb_charlenconv((str), (len), (cp))
 #define MB_CHARLEN(str, len)	mb_charlenconv((str), (len), NULL)
 
+#define MB_NICECHAR(cp)		wcs_nicechar((cp), NULL, NULL)
+
 /*
  * We replace broken implementations with one that uses Unicode
  * characters directly as wide characters.  In principle this is only
@@ -3363,6 +3365,8 @@ typedef int convchar_t;
 #define MB_CHARINIT()
 #define MB_CHARLENCONV(str, len, cp) charlenconv((str), (len), (cp))
 #define MB_CHARLEN(str, len) ((len) ? 1 : 0)
+
+#define MB_NICECHAR(cp)		nicechar((cp))
 
 #define WCWIDTH_WINT(c)	(1)
 

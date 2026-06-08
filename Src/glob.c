@@ -2325,12 +2325,8 @@ xpandbraces(LinkList list, LinkNode *np)
 	    do {
 		char *ncptr;
 		int nclen;
-#ifdef MULTIBYTE_SUPPORT
-		mb_charinit();
-		ncptr = wcs_nicechar(cend, NULL, NULL);
-#else
-		ncptr = nicechar(cend);
-#endif
+		MB_CHARINIT();
+		ncptr = MB_NICECHAR(cend);
 		nclen = strlen(ncptr);
 		p = zhalloc(lenalloc + nclen);
 		memcpy(p, str3, strp);
