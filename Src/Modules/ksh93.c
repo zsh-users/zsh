@@ -197,8 +197,7 @@ ksh93_wrapper(Eprog prog, FuncWrap w, char *name)
 	    strcpy(sh_edmode, "\033");
 	else
 	    strcpy(sh_edmode, "");
-	if (sh_edchar == sh_unsetval)
-	    sh_edchar = dupstring(getsparam("KEYS"));
+	sh_edchar = dupstring(getsparam("KEYS"));
 	if (varedarg) {
 	    char *ie = itype_end((sh_name = dupstring(varedarg)), INAMESPC, 0);
 	    if (ie && *ie) {

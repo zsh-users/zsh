@@ -1,5 +1,8 @@
 2026-06-10  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54705: Src/Modules/ksh93.c: ksh93: fix use after free of
+	.sh.edchar
+
 	* 54704 + 54728: Src/Modules/ksh93.c: remove obsolete workaround
 	in ksh93 module
 
