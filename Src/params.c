@@ -6324,19 +6324,11 @@ resolve_nameref_rec(Param pm, const Param stop, int keep_lastref)
 	/* If present, it has to be the end of any chain, see fetchvalue() */
 	|| pm->width || !(refname = GETREFNAME(pm)) || !*refname)
 	return pm;
-    if (pm->node.flags & PM_TAGGED) {
-	zerr("%s: invalid self reference", pm->node.nam);
-	return NULL;
-    }
     queue_signals();
     if ((pm = (Param)gethashnode2(realparamtab, refname))) {
 	if ((pm = loadparamnode(paramtab, upscope(pm, ref), refname)) &&
-	    pm != stop && !(pm->node.flags & PM_UNSET)) {
-	    /* user can't tag a nameref, safe for loop detection */
-	    ref->node.flags |= PM_TAGGED;
+	    pm != stop && !(pm->node.flags & PM_UNSET))
 	    pm = resolve_nameref_rec(pm, stop, keep_lastref);
-	    ref->node.flags &= ~PM_TAGGED;
-	}
     } else if (keep_lastref)
 	pm = ref;
     unqueue_signals();
