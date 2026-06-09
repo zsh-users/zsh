@@ -1,5 +1,7 @@
 2026-06-08  dana  <dana@dana.is>
 
+	* unposted: NEWS: document COLUMNS+LINES change from w/54676
+
 	* 54676: Doc/Zsh/params.yo, Src/init.c, Src/params.c,
 	Src/utils.c, Test/D04parameter.ztst: preserve COLUMNS + LINES
 	from the environment
