@@ -33,44 +33,44 @@
    }
 
    function g() {
-     if (($2)); then local -n $1 rs ra rs1 ra1;
-     else local -n $1 rs=s ra=a rs1="s[1]" ra1="a[1]"; fi;
-     if (($2 == 1)); then rs=s; ra=a; rs1="s[1]"; ra1="a[1]"; fi;
-     echo "$0:1: rs=$rs - ra=$ra - rs1=$rs1 - ra1=$ra1";
+     if (($2)); then local -n $1 rs ra;
+     else local -n $1 rs=s ra=a; fi;
+     if (($2 == 1)); then rs=s; ra=a; fi;
+     echo "$0:1: rs=$rs - ra=$ra";
      local s=$0 a=($0);
-     if (($2 == 2)); then rs=s; ra=a; rs1="s[1]"; ra1="a[1]"; fi;
-     echo "$0:2: rs=$rs - ra=$ra - rs1=$rs1 - ra1=$ra1";
+     if (($2 == 2)); then rs=s; ra=a; fi;
+     echo "$0:2: rs=$rs - ra=$ra";
      h "$@";
-     echo "$0:3: rs=$rs - ra=$ra - rs1=$rs1 - ra1=$ra1";
+     echo "$0:3: rs=$rs - ra=$ra";
    }
 
    function h() {
-     if (($2 == 3)); then rs=s; ra=a; rs1="s[1]"; ra1="a[1]"; fi;
-     echo "$0:1: rs=$rs - ra=$ra - rs1=$rs1 - ra1=$ra1";
+     if (($2 == 3)); then rs=s; ra=a; fi;
+     echo "$0:1: rs=$rs - ra=$ra";
      local s=$0 a=($0);
-     if (($2 == 4)); then rs=s; ra=a; rs1="s[1]"; ra1="a[1]"; fi;
-     echo "$0:2: rs=$rs - ra=$ra - rs1=$rs1 - ra1=$ra1";
+     if (($2 == 4)); then rs=s; ra=a; fi;
+     echo "$0:2: rs=$rs - ra=$ra";
      i "$@";
-     echo "$0:3: rs=$rs - ra=$ra - rs1=$rs1 - ra1=$ra1";
+     echo "$0:3: rs=$rs - ra=$ra";
      # Check that re-entering the same scope doesn't undo scope exit
      k "$@"
    }
 
    function i() {
-     if (($2 == 5)); then rs=s; ra=a; rs1="s[1]"; ra1="a[1]"; fi;
-     echo "$0:1: rs=$rs - ra=$ra - rs1=$rs1 - ra1=$ra1";
+     if (($2 == 5)); then rs=s; ra=a; fi;
+     echo "$0:1: rs=$rs - ra=$ra";
      local s=$0 a=($0);
-     if (($2 == 6)); then rs=s; ra=a; rs1="s[1]"; ra1="a[1]"; fi;
-     echo "$0:2: rs=$rs - ra=$ra - rs1=$rs1 - ra1=$ra1";
+     if (($2 == 6)); then rs=s; ra=a; fi;
+     echo "$0:2: rs=$rs - ra=$ra";
      j "$@";
-     echo "$0:3: rs=$rs - ra=$ra - rs1=$rs1 - ra1=$ra1";
+     echo "$0:3: rs=$rs - ra=$ra";
      k "$@";
    }
 
    function j() {
-     echo "$0:1: rs=$rs - ra=$ra - rs1=$rs1 - ra1=$ra1";
+     echo "$0:1: rs=$rs - ra=$ra";
      local s=$0 a=($0);
-     echo "$0:2: rs=$rs - ra=$ra - rs1=$rs1 - ra1=$ra1";
+     echo "$0:2: rs=$rs - ra=$ra";
    }
 
    functions -c j k
@@ -276,11 +276,6 @@ F:note this causes "var" to become set
 >typeset -n ptr=var
 >typeset -t var
 
- typeset -n ptr=var[2]
- typeset -t ptr
-1:change type of referenced array element
-*?*var\[2\]: can't change type via subscript reference
-
  typeset -n ptr[1]=var
 1:illegal nameref name
 *?*reference variable cannot be an array
@@ -288,81 +283,190 @@ F:note this causes "var" to become set
  typeset var=value
  typeset -n ptr=var
  print $ptr
-0:basic nameref expansion, no braces
+ print $ptr[2,4]
+0:nameref expansion, no braces
 >value
+>alu
 
  typeset var=value
  typeset -n ptr=var
  print ${ptr}
-0:basic nameref expansion, braces
+ print ${(U)ptr}
+ print ${ptr[2,5][1,3]}
+ print ${(U)ptr[2,5][1,3]}
+0:nameref expansion, braces
 >value
+>VALUE
+>alu
+>ALU
 
  typeset var=(val1 val2)
  typeset -n ptr=var
  print $ptr
-0:nameref array expansion
+ print $ptr[2]
+0:nameref array expansion, no braces
 >val1 val2
+>val2
 
- typeset -A var=(val1 val2)
+ typeset var=(val1 val2)
  typeset -n ptr=var
+ print ${ptr}
+ print ${(O)ptr}
+ print ${ptr[2]}
+ print ${(U)ptr[2]}
+ print ${ptr[2][2,4]}
+ print ${(U)ptr[2][2,4]}
+0:nameref array expansion, braces
+>val1 val2
+>val2 val1
+>val2
+>VAL2
+>al2
+>AL2
+
+ typeset -A var=(key1 val1 key2 val2)
+ typeset -n ptr=var
+ print $ptr
+ print $ptr[key2]
+0:nameref hash expansion, no braces
+>val1 val2
+>val2
+
+ typeset -A var=(key1 val1 key2 val2)
+ typeset -n ptr=var
+ print ${ptr}
  print ${(kv)ptr}
-0:nameref hash expansion
+ print ${ptr[key2]}
+ print ${(U)ptr[key2]}
+ print ${ptr[key2][2,4]}
+ print ${(U)ptr[key2][2,4]}
+0:nameref hash expansion, braces
 >val1 val2
+>key1 val1 key2 val2
+>val2
+>VAL2
+>al2
+>AL2
 
- typeset -n ptr=var
  typeset var=value
- typeset -p ptr var
+ typeset -n ptr=var
  ptr=newvalue
- typeset -p ptr var
-0:assign existing scalar via nameref
->typeset -n ptr=var
->typeset var=value
->typeset -n ptr=var
+ typeset -p var
+ ptr[3]=xt
+ typeset -p var
+ typeset ptr=newvalue
+ typeset -p var
+ typeset ptr[3]=xt
+ typeset -p var
+0:assign/typeset existing scalar via nameref
 >typeset var=newvalue
+>typeset var=nextvalue
+>typeset var=newvalue
+>typeset var=nextvalue
 
+ typeset var=(val1 val2)
  typeset -n ptr=var
+ ptr=(new1 new2 new3 new4 new5)
+ typeset -p var
+ ptr[3]=new6
+ typeset -p var
+ ptr[2,4]=(new7 new8)
+ typeset -p var
+ typeset ptr=(new1 new2 new3 new4 new5)
+ typeset -p var
+ typeset ptr[3]=new6
+ typeset -p var
+ typeset ptr[2,4]=(new7 new8)
+ typeset -p var
+0:assign/typeset existing array via nameref
+>typeset -a var=( new1 new2 new3 new4 new5 )
+>typeset -a var=( new1 new2 new6 new4 new5 )
+>typeset -a var=( new1 new7 new8 new5 )
+>typeset -a var=( new1 new2 new3 new4 new5 )
+>typeset -a var=( new1 new2 new6 new4 new5 )
+>typeset -a var=( new1 new7 new8 new5 )
+
+ typeset -A var=(key1 val1)
+ typeset -n ptr=var
+ ptr=(key2 val2 key3 val3)
+ typeset -p var
+ ptr[key3]=VAL3
+ ptr[key4]=val4
+ typeset -p var
+ typeset ptr=(key2 val2 key3 val3)
+ typeset -p var
+ typeset ptr[key3]=VAL3
+ typeset ptr[key4]=val4
+ typeset -p var
+0:assign/typeset existing array via nameref
+>typeset -A var=( [key2]=val2 [key3]=val3 )
+>typeset -A var=( [key2]=val2 [key3]=VAL3 [key4]=val4 )
+>typeset -A var=( [key2]=val2 [key3]=val3 )
+>typeset -A var=( [key2]=val2 [key3]=VAL3 [key4]=val4 )
+
+ () {
+   unset var
+   typeset -n ptr=var
+   ptr=value
+   typeset -p var
+   unset var
+   typeset ptr=value
+   typeset -p var
+ }
+ typeset -p var
+1:assign/typeset new scalar via nameref
+>typeset -g var=value
+>typeset var=value
+*?*no such variable: var
+
+ () {
+   unset var
+   typeset -n ptr=var
+   ptr=(val1 val2)
+   typeset -p var
+   unset var
+   typeset ptr=(val1 val2)
+   typeset -p var
+ }
+ typeset -p var
+1:assign/typeset new array via nameref
+>typeset -g -a var=( val1 val2 )
+>typeset -a var=( val1 val2 )
+*?*no such variable: var
+
  typeset var=value
+ typeset -n ptr=var
+ unset "ptr[3]"
+ typeset -p var
+ unset "ptr[2,3]"
+ typeset -p var
+ unset ptr
+ typeset -p var
+ typeset var=(val1 val2 val3 val4 val5)
+ unset "ptr[3]"
+ typeset -p var
+ unset "ptr[2,4]"
+ typeset -p var
+ unset ptr
+ typeset -p var
+ typeset -A var=(key1 val1 key2 val2)
+ unset "ptr[key2]"
+ typeset -p var
  unset ptr
  typeset -p var
 0:unset via nameref
+>typeset var=vaue
+>typeset var=ve
+>typeset -a var=( val1 val2 '' val4 val5 )
+>typeset -a var=( val1 '' val5 )
+>typeset -A var=( [key1]=val1 )
 
- typeset -n ptr=var
  typeset var=value
+ typeset -n ptr=var
  unset -n ptr
  typeset -p var ptr
 0:unset of the nameref itself
-F:If earlier tests change, might get "no such variable" here
 >typeset var=value
-
- typeset -n ptr=var
- typeset var=value
- typeset -p ptr var
- typeset ptr=newvalue
- typeset -p ptr var
-0:typeset existing scalar via nameref
->typeset -n ptr=var
->typeset var=value
->typeset -n ptr=var
->typeset var=newvalue
-
- typeset -n ptr=var
- ptr=value
- typeset -p var ptr
-0:assign new scalar via nameref
->typeset -g var=value
->typeset -n ptr=var
-
- unset var
- typeset -n ptr=var
- typeset var=(val1 val2)
- typeset -p ptr var
- ptr=(new1 new2)
- typeset -p ptr var
-0:assign existing array via nameref
->typeset -n ptr=var
->typeset -a var=( val1 val2 )
->typeset -n ptr=var
->typeset -a var=( new1 new2 )
 
  typeset -p ptr ptr1 ptr2 var
 1:check state of paramtab ONE
@@ -371,13 +475,6 @@ F:unexpected side-effects of previous tests
 *?*no such variable: ptr1
 *?*no such variable: ptr2
 *?*no such variable: var
-
- typeset -n ptr=var
- ptr=(val1 val2)
- typeset -p var ptr
-0:assign new array via nameref
->typeset -g -a var=( val1 val2 )
->typeset -n ptr=var
 
  unset var
  typeset -n ptr2=var
@@ -540,81 +637,10 @@ F:unexpected side-effects of previous tests
  }
 0:regression: not a self reference (test 3)
 
-
- unset -n ptr2
- typeset -n ptr2='path[2]'
- print -r -- $ptr2
-0q:nameref to array element, no braces
->${path[2]}
-
- unset -n ptr2
- typeset -n ptr2='path[2]'
- print -r -- ${ptr2}
-0q:nameref to array element, with braces
->${path[2]}
-
- unset -n ptr1
- typeset -A hash=(x MISS y HIT)
- typeset -n ptr1='hash[y]'
- print -r -- $ptr1
-0:nameref to hash element, no braces
->HIT
-
- unset -n ptr1
- typeset -A hash=(x MISS y HIT)
- typeset -n ptr1='hash[y]'
- print -r -- ${ptr1}
-0:nameref to hash element, with braces
->HIT
-
- unset -n ptr2
- typeset -a ary=(1 2)
- typeset -n ptr2='ary[2]'
- ptr2=TWO
- typeset -p ary
-0:assign array element by nameref
->typeset -a ary=( 1 TWO )
-
- unset -n ptr2
- typeset -n ptr2='ary[2]'
- ptr2=TWO
- typeset -p ary
-0f:create array element by nameref
-F:ksh93 does not implement this either
->typeset -a ary=( '' TWO )
-
- unset -n ptr1
- typeset -A hash=(x MISS y MISS)
- typeset -n ptr1='hash[y]'
- ptr1=HIT
- typeset -p hash
-0:assign to hash element by nameref
->typeset -A hash=( [x]=MISS [y]=HIT )
-
- unset -n ptr1
- typeset -A hash
- typeset -n ptr1='hash[y]'
- ptr1=HIT
- typeset -p hash
-0f:create hash by element nameref
-F:ksh93 does not implement this either
->typeset -A hash=( [y]=HIT )
-
  unset -n ptr1
  typeset -n ptr1='not[2]good'
 1:invalid nameref
 *?*invalid variable name: not\[2\]good
-
- unset -n ptr1
- unset hash
- typeset -A hash
- typeset -n ptr1='hash[y]'
- print ${ptr1::=HIT}
- typeset -p ptr1 hash
-0f:create hash by element substitution
->HIT
->typeset -n ptr1='hash[y]'
->typeset -A hash=( [y]=HIT )
 
  unset -n ptr
  unset gval
@@ -683,9 +709,9 @@ F:unexpected side-effects of previous tests
 
  typeset -A var=(myself outside)
  () {
-   typeset -n myself=var[myself]
+   typeset -n myself=var
    local -h var
-   print -r -- $myself
+   print -r -- $myself[myself]
    typeset -p var
  }
 0:up-reference part 3, hidden global
@@ -800,15 +826,15 @@ F:Same test, should part 5 output look like this?
  if zmodload zsh/parameter; then
  () {
    zmodload -u zsh/parameter
-   typeset -n myself=parameters[myself]
+   typeset -n myself=parameters
    local -h parameters
-   print -r -- $myself
+   print -r -- $myself[myself]
    typeset -p parameters
  }
  else ZTST_skip='Cannot zmodload zsh/parameter, skipping autoload test'
  fi
 0:up-reference part 9, autoloading with hidden special
->nameref-local-nameref-local
+>nameref-local-association-readonly-hide-hideval-special
 >typeset -h parameters
 
  (
@@ -908,15 +934,6 @@ F:Checking for a bug in zmodload that affects later tests
  echo ${(P)ptr}
 0:named references with (P), as ${(P)nameref}
 >value
-
- ary=( 'bry[1]' 'bry[2]' ) 
- bry=( lorem ipsum )
- typeset -n ptr='ary[2]'
- print -r -- ${ptr}
- print -r -- ${(P)ptr}
-0:named references with (P), array element to array element
->bry[2]
->ipsum
 
  unset -n ref
  unset var
@@ -1078,13 +1095,6 @@ F:Checking for a bug in zmodload that affects later tests
 >typeset -n ref=inner
 *?*reference ref*to local variable inner
 
- typeset -n ptr='ary[$(echo 2)]'
- typeset -a ary=(one two three)
- print $ptr
-1:attempt deferred command substitution in subscript
-F:runs in `setopt noexec` so $(...) returns nothing
-*?*bad math expression: empty string
-
  unset -n ref
  typeset -n ref=GLOBAL
  () {
@@ -1168,93 +1178,93 @@ F:previously this could create an infinite recursion and crash
 
  e -u 0
 0:assignment at different scope than declaration, -u 0
->g:1: rs=f - ra=f - rs1=f - ra1=f
->g:2: rs=f - ra=f - rs1=f - ra1=f
->h:1: rs=f - ra=f - rs1=f - ra1=f
->h:2: rs=f - ra=f - rs1=f - ra1=f
->i:1: rs=f - ra=f - rs1=f - ra1=f
->i:2: rs=f - ra=f - rs1=f - ra1=f
->j:1: rs=f - ra=f - rs1=f - ra1=f
->j:2: rs=f - ra=f - rs1=f - ra1=f
->i:3: rs=f - ra=f - rs1=f - ra1=f
->k:1: rs=f - ra=f - rs1=f - ra1=f
->k:2: rs=f - ra=f - rs1=f - ra1=f
->h:3: rs=f - ra=f - rs1=f - ra1=f
->k:1: rs=f - ra=f - rs1=f - ra1=f
->k:2: rs=f - ra=f - rs1=f - ra1=f
->g:3: rs=f - ra=f - rs1=f - ra1=f
+>g:1: rs=f - ra=f
+>g:2: rs=f - ra=f
+>h:1: rs=f - ra=f
+>h:2: rs=f - ra=f
+>i:1: rs=f - ra=f
+>i:2: rs=f - ra=f
+>j:1: rs=f - ra=f
+>j:2: rs=f - ra=f
+>i:3: rs=f - ra=f
+>k:1: rs=f - ra=f
+>k:2: rs=f - ra=f
+>h:3: rs=f - ra=f
+>k:1: rs=f - ra=f
+>k:2: rs=f - ra=f
+>g:3: rs=f - ra=f
 
  e '' 0
 0:assignment at different scope than declaration, '' 0
->g:1: rs=f - ra=f - rs1=f - ra1=f
->g:2: rs=f - ra=f - rs1=f - ra1=f
->h:1: rs=f - ra=f - rs1=f - ra1=f
->h:2: rs=f - ra=f - rs1=f - ra1=f
->i:1: rs=f - ra=f - rs1=f - ra1=f
->i:2: rs=f - ra=f - rs1=f - ra1=f
->j:1: rs=f - ra=f - rs1=f - ra1=f
->j:2: rs=f - ra=f - rs1=f - ra1=f
->i:3: rs=f - ra=f - rs1=f - ra1=f
->k:1: rs=f - ra=f - rs1=f - ra1=f
->k:2: rs=f - ra=f - rs1=f - ra1=f
->h:3: rs=f - ra=f - rs1=f - ra1=f
->k:1: rs=f - ra=f - rs1=f - ra1=f
->k:2: rs=f - ra=f - rs1=f - ra1=f
->g:3: rs=f - ra=f - rs1=f - ra1=f
+>g:1: rs=f - ra=f
+>g:2: rs=f - ra=f
+>h:1: rs=f - ra=f
+>h:2: rs=f - ra=f
+>i:1: rs=f - ra=f
+>i:2: rs=f - ra=f
+>j:1: rs=f - ra=f
+>j:2: rs=f - ra=f
+>i:3: rs=f - ra=f
+>k:1: rs=f - ra=f
+>k:2: rs=f - ra=f
+>h:3: rs=f - ra=f
+>k:1: rs=f - ra=f
+>k:2: rs=f - ra=f
+>g:3: rs=f - ra=f
 
  e -u 2
 0:assignment at different scope than declaration, -u 2
->g:1: rs= - ra= - rs1= - ra1=
->g:2: rs=f - ra=f - rs1=f - ra1=f
->h:1: rs=f - ra=f - rs1=f - ra1=f
->h:2: rs=f - ra=f - rs1=f - ra1=f
->i:1: rs=f - ra=f - rs1=f - ra1=f
->i:2: rs=f - ra=f - rs1=f - ra1=f
->j:1: rs=f - ra=f - rs1=f - ra1=f
->j:2: rs=f - ra=f - rs1=f - ra1=f
->i:3: rs=f - ra=f - rs1=f - ra1=f
->k:1: rs=f - ra=f - rs1=f - ra1=f
->k:2: rs=f - ra=f - rs1=f - ra1=f
->h:3: rs=f - ra=f - rs1=f - ra1=f
->k:1: rs=f - ra=f - rs1=f - ra1=f
->k:2: rs=f - ra=f - rs1=f - ra1=f
->g:3: rs=f - ra=f - rs1=f - ra1=f
+>g:1: rs= - ra=
+>g:2: rs=f - ra=f
+>h:1: rs=f - ra=f
+>h:2: rs=f - ra=f
+>i:1: rs=f - ra=f
+>i:2: rs=f - ra=f
+>j:1: rs=f - ra=f
+>j:2: rs=f - ra=f
+>i:3: rs=f - ra=f
+>k:1: rs=f - ra=f
+>k:2: rs=f - ra=f
+>h:3: rs=f - ra=f
+>k:1: rs=f - ra=f
+>k:2: rs=f - ra=f
+>g:3: rs=f - ra=f
 
  e -u 6
 0:assignment at different scope than declaration, -u 6
->g:1: rs= - ra= - rs1= - ra1=
->g:2: rs= - ra= - rs1= - ra1=
->h:1: rs= - ra= - rs1= - ra1=
->h:2: rs= - ra= - rs1= - ra1=
->i:1: rs= - ra= - rs1= - ra1=
->i:2: rs=f - ra=f - rs1=f - ra1=f
->j:1: rs=f - ra=f - rs1=f - ra1=f
->j:2: rs=f - ra=f - rs1=f - ra1=f
->i:3: rs=f - ra=f - rs1=f - ra1=f
->k:1: rs=f - ra=f - rs1=f - ra1=f
->k:2: rs=f - ra=f - rs1=f - ra1=f
->h:3: rs=f - ra=f - rs1=f - ra1=f
->k:1: rs=f - ra=f - rs1=f - ra1=f
->k:2: rs=f - ra=f - rs1=f - ra1=f
->g:3: rs=f - ra=f - rs1=f - ra1=f
+>g:1: rs= - ra=
+>g:2: rs= - ra=
+>h:1: rs= - ra=
+>h:2: rs= - ra=
+>i:1: rs= - ra=
+>i:2: rs=f - ra=f
+>j:1: rs=f - ra=f
+>j:2: rs=f - ra=f
+>i:3: rs=f - ra=f
+>k:1: rs=f - ra=f
+>k:2: rs=f - ra=f
+>h:3: rs=f - ra=f
+>k:1: rs=f - ra=f
+>k:2: rs=f - ra=f
+>g:3: rs=f - ra=f
 
  e '' 6
 0:assignment at different scope than declaration, '' 6
->g:1: rs= - ra= - rs1= - ra1=
->g:2: rs= - ra= - rs1= - ra1=
->h:1: rs= - ra= - rs1= - ra1=
->h:2: rs= - ra= - rs1= - ra1=
->i:1: rs= - ra= - rs1= - ra1=
->i:2: rs=i - ra=i - rs1=i - ra1=i
->j:1: rs=i - ra=i - rs1=i - ra1=i
->j:2: rs=i - ra=i - rs1=i - ra1=i
->i:3: rs=i - ra=i - rs1=i - ra1=i
->k:1: rs=i - ra=i - rs1=i - ra1=i
->k:2: rs=i - ra=i - rs1=i - ra1=i
->h:3: rs=h - ra=h - rs1=h - ra1=h
->k:1: rs=h - ra=h - rs1=h - ra1=h
->k:2: rs=h - ra=h - rs1=h - ra1=h
->g:3: rs=g - ra=g - rs1=g - ra1=g
+>g:1: rs= - ra=
+>g:2: rs= - ra=
+>h:1: rs= - ra=
+>h:2: rs= - ra=
+>i:1: rs= - ra=
+>i:2: rs=i - ra=i
+>j:1: rs=i - ra=i
+>j:2: rs=i - ra=i
+>i:3: rs=i - ra=i
+>k:1: rs=i - ra=i
+>k:2: rs=i - ra=i
+>h:3: rs=h - ra=h
+>k:1: rs=h - ra=h
+>k:2: rs=h - ra=h
+>g:3: rs=g - ra=g
 
  f1
 0:Transitive references with scoping changes
@@ -1346,90 +1356,118 @@ F:previously this could create an infinite recursion and crash
 >B8: ref1=l2 ref2=l2
 >B9: ref1=l1 ref2=l1
 
-#
-# The following two tests are linked, do not separate
-#
+ check-valid-referent-name() {
+   local -n ref=$1
+   [[ $ref = $2 ]] || echo "Unexpected expansion result: ref=$1, \$ref=$ref != $2"
+ }
+ check-invalid-variable-name() {
+   {
+     local -- $1=value-$1 2>/dev/null
+     echo "Unexpected valid variable name: $1"
+   } always {
+     TRY_BLOCK_ERROR=0
+   }
+ }
+ check-invalid-referent-name() {
+   {
+     local -n -- ref=$1 2>/dev/null
+     echo "Unexpected valid referent name: $1"
+   } always {
+     TRY_BLOCK_ERROR=0
+   }
+ }
+ local name value;
+ # Test valid variable names.
+ for name in \
+    foo  foo.  foo.bar  foo.456  foo.4ar \
+   .foo       .foo.bar .foo.456
+ do
+   local $name=value-$name
+   check-valid-referent-name "$name" value-$name
+   check-invalid-referent-name "$name"@
+   check-invalid-referent-name "$name""[1]"
+ done
+ # Test valid builtin variable names
+ for name value in 123 "" \! 0 \? 0 \$ $$ - 569X _ -n; do
+   check-valid-referent-name "$name" $value
+   check-invalid-referent-name "$name"@
+   check-invalid-referent-name "$name""[1]"
+ done
+ # Test invalid variable names.
+ for name in \
+        .foo.                   .foo.4ar  .  foo.. \
+         123.  123.bar  123.456  123.4ar .. .foo.. \
+   .123 .123. .123.bar .123.456 .123.4ar \
+    1oo  1oo.  1oo.bar  1oo.456  1oo.4ar \
+   .1oo .1oo. .1oo.bar .1oo.456 .1oo.4ar
+ do
+   check-invalid-variable-name "$name"
+   check-invalid-referent-name "$name"
+   check-invalid-referent-name "$name"@
+   check-invalid-referent-name "$name""[1]"
+ done
+ # Any variable name with more than one non-leading '.' is invalid.
+ for name in {,.}{foo,123,1oo}.{bar,456,4ar}.{,baz,789,7az}; do
+   check-invalid-variable-name "$name"
+   check-invalid-referent-name "$name"
+ done
+ unfunction check-valid-referent-name
+ unfunction check-invalid-variable-name
+ unfunction check-invalid-referent-name
+ unset name value
+0:references to invalid variable names
 
  edgelocal() ( local -n x=$1; typeset -p x; print -r $x )
  edgeupper() ( local -nu x=$1; typeset -p x; print -r $x )
- for edge in argv ARGC \@ \* \# 0 1 01 \! \? - _
+ for edge in argv ARGC \@ \* \# 0 1 01 \! \? \$ - _
  do
   edgelocal $edge
-  edgelocal "$edge""[1]"
   edgeupper $edge
  done
-0:references to builtin specials
-F:Subscripting on 1 01 ! ? - should print first character but do not
+ unfunction edgelocal edgeupper
+0q:references to builtin specials
+F:BUG:References to 1, 2, ... are supported but don't work (always expand to "")
 >typeset -n x=argv
 >argv
->typeset -n x='argv[1]'
->argv[1]
 >typeset -n x=ARGC
->1
->typeset -n x='ARGC[1]'
 >1
 >typeset -n x=0
 >edgelocal
->typeset -n x='0[1]'
->e
 >typeset -n x=1
->
->typeset -n x='1[1]'
 >
 >typeset -n x=01
 >
->typeset -n x='01[1]'
->
 >typeset -n x=!
 >0
->typeset -n x='![1]'
->
 >typeset -un x=!
 >0
 >typeset -n x='?'
 >0
->typeset -n x='?[1]'
->
 >typeset -un x='?'
 >0
+>typeset -n x='$'
+>$$
+>typeset -un x='$'
+>$$
 >typeset -n x=-
 >569X
->typeset -n x='-[1]'
->
 >typeset -un x=-
 >569X
 >typeset -n x=_
->x
->typeset -n x='_[1]'
 >x
 >typeset -un x=_
 >x
 ?edgeupper: invalid variable name: argv
 ?edgeupper: invalid variable name: ARGC
 ?edgelocal: invalid variable name: @
-?edgelocal: invalid variable name: @[1]
 ?edgeupper: invalid variable name: @
 ?edgelocal: invalid variable name: *
-?edgelocal: invalid variable name: *[1]
 ?edgeupper: invalid variable name: *
 ?edgelocal: invalid variable name: #
-?edgelocal: invalid variable name: #[1]
 ?edgeupper: invalid variable name: #
 ?edgeupper: invalid variable name: 0
 ?edgeupper: invalid variable name: 1
 ?edgeupper: invalid variable name: 01
-
- edgelocal \$
- edgelocal '$[1]'
- edgeupper \$
- unfunction edgelocal edgeupper
-0qf:references to $$
-F:$$[1] reference should print the first digit of $$ but prints nothing
->typeset -n x='$'
->$$
->typeset -n x='\$[1]'
->$$[1]
->$$
 
 #
 # The following tests are run in interactive mode, using PS1 as an
@@ -1498,22 +1536,7 @@ F:$$[1] reference should print the first digit of $$ but prints nothing
  zmodload -u zsh/random
  echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
  echo v=${ref/<->/integer}
-0:Referring and dereferring an autoload variable loads it (direct)
->z=SRANDOM (zsh/random)
->z=
->v=integer
->z=SRANDOM (zsh/random)
->v=integer
-
- zmodload -u zsh/random
- echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
- typeset -n ref=SRANDOM[1,20]
- echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
- echo v=${ref/<->/integer}
- zmodload -u zsh/random
- echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
- echo v=${ref/<->/integer}
-0:Referring and dereferring an autoload variable loads it (subscript)
+0:Referring and dereferring an autoload variable loads it
 >z=SRANDOM (zsh/random)
 >z=
 >v=integer
@@ -1527,21 +1550,7 @@ F:$$[1] reference should print the first digit of $$ but prints nothing
  typeset -h SRANDOM=local-variable
  echo v=${ref/<->/integer}
  echo NOT REACHED
-1:Dereferring an autoload variable fails to load it if its hidden (direct)
->v=integer
->z=SRANDOM (zsh/random)
-?(eval):6: Can't add module parameter `SRANDOM': local parameter exists
-?(eval):zsh/random:6: error when adding parameter `SRANDOM'
-?(eval):6: autoloading module zsh/random failed to define parameter: SRANDOM
-
- typeset -n ref=SRANDOM[1,20]
- echo v=${ref/<->/integer}
- zmodload -u zsh/random
- echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
- typeset -h SRANDOM=local-variable
- echo v=${ref/<->/integer}
- echo NOT REACHED
-1:Dereferring an autoload variable fails to load it if its hidden (subscript)
+1:Dereferring an autoload variable fails to load it if its hidden
 >v=integer
 >z=SRANDOM (zsh/random)
 ?(eval):6: Can't add module parameter `SRANDOM': local parameter exists
@@ -1759,10 +1768,6 @@ F:converting from association/array to string should work here too
  }
 1:regression: reference loop with same name enclosing variable
 ?(anon):3: ptr2: invalid self reference
-
- typeset -n ref=ref[1]
-1:self reference with subscript
-*?*: ref: invalid self reference
 
  typeset var=foo
  typeset -n ref=var
