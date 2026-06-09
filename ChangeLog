@@ -1,5 +1,8 @@
 2026-06-08  Bart Schaefer  <schaefer@zsh.org>
 
+	* Philippe Altherr: 54700: Src/params.c, Test/A06assign.ztst:
+	Refine string and array slice assignments (no user-visible change)
+
 	* Mikel Ward: 54294: Src/jobs.c, Test/A05execution.ztst,
 	Test/W02jobs.ztst: Fix %- (prevjob) picking wrong job after resuming
 
