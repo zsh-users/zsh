@@ -20,8 +20,8 @@ known signal numbers and their names.
 The new completion helper _as_if can be used to complete one command as
 if it were another command with particular arguments.
 
-Changes since 5.8.1
--------------------
+Changes from 5.8.1 to 5.9
+-------------------------
 
 zsh 5.9 is dedicated to the memory of Sven Guckes, who was, amongst other
 things, a long-time zsh advocate.  For more information, see:

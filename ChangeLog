@@ -1,3 +1,7 @@
+2026-06-08  dana  <dana@dana.is>
+
+	* unposted: NEWS: fix 5.9 changes header
+
 2026-06-01  dana  <dana@dana.is>
 
 	* Lukáš Zaoral: unposted: Src/Zle/zle_tricky.c: fix segfault in
