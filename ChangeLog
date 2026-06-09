@@ -1,5 +1,9 @@
 2026-06-08  Bart Schaefer  <schaefer@zsh.org>
 
+	* Philippe Altherr: 54475: Src/Modules/watch.c, Src/Modules/zftp.c,
+	Src/builtin.c, Src/init.c, Src/module.c, Src/params.c, Src/utils.c:
+	Don't perform dereferencing when looking up certain special parameters
+
 	* Philippe Altherr: 54700: Src/params.c, Test/A06assign.ztst:
 	Refine string and array slice assignments (no user-visible change)
 
