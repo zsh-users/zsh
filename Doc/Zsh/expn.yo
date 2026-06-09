@@ -1699,7 +1699,7 @@ are not the same as the flags used within parameter substitutions.
 At the outermost level of substitution, the `tt((P))' flag (rule tt(4.))
 ignores these transformations and uses the unmodified value of the
 parameter as the name to be replaced.  This is usually the desired
-behavior because padding may make the value syntactically illegal as a
+behavior because padding may make the value syntactically invalid as a
 parameter name, but if capitalization changes are desired, use the
 tt(${${(P)foo}}) form (rule tt(25.)).
 )

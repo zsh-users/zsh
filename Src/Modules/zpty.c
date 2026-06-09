@@ -803,7 +803,7 @@ bin_zpty(char *nam, char **args, Options ops, UNUSED(int func))
 				OPT_ISSET(ops,'m'))) ||
 	(OPT_ISSET(ops,'L') && (OPT_ISSET(ops,'b') || OPT_ISSET(ops,'e') ||
 				OPT_ISSET(ops,'m')))) {
-	zwarnnam(nam, "illegal option combination");
+	zwarnnam(nam, "invalid option combination");
 	return 1;
     }
     if (OPT_ISSET(ops,'r') || OPT_ISSET(ops,'w')) {

@@ -2064,7 +2064,7 @@ refreshline(int ln)
 		/*
 		 * inserting characters - characters pushed off the right
 		 * should be annihilated, but we don't do this if we're on the
-		 * last line lest undesired scrolling occurs due to `illegal'
+		 * last line lest undesired scrolling occurs due to `invalid'
 		 * characters on screen
 		 */ 
 		if (tccan(TCINS) && (vln != zterm_lines - 1)) {

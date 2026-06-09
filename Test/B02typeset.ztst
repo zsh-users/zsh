@@ -18,7 +18,7 @@
 #  Function tracing (typeset -ft)		E02xtrace
 
 # Not yet tested:
-#  Assorted illegal flag combinations
+#  Assorted invalid flag combinations
 
 # For a few tests, we include a
 #    typeset -p param

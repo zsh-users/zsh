@@ -2626,7 +2626,7 @@ foo
 
 %
 .De
-With \fICSHJUNKIEQUOTES\fP set, this is illegal, as it is
+With \fICSHJUNKIEQUOTES\fP set, this is invalid, as it is
 in csh.
 .Ds
 %\0setopt\0cshjunkiequotes

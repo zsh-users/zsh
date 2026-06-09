@@ -1,5 +1,14 @@
 2026-06-14  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54721: Doc/Zsh/expn.yo, Doc/intro.ms, Functions/Misc/zmv,
+	Src/Modules/zpty.c, Src/Modules/zutil.c, Src/Zle/compctl.c,
+	Src/Zle/computil.c, Src/Zle/zle_main.c, Src/Zle/zle_refresh.c,
+	Src/builtin.c, Src/glob.c, Src/hist.c, Src/jobs.c,
+	Src/math.c, Src/module.c, Src/parse.c, Test/B02typeset.ztst,
+	Test/B10getopts.ztst, Test/B11kill.ztst, Test/D04parameter.ztst,
+	Test/K01nameref.ztst, Test/V13zformat.ztst: illegal -> invalid,
+	invalid option -> bad option
+
 	* 54715: Src/Zle/compctl.c: compctl: print multibyte errors
 	correctly (phew)
 

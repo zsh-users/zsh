@@ -946,7 +946,7 @@ histsubchar(int c)
 		break;
 	    default:
 		herrflush();
-		zerr("illegal modifier: %c", c);
+		zerr("invalid modifier: %c", c);
 		return -1;
 	    }
 	} else {

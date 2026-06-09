@@ -2485,7 +2485,7 @@ xpandbraces(LinkList list, LinkNode *np)
 		cnt++;
 	    else if (*str == Outbrace)
 		cnt--;
-	    DPUTS(!*str, "BUG: illegal brace expansion");
+	    DPUTS(!*str, "BUG: invalid brace expansion");
 	}
 	/* Concatenate the string before the braces (str3), the section *
 	 * just found (str4) and the text after the braces (str2)       */

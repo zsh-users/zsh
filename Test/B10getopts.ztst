@@ -73,11 +73,11 @@
 >test_getopts:3: argument expected after +c option
 
   test_getopts -x
-1:one illegal option
+1:one invalid option
 >test_getopts:3: bad option: -x
 
   test_getopts +x
-1:one illegal option, + variant
+1:one invalid option, + variant
 >test_getopts:3: bad option: +x
 
   set -- -x

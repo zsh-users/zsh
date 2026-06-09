@@ -3031,7 +3031,7 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 		    killjb(jobtab + p, SIGCONT);
 	    }
 	} else if (!isanum(*argv)) {
-	    zwarnnam("kill", "illegal pid: %s", *argv);
+	    zwarnnam("kill", "invalid pid: %s", *argv);
 	    returnval++;
 	} else {
 	    int pid = atoi(*argv);

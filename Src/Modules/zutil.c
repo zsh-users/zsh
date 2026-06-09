@@ -595,7 +595,7 @@ bin_zstyle(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     case 'q': min = 2; max =  2; break;
     case 'g': min = 1; max =  3; break;
     default:
-	zwarnnam(nam, "invalid option: %s", args[0]);
+	zwarnnam(nam, "bad option: %s", args[0]);
 	return 1;
     }
     n = arrlen(args) - 1;

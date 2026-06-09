@@ -2461,7 +2461,7 @@ bin_zmodload(char *nam, char **args, Options ops, UNUSED(int func))
     if (OPT_ISSET(ops,'A') || OPT_ISSET(ops,'R')) {
 	if (ops_bcpf || ops_au || OPT_ISSET(ops,'d') || 
 	    (OPT_ISSET(ops,'R') && OPT_ISSET(ops,'e'))) {
-	    zwarnnam(nam, "illegal flags combined with -A or -R");
+	    zwarnnam(nam, "invalid flags combined with -A or -R");
 	    return 1;
 	}
 	if (!OPT_ISSET(ops,'e'))
@@ -3527,7 +3527,7 @@ autofeatures(const char *cmdnam, const char *module, char **features,
 	}
 
 	if (strchr(fnam, '/')) {
-	    zwarnnam(cmdnam, "%s: `/' is illegal in a %s", fnam, typnam);
+	    zwarnnam(cmdnam, "%s: `/' is invalid in a %s", fnam, typnam);
 	    ret = 1;
 	    continue;
 	}

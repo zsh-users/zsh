@@ -3392,7 +3392,7 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	(OPT_MINUS(ops,'X') && (OPT_ISSET(ops,'m') || !scriptname)) ||
 	(OPT_ISSET(ops,'c') && (OPT_ISSET(ops,'x') || OPT_ISSET(ops,'X') ||
 				OPT_ISSET(ops,'m')))) {
-	zwarnnam(name, "invalid option(s)");
+	zwarnnam(name, "bad option(s)");
 	return 1;
     }
 
@@ -3469,7 +3469,7 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	 */
 	if (on || off || pflags || OPT_ISSET(ops,'X') || OPT_ISSET(ops,'u')
 	    || OPT_ISSET(ops,'U') || OPT_ISSET(ops,'w')) {
-	    zwarnnam(name, "invalid option(s)");
+	    zwarnnam(name, "bad option(s)");
 	    return 1;
 	}
 	if (!*argv) {
@@ -4447,7 +4447,7 @@ bin_alias(char *name, char **argv, Options ops, UNUSED(int func))
 	OPT_ISSET(ops, 's');
     if (type_opts) {
 	if (type_opts > 1) {
-	    zwarnnam(name, "illegal combination of options");
+	    zwarnnam(name, "invalid combination of options");
 	    return 1;
 	}
 	if (OPT_ISSET(ops,'g'))

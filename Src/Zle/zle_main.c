@@ -1154,7 +1154,7 @@ zlecore(void)
 		    break;
 	    }
 	    handleprefixes();
-	    /* for vi mode, make sure the cursor isn't somewhere illegal */
+	    /* for vi mode, make sure the cursor isn't somewhere invalid */
 	    if (invicmdmode() && zlecs > findbol() &&
 		(zlecs == zlell || zleline[zlecs] == ZWC('\n')))
 		DECCS();

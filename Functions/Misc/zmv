@@ -183,7 +183,7 @@ repl=$2
 shift 2
 
 if [[ -n $opt_s && $action != ln ]]; then
-  print -r -- "$myname: invalid option: -s" >&2
+  print -r -- "$myname: bad option: -s" >&2
   return 1
 fi
 

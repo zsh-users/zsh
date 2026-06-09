@@ -3187,7 +3187,7 @@ bin_zcompile(char *nam, char **args, Options ops, UNUSED(int func))
 	(OPT_ISSET(ops,'c') &&
 	 (OPT_ISSET(ops,'U') || OPT_ISSET(ops,'k') || OPT_ISSET(ops,'z'))) ||
 	(!(OPT_ISSET(ops,'c') || OPT_ISSET(ops,'a')) && OPT_ISSET(ops,'m'))) {
-	zwarnnam(nam, "illegal combination of options");
+	zwarnnam(nam, "invalid combination of options");
 	return 1;
     }
     if ((OPT_ISSET(ops,'c') || OPT_ISSET(ops,'a')) && isset(KSHAUTOLOAD))

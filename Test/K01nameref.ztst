@@ -277,7 +277,7 @@ F:note this causes "var" to become set
 >typeset -t var
 
  typeset -n ptr[1]=var
-1:illegal nameref name
+1:invalid nameref name
 *?*reference variable cannot be an array
 
  typeset var=value

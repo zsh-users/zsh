@@ -513,7 +513,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		    char *p;
 
 		    if (cl) {
-			zwarnnam(name, "illegal option -%c", arg);
+			zwarnnam(name, "bad option: -%c", arg);
 			return 1;
 		    }
 		    if (**argv) {
@@ -656,7 +656,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		break;
 	    case 'l':
 		if (cl) {
-		    zwarnnam(name, "illegal option -%c", arg);
+		    zwarnnam(name, "bad option: -%c", arg);
 		    return 1;
 		} else if (**argv) {
 		    cct.subcmd = *argv;
@@ -671,7 +671,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		break;
 	    case 'h':
 		if (cl) {
-		    zwarnnam(name, "illegal option -%c", arg);
+		    zwarnnam(name, "bad option: -%c", arg);
 		    return 1;
 		} else if (**argv) {
 		    cct.substr = *argv;
@@ -778,7 +778,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		break;
 	    case 'C':
 		if (cl) {
-		    zwarnnam(name, "illegal option -%c", arg);
+		    zwarnnam(name, "bad option: -%c", arg);
 		    return 1;
 		}
 		if (first && !hx) {
@@ -790,7 +790,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		break;
 	    case 'D':
 		if (cl) {
-		    zwarnnam(name, "illegal option -%c", arg);
+		    zwarnnam(name, "bad option: -%c", arg);
 		    return 1;
 		}
 		if (first && !hx) {
@@ -803,7 +803,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		break;
  	    case 'T':
 		if (cl) {
-		    zwarnnam(name, "illegal option -%c", arg);
+		    zwarnnam(name, "bad option: -%c", arg);
 		    return 1;
 		}
 		if (first && !hx) {
@@ -815,11 +815,11 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
  		break;
 	    case 'L':
 		if (cl) {
-		    zwarnnam(name, "illegal option -%c", arg);
+		    zwarnnam(name, "bad option: -%c", arg);
 		    return 1;
 		}
 		if (!first || hx) {
-		    zwarnnam(name, "illegal use of -L flag");
+		    zwarnnam(name, "invalid use of -L flag");
 		    return 1;
 		}
 		cclist |= COMP_LIST;
@@ -859,7 +859,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 	if (*++argv && (!ready || ready == 2) &&
 	    **argv == '+' && !argv[0][1]) {
 	    if (cl) {
-		zwarnnam(name, "xor'ed completion illegal");
+		zwarnnam(name, "xor'ed completion invalid");
 		return 1;
 	    }
 	    /* There's an alternative (+) completion:  assign

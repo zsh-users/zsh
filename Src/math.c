@@ -1102,7 +1102,7 @@ callmathfunc(char *o)
 	    }
 	    if (*a && !errflag) {
 		convchar_t wa = unmeta_one(a, NULL);
-		zerr("bad math expression: illegal character: %c", wa);
+		zerr("bad math expression: invalid character: %c", wa);
 	    }
 	    if (!errflag) {
 		if (argc >= f->minargs && (f->maxargs < 0 ||
@@ -1501,7 +1501,7 @@ matheval(char *s)
     mtok = xmtok;
     if (*junk) {
 	convchar_t j = unmeta_one(junk, NULL);
-	zerr("bad math expression: illegal character: %c", j);
+	zerr("bad math expression: invalid character: %c", j);
     }
     return x;
 }

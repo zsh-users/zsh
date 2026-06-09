@@ -890,7 +890,7 @@ bin_compdescribe(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    return 1;
 	}
     }
-    zwarnnam(nam, "invalid option: %s", args[0]);
+    zwarnnam(nam, "bad option: %s", args[0]);
     return 1;
 }
 
@@ -2634,7 +2634,7 @@ bin_comparguments(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     case 'W': min = 3; max =  3; break;
     case 'n': min = 1; max =  1; break;
     default:
-	zwarnnam(nam, "invalid option: %s", args[0]);
+	zwarnnam(nam, "bad option: %s", args[0]);
 	return 1;
     }
     n = arrlen(args) - 1;
@@ -3526,7 +3526,7 @@ bin_compvalues(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     case 'L': min = 3; max =  4; break;
     case 'v': min = 1; max =  1; break;
     default:
-	zwarnnam(nam, "invalid option: %s", args[0]);
+	zwarnnam(nam, "bad option: %s", args[0]);
 	return 1;
     }
     n = arrlen(args) - 1;
@@ -3888,7 +3888,7 @@ bin_comptags(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     case 'S': min = 1; max =  1; break;
     case 'A': min = 2; max =  3; break;
     default:
-	zwarnnam(nam, "invalid option: %s", args[0]);
+	zwarnnam(nam, "bad option: %s", args[0]);
 	return 1;
     }
     n = arrlen(args) - 1;
@@ -5009,7 +5009,7 @@ bin_compfiles(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     case 'p':
     case 'P':
 	if (args[0][2] && (args[0][2] != '-' || args[0][3])) {
-	    zwarnnam(nam, "invalid option: %s", *args);
+	    zwarnnam(nam, "bad option: %s", *args);
 	    return 1;
 	} else {
 	    char **tmp;
@@ -5037,7 +5037,7 @@ bin_compfiles(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	}
     case 'i':
 	if (args[0][2]) {
-	    zwarnnam(nam, "invalid option: %s", *args);
+	    zwarnnam(nam, "bad option: %s", *args);
 	    return 1;
 	} else {
 	    char **tmp;
@@ -5093,7 +5093,7 @@ bin_compfiles(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    return ret;
 	}
     }
-    zwarnnam(nam, "invalid option: %s", *args);
+    zwarnnam(nam, "bad option: %s", *args);
     return 1;
 }
 

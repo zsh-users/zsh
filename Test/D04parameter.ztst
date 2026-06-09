@@ -2429,13 +2429,13 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
   (
   IFS=$'\x80'
   if [[ $IFS = $' \t\n\0' ]]; then
-    echo OK     # if $'\x80' is illegal (e.g. Linux)
+    echo OK     # if $'\x80' is invalid (e.g. Linux)
   else          # otherwise (e.g. macOS), it should work as a separator
     s=$'foo\x80\bar'
     [[ ${${=s}[1]} = foo ]] && echo OK
   fi
   )
-0D:reset IFS to default if it contains illegal character
+0D:reset IFS to default if it contains invalid character
 >OK
 
   (
@@ -2955,7 +2955,7 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 
   : ${(#X):-@}
 1:${(#X)...}: bad math expression
-?(eval):1: bad math expression: illegal character: @
+?(eval):1: bad math expression: invalid character: @
 
   echo a${(#):-@}z
 0:${(#)...}: bad math expression

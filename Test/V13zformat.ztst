@@ -181,7 +181,7 @@
   for 1 in % \) - . 0 9 ''; do
     zformat -F REPLY '' $1:
   done
-1:spec with illegal char
+1:spec with invalid char
 ?(eval):zformat:2: invalid spec: %:
 ?(eval):zformat:2: invalid spec: ):
 ?(eval):zformat:2: invalid spec: -:
