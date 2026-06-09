@@ -747,9 +747,9 @@ boot_(UNUSED(Module m))
     /* These two parameters are only set to defaults if not set.
      * So setting them in .zshrc will not be enough to load the
      * module. It's useless until the watch array is set anyway. */
-    if (!paramtab->getnode(paramtab, "WATCHFMT"))
+    if (!realparamtab->getnode2(realparamtab, "WATCHFMT"))
 	setsparam("WATCHFMT", ztrdup_metafy(default_watchfmt));
-    if (!paramtab->getnode(paramtab, "LOGCHECK"))
+    if (!realparamtab->getnode2(realparamtab, "LOGCHECK"))
 	setiparam("LOGCHECK", 60);
 
     addprepromptfn(&checksched);

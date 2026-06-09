@@ -803,13 +803,13 @@ set_pwd_env(void)
 
     /* update the PWD and OLDPWD shell parameters */
 
-    pm = (Param) paramtab->getnode(paramtab, "PWD");
+    pm = (Param) realparamtab->getnode2(realparamtab, "PWD");
     if (pm && PM_TYPE(pm->node.flags) != PM_SCALAR) {
 	pm->node.flags &= ~PM_READONLY;
 	unsetparam_pm(pm, 0, 1);
     }
 
-    pm = (Param) paramtab->getnode(paramtab, "OLDPWD");
+    pm = (Param) realparamtab->getnode2(realparamtab, "OLDPWD");
     if (pm && PM_TYPE(pm->node.flags) != PM_SCALAR) {
 	pm->node.flags &= ~PM_READONLY;
 	unsetparam_pm(pm, 0, 1);
@@ -818,10 +818,10 @@ set_pwd_env(void)
     assignsparam("PWD", ztrdup(pwd), 0);
     assignsparam("OLDPWD", ztrdup(oldpwd), 0);
 
-    pm = (Param) paramtab->getnode(paramtab, "PWD");
+    pm = (Param) realparamtab->getnode2(realparamtab, "PWD");
     if (!(pm->node.flags & PM_EXPORTED))
 	addenv(pm, pwd);
-    pm = (Param) paramtab->getnode(paramtab, "OLDPWD");
+    pm = (Param) realparamtab->getnode2(realparamtab, "OLDPWD");
     if (!(pm->node.flags & PM_EXPORTED))
 	addenv(pm, oldpwd);
 }

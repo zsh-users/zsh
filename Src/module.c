@@ -1026,7 +1026,7 @@ checkaddparam(const char *nam, int opt_i)
 {
     Param pm;
 
-    if (!(pm = (Param) gethashnode2(paramtab, nam)))
+    if (!(pm = (Param) realparamtab->getnode2(realparamtab, nam)))
 	return 0;
 
     if (pm->level || !(pm->node.flags & PM_AUTOLOAD)) {
@@ -1070,7 +1070,7 @@ addparamdef(Paramdef d)
 	    return 1;
     }
     else if (!(pm = createparam(d->name, d->flags)) &&
-	!(pm = (Param) paramtab->getnode(paramtab, d->name)))
+	!(pm = (Param) realparamtab->getnode2(realparamtab, d->name)))
 	return 1;
 
     d->pm = pm;
@@ -1127,7 +1127,7 @@ addparamdef(Paramdef d)
 int
 deleteparamdef(Paramdef d)
 {
-    Param pm = (Param) paramtab->getnode(paramtab, d->name);
+    Param pm = (Param) realparamtab->getnode2(realparamtab, d->name);
 
     if (!pm)
 	return 1;
@@ -1146,10 +1146,10 @@ deleteparamdef(Paramdef d)
 	if (!searchpm)
 	    return 1;
 
-	paramtab->removenode(paramtab, pm->node.nam);
+	realparamtab->removenode(realparamtab, pm->node.nam);
 	prevpm->old = searchpm->old;
 	searchpm->old = pm;
-	paramtab->addnode(paramtab, searchpm->node.nam, searchpm);
+	realparamtab->addnode(realparamtab, searchpm->node.nam, searchpm);
 
 	pm = searchpm;
     }
@@ -1238,7 +1238,7 @@ add_autoparam(const char *module, const char *pnam, int flags)
 static int
 del_autoparam(UNUSED(const char *modnam), const char *pnam, int flags)
 {
-    Param pm = (Param) gethashnode2(paramtab, pnam);
+    Param pm = (Param) realparamtab->getnode2(realparamtab, pnam);
 
     if (!pm) {
 	if (!(flags & FEAT_IGNORE))
@@ -2759,7 +2759,7 @@ bin_zmodload_auto(char *nam, char **args, Options ops)
     } else if (OPT_ISSET(ops,'p')) {
 	if (!*args) {
 	    /* list autoloaded parameters */
-	    scanhashtable(paramtab, 1, 0, 0, printautoparams,
+	    scanhashtable(realparamtab, 1, 0, 0, printautoparams,
 			  OPT_ISSET(ops,'L'));
 	    return 0;
 	}
