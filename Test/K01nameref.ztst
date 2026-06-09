@@ -1043,15 +1043,15 @@ F:Checking for a bug in zmodload that affects later tests
  typeset -p .K01.{scalar,assoc,array,integer,double,float,readonly}
  unset .K01.{scalar,assoc,array,integer,double,float}
 0:unset various types via nameref, including a readonly special
->typeset -g .K01.scalar
->typeset -g -A .K01.assoc
->typeset -g -a .K01.array
->typeset -g -i .K01.integer
->typeset -g -E .K01.double
->typeset -g -F .K01.float
 >typeset -g -r .K01.readonly=RO
 *?*read-only variable: ARGC
 *?*read-only variable: .K01.readonly
+*?*no such variable: .K01.scalar
+*?*no such variable: .K01.assoc
+*?*no such variable: .K01.array
+*?*no such variable: .K01.integer
+*?*no such variable: .K01.double
+*?*no such variable: .K01.float
 
  unset -n ref
  unset one
@@ -1950,6 +1950,220 @@ F:converting from association/array to string should work here too
 >typeset -i var=42
 ># d:reference to not-yet-defined - local - ref1
 >typeset -i var=42
+
+ test-unset() {
+   typeset var0=foo
+   typeset -n ref1=var0 ref2=ref1
+   typeset cmd=(unset $@); echo "#" $cmd; $cmd
+   typeset -p var0 ref1 ref2
+ }
+ test-unset -n    ref1
+ test-unset -n    ref2
+ test-unset -n -m ref1
+ test-unset -n -m ref2
+ unfunction test-unset
+0:unsetting references with -n unsets the references
+># unset -n ref1
+>typeset var0=foo
+>typeset -n ref2=ref1
+># unset -n ref2
+>typeset var0=foo
+>typeset -n ref1=var0
+># unset -n -m ref1
+>typeset var0=foo
+>typeset -n ref2=ref1
+># unset -n -m ref2
+>typeset var0=foo
+>typeset -n ref1=var0
+
+ test-unset() {
+   typeset var0=foo
+   typeset -n ref1=var0 ref2=ref1
+   typeset cmd=(unset $@); echo "#" $cmd; $cmd
+   typeset -p var0 ref1 ref2
+ }
+ test-unset    ref1
+ test-unset    ref2
+ test-unset -m ref1
+ test-unset -m ref2
+ unfunction test-unset
+0:unsetting references without -n unsets the referred parameters
+># unset ref1
+>typeset -n ref1=var0
+>typeset -n ref2=ref1
+># unset ref2
+>typeset -n ref1=var0
+>typeset -n ref2=ref1
+># unset -m ref1
+>typeset -n ref1=var0
+>typeset -n ref2=ref1
+># unset -m ref2
+>typeset -n ref1=var0
+>typeset -n ref2=ref1
+
+ test-unset() {
+   typeset var0=12345
+   typeset -n ref1=var0 ref2=ref1
+   typeset cmd=(unset $@); echo "#" $cmd; $cmd
+   typeset -p var0
+ }
+ test-unset    ref1"[3]"
+ test-unset    ref2"[3]"
+ test-unset -n ref1"[3]"
+ test-unset -n ref2"[3]"
+ unfunction test-unset
+0:unsetting subscripted references unsets the referred elements
+># unset ref1[3]
+>typeset var0=1245
+># unset ref2[3]
+>typeset var0=1245
+># unset -n ref1[3]
+>typeset var0=1245
+># unset -n ref2[3]
+>typeset var0=1245
+
+ test-unset() {
+   typeset -r var=foo
+   typeset -n ref=var
+   typeset cmd=(unset $@); echo "#" $cmd; { $cmd 2>&1 } always { TRY_BLOCK_ERROR=0 }
+   typeset -p var
+ }
+ test-unset    var
+ test-unset -m var
+ test-unset    ref
+ test-unset -m ref
+ test-unset    var"[2]"
+ test-unset    ref"[2]"
+ test-unset -n ref"[2]"
+ unfunction test-unset
+0:unsetting read-only parameter triggers an error
+># unset var
+>test-unset:3: read-only variable: var
+>typeset -r var=foo
+># unset -m var
+>test-unset:3: read-only variable: var
+>typeset -r var=foo
+># unset ref
+>test-unset:3: read-only variable: var
+>typeset -r var=foo
+># unset -m ref
+>test-unset:3: read-only variable: var
+>typeset -r var=foo
+># unset var[2]
+>test-unset:3: read-only variable: var
+>typeset -r var=foo
+># unset ref[2]
+>test-unset:3: read-only variable: var
+>typeset -r var=foo
+># unset -n ref[2]
+>test-unset:3: read-only variable: var
+>typeset -r var=foo
+
+ test-unset() {
+   typeset -n ref1 ref2=ref1
+   typeset cmd=(unset $@); echo "#" $cmd; $cmd
+   typeset -p ref1 ref2
+ }
+ test-unset    ref1
+ test-unset    ref2
+ test-unset -m ref1
+ test-unset -m ref2
+ unfunction test-unset
+0:unsetting placeholder references or their referents has no effect
+># unset ref1
+>typeset -n ref1
+>typeset -n ref2=ref1
+># unset ref2
+>typeset -n ref1
+>typeset -n ref2=ref1
+># unset -m ref1
+>typeset -n ref1
+>typeset -n ref2=ref1
+># unset -m ref2
+>typeset -n ref1
+>typeset -n ref2=ref1
+
+ test-unset() {
+   typeset -n ref1=undefined ref2=ref1
+   typeset cmd=(unset $@); echo "#" $cmd; $cmd
+   typeset -p ref1 ref2
+ }
+ typeset -p undefined 2>&1
+ test-unset    ref1
+ test-unset    ref2
+ test-unset -m ref1
+ test-unset -m ref2
+ unfunction test-unset
+0:unsetting references to not-yet-defined variables or their referents has no effect
+>(eval):typeset:6: no such variable: undefined
+># unset ref1
+>typeset -n ref1=undefined
+>typeset -n ref2=ref1
+># unset ref2
+>typeset -n ref1=undefined
+>typeset -n ref2=ref1
+># unset -m ref1
+>typeset -n ref1=undefined
+>typeset -n ref2=ref1
+># unset -m ref2
+>typeset -n ref1=undefined
+>typeset -n ref2=ref1
+
+ test-unset() {
+   typeset -n refg1=g1 refl1=l1
+   () {
+     typeset -g g1=glb1 g2=glb2
+     typeset    l1=lcl1 l2=lcl2
+     () {
+       typeset -n refg2=g2 refl2=l2
+       typeset cmd=(unset $@ refg1 refg2 refl1 refl2); echo "#" $cmd; $cmd
+     } $@
+     typeset -p g1 g2 l1 l2 2>&1
+   } $@
+   unset g1 g2
+ }
+ test-unset
+ test-unset -m
+ unfunction test-unset
+0:unsetting references referring to parameters in enclosing scopes unsets the parameters
+># unset refg1 refg2 refl1 refl2
+>(anon):typeset:7: no such variable: g1
+>(anon):typeset:7: no such variable: g2
+># unset -m refg1 refg2 refl1 refl2
+>(anon):typeset:7: no such variable: g1
+>(anon):typeset:7: no such variable: g2
+
+ test-unset() {
+   typeset -g g=glb
+   typeset    l=lcl
+   typeset -n refg=g refl=l
+   () {
+     typeset g=hide-g
+     typeset l=hide-l
+     typeset cmd=(unset $@ refg refl); echo "#" $cmd; $cmd
+     echo "# inner scope"
+     typeset -p g l 2>&1
+   } $@
+   echo "# outer scope"
+   typeset -p g l 2>&1
+   unset g
+ }
+ test-unset
+ test-unset -m
+ unfunction test-unset
+0:unsetting references referring to hidden parameters unsets the hidden parameters
+># unset refg refl
+># inner scope
+>typeset g=hide-g
+>typeset l=hide-l
+># outer scope
+>test-unset:typeset:12: no such variable: g
+># unset -m refg refl
+># inner scope
+>typeset g=hide-g
+>typeset l=hide-l
+># outer scope
+>test-unset:typeset:12: no such variable: g
 
  typeset -n ref1
  typeset -n ref2

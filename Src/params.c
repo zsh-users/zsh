@@ -504,6 +504,16 @@ static Param argvparam;
  * times in the same list. Non of that is harmful as long as only
  * instances that are still references referring to the ending scope
  * are updated when the scope ends.
+ *
+ * The list corresponding to the global scope never receives any of
+ * the named references described above. Instead, it's used to track
+ * global parameters that were unset via a named reference while in a
+ * scope where they were hidden by a nested parameter with the same
+ * name. In such cases, the global parameter's Param instance can't be
+ * deleted as usual. Instead, it's marked as unset and added to the
+ * global scope's list. Each time a scope ends, the list is traversed
+ * and parameters that are still unset but no longer hidden are
+ * deleted.
  */
 static LinkList *scoperefs = NULL;
 static int scoperefs_num = 0;
@@ -3835,6 +3845,24 @@ unsetparam_pm(Param pm, int altflag, int exp)
 	(pm->node.flags & (PM_SPECIAL|PM_REMOVABLE)) == PM_SPECIAL)
 	return 0;
 
+    /*
+     * Global variables can only be deleted if they aren't hidden by a
+     * local one with the same name.
+     */
+    if (!pm->level &&
+	pm != (Param) (paramtab == realparamtab ?
+		       /* getnode2() to avoid autoloading */
+		       paramtab->getnode2(paramtab, pm->node.nam) :
+		       paramtab->getnode(paramtab, pm->node.nam))) {
+	LinkList refs;
+	if (!scoperefs)
+	    scoperefs = zshcalloc((scoperefs_num = 8) * sizeof(refs));
+	if (!scoperefs[0])
+	    scoperefs[0] = znewlinklist();
+	zpushnode(scoperefs[0], pm);
+	return 0;
+    }
+
     /* remove parameter node from table */
     paramtab->removenode(paramtab, pm->node.nam);
 
@@ -5808,6 +5836,15 @@ endparamscope(void)
 	    pm->base = 0;
 	    setscope(pm);
 	}
+    }
+    /* Delete unset global variables that were hidden at unset time */
+    if ((refs = scoperefs ? scoperefs[0] : NULL)) {
+	scoperefs[0] = NULL;
+	for (Param pm; refs && (pm = (Param)getlinknode(refs));) {
+	    if ((pm->node.flags & PM_UNSET) && !(pm->node.flags & PM_DECLARED))
+		unsetparam_pm(pm, 1, 0);
+	}
+	freelinklist(refs, NULL);
     }
     unqueue_signals();
 }

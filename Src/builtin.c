@@ -3836,10 +3836,9 @@ bin_unset(char *name, char **argv, Options ops, int func)
 			/* record pointer to next, since we may free this one */
 			next = (Param) pm->node.next;
 			if (pattry(pprog, pm->node.nam)) {
-			    if (!OPT_ISSET(ops,'n') &&
-				(pm->node.flags & PM_NAMEREF) && pm->u.str)
-				unsetparam(pm->u.str);
-			    else
+			    if (OPT_ISSET(ops,'n') ||
+				((pm = resolve_nameref(pm)) &&
+				 !(pm->node.flags & PM_NAMEREF)))
 				unsetparam_pm(pm, 0, 1);
 			    match++;
 			}
@@ -3931,22 +3930,11 @@ bin_unset(char *name, char **argv, Options ops, int func)
 		zerrnam(name, "%s: invalid element for unset", s);
 		returnval = 1;
 	    }
-	} else {
-	    if (!OPT_ISSET(ops,'n')) {
-		int ref = (pm->node.flags & PM_NAMEREF);
-		if (!(pm = resolve_nameref(pm)))
-		    continue;
-		if (ref && pm->level < locallevel &&
-		    !(pm->node.flags & PM_READONLY)) {
-		    /* Just mark unset, do not remove from table */
-		    stdunsetfn(pm, 0);
-		    pm->node.flags |= PM_DECLARED;
-		    continue;
-		}
-	    }
+	} else if (OPT_ISSET(ops,'n') ||
+		   ((pm = resolve_nameref(pm)) &&
+		    !(pm->node.flags & PM_NAMEREF)))
 	    if (unsetparam_pm(pm, 0, 1))
 		returnval = 1;
-	}
 	if (ss)
 	    *ss = '[';
     }
