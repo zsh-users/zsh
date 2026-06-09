@@ -1,5 +1,7 @@
 2026-06-08  dana  <dana@dana.is>
 
+	* unposted: NEWS: fix 5.9 changes header
+
 	* 54659: Completion/Zsh/Command/_alias,
 	Completion/Zsh/Command/_bindkey,
 	Completion/Zsh/Command/_command,

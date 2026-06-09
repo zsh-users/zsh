@@ -128,8 +128,8 @@ processing can be applied to the result.
 A 'math' context now appears in $zsh_eval_context within arithmetic
 constructs.  This can be used to create dual-purpose math functions.
 
-Changes since 5.8.1
--------------------
+Changes from 5.8.1 to 5.9
+-------------------------
 
 zsh 5.9 is dedicated to the memory of Sven Guckes, who was, amongst other
 things, a long-time zsh advocate.  For more information, see:
