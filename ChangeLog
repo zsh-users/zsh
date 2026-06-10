@@ -1,3 +1,14 @@
+2026-06-09  Bart Schaefer  <schaefer@zsh.org>
+
+	* Philippe: 54731: Src/Modules/db_gdbm.c, Test/V11db_gdbm.ztst:
+	Adapt gdbm code to named references
+
+	* Philippe: 54727: Src/params.c, Test/K01nameref.ztst: Implement
+	references to positional parameters
+
+	* Philippe: 54722: Src/builtin.c, Src/params.c, Src/params.c: Fix
+	nameref issues in builtin "unset"
+
 2026-06-10  Mikael Magnusson  <mikachu@gmail.com>
 
 	* Stephane Chazelas: 54695: Doc/Zsh/contrib.yo,
