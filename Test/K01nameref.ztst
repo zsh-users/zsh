@@ -1419,24 +1419,25 @@ F:previously this could create an infinite recursion and crash
 
  edgelocal() ( local -n x=$1; typeset -p x; print -r $x )
  edgeupper() ( local -nu x=$1; typeset -p x; print -r $x )
- for edge in argv ARGC \@ \* \# 0 1 01 \! \? \$ - _
+ for edge in argv ARGC \@ \* \# 0 00 2 02 \! \? \$ - _
  do
-  edgelocal $edge
-  edgeupper $edge
+  edgelocal $edge foo
+  edgeupper $edge foo
  done
  unfunction edgelocal edgeupper
 0q:references to builtin specials
-F:BUG:References to 1, 2, ... are supported but don't work (always expand to "")
 >typeset -n x=argv
->argv
+>argv foo
 >typeset -n x=ARGC
->1
+>2
 >typeset -n x=0
 >edgelocal
->typeset -n x=1
->
->typeset -n x=01
->
+>typeset -n x=00
+>edgelocal
+>typeset -n x=2
+>foo
+>typeset -n x=02
+>foo
 >typeset -n x=!
 >0
 >typeset -un x=!
@@ -1466,8 +1467,78 @@ F:BUG:References to 1, 2, ... are supported but don't work (always expand to "")
 ?edgelocal: invalid variable name: #
 ?edgeupper: invalid variable name: #
 ?edgeupper: invalid variable name: 0
-?edgeupper: invalid variable name: 1
-?edgeupper: invalid variable name: 01
+?edgeupper: invalid variable name: 00
+?edgeupper: invalid variable name: 2
+?edgeupper: invalid variable name: 02
+
+ tst() {
+   typeset -n ref0=0 2>&1
+   typeset -n ref00=00 2>&1
+   typeset -n ref2=2 2>&1
+   typeset -n ref02=02 2>&1
+   echo ${(q)0} ${(q)*} - $ref0 - $ref00 - $ref2 - $ref02
+   ref0=TST
+   ref2=BBB
+   echo ${(q)0} ${(q)*} - $ref0 - $ref00 - $ref2 - $ref02
+   ref00=Tst
+   ref02=Bbb
+   echo ${(q)0} ${(q)*} - $ref0 - $ref00 - $ref2 - $ref02; typeset -p -- 0 00 2 02 2>&1
+   unset ref0
+   unset ref2
+   echo ${(q)0} ${(q)*} - $ref0 - $ref00 - $ref2 - $ref02; typeset -p -- 0 00 2 02 2>&1
+   ref0=tst
+   ref2=bbb
+   echo ${(q)0} ${(q)*} - $ref0 - $ref00 - $ref2 - $ref02; typeset -p -- 0 00 2 02 2>&1
+   { ref0=(TST TST) 2>&1 } always { TRY_BLOCK_ERROR=0 }
+   { ref2=(BBB BBB) 2>&1 } always { TRY_BLOCK_ERROR=0 }
+   echo ${(q)0} ${(q)*} - $ref0 - $ref00 - $ref2 - $ref02; typeset -p -- 0 00 2 02 2>&1
+   typeset -n ref5=5 2>&1
+   ref5=zzz
+   echo ${(q)0} ${(q)*}
+   unset ref2
+   echo ${(q)0} ${(q)*}
+   unset ref2
+   echo ${(q)0} ${(q)*}
+   unset ref2
+   echo ${(q)0} ${(q)*}
+   unset ref2
+   echo ${(q)0} ${(q)*}
+   unset ref2
+   echo ${(q)0} ${(q)*}
+ }
+ tst aaa bbb ccc
+ unfunction tst
+0:references to positional parameters
+>tst aaa bbb ccc - tst - tst - bbb - bbb
+>TST aaa BBB ccc - TST - TST - BBB - BBB
+>Tst aaa Bbb ccc - Tst - Tst - Bbb - Bbb
+>tst:typeset:11: no such variable: 00
+>tst:typeset:11: no such variable: 2
+>tst:typeset:11: no such variable: 02
+>typeset -g 0=Tst
+>Tst aaa ccc - Tst - Tst - ccc - ccc
+>tst:typeset:14: no such variable: 00
+>tst:typeset:14: no such variable: 2
+>tst:typeset:14: no such variable: 02
+>typeset -g 0=Tst
+>tst aaa bbb - tst - tst - bbb - bbb
+>tst:typeset:17: no such variable: 00
+>tst:typeset:17: no such variable: 2
+>tst:typeset:17: no such variable: 02
+>typeset -g 0=tst
+>tst:18: 0: attempt to assign array value to non-array
+>tst:19: 2: attempt to assign array value to non-array
+>tst aaa bbb - tst - tst - bbb - bbb
+>tst:typeset:20: no such variable: 00
+>tst:typeset:20: no such variable: 2
+>tst:typeset:20: no such variable: 02
+>typeset -g 0=tst
+>tst aaa bbb '' '' zzz
+>tst aaa '' '' zzz
+>tst aaa '' zzz
+>tst aaa zzz
+>tst aaa
+>tst aaa
 
 #
 # The following tests are run in interactive mode, using PS1 as an

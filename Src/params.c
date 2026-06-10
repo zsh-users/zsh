@@ -229,6 +229,8 @@ static const struct gsu_integer ttyidle_gsu =
 
 static const struct gsu_scalar argzero_gsu =
 { argzerogetfn, argzerosetfn, nullunsetfn };
+static const struct gsu_scalar argn_gsu =
+{ argngetfn, argnsetfn, argnunsetfn };
 static const struct gsu_scalar username_gsu =
 { usernamegetfn, usernamesetfn, stdunsetfn };
 static const struct gsu_scalar dash_gsu =
@@ -489,6 +491,8 @@ static initparam argvparam_pm = IPDEF9("", &pparams, NULL, \
 			  (zsfree((PM)->u.str), (PM)->u.str = (S)))
 
 static Param argvparam;
+static Param *argnparams;
+static size_t argnparams_size;
 
 /*
  * Lists of references to nested variables ("Param" instances) indexed
@@ -861,6 +865,9 @@ createparamtable(void)
     }
 
     argvparam = (Param) &argvparam_pm;
+    argnparams = zshcalloc(8 * sizeof(Param));
+    argnparams_size = 8;
+    argnparams[0] = (Param) paramtab->getnode(paramtab, "0");
 
     noerrs = 2;
 
@@ -4903,6 +4910,49 @@ argzerogetfn(UNUSED(Param pm))
     return argzero;
 }
 
+/* Function to get value for positional parameters */
+
+/**/
+static char *
+argngetfn(Param pm)
+{
+    return arrlen_gt(pparams, pm->u.val - 1) ?
+	pparams[pm->u.val - 1] : (char *) hcalloc(1);
+}
+
+/* Function to set value for positional parameters */
+
+/**/
+static void
+argnsetfn(Param pm, char *x)
+{
+    int len = arrlen(pparams);
+    int ppar = pm->u.val;
+    if (ppar <= len)
+	zsfree(pparams[ppar - 1]);
+    else if (x) {
+	int i;
+	pparams = (char **) zrealloc(pparams, sizeof(char *) * ppar + 1);
+	for (i = len; i < ppar - 1; i++)
+	    pparams[i] = ztrdup("");
+	pparams[ppar] = 0;
+    }
+    if (x) {
+	pparams[ppar - 1] = ztrdup(x);
+	zsfree(x);
+    } else if (ppar <= len)
+	memmove(pparams + ppar - 1, pparams + ppar, (len - ppar + 1) * sizeof(char *));
+}
+
+/* Function to unset positional parameters */
+
+/**/
+static void
+argnunsetfn(Param pm, UNUSED(int exp))
+{
+    argnsetfn(pm, NULL);
+}
+
 /* Function to get value for special parameter `HISTSIZE' */
 
 /**/
@@ -6295,6 +6345,23 @@ resolve_nameref_rec(Param pm, const Param stop, int keep_lastref)
 	if ((pm = loadparamnode(paramtab, upscope(pm, ref), refname)) &&
 	    pm != stop && !(pm->node.flags & PM_UNSET))
 	    pm = resolve_nameref_rec(pm, stop, keep_lastref);
+    } else if (idigit(*refname)) {
+	int ppar = zstrtol(refname, NULL, 10);
+	if (ppar >= argnparams_size) {
+	    size_t old_size = argnparams_size;
+	    size_t new_size = argnparams_size = MAX(2 * old_size, ppar);
+	    argnparams = zrealloc(argnparams, new_size * sizeof(Param));
+	    memset(argnparams + old_size, 0,
+		   (new_size - old_size) * sizeof(Param));
+	}
+	if (!(pm = argnparams[ppar])) {
+	    pm = argnparams[ppar] = zshcalloc(sizeof(*pm));
+	    pm->node.nam = zalloc(snprintf(NULL, 0, "%d", ppar) + 1);
+	    sprintf(pm->node.nam, "%d", ppar);
+	    pm->node.flags = PM_SCALAR | PM_SPECIAL;
+	    pm->u.val = ppar;
+	    pm->gsu.s = &argn_gsu;
+	}
     } else if (keep_lastref)
 	pm = ref;
     unqueue_signals();
