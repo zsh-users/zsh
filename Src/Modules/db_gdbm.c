@@ -38,12 +38,6 @@
 #define PM_UPTODATE     PM_DONTIMPORT_SUID	/* Safe PM_ bit to re-use */
 #endif
 
-static Param createhash( char *name, int flags );
-static int append_tied_name( const char *name );
-static int remove_tied_name( const char *name );
-static char *unmetafy_zalloc(const char *to_copy, int *new_len);
-static void myfreeparamnode(HashNode hn);
-
 static int no_database_action = 0;
 
 #include <gdbm.h>
@@ -133,7 +127,7 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
     resource_name = OPT_ARG(ops, 'f');
     pmname = *args;
 
-    if ((tied_param = (Param)paramtab->getnode(paramtab, pmname)) &&
+    if ((tied_param = (Param)realparamtab->getnode(realparamtab, pmname)) &&
 	!(tied_param->node.flags & PM_UNSET)) {
 	/*
 	 * Unset any existing parameter.  Note there's no implicit
@@ -159,7 +153,7 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
 	return 1;
     }
 
-    if (!(tied_param = createhash(pmname, pmflags))) {
+    if (!(tied_param = creategdbmhash(pmname, pmflags))) {
         zwarnnam(nam, "cannot create the requested parameter %s", pmname);
 	gdbm_close(dbf);
 	return 1;
@@ -185,7 +179,7 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
     dbf_carrier->dbfile_path = ztrdup(resource_name);
 
     addmodulefd(gdbm_fdesc(dbf), FDT_INTERNAL);
-    append_tied_name(pmname);
+    append_tied_name(tied_param->node.nam);
 
     return 0;
 }
@@ -199,7 +193,7 @@ bin_zuntie(char *nam, char **args, Options ops, UNUSED(int func))
     int ret = 0;
 
     for (pmname = *args; *args++; pmname = *args) {
-	pm = (Param) paramtab->getnode(paramtab, pmname);
+	pm = (Param) realparamtab->getnode(realparamtab, pmname);
 	if(!pm) {
 	    zwarnnam(nam, "cannot untie %s", pmname);
 	    ret = 1;
@@ -239,7 +233,7 @@ bin_zgdbmpath(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
         return 1;
     }
 
-    pm = (Param) paramtab->getnode(paramtab, pmname);
+    pm = (Param) realparamtab->getnode(realparamtab, pmname);
     if(!pm) {
         zwarnnam(nam, "no such parameter: %s", pmname);
         return 1;
@@ -651,7 +645,8 @@ finish_(UNUSED(Module m))
  * Utility functions *
  *********************/
 
-static Param createhash( char *name, int flags ) {
+/**/
+static Param creategdbmhash( char *name, int flags ) {
     Param pm;
     HashTable ht;
 
@@ -660,20 +655,11 @@ static Param createhash( char *name, int flags ) {
         return NULL;
     }
 
-    if (pm->old)
-	pm->level = locallevel;
-
     /* This creates standard hash. */
     ht = pm->u.hash = newparamtable(17, name);
-    if (!pm->u.hash) {
-        paramtab->removenode(paramtab, name);
-        paramtab->freenode(&pm->node);
-        zwarnnam(name, "out of memory when allocating hash");
-        return NULL;
-    }
 
     /* Does free Param (unsetfn is called) */
-    ht->freenode = myfreeparamnode;
+    ht->freenode = freegdbmnode;
 
     /* These provide special features */
     ht->getnode = ht->getnode2 = getgdbmnode;
@@ -686,6 +672,7 @@ static Param createhash( char *name, int flags ) {
  * Adds parameter name to `zgdbm_tied`
  */
 
+/**/
 static int append_tied_name( const char *name ) {
     int old_len = arrlen(zgdbm_tied);
     char **new_zgdbm_tied = zshcalloc( (old_len+2) * sizeof(char *));
@@ -711,6 +698,7 @@ static int append_tied_name( const char *name ) {
  * Removes parameter name from `zgdbm_tied`
  */
 
+/**/
 static int remove_tied_name( const char *name ) {
     int old_len = arrlen(zgdbm_tied);
     int new_len;
@@ -766,6 +754,8 @@ static int remove_tied_name( const char *name ) {
  * - does zalloc of exact size for the new string,
  * - restores work buffer to original content, to restore strlen
  */
+
+/**/
 static char *
 unmetafy_zalloc(const char *to_copy, int *new_len) {
     char *work, *to_return;
@@ -789,8 +779,9 @@ unmetafy_zalloc(const char *to_copy, int *new_len) {
     return to_return;
 }
 
+/**/
 static void
-myfreeparamnode(HashNode hn)
+freegdbmnode(HashNode hn)
 {
     Param pm = (Param) hn;
 

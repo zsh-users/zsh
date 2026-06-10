@@ -204,34 +204,67 @@
  local -a dbase
  dbase=( fromarray )
  () {
-     local -a dbase
+   local dbase
+   () {
      ztie -d db/gdbm -f $dbfile dbase
-     echo ${(t)dbase}
-     zuntie dbase
+     echo "Connected:" $dbase[a]
+   }
+   echo "Still connected:" $dbase[a]
  }
  echo $dbase[1]
  ztie -d db/gdbm -f $dbfile dbase2
  echo "Can connect, so untie happened:" $dbase2[a]
  zuntie dbase2
 0:Test of automatic untie (use of local scope) and of scoping
->association-local-special
+>Connected: b
+>Still connected: b
 >fromarray
 >Can connect, so untie happened: b
+
+ local dbase
+ () {
+   local -n rbase=dbase
+   local dbase=not-a-dbase
+   ztie -d db/gdbm -f $dbfile rbase
+   echo $dbase
+   echo "Connected:" $rbase[a]
+   zuntie rbase
+   echo "Disconnected:" $rbase[a]
+   ztie -d db/gdbm -f $dbfile rbase
+   echo "Reconnected:" $rbase[a]
+   echo $dbase
+ }
+ echo "Still connected:" $dbase[a]
+ zuntie dbase
+0:Test of tie to hidden local via named reference
+>not-a-dbase
+>Connected: b
+>Disconnected:
+>Reconnected: b
+>not-a-dbase
+>Still connected: b
 
  echo $zgdbm_tied ${#zgdbm_tied}
  ztie -r -d db/gdbm -f $dbfile dbase
  echo $zgdbm_tied ${#zgdbm_tied}
  ztie -d db/gdbm -f ${dbfile}2 dbase2
  echo $zgdbm_tied ${#zgdbm_tied}
+ local -n rbase3=dbase3
+ ztie -d db/gdbm -f ${dbfile}3 rbase3
+ echo $zgdbm_tied ${#zgdbm_tied}
  zuntie -u dbase
  echo $zgdbm_tied ${#zgdbm_tied}
  zuntie dbase2
+ echo $zgdbm_tied ${#zgdbm_tied}
+ zuntie rbase3
  echo $zgdbm_tied ${#zgdbm_tied}
 0:zgdbm_tied parameter
 >0
 >dbase 1
 >dbase dbase2 2
->dbase2 1
+>dbase dbase2 dbase3 3
+>dbase2 dbase3 2
+>dbase3 1
 >0
 
  unset zgdbm_tied 2>/dev/null
@@ -311,7 +344,13 @@
  zgdbmpath dbase
  [[ $REPLY = */Test/db.gdbm ]] && echo correct
  zuntie -u dbase
+ local -n rbase=dbase
+ ztie -r -d db/gdbm -f $dbfile rbase
+ zgdbmpath rbase
+ [[ $REPLY = */Test/db.gdbm ]] && echo correct
+ zuntie -u rbase
 0:zgdbmpath builtin
+>correct
 >correct
 >correct
 
