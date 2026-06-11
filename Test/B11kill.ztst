@@ -84,3 +84,26 @@
 1:Plain kill with empty pid should not send signal to current process group
 ?(eval):kill:3: illegal pid: 
 
+# posix doesn't actually define which numbers map to which signals, but the
+# first three seem pretty universal so we'll trust them
+  kill -l
+  kill -l HUP
+  kill -l sighup
+  kill -l 1
+  kill -l 137
+  kill -l 9009
+  kill -l 6term
+  kill -l sig6term
+1:kill -l
+*>HUP INT QUIT *
+*>1
+*>1
+*>HUP
+*>KILL
+*>9009
+*?*: SIG6TERM
+*?*: SIG6TERM
+
+  print -r - ${(f)${ kill -L }}
+0:kill -L
+*>*1*HUP*2*INT*3*QUIT*

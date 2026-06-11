@@ -2869,6 +2869,7 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 				printf("%d\n", sig);
 			} else {
 			    if (*signame) {
+				signame = casemodify(*argv, CASMOD_UPPER);
 				zwarnnam(nam, "unknown signal: SIG%s",
 					 signame);
 				returnval++;

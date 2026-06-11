@@ -1,3 +1,8 @@
+2026-06-10  dana  <dana@dana.is>
+
+	* unposted: Src/jobs.c, Test/B11kill.ztst: kill: fix -l
+	argument error, add tests
+
 2026-06-09  Bart Schaefer  <schaefer@zsh.org>
 
 	* Philippe: 54731: Src/Modules/db_gdbm.c, Test/V11db_gdbm.ztst:
