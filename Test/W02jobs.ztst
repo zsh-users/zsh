@@ -7,6 +7,7 @@
       export PS1= PS2=
       zpty -d
       zpty zsh "${(q)ZTST_testdir}/../Src/zsh -fiV +Z"
+      zpty -w zsh 'alias sleep="sleep </dev/null >/dev/null 2>&1"'
     }
     zpty_input() {
       zpty -w zsh "${(F)@}" $'\n'
@@ -204,29 +205,29 @@
   zpty_stop
 0:jobs in sub-shell with job in parent shell
 *>\[1] <->
-*>\[1]  + * sleep 2
+*>\[1]  + * sleep 2*
 
   zpty_start
   zpty_input '( sleep 2 &; jobs ); :'
   zpty_stop
 0:jobs in sub-shell with job in same shell
-*>\[2]  + * sleep 2
+*>\[2]  + * sleep 2*
 
   zpty_start
   zpty_input 'sleep 2 &; jobs; ( sleep 3 &; jobs ); jobs; disown'
   zpty_stop
 0:jobs in sub-shell with job in parent + same shell
 *>\[1] <->
-*>\[1]  + * sleep 2
-*>\[2]  + * sleep 3
-*>\[1]  + * sleep 2
+*>\[1]  + * sleep 2*
+*>\[2]  + * sleep 3*
+*>\[1]  + * sleep 2*
 
   zpty_start
   zpty_input '( sleep 2 &; sleep 3 &; jobs ); :'
   zpty_stop
 0:jobs in sub-shell with two jobs in same shell
-*>\[2]  - * sleep 2
-*>\[3]  + * sleep 3
+*>\[2]  - * sleep 2*
+*>\[3]  + * sleep 3*
 
   zpty_start
   zpty_input 'sleep 2 &; sleep 3 &; disown; jobs; disown'
@@ -234,7 +235,7 @@
 0:disown current job
 *>\[1] <->
 *>\[2] <->
-*>\[1]  + * sleep 2
+*>\[1]  + * sleep 2*
 
   zpty_start
   zpty_input disown
@@ -248,7 +249,7 @@
 0:disown in sub-shell with job in parent shell
 *>\[1] <->
 *>disown: can't manipulate jobs in subshell
-*>\[1]  + * sleep 2
+*>\[1]  + * sleep 2*
 
   zpty_start
   zpty_input '( sleep 3 &; disown; jobs ); :'
@@ -260,7 +261,7 @@
   zpty_stop
 0:disown in sub-shell with job in parent + same shell
 *>\[1] <->
-*>\[1]  + * sleep 2
+*>\[1]  + * sleep 2*
 
 # @todo apparently testing suspended jobs with zpty is error-prone. see above
 #  zpty_start
@@ -292,9 +293,9 @@
   zpty_stop
 0:background and disown with &| and &!
 *>\[1] <->
-*>\[1] * sleep 2
+*>\[1] * sleep 2*
 *>\[1] <->
-*>\[1] * sleep 2
+*>\[1] * sleep 2*
 
   zpty_start
   zpty_input '( fg ); :'

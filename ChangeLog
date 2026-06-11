@@ -1,5 +1,8 @@
 2026-06-14  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54751: Test/W02jobs.ztst: make the W02 test not take a full
+	minute on linux
+
 	* 54721: Doc/Zsh/expn.yo, Doc/intro.ms, Functions/Misc/zmv,
 	Src/Modules/zpty.c, Src/Modules/zutil.c, Src/Zle/compctl.c,
 	Src/Zle/computil.c, Src/Zle/zle_main.c, Src/Zle/zle_refresh.c,
