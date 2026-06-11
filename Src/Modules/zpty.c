@@ -447,9 +447,8 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 	    return 1;
 	}
     }
-#else
-    addmodulefd(master, FDT_INTERNAL);
 #endif
+    addmodulefd(master, FDT_MODULE);
 
     p = (Ptycmd) zalloc(sizeof(*p));
 

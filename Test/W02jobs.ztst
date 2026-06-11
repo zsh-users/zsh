@@ -23,8 +23,7 @@
     zpty_stop() {
       # exit twice in case of check_jobs
       zpty -w zsh $'exit\nexit\n'
-      # zpty gives no output when piped without these braces (?)
-      { zpty -r zsh } | sed $'/[^[:space:]]/!d; s/\r$//;'
+      zpty -r zsh | sed $'/[^[:space:]]/!d; s/\r$//;'
       zpty -d
       :
     }

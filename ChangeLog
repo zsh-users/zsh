@@ -1,5 +1,8 @@
 2026-06-14  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54753: Src/Modules/zpty.c, Test/W02jobs.ztst: zpty: register
+	pty fd as FDT_MODULE so it isn't closed when forking
+
 	* 54751: Test/W02jobs.ztst: make the W02 test not take a full
 	minute on linux
 
