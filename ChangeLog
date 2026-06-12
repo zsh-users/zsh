@@ -1,5 +1,8 @@
 2026-06-14  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54762: Src/jobs.c, Test/W02jobs.ztst: make curjob and prevjob
+	work better
+
 	* unposted: Doc/Zsh/mod_zpty.yo: add some usage notes to zpty
 	-d and -t
 

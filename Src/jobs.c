@@ -324,7 +324,10 @@ handle_sub(int job, int fg)
 		deletejob(jn, 1);
 	    }
 	}
-	curjob = jn - jobtab;
+	if (fg)
+	    /* don't change curjob if we got here from a signal handler, the superjob
+	     * might not be the current job at all then */
+	    curjob = jn - jobtab;
     } else if (sj->stat & STAT_STOPPED) {
 	struct process *p;
 
@@ -2644,21 +2647,23 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	    }
 	    /* It's time to shuffle the jobs around!  Reset the current job,
 	    and pick a sensible secondary job. */
-	    {
-		/* Exclude this job from setprevjob() consideration. */
+	    if (func != BIN_BG && curjob == job) {
+		curjob = prevjob;
+		prevjob = job;
+	    }
+	    if (prevjob == job) {
 		int saved_thisjob = thisjob;
-		thisjob = job;
-		if (curjob == job) {
-		    curjob = prevjob;
-		    prevjob = (func == BIN_BG) ? -1 : job;
-		}
-		if (prevjob == job || prevjob == -1)
-		    setprevjob();
-		if (curjob == -1) {
-		    curjob = prevjob;
-		    setprevjob();
-		}
+		if (func != BIN_BG && curjob != -1)
+		    /* Exclude this job from setprevjob() consideration. */
+		    thisjob = job;
+		setprevjob();
 		thisjob = saved_thisjob;
+	    } else if (prevjob == -1) {
+		setprevjob();
+	    }
+	    if (curjob == -1) {
+		curjob = prevjob;
+		setprevjob();
 	    }
 	    if (func != BIN_WAIT)
 		/* for bg and fg -- show the job we are operating on */
