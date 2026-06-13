@@ -1,3 +1,8 @@
+2026-06-14  Mikael Magnusson  <mikachu@gmail.com>
+
+	* unposted: Doc/Zsh/mod_zpty.yo: add some usage notes to zpty
+	-d and -t
+
 2026-06-10  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 54696: Src/glob.c: unset REPLY before e:: and oe:: so things
