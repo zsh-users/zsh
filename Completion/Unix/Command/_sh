@@ -1,36 +1,151 @@
-#compdef sh ash csh dash ksh ksh88 ksh93 mksh oksh pdksh rc tcsh yash
+#compdef sh ash csh dash ksh ksh88 ksh93 lksh mksh oksh osh pdksh posh rc rksh rksh93 tcsh yash ysh
 
-local bourne argv0
-local -a args all_opts=( -{{0..9},{A..Z},{a..z}} )
+(( $+functions[_sh_set_options] )) ||
+_sh_set_options() {
+  local MATCH MBEGIN MEND k_ v_
+  local -a opts_ tmp_ expl_
 
-[[ $service == (csh|?csh|fish|rc) ]] || bourne=1
+  tmp_=( ${(f)"$( _call_program options $words[1] -c '"set -o"' )"} )
 
-# Bourne-style shells support +x variants
-# @todo Uncomment when workers/45422 is fixed
-# (( bourne )) && all_opts+=( ${all_opts/#-/+} )
-# Bourne-style shells take argv[0] as the second argument to -c
-(( bourne )) && argv0=':argv[0]:'
+  # remove heading
+  [[ $tmp_[1] == (#i)*'current option'* ]] && tmp_=( $tmp_[2,-1] )
+  # convert osh/ysh syntax
+  [[ $tmp_[1] == set\ [+-]o\ * ]] && {
+    tmp_=( ${(@)tmp_##set [+-]o } )
+    tmp_=( ${tmp_:^tmp_} )
+  }
+  # loop since some shells arrange the options in columns
+  for k_ v_ in $=tmp_; do
+    opts_+=( $k_ )
+  done
 
-# All of the recognised shells support at least these arguments
-args=(
-  "(1 -)-c[execute specified command string]: :_cmdstring$argv0"
-  '-e[exit immediately on non-zero return]'
-  '-i[act as interactive shell]'
-  '-l[act as login shell]'
-  '-x[print command trace]'
-  '1:script file:_files'
-  '*:: :_files'
-)
-# Bourne-style shells support -o/+o option. Not all of them support -ooption in
-# the same argument, but we'll allow it here for those that do
-(( bourne )) && args+=(
-  '-o+[set specified option]:option:'
-  '+o+[unset specified option]:option:'
-)
-# Since this is a generic function we don't know what other options these shells
-# support, but we don't want them to break the ones listed above, so we'll just
-# ignore any other single-alphanumeric option. Obviously this doesn't account
-# for long options
-args+=( '!'${^${all_opts:#(${(~j<|>)${(@M)${(@M)args#(*[\*\)]|)[+-]?}%[+-]?}})}} )
+  _wanted set-options expl_ 'set option' compadd -a "$@" - opts_
+}
 
-_arguments -s -S -A '-*' : $args
+local variant apat='[+-]?*'
+local -a args oopts
+
+case ${${(Q)words[1]}:t} in
+  r#ksh)
+    _pick_variant -r variant \
+      ksh93=showme \
+      mksh='utf8-#mode' \
+      oksh='csh-#history' \
+      '' \
+      -c '"set -o"'
+    ;;
+  sh)
+    _pick_variant -r variant \
+      zsh=junkie \
+      bash=onecmd \
+      ksh93=showme \
+      mksh='utf8-#mode' \
+      oksh='csh-#history' \
+      ksh=keyword \
+      dash=debug \
+      '' \
+      -c '"set -o"'
+    ;;
+esac
+case $variant in
+  bash|zsh) _$variant "$@"; return ;;
+  ?*) service=$variant ;;
+esac
+
+# bourne/ksh/posix-style shells. not meant to be totally accurate, but mostly
+if [[ $service != (csh|?csh|rc) ]]; then
+  args=(
+    # invocation options
+    '(1 -)-c[execute specified command string]: :_cmdstring:argv[0]:'
+    '-i[act as interactive shell]'
+    '-l[act as login shell]' # not defined by posix but very widely supported
+    '-o+[set specified option]: :_sh_set_options'
+    '+o+[unset specified option]: :_sh_set_options'
+    '(-c)-s[read commands from standard input]'
+    # set options. these are all defined by posix
+    '(-a +a)'{'-a[',"+a[don't "}'mark all variables for export]'
+    '(-b +b)'{'-b[',"+b[don't "}'report status of terminated background jobs immediately]'
+    '(-C +C)'{'-C[',"+C[don't "}'prevent output redirection from overwriting existing files]'
+    '(-e +e)'{'-e[',"+e[don't "}'exit immediately on non-zero return]'
+    '(-f +f)'{'-f[',"+f[don't "}'disable file globbing]'
+    '(-h +h)'{'-h[',"+h[don't "}'hash commands]'
+    '(-m +m)'{'-m[',"+m[don't "}'enable job control]'
+    '(-n +n)'{'-n[',"+n[don't "}'read (syntax-check) commands only]'
+    '(-u +u)'{'-u[',"+u[don't "}'treat unset variables as an error during parameter expansion]'
+    '(-v +v)'{'-v[',"+v[don't "}'print shell input lines as they are read]'
+    '(-x +x)'{'-x[',"+x[don't "}'print command trace]'
+  )
+
+  case $service in
+    dash)
+      args=(
+        ${args:#\(*\)[+-]h\[*}
+        '(-E +E -V +V)'{'-E[',"+E[don't "}'use emacs-style command-line editing]'
+        '(-I +I)'{'-I[',"+I[don't "}'ignore EOF]'
+        '(-E +E -V +V)'{'-V[',"+V[don't "}'use vi-style command-line editing]'
+      )
+      ;;
+    yash)
+      PREFIX= _sh_set_options -O oopts
+      oopts=( ${oopts:#cmdline} )
+      args+=(
+        '(- : *)--help[display help information]'
+        '(- : *)'{-V,--version}'[display version information]'
+        "(--profile)--noprofile[don't load ~/.yash_profile]"
+        "(--rcfile)--norcfile[don't load ~/.yashrc]"
+        '(--noprofile)--profile=[load specified file instead of ~/.yash_profile]:.yash_profile file:_files'
+        '(--norcfile)--rcfile=[load specified file instead of ~/.yashrc]:.yashrc file:_files'
+        ${${(M)args:#\(*\)-c\[*}/-c/--cmdline}
+        --$^oopts
+        ++$^oopts
+      )
+      ;;
+    *ksh*)
+      args+=(
+        '(-k +k)'{'-k[',"+k[don't "}'recognise parameter assignments anywhere in a command]'
+        '(-p +p)'{'-p[',"+p[don't "}'enable privileged mode]'
+        '(-r +r)'{'-r[',"+r[don't "}'enable restricted mode]'
+      )
+      ;|
+    oksh|r#[lm]ksh)
+      args+=(
+        '(-X +X)'{'-X[',"+X[don't "}'mark directories with trailing / when globbing]'
+      )
+      ;|
+    ksh93)
+      PREFIX= _sh_set_options -O oopts
+      oopts=( ${${oopts:#rc}//[_-]/} )
+      args+=(
+        '(-B +B)'{'-B[',"+B[don't "}'enable brace expansion]'
+        '(-D +D)'{'-D[',"+D[don't "}'display strings subject to language translation]'
+        '(-E +E --rc)'{'--rc[','-E[',"+E[don't "}'load $ENV or ~/.kshrc]'
+        '(-G +G)'{'-G[',"+G[don't "}'enable ** pattern (globstar)]'
+        '(-H +H)'{'-H[',"+H[don't "}'enable history expansion]'
+        '(-t +t)'{'-t[',"+t[don't "}'read one command and exit]'
+        --$^oopts
+      )
+      [[ $PREFIX == --n* ]] && args+=( --no$^oopts )
+      ;;
+    r#[lm]ksh)
+      args+=(
+        '(-U +U)'{'-U[',"+U[don't "}'enable UTF-8 support]'
+        '-T+[spawn on specified tty]:tty:_files -g "*(%c)"'
+      )
+      ;;
+  esac
+
+# others. these options are common to all of those currently enumerated
+else
+  apat='-?*'
+  args=(
+    '(1 -)-c[execute specified command string]: :_cmdstring'
+    '-e[exit immediately on non-zero return]'
+    '-i[act as interactive shell]'
+    '-l[act as login shell]'
+    '-x[print command trace]'
+  )
+fi
+
+args+=( '1:script file:_files' '*:: :_files' )
+
+_arguments -s -S -A $apat : $args

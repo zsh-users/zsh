@@ -1,3 +1,8 @@
+2026-06-20  dana  <dana@dana.is>
+
+	* 54763: Completion/Unix/Command/_sh: support more shells +
+	options
+
 2026-06-19  Oliver Kiddle  <opk@zsh.org>
 
 	* 54800, 54807: Completion/...: completion options update
