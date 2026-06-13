@@ -1,5 +1,8 @@
 2026-06-14  Mikael Magnusson  <mikachu@gmail.com>
 
+	* unposted: Doc/Zsh/mod_zpty.yo: add some usage notes to zpty
+	-d and -t
+
 	* 54753: Src/Modules/zpty.c, Test/W02jobs.ztst: zpty: register
 	pty fd as FDT_MODULE so it isn't closed when forking
 

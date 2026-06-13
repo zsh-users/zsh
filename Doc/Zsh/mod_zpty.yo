@@ -30,10 +30,13 @@ and tt(syswrite) is em(not) recommended; use tt(zpty -r) and tt(zpty -w)
 unless you know exactly what you are doing.
 )
 item(tt(zpty) tt(-d) [ var(name) ... ])(
-The second form, with the tt(-d) option, is used to delete commands
-previously started, by supplying a list of their var(name)s.  If no
-var(name) is given, all commands are deleted.  Deleting a command causes
-the HUP signal to be sent to the corresponding process.
+The tt(-d) option is used to delete commands previously started, by
+supplying a list of their var(name)s.  If no var(name) is given, all
+commands are deleted.  Deleting a command causes the HUP signal to be sent
+to the corresponding process.  It is not a good idea to use this form in a
+subshell, as it will kill the command but leave the parent shell confused
+about the state, and it may try to kill another process that re-used the
+process ID.
 )
 item(tt(zpty) tt(-w) [ tt(-n) ] var(name) [ var(string) ... ])(
 The tt(-w) option can be used to send the to command var(name) the given
@@ -82,9 +85,10 @@ when the command has exited:  the return value is zero if at least
 one character could still be read even if the pattern failed to match.
 )
 item(tt(zpty) tt(-t) var(name))(
-The tt(-t) option without the tt(-r) option can be used to test
-whether the command var(name) is still running.  It returns a zero
-status if the command is running and a non-zero value otherwise.
+The tt(-t) option without the tt(-r) option can be used to test whether the
+command var(name) is still running.  It returns a zero status if the command
+is running and a non-zero value otherwise.  Note that this does not indicate
+whether or not any output is available to read.
 )
 item(tt(zpty) [ tt(-L) ])(
 The last form, without any arguments, is used to list the commands
