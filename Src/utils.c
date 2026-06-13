@@ -313,12 +313,12 @@ zerrmsg(FILE *file, const char *fmt, va_list ap)
 	    switch (*fmt++) {
 	    case 's':
 		str = va_arg(ap, const char *);
-		nicezputs(str, file);
+		nicezputs(str ? str : "(null)", file);
 		break;
 	    case 'l': {
 		str = va_arg(ap, const char *);
 		num = va_arg(ap, int);
-		fwrite(str, num, 1, file);
+		fwrite(str ? str : "(null)", num, 1, file);
 		break;
 	    }
 	    case 'L':

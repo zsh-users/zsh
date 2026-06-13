@@ -1,3 +1,7 @@
+2026-06-15  dana  <dana@dana.is>
+
+	* 54764: Src/utils.c: zerrmsg: handle null pointers with %s/%l
+
 2026-06-14  Mikael Magnusson  <mikachu@gmail.com>
 
 	* unposted: Completion/Unix/Command/_zip: fix return code in _zip
