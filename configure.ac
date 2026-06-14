@@ -1308,23 +1308,27 @@ AC_CHECK_DECLS([fpurge])
 # isinf() and isnan() can exist as either functions or macros.
 AH_TEMPLATE([HAVE_ISINF],
   [Define to 1 if you have the `isinf' macro or function.])
-AC_MSG_CHECKING([for isinf])
-AC_LINK_IFELSE([AC_LANG_SOURCE(
+AC_CACHE_CHECK([for isinf], zsh_cv_func_isinf,
+[AC_LINK_IFELSE([AC_LANG_SOURCE(
 [[#include <math.h>
 int main () { return (isinf(1.0) != 0); }]])],
-  [AC_MSG_RESULT([yes])
-   AC_DEFINE([HAVE_ISINF])],
-  [AC_MSG_RESULT([no])])
+  [zsh_cv_func_isinf=yes],
+  [zsh_cv_func_isinf=no])])
+if test x$zsh_cv_func_isinf = xyes; then
+  AC_DEFINE([HAVE_ISINF])
+fi
 
 AH_TEMPLATE([HAVE_ISNAN],
   [Define to 1 if you have the `isnan' macro or function.])
-AC_MSG_CHECKING([for isnan])
-AC_LINK_IFELSE([AC_LANG_SOURCE([[
+AC_CACHE_CHECK([for isnan], zsh_cv_func_isnan,
+[AC_LINK_IFELSE([AC_LANG_SOURCE([[
 #include <math.h>
 int main () { return (isnan(1.0) != 0); }]])],
-  [AC_MSG_RESULT([yes])
-   AC_DEFINE([HAVE_ISNAN])],
-  [AC_MSG_RESULT([no])])
+  [zsh_cv_func_isnan=yes],
+  [zsh_cv_func_isnan=no])])
+if test x$zsh_cv_func_isnan = xyes; then
+  AC_DEFINE([HAVE_ISNAN])
+fi
 
 AH_TEMPLATE([REALPATH_ACCEPTS_NULL],
 [Define if realpath() accepts NULL as its second argument.])
@@ -1715,38 +1719,52 @@ if test x$zsh_cv_path_term_header != xnone; then
     term_includes="#include <$zsh_cv_path_term_header>"
   fi
 
-  AC_MSG_CHECKING(if boolcodes is available)
-  AC_LINK_IFELSE([AC_LANG_PROGRAM([[$term_includes]], [[char **test = (char **)boolcodes; puts(*test);]])],[AC_DEFINE(HAVE_BOOLCODES) boolcodes=yes],[boolcodes=no])
-  AC_MSG_RESULT($boolcodes)
+  AC_CACHE_CHECK(if boolcodes is available, zsh_cv_terminfo_boolcodes,
+  [AC_LINK_IFELSE([AC_LANG_PROGRAM([[$term_includes]], [[char **test = (char **)boolcodes; puts(*test);]])],[zsh_cv_terminfo_boolcodes=yes],[zsh_cv_terminfo_boolcodes=no])])
+  if test x$zsh_cv_terminfo_boolcodes = xyes; then
+    AC_DEFINE(HAVE_BOOLCODES)
+  fi
 
-  AC_MSG_CHECKING(if numcodes is available)
-  AC_LINK_IFELSE([AC_LANG_PROGRAM([[$term_includes]], [[char **test = (char **)numcodes; puts(*test);]])],[AC_DEFINE(HAVE_NUMCODES) numcodes=yes],[numcodes=no])
-  AC_MSG_RESULT($numcodes)
+  AC_CACHE_CHECK(if numcodes is available, zsh_cv_terminfo_numcodes,
+  [AC_LINK_IFELSE([AC_LANG_PROGRAM([[$term_includes]], [[char **test = (char **)numcodes; puts(*test);]])],[zsh_cv_terminfo_numcodes=yes],[zsh_cv_terminfo_numcodes=no])])
+  if test x$zsh_cv_terminfo_numcodes = xyes; then
+    AC_DEFINE(HAVE_NUMCODES)
+  fi
 
-  AC_MSG_CHECKING(if strcodes is available)
-  AC_LINK_IFELSE([AC_LANG_PROGRAM([[$term_includes]], [[char **test = (char **)strcodes; puts(*test);]])],[AC_DEFINE(HAVE_STRCODES) strcodes=yes],[strcodes=no])
-  AC_MSG_RESULT($strcodes)
+  AC_CACHE_CHECK(if strcodes is available, zsh_cv_terminfo_strcodes,
+  [AC_LINK_IFELSE([AC_LANG_PROGRAM([[$term_includes]], [[char **test = (char **)strcodes; puts(*test);]])],[zsh_cv_terminfo_strcodes=yes],[zsh_cv_terminfo_strcodes=no])])
+  if test x$zsh_cv_terminfo_strcodes = xyes; then
+    AC_DEFINE(HAVE_STRCODES)
+  fi
 
-  AC_MSG_CHECKING(if boolnames is available)
-  AC_LINK_IFELSE([AC_LANG_PROGRAM([[$term_includes]], [[char **test = (char **)boolnames; puts(*test);]])],[AC_DEFINE(HAVE_BOOLNAMES) boolnames=yes],[boolnames=no])
-  AC_MSG_RESULT($boolnames)
+  AC_CACHE_CHECK(if boolnames is available, zsh_cv_terminfo_boolnames,
+  [AC_LINK_IFELSE([AC_LANG_PROGRAM([[$term_includes]], [[char **test = (char **)boolnames; puts(*test);]])],[zsh_cv_terminfo_boolnames=yes],[zsh_cv_terminfo_boolnames=no])])
+  if test x$zsh_cv_terminfo_boolnames = xyes; then
+    AC_DEFINE(HAVE_BOOLNAMES)
+  fi
 
-  AC_MSG_CHECKING(if numnames is available)
-  AC_LINK_IFELSE([AC_LANG_PROGRAM([[$term_includes]], [[char **test = (char **)numnames; puts(*test);]])],[AC_DEFINE(HAVE_NUMNAMES) numnames=yes],[numnames=no])
-  AC_MSG_RESULT($numnames)
+  AC_CACHE_CHECK(if numnames is available, zsh_cv_terminfo_numnames,
+  [AC_LINK_IFELSE([AC_LANG_PROGRAM([[$term_includes]], [[char **test = (char **)numnames; puts(*test);]])],[zsh_cv_terminfo_numnames=yes],[zsh_cv_terminfo_numnames=no])])
+  if test x$zsh_cv_terminfo_numnames = xyes; then
+    AC_DEFINE(HAVE_NUMNAMES)
+  fi
 
-  AC_MSG_CHECKING(if strnames is available)
-  AC_LINK_IFELSE([AC_LANG_PROGRAM([[$term_includes]], [[char **test = (char **)strnames; puts(*test);]])],[AC_DEFINE(HAVE_STRNAMES) strnames=yes],[strnames=no])
-  AC_MSG_RESULT($strnames)
+  AC_CACHE_CHECK(if strnames is available, zsh_cv_terminfo_strnames,
+  [AC_LINK_IFELSE([AC_LANG_PROGRAM([[$term_includes]], [[char **test = (char **)strnames; puts(*test);]])],[zsh_cv_terminfo_strnames=yes],[zsh_cv_terminfo_strnames=no])])
+  if test x$zsh_cv_terminfo_strnames = xyes; then
+    AC_DEFINE(HAVE_STRNAMES)
+  fi
 
   dnl There are apparently defective terminal library headers on some
   dnl versions of Solaris before 11.
-  AC_MSG_CHECKING(if tgoto prototype is missing)
-  tgoto_includes="$term_includes
+  AC_CACHE_CHECK(if tgoto prototype is missing, zsh_cv_terminfo_tgoto_proto_missing,
+  [tgoto_includes="$term_includes
 /* guaranteed to clash with any valid tgoto prototype */
 extern void tgoto(int **stuff, float **more_stuff);"
-  AC_LINK_IFELSE([AC_LANG_PROGRAM([[$tgoto_includes]], [[int *stuff; float *more_stuff; tgoto(&stuff, &more_stuff);]])],[AC_DEFINE(TGOTO_PROTO_MISSING) tgotoprotomissing=yes],[tgotoprotomissing=no])
-  AC_MSG_RESULT($tgotoprotomissing)
+  AC_LINK_IFELSE([AC_LANG_PROGRAM([[$tgoto_includes]], [[int *stuff; float *more_stuff; tgoto(&stuff, &more_stuff);]])],[zsh_cv_terminfo_tgoto_proto_missing=yes],[zsh_cv_terminfo_tgoto_proto_missing=no])])
+  if test x$zsh_cv_terminfo_tgoto_proto_missing = xyes; then
+    AC_DEFINE(TGOTO_PROTO_MISSING)
+  fi
 else
   ZSH_TERM_H=
 fi
