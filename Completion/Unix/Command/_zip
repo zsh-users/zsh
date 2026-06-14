@@ -166,7 +166,7 @@ case $state in
       elif [[ -f $testfile.ZIP ]]; then
 	zipfile=$testfile.ZIP
       else
-	return 1
+	return ret
       fi 2>/dev/null
       if [[ $zipfile !=  $_zip_cache_name ]]; then
 	_zip_cache_name="$zipfile"
