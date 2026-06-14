@@ -1,5 +1,7 @@
 2026-06-14  Mikael Magnusson  <mikachu@gmail.com>
 
+	* unposted: Completion/Unix/Command/_zip: fix return code in _zip
+
 	* unposted: Doc/Zsh/mod_zpty.yo: add some usage notes to zpty
 	-d and -t
 
