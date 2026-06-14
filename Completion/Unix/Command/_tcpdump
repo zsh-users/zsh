@@ -94,9 +94,6 @@ _data_link_types () {
   fi
 }
 
-_bpf_filter () {
-}
-
 args=(
   '-A[print each packet in ASCII]'
   '-c+[exit after receiving specified number of packets]:number of packets'

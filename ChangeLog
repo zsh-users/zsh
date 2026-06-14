@@ -1,5 +1,7 @@
 2026-06-14  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/Unix/Command/_tcpdump: remove dead code
+
 	* unposted: Completion/Unix/Command/_cdrecord: use _tilde_files
 
 	* 54665: Doc/Zsh/compsys.yo, Completion/Base/Utility/_phony,
