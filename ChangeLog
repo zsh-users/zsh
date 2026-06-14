@@ -1,5 +1,7 @@
 2026-06-14  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/Unix/Command/_cdrecord: use _tilde_files
+
 	* 54665: Doc/Zsh/compsys.yo, Completion/Base/Utility/_phony,
 	Completion/Darwin/Command/_fink, Completion/Solaris/Command/_ipadm,
 	Completion/Unix/Command/_abcde, Completion/Unix/Command/_postfix,
