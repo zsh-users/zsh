@@ -308,3 +308,18 @@ F:In math, (($i)) should be the same as ((i)), see workers/47748.
 F:Regression test for inconsistency of failed (i) on zero-length string
 >2
 >1
+
+  string='foo bar baz'
+  for 1 in 0 1 2 3 4 -1 -2 -3 -4; do
+    print -r - $1 $string[(w)$1]
+  done
+0:(w)
+>0
+>1 foo
+>2 bar
+>3 baz
+>4
+>-1 baz
+>-2 bar
+>-3 foo
+>-4

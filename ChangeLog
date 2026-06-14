@@ -1,5 +1,8 @@
 2026-06-20  dana  <dana@dana.is>
 
+	* 54773: Src/params.c, Test/D06subscript.ztst: make out-of-range
+	(w) subscript index work like others
+
 	* 54768: Completion/Base/Core/_description,
 	Completion/Base/Core/_main_complete,
 	Completion/Base/Core/_message,

@@ -1621,15 +1621,15 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 	}
 	if (word && !v->scanflags) {
 	    s = t = getstrvalue(v);
+	    if (!s || !*s)
+		return 0;
+
 	    i = wordcount(s, sep, 0);
 	    if (r < 0)
 		r += i + 1;
-	    if (r < 1)
-		r = 1;
-	    if (r > i)
-		r = i;
-	    if (!s || !*s)
+	    if (r < 1 || r > i)
 		return 0;
+
 	    while ((d = findword(&s, sep)) && --r);
 	    if (!d)
 		return 0;
