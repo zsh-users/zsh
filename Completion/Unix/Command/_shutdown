@@ -23,7 +23,7 @@ case $OSTYPE in
       '-r[reboot the system]'
       '-k[kick everybody off]'
       '-n[prevent file system cache from being flushed]'
-      '1: :_guard "^-*" "time (now/hh\:mm/+mins)"'
+      '1:time (hh\:mm/+mins):_phony now -- _guard "^-*" "time (hh\:mm/+mins)"' \
       '*:warning message'
     )
   ;|

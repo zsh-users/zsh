@@ -274,7 +274,7 @@ _ipadm() {
 
 			("dhcp:"*)
 				_arguments -A "-*" \
-				'(-w --wait)'{-w,--wait}'[Seconds to wait for completion]:number or "forever":{if [[ -prefix [0-9]## ]]; then _message -e "number of seconds"; else _wanted forever expl "number or \"forever\"" compadd forever; fi}' \
+                                '(-w --wait)'{-w,--wait}'[time to wait for completion]:time (seconds):_phony forever' \
 				'-h[Request a specific hostname]:hostname:' \
 				':address object name:_ipadm_addrobjs_or_ifs'
 				;;

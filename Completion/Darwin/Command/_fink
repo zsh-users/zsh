@@ -123,7 +123,7 @@ _fink(){
 	'(-s --section)'{-s=,--section=}'[sections]:section name' \
 	'(-m --maintainer)'{-m=,--maintainer=}'[maintainer]:maintainer name' \
 	--tree='[tree]:tree name' \
-	'(-w --width)'{-w=,--width=}'[width of display]:number or "auto"' \
+	'(-w --width)'{-w=,--width=}'[width of display]:number:_phony auto' \
 	'(1 : -)'{-h,--help}'[display help text]' \
 	'1: :->pkgs' && return 0
 
@@ -134,7 +134,7 @@ _fink(){
     apropos)
       _arguments \
         '(-t --tab)'{-t,--tab}'[output the list with tabs as field delimiter]' \
-        '(-w --width)'{-w=,--width=}'[width of display]:number or "auto"' \
+        '(-w --width)'{-w=,--width=}'[width of display]:number:_phony auto' \
         '(1 : -)'{-h,--help}'[display help text]' \
         '1: :->pkgs' && return
 

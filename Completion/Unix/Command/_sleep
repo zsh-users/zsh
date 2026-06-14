@@ -1,0 +1,25 @@
+#compdef sleep
+
+local sum inf fraction
+local -a expl units
+
+case $OSTYPE in
+  linux-gnu)
+    args=(
+      -S
+      '--help[display help information]'
+      '--version[display version information]'
+    )
+  ;& # fall-through
+  solaris*)
+    inf="_phony infinity --"
+  ;& # fall-through
+  darwin*|freebsd*)
+    units=( :s:seconds m:minutes h:hours d:days )
+    sum='*'
+    fraction='-f'
+  ;;
+esac
+
+_arguments $args \
+  "${sum}:interval:$inf _numbers $fraction -u seconds interval $units"

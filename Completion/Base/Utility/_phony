@@ -1,0 +1,51 @@
+#autoload
+
+# Mix literal matches in with those produced by another function.
+# This is useful where certain phony values, like "all", "any" or
+# "none" are permitted alongside the real matches.
+
+# _phony [compadd options] [word] [words... --] [ _function [args] ]
+# -a, -k, -l and -d options are the same as for compadd but are not
+#                   passed on to the child function
+# -E                is only used once (last)
+# -A and -O         results merged as if compadd was used once only
+
+local curcontext="$curcontext" minus
+local -i minus strip nm skip ret=1
+local -a phony opts cont amerge omerge phony_amat phony_omat last
+
+zparseopts -D -a opts a=phony k=phony d:=phony l=phony \
+    n F: p: i: P: I: e f s: S: q r: R: M+: J+: V+: 1 2 o+: X+: x+: D: \
+    A+:=amerge O+:=omerge \
+    E:=last
+
+if (( $argv[(I)--] )); then
+  (( strip = $argv[(i)--]  ))
+  phony+=( "${(@)argv[1,strip-1]}" )
+  shift $strip
+else
+  phony+=( "$argv[1]" )
+  shift
+fi
+
+if (( ! $# )); then # no function passed
+  opts=( ${opts:/-X/-x} )
+  skip=1
+else
+  (( minus = argv[(ib:2:)-] ))
+  (( minus > $# )) && minus=2 && argv[1]+=( - )
+  argv[minus]=( "$opts[@]" ${=amerge:+-A phony_amat} ${=omerge:+-O phony_omat} "$last[@]" )
+fi
+
+compadd "$opts[@]" "$amerge[@]" "$omerge[@]" "$phony[@]" && ret=0
+nm=$compstate[nmatches]
+if (( skip )) || "$@" || [[ -n "$_comp_mesg" ]]; then
+  [[ ret -eq 0 && compstate[nmatches] -eq nm && -z "$PREFIX$SUFFIX" ]] &&
+      compstate[insert]=''
+  ret=0
+fi
+
+(( $+amerge[2] )) && set -A ${amerge[2]} "${(@P)amerge[2]}" "$phony_amat[@]"
+(( $+omerge[2] )) && set -A ${omerge[2]} "${(@P)omerge[2]}" "$phony_omat[@]"
+
+return ret

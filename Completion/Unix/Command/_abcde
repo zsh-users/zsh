@@ -34,7 +34,7 @@ _arguments -s -S -A "-*" \
   '(- :)-v[show the version and exit]' \
   '-V[be more verbose]' \
   '-x[eject the CD when all tracks have been read]' \
-  '-X+[use an alternative "cue2discid" implementation]:cue2discid:_command_names -e' \
+  '-X+[use an alternative "cue2discid" implementation]:cue2discid:_phony builtin _command_names -e' \
   '-w+[add a comment to the tracks ripped from the CD]:comment' \
   "-W+[concatenate CD's]:cd-number" \
   '-z[debug mode]' \

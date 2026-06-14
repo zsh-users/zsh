@@ -1,3 +1,12 @@
+2026-06-14  Oliver Kiddle  <opk@zsh.org>
+
+	* 54665: Doc/Zsh/compsys.yo, Completion/Base/Utility/_phony,
+	Completion/Darwin/Command/_fink, Completion/Solaris/Command/_ipadm,
+	Completion/Unix/Command/_abcde, Completion/Unix/Command/_postfix,
+	Completion/Unix/Command/_shutdown, Completion/Unix/Command/_sleep,
+	Completion/Unix/Command/_ssh, Completion/Unix/Command/_zfs:
+	new utility function for mixing in extra values
+
 2026-06-14  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 54762: Src/jobs.c, Test/W02jobs.ztst: make curjob and prevjob

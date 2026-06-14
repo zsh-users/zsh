@@ -169,8 +169,8 @@ case $service:$implementation in
       'userobjquota@'
       'vscan:value:(on off)'
       'xattr:value:(on off dir sa)'
-      "filesystem_limit: :{if [[ -prefix [0-9]## ]]; then _message -e 'number'; elif [[ -prefix n ]]; then compadd none; else _message -e limits 'number or none'; fi}"
-      "snapshot_limit: :{if [[ -prefix [0-9]## ]]; then _message -e 'number'; elif [[ -prefix n ]]; then compadd none; else _message -e limits 'number or none'; fi}"
+      "filesystem_limit:unlimited:_phony none _numbers limit"
+      "snapshot_limit:unlimited:_phony none _numbers limit"
       'volmode:mode:((
         default\:use\ system-wide\ tunable
         full\:expose\ as\ block\ devices
@@ -1023,7 +1023,7 @@ case $service:$words[1] in
       '-f[force use of in-use devices]' \
       '-n[display configuration without creating pool]' \
       '-R+[use alternate root]:alternate root:_directories' \
-      '-m+[set mountpoint for root dataset]:mountpoint' \
+      '-m+[set mountpoint for root dataset]:mountpoint:_phony none _path_files -/ -P / -W /' \
       '-t+[use a temporary pool name]:pool name' \
       ':pool :_guard "^-*" "pool name"' \
       '*: :->virtual-devices'

@@ -67,7 +67,7 @@ case $service in
 	'-d[delete]:queue id:_postfix_queue_id' \
 	'-h[hold]:queue id:_postfix_queue_id' \
 	'-H[release]:queue id:_postfix_queue_id' \
-	'*-r[requeue]:queue id, or "ALL":_postfix_queue_id' \
+	'*-r[requeue]:queue id:_phony ALL _postfix_queue_id' \
 	'1:queue:(hold incoming active deferred)'
 	;;
         (postqueue)
