@@ -17,7 +17,7 @@ specs=(
 if _pick_variant gnu='(GNU|uutils)' unix --version; then
   # GNU coreutils 8.32
   specs+=(
-    '(hv -b --suffix-format -n --digits)'{-b+,--suffix-format=}'[specify format for numbers in output file names]:format [%%02d]: '
+    '(hv -b --suffix-format -n --digits)'{-b+,--suffix-format=}'[specify format for numbers in output file names]:format [%02d]: '
     '(hv)--suppress-matched[suppress the lines matching the pattern]'
     '(hv -z --elide-empty)'{-z,--elide-empty-files}'[remove empty output files]'
     + hv
@@ -44,7 +44,7 @@ case $state in
     elif compset -P '[0-9]*'; then
       _message 'line number' && ret=0
     elif [[ ${words[CURRENT]} != -* ]] then
-      _message "line_number, '/regex/[offset]', '%%regex%%[offset]', or '{count}'" && ret=0
+      _message "line_number, '/regex/[offset]', '%regex%[offset]', or '{count}'" && ret=0
     fi
 esac
 

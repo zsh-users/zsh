@@ -171,6 +171,12 @@ candidate for ~b):
 
   () { local b=/bin; cd ~b }
 
+Completion utility functions like _description now escape '%' characters
+in most format specs by default, eliminating the need for function
+authors to manually escape them in _arguments optarg descriptions, etc.
+'%' characters output by some third-party functions may appear doubled
+until they're updated to account for this.
+
 Incompatibilities between 5.8.1 and 5.9
 ---------------------------------------
 

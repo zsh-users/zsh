@@ -1,5 +1,19 @@
 2026-06-20  dana  <dana@dana.is>
 
+	* 54768: Completion/Base/Core/_description,
+	Completion/Base/Core/_main_complete,
+	Completion/Base/Core/_message,
+	Completion/Base/Utility/_numbers,
+	Completion/Debian/Command/_git-buildpackage,
+	Completion/Linux/Command/_valgrind,
+	Completion/Unix/Command/_csplit,
+	Completion/Unix/Command/_gcore, Completion/Unix/Command/_mpc,
+	Completion/Unix/Command/_nano,
+	Completion/Unix/Command/_opustools,
+	Completion/Unix/Type/_date_formats, Test/Y01completion.ztst,
+	Test/Y03arguments.ztst, Test/Y05describe.ztst,
+	Test/Y06values.ztst: use `zformat -q` for formatting
+
 	* 54767: Doc/Zsh/mod_zutil.yo, Src/Modules/zutil.c,
 	Test/V13zformat.ztst: zformat: replace -qn by spec quoting
 	indicator syntax

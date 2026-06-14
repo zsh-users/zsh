@@ -107,6 +107,6 @@ done
 
 _describe -t date-format-specifier 'date format specifier' specs \
     -p "${(Q)PREFIX:-%}" -S '' && ret=0
-[[ $1 == zsh ]] && _message -e date-format-precision 'precision for %%. (1-9)'
+[[ $1 == zsh ]] && _message -e date-format-precision 'precision for %. (1-9)'
 
 return ret

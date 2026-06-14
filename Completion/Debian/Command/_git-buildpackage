@@ -13,8 +13,8 @@ _arguments \
   '--git-sign-tags[sign tags]' \
   '--git-no-sign-tags[negates --git-sign-tags]' \
   '--git-keyid=-[GPG keyid to sign tags with]:GPG key:' \
-  '--git-debian-tag=-[format string for debian tags]:format string [debian/%%(version)s]' \
-  '--git-upstream-tag=-[format string for upstream tags]:format string [upstream/%%(version)s]' \
+  '--git-debian-tag=-[format string for debian tags]:format string [debian/%(version)s]' \
+  '--git-upstream-tag=-[format string for upstream tags]:format string [upstream/%(version)s]' \
   '--git-pristine-tar[use pristine-tar to create .orig.tar.gz]' \
   '--git-no-pristine-tar[negates --git-pristine-tar]' \
   '--git-force-create[force creation of orig.tar.gz]' \

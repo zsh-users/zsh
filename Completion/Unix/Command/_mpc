@@ -234,7 +234,7 @@ _mpc_play() {
 }
 
 _mpc_seek() {
-  _message -e position 'position ([+-][HH:MM:SS]|<0-100>%%)'
+  _message -e position 'position ([+-][HH:MM:SS]|<0-100>%)'
 }
 
 _mpc_seekthrough() {

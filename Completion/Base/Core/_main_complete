@@ -366,7 +366,7 @@ elif [[ nm -eq 0 && -z "$_comp_mesg" &&
   esac
 
   _setup warnings
-  zformat -f mesg "$format" "d:$str" "D:${(F)${(@)_lastdescr:#}}"
+  zformat -fq mesg "$format" "d:$str" "D:${(F)${(@)_lastdescr:#}}"
   compadd -x "$mesg"
 fi
 

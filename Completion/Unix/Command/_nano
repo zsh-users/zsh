@@ -20,7 +20,7 @@ args=(
   '(-N --noconvert -u --unix)'{-N,--noconvert}"[don't convert files from DOS/Mac format]"
   '(-O --bookstyle)'{-O,--bookstyle}'[when justifying, leading whitespace means new paragraph]'
   '(-P --positionlog)'{-P,--positionlog}'[remember cursor position]'
-  '(-Q --quotestr)'{-Q+,--quotestr=}'[specify regular expression to match quoting]:quoting regex [^([ \t]*([!#%%\:;>|}]|//))+]'
+  '(-Q --quotestr)'{-Q+,--quotestr=}'[specify regular expression to match quoting]:quoting regex [^([ \t]*([!#%\:;>|}]|//))+]'
   '(-R --restricted)'{-R,--restricted}'[restrict access to the file system]'
   '(-S --softwrap)'{-S,--softwrap}'[soft-wrap long lines]'
   '(-T --tabsize)'{-T+,--tabsize=}'[specify tab width]: :_numbers -u columns -l1 -d8 "tab width"'

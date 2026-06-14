@@ -92,6 +92,14 @@
 >NO:{x}
 >line: {tst cx}{}
 
+  tst_describe %2Fdesc%f '(a:adesc b:%2Fbdesc%f)'
+  comptest $'tst \t'
+0:% in descriptions
+>line: {tst }{}
+>DESCRIPTION:{%2Fdesc%f}
+>NO:{a  -- adesc}
+>NO:{b  -- %2Fbdesc%f}
+
 %clean
 
   zmodload -ui zsh/zpty

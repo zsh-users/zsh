@@ -811,6 +811,17 @@ F:shouldn't offer -t in the first case (with stacked options)
 >DESCRIPTION:{option}
 >NO:{-b}
 
+ tst_arguments : '-x+[%2Fxdesc%f]:%2Fxargdesc%f' -y '1:%2F1desc%f'
+ comptest $'tst -\t'
+ comptest $'tst -x\t'
+0:% in descriptions
+>line: {tst -}{}
+>DESCRIPTION:{%2F1desc%f}
+>DESCRIPTION:{option}
+>NO:{-x  -- %2Fxdesc%f}
+>NO:{-y}
+>line: {tst -x}{}
+>DESCRIPTION:{%2Fxargdesc%f}
 
 %clean
 
