@@ -3282,7 +3282,7 @@ makearray(LinkList l, int type, int flags, int *np, int *nlp, int *llp)
 		if ((*ap)->flags & (CMF_NOLIST | CMF_MULT))
 		    nl++;
 	    }
-	/* used -O nosort or -V, don't sort */
+	/* used -o nosort or -V, don't sort */
 	} else {
 	    /* didn't use -1 or -2, so remove all duplicates (efficient) */
 	    if (!(flags & CGF_UNIQALL) && !(flags & CGF_UNIQCON)) {
@@ -3303,12 +3303,14 @@ makearray(LinkList l, int type, int flags, int *np, int *nlp, int *llp)
 		    } else if (!ap[0]->disp) {
 			/* Mark those, that would show the same string in the list. */
 			for (dup = 0; bp[0] && !(bp[0])->disp &&
-				 !strcmp((*ap)->str, (bp[0])->str); bp = ++sp) {
+				 !strcmp((*ap)->str, (bp[0])->str); bp = ++asp) {
 			    (bp[0])->flags |= CMF_MULT;
 			    dup = 1;
 			}
-			if (dup)
+			if (dup) {
 			    (*ap)->flags |= CMF_FMULT;
+			    asp--;
+			}
 		    }
 		}
 		if (del) {

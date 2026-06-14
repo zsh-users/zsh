@@ -84,6 +84,31 @@
 >FI:{file1}
 >FI:{file2}
 
+  comptesteval '_tst() { compadd -V grp -S /a foo bar; compadd -V grp -S /b foo baz }'
+  comptest $'tst \t'
+0:nosort dedup hides same-string non-duplicate matches
+>line: {tst }{}
+>NO:{foo}
+>NO:{bar}
+>NO:{baz}
+
+  comptesteval '_tst() { local disp1=(Foo Bar); compadd -V grp -d disp1 -S /a foo bar; local disp2=(Foo Baz); compadd -V grp -d disp2 -S /b foo baz; }'
+  comptest $'tst \t'
+0:nosort dedup with display strings does not hide same-string non-duplicate matches
+>line: {tst }{}
+>NO:{Foo}
+>NO:{Bar}
+>NO:{Foo}
+>NO:{Baz}
+
+  comptesteval '_tst() { compadd -V grp -S /a foo; compadd -V grp -S /b foo; compadd -V grp -S /c foo; compadd -V grp bar baz }'
+  comptest $'tst \t'
+0:nosort dedup with three same-string non-duplicates
+>line: {tst }{}
+>NO:{foo}
+>NO:{bar}
+>NO:{baz}
+
   # Temporarily modify format set in comptest
   comptesteval 'zstyle -s ":completion:*:descriptions" format oldfmt'
   comptesteval 'zstyle ":completion:*:descriptions" format \
