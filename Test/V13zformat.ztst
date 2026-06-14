@@ -275,35 +275,32 @@
 
   zformat -qa reply .
   zformat -aq reply .
-1:-a + -q not allowed
-?(eval):zformat:1: -q not allowed with -a
-?(eval):zformat:2: -q not allowed with -a
+  zformat -aQ reply .
+1:-a + -qQ not allowed
+?(eval):zformat:1: -qQ not allowed with -a
+?(eval):zformat:2: -qQ not allowed with -a
+?(eval):zformat:3: -qQ not allowed with -a
 
   zformat -Fq     REPLY F && print -r - $REPLY
   zformat -qF     REPLY F && print -r - $REPLY
   zformat -FqF    REPLY F && print -r - $REPLY
-  zformat -q1 -F  REPLY F && print -r - $REPLY
-  zformat -q1F    REPLY F && print -r - $REPLY
-  zformat -q-1 -F REPLY F && print -r - $REPLY
-1:optional argument to -q
+  zformat -qqF    REPLY F && print -r - $REPLY
+  zformat -qQF    REPLY F && print -r - $REPLY
+1:more than one of -qQ not allowed
 >F
 >F
 >F
 >F
-?(eval):zformat:5: bad argument to -q: 1F
-?(eval):zformat:6: bad option: --
+?(eval):zformat:5: only one of -qQ allowed
 
-# the spec order in the format string differs from the order in the arguments
-# here to make sure we're testing -qn's effects on the latter
-  for 1 in '' 0 1 2 3; do
-    zformat -Fq$1   REPLY '%%x %) %. %X %D %d' d:%foo% D:%bar% && print -r - $REPLY
+  for 1 in -F -FQ -Fq; do
+    zformat $1 REPLY '%a, %b, %c, %d, %%e' a:%aaa% %b:%bbb% %%c:%ccc%
+    print -r - $REPLY
   done
-0:-q with and without optarg
->%%x %) %. %X %%bar%% %%foo%%
->%%x %) %. %X %bar% %foo%
->%%x %) %. %X %bar% %%foo%%
->%%x %) %. %X %%bar%% %%foo%%
->%%x %) %. %X %%bar%% %%foo%%
+0:spec quoting indicators, -Q vs -q
+>%aaa%, %%bbb%%, %ccc%, %d, %e
+>%%aaa%%, %%bbb%%, %ccc%, %d, %e
+>%%aaa%%, %%bbb%%, %ccc%, %d, %%e
 
   zformat -Fq REPLY '%(x.%%/%d.%%/%D)' x:1 d:%foo% D:%bar% && print -r - $REPLY
   zformat -Fq REPLY '%(X.%%/%d.%%/%D)' x:1 d:%foo% D:%bar% && print -r - $REPLY
@@ -340,11 +337,3 @@
 0:-q: ternary width test ignores extra %s
 >t f f
 >t t f
-
-  zformat -FQ  REPLY '%%x %) %. %X %D %d' d:%foo% D:%bar% && print -r - $REPLY
-  zformat -FQ0 REPLY '%%x %) %. %X %D %d' d:%foo% D:%bar% && print -r - $REPLY
-  zformat -FQ1 REPLY '%%x %) %. %X %D %d' d:%foo% D:%bar% && print -r - $REPLY
-0:-Q, -Q0, -Q1
->%x ) %. %X %%bar%% %%foo%%
->%x ) %. %X %bar% %foo%
->%x ) %. %X %bar% %%foo%%

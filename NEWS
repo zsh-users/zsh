@@ -123,7 +123,8 @@ The disown builtin learnt a new -a option to disown all jobs.
 
 The zsh/zutil module's zformat builtin learnt two new options, -q and
 -Q, to escape '%' characters in format strings and/or specs so further
-processing can be applied to the result.
+processing can be applied to the result.  Quoting of each spec can also
+be controlled via the spec prefixes '%' and '%%'.
 
 A 'math' context now appears in $zsh_eval_context within arithmetic
 constructs.  This can be used to create dual-purpose math functions.

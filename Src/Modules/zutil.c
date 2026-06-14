@@ -984,20 +984,11 @@ static int
 bin_zformat(char *nam, char **args, Options ops, UNUSED(int func))
 {
     unsigned char qopt = OPT_ISSET(ops, 'q') ? 'q' : OPT_ISSET(ops, 'Q') ? 'Q' : 0;
-    int presence = 0, quote = INT_MAX;
+    int presence = 0;
 
     if (OPT_ISSET(ops, 'q') && OPT_ISSET(ops, 'Q')) {
 	zwarnnam(nam, "only one of -qQ allowed");
 	return 1;
-    }
-    // the error here is more meaningful than the following ones with e.g. -q1F
-    if (OPT_HASARG(ops, qopt)) {
-	char *qptr;
-	quote = (int) zstrtol(OPT_ARG(ops, qopt), &qptr, 10);
-	if (quote < 0 || *qptr) {
-	    zwarnnam(nam, "bad argument to -%c: %s", qopt, OPT_ARG(ops, qopt));
-	    return 1;
-	}
     }
     if (OPT_ISSET(ops, 'a') + OPT_ISSET(ops, 'f') + OPT_ISSET(ops, 'F') < 1) {
 	zwarnnam(nam, "one of -afF expected");
@@ -1007,8 +998,8 @@ bin_zformat(char *nam, char **args, Options ops, UNUSED(int func))
 	zwarnnam(nam, "only one of -afF allowed");
 	return 1;
     }
-    if (OPT_ISSET(ops, 'a') && OPT_ISSET(ops, 'q')) {
-	zwarnnam(nam, "-q not allowed with -a");
+    if (OPT_ISSET(ops, 'a') && qopt) {
+	zwarnnam(nam, "-qQ not allowed with -a");
 	return 1;
     }
 
@@ -1018,26 +1009,37 @@ bin_zformat(char *nam, char **args, Options ops, UNUSED(int func))
 	/* fall-through */
     case 'f':
 	{
-	    char **ap, *specs[256] = {0}, *out;
-	    int i, olen, oused = 0;
+	    char **ap, *specs[256] = {0}, *out, *arg;
+	    int quote, olen, oused = 0;
 	    int qspecs[256] = {0};
 
 	    /* Parse the specs in argv. */
-	    for (i = 1, ap = args + 2; *ap; i++, ap++) {
-		if (!ap[0][0] || ap[0][0] == '-' || ap[0][0] == '.' ||
-		    ap[0][0] == '%' || ap[0][0] == ')' ||
-		    idigit(ap[0][0]) || ap[0][1] != ':') {
+	    for (ap = args + 2; (arg = *ap); ap++) {
+		// quote by default (spec like d:...) with -qQ
+		quote = !!qopt;
+
+		// spec like %%d:... -- explicitly disable quoting
+		if (arg[0] == '%' && arg[1] == '%') {
+		    quote = 0;
+		    arg += 2;
+		// spec like %d:... -- explicitly enable quoting
+		} else if (arg[0] == '%') {
+		    quote = 1;
+		    arg += 1;
+		}
+
+		if (!arg[0] || arg[0] == '-' || arg[0] == '.' ||
+		    arg[0] == '%' || arg[0] == ')' ||
+		    idigit(arg[0]) || arg[1] != ':') {
 		    zwarnnam(nam, "invalid spec: %s", *ap);
 		    return 1;
 		}
 
-		// need to quote specs here because zformat_substring() won't
-		// know the order
-		if (qopt && quote >= i) {
+		if (quote) {
 		    int len = 0, pct = 0;
-		    char *aptr, *sptr, *spec = *ap + 2;
+		    char *aptr, *sptr, *spec = arg + 2;
 
-		    for (aptr = *ap + 2; *aptr; aptr++, len++) {
+		    for (aptr = arg + 2; *aptr; aptr++, len++) {
 			if (*aptr == '%') {
 			    len++, pct++;
 			}
@@ -1046,7 +1048,7 @@ bin_zformat(char *nam, char **args, Options ops, UNUSED(int func))
 		    if (pct) {
 			spec = (char *) zhalloc(len + 1);
 			sptr = spec;
-			for (aptr = *ap + 2; *aptr; aptr++) {
+			for (aptr = arg + 2; *aptr; aptr++) {
 			    *sptr++ = *aptr;
 			    if (*aptr == '%') {
 				*sptr++ = *aptr;
@@ -1055,10 +1057,10 @@ bin_zformat(char *nam, char **args, Options ops, UNUSED(int func))
 			*sptr = '\0';
 		    }
 
-		    specs[(unsigned char) ap[0][0]] = spec;
-		    qspecs[(unsigned char) ap[0][0]] = pct;
+		    specs[(unsigned char) *arg] = spec;
+		    qspecs[(unsigned char) *arg] = pct;
 		} else {
-		    specs[(unsigned char) ap[0][0]] = ap[0] + 2;
+		    specs[(unsigned char) *arg] = arg + 2;
 		}
 	    }
 
@@ -2146,7 +2148,7 @@ bin_zparseopts(char *nam, char **args, Options ops, UNUSED(int func))
 }
 
 static struct builtin bintab[] = {
-    BUILTIN("zformat", 0, bin_zformat, 2, -1, 0, "afFq:%Q:%", NULL),
+    BUILTIN("zformat", 0, bin_zformat, 2, -1, 0, "afFqQ", NULL),
     BUILTIN("zparseopts", 0, bin_zparseopts, 0, -1, 0, "a:A:DEFGKMn:v:", NULL),
     BUILTIN("zregexparse", 0, bin_zregexparse, 3, -1, 0, "c", NULL),
     BUILTIN("zstyle", 0, bin_zstyle, 0, -1, 0, NULL, NULL),

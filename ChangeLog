@@ -1,5 +1,9 @@
 2026-06-20  dana  <dana@dana.is>
 
+	* 54767: Doc/Zsh/mod_zutil.yo, Src/Modules/zutil.c,
+	Test/V13zformat.ztst: zformat: replace -qn by spec quoting
+	indicator syntax
+
 	* 54763: Completion/Unix/Command/_sh: support more shells +
 	options
 

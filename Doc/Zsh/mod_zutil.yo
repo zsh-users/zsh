@@ -158,8 +158,8 @@ var(pattern) matches at least one of the strings in the value.
 enditem()
 )
 findex(zformat)
-xitem(tt(zformat -f) [ tt(-qQ) [ var(n) ] ] var(param) var(format) var(spec) ...)
-xitem(tt(zformat -F) [ tt(-qQ) [ var(n) ] ] var(param) var(format) var(spec) ...)
+xitem(tt(zformat -f) [ tt(-qQ) ] ] var(param) var(format) var(spec) ...)
+xitem(tt(zformat -F) [ tt(-qQ) ] ] var(param) var(format) var(spec) ...)
 item(tt(zformat -a) var(array) var(sep) var(spec) ...)(
 This builtin provides different forms of formatting.
 
@@ -179,6 +179,11 @@ var(string) is shorter than the requested width.  Padding to the left
 can be achieved by giving a negative minimum field width.  If a maximum 
 field width is specified, the var(string) will be truncated after that
 many characters.
+
+The var(char) in each var(spec) may optionally be preceded by an
+escaping indicator, either `tt(%)' to explicitly enable the
+var(spec)-escaping behaviour of tt(-q) described below, or `tt(%%)' to
+explicitly disable it.  The default behaviour is to em(not) escape specs.
 
 Any `tt(%)' sequence in tt(format) that does not match a given var(spec)
 (or one of the special sequences described below) is output as-is.  If
@@ -222,8 +227,8 @@ number the condition is true when the width is em(greater than) that
 number, and with a negative number the condition is true when the width
 is em(less than or equal to) the absolute value of that number.
 
-With tt(-q), `tt(%)' characters in the var(spec)s are escaped as they
-are inserted into the formatted string, and pre-escaped `tt(%)' and
+With tt(-q), `tt(%)' characters in the var(spec)s are escaped by default
+as they are inserted into the formatted string, and pre-escaped `tt(%)' and
 `tt(RPAR())` characters in the format string are left as they are.  For
 example:
 
@@ -235,14 +240,6 @@ the tt(%B)...tt(%b) sequences could be used with prompt expansion to
 produce bold text.  One notable use case is formatting a description to
 be passed to tt(compadd -x) in a completion function.
 
-tt(-q) may be followed by an optional integer argument var(n) to escape
-only the first var(n) var(spec)s.  For example,
-
-example(zformat -Fq1 REPLY '%D %d' d:%foo% D:%bar%)
-
-outputs `tt(%bar% %%foo%%)' to tt(REPLY).  This is the only case where
-the order that var(spec)s are given in is significant.
-
 Since the output with tt(-q) is expected to be subject to further
 processing, width specifiers don't count the extra escape characters,
 ensuring that the widths are correct em(after) that processing.
@@ -251,6 +248,13 @@ against the em(pre-escaped) spec lengths.
 
 tt(-Q) is like tt(-q) except that it interprets pre-escaped `tt(%)' and
 `tt(RPAR())` characters in the format string as normal.
+
+The optional escaping indicator can be used to exempt individual
+var(spec)s from escaping as described above.  For example:
+
+example(zformat -qF REPLY '%d %D' d:%foo% %%D:%bar%)
+
+outputs `tt(%%foo%% %bar%)' to tt(REPLY).
 
 The form using the tt(-a) option can be used for aligning
 strings.  Here, the var(spec)s are of the form
