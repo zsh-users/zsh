@@ -1,3 +1,8 @@
+2026-06-16  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 54771: Src/Zle/compcore.c, Test/Y01completion.ztst: fix a bug
+	in nosort deduplication
+
 2026-06-15  dana  <dana@dana.is>
 
 	* unposted: Completion/Unix/Command/_ansible: remove duplicate
