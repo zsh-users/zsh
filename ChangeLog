@@ -1,5 +1,7 @@
 2026-06-14  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: config.guess, config.sub: update to 2026-05-17
+
 	* unposted: Completion/Unix/Command/_tcpdump: remove dead code
 
 	* unposted: Completion/Unix/Command/_cdrecord: use _tilde_files
