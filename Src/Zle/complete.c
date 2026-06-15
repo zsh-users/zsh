@@ -797,11 +797,13 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		argv++;
 		goto ca_args;
 	    default:
-		convchar_t c = unmeta_one(p, NULL);
-		zwarnnam(name, "bad option: -%c", c);
-		zsfree(mstr);
-		zfree(dat.dpar, dparsize);
-		return 1;
+		{
+		    convchar_t c = unmeta_one(p, NULL);
+		    zwarnnam(name, "bad option: -%c", c);
+		    zsfree(mstr);
+		    zfree(dat.dpar, dparsize);
+		    return 1;
+		}
 	    }
 	    if (sp) {
 		if (p[1]) {

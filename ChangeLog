@@ -1,5 +1,9 @@
 2026-06-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54776: Src/Modules/system.c, Src/Modules/zftp.c,
+	Src/Zle/complete.c, Src/exec.c, Src/glob.c: fix warnings from
+	54710
+
 	* 54771: Src/Zle/compcore.c, Test/Y01completion.ztst: fix a bug
 	in nosort deduplication
 

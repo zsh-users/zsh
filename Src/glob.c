@@ -1755,11 +1755,13 @@ zglob(LinkList list, LinkNode np, int nountok)
 		    break;
 		}
 		default:
-		    untokenize(--s);
-		    convchar_t attr = unmeta_one(s, NULL);
-		    zerr("unknown file attribute: %c", attr);
-		    restore_globstate(saved);
-		    return;
+		    {
+			untokenize(--s);
+			convchar_t attr = unmeta_one(s, NULL);
+			zerr("unknown file attribute: %c", attr);
+			restore_globstate(saved);
+			return;
+		    }
 		}
 	    }
 	    if (func) {

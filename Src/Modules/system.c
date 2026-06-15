@@ -556,7 +556,7 @@ bin_zsystem_flock(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 #endif
 
     while (*args && **args == '-') {
-	int opt;
+	convchar_t opt;
 	char *optptr = *args + 1, *optarg;
 	args++;
 	if (!*optptr || !strcmp(optptr, "-"))
@@ -653,7 +653,7 @@ bin_zsystem_flock(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		break;
 
 	    default:
-		convchar_t opt = unmeta_one(optptr, NULL);
+		opt = unmeta_one(optptr, NULL);
 		zwarnnam(nam, "flock: bad option: %c", opt);
 		return 1;
 	    }
