@@ -37,6 +37,13 @@
 #endif
 #endif
 
+#ifdef HAVE_POLL_H
+# include <poll.h>
+#endif
+#if defined(HAVE_POLL) && !defined(POLLIN)
+# undef HAVE_POLL
+#endif
+
 /* The number of bytes we normally read when given no pattern and the
  * upper bound on the number of bytes we read (even if we are give a
  * pattern). */
@@ -529,6 +536,59 @@ deleteallptycmds(void)
 
 /**** a better process handling would be nice */
 
+#ifdef HAVE_POLL
+static void
+checkptycmd(Ptycmd cmd)
+{
+    struct pollfd pfd;
+
+    if (cmd->fin)
+        return;
+    pfd.fd = cmd->fd;
+    pfd.events = POLLIN;
+    pfd.revents = 0;
+    if (poll(&pfd, 1, 0) <= 0)
+        return;  /* no events: slave still open, not finished */
+    if (pfd.revents & POLLIN)
+        return;  /* data available, not finished */
+    /* POLLHUP without POLLIN: slave closed, no data */
+    cmd->fin = 1;
+    zclose(cmd->fd);
+}
+#elif defined(FIONREAD)
+static void
+checkptycmd(Ptycmd cmd)
+{
+    int val = 0, select_ret = 0;
+
+    if (cmd->fin)
+        return;
+#ifdef HAVE_SELECT
+    {
+	fd_set fds;
+	struct timeval tv;
+	int ret;
+
+	FD_ZERO(&fds);
+	FD_SET(cmd->fd, &fds);
+	tv.tv_sec = 0;
+	tv.tv_usec = 0;
+	ret = select(cmd->fd + 1, (SELECT_ARG_2_T) &fds, NULL, NULL, &tv);
+	if (ret > 0 && FD_ISSET(cmd->fd, &fds)) {
+	    /* either there are bytes, or the process exited */
+	    select_ret = 1;
+	}
+    }
+#endif
+    if (ioctl(cmd->fd, FIONREAD, (char *) &val) == 0 && val > 0)
+        return;  /* data available, not finished */
+    /* No data (or ioctl failed): check if process is dead */
+    if (select_ret || kill(cmd->pid, 0) < 0) {
+        cmd->fin = 1;
+        zclose(cmd->fd);
+    }
+}
+#else
 static void
 checkptycmd(Ptycmd cmd)
 {
@@ -545,6 +605,7 @@ checkptycmd(Ptycmd cmd)
     }
     cmd->read = (int) c;
 }
+#endif
 
 static int
 ptyread(char *nam, Ptycmd cmd, char **args, int noblock, int mustmatch)

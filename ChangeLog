@@ -1,3 +1,8 @@
+2026-07-04  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 54783: Src/Modules/zpty.c, Test/V08zpty.ztst: improve
+	checkptycmd
+
 2026-07-03  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/X/Command/_mplayer, Completion/X/Command/_xv:

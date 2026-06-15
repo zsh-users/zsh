@@ -25,3 +25,15 @@
   zpty -d cat
 0:zpty with a process that does not set up the terminal: write via stdin
 >a line of text
+
+  zpty loop 'while read; do echo hello; done'
+  zpty -w loop hi
+  zpty -rt loop | tr -d $'\r'
+  zpty -w loop hi
+  zpty -t loop
+  zpty -rt loop | tr -d $'\r'
+  zpty -rt loop
+  zpty -d loop
+0:zpty doesn't duplicate data
+>hello
+>hello
