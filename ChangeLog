@@ -1,5 +1,8 @@
 2026-06-15  dana  <dana@dana.is>
 
+	* unposted: Completion/Unix/Command/_ansible: remove duplicate
+	option
+
 	* 54764: Src/utils.c: zerrmsg: handle null pointers with %s/%l
 
 2026-06-14  Mikael Magnusson  <mikachu@gmail.com>
