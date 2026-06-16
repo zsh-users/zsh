@@ -143,7 +143,6 @@ case $service in
   ;;
   ansible-playbook)
     args+=(
-      '--flush-cache[clear the fact cache for every host in inventory]'
       '--force-handlers[run handlers even if a task fails]'
       '--list-tags[list all available tags]'
       '--list-tasks[list all tasks that would be executed]'
