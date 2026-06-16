@@ -1,5 +1,8 @@
 2026-06-20  dana  <dana@dana.is>
 
+	* Nuke: 54790 (tweaked): Completion/Unix/Command/_ffmpeg:
+	update for modern ffmpeg
+
 	* Holger Hoffstätte: github #174: Completion/Unix/Command/_gcc:
 	_gcc: coroutines-ts was merged in 2020
 
