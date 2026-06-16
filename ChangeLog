@@ -1,5 +1,8 @@
 2026-06-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54788: Completion/Unix/Command/_shutdown: fix shutdown
+	completion when not using systemd
+
 	* 54771: Src/Zle/compcore.c, Test/Y01completion.ztst: fix a bug
 	in nosort deduplication
 

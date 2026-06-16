@@ -2,7 +2,7 @@
 
 local -a args
 
-if [[ -d /etc/systemd ]]; then
+if [[ -d /run/systemd/system ]]; then
   _arguments \
     '--help[display usage information]' \
     '(-H --halt)'{-H,--halt}'[halt the machine]' \
