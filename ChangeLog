@@ -1,5 +1,8 @@
 2026-06-16  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54788: Completion/Unix/Command/_shutdown: fix shutdown
+	completion when not using systemd
+
 	* 54784: configure.ac: cache the last few checks in configure.ac
 
 	* 54776: Src/Modules/system.c, Src/Modules/zftp.c,
