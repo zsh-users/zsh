@@ -1,8 +1,7 @@
-#compdef pgrep pkill
+#compdef pgrep pkill pidwait
 
 # Notes:
-# - We assume that Linux systems use procps-ng - specifically, procps-ng >=3.3.4
-#   (which changed the behaviour of -f and added -a)
+# - We assume that Linux systems use procps-ng
 # - We don't really need to keep pgopts and pkopts separate, but it seems like
 #   it should make things a bit easier to follow
 
@@ -17,13 +16,13 @@ typeset -a arguments sig_arguments aopts
 arguments=(
   '-a[include process ancestors in match list]'
   '-c+[match only on specified login class]:login class:_login_classes'
-  '(-F --pidfile)'{-F+,--pidfile=}'[match only processes in specified PID file]:PID file:_files'
+  '(-F --pidfile -p --pid)'{-F+,--pidfile=}'[match only processes in specified PID file]:PID file:_files'
   '(-f --full)'{-f,--full}'[match against full command line]'
   '(-G --group)'{-G+,--group=}'[match only on specified real group IDs]: :_sequence _groups'
   '(-g --pgroup)'{-g+,--pgroup=}'[match only on specified process group IDs]: :->pgid'
   '(: * -)'{-h,--help}'[display help information]'
   '-I[request confirmation before signalling each process]'
-  '-i[ignore case distinctions]'
+  '(-i --ignore-case)'{-i,--ignore-case}'[ignore case distinctions]'
   '-j+[match only on specified jail IDs]:jail:_sequence _jails -0 -o jid'
   '(-L --logpidfile)'{-L,--logpidfile}'[fail if PID file not locked (with -F)]'
   '(-N)-M+[extract name list from specified core]:core file:_files'
@@ -67,15 +66,25 @@ arguments=(
 case $OSTYPE in
   linux*)
     # Note: We deliberately exclude -v but not --inverse from pkill
-    pgopts=AacdFfGghLlnoOPrstUuVvwx-
-    pkopts=AceFfGgHhLnoOPstUuVx-
+    pgopts=AacdFfGghLlnopOPQrstUuVvwx-
+    pkopts=AceFfGgHhLmnoOPstUuVx-
+    pwopts=AceFfGghiLnOoPpQrstUuVx-
     arguments=(
       ${arguments:#((#s)|*\))(\*|)-[acl]*}
       '(-c --count)'{-c,--count}'[display count of matching processes]'
+      '(-p --pid -F --pidfile)'{-p+,--pid=}'[match process PIDs]: :_sequence _pids'
+      '(-Q --shell-quote)'{-Q,--shell-quote}'[output the command line in shell-quoted form]'
+    )
+    [[ $service == pkill ]] && arguments+=(
+      '(-m --mrelease)'{-m,--mrelease}'[release process memory immediately after kill]'
     )
     [[ $service == pgrep ]] && arguments+=(
       '(-a -l --list-full --list-name)'{-a,--list-full}'[display full command line]'
       '(-a -l --list-full --list-name)'{-l,--list-name}'[display process name]'
+      '--quiet[suppress all normal output]'
+    )
+    [[ $service == pidwait ]] && arguments+=(
+      '(-e --echo)'{-e,--echo}'[display PIDs before waiting]'
     )
     ;;
   dragonfly*|freebsd*)
@@ -110,7 +119,9 @@ case $OSTYPE in
     ;;
 esac
 
-if [[ $service == pgrep ]]; then
+if [[ $service == pidwait ]]; then
+  arguments=( ${(M)arguments:#((#s)|*\))(\*|)-[$pwopts]*} )
+elif [[ $service == pgrep ]]; then
   arguments=( ${(M)arguments:#((#s)|*\))(\*|)-[$pgopts]*} )
 else
   arguments=( ${(M)arguments:#((#s)|*\))(\*|)-[$pkopts]*} )
@@ -140,7 +151,7 @@ fi
 
 arguments+=( $sig_arguments + o '*: :->pname' )
 
-[[ $OSTYPE == linux* ]] || aopts+=( -A '*-' )
+[[ $OSTYPE == linux* ]] || aopts+=( -A '-?*' )
 _arguments -C -s -S $aopts : $arguments && ret=0
 
 # complete comma-separated list of various IDs

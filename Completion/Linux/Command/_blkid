@@ -19,10 +19,10 @@ _arguments \
   '(-l --list-one)'{-l,--list-one}'[look up only first device with token specified by -t]' \
   '(-n --match-types)'{-n+,--match-types=}'[filter by filesystem type]: :_sequence _file_systems' \
   '(-O --offset)'{-O+,--offset=}'[probe at the given offset]: :_numbers -M "m\:{a-zA-Z}={A-Za-z}" offset {K,M,G,T,P,E,Z,Y}{,B,iB}' \
-  '(-o --output)'{-o+,--output=}'[specify output format]:format [full]:(full value list device udev export)' \
+  '(-o --output)'{-o+,--output=}'[specify output format]:format [full]:(full value list device udev export json)' \
   '(-p --probe)'{-p,--probe}'[probe low-level superblocks]' \
   \*{-s+,--match-tag=}'[show specified tag(s)]:tag:(none LABEL UUID UUID_SUB TYPE PARTLABEL PARTUUID SEC_TYPE PTUUID PTTYPE ALIGNMENT_OFFSET MINIMUM_IO_SIZE OPTIMAL_IO_SIZE PHYSICAL_SECTOR_SIZE LOGICAL_SECTOR_SIZE)' \
-  '(-S --size)'{-S+,--size=}'[overwrite device size]: :_numbers -M "m\:{a-zA-Z}={A-Za-z}" size {K,M,G,T,P,E,Z,Y}{,B,iB}' \
+  '(-S --size)'{-S+,--size=}'[override device size]: :_numbers -M "m\:{a-zA-Z}={A-Za-z}" size {K,M,G,T,P,E,Z,Y}{,B,iB}' \
   '(-t --match-token)'{-t+,--match-token=}'[find device with a specific token]:token' \
   '(-u --usages)'{-u+,--usages=}'[filter by usage]:usage:_sequence compadd - {no,}{filesystem,raid,crypto,other}' \
   '*:device:_files -g "*(-%)"'

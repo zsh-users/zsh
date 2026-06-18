@@ -13,23 +13,29 @@ _arguments -C -s \
   "($info -r --resolve)"{-r,--resolve}'[resolve host addresses]' \
   "($info -a --all -l --listening)"{-a,--all}'[display all sockets]' \
   "($info -l --listening -a --all)"{-l,--listening}'[display listening sockets]' \
+  "($info -B --bound-inactive)"{-B,--bound-inactive}'[display TCP bound but inactive sockets]' \
   "($info -o --options -e --extended)"{-o,--options}'[show timer information]' \
   "($info -e --extended -o --options)"{-e,--extended}'[show detailed information]' \
   "($info -m --memory)"{-m,--memory}'[show socket memory usage]' \
   "($info -p --processes)"{-p,--processes}'[show process using each socket]' \
+  "($info -T --threads)"{-T,--threads}'[show thread using socket]' \
   "($info -i --info)"{-i,--info}'[show internal TCP information]' \
   "($info)--tipcinfo[show internal tipc socket information]" \
   "($info -s --summary)"{-s,--summary}'[print summary statistics]' \
   "($info)--tos[show tos and priority information]" \
+  "($info)--cgroup[show cgroup information]" \
   "($info -b --bpf)"{-b,--bpf}'[show bpf filter socket information]' \
+  "($info)--bpf-maps[show all BPF socket-local storage maps]" \
+  "($info)--bpf-map-id=[show a BPF socket-local storage map]:map ID" \
   "($info -E --events)"{-E,--events}'[continually display sockets as they are destroyed]' \
-  "($info -Z --context)"{-Z,--context}'[display process SELinux security contexts]' \
-  "($info -z --contexts)"{-z,--contexts}'[display process and socket SELinux security contexts]' \
+  "($info -Z --context)"{-Z,--context}'[display task SELinux security contexts]' \
+  "($info -z --contexts)"{-z,--contexts}'[display task and socket SELinux security contexts]' \
   "($info -N --net)"{-N,--net}'[switch to specified network namespace]:network namespace' \
   "($info -4 --ipv4 -6 --ipv6)"{-4,--ipv4}'[display only IP version 4 sockets]' \
   "($info -4 --ipv4 -6 --ipv6)"{-6,--ipv6}'[display only IP version 6 sockets]' \
   "($info -0 --packet)"{-0,--packet}'[display PACKET sockets]' \
   "($info -t --tcp)"{-t,--tcp}'[display TCP sockets]' \
+  "($info -M --mptcp)"{-M,--mptcp}'[display only MPTCP sockets]' \
   "($info -S --sctp)"{-S,--sctp}'[display SCTP sockets]' \
   "($info -u --udp)"{-u,--udp}'[display UDP sockets]' \
   "($info -d --dccp)"{-d,--dccp}'[display DCCP sockets]' \
@@ -41,7 +47,9 @@ _arguments -C -s \
   "($info -f --family)"{-f+,--family=}'[display sockets of specified type]:family:(inet inet6 link unix netlink vsock tipc xdp help)' \
   "($info -K --kill)"{-K,--kill}'[forcibly close sockets, display what was closed]' \
   "($info -H --no-header)"{-H,--no-header}'[suppress header line]' \
+  "($info -Q --no-queues)"{-Q,--no-queues}'[suppress sending and receiving queue columns]' \
   "($info -O --oneline)"{-O,--oneline}"[print socket's data on a single line]" \
+  "($info)--inet-sockopt[show various inet socket options]" \
   "($info -A --query --socket)"{-A+,--query=,--socket=}'[specify socket tables to show]: :_values -s , socket\ table all inet tcp udp raw unix packet netlink unix_dgram unix_stream unix_seqpacket packet_raw packet_dgram vsock_stream vsock_dgram tipc' \
   "($info -D)"{-D+,--diag=}'[dump raw info to file]:file:_files' \
   "($info -F)"{-F+,--filter=}'[read filter information from a file]:file:_files' \

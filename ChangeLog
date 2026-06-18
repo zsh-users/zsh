@@ -1,3 +1,7 @@
+2026-06-19  Oliver Kiddle  <opk@zsh.org>
+
+	* 54800, 54807: Completion/...: completion options update
+
 2026-06-16  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 54788: Completion/Unix/Command/_shutdown: fix shutdown

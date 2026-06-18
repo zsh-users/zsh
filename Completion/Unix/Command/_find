@@ -12,17 +12,21 @@ case $variant in
       '*-local'
     )
   ;|
-  solaris*|darwin*)
+  solaris*|darwin*|freebsd<15->.*)
     args+=( '*-xattr' )
   ;|
   solaris2.<10->|freebsd*|darwin*)
     args+=( '*-acl' )
   ;|
-  solaris2.<11->|freebsd*|dragonfly*|darwin*|openbsd*|gnu)
+  aix*|solaris2.<11->|freebsd*|dragonfly*|darwin*|openbsd*|gnu)
     args+=(
       '*-amin:access time (minutes)'
       '*-cmin:inode change time (minutes)'
       '*-mmin:modification time (minutes)'
+    )
+  ;|
+  solaris2.<11->|freebsd*|dragonfly*|darwin*|openbsd*|gnu)
+    args+=(
       '*-iname:name pattern to match (case insensitive)'
       '*-print0'
     )
@@ -36,7 +40,7 @@ case $variant in
   darwin*|freebsd*|gnu)
     args+=(
       '*-Bmin:birth time (minutes)'
-      '*-Bnewer:file to compare (birth time):_files'
+      '!*-Bnewer:reference file:_files'
       '*-newer'{a,B,c,m}{a,B,c,m}'[if [aBcm\]time is newer than [aBcm\]time of given file]:reference file:_files'
       '*-newerat[if access time is newer than given timestamp]:timestamp: '
       '*-newerBt[if birth time is newer than given timestamp]:timestamp: '
@@ -98,7 +102,7 @@ case $variant in
     )
   ;|
   freebsd*|dragonfly*) args+=( '*-sparse' ) ;|
-  darwin*) args+=( '*-xattrname:name' ) ;|
+  darwin*|freebsd<15->.*) args+=( '*-xattrname:name' ) ;|
   gnu)
     args+=(
       '(- *)-help' '(-)--help'

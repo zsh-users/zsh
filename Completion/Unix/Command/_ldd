@@ -26,6 +26,17 @@ else
 	'-s[display search path used]'
 	'-v[displays all dependency relationships]'
       )
+    ;|
+    solaris2.<11->)
+      args+=(
+        '-c[disable configuration file used]'
+        '-D[skip deferred dependency loading]'
+        '-p[display unresolved parent and external references]'
+        '-S+[specify system root]:directory:_directories'
+        '-w[display unresolved weak references]'
+        '(- *)'{-\?,--help}'[display usage information]'
+        '(- *)'{-V,--version}'[display version information]'
+      )
     ;;
     freebsd*)
       args=(

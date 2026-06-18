@@ -67,8 +67,13 @@ case $variant in
       '!(--no-recurse-limit)--recurse-limit'
       '--no-recurse-limit[disable demangling recursion limit]'
       '(-w --wide)'{-w,--wide}'[format output for more than 80 columns]'
-      '-U+[specify how to display unicode characters]:method:(d l e x h i)'
-      '--unicode=[specify how to display unicode characters]:method:(default locale escape hex highlight invalid)'
+      '(-U --unicode)'{-U+,--unicode=}'[specify how to treat UTF-8 encoded unicode characters]: : _values "treatment [default]"
+        {d,default}"[no special treatment]"
+        {l,locale}"[convert to current locale]"
+        {i,invalid}"[not part of a valid string]"
+        {x,hex}"[<> enclosed hex byte sequences]"
+        {e,escape}"[escape sequences (\\\\uxxxx)]"
+        {h,highlight}"[escape sequences highlighted in red]"' \
       '(-z --disassemble-zeroes)'{-z,--disassemble-zeroes}"[don't skip blocks of zeroes when disassembling]"
 
       '--start-address=[only process data whose address is >= ADDR]:address'

@@ -49,7 +49,9 @@ if _pick_variant -r variant gnu=GNU elftoolchain=elftoolchain $OSTYPE --version;
         '(*)-o+[output file]:output file:_files'
         '--keep-section-symbols[retain section symbols]'
         '--keep-file-symbols[retain symbols specifying source file names]'
-        '(-v --verbose)'{-v,--verbose}'[list all object files modified or members of archives]')
+        '(-v --verbose)'{-v,--verbose}'[list all object files modified or members of archives]'
+        '--plugin=[load specified plugin]:plugin'
+      )
     ;;
     elftoolchain)
       args+=(

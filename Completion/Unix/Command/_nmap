@@ -1,63 +1,125 @@
 #compdef nmap
 
-local curcontext="$curcontext" state line suf ret=1
+local curcontext="$curcontext" ign dir ret=1
+local -a state line expl suf
+local -A opt_args
+local -aU scripts categories
 
-_arguments -C \
+(( $#words == 2 )) || ign='!(- *)'
+_arguments -s -S -C \
+  '!(-6)-4' \
   '!-sI:zombie host:_hosts' \
-  '!-P'{T,S,U}'+:port list' \
-  '*-s-[specify scan type]:scan type:((S\:TCP\ SYN\ scan T\:TCP\ connect\(\)\ scan F\:stealth\ FIN\ scan X\:stealth\ Xmas\ tree\ scan N\:stealth\ null\ scan P\:ping\ scanning U\:UDP\ scan O\:IP\ protocol\ scan I\:idle\ scan A\:ACK\ scan W\:window\ scan R\:RPC\ scan L\:list\ scan V\:version\ detection))' \
-  '-b[specify ftp relay host]:ftp relay host:_hosts' \
-  '*-P-[specify probe types and options]:probe type/options:->probe-opts' \
-  '-A[enable OS detection and version scanning]' \
-  '-O[enable remote OS identification]' \
-  '-6[enable IPv6 support]' \
-  '-I[enable TCP reverse ident scanning]' \
-  '-f[use tiny fragmented IP  packets]' \
-  '*-v[verbose mode]' \
-  '-h[show help information]' \
-  '*-o-[log results]:log format:->log-forms:log filename:_files' \
-  '--resume[resume cancelled scan]:log filename:_files' \
-  '--append-output[append results to any log files]' \
+  '!-P'{S,A,U,Y}'+:port list' \
+  '!-PO+:protocol list' \
+  '!(-F -p --exclude-ports)-sn' \
   '-iL[read target specifications from file]:file:_files' \
   '-iR[scan random hosts]:num hosts' \
-  '-p[specify ports to try]:port numbers' \
-  '-F[scan only ports listed in services file]' \
-  '-D[perform decoy scan]:host list:_sequence -s, _hosts' \
-  '-S[specify source address]:address:_hosts' \
-  '-e[specify interface to use]:network interface:_net_interfaces' \
-  '-g[specify source port number]:port number' \
-  '--data-length[add random data to packets]:data length' \
-  '(-R)-n[skip reverse DNS to speed things up]' \
+  '--exclude[specify hosts/networks to exclude]:host list:_sequence _hosts' \
+  '--excludefile[use exclude list from a file]:file:_files' \
+  '*-s-[specify scan type]:scan type:((S\:TCP\ SYN\ scan T\:TCP\ connect\(\)\ scan F\:stealth\ FIN\ scan X\:stealth\ Xmas\ tree\ scan N\:stealth\ null\ scan P\:ping\ scanning U\:UDP\ scan O\:IP\ protocol\ scan I\:idle\ scan A\:TCP\ ACK\ scan W\:TCP\ window\ scan M\:TCP\ Maimon\ scan R\:RPC\ scan L\:list\ scan Y\:SCTP\ INIT\ scan Z\:SCTP\ COOKIE-ECHO\ scan V\:version\ detection n\:no\ port\ scan C\:equivalent\ to\ --script=default))' \
+  '*-P-[specify probe types and options]:probe type/options:->probe-opts' \
+  '(-R --dns-servers --system-dns)-n[skip reverse DNS to speed things up]' \
   '(-n)-R[always do reverse DNS on targets]' \
+  '--resolve-all[scan all addresses resolved via DNS]' \
+  '--unique[scan each address only once]' \
+  '(--dns-servers -n)--system-dns[use OS DNS resolver for reverse lookups]' \
+  '(--system-dns -n)--dns-servers[specify custom DNS servers for reverse lookups]:server:_sequence _hosts' \
+  "--disable-arp-ping[don't do ARP or IPv6 ND of locally connected ethernet hosts]" \
+  "--discovery-ignore-rst[don't treat RST replies as proof of a target being up]" \
+  '--traceroute[trace hop path to each host]' \
+  '--scanflags[customize TCP scan flags]:TCP flags:->tcp-flags' \
+  '-b[specify ftp relay host]:ftp relay host:_hosts' \
+  '-p+[specify ports to try]:port numbers' \
+  '--exclude-ports[exclude specified ports]:port numbers' \
+  '-F[scan only ports listed in services file]' \
   "-r[don't randomize order in which ports are scanned]" \
-  '-ttl[specify IPv4 time to live for sent packets]' \
-  '--randomize-hosts[scan hosts in random order]' \
-  '-M[specify maximum number of parallel TCP connects]:maximum TCP connects' \
-  '--packet-trace[show all packets sent in tcpdump-like format]' \
+  '--top-ports[scan most common ports]:number of ports' \
+  '--port-ratio[scan ports more common than specified ratio]: :_numbers -l 0.0 -m 1.0 ratio' \
+  "--allports[don't exclude any ports from version detection]" \
+  '(--version-light --version-all)--version-intensity[limit version probes to try]:level:((0\:light 1 2 3 4 5 6 7 8 9\:try\ all))' \
+  '(--version-intensity --version-all)--version-light[alias for --version-intensity 2]' \
+  '(--version-intensity --version-light)--version-all[alias for --version-intensity 9]' \
   '--version-trace[show packets related to version scanning]' \
-  '--datadir[specify directory containing data files]:directory:_directories' \
-  '-T[specify timing policy]:timing policy:(Paranoid Sneaky Polite Normal Aggressive Insane)' \
-  '--host-timeout[specify maximum time for scanning a single host]:timeout (ms)' \
-  '--max-rtt-timeout[maximum time for a probe response]:timeout (ms)' \
-  '--min-rtt-timeout[minimum time to wait for a probe response]:time (ms)' \
-  '--initial-rtt-timeout[specify initial probe timeout]:timeout (ms)' \
-  '--max-parallelism[specify max number of scans to perform in parallel]:number' \
-  '--min-parallelism[scan at least specified number of ports in parallel]:number' \
-  '--scan-delay[specify minimum amount of time between probes]:delay (ms)' \
-  '--interactive[go into interactive mode]' \
+  '-O[enable remote OS identification]' \
+  '--osscan-limit[limit OS detection to promising targets]' \
+  '(--osscan-guess --fuzzy)'{--osscan-guess,--fuzzy}'[guess OS more aggressively]' \
+  '--max-os-tries[set maximum number of OS detection tries against a target]:tries [5]' \
+  '--script=[specify Lua scripts]:script:->scripts' \
+  '--script-args[provide arguments to scripts]:arguments' \
+  '--script-args-file[provide script arguments in a file]:file:_files' \
+  '--script-trace[show all data sent and received]' \
+  '--script-updatedb[update the script database]' \
+  "$ign--script-help=[show help about scripts]:script:->scripts" \
+  --{min,max}-hostgroup'[set parallel scan group size]:size' \
+  --{min,max}-parallelism'[specify number of scans to perform in parallel]:number' \
+  --{min,max}-rtt-timeout'[set time to wait for a probe response]: :_numbers -u seconds time \:s ms m h' \
+  '--initial-rtt-timeout[specify initial probe timeout]: :_numbers -u seconds timeout \:s ms m h' \
+  '--max-retries[cap number of port scan probe retransmissions]:tries' \
+  '--host-timeout[specify maximum time for scanning a single host]: :_numbers -u seconds timeout \:s ms m h' \
+  '--script-timeout[set a ceiling on script execution time]:max time' \
+  '(--scan-delay --max-scan-delay)'--{max-,}'scan-delay[set amount of time between probes to a given host]: :_numbers -u seconds delay \:s ms m h' \
+  '--min-rate[send packets no slower than number per second]:packets' \
+  '--max-rate[send packets no faster than number per second]:packets' \
+  '--defeat-'{rst,icmp}'-ratelimit' \
+  '--nsock-engine:IO multiplexing engine:(iocp epoll kqueue poll select)' \
+  '-T[set a timing template]:timing policy:(paranoid sneaky polite normal aggressive insane)' \
+  '-f[fragment packets]' \
+  '--mtu=[specify MTU, with -f]:mtu' \
+  '-D[perform decoy scan]:host list:_sequence _hosts' \
+  '-S[spoof source address]:address:_hosts' \
+  '-e[specify interface to use]:network interface:_net_interfaces' \
+  '(-g --source-port)'{-g,--source-port=}'[specify source port number]:port number' \
+  '--data=[append a custom payload to sent packets]:payload (hex string)' \
+  '--data-string=[append a custom ASCII string to sent packets]:string' \
+  '--data-length[add random data to packets]:data length' \
+  '--ip-options=[send packets with specified IP options]:IP options:->ip-options' \
+  '--ttl[specify IPv4 time to live for sent packets]:time-to-live' \
+  '--randomize-hosts[scan hosts in random order]' \
+  '--spoof-mac=[spoof your MAC address]:MAC address' \
+  '--proxies=[relay connections through HTTP/SOCKS4 proxies]:proxy:_sequence _urls' \
+  '--badsum[send packets with a bogus TCP/UDP/SCTP checksum]' \
+  '--adler32[use deprecated Adler32 instead of CRC32C for SCTP checksums]' \
+  '*-o-[log results]:log format:->log-forms: :{_files || _date_formats}' \
+  '*-v-[increase verbosity]::level' \
+  '*-d-[increase debugging level]::level' \
+  '--reason[show why a port is in a particular state]' \
+  '--stats-every=[print periodic timing stats]: :_numbers -u seconds interval \:s ms m h' \
+  '--open[only show open (or possibly open) ports]' \
+  '--packet-trace[show all packets sent in tcpdump-like format]' \
+  "$ign--iflist[list interfaces and routes]" \
+  '--append-output[append results to any log files]' \
+  "$ign--resume[resume aborted scan]:log filename:_files" \
+  '--noninteractive[disable runtime interactions via keyboard]' \
+  '(--webxml)--stylesheet[specify XSL stylesheet to transform XML output to HTML]:stylesheet:_urls' \
+  '(--stylesheet)--webxml[load stylesheet from Nmap.Org]' \
+  '--no-stylesheet[omit XSL stylesheet declaration from XML]' \
+  '-6[enable IPv6 scanning]' \
+  '(-O)-A[enable OS detection, version detection, script scanning and traceroute]' \
+  '--datadir=[specify custom Nmap data file location]:directory:_directories' \
+  '--servicedb=[specify custom services file]:services file:_files' \
+  '--versiondb=[specify custom service probes file]:service probes file:_files' \
+  '(--send-ip)--send-eth[send using raw ethernet frames]' \
+  '(--send-eth)--send-ip[send using raw IP packets]' \
+  '(--unprivileged)--privileged[assume user is fully privileged]' \
+  '(--privileged)--unprivileged[assume user lacks raw socket privileges]' \
+  '!--release-memory' \
+  "$ign"{-V,--version}'[print version number]' \
+  "$ign"{-h,--help}'[print help summary]' \
   '*:host:_hosts' && ret=0
 
 case $state in
   probe-opts)
-    _values -S '' 'probe type/option' \
-      "0[don't try to ping hosts before scanning]" \
-      'T[use TCP "ping"]' \
-      'S[use SYN packets instead of ACK]' \
-      'U[send UDP probes]' \
-      'E[use a true ping]' \
-      'P[use an ICMP timestamp request]' \
-      'M[use a netmask request]' \
-      'B[use ACK and ICMP echo in parallel]' && ret=0
+    _values -S '' 'discovery probe type [R]' \
+      'n[skip host discovery]' \
+      'A[use TCP with ACK flag]' \
+      'S[use TCP with SYN flag]' \
+      'U[use UDP discovery probe]' \
+      'Y[use SCTP discovery probe]' \
+      'E[use ICMP echo request ]' \
+      'P[use ICMP timestamp request]' \
+      'M[use ICMP netmask request]' \
+      'O[IP protocol ping]' \
+      'R[use ARP]' && ret=0
   ;;
   log-forms)
     _values 'log format' \
@@ -65,13 +127,50 @@ case $state in
       'X[XML]' \
       'G[grepable]' \
       'A[all]' \
-      'S[S|<ipT kiDdI3]' && ret=0
+      'S[S|<rIpt kIddi3]' && ret=0
   ;;
-  host-list)
-    suf=()
-    compset -P '*,'
+  tcp-flags)
+    compset -P '(URG|ACK|PSH|RST|SYN|FIN)#'
+    _wanted tcp-flags expl 'TCP flag' compadd -S '' \
+        URG ACK PSH RST SYN FIN && ret=0
+  ;;
+  ip-options)
+    _values -S ' ' "IP option" \
+      'R[record route (9 slots available)]' \
+      'T[record internet timestamps (9 slots)]' \
+      'U[record timestamps and ip addresses (4 slots)]' \
+      'L[loose source routing (8 slots)]:hop ip' \
+      'S[strict source routing (8 slots)]:hop ip' && ret=0
+  ;;
+  scripts)
+    compset -P '*,(|+)'
     compset -S ',*' || suf=(-qS ,)
-    _hosts "$suf[@]" && ret=0
+
+    if [[ $PREFIX$SUFFIX = */* ]]; then
+      _files -g "*.nse(-.)"
+      return
+    fi
+
+    categories=( all )
+    for dir in \
+      ${opt_args[--datadir]:+${~opt_args[--datadir]}/scripts(/N)} \
+      $NMAPDIR/scripts(/N) \
+      ${${commands[$words[1]]:-$words[1]}:P:h:h}/share/nmap/scripts(/N) \
+      ~/.nmap/scripts(/N) \
+      ../share/nmap/scripts(/N) \
+      $NMAPDATADIR/scripts(/N) \
+      .
+    do
+      if [[ -r $dir/script.db ]]; then
+        scripts+=( ${${${(SM)${(f)"$(<$dir/script.db)"}#filename = \"[^.]##.}%.}#*\"} )
+        categories+=( ${${(s.,.)${(SM)${(f)"$(<$dir/script.db)"}##categories = [^\}]#}#*\{}//[ \"]/} )
+      else
+        scripts+=( $dir/*.nse(N:t:r) )
+      fi
+    done
+    _alternative \
+      'categories:category:compadd $suf -a categories' \
+      'scripts:script:compadd -M "r:|-=* r:|=*" $suf -a scripts' && ret=0
   ;;
 esac
    

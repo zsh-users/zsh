@@ -69,9 +69,12 @@ case $variant in
     args+=(
       '-n[list only processes with non-blocking mandatory locks]'
     )
-  ;;
+  ;|
   solaris2.<10->)
     args+=( '-d[report device usage for all minor nodes bound to same device]' )
+  ;|
+  solaris2.<11->)
+    args+=( "-l[don't resolve symlinks to target file]" )
   ;;
   sysv4 )
     (( $+words[(r)-k] )) && argf=( ':name: _alternative signals\:signal\:_signals\ -p files:file:_files' )

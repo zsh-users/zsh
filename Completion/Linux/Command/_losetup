@@ -8,7 +8,7 @@ fi
 
 local device offset
 
-device='1:device:_files -g "/dev/loop<->"'
+device=':device:_files -g "/dev/loop<->"'
 offset=( {-o,--offset}'+[specify data start is offset]:offset (bytes)' )
 
 _arguments -s -S \
@@ -28,7 +28,8 @@ _arguments -s -S \
   {-c,--set-capacity}'[reread the size of the file associated with the loop device]' \
   - 'detach' \
   '(-)'{--detach,-d}'[detach from specified loop device]' \
-  "$device" \
+  '(-)--remove[remove one or more devices]:device' \
+  "*$device" \
   - '(detach-all)' \
   {-D,--detach-all}'[detach all associated loop devices]' \
   - 'create' \

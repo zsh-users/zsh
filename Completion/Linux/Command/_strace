@@ -23,11 +23,13 @@ _arguments -C -s \
   '(-z -Z --successful-only --failed-only)'{-z,--successful-only}'[trace only system calls that return success]' \
   '(-z -Z --successful-only --failed-only)'{-Z,--failed-only}'[trace only system calls that return an error]' \
   '(-a --columns)'{-a+,--columns=}'[align return values in a specific column]:column number [40]' \
+  '--color=[control use of color]:color [auto]:(never always auto)' \
   '(-i --instruction-pointer -c --summary-only)'{-i,--instruction-pointer}'[print instruction pointer at time of syscall]' \
   '(-c --summary-only)*-k[obtain stack trace between each syscall]' \
   '(-c --summary-only -k)--stack-trace=-[obtain stack trace between each syscall]::symbol' \
   '(-c --summary-only)--stack-trace-frame-limit=[specify limit on stack trace frames to print]:frames [256]' \
   '(-n --syscall-number)'{-n,--syscall-number}'[print syscall number]' \
+  '(-N --arg-names)'{-N,--arg-names}'[print syscall argument names]' \
   '(-o --output)'{-o+,--output=}'[send trace output to the specified file]:output file:->file-pipe' \
   '(-A --output-append-mode)'{-A,--output-append-mode}'[open the file provided with the -o option in append mode]' \
   '--output-separately[output to separate files for child processes (by appending pid to file names)]' \
@@ -95,6 +97,7 @@ case $state in
       'status[trace system calls with given return status]:status:->status' \
       'quiet[suppress various information messages]:message [none]:_sequence compadd - none attach exit path-resolution personality thread-execve superseded' \
       'kvm[print the exit reason of kvm vcpu]: :(vcpu)' \
+      'namespace=new[print namespace IDs that the tracee enters]' \
       'decode-fds[print information associated with file descriptors]:information [none]:_sequence compadd - none all path socket dev eventfd pidfd signalfd' \
       'secontext' \
       'decode-pids[print information associated with process IDs]:information [none]:_sequence compadd - none comm pidns' && ret=0

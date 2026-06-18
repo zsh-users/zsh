@@ -52,6 +52,7 @@ elif (( $words[(I)(-d|--decompress|--uncompress|-l|--list|-t|--test)] )); then
     '(--sparse)-o[specify output file]:file:_files -g "^*.(|t)zst(-.)"'
     "(M)--no-check[ignore checksums in compressed frame]"
     '!(M --no-check)'{-C,--check}
+    '--pass-through[pass through uncompressed files as-is]'
     '*:files:_files -g "*.(|t)zst(-.)"'
   )
 else
@@ -108,6 +109,7 @@ _arguments -s -S : $args \
   '--filelist=[read list of files to operate upon from file]: :_files' \
   '--output-dir-flat=[store processed files in directory]: :_directories' \
   '--output-dir-mirror=[store processed files in directory respecting original structure]: :_directories' \
+  '--no-asyncio[disable asynchronous IO]' \
   '--trace=[log tracing information to file]: :_files' \
   + '(M)' \
   \!{-z,--compress,--uncompress} \

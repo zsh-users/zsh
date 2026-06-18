@@ -15,6 +15,7 @@ _arguments -S \
   '(H)--padding=[pad the output to specified width]:width; positive - right-align; negative - left-align' \
   '(H)--round=[use specified method for rounding when scaling]:method [from-zero]:(up down from-zero towards-zero nearest)' \
   '(H)--suffix=[add suffix to output numbers and accept optional suffix in input numbers]:suffix' \
+  '(H)--unit-separator=[insert separator between number and unit on output]:separator' \
   "(H)--to=[auto-scale output numbers to specified unit]:unit:$units" \
   '(H)--to-unit=[specify output unit size]:unit size [1]' \
   '(H -z --zero-terminated -d --delimiter)'{-z,--zero-terminated}'[line delimiter is NUL, not newline]' \

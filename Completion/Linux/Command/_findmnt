@@ -19,6 +19,7 @@ _arguments -s -C \
   '(H -e --evaluate)'{-e,--evaluate}'[convert LABEL/UUID/PARTLABEL/PARTUUID to the device name]' \
   '(H -F --tab-file)*'{-F+,--tab-file=}'[search in the specified tab file]:tab file:_files' \
   '(H -f --first-only)'{-f,--first-only}'[print the first matching filesystem only]' \
+  '(H)--hyperlink=-[print paths as hyperlinks]::when:(always never auto)' \
   '(H -i --invert)'{-i,--invert}'[invert the sense of matching]' \
   '(H -M --mountpoint :)'{-M+,--mountpoint=}'[specify the mountpoint]: :->targets' \
   '(H -n --noheadings)'{-n,--noheadings}'[do not print a header line]' \
@@ -52,7 +53,8 @@ _arguments -s -C \
   '(H)'{-P,--pairs}'[use key="value" output format]' \
   '(H)'{-r,--raw}'[use raw output format]' \
   + '(S)' \
-  '(H)'{-k,--kernel}'[search in /proc/self/mountinfo (default)]' \
+  '(H)-k[search in /proc/self/mountinfo (default)]' \
+  '(H)--kernel=-[search in /proc/self/mountinfo (default)]::method:(mountinfo listmount)' \
   '(H)'{-m,--mtab}'[search in /etc/mtab]' \
   '(H)'{-N+,--task=}'[search /proc/<pid>/mountinfo]: :_pids' \
   '(H)'{-s,--fstab}'[search in /etc/fstab]' \

@@ -15,17 +15,19 @@ common=(
   '-dh[open shared files]'
   '-ep[exclude paths from name]'
   '-f[freshen files]'
-  '-idn[hide archived names]'
-  '-idp[disable percentage display]'
+  '-id-[disable messages]: : _values -s "" message
+    "c[copyright]" "d[done]" "n[archived names]" "p[percentage indicator]" "q[quiet]"' \
   '-ierr[send all messages to stderr]'
   '-inul[disable all messages]'
   '-kb[keep broken extracted files]'
   '-o\+[overwrite existing files]'
   '-o\-[do not overwrite existing files]'
+  '-ol-[save symbolic links as the link instead of the file]:: :((a\:absolute s\:skip))' \
   '-ow[save or restore file owner and group]'
   '-p+:password'
   '-p\-[do not query password]'
   '-r[recurse subdirectories]'
+  '-si-[read data from standard input]::name'
   '-ta+[process files modified after a date]:date (YYYYMMDDHHMMSS)'
   '-tb+[process files modified before a date]:date (YYYYMMDDHHMMSS)'
   '-tn+[process files newer than a specified time]:time'
@@ -56,9 +58,8 @@ case $service in
     else
       _arguments -S \
 	'-ep3[expand paths to full including the drive letter]' \
-        '-idc[disable ___ display]' \
-        '-idd[disable ___ display]' \
-        '-idq[disable ___ display]' \
+        '-mes[skip encrypted files]' \
+        '-op-[set output path for extracted files]:path:_directories' \
 	'-n+:file to include:_files' \
 	'-n@+:file of files to include:_files' \
         "$common[@]" \
@@ -106,6 +107,7 @@ case $service in
 	'-en[do not put end of archive block]' \
 	'-ep1[exclude base directory from names]' \
 	'-ep2[expand paths to full]' \
+        '-ep4-[exclude path prefix from names]:prefix' \
 	'-hp[encrypt both file data and headers]' \
 	'-ilog[log errors to file (registered versions only)]' \
 	'-isnd[enable sound]' \
@@ -113,7 +115,6 @@ case $service in
 	'-m+[set compression level]:compression level:(( 0\:store 1\:fastest 2\:fast 3\:normal 4\:good 5\:maximal ))' \
 	'-md+[dictionary size]:dictionary size (KB):( 64 128 256 512 1024 2048 4096 a b c d e f g )' \
 	'-ms[specify file types to store]' \
-	'-ol[save symbolic links as the link instead of the file]' \
 	'-p[set password]' \
 	'-r0[recurse subdirectories for wildcard names only]' \
 	'-rr[add data recovery record]' \

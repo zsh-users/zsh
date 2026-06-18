@@ -13,6 +13,9 @@ case $service in
       '(-z --decompress)'{-z,--decompress}'[decompress .gz and .bz2 files]'
     )
   ;|
+  (combine|inter|filter|flip)diff)
+    args+=( '--in-place[write output to original input files]' )
+  ;|
   interdiff|combinediff|flipdiff)
     args+=(
       '(-q --quiet)'{-q,--quiet}'[quieter output]'
@@ -22,6 +25,7 @@ case $service in
       '(-B --ignore-blank-lines)'{-B,--ignore-blank-lines}'[ignore changes whose lines are all blank]'
       '(-i --ignore-case)'{-i,--ignore-case}'[ignore case differences]'
       '(-b --ignore-space-change)'{-b,--ignore-space-change}'[ignore changes in the amount of whitespace]'
+      '--color=-[colorize the output]::when [auto]:(never always auto)'
       '!(--in-place)--interpolate' '!-h'
       '!(--no-revert-omitted --in-place)--combinediff'
       '!(--no-revert-omitted)--flip'
@@ -33,7 +37,6 @@ case $service in
       "--no-revert-omitted[don't revert files changed in only the first patch]"
     )
   ;;
-  flipdiff) args+=( '--in-place[write output to original input files]' ) ;;
   filterdiff|grepdiff|lsdiff)
     args+=(
       '(-i --include)'{-i,--include}'[include only files matching pattern]:pattern:_files'
@@ -42,6 +45,8 @@ case $service in
       '--lines=[only list hunks containing lines within specified range]:range'
       '(-F --files)'{-F+,--files=}'[only list files within specified range]:range'
       '--strip=[remove specified number of pathname components before displaying]:components'
+      '--git-prefixes=[specify handling of a/ and b/ prefixes in git diffs]:handling:(strip keep)'
+      '--git-extended-diffs=[process git diffs without hunks]:action [include]:(exclude include)'
       '--addprefix=[insert specified path prefix before displaying path names]:prefix:_directories'
       '*:diff file:_files'
     )
@@ -68,7 +73,7 @@ case $service in
       '--format=[use specified output format]:format:(unified context)'
       '--addnewprefix=[insert specified path prefix before new file path names]:prefix:_directories'
       '--addoldprefix=[insert specified path prefix before original file path names]:prefix:_directories'
-      '--as-numbered-lines=[display lines of selected hunks]:line numbers:(before after)'
+      '--as-numbered-lines=[display lines of selected hunks]:line numbers:(before after original-before original-after)'
       "--remove-timestamps[don't include timestamps in output]"
     )
   ;|
@@ -102,6 +107,7 @@ case $service in
     args+=( '-v[verbose operation]' '*:diff file:_files' )
   ;;
 esac
+
 
 _arguments -s $args
 

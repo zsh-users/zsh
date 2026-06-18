@@ -14,6 +14,8 @@ _arguments -C \
   '(-e -s   )-j[JIS]' \
   '(-v *)-B[load bookmark]' \
   '-bookmark[specify bookmark file]:bookmark file:_files' \
+  '-R[restore from session file]' \
+  '-session[specify session file]:session file:_files' \
   '-T[specify content-type]:content type:_mime_types' \
   '-m[internet message mode]' \
   '(-B *)-v[visual startup mode]' \
@@ -36,9 +38,11 @@ _arguments -C \
   "-no-proxy[don't use proxy]" \
   '(-6)-4[IPv4 only (-o dns_order=4)]' \
   '(-4)-6[IPv6 only (-o dns_order=6)]' \
+  '-insecure[use insecure SSL config options]' \
   "-no-mouse[don't use mouse]" \
   '(-no-cookie)-cookie[use cookie]' \
   "(-cookie)-no-cookie[don't use cookie]" \
+  '-cookie-jar[use specified cookie file]:file:_files' \
   '(-no-graph)-graph[use DEC special graphics for border of table and menu]' \
   '(-graph)-no-graph[use ASCII character for border of table and menu]' \
   '-S[squeeze multiple blank lines]' \
@@ -86,13 +90,13 @@ case "$state" in
       'history:history:compadd -a w3mhistory' && ret=0
   ;;
   option)
-    local -a options
-    options=( ${${(M)${(f)"$(_call_program options $words[1] -show-option 2>/dev/null)"}:#    -o *}/(#b)    -o (*)=[^ ]#[[:blank:]]##(*)/$match[1]:${match[2]:l}} )
+    local -a wopts
+    wopts=( ${${(M)${(f)"$(_call_program options $words[1] -show-option)"}:#    -o *}/(#b)    -o (*)=[^ ]#[[:blank:]]##(*)/$match[1]:${match[2]:l}} )
     if compset -P 1 '*='; then
       _message -e values 'value'
     else
       compset -S '=*' || suf=( -S '=' )
-      _describe -t options 'option' options "$suf[@]" && ret=0
+      _describe -t config-options 'option' wopts "$suf[@]" && ret=0
     fi
   ;;
 esac

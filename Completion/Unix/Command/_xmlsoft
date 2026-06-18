@@ -37,9 +37,8 @@ case $service in
       '--novalid[skip the DTD loading phase]' \
       '--nodtdattr[do not default attributes from the DTD]' \
       '--noout[do not dump the result]' \
-      '--maxdepth[increase the maximum depth]:depth' \
-      '--maxvars[increase the maximum variables]:variables' \
-      '--maxparserdepth[increase the maximum parser depth]:depth' \
+      '--maxdepth[increase the maximum depth]:depth [3000]' \
+      '--maxvars[increase the maximum variables]:variables [15000]' \
       '--huge[relax hardcoded limits of the parser]' \
       '--seed-rand[initialise random number generator]:seed' \
       '--html[input document is an HTML file]' \
@@ -64,7 +63,6 @@ case $service in
       '--version[display the version of the XML library used]' \
       '--debug[dump a debug tree of the in-memory document]' \
       '--shell[run a navigating shell]' \
-      '--debugent[debug the entities defined in the document]' \
       '--copy[used to test the internal copy implementation]' \
       '--recover[output what was parsable on broken XML documents]' \
       '--huge[remove any internal arbitrary parser limits]' \
@@ -75,8 +73,6 @@ case $service in
       '--load-trace[print trace of all external entities loaded]' \
       '--nonet[refuse to fetch DTDs or entities over network]' \
       '--nocompact[do not generate compact text nodes]' \
-      '--htmlout[output results as HTML]' \
-      '--nowrap[do not put HTML doc wrapper]' \
       '--valid[validate the document in addition to std well-formed check]' \
       '(--dtdvalid --relaxng --schema)--postvalid[do a posteriori validation, i.e after parsing]' \
       '(--postvalid --relaxng --schema --dtdvalidfpi)--dtdvalid[do a posteriori validation against a given DTD]:DTD:_webbrowser' \
@@ -86,17 +82,19 @@ case $service in
       '(--noout --output -o)'{--output,-o}'[save to a given file]:output file:_files' \
       '--repeat[repeat 100 times, for timing or profiling]' \
       '--insert[ad-hoc test for valid insertions]' \
+      '--strict-namespace[return failure if document has namespace errors]' \
       '--compress[turn on gzip compression of output]' \
       '--html[use the HTML parser]' \
       '--xmlout[use the XML serializer when using --html]' \
       '--nodefdtd[do not default HTML doctype]' \
       '--push[use the push mode of the parser]' \
-      '--pushsmall[use the push mode of the parser using tiny increments]' \
       '--memory[parse from memory]' \
-      '--maxmem[limit memory allocation]:bytes' \
+      '--maxmem[limit memory allocation]:maximum (bytes)' \
       '--nowarning[do not emit warnings from parser/validator]' \
       '--noblanks[drop (ignorable?) blanks spaces]' \
       '--nocdata[replace cdata section with text nodes]' \
+      '--nodict[create document without dictionary]' \
+      '--pedantic[enable additional warnings]' \
       '--format[reformat/reindent the input]' \
       '--encode[output in the given encoding]:encoding:(${encoding[@]})' \
       '--dropdtd[remove the DOCTYPE of the input docs]' \
@@ -124,6 +122,8 @@ case $service in
       '--sax[do not build a tree but work just at the SAX level]' \
       '--oldxml10[use XML-1.0 parsing rules before the 5th edition]' \
       '(--noout)--xpath[evaluate the XPath expression, implies --noout]:XPath expression' \
+      '(--noout)--xpath0[evaluate the XPath expression separating results by NUL, implies --noout]:XPath expression' \
+      '--max-ampl[set maximum amplification factor]:factor [5]' \
       '*:XML file:_webbrowser' && return
   ;;
   *XML_CATALOG_FILES*)

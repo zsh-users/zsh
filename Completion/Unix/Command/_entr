@@ -13,6 +13,7 @@ _arguments -s -S \
   '(*)-s[evaluate the first argument using interpreter specified by $SHELL]' \
   '*-x[format custom exit status messages using a persistent awk(1) process]' \
   '-z[exit after the utility completes]' \
+  '(- *)-h[display usage information]' \
   '(-): :->command' \
   '*::arguments:_normal' && ret=0
 

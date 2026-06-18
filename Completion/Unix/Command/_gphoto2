@@ -72,6 +72,8 @@ _arguments -s -C \
   '--get-all-raw-data[get all raw data from folder]' \
   '--get-audio-data=[get audio data given in range]:range' \
   '--get-all-audio-data[get all audio data from folder]' \
+  '--get-exif=[get files in given range]:range' \
+  '--get-all-exif[get all files from folder]' \
   '(-d --delete-file)'{-d,--delete-file=}'[delete files in given range]:range' \
   '(-D --delete-all-files)'{-D,--delete-all-files}'[delete all files in folder]' \
   '(-u --upload-file)'{-u,--upload-file=}'[upload a file to camera]:file:_files' \
@@ -80,6 +82,7 @@ _arguments -s -C \
   '(-f --folder)'{-f,--folder=}'[specify camera folder]:folder [/]' \
   '(-R --recurse --no-recurse)'{-R,--recurse}'[recursion (default for download)]' \
   '(-R --recurse)--no-recurse[no recursion (default for deletion)]' \
+  '--reverse[reverse order of file operations]' \
   '--new[process new files only]' \
   '--force-overwrite[overwrite files without asking]' \
   '--skip-existing[skip files that already exist on local filesystem]' && ret=0

@@ -13,16 +13,18 @@ _arguments -C -s -S \
   '(H)*--ct-filter=[restrict the next counter]:expression' \
   '(H)*--ct=[define a custom counter]:name\:param\:func' \
   '(H -a --all)'{-a,--all}'[print all devices]' \
-  '(H -b --bytes)'{-b,--bytes}'[print size in bytes rather than in human readable format]' \
+  '(H -b --bytes)'{-b,--bytes}'[print size in bytes instead of a human readable format]' \
   '(H -d --nodeps)'{-d,--nodeps}"[don't print slaves or holders]" \
   '(H -I --include)*'{-e,--exclude}'[exclude devices by major number]:major device number:->majorlist' \
   '(H -e --exclude)*'{-I+,--include=}'[show only devices with specified major numbers]:major device number:->majorlist' \
+  '(H)--hyperlink=-[print paths as hyperlinks]::when:(always never auto)' \
   '(H -n --noheadings -y --shell)'{-n,--noheadings}"[don't print headings]" \
   '(H -p --paths)'{-p,--paths}'[print complete device path]' \
   '(H -s --inverse)'{-s,--inverse}'[reverse dependency order]' \
   '(H -w --width)'{-w+,--width=}'[specify output width]:width' \
   '(H -x --sort)'{-x+,--sort=}'[sort output by specified column]:column:->columns' \
   '(H -y --shell -n --noheadings)'{-y,--shell}'[use column names usable as shell variable identifiers]' \
+  '--properties-by=[specify methods used to gather data]:method [file,udev,blkid]:_sequence compadd - udev blkid file none' \
   '(H)--sysroot=[use specified directory as system root]:directory:_directories' \
   '*:device:_files -g "*(-%b)" -P / -W /' \
   + fields \

@@ -1,16 +1,32 @@
 #compdef dpkg-source
 
 _arguments \
-  '-x[specify source file]:Debian source file:_files -g "*.dsc(-.)"' \
-  '-b[specify source directory]:Debian source directory:_files -/' \
+  '(-x --extract)'{-x,--extract}'[specify source file]:Debian source file:_files -g "*.dsc(-.)"::output directory:_directories' \
+  '(-b --build)'{-b,--build}'[specify source directory]:Debian source directory:_files -/' \
+  '--print-format[print the format to be used for the source package]: :_directories' \
+  '--before-build[run the corresponding source package format hook]: :_directories' \
+  '--after-build[run the corresponding source package format hook]: :_directories' \
+  '--commit[store upstream changes in a new patch]: :_directories::patch name' \
   '-c-[control file]:control file:_files' \
   '-l-[changelog file]:changelog file:_files' \
   '-F-[changelog format]:changelog format:' \
+  '--format=[set the format to be used for the source package]:format' \
   '-V-[set substitutions variable]:expression:' \
   '-T-[alternate variable file]:varlistfile:' \
   '-D-[override dsc field]:expression:' \
   '-U-[remove a field]:field:' \
-  '-i-[ignore files in diff]:filter:' \
+  '(-i --diff-ignore)'{-i-,--diff-ignore=}'[filter out files to ignore diffs of]:regex' \
+  '--extend-diff-ignore=:regex' \
+  '(-I --tar-ignore)'{-I-,--tar-ignore=}'[filter out files when building tarballs]:regex' \
+  '(-Z --compression)'{-Z-,--compression=}'[select compression to use]:compression [xz]:(bzip2 gzip lzma xz)' \
+  '(-z --compression-level)'{-z-,--compression-level=}'[compression level to use]:level [9]' \
+  "--no-copy[don't copy .orig tarballs]" \
+  "--no-check[don't check signature and checksums before unpacking]" \
+  "--no-overwrite-dir[don't overwrite directory on extraction]" \
+  "--require-valid-signature[abort if the package doesn't have a valid signature]" \
+  '--require-strong-checksums[abort if the package contains no strong checksums]' \
+  '--ignore-bad-version[allow bad source package versions]' \
+  '--threads-max=[set maximum number of threads for compressors]:threads' \
   '-sa[autoselect orig source]' \
   '-sk[use packaged orig source - unpack and keep]' \
   '-sp[use packaged orig source - unpack and remove]' \
@@ -19,10 +35,14 @@ _arguments \
   '-ss[trust packed and unpacked source are the same]' \
   '-sn[no diff, do main tarfile only]' \
   '-sA[autoselect orig source with overwrite]' \
+  '--abort-on-upstream-changes' \
   '-sK[use packaged orig source - unpack and keep with overwrite]' \
   '-sP[use packaged orig source - unpack and remove with overwrite]' \
   '-sU[use unpackaged orig source - unpack and keep with overwrite]' \
   '-sR[use unpackaged orig source - unpack and remove with overwrite]' \
   '-sp[leave original source packed in cwd]' \
   '-su[unpack original source tree too]' \
-  '-h[help]'
+  "--skip-debianization[don't apply debian diff to upstream sources]" \
+  '(-)'{-\?,--help}'[display help information]' \
+  '-q[quiet mode]' \
+  '--version[display version information]'

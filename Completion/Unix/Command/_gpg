@@ -95,7 +95,6 @@ fi
   '(--encrypt-to)--no-encrypt-to[disable the use of all --encrypt-to keys]'
   '--group[set up email aliases]:spec'
   '-z[specify compression level]:compression level:((0\:no\ compression 1\:minimum 2 3 4 5 6\:default 7 8 9\:maximum))'
-  '(-t --textmode)'{-t,--textmode}'[use canonical text mode]'
   '(-n --dry-run)'{-n,--dry-run}"[don't make any changes]"
   '(-i --interactive --batch)'{-i,--interactive}'[prompt before overwriting files]'
   '(-i --interactive --no-batch)--batch[use batch mode]'

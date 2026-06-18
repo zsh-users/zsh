@@ -5,7 +5,7 @@ if _pick_variant gnu='(Free Soft|uutils)' unix --version /dummy/no-such-file; th
 
   _arguments -s \
     '(-a --all -s --summarize)'{-a,--all}'[write counts for all files]' \
-    '--apparent-size[print apparent sizes rather than disc usage]' \
+    '(-A --apparent-size)'{-A,--apparent-size}'[print apparent sizes rather than disc usage]' \
     '(-B --block-size -k)'{-B+,--block-size=}'[specify block size]:size (bytes)' \
     '(-B --block-size -k --apparent-size -b --bytes)'{-b,--bytes}'[equivalent to --apparent-size --block-size=1]' \
     '(-c --total)'{-c,--total}'[produce a grand total]' \
@@ -56,22 +56,22 @@ else
   local xdev='[skip directories on different filesystems]'
   for pattern arg in \
     '(freebsd|darwin)*' '-A[apparent size instead of usage]' \
-    '(darwin*|*bsd*|dragonfly*|solaris2.<10->)' '(-H -L -P)-H[follow symlinks on the command line]' \
+    '(aix*|darwin*|*bsd*|dragonfly*|solaris2.<10->)' '(-H -L -P)-H[follow symlinks on the command line]' \
     '(darwin|*bsd|dragonfly)*' '(-H -L -P)-P[do not follow symlinks (default)]' \
     '(darwin|dragonfly|freebsd)*' '*-I+[ignore files/directories matching specified mask]:mask' \
     '(darwin|*bsd|dragonfly)*' '(-a -s -d)-d+[display entry for directories up to specified depth]:depth' \
     '(darwin*|*bsd*|dragonfly*|solaris2.<10->)' '(-k -m -g -B)-h[human readable output]' \
     'netbsd*' '-i[output inode usage instead of blocks]' \
-    '(darwin*|freebsd*|netbsd*|solaris2.<11->)' '(-h -k -g -B)-m[use block size of 1M-byte]' \
-    '(darwin|freebsd<8->.|netbsd)*' '(-h -k -m -B)-g[use block size of 1G-byte]' \
+    '(aix*|darwin*|freebsd*|netbsd*|solaris2.<11->)' '(-h -k -g -B)-m[use block size of 1M-byte]' \
+    '(aix|darwin|freebsd<8->.|netbsd)*' '(-h -k -m -B)-g[use block size of 1G-byte]' \
     '(freebsd|darwin)*' '(-h -k -m -g)-B+[block size]:block size (bytes)' \
     '(darwin|*bsd|dragonfly)*' '-c[display grand total]' \
-    '(freebsd|darwin)*' '-l[count sizes many times if hard linked]' \
+    '(aix|freebsd|darwin)*' '-l[count sizes many times if hard linked]' \
     '(freebsd|netbsd)*' '-n[ignore files and directories with nodump flag set]' \
     'solaris*' "(-a)-o[don't add child directories' usage to parent's total]" \
     '(freebsd|darwin)*' '-t+[report only entries for which size exceeds threshold]:threshold' \
     'solaris*' "-d$xdev" \
-    '(darwin|*bsd|dragonfly|solaris)*' "-x$xdev"
+    '(aix|darwin|*bsd|dragonfly|solaris)*' "-x$xdev"
   do
     [[ $OSTYPE = $~pattern ]] && args+=( $arg )
   done

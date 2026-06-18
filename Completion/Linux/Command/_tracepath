@@ -1,9 +1,12 @@
 #compdef tracepath tracepath6
 
 _arguments -s -S \
+  '(-6)-4[use IPv4]' \
+  '(-4)-6[use IPv6]' \
   '-n[print IP addresses numerically]' \
   '-b[print both host names and IP addresses]' \
   '-l+[set the initial packet length]:length (bytes)' \
   '-m+[set maximum hops]:maximum [30]' \
   '-p+[set initial destination port to use]:port:_ports' \
+  '-V[display version information]' \
   ':destination:_hosts'

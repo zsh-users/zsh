@@ -43,6 +43,7 @@ if [[ $state = args ]]; then
       args+=(
         '-r[create recursive boot environment]'
         '-e+[clone specified boot environment]: :->boot-environs'
+        '-E[create new empty boot environment]'
       )
     ;;
     destroy)
