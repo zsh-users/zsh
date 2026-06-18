@@ -20,7 +20,7 @@ _arguments -s -S -C \
   '(-4)-6[stay on ipv6]' \
   '-a[fallback to EDNS0 and TCP if the answer is truncated]' \
   '-b+[specify buffer size (defaults to 512 b)]:size (bytes) [512]' \
-  '-c+[use specified file for rescursive nameserver configuration]:file [/etc/resolv.conf]:_files' \
+  '-c+[use specified file for recursive nameserver configuration]:file [/etc/resolv.conf]:_files' \
   '-k+[specify a file that contains a trusted DNSSEC key]:file:_files' \
   '*-o+[set/unset header bits]:mnemonic (uppercase sets, lower unsets):_sequence compadd - QR qr AA aa TC tc RD rd CD cd RA ra AD ad' \
   '-p+[use specified remote port number]:port:_ports' \

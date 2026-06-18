@@ -18,12 +18,13 @@ case "$service" in
     '(I -k --keep)'{-k,--keep}"[keep (don't delete) input files]" \
     '(I -f --force)'{-f,--force}'[force overwrite]' \
     '(I -c --stdout)'{-c,--stdout}'[write on standard output]' \
+    "(I)--no-sync[don't flush writes before removing input file]" \
     '(I)*'{-q,--quiet}'[suppress all warnings]' \
     '(I)*'{-v,--verbose}'[verbose mode]' \
     '(I * --files --files0)--files=-[read list of files to process from file]::file:_files' \
     '(I * --files --files0)--files0=-[read null terminated list of files to process from file]::file:_files' \
     '(I -F --format)'{-F+,--format=}'[specify file format]:format:(auto xz lzma lzip raw)' \
-    '(I -T --threads)'{-T+,--threads=}'[use specified number of threads]:threads [1]' \
+    '(I -T --threads)'{-T+,--threads=}'[use specified number of threads]:threads [0]' \
     '(I -M --memlimit --memory)'{-M+,--memlimit=,--memory=}'[set memory usage limit]: :_numbers -u bytes "memory limit" KiB MiB GiB %\:percentage\ of\ available\ RAM' \
     '(I)--no-adjust[give error if settings exceed memory limit]' \
     '(I -Q --no-warn)'{-Q,--no-warn}'[make warnings not affect exit status]' \
@@ -49,11 +50,14 @@ case "$service" in
     '(* comp decomp level filters common)--info-memory[display amount of RAM and memory usage limits]' \
     '(- *)'{-h,--help}'[display help message]' \
     '(- *)'{-H,--long-help}'[display the long help (lists also the advanced options)]' \
+    '(- *)--filters-help[display liblzma filter string syntax information]' \
     '(* comp decomp level filters common)'{-V,--version}'[display version number]' \
     + '(level)' \
     '(I filters decomp)-'{-best,-fast,1,2,3,4,5,6,7,8,9} \
     + filters \
-    '(I level decomp --extreme)'--{x86,powerpc,ia64,arm,armthumb,arm64,sparc}=-'[add a branch/call/jump filter]::option:->bcj-options' \
+    '(I level decomp --extreme)'--{x86,powerpc,ia64,arm,armthumb,arm64,sparc,riscv}=-'[add a branch/call/jump filter]::option:->bcj-options' \
+    '(I level decomp --extreme)--filters=[set filter chain using liblzma filter string]:filter string' \
+    '!(I level decomp --extreme)--filters'{1..9}'=:filter string' \
     '(I level decomp --extreme)'--lzma{1,2}=-'[add lzma filter]::option:->lzma-options' \
     '(I level decomp --extreme)--delta=-[add delta filter]::option:->delta-options' && ret=0
   ;;

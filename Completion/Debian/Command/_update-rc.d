@@ -3,25 +3,17 @@
 local curcontext="$curcontext" state line expl
 
 _arguments -C \
-  '-n[show actions without performing them]' \
   '-f[force removal of symlinks]' \
   '1:service:_services' \
-  '2:command:(remove defaults start stop)' \
+  '2:command:(remove defaults defaults-disabled disable enable)' \
   '*::args:->args' && return
 
 case $words[2] in
-  defaults)
-    _message -e number 'sequence number'
+  disable|enable)
+    _wanted runlevels expl runlevel S 2 3 4 5 && return
   ;;
-  remove)
+  *)
     _message 'no more arguments'
-  ;;
-  st*)
-    case ${words[CURRENT-1]} in
-      .) _wanted commands expl commands compadd start stop && return ;;
-      start|stop) _message -e number 'sequence number' ;;
-      *) _message -e runlevels run\ level ;;
-    esac
   ;;
 esac
 

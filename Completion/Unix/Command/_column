@@ -32,10 +32,11 @@ case $variant in
       + fill
       '(info table text json -x --fillrows)'{-x,--fillrows}'[print across before down]'
       + table
-      '(info fill -t --table)'{-t,--table}'[create a table]'
+      '(info fill -t --table -S --use-spaces)'{-t,--table}'[create a table]'
       '(info fill -o --output-separator)'{-o+,--output-separator=}'[specify column separator for table output]:separator [two spaces]'
-      '(info fill -s --separator)'{-s+,--separator=}'[specify column delimiters in input data]:delimiters'
+      '(info fill -s --input-separator --separator)'{-s+,--input-separator=,--separator=}'[specify column delimiters in input data]:delimiters'
       '(info fill -O --table-order)'{-O+,--table-order=}'[specify order of output columns]: :->columns'
+      '(info)--table-colorscheme=[specify color scheme name]:name [column]'
       '(info fill -N --table-columns)*'{-C+,--table-column=}'[specify column properties]: :_values -s, -S= property
         "name[column name]\:name"
         "trunc[truncate text in the columns when necessary]"
@@ -54,13 +55,16 @@ case $variant in
       '(info fill json -d --table-noheadings)'{-d,--table-noheadings}"[don't print header]"
       '(info fill json -E --table-noextreme)'{-E+,--table-noextreme}"[specify columns where length can be ignored]: :->columns"
       '(info fill json -e --table-header-repeat)'{-e,--table-header-repeat}'[repeat header for each page]'
+      '(info fill json -K --table-header-as-columns)'{-K,--table-header-as-columns}'[use first row as table header]'
       '(info fill json -H --table-hide)'{-H+,--table-hide=}"[don't print specified columns]: :->columns"
       '(info fill json -R --table-right)'{-R+,--table-right=}'[right align text in these columns]: :->columns'
       '(info fill json -T --table-truncate)'{-T+,--table-truncate=}'[truncate text in the columns when necessary]: :->columns'
       '(info fill json -W --table-wrap)'{-W+,--table-wrap=}'[wrap text in the columns when necessary]: :->columns'
+      '(info fill json)--wrap-separator=[wrap at specified separator]:string'
       '(info fill json -r --tree)'{-r+,--tree=}'[specify column to format tree-like]: :->columns'
       '(info fill json -i --tree-id)'{-i+,--tree-id=}'[specify column containing ID for child-parent relations]: :->columns'
       '(info fill json -p --tree-parent)'{-p+,--tree-parent=}'[specify column containing reference to parent]: :->columns'
+      '(info table json -S --use-spaces)'{-S+,--use-spaces=}'[minimal whitespace between columns (no tabs)]:spaces'
       + json
       '(info fill text -n --table-name -c --output-width)'{-n+,--table-name=}'[specify table name for JSON output]:name'
       '(info fill text -J --json -c --output-width)'{-J,--json}'[use JSON output format for table]'

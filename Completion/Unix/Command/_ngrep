@@ -25,6 +25,8 @@ _arguments -s -S \
    '-S+[set the upper limit on size of packets matched]:size (bytes)' \
    '(-x)-W+[set the dump format]:packet display format:(normal byline single none)' \
    '-c+[force the column width to the specified size]:columns' \
+   '-C[colorize matches in packet contents output]' \
+   '-u[show payload as UTF-8 characters]' \
    '-P+[set the non-printable display char to what is specified]:character [.]' \
    '-F+[read the bpf filter from the specified file]:file:_files' \
    '-N[show sub protocol number]' \

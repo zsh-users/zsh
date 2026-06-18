@@ -1,0 +1,43 @@
+#compdef hardlink
+
+local ign
+local -a args
+
+(( $#words > 2 )) && ign='!(- *)'
+
+if _pick_variant linux=util-linux jak -V; then
+  args=(
+    '(-c --content -p --ignore-mode -o --ignore-owner -t --ignore-time)'{-c,--content}'[compare only file contents, same as -pot]'
+    '(-b --io-size)'{-b+,--io-size=}'[specify I/O buffer size for file reading]: :_numbers "IO buffer size" K M G T P'
+    '(-d --respect-dir)'{-d,--respect-dir}'[directory names have to be identical]'
+    '(-F --prioritize-trees)'{-F,--prioritize-trees}'[keep files found in the earliest specified top-level]'
+    '(-l --list-duplicates)'{-l,--list-duplicates}"[just list paths of duplicates, don't link them]"
+    '--mount[stay within the same filesystem]'
+    '(-q --quiet)'{-q,--quiet}"[quiet mode - don't print anything]"
+    '(-r --cache-size)'{-r+,--cache-size=}'[specify memory limit for cached file content data]: :_numbers size K M G T P'
+    '(--skip-reflinks)--reflink=-[create clone/CoW copies]::when [auto]:(auto always never)'
+    '--skip-reflinks[skip already cloned files]'
+    '(-S --maximum-size)'{-S+,--maximum-size=}'[specify maximum size for files]: :_numbers -u bytes -d 0 size K M G T P E Z Y'
+    '--exclude-subtree[specify regular expression to exclude directories]:regex'
+    '(-X --respect-xattrs)'{-X,--respect-xattrs}'[respect extended attributes]'
+    '(-y --method)'{-y+,--method=}'[specify file content comparison method]:method [sha256]:(sha256 sha1 crc32c memcmp)'
+    '(-z --zero)'{-z,--zero}'[delimit output with NULs instead of newlines]'
+  )
+fi
+
+_arguments -S -s $args \
+  '(-f --respect-name)'{-f,--respect-name}'[filenames have to be identical]' \
+  '(-i --include)'{-i+,--include=}'[regular expression to include files/dirs]:regex' \
+  '(-m --maximize -M --minimize)'{-m,--maximize}'[keep the file with the most links]' \
+  '(-M --minimize -m --maximize)'{-M,--minimize}'[keep the file with the fewest links]' \
+  '(-n --dry-run)'{-n,--dry-run}"[don't actually link anything]" \
+  '(-o --ignore-owner -c --content)'{-o,--ignore-owner}'[ignore owner changes]' \
+  '(-O --keep-oldest)'{-O,--keep-oldest}'[keep the oldest file of multiple equal files]' \
+  '(-p --ignore-mode -c --content)'{-p,--ignore-mode}'[ignore changes of file mode]' \
+  '(-s --minimum-size)'{-s+,--minimum-size=}'[specify minimum size for files]: :_numbers -u bytes -d 1 size K M G T P E Z Y' \
+  '(-t --ignore-time -c --content)'{-t,--ignore-time}'[ignore timestamps (when testing for equality)]' \
+  \*{-v,--verbose}'[more verbose output]' \
+  '(-x --exclude)'{-x+,--exclude=}'[specify regular expression to exclude files]:regex' \
+  "$ign"{-h,--help}'[display usage information]' \
+  "$ign"{-V,--version}'[display version information]' \
+  '*:file or directory:_files'

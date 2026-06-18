@@ -69,7 +69,13 @@ if _pick_variant -r variant binutils=GNU elftoolchain=elftoolchain elfutils=elfu
 	'--special-syms[include special symbols in the output]'
 	'--synthetic[display synthetic symbols as well]'
 	"--target=[target object format]:target:(${${(@M)${(f)$(_call_program targets nm --help)}:#*supported targets:*}##*: })"
-	'--unicode=[specify how to treat UTF-8 encoded unicode characters]:how_to_treat:(default show invalid hex escape highlight)'
+        '--unicode=[specify how to treat UTF-8 encoded unicode characters]: : _values "treatment [default]"
+          {d,default}"[no special treatment]"
+          {l,locale}"[convert to current locale]"
+          {i,invalid}"[not part of a valid string]"
+          {x,hex}"[<> enclosed hex byte sequences]"
+          {e,escape}"[escape sequences (\\\\uxxxx)]"
+          {h,highlight}"[escape sequences highlighted in red]"' \
 	'(-W --no-weak)'{-W,--no-weak}'[ignore weak symbols]'
 	'--with-symbol-versions[display version strings after symbol names]'
 	'--without-symbol-versions[not display of symbol version information]'

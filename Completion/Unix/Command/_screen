@@ -76,6 +76,7 @@ _arguments -C \
   '-m[ignore $STY variable, do create a new screen session]' \
   '-O[choose optimal output rather than exact vt100 emulation]' \
   '-p[preselect the named window]:window number or name:((\=\:windowlist -\:blank\ window \:window\ number))' \
+  '-P[enable authentication]' \
   '-q[quiet startup, exit with non-zero return code if unsuccessful]' \
   '-Q[send response to stdout of command query process]:screen command:(echo info lastmsg number select time title windows)' \
   '-r[reattach to a detached screen process]: :->detached-sessions' \

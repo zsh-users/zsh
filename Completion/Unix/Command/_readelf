@@ -2,11 +2,11 @@
 
 local variant args sections
 
-sections=( .bss .data .dynamic .dynsym .got .interp .shstrtab .symtab .text )
+sections=( .bss .comment .data .dynamic .dynsym .got .interp .shstrtab .symtab .text )
 _pick_variant -r variant elftoolchain=elftoolchain elfutils=elfutils binutils --version
 
 args=(
-  '(-a --all)'{-a,--all}'[show all tables]'
+  '(-a --all -h --file-header -l --program-headers --segments -S --section-headers --sections -r --relocs -d --dynamic -V --version-info -A --arch-specific -I --histogram --got-contents)'{-a,--all}'[show all tables]'
   '(-g --section-groups)'{-g,--section-groups}'[show section groups]'
   '(-h --file-header)'{-h,--file-header}'[show file header]'
   '(-l --program-headers --segments)'{-l,--program-headers,--segments}'[show program headers]'
@@ -57,8 +57,12 @@ case $variant in
       '(-C)--demangle=-[decode symbol names]::style [auto]:(none auto gnu-v3 java gnat dlang rust)'
       '!(--no-recurse-limit)--recurse-limit'
       '--no-recurse-limit[disable demangling recursion limit]'
-      '-U+[specify how to display unicode characters]:method:(d l e x h i)'
-      '--unicode=[specify how to display unicode characters]:method:(default locale escape hex highlight invalid)'
+      '(-U --unicode)'{-U+,--unicode=}'[specify how to treat UTF-8 encoded unicode characters]: : _values "treatment [locale]"
+        {l,locale,d,default}"[convert to current locale]"
+        {i,invalid}"[not part of a valid string]"
+        {x,hex}"[<> enclosed hex byte sequences]"
+        {e,escape}"[escape sequences (\\\\uxxxx)]"
+        {h,highlight}"[escape sequences highlighted in red]"' \
       '(-X --extra-sym-info)'{-X,--extra-sym-info}'[display extra information when showing symbols]'
       '!(-X --extra-sym-info)--no-extra-sym-info'
       '(-L --lint --enable-checks)'{-L,--lint,--enable-checks}'[display warning messages for possible problems]'
@@ -71,6 +75,7 @@ case $variant in
       '--ctf-symbols=[use specified section as the CTF external symbol table]:section'
       '--ctf-strings=[use specified section as the CTF external string table]:section'
       '--sframe=-[display SFrame info from section]::section name [.sframe]'
+      '(-a --all)--got-contents[display GOT section contents]'
       '(-T --silent-truncation)'{-T,--silent-truncation}"[if a symbol name is truncated, don't add ... suffix]"
     )
   ;;

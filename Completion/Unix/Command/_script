@@ -30,7 +30,7 @@ case $OSTYPE in
       "(-T --log-timing -t --timing $hlp)"{-T+,--log-timing=}'[log timing information to file]:file:_files'
       "(-m --logging-format $hlp)"{-m+,--logging-format=}'[specify log file format]:format:(classic advanced)'
       "(-a --append $hlp)"{-a,--append}'[append to the log file]'
-      "(-c --command $hlp)"{-c,--command=}'[run specified command instead of a shell]:command:_cmdstring'
+      "(-c --command $hlp --)"{-c,--command=}'[run specified command instead of a shell]:command:_cmdstring'
       "(-e --return $hlp)"{-e,--return}'[return exit status of the child process]'
       "(-f --flush $hlp)"{-f,--flush}'[flush output after each write]'
       "(-E --echo $hlp)"{-E+,--echo=}'[echo input]:when:(auto always never)'
@@ -40,6 +40,7 @@ case $OSTYPE in
       "(-t --timing $hlp)"{-t-,--timing=-}'[output timing data]::timing file:_files'
       '(- 1)'{-h,--help}'[display help information]'
       '(- 1)'{-V,--version}'[display version information]'
+      '!--:*::: : _normal $service'
     )
   ;;
   darwin*|dragonfly*|netbsd*|freebsd*)

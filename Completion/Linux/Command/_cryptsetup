@@ -45,6 +45,7 @@ _arguments -s \
   '--dump-volume-key[dump volume key instead of keyslots info]' \
   '--external-tokens-path=[specify path to directory with external token handlers (plugins)]:path:_directories' \
   '--force-offline-reencrypt[force offline LUKS2 reencryption and bypass active device detection]' \
+  '--force-no-keyslots[force dangerous reencryption operation erasing all remaining keyslots]' \
   '--header=[device or file with separated LUKS header]:file:_files' \
   '--hw-opal[use HW OPAL encryption together with SW encryption]' \
   '--hw-opal-factory-reset[wipe WHOLE OPAL disk on luksErase]' \
@@ -52,8 +53,12 @@ _arguments -s \
   '--keep-key[do not change volume key]' \
   '--link-vk-to-keyring=[set keyring where to link volume key]:string' \
   '--new-keyfile=[read the key for a new slot from a file]:file:_files' \
+  '--new-key-description=[specify keyring new key description]:description' \
+  '--new-key-size=[specify size of the new encryption key]:size (bits)' \
   '--new-key-slot=[specify slot number for new key]:slot [first free]' \
   '--new-token-id=[token number]:number [any]' \
+  '--new-volume-key-file=[use new volume key from file]: :_files' \
+  '--new-volume-key-keyring=[use specified keyring key as new volume key]:key' \
   '--progress-json[print progress data in json format]' \
   "--test-args[don't run action, just validate all command line parameters]" \
   '--volume-key-file=[use the volume key from file]:file:_files' \
@@ -76,6 +81,7 @@ _arguments -s \
   '--force-password[disable password quality check (if enabled)]' \
   '--perf-same_cpu_crypt[use dm-crypt same_cpu_crypt performance compatibility option]' \
   '--perf-submit_from_crypt_cpus[use dm-crypt submit_from_crypt_cpus performance compatibility option]' \
+  '--perf-high_priority[set dm-crypt workqueues and writer thread to high priority]' \
   '--perf-no_read_workqueue[bypass dm-crypt workqueue and process read requests synchronously]' \
   '--perf-no_write_workqueue[bypass dm-crypt workqueue and process write requests synchronously]' \
   '--deferred[device removal is deferred until the last user closes it]' \
@@ -88,12 +94,14 @@ _arguments -s \
   '--disable-locks[disable locking of on-disk metadata]' \
   '--disable-keyring[disable loading volume keys via kernel keyring]' \
   '(-I --integrity)'{-I+,--integrity=}'[specify data integrity algorithm (LUKS2 only)]:algorithm' \
+  '--integrity-inline[use inline mode (use HW integrity field)]' \
+  '--integrity-key-size=[specify size of the data integrity key]:size (bits)' \
   '--integrity-no-journal[disable journal for integrity device]' \
   "--integrity-no-wipe[don't wipe device after format]" \
   '--integrity-legacy-padding[use inefficient legacy padding (old kernels)]' \
   "--token-only[don't ask for passphrase if activation by token fails]" \
   '--token-id=[specify token number]:number [any]' \
-  '--key-description=[specify key description]:description' \
+  '--key-description=[specify keyring key description]:description' \
   '--sector-size=[specify encryption sector size]:size [512 bytes]' \
   '--iv-large-sectors[use IV counted in sector size (not in 512 bytes)]' \
   '--persistent[set activation flags persistent for device]' \

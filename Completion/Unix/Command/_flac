@@ -67,7 +67,6 @@ case $service in
       - 'H' \
       '(-)'{-v,--version}'[display version information]' \
       '(-)'{-h,--help}'[display help information]' \
-      '(-)'{-H,--explain}'[display detailed explanation of usage and options]' \
       - encode \
       '(-V --verify)'{-V,--verify}'[verify a correct encoding]' \
       --lax --ignore-chunk-sizes '!--sector-align' --replay-gain \
@@ -88,6 +87,7 @@ case $service in
       '(-p --qlp-coeff-precision-search -q --qlp-coeff-precision)'{-q,--qlp-coeff-precision=}'[specify precision]:precision (bits)' \
       '(-r --rice-partition-order)'{-r,--rice-partition-order=}'[set min/max residual partition order]:order' \
       "--limit-min-bitrate[don't allow frames consisting of only constant subframes]" \
+      '(-j --threads)'{-j+,--threads=}'[set number of encoding threads]:threads' \
       '--endian=:byte order:(big little)' \
       '--channels=:channels' \
       '--bps=:bits per sample' \
@@ -102,6 +102,7 @@ case $service in
       '(-F --decode-through-errors)'{-F,--decode-through-errors}'[continue decoding through stream errors]' \
       '--apply-replaygain-which-is-not-lossless=:specification' \
       '--cue=[set the beginning and ending cuepoints to decode]:cue point' \
+      '--decode-chained-stream[decode all links in a chained Ogg stream, not just the first one]' \
       '(--force-raw-format --force-rf64-format --force-wave64-format --force-legacy-wave-format --force-extensible-wave-format --force-aiff-c-none-format --force-aiff-c-sowt-format)--force-aiff-format' \
       '(--force-raw-format --force-aiff-format --force-wave64-format --force-legacy-wave-format --force-extensible-wave-format --force-aiff-c-none-format --force-aiff-c-sowt-format)--force-rf64-format' \
       '(--force-raw-format --force-aiff-format --force-rf64-format --force-legacy-wave-format --force-extensible-wave-format --force-aiff-c-none-format --force-aiff-c-sowt-format)--force-wave64-format' \
@@ -112,6 +113,7 @@ case $service in
   ;;
   metaflac)
     _arguments -S $shared \
+      '(-o --output-name)'{-o+,--output-name=}'[write changes to a new file]:file:_files' \
       '(--no-filename)--with-filename[prefix output with filename]' \
       '(--with-filename)--no-filename' \
       '--dont-use-padding[always rewrite the file]' \

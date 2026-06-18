@@ -1,11 +1,11 @@
 #compdef pmap
 
 if _pick_variant procps=procps-ng unix -V 2>/dev/null; then
-  # based on procps-ng-3.3.15
   _arguments -s \
     '(exit -A --range)'{-A+,--range}'[limit results to the specified address range]:low,high: ' \
     '(exit -q --quiet)'{-q,--quiet}'[do not display some header or footer lines]' \
     '(exit -p --show-path)'{-p,--show-path}'[show full path to files in the mapping column]' \
+    '(exit -k --use-kernel-name)'{-k,--use-kernel-name}'[use names provided by kernel]' \
     '(exit)*: :_pids' \
     + '(format)' \
     '(exit)'{-d,--device}'[show the device format]' \

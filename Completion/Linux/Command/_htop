@@ -19,6 +19,8 @@ args=(
   '(-)'{-h,--help}'[display usage information]'
   '(-H --highlight-changes)'{-H+,--highlight-changes=}'[highlight new and old processes (optionally specify delay)]::delay (seconds) (1-86400) [5]'
   '(-M --no-mouse)'{-M,--no-mouse}'[disable mouse]'
+  '--no-meters[hide meters]'
+  '(-n --max-iterations)'{-n+,--max-iterations=}'[exit after given number of frame updates]:number'
   \*{-p+,--pid=}'[show only specified PIDs]: : _sequence _pids'
   '--readonly[disable all system and process changing features]'
   '(-s --sort-key)'{-s+,--sort-key=}'[sort by specified column]: :->sort-keys'
@@ -48,7 +50,7 @@ case $state in
     tmp=( ${tmp//:/\\:} )
     tmp=( ${tmp/[[:space:]]##/:} )
     tmp=( ${tmp/(#m):[A-Z]/${(L)MATCH}} )
-    _describe -t sort-keys 'column (key)' tmp && ret=0
+    _describe -t sort-keys 'column' tmp -M 'b:=M_ b:=IO_' && ret=0
     ;;
 esac
 

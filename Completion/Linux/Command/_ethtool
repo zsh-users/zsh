@@ -6,14 +6,24 @@ local -A opt_args
 
 _arguments -C -A "-*" \
   '--debug[turn on debugging messages]:mask:((1\:parser\ information))' \
-  '--json[output results in JSON]' \
+  '(-j --json)'{-j,--json}'[output results in JSON]' \
   '(-I --include-statistics)'{-I,--include-statistics}'[include command-related statistics in the output]' \
-  '(cmds)'{-Q,--per-queue}'[apply per-queue command]: :(queue_mask):queue mask' \
+  '(cmds cmdp)'{-Q,--per-queue}'[apply per-queue command]: :(queue_mask):queue mask' \
+  '(cmds cmdc)--phy=[target a PHY within the interface]:phy' \
   "1:interface:_net_interfaces" \
   '*:: :->args' \
   + '(cmdc)' \
-  '(cmds)'{-c,--show-coalesce}'[query the specified ethernet device for coalescing information]' \
-  '(cmds)'{-C,--coalesce}'[change the coalescing settings of the specified ethernet device]' \
+  '(cmdp cmds)'{-c,--show-coalesce}'[query the specified ethernet device for coalescing information]' \
+  '(cmdp cmds)'{-C,--coalesce}'[change the coalescing settings of the specified ethernet device]' \
+  + '(cmdp)' \
+  '(cmds cmdc)--cable-test[perform cable test and report the results]' \
+  '(cmds cmdc)--cable-test-tdr[perform cable test and report Time Domain Reflectometer data]' \
+  '(cmds cmdc)--get-plca-cfg[get PLCA configuration]' \
+  '(cmds cmdc)--set-plca-cfg[set PLCA configuration]' \
+  '(cmds cmdc)--get-plca-status[get PLCA status information]' \
+  '(cmds cmdc)--show-pse[show settings for power sourcing equipment]' \
+  '(cmds cmdc)--set-pse[set power sourcing equipment settings]' \
+  '(cmds cmdc)--show-mse[show Mean Square Error (MSE) diagnostics]' \
   + '(cmds)' \
   '(1)'{-h,--help}'[display help information]' \
   '(1)--version[display version information]' \
@@ -36,6 +46,8 @@ _arguments -C -A "-*" \
   {-n,--show-nfc,-u,--show-ntuple}'[retrieve receive network flow classification options or rules]' \
   {-N,--config-nfc,-U,--config-ntuple}'[configure receive network flow classification options or rules]' \
   {-T,--show-time-stamping}"[show device's time stamping capabilities]" \
+  '--get-hwtimestamp-cfg[get selected hardware time stamping]' \
+  '--set-hwtimestamp-cfg[select hardware time stamping]' \
   {-x,--show-rxfh-indir,--show-rxfh}'[show Rx flow hash indirection table and/or RSS hash key]' \
   {-X,--set-rxfh-indir,--rxfh}'[set Rx flow hash indirection table and/or RSS hash key]' \
   {-f,--flash}'[flash firmware image from the specified file]' \
@@ -56,24 +68,20 @@ _arguments -C -A "-*" \
   '--reset[reset hardware components]' \
   '--show-fec[query device for forward error correction support]' \
   '--set-fec[configure forward error correction for device]' \
-  '--cable-test[perform cable test and report the results]' \
-  '--cable-test-tdr[perform cable test and report Time Domain Reflectometer data]' \
   '--show-tunnels[show tunnel-related device capabilities and state]' \
   '--show-module[show transceiver module settings]' \
   '--set-module[set transceiver module settings]' \
-  '--get-plca-cfg[get PLCA configuration]' \
-  '--set-plca-cfg[set PLCA configuration]' \
-  '--get-plca-status[get PLCA status information]' \
   '--show-mm[show MAC merge layer state]' \
   '--set-mm[set MAC merge layer parameters]' \
-  '--show-pse[show settings for power sourcing equipment]' \
-  '--set-pse[set power sourcing equipment settings]' \
+  '--flash-module-firmware[flash transceiver module firmware]' \
+  '--show-phys[list PHYs]' \
   '--monitor[listen to netlink notifications and displays them]::command:(
     --all -s --change -k --show-features --show-offload -K
     --features --offload  --show-priv-flags --set-priv-flags -g --show-ring
     -G --set-ring -l --show-channels -L --set-channels -c --show-coalesce
     -C --coalesce -a --show-pause -A --pause --show-eee --set-eee
     --cable-test --cable-test-tdr --show-module --set-module
+    --get-plca-cfg --set-plca-cfg --pse-event
   )' && return
 
 if [[ -n $state ]]; then
@@ -97,17 +105,18 @@ if [[ -n $state ]]; then
   rx-frames-low|tx-usecs-low|tx-frames-low|pkt-rate-high|rx-usecs-high) ;&
   rx-frames-high|tx-usecs-high|tx-frames-high|sample-interval|dmac) ;&
   tx-aggr-max-bytes|tx-aggr-max-frame|tx-aggr-time-usec) ;&
-  rx-mini|rx-jumbo|rx-buf-len|cqe-size|tx-push-buf-len) ;&
+  rx-mini|rx-jumbo|rx-buf-len|cqe-size|tx-push-buf-len|hds-thresh) ;&
   offset|length|magic|value|phyad|proto|tos|tclass|l4proto|src-port) ;&
   dst-port|spi|l4data|vlan-etype|vlan|user-def|action|vf|queue|loc) ;&
+  index) ;&
   page|bank|i2c|first|last|step|pair|lanes) ;&
   rx-copybreak|tx-copybreak|tx-buf-size|pfc-prevention-tout) ;&
   other|combined|tx-timer|count|msecs) ;&
   node-id|node-cnt|to-tmr|burst-cnt|burst-tmr) ;&
-  tx-min-frag-size)
+  tx-min-frag-size|c33-pse-avail-pw-limit|prio)
     _message -e numbers 'number'
   ;;
-  podl-pse-admin-control)
+  (podl-pse|c33-pse)-admin-control)
     _wanted values expl 'value' compadd enable disable
   ;;
   speed)
@@ -168,6 +177,12 @@ if [[ -n $state ]]; then
   src|src-ip|dst|dst-ip|dst-mac)
     _message -e addresses address
   ;;
+  qualifier)
+    _wanted qualifiers expl qualifier compadd precise approx
+  ;;
+  rx-filter)
+    _message -e values value
+  ;;
   m)
     _message -e masks mask
   ;;
@@ -178,7 +193,7 @@ if [[ -n $state ]]; then
     _message -e functions 'hash function'
   ;;
   xfrm)
-    _wanted transformations expl transformation compadd symmetric-xor none
+    _wanted transformations expl transformation compadd symmetric-xor symmetric-or-xor none
   ;;
   flags)
     _message -e masks mask
@@ -191,6 +206,9 @@ if [[ -n $state ]]; then
   ;;
   tcp-data-split)
     _wanted states expl state compadd auto on off
+  ;;
+  pass)
+    _message -e passwords password
   ;;
   *)
     case ${${(Mk)opt_args:#cmd?*}[1]#cmd?-} in
@@ -215,7 +233,8 @@ if [[ -n $state ]]; then
         'rx-mini[change number of ring entries for the RX Mini ring]' \
         'rx-jumbo[change number of ring entries for the RX Jumbo ring]' \
         'tx[change number of ring entries for the TX ring]' \
-        rx-buf-len tcp-data-split cqe-size tx-push rx-push tx-push-buf-len
+        rx-buf-len tcp-data-split cqe-size tx-push rx-push tx-push-buf-len \
+        hds-thresh
     ;;
     -d|--register-dump)
       _values -S ' ' -w 'option' \
@@ -303,6 +322,12 @@ if [[ -n $state ]]; then
             queue context loc
       fi
     ;;
+    -T|--show-time-stamping)
+      _wanted options expl option compadd index qualifier
+    ;;
+    --set-hwtimestamp-cfg)
+      _wanted options expl option compadd index qualifier tx rx-filter
+    ;;
     -x|--show-rxfh-indir|--show-rxfh)
       _wanted options expl option compadd -F line - context
     ;;
@@ -380,6 +405,17 @@ if [[ -n $state ]]; then
     --set-plca-cfg)
       _wanted options expl tunable compadd enable node-id node-cnt \
           to-tmr burst-cnt burst-tmr
+    ;;
+    --set-mm)
+      _wanted options expl option compadd verify-enabled verify-time \
+          tx-enabled pmac-enabled tx-min-frag-size
+    ;;
+    --set-pse)
+      _wanted options expl option compadd {podl-pse,c33-pse}-admin-control \
+          c33-pse-avail-pw-limit prio
+    ;;
+    --flash-module-firmware)
+      _wanted options expl option compadd file pass
     ;;
     esac
   ;;

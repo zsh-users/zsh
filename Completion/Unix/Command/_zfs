@@ -477,9 +477,11 @@ case $service:$words[1] in
   ;;
 
   zfs:clone)
-    [[ $implementation = solaris ]] && args+=(
-    '-K[create encryption key]'
-  )
+    if [[ $implementation = solaris ]]; then
+      args+=( '-K[create encryption key]' )
+    else
+      args+=( "-u[don't mount newly created dataset]" )
+    fi
   _arguments -C -A "-*" -S $args \
     '-p[create parent datasets]' \
     '*-o+[set property]:property:->create-properties' \

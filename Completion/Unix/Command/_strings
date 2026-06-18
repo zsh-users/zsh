@@ -18,6 +18,13 @@ if _pick_variant -r variant binutils=GNU elftoolchain=elftoolchain elfutils=elfu
       l\:16-bit\ little-endian
       B\:32-bit\ big-endian
       L\:32-bit\ little-endian))'
+    '(-U --unicode -e --encoding)'{-U+,--unicode=}'[specify how to treat UTF-8 encoded unicode characters]: : _values "treatment [default]"
+      {d,default}"[rely on --encoding]"
+      {l,locale}"[convert to current locale]"
+      {i,invalid}"[not part of a valid string]"
+      {x,hex}"[<> enclosed hex byte sequences]"
+      {e,escape}"[escape sequences (\\\\uxxxx)]"
+      {h,highlight}"[escape sequences highlighted in red]"' \
     '(-f --print-file-name)'{-f,--print-file-name}'[print name of the file before each string]'
     '(-n --bytes)'{-n+,--bytes=}"$bytes"
     '(-d -t --radix)'{-t+,--radix=}"$format"

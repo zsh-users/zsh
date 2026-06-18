@@ -207,7 +207,8 @@ _git-archive () {
 _git-backfill() {
   _arguments -S \
     '--min-batch-size=[specify minimum number of objects to request at a time]:number of objects' \
-    '--sparse[only download objects at a path matching current sparse-checkout]'
+    '--sparse[only download objects at a path matching current sparse-checkout]' \
+    '--no-include-edges[exclude blobs from boundary commits in the backfill]'
 }
 
 (( $+functions[_git-bisect] )) ||
@@ -557,7 +558,7 @@ _git-checkout () {
 
       elif [[ -n ${opt_args[(I)-b|-B|-t|--track|--orphan|--detach]} ]]; then
         _nothing
-      elif [[ -n $line[1] ]] && __git_is_treeish ${(Q)line[1]}; then
+      elif [[ -n $line[1] && $line[1] != (@|HEAD) ]] && __git_is_treeish ${(Q)line[1]}; then
         __git_ignore_line __git_tree_files ${PREFIX:-.} ${(Q)line[1]} && ret=0
       else
         __git_ignore_line __git_modified_files && ret=0
@@ -698,7 +699,7 @@ _git-clone () {
     '(--single-branch)--no-single-branch[clone history leading up to each branch]' \
     "--no-tags[don't clone any tags and make later fetches not follow them]" \
     '--shallow-submodules[any cloned submodules will be shallow]' \
-    '(--recursive --recurse-submodules)'{--recursive,--recurse-submodules}'=-[initialize submodules in the clone]::file:__git_files' \
+    '(--recursive --recurse-submodules)'{--recursive,--recurse-submodules}'=-[initialize submodules in the clone]::file:_files' \
     '--separate-git-dir[place .git dir outside worktree]:path to .git dir:_path_files -/' \
     '--ref-format=[specify reference format to use]:format:(files reftable)' \
     \*--server-option='[send specified string to the server when using protocol version 2]:option' \
@@ -2008,7 +2009,7 @@ _git-sparse-checkout() {
 _git-stash () {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
-  local -a save_arguments
+  local -a save_arguments args
 
   save_arguments=(
     '(-p --patch -a --all -u --include-untracked)'{-p,--patch}'[interactively select hunks from diff between HEAD and working tree to stash]'
@@ -2085,8 +2086,9 @@ _git-stash () {
             '(-u --include-untracked)--only-untracked[show only the untracked files in the stash entry as part of the diff]' \
             ':: :__git_stashes' && ret=0
           ;;
-        (pop|apply)
-          _arguments -S $endopt \
+        apply) args=( '--label-'{ours,theirs,base}'=:label' ) ;&
+        pop)
+          _arguments -S $endopt $args \
             '--index[try to reinstate the changes added to the index as well]' \
             '(-q --quiet)'{-q,--quiet}'[suppress all output]' \
             ':: :__git_stashes' && ret=0
@@ -4427,7 +4429,8 @@ _git-repack () {
     '--pack-kept-objects[repack objects in packs marked with .keep]' \
     '--keep-pack=[ignore named pack]:pack' \
     '(-g --geometric)'{-g+,--geometric=}'[find a geometric progression with specified factor]:factor' \
-    '(-m --write-midx)'{-m,--write-midx}'[write a multi-pack index of the resulting packs]' \
+    '(--write-midx)-m[write a multi-pack index of the resulting packs]' \
+    '(-m)--write-midx=-[write a multi-pack index of the resulting packs]:mode:(default incremental)' \
     '--expire-to=[pack prefix to store a pack containing pruned objects]:directory:_directories' \
     '--filter-to=[pack prefix to store a pack containing filtered out objects]:directory:_directories'
 }
@@ -4586,9 +4589,32 @@ _git-fsck () {
     '*: :__git_objects'
 }
 
+(( $+functions[_git-format-rev] )) ||
+_git-format-rev() {
+  _arguments -S $endopt \
+    '--format=[specify format]:format:__git_format_placeholders' \
+    '--stdin-mode=[specify stdin mode]:mode:(revs text)' \
+    '--notes=[display notes for pretty format]:reference' \
+    '(-z --null --null-input --null-output)'{-z,--null}'[use NUL for input and output termination]' \
+    '(-z --null)--null-input[use NUL for input termination]' \
+    '(-z --null)--null-output[use NUL for output termination]'
+}
+
 (( $+functions[_git-get-tar-commit-id] )) ||
 _git-get-tar-commit-id () {
   _message 'no arguments allowed; accepts tar-file on standard input'
+}
+
+(( $+functions[_git-last-modified] )) ||
+_git-last-modified() {
+  _arguments -s \
+    '(-r --recursive)'{-r,--recursive}'[recurse into subtrees]' \
+    '(-t --show-trees)'{-t,--show-trees}'[show tree entries when recursing into subtrees]' \
+    '--max-depth=[specify maximum tree depth to recurse]:depth [0]' \
+    '-z[separate lines with NUL character]' \
+    '1: :__git_commit_ranges' \
+    \!--{,end-of-options}':*: :__git_tree_files ${PREFIX:-.} HEAD' \
+    '*: :__git_tree_files ${PREFIX:-.} $line[1]'
 }
 
 (( $+functions[_git-help] )) ||
@@ -5499,7 +5525,7 @@ _git-mktree () {
 
 (( $+functions[_git-multi-pack-index] )) ||
 _git-multi-pack-index() {
-  _arguments \
+  _arguments -S \
     '--object-dir=[specify location of git objects]:directory:_directories' \
     '(--progress)--no-progress[turn progress off]' '!(--no-progress)--progress' \
     '--preferred-pack=[break ties in favor of specified pack]:pack' \
@@ -5508,7 +5534,11 @@ _git-multi-pack-index() {
     '--refs-snapshot=[specify a file which contains a "refs snapshot" taken prior to repacking]:file:_files' \
     '--incremental[write an incremental MIDX file]' \
     '--batch-size=[during repack, select packs so as to have pack files of at least the specified size]:size' \
-    '1:verb:(write compact verify expire repack)'
+    "--write-chain-file[write new MIDX layer but don't update multi-pack-index-chain file]" \
+    '--base=[specify checksum of MIDX layer to use as base]:checksum' \
+    '1:verb:(write compact verify expire repack)' \
+    '2:from (checksum)' \
+    '3:to (checksum)'
 }
 
 (( $+functions[_git-pack-objects] )) ||
@@ -6426,6 +6456,7 @@ _git-hook() {
     '--allow-unknown-hook-name' \
     '-z[terminate output lines with NUL instead of newlines]' \
     '--show-scope[prefix each hook name with a config scope]' \
+    '(-j --jobs)'{-j+,--jobs=}'[allow specified number of simultaneous hooks]:jobs' \
     '1:subcommand:(run list)' \
     '2:hook name:compadd $gitdir/hooks/*(x\:t)'
 }
@@ -6481,6 +6512,13 @@ _git-stripspace () {
   _arguments \
     '(-s --strip-comments -c --comment-lines)'{-s,--strip-comments}'[also strip lines starting with #]' \
     '(-c --comment-lines -s --strip-comments)'{-c,--comment-lines}'[prepend comment character and blank to each line]'
+}
+
+(( $+functions[_git-url-parse] )) ||
+_git-url-parse() {
+  _arguments -S $endopt \
+    '(-c --component)'{-c+,--component=}'[specific URL component]:component:(scheme user password host port path)' \
+    '*: :_guard "^-*" url'
 }
 
 # INTERNAL GIT COMPLETION FUNCTIONS
@@ -6769,13 +6807,16 @@ _git_commands () {
     diff-tree:'compare content and mode of blobs found via two tree objects'
     for-each-ref:'output information on each ref'
     for-each-repo:'run a git command on a list of repositories'
+    format-rev:'pretty format revisions from stdin'
     get-tar-commit-id:'extract commit ID from an archive created using git archive'
+    last-modified:'show when files were last modified'
     ls-files:'information about files in index/working directory'
     ls-remote:'show references in a remote repository'
     ls-tree:'list contents of a tree object'
     merge-base:'find as good a common ancestor as possible for a merge'
     name-rev:'find symbolic names for given revisions'
     pack-redundant:'find redundant pack files'
+    repo:'retrieve information about repository'
     rev-list:'list commit object in reverse chronological order'
     rev-parse:'pick out and massage parameters for other git commands'
     show-index:'show packed archive index'
@@ -6811,8 +6852,10 @@ _git_commands () {
     mailinfo:'extract patch and authorship from a single email message'
     mailsplit:'split mbox file into a list of files'
     merge-one-file:'standard helper-program to use with git merge-index'
-    patch-id:'compute unique ID for a patch'
-    stripspace:'filter out empty lines')
+    patch-id:'compute unique ID for patches'
+    stripspace:'filter out empty lines'
+    url-parse:'parse and extract git URL components'
+  )
 
   zstyle -a :completion:$curcontext: user-commands user_commands
 
@@ -8714,11 +8757,13 @@ __git_setup_fetch_options () {
     '(-q --quiet)--progress[force progress reporting]'
     '--show-forced-updates[check for forced-updates on all updated branches]'
     '--set-upstream[set upstream for git pull/fetch]'
-    '--shallow-since=[deepen history of shallow repository based on time]:time' \
-    '*--shallow-exclude=[deepen history of shallow clone by excluding ref]:reference' \
-    '--deepen[deepen history of shallow clone]:number of commits' \
+    '--shallow-since=[deepen history of shallow repository based on time]:time'
+    '*--shallow-exclude=[deepen history of shallow clone by excluding ref]:reference'
+    '--deepen[deepen history of shallow clone]:number of commits'
     \*{-o+,--server-option=}'[send specified string to the server when using protocol version 2]:option'
-    '--negotiation-tip=[only report refs reachable from specified object to the server]:commit:__git_commits' \
+    '--negotiation-restrict=[only report refs reachable from specified object to the server]:commit:__git_commits'
+    '!--negotiation-tip=:commit:__git_commits'
+    '--negotiation-include=[report given commit as "have" in negotiation]:commit:__git_commits'
   )
 }
 

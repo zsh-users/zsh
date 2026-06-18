@@ -14,8 +14,10 @@ _arguments -C \
   '--test' \
   '--help' \
   '--version' \
-  '--altdir:altdir:_files -/' \
-  '--admindir:admindir:_files -/' \
+  '--altdir:alternatives directory [/etc/alternatives]:_files -/' \
+  "--admindir:administrative directory [$alterdir]:_files -/" \
+  '--instdir:installation directory:_files -/' \
+  '--root:root directory:_files -/' \
   '--log:log file:_files -/' \
   '--force' \
   '--skip-auto' \

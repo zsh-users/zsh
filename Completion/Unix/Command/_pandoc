@@ -214,6 +214,7 @@ _arguments -s \
   '--highlight-style=[specify coloring style to be used in highlighted source code]: :_pandoc_highlight_style' \
   '(- :)--print-highlight-style=[prints a JSON version of a highlighting style]: :_pandoc_highlight_style' \
   '--syntax-definition=[load a KDE XML syntax definition file]:file:_files -g "*.xml(-.)"' \
+  '--syntax-highlighting=[specify method to use for syntax highlighting]:method' \
   \*{-H+,--include-in-header=}'[include contents of file, verbatim, at the end of the header, implies --standalone]:file:_files' \
   \*{-B+,--include-before-body=}'[include contents of file, verbatim, at the beginning of the document body, implies --standalone]:file:_files' \
   \*{-A+,--include-end-body=}'[include contents of file, verbatim, at the end of the document body, implies --standalone]:file:_files' \

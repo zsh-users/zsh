@@ -157,7 +157,8 @@ tiffinfo)
     '-s[display offsets and byte counts for all data strips]' \
     '-i[ignore read errors]' \
     '-f+[force fill order]:fill order:(lsb2msb msb2lsb)' \
-    '-w[display raw data in words]' \
+    '-w[show image data as 16-bit words]' \
+    '-W[warn about unknown tags]' \
     '-z[enable strip chopping]' \
     '-M+[set the memory allocation limit]:limit (MiB), 0 for unlimited' \
     '*:input TIFF file:_files -g "*.(#i)tif(|f)(-.)"' && ret=0
@@ -235,6 +236,7 @@ pal2rgb)
 *)
   _description files expl 'picture file'
   _files "$expl[@]" -g "$pat" && ret=0
+;;
 esac
 
 if [[ -n "$state" ]]; then
@@ -265,7 +267,7 @@ if [[ -n "$state" ]]; then
     while _tags; do
       while _next_label values expl 'compression scheme'; do
         compadd "$expl[@]" - none jbig g4 packbits sgilog && ret=0
-        compadd "$expl[@]" -qS: - lzw zip lzma zstd webp jpeg g3 && ret=0
+        compadd "$expl[@]" -qS: - lzw zip lerc lzma zstd webp jpeg g3 && ret=0
       done
       (( ret )) || return 0
     done

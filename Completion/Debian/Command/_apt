@@ -492,12 +492,15 @@ _apt-get () {
     -d,--download-only:bool \
     -f,--fix-broken:bool \
     -h,--help:bool \
+    --assume-no:bool \
+    -a,--host-architecture:bool \
+    -P,--build-profiles:bool \
     -m,--ignore-missing,--fix-missing:bool \
     -o,--option:arbitem \
     -q,--quiet,--silent:intlevel \
     -s,--simulate,--just-print,--dry-run,--recon,--no-act:bool \
     -t,--target-release,--default-release:release \
-    -u,--show-upgraded:bool \
+    --no-show-upgraded:bool \
     -v,--version:bool \
     -y,--yes,--assume-yes:bool \
     --allow-change-held-packages:bool \
@@ -515,6 +518,7 @@ _apt-get () {
     --no-download:bool \
     --no-install-recommends:bool \
     --no-remove:bool \
+    --install-suggests:bool \
     --no-upgrade:bool \
     --only-source:bool \
     --only-upgrade:bool \

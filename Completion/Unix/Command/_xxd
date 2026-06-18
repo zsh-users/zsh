@@ -22,13 +22,14 @@ local arguments
 
 arguments=(
   # output options
-  '(-b -bits            -i -include -p -postscript -plain -ps -r -revert -u -uppercase)'{-b,-bits}'[output in binary digits, rather than hex]'
-  '(         -E -EBCDIC -i -include -p -postscript -plain -ps -r -revert              )'{-E,-EBCDIC}'[print human-readable part in EBCDIC rather than ASCII]'
-  '(-i -include -p -postscript -plain -ps -r -revert)-e[little-endian dump]'
-  '(-b -bits -E -EBCDIC -i -include -p -postscript -plain -ps -r -revert              )'{-i,-include}'[output in C include file style]'
-  '(-b -bits -E -EBCDIC -i -include -p -postscript -plain -ps -C -capitalize          )'{-p,-postscript,-plain,-ps}'[read or write a plain hexdump (no line numbers or ASCII rendering)]'
+  '(-b -bits -i -include -t -p -postscript -plain -ps -r -revert -u -uppercase)'{-b,-bits}'[output in binary digits, rather than hex]'
+  '(-E -EBCDIC -i -include -t -p -postscript -plain -ps -r -revert)'{-E,-EBCDIC}'[print human-readable part in EBCDIC rather than ASCII]'
+  '(-i -include -t -p -postscript -plain -ps -r -revert)-e[little-endian dump]'
+  '(-E -EBCDIC -i -include -p -postscript -plain -ps -r -revert)'{-i,-include}'[output in C include file style]'
+  '(-E -EBCDIC -p -postscript -plain -ps -r -revert)-t[append terminating zero to C include output]'
+  '(-b -bits -E -EBCDIC -i -include -t -p -postscript -plain -ps -C -capitalize)'{-p,-postscript,-plain,-ps}'[read or write a plain hexdump (no line numbers or ASCII rendering)]'
 
-  '(-b -bits -E -EBCDIC -i -include                           -r -revert -u -uppercase)'{-r,-revert}'[reverse mode\: read a hex dump and output binary data]'
+  '(-b -bits -E -EBCDIC -i -include -t -r -revert -u -uppercase)'{-r,-revert}'[reverse mode\: read a hex dump and output binary data]'
   '(-b -bits                                                  -r -revert -u -uppercase)'{-u,-uppercase}'[output upper-case hex digits]'
 
   '(- :)'{-h,-help}'[display usage message]'
@@ -42,7 +43,7 @@ arguments=(
   '(-o -offset)'{-o+,-offset}'[add specified offset to displayed file position]:offset'
   '-d[show offset in decimal instead of hex]'
   '-R+[colorize the output]:when:(always auto never)'
-  '(-s -skip -seek)'{-s+,-skip,-seek}'[specify file offset to dump from]: :_guard "(0x|)[0-9a-fA-F]#" "file offset to dump from (absolute or relative)"'
+  '(-s -skip -seek)'{-s+,-skip,-seek}'[specify file offset to dump from]: :_guard "([+-]|)(0x|)[0-9a-fA-F]#" "file offset to dump from (bytes, absolute or +/- relative)"'
 
   ': :_files'
 )

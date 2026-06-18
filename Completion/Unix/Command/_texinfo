@@ -123,13 +123,16 @@ case $service in
       '--conf-dir=[specify additional directory for configuration files]:directory:_directories' \
       '--init-file=[specify initialisation file]:file:_files' \
       \*{-c+,--set-customization-variable=}'[set customization variable]:variable' \
+      '--trace-includes[print names of included files]' \
       '(-v --verbose)'{-v,--verbose}'[explain what is being done]' \
       '(* -)--version[display version info]' \
-      '(--html --xml --plaintext)--docbook[output in DocBook XML format]' \
-      '(--docbook --xml --plaintext)--html[output in HTML format]' \
+      '(--html --xml --epub3 --latex --plaintext)--docbook[output in DocBook XML format]' \
+      '(--docbook --xml --epub3 --latex --plaintext)--html[output in HTML format]' \
       '--no-headers[suppress node separators and menus]' \
-      '(--docbook --html --plaintext)--xml[output in XML (TexinfoML) format]' \
-      '(--docbook --html --xml)--plaintext[output in plain text format]' \
+      '(--docbook --html --epub3 --latex --plaintext)--xml[output in XML (TexinfoML) format]' \
+      '(--docbook --html --xml --latex --plaintext)--epub3[output in EPUB 3 format]' \
+      '(--docbook --html --xml --epub3 --plaintext)--latex[output in LaTeX format]' \
+      '(--docbook --html --xml --epub3 --latex)--plaintext[output in plain text format]' \
       '--dvi[output in dvi format]' \
       '--dvipdf[output in pdf format]' \
       '--ps[output in ps format]' \
@@ -138,11 +141,13 @@ case $service in
       '(--docbook --xml)--no-split[suppress splitting of output]' \
       '--no-number-sections[output chapter and section numbers]' \
       '!(--no-number-sections)--number-sections' \
+      '--no-number-footnotes[number footnotes sequentially]' \
+      '!(--no-number-footnotes)--number-footnotes' \
       '(-o --output=)'{-o,--output}'[specify output file]:output file:_files' \
       '(--docbook --html --xml)--disable-encoding[output special characters]' \
       '!(--disable-encoding)--enable-encoding' \
       '(--docbook --html --xml)--fill-column=[specify width to break lines at]:width [72]' \
-      '(--docbook --html --xml)--footnote-style=[specify style for output of footnotes]:((separate\:in\ own\ node end\:at\ end\ of\ node))' \
+      '(--docbook --html --xml)--footnote-style=[specify style for output of footnotes]:style [end]:((separate\:in\ own\ node end\:at\ end\ of\ node))' \
       '(--docbook --html --xml)--paragraph-indent=[specify spaces to indent paragraphs by]:indent [3]' \
       '(--docbook --html --xml)--split-size=[split Info files at specified size]:size [300000]' \
       '(--docbook --xml --plaintext)--css-include=[specify file in include in HTML <style> output]:file:_files' \
@@ -151,7 +156,7 @@ case $service in
       '(--docbook --xml --plaintext)--split=[split output at specified boundary]:split boundary:(chapter section node)' \
       '(--docbook --xml --plaintext)--transliterate-file-names[produce file names in ASCII transliteration]' \
       '(--docbook --xml --plaintext)--node-files[produce redirection files for nodes]' \
-      '-Xopt=[specify option to texi2dvi]:options' \
+      '*-Xopt=[pass option to texi2dvi]:option' \
       '-D[define variable]:variable' \
       '-I[specify directory to append to @include search path]:directory:_files -/' \
       '-P[specify directory to prepend to @include search path]:directory:_files -/' \

@@ -206,6 +206,7 @@ case $OSTYPE in
       '-M[show security data]'
       '(--forest -H)'{--forest,-H}'[show process hierarchy]'
       '-P[add psr column]'
+      '--delimiter=[specify column delimiter]:string'
       '--headers[repeat header lines, one per page of output]'
       '(--cols --columns --width)'{--cols,--columns,--width}'[set screen width]:width'
       '(--lines --rows)'{--lines,--rows}'[set screen height]'

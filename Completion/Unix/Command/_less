@@ -88,17 +88,25 @@ _arguments -S -s -A "[-+]*"  \
   '(-\" --quotes)'{'-\"+',--quotes=}'[change quoting character]:quoting characters' \
   '(-~ --tilde)'{-~,--tilde}"[don't display tildes after end of file]" \
   '(-\# --shift)'{'-\#+',--shift=}"[specify amount to move when scrolling horizontally]:number of columns or fraction of screen width [.5]" \
+  '--autosave=[set additional actions which cause the history file to be saved]: : _values -s "" action
+    "(*)m[setting or clearing a mark]"
+    "(*)/[searching]"
+    "(*)\![running a shell command]"
+    "(m / !)\*[any action; same as m/!]"' \
+  '--emouse=[enable mouse features]:mouse feature:_sequence compadd - vscroll vdrag hscroll hdrag lclick rclick scroll drag hmove vmove move click all' \
+  '--end-prompt=[specify string to be printed after erasing the prompt]:string' \
   '--exit-follow-on-close[exit F command on a pipe when writer closes pipe]' \
   '--file-size[automatically determine the size of the input file]' \
   '--follow-name[the F command changes file if the input file is renamed]' \
   '--form-feed[stop scrolling when a form feed character (^L) is reached]' \
   '--header=[set header size]:lines,columns,first-line' \
+  '--hilite-target=[highlight the target line]' \
   '--incsearch[search file as each pattern character is typed in]' \
   '--intr=[specify interrupt character instead of ^X]:char [^X]' \
   '--line-num-width=[set the width of line number field]:width [7]' \
   '--match-shift=[with -S, shift horizontally to make the match visible]:number of columns or fraction of screen width' \
   '--modelines=[look for vim modelines]:number of lines to search' \
-  '(--MOUSE)--mouse[enable mouse input]' \
+  '(--MOUSE)--mouse[enable mouse clicking and vertical scrolling]' \
   '(--mouse)--MOUSE[enable mouse input, wheel down moves backwards in the file]' \
   "--no-edit-warn[don't warn when using v command on a file opened by LESSOPEN]" \
   '--no-histdups[remove duplicates from command history]' \
@@ -123,6 +131,7 @@ _arguments -S -s -A "[-+]*"  \
     "E[multi-file]" "F[from first line]" "K[highlight]"
     "N[non-matching]" "R[literal]" "W[wrap]" -' \
   '--show-preproc-errors[display a message if preprocessor exits with an error status]' \
+  '--past-eof[scrolling commands continue past end of file]' \
   '--status-col-width=[set the width of the -J status column]:width [2]' \
   '--status-line[highlight or color the entire line containing a mark]' \
   '--use-backslash[subsequent options use backslash as escape char]' \

@@ -1,3 +1,7 @@
+2026-06-19  Oliver Kiddle  <opk@zsh.org>
+
+	* 54800, 54807: Completion/...: completion options update
+
 2026-06-18  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 54801: Src/Zle/compctl.c, Src/Zle/complete.c: fix two more
