@@ -1,5 +1,7 @@
 2026-06-20  dana  <dana@dana.is>
 
+	* 54808: .git-blame-ignore-revs: add .git-blame-ignore-revs
+
 	* 54773: Src/params.c, Test/D06subscript.ztst: make out-of-range
 	(w) subscript index work like others
 

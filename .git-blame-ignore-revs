@@ -1,0 +1,26 @@
+# commits to be ignored by git blame. use as follows:
+#
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+# .git-blame-ignore-revs is the conventional file name for this purpose, so you
+# may prefer to use it globally instead. this is possible in git 2.53+:
+#
+#   git config --global blame.ignoreRevsFile ':(optional).git-blame-ignore-revs'
+#
+# in general, only trivial, non-functionality-affecting commits (e.g. typo and
+# white-space fixes) should be added to this list
+#
+# please add in ascending chronological order
+
+# unposted: Fix inconsistent white space in change log
+92b0e885d6273315602668eb50f25310020fee13
+# unposted: fix indentation (whitespace-only change)
+6c6200520afa0409c5c310cd421f33353c44c61d
+# 45101: Adjust white space
+1a8c69e26fc7e64e1b5e2837d7754a910b6a0c26
+# Clean up error-message white space
+4ce66857b71b40a0661df3780ff557f2b0f4cb13
+# 46139: _git: Remove hanging whitespaces
+d839833e4e00ee320a353846eaa235ab952181f0
+# 49435: Remove trailing whitespaces in expn.yo
+02f75cf38699b99340c1d2c8f5a9d9aaf81432e7
