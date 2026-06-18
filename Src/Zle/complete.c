@@ -1167,9 +1167,11 @@ bin_compset(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     case 'S': test = CVT_SUFPAT; break;
     case 'q': return set_comp_sep();
     default:
-	convchar_t c = unmeta_one(&argv[0][1], NULL);
-	zwarnnam(name, "bad option: -%c", c);
-	return 1;
+	{
+	    convchar_t c = unmeta_one(&argv[0][1], NULL);
+	    zwarnnam(name, "bad option: -%c", c);
+	    return 1;
+	}
     }
     if (argv[0][2]) {
 	sa = argv[0] + 2;

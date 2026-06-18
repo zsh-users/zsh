@@ -511,6 +511,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 	    case 't':
 		{
 		    char *p;
+		    convchar_t s;
 
 		    if (cl) {
 			zwarnnam(name, "bad option: -%c", arg);
@@ -541,7 +542,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 			cct.mask2 = CC_DEFCONT;
 			break;
 		    default:
-			convchar_t s = unmeta_one(p, NULL);
+			s = unmeta_one(p, NULL);
 			zwarnnam(name, "invalid retry specification character `%c'", s);
 			return 1;
 		    }
