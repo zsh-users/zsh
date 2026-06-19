@@ -3304,8 +3304,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 			    aval = paramvalarr(pm->gsu.h->getfn(pm), hkeys|hvals);
 		    } else {
 			Param pm = setaparam(idbeg, a);
-			if (pm)
-			    aval = pm->gsu.a->getfn(pm);
+			if (pm) {
+			    struct value vbuf = { 0 };
+			    char *p = idbeg;
+			    Value v = getvalue(&vbuf, &p, 1);
+			    if (v) {
+				aval = getarrvalue(v);
+			    }
+			}
 		    }
 		    isarr = 1;
 		    arrasg = 0;
@@ -3313,11 +3319,17 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		    untokenize(val);
 		    Param pm = setsparam(idbeg, ztrdup(val));
 		    if (pm) {
-			struct value vbuf = { 0 };
-			vbuf.pm = pm;
-			vbuf.end = -1;
-			vbuf.valflags = VALFLAG_SUBST;
-			val = getstrvalue(&vbuf);
+			/* this check isn't needed for correctness, but array values
+			 * aren't affected by SUBST flags anyway */
+			if ((PM_TYPE(pm->node.flags) & (PM_HASHED|PM_ARRAY)) == 0) {
+			    struct value vbuf = { 0 };
+			    char *p = idbeg;
+			    Value v = getvalue(&vbuf, &p, 1);
+			    if (v) {
+				v->valflags = VALFLAG_SUBST;
+				val = ztrdup(getstrvalue(v));
+			    }
+			}
 		    }
 		}
 		*idend = sav;

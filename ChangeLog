@@ -1,3 +1,8 @@
+2026-06-21  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 54822: Src/subst.c, Test/D04parameter.ztst: the ::= fix in
+	54674 was incomplete
+
 2026-06-20  dana  <dana@dana.is>
 
 	* Nuke: 54790 (tweaked): Completion/Unix/Command/_ffmpeg:

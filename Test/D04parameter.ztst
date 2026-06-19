@@ -84,16 +84,55 @@
 
   typeset -Z3 zerothree
   print ${zerothree::=15}
+  zerothree=
+  print ${zerothree[1]::=2} $zerothree[1] $zerothree
+  zerothree=
+  print ${zerothree[1,2]::=34} $zerothree[1,2] $zerothree
+  zerothree=
+  print ${zerothree[2,3]::=7} $zerothree[2,3] $zerothree
   typeset -E3 ethree
   five=5
   print ${ethree::=five}
   typeset -a -U uniquearr
   typeset -a duplicates=(1 2 1 1 2 3)
   print ${(A)uniquearr::=$duplicates}
+  print ${(A)uniquearr[1,2]::=$duplicates}
+  typeset -a normalarray=( a b c d e )
+  print ${(A)normalarray[2,4]::=o}
+  typeset -u upper=aaaaa
+  print ${upper[2,3]::=hi} $upper $upper[2,3]
+  print ${(A)upper::=big} $upper ${(t)upper}
 0:::= respects expansion flags
 >015
+>0 0 002
+>03 03 034
+>07 07 007
 >5.00e+00
 >1 2 3
+>1 2
+>o e
+>HI AHIAA HI
+>big big array-local
+
+  local foo=xxx
+  () { echo ${2::=$foo} ${3::=$foo} ${4::=$foo}; echo $2 } yyy
+  () { echo ${11::=$foo}; echo $11 } yyy blah
+0:::= doesn't do weird things with positional arguments
+>xxx xxx xxx
+>xxx
+>xxx
+>xxx
+
+  local five=5 arr=( a b )
+  print -rl - ${arr[2]::=$five}
+  () { print -rl - ${1::=$2} } x y
+  () { print -rl - ${1::=$five} ${2::=$five} ${9::=$five} } x y
+0:regression: ::= with multiple assignments
+>5
+>y
+>5
+>5
+>5
 
   unset array
   print ${#${(A)=array=word}}
