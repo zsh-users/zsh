@@ -3985,9 +3985,9 @@ to prevent tt(_arguments) from altering the global environment.
 )
 item(tt({)var(eval-string)tt(}))(
 vindex(expl, use of)
-A string in braces is evaluated as shell code to generate matches.  If the
-var(eval-string) itself does not begin with an opening parenthesis or
-brace it is split into separate words before execution.
+A string in braces is evaluated as shell code to generate matches.
+This is similar to the `tt(SP())var(word) var(...)' action described
+below, but isn't limited to a single command.
 )
 item(tt(= )var(action))(
 If the var(action) starts with `tt(= )' (an equals sign followed by a
@@ -4005,8 +4005,8 @@ causes tt(_arguments) on a restricted range; it is necessary to use this
 trick to insert an appropriate command name into the range for the second
 call to tt(_arguments) to be able to parse the line.
 )
-xitem(var(tt(SP())word...))
-item(var(word...))(
+xitem(tt(SP())var(word) var(...))
+item(var(word) var(...))(
 This covers all forms other than those above.  If the var(action)
 starts with a space, the remaining list of words will be invoked unchanged.
 

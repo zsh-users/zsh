@@ -1,5 +1,8 @@
 2026-06-23  dana  <dana@dana.is>
 
+	* 54818: Doc/Zsh/compsys.yo: clarify _arguments {...} action
+	behaviour
+
 	* 54823: Doc/Zsh/expn.yo: clarify ::= behaviour
 
 2026-06-23  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
