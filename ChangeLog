@@ -1,5 +1,8 @@
 2026-06-20  dana  <dana@dana.is>
 
+	* Holger Hoffstätte: github #174: Completion/Unix/Command/_gcc:
+	_gcc: coroutines-ts was merged in 2020
+
 	* 54808: .git-blame-ignore-revs: add .git-blame-ignore-revs
 
 	* 54773: Src/params.c, Test/D06subscript.ztst: make out-of-range
