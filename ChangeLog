@@ -1,3 +1,7 @@
+2026-06-23  dana  <dana@dana.is>
+
+	* 54823: Doc/Zsh/expn.yo: clarify ::= behaviour
+
 2026-06-23  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 54838: Test/D04parameter.ztst: avoid hang up if FIFO is used

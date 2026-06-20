@@ -663,7 +663,7 @@ item(tt(${)var(name)tt(::=)var(word)tt(}))(
 In the first form, if var(name) is unset then set it to var(word); in the
 second form, if var(name) is unset or null then set it to var(word); and
 in the third form, unconditionally set var(name) to var(word).  In all
-forms, the value of the parameter is then substituted.
+forms, the value of var(name) is then substituted.
 )
 xitem(tt(${)var(name)tt(?)var(word)tt(}))
 item(tt(${)var(name)tt(:?)var(word)tt(}))(
