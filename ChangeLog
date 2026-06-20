@@ -6,6 +6,10 @@
 
 	* 54828: Completion/Unix/Command/_shutdown: handle time arguments
 
+2026-06-23  dana  <dana@dana.is>
+
+	* 54823: Doc/Zsh/expn.yo: clarify ::= behaviour
+
 2026-06-20  dana  <dana@dana.is>
 
 	* Nuke: 54790 (tweaked): Completion/Unix/Command/_ffmpeg:
