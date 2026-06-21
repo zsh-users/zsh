@@ -823,6 +823,14 @@ F:shouldn't offer -t in the first case (with stacked options)
 >line: {tst -x}{}
 >DESCRIPTION:{%2Fxargdesc%f}
 
+  tst_arguments : -x '-y[]'
+  comptest $'tst -\t'
+0:empty description
+>line: {tst -}{}
+>DESCRIPTION:{option}
+>NO:{-x}
+>NO:{-y}
+
 %clean
 
   zmodload -ui zsh/zpty

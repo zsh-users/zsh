@@ -1471,6 +1471,9 @@ parse_cadef(char *nam, char **args)
 		    zwarnnam(nam, "invalid option definition: %s", *args);
 		    return NULL;
 		}
+		// treat empty description as if missing
+		if (p == descr)
+		    descr = NULL;
 		*p++ = '\0';
 		c = *p;
 	    } else
