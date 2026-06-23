@@ -1,3 +1,16 @@
+2026-06-22  Bart Schaefer  <schaefer@zsh.org>
+
+	* Philippe: 54805: Test/comptest: capture any DPUTS output during
+	completion tests
+
+	* Philippe: 54806: Test/A02alias.ztst, Test/B06fc.ztst,
+	Test/D04parameter.ztst, Test/K01nameref.ztst,
+	Test/W01history.ztst: Null prompts in interactive tests to avoid
+	unnecessary stderr; reformat for readability
+
+	* Philippe: 54792: Src/params.c, Test/K01nameref.ztst: prevent
+	named references from being entered as named directories
+
 2026-06-23  Oliver Kiddle  <opk@zsh.org>
 
 	* Felipe Contreras: 47546: Src/builtin.c: trivial cleanup
