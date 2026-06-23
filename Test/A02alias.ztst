@@ -59,10 +59,11 @@
 >And aliases are expanded
 
   PS1= $ZTST_testdir/../Src/zsh -fis <<<'
-  alias \{=echo
-  { begin
-  {end
-  fc -l -2'
+    alias \{=echo
+    { begin
+    {end
+    fc -l -2
+  '
 0:Aliasing reserved tokens
 >begin
 >end
@@ -70,9 +71,10 @@
 *>*3*{end
 
   PS1= $ZTST_testdir/../Src/zsh -fis <<<'
-  alias -g S=\"
-  echo S a string S "
-  fc -l -1'
+    alias -g S=\"
+    echo S a string S "
+    fc -l -1
+  '
 0:Global aliasing quotes
 > a string S 
 *>*2*echo S a string S "

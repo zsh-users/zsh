@@ -1547,14 +1547,14 @@ F:previously this could create an infinite recursion and crash
 
  # Note bypassing TYPESET_TO_UNSET here
  PS1= PS2= $ZTST_testdir/../Src/zsh -fis <<<'
- typeset -n p=PS3
- () {
-  typeset -p p
-  local p
-  typeset -p p
-  p=xx
-  typeset -p p
- }
+   typeset -n p=PS3
+   () {
+    typeset -p p
+    local p
+    typeset -p p
+    p=xx
+    typeset -p p
+   }
  '
 0:regression: assign to local that shadows global named reference
 >typeset -g -n p=PS3
@@ -1563,12 +1563,12 @@ F:previously this could create an infinite recursion and crash
 
  # Note bypassing TYPESET_TO_UNSET here
  PS1= PS2= $ZTST_testdir/../Src/zsh -fis <<<'
- () {
-   typeset p=PS3
-   typeset -n p
-   p=zz
- }
- typeset -p PS3
+   () {
+     typeset p=PS3
+     typeset -n p
+     p=zz
+   }
+   typeset -p PS3
  '
 0:regression - converting a string into a named reference
 >typeset PS3=zz

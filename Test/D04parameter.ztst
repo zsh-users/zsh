@@ -148,13 +148,13 @@
 ?(eval):2: null1: exiting2
 
   PS1= PS2= $ZTST_testdir/../Src/zsh -fis <<<'
-  exec 2>&1
-  foo() {
-      print ${1:?no arguments given}
-      print not reached
-  }
-  foo
-  print reached
+    exec 2>&1
+    foo() {
+        print ${1:?no arguments given}
+        print not reached
+    }
+    foo
+    print reached
   '
 0:interactive shell returns to top level on ${...?...} error
 >foo:1: 1: no arguments given
