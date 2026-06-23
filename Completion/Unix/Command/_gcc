@@ -1,10 +1,18 @@
-#compdef gcc g++ cc c++ llvm-gcc llvm-g++ clang clang++ -value-,LDFLAGS,-default- -value-,CFLAGS,-default- -value-,CXXFLAGS,-default- -value-,CPPFLAGS,-default- -P gcc-* -P g++-* -P c++-*
+#compdef gcc g++ cc c++ llvm-gcc llvm-g++ clang clang++ -value-,LDFLAGS,-default- -value-,CFLAGS,-default- -value-,CXXFLAGS,-default- -value-,CPPFLAGS,-default- -value-,CC,-default- -value-,CXX,-default- -P gcc-* -P g++-* -P c++-*
 
 local curcontext="$curcontext" state line ret=1 expl i
 local -a args args2 warnings arch
 typeset -A opt_args
 
-if [[ "$service" = -value-* ]]; then
+if [[ "$service" = -value-,CC,* ]]; then
+  _description compilers expl compiler
+  compadd "$expl[@]" -M 'r:|-=* r:|=*' -k 'commands[(I)(clang|([ig]|sun|open)cc(|<->|-devel)|icx)]'
+  return
+elif [[ "$service" = -value-,CXX,* ]]; then
+  _description compilers expl compiler
+  compadd "$expl[@]" -M 'r:|-=* r:|=*' -k 'commands[(I)((clang|g)++(|<->|-devel)|(sun|open|)CC|icpx)]'
+  return
+elif [[ "$service" = -value-* ]]; then
   compset -q
   words=( fake "$words[@]" )
   (( CURRENT++ ))
