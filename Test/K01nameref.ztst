@@ -1575,6 +1575,36 @@ F:previously this could create an infinite recursion and crash
 >typeset PS1=zz
 *?*
 
+# Testing named directories requires to run in interactive mode
+
+ PS1= $ZTST_testdir/../Src/zsh -fis <<<'
+   typeset v1=/1 v2
+   typeset -n r1=v1 r2
+   { echo "~v1:" ~v1 } 2>&1
+   { echo "~r1:" ~r1 } 2>&1
+   echo "nameddirs=( ${(kv)nameddirs} )"
+   r1=/A
+   echo "nameddirs=( ${(kv)nameddirs} )"
+   hash -d v2=/2 r2=/R
+   echo "nameddirs=( ${(kv)nameddirs} )"
+   setopt autonamedirs
+   v2=V2
+   echo "nameddirs=( ${(kv)nameddirs} )"
+   r2=v2
+   echo "nameddirs=( ${(kv)nameddirs} )"
+   r2=/B
+   echo "nameddirs=( ${(kv)nameddirs} )"
+ '
+0:Only string parameters are promoted to named directories
+>~v1: /1
+>zsh: no such user or named directory: r1
+>nameddirs=( v1 /1 )
+>nameddirs=( v1 /A )
+>nameddirs=( v1 /A v2 /2 r2 /R )
+>nameddirs=( v1 /A r2 /R )
+>nameddirs=( v1 /A r2 /R )
+>nameddirs=( v1 /A v2 /B r2 /R )
+
  unset var1 var2
  typeset -n ref1=var1
  () {
