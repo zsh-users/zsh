@@ -1541,13 +1541,13 @@ F:previously this could create an infinite recursion and crash
 >tst aaa
 
 #
-# The following tests are run in interactive mode, using PS1 as an
+# The following tests are run in interactive mode, using PS3 as an
 # assignable special with side-effects.  This crashed at one time.
 #
 
  # Note bypassing TYPESET_TO_UNSET here
- $ZTST_testdir/../Src/zsh -fis <<<$'
- typeset -n p=PS1
+ PS1= PS2= $ZTST_testdir/../Src/zsh -fis <<<'
+ typeset -n p=PS3
  () {
   typeset -p p
   local p
@@ -1557,23 +1557,21 @@ F:previously this could create an infinite recursion and crash
  }
  '
 0:regression: assign to local that shadows global named reference
->typeset -g -n p=PS1
+>typeset -g -n p=PS3
 >typeset p=''
 >typeset p=xx
-*?*
 
  # Note bypassing TYPESET_TO_UNSET here
- $ZTST_testdir/../Src/zsh -fis <<<$'
+ PS1= PS2= $ZTST_testdir/../Src/zsh -fis <<<'
  () {
-   typeset p=PS1
+   typeset p=PS3
    typeset -n p
    p=zz
  }
- typeset -p PS1
+ typeset -p PS3
  '
 0:regression - converting a string into a named reference
->typeset PS1=zz
-*?*
+>typeset PS3=zz
 
 # Testing named directories requires to run in interactive mode
 
