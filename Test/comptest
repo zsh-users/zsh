@@ -21,7 +21,7 @@ comptestinit () {
   export PS1="<PROMPT>"
   zpty zsh "$comptest_zsh -f +Z"
 
-  zpty -r zsh log1 "*<PROMPT>*" || { 
+  zpty_read log1 "*<PROMPT>*" || {
     print "first prompt hasn't appeared."
     return 1
   }
@@ -99,20 +99,47 @@ bindkey -a "^X" zle-finish
 '
 }
 
+# Reads output until the pattern $2 is matched or the end is reached.
+# Detects, prints, and removes any DPUTS messages found in the output.
+# Stores the result in the parameter named $1. Returns 0 iff the
+# pattern was matched.
+zpty_read() {
+  local logvar=$1 pattern=$2
+  zpty -r -m zsh $logvar $pattern
+  local -i result=$?
+  zpty_handle_dputs $logvar
+  return result
+}
+
 zpty_flush() {
   local junk
   if zpty -r -t zsh junk \*; then
+    zpty_handle_dputs junk
     (( ZTST_verbose > 2 )) && print -n -u $ZTST_fd "$*: ${(V)junk}"
     while zpty -r -t zsh junk \* ; do
+      zpty_handle_dputs junk
       (( ZTST_verbose > 2 )) && print -n -u $ZTST_fd "${(V)junk}"
     done
     (( ZTST_verbose > 2 )) && print -u $ZTST_fd ''
   fi
 }
 
+# Detects, prints as "DPUTS:{<message>}\n", and removes any DPUTS
+# messages found in the parameter named $1.
+zpty_handle_dputs() {
+  local -nu log=$1
+  local -i lastend=0
+  while (( ${(N)${log[lastend+1,-1]}#*(#b)((<->:|) *.c:<->: *[$'\r\n'])} )); do
+    print -u2 -r "DPUTS:{${match[1][1,-2]}}"
+    log[lastend+$mbegin[1],lastend+$mend[1]]=""
+    [[ $log[lastend+$mbegin[1]] != $'\n' ]] || log[lastend+$mbegin[1]]=""
+    lastend+=$mbegin[1]
+  done
+}
+
 zpty_run() {
   zpty -w zsh "$*"
-  zpty -r -m zsh log "*<PROMPT>*" || {
+  zpty_read log "*<PROMPT>*" || {
     print "prompt hasn't appeared."
     return 1
   }
@@ -130,7 +157,7 @@ comptesteval () {
 
      # zpty_flush Before comptesteval
      zpty -w zsh ". ${(q)tmp}"
-     zpty -r -m zsh log_eval "*<PROMPT>*" || {
+     zpty_read log_eval "*<PROMPT>*" || {
        print "prompt hasn't appeared."
        return 1
      }
@@ -144,7 +171,7 @@ comptesteval () {
 comptest () {
   input="$*"
   zpty -n -w zsh "$input"$'\C-Z'
-  zpty -r -m zsh log "*<WIDGET><finish>*<PROMPT>*" || {
+  zpty_read log "*<WIDGET><finish>*<PROMPT>*" || {
     print "failed to invoke finish widget."
     return 1
   }
@@ -184,7 +211,7 @@ zletest () {
     zpty -n -w zsh "$input"
   done
   zpty -n -w zsh $'\C-X'
-  zpty -r -m zsh log "*<WIDGET><finish>*<PROMPT>*" || {
+  zpty_read log "*<WIDGET><finish>*<PROMPT>*" || {
     print "failed to invoke finish widget."
     return 1
   }
