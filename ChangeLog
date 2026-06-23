@@ -1,5 +1,9 @@
 2026-06-23  Oliver Kiddle  <opk@zsh.org>
 
+	* 54844: Completion/Unix/Command/_configure,
+	Completion/Unix/Command/_gcc: complete variable assignments
+	with configure
+
 	* 54828: Completion/Unix/Command/_shutdown: handle time arguments
 
 2026-06-20  dana  <dana@dana.is>
