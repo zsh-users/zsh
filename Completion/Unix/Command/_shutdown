@@ -1,35 +1,39 @@
 #compdef shutdown
 
-local -a args
+local curcontext="$curcontext" variant="$OSTYPE" ret=1
+local -a state line args suffixes
 
-if [[ -d /run/systemd/system ]]; then
-  _arguments \
-    '--help[display usage information]' \
-    '(-H --halt)'{-H,--halt}'[halt the machine]' \
-    '(-P --poweroff -h)'{-P,--poweroff,-h}'[power-off the machine (default)]' \
-    '(-r --reboot)'{-r,--reboot}'[reboot the machine]' \
-    "(--no-wall)-k[don't shutdown, just write wall message]" \
-    "(-k)--no-wall[don't send a wall message]" \
-    '-c[cancel pending shutdown]' \
-    '1: :_guard "^-*" "time (now/hh\:mm/+mins)"' \
-    '*:warning message'
-  return
-fi
+[[ -d /run/systemd/system ]] && variant=systemd
 
-case $OSTYPE in
+case $variant in
+  systemd)
+    args=(
+      "(-k)--no-wall[don't send a wall message]"
+      '1: :->times'
+      '*:warning message'
+      + '(action)'
+      '(* : -)--help[display usage information]'
+      "(--no-wall)-k[don't shutdown, just write wall message]"
+      {-H,--halt}'[halt the machine]'
+      {-P,--poweroff,-h}'[power-off the machine (default)]'
+      {-r,--reboot}'[reboot the machine]'
+      '-c[cancel pending shutdown]'
+    )
+  ;;
   *bsd*|dragonfly*|linux*|darwin*)
     args=(
-      '-h[halt the system after shutdown]'
-      '-r[reboot the system]'
+      '(-p -r -c)-h[halt the system after shutdown]'
+      '(-p -h -c)-r[reboot the system]'
       '-k[kick everybody off]'
       '-n[prevent file system cache from being flushed]'
-      '1: :_guard "^-*" "time (now/hh\:mm/+mins)"'
+      '1: :->times'
+      '(*)-[read warning message from standard input]' \
       '*:warning message'
     )
   ;|
   *bsd*|dragonfly*)
     args+=(
-      '-p[turn off power after shutdown]'
+      '(-h -r -c)-p[turn off power after shutdown]'
     )
   ;|
   (net|open)bsd*)
@@ -39,13 +43,14 @@ case $OSTYPE in
     )
   ;|
   freebsd*|dragonfly*)
+    suffixes=( s:seconds :m:minutes h:hours )
     args+=(
       '-o[execute halt or reboot instead of sending a signal to init]'
     )
   ;|
   freebsd<12->.*)
     args+=(
-      '-c[power cycle the system instead of halting if possible]'
+      '(-h -r -p)-c[power cycle the system instead of halting if possible]'
     )
   ;;
   netbsd*)
@@ -74,4 +79,16 @@ case $OSTYPE in
   ;;
 esac
 
-_arguments $args
+_arguments -C $args && ret=0
+
+if [[ -n $state ]]; then
+  if compset -P '+'; then
+    _numbers -u minutes "grace period" $suffixes
+  else
+    _alternative \
+      'relative-times:relative time:{ compadd "$expl[@]" -S "" +; compadd "$expl[@]" now }' \
+      'absolute-times: :_guard "^-*" "time ([yymmdd]hhmm)"' && ret=0
+  fi
+fi
+
+return ret
