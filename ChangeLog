@@ -1,3 +1,7 @@
+2026-06-23  Oliver Kiddle  <opk@zsh.org>
+
+	* 54828: Completion/Unix/Command/_shutdown: handle time arguments
+
 2026-06-21  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 54822: Src/subst.c, Test/D04parameter.ztst: the ::= fix in
