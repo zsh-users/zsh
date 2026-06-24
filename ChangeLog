@@ -8,6 +8,9 @@
 
 2026-06-23  dana  <dana@dana.is>
 
+	* 54830 (tweaked): Completion/Unix/Command/_ffmpeg: improve
+	_ffmpeg
+
 	* 54818: Doc/Zsh/compsys.yo: clarify _arguments {...} action
 	behaviour
 

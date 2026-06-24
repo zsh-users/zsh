@@ -1,140 +1,1525 @@
 #compdef ffmpeg
 
-local curcontext="$curcontext" state line expl
-typeset -A opt_args
+# notes:
+# - stream/file options modify the input/output file argument that follows, so
+#   ideally their arguments would be limited accordingly (e.g. -c would only
+#   show encoders before an output file). but it seemed like being too 'smart'
+#   about this could be very confusing/annoying. so we don't do that
 
-(( $+functions[_ffmpeg_presets] )) || _ffmpeg_presets() {
-    local presets
-    presets=(~/.ffmpeg/*.ffpreset(:t:r) "$FFMPEG_DATADIR"/*.ffpreset(:t:r))
-    _wanted ffmpeg-presets expl 'preset' compadd -a presets
+# complete numeric argument
+(( $+functions[_ffmpeg_numbers] )) ||
+_ffmpeg_numbers() {
+  # most numeric args support these suffixes, even when it's nonsensical, e.g.
+  # -framerate 1KiB specifies 8192 fps. and most options that only accept
+  # integer args nonetheless need -f here because of this
+  _numbers -f "$@" {K,M,G}{,i}{,B}
 }
 
-(( $+functions[_ffmpeg_acodecs] )) || _ffmpeg_acodecs() {
-    local -a acodecs
-    acodecs=(copy ${(f)"$(_call_program audio-codecs \
-        $words[1] -encoders 2>/dev/null | awk 'NR>10 && /^ A/{print $2}')"})
-    _wanted ffmpeg-audio-codecs expl \
-        'force audio codec (''copy'' to copy stream)' compadd -a acodecs
+# `compadd -R` helper for _ffmpeg_flags
+(( $+functions[_ffmpeg_flags_remf] )) ||
+_ffmpeg_flags_remf() {
+  [[ $1 == 0 ]] || return
+  # swallow last char of inserted match if it was typed again
+  [[ $LBUFFER[-1] == $KEYS ]] && LBUFFER=${LBUFFER%?}
 }
 
-(( $+functions[_ffmpeg_vcodecs] )) || _ffmpeg_vcodecs() {
-    local -a vcodecs
-    vcodecs=(copy ${(f)"$(_call_program video-codecs \
-        $words[1] -encoders 2>/dev/null | awk 'NR>10 && /^ V/{print $2}')"})
-    _wanted ffmpeg-video-codecs expl \
-        'force video codec (''copy'' to copy stream)' compadd -a vcodecs
+# complete flag argument (flag1+flag2-flag3)
+# $1 ... => flag
+(( $+functions[_ffmpeg_flags] )) ||
+_ffmpeg_flags() {
+  local ret=1 tag=${curtag:-flags}
+  local -a expl ca_opts ca_x_opts flags
+  local -A opth
+
+  zparseopts -A opth -D -F - \
+    M+:=ca_opts {x+:,X+:}=ca_x_opts 1 2 F: J: n o: q r: R: s: S: V: \
+  || return
+
+  flags=( ${@:#${PREFIX//:/\\:}(|:*)} )
+
+  compset -S '[+-]*'
+  compset -P '*[+-]'
+
+  _describe -t $tag flag flags "${(@)ca_opts}" "${(@)ca_x_opts}" -S '' && ret=0
+
+  [[ $IPREFIX$PREFIX == *[+-] ]] || {
+    compset -P '*'
+    _wanted operators expl operator \
+      compadd "${(@)ca_opts}" -R _ffmpeg_flags_remf -S '' - + - && ret=0
+  }
+
+  return ret
 }
 
-(( $+functions[_ffmpeg_scodecs] )) || _ffmpeg_scodecs() {
-    local -a scodecs
-    scodecs=(copy ${(f)"$(_call_program subtitle-codecs \
-        $words[1] -encoders 2>/dev/null | awk 'NR>10 && /^ S/{print $2}')"})
-    _wanted ffmpeg-subtitle-codecs expl \
-        'force subtitle codec (''copy'' to copy stream)' compadd -a scodecs
+# helper to get stream type char from stream specifier in previous word. this
+# isn't quite accurate, but probably fine for most purposes
+# $1 => param to assign to
+(( $+functions[_ffmpeg_prev_ss_type] )) ||
+_ffmpeg_prev_ss_type() {
+  [[ $1 == (-|--) ]] && shift
+  case ${9::=${(Q)words[CURRENT-1]}} in
+    -[adsv]codec|-[av]f)
+      : ${(P)1::=${(U)9[2]}}
+      ;;
+    -(c|codec):(|*:*:)[adstvV](|:*)) ;&
+    -filter:(|*:*:)[avV](|:*))
+      8=${(M)9##*:[adstvV](:|)}
+      8=${${8%:}##*:}
+      : ${(P)1::=${(U)8}}
+      ;;
+    *) return 1 ;;
+  esac
 }
 
-(( $+functions[_ffmpeg_formats] )) || _ffmpeg_formats() {
-    local _out
-    _out=$(_call_program formats $words[1] -formats 2>/dev/null | \
-        awk 'NR>4 {name=($2=="d")?$3:$2; n=split(name,a,","); for(i=1;i<=n;i++) if(a[i]~/^[a-z0-9]/) print a[i]}')
-    local -a formats
-    formats=(${(ou)${(f)_out}})
-    _wanted ffmpeg-formats expl 'force format' compadd -a formats
+# complete stream specifier, usually after a colon-option like -c:
+(( $+functions[_ffmpeg_stream_specs] )) ||
+_ffmpeg_stream_specs() {
+  # does it make sense to allow e.g. -c:a:a:... ?
+  if compset -P '([adstvV]|g:([^i:]*|i:*)|(p|disp):*):'; then
+    _ffmpeg_stream_specs
+  elif compset -P 'g:(\#|\\\#|i:)'; then
+    _message 'group ID'
+  elif compset -P g:; then
+    _message 'group specifier'
+  elif compset -P p:; then
+    _message 'program ID'
+  elif compset -P '(\#|\\\#|i:)'; then
+    _message 'stream ID'
+  elif compset -P m:; then
+    _message 'metadata tag key[:value]'
+  elif compset -P disp:; then
+    _sequence -s+ _ffmpeg_dispositions -I
+  else
+    local ret=1
+    local -a ca_opts
+    local -A opth
+
+    zparseopts -A opth -D -F - \
+      {1+,2+,F+:,M+:,n+,o+:,q+,r+:,R+:,s+:,S+:}=ca_opts J: V: x: X: \
+    || return
+
+    _describe -t stream-specifier-types 'stream-type specifier' '(
+      a:"audio"
+      d:"data"
+      s:"subtitle"
+      t:"attachment"
+      v:"video (all)"
+      V:"video (not images)"
+    )' -qS: "${(@)ca_opts}" && ret=0
+    _describe -t stream-specifier-others 'other stream specifier' \
+      '(
+        g:"group index or ID"
+        i:"stream ID"
+        p:"program ID"
+        m:"metadata tag"
+        disp:"dispositions"
+      )' -qS: "${(@)ca_opts}" \
+      -- \
+      '(
+        u:"usable configuration"
+      )' "${(@)ca_opts}" && ret=0
+
+    return ret
+  fi
 }
 
-(( $+functions[_ffmpeg_pix_fmts] )) || _ffmpeg_pix_fmts() {
-    _wanted ffmpeg-pix-fmts expl 'pixel format' compadd "$@" - \
-        ${${${(M)${(f)"$(_call_program formats $words[1] -pix_fmts 2>/dev/null)"}:#[I.][O.][H.][P.][B.] [^=[:space:]]*}#* }%% *}
+# complete metadata specifier
+(( $+functions[_ffmpeg_metadata_specs] )) ||
+_ffmpeg_metadata_specs() {
+  if compset -P s:; then
+    _ffmpeg_stream_specs
+  elif compset -P c:; then
+    _message 'chapter index'
+  elif compset -P p:; then
+    _message 'program index'
+  else
+    _describe -t metadata-specs 'metadata specifier' \
+      '(
+        c:"per-chapter metadata"
+        p:"per-program metadata"
+        s:"per-stream metadata"
+      )' -qS: \
+      -- \
+      '(
+        g:"global metadata"
+      )'
+  fi
 }
 
-(( $+functions[_ffmpeg_bsfs] )) || _ffmpeg_bsfs() {
-    local bsfs
-    bsfs=(${${(f)"$(_call_program bsfs $words[1] -bsfs 2>/dev/null)"}:#*:})
-    _wanted ffmpeg-bsfs expl 'set bitstream filter' compadd -a bsfs
+# complete preset name
+(( $+functions[_ffmpeg_presets] )) ||
+_ffmpeg_presets() {
+  local -a presets=(
+    ~/.ffmpeg
+    $FFMPEG_DATADIR
+    ${${${${(Q)words[1]}:c}%/bin/*}:-/usr}/share/ffmpeg
+  )
+  presets=( $^presets/*.ffpreset(N:t:r) )
+  _wanted presets expl preset compadd "$@" -a presets
 }
 
-_arguments -C -S \
-    '(-y -n)-y[overwrite output files without asking]' \
-    '(-y -n)-n[never overwrite output files]' \
-    '-v[set logging level]:level:(quiet panic fatal error warning info verbose debug trace)' \
-    '-loglevel[set logging level]:level:(quiet panic fatal error warning info verbose debug trace)' \
-    '-report[generate a report]' \
-    '-hide_banner[suppress printing banner]' \
-    '-cpuflags[force specific cpu flags]:flags' \
-    '-stats[print encoding progress and statistics]' \
-    '-nostats[suppress encoding progress and statistics]' \
-    '-progress[write program-readable progress information]:URL' \
-    '-benchmark[add benchmarking information to the report]' \
-    '-timelimit[exit after specified number of seconds of CPU time]:seconds' \
-    '-dump[dump each input packet to stderr]' \
-    '-hex[dump each input packet in hexadecimal]' \
-    '-re[read input at native frame rate]' \
-    '-stream_loop[set number of times to loop the input]:count' \
-    '-i[input file or URL]:input file:_files' \
-    '*-f[force container format]:format:_ffmpeg_formats' \
-    '-c[select encoder or decoder]:codec' \
-    '-codec[select encoder or decoder]:codec' \
-    '-t[stop transcoding after duration]:duration' \
-    '-to[stop transcoding at time]:time' \
-    '-fs[set output file size limit in bytes]:bytes' \
-    '-ss[start at time offset]:time' \
-    '-sseof[start at time offset relative to EOF]:time' \
-    '-seek_timestamp[seek by timestamp with -ss when set to 1]:flag' \
-    '-itsoffset[set input time offset]:time' \
-    '-timestamp[set the recording timestamp]:time' \
-    '-metadata[add metadata to the output file]:key=value' \
-    '-program[add a program with specified streams]:title=outfile,key=value,...' \
-    '-target[specify target file type]:type:(vcd svcd dvd dv dv50)' \
-    '-apad[pad audio output with silence]' \
-    '-frames[stop writing after specified number of frames]:count' \
-    '-filter[set filtergraph for a stream]:filtergraph' \
-    '-filter_script[read filtergraph from file]:file:_files' \
-    '-reinit_filter[reinit filtergraph on input parameter changes]:flag' \
-    '-discard[discard matching stream packets]:type' \
-    '-disposition[set disposition flags for a stream]:flags' \
-    '-map[set input stream mapping]:stream_specifier' \
-    '-map_metadata[set metadata information of outfile]:outfile_spec' \
-    '-map_chapters[read chapters from input file]:input_file_index' \
-    '-copyts[copy timestamps from input to output]' \
-    '-start_at_zero[shift timestamps to start at 0 with -copyts]' \
-    '-copytb[copy input stream time base when stream copying]:mode' \
-    '-shortest[finish encoding when the shortest input stream ends]' \
-    '-dts_delta_threshold[timestamp discontinuity delta threshold]:threshold' \
-    '-muxdelay[set the maximum demux-decode delay in seconds]:seconds' \
-    '-muxpreload[set the initial demux-decode delay in seconds]:seconds' \
-    '-streamid[force a stream identifier]:ost_index:newval' \
-    '-bitexact[enable bitexact mode]' \
-    '-xerror[exit on error]' \
-    '-strict[how strictly to follow standards]:level:(very strict normal unofficial experimental)' \
-    '-max_muxing_queue_size[maximum packets in the muxing queue]:count' \
-    '-threads[number of threads to use]:count' \
-    '-vn[disable video]' \
-    '-vcodec[force video codec]:codec:_ffmpeg_vcodecs' \
-    '-vf[set video filtergraph]:filtergraph' \
-    '-b[set video bitrate]:bitrate' \
-    '-r[set video frame rate]:rate' \
-    '-s[set video frame size]:WxH' \
-    '-aspect[set video aspect ratio]:ratio' \
-    '*-pix_fmt[set pixel format]:format:_ffmpeg_pix_fmts' \
-    '-vframes[set number of video frames to output]:count' \
-    '-g[set group of picture size]:size' \
-    '*-vpre[set video preset options]:preset:_ffmpeg_presets' \
-    '-an[disable audio]' \
-    '-acodec[force audio codec]:codec:_ffmpeg_acodecs' \
-    '-af[set audio filtergraph]:filtergraph' \
-    '-ab[set audio bitrate]:bitrate' \
-    '-ar[set audio sampling rate in Hz]:rate' \
-    '-ac[set number of audio channels]:channels' \
-    '-aq[set audio quality]:quality' \
-    '-aframes[set number of audio frames to output]:count' \
-    '-atag[force audio tag or fourcc]:fourcc' \
-    '*-apre[set audio preset options]:preset:_ffmpeg_presets' \
-    '-sn[disable subtitle]' \
-    '-scodec[force subtitle codec]:codec:_ffmpeg_scodecs' \
-    '-stag[force subtitle tag or fourcc]:fourcc' \
-    '-fix_sub_duration[fix subtitle duration]' \
-    '-canvas_size[set canvas size]:WxH' \
-    '*-spre[set subtitle preset options]:preset:_ffmpeg_presets' \
-    '-bsf[set bitstream filter]:bitstream filter:_ffmpeg_bsfs' \
-    '-dn[disable data streams]' \
-    '*:output file:_files'
+# complete codec or encoder/decoder (-codec et al accept either)
+# -D => decoders, -E => encoders, -T => type (audio, video, etc)
+(( $+functions[_ffmpeg_codecs] )) ||
+_ffmpeg_codecs() {
+  local ret=1 de=DE de_desc=encoder/decoder type=ADSTV type_desc
+  local -a ca_opts codecs encdecs
+  local -A opth
+
+  zparseopts -A opth -D -F - \
+    {1+,2+,F+:,M+:,n+,o+:,q+,r+:,R+:,s+:,S+:,x+:,X+:}=ca_opts J: V: \
+    D E T: \
+  || return
+
+  case ${(L)opth[-T]} in
+    a|aud*) type=A ;;
+    d|dat*) type=D ;;
+    s|sub*) type=S ;;
+    t|att*) type=T ;;
+    v|vid*) type=V ;;
+    *)      _ffmpeg_prev_ss_type type ;;
+  esac
+  case $type in
+    A) type_desc=audio ;;
+    D) type_desc=data ;;
+    S) type_desc=subtitle ;;
+    T) type_desc=attachment ;;
+    V) type_desc=video ;;
+  esac
+
+  if (( ${+opth[-D]} )); then
+    de=D de_desc=decoder
+  elif (( ${+opth[-E]} )); then
+    de=E de_desc=encoder
+  fi
+
+  codecs=( ${(f)"$( _call_program codecs $words[1] -codecs )"} )
+  codecs=( ${(M)codecs:# [ADILSTV. ](#c6) [^=]* *} )
+  [[ $de == *D* ]] || codecs=( ${codecs:# D?*} )
+  [[ $de == *E* ]] || codecs=( ${codecs:# ?E*} )
+  codecs=( ${(M)codecs:# ??[$type]??? *} )
+  codecs=( ${codecs# ?????? } )
+
+  # -decoders and -encoders don't include data/attachment
+  [[ $type == *[ASV]* ]] && {
+    [[ $de == *D* ]] &&
+    encdecs+=( ${(f)"$( _call_program decoders $words[1] -decoders )"} )
+    [[ $de == *E* ]] &&
+    encdecs+=( ${(f)"$( _call_program encoders $words[1] -encoders )"} )
+
+    encdecs=( ${(M)encdecs:# [$type][ABDFSVX. ](#c5) [^=]* *} )
+    encdecs=( ${encdecs# ?????? } )
+  }
+
+  if zstyle -t ":completion:$curcontext:$tag" verbose; then
+    codecs=( ${codecs%%[[:space:]]##\((decoders#|encoders#):*} )
+    codecs=( ${${(@)codecs//:/\\:}/[[:space:]]##/:} )
+    # _describe doesn't remove duplicates when there are descriptions
+    encdecs=( ${(u)encdecs} )
+    encdecs=( ${${(@)encdecs//:/\\:}/[[:space:]]##/:} )
+  else
+    codecs=( ${codecs%%[[:space:]]*} )
+    encdecs=( ${encdecs%%[[:space:]]*} )
+  fi
+
+  _describe -t codecs "${type_desc:+$type_desc }codec" \
+    codecs "${(@)ca_opts}" && ret=0
+  _describe -t encoders-decoders "${type_desc:+$type_desc }$de_desc" \
+    encdecs "${(@)ca_opts}" && ret=0
+  [[ $de == *E* && ${(Q)words[CURRENT-1]} == -(c|[adsv]#codec)(|:*) ]] &&
+  _describe -t codecs-special 'copy option' '( copy:"copy stream" )' && ret=0
+
+  return ret
+}
+
+# complete format/muxer/demuxer/device
+# -D => demuxer, -E => muxer, -v => device
+(( $+functions[_ffmpeg_formats] )) ||
+_ffmpeg_formats() {
+  local dde=dDE tag=formats desc=format
+  local -a ca_opts tmp formats
+  local -A opth
+
+  zparseopts -A opth -D -F - \
+    {1+,2+,F+:,J+:,M+:,n+,o+:,q+,r+:,R+:,s+:,S+:,V+:,x+:,X+:}=ca_opts \
+    D E v \
+  || return
+
+  if (( ${+opth[-D]} )); then
+    dde=D tag=demuxers desc=demuxer
+  elif (( ${+opth[-E]} )); then
+    dde=E tag=muxers desc=muxer
+  elif (( ${+opth[-v]} )); then
+    dde=d tag=devices desc=device
+  fi
+
+  tmp=( ${(f)"$( _call_program formats $words[1] -formats )"} )
+  tmp=( ${(M)tmp:# [dDE. ](#c3) [^=]* *} )
+  [[ $dde == *D* ]] && formats+=( ${(M)tmp:# D?? *} )
+  [[ $dde == *E* ]] && formats+=( ${(M)tmp:# ?E? *} )
+  [[ $dde == *d* ]] && formats+=( ${(M)tmp:# ??d *} )
+  formats=( ${formats# ??? } )
+
+  # some formats have multiple descriptions, e.g. 'matroska:Matroska' and
+  # 'matroska:Matroska / WebM'. ideally we would merge these together somehow
+  if zstyle -t ":completion:$curcontext:$tag" verbose; then
+    local f d
+    tmp=( ${${(@)formats//:/\\:}/[[:space:]]##/:} )
+    formats=( )
+    for f in $tmp; do
+      d=${f#*:} f=${f%%:*}
+      formats+=( ${^${(@s<,>)f}}:$d )
+    done
+    formats=( ${(u)formats} )
+
+  else
+    formats=( ${(@s<,>)${(@)formats%%[[:space:]]*}} )
+  fi
+
+  _describe -t $tag $desc formats "${(@)ca_opts}"
+}
+
+# complete bitstream filter
+# -I => single bsf
+(( $+functions[_ffmpeg_bsfs] )) ||
+_ffmpeg_bsfs() {
+  local tag=bsfs desc='bitstream filter'
+  local -a ca_opts expl bsfs
+  local -A opth
+
+  zparseopts -A opth -D -F - \
+    {1+,2+,F+:,J+:,M+:,n+,o+:,q+,r+:,R+:,s+:,S+:,V+:,x+:,X+:}=ca_opts \
+    I \
+  || return
+
+  bsfs=( ${(f)"$( _call_program $tag $words[1] -bsfs )"} )
+  bsfs=( ${bsfs##[[:space:]]##} )
+  bsfs=( ${bsfs:#*:} )
+
+  if (( ${+opth[-I]} )); then
+    _describe -t $tag $desc bsfs "${(@)ca_opts}"
+  else
+    _wanted $tag expl '' _values -s, -S= $desc \
+      $^bsfs':bsf option (opt1=val1\:opt2=val2\:...):'
+  fi
+}
+
+# complete pixel format / hwaccel output format
+# -H => hwaccel formats only
+(( $+functions[_ffmpeg_pix_fmts] )) ||
+_ffmpeg_pix_fmts() {
+  local tag=pixel-formats desc='pixel format'
+  local -a ca_opts pixfmts
+  local -A opth
+
+  zparseopts -A opth -D -F - \
+    {1+,2+,F+:,J+:,M+:,n+,o+:,q+,r+:,R+:,s+:,S+:,V+:,x+:,X+:}=ca_opts \
+    H \
+  || return
+
+  pixfmts=( ${(f)"$( _call_program $tag $words[1] -pix_fmts )"} )
+  pixfmts=( ${(M)pixfmts:#[BHIOP. ](#c5) [^=]* *} )
+
+  (( ${+opth[-H]} )) && {
+    tag=hwaccel-formats desc='output format'
+    pixfmts=( ${(M)pixfmts:#??H?? *} )
+  }
+
+  pixfmts=( ${pixfmts#????? *} )
+  pixfmts=( ${pixfmts%%[[:space:]]*} )
+
+  (( ${+opth[-H]} )) || {
+    compset -P + || pixfmts+=( + )
+  }
+
+  _describe -t $tag $desc pixfmts "${(@)ca_opts}"
+}
+
+# complete filter
+(( $+functions[_ffmpeg_filters] )) ||
+_ffmpeg_filters() {
+  local MATCH MBEGIN MEND x y z tag=filters desc=filter type=AV
+  local -a ca_opts tmp filters
+  local -A opth
+
+  zparseopts -A opth -D -F - \
+    {1+,2+,F+:,J+:,M+:,n+,o+:,q+,r+:,R+:,s+:,S+:,V+:,x+:,X+:}=ca_opts \
+    T: \
+  || return
+
+  case ${(L)opth[-T]} in
+    a|aud*) type=A ;;
+    v|vid*) type=V ;;
+    *)      _ffmpeg_prev_ss_type type ;;
+  esac
+  case $type in
+    A) tag=audio-$tag desc="audio $desc" ;;
+    V) tag=video-$tag desc="video $desc" ;;
+  esac
+
+  tmp=( ${(f)"$( _call_program filters $words[1] -filters )"} )
+  tmp=( ${(M)tmp:#*-\>*} )
+  tmp=( ${tmp# ?? } )
+  tmp=( ${tmp/[ ]##/$'\t'} )
+  tmp=( ${tmp/[ ]##/$'\t'} )
+
+  for x y z in "${(@ps<\t>)tmp}"; do
+    [[ ${y//[N$type]/} == $y ]] ||
+    filters+=( $x:${z//:/\\:} )
+  done
+
+  if zstyle -t ":completion:$curcontext:$tag" verbose; then
+    # undo sentence case/punctuation
+    filters=( ${filters%.} )
+    filters=( ${filters/(#m):[A-Z][a-z]/${(L)MATCH}} )
+  else
+    filters=( ${filters%%:*} )
+  fi
+
+  _describe -t $tag $desc filters "${(@)ca_opts}"
+}
+
+# complete filtergraph spec
+(( $+functions[_ffmpeg_filtergraphs] )) ||
+_ffmpeg_filtergraphs() {
+  # [link][link] fltr@id=val:key=val:val, fltr@id [link]; fltr=val; ...
+  compset -P '*[];,]'
+  compset -P '[[:space:]]##'
+  compset -S '[;,[]*'
+  compset -S '[[:space:]]##'
+
+  if compset -P '*\['; then
+    _message 'link label'
+  elif compset -P '*='; then
+    _message 'filter arguments ([key=]val:[key=]val:...)'
+  elif compset -P '*@'; then
+    _message 'filter ID'
+  else
+    _ffmpeg_filters -r$'@=,[; \t\n\-' -S,
+  fi
+}
+
+# complete protocol
+(( $+functions[_ffmpeg_protocols] )) ||
+_ffmpeg_protocols() {
+  local tag=protocols desc=protocol
+  local -a protocols
+
+  protocols=( ${(f)"$( _call_program $tag $words[1] -protocols )"} )
+  protocols=( ${protocols:#*:*} )
+  protocols=( ${protocols##[[:space:]]##} )
+
+  _describe -t $tag $desc protocols "$@"
+}
+
+# complete standard or custom channel layout
+(( $+functions[_ffmpeg_layouts] )) ||
+_ffmpeg_layouts() {
+  local ret=1
+  local -a tmp names layouts
+
+  tmp=( ${(f)"$( _call_program layouts $words[1] -layouts )"} )
+  tmp=( ${tmp##[[:space:]]##} )
+
+  names=( ${tmp[1,(R)*(#i)layouts*:*]} )
+  names=( ${names:#(#i)*(NAME[[:space:]]##D|(channel|layout)*:)*} )
+  names=( ${^${names/[[:space:]]##/\[}}\] )
+  names=( $^names':custom name' )
+
+  layouts=( ${tmp[(R)*(#i)layouts*:*,-1]} )
+  layouts=( ${layouts:#(#i)*(NAME[[:space:]]##D|layouts*:)*} )
+  layouts=( ${layouts//:/\\:} )
+  layouts=( ${layouts/[[:space:]]##/:} )
+
+  [[ $PREFIX == *[@+]* ]] || {
+    _describe -t channel-layouts 'standard channel layout' layouts && ret=0
+  }
+  _values -s+ -S@ 'channel name' $names && ret=0
+
+  return ret
+}
+
+# complete sample format
+(( $+functions[_ffmpeg_sample_fmts] )) ||
+_ffmpeg_sample_fmts() {
+  local tag=sample-formats desc='sample format'
+  local -a sample_fmts
+
+  sample_fmts=( ${(f)"$( _call_program $tag $words[1] -sample_fmts )"} )
+  sample_fmts=( ${sample_fmts:#*(:|name[[:space:]]##desc)*} )
+  sample_fmts=( ${sample_fmts##[[:space:]]##} )
+  sample_fmts=( ${sample_fmts%%[[:space:]]*} )
+
+  _describe -t $tag $desc sample_fmts "$@"
+}
+
+# complete hardware acceleration method
+# -T => types only
+(( $+functions[_ffmpeg_hwaccels] )) ||
+_ffmpeg_hwaccels() {
+  local tag=hwaccels desc='hardware acceleration method'
+  local -a ca_opts hwaccels
+  local -A opth
+
+  zparseopts -A opth -D -F - \
+    {1+,2+,F+:,J+:,M+:,n+,o+:,q+,r+:,R+:,s+:,S+:,V+:,x+:,X+:}=ca_opts \
+    T \
+  || return
+
+  hwaccels=( ${(f)"$( _call_program $tag $words[1] -hwaccels )"} )
+  hwaccels=( ${hwaccels##[[:space:]]##} )
+  hwaccels=( ${hwaccels:#*:*} )
+
+  (( ${+opth[-T]} )) || hwaccels+=( none auto )
+
+  _describe -t $tag $desc hwaccels "${(@)ca_opts}"
+}
+
+# complete hardware devices
+(( $+functions[_ffmpeg_hw_devices] )) ||
+_ffmpeg_hw_devices() {
+  local i tag=hardware-devices desc='hardware device'
+  local -a ca_opts devices
+  local -A opth
+
+  zparseopts -A opth -D -F - \
+    {1+,2+,F+:,M+:,n+,o+:,q+,r+:,R+:,s+:,S+:,x+:,X+:}=ca_opts J: V: \
+  || return
+
+  for (( i = 2; i <= CURRENT; i++ )); do
+    [[ ${(Q)words[i]} == -init_hw_device ]] || continue
+    devices+=( ${${${(Q)words[i+1]}#*=}%@*} )
+    (( i++ ))
+  done
+
+  # exclude name in current arg
+  [[ ${(Q)words[CURRENT-1]} == -init_hw_device ]] &&
+  [[ ${i::=$IPREFIX$PREFIX} == *=* ]] &&
+  devices=( ${devices:#${${i%%[@:,]*}#*=}} )
+
+  _alternative -O ca_opts \
+    "$tag:$desc:( ${(j< >)${(@q+)devices}} )" \
+    "$tag:$desc:_ffmpeg_hwaccels -T"
+}
+
+# complete hardware devices init spec
+(( $+functions[_ffmpeg_hw_device_inits] )) ||
+_ffmpeg_hw_device_inits() {
+  local -a expl
+  if compset -P '*,*=' && [[ $PREFIX != *,* ]]; then
+    _wanted values expl 'device parameter value' _files -qS,
+  elif compset -P '*,'; then
+    _message 'device parameter (key=val)'
+  elif compset -P '*@'; then
+    _ffmpeg_hw_devices
+  elif compset -P '*:'; then
+    _wanted devices expl device _files -qS,
+  elif compset -P '*='; then
+    _message 'hardware device name'
+  else
+    _ffmpeg_hwaccels -T -qS=
+  fi
+}
+
+# complete input/output devices
+(( $+functions[_ffmpeg_devices] )) ||
+_ffmpeg_devices() {
+  local de=DE tag=devices desc=device
+  local -a ca_opts tmp devices
+  local -A opth
+
+  zparseopts -A opth -D -F - \
+    {1+,2+,F+:,J+:,M+:,n+,o+:,q+,r+:,R+:,s+:,S+:,V+:,x+:,X+:}=ca_opts \
+    D E \
+  || return
+
+  if (( ${+opth[-D]} )); then
+    de=D tag=input-$tag desc="input $desc"
+  elif (( ${+opth[-E]} )); then
+    de=E tag=output-$tag desc="output $desc"
+  fi
+
+  tmp=( ${(f)"$( _call_program devices $words[1] -devices )"} )
+  tmp=( ${(M)tmp:# [DE. ](#c2) [^=]* *} )
+
+  [[ $de == *D* ]] && devices+=( ${(M)tmp:# D? *} )
+  [[ $de == *E* ]] && devices+=( ${(M)tmp:# ?E *} )
+  devices=( ${devices# ?? } )
+
+  if zstyle -t ":completion:$curcontext:$tag" verbose; then
+    local f d
+    tmp=( ${${(@)devices//:/\\:}/[[:space:]]##/:} )
+    devices=( )
+    for f in $tmp; do
+      d=${f#*:} f=${f%%:*}
+      devices+=( ${^${(@s<,>)f}}:$d )
+    done
+    devices=( ${(u)devices} )
+
+  else
+    devices=( ${(@s<,>)${(@)devices%%[[:space:]]*}} )
+  fi
+
+  _describe -t $tag $desc devices "${(@)ca_opts}"
+}
+
+# complete disposition flags
+# -I => single disposition
+(( $+functions[_ffmpeg_dispositions] )) ||
+_ffmpeg_dispositions() {
+  local tag=dispositions desc='disposition flag'
+  local -a ca_opts expl dispositions
+  local -A opth
+
+  zparseopts -A opth -D -F - \
+    {1+,2+,F+:,J+:,M+:,n+,o+:,q+,r+:,R+:,s+:,S+:,V+:,x+:,X+:}=ca_opts \
+    I \
+  || return
+
+  dispositions=( ${(f)"$( _call_program $tag $words[1] -dispositions )"} )
+  dispositions=( ${dispositions:#*:*} )
+  dispositions=( ${dispositions##[[:space:]]##} )
+
+  if (( ${+opth[-I]} )); then
+    _describe -t $tag $desc dispositions "${(@)ca_opts}"
+  else
+    _wanted $tag expl $desc _ffmpeg_flags "${(@)ca_opts}" - $dispositions
+  fi
+}
+
+# complete stats format spec
+(( $+functions[_ffmpeg_stats_fmt_specs] )) ||
+_ffmpeg_stats_fmt_specs() {
+  local bs
+
+  compset -S '[{[[:space:]]*'
+  compset -P '*[}[[:space:]]'
+
+  [[ -n $compstate[quote] ]] || bs=\\
+
+  argv=( -r'}\-' -S"$bs}" "$@" )
+  compset -P '*{' || argv=( -P"$bs{" "$@" )
+
+  _describe -t stats-format-spec-directives 'stats format spec directive' '(
+    fidx:"index of output file"
+    sidx:"index of output stream in file"
+    n:"frame number"
+    ni:"input frame number"
+    tb:"time base for time stamps of frame/packet"
+    tbi:"timebase for ptsi"
+    pts:"presentation time stamp of frame/packet"
+    ptsi:"presentation time stamp of input frame (ni)"
+    t:"presentation time of frame/packet"
+    ti:"presentation time of input frame (ni)"
+    dts:"decoding time stamp of packet"
+    dt:"decoding time of frame/packet (dts*tb)"
+    sn:"number of audio samples sent to encoder"
+    samp:"number of audio samples in frame"
+    size:"size of packet (bytes)"
+    br:"current bit rate (bps)"
+    abr:"average bit rate of whole stream (bps)"
+    key:"K if packet contains key frame, N otherwise"
+  )' "$@"
+}
+
+# complete vsync method / frame-rate mode
+(( $+functions[_ffmpeg_fps_modes] )) ||
+_ffmpeg_fps_modes() {
+  _describe -t fps-modes 'frame-rate mode [auto]' '(
+    passthrough:"pass through frames unmodified"
+    cfr:"duplicate or drop frames to achieve constant frame rate"
+    vfr:"pass through or drop frames to achieve variable frame rate"
+    auto:"choose cfr or vfr based on muxer capabilities"
+  )' "$@"
+}
+
+# complete video-size abbreviation
+(( $+functions[_ffmpeg_video_sizes] )) ||
+_ffmpeg_video_sizes() {
+  _describe -t video-sizes 'video size abbreviation (or WxH)' '(
+    ntsc:720x480 pal:720x576 qntsc:352x240 qpal:352x288
+    sntsc:640x480 spal:768x576 film:352x240 ntsc-film:352x240
+    sqcif:128x96 qcif:176x144 cif:352x288 4cif:704x576
+    16cif:1408x1152 qqvga:160x120 qvga:320x240 vga:640x480
+    svga:800x600 xga:1024x768 uxga:1600x1200 qxga:2048x1536
+    sxga:1280x1024 qsxga:2560x2048 hsxga:5120x4096 wvga:852x480
+    wxga:1366x768 wsxga:1600x1024 wuxga:1920x1200 woxga:2560x1600
+    wqsxga:3200x2048 wquxga:3840x2400 whsxga:6400x4096
+    whuxga:7680x4800 cga:320x200 ega:640x350 hd480:852x480
+    hd720:1280x720 hd1080:1920x1080 2k:2048x1080 2kflat:1998x1080
+    2kscope:2048x858 4k:4096x2160 4kflat:3996x2160
+    4kscope:4096x1716 nhd:640x360 hqvga:240x160 wqvga:400x240
+    fwqvga:432x240 hvga:480x320 qhd:960x540 2kdci:2048x1080
+    4kdci:4096x2160 uhd2160:3840x2160 uhd4320:7680x4320
+  )' "$@"
+}
+
+# complete map data source
+(( $+functions[_ffmpeg_map_sources] )) ||
+_ffmpeg_map_sources() {
+  compset -P -
+
+  if compset -P '*:view:'; then
+    _message 'view ID'
+  elif compset -P '*:vidx:'; then
+    _message 'view index'
+  elif compset -P '*:vpos:'; then
+    _describe -t view-positions 'view position' '(left right)'
+  elif compset -P 1 '*:'; then
+    local ret=1
+    # this isn't quite right
+    compset -P '<->:' ||
+    compset -P '[astvV](:(?|[\\#]##[^:]##))#:' ||
+    compset -P 'g:(i:|)[\\#]#[^:]##:' ||
+    compset -P 'p:[^:]##(|:(?|[\\#]##[^:]##))#:' ||
+    compset -P '([\\#]##|i:)[^:]##:' ||
+    compset -P 'm:[^:]##:' || # how can this have a value here?
+    compset -P 'disp:[^:]##:' ||
+    compset -P u:
+    _ffmpeg_stream_specs -qS: && ret=0
+    _describe -t view-specifiers 'view specifier' '(
+      view:"view ID"
+      vidx:"view index"
+      vpos:"view position"
+    )' -qS: && ret=0
+    return ret
+  else
+    _message \
+      'map source ([-]input_file_id[:stream_specifier][:view_specifier][:?])'
+  fi
+}
+
+# complete program spec
+(( $+functions[_ffmpeg_program_specs] )) ||
+_ffmpeg_program_specs() {
+  local x
+  local -a kvs keys=(
+    'title:program title'
+    'program_num:program number'
+    'st:stream index'
+  )
+  for x in $keys; do
+    kvs+=( "${x%%:*}[${${x#*:}%%:*}]:${x#*:}" )
+  done
+
+  # it doesn't seem like these need to be given in order
+  compset -P '*:'
+  _values -s: -S= 'program specifier (key=val:key=val:...)' $kvs
+}
+
+# complete stream-group spec
+(( $+functions[_ffmpeg_stream_group_specs] )) ||
+_ffmpeg_stream_group_specs() {
+  local x
+  local -a kvs keys=(
+    'map:input-group mapping'
+    'type:stream-group type:( iamf_audio_element iamf_mix_presentation )'
+    'st:stream index'
+    'stg:stream group'
+    'id:stream-group ID'
+  )
+  for x in $keys; do
+    kvs+=( "${x%%:*}[${${x#*:}%%:*}]:${x#*:}" )
+  done
+
+  # @todo we should complete these. it's annoying because some use ':' for their
+  # own values
+  compset -P '*,' && {
+    _message 'type option'
+    return
+  }
+
+  # it doesn't seem like these need to be given in order. except maybe the type
+  # options?
+  compset -P '*:'
+  _values -s: -S= 'stream-group specifier (key=val:key=val:...)' $kvs
+}
+
+# complete key-frame force condition
+(( $+functions[_ffmpeg_kf_force_conds] )) ||
+_ffmpeg_kf_force_conds() {
+  if compset -P expr:; then
+    _message expression
+  elif compset -P '*[0-9,]*'; then
+    _message 'time stamps (time[,time...])'
+  else
+    _describe -t kf-force-conditions 'when to force key frame (or time stamps)' \
+      '(
+        source:"when source frame is marked as key frame"
+        scd_metadata:"when frame has metadata entry lavfi.scd.time"
+      )' \
+      -- \
+      '( expr:"when evaluated expression is non-zero" )' -qS:
+  fi
+}
+
+# complete log-level flag
+(( $+functions[_ffmpeg_loglevels] )) ||
+_ffmpeg_loglevels() {
+  local -a levels=(
+    quiet panic fatal error warning info verbose debug trace
+  )
+  compset -P "(|*+)(${(j<|>)${(@b)levels}})" && return
+  _alternative \
+    "levels:logging level:_ffmpeg_flags - ${(j< >)${(@q+)levels}}" \
+    'flags: :_ffmpeg_flags - repeat level time datetime'
+}
+
+# complete date spec
+(( $+functions[_ffmpeg_dates] )) ||
+_ffmpeg_dates() {
+  _message -e dates \
+    'date ([(YYYY-MM-DD|YYYYMMDD)[T|t| ]]((HH:MM:SS[.m]]])|(HHMMSS[.m]]]))[Z]) (or now)'
+}
+
+# complete duration spec
+(( $+functions[_ffmpeg_durations] )) ||
+_ffmpeg_durations() {
+  _message -e durations 'duration ([-][HH:]MM:SS[.m] or [-]S+[.m][s|ms|us])'
+}
+
+# complete compare functions
+(( $+functions[_ffmpeg_cmp_functions] )) ||
+_ffmpeg_cmp_functions() {
+  _describe -t compare-functions 'compare function' '(
+    sad sse satd dct psnr bit rd zero vsad vsse nsse w53 w97 dctmax
+    chroma msad
+  )' "$@"
+}
+
+# complete frame discard methods
+(( $+functions[_ffmpeg_discard_methods] )) ||
+_ffmpeg_discard_methods() {
+  _describe -t discard-methods 'frame discard method' '(
+    none:"no frames"
+    default:"useless frames"
+    noref:"non-reference frames"
+    bidir:"bi-directional frames"
+    nointra:"all except I frames"
+    nokey:"all except key frames"
+    all:"all frames"
+  )' "$@"
+}
+
+# complete -help topic
+(( $+functions[_ffmpeg_help_topics] )) ||
+_ffmpeg_help_topics() {
+  if compset -P decoder=; then
+    _ffmpeg_codecs -D
+  elif compset -P encoder=; then
+    _ffmpeg_codecs -E
+  elif compset -P demuxer=; then
+    _ffmpeg_formats -D
+  elif compset -P muxer=; then
+    _ffmpeg_formats -E
+  elif compset -P filter=; then
+    _ffmpeg_filters
+  elif compset -P bsf=; then
+    _ffmpeg_bsfs -I
+  elif compset -P protocol=; then
+    _ffmpeg_protocols
+  else
+    _describe -t help-topics 'help topic' \
+      '(
+        long:"basic and advanced tool options"
+        full:"all options"
+      )' \
+      -- \
+      '(
+        decoder:"specified decoder"
+        encoder:"specified encoder"
+        demuxer:"specified demuxer"
+        muxer:"specified muxer"
+        filter:"specified filter"
+        bsf:"specified bitstream filter"
+        protocol:"specified protocol"
+      )' -qS=
+  fi
+}
+
+local MATCH MBEGIN MEND x y z no
+local -a ss_opts ms_opts basic_opts expert_opts gen_avo_opts opts tmp
+
+# names of options that support optional :stream_specifier form
+ss_opts=(
+  ac apad apply_cropping ar aspect autorotate autoscale b
+  bits_per_raw_sample bsf c canvas_size ch_layout channel_layout
+  chroma_intra_matrix codec copyinkf copypriorss discard
+  display_hflip display_rotation display_vflip disposition
+  drop_changed dump_attachment enc_time_base filter filter_script
+  fix_sub_duration fix_sub_duration_heartbeat force_fps
+  force_key_frames fps_mode fpsmax frames guess_layout_max hwaccel
+  hwaccel_device hwaccel_output_format inter_matrix intra_matrix
+  itsscale max_muxing_queue_size muxing_queue_data_threshold pass
+  passlogfile pix_fmt pre q qscale r rc_override reinit_filter s
+  sample_fmt stats_enc_post stats_enc_post_fmt stats_enc_pre
+  stats_enc_pre_fmt stats_mux_pre stats_mux_pre_fmt tag threads
+  time_base top
+)
+
+# names of options that support optional :metadata_specifier form
+ms_opts=( metadata map_metadata )
+
+# option specs are grouped and ordered per `ffmpeg -help full` output. the
+# separate arrays probably aren't necessary, but i was keeping track of it
+# anyway, and maybe it'll be useful in the future
+
+# note: in order for the replacements below to work reliably, all specs must
+# have descriptions ('-o[desc]'), and colons must not be omitted after optarg
+# descriptions: '-o[desc]:argdesc:', NOT '-o[desc]:argdesc'
+
+# basic information/capability options
+basic_opts+=(
+  '(- : *)'{-L,-license}'[display licence information]'
+  '(- : *)'{-h,-help,--help}'[display help information]:: :_ffmpeg_help_topics'
+  '!(- : *)-?[]:: :_ffmpeg_help_topics' # annoying
+  '(- : *)-version[display version information]'
+  '(- : *)-muxers[display available muxers]'
+  '(- : *)-demuxers[display available demuxers]'
+  '(- : *)-devices[display available devices]'
+  '(- : *)-decoders[display available decoders]'
+  '(- : *)-encoders[display available encoders]'
+  '(- : *)-filters[display available filters]'
+  '(- : *)-pix_fmts[display available pixel formats]'
+  '(- : *)-layouts[display channel names and standard channel layouts]'
+  '(- : *)-sample_fmts[display available sample formats]'
+)
+# advanced information/capability options
+expert_opts+=(
+  '(- : *)-buildconf[display build configuration]'
+  '(- : *)-formats[display available formats]'
+  '(- : *)-codecs[display available codecs]'
+  '(- : *)-bsfs[display available bitstream filters]'
+  '(- : *)-protocols[display available protocols]'
+  '(- : *)-dispositions[display stream dispositions]'
+  '(- : *)-colors[display recognised colours]'
+  '(- : *)-sources[display input sources (specify device)]:: :{
+    compset -S ",*"
+    if compset -P "*,"; then
+      _message "input device option (opt1=val1,opt2=val2,...)"
+    else
+      _ffmpeg_devices -D -qS,
+    fi
+  }'
+  '(- : *)-sinks[display output sinks (specify device)]:: :{
+    compset -S ",*"
+    if compset -P "*,"; then
+      _message "output device option (opt1=val1,opt2=val2,...)"
+    else
+      _ffmpeg_devices -E -qS,
+    fi
+  }'
+  '(- : *)-hwaccels[display available hardware-acceleration methods]'
+)
+# basic global options
+basic_opts+=(
+  '(-v -loglevel)'{-v,-loglevel}'[set logging level]: :_ffmpeg_loglevels'
+  '(-n)-y[overwrite output files without asking]'
+  '(-y)-n[never overwrite output files]'
+  '-print_graphs[print execution graph data to stderr]'
+  '-print_graphs_file[write execution graph data to specified file]:execution graph file:_files'
+  '-print_graphs_format[specify execution graph format]:execution graph format:(
+    default compact csv flat ini json xml mermaid mermaidhtml
+  )'
+  '-stats[print encoding progress and statistics]'
+)
+# advanced global options
+expert_opts+=(
+  '-report[generate report]'
+  '-max_alloc[specify heap allocation size limit]: :\
+    _ffmpeg_numbers -u bytes "max heap allocation block size"
+  '
+  # we could check these against $MACHTYPE but i don't think it matters
+  '-cpuflags[specify CPU flags]:CPU flag:_ffmpeg_flags - \
+    mmx mmxext \
+    sse sse2 sse2slow sse3 sse3slow ssse3 sse4.1 sse4.2 \
+    atom \
+    avx avx2 \
+    xop \
+    fma3 fma4 \
+    3dnow 3dnowext \
+    bmi1 bmi2 \
+    cmov \
+    pentium2 pentium3 pentium4 k6 k62 athlon athlonxp k8 \
+    armv5te armv6 armv6t2 vfp vfpv3 neon setend \
+    armv8 vfp neon \
+    altivec
+  '
+  '-cpucount[specify CPU count]: :_ffmpeg_numbers "CPU count"'
+  '-hide_banner[suppress banner]'
+  '(-copy_unknown)-ignore_unknown[ignore unknown stream types]'
+  '(-ignore_unknown)-copy_unknown[copy unknown stream types]'
+  '-recast_media[allow forcing decoder of different media type]'
+  '-benchmark[show benchmark information at end of encode]'
+  '-benchmark_all[show benchmark information during encode]'
+  '-progress[write progress information to specified URL]: :{
+    if compset -P pipe\:; then
+      _describe "file descriptor" "(0 1 2)"
+    else
+      _alternative "urls\: \:_urls" "files\: \:_files"
+    fi
+  }'
+  '-stdin[enable interaction on standard input]'
+  '-timelimit[specify max run time]: :\
+    _ffmpeg_numbers -u seconds "max CPU user time"
+  '
+  '-dump[dump each input packet to stderr]'
+  '-hex[also dump payload (with -dump)]'
+  '-frame_drop_threshold[specify frame-drop threshold]: :\
+    _ffmpeg_numbers -u frames -N -d-1.1 "frame-drop threshold"
+  '
+  '-copyts[copy timestamps]'
+  '-start_at_zero[shift input timestamps to start at 0 (with -copyts)]'
+  '-copytb[specify how to set encoder time base when copying stream]:mode:((
+    -1\:"decide automatically"
+    0\:"use decoder time base"
+    1\:"use demuxer time base"
+  ))'
+  '-dts_delta_threshold[specify timestamp discontinuity delta threshold]: :\
+    _ffmpeg_numbers -u seconds -d10 "timestamp discontinuity delta threshold"
+  '
+  '-dts_error_threshold[specify timestamp error delta threshold]: :\
+    _ffmpeg_numbers -u seconds -d108000 "timestamp error delta threshold"
+  '
+  '-xerror[exit on error]'
+  '-abort_on[abort on specified condition flags]:condition flag:\
+    _ffmpeg_flags - empty_output empty_output_stream
+  '
+  '-filter_threads[specify number of threads used for each filter pipeline]: :\
+    _ffmpeg_numbers threads
+  '
+  '-filter_buffered_frames[specify max buffered frames in a filtergraph]: :\
+    _ffmpeg_numbers -d0 "max buffered frames"
+  '
+  '*'{-filter_complex,-lavfi}'[define specified complex filtergraph]: :_ffmpeg_filtergraphs'
+  '-filter_complex_threads[specify number of threads used for each complex filtergraph]: :\
+    _ffmpeg_numbers threads
+  '
+  '!*-filter_complex_script[]:-filter_complex script:_files' # deprecated
+  '-auto_conversion_filters[enable automatic conversion filters globally]'
+  '-stats_period[specify progress/statistics update interval]: :\
+    _ffmpeg_numbers -u seconds -d0.5 "update interval"
+  '
+  '-debug_ts[print timestamp/latency information]'
+  '-max_error_rate[specify max decoding error ratio]: :\
+    _ffmpeg_numbers -l0 -m1 -d0.67 "max decoding error ratio"
+  '
+  '-sdp_file[write sdp information to specified file]:sdp file:_files'
+  '*-init_hw_device[initialise specified hardware device]: :_ffmpeg_hw_device_inits'
+  '-filter_hw_device[specify hardware device for filtering]: :_ffmpeg_hw_devices'
+  '!-adrift_threshold[]:threshold:' # deprecated
+  '!-qphist[]' # deprecated
+  # deprecated in favour of -fps_mode, but still used in documentation, so no !
+  '-vsync[specify video sync method globally]: :_ffmpeg_fps_modes'
+)
+# basic per-file options (input and output)
+basic_opts+=(
+  '*-f[force specified container format]: :_ffmpeg_formats'
+  '*-t[stop after specified duration]: :_ffmpeg_durations'
+  '*-to[stop at specified time]: :_ffmpeg_durations'
+  '*-ss[start at specified time]: :_ffmpeg_durations'
+)
+# advanced per-file options (input and output)
+expert_opts+=(
+  '*-bitexact[enable bitexact mode]'
+  '*-thread_queue_size[specified max queued packets for demuxer]: :\
+    _ffmpeg_numbers "max queued packets"
+  '
+)
+# advanced per-file options (input only)
+expert_opts+=(
+  '*-sseof[start at specified time relative to EOF]: :_ffmpeg_durations'
+  '*-seek_timestamp[seek by timestamp (with -ss/-sseof)]'
+  '*-accurate_seek[enable accurate seeking (with -ss/-sseof)]'
+  '*-isync[specify input index for sync reference]: :\
+    _ffmpeg_numbers -N -d-1 "input index"
+  '
+  '*-itsoffset[specify input time offset]: :_ffmpeg_durations'
+  '*-re[read input at native frame rate (like -readrate 1)]'
+  '*-readrate[specify input read speed limit]: :\
+    _ffmpeg_numbers -u seconds -l0 -d0 "max input read duration per 1s of wall time"
+  '
+  '*-readrate_initial_burst[specify initial read burst time (with -readrate)]: :\
+    _ffmpeg_numbers -u seconds "initial read burst time"
+  '
+  '*-readrate_catchup[specify catch-up read speed limit if blocked (with -readrate)]: :\
+    _ffmpeg_numbers -u seconds "max input read duration per 1s of wall time"
+  '
+  '*-dump_attachment[extract matching attachment into specified file]:attachment output file:_files'
+  '*-stream_loop[specify number of times to loop input stream]: :\
+    _ffmpeg_numbers -N -d0 "input-stream loops"
+  '
+  '*-find_stream_info[decode streams to fill missing info with heuristics]'
+)
+# basic per-file options (output only)
+basic_opts+=(
+  '*-metadata[add specified metadata to output]:metadata key=value:'
+)
+# advanced per-file options (output only)
+expert_opts+=(
+  '*-map[specify stream mapping from input to output]: :_ffmpeg_map_sources'
+  '*-map_metadata[set metadata mapping from input to output]: :{
+    if compset -P 1 "*\:"; then
+      _ffmpeg_metadata_specs
+    else
+      _message "input file index[\:metadata specifier]"
+    fi
+  }'
+  '*-map_chapters[specify chapter mapping from input to output]: :\
+    _ffmpeg_numbers -N "input index"
+  '
+  '*-fs[specify output file size limit]: :\
+    _ffmpeg_numbers -u bytes "output file size limit"
+  '
+  '*-timestamp[specify recording timestamp]: :_ffmpeg_dates'
+  '*-program[add program with specified streams]: :_ffmpeg_program_specs'
+  '*-stream_group[add stream group with specified streams]: :_ffmpeg_stream_group_specs'
+  '*-dframes[specify max data frames to output (-like -frames\:d)]: :\
+    _ffmpeg_numbers "max data frames"
+  '
+  '*-target[specify target file type]:file type:(
+    {film-,ntsc-,pal-,}{vcd,svcd,dvd,dv,dv50}
+  )'
+  '*-shortest[finish encoding when shortest output stream ends]'
+  '*-shortest_buf_duration[specify buffer duration for -shortest]: :\
+    _ffmpeg_numbers -u seconds -d10 "max duration of buffered frames"
+  '
+  '*'{-q,-qscale}'[specify VBR quality]: :\
+    _ffmpeg_numbers "quality scale value"
+  '
+  # this is codec-specific, but here are some we know about
+  '*-profile[specify codec profile]:codec profile:(
+    # avcodeccontext
+    unknown main10
+    # dnxhd
+    dnxhd dnxhr_444 dnxhr_hqx dnxhr_hq dnxhr_sq dnxhr_lb
+    # prores
+    auto proxy lt standard hq 4444 4444xq
+    # x264
+    baseline main high high10 high422 high444
+    # h264 videotoolbox
+    baseline constrained_baseline main high constrained_high extended
+    # hevc videotoolbox
+    main main10 main42210 rext
+    # prores videotoolbox
+    auto proxy lt standard hq 4444 xq
+  )'
+  '*-attach[add attachment]:file to attach:_files'
+  '*-muxdelay[specify max demux-decode delay]: :\
+    _ffmpeg_numbers -u seconds "max demux-decode delay"
+  '
+  '*-muxpreload[specify initial demux-decode delay]: :\
+    _ffmpeg_numbers -u seconds "demux-decode delay"
+  '
+  '*-fpre[set options from specified preset file]:preset file:_files' \
+)
+# basic per-stream options
+basic_opts+=(
+  '*'{-c,-codec}'[specify encoder or decoder]: :_ffmpeg_codecs'
+  '*-filter[apply specified filtergraph]: :_ffmpeg_filtergraphs'
+)
+# advanced per-stream options
+expert_opts+=(
+  '*-pre[specify preset]: :_ffmpeg_presets'
+  '*-itsscale[specify input timestamp scale]: :_ffmpeg_numbers scale'
+  '*-copyinkf[copy initial non-key frames]'
+  '*-copypriorss[copy or discard frames before start time]'
+  '*-frames[specify max frames to output]: :\
+    _ffmpeg_numbers "max frames"
+  '
+  # there are hundreds of these so i'm not sure it makes sense to complete them
+  '*-tag[force specified codec tag/fourcc]:codec fourcc:'
+  '!*-filter_script[]:-filter script:_files' # deprecated
+  '*-reinit_filter[specify whether to re-initialise filtergraph on input parameter change]:re-initialise mode:((
+    0\:disabled
+    1\:enabled
+  ))'
+  '*-drop_changed[specify whether to drop frame on input parameter change]:drop mode:((
+    0\:disabled
+    1\:enabled
+  ))'
+  '*-discard[specify frames to discard]: :_ffmpeg_discard_methods'
+  '*-disposition[specify disposition flags]: :_ffmpeg_dispositions'
+  '*-bits_per_raw_sample[specify bits per raw sample]: :\
+    _ffmpeg_numbers "bits per raw sample"
+  '
+  '*-stats_enc_pre[write pre-encoding frame stats to specified file]:stats file:_files'
+  '*-stats_enc_post[write post-encoding frame stats to specified file]:stats file:_files'
+  '*-stats_mux_pre[write pre-muxing frame stats to specified file]:stats file:_files'
+  '*-stats_enc_pre_fmt[specify format for -stats_enc_pre]: :_ffmpeg_stats_fmt_specs'
+  '*-stats_enc_post_fmt[specify format for -stats_enc_post]: :_ffmpeg_stats_fmt_specs'
+  '*-stats_mux_pre_fmt[specify format for -stats_mux_pre]: :_ffmpeg_stats_fmt_specs'
+  '*-time_base[specify time base for output stream]:time base (num\:den or float):'
+  '*-enc_time_base[specify time base for encoder]:encoder time base (or num\:den or float):((
+    0\:"assign default value according to media type"
+    demux\:"use time base from demuxer"
+    filter\:"use time base from filtergraph"
+  ))'
+  '*-bsf[specify bitstream filters]: :_ffmpeg_bsfs'
+  '*-max_muxing_queue_size[specify max packets in muxing queue]: :\
+    _ffmpeg_numbers "max packets in muxing queue"
+  '
+  '*-muxing_queue_data_threshold[specify minimum threshold for -max_muxing_queue_size]: :\
+    _ffmpeg_numbers -u bytes -d50M "minimum threshold for muxing queue size"
+  '
+)
+# basic video options
+basic_opts+=(
+  '*-r[specify frame rate]: :\
+    _ffmpeg_numbers -u "Hz, fraction, or abbreviation" "frame rate"
+  '
+  '*-aspect[specify aspect ratio]: :\
+    _ffmpeg_numbers -u "float or num:den" "aspect ratio"
+  '
+  '*-vn[disable video]'
+  '*-vcodec[force specified video codec (like -c\:v)]: :_ffmpeg_codecs -Tv'
+  '*-vf[apply specified filtergraph to video (like -filter\:v)]: :_ffmpeg_filtergraphs'
+  # this is actually not a video option, it has to be used like -b:a or -b:v.
+  # but this is where it's listed in the help output
+  '*-b[specify bit rate]: :_ffmpeg_numbers -u bps "bit rate"'
+  # this isn't in the help output for some reason
+  '*-s[specify video frame size]: :_ffmpeg_video_sizes'
+)
+# advanced video options
+expert_opts+=(
+  '*-vframes[specify max video frames to output (like -frames\:v)]: :\
+    _ffmpeg_numbers "max video frames"
+  '
+  '*-fpsmax[specify max video frame rate]: :\
+    _ffmpeg_numbers -u "Hz, fraction, or abbreviation" "frame rate"
+  '
+  '*-pix_fmt[specify pixel format]: :_ffmpeg_pix_fmts'
+  '*-display_rotation[specify video rotation]: :\
+    _ffmpeg_numbers -u degrees "anti-clockwise video rotation"
+  '
+  '*-display_hflip[flip video horizontally]'
+  '*-display_vflip[flip video vertically]'
+  '*-rc_override[specify rate-control override]:rate control (beg,end,quant):'
+  '*-timecode[specify timecode]:timecode (hh\:mm\:ss[\:;.]ff)'
+  '*-pass[specify pass number for two-pass video encoding]:pass:(1 2)'
+  '*-passlogfile[specify two-pass log-file prefix]:log-file prefix [ffmpeg2pass]:'
+  '*-intra_matrix[specify intra quantisation matrix]:intra quantisation matrix:'
+  '*-inter_matrix[specify inter quantisation matrix]:inter quantisation matrix:'
+  '*-chroma_intra_matrix[specify chroma intra quantisation matrix]:intra quantisation matrix:'
+  '*-vtag[force specified video codec tag/fourcc (like -tag\:v)]:video codec fourcc:'
+  '*-fps_mode[specify frame-rate mode]: :_ffmpeg_fps_modes'
+  '*-force_fps[force selected frame rate]'
+  '*-streamid[specify stream identifier]:output-stream-index\:new-value:'
+  '*-force_key_frames[force key frames at specified timestamps]: :_ffmpeg_kf_force_conds'
+  '*-hwaccel[specify hardware acceleration for decoding]: :_ffmpeg_hwaccels'
+  '*-hwaccel_device[specify hardware-acceleration device (with -hwaccel)]: :_ffmpeg_hw_devices'
+  '*-hwaccel_output_format[specify hardware-acceleration output format (with -hwaccel)]: :_ffmpeg_pix_fmts -H'
+  '*-autorotate[automatically rotate video]'
+  '*-autoscale[automatically scale video]'
+  '*-apply_cropping[automatically crop video using specified method]:crop method [all]:((
+    none\:"don'\''t apply cropping"
+    all\:"apply codec- and container-level cropping"
+    codec\:"apply codec-level cropping"
+    container\:"apply container-level cropping"
+  ))'
+  '*-fix_sub_duration_heartbeat[set stream as heartbeat stream (with -fix_sub_duration)]'
+  '*-vpre[specify video preset]: :_ffmpeg_presets'
+  '!*-top[]:top:' # deprecated
+)
+# basic audio options
+basic_opts+=(
+  '*-aq[specify audio VBR quality (like -q\:a)]: :\
+    _ffmpeg_numbers "quality scale value"
+  '
+  '*-ar[specify audio sampling rate]: :\
+    _ffmpeg_numbers -u Hz "audio sampling rate"
+  '
+  '*-ac[specify number of audio channels]: :\
+    _ffmpeg_numbers "audio channels"
+  '
+  '*-an[disable audio]'
+  '*-acodec[force specified audio codec (like -c\:a)]: :_ffmpeg_codecs -Ta'
+  '*-ab[specify audio bit rate]: :_ffmpeg_numbers -u bps "audio bit rate"'
+  '*-af[apply specified filtergraph to audio (like -filter\:a)]: :_ffmpeg_filtergraphs'
+)
+# advanced audio options
+expert_opts+=(
+  '*-aframes[specify max audio frames to output (like -frames\:a)]: :\
+    _ffmpeg_numbers "max audio frames"
+  '
+  '*-apad[pad audio stream with specified parameters (like -af apad) (with -shortest)]:apad filter parameters ([key=]val\:[key=]val\:...):'
+  '*-atag[force specified audio codec tag/fourcc (like -tag\:a)]:audio codec fourcc:'
+  '*-sample_fmt[specify audio sample format]: :_ffmpeg_sample_fmts'
+  '*'{-channel_layout,-ch_layout}'[specify audio channel layout]: :_ffmpeg_layouts'
+  '*-guess_layout_max[specify max channels for guessing channel layout]: :\
+    _ffmpeg_numbers "max audio channels"
+  '
+  '*-apre[specify audio preset]: :_ffmpeg_presets'
+)
+# basic subtitle options
+basic_opts+=(
+  '*-sn[disable subtitles]'
+  '*-scodec[force specified subtitle codec (like -c\:s)]: :_ffmpeg_codecs -Ts'
+)
+# advanced subtitle options
+expert_opts+=(
+  '*-stag[force specified subtitle codec tag/fourcc (like -tag\:s)]:subtitle codec fourcc:'
+  '*-fix_sub_duration[fix subtitle durations]'
+  '*-canvas_size[specify size of canvas for rendering subtitles]: :_ffmpeg_video_sizes'
+  '*-spre[specify subtitle preset]: :_ffmpeg_presets'
+)
+# basic data-stream options
+basic_opts+=(
+  '*-dcodec[force specified data codec (like -c\:d)]: :_ffmpeg_codecs -Td'
+  '*-dn[disable data]'
+)
+# generic codec AVOptions. my assumption is that these are rarely used, so i
+# haven't put much effort into them
+gen_avo_opts+=(
+  '!*-bt[]: :_ffmpeg_numbers -u bps "bit-rate tolerance"'
+  '!*-flags[]: :_ffmpeg_flags - \
+    unaligned mv4qpel loop gray psnr ildct low_delay global_header \
+    bitexact aic ilme cgop output_corrupt
+  '
+  '!*-flags2[]: :_ffmpeg_flags - \
+    fast noout ignorecrop local_header chunks showall export_mvs \
+    skip_manual ass_ro_flush_noop icc_profiles
+  '
+  '!*-export_side_data[]: :_ffmpeg_flags - \
+    mvs prft venc_params film_grain enhancements
+  '
+  '*-g[specify GOP (group of pictures) length]: :\
+    _ffmpeg_numbers -u frames "GOP length"
+  '
+  '*-cutoff[specify audio cut-off frequency]: :\
+    _ffmpeg_numbers -u Hz "cut-off frequency"
+  '
+  '*-frame_size[specify audio frame size]: :\
+    _ffmpeg_numbers -u samples/channel "frame size"
+  '
+  '!*-qcomp[]:float:'
+  '!*-qblur[]:float:'
+  '!*-qmin[]:int:'
+  '!*-qmax[]:int:'
+  '!*-qdiff[]:int:'
+  '!*-bf[]:int:'
+  '!*-b_qfactor[]:float:'
+  '!*-bug[]: :_ffmpeg_flags - \
+    autodetect xvid_ilace ump4 no_padding amv qpel_chroma std_qpel \
+    qpel_chroma2 direct_blocksize edge hpel_chroma dc_clip ms trunc \
+    iedge
+  '
+  '*-strict[specify how strictly to follow standards]:strictness level:(
+    very strict normal unofficial experimental
+  )'
+  '!*-b_qoffset[]:float:'
+  '!*-err_detect[]: :_ffmpeg_flags - \
+    crccheck bitstream buffer explode ignore_err careful compliant
+    aggressive
+  '
+  '!*-maxrate[]:int64:'
+  '!*-minrate[]:int64:'
+  '!*-bufsize[]:int:'
+  '!*-i_qfactor[]:float:'
+  '!*-i_qoffset[]:float:'
+  '!*-lumi_mask[]:float:'
+  '!*-tcplx_mask[]:float:'
+  '!*-scplx_mask[]:float:'
+  '!*-p_mask[]:float:'
+  '!*-dark_mask[]:float:'
+  '!*-dct[]:algorithm:(auto fastint int mmx altivec faan neon)'
+  '!*-idct[]:algorithm:(
+    auto int simple simplemmx arm altivec simplearm simplearmv5te
+    simplearmv6 simpleneon xvid xvidmmx faani simpleauto
+  )'
+  '!*-ec[]: :_ffmpeg_flags - guess_mvs deblock favor_inter'
+  '!*-sar[]:rational:'
+  '!*-debug[]: :_ffmpeg_flags - \
+    pict rc bitstream mb_type qp dct_coeff green_metadata skip \
+    startcode er mmco bugs buffers thread_ops nomc
+  '
+  '!*-dia_size[]:int:'
+  '!*-last_pred[]:int:'
+  '!*-pre_dia_size[]:int:'
+  '!*-subq[]:int:'
+  '!*-me_range[]:int:'
+  '!*-global_quality[]:int:'
+  '!*-mdb[]:macroblock decision algorithm [simple]:(simple bits rd)'
+  '!*-rc_init_occupancy[]:int:'
+  '*-threads[specify number of threads to use]: :\
+    _ffmpeg_numbers -d1 "threads (or auto)"
+  '
+  '!*-dc[]:int:'
+  '!*-nssew[]:int:'
+  '!*-skip_top[]:int:'
+  '!*-skip_bottom[]:int:'
+  '!*-level[]:int:'
+  '!*-lowres[]:int:'
+  '!*-cmp[]: :_ffmpeg_cmp_functions'
+  '!*-subcmp[]: :_ffmpeg_cmp_functions'
+  '!*-mbcmp[]: :_ffmpeg_cmp_functions'
+  '!*-ildctcmp[]: :_ffmpeg_cmp_functions'
+  '!*-precmp[]: :_ffmpeg_cmp_functions'
+  '!*-mblmin[]:int:'
+  '!*-mblmax[]:int:'
+  '!*-skip_loop_filter[]: :_ffmpeg_discard_methods'
+  '!*-skip_idct[]: :_ffmpeg_discard_methods'
+  '!*-skip_frame[]: :_ffmpeg_discard_methods'
+  '!*-bidir_refine[]:int:'
+  '!*-keyint_min[]:int:'
+  '!*-refs[]:int:'
+  '!*-trellis[]:int:'
+  '!*-mv0_threshold[]:int:'
+  '!*-compression_level[]:int:'
+  '!*-rc_max_vbv_use[]:float:'
+  '!*-rc_min_vbv_use[]:float:'
+  '!*-color_primaries[]:colour primary [unknown]:(
+    bt709 unknown bt470m bt470bg smpte170m smpte240m film bt2020
+    smpte428 smpte428_1 smpte431 smpte432 jedec-p22 ebu3213
+    unspecified
+  )'
+  '!*-color_trc[]:colour transfer characteristic [unknown]:(
+    bt709 unknown gamma22 gamma28 smpte170m smpte240m linear log100
+    log316 iec61966-2-4 bt1361e iec61966-2-1 bt2020-10 bt2020-12
+    smpte2084 smpte428 arib-std-b67 unspecified log log_sqrt
+    iec61966_2_4 bt1361 iec61966_2_1 bt2020_10bit bt2020_12bit
+    smpte428_1
+  )'
+  '!*-colorspace[]:colour space [unknown]:(
+    rgb bt709 unknown fcc bt470bg smpte170m smpte240m ycgco bt2020nc
+    bt2020c smpte2085 chroma-derived-nc chroma-derived-c ictcp ipt-c2
+    unspecified ycocg ycgco-re ycgco-ro bt2020_ncl bt2020_cl
+  )'
+  '!*-color_range[]:colour range [unknown]:(
+    unknown tv pc unspecified mpeg jpeg limited full
+  )'
+  '!*-chroma_sample_location[]:sample location [unknown]:(
+    unknown left center topleft top bottomleft bottom unspecified
+  )'
+  '!*-alpha_mode[]:alpha mode [unknown]:(
+    unknown unspecified premultiplied straight
+  )'
+  '!*-slices[]:int:'
+  '!*-thread_type[]:thread-type flag [slice+frame]:_ffmpeg_flags - slice frame'
+  '!*-audio_service_type[]:audio service type [ma]:(ma ef vi hi di co em vo ka)'
+  '!*-request_sample_fmt[]: :_ffmpeg_sample_fmts'
+  '!*-sub_charenc[specify subtitle character encoding]:subtitle character encoding:'
+  '!*-sub_charenc_mode[]:subtitle character encoding mode flag [0]:\
+    _ffmpeg_flags - do_nothing auto pre_decoder ignore
+  '
+  '!*-skip_alpha[]'
+  '!*-field_order[]:field order [0]:(progressive tt bb tb bt)'
+  '!*-dump_separator[specify information dump field separator]:field separator:'
+  '!*-codec_whitelist[]: :_sequence -s, _ffmpeg_codecs -D'
+  '!*-max_pixels[]:int64:'
+  '!*-max_samples[]:int64:'
+  '!*-hwaccel_flags[]:hardware-acceleration flag [ignore_level]:\
+    _ffmpeg_flags - \
+      ignore_level allow_high_depth allow_profile_mismatch \
+      unsafe_output
+  '
+  '!*-extra_hw_frames[]:int:'
+  '!*-discard_damaged_percentage[]:int:'
+  '!*-side_data_prefer_packet[]: : _values -s, "side data type" \
+    replaygain displaymatrix spherical stereo3d audio_service_type \
+    mastering_display_metadata content_light_level icc_profile exif
+  '
+)
+# generic format AVOptions. see above
+gen_avo_opts+=(
+  '!*-avioflags[]: :_ffmpeg_flags - direct'
+  '!*-probesize[]:int64:'
+  '!*-formatprobesize[]:int:'
+  '!*-packetsize[]:int:'
+  '!*-fflags[]: :_ffmpeg_flags - \
+    flush_packets ignidx genpts nofillin noparse igndts \
+    discardcorrupt sortdts fastseek nobuffer bitexact autobsf
+  '
+  '!*-seek2any[]'
+  '!*-analyzeduration[]:int64:'
+  '!*-cryptokey[]:binary:'
+  '!*-indexmem[]:int:'
+  '!*-rtbufsize[]:int:'
+  '!*-fdebug[]: :_ffmpeg_flags - ts'
+  '!*-max_delay[]:int:'
+  '!*-start_time_realtime[]:int64:'
+  '!*-fsprobesize[]:int:'
+  '!*-audio_preload[]:int:'
+  '!*-chunk_duration[]:int:'
+  '!*-chunk_size[]:int:'
+  '!*'{-f_err_detect,-err_detect}'[]: :_ffmpeg_flags - \
+    crccheck bitstream buffer explode ignore_err careful compliant \
+    aggressive
+  ' # -f_err_detect is deprecated
+  '!*-use_wallclock_as_timestamps[]'
+  '!*-skip_initial_bytes[]:int64:'
+  '!*-correct_ts_overflow[]'
+  '!*-flush_packets[]:int:'
+  '!*-metadata_header_padding[]:int:'
+  '!*-output_ts_offset[]: :_ffmpeg_durations'
+  '!*-max_interleave_delta[]:int64:'
+  # deprecated. see -strict
+  '!*-f_strict[]:strictness level:(very strict normal unofficial experimental)'
+  '!*-max_ts_probe[]:int:'
+  '!*-avoid_negative_ts[]:time-stamp shift method:(
+    auto disabled make_non_negative make_zero
+  )'
+  '!*-format_whitelist[]: :_sequence -s, _ffmpeg_formats -D'
+  '!*-protocol_whitelist[]: :_sequence -s, _ffmpeg_protocols'
+  '!*-protocol_blacklist[]: :_sequence -s, _ffmpeg_protocols'
+  '!*-max_streams[]:int:'
+  '!*-skip_estimate_duration_from_pts[]'
+  '!*-max_probe_packets[]:int:'
+  '!*-duration_probesize[]:int64:'
+)
+# and... this
+basic_opts+=(
+  '*-i[input file or URL]:input file:_files'
+)
+
+# previous iterations of this function only completed basic options. not sure if
+# that's specifically desirable, but we can support it
+opts=( $basic_opts )
+if zstyle -t ":completion:$curcontext:$curtag" basic; then
+  opts+=( ${expert_opts/#(#m)[^!]/!$MATCH} ${gen_avo_opts/#(#m)[^!]/!$MATCH} )
+else
+  opts+=( $expert_opts $gen_avo_opts )
+fi
+
+# --help looks annoying in the list
+[[ -n $words[(r)--*] ]] || opts=( ${opts:#(|\(*\))\*#--*} )
+
+# support -no variants of boolean options
+[[ $PREFIX == -no* ]] &&
+for x in ${opts:#*\]:*}; do
+  [[ $x == \([' *:-']##\)* ]] && continue # skip -version etc
+  # skip some others that are stupid
+  [[ $x == (|\(*\))-(hide_banner|n|y)\[* ]] && continue
+  # turn '-foo[do bar]' into "-nofoo[don't do bar]"
+  [[ $x == \(* ]] && x=${x/\)-/\)-no} || x=${x/-/-no}
+  x=${x/\[/\[don\'t }
+  opts+=( $x )
+done
+
+# support optional stream/metadata spec, e.g. -codec:a or -metadata:s:a
+[[ $words[CURRENT] == -/#*:* || $words[CURRENT-1] == -/#*:* ]] &&
+for x y in ss_opts _ffmpeg_stream_specs ms_opts _ffmpeg_metadata_specs; do
+  for z in ${(P)x}; do
+    [[ $words[CURRENT] == -/#$z:* || $words[CURRENT-1] == -/#$z:* ]] || continue
+    tmp=( ${(M)opts:#(|\(*\))\*#-$z\[*} )
+    opts=( ${opts:#$tmp} )
+    # turn '-c:x:y' into '-c\:-: :_ffmpeg_stream_specs:x:y'
+    tmp=( ${tmp/\[/\\:-\[} )
+    tmp=( ${tmp/%(#m):([^:]|\\:)##(|:([^:]|\\:)#)/: :$y$MATCH} )
+    opts+=( $tmp )
+    break
+  done
+done
+
+# support -/ variant (-/filter:v filter.script) of options with args
+[[ $words[CURRENT] == -/* || $words[CURRENT-1] == -/?* ]] &&
+for (( x = 1; x <= $#opts; x++ )); do
+  [[ $opts[x] == *\]:* ]] || continue
+  [[ $opts[x] == \([' *:-']##\)* ]] && continue # skip -help etc
+  y=${${${${opts[x]#\!}#\(*\)}#\*}%%(\\:|)(-|)\[*} # option name for desc
+  # turn '-c:x:y' into '-/c:...:_files'
+  [[ $opts[x] == \(* ]] && opts[x]=${opts[x]/\)-/\)-/} || opts[x]=${opts[x]/-/-/}
+  opts[x]=${opts[x]/%:([^:]|\\:)##(|:([^:]|\\:)#)/:$y argument value file:_files}
+done
+
+_arguments -S : $opts '*:output file:_files'
