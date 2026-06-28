@@ -1,5 +1,8 @@
 2026-06-28  dana  <dana@dana.is>
 
+	* unposted: Completion/Base/Utility/_numbers: fix compadd -q
+	spec
+
 	* unposted: Completion/Unix/Command/_configure: auto-remove =
 	after variable name
 
