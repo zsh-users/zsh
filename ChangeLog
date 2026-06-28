@@ -1,5 +1,8 @@
 2026-06-28  dana  <dana@dana.is>
 
+	* unposted: Config/version.mk, Etc/FAQ.yo, README: test
+	release: 5.9.1.2-test
+
 	* unposted: Completion/Base/Utility/_numbers: fix compadd -q
 	spec
 
