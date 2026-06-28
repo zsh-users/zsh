@@ -1,3 +1,8 @@
+2026-06-28  dana  <dana@dana.is>
+
+	* unposted: Completion/Unix/Command/_configure: auto-remove =
+	after variable name
+
 2026-06-23  Oliver Kiddle  <opk@zsh.org>
 
 	* 54844: Completion/Unix/Command/_configure,
