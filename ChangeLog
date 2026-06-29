@@ -1,3 +1,8 @@
+2026-07-01  dana  <dana@dana.is>
+
+	* Štěpán Němec: 54868: Completion/Unix/Command/_perl: fix -c
+	option description
+
 2026-07-01  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 54648: Test/K01nameref.ztst: set $module_path in child zsh
