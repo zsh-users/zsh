@@ -1,5 +1,9 @@
 2026-07-01  dana  <dana@dana.is>
 
+	* Štěpán Němec: 54870: Doc/Zsh/builtins.yo, Doc/Zsh/compsys.yo,
+	Doc/Zsh/options.yo, Doc/intro.ms, Etc/CONTRIBUTORS: Fix some
+	doc typos
+
 	* Štěpán Němec: 54869: Doc/Zsh/compsys.yo: move 'expl' index
 	annotation to (more) proper place(s)
 

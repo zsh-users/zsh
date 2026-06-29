@@ -1759,7 +1759,7 @@ If the tt(-m) flag is given the arguments are taken as patterns
 options with names matching these patterns are set.
 
 Note that a bad option name does not cause execution of subsequent shell
-code to be aborted; this is behaviour is different from that of `tt(set
+code to be aborted; this behaviour is different from that of `tt(set
 -o)'.  This is because tt(set) is regarded as a special builtin by the
 POSIX standard, but tt(setopt) is not.
 )

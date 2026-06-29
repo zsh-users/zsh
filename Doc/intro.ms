@@ -6,7 +6,7 @@
 .if "\*(.T"html" .nr HTML 1
 .nr De \n[.ss]
 .\}
-.\" ----- macro defintions -----
+.\" ----- macro definitions -----
 .\" Ds/De: start/end of example
 .\" Sh: section header
 .\" XXX: It seems we can't use the same definition for both pdf and html
