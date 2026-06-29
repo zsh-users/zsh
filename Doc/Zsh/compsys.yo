@@ -32,7 +32,7 @@ enditemize()
 
 A full context specification contains other elements, as we shall describe.
 
-Besides commands names and contexts, the system employs two more
+Besides command names and contexts, the system employs two more
 concepts, em(styles) and em(tags).  These provide ways for the user
 to configure the system's behaviour.
 
@@ -775,7 +775,7 @@ for color names
 kindex(commands, completion tag)
 item(tt(commands))(
 for names of external commands.  Also used by complex commands such as
-tt(cvs) when completing names subcommands.
+tt(cvs) when completing names of subcommands.
 )
 kindex(contexts, completion tag)
 item(tt(contexts))(
