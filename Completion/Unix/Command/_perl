@@ -7,7 +7,7 @@ _perl () {
     '-0-[input record separator ($/)]:: :_perl_input_seps' \
     '-a[autosplit mode with -n or -p (splits $_ into @F)]' \
     '-C-[control some unicode features]: :_perl_unicode_flags' \
-    "-c[check syntax only (runs BEGIN and END blocks)]" \
+    "-c[check syntax only]" \
     '(   -dt -d: -dt:)-d[run scripts under debugger]' \
     '(-d     -d: -dt:)-dt[run scripts under debugger (debugged code uses threads)]' \
     '(-d -dt     -dt:)-d\:-[run under control of a debugging/tracing module]:debugging/tracing module:_perl_modules --strip-prefix --perl-hierarchy=Devel' \
