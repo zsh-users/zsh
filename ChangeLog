@@ -1,5 +1,8 @@
 2026-07-01  dana  <dana@dana.is>
 
+	* Štěpán Němec: 54871: Doc/Zsh/compwid.yo: add index markup for
+	the Completion Condition Codes
+
 	* Štěpán Němec: 54870: Doc/Zsh/builtins.yo, Doc/Zsh/compsys.yo,
 	Doc/Zsh/options.yo, Doc/intro.ms, Etc/CONTRIBUTORS: Fix some
 	doc typos

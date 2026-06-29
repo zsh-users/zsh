@@ -880,16 +880,20 @@ builtin, but in the case of the condition codes the contents of the special
 parameters are not modified.
 
 startitem()
+findex(-prefix, within [[)
 item(tt(-prefix) [ var(number) ] var(pattern))(
 true if the test for the tt(-P) option of tt(compset) would succeed.
 )
+findex(-suffix, within [[)
 item(tt(-suffix) [ var(number) ] var(pattern))(
 true if the test for the tt(-S) option of tt(compset) would succeed.
 )
+findex(-after, within [[)
 item(tt(-after) var(beg-pat))(
 true if the test of the tt(-N) option with only the var(beg-pat) given
 would succeed.
 )
+findex(-between, within [[)
 item(tt(-between) var(beg-pat end-pat))(
 true if the test for the tt(-N) option with both patterns would succeed.
 )
