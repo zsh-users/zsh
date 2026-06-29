@@ -3984,7 +3984,6 @@ typeset -A opt_args)
 to prevent tt(_arguments) from altering the global environment.
 )
 item(tt({)var(eval-string)tt(}))(
-vindex(expl, use of)
 A string in braces is evaluated as shell code to generate matches.
 This is similar to the `tt(SP())var(word) var(...)' action described
 below, but isn't limited to a single command.
@@ -4007,6 +4006,7 @@ call to tt(_arguments) to be able to parse the line.
 )
 xitem(tt(SP())var(word) var(...))
 item(var(word) var(...))(
+vindex(expl, use of)
 This covers all forms other than those above.  If the var(action)
 starts with a space, the remaining list of words will be invoked unchanged.
 
@@ -4450,6 +4450,7 @@ it does not need to appear inside a loop over tag labels.
 )
 findex(_description)
 item(tt(_description) [ tt(-x) ] [ tt(-12VJ) ] var(tag) var(name) var(descr) [ var(spec) ... ])(
+vindex(expl, use of)
 This function is not to be confused with the previous one; it is used as
 a helper function for creating options to tt(compadd).  It is buried
 inside many of the higher level completion functions and so often does

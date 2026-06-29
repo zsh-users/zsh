@@ -1,5 +1,8 @@
 2026-07-01  dana  <dana@dana.is>
 
+	* Štěpán Němec: 54869: Doc/Zsh/compsys.yo: move 'expl' index
+	annotation to (more) proper place(s)
+
 	* Štěpán Němec: 54868: Completion/Unix/Command/_perl: fix -c
 	option description
 
