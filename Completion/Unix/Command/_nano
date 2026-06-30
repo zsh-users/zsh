@@ -73,7 +73,7 @@ case $state in
     tmp=( ${(f)"$( _call_program syntaxes $words[1] --listsyntaxes )"} )
     tmp=( ${tmp:#(#i)*available syntax*} )
     tmp=( ${(@Z<n>)tmp} )
-    _wanted volume-names expl 'syntax' compadd -a - tmp && ret=0
+    _wanted syntaxes expl syntax compadd -a - tmp && ret=0
     ;;
 
   files)

@@ -1,3 +1,7 @@
+2026-06-30  dana  <dana@dana.is>
+
+	* unposted: Completion/Unix/Command/_nano: fix syntaxes tag
+
 2026-06-29  dana  <dana@dana.is>
 
 	* 54863: Completion/Unix/Command/_configure,
