@@ -1,3 +1,8 @@
+2026-07-01  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 54847 + 54849: Test/V15nearcolor.ztst: skip only 88 or 256
+	color tests if corresponding terminal is not available
+
 2026-06-30  dana  <dana@dana.is>
 
 	* unposted: Completion/Unix/Command/_nano: fix syntaxes tag
