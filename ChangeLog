@@ -1,5 +1,7 @@
 2026-07-01  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
+	* 54648: Test/K01nameref.ztst: set $module_path in child zsh
+
 	* 54847 + 54849: Test/V15nearcolor.ztst: skip only 88 or 256
 	color tests if corresponding terminal is not available
 

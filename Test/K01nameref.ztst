@@ -1576,6 +1576,7 @@ F:previously this could create an infinite recursion and crash
 # Testing named directories requires to run in interactive mode
 
  PS1= $ZTST_testdir/../Src/zsh -fis <<<'
+   [[ -d Modules/zsh ]] && module_path=( $PWD/Modules )
    typeset v1=/1 v2
    typeset -n r1=v1 r2
    { echo "~v1:" ~v1 } 2>&1
