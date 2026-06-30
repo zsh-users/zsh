@@ -1,5 +1,8 @@
 2026-07-03  dana  <dana@dana.is>
 
+	* 54876: Src/Zle/computil.c, Test/Y03arguments.ztst:
+	comparguments: search more thoroughly for foreign-set options
+
 	* unposted: Completion/Unix/Command/_ping: revert previous
 	_arguments fix
 

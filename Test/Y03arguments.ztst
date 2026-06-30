@@ -728,6 +728,35 @@ F:should offer both sets of arguments in first case
 >NO:{-d}
 F:shouldn't offer -t in the first case (with stacked options)
 
+ tst_arguments -s : - set1 -a -b -c+: --d=: - set2 -e -f
+ comptest $'tst -ab -\t'   # stack with known options
+ comptest $'tst -ax -\t'   # stack with unknown option
+ comptest $'tst -cx -\t'   # short option with same-word optarg
+ comptest $'tst --d=x -\t' # long option with same-word optarg
+0:detection of foreign-set option in stack or with same-word optarg
+>line: {tst -ab -}{}
+>DESCRIPTION:{option}
+>NO:{--d}
+>NO:{-c}
+>line: {tst -ax -}{}
+>DESCRIPTION:{option}
+>NO:{--d}
+>NO:{-a}
+>NO:{-b}
+>NO:{-c}
+>NO:{-e}
+>NO:{-f}
+>line: {tst -cx -}{}
+>DESCRIPTION:{option}
+>NO:{--d}
+>NO:{-a}
+>NO:{-b}
+>line: {tst --d=x -}{}
+>DESCRIPTION:{option}
+>NO:{-a}
+>NO:{-b}
+>NO:{-c}
+
  tst_arguments -s '(set-a set--b grp-a grp--b grp-)-a' - set-a -s - set--b -t + grp-a -g + grp--b -h + grp- -i
  comptest $'tst -a\t'
 0:sets and groups with - in their name

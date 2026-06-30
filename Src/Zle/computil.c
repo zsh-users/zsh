@@ -1722,6 +1722,8 @@ get_cadef(char *nam, char **args)
  *
  * "d" is a complete set of argument/option definitions to scan.
  * "line" is the word we are scanning.
+ * "ign_active" indicates that whether an option def is active or not
+ *   should be ignored when matching
  * "full" indicates that the option must match a full word; otherwise
  *   we look for "=" arguments or prefixes.
  * *"end" is set to point to the end of the option, in some cases
@@ -1729,24 +1731,25 @@ get_cadef(char *nam, char **args)
  */
 
 static Caopt
-ca_get_opt(Cadef d, char *line, int full, char **end)
+ca_get_opt(Cadef d, char *line, int ign_active, int full, char **end)
 {
     Caopt p;
 
     /* The full string may be an option. */
 
-    for (p = d->opts; p; p = p->next)
-	if (p->active && !strcmp(p->name, line)) {
+    for (p = d->opts; p; p = p->next) {
+	if ((ign_active || p->active) && !strcmp(p->name, line)) {
 	    if (end)
 		*end = line + strlen(line);
 
 	    return p;
 	}
+    }
 
     if (!full) {
 	/* The string from the line probably only begins with an option. */
 	for (p = d->opts; p; p = p->next)
-	    if (p->active && ((!p->args || p->type == CAO_NEXT) ?
+	    if ((ign_active || p->active) && ((!p->args || p->type == CAO_NEXT) ?
 			      !strcmp(p->name, line) : strpfx(p->name, line))) {
 		int l = strlen(p->name);
 		if ((p->type == CAO_OEQUAL || p->type == CAO_EQUAL) &&
@@ -1770,7 +1773,7 @@ ca_get_opt(Cadef d, char *line, int full, char **end)
 /* Same as above, only for single-letter-style. */
 
 static Caopt
-ca_get_sopt(Cadef d, char *line, char **end, LinkList *lp)
+ca_get_sopt(Cadef d, char *line, int ign_active, char **end, LinkList *lp)
 {
     Caopt p, pp = NULL;
     char pre = *line++;
@@ -1779,8 +1782,8 @@ ca_get_sopt(Cadef d, char *line, char **end, LinkList *lp)
 
     *lp = NULL;
     for (p = NULL; *line; line++) {
-	if ((sidx = single_index(pre, *line)) != -1 &&
-	    (p = d->single[sidx]) && p->active && p->args) {
+	if (d->single && (sidx = single_index(pre, *line)) != -1 &&
+	    (p = d->single[sidx]) && (ign_active || p->active) && p->args) {
 	    if (p->type == CAO_NEXT) {
 		if (!l)
 		    *lp = l = newlinklist();
@@ -1796,7 +1799,7 @@ ca_get_sopt(Cadef d, char *line, char **end, LinkList *lp)
 		pp = p;
 		break;
 	    }
-	} else if (!p || (p && !p->active))
+	} else if (!p || (p && !(ign_active || p->active)))
 	    return NULL;
 	pp = (p->name[0] == pre ? p : NULL);
 	p = NULL;
@@ -1813,16 +1816,15 @@ static int
 ca_foreign_opt(Cadef curset, Cadef all, char *option)
 {
     Cadef d;
-    Caopt p;
+    LinkList l;
 
     for (d = all; d; d = d->snext) {
 	if (d == curset)
 	    continue;
-
-	for (p = d->opts; p; p = p->next) {
-	    if (!strcmp(p->name, option))
-		return 1;
-	}
+	if (ca_get_opt(d, option, 1, 0, NULL))
+	    return 1;
+	if (ca_get_sopt(d, option, 1, NULL, &l))
+	    return 1;
     }
     return 0;
 }
@@ -1932,7 +1934,7 @@ ca_inactive(Cadef d, char **xor, int cur, int opts)
 		    if (a && a->num == n && (!grp || (a->gsname &&
 			    !strncmp(a->gsname, grp, grplen))))
 			a->active = 0;
-		} else if ((opt = ca_get_opt(d, x, 1, NULL)) &&
+		} else if ((opt = ca_get_opt(d, x, 0, 1, NULL)) &&
 			(!grp || (opt->gsname && !strncmp(opt->gsname, grp, grplen))) &&
 			!(single && *opt->name && opt->name[1] && opt->name[2]))
 		    opt->active = 0;
@@ -2181,7 +2183,7 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
 	/* See if it's an option. */
 
 	if (state.opt == 2 && (*line == '-' || *line == '+') &&
-	    (state.curopt = ca_get_opt(d, line, 0, &pe)) &&
+	    (state.curopt = ca_get_opt(d, line, 0, 0, &pe)) &&
 	    (state.curopt->type == CAO_OEQUAL ?
 	     (compwords[cur] || pe[-1] == '=') :
 	     (state.curopt->type == CAO_EQUAL ?
@@ -2230,7 +2232,7 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
 	    }
 	} else if (state.opt == 2 && d->single &&
 		   (*line == '-' || *line == '+') &&
-		   ((state.curopt = ca_get_sopt(d, line, &pe, &sopts)) ||
+		   ((state.curopt = ca_get_sopt(d, line, 0, &pe, &sopts)) ||
 		    (cur != compcurrent && sopts && nonempty(sopts)))) {
 	    /* Or maybe it's a single-letter option? */
 
@@ -2812,7 +2814,7 @@ bin_comparguments(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    subc = newlinklist();
 
 	    while (lstate) {
-		opt = ca_get_opt(lstate->d, args[1], 1, NULL);
+		opt = ca_get_opt(lstate->d, args[1], 0, 1, NULL);
 
 		if (opt && opt->args) {
 		    ret = 0;
