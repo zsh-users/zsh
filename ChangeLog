@@ -1,3 +1,10 @@
+2026-06-29  dana  <dana@dana.is>
+
+	* 54863: Completion/Unix/Command/_configure,
+	Completion/Unix/Command/_ffmpeg, Completion/Unix/Command/_git,
+	Completion/Unix/Command/_php,
+	Completion/Unix/Command/_postgresql: compadd -q -> -r
+
 2026-06-28  dana  <dana@dana.is>
 
 	* unposted: Completion/Base/Utility/_numbers: fix compadd -q

@@ -113,7 +113,7 @@ _ffmpeg_stream_specs() {
         p:"program ID"
         m:"metadata tag"
         disp:"dispositions"
-      )' -qS: "${(@)ca_opts}" \
+      )' -r: -S: "${(@)ca_opts}" \
       -- \
       '(
         u:"usable configuration"
@@ -138,7 +138,7 @@ _ffmpeg_metadata_specs() {
         c:"per-chapter metadata"
         p:"per-program metadata"
         s:"per-stream metadata"
-      )' -qS: \
+      )' -r: -S: \
       -- \
       '(
         g:"global metadata"
@@ -749,7 +749,7 @@ _ffmpeg_kf_force_conds() {
         scd_metadata:"when frame has metadata entry lavfi.scd.time"
       )' \
       -- \
-      '( expr:"when evaluated expression is non-zero" )' -qS:
+      '( expr:"when evaluated expression is non-zero" )' -r: -S:
   fi
 }
 
@@ -833,7 +833,7 @@ _ffmpeg_help_topics() {
         filter:"specified filter"
         bsf:"specified bitstream filter"
         protocol:"specified protocol"
-      )' -qS=
+      )' -r= -S=
   fi
 }
 

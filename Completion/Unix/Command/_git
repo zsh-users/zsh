@@ -8500,7 +8500,7 @@ __git_format_placeholders() {
   _alternative \
     'formats:: _describe -t formats "built-in format" builtin_fmts' \
     'user-formats:: _describe -t user-formats "user format" user_fmts' \
-    'custom-formats:: _describe -t custom-formats "custom format" custom_fmts -qS:' \
+    'custom-formats:: _describe -t custom-formats "custom format" custom_fmts -r: -S:' \
   && return
 
   # @todo: still unsupported: more complicated place-holders like %C() and
