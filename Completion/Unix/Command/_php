@@ -155,7 +155,7 @@ _php() {
       if compset -P 1 '*='; then
         _default && ret=0
       else
-        compset -S '=*' || suf=( -qS '=' )
+        compset -S '=*' || suf=( -r= -S= )
         _wanted directives expl 'INI directive' \
           compadd "$suf[@]" -a directives && ret=0
       fi

@@ -200,7 +200,7 @@ __pgsql_cfg_params_values() {
     _message -e values 'PostgreSQL run-time configuration-parameter value'
   else
     compset -S '=*'
-    __pgsql_cfg_params "$@" -qS=
+    __pgsql_cfg_params "$@" -r= -S=
   fi
 }
 
@@ -332,7 +332,7 @@ __pgsql_cfg_variables_values() {
     _message -e values 'PostgreSQL special-variable value'
   else
     compset -S '=*'
-    __pgsql_variables "$@" -qS=
+    __pgsql_variables "$@" -r= -S=
   fi
 }
 

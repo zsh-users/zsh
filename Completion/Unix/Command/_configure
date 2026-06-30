@@ -21,7 +21,7 @@ if [[ ! -prefix - ]]; then
     compset -P 1 '*='
     _value && ret=0
   else
-    compset -S '=*' || suf=( -qS = )
+    compset -S '=*' || suf=( -r = -S = )
     _wanted -x variables expl variable compadd $suf \
         CC CFLAGS CPP CPPFLAGS CXX CXXFLAGS DEFS ERLCFLAGS FCFLAGS \
         FFLAGS GOFLAGS LDFLAGS LIBS OBJCFLAGS OBJCXXFLAGS && ret=0
