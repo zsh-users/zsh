@@ -656,16 +656,75 @@ F:shouldn't offer -b as it is already on the command-line
 >NO:{-b}
 >NO:{-c}
 
+ tst_arguments : -a:arg -b -c --d
+ comptest $'tst -a -b -\t'
+ comptest $'tst -a --d -\t'
+0:single optarg that looks like an option
+>line: {tst -a -b -}{}
+>DESCRIPTION:{option}
+>NO:{--d}
+>NO:{-b}
+>NO:{-c}
+>line: {tst -a --d -}{}
+>DESCRIPTION:{option}
+>NO:{--d}
+>NO:{-b}
+>NO:{-c}
+
+ tst_arguments : -a:arg1::arg2::arg3 -b -c -d: --e --f --g:
+ comptest $'tst -a -b -c -d -\t'
+ comptest $'tst -a --e --f --g -\t'
+0:multiple optargs that look like options
+>line: {tst -a -b -c -d -}{}
+>DESCRIPTION:{option}
+>NO:{--e}
+>NO:{--f}
+>NO:{--g}
+>NO:{-b}
+>NO:{-c}
+>NO:{-d}
+>line: {tst -a --e --f --g -}{}
+>DESCRIPTION:{option}
+>NO:{--e}
+>NO:{--f}
+>NO:{--g}
+>NO:{-b}
+>NO:{-c}
+>NO:{-d}
+
+ tst_arguments : - set1 -a: -b -c - set2 -d: -e -f
+ comptest $'tst -a -b -\t'
+ comptest $'tst -d -e -\t'
+0:optarg that look like an option in a set
+>line: {tst -a -b -}{}
+>DESCRIPTION:{option}
+>NO:{-b}
+>NO:{-c}
+>line: {tst -d -e -}{}
+>DESCRIPTION:{option}
+>NO:{-e}
+>NO:{-f}
+
+ tst_arguments -S -S : -a: -b -c
+ comptest $'tst -a - -\t'
+ comptest $'tst -a -- -\t'
+0:optarg that looks like a terminator
+>line: {tst -a - -}{}
+>DESCRIPTION:{option}
+>NO:{-b}
+>NO:{-c}
+>line: {tst -a -- -}{}
+>DESCRIPTION:{option}
+>NO:{-b}
+>NO:{-c}
+
  tst_arguments '-a:arg' -b '(-b)-c'
  comptest $'tst -a -c -\t'
 0:exclusion with option argument that looks like an option
 >line: {tst -a -c -}{}
->MESSAGE:{no arguments}
-F:The current behaviour is wrong; the correct expected output is:
-F:>line: {tst -a -c -}{}
-F:>DESCRIPTION:{option}
-F:>NO:{-b}
-F:>NO:{-c}
+>DESCRIPTION:{option}
+>NO:{-b}
+>NO:{-c}
 
  tst_arguments + grp1 -a -b - onlyset '(-a grp3--y grp2 grp4--)-m' -n + grp2 -u -v + grp3 -x -y + grp4 -0 ':rest'
  comptest $'tst -m -\t'

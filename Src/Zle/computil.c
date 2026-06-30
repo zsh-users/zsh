@@ -2125,6 +2125,7 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
 	    argxor = NULL;
 	}
 	if (cur != compcurrent && state.actopts &&
+		!(state.def && state.inopt) &&
 		(((d->flags & CDF_SEP) && !strcmp(line, "--")) ||
 		((d->flags & CDF_ZSEP) && !strcmp(line, "-")))) {
 	    ca_inactive(d, NULL, cur, 1);
@@ -2154,6 +2155,7 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
 	    } else if ((state.def = state.def->next)) {
 		state.argbeg = cur;
 		state.argend = argend;
+		goto cont;
 	    } else if (sopts && nonempty(sopts)) {
 		state.curopt = (Caopt) uremnode(sopts, firstnode(sopts));
 		state.def = state.curopt->args;
@@ -2168,6 +2170,7 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
 	    } else {
 		state.curopt = NULL;
 		state.opt = 1;
+		goto cont;
 	    }
 	} else {
 	    state.opt = state.arg = 1;

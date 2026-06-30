@@ -1,5 +1,8 @@
 2026-07-03  dana  <dana@dana.is>
 
+	* 54889: Src/Zle/computil.c, Test/Y03arguments.ztst:
+	comparguments: always parse optargs as optargs
+
 	* 54876: Src/Zle/computil.c, Test/Y03arguments.ztst:
 	comparguments: search more thoroughly for foreign-set options
 
