@@ -13,6 +13,11 @@
 	* Štěpán Němec: 54868: Completion/Unix/Command/_perl: fix -c
 	option description
 
+2026-07-01  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* unposted: Completion/Unix/Command/_attr: $list was removed
+	in 54528
+
 2026-06-30  dana  <dana@dana.is>
 
 	* unposted: Completion/Unix/Command/_nano: fix syntaxes tag
