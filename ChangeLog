@@ -1,5 +1,7 @@
 2026-07-01  dana  <dana@dana.is>
 
+	* unposted: Completion/X/Command/_sioyek: remove _sioyek
+
 	* Štěpán Němec: 54871: Doc/Zsh/compwid.yo: add index markup for
 	the Completion Condition Codes
 
