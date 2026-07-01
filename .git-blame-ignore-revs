@@ -24,3 +24,5 @@
 d839833e4e00ee320a353846eaa235ab952181f0
 # 49435: Remove trailing whitespaces in expn.yo
 02f75cf38699b99340c1d2c8f5a9d9aaf81432e7
+# 54806: reformat interactive tests for readability (whitespace only)
+4d1193772b093e23c533e86cb11448d36f38c8c2
