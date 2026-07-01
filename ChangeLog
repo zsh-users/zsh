@@ -1,5 +1,13 @@
 2026-07-03  dana  <dana@dana.is>
 
+	* 54891: Completion/Linux/Command/_ip,
+	Completion/Linux/Command/_kbd, Completion/Linux/Command/_kmod,
+	Completion/Linux/Command/_ladspa,
+	Completion/Solaris/Command/_pkgadd,
+	Completion/Solaris/Command/_pkginfo,
+	Completion/Solaris/Command/_pkgrm,
+	Completion/Unix/Command/_htop: move/rename several functions
+
 	* 54891: Completion/BSD/Command/_csup,
 	Completion/BSD/Command/_portaudit,
 	Completion/Base/Utility/_arg_compile,
