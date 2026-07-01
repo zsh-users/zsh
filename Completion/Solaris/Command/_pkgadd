@@ -23,10 +23,10 @@ _pkgadd() {
 	'-R[root path]:root path:_files -/' \
 	'-r[response file]:response file:_files' \
 	'-V[alternate vfstab file]:vfstab file:_files' \
-	'*:package instance:_pkg_instance --_opts uninstalled:-d' \
+	'*:package instance:_pkg_instances --_opts uninstalled:-d' \
 	- set2 \
 	'-s[spool package]:spool directory:_files -/' \
-	'*:package instance:_pkg_instance --_opts uninstalled:-d'
+	'*:package instance:_pkg_instances --_opts uninstalled:-d'
 }
 
 _pkgadd "$@"

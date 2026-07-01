@@ -12,7 +12,7 @@ _arguments -s \
   '(-p)-i[select completely installed packages]' \
   '(-i)-p[select partially installed packages]' \
   '-R[root path]:root path:_files -/' \
-  '*:package instance:_pkg_instance --_opts installed:set1--R' \
+  '*:package instance:_pkg_instances --_opts installed:set1--R' \
   - set2 \
   '-d[device]:device file:_files' \
-  '*:package instance:_pkg_instance --_opts uninstalled:set2--d'
+  '*:package instance:_pkg_instances --_opts uninstalled:set2--d'

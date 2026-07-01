@@ -1,5 +1,11 @@
 2026-07-03  dana  <dana@dana.is>
 
+	* 54891: Completion/Solaris/Command/_pkgadd,
+	Completion/Solaris/Command/_pkginfo,
+	Completion/Solaris/Command/_pkgrm,
+	Completion/Solaris/Type/_pkg_instances: move/rename
+	_pkg_instance -> _pkg_instances
+
 	* 54891: Completion/Linux/Command/_ip,
 	Completion/Linux/Command/_kbd, Completion/Linux/Command/_kmod,
 	Completion/Linux/Command/_ladspa,
