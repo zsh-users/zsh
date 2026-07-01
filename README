@@ -182,6 +182,11 @@ nearest in-range one.  (e.g., given x='a b c', $x[(w)4] expanded to c.)
 This has been changed so that an out-of-range index now yields an empty
 string, as in other subscripting cases.
 
+Assignment and expansion via ${name=word}, ${name:=word}, and
+${name::=word} now respect parameter attributes (e.g. `typeset -u`) and
+generally behave more consistently, especially when name contains a
+subscript.
+
 Incompatibilities between 5.8.1 and 5.9
 ---------------------------------------
 
