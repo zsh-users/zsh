@@ -2,7 +2,7 @@
 
 case $service in
   attr)
-    _arguments -s -S "$list[@]" \
+    _arguments -s -S \
       '(-l -r -s -V)-g[get extended attribute for file]:attribute name' \
       '(-g -s -r -V)-l[list extended attributes associated with file]' \
       '(-l -g -s -q -V)-r[remove given attribute from file]:attribute name' \

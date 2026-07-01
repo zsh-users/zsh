@@ -1,3 +1,8 @@
+2026-07-01  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* unposted: Completion/Unix/Command/_attr: $list was removed
+	in 54528
+
 2026-07-01  dana  <dana@dana.is>
 
 	* unposted: Completion/Zsh/Command/_zformat: add _zformat
