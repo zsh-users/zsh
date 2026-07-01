@@ -1,5 +1,7 @@
 2026-07-01  dana  <dana@dana.is>
 
+	* unposted: Completion/Zsh/Command/_zformat: add _zformat
+
 	* unposted: README: document ::= changes
 
 	* unposted: .git-blame-ignore-revs: add 4d1193772b (54806) to

@@ -1,0 +1,24 @@
+#compdef zformat
+
+local -a args=(
+  - align
+  '-a[align strings]'
+  '1:array to store formatted strings in:_parameters -g "*array*~*readonly*"'
+  '2:separator string'
+  '*:strings to align (left\:right)'
+
+  - format
+  '(-F)-f[format string (ternary tests spec value)]'
+  '(-f)-F[format string (ternary tests spec length)]'
+  '(-Q)-q[escape % in specs by default, preserve escapes in format string (with -fF)]'
+  '(-q)-Q[escape % in specs by default (with -fF)]'
+  '1:parameter to store formatted string in:_parameters -g "^*readonly*"'
+  '2:format string'
+  '*:format spec ([quote]char\:string)'
+)
+
+# don't complete operands until we see one of -afF
+[[ -n ${(M)${(@Q)words}:#-[A-Za-z]#[afF][A-Za-z]#} ]] ||
+args=( ${args:#(|<->|\*):?*} )
+
+_arguments -s -S -S -A '-?*' : $args
