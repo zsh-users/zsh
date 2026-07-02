@@ -1,3 +1,7 @@
+2026-07-06  dana  <dana@dana.is>
+
+	* 54894 (tweaked): Completion/compdump: improve performance
+
 2026-07-04  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 54783: Src/Modules/zpty.c, Test/V08zpty.ztst: improve

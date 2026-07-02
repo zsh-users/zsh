@@ -10,66 +10,46 @@
 # create the .dump file as before.  Again, compinit -d handles this
 # automatically.
 
-# Print the number of files used for completion. This is used in compinit
-# to see if auto-dump should re-dump the dump-file.
-
 emulate -L zsh
-setopt extendedglob noshglob
+setopt bareglobqual extendedglob noshglob
 
-typeset _d_file _d_f _d_fd _d_bks _d_line _d_als _d_files _d_name _d_tmp
+typeset _d_complist _d_fd _d_file
+typeset -a _d_als _d_bks _d_files _d_tmp
 
 _d_file=${_comp_dumpfile-${0:h}/compinit.dump}.$HOST.$$
 [[ $_d_file = //* ]] && _d_file=${_d_file[2,-1]}
 
 [[ -w ${_d_file:h} ]] || return 1
 
-_d_files=( ${^~fpath:/.}/^([^_]*|*~|*.zwc)(N) )
+# avoid scanning fpath again if compinit has already done it
+if (( ${+funcstack[(re)compinit]} && $#_i_files )); then
+  _d_files=( $_i_files )
+else
+  _d_files=( ${^fpath:/.}/^([^_]*|*[\;\|\&]*|*~|*.zwc)(NoN) )
+fi
 
 if [[ -n "$_comp_secure" ]]; then
-  _d_wdirs=( ${^fpath}(Nf:g+w:,f:o+w:,^u0u${EUID}) )
-  _d_wfiles=( ${^~fpath:/.}/^([^_]*|*~|*.zwc)(N^u0u${EUID}) )
+  local -a _d_wdirs _d_wfiles
+
+  _d_wdirs=( ${^fpath}(NoNf:g+w:,f:o+w:,^u0u${EUID}) )
+  _d_wfiles=( ${^fpath:/.}/^([^_]*|*~|*.zwc)(NoN^u0u${EUID}) )
 
   (( $#_d_wfiles )) && _d_files=( "${(@)_d_files:#(${(j:|:)_d_wfiles})}"  )
   (( $#_d_wdirs ))  && _d_files=( "${(@)_d_files:#(${(j:|:)_d_wdirs})/*}" )
 fi
 
 exec {_d_fd}>$_d_file
+
+# Print the number of files used for completion. This is used in compinit
+# to see if auto-dump should re-dump the dump-file.
+
 print "#files: $#_d_files\tversion: $ZSH_VERSION" >& $_d_fd
 
-# Dump the arrays _comps, _services and _patcomps.  The quoting
-# hieroglyphics ensure that a single quote inside a variable is itself
-# correctly quoted.
-
-print "\n_comps=(" >& $_d_fd
-for _d_f in ${(ok)_comps}; do
-  print -r - "${(qq)_d_f}" "${(qq)_comps[$_d_f]}"
+for 1 in _comps _services _patcomps _postpatcomps _compautos; do
+  print "\n${1}=("
+  printf '  %s %s\n' "${(@Pkvqq)1}"
+  print ")"
 done >& $_d_fd
-print ")" >& $_d_fd
-
-print "\n_services=(" >& $_d_fd
-for _d_f in ${(ok)_services}; do
-  print -r - "${(qq)_d_f}" "${(qq)_services[$_d_f]}"
-done >& $_d_fd
-print ")" >& $_d_fd
-
-print "\n_patcomps=(" >& $_d_fd
-for _d_f in ${(ok)_patcomps}; do
-  print -r - "${(qq)_d_f}" "${(qq)_patcomps[$_d_f]}"
-done >& $_d_fd
-print ")" >& $_d_fd
-
-_d_tmp="_postpatcomps"
-print "\n_postpatcomps=(" >& $_d_fd
-for _d_f in ${(ok)_postpatcomps}; do
-  print -r - "${(qq)_d_f}" "${(qq)_postpatcomps[$_d_f]}"
-done >& $_d_fd
-print ")" >& $_d_fd
-
-print "\n_compautos=(" >& $_d_fd
-for _d_f in "${(ok@)_compautos}"; do
-  print -r - "${(qq)_d_f}" "${(qq)_compautos[$_d_f]}"
-done >& $_d_fd
-print ")" >& $_d_fd
 
 print >& $_d_fd
 
@@ -79,60 +59,54 @@ print >& $_d_fd
 # We can ignore any zle -C which rebinds a standard widget (second
 # argument to zle does not begin with a `_').
 
-_d_bks=()
-typeset _d_complist=
-zle -lL |
-  while read -rA _d_line; do
-    if [[ ${_d_line[3]} = _* && ${_d_line[5]} = _* ]]; then
-      if [[ -z "$_d_complist" && ${_d_line[4]} = .menu-select ]]; then
-        print 'zmodload -i zsh/complist'
-	_d_complist=yes
-      fi
-      print -r - ${_d_line}
-      _d_bks+=(${_d_line[3]})
-    fi
-  done >& $_d_fd
-bindkey |
-  while read -rA _d_line; do
-    if [[ ${_d_line[2]} = (${(j.|.)~_d_bks}) ]]; then
-      print -r "bindkey '${_d_line[1][2,-2]}' ${_d_line[2]}"
-    fi
-  done >& $_d_fd
+for 1 in ${(f)${ zle -lL }}; do
+  argv=( ${(z)1} )
 
-print >& $_d_fd
+  [[ $3 == _* && $5 == _* ]] || continue
 
-
-# Autoloads: look for all defined functions beginning with `_' (that also
-# exists in fpath: see workers/38547).
-
-_d_als=($^fpath/(${(o~j.|.)$(typeset +fm '_*')})(N:t))
-
-# print them out:  about five to a line looks neat
-
-integer _i=5
-print -n autoload -Uz >& $_d_fd
-while (( $#_d_als )); do
-  if (( ! $+_compautos[$_d_als[1]] )); then
-    print -n " $_d_als[1]"
-    if (( ! --_i && $#_d_als > 1 )); then
-      _i=5
-      print -n ' \\\n           '
-    fi
+  if [[ -z $_d_complist && $4 == .menu-select ]]; then
+    print 'zmodload -i zsh/complist'
+    _d_complist=yes
   fi
-  shift _d_als
+
+  print -r - $@
+  _d_bks+=( $3 )
 done >& $_d_fd
 
 print >& $_d_fd
 
-local _c
-for _c in "${(ok@)_compautos}"; do
-  print "autoload -Uz $_compautos[$_c] $_c" >& $_d_fd
-done
+for 1 in ${(f)${ bindkey }}; do
+  argv=( ${(z)1} )
+
+  (( ${+_d_bks[(re)$2]} )) &&
+  print -r bindkey $1 $2
+done >& $_d_fd
+
+print >& $_d_fd
+
+# Autoloads: look for all defined functions beginning with `_' (that also
+# exists in fpath: see workers/38547).
+
+_d_tmp=( ${${(M)_d_files:#*/(${(~j.|.)${(f)${ typeset +fm '_*' }}})}:t} )
+
+# print them out:  about five to a line looks neat
+
+printf -v _d_als '  %s %s %s %s %s' $_d_tmp
+_d_als[-1]=${_d_als[-1]%%[[:space:]]##} # purely for aesthetics
+
+print -r autoload -Uz \\ >& $_d_fd
+print -rl - ${(pj< \\\n>)_d_als} >& $_d_fd
+
+print >& $_d_fd
+
+# note Oa to reverse key and val
+printf 'autoload -Uz %s %s\n' "${(@kvOa)_compautos}" >& $_d_fd
 
 print >& $_d_fd
 
 print "typeset -gUa _comp_assocs" >& $_d_fd
 print "_comp_assocs=( ${(qq)_comp_assocs} )" >& $_d_fd
+
 exec {_d_fd}>&-
 
 mv -f -- $_d_file ${_d_file%.$HOST.$$}
