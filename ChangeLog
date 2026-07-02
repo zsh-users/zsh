@@ -1,3 +1,8 @@
+2026-07-02  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 54893: Functions/Misc/is-at-least, Test/Z01is-at-least.ztst:
+	fix/simplify is-at-least
+
 2026-07-01  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* unposted: Completion/Unix/Command/_attr: $list was removed

@@ -1,62 +1,53 @@
 #
-# Test whether $ZSH_VERSION (or some value of your choice, if a second argument
-# is provided) is greater than or equal to x.y.z-r (in argument one). In fact,
-# it'll accept any dot/dash-separated string of numbers as its second argument
-# and compare it to the dot/dash-separated first argument. Leading non-number
-# parts of a segment (such as the "zefram" in 3.1.2-zefram4) are not considered
-# when the comparison is done; only the numbers matter. Any left-out segments
-# in the first argument that are present in the version string compared are
-# considered as zeroes, eg 3 == 3.0 == 3.0.0 == 3.0.0.0 and so on.
+# is-at-least: compare two version strings
 #
-# Usage examples:
-# is-at-least 3.1.6-15 && setopt NO_GLOBAL_RCS
-# is-at-least 3.1.0 && setopt HIST_REDUCE_BLANKS
-# is-at-least 586 $MACHTYPE && echo 'You could be running Mandrake!'
-# is-at-least $ZSH_VERSION || print 'Something fishy here.'
+# Usage:  is-at-least minimum_version [current_version]
+# 
+# Returns true if current_version is equal to or newer than minimum_version.
+# If current_version is omitted, $ZSH_VERSION is used.
+# {minimum,current}_version is a string consisting of a few 'segments'
+# joined by either '.' or '-'. For example:
+#     1.2-test          3.1.2-zefram4
+#     4.4.5beta23       12.34-patch23a
 #
-# Note that segments that contain no digits at all are ignored, and leading
-# text is discarded if trailing digits follow, because this was the meaning
-# of certain zsh version strings in the early 2000s.  Other segments that
-# begin with digits are compared using NUMERIC_GLOB_SORT semantics, and any
-# other segments starting with text are compared lexically.
-
+# A segment with no digits, such as 'test' above, is ignored.
+#
+# Two segments are compared numerically if the first differing characters
+# are both digits, and lexically otherwise.
+#
+# If number of segments in the two version strings differ, missing
+# segments are assumed to be '0'. This means
+#     5.9, 5.9.0, 5.9.0.0, 5.9-test
+# are all considered to be the same version.
+#
 emulate -L zsh
+setopt extended_glob
 
-local IFS=".-" min_cnt=0 ver_cnt=0 part min_ver version order
+local IFS=".-" min_ver cur_ver n order
 
 : ${2=$ZSH_VERSION}
 
 # sort out the easy corner cases first
-[[ $1 = $2 ]] && return 0 # same version
-[[ -n $2 ]] || return 1   # no version
+[[ -z $1 || -z $2 ]] && return 1    # no version
+[[ $1 = $2 ]] && return 0           # same version
 
+# split into segments
 min_ver=(${=1})
-version=(${=2} 0)
+cur_ver=(${=2})
 
-while (( $min_cnt <= ${#min_ver} )); do
-  while [[ "$part" != <-> ]]; do
-    (( ++ver_cnt > ${#version} )) && return 0
-    if [[ ${version[ver_cnt]} = *[0-9][^0-9]* ]]; then
-      # Contains a number followed by text.  Not a zsh version string.
-      order=( ${version[ver_cnt]} ${min_ver[ver_cnt]} )
-      if [[ ${version[ver_cnt]} = <->* ]]; then
-        # Leading digits, compare by sorting with numeric order.
-        [[ $order != ${${(On)order}} ]] && return 1
-      else
-        # No leading digits, compare by sorting in lexical order.
-        [[ $order != ${${(O)order}} ]] && return 1
-      fi
-      [[ $order[1] != $order[2] ]] && return 0
-    fi
-    part=${version[ver_cnt]##*[^0-9]}
-  done
+# remove segments containing no digits
+min_ver=( ${min_ver:#[^0-9]##} )
+cur_ver=( ${cur_ver:#[^0-9]##} )
+(( $#min_ver == 0 || $#cur_ver == 0 )) && return 1
 
-  while true; do
-    (( ++min_cnt > ${#min_ver} )) && return 0
-    [[ ${min_ver[min_cnt]} = <-> ]] && break
-  done
-
-  (( part > min_ver[min_cnt] )) && return 0
-  (( part < min_ver[min_cnt] )) && return 1
-  part=''
+# find the first segment that differs
+for (( n = 1; n <= $#min_ver; ++n )) do
+  [[ ${min_ver[n]} != ${cur_ver[n]-0} ]] && break
 done
+
+# if all segments in $min_ver are equal to those in $cur_ver
+(( n > $#min_ver )) && return 0
+
+# now compare the two segments that differ
+order=( ${cur_ver[n]-0} ${min_ver[n]-0} )
+[[ $order != ${${(On)order}} ]] && return 1 || return 0

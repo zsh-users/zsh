@@ -16,12 +16,27 @@
   done
 0:is-at-least smoke test
 
-  is-at-least 5.8.0.2 5.8
-1f:regression test: Two trailing zeroes are filled in
-# TODO: When fixing this, extend the smoke test to cover this.
+# versions in v1 should be equal
+# versions in v2 should be newer than those in v1
+  v1=( 1 1.0 1.0.0 1.0.0.0 1-b 1.X-0 )
+  v2=( 1.0.0.1 1.0.1 1.0.1.0 1.0.1.1 1-a-0-1 1-0-a.1)
+  for (( i = 1; i < $#v1; ++i )); do
+    for (( j = 1; j < $#v1; ++j )); do
+      is-at-least $v1[i] $v1[j] || echo "$v1[i] ≰ $v1[j]"
+    done
+  done
+  for (( i = 1; i < $#v1; ++i )); do
+    for (( j = 1; j < $#v2; ++j )); do
+      is-at-least $v1[i] $v2[j] || echo "$v1[i] ≰ $v2[j]"
+      { ! is-at-least $v2[j] $v1[i] } || echo "$v2[j] ≤ $v1[i]"
+    done
+  done
+0:trailing zeroes are filled in, text-only segments are ignored
 
-  is-at-least 5.8.0.2 5.8.0.0
-1:regression test: Two trailing zeroes are filled in
-# TODO: Extend the smoke test to cover this.
+  local min cur
+  for min cur in 1.2 1.12   1.2b 1.12a   1-a3 1-b1; do
+    is-at-least $min $cur || echo  "$min ≰ $cur"
+  done
+0:numerical or lexical order
 
 %clean
