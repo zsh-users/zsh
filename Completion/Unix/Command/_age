@@ -1,0 +1,24 @@
+#compdef age age-keygen
+
+case $service in
+  age)
+    _arguments -S -A '-?*' \
+      '(- :)'{-h,--help}'[display usage information]' \
+      '!(-d --decrypt)'{-e,--encrypt} \
+      '(-e --encrypt -d --decrypt -a --armor -p --passphrase -r --recipient -R --recipients-file)'{-d,--decrypt}'[decrypt the input to the output]' \
+      '(-o --output)'{-o,--output=}'[write result to given file]:output file:_files' \
+      '(-a --armor -d --decrypt)'{-a,--armor}'[encrypt to PEM encoded format]' \
+      '(-p --passphrase -d --decrypt)'{-p,--passphrase}'[encrypt with passphrase]' \
+      '(-d --decrypt)'\*{-r,--recipient=}'[encrypt to specified recipient]:recipient' \
+      '(-d --decrypt)'\*{-R,--recipients-file=}'[encrypt to recipients listed in specified file]:recipients file:_files' \
+      \*{-i,--identity=}'[use given identify file]:identity:_files' \
+      ':input:_files'
+  ;;
+  age-keygen)
+    _arguments -S -A '-?*' \
+      '-pq[generate post-quantum hybrid ML-KEM-768 + X25519 key pair]' \
+      '(-o --output)'{-o,--output}'[write the result to the given file]:file:_files' \
+      '-y[convert an identity file to a recipients file]' \
+      ':input:_files'
+  ;;
+esac
