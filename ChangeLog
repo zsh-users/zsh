@@ -10,6 +10,10 @@
 
 	* unposted: Completion/Unix/Command/_pip: remove -b
 
+2026-07-03  Oliver Kiddle  <opk@zsh.org>
+
+	* 54899: Completion/Linux/Command/_namei: new completion
+
 2026-07-01  dana  <dana@dana.is>
 
 	* Štěpán Němec: 54871: Doc/Zsh/compwid.yo: add index markup for
