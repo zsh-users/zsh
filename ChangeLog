@@ -1,5 +1,10 @@
 2026-07-03  dana  <dana@dana.is>
 
+	* unposted: Completion/BSD/Command/_pfctl,
+	Completion/Debian/Command/_module-assistant,
+	Completion/Unix/Command/_ping, Completion/Unix/Command/_tiff,
+	Completion/Unix/Command/_zfs: fix ambiguous arg specs
+
 	* unposted: Completion/Unix/Command/_pip: remove -b
 
 2026-07-02  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
