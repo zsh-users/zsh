@@ -1,5 +1,8 @@
 2026-07-03  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/X/Command/_mplayer, Completion/X/Command/_xv:
+	complete more media file types
+
 	* unposted (c.f. 54878): Completion/Unix/Command/_age: import
 	ZSH-licenced age completion from zsh-completions (by Hydrargyrum)
 
