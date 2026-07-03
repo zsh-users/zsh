@@ -644,7 +644,7 @@ case $service:$words[1] in
       '-l[load keys for encrypted filesystems as they are being mounted]'
       '(-a)-R[mount filesystems along with all their children]'
     )
-    _arguments -A "-*" -S $args \
+    _arguments -A "-*" -S : $args \
       '(- :)'{-j,--json}'[show all mounted file systems in JSON format]' \
       '-o+[specify temporary file system options]: :_values -s , "option" {,no}{atime,dev,exec,relatime,suid,xattr} ro rw' \
       '-v[report mount progress]' \

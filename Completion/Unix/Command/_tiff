@@ -173,7 +173,7 @@ tiffmedian)
     ':output file:_files -g "*.(#i)tif(|f)(-.)"' && ret=0
   ;;
 tiffsplit)
-  _arguments \
+  _arguments : \
     '-M+[set the memory allocation limit]:limit (MiB), 0 for unlimited' \
     ':input file:_files -g "*.(#i)tif(|f)(-.)"' \
     ':output file prefix' && ret=0

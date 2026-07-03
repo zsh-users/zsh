@@ -242,5 +242,5 @@ case ${variant}:${${service#ping}:-4} in
   ;;
 esac
 
-_arguments -s -S $args \
+_arguments -s -S : $args \
   '*:host:_hosts'

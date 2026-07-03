@@ -99,7 +99,7 @@ case $OSTYPE in
   ;;
 esac
 
-_arguments -s $args \
+_arguments -s : $args \
   '-a[apply flags -f, -F, and -s only to the rules in the specified anchor]:anchor' \
   '-F+[flush the filter parameters specified by modifier]:modifier:(($pfctl_flush_modifiers))' \
   '-D+[define macro to be set to value]:macro' \

@@ -20,7 +20,7 @@ _module_assistant_commands=(
   'purge[clear cache and remove all binary packages of source package]'
 )
 
-_arguments -A \
+_arguments -s -S : \
   '(-h --help)'{-h,--help}'[print help screen]' \
   '(-v --verbose)'{-v,--verbose}'[be verbose, show full paths, etc.]' \
   '(-q --quiet)'{-q,--quiet}'[the opposite of verbose]' \
@@ -34,4 +34,3 @@ _arguments -A \
   '(-t --text-mode)'{-t,--text-mode}'[no progress bars]' \
   '1:list of commands:_values -s , subcommands "${_module_assistant_commands[@]}"' \
   '*:package: compadd /usr/src/modass/var_cache_modass/*.avail_version(N:t:r) /var/cache/modass/*.avail_version(N:t:r)'
-
