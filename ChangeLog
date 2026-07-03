@@ -1,3 +1,7 @@
+2026-07-03  dana  <dana@dana.is>
+
+	* unposted: Completion/Unix/Command/_pip: remove -b
+
 2026-07-02  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 54893: Functions/Misc/is-at-least, Test/Z01is-at-least.ztst:
