@@ -1,3 +1,7 @@
+2026-07-03  Oliver Kiddle  <opk@zsh.org>
+
+	* 54899: Completion/Linux/Command/_namei: new completion
+
 2026-07-03  dana  <dana@dana.is>
 
 	* 54891: Completion/Solaris/Command/_pkgadd,

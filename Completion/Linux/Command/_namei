@@ -1,0 +1,15 @@
+#compdef namei
+
+local ign
+
+(( $#words > 2 )) && ign='!(* -)'
+_arguments -s -S \
+  '(-x --mountpoints)'{-x,--mountpoints}"[mark mount point directories with a 'D']" \
+  '(-m --modes -l --long)'{-m,--modes}'[show the permission bits of each file]' \
+  '(-o --owners -l --long)'{-o,--owners}'[show owner and group of each file]' \
+  '(-l --long -m --modes -o --owners -v --vertical)'{-l,--long}'[use long listing format (-m -o -v)]' \
+  '(-n --nosymlinks)'{-n,--nosymlinks}"[don't follow symlinks]" \
+  '(-v --vertical -l --long)'{-v,--vertical}'[align modes and owners vertically]' \
+  "$ign"{-h,--help}'[display usage information]' \
+  "$ign"{-V,--version}'[display version information]' \
+  '*: :_files'
