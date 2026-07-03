@@ -85,7 +85,6 @@ case $state in
           '--src=[check out --editable packages into given directory]: :_directories'
           '--ignore-requires-python[ignore the Requires-Python information]'
           "--no-deps[don't install package dependencies]"
-          '(-b --build)'{-https://cloud.kiddleb+,--build=}'[specify directory to unpack packages into]: :_directories'
           '--global-option=[extra global options to be supplied to the setup.py call before the install command]:options'
           "--no-clean[don't clean up build directories]"
           '--require-hashes[require a hash to check each requirement against]'

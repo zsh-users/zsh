@@ -1,3 +1,7 @@
+2026-07-03  dana  <dana@dana.is>
+
+	* unposted: Completion/Unix/Command/_pip: remove -b
+
 2026-07-01  dana  <dana@dana.is>
 
 	* Štěpán Němec: 54871: Doc/Zsh/compwid.yo: add index markup for
