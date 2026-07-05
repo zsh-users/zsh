@@ -1,0 +1,192 @@
+#compdef chrome chromium google-chrome brave cromite helium helium-browser microsoft-edge opera opera-gx ungoogled-chromium vivaldi -P google-chrome-* brave-* microsoft-edge-* opera-* vivaldi-*
+
+(( $+functions[_chromium_urls] )) ||
+_chromium_urls() {
+  # chromium doesn't allow you to open about: or chrome:// urls from the cli,
+  # except for about:blank
+  _alternative \
+    'files: :_files' \
+    'urls: :_urls' \
+    'urls-about:about page:(about\:blank)'
+}
+
+# complete possible data directories (and, without -0, generic paths). as with
+# firefox, we could try harder to look for the *exact* directory we need, but
+# this is probably fine
+# -0 <name>  instead of completing, insert directories into array <name>
+# -a         use all possible directories instead of service-specific ones
+(( $+functions[_chromium_data_dirs] )) ||
+_chromium_data_dirs() {
+  local cfg=${XDG_CONFIG_HOME:-$HOME/.config}
+  local -a ca_opts expl dirs
+  local -A opth
+
+  zparseopts -A opth -D -F - \
+    {M+:,P+:,q+:,r+:,R+:,S+:}=ca_opts 1 2 J: o: O: V: x: X: \
+    0: a \
+  || return
+
+  local -a chrome_dirs=(
+    $cfg/google-chrome{,-beta,-unstable,-canary}
+    $HOME/.var/app/com.google.Chrome/config/google-chrome
+    "$HOME/Library/Application Support/Google/Chrome"{,\ Beta,\ Dev,\ Canary}
+  )
+  local -a chromium_dirs=(
+    $cfg/chromium
+    $HOME/snap/chromium/current/.config/chromium
+    $HOME/.var/app/org.chromium.Chromium/config/chromium
+    "$HOME/Library/Application Support/Chromium"
+  )
+  local -a brave_dirs=(
+    $cfg/brave{,-beta,-development,-unstable}
+    $cfg/BraveSoftware/Brave-Browser{,-Beta,-Dev,-Development,-Nightly}
+    $HOME/.var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser
+    "$HOME/Library/Application Support/BraveSoftware/Brave-Browser"{,-Beta,-Dev,-Development,-Nightly}
+  )
+  local -a cromite_dirs=(
+    $cfg/cromite
+  )
+  local -a helium_dirs=(
+    $cfg/net.imput.helium
+    "$HOME/Library/Application Support/net.imput.helium"
+  )
+  local -a edge_dirs=(
+    $cfg/microsoft-edge{,-beta,-dev,-canary}
+    "$HOME/Library/Application Support/Microsoft Edge"{,\ Beta,\ Dev,\ Canary}
+  )
+  local -a opera_gx_dirs=(
+    $cfg/opera-gx
+    $HOME/.var/app/com.opera.opera-gx/config/opera
+    "$HOME/Library/Application Support/com.operasoftware.OperaGX"
+  )
+  local -a opera_dirs=(
+    $cfg/opera{,-beta,-developer}
+    $HOME/.var/app/com.opera.Opera/config/opera
+    "$HOME/Library/Application Support/com.operasoftware.Opera"
+  )
+  local -a vivaldi_dirs=(
+    $cfg/vivaldi{,-snapshot}
+    $HOME/.var/app/com.vivaldi.Vivaldi/config/vivaldi
+    "$HOME/Library/Application Support/Vivaldi"{,\ Snapshot}
+  )
+
+  if (( $+opth[-a] )); then
+    dirs=(
+      $chrome_dirs $chromium_dirs $brave_dirs $cromite_dirs
+      $helium_dirs $edge_dirs $opera_gx_dirs $opera_dirs $vivaldi_dirs
+    )
+
+  else
+    case $service in
+      google*|chrome*)      dirs=( $chrome_dirs ) ;;
+      chromium*|ungoogled*) dirs=( $chromium_dirs ) ;;
+      brave*)               dirs=( $brave_dirs ) ;;
+      cromite*)             dirs=( $cromite_dirs ) ;;
+      helium*)              dirs=( $helium_dirs ) ;;
+      microsoft*|edge*)     dirs=( $edge_dirs ) ;;
+      opera-gx*)            dirs=( $opera_gx_dirs ) ;;
+      opera*)               dirs=( $opera_dirs ) ;;
+      vivaldi*)             dirs=( $vivaldi_dirs ) ;;
+    esac
+  fi
+
+  dirs=( $^dirs/'Local State'(#qN.-) )
+  dirs=( ${dirs:h} )
+  dirs=( ${(u)dirs} )
+
+  (( $+opth[-0] )) && {
+    trap "${opth[-0]}=( ${(j< >)${(@q+)dirs}} )" EXIT
+    return $(( ! $#dirs ))
+  }
+
+  dirs=( ${dirs//:/\:} )
+
+  _describe -t data-directories 'user data directory' \
+    dirs "${(@)ca_opts}" && ret=0
+  _wanted files expl 'user data directory' \
+    _files -/ "${(@)ca_opts}" && ret=0
+
+  return ret
+}
+
+(( $+functions[_chromium_profile_dirs] )) ||
+_chromium_profile_dirs() {
+  local -a ca_opts cli_dirs dirs profiles disp inst
+  local -A opth
+
+  zparseopts -A opth -D -F - \
+    {1,2,J+:,M+:,o+:,O+:,P+:,q+,r+:,R+:,S+:,V+:,x+:,X+:}=ca_opts \
+    a \
+  || return
+
+  cli_dirs=( ${${(MQ)words:#--user-data-dir=*}#*=} )
+
+  if (( $+opth[-a] )); then
+    _chromium_data_dirs -a0dirs
+    dirs+=( $cli_dirs )
+  else
+    dirs=( $cli_dirs )
+    (( $#dirs )) || _chromium_data_dirs -0dirs
+  fi
+
+  # the name given to a profile by the user has no relationship at all to the
+  # profile's directory name. to make the results meaningful, we'll try to parse
+  # the dirs + names out of the config
+  (( $+commands[python3] )) &&
+  profiles=( ${(f)"$(
+    python3 -c 'if 1:
+      import json, re, sys
+      for st in sys.argv[1:]:
+        with open(st) as f:
+          ps = json.load(f).get("profile", {}).get("info_cache", {})
+          for k, v in ps.items():
+            dir = k
+            nam = v.get("name", "")
+            print(f"{nam}\0{dir}")
+    ' $^dirs/'Local State'(#qN.-)
+  )"} )
+
+  (( $#profiles )) || profiles=( $^dirs/(Default|Profile\ *)(#qN/-:t) )
+
+  disp=( ${${profiles//:/\\:}/$'\0'/:} )
+  inst=( ${profiles#*$'\0'} )
+
+  _describe -t profiles 'profile directory' disp inst "${(@)ca_opts}"
+}
+
+# chromium has hundreds of options, largely undocumented and apparently
+# unstable. we make no attempt to support them all. these are the ones i found
+# to be most commonly referenced
+local -a args=(
+  + '(excl)'
+  '(- : *)--version[display version information]'
+
+  + '(open)'
+  '--incognito[open new Incognito window or tab]'
+  '--new-tab[open new tab]'
+  '--new-window[open new window]'
+
+  + '(proxy)'
+  '--proxy-server=-[specify proxy server]:proxy server:{
+    compset -P "(http|socks|socks4|socks5)\://"
+    _hosts "${(@)expl}"
+  }'
+  '--no-proxy-server[disable proxy server]'
+  '--proxy-auto-detect[auto-detect proxy configuration]'
+  # @todo this has to be http://, https://, or data:
+  '--proxy-pac-url=-[specify proxy auto-configuration URL]:PAC-file URL:_urls'
+
+  + misc
+  '(*)--app=-[open specified URL in app mode]: :_chromium_urls'
+  '--password-store=-[specify password storage back-end]:password store:(
+    basic gnome gnome-libsecret kwallet kwallet5 kwallet6
+  )'
+  '--user-data-dir=-[specify user data directory]: :_chromium_data_dirs -a'
+  '--profile-directory=-[specify profile directory]: :_chromium_profile_dirs'
+  '(--app)*: :_chromium_urls'
+)
+
+[[ $service == (microsoft|edge)* ]] &&
+args=( ${${args//incognito/inprivate}//Incognito/InPrivate} )
+
+_arguments -s -S : $args

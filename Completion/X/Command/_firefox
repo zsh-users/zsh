@@ -1,0 +1,328 @@
+#compdef firefox mozilla-firefox=firefox floorp librewolf mullvad-browser mullvadbrowser palemoon tor-browser torbrowser waterfox zen zen-browser -P firefox*
+
+(( $+functions[_firefox_urls] )) ||
+_firefox_urls() {
+  if compset -P about:; then
+    _describe -t urls-about 'about page' '(
+      about addons buildconfig cache certificate checkerboard compat
+      config crashes credits debugging downloads firefoxview home
+      keyboard license logging logins loginsimportreport logo memory
+      mozilla networking newtab policies preferences privatebrowsing
+      processes profiles profiling protections rights robots
+      serviceworkers studies support sync-log telemetry translations
+      unloads url-classifier webauthn webrtc welcome
+    )'
+  elif compset -P mailto:; then
+    _email_addresses -c
+  else
+    _alternative 'files: :_files' 'urls: :_urls'
+  fi
+}
+
+# complete possible config directories. we could try harder to look for the
+# *exact* directory we need, but this should work in most cases
+# -0 <name>  instead of completing, insert directories into array <name>
+# -a         use all possible directories instead of service-specific ones
+(( $+functions[_firefox_config_dirs] )) ||
+_firefox_config_dirs() {
+  local cfg=${XDG_CONFIG_HOME:-$HOME/.config}
+  local -a ca_opts dirs
+  local -A opth
+
+  zparseopts -A opth -D -F - \
+    {1,2,J+:,M+:,o+:,O+:,P+:,q+,r+:,R+:,S+:,V+:,x+:,X+:}=ca_opts \
+    0: a \
+  || return
+
+  local -a firefox_dirs=(
+    $cfg/mozilla/firefox
+    $HOME/.mozilla/firefox
+    $HOME/.var/app/org.mozilla.firefox/.mozilla/firefox
+    $HOME/snap/firefox/common/.mozilla/firefox
+    "$HOME/Library/Application Support/Firefox"
+  )
+  local -a floorp_dirs=(
+    $cfg/floorp/floorp # unverified
+    $HOME/.floorp
+    $HOME/.var/app/one.ablaze.floorp/.floorp
+    "$HOME/Library/Application Support/Floorp"
+  )
+  local -a librewolf_dirs=(
+    $cfg/librewolf/librewolf
+    $HOME/.librewolf
+    $HOME/.var/app/io.gitlab.librewolf-community/.librewolf
+    "$HOME/Library/Application Support/librewolf"
+  )
+  local -a mullvad_dirs=(
+    # based on tor browser, probably works similar
+    $HOME/.var/app/net.mullvad.MullvadBrowser/.mullvad-browser/.mullvad/mullvadbrowser
+    "$HOME/Library/Application Support/MullvadBrowser"
+  )
+  local -a palemoon_dirs=(
+    "$HOME/.moonchild productions/pale moon"
+    "$HOME/Library/Application Support/Pale Moon"
+  )
+  local -a tor_dirs=(
+    # i think on linux the ~/.mozilla equivalent normally lives inside the same
+    # directory the browser is installed to? but i couldn't verify
+    "$HOME/Library/Application Support/TorBrowser-Data/Browser"
+  )
+  local -a waterfox_dirs=(
+    $cfg/waterfox/waterfox # unverified
+    $HOME/.waterfox
+    $HOME/.var/app/net.waterfox.waterfox/.waterfox
+    "$HOME/Library/Application Support/Waterfox"
+  )
+  local -a zen_dirs=(
+    $cfg/zen/zen
+    $HOME/.zen
+    $HOME/.var/app/app.zen_browser.zen/.zen
+    $HOME/.var/app/io.github.zen_browser.zen/.zen
+    "$HOME/Library/Application Support/zen"
+  )
+
+  if (( $+opth[-a] )); then
+    dirs=(
+      $firefox_dirs $floorp_dirs $librewolf_dirs $mullvad_dirs
+      $palemoon_dirs $tor_dirs $waterfox_dirs $zen_dirs
+    )
+  else
+    case $service in
+      firefox*)   dirs=( $firefox_dirs ) ;;
+      floorp*)    dirs=( $floorp_dirs ) ;;
+      librewolf*) dirs=( $librewolf_dirs ) ;;
+      mullvad*)   dirs=( $mullvad_dirs ) ;;
+      palemoon*)  dirs=( $palemoon_dirs ) ;;
+      tor*)       dirs=( $tor_dirs ) ;;
+      waterfox*)  dirs=( $waterfox_dirs ) ;;
+      zen*)       dirs=( $zen_dirs ) ;;
+    esac
+  fi
+
+  dirs=( $^dirs/profiles.ini(#qN.-) )
+  dirs=( ${dirs:h} )
+  dirs=( ${(u)dirs} )
+
+  (( $+opth[-0] )) && {
+    trap "${opth[-0]}=( ${(j< >)${(@q+)dirs}} )" EXIT
+    return $(( ! $#dirs ))
+  }
+
+  dirs=( ${dirs//:/\:} )
+
+  _describe -t profile-directories 'profile directory' dirs "${(@)ca_opts}"
+}
+
+# complete old-style ToolkitProfileService profiles
+# -0 <name>  instead of completing, insert NUL-separated name/path pairs into
+#            array <name>
+# -a         see _firefox_profile_dirs
+(( $+functions[_firefox_toolkit_profiles] )) ||
+_firefox_toolkit_profiles() {
+  local dir
+  local -a ca_opts tmp dirs profiles
+  local -A opth
+
+  zparseopts -A opth -D -F - \
+    {1,2,J+:,M+:,o+:,O+:,P+:,q+,r+:,R+:,S+:,V+:,x+:,X+:}=ca_opts \
+    0: a \
+  || return
+
+  _firefox_config_dirs ${opth[-a]+-a} -0dirs
+
+  # if we don't care about the paths we can use a simpler method
+  if (( ! $+opth[-0] )); then
+    for dir in $dirs; do
+      tmp=( ${(f)"$( < $dir/profiles.ini )"} )
+      tmp=( ${(M)tmp:#[[:space:]]#Name=*} )
+      tmp=( ${tmp#*=} )
+      profiles+=( $tmp )
+    done
+
+  elif (( $+commands[python3] )); then
+    profiles=( ${(f)"$(
+      python3 -c 'if 1:
+        import configparser, re, sys
+        for dir in sys.argv[1:]:
+          cfg = configparser.ConfigParser()
+          cfg.read(f"{dir}/profiles.ini")
+          for sct in cfg.sections():
+            if not sct.startswith("Profile") or not cfg[sct].get("Name"):
+              continue
+            name = cfg[sct].get("Name")
+            path = cfg[sct].get("Path")
+            # ignore Windows path
+            if "/" not in path and "\\" in path:
+              continue
+            if cfg[sct].get("IsRelative") == "1":
+              path = f"{dir}/{path}"
+            print(f"{name}\0{path}")
+      ' $dirs
+    )"} )
+  fi
+
+  (( $+opth[-0] )) && {
+    trap "${opth[-0]}=( ${(j< >)${(@q+)profiles}} )" EXIT
+    return $(( ! $#profiles ))
+  }
+
+  profiles=( ${profiles%%$'\0'*} )
+  profiles=( ${profiles//:/\:} )
+
+  _describe -t toolkit-profiles 'toolkit profile' profiles "${(@)ca_opts}"
+}
+
+# complete new-style SelectableProfileService profiles
+# -0 <name>  see _firefox_toolkit_profiles
+# -a         see _firefox_toolkit_profiles
+(( $+functions[_firefox_selectable_profiles] )) ||
+_firefox_selectable_profiles() {
+  local dir db
+  local -a ca_opts tmp dirs profiles
+  local -A opth
+
+  zparseopts -A opth -D -F - \
+    {1,2,J+:,M+:,o+:,O+:,P+:,q+,r+:,R+:,S+:,V+:,x+:,X+:}=ca_opts \
+    0: a \
+  || return
+
+  _firefox_config_dirs ${opth[-a]+-a} -0dirs
+
+  (( $+commands[sqlite3] )) &&
+  for dir in $dirs; do
+    # apparently firefox sometimes re-creates these databases, so there can be
+    # more than one in the directory. the active one is stored in preferences,
+    # but we'll just assume it's the newest
+    for db in "$dir/Profile Groups/"*.sqlite(#qN.-om[1]); do
+      tmp+=( ${${(f)"$(
+        sqlite3 -separator $'\x1f' $db 'SELECT name, path FROM Profiles;'
+      )"}//$'\x1f'/$'\0'} )
+      for 1 2 in "${(@0)tmp}"; do
+        [[ $2 != */* && $2 == *\\* ]] && continue # ignore Windows path
+        [[ $2 == /* ]] || 2=${db:h:h}/$2 # make absolute
+        profiles+=( $1$'\0'$2 )
+      done
+    done
+  done
+
+  (( $+opth[-0] )) && {
+    trap "${opth[-0]}=( ${(j< >)${(@q+)profiles}} )" EXIT
+    return $(( ! $#profiles ))
+  }
+
+  profiles=( ${profiles%%$'\0'*} )
+  profiles=( ${profiles//:/\:} )
+
+  _describe -t selectable-profiles 'selectable profile' profiles "${(@)ca_opts}"
+}
+
+# at time of writing, there's no specific way to use/manage the newer
+# SelectableProfileService profiles from the cli. however, it's possible to load
+# one by giving its path to --profile, which is a common work-around. to make
+# this more convenient, we offer these profile paths in addition to the generic
+# path completion
+# -a  see _firefox_toolkit_profiles
+(( $+functions[_firefox_profile_dirs] )) ||
+_firefox_profile_dirs() {
+  local ret=1
+  local -a ca_opts expl profiles disp inst
+
+  zparseopts -A opth -D -F - \
+    {M+:,P+:,q+:,r+:,R+:,S+:}=ca_opts 1 2 J: o: O: V: x: X: \
+    a \
+  || return
+
+  _firefox_toolkit_profiles ${opth[-a]+-a} -0profiles && {
+    disp=( ${${profiles//:/\\:}/$'\0'/:} )
+    inst=( ${profiles#*$'\0'} )
+    _describe -t toolkit-profiles 'toolkit profile directory' \
+      disp inst "${(@)ca_opts}" && ret=0
+  }
+
+  _firefox_selectable_profiles ${opth[-a]+-a} -0profiles && {
+    disp=( ${${profiles//:/\\:}/$'\0'/:} )
+    inst=( ${profiles#*$'\0'} )
+    _describe -t selectable-profiles 'selectable profile directory' \
+      disp inst "${(@)ca_opts}" && ret=0
+  }
+
+  _wanted files expl 'profile directory' _files -/ "${(@)ca_opts}" && ret=0
+
+  return ret
+}
+
+local x
+local -a match mbegin mend tmp args
+
+tmp=(
+  + '(excl)'
+  '(- : *)'{-h,--help}'[display help information]'
+  '(- : *)'{-v,--version}'[display version information]'
+  '(- : *)--full-version[display version and build information]'
+
+  + '(start)'
+  # not in help output for some reason
+  '--CreateProfile=[create new profile with specified name]:profile name'
+  '-P=[start with profile manager or specified profile]:: :_firefox_toolkit_profiles'
+  '--profile=[start with profile at specified path]: :_firefox_profile_dirs -a'
+  '--migration[start with migration wizard]'
+  '--ProfileManager[start with profile manager]'
+
+  + misc
+  '--g-fatal-warnings[make all warnings fatal]'
+  '--origin-to-force-quic-on=[force to use QUIC for specified origin]: :_urls'
+  '--new-instance[open new instance instead of new window]'
+  '--safe-mode[disable extensions and themes]'
+  '--allow-downgrade[allow downgrading profile]'
+  '--MOZ_LOG=[specify log modules]:log modules'
+  '--MOZ_LOG_FILE=[specify log file]:log file:_files'
+  '--headless[run without GUI]'
+  '--browser[open browser window]'
+  '*--new-window=[open new window (specify URL)]:: :_firefox_urls'
+  '*--new-tab=[open new tab (specify URL)]:: :_firefox_urls'
+  '*--private-window=[open new private window (specify URL)]:: :_firefox_urls'
+  '--preferences[open about\:preferences]'
+  '--screenshot=[save screenshot (specify path)]::screenshot path:_files'
+  '--window-size=[specify width and height of screenshot (with --screenshot)]:screenshot window size (width[,height])'
+  '--search=[search for specified term with default search engine]:search term'
+  '--setDefaultBrowser[set as default browser]'
+  '--first-startup[run post-install actions before opening new window]'
+  '--kiosk[start in kiosk mode]'
+  '--kiosk-monitor=[place kiosk browser window on specified monitor]: :_numbers "monitor number"'
+  '--disable-pinch[disable touch-screen and touch-pad pinch gestures]'
+  '--jsconsole[open Browser Console]'
+  '--devtools[open DevTools on initial load]'
+  '--jsdebugger=[open Browser Toolbox (specify Firefox path)]::Firefox path:_files'
+  '--wait-for-jsdebugger[spin event loop until JS debugger connects (with --jsdebugger)]'
+  '--start-debugger-server=[start devtools server at specified port or socket path]: :{
+    compset -P ws\:
+    _alternative \
+      "ports\: \:_numbers -l1 -m65535 \"port number\"" \
+      "files\:socket path\:_files -g \"(#q=-)\""
+  }'
+  '--marionette[enable remote control server]'
+  '--remote-debugging-port=[start Firefox Remote Agent (specify port)]:: :\
+    _numbers -l1 -m65535 -d9222 "port number"
+  '
+  '--remote-allow-hosts=[specify Host header values to allow for incoming requests (with --remote-debugging-port)]:Host header value:\
+    _sequence -s, _hosts
+  '
+  '--remote-allow-origins=[specify Origin header values to allow for incoming requests (with --remote-debugging-port)]:Origin header value:\
+    _sequence -s, _urls
+  '
+  "--remote-allow-system-access[enable privileged access to application's parent process (with --remote-debugging-port)]"
+
+  '*: :_firefox_urls'
+)
+
+# options support both single and double hyphens. recognise the alternate forms
+for x in $tmp; do
+  args+=( $x )
+  [[ $x == (#b)(|\(*\))(|\*)(--|-)([^-]*) ]] && {
+    [[ $match[3] == - ]] && match[3]=-- || match[3]=-
+    args+=( \!${(j<>)match} )
+  }
+done
+
+# options are also case-insensitive
+_arguments -s -S -M 'm:{A-Za-z}={a-zA-Z} r:|[_-]=* r:|=*' : $args

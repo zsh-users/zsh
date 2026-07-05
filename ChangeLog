@@ -1,5 +1,9 @@
 2026-07-08  dana  <dana@dana.is>
 
+	* 54914: Completion/Unix/Command/_webbrowser,
+	Completion/X/Command/_chromium, Completion/X/Command/_firefox,
+	Completion/X/Command/_mozilla: add _firefox, _chromium, etc
+
 	* 54913: Completion/Base/Core/_message,
 	Test/Y01completion.ztst: improve option parsing
 
