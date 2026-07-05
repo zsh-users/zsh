@@ -4292,7 +4292,7 @@ The return status of tt(_call_function) itself is zero if the function
 var(name) exists and was called and non-zero otherwise.
 )
 findex(_call_program)
-item(tt(_call_program) [ tt(-l) ] [ tt(-p) ] var(tag) var(string) ...)(
+item(tt(_call_program) [ tt(-lpqQ) ] var(tag) var(string) ...)(
 This function provides a mechanism for the user to override the use of an
 external command.  It looks up the tt(command) style with the supplied
 var(tag).  If the style is set, its value is used as the command to
@@ -4314,6 +4314,15 @@ match the permissions to whatever the final command is likely to run
 under. When looking up the tt(gain-privileges) and tt(command) styles,
 the command component of the zstyle context will end with a slash
 (`tt(/)') followed by the command that would be used to gain privileges.
+
+By default, the var(string)s are passed directly to tt(eval), which may
+require double-quoting in some cases. The options tt(-q) and tt(-Q) can
+help with this: with tt(-q), all var(string)s are quoted, whereas with
+tt(-Q) all var(string)s except the first one (usually the name of the
+command to run) are quoted. tt(-Q) is useful when the first var(string)
+is tt($words[1]), which may already be quoted since it is taken directly
+from the typed command line. These options do not affect the quoting of
+arguments derived from the tt(command) style.
 )
 findex(_combination)
 item(tt(_combination) [ tt(-s) var(pattern) ] var(tag) var(style) var(spec) ... var(field) var(opts) ...)(

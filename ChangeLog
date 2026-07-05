@@ -1,5 +1,9 @@
 2026-07-08  dana  <dana@dana.is>
 
+	* 54912: Completion/Base/Utility/_call_program,
+	Doc/Zsh/compsys.yo, Test/Y07call_program.ztst: add -qQ options,
+	etc
+
 	* unposted: Test/D04parameter.ztst: add regression test for
 	w/54909
 

@@ -1,19 +1,30 @@
 #autoload +X
 
 local -xi COLUMNS=999
-local curcontext="${curcontext}" tmp err_fd=-1 clocale='_comp_locale;'
-local -a prefix
+local curcontext="${curcontext}" tmp ssb sse err_fd=-1 clocale='_comp_locale;'
+local -a prefix args
+local -A opth
 
-if [[ "$1" = -p ]]; then
-  shift
-  if (( $#_comp_priv_prefix )); then
-    curcontext="${curcontext%:*}/${${(@M)_comp_priv_prefix:#^*[^\\]=*}[1]}:"
-    zstyle -t ":completion:${curcontext}:${1}" gain-privileges &&
-	prefix=( $_comp_priv_prefix )
-  fi
-elif [[ "$1" = -l ]]; then
-  shift
-  clocale=''
+zparseopts -A opth -D -F - l p q Q || return
+
+(( $+opth[-l] )) && clocale=
+
+# function authors might be tempted to run this in ${ ... }. but doing so will
+# wreck the user's locale. force a sub-shell if necessary to avoid this
+(( $+opth[-l] || ZSH_SUBSHELL )) || ssb='(' sse=')'
+
+(( $+opth[-p] && $#_comp_priv_prefix )) && {
+  curcontext="${curcontext%:*}/${${(@M)_comp_priv_prefix:#^*[^\\]=*}[1]}:"
+  zstyle -t ":completion:${curcontext}:${1}" gain-privileges &&
+    prefix=( $_comp_priv_prefix )
+}
+
+if (( $+opth[-q] )); then
+  args=( "${(@q+)argv[2,-1]}" )
+elif (( $+opth[-Q] )); then
+  args=( "$2" "${(@q+)argv[3,-1]}" )
+else
+  args=( "${(@)argv[2,-1]}" )
 fi
 
 if (( ${debug_fd:--1} > 2 )) || [[ ! -t 2 ]]
@@ -25,12 +36,12 @@ fi
 
 if zstyle -s ":completion:${curcontext}:${1}" command tmp; then
   if [[ "$tmp" = -* ]]; then
-    eval $clocale "$tmp[2,-1]" "$argv[2,-1]"
+    eval $ssb $clocale "$tmp[2,-1]" "${(@)args}" $sse
   else
-    eval $clocale $prefix "$tmp"
+    eval $ssb $clocale $prefix "$tmp" $sse
   fi
 else
-  eval $clocale $prefix "$argv[2,-1]"
+  eval $ssb $clocale $prefix "${(@)args}" $sse
 fi 2>&$err_fd
 
 } always {

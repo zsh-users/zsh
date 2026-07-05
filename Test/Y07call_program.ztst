@@ -1,0 +1,107 @@
+# tests for _call_program
+
+%prep
+
+  if ( zmodload -s zsh/zpty ); then
+    source $ZTST_srcdir/comptest
+    mkdir comp.tmp
+    cd comp.tmp
+    comptestinit -z $ZTST_testdir/../Src/zsh && {
+      comptesteval '
+        pp() { printf "<%s>" "$@"; print }
+        compdef _tst tst
+      '
+      tst_call_program() {
+        comptesteval "_tst() {
+          [[ ${(q+)1} == -[lpqQ]#p[lpqQ]# ]] &&
+          local -a _comp_priv_prefix=( print -r priv )
+          local ret=\${ _call_program ${${(@q+)@}} }
+          _message - \$ret
+        }"
+        comptest $'tst \t'
+      }
+    }
+  else
+    ZTST_unimplemented='the zsh/zpty module is not available'
+  fi
+
+%test
+
+  tst_call_program tag pp a b c
+  tst_call_program tag pp 'a b c'
+  tst_call_program tag pp '"a b c"'
+0:basic command arguments
+>line: {tst }{}
+>MESSAGE:{<a><b><c>}
+>line: {tst }{}
+>MESSAGE:{<a><b><c>}
+>line: {tst }{}
+>MESSAGE:{<a b c>}
+
+  for 1 in -q -Q; do
+    tst_call_program $1 tag pp $1 a b c
+    tst_call_program $1 tag pp $1 'a b c'
+    tst_call_program $1 tag pp $1 '"a b c"'
+  done
+0:-qQ: argument quoting
+>line: {tst }{}
+>MESSAGE:{<-q><a><b><c>}
+>line: {tst }{}
+>MESSAGE:{<-q><a b c>}
+>line: {tst }{}
+>MESSAGE:{<-q><"a b c">}
+>line: {tst }{}
+>MESSAGE:{<-Q><a><b><c>}
+>line: {tst }{}
+>MESSAGE:{<-Q><a b c>}
+>line: {tst }{}
+>MESSAGE:{<-Q><"a b c">}
+
+  tst_call_program    tag '"pp"' a b c
+  tst_call_program -q tag '"pp"' a b c
+  tst_call_program -Q tag '"pp"' a b c
+0:-qQ: command-name quoting
+>line: {tst }{}
+>MESSAGE:{<a><b><c>}
+>line: {tst }{}
+>MESSAGE:{}
+>line: {tst }{}
+>MESSAGE:{<a><b><c>}
+
+  if [[ -z ${lc::=${ ZTST_find_UTF8 }} ]]; then
+    ZTST_skip='no utf8 locale'
+  else
+    comptesteval "old_LC_ALL=\$LC_ALL; LC_ALL=${(q+)lc}"
+    for 1 in '' -l; do
+      tst_call_program $1 tag '
+        local -a arr=( z e é )
+        print -r - ${(o)arr}
+      '
+    done
+    comptesteval 'LC_ALL=$old_LC_ALL'
+  fi
+0:-l
+>line: {tst }{}
+>MESSAGE:{e z é}
+>line: {tst }{}
+>MESSAGE:{e é z}
+
+  tst_call_program    tag print a b c
+  tst_call_program -p tag print a b c
+  comptesteval 'zstyle ":completion:*" gain-privileges yes'
+  tst_call_program    tag print a b c
+  tst_call_program -p tag print a b c
+  comptesteval 'zstyle -d ":completion:*" gain-privileges'
+0:-p
+>line: {tst }{}
+>MESSAGE:{a b c}
+>line: {tst }{}
+>MESSAGE:{a b c}
+>line: {tst }{}
+>MESSAGE:{a b c}
+>line: {tst }{}
+>MESSAGE:{priv print a b c}
+
+%clean
+
+  zmodload -ui zsh/zpty
