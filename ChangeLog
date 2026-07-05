@@ -1,3 +1,8 @@
+2026-07-08  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 54909: Src/subst.c: Untokenize before quoting unquoted literal
+	values
+
 2026-07-03  dana  <dana@dana.is>
 
 	* unposted: Completion/Unix/Command/_ping: revert previous

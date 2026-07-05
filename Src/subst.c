@@ -3807,13 +3807,16 @@ colonsubscript:
 
 	    if (quotemod > 0) {
 		if (quotetype == QT_QUOTEDZPUTS) {
-		    for (; *ap; ap++)
+		    for (; *ap; ap++) {
+			untokenize(*ap);
 			*ap = quotedzputs(*ap, NULL);
+		    }
 		} else if (quotetype > QT_BACKSLASH) {
 		    int sl;
 		    char *tmp;
 
 		    for (; *ap; ap++) {
+			untokenize(*ap);
 			tmp = quotestring(*ap, quotetype);
 			sl = strlen(tmp);
 			*ap = (char *) zhalloc(pre + sl + post + 1);
@@ -3853,10 +3856,12 @@ colonsubscript:
 		val = dupstring(val), copied = 1;
 	    if (quotemod > 0) {
 		if (quotetype == QT_QUOTEDZPUTS) {
+		    untokenize(val);
 		    val = quotedzputs(val, NULL);
 		} else if (quotetype > QT_BACKSLASH) {
 		    int sl;
 		    char *tmp;
+		    untokenize(val);
 		    tmp = quotestring(val, quotetype);
 		    sl = strlen(tmp);
 		    val = (char *) zhalloc(pre + sl + post + 1);
