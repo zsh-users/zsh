@@ -4,8 +4,6 @@
 # - open(1) says that -f opens the result in the default text editor. This is
 #   not true; the result is always opened in TextEdit unless another option is
 #   supplied to override it
-# - We no longer try to restrict files to those associated with the specified
-#   app; this was a nice idea, but it's unreliable
 
 _open_absolute_application_path() {
   local expl curcontext
@@ -17,28 +15,31 @@ _open_absolute_application_path() {
 _open() {
   local curcontext=$curcontext ret=1
   local -a context expl line state state_descr tmp
-  local -A opt_args val_args
+  local -A opt_args
 
   # No +, and no -S (--args covers that)
-  _arguments -s -C : \
+  _arguments -0 -s -C : \
     '(-a -b -e -f -R -t)-a+[specify application name]: :->applications' \
-    '(: * -)--args[pass remaining arguments to application]:*:::argument' \
+    '--arch[open with specified CPU architecture/subtype]:architecture (or type/subtype):(
+      any arm arm64 arm64e arm64_32 x86_64 x86_64h i386
+    )' \
+    '(: * -)--args[pass remaining arguments to application]:*::: :->arguments' \
     '(-a -b -e -f -R -t)-b+[specify application bundle identifier]: :->bundle-ids' \
     '(-a -b -e -f -R -t)-e[open with TextEdit]' \
-    '*--env[add the environment variable of the launched application]:env_var=value:_parameters -g "*export*" -qS=' \
+    '*--env[export specified environment variable]:name=value:_parameters -g "*export*" -qS=' \
     '(-h)-f[open standard input with TextEdit or specified application]' \
     '(-R)-F[open application with fresh state]' \
     '(-j)-g[do not bring application to foreground]' \
     '(-f)-h[open library header file]' \
-    '(-g)-j[launch the app hidden]' \
+    '(-g)-j[open application hidden]' \
     '(-R)-n[always open new instance of application]' \
     '(-a -b -e -f -F -n -s -t -W --args)-R[reveal in Finder]' \
-    '(-R)-s+[specify SDK name/version]: :->sdks' \
-    '--stdin[launch the application with stdin connected to the given file]:file:_files' \
-    '--stdout[launch the application with stdout connected to the given file]:file:_files' \
-    '--stderr[launch the application with stderr connected to the given file]:file:_files' \
+    '(-R)-s+[specify SDK name/version (with -h)]: :->sdks' \
+    '--stdin[open application with stdin connected to specified file]:stdin file:_files' \
+    '--stdout[open application with stdout connected to specified file]:stdout file:_files' \
+    '--stderr[open application with stderr connected to specified file]:stderr file:_files' \
     '(-a -b -e -f -R -t)-t[open with default text editor]' \
-    '-u[open URL with whatever application claims the url scheme]:url:_urls' \
+    '-u+[open specified URL]: :_urls' \
     '(-R)-W[wait for application to exit]' \
     '(-f)*: :->files' \
   && ret=0
@@ -53,20 +54,73 @@ _open() {
     bundle-ids)
       autoload -Uz zargs
       _retrieve_mac_apps
-      tmp=( ${(@)_mac_apps:#/System/Library/(Private|)Frameworks/*} )
+      tmp=( $_mac_apps )
       tmp=( ${(0)"$(
         _call_program bundle-ids \
           zargs -n300 -P2 -- ${(@q)tmp} -- mdls -rn kMDItemCFBundleIdentifier
       )"} )
-      tmp=( ${(@)tmp:#\(null\)} )
-      _values 'bundle identifier' $tmp com.apple.TextEdit && ret=0
+      tmp=( ${(@)tmp:#\(null\)} com.apple.TextEdit )
+      _describe -t bundle-identifier 'bundle identifier' tmp && ret=0
+      ;;
+    arguments)
+      local app exe
+
+      _retrieve_mac_apps
+
+      # resolve bundle id or app name to path
+      if (( $+opt_args[-b] )); then
+        app=$(
+          # 'c' suffix means case-insensitive
+          _call_program -q bundle-identifier-app \
+            mdfind "kMDItemCFBundleIdentifier == ${(qq)${(Q)opt_args[-b]}}c"
+        )
+      elif [[ ${(Q)opt_args[-a]} == */* ]]; then
+        app=${(Q)opt_args[-a]}
+      elif (( $+opt_args[-a] )); then
+        tmp=( ${(M)_mac_apps:#*/${(Q)opt_args[-a]%.app}.app} )
+        (( $#tmp )) || tmp=( ${(M)_mac_apps:#*/${(Q)opt_args[-a]}} )
+        app=$tmp[1]
+      fi
+
+      # find actual executable for app
+      [[ -n $app ]] && {
+        # plutil prints errors to stdout, so we need to check the return status
+        exe=$(
+          _call_program -q bundle-executable \
+            plutil -extract CFBundleExecutable raw -- $app/Contents/Info.plist
+        ) || exe=
+        [[ ${exe:-/} == /* ]] || exe=$app/Contents/MacOS/$exe
+      }
+
+      if [[ -n $exe ]]; then
+        # many applications use the same name for their executable as for the
+        # app itself (including capitalisation and spaces). this usually isn't
+        # compdef'd. but sometimes there is a linux equivalent that is -- e.g.
+        # instead of 'Google Chrome' we might have 'google-chrome'. try to find
+        # one of these
+        for 1 in ${exe:t} ${${(L)exe:t}// /-} ${(L)exe:t} ${${exe:t}// /-}; do
+          (( $+_comps[$1] )) || continue
+          exe=${exe:h}/$1 && break
+        done
+        # if we still didn't find something, try the kebab-case form anyway,
+        # maybe it will match a -P pattern
+        (( $+_comps[${exe:t}] )) || exe=${exe:h}/${${(L)exe:t}// /-}
+        words=( $exe "${(@)words}" )
+        (( CURRENT++ ))
+        _normal && ret=0
+      else
+        _default && ret=0
+      fi
       ;;
     files)
       if (( $+opt_args[-h] )); then
         tmp=(
-          /System/Library/Frameworks/*/Headers/*.h(#q-.N:t)
-          /usr/local/include/**/*.h(#q-.N:t)
+          # found via `strings =open | rg -C2 /`
+          ~/Library/(|Private)Frameworks/*/(|Private)Headers/*.h(#q-.N:t)
+          /Library/(|Private)Frameworks/*/(|Private)Headers/*.h(#q-.N:t)
+          /System/Library/(|Private)Frameworks/*/(|Private)Headers/*.h(#q-.N:t)
           /usr/include/**/*.h(#q-.N:t)
+          /usr/local/include/**/*.h(#q-.N:t)
         )
         _describe -t headers 'header file' tmp && ret=0
       else
@@ -75,11 +129,7 @@ _open() {
       ;;
     sdks)
       tmp=( /Library/Developer/CommandLineTools/SDKs/*.*.sdk(#qN:t:r) )
-      if (( $#tmp )); then
-        _describe -t sdks 'SDK name/version' tmp && ret=0
-      else
-        _message -e sdks 'SDK name/version' && ret=0
-      fi
+      _describe -t sdks 'SDK name/version' tmp && ret=0
       ;;
   esac
 

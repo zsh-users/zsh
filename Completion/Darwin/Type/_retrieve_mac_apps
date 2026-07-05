@@ -17,7 +17,7 @@ _mac_apps_caching_policy () {
 # Paths to applications are stored in _mac_apps.
 
 _mac_apps_spotlight_retrieve () {
-  typeset mdfind_query="kMDItemContentType == 'com.apple.application-*'"
+  typeset mdfind_query="kMDItemContentType == 'com.apple.application-bundle'"
 
   for i in ${app_dir_root}; do
     _mac_apps+=(${(f)"$(_call_program command \
@@ -101,6 +101,19 @@ _retrieve_mac_apps() {
 
     typeset -g -Ua _mac_apps
     $retrieve
+
+    # filter out some false positives
+    local -a ign_pats=(
+      '/Library/Apple/System/Library/(|Private)Frameworks/*'
+      '/Library/Developer/CommandLineTools/*'
+      '/Library/Image Capture/*'
+      '/Library/PrivilegedHelperTools/*'
+      '/System/Library/(|Private)Frameworks/*'
+      # firefox garbage
+      '/Users/*/Library/Application Support/*/Profiles/*/storage/*'
+      '/Users/*/Library/HTTPStorages/*'
+    )
+    _mac_apps=( ${_mac_apps:#(${(j<|>)~ign_pats})} )
 
     _store_cache Mac_applications _mac_apps
   fi
