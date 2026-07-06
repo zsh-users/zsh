@@ -875,6 +875,36 @@ starttrapscope(void)
  * endparamscope() so that the locallevel has been decremented.
  */
 
+/*
+ * Restore a single saved trap entry: call settrap() to reinstall it,
+ * update sigtrapped[], and for function-style traps re-add the node
+ * to shfunctab.  Used by endtrapscope().
+ */
+
+static void
+restore_saved_trap(struct savetrap *st)
+{
+    int sig = st->sig;
+
+    dontsavetrap++;
+    if (st->flags & ZSIG_FUNC)
+	settrap(sig, NULL, ZSIG_FUNC);
+    else
+	settrap(sig, (Eprog) st->list, 0);
+    if (sig == SIGEXIT)
+	exit_trap_posix = st->posix;
+    dontsavetrap--;
+    /*
+     * counting of nsigtrapped should presumably be handled
+     * in settrap...
+     */
+    DPUTS((sigtrapped[sig] ^ st->flags) & ZSIG_TRAPPED,
+	  "BUG: settrap didn't restore correct ZSIG_TRAPPED");
+    if ((sigtrapped[sig] = st->flags) & ZSIG_FUNC)
+	shfunctab->addnode(shfunctab, ((Shfunc)st->list)->node.nam,
+			   (Shfunc) st->list);
+}
+
 /**/
 void
 endtrapscope(void)
@@ -911,24 +941,7 @@ endtrapscope(void)
 	    remnode(savetraps, ln);
 
 	    if (st->flags && (st->list != NULL)) {
-		/* prevent settrap from saving this */
-		dontsavetrap++;
-		if (st->flags & ZSIG_FUNC)
-		    settrap(sig, NULL, ZSIG_FUNC);
-		else
-			settrap(sig, (Eprog) st->list, 0);
-		if (sig == SIGEXIT)
-		    exit_trap_posix = st->posix;
-		dontsavetrap--;
-		/*
-		 * counting of nsigtrapped should presumably be handled
-		 * in settrap...
-		 */
-		DPUTS((sigtrapped[sig] ^ st->flags) & ZSIG_TRAPPED,
-		      "BUG: settrap didn't restore correct ZSIG_TRAPPED");
-		if ((sigtrapped[sig] = st->flags) & ZSIG_FUNC)
-		    shfunctab->addnode(shfunctab, ((Shfunc)st->list)->node.nam,
-				       (Shfunc) st->list);
+		restore_saved_trap(st);
 	    } else if (sigtrapped[sig]) {
 		/*
 		 * Don't restore the old state if someone has set a
@@ -947,7 +960,20 @@ endtrapscope(void)
 	 * We already made sure this wasn't set as a POSIX exit trap.
 	 * We respect the user's intention when the trap in question
 	 * was set.
+	 *
+	 * If we are exiting, clear errflag so the trap can run.
+	 * Matches what zexit() does before calling dotrap().
+	 *
+	 * If errflag is set in a non-interactive shell (which will
+	 * cause exit via the main loop), convert to exit_pending so
+	 * that all nested EXIT traps are properly executed bottom-up.
+	 * This handles NOUNSET errors and any other zerr()-based
+	 * errors that would cause exit.
 	 */
+	if (!exit_pending && !interact && (errflag & ERRFLAG_ERROR))
+	    set_exit_pending(lastval ? lastval : 1);
+	if (exit_pending)
+	    errflag = 0;
 	dotrapargs(SIGEXIT, &exittr, exitfn);
 	if (exittr & ZSIG_FUNC)
 	    shfunctab->freenode((HashNode)exitfn);
@@ -957,7 +983,6 @@ endtrapscope(void)
     DPUTS(!locallevel && savetraps && firstnode(savetraps),
 	  "BUG: still saved traps outside all function scope");
 }
-
 
 /*
  * Decide whether a trap needs handling.
