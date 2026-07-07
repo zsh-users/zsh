@@ -1674,9 +1674,12 @@ _git-rebase () {
     "(-S --gpg-sign --no-gpg-sign)--no-gpg-sign[don't GPG-sign the commit]" \
     '(-q --quiet -v --verbose --stat -n --no-stat)'{-q,--quiet}'[suppress all output]' \
     '(-q --quiet -v --verbose --stat -n --no-stat)'{-v,--verbose}'[output additional information]' \
-    '(-n --no-stat)'{-n,--no-stat}"[don't show diffstat of what changed upstream]" \
-    '--rerere-autoupdate[update the index with reused conflict resolution if possible]' \
-    '--no-verify[bypass the pre-rebase hook]' \
+    '(-n --no-stat)--stat[show a diffstat of what changed upstream since the last rebase]' \
+    '(-n --no-stat --stat)'{-n,--no-stat}"[don't show diffstat of what changed upstream]" \
+    '(--no-rerere-autoupdate)--rerere-autoupdate[update the index with reused conflict resolution if possible]' \
+    '(--rerere-autoupdate)--no-rerere-autoupdate[do not update the index with reused conflict resolution if possible]' \
+    '(--no-verify)--verify[allow the pre-rebase hook to run]' \
+    '(--verify)--no-verify[bypass the pre-rebase hook]' \
     '(--apply -m --merge -s --strategy -X --strategy-option --auto-squash --no-auto-squash -r --rebase-merges -i --interactive -x --exec --empty --reapply-cherry-picks --edit-todo --reschedule-failed-exec)-C-[ensure that given lines of surrounding context match]: :__git_guard_number "lines of context"' \
     '(-f --force-rebase)'{-f,--force-rebase}'[force rebase even if current branch descends from commit rebasing onto]' \
     '(-i --interactive)--ignore-whitespace[ignore changes in whitespace]' \
@@ -1686,7 +1689,11 @@ _git-rebase () {
     '(-m --merge -s --strategy -X --strategy-option --auto-squash --no-auto-squash -r --rebase-merges -i --interactive -x --exec --empty --reapply-cherry-picks --edit-todo --reschedule-failed-exec)--apply[use apply strategies to rebase]' \
     '(-m --merge --apply --whitespace -C)'{-m,--merge}'[use merging strategies to rebase]' \
     '(-i --interactive --ignore-whitespace --apply --whitespace -C --committer-date-is-author-date)'{-i,--interactive}'[make a list of commits to be rebased and open in $EDITOR]' \
-    '(--apply --whitespace -C)--empty=[specify how to handle commits that become empty]:handling:(drop keep stop)' \
+    '(--apply --whitespace -C --keep-empty --no-keep-empty)--empty=[specify how to handle commits that become empty]:handling:(drop keep stop)' \
+    '(--apply --whitespace -C --empty --no-keep-empty)--keep-empty[keep commits that start empty before the rebase in the result]' \
+    '(--apply --whitespace -C --empty --keep-empty)--no-keep-empty[do not keep commits that start empty before the rebase in the result]' \
+    '(--apply --whitespace -C --no-reapply-cherry-picks)--reapply-cherry-picks[apply all changes, even those already present upstream]' \
+    '(--apply --whitespace -C --reapply-cherry-picks)--no-reapply-cherry-picks[do not apply all changes, even those already present upstream]' \
     '(--apply --whitespace -C)'{-x+,--exec=}'[with -i\: append "exec <cmd>" after each line]:command:_command_names -e' \
     '(-r --rebase-merges --apply --whitespace -C)'{-r-,--rebase-merges=-}'[try to rebase merges instead of skipping them]::option:(rebase-cousins no-rebase-cousins)' \
     '(--apply --whitespace -C)*'{-s+,--strategy=}'[use given merge strategy]:merge strategy:__git_merge_strategies' \
@@ -1696,15 +1703,16 @@ _git-rebase () {
     "(--autosquash)--no-autosquash[don't check for auto-squash boundaries]" \
     '(--autostash --no-autostash)--autostash[stash uncommitted changes before rebasing and apply them afterwards]' \
     "(--autostash --no-autostash)--no-autostash[don't stash uncommitted changes before rebasing and apply them afterwards]" \
-    '(--root)--fork-point[use merge-base --fork-point to refine upstream]' \
+    '(--root --no-fork-point)--fork-point[do not use merge-base --fork-point to refine upstream]' \
+    '(--root --fork-point)--no-fork-point[use merge-base --fork-point to refine upstream]' \
     '--signoff[add Signed-off-by: trailer to the commit message]' \
     '(--force-rebase)*--trailer=[add custom trailer to every rebased commit]:trailer:__git_trailers_tokens' \
     '--no-ff[cherry-pick all rebased commits with --interactive, otherwise synonymous to --force-rebase]' \
     '(--keep-base)--onto=[start new branch with HEAD equal to given revision]:newbase:__git_revisions' \
-    "(--apply --whitespace -C)--reschedule-failed-exec[automatically re-schedule any 'exec' that fails]" \
-    '(--apply --whitespace -C)--reapply-cherry-picks[apply all changes, even those already present upstream]' \
-    '--update-refs[update branches that point to commits that are being rebased]' \
-    '!(--update-refs)--no-update-refs' \
+    "(--apply --whitespace -C --no-reschedule-failed-exec)--reschedule-failed-exec[automatically re-schedule any 'exec' that fails]" \
+    "(--apply --whitespace -C --reschedule-failed-exec)--no-reschedule-failed-exec[do not automatically re-schedule any 'exec' that fails]" \
+    '(--no-update-refs)--update-refs[update branches that point to commits that are being rebased]' \
+    '(--update-refs)--no-update-refs[do not update branches that point to commits that are being rebased]' \
     ':upstream branch:__git_revisions' \
     '::working branch:__git_revisions'
 }
@@ -2205,6 +2213,8 @@ _git-submodule () {
             '(-f --force)'{-f,--force}'[allow adding an otherwise ignored submodule path]' \
             '--name[use given name instead of defaulting to its path]:name' \
             '--reference=[remote repository to clone]: :__git_any_repositories' \
+            '--ref-format[ref storage format of newly cloned submodules]:format' \
+            '--depth[create a shallow clone with a history truncated to the depth revisions]:depth' \
             ': :__git_any_repositories' \
             ':: :_directories' && ret=0
           ;;
@@ -2233,13 +2243,18 @@ _git-submodule () {
 	    '(--merge --rebase)--checkout[checkout commit recorded in the superproject in the submodule on a detached HEAD]' \
 	    '(--checkout --rebase)--merge[merge commit recorded in superproject into current branch of submodule]' \
 	    '(--checkout --merge)--rebase[rebase current branch onto commit recorded in superproject]' \
-	    '--no-recommend-shallow[ignore submodule.<name>.shallow from .gitmodules]' \
+            '(--no-recommend-shallow)--recommend-shallow[recommend shallow cloning of submodules]' \
+            '(--recommend-shallow)--no-recommend-shallow[ignore submodule.<name>.shallow from .gitmodules]' \
             '--reference=[remote repository to clone]: :__git_any_repositories' \
+            '--ref-format=[set ref storage format of submodules]:ref format' \
             '--recursive[traverse submodules recursively]' \
+            '--jobs[update submodules in parallel with <n> jobs]:n' \
             '--remote[use the status of the submodule''s remote-tracking branch]' \
             '--force[discard local changes by checking out the current up-to-date version]' \
             '--init[initialize uninitialized submodules]' \
-            '--single-branch[clone only one branch]' \
+            '--depth[create a shallow clone with a history truncated to the <depth> revisions]:depth' \
+            '(--no-single-branch)--single-branch[clone only one branch]' \
+            '(--single-branch)--no-single-branch[clone all branches]' \
             '--filter=[apply partial clone filter to the submodule]:filter' \
             '*: :__git_ignore_line_inside_arguments __git_submodules' && ret=0
 	;;
