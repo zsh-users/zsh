@@ -1,3 +1,8 @@
+2026-07-11  dana  <dana@dana.is>
+
+	* 54926: Completion/Base/Core/_main_complete: mark some
+	parameters as global
+
 2026-07-10  dana  <dana@dana.is>
 
 	* unposted: Completion/X/Command/_firefox,

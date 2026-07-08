@@ -305,7 +305,7 @@ if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
     elif [[ -n "$_menu_style[(r)select=long*]" ]]; then
       if [[ tmp -gt LINES ]]; then
         zmodload -i zsh/complist
-        MENUSELECT=00
+        typeset -g MENUSELECT=00
       fi
     fi
     if [[ "$MENUSELECT" != 00 ]]; then
@@ -328,19 +328,19 @@ if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
         done
 
         zmodload -i zsh/complist
-        MENUSELECT="$min"
+        typeset -g MENUSELECT="$min"
       else
         unset MENUSELECT
       fi
     fi
     if [[ -n "$MENUSELECT" ]]; then
       if [[ -n "$_menu_style[(r)interactive*]" ]]; then
-        MENUMODE=interactive
+        typeset -g MENUMODE=interactive
       elif [[ -n "$_menu_style[(r)search*]" ]]; then
         if [[ -n "$_menu_style[(r)*backward*]" ]]; then
-          MENUMODE=search-backward
+          typeset -g MENUMODE=search-backward
         else
-          MENUMODE=search-forward
+          typeset -g MENUMODE=search-forward
         fi
       else
         unset MENUMODE
@@ -385,12 +385,12 @@ fi
   # Stuff we always do to clean up.
   if [[ "$compstate[old_list]" = keep ]]; then
     if [[ $_saved_colors_set = 1 ]]; then
-      ZLS_COLORS="$_saved_colors"
+      typeset -g ZLS_COLORS="$_saved_colors"
     else
       unset ZLS_COLORS
     fi
   elif (( $#_comp_colors )); then
-    ZLS_COLORS="${(j.:.)_comp_colors}"
+    typeset -g ZLS_COLORS="${(j.:.)_comp_colors}"
   else
     unset ZLS_COLORS
   fi
