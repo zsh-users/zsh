@@ -1,5 +1,7 @@
 2026-07-08  dana  <dana@dana.is>
 
+	* unposted: Completion/Unix/Type/_urls: make parameter local
+
 	* 54915 (tweaked): Completion/Darwin/Command/_open,
 	Completion/Darwin/Type/_retrieve_mac_apps: complete --args, etc
 

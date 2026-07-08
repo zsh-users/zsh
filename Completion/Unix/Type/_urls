@@ -37,7 +37,7 @@
 #    E.g.:
 #      zstyle ':completion:*:urls' local www /usr/local/apache/htdocs public_html
 
-local ipre scheme host user uhosts ret=1 expl match glob suf
+local ipre scheme host user uhosts urls ret=1 expl match glob suf
 local localhttp
 zstyle -a ":completion:${curcontext}:urls" local localhttp
 local localhttp_servername="$localhttp[1]"
