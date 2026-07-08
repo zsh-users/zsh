@@ -1,3 +1,8 @@
+2026-07-08  dana  <dana@dana.is>
+
+	* unposted: Test/D04parameter.ztst: add regression test for
+	w/54909
+
 2026-07-08  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 54909: Src/subst.c: Untokenize before quoting unquoted literal

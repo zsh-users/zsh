@@ -2195,6 +2195,26 @@
 0:(q) and (b) quoting deal with the EQUALS option
 >\=foo =foo '=foo'
 
+  print -r - ${(q):-=} ${(qq):-=} ${(qqq):-=} ${(qqqq):-=} ${(q+):-=} ${(q-):-=}
+  print -r - \
+    ${(q):-a = b}, ${(qq):-a = b}, ${(qqq):-a = b}, ${(qqqq):-a = b}, \
+    ${(q+):-a = b}, ${(q-):-a = b}
+  print -r - \
+    ${(qq):-a= {b,c}*}, ${(qqq):-a= {b,c}*}, ${(qqqq):-a= {b,c}*}, \
+    ${(q+):-a= {b,c}*}, ${(q-):-a= {b,c}*}
+  ( print -r - ${(q):-=}a )
+  ( print -r - ${(q+):-= } )
+  ( print -r - ${(q+):-=a} )
+  ( print -r - ${(q):-a= {b,c}*} )
+-:regression: workers/54909, (q) etc tokenised chars
+>= '=' "=" $'=' '=' '='
+>a\ =\ b, 'a = b', "a = b", $'a = b', 'a = b', 'a = b'
+>'a= b*' 'a= c*', "a= b*" "a= c*", $'a= b*' $'a= c*', 'a= b*' 'a= c*', 'a= b*' 'a= c*'
+*?*no*found*
+*?*no*found*
+*?*no*found*
+*?*no*found*
+
   args() { print $#; }
   a=(foo)
   args "${a[3,-1]}"
