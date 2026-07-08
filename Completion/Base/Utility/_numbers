@@ -44,7 +44,8 @@ local -a default max min keep tags units
 local -i i
 local -A opts
 
-zparseopts -K -D -A opts M+:=keep q+=keep s+:=keep S+:=keep J+: V+: 1 2 o+: n F: x+: X+: \
+zparseopts -K -D -A opts \
+  {M+:,q+,r+:,R+:,s+:,S+:}=keep J+: V+: 1 2 o+: n F: x+: X+: \
   t:=tags u:=units l:=min m:=max d:=default f=type e=type N=type
 
 desc="${1:-number}" tag="${tags[2]:-numbers}"
