@@ -1,5 +1,8 @@
 2026-07-08  dana  <dana@dana.is>
 
+	* 54913: Completion/Base/Core/_message,
+	Test/Y01completion.ztst: improve option parsing
+
 	* 54913: Completion/Base/Utility/_numbers: pass -r and -R to
 	compadd
 

@@ -424,6 +424,20 @@ F:regression test workers/31611
 >line: {tst }{}
 >MESSAGE:{%foo %BAR}
 
+  comptesteval '_tst() { _message -e abc }'
+  comptest $'tst \t'
+  comptesteval '_tst() { _message -e - abc }'
+  comptest $'tst \t'
+  comptesteval '_tst() { _message -e - tag abc }'
+  comptest $'tst \t'
+0:_message -e
+>line: {tst }{}
+>DESCRIPTION:{abc}
+>line: {tst }{}
+>DESCRIPTION:{abc}
+>line: {tst }{}
+>DESCRIPTION:{abc}
+
 %clean
 
   zmodload -ui zsh/zpty
