@@ -1,5 +1,7 @@
 2026-07-08  dana  <dana@dana.is>
 
+	* 54913: Test/comptest: prefer $TMPDIR for temp files
+
 	* 54912: Completion/Base/Utility/_call_program,
 	Doc/Zsh/compsys.yo, Test/Y07call_program.ztst: add -qQ options,
 	etc

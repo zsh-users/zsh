@@ -149,7 +149,7 @@ comptesteval () {
    {
      # Avoid symlink attacks on the predictable filename
      # TODO: either use =(:) or create this file in the tests' workdir
-     local tmp=/tmp/comptest.$$
+     local tmp=${TMPDIR:-/tmp}/comptest.$$
      () {
        setopt localoptions NO_CLOBBER ERR_EXIT
        print -lr - "$@" > $tmp
