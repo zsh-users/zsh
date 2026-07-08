@@ -371,15 +371,6 @@ struct timespec {
 # endif
 #endif
 
-#if defined(__APPLE__) && defined(HAVE_SELECT)
-/*
- * Prefer select() to poll() on MacOS X since poll() is known
- * to be problematic in 10.4
- */
-#undef HAVE_POLL
-#undef HAVE_POLL_H
-#endif
-
 #ifdef HAVE_SYS_FILIO_H
 # include <sys/filio.h>
 #endif

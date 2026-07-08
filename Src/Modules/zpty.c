@@ -555,39 +555,6 @@ checkptycmd(Ptycmd cmd)
     cmd->fin = 1;
     zclose(cmd->fd);
 }
-#elif defined(FIONREAD)
-static void
-checkptycmd(Ptycmd cmd)
-{
-    int val = 0, select_ret = 0;
-
-    if (cmd->fin)
-        return;
-#ifdef HAVE_SELECT
-    {
-	fd_set fds;
-	struct timeval tv;
-	int ret;
-
-	FD_ZERO(&fds);
-	FD_SET(cmd->fd, &fds);
-	tv.tv_sec = 0;
-	tv.tv_usec = 0;
-	ret = select(cmd->fd + 1, (SELECT_ARG_2_T) &fds, NULL, NULL, &tv);
-	if (ret > 0 && FD_ISSET(cmd->fd, &fds)) {
-	    /* either there are bytes, or the process exited */
-	    select_ret = 1;
-	}
-    }
-#endif
-    if (ioctl(cmd->fd, FIONREAD, (char *) &val) == 0 && val > 0)
-        return;  /* data available, not finished */
-    /* No data (or ioctl failed): check if process is dead */
-    if (select_ret || kill(cmd->pid, 0) < 0) {
-        cmd->fin = 1;
-        zclose(cmd->fd);
-    }
-}
 #else
 static void
 checkptycmd(Ptycmd cmd)

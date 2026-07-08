@@ -1,5 +1,8 @@
 2026-07-12  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54927: Src/Modules/zpty.c, Src/zsh_system.h: checkptycmd:
+	remove select()+FIONREAD variant, re-enable poll on osx
+
 	* 54928: Test/W02jobs.ztst: W02: really close all the fds
 	for sleep
 
