@@ -132,6 +132,9 @@ constructs.  This can be used to create dual-purpose math functions.
 The shell now preserves COLUMNS and LINES from the environment when run
 non-interactively.
 
+The completion helper _call_program learnt two new options, -q and -Q,
+to quote its arguments before passing them to eval.
+
 Changes from 5.8.1 to 5.9
 -------------------------
 

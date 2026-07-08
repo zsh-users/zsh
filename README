@@ -102,6 +102,13 @@ consistent and better aligned with the POSIX-2017 specification of
       f() { { false; echo "This is printed only since 5.10." } || true }
       if f; then true; fi
 
+The vcs_info git back-end now respects the get-unapplied style as
+documented.  As a result it may omit information it previously showed
+during rebase and cherry-pick operations.  The previous behaviour can be
+restored by setting the style as follows:
+
+  zstyle ':vcs_info:git*:*:*' get-unapplied true
+
 PCRE support is now PCRE2.
 
 Parameter names may begin with a "." and follow a relaxed implementation
@@ -186,6 +193,15 @@ Assignment and expansion via ${name=word}, ${name:=word}, and
 ${name::=word} now respect parameter attributes (e.g. `typeset -u`) and
 generally behave more consistently, especially when name contains a
 subscript.
+
+The behaviour of the is-at-least function has been improved. Notably,
+`is-at-least 5.9.0.3 5.9` now correctly returns false.  Also, segments
+containing non-digit characters are now compared numerically instead of
+lexicographically if possible.
+
+The completion helper _message now has more regular option parsing.  As
+a consequence it is always necessary to guard a message beginning with a
+hyphen by - or --.
 
 Incompatibilities between 5.8.1 and 5.9
 ---------------------------------------
