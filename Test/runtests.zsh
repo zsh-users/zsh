@@ -27,7 +27,11 @@ for file in "${(f)ZTST_testlist}"; do
     (( skipped++ ))
   elif (( $retval )); then
     (( failure++ ))
-    (( $retval > 128 )) && print -r - "$file: failed: SIG$signals[$retval - 127]."
+    (( $retval > 128 )) && {
+      [[ -n $ZTST_failcolour ]] && print -rnP "%F{$ZTST_failcolour}"
+      print -r - "$file: test failed: SIG$signals[$retval - 127]."
+      [[ -n $ZTST_failcolour ]] && print -rnP %f
+    }
     ffiles+=( $file )
   else
     (( success++ ))

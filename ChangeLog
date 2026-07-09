@@ -1,5 +1,8 @@
 2026-07-08  dana  <dana@dana.is>
 
+	* unposted: Test/runtests.zsh: runtests: colourise signal fail
+	message
+
 	* unposted: NEWS, README: mention various changes
 
 	* unposted: Completion/Unix/Type/_urls: make parameter local
