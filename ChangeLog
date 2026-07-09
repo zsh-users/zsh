@@ -1,3 +1,9 @@
+2026-07-09  dana  <dana@dana.is>
+
+	* unposted (see 54915):
+	Completion/Darwin/Type/_mac_files_for_application: remove
+	_mac_files_for_application
+
 2026-07-08  dana  <dana@dana.is>
 
 	* unposted: Test/runtests.zsh: runtests: colourise signal fail
