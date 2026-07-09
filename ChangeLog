@@ -1,3 +1,8 @@
+2026-07-12  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 54928: Test/W02jobs.ztst: W02: really close all the fds
+	for sleep
+
 2026-07-11  dana  <dana@dana.is>
 
 	* 54930: Src/builtin.c: zexit: don't write history in sub-shells

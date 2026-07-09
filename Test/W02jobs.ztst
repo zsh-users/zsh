@@ -3,11 +3,12 @@
 %prep
 
   if zmodload zsh/zpty 2> /dev/null; then
+    export ZTST_fd
     zpty_start() {
       export PS1= PS2=
       zpty -d
       zpty zsh "${(q)ZTST_testdir}/../Src/zsh -fiV +Z"
-      zpty -w zsh 'alias sleep="sleep </dev/null >/dev/null 2>&1"'
+      zpty -w zsh 'alias sleep="sleep </dev/null >/dev/null 2>&1"; exec {ZTST_fd}>&-'
     }
     zpty_input() {
       zpty -w zsh "${(F)@}" $'\n'
