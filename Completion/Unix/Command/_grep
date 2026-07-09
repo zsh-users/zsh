@@ -68,7 +68,9 @@ arguments+=(
   '(-)--help[display help information]'
 )
 
-_pick_variant -r variant -c "$command" gnu=gnu gpl2=2.5.1 unix --version
+_pick_variant -r variant -c "$command" \
+  gnu=gnu gpl2='(2.5.1|GNU compatible)' unix --version
+
 case $variant:$OSTYPE in
   (gnu:*|gpl2:freebsd*))
     [[ $service != (|g|z|gz|bz)[ef]grep ]] && arguments+=(

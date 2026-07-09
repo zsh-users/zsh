@@ -1,5 +1,8 @@
 2026-07-09  dana  <dana@dana.is>
 
+	* unposted: Completion/Unix/Command/_grep: fix freebsd grep
+	variant pattern
+
 	* unposted (see 54915):
 	Completion/Darwin/Type/_mac_files_for_application: remove
 	_mac_files_for_application
