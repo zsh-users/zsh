@@ -6,7 +6,7 @@ typeset -A opt_args
 local msg='number of samples (0=infinite)'
 local specs=(
   '-m+[specify the mode]:mode:(tcp udp route)'
-  '*-t+[specify interface type]:interface type:(wifi wired loopback owdl expensive undefined external)'
+  '*-t+[specify interface type]:interface type:(wifi wired loopback awdl expensive undefined external)'
   '-n[disable address to name resolution]'
   '-c[less intensive use of the CPU]'
   '-d[delta mode]'
