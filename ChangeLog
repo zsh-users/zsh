@@ -1,5 +1,7 @@
 2026-07-11  dana  <dana@dana.is>
 
+	* 54930: Src/builtin.c: zexit: don't write history in sub-shells
+
 	* 54926: Completion/Base/Core/_main_complete: mark some
 	parameters as global
 

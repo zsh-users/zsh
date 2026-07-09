@@ -6005,7 +6005,7 @@ zexit(int val, enum zexit_t from_where)
 	killrunjobs(from_where == ZEXIT_SIGNAL);
     }
     cleanfilelists();
-    if (isset(RCS) && interact) {
+    if (isset(RCS) && interact && !subsh) {
 	if (!nohistsave) {
 	    int writeflags = HFILE_USE_OPTIONS;
 	    if (from_where == ZEXIT_SIGNAL)
@@ -6013,7 +6013,7 @@ zexit(int val, enum zexit_t from_where)
 	    saveandpophiststack(1, writeflags);
 	    savehistfile(NULL, 1, writeflags);
 	}
-	if (islogin && !subsh) {
+	if (islogin) {
 	    sourcehome(".zlogout");
 #ifdef GLOBAL_ZLOGOUT
 	    if (isset(RCS) && isset(GLOBALRCS))
