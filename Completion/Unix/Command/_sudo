@@ -1,7 +1,7 @@
 #compdef sudo sudoedit
 
 local curcontext="$curcontext" environ e cmd cpp ret=1
-local -a context state line args _comp_priv_prefix
+local -a context state state_descr line args _comp_priv_prefix
 local -A opt_args
 
 zstyle -a ":completion:${curcontext}:" environ environ
@@ -41,7 +41,8 @@ args=(
 # 
 # TODO: use _arguments' $opt_args to detect the cases '-u jrandom -e' and '-Ae'
 if [[ $service = sudoedit ]] || (( $words[(i)-e] < $words[(i)^(*sudo|-[^-]*)] ))  ; then
-  args=( -A "-*" $args '!(-V --version -h --help)-e' '*:file:_files' )
+  args+=( '!(-V --version -h --help)-e' '*: :_files' )
+  _arguments -s -S -A '-?*' : $args && ret=0
 else
   cmd="$words[1]"
   args+=(
@@ -53,38 +54,41 @@ else
     '(-E -i --login -s --shell -e --edit)--preserve-env=-[preserve user environment when running command]::environment variable:_sequence _parameters -g "*export*"' \
     '(-H --set-home -i --login -s --shell -e --edit)'{-H,--set-home}"[set HOME variable to target user's home dir]" \
     '(-P --preserve-groups -i --login -s --shell -e --edit)'{-P,--preserve-groups}"[preserve group vector instead of setting to target's]" \
-    '*:: :->normal'
+    '*: :->normal'
   )
+  # sudo allows environment-variable assignments to be interspersed with
+  # options. this pattern represents the lax method it uses to determine whether
+  # an arg is an assignment
+  _arguments -s -S -A '(-?*|[^/=]*=*)' : $args && ret=0
 fi
-
-_arguments -s -S $args && ret=0
 
 if [[ $state = normal ]]; then
   _comp_priv_prefix=(
     $cmd -n
     ${(kv)opt_args[(I)(-[ugHEP]|--(user|group|set-home|preserve-env|preserve-groups))]}
   )
+
+  # there's no special handling for assignments with -l. they're parsed as
+  # normal, just ignored. we'll ignore them too
   if (( $+opt_args[-l] || $+opt_args[--list] )); then
+    CURRENT=$#line words=( "${(@)line}" )
     _normal -p $service
     return
   fi
-  while [[ $words[1] = *=* ]]; do
-    if (( CURRENT == 1 )); then
-      compstate[parameter]="${PREFIX%%\=*}"
-      compset -P 1 '*='
-      _value && ret=0
-      return ret
-    fi
-    shift words
-    (( CURRENT-- ))
-  done
-  if (( CURRENT == 1 )); then
+
+  # $line excludes words that match the -A pattern, except when it's the current
+  # word. so if $#line == 1 we haven't seen a command yet
+  if (( $#line == 1 )) && [[ $PREFIX == *=* ]]; then
+    compstate[parameter]="${PREFIX%%\=*}"
+    compset -P 1 '*='
+    _value && ret=0
+  elif (( $#line == 1 )); then
     curcontext="${curcontext%:*:*}:-command-:"
     _alternative \
       'commands:: _command_names -e' \
-      'options:option:(-s --shell -l --login)' \
       'parameters: :_parameters -g "*export*~*readonly*" -qS=' && ret=0
   else
+    CURRENT=$#line words=( "${(@)line}" )
     _normal && ret=0
   fi
 fi
