@@ -1717,7 +1717,7 @@
    cat < <( contextfn )
    cat =( contextfn )
    # ': >( contextfn )' would hang if FIFO is used for process substitution
-   () { echo > $1 } >( contextfn )
+   () { : > $1 } >( read; contextfn )
    : > >( contextfn )
    source <( <<< contextfn )
    $ZTST_testdir/../Src/zsh -fc 'print -r - $zsh_eval_context'

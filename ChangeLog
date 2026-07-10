@@ -1,5 +1,8 @@
 2026-07-09  dana  <dana@dana.is>
 
+	* 54919: Test/D04parameter.ztst: fix hang in D04
+	zsh_eval_context test
+
 	* unposted: Completion/Unix/Command/_grep: fix freebsd grep
 	variant pattern
 
