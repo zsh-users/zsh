@@ -1,3 +1,8 @@
+2026-07-12  dana  <dana@dana.is>
+
+	* 54939: Completion/Unix/Command/_sudo: fix handling of envvar
+	assignments
+
 2026-07-12  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 54927: Src/Modules/zpty.c, Src/zsh_system.h: checkptycmd:
