@@ -1,3 +1,9 @@
+2026-07-10  dana  <dana@dana.is>
+
+	* unposted: Completion/X/Command/_firefox,
+	Completion/Zsh/Type/_command_names: fix some wrongly ordered
+	globquals
+
 2026-07-09  dana  <dana@dana.is>
 
 	* 54919: Test/D04parameter.ztst: fix hang in D04

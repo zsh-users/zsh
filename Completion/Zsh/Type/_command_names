@@ -62,7 +62,7 @@ zstyle -a ":completion:${curcontext}" command-path cmdpath
 # otherwise overridden (bash-completion's _sudo does something similar)
 if (( ! $#cmdpath && $#_comp_priv_prefix )); then
   cmdpath=( $path ${path/%\/bin//sbin} )
-  cmdpath=( ${(u)^cmdpath}(/-N) )
+  cmdpath=( ${(u)^cmdpath}(-/N) )
 fi
 
 if (( $#cmdpath )); then

@@ -99,7 +99,7 @@ _firefox_config_dirs() {
     esac
   fi
 
-  dirs=( $^dirs/profiles.ini(#qN.-) )
+  dirs=( $^dirs/profiles.ini(#qN-.) )
   dirs=( ${dirs:h} )
   dirs=( ${(u)dirs} )
 
@@ -193,7 +193,7 @@ _firefox_selectable_profiles() {
     # apparently firefox sometimes re-creates these databases, so there can be
     # more than one in the directory. the active one is stored in preferences,
     # but we'll just assume it's the newest
-    for db in "$dir/Profile Groups/"*.sqlite(#qN.-om[1]); do
+    for db in "$dir/Profile Groups/"*.sqlite(#qN-.om[1]); do
       tmp+=( ${${(f)"$(
         sqlite3 -separator $'\x1f' $db 'SELECT name, path FROM Profiles;'
       )"}//$'\x1f'/$'\0'} )
@@ -298,7 +298,7 @@ tmp=(
     compset -P ws\:
     _alternative \
       "ports\: \:_numbers -l1 -m65535 \"port number\"" \
-      "files\:socket path\:_files -g \"(#q=-)\""
+      "files\:socket path\:_files -g \"(#q-=)\""
   }'
   '--marionette[enable remote control server]'
   '--remote-debugging-port=[start Firefox Remote Agent (specify port)]:: :\
