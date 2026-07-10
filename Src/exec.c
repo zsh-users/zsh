@@ -4467,14 +4467,16 @@ static void
 save_params(Estate state, Wordcode pc, LinkList *restore_p, LinkList *remove_p)
 {
     Param pm;
-    char *s;
     wordcode ac;
 
     *restore_p = newlinklist();
     *remove_p = newlinklist();
 
     while (wc_code(ac = *pc) == WC_ASSIGN) {
-	s = ecrawstr(state->prog, pc + 1, NULL);
+	char *s = ecrawstr(state->prog, pc + 1, NULL);
+	char *ss = itype_end(s, INAMESPC, 0);
+	int slen = *ss == '[' || *ss == Inbrack ? ss - s : strlen(s);
+	addlinknode(*remove_p, s = dupstring_wlen(s, slen));
 	if ((pm = (Param) paramtab->getnode(paramtab, s))) {
 	    Param tpm = NULL;
 	    if (pm->env)
@@ -4503,11 +4505,9 @@ save_params(Estate state, Wordcode pc, LinkList *restore_p, LinkList *remove_p)
 		tpm->node.nam = pm->node.nam;
 		copyparam(tpm, pm, 1);
 	    }
-	    addlinknode(*remove_p, dupstring(s));
 	    if (tpm)
 		addlinknode(*restore_p, tpm);
-	} else
-	    addlinknode(*remove_p, dupstring(s));
+	}
 
 	pc += (WC_ASSIGN_TYPE(ac) == WC_ASSIGN_SCALAR ?
 	       3 : WC_ASSIGN_NUM(ac) + 2);

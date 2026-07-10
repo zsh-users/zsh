@@ -539,12 +539,16 @@
   call
   HELLO=${HELLO}liness call
   call
+  HELLO[2,4]=oo call
+  call
   unset HELLO
 0:save and restore when using original value in temporary
 >world
 >universe
 >world
 >worldliness
+>world
+>wood
 >world
 
  (integer i n x
