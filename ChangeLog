@@ -1,3 +1,7 @@
+2026-07-15  dana  <dana@dana.is>
+
+	* 54950: Doc/Zsh/compsys.yo: clarify $line contents
+
 2026-07-12  dana  <dana@dana.is>
 
 	* 54939: Completion/Unix/Command/_sudo: fix handling of envvar
