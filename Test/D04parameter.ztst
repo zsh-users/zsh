@@ -3104,3 +3104,18 @@ F:output ignorable as long as not an error
 >47 47
 >74 74
 >74 74
+
+  $ZTST_testdir/../Src/zsh -fic '
+    echo ${ZLE_RPROMPT_INDENT-unset}
+    for 1 in "" 0 1 2; do (
+      ZLE_RPROMPT_INDENT=$1
+      () { local TERM=dumb }
+      echo ${ZLE_RPROMPT_INDENT-unset}
+    ); done
+  '
+0:ZLE_RPROMPT_INDENT value
+>unset
+>0
+>0
+>1
+>2

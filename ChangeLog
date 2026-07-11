@@ -1,5 +1,8 @@
 2026-07-15  dana  <dana@dana.is>
 
+	* 54956: Src/init.c, Test/D04parameter.ztst: init: don't reset
+	ZLE_RPROMPT_INDENT on term init
+
 	* 54950: Doc/Zsh/compsys.yo: clarify $line contents
 
 2026-07-12  dana  <dana@dana.is>

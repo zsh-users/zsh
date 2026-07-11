@@ -882,7 +882,10 @@ init_term(void)
 	    tcstr[TCCLEARSCREEN] = ztrdup("\14");
 	    tclen[TCCLEARSCREEN] = 1;
 	}
-	rprompt_indent = 1; /* If you change this, update rprompt_indent_unsetfn() */
+
+	// don't touch this if it's been set explicitly by the user
+	if (!getsparam("ZLE_RPROMPT_INDENT"))
+	    rprompt_indent = 1; /* If you change this, update rprompt_indent_unsetfn() */
 	/* The following is an attempt at a heuristic,
 	 * but it fails in some cases */
 	/* int hasbw = tgetflag("bw"); */
