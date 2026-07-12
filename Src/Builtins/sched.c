@@ -355,16 +355,16 @@ schedgetfn(UNUSED(Param pm))
 
 	t = sch->time;
 #if defined(PRINTF_HAS_LLD)
-	sprintf(tbuf, "%lld", (long long)t);
+	snprintf(tbuf, sizeof(tbuf), "%lld", (long long)t);
 #else
-	sprintf(tbuf, "%ld", (long)t);
+	snprintf(tbuf, sizeof(tbuf), "%ld", (long)t);
 #endif
 	if (sch->flags & SCHEDFLAG_TRASH_ZLE)
 	    flagstr = "-o";
 	else
 	    flagstr = "";
 	*aptr = (char *)zhalloc(5 + strlen(tbuf) + strlen(sch->cmd));
-	sprintf(*aptr, "%s:%s:%s", tbuf, flagstr, sch->cmd);
+	snprintf(*aptr, 5 + strlen(tbuf) + strlen(sch->cmd), "%s:%s:%s", tbuf, flagstr, sch->cmd);
     }
     *aptr = NULL;
 
