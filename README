@@ -5,7 +5,7 @@ THE Z SHELL (ZSH)
 Version
 -------
 
-This is version 5.9.2 of the shell.  This is a security and bug-fix release.
+This is version 5.9.2 of the shell.  This is a bug-fix release.
 All zsh installations are encouraged to upgrade as soon as possible.
 
 Note in particular the changes highlighted under "Incompatibilities since
