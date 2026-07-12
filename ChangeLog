@@ -1,5 +1,7 @@
 2026-07-12  dana  <dana@dana.is>
 
+	* unposted: Config/version.mk: post-release version bump
+
 	* unposted: Config/version.mk, README: release 5.9.2
 
 	* 54939: Completion/Unix/Command/_sudo: fix handling of envvar
