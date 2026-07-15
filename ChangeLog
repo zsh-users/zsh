@@ -1,5 +1,8 @@
 2026-07-15  dana  <dana@dana.is>
 
+	* Shohei YOSHIDA: 54974: Completion/Unix/Command/_vim: Add
+	'--log' option
+
 	* Shohei YOSHIDA: 54933: Completion/Darwin/Command/_nettop:
 	Correct interface type name in nettop
 

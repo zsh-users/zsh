@@ -91,6 +91,7 @@ else
     '(- *)--serverlist[list available vim servers and exit]'
     '--servername[name of vim server to send to or name of server to become]:server name:->server'
     '--socketid[run GVIM in another window]'
+    '--log[start logging to given file]:log file:_files'
     '-i[use specified viminfo file]:viminfo file [~/.viminfo]:_files'
   )
 fi
