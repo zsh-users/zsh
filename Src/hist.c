@@ -2456,7 +2456,7 @@ getargs(Histent elist, int arg1, int arg2)
     short *words = elist->words;
     int pos1, pos2, nwords = elist->nwords;
 
-    if (arg2 < arg1 || arg1 >= nwords || arg2 >= nwords) {
+    if (arg1 < 0 || arg2 < 0 || arg2 < arg1 || arg1 >= nwords || arg2 >= nwords) {
 	/* remember, argN is indexed from 0, nwords is total no. of words */
 	herrflush();
 	zerr("no such word in event");
