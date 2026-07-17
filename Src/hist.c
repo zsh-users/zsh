@@ -231,6 +231,7 @@ static struct histsave {
     HashTable histtab;
     Histent hist_ring;
     zlong curhist;
+    zlong histline;
     zlong histlinect;
     zlong histsiz;
     zlong savehistsiz;
@@ -3873,6 +3874,10 @@ pushhiststack(char *hf, zlong hs, zlong shs, int level)
     h->histsiz = histsiz;
     h->savehistsiz = savehistsiz;
     h->locallevel = level;
+    if (zleactive)
+	zleentry(ZLE_CMD_GET_HIST_LINE, &h->histline);
+    else
+	h->histline = 0;
 
     memset(&lasthist, 0, sizeof lasthist);
     if (hf) {
@@ -3925,7 +3930,7 @@ pophiststack(void)
     hist_ring = h->hist_ring;
     curhist = h->curhist;
     if (zleactive)
-	zleentry(ZLE_CMD_SET_HIST_LINE, curhist);
+	zleentry(ZLE_CMD_SET_HIST_LINE, h->histline);
     histlinect = h->histlinect;
     histsiz = h->histsiz;
     savehistsiz = h->savehistsiz;

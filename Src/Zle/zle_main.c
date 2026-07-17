@@ -2185,6 +2185,14 @@ zle_main_entry(int cmd, va_list ap)
 	break;
     }
 
+    case ZLE_CMD_GET_HIST_LINE:
+    {
+	zlong *p = va_arg(ap, zlong *);
+	*p = histline;
+
+	break;
+    }
+
     case ZLE_CMD_PREEXEC:
 	mark_output(1);
 	break;

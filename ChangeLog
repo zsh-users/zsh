@@ -1,3 +1,8 @@
+2026-07-21  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 54985: Src/Zle/zle_main.c, Src/hist.c, Src/zsh.h: fix crash
+	with bracketed-paste-magic and undo
+
 2026-07-19  Bart Schaefer  <schaefer@zsh.org>
 
 	* 54996: Doc/Zsh/mod_ksh93.yo: Remove obsolete doc reference to
