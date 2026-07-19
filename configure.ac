@@ -422,11 +422,11 @@ AC_ARG_ENABLE(pcre,
 AS_HELP_STRING([--enable-pcre],[enable the search for the pcre2 library (may create run-time library dependencies)]))
 
 AC_ARG_VAR(PCRE_CONFIG, [pathname of pcre2-config if it is not in PATH])
+AC_ARG_VAR(PCRE_LIBS, [library linker flag to use for pcre module if pcre2-config is not available])
 if test "x$enable_pcre" = xyes; then
   AC_CHECK_PROG([PCRE_CONFIG], pcre2-config, pcre2-config)
   if test "x$PCRE_CONFIG" = x; then
-    enable_pcre=no
-    AC_MSG_WARN([pcre2-config not found: pcre module is disabled.])
+    AC_MSG_WARN([pcre2-config not found: will search for pcre library in specified paths. (You will probably need to pass PCRE_LIBS=-lpcre2-8 to configure for this to work.)])
     AC_MSG_NOTICE(
       [Set PCRE_CONFIG to pathname of pcre2-config if it is not in PATH.])
   fi
@@ -622,8 +622,10 @@ dnl pcre2-config --cflags may produce a -I output which needs to go into
 dnl CPPFLAGS else configure's preprocessor tests don't pick it up,
 dnl producing a warning.
 if test "x$enable_pcre" = xyes; then
-  CPPFLAGS="`$PCRE_CONFIG --cflags` $CPPFLAGS"
-  AC_CHECK_HEADERS([pcre2.h],,,[#define PCRE2_CODE_UNIT_WIDTH 8])
+  if test "x$PCRE_CONFIG" != x; then
+    CPPFLAGS="`$PCRE_CONFIG --cflags` $CPPFLAGS"
+  fi
+  AC_CHECK_HEADERS([pcre2.h],[],[AC_MSG_FAILURE([pcre2.h not found])],[#define PCRE2_CODE_UNIT_WIDTH 8])
 fi
 
 AC_CHECK_HEADERS(sys/time.h sys/times.h sys/select.h termcap.h termio.h \
@@ -855,7 +857,7 @@ if test "x$dynamic" = xyes; then
 fi
 
 if test x$enable_cap = xyes; then
-  AC_CHECK_LIB(cap, cap_get_proc)
+  AC_CHECK_LIB(cap, cap_get_proc, [], [AC_MSG_FAILURE([cap_get_proc not found in libcap])])
 fi
 
 AC_CHECK_LIB(socket, socket)
@@ -947,10 +949,10 @@ elif test x$zsh_cv_decl_ospeed_must_define = xyes; then
 fi
 
 if test x$enable_gdbm = xyes; then
-  AC_CHECK_HEADERS(gdbm.h)
+  AC_CHECK_HEADERS(gdbm.h, [], [AC_MSG_FAILURE([gdbm.h not found])])
   save_LIBS=$LIBS
   LIBS=
-  AC_CHECK_LIB(gdbm, gdbm_open)
+  AC_CHECK_LIB(gdbm, gdbm_open, [], [AC_MSG_FAILURE([gdbm_open not found in libgdbm])])
   GDBM_LIBS=$LIBS
   LIBS=$save_LIBS
   if test x$enable_link_all_libs = xyes; then
@@ -1349,9 +1351,11 @@ fi
 
 if test x$enable_pcre = xyes; then
   save_LIBS=$LIBS
-  PCRE_LIBS="`$PCRE_CONFIG --libs8`"
+  if test "x$PCRE_CONFIG" != x; then
+    PCRE_LIBS="`$PCRE_CONFIG --libs8`"
+  fi
   LIBS="$PCRE_LIBS $LIBS"
-  AC_CHECK_FUNCS(pcre2_compile_8)
+  AC_CHECK_FUNCS(pcre2_compile_8, [], [AC_MSG_FAILURE([pcre2_compile_8 not found in $PCRE_LIBS])])
   LIBS=$save_LIBS
   if test x$enable_link_all_libs = xyes; then
     LIBS="$PCRE_LIBS $LIBS"
