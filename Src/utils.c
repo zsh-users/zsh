@@ -2050,7 +2050,7 @@ redup(int x, int y)
 	if (dup2(x, y) == -1) {
 	    ret = -1;
 	} else {
-	    check_fd_table(y);
+	    check_fd_table(maximum(x, y));
 	    fdtable[y] = fdtable[x];
 	    if (fdtable[y] == FDT_FLOCK || fdtable[y] == FDT_FLOCK_EXEC)
 		fdtable[y] = FDT_INTERNAL;
@@ -2059,16 +2059,18 @@ redup(int x, int y)
 	 * Closing any fd to the locked file releases the lock.
 	 * This isn't expected to happen, it's here for completeness.
 	 */
+	check_fd_table(x);
 	if (fdtable[x] == FDT_FLOCK)
 	    fdtable_flocks--;
 	zclose(x);
-    }
+    } else
+	check_fd_table(x);
 
     return ret;
 }
 
 /*
- * Add an fd opened ithin a module.
+ * Add an fd opened within a module.
  *
  * fdt is the type of the fd; see the FDT_ definitions in zsh.h.
  * The most likely failures are:

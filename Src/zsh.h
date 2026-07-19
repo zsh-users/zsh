@@ -29,6 +29,7 @@
 
 /* A few typical macros */
 #define minimum(a,b)  ((a) < (b) ? (a) : (b))
+#define maximum(a,b)  ((a) > (b) ? (a) : (b))
 
 /*
  * Our longest integer type:  will be a 64 bit either if long already is,

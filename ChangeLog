@@ -1,3 +1,10 @@
+2026-07-25  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 54986: Src/Modules/socket.c, Src/Modules/tcp.c,
+	Src/Modules/zftp.c, Src/exec.c, Src/params.c, Src/utils.c,
+	Src/zsh.h: actually prevent FDT_MODULE fds from being closed
+	by user
+
 2026-07-21  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 54985: Src/Zle/zle_main.c, Src/hist.c, Src/zsh.h: fix crash

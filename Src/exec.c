@@ -3885,10 +3885,12 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 				    bad = 1;
 			    }
 			    if (!bad && fn->fd1 <= max_zsh_fd) {
-				if (fn->fd1 >= 10 &&
-				    (fdtable[fn->fd1] & FDT_TYPE_MASK) ==
-				    FDT_INTERNAL)
-				    bad = 3;
+				int fdt = fdtable[fn->fd1] & FDT_TYPE_MASK;
+				if ((fn->fd1 >= 10 && fdt == FDT_INTERNAL) ||
+				    fdt == FDT_MODULE)
+				{
+				    bad = 3 + (fdt == FDT_MODULE);
+				}
 			    }
 			}
 		    }
@@ -3896,7 +3898,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 			const char *bad_msg[] = {
 			    "parameter %s does not contain a file descriptor",
 			    "can't close file descriptor from readonly parameter %s",
-			    "file descriptor %d used by shell, not closed"
+			    "file descriptor %d used by shell, not closed",
+			    "file descriptor %d used by module, not closed",
 			};
 			if (bad > 2)
 			    zwarn(bad_msg[bad-1], fn->fd1);
@@ -3947,6 +3950,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 			  */
 			 (fn->fd2 <= max_zsh_fd &&
 			  ((fdtable[fn->fd2] != FDT_UNUSED &&
+			    fdtable[fn->fd2] != FDT_MODULE &&
 			    fdtable[fn->fd2] != FDT_EXTERNAL) ||
 			   fn->fd2 == coprocin ||
 			   fn->fd2 == coprocout))) {

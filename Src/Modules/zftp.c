@@ -458,7 +458,7 @@ zfunpipe(void)
 }
 
 /*
- * Same as movefd(), but don't mark the fd in the zsh tables,
+ * Same as movefd(), but mark the fd as FDT_MODULE in the zsh tables,
  * because we only want it closed by zftp.  However, we still
  * need to shift the fd's out of the way of the user-visible 0-9.
  */
@@ -473,9 +473,10 @@ zfmovefd(int fd)
 #else
 	int fe = zfmovefd(dup(fd));
 #endif
-	close(fd);
+	zclose(fd);
 	fd = fe;
     }
+    addmodulefd(fd, FDT_MODULE);
     return fd;
 }
 
@@ -1040,7 +1041,7 @@ zfclosedata(void)
 {
     if (zfsess->dfd == -1)
 	return;
-    close(zfsess->dfd);
+    zclose(zfsess->dfd);
     zfsess->dfd = -1;
 }
 

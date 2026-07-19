@@ -2944,7 +2944,7 @@ setarrvalue(Value v, char **val)
 	    v->end = oldlen;
 
 	/* Strings before slice + strings from val + strings after slice */
-	newlen = v->start + vallen + MAX(0, oldlen - v->end);
+	newlen = v->start + vallen + maximum(0, oldlen - v->end);
 
 	if (v->pm->gsu.a->setfn == arrsetfn && old == v->pm->u.arr) {
 	    v->pm->u.arr = NULL; /* Steal the old array */
@@ -2964,7 +2964,7 @@ setarrvalue(Value v, char **val)
 			sizeof(char *) * (oldlen - v->end));
 	} else {
 	    new = (char **) zalloc(sizeof(char *) * (newlen + 1));
-	    for (p = new, q = old, i = MIN(v->start, oldlen); i > 0; i--)
+	    for (p = new, q = old, i = minimum(v->start, oldlen); i > 0; i--)
 		*p++ = ztrdup(*q++);
 	    if (v->end < oldlen)
 		for (p = new + v->start + vallen, q = old + v->end; *q;)
@@ -6351,7 +6351,7 @@ resolve_nameref_rec(Param pm, const Param stop, int keep_lastref)
 	int ppar = zstrtol(refname, NULL, 10);
 	if (ppar >= argnparams_size) {
 	    size_t old_size = argnparams_size;
-	    size_t new_size = argnparams_size = MAX(2 * old_size, ppar);
+	    size_t new_size = argnparams_size = maximum(2 * old_size, ppar);
 	    argnparams = zrealloc(argnparams, new_size * sizeof(Param));
 	    memset(argnparams + old_size, 0,
 		   (new_size - old_size) * sizeof(Param));
@@ -6443,7 +6443,7 @@ setscope_base(Param pm, int base)
 	LinkList refs;
 	if (base >= scoperefs_num) {
 	    int old_num = scoperefs_num;
-	    int new_num = scoperefs_num = MAX(2 * base, 8);
+	    int new_num = scoperefs_num = maximum(2 * base, 8);
 	    scoperefs = zrealloc(scoperefs, new_num * sizeof(refs));
 	    memset(scoperefs + old_num, 0, (new_num - old_num) * sizeof(refs));
 	}

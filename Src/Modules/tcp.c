@@ -489,17 +489,25 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 
 	if (targetfd) {
 	    sess->fd = redup(sess->fd, targetfd);
+	    if (sess->fd < 0) {
+		zerrnam(nam, "could not duplicate socket fd to %d: %e", targetfd, errno);
+		tcp_close(sess);
+		return 1;
+	    }
 	}
 	else {
-	    /* move the fd since no one will want to read from it */
+	    targetfd = sess->fd; /* just stashing here for error message */
 	    sess->fd = movefd(sess->fd);
 	}
 
 	if (sess->fd == -1) {
-	    zwarnnam(nam, "cannot duplicate fd %d: %e", sess->fd, errno);
+	    zwarnnam(nam, "cannot duplicate fd %d: %e", targetfd, errno);
 	    tcp_close(sess);
 	    return 1;
 	}
+
+	/* disallow to be closed explicitly, after movefd set it to INTERNAL */
+	fdtable[sess->fd] = FDT_MODULE;
 
 	setiparam_no_convert("REPLY", (zlong)sess->fd);
 
@@ -588,19 +596,24 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	    return 1;
 	}
 
-	/* redup expects fd is already registered */
-	addmodulefd(rfd, FDT_MODULE);
-
 	if (targetfd) {
 	    sess->fd = redup(rfd, targetfd);
 	    if (sess->fd < 0) {
 		zerrnam(nam, "could not duplicate socket fd to %d: %e", targetfd, errno);
+		tcp_close(sess);
 		return 1;
 	    }
 	}
 	else {
-	    sess->fd = rfd;
+	    sess->fd = movefd(rfd);
 	}
+	if (sess->fd < 0) {
+	    zerrnam(nam, "could not move socket fd %d: %e", rfd, errno);
+	    tcp_close(sess);
+	    return 1;
+	}
+	/* disallow to be closed explicitly */
+	fdtable[sess->fd] = FDT_MODULE;
 
 	setiparam_no_convert("REPLY", (zlong)sess->fd);
 

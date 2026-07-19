@@ -119,17 +119,18 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	    return 1;
 	}
 
-	addmodulefd(sfd, FDT_EXTERNAL);
-
 	if (targetfd) {
 	    sfd = redup(sfd, targetfd);
-	}
-	else {
-	    /* move the fd since no one will want to read from it */
+	    if (sfd == -1) {
+		zerrnam(nam, "cannot duplicate socket fd to %d: %e", targetfd, errno);
+		return 1;
+	    }
+	} else {
+	    targetfd = sfd; /* for error message */
 	    sfd = movefd(sfd);
 	}
 	if (sfd == -1) {
-	    zerrnam(nam, "cannot duplicate fd %d: %e", sfd, errno);
+	    zerrnam(nam, "could not move socket fd %d: %e", targetfd, errno);
 	    return 1;
 	}
 
@@ -209,20 +210,20 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	    return 1;
 	}
 
-	addmodulefd(rfd, FDT_EXTERNAL);
-
 	if (targetfd) {
 	    sfd = redup(rfd, targetfd);
-	    if (sfd < 0) {
+	    if (sfd == -1) {
 		zerrnam(nam, "could not duplicate socket fd to %d: %e", targetfd, errno);
-		zclose(rfd);
 		return 1;
 	    }
-	    fdtable[sfd] = FDT_EXTERNAL;
+	} else {
+	    sfd = movefd(rfd);
 	}
-	else {
-	    sfd = rfd;
+	if (sfd == -1) {
+	    zerrnam(nam, "could not move socket fd %d: %e", rfd, errno);
+	    return 1;
 	}
+	fdtable[sfd] = FDT_EXTERNAL;
 
 	setiparam_no_convert("REPLY", (zlong)sfd);
 
@@ -268,17 +269,21 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	}
 	else
 	{
-	    addmodulefd(sfd, FDT_EXTERNAL);
-
 	    if (targetfd) {
-		if (redup(sfd, targetfd) < 0) {
+		if (redup(sfd, targetfd) == -1) {
 		    zerrnam(nam, "could not duplicate socket fd to %d: %e", targetfd, errno);
-		    zclose(sfd);
 		    return 1;
 		}
 		sfd = targetfd;
-		fdtable[sfd] = FDT_EXTERNAL;
+	    } else {
+		targetfd = sfd; /* for error message */
+		sfd = movefd(sfd);
 	    }
+	    if (sfd == -1) {
+		zerrnam(nam, "could not move socket fd %d: %e", targetfd, errno);
+		return 1;
+	    }
+	    fdtable[sfd] = FDT_EXTERNAL;
 
 	    setiparam_no_convert("REPLY", (zlong)sfd);
 
