@@ -100,6 +100,7 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
     char *resource_name, *pmname;
     GDBM_FILE dbf = NULL;
     int read_write = GDBM_SYNC, pmflags = PM_REMOVABLE|PM_SINGLE;
+    int fdflags = 0;
     Param tied_param;
 
     if(!OPT_ISSET(ops,'d')) {
@@ -112,9 +113,11 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
     }
     if (OPT_ISSET(ops,'r')) {
 	read_write |= GDBM_READER;
+	fdflags |= O_RDONLY;
 	pmflags |= PM_READONLY;
     } else {
 	read_write |= GDBM_WRCREAT;
+	fdflags |= O_RDWR|O_CREAT;
     }
 
     /* Here should be a lookup of the backend type against
@@ -147,14 +150,21 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
     }
 
     gdbm_errno=0;
-    dbf = gdbm_open(resource_name, 0, read_write, 0666, 0);
-    if(dbf == NULL) {
-	zwarnnam(nam, "error opening database file %s (%s)", resource_name, gdbm_strerror(gdbm_errno));
+    int fd = movefd(open(resource_name, fdflags, 0666));
+    if (fd < 0) {
+	zwarnnam(nam, "error opening database file %s: %e", resource_name, errno);
+	return 1;
+    }
+    dbf = gdbm_fd_open(fd, resource_name, 0, read_write, 0);
+    if (dbf == NULL) {
+	zwarnnam(nam, "error opening database file %s: %s", resource_name, gdbm_strerror(gdbm_errno));
+        zclose(fd);
 	return 1;
     }
 
     if (!(tied_param = creategdbmhash(pmname, pmflags))) {
         zwarnnam(nam, "cannot create the requested parameter %s", pmname);
+        fdtable[gdbm_fdesc(dbf)] = FDT_UNUSED;
 	gdbm_close(dbf);
 	return 1;
     }

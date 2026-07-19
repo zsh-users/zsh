@@ -952,7 +952,7 @@ if test x$enable_gdbm = xyes; then
   AC_CHECK_HEADERS(gdbm.h, [], [AC_MSG_FAILURE([gdbm.h not found])])
   save_LIBS=$LIBS
   LIBS=
-  AC_CHECK_LIB(gdbm, gdbm_open, [], [AC_MSG_FAILURE([gdbm_open not found in libgdbm])])
+  AC_CHECK_LIB(gdbm, gdbm_fd_open, [], [AC_MSG_FAILURE([gdbm_fd_open not found in libgdbm])])
   GDBM_LIBS=$LIBS
   LIBS=$save_LIBS
   if test x$enable_link_all_libs = xyes; then

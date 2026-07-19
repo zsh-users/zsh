@@ -1,5 +1,8 @@
 2026-07-25  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 54994: Src/Modules/db_gdbm.c, configure.ac: use gdbm_fd_open
+	so we can move the fd to >9
+
 	* 54993: configure.ac: fail at configure time if a feature is
 	requested and we couldn't find it
 
