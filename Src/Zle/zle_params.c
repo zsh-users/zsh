@@ -200,14 +200,13 @@ makezleparams(int ro)
 	Param pm = createparam(zp->name, (zp->type |PM_SPECIAL|PM_REMOVABLE|
 					  PM_LOCAL|(ro ? PM_READONLY : 0)));
 	if (!pm)
-	    pm = (Param) paramtab->getnode(paramtab, zp->name);
-	DPUTS(!pm, "param not set in makezleparams");
+	    pm = (Param) realparamtab->getnode2(realparamtab, zp->name);
+	DPUTS1(!pm, "param %s not set in makezleparams", zp->name);
 
 	pm->level = locallevel + 1;
 	pm->u.data = zp->data;
 	switch(PM_TYPE(zp->type)) {
 	    case PM_SCALAR:
-	    case PM_NAMEREF:
 		pm->gsu.s = zp->gsu;
 		break;
 	    case PM_ARRAY:

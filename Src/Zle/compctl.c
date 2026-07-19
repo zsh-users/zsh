@@ -3664,7 +3664,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	dumphashtable(cmdnamtab, -3);
 	/* And parameter names if autocd and cdablevars are set. */
 	if (isset(AUTOCD) && isset(CDABLEVARS))
-	    dumphashtable(paramtab, -4);
+	    dumphashtable(realparamtab, -4);
     }
     oaw = addwhat = (cc->mask & CC_QUOTEFLAG) ? -2 : CC_QUOTEFLAG;
 
@@ -3676,7 +3676,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	dumphashtable(optiontab, addwhat);
     if (cc->mask & CC_VARS) {
 	/* And parameter names. */
-	dumphashtable(paramtab, -9);
+	dumphashtable(realparamtab, -9);
 	addwhat = oaw;
     }
     if (cc->mask & CC_BINDINGS) {
@@ -3843,7 +3843,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
     if ((t = cc->mask & (CC_ARRAYS | CC_INTVARS | CC_ENVVARS | CC_SCALARS |
 			 CC_READONLYS | CC_SPECIALS | CC_PARAMS)))
 	/* Add various flavours of parameters. */
-	dumphashtable(paramtab, t);
+	dumphashtable(realparamtab, t);
     if ((t = cc->mask & CC_SHFUNCS))
 	/* Add shell functions. */
 	dumphashtable(shfunctab, t | (cc->mask & (CC_DISCMDS|CC_EXCMDS)));

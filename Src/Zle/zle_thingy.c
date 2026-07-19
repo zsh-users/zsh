@@ -683,7 +683,8 @@ bin_zle_flags(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 		    if (invicmdmode()) {
 			startvichange(-1);
 			if (zmod.flags & (MOD_MULT|MOD_TMULT)) {
-			    Param pm = (Param) paramtab->getnode(paramtab, "NUMERIC");
+			    Param pm = (Param)
+				realparamtab->getnode2(realparamtab, "NUMERIC");
 			    if (pm && pm->node.flags & PM_SPECIAL)
 				pm->node.flags &= ~PM_UNSET;
 			}

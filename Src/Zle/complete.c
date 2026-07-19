@@ -1314,15 +1314,14 @@ addcompparams(struct compparam *cp, Param *pp)
 	Param pm = createparam(cp->name,
 			       cp->type |PM_SPECIAL|PM_REMOVABLE|PM_LOCAL);
 	if (!pm)
-	    pm = (Param) paramtab->getnode(paramtab, cp->name);
-	DPUTS(!pm, "param not set in addcompparams");
+	    pm = (Param) paramtab->getnode2(paramtab, cp->name);
+	DPUTS1(!pm, "param %s not set in addcompparams", cp->name);
 
 	*pp = pm;
 	pm->level = locallevel + 1;
 	if ((pm->u.data = cp->var)) {
 	    switch(PM_TYPE(cp->type)) {
 	    case PM_SCALAR:
-	    case PM_NAMEREF:
 		pm->gsu.s = &compvarscalar_gsu;
 		break;
 	    case PM_INTEGER:
@@ -1347,23 +1346,21 @@ void
 makecompparams(void)
 {
     Param cpm;
-    HashTable tht;
 
     addcompparams(comprparams, comprpms);
 
     if (!(cpm = createparam(
 	      COMPSTATENAME,
 	      PM_SPECIAL|PM_REMOVABLE|PM_SINGLE|PM_LOCAL|PM_HASHED)))
-	cpm = (Param) paramtab->getnode(paramtab, COMPSTATENAME);
-    DPUTS(!cpm, "param not set in makecompparams");
+	cpm = (Param) realparamtab->getnode2(realparamtab, COMPSTATENAME);
+    DPUTS1(!cpm, "param %s not set in makecompparams", COMPSTATENAME);
 
     comprpms[CPN_COMPSTATE] = cpm;
-    tht = paramtab;
     cpm->level = locallevel + 1;
     cpm->gsu.h = &compstate_gsu;
     cpm->u.hash = paramtab = newparamtable(31, COMPSTATENAME);
     addcompparams(compkparams, compkpms);
-    paramtab = tht;
+    paramtab = realparamtab;
 }
 
 /**/

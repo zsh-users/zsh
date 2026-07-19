@@ -437,8 +437,8 @@ checkparams(char *p)
     int t0, n, l = strlen(p), e = 0;
     struct hashnode *hn;
 
-    for (t0 = paramtab->hsize - 1, n = 0; n < 2 && t0 >= 0; t0--)
-	for (hn = paramtab->nodes[t0]; n < 2 && hn; hn = hn->next)
+    for (t0 = realparamtab->hsize - 1, n = 0; n < 2 && t0 >= 0; t0--)
+	for (hn = realparamtab->nodes[t0]; n < 2 && hn; hn = hn->next)
 	    if (pfxlen(p, hn->nam) == l) {
 		n++;
 		if ((int)strlen(hn->nam) == l)
@@ -1512,7 +1512,8 @@ get_comp_string(void)
 	    zlemetacs_qsub - wb) {
 	    s = NULL;
 	    inwhat = IN_MATH;
-	    if ((keypm = (Param) paramtab->getnode(paramtab, varname)) &&
+	    if ((keypm = (Param)
+		 realparamtab->getnode(realparamtab, varname)) &&
 		(keypm->node.flags & PM_HASHED))
 		insubscr = 2;
 	    else
@@ -1612,7 +1613,8 @@ get_comp_string(void)
 		zsfree(varname);
 		varname = ztrdup(nb);
 		*ne = sav;
-		if ((keypm = (Param) paramtab->getnode(paramtab, varname)) &&
+		if ((keypm = (Param)
+		     realparamtab->getnode(realparamtab, varname)) &&
 		    (keypm->node.flags & PM_HASHED))
 		    insubscr = 2;
 	    }
@@ -1693,7 +1695,8 @@ get_comp_string(void)
 	    if (wptr < sqbr) {
 		zsfree(varname);
 		varname = ztrduppfx(wptr, sqbr - wptr);
-		if ((keypm = (Param) paramtab->getnode(paramtab, varname)) &&
+		if ((keypm = (Param)
+		     realparamtab->getnode(realparamtab, varname)) &&
 		    (keypm->node.flags & PM_HASHED)) {
 		    if (insubscr != 3)
 			insubscr = 2;
