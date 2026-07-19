@@ -1575,6 +1575,7 @@ F:previously this could create an infinite recursion and crash
 
 # Testing named directories requires to run in interactive mode
 
+ # Use "${(kv)nameddirs}" because "typeset -p nameddirs" prints no value
  PS1= $ZTST_testdir/../Src/zsh -fis <<<'
    [[ -d Modules/zsh ]] && module_path=( $PWD/Modules )
    typeset v1=/1 v2
