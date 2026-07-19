@@ -1167,7 +1167,7 @@ createparam(char *name, int flags)
 	    paramtab->addnode(paramtab, ztrdup(name), pm);
 	}
 
-	if (isset(ALLEXPORT) && !(flags & PM_HASHELEM))
+	if (isset(ALLEXPORT) && !(flags & (PM_NAMEREF | PM_HASHELEM)))
 	    flags |= PM_EXPORTED;
     } else {
 	pm = (Param) hcalloc(sizeof *pm);
@@ -2835,7 +2835,8 @@ assignstrvalue(Value v, char *val, int flags)
     setscope(v->pm);
     if (errflag ||
 	((!v->pm->env && !(v->pm->node.flags & PM_EXPORTED) &&
-	  !(isset(ALLEXPORT) && !(v->pm->node.flags & PM_HASHELEM))) ||
+	  !(isset(ALLEXPORT) &&
+	    !(v->pm->node.flags & (PM_NAMEREF | PM_HASHELEM)))) ||
 	 (v->pm->node.flags & PM_ARRAY) || v->pm->ename))
 	return;
     export_param(v->pm);
