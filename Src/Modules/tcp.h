@@ -38,6 +38,10 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
+#ifdef SO_BINDTODEVICE
+#include <net/if.h>
+#endif
+
 #ifdef HAVE_BIND_NETDB_H
 /*
  * On systems where we're using -lbind, this has more definitions

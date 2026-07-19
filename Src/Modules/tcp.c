@@ -367,7 +367,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
     int herrno, err=1, destport, force=0, verbose=0, test=0, targetfd=0;
     ZSOCKLEN_T  len;
     char **addrp, *desthost;
-    const char *localname, *remotename;
+    const char *localname, *remotename, *opt;
     struct hostent *zthost = NULL, *ztpeer = NULL;
     struct servent *srv;
     Tcp_session sess = NULL;
@@ -385,6 +385,13 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	targetfd = atoi(OPT_ARG(ops,'d'));
 	if (!targetfd) {
 	    zwarnnam(nam, "%s is an invalid argument to -d", OPT_ARG(ops,'d'));
+	    return 1;
+	}
+    }
+
+    for (opt = "rbi"; *opt; opt++) {
+	if (OPT_ISSET(ops,*opt) && !OPT_ISSET(ops,'l')) {
+	    zwarnnam(nam, "-%c is only valid with -l", *opt);
 	    return 1;
 	}
     }
@@ -437,6 +444,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
     }
     else if (OPT_ISSET(ops,'l')) {
 	int lport = 0;
+	char *address = OPT_ISSET(ops,'b') ? OPT_ARG(ops,'b') : "0.0.0.0";
 
 	if (!args[0]) {
 	    zwarnnam(nam, "-l requires an argument");
@@ -461,10 +469,42 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	len = 1;
 	setsockopt(sess->fd, SOL_SOCKET, SO_OOBINLINE, (char *)&len, sizeof(len));
 #endif
-	if (!zsh_inet_aton("0.0.0.0", &(sess->sock.in.sin_addr)))
+	if (OPT_ISSET(ops,'r')) {
+#ifdef SO_REUSEADDR
+	    len = 1;
+	    setsockopt(sess->fd, SOL_SOCKET, SO_REUSEADDR, (char *)&len, sizeof(len));
+#else
+	    /* probably just annoying to warn about this */
+	    /* zwarnnam(nam, "SO_REUSEADDR not available"); */
+#endif
+	}
+	if (OPT_ISSET(ops,'i')) {
+	    char *iface = OPT_ARG(ops,'i');
+	    if (!*iface) {
+		zwarnnam(nam, "argument can't be empty: -i");
+		goto l_opt_close_err;
+	    }
+#ifdef SO_BINDTODEVICE
+	    char *iface_unmeta = unmeta(iface);
+	    if (strlen(iface_unmeta) >= IFNAMSIZ) {
+		zwarnnam(nam, "interface name too long (max %d bytes): %s",
+			 IFNAMSIZ-1, iface);
+		goto l_opt_close_err;
+	    }
+	    if (setsockopt(sess->fd, SOL_SOCKET, SO_BINDTODEVICE,
+			   iface_unmeta, strlen(iface_unmeta))) {
+		zwarnnam(nam, "could not bind to interface %s: %e", iface, errno);
+		goto l_opt_close_err;
+	    }
+#else
+	    zwarnnam(nam, "SO_BINDTODEVICE not available");
+	    goto l_opt_close_err;
+#endif
+	}
+	if (!zsh_inet_aton(address, &(sess->sock.in.sin_addr)))
 	{
-	    zwarnnam(nam, "bad address: %s", "0.0.0.0");
-	    return 1;
+	    zwarnnam(nam, "bad address: %s", address);
+	    goto l_opt_close_err;
 	}
 
 	sess->sock.in.sin_family = AF_INET;
@@ -476,23 +516,20 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	    char buf[DIGBUFSIZE];
 	    convbase(buf, (zlong)ntohs(lport), 10);
 	    zwarnnam(nam, "could not bind to port %s: %e", buf, errno);
-	    tcp_close(sess);
-	    return 1;
+	    goto l_opt_close_err;
 	}
 
 	if (listen(sess->fd, 1))
 	{
 	    zwarnnam(nam, "could not listen on socket: %e", errno);
-	    tcp_close(sess);
-	    return 1;
+	    goto l_opt_close_err;
 	}
 
 	if (targetfd) {
 	    sess->fd = redup(sess->fd, targetfd);
 	    if (sess->fd < 0) {
 		zerrnam(nam, "could not duplicate socket fd to %d: %e", targetfd, errno);
-		tcp_close(sess);
-		return 1;
+		goto l_opt_close_err;
 	    }
 	}
 	else {
@@ -502,8 +539,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 
 	if (sess->fd == -1) {
 	    zwarnnam(nam, "cannot duplicate fd %d: %e", targetfd, errno);
-	    tcp_close(sess);
-	    return 1;
+	    goto l_opt_close_err;
 	}
 
 	/* disallow to be closed explicitly, after movefd set it to INTERNAL */
@@ -516,6 +552,9 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 
 	return 0;
 
+l_opt_close_err:
+	tcp_close(sess);
+	return 1;
     }
     else if (OPT_ISSET(ops,'a'))
     {
@@ -751,7 +790,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 }
 
 static struct builtin bintab[] = {
-    BUILTIN("ztcp", 0, bin_ztcp, 0, 3, 0, "acd:flLstv", NULL),
+    BUILTIN("ztcp", 0, bin_ztcp, 0, 2, 0, "ab:cd:fi:lLrstv", NULL),
 };
 
 static struct features module_features = {

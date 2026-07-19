@@ -89,7 +89,8 @@ subsect(Inbound Connections)
 cindex(sockets, inbound TCP)
 
 startitem()
-item(tt(ztcp) tt(-l) [ tt(-v) ] [ tt(-d) var(fd) ] var(port))(
+xitem(tt(ztcp) tt(-l) [ tt(-v) ] [ tt(-d) var(fd) ] [ tt(-b) var(address) ])
+item(SPACES()[ tt(-r) ] [ tt(-i) var(interface) ] var(port))(
 tt(ztcp -l) will open a socket listening on TCP
 var(port).  The socket will be added to the
 session table and the shell parameter tt(REPLY)
@@ -98,6 +99,20 @@ with that listener.
 
 If tt(-d) is specified, its argument will be taken as the target file
 descriptor for the connection.
+
+If tt(-b) is specified, its argument will be used instead of "0.0.0.0"
+as the host to bind to. var(address) has to be in numeric form.
+
+If tt(-i) is specified, SO_BINDTODEVICE is used to bind to the specified
+var(interface). Note that this socket option is Linux-only and may require root
+or CAP_NET_RAW on kernels before v5.7. It can be used in combination with -b
+which can be useful if, for example, an interface has multiple IP addresses.
+Note also that older tools like netstat will not show the bound device in their
+listings, but ss will.
+
+If tt(-r) is specified, the SO_REUSEADDR socket option is used, allowing
+binding to ports in the TIME_WAIT state when possible. If applying the option
+fails, or it is not supported, no error is reported.
 
 In order to elicit more verbose output, use tt(-v).
 )
