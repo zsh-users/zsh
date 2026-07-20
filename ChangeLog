@@ -1,3 +1,19 @@
+2026-07-19  Bart Schaefer  <schaefer@zsh.org>
+
+	* 54996: Doc/Zsh/mod_ksh93.yo: Remove obsolete doc reference to
+	subscript namerefs
+
+	* Philippe: 54943: Src/params.c: Do not export named references
+	even when ALLEXPORT is enabled
+
+	* Philippe: 54809: Src/Zle/compctl.c, Src/Zle/complete.c,
+	Src/Zle/compresult.c, Src/Zle/zle_main.c, Src/Zle/zle_params.c,
+	Src/Zle/zle_thingy.c, Src/Zle/zle_tricky.c: ZLE specials are
+	always in realparamtab and can't be namerefs
+
+	* Philippe: 54988: Test/K01nameref.ztst: Add comment clarifying
+	test from workers/54792
+
 2026-07-15  dana  <dana@dana.is>
 
 	* Philippe Altherr: 54941: Src/exec.c, Test/A06assign.ztst: Fix
