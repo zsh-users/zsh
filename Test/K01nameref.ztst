@@ -2349,4 +2349,14 @@ F:converting from association/array to string should work here too
 >B:16#FF
 >C:16#FF
 
+ typeset -n ref1
+ setopt allexport
+ ref1=var
+ typeset -n ref2
+ unsetopt allexport
+ typeset -p ref1 ref2
+0:references are not exported
+>typeset -n ref1=var
+>typeset -n ref2
+
 %clean
