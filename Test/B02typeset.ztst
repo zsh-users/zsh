@@ -1123,11 +1123,35 @@
 
  zmodload -u zsh/random
  echo v=${SRANDOM/<->/integer}
- typeset SRANDOM
+ typeset -g SRANDOM
  echo v=${SRANDOM/<->/integer}
 0:Global non -h variable doesn't hide special variable
 >v=integer
 >v=integer
+
+ zmodload -u zsh/random
+ echo v=${SRANDOM/<->/integer}
+ typeset -gh SRANDOM
+ echo v=${SRANDOM/<->/integer}
+0:Global -h variable doesn't hide special variable
+>v=integer
+>v=integer
+
+ zmodload -u zsh/random
+ echo v=${SRANDOM/<->/integer}
+ typeset SRANDOM
+ echo v=${SRANDOM/<->/integer}
+0:Local non -h variable doesn't hide special variable
+>v=integer
+>v=integer
+
+ zmodload -u zsh/random
+ echo v=${SRANDOM/<->/integer}
+ typeset -h SRANDOM
+ echo v=${SRANDOM/<->/integer}
+0:Local -h variable hides special variable
+>v=integer
+>v=
 
  zmodload -u zsh/random
  echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
@@ -1147,14 +1171,6 @@
 0:Global -h variable doesn't hide autoload variable
 >z=SRANDOM (zsh/random)
 >z=SRANDOM (zsh/random)
->v=integer
-
- zmodload -u zsh/random
- echo v=${SRANDOM/<->/integer}
- typeset SRANDOM
- echo v=${SRANDOM/<->/integer}
-0:Local non -h variable doesn't hide special variable
->v=integer
 >v=integer
 
  zmodload -u zsh/random
