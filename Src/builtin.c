@@ -2209,6 +2209,17 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    on |= PM_EXPORTED;
 	*/
     }
+    if (usepm && (on & PM_HIDE) &&
+	(pm->node.flags & (PM_SPECIAL|PM_AUTOLOAD)) &&
+	pm->level <= locallevel) {
+#if 0
+	zwarnnam(cname, "%s: can't change parameter attribute", pname);
+	/* return NULL; */	/* this has always been a no-op */
+#else
+	zerrnam(cname, "%s: can't change parameter attribute", pname);
+	return NULL;	/* this was previously a no-op */
+#endif
+    }
 
     /*
      * A parameter will be local if
@@ -2516,8 +2527,8 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	pm = createparam(pname, on & ~PM_READONLY);
 	if (!pm) {
 	    if (on & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z |
-		      PM_INTEGER | PM_EFLOAT | PM_FFLOAT))
-		zerrnam(cname, "can't change variable attribute: %s", pname);
+		      PM_INTEGER | PM_EFLOAT | PM_FFLOAT | PM_NAMEREF))
+		zerrnam(cname, "%s: can't change parameter attribute", pname);
 	    return NULL;
 	}
 	if (on & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) {
@@ -2689,14 +2700,14 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	else
 	    continue;
 	if (OPT_MINUS(ops,'n')) {
-	    if (bit & ~(PM_READONLY|PM_UPPER|PM_HIDEVAL)) {
+	    if (bit & ~(PM_READONLY|PM_UPPER|PM_HIDEVAL|PM_HIDE)) {
 		zwarnnam(name, "-%c not allowed with -n", optval);
 		/* return 1; */
 	    }
 	}
     }
     if (OPT_MINUS(ops,'n')) {
-	if ((on|off) & ~(PM_READONLY|PM_UPPER|PM_HIDEVAL)) {
+	if ((on|off) & ~(PM_READONLY|PM_UPPER|PM_HIDEVAL|PM_HIDE)) {
 	    /* zwarnnam(name, "no other attributes allowed with -n"); */
 	    return 1;
 	}

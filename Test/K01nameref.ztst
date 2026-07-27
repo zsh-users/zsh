@@ -2359,4 +2359,8 @@ F:converting from association/array to string should work here too
 >typeset -n ref1=var
 >typeset -n ref2
 
+ typeset -hn ref_h
+ typeset -Hn ref_H
+0:unsusual but legal option combinations
+
 %clean

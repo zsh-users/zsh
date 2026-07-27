@@ -1133,9 +1133,9 @@
  echo v=${SRANDOM/<->/integer}
  typeset -gh SRANDOM
  echo v=${SRANDOM/<->/integer}
-0:Global -h variable doesn't hide special variable
+1:Global -h variable doesn't hide special variable
 >v=integer
->v=integer
+?(eval):typeset:3: SRANDOM: can't change parameter attribute
 
  zmodload -u zsh/random
  echo v=${SRANDOM/<->/integer}
@@ -1168,10 +1168,9 @@
  typeset -gh SRANDOM
  echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
  echo v=${SRANDOM/<->/integer}
-0:Global -h variable doesn't hide autoload variable
+1:Global -h variable doesn't hide autoload variable
 >z=SRANDOM (zsh/random)
->z=SRANDOM (zsh/random)
->v=integer
+?(eval):typeset:3: SRANDOM: can't change parameter attribute
 
  zmodload -u zsh/random
  echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
