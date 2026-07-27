@@ -2263,7 +2263,6 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    return NULL;
 	}
 	if ((on & PM_UNIQUE) && !(pm->node.flags & PM_READONLY & ~off)) {
-	    Param apm;
 	    char **x;
 	    if (PM_TYPE(pm->node.flags) == PM_ARRAY) {
 		x = (*pm->gsu.a->getfn)(pm);
@@ -2274,10 +2273,10 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 		    (*pm->gsu.a->setfn)(pm, x);
 		} else if (pm->ename && x)
 		    arrfixenv(pm->ename, x);
-	    } else if (PM_TYPE(pm->node.flags) == PM_SCALAR && pm->ename &&
-		       (apm =
-			(Param) paramtab->getnode(paramtab, pm->ename))) {
-		x = (*apm->gsu.a->getfn)(apm);
+	    } else if (PM_TYPE(pm->node.flags) == PM_SCALAR && pm->ename) {
+		x = *(pm->node.flags & PM_SPECIAL
+		      ? (char ***)pm->u.data
+		      : ((struct tieddata *)pm->u.data)->arrptr);
 		uniqarray(x);
 		if (x)
 		    arrfixenv(pm->node.nam, x);

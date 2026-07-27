@@ -301,6 +301,20 @@
 >local unique tied array SCALAR
 >array local tied SCALAR array
 
+ typeset -T VAR var=(a b c b a)
+ () {
+   typeset -i var=1
+   typeset -g -U VAR
+   typeset -p VAR var
+ }
+ typeset -p VAR var
+0:Regression test for not segfaulting when uniquifying a hidden tied array
+F:BUG:The inner "typeset -p VAR" should contain the value of the outer "var"
+>typeset -g -UT VAR var=1
+>typeset -i var=1
+>typeset -UT VAR var=( a b c )
+>typeset -aT VAR var=( a b c )
+
  typeset -T SCALAR array
  typeset +T SCALAR
 1:Untying is prohibited
