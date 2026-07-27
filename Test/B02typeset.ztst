@@ -1131,11 +1131,13 @@
 
  zmodload -u zsh/random
  echo v=${SRANDOM/<->/integer}
- typeset -gh SRANDOM
+ { typeset -gh SRANDOM 2>&1; echo alive } always { echo status=$?; TRY_BLOCK_ERROR=0 }
  echo v=${SRANDOM/<->/integer}
-1:Global -h variable doesn't hide special variable
+0:Global -h variable doesn't hide special variable
 >v=integer
-?(eval):typeset:3: SRANDOM: can't change parameter attribute
+>(eval):typeset:3: SRANDOM: can't change parameter attribute
+>status=1
+>v=integer
 
  zmodload -u zsh/random
  echo v=${SRANDOM/<->/integer}
@@ -1165,12 +1167,15 @@
 
  zmodload -u zsh/random
  echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
- typeset -gh SRANDOM
+ { typeset -gh SRANDOM 2>&1; echo alive } always { echo status=$?; TRY_BLOCK_ERROR=0 }
  echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
  echo v=${SRANDOM/<->/integer}
-1:Global -h variable doesn't hide autoload variable
+0:Global -h variable doesn't hide autoload variable
 >z=SRANDOM (zsh/random)
-?(eval):typeset:3: SRANDOM: can't change parameter attribute
+>(eval):typeset:3: SRANDOM: can't change parameter attribute
+>status=1
+>z=SRANDOM (zsh/random)
+>v=integer
 
  zmodload -u zsh/random
  echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
