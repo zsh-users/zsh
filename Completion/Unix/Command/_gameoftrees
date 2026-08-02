@@ -1,0 +1,827 @@
+#compdef got gotadmin tog
+
+_got_branches() {
+  local branches
+
+  branches=$(got br -l 2>/dev/null | awk '{print $(NF-1)}' | sed 's/:$//')
+  reply=(${(f)branches})
+}
+
+_got_branch_names() {
+  local -a expl
+
+  _got_branches
+  _description branches expl 'branch name'
+  compadd "$@" "$expl[@]" -a reply
+}
+
+_got_worktree_repository_path() {
+  local repo
+
+  repo=$(got info 2>/dev/null | sed -n 's/^repository: //p')
+  reply=($repo)
+}
+
+_got_worktree_path() {
+  local root
+
+  root=$(got info 2>/dev/null | sed -n 's/^work tree: //p')
+  reply=($root)
+}
+
+_got_remotes() {
+  local repo remotes
+
+  _got_worktree_repository_path
+  repo=$reply[1]
+  reply=()
+  if [[ -z $repo || ! -f $repo/got.conf ]]; then
+    return
+  fi
+
+  remotes=$(grep -E '^remote' "$repo/got.conf" | awk -F'"' '{print $2}')
+  reply=(${(f)remotes})
+}
+
+_got_remote_names() {
+  local -a expl
+
+  _got_remotes
+  _description remotes expl 'remote repository'
+  compadd "$@" "$expl[@]" -a reply
+}
+
+_got_tags() {
+  local tags
+
+  tags=$(got ref -l refs/tags 2>/dev/null | awk '{print $1}' | sed 's#^refs/tags/##; s/:$//')
+  reply=(${(f)tags})
+}
+
+_got_tag_names() {
+  local -a expl
+
+  _got_tags
+  _description tags expl 'tag name'
+  compadd "$@" "$expl[@]" -a reply
+}
+
+_got_refs() {
+  local refs
+
+  refs=$(got ref -l 2>/dev/null | awk '{print $1}' | sed 's/:$//')
+  reply=(${(f)refs})
+}
+
+_got_ref_names() {
+  local -a expl
+
+  _got_refs
+  _description references expl 'reference name'
+  compadd "$@" "$expl[@]" -a reply
+}
+
+_got_branches_or_keywords() {
+  _alternative \
+    'keywords:keyword:(:base :head)' \
+    'branches:: _got_branch_names'
+}
+
+_got_status_codes() {
+  _values -s '' 'status code' \
+    'M[modified file]' \
+    'A[file scheduled for addition]' \
+    'D[file scheduled for deletion]' \
+    'C[modified or added file which contains merge conflicts]' \
+    '\![versioned file was expected on disk but is missing]' \
+    '~[versioned file is obstructed by a non-regular file]' \
+    '?[unversioned item not tracked by got]' \
+    'm[modified file mode (executable bit only)]' \
+    'N[non-existent path specified on the command line]'
+}
+
+_got_remove_status_codes() {
+  _values -s '' 'status code' \
+    'M[modified file (implies -f)]' \
+    '\![versioned file expected on disk but missing]' \
+    '?[unversioned file (deletion is permanent)]'
+}
+
+_got_status_paths() {
+  local root prefix paths
+
+  # 'got' subcommands like add/sg/rv/ug taking path argument, expect paths to
+  # be relative to $PWD
+  _got_worktree_path
+  root=$reply[1]
+  prefix=
+  [[ -n $root && $PWD == ${root}/* ]] && prefix=${PWD#$root/}/
+
+  # use substr because path can contain spaces
+  paths=$(got status . 2>/dev/null | grep "$1" | awk '{print substr($0, 4)}')
+  reply=(${(f)paths})
+  [[ -n $prefix ]] && reply=(${(@)reply#$prefix})
+}
+
+_got_add_paths() {
+  # only these status codes make sense for 'got add', same technique below
+  _got_status_paths '^?'
+}
+
+_got_add_files() {
+  local -a expl
+
+  _got_add_paths
+  _description files expl 'unversioned file'
+  compadd "$@" "$expl[@]" -f -a reply
+}
+
+_got_revert_paths() {
+  _got_status_paths '^[MADC!~m]'
+}
+
+_got_revert_files() {
+  local -a expl
+
+  _got_revert_paths
+  _description files expl 'changed file'
+  compadd "$@" "$expl[@]" -f -a reply
+}
+
+_got_stage_paths() {
+  _got_status_paths '^[AMD]'
+}
+
+_got_stage_files() {
+  local -a expl
+
+  _got_stage_paths
+  _description files expl 'unstaged file'
+  compadd "$@" "$expl[@]" -f -a reply
+}
+
+_got_unstage_paths() {
+  _got_status_paths '^.[AMD]'
+}
+
+_got_unstage_files() {
+  local -a expl
+
+  _got_unstage_paths
+  _description files expl 'staged file'
+  compadd "$@" "$expl[@]" -f -a reply
+}
+
+_got-init() {
+  _arguments : \
+    '-A[configure the hashing algorithm used for object IDs]:hashing algorithm:(sha1 sha256)' \
+    '-b[make HEAD point at the specified branch instead of main]:branch:' \
+    '1:repository path:_files -/'
+}
+
+_got-import() {
+  _arguments : \
+    '-b[create the specified branch]:branch:' \
+    '*-I[ignore files or directories matching the given pattern]:pattern:' \
+    '-m[use the specified log message]:message:' \
+    '-r[use the repository at the specified path]:repository path:_files -/' \
+    '1:directory:_files -/'
+}
+
+_got-clone() {
+  _arguments -s : \
+    '(-b -l)-a[fetch all branches from the remote repository]' \
+    '(-a -l)*-b[fetch the specified branch]:branch:' \
+    '(-l)-i[specify an SSH identity file]:identity file:_files' \
+    '(-l)-J[specify a jumphost for SSH connections]:jumphost:_ssh_hosts' \
+    '(-a -b -i -J -m -R)-l[list branches and tags available for fetching and exit]' \
+    '(-l)-m[create the cloned repository as a mirror]' \
+    '-q[suppress progress reporting]' \
+    '(-l)*-R[fetch an additional reference]:reference:' \
+    '*-v[verbose mode]' \
+    '1:repository URL:' \
+    '2::directory:_files -/'
+}
+
+_got-checkout() {
+  _arguments : \
+    '-b[check out the specified branch]:branch:_got_branch_names' \
+    '-c[check out the specified commit]:commit:_got_branches_or_keywords' \
+    '-E[proceed even if the work tree directory is not empty]' \
+    '-p[restrict the work tree to the specified path prefix]:path prefix:' \
+    '-q[silence progress output]' \
+    '1:repository path:_files -/' \
+    '2::work tree path:_files -/'
+}
+
+_got-update() {
+  _arguments : \
+    '-b[switch the work tree to the specified branch]:branch:_got_branch_names' \
+    '-c[update the work tree to the specified commit]:commit:_got_branches_or_keywords' \
+    '-q[silence progress output]' \
+    '(-b)*:path:_files'
+}
+
+_got-log() {
+  _arguments : \
+    '-b[display commits merged in from other branches]' \
+    '-C[set the number of diff context lines shown with -p]:context lines:' \
+    '-c[start traversing history at the specified commit]:commit:_got_branches_or_keywords' \
+    '(-s)-d[display diffstat of changes in each commit]' \
+    '-l[limit history traversal to the given number of commits]:limit:' \
+    '(-s)-P[display paths changed in each commit]' \
+    '(-s)-p[display the patch of modifications in each commit]' \
+    '-R[display commits in reverse order]' \
+    '-r[use the repository at the specified path]:repository path:_files -/' \
+    '-S[only show commits matching the given search pattern]:search pattern:' \
+    '(-d -p -P)-s[display a short one-line summary of each commit]' \
+    '-t[display commits in topological order]' \
+    '-x[stop traversing history after the specified commit]:commit:_got_branches_or_keywords' \
+    '*:path:_files'
+}
+
+_got-diff() {
+  _arguments : \
+    '-a[treat file contents as ASCII text]' \
+    '-C[set the number of context lines shown in the diff]:context lines:' \
+    '(-P)*-c[show differences between commits]:commit:_got_branches_or_keywords' \
+    '-d[display diffstat of changes]' \
+    '(-c)-P[interpret all arguments as paths]' \
+    '-r[use the repository at the specified path]:repository path:_files -/' \
+    '-s[show staged changes]' \
+    '-w[ignore whitespace-only changes]' \
+    '*:object or path:_files'
+}
+
+_got-blame() {
+  _arguments : \
+    '-c[start traversing history at the specified commit]:commit:_got_branches_or_keywords' \
+    '-r[use the repository at the specified path]:repository path:_files -/' \
+    '1:path:_files'
+}
+
+_got-tree() {
+  _arguments : \
+    '-c[list files and directories as they appear in the specified commit]:commit:_got_branches_or_keywords' \
+    '-i[show object IDs of files and directories]' \
+    '-R[recurse into sub-directories]' \
+    '-r[use the repository at the specified path]:repository path:_files -/' \
+    '*:path:_files'
+}
+
+_got-ref() {
+  _arguments : \
+    '(-d -l -s)-c[create or change the reference to point at the specified object]:object:_got_branches_or_keywords' \
+    '(-c -l -s)-d[delete the reference]' \
+    '(-c -d -s)-l[list references]' \
+    '-r[use the repository at the specified path]:repository path:_files -/' \
+    '(-c -d -l)-s[create or change a symbolic reference to point at the specified reference]:reference:_got_ref_names' \
+    '-t[sort listed references by modification time (requires -l)]' \
+    '1::reference name:_got_ref_names'
+}
+
+_got-branch() {
+  _arguments : \
+    '-c[make the new branch point at the specified commit]:commit:_got_branches_or_keywords' \
+    '-d[delete the specified branch]:branch:_got_branch_names' \
+    '-l[list all existing branches]' \
+    '-n[do not switch and update the work tree after creating a branch]' \
+    '-r[use the repository at the specified path]:repository path:_files -/' \
+    '-t[sort listed branches by modification time (requires -l)]' \
+    '1::branch name:'
+}
+
+_got-tag() {
+  _arguments -s : \
+    '-c[make the new tag point at the specified commit]:commit:_got_branches_or_keywords' \
+    '-l[list all existing tags]' \
+    '-m[use the specified tag message]:message:' \
+    '-r[use the repository at the specified path]:repository path:_files -/' \
+    '-S[sign the tag with the given signer identity]:signer identity file:_files' \
+    '-s[display a short one-line summary of each tag (requires -l)]' \
+    '-V[verify tag object signatures]' \
+    '*-v[verbose mode]' \
+    '1::tag name:_got_tag_names'
+}
+
+_got-add() {
+  _arguments : \
+    '-I[add files even if they match an ignore pattern]' \
+    '-R[permit recursion into directories]' \
+    '*:path:_got_add_files'
+}
+
+_got-remove() {
+  _arguments : \
+    '-f[perform the operation even if a file is modified or missing]' \
+    '-I[remove unversioned files even if they match an ignore pattern]' \
+    '-k[keep affected files on disk]' \
+    '-R[permit recursion into directories]' \
+    '-s[only delete files matching the given status codes]:status codes:_got_remove_status_codes' \
+    '*:path:_files'
+}
+
+_got-patch() {
+  _arguments : \
+    '-c[use the specified commit as a merge base]:commit:_got_branches_or_keywords' \
+    '-n[do not modify the work tree]' \
+    '-p[strip the given number of leading path components]:strip count:' \
+    '-R[reverse the patch before applying it]' \
+    '1::patch file:_files'
+}
+
+_got-revert() {
+  _arguments : \
+    '-F[read y/n/q responses from the specified file]:response script:_files' \
+    '-p[interactively select or reject changes to revert]' \
+    '-R[permit recursion into directories]' \
+    '*:path:_got_revert_files'
+}
+
+_got-commit() {
+  _arguments : \
+    '-A[set author information for the new commit]:author:' \
+    '-C[allow committing files in conflicted status]' \
+    '(-m)-F[use the prepared log message stored at the specified path]:log message file:_files' \
+    '(-F)-m[use the specified log message]:message:' \
+    '-N[do not open the commit message in an editor]' \
+    '-n[do not generate a diff of to-be-committed changes]' \
+    '-S[allow symbolic links which point outside of version control]' \
+    '*:path:_files'
+}
+
+_got-fetch() {
+  _arguments -s : \
+    '(-b -l -X)-a[fetch all branches from the remote repository]' \
+    '(-a -l -X)*-b[fetch the specified branch from the remote repository]:branch:_got_branch_names' \
+    '(-l -X)-d[delete branches and tags no longer present on the remote]' \
+    '(-l -X)-i[specify an SSH identity file]:identity file:_files' \
+    '(-l -X)-J[specify a jumphost for SSH connections]:jumphost:_ssh_hosts' \
+    '(-a -b -d -i -J -R -t -X)-l[list branches and tags available for fetching and exit]' \
+    '-q[suppress progress reporting]' \
+    '(-l -X)*-R[fetch an additional reference]:reference:' \
+    '-r[use the repository at the specified path]:repository path:_files -/' \
+    '(-l -X)-t[replace existing tags]' \
+    '*-v[verbose mode]' \
+    '(-a -b -d -i -J -l -R -t)-X[delete all references for the given remote repository]' \
+    '1::remote repository:_got_remote_names'
+}
+
+_got-cherrypick() {
+  _arguments : \
+    '(-X)-l[list log messages recorded by cherrypick operations]' \
+    '(-l)-X[delete log messages created by previous cherrypick operations]' \
+    '1::commit:_got_branches_or_keywords'
+}
+
+_got-backout() {
+  _arguments : \
+    '(-X)-l[list log messages recorded by backout operations]' \
+    '(-l)-X[delete log messages created by previous backout operations]' \
+    '1::commit:_got_branches_or_keywords'
+}
+
+_got-rebase() {
+  _arguments : \
+    '(-C -c -l -X)-a[abort an interrupted rebase operation]' \
+    '(-a -l -X)-c[continue an interrupted rebase operation]' \
+    '(-a -l -X)-C[allow files in conflicted status when continuing a rebase (requires -c)]' \
+    '(-a -C -c -X)-l[list past rebase operations]' \
+    '(-a -C -c -l)-X[delete backups of past rebase operations]' \
+    '(-a -c)1::branch:_got_branch_names'
+}
+
+_got-histedit() {
+  _arguments : \
+    '(-c -C -d -e -F -f -l -m -X)-a[abort an interrupted histedit operation]' \
+    '(-a -d -e -F -f -l -m -X)-c[continue an interrupted histedit operation]' \
+    '(-a -d -e -F -f -l -m -X)-C[allow files in conflicted status when continuing (requires -c)]' \
+    '(-a -c -C -e -F -f -l -m -X)-d[drop all commits]' \
+    '(-a -c -C -d -F -f -l -m -X)-e[interrupt for editing after merging each commit]' \
+    '(-a -c -C -d -e -f -l -m -X)-F[use the specified histedit script]:histedit script:_files' \
+    '(-a -c -C -d -e -F -l -m -X)-f[fold all commits into a single commit]' \
+    '(-a -c -C -d -e -F -f -m -X)-l[list past histedit operations]' \
+    '(-a -c -C -d -e -F -f -l -X)-m[edit log messages only]' \
+    '(-a -c -C -d -e -F -f -l -m)-X[delete backups of past histedit operations]' \
+    '(-a -c -d -e -f -m)1::branch:_got_branch_names'
+}
+
+_got-integrate() {
+  _arguments : \
+    '1:branch:_got_branch_names'
+}
+
+_got-merge() {
+  _arguments : \
+    '(-c -C -M -n)-a[abort an interrupted merge operation]' \
+    '(-a -M -n)-c[continue an interrupted merge operation]' \
+    '(-a -M -n)-C[allow files in conflicted status when continuing (requires -c)]' \
+    '(-a -c -C)-M[create a merge commit even if the branches have not diverged]' \
+    '(-a -c -C)-n[merge changes but do not create a merge commit immediately]' \
+    '(-a -c)1::branch:_got_branch_names'
+}
+
+_got-stage() {
+  _arguments : \
+    '-F[read y/n/q responses from the specified file]:response script:_files' \
+    '-l[list already staged paths]' \
+    '-p[interactively select or reject changes for staging]' \
+    '-S[allow staging of symbolic links pointing outside version control]' \
+    '*:path:_got_stage_files'
+}
+
+_got-unstage() {
+  _arguments : \
+    '-F[read y/n/q responses from the specified file]:response script:_files' \
+    '-p[interactively select or reject changes for unstaging]' \
+    '*:path:_got_unstage_files'
+}
+
+_got-cat() {
+  _arguments : \
+    '-c[look up paths in the specified commit]:commit:_got_branches_or_keywords' \
+    '-P[interpret all arguments as paths]' \
+    '-r[use the repository at the specified path]:repository path:_files -/' \
+    '*:object or path:_files'
+}
+
+_got-info() {
+  _arguments : \
+    '*:path:_files'
+}
+
+_got-send() {
+  _arguments -s : \
+    '(-b)-a[send all branches from the local repository]' \
+    '(-a)*-b[send the specified branch]:branch:_got_branch_names' \
+    '*-d[delete the specified branch on the remote repository]:branch:_got_branch_names' \
+    '-f[force the server to overwrite existing branches or tags]' \
+    '-i[specify an SSH identity file]:identity file:_files' \
+    '-J[specify a jumphost for SSH connections]:jumphost:_ssh_hosts' \
+    '-q[suppress progress reporting]' \
+    '-r[use the repository at the specified path]:repository path:_files -/' \
+    '(-t)-T[send all tags from the local repository]' \
+    '(-T)*-t[send the specified tag]:tag:_got_tag_names' \
+    '*-v[verbose mode]' \
+    '1::remote repository:_got_remote_names'
+}
+
+_got-status() {
+  _arguments : \
+    '-I[show unversioned files even if they match an ignore pattern]' \
+    '(-s)-S[suppress files matching the given status codes]:status codes:_got_status_codes' \
+    '(-S)-s[only show files matching the given status codes]:status codes:_got_status_codes' \
+    '*:path:_files'
+}
+
+_got() {
+  local curcontext="$curcontext" line state
+
+  _arguments -C \
+    '1: :->command' \
+    '*::arg:->args'
+
+  case $state in
+  command)
+    _values 'got command' \
+      'init[create a new empty repository]' \
+      'im[create an initial commit from a directory (alias for import)]' \
+      'cl[clone a repository (alias for clone)]' \
+      'fe[fetch new changes from a remote repository (alias for fetch)]' \
+      'co[check out a work tree from a repository (alias for checkout)]' \
+      'up[update a work tree (alias for update)]' \
+      'log[display history of a repository]' \
+      'di[display differences between files or commits (alias for diff)]' \
+      'bl[display line-by-line history of a file (alias for blame)]' \
+      'tr[display a repository tree listing (alias for tree)]' \
+      'st[show the modification status of files in a work tree (alias for status)]' \
+      'ref[manage references in a repository]' \
+      'br[create, list, or delete branches (alias for branch)]' \
+      'tag[manage tags in a repository]' \
+      'add[schedule unversioned files for addition]' \
+      'rm[remove files from a work tree (alias for remove)]' \
+      'pa[apply changes from a patch file (alias for patch)]' \
+      'rv[revert local changes in a work tree (alias for revert)]' \
+      'ci[create a new commit (alias for commit)]' \
+      'se[send new changes to a remote repository (alias for send)]' \
+      'cy[merge changes from a single commit (alias for cherrypick)]' \
+      'bo[reverse-merge changes from a single commit (alias for backout)]' \
+      'rb[rebase commits onto the tip of the current branch (alias for rebase)]' \
+      'he[edit commit history (alias for histedit)]' \
+      'ig[integrate a branch into the current branch (alias for integrate)]' \
+      'mg[merge a branch into the current branch (alias for merge)]' \
+      'sg[stage local changes for the next commit (alias for stage)]' \
+      'ug[merge staged changes back into the work tree (alias for unstage)]' \
+      'cat[print contents of repository objects]' \
+      'info[display work tree meta-data]'
+    ;;
+  args)
+    curcontext=${curcontext%:*}-$line[1]:
+    case $line[1] in
+    init)
+      _got-init
+      ;;
+    import|im)
+      _got-import
+      ;;
+    clone|cl)
+      _got-clone
+      ;;
+    fetch|fe)
+      _got-fetch
+      ;;
+    checkout|co)
+      _got-checkout
+      ;;
+    update|up)
+      _got-update
+      ;;
+    log)
+      _got-log
+      ;;
+    diff|di)
+      _got-diff
+      ;;
+    blame|bl)
+      _got-blame
+      ;;
+    tree|tr)
+      _got-tree
+      ;;
+    status|st)
+      _got-status
+      ;;
+    ref)
+      _got-ref
+      ;;
+    branch|br)
+      _got-branch
+      ;;
+    tag)
+      _got-tag
+      ;;
+    add)
+      _got-add
+      ;;
+    remove|rm)
+      _got-remove
+      ;;
+    patch|pa)
+      _got-patch
+      ;;
+    revert|rv)
+      _got-revert
+      ;;
+    commit|ci)
+      _got-commit
+      ;;
+    send|se)
+      _got-send
+      ;;
+    cherrypick|cy)
+      _got-cherrypick
+      ;;
+    backout|bo)
+      _got-backout
+      ;;
+    rebase|rb)
+      _got-rebase
+      ;;
+    histedit|he)
+      _got-histedit
+      ;;
+    integrate|ig)
+      _got-integrate
+      ;;
+    merge|mg)
+      _got-merge
+      ;;
+    stage|sg)
+      _got-stage
+      ;;
+    unstage|ug)
+      _got-unstage
+      ;;
+    cat)
+      _got-cat
+      ;;
+    info)
+      _got-info
+      ;;
+    *)
+      _default
+      ;;
+    esac
+    ;;
+  esac
+}
+
+_gotadmin-init() {
+  _arguments : \
+    '-A[configure the hashing algorithm used for object IDs]:hashing algorithm:(sha1 sha256)' \
+    '-b[make HEAD point at the specified branch instead of main]:branch:' \
+    '1:repository path:_files -/'
+}
+
+_gotadmin-info() {
+  _arguments : \
+    '-r[use the repository at the specified path]:repository path:_files -/'
+}
+
+_gotadmin-pack() {
+  _arguments : \
+    '-a[add objects even if already packed in a different pack file]' \
+    '-D[force the use of ref-delta representation]' \
+    '-q[suppress progress reporting]' \
+    '-r[use the repository at the specified path]:repository path:_files -/' \
+    '*-x[exclude objects reachable via the specified reference]:reference:_got_ref_names' \
+    '*:reference:_got_ref_names'
+}
+
+_gotadmin-indexpack() {
+  _arguments : \
+    '1:pack file path:_files'
+}
+
+_gotadmin-listpack() {
+  _arguments : \
+    '-h[show object sizes in human-readable form]' \
+    '-s[display statistics about the pack file]' \
+    '1:pack file path:_files'
+}
+
+_gotadmin-cleanup() {
+  _arguments : \
+    '-a[delete all redundant loose and packed objects]' \
+    '-n[perform a trial run without removing any files]' \
+    '-p[remove pack index files lacking a corresponding pack file]' \
+    '-q[suppress progress reporting and disk space summary]' \
+    '-r[use the repository at the specified path]:repository path:_files -/'
+}
+
+_gotadmin-dump() {
+  _arguments : \
+    '-q[suppress progress reporting]' \
+    '-r[use the repository at the specified path]:repository path:_files -/' \
+    '*-x[exclude objects reachable via the specified reference]:reference:_got_ref_names' \
+    '*:reference:_got_ref_names'
+}
+
+_gotadmin-load() {
+  _arguments : \
+    '(-n)-l[list references available for loading from the bundle and exit]:bundle path:_files' \
+    '(-l)-n[verify the bundle without installing any data]' \
+    '-q[suppress progress reporting]' \
+    '-r[use the repository at the specified path]:repository path:_files -/' \
+    '(-l)*:reference:'
+}
+
+_gotadmin() {
+  local curcontext="$curcontext" line state
+
+  _arguments -C \
+    '1: :->command' \
+    '*::arg:->args'
+
+  case $state in
+  command)
+    _values 'gotadmin command' \
+      'init[create a new empty repository]' \
+      'info[display information about a repository]' \
+      'pack[generate a new pack file and pack index]' \
+      'ix[create a pack index for a pack file (alias for indexpack)]' \
+      'ls[list the contents of a pack file (alias for listpack)]' \
+      'cl[repack and purge unreferenced objects (alias for cleanup)]' \
+      'dump[dump repository contents in Git bundle format]' \
+      'load[load a Git bundle into a repository]'
+    ;;
+  args)
+    curcontext=${curcontext%:*}-$line[1]:
+    case $line[1] in
+    init)
+      _gotadmin-init
+      ;;
+    info)
+      _gotadmin-info
+      ;;
+    pack)
+      _gotadmin-pack
+      ;;
+    indexpack|ix)
+      _gotadmin-indexpack
+      ;;
+    listpack|ls)
+      _gotadmin-listpack
+      ;;
+    cleanup|cl)
+      _gotadmin-cleanup
+      ;;
+    dump)
+      _gotadmin-dump
+      ;;
+    load)
+      _gotadmin-load
+      ;;
+    *)
+      _default
+      ;;
+    esac
+    ;;
+  esac
+}
+
+_tog-log() {
+  _arguments : \
+    '-b[display individual commits merged in from other branches]' \
+    '-c[start traversing history at the specified commit]:commit:_got_branches_or_keywords' \
+    '-r[use the repository at the specified path]:repository path:_files -/' \
+    '*:path:_files'
+}
+
+_tog-diff() {
+  _arguments -s : \
+    '-a[treat file contents as ASCII text]' \
+    '-C[set the number of context lines shown in the diff]:context lines:' \
+    '*-c[show differences between commits]:commit:_got_branches_or_keywords' \
+    '-r[use the repository at the specified path]:repository path:_files -/' \
+    '-s[show staged changes]' \
+    '-w[ignore whitespace-only changes]' \
+    '*:object or path:_files'
+}
+
+_tog-blame() {
+  _arguments : \
+    '-c[start traversing history at the specified commit]:commit:_got_branches_or_keywords' \
+    '-r[use the repository at the specified path]:repository path:_files -/' \
+    '1:path:_files'
+}
+
+_tog-tree() {
+  _arguments : \
+    '-c[start traversing history at the specified commit]:commit:_got_branches_or_keywords' \
+    '-r[use the repository at the specified path]:repository path:_files -/' \
+    '*:path:_files'
+}
+
+_tog-ref() {
+  _arguments : \
+    '-r[use the repository at the specified path]:repository path:_files -/'
+}
+
+_tog() {
+  local curcontext="$curcontext" line state
+
+  _arguments -C \
+    '1: :->command' \
+    '*::arg:->args'
+
+  case $state in
+  command)
+    _values 'tog command' \
+      'log[display history of a repository]' \
+      'diff[display work tree changes or differences between commits]' \
+      'blame[display line-by-line history of a file]' \
+      'tree[display a repository tree listing]' \
+      'ref[display references in a repository]'
+    ;;
+  args)
+    curcontext=${curcontext%:*}-$line[1]:
+    case $line[1] in
+    log)
+      _tog-log
+      ;;
+    diff)
+      _tog-diff
+      ;;
+    blame)
+      _tog-blame
+      ;;
+    tree)
+      _tog-tree
+      ;;
+    ref)
+      _tog-ref
+      ;;
+    *)
+      _default
+      ;;
+    esac
+    ;;
+  esac
+}
+
+_gameoftrees() {
+  case $service in
+  (got)
+    _got "$@"
+    ;;
+  (gotadmin)
+    _gotadmin "$@"
+    ;;
+  (tog)
+    _tog "$@"
+    ;;
+  esac
+}
+
+_gameoftrees "$@"

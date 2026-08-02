@@ -1,5 +1,8 @@
 2026-10-09  Oliver Kiddle  <opk@zsh.org>
 
+	* Mikhail Pchelin: 55056: Completion/Unix/Command/_gameoftrees:
+	got (gameoftrees) suite completion
+
 	* Christopher Bock: users/30736: Completion/Unix/Command/_units:
 	handle more units, in particular those named with underscores
 
