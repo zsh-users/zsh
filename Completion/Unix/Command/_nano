@@ -9,7 +9,7 @@ args=(
   '(-C --backupdir)'{-C+,--backupdir=}'[save uniquely numbered backups to specified directory]:backup directory:_directories'
   '(-D --boldtext)'{-D,--boldtext}'[use bold instead of reverse video text]'
   '(-E --tabstospaces)'{-E,--tabstospaces}'[convert typed tabs to spaces]'
-  '(-F --multibuffer)'{-F,--multibuffer}'[read file into new buffer by default]'
+  '(-F --multibuffer --newbuffer)'{-F,--multibuffer,--newbuffer}'[read file into new buffer by default]'
   '(-G --locking)'{-G,--locking}'[use vim-style lock files]'
   '(-H --historylog)'{-H,--historylog}'[remember search/replace strings]'
   '(-I --ignorercfiles)'{-I,--ignorercfiles}"[don't look at nanorc files]"

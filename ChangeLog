@@ -1,5 +1,8 @@
 2026-10-09  Oliver Kiddle  <opk@zsh.org>
 
+	* Shohei YOSHIDA: 55063: Completion/Unix/Command/_nano:
+	add --newbuffer option
+
 	* Mikhail Pchelin: 55056: Completion/Unix/Command/_gameoftrees:
 	got (gameoftrees) suite completion
 
