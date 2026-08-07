@@ -31,43 +31,44 @@ _arguments -C -s -S \
 # need to be a single argument.  Units themselves don't have special
 # characters, so it's safe to take just the characters around the
 # cursor.
-compset -P '*[^[:alnum:]]'
-compset -S '[^[:alnum:]]*'
+compset -P '*[^[:alnum:]_]'
+compset -S '[^[:alnum:]_]*'
 
 # Find the units data.
 local datfile
-local -a testfiles
-testfiles=(
-  /usr/share/units.dat		# GNU on Fedora
+local -a unitsfiles
+unitsfiles=(
+  /usr/share/units.dat          # GNU on Fedora
   /usr/share/units/units.dat    # on gentoo
-  /usr/share/units/definitions.units # on Debian, units 2.00 and newer
+  /usr/share/units/*.units      # on Debian, units 2.00 and newer
   /usr/local/share/units.dat    # GNU DIY install
-  /usr/share/lib/unittab	# Solaris
+  /usr/share/lib/unittab        # Solaris
   /usr/share/misc/units.lib     # OpenBSD [as of 2020]; also FreeBSD 9.1
   /usr/share/misc/definitions.units     # FreeBSD 12.1
   /usr/share/misc/units.dat     # on Debian, units 1.88 and older
 )
 
+# This currently only allows completion on the first occurence if we provide
+# something like -f file1 -f file2 -f file3.
+# TODO: Use all provided files.
 datfile=${opt_args[-f]:-${opt_args[--file]}}
-if [[ -z $datfile ]]; then
-  for datfile in $testfiles; do
-    [[ -f $datfile ]] && break
-  done
-fi
-
-if [[ ! -f $datfile ]]; then
-  _message "Data file for units not found."
-  return
+if [[ ! -z $datfile ]]; then
+  if [[ -f $datfile ]]; then
+    unitsfiles=( $datfile )
+  else
+    _message "Data file for units not found."
+    return
+  fi
 fi
 
 local -a all units pfxs
 # Solaris uses / to start a comment, else #.
 # could cache this, but it's not that big a deal...
-all=($(awk '$1 !~ /^[\/#]/ { print $1 }' $datfile))
+all=( $( awk '$1 !~ /^[\/#]/ { print $1 }' $^unitsfiles(N) ) )
 # prefixes end in a -
-pfxs=(${${all:#^[[:alnum:]]##-}%%-})
+pfxs=( ${${all:#^[[:alnum:]]##-}%%-} )
 # units may include regular or piecewise linear functions
-units=(${${all:#^[[:alnum:]]##([\(\]]*|)}%%\(*})
+units=( ${${all:#^[[:alnum:]_]##([\(\]]*|)}%%\(*} )
 
 if (( ${#units} )); then
   _alternative 'unitprefixes:unit prefix:compadd -S "" -a pfxs' \

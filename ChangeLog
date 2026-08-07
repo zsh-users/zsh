@@ -1,5 +1,8 @@
 2026-10-09  Oliver Kiddle  <opk@zsh.org>
 
+	* Christopher Bock: users/30736: Completion/Unix/Command/_units:
+	handle more units, in particular those named with underscores
+
 	* 55202: Src/params.c: fix for direct array index assignments
 
 	* 55156: Src/params.c: fix Solaris compiler build error
