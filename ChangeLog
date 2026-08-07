@@ -1,3 +1,7 @@
+2026-08-13  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 55065: Src/jobs.c: fix null deref in havefiles
+
 2026-08-05  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 55055: Src/builtin.c, Test/A07control.ztst: break: more

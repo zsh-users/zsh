@@ -1617,7 +1617,7 @@ havefiles(void)
 
     for (i = 1; i <= maxjob; i++)
 	if (jobtab[i].stat && jobtab[i].filelist &&
-	    peekfirst(jobtab[i].filelist)) {
+	    nonempty(jobtab[i].filelist)) {
 	    return 1;
 	}
     return 0;
