@@ -1983,13 +1983,17 @@ _git-sparse-checkout() {
       case $line[1] in
         init|reapply)
           _arguments \
-            '--cone[allow for better performance with a limited set of patterns]' \
-            '--no-sparse-index[rewrite index to not be sparse]' && ret=0
+            '(--no-cone)--cone[allow for better performance with a limited set of patterns]' \
+            '(--cone)--no-cone[disallow for better performance with a limited set of patterns]' \
+            '(--no-sparse-index)--sparse-index[do not rewrite index to not be sparse]' \
+            '(--sparse-index)--no-sparse-index[rewrite index to not be sparse]' && ret=0
         ;;
         set|add)
           _arguments -S \
-            '--cone[initialize the sparse-checkout in cone mode]' \
-            '--sparse-index[toggle the use of a sparse index]' \
+            '(--no-cone)--cone[initialize the sparse-checkout in cone mode]' \
+            '(--cone)--no-cone[do not initialize the sparse-checkout in cone mode]' \
+            '(--no-sparse-index)--sparse-index[toggle the use of a sparse index]' \
+            '(--sparse-index)--no-sparse-index[do not toggle the use of a sparse index]' \
             '--skip-checks[skip some sanity checks on the given paths that might give false positives]' \
             '(*)--stdin[read patterns from input]' \
             '*:pattern:_files' && ret=0
@@ -1997,8 +2001,10 @@ _git-sparse-checkout() {
         check-rules)
           _arguments \
            '-z[terminate input and output files by a NUL character]' \
-           '--cone[interpret rules file patterns as cone mode patterns]' \
-           '--rules-file=[use patterns in specified file]:file:_files' && ret=0
+           '(--no-cone)--cone[interpret rules file patterns as cone mode patterns]' \
+           '(--cone)--no-cone[do not interpret rules file patterns as cone mode patterns]' \
+           '(--no-rules-file)--rules-file=[use patterns in specified file]:file:_files' \
+           '(--rules-file)--no-rules-file[do not use patterns in specified file]' && ret=0
         ;;
         clean)
           _arguments \
