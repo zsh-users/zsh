@@ -1,5 +1,8 @@
 2026-08-13  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 55076: Src/exec.c: _exit in zexecve when the interpreter
+	doesn't work
+
 	* 55065: Src/jobs.c: fix null deref in havefiles
 
 2026-08-05  Mikael Magnusson  <mikachu@gmail.com>

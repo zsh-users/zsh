@@ -552,10 +552,11 @@ zexecve(char *pth, char **argv, char **newenvp)
 		    for (t0 = 0; t0 != ct; t0++)
 			if (execvebuf[t0] == '\n')
 			    break;
-		    if (t0 == ct)
+		    if (t0 == ct) {
 			zerr("%s: bad interpreter: %s: %e", pth,
 			     metafy(execvebuf + 2, -1, META_STATIC), eno);
-		    else {
+			_exit(126);
+		    } else {
 			while (inblank(execvebuf[t0]))
 			    execvebuf[t0--] = '\0';
 			for (ptr = execvebuf + 2; *ptr && *ptr == ' '; ptr++);
@@ -579,6 +580,7 @@ zexecve(char *pth, char **argv, char **newenvp)
 			    }
 			    zerr("%s: bad interpreter: %s: %e", pth,
 				 metafy(ptr2, -1, META_STATIC), eno);
+			    _exit(126);
 			} else if (*ptr) {
 			    *ptr = '\0';
 			    argv[-2] = ptr2;
