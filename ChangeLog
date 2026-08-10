@@ -1,5 +1,8 @@
 2026-11-01  Oliver Kiddle  <opk@zsh.org>
 
+	* Daniel Colascione: 55080: Src/init.c, Test/X06termquery.ztst,
+	OSC133 outputs shouldn't be printed in non-interactive mode
+
 	* 55232: Completion/BSD/Type/_bsd_disks,
 	Completion/Unix/Command/_chmod, Completion/Unix/Command/_chown,
 	Completion/Unix/Command/_date, Completion/Unix/Command/_df,

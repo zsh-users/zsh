@@ -224,7 +224,7 @@ loop(int toplevel, int justonce)
 		 */
 		errflag &= ~ERRFLAG_ERROR;
 	    }
-	    if (toplevel && zle_load_state == 1)
+	    if (interact && toplevel && zle_load_state == 1)
 		zleentry(ZLE_CMD_PREEXEC);
 	    if (stopmsg)	/* unset 'you have stopped jobs' flag */
 		stopmsg--;
@@ -232,7 +232,7 @@ loop(int toplevel, int justonce)
 	    tok = toksav;
 	    if (toplevel) {
 		noexitct = 0;
-		if (zle_load_state == 1)
+		if (interact && zle_load_state == 1)
 		    zleentry(ZLE_CMD_POSTEXEC);
 	    }
 	}

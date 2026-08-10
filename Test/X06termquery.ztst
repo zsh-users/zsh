@@ -19,6 +19,19 @@
       { zpty -r zsh } | tr -d '\015' | grep -v '^ '
       zpty -d
     }
+    noninteractive_integration() {
+      local REPLY chunk out=
+      zpty -d
+      zpty zsh "${(q)ZTST_testdir}/../Src/zsh +i -f"
+      zpty -w zsh "module_path=( ${(j< >)${(@q-)module_path}} \$module_path )"
+      zpty -w zsh 'zmodload zsh/zle && print -r -- PAYLOAD'
+      zpty -w zsh exit
+      while zpty -r zsh chunk; do
+        out+=$chunk
+      done
+      zpty -d
+      [[ $out == *PAYLOAD* && $out != *$'\e]133;'* ]]
+    }
   else
     ZTST_unimplemented='the zsh/zpty module is not available'
   fi
@@ -105,6 +118,9 @@
 0:paste over from clipboard
 >replace
 >typeset -a .term.extensions=( -bracketed-paste -integration )
+
+  noninteractive_integration
+0:Noninteractive shells do not emit OSC 133 markers after loading ZLE
 
 %clean
 
