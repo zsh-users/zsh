@@ -248,7 +248,7 @@ bin_private(char *nam, char **args, LinkList assigns, Options ops, int func)
     fakelevel = locallevel;
     startparamscope();
     from_typeset = bin_typeset("private", args, assigns, ops, func);
-    scanhashtable(paramtab, 0, 0, 0, makeprivate, 0);
+    scanhashtable(realparamtab, 0, 0, 0, makeprivate, 0);
     endparamscope();
     fakelevel = ofake;
     unqueue_signals();
@@ -552,9 +552,9 @@ wrap_private(Eprog prog, FuncWrap w, char *name)
     if (private_wraplevel < locallevel /* && strcmp(name, "(anon)") != 0 */) {
 	int owl = private_wraplevel;
 	private_wraplevel = locallevel;
-	scanhashtable(paramtab, 0, 0, 0, scopeprivate, PM_UNSET);
+	scanhashtable(realparamtab, 0, 0, 0, scopeprivate, PM_UNSET);
 	runshfunc(prog, w, name);
-	scanhashtable(paramtab, 0, 0, 0, scopeprivate, 0);
+	scanhashtable(realparamtab, 0, 0, 0, scopeprivate, 0);
 	private_wraplevel = owl;
 	return 0;
     }
