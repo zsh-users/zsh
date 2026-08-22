@@ -2055,7 +2055,8 @@ typeset_single(char *cname, char *pname, Param pm, int func,
      * POSIXBUILTINS horror: we need to retain the 'readonly' or 'export'
      * flags of an unset parameter.
      */
-    usepm = pm && (!(pm->node.flags & PM_UNSET) || OPT_ISSET(ops, 'p') ||
+    usepm = pm && (!(pm->node.flags & PM_UNSET) ||
+		   (pm->node.flags & PM_DECLARED) || OPT_ISSET(ops, 'p') ||
 		   (isset(POSIXBUILTINS) &&
 		    (pm->node.flags & (PM_READONLY|PM_EXPORTED))));
 
@@ -2289,7 +2290,8 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	/*
 	 * Keep unset if using readonly in POSIX mode unless specified otherwise.
 	 */
-	if ((usepm != 2) && !((on & PM_READONLY) && isset(POSIXBUILTINS)))
+	if ((usepm != 2) && !((on & PM_READONLY) && isset(POSIXBUILTINS)) &&
+	    !(pm->node.flags & PM_DECLARED))
 	    off |= PM_UNSET;
 	pm->node.flags = (pm->node.flags | (on & ~PM_READONLY)) & ~off;
 	if (on & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) {

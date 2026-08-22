@@ -174,6 +174,34 @@
 >inner
 >outer
 
+ addflags() {
+   setopt localoptions typeset_to_unset
+   if ((ARGC == 2)); then typeset $1=$2; else typeset $1; fi
+   typeset -p $1
+   typeset -R5 $1
+   typeset -p $1
+   typeset -u $1
+   typeset -p $1
+   typeset -x $1
+   typeset -p $1
+ }
+ addflags var1 foo
+ addflags var2 ""
+ addflags var3
+0:Typesetting is cumulative
+>typeset var1=foo
+>typeset -R5 var1=foo
+>typeset -R5 -u var1=foo
+>local -R5 -ux var1=foo
+>typeset var2=''
+>typeset -R5 var2=''
+>typeset -R5 -u var2=''
+>local -R5 -ux var2=''
+>typeset var3
+>typeset -R5 var3
+>typeset -R5 -u var3
+>local -R5 -ux var3
+
  float f=3.14159
  typeset +m f
  float -E3 f
