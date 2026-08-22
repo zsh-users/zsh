@@ -297,154 +297,171 @@ typedef struct iparam {
 } initparam;
 #endif
 
-static initparam special_params[] ={
-#define GSU(X) BR((GsuScalar)(void *)(&(X)))
+#define GSU(X)   BR((GsuScalar)(void *)(&(X)))
 #define NULL_GSU BR((GsuScalar)(void *)NULL)
-#define IPDEF1(A,B,C) {{NULL,A,PM_INTEGER|PM_SPECIAL|C},BR(NULL),GSU(B),10,0,NULL,NULL,NULL,0}
-IPDEF1("#", pound_gsu, PM_READONLY_SPECIAL),
-IPDEF1("ERRNO", errno_gsu, PM_UNSET),
-IPDEF1("GID", gid_gsu, PM_DONTIMPORT),
-IPDEF1("EGID", egid_gsu, PM_DONTIMPORT),
-IPDEF1("HISTSIZE", histsize_gsu, 0),
-IPDEF1("RANDOM", random_gsu, 0),
-IPDEF1("SAVEHIST", savehist_gsu, 0),
-IPDEF1("SECONDS", intseconds_gsu, 0),
-IPDEF1("UID", uid_gsu, PM_DONTIMPORT),
-IPDEF1("EUID", euid_gsu, PM_DONTIMPORT),
-IPDEF1("TTYIDLE", ttyidle_gsu, PM_READONLY_SPECIAL),
 
-#define IPDEF2(A,B,C) {{NULL,A,PM_SCALAR|PM_SPECIAL|C},BR(NULL),GSU(B),0,0,NULL,NULL,NULL,0}
-IPDEF2("USERNAME", username_gsu, PM_DONTIMPORT),
-IPDEF2("-", dash_gsu, PM_READONLY_SPECIAL),
-IPDEF2("histchars", histchars_gsu, PM_DONTIMPORT),
-IPDEF2("HOME", home_gsu, PM_UNSET),
-IPDEF2("TERM", term_gsu, PM_UNSET),
-IPDEF2("TERMINFO", terminfo_gsu, PM_UNSET),
-IPDEF2("TERMINFO_DIRS", terminfodirs_gsu, PM_UNSET),
-IPDEF2("WORDCHARS", wordchars_gsu, 0),
-IPDEF2("IFS", ifs_gsu, PM_DONTIMPORT),
-IPDEF2("_", underscore_gsu, PM_DONTIMPORT),
-IPDEF2("KEYBOARD_HACK", keyboard_hack_gsu, PM_DONTIMPORT),
-IPDEF2("0", argzero_gsu, 0),
+#define PM(name, var, gsu, flags, base, ename) \
+    { { NULL, name, PM_SPECIAL|flags }, \
+	    BR((void *)var), GSU(gsu), base, 0, NULL, ename, NULL, 0 }
+#define NULL_PM \
+    { { NULL, NULL, 0 }, BR(NULL), NULL_GSU, 0, 0, NULL, NULL, NULL, 0 }
+
+#define STRPM(name, var, gsu, flags) \
+    PM(name, var, gsu, PM_SCALAR|flags, 0, NULL)
+#define INTPM(name, var, gsu, flags) \
+    PM(name, var, gsu, PM_INTEGER|flags, 10, NULL)
+#define ARRPM(name, var, gsu, flags) \
+    PM(name, var, gsu, PM_ARRAY|PM_DONTIMPORT|flags, 0 , NULL)
+
+#define VAR_STRPM(name, var, flags) STRPM(name, var, varscalar_gsu, flags)
+#define VAR_INTPM(name, var, flags) INTPM(name, var, varinteger_gsu, flags)
+#define VAR_ARRPM(name, var, flags) ARRPM(name, var, vararray_gsu, flags)
+
+#define ROVAR_INTPM(name, var, flags) \
+    INTPM(name, var, varint_readonly_gsu, PM_READONLY_SPECIAL|flags)
+
+#define LC_STRPM(name) \
+    STRPM(name, NULL, lc_blah_gsu, PM_UNSET)
+#define COLONARR_STRPM(name, var, flags) \
+    STRPM(name, var, colonarr_gsu, flags)
+
+#define TIED_STRPM(name, var, ename, flags) \
+    PM(name, var, colonarr_gsu, PM_TIED|PM_SCALAR|flags, 0, ename)
+#define TIED_ARRPM(name, var, ename, flags) \
+    PM(name, var, vararray_gsu, PM_TIED|PM_ARRAY|PM_DONTIMPORT|flags, 0, ename)
+
+static initparam special_params[] = {
+    INTPM("#", NULL, pound_gsu, PM_READONLY_SPECIAL),
+    INTPM("ERRNO", NULL, errno_gsu, PM_UNSET),
+    INTPM("GID", NULL, gid_gsu, PM_DONTIMPORT),
+    INTPM("EGID", NULL, egid_gsu, PM_DONTIMPORT),
+    INTPM("HISTSIZE", NULL, histsize_gsu, 0),
+    INTPM("RANDOM", NULL, random_gsu, 0),
+    INTPM("SAVEHIST", NULL, savehist_gsu, 0),
+    INTPM("SECONDS", NULL, intseconds_gsu, 0),
+    INTPM("UID", NULL, uid_gsu, PM_DONTIMPORT),
+    INTPM("EUID", NULL, euid_gsu, PM_DONTIMPORT),
+    INTPM("TTYIDLE", NULL, ttyidle_gsu, PM_READONLY_SPECIAL),
+
+    STRPM("USERNAME", NULL, username_gsu, PM_DONTIMPORT),
+    STRPM("-", NULL, dash_gsu, PM_READONLY_SPECIAL),
+    STRPM("histchars", NULL, histchars_gsu, PM_DONTIMPORT),
+    STRPM("HOME", NULL, home_gsu, PM_UNSET),
+    STRPM("TERM", NULL, term_gsu, PM_UNSET),
+    STRPM("TERMINFO", NULL, terminfo_gsu, PM_UNSET),
+    STRPM("TERMINFO_DIRS", NULL, terminfodirs_gsu, PM_UNSET),
+    STRPM("WORDCHARS", NULL, wordchars_gsu, 0),
+    STRPM("IFS", NULL, ifs_gsu, PM_DONTIMPORT),
+    STRPM("_", NULL, underscore_gsu, PM_DONTIMPORT),
+    STRPM("KEYBOARD_HACK", NULL, keyboard_hack_gsu, PM_DONTIMPORT),
+    STRPM("0", NULL, argzero_gsu, 0),
 
 #ifdef USE_LOCALE
-# define LCIPDEF(name) IPDEF2(name, lc_blah_gsu, PM_UNSET)
-IPDEF2("LANG", lang_gsu, PM_UNSET),
-IPDEF2("LC_ALL", lc_all_gsu, PM_UNSET),
+    STRPM("LANG", NULL, lang_gsu, PM_UNSET),
+    STRPM("LC_ALL", NULL, lc_all_gsu, PM_UNSET),
 # ifdef LC_COLLATE
-LCIPDEF("LC_COLLATE"),
+    LC_STRPM("LC_COLLATE"),
 # endif
 # ifdef LC_CTYPE
-LCIPDEF("LC_CTYPE"),
+    LC_STRPM("LC_CTYPE"),
 # endif
 # ifdef LC_MESSAGES
-LCIPDEF("LC_MESSAGES"),
+    LC_STRPM("LC_MESSAGES"),
 # endif
 # ifdef LC_NUMERIC
-LCIPDEF("LC_NUMERIC"),
+    LC_STRPM("LC_NUMERIC"),
 # endif
 # ifdef LC_TIME
-LCIPDEF("LC_TIME"),
+    LC_STRPM("LC_TIME"),
 # endif
 #endif /* USE_LOCALE */
 
-#define IPDEF4(A,B) {{NULL,A,PM_INTEGER|PM_READONLY_SPECIAL},BR((void *)B),GSU(varint_readonly_gsu),10,0,NULL,NULL,NULL,0}
-IPDEF4("!", &lastpid),
-IPDEF4("$", &mypid),
-IPDEF4("?", &lastval),
-IPDEF4("HISTCMD", &curhist),
-IPDEF4("LINENO", &lineno),
-IPDEF4("PPID", &ppid),
-IPDEF4("ZSH_SUBSHELL", &zsh_subshell),
+    ROVAR_INTPM("!", &lastpid, 0),
+    ROVAR_INTPM("$", &mypid, 0),
+    ROVAR_INTPM("?", &lastval, 0),
+    ROVAR_INTPM("HISTCMD", &curhist, 0),
+    ROVAR_INTPM("LINENO", &lineno, 0),
+    ROVAR_INTPM("PPID", &ppid, 0),
+    ROVAR_INTPM("ZSH_SUBSHELL", &zsh_subshell, 0),
 
-#define IPDEF5(A,B,F) {{NULL,A,PM_INTEGER|PM_SPECIAL},BR((void *)B),GSU(F),10,0,NULL,NULL,NULL,0}
-#define IPDEF5U(A,B,F) {{NULL,A,PM_INTEGER|PM_SPECIAL|PM_UNSET},BR((void *)B),GSU(F),10,0,NULL,NULL,NULL,0}
-IPDEF5("COLUMNS", &zterm_columns, zlevar_gsu),
-IPDEF5("LINES", &zterm_lines, zlevar_gsu),
-IPDEF5U("ZLE_RPROMPT_INDENT", &rprompt_indent, rprompt_indent_gsu),
-IPDEF5("SHLVL", &shlvl, varinteger_gsu),
-IPDEF5("FUNCNEST", &zsh_funcnest, varinteger_gsu),
+    INTPM("COLUMNS", &zterm_columns, zlevar_gsu, 0),
+    INTPM("LINES", &zterm_lines, zlevar_gsu, 0),
+    INTPM("ZLE_RPROMPT_INDENT", &rprompt_indent, rprompt_indent_gsu, PM_UNSET),
+    VAR_INTPM("SHLVL", &shlvl, 0),
+    VAR_INTPM("FUNCNEST", &zsh_funcnest, 0),
 
-/* Don't import internal integer status variables. */
-#define IPDEF6(A,B,F) {{NULL,A,PM_INTEGER|PM_SPECIAL|PM_DONTIMPORT},BR((void *)B),GSU(F),10,0,NULL,NULL,NULL,0}
-IPDEF6("OPTIND", &zoptind, varinteger_gsu),
-IPDEF6("TRY_BLOCK_ERROR", &try_errflag, varinteger_gsu),
-IPDEF6("TRY_BLOCK_INTERRUPT", &try_interrupt, varinteger_gsu),
+    /* Don't import internal integer status variables. */
+    VAR_INTPM("OPTIND", &zoptind, PM_DONTIMPORT),
+    VAR_INTPM("TRY_BLOCK_ERROR", &try_errflag, PM_DONTIMPORT),
+    VAR_INTPM("TRY_BLOCK_INTERRUPT", &try_interrupt, PM_DONTIMPORT),
 
-#define IPDEF7(A,B) {{NULL,A,PM_SCALAR|PM_SPECIAL},BR((void *)B),GSU(varscalar_gsu),0,0,NULL,NULL,NULL,0}
-#define IPDEF7R(A,B) {{NULL,A,PM_SCALAR|PM_SPECIAL|PM_DONTIMPORT_SUID},BR((void *)B),GSU(varscalar_gsu),0,0,NULL,NULL,NULL,0}
-#define IPDEF7U(A,B) {{NULL,A,PM_SCALAR|PM_SPECIAL|PM_UNSET},BR((void *)B),GSU(varscalar_gsu),0,0,NULL,NULL,NULL,0}
-IPDEF7("OPTARG", &zoptarg),
-IPDEF7("NULLCMD", &nullcmd),
-IPDEF7U("POSTEDIT", &postedit),
-IPDEF7("READNULLCMD", &readnullcmd),
-IPDEF7("PS1", &prompt),
-IPDEF7U("RPS1", &rprompt),
-IPDEF7U("RPROMPT", &rprompt),
-IPDEF7("PS2", &prompt2),
-IPDEF7U("RPS2", &rprompt2),
-IPDEF7U("RPROMPT2", &rprompt2),
-IPDEF7("PS3", &prompt3),
-IPDEF7R("PS4", &prompt4),
-IPDEF7("SPROMPT", &sprompt),
+    VAR_STRPM("OPTARG", &zoptarg, 0),
+    VAR_STRPM("NULLCMD", &nullcmd, 0),
+    VAR_STRPM("POSTEDIT", &postedit, PM_UNSET),
+    VAR_STRPM("READNULLCMD", &readnullcmd, 0),
+    VAR_STRPM("PS1", &prompt, 0),
+    VAR_STRPM("RPS1", &rprompt, PM_UNSET),
+    VAR_STRPM("RPROMPT", &rprompt, PM_UNSET),
+    VAR_STRPM("PS2", &prompt2, 0),
+    VAR_STRPM("RPS2", &rprompt2, PM_UNSET),
+    VAR_STRPM("RPROMPT2", &rprompt2, PM_UNSET),
+    VAR_STRPM("PS3", &prompt3, 0),
+    VAR_STRPM("PS4", &prompt4, PM_DONTIMPORT_SUID),
+    VAR_STRPM("SPROMPT", &sprompt, 0),
 
-#define IPDEF9(A,B,C,D) {{NULL,A,D|PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT},BR((void *)B),GSU(vararray_gsu),0,0,NULL,C,NULL,0}
-IPDEF9("*", &pparams, NULL, PM_ARRAY|PM_READONLY_SPECIAL|PM_DONTIMPORT),
-IPDEF9("@", &pparams, NULL, PM_ARRAY|PM_READONLY_SPECIAL|PM_DONTIMPORT),
+    VAR_ARRPM("*", &pparams, PM_READONLY_SPECIAL),
+    VAR_ARRPM("@", &pparams, PM_READONLY_SPECIAL),
 
-/*
- * This empty row indicates the end of parameters available in
- * all emulations.
- */
-{{NULL,NULL,0},BR(NULL),NULL_GSU,0,0,NULL,NULL,NULL,0},
+    /* End of parameters available in all emulations */
+    NULL_PM,
 
-#define IPDEF8(A,B,C,D) {{NULL,A,D|PM_SCALAR|PM_SPECIAL},BR((void *)B),GSU(colonarr_gsu),0,0,NULL,C,NULL,0}
-IPDEF8("CDPATH", &cdpath, "cdpath", PM_TIED),
-IPDEF8("FIGNORE", &fignore, "fignore", PM_TIED),
-IPDEF8("FPATH", &fpath, "fpath", PM_TIED),
-IPDEF8("MAILPATH", &mailpath, "mailpath", PM_TIED),
-IPDEF8("PATH", &path, "path", PM_TIED),
-IPDEF8("PSVAR", &psvar, "psvar", PM_TIED),
-IPDEF8("ZSH_EVAL_CONTEXT", &zsh_eval_context, "zsh_eval_context", PM_READONLY_SPECIAL|PM_TIED),
+    TIED_STRPM("CDPATH", &cdpath, "cdpath", PM_TIED),
+    TIED_STRPM("FIGNORE", &fignore, "fignore", PM_TIED),
+    TIED_STRPM("FPATH", &fpath, "fpath", PM_TIED),
+    TIED_STRPM("MAILPATH", &mailpath, "mailpath", PM_TIED),
+    TIED_STRPM("PATH", &path, "path", PM_TIED),
+    TIED_STRPM("PSVAR", &psvar, "psvar", PM_TIED),
+    TIED_STRPM("ZSH_EVAL_CONTEXT", &zsh_eval_context, "zsh_eval_context",
+	       PM_READONLY_SPECIAL|PM_TIED),
 
-/* MODULE_PATH is not imported for security reasons */
-IPDEF8("MODULE_PATH", &module_path, "module_path", PM_DONTIMPORT|PM_TIED),
+    /* MODULE_PATH is not imported for security reasons */
+    TIED_STRPM("MODULE_PATH", &module_path, "module_path",
+	       PM_DONTIMPORT|PM_TIED),
 
-#define IPDEF10(A,B) {{NULL,A,PM_ARRAY|PM_SPECIAL},BR(NULL),GSU(B),10,0,NULL,NULL,NULL,0}
+    /*
+     * The following parameters are not available in sh/ksh compatibility *
+     * mode.
+     */
 
-/*
- * The following parameters are not available in sh/ksh compatibility *
- * mode.
- */
+    /* All of these have sh compatible equivalents. */
+    INTPM("ARGC", NULL, argc_gsu, PM_READONLY_SPECIAL),
+    STRPM("HISTCHARS", NULL, histchars_gsu, PM_DONTIMPORT),
+    ROVAR_INTPM("status", &lastval, 0),
+    VAR_STRPM("prompt", &prompt, 0),
+    VAR_STRPM("PROMPT", &prompt, 0),
+    VAR_STRPM("PROMPT2", &prompt2, 0),
+    VAR_STRPM("PROMPT3", &prompt3, 0),
+    VAR_STRPM("PROMPT4", &prompt4, 0),
+    TIED_STRPM("MANPATH", &manpath, "manpath", PM_TIED),
+    VAR_ARRPM("argv", &pparams, 0),
+    TIED_ARRPM("fignore", &fignore, "FIGNORE", 0),
+    TIED_ARRPM("cdpath", &cdpath, "CDPATH", 0),
+    TIED_ARRPM("fpath", &fpath, "FPATH", 0),
+    TIED_ARRPM("mailpath", &mailpath, "MAILPATH", 0),
+    TIED_ARRPM("manpath", &manpath, "MANPATH", 0),
+    TIED_ARRPM("psvar", &psvar, "PSVAR", 0),
 
-/* All of these have sh compatible equivalents.                */
-IPDEF1("ARGC", argc_gsu, PM_READONLY_SPECIAL),
-IPDEF2("HISTCHARS", histchars_gsu, PM_DONTIMPORT),
-IPDEF4("status", &lastval),
-IPDEF7("prompt", &prompt),
-IPDEF7("PROMPT", &prompt),
-IPDEF7("PROMPT2", &prompt2),
-IPDEF7("PROMPT3", &prompt3),
-IPDEF7("PROMPT4", &prompt4),
-IPDEF8("MANPATH", &manpath, "manpath", PM_TIED),
-IPDEF9("argv", &pparams, NULL, 0),
-IPDEF9("fignore", &fignore, "FIGNORE", PM_TIED),
-IPDEF9("cdpath", &cdpath, "CDPATH", PM_TIED),
-IPDEF9("fpath", &fpath, "FPATH", PM_TIED),
-IPDEF9("mailpath", &mailpath, "MAILPATH", PM_TIED),
-IPDEF9("manpath", &manpath, "MANPATH", PM_TIED),
-IPDEF9("psvar", &psvar, "PSVAR", PM_TIED),
+    TIED_ARRPM("zsh_eval_context", &zsh_eval_context, "ZSH_EVAL_CONTEXT",
+	       PM_READONLY_SPECIAL),
 
-IPDEF9("zsh_eval_context", &zsh_eval_context, "ZSH_EVAL_CONTEXT", PM_TIED|PM_READONLY_SPECIAL),
+    TIED_ARRPM("module_path", &module_path, "MODULE_PATH", 0),
+    TIED_ARRPM("path", &path, "PATH", 0),
 
-IPDEF9("module_path", &module_path, "MODULE_PATH", PM_TIED),
-IPDEF9("path", &path, "PATH", PM_TIED),
+    /* These are known to zsh alone. */
 
-/* These are known to zsh alone. */
+    PM("pipestatus", NULL, pipestatus_gsu, PM_ARRAY, 10, NULL),
 
-IPDEF10("pipestatus", pipestatus_gsu),
-
-{{NULL,NULL,0},BR(NULL),NULL_GSU,0,0,NULL,NULL,NULL,0},
+    NULL_PM,
 };
 
 /*
@@ -452,18 +469,18 @@ IPDEF10("pipestatus", pipestatus_gsu),
  * sh emulation.  These don't link to the array versions.
  */
 static initparam special_params_sh[] = {
-IPDEF8("CDPATH", &cdpath, NULL, 0),
-IPDEF8("FIGNORE", &fignore, NULL, 0),
-IPDEF8("FPATH", &fpath, NULL, 0),
-IPDEF8("MAILPATH", &mailpath, NULL, 0),
-IPDEF8("PATH", &path, NULL, 0),
-IPDEF8("PSVAR", &psvar, NULL, 0),
-IPDEF8("ZSH_EVAL_CONTEXT", &zsh_eval_context, NULL, PM_READONLY_SPECIAL),
+    COLONARR_STRPM("CDPATH", &cdpath, 0),
+    COLONARR_STRPM("FIGNORE", &fignore, 0),
+    COLONARR_STRPM("FPATH", &fpath, 0),
+    COLONARR_STRPM("MAILPATH", &mailpath, 0),
+    COLONARR_STRPM("PATH", &path, 0),
+    COLONARR_STRPM("PSVAR", &psvar, 0),
+    COLONARR_STRPM("ZSH_EVAL_CONTEXT", &zsh_eval_context, PM_READONLY_SPECIAL),
 
-/* MODULE_PATH is not imported for security reasons */
-IPDEF8("MODULE_PATH", &module_path, NULL, PM_DONTIMPORT),
+    /* MODULE_PATH is not imported for security reasons */
+    COLONARR_STRPM("MODULE_PATH", &module_path, PM_DONTIMPORT),
 
-{{NULL,NULL,0},BR(NULL),NULL_GSU,0,0,NULL,NULL,NULL,0},
+    NULL_PM,
 };
 
 /*
@@ -471,9 +488,9 @@ IPDEF8("MODULE_PATH", &module_path, NULL, PM_DONTIMPORT),
  * and $@, this is not readonly.  This parameter is not directly
  * visible in user space.
  */
-static initparam argvparam_pm = IPDEF9("", &pparams, NULL, \
-				 PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT);
+static initparam argvparam_pm = VAR_ARRPM("", &pparams, 0);
 
+#undef PM
 #undef BR
 
 #define IS_UNSET_VALUE(V) \
