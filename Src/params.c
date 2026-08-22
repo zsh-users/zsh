@@ -3160,6 +3160,7 @@ assignsparam(char *s, char *val, int flags)
     size_t lvar;
     mnumber lhs, rhs;
     int sstart, created = 0;
+    int scanflags = flags & ASSPM_NONAMEREF ? SCANPM_NONAMEREF : 0;
 
     if (!isident(s)) {
 	zerr("not an identifier: %s", s);
@@ -3170,7 +3171,7 @@ assignsparam(char *s, char *val, int flags)
     queue_signals();
     if ((ss = strchr(s, '['))) {
 	*ss = '\0';
-	if (!(v = getvalue(&vbuf, &s, 1))) {
+	if (!(v = fetchvalue(&vbuf, &s, 1, scanflags))) {
 	    createparam(t, PM_ARRAY);
 	    created = 1;
 	} else {
@@ -3191,7 +3192,7 @@ assignsparam(char *s, char *val, int flags)
 	*ss = '[';
 	v = NULL;
     } else {
-	if (!(v = getvalue(&vbuf, &s, 1))) {
+	if (!(v = fetchvalue(&vbuf, &s, 1, scanflags))) {
 	    createparam(t, PM_SCALAR);
 	    created = 1;
 	} else if ((((v->pm->node.flags & PM_ARRAY) &&
@@ -3209,7 +3210,7 @@ assignsparam(char *s, char *val, int flags)
 	    v = NULL;
 	}
     }
-    if (!v && !(v = getvalue(&vbuf, &t, 1))) {
+    if (!v && !(v = fetchvalue(&vbuf, &t, 1, scanflags))) {
 	zsfree(val);
 	unqueue_signals();
 	/* errflag |= ERRFLAG_ERROR; */
@@ -3322,6 +3323,7 @@ assignaparam(char *s, char **val, int flags)
     char *ss;
     int created = 0;
     int may_warn_about_nested_vars = 1;
+    int scanflags = flags & ASSPM_NONAMEREF ? SCANPM_NONAMEREF : 0;
 
     if (!isident(s)) {
 	zerr("not an identifier: %s", s);
@@ -3332,7 +3334,7 @@ assignaparam(char *s, char **val, int flags)
     queue_signals();
     if ((ss = strchr(s, '['))) {
 	*ss = '\0';
-	if (!(v = getvalue(&vbuf, &s, 1))) {
+	if (!(v = fetchvalue(&vbuf, &s, 1, scanflags))) {
 	    createparam(t, PM_ARRAY);
 	    created = 1;
 	} else {
@@ -3349,7 +3351,7 @@ assignaparam(char *s, char **val, int flags)
 	}
 	v = NULL;
     } else {
-	if (!(v = fetchvalue(&vbuf, &s, 1, SCANPM_ASSIGNING))) {
+	if (!(v = fetchvalue(&vbuf, &s, 1, scanflags | SCANPM_ASSIGNING))) {
 	    createparam(t, PM_ARRAY);
 	    created = 1;
 	} else if (v->pm->node.flags & PM_NAMEREF) {
@@ -3380,7 +3382,7 @@ assignaparam(char *s, char **val, int flags)
 	}
     }
     if (!v)
-	if (!(v = fetchvalue(&vbuf, &t, 1, SCANPM_ASSIGNING))) {
+	if (!(v = fetchvalue(&vbuf, &t, 1, scanflags | SCANPM_ASSIGNING))) {
 	    unqueue_signals();
 	    freearray(val);
 	    /* errflag |= ERRFLAG_ERROR; */

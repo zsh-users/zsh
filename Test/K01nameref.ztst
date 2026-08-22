@@ -2349,6 +2349,50 @@ F:converting from association/array to string should work here too
 >B:16#FF
 >C:16#FF
 
+ show() { printf "%-13s: %-3s - %-3s - %-3s\n" "$@" }
+ typeset var=aaa
+ typeset -n refU refN="" refS=var
+ show '${refX}'       ${(q!)refU}       ${(q!)refN}       ${(q!)refS}
+ show '${+refX}'      ${(q!)+refU}      ${(q!)+refN}      ${(q!)+refS}
+ show '${refX+1}'     ${(q!)refU+1}     ${(q!)refN+1}     ${(q!)refS+1}
+ show '${refX:+1}'    ${(q!)refU:+1}    ${(q!)refN:+1}    ${(q!)refS:+1}
+ echo
+ show '${refX-bbb}'   ${(q!)refU-bbb}   ${(q!)refN-bbb}   ${(q!)refS-bbb}
+ show '${refX=bbb}'   ${(q!)refU=bbb}   ${(q!)refN=bbb}   ${(q!)refS=bbb}
+ show '${refX}'       ${(q!)refU}       ${(q!)refN}       ${(q!)refS}
+ show '${var}'        ${var}
+ echo
+ typeset -n refU refN="" refS=var
+ show '${refX:-ccc}'  ${(q!)refU:-ccc}  ${(q!)refN:-ccc}  ${(q!)refS:-ccc}
+ show '${refX:=ccc}'  ${(q!)refU:=ccc}  ${(q!)refN:=ccc}  ${(q!)refS:=ccc}
+ show '${refX}'       ${(q!)refU}       ${(q!)refN}       ${(q!)refS}
+ show '${var}'        ${var}
+ echo
+ typeset -n refU refN="" refS=var
+ show '${refX::=ddd}' ${(q!)refU::=ddd} ${(q!)refN::=ddd} ${(q!)refS::=ddd}
+ show '${refX}'       ${(q!)refU}       ${(q!)refN}       ${(q!)refS}
+ show '${var}'        ${var}
+ unfunction show
+0:reference itself is examined in substitutions with the ! flag
+>${refX}      : ''  - ''  - var
+>${+refX}     : 0   - 1   - 1  
+>${refX+1}    : ''  - 1   - 1  
+>${refX:+1}   : ''  - ''  - 1  
+>
+>${refX-bbb}  : bbb - ''  - var
+>${refX=bbb}  : bbb - ''  - var
+>${refX}      : bbb - ''  - var
+>${var}       : aaa -     -    
+>
+>${refX:-ccc} : ccc - ccc - var
+>${refX:=ccc} : ccc - ccc - var
+>${refX}      : ccc - ccc - var
+>${var}       : aaa -     -    
+>
+>${refX::=ddd}: ddd - ddd - ddd
+>${refX}      : ddd - ddd - ddd
+>${var}       : aaa -     -    
+
  typeset -n ref1
  setopt allexport
  ref1=var
