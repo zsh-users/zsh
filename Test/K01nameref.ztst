@@ -2407,4 +2407,59 @@ F:converting from association/array to string should work here too
  typeset -Hn ref_H
 0:unsusual but legal option combinations
 
+ typeset str0=abc
+ typeset -a arr0=(aa bb cc)
+ typeset -A hsh0=([0]=aa [1]=bb [2]=cc)
+ typeset -n str1=str0 arr1=arr0 hsh1=hsh0
+ typeset -n str2=str1 arr2=arr1 hsh2=hsh1
+ emulate ksh -c '
+   echo "${str0} - ${str1} - ${str2}"
+   echo "${str0[1]} - ${str1[1]} - ${str2[1]}"
+   echo "${str0[1,2]} - ${str1[1,2]} - ${str2[1,2]}"
+   echo "${str0[@]} - ${str1[@]} - ${str2[@]}"
+   echo "${arr0} - ${arr1} - ${arr2}"
+   echo "${arr0[1]} - ${arr1[1]} - ${arr2[1]}"
+   echo "${arr0[1,2]} - ${arr1[1,2]} - ${arr2[1,2]}"
+   echo "${arr0[@]} - ${arr1[@]} - ${arr2[@]}"
+   echo "${hsh0} - ${hsh1} - ${hsh2}"
+   echo "${hsh0[1]} - ${hsh1[1]} - ${hsh2[1]}"
+   echo "${hsh0[@]} - ${hsh1[@]} - ${hsh2[@]}"
+   echo
+   echo "${!str0} - ${!str1} - ${!str2}"
+   echo "${!str0[1]} - ${!str1[1]} - ${!str2[1]}"
+   echo "${!str0[1,2]} - ${!str1[1,2]} - ${!str2[1,2]}"
+   echo "${!str0[@]} - ${!str1[@]} - ${!str2[@]}"
+   echo "${!arr0} - ${!arr1} - ${!arr2}"
+   echo "${!arr0[1]} - ${!arr1[1]} - ${!arr2[1]}"
+   echo "$(exec 2>&1; echo ${!arr0[1,2]}) - $(exec 2>&1; echo ${!arr1[1,2]}) - $(exec 2>&1; echo ${!arr2[1,2]})"
+   echo "${!arr0[@]} - ${!arr1[@]} - ${!arr2[@]}"
+   echo "${!hsh0} - ${!hsh1} - ${!hsh2}"
+   echo "${!hsh0[1]} - ${!hsh1[1]} - ${!hsh2[1]}"
+   echo "${!hsh0[@]} - ${!hsh1[@]} - ${!hsh2[@]}"
+ '
+0:emulation of ksh's bang always dereferences the expanded parameter
+>abc - abc - abc
+>b - b - b
+>bc - bc - bc
+>abc - abc - abc
+>aa - aa - aa
+>bb - bb - bb
+>bb cc - bb cc - bb cc
+>aa bb cc - aa bb cc - aa bb cc
+>aa - aa - aa
+>bb - bb - bb
+>aa bb cc - aa bb cc - aa bb cc
+>
+>abc - abc - abc
+>b - b - b
+>bc - bc - bc
+>abc - abc - abc
+>aa - aa - aa
+>1 - 1 - 1
+>(eval):6: invalid subscript - (eval):6: invalid subscript - (eval):6: invalid subscript
+>aa bb cc - aa bb cc - aa bb cc
+>aa - aa - aa
+>1 - 1 - 1
+>0 1 2 - 0 1 2 - 0 1 2
+
 %clean

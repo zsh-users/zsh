@@ -93,12 +93,25 @@ F:Braces are required
   () {
     typeset -n .k02.ref=.k02.array
     emulate -L ksh
-    print -l ${!.k02.ref} ${(!).k02.ref} ${.k02.ref}
+    print -l ${!.k02.ref} ${(k).k02.ref} ${(!).k02.ref} ${.k02.ref}
+    print -l ${!.k02.ref[2]} ${(k).k02.ref[2]} ${(!).k02.ref[2]} ${.k02.ref[2]}
   }
 0:namerefs with namespaces
->.k02.array
->.k02.array
+F:ksh expands "${!.k02.ref}" to ".k02.ref" but ("${!ref}" when in namespace "k02") to "array"
+F:the former looks bogus; expanding to ".k02.array" looks more logical/consistent
 >characters
+>characters
+>.k02.array
+F:ksh expands "${.k02.ref}" to ".k02.array" but ("${ref}" when in namespace "k02") to "characters"
+F:the former looks bogus; expanding to "characters" looks more logical/consistent
+>characters
+F:ksh expands "${!.k02.ref[2]}" and ("${!ref[2]}" when in namespace "k02") to "array[2]"
+>2
+>2
+F:"${(!).k02.ref[2]}" -> "${${:-.k02.array}[2]}" -> "0"
+>0
+F:ksh expands "${.k02.ref[2]}" and ("${ref[2]}" when in namespace "k02") to "an"
+>an
 
   k.=empty
   k.2=test

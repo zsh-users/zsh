@@ -2118,7 +2118,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	 * handle this with the ^, =, ~ stuff, below.
 	 */
 	if ((c = *s) == '!' && s[1] != Outbrace && EMULATION(EMULATE_KSH)) {
-	    hkeys = SCANPM_WANTKEYS|SCANPM_NONAMEREF;
+	    hkeys = SCANPM_WANTKEYS;
 	    s++;
 	    /* There's a slew of other special bash meanings of parameter
 	     * references that start with "!":
