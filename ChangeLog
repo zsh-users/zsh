@@ -1,3 +1,33 @@
+2026-08-22  Bart Schaefer  <schaefer@zsh.org>
+
+	* 55069: Philippe: Doc/Zsh/builtins.yo, Doc/Zsh/expn.yo,
+	Doc/Zsh/func.yo: Fixes to "named references" documention to
+	reflect recent changes
+
+	* 55061: Philippe (first part): Src/builtin.c, Src/exec.c,
+	Src/init.c, Src/loop.c, Test/A07control.ztst: break/continue
+	errors in a subshell with no local loop
+
+	* 54940: Philippe: Src/subst.c: Forbid (!v) substitution flags for
+	symmetry with (v!)
+
+	* 55047: Philippe (first part): Src/subst.c, Test/K01nameref.ztst,
+	Test/K02parameter.ztst: Revert ${!var} in ksh mode to remove
+	namref special case
+
+	* 55026: Philippe: Src/params.c, Src/subst.c, Src/zsh.h,
+	Test/K01nameref.ztst: Fix ${(!)ref::=var} substitutions for
+	symmetry with other flags
+
+	* 55022: Philippe: Src/params.c: descriptive names for parameter
+	declaration CPP macros
+
+	* 55020: Philippe: Src/builtin.c, Test/B02typeset.ztst: fix changing
+	flags (not type) of a TYPESET_TO_UNSET parameter
+
+	* 54810: Philippe: Src/Modules/param_private.c: use realparamtab to
+	create and scope private variables
+
 2026-08-14  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 55082: Src/Zle/zle_move.c: fix zlecs bounds checks in
