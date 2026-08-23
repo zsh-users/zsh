@@ -2394,7 +2394,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		    hkeys = SCANPM_WANTKEYS;
 		    break;
 		case 'v':
-		    if (hvals & ~SCANPM_WANTVALS)
+		    if (hkeys & ~SCANPM_WANTKEYS)
 			goto flagerr;
 		    hvals = SCANPM_WANTVALS;
 		    break;
