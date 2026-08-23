@@ -304,39 +304,44 @@ F:future revision will create a global with this assignment
  typeset top=TOP
  () {
   local -P -n test=top
-  print $top
+  print $test
+  test=top
+  print $test
   () { print UP: $test }
  }
+ print $top
 0:nameref can be declared private
 >TOP
+>top
 >UP:
+>top
 
  () {
    typeset -a ary
    local -P -n ref=ary
    {
-    (){
-     ref=XX	# Should be an error
-     typeset -p ary ref
+    () {
+     ref=XX 2>&1	# Should be an error
+     echo NOT REACHED
     }
    } always {
     TRY_BLOCK_ERROR=0
     typeset -p ary ref
    }
  }
- typeset -p ary
+ typeset -p ary 2>&1
 1:assignment to private nameref in wrong scope, part 1
+>(anon):1: ref: can't modify read-only parameter
 >typeset -a ary
 >typeset -hn ref=ary
-*?*ref: can't modify read-only parameter
-*?*no such variable: ary
+>(eval):typeset:14: no such variable: ary
 
  () {
    typeset -a ary
    local -P -n ref=ary
    {
     (){
-     typeset ref=XX	# Should create a local
+     typeset ref=XX 2>&1	# Should create a local
      typeset -p ary ref
     }
    } always {
@@ -344,53 +349,89 @@ F:future revision will create a global with this assignment
     typeset -p ary ref
    }
  }
- typeset -p ary
+ typeset -p ary 2>&1
 1:assignment to private nameref in wrong scope, part 2
 >typeset -g -a ary
 >typeset ref=XX
 >typeset -a ary
 >typeset -hn ref=ary
-*?*no such variable: ary
+>(eval):typeset:14: no such variable: ary
 
  () {
+   typeset val=LOCAL
    typeset -n ptr1=ptr2
    private -n ptr2	# TYPESET_TO_UNSET makes this not a "placeholder"
    typeset -p ptr1 ptr2
-   typeset val=LOCAL
    () {
-     ptr1=val		# Test dies here as ptr2 is private and unset
-     typeset -n
-     printf "%s=%s\n" ptr1 "$ptr1" ptr2 "$ptr2"
+     ptr1=val 2>&1		# Test dies here as ptr2 is private
+     echo NOT REACHED
    }
-   typeset -p ptr1 ptr2
+   echo NOT REACHED
  }
- typeset -p ptr2
+ echo NOT REACHED
 1:up-reference for private namerefs, end unset and not in scope
 F:See K01nameref.ztst up-reference part 5
 F:Here ptr1 finds private ptr2 by scope mismatch
 >typeset -n ptr1=ptr2
 >typeset -hn ptr2
-?(anon):1: read-only variable: ptr2
+>(anon):1: read-only variable: ptr2
 
  () {
+   typeset val=LOCAL
    typeset -n ptr1=ptr2
    private -n ptr2=	# Assignment makes this a placeholder, not unset
    typeset -p ptr1 ptr2
-   typeset val=LOCAL
    () {
-     ptr1=val		# Test dies here as ptr2 is private and uninitialized
-     typeset -n
-     printf "%s=%s\n" ptr1 "$ptr1" ptr2 "$ptr2"
+     ptr1=val 2>&1		# Test dies here as ptr2 is private
+     echo NOT REACHED
    }
-   typeset -p ptr1 ptr2
+   echo NOT REACHED
  }
- typeset -p ptr2
-1:up-reference for private namerefs, end not in scope
+ echo NOT REACHED
+1:up-reference for private namerefs, end is placeholder and not in scope
 F:See K01nameref.ztst up-reference part 5
 F:Here ptr1 finds private ptr2 by scope mismatch
 >typeset -n ptr1=ptr2
 >typeset -hn ptr2=''
-?(anon):1: ptr1: can't modify read-only parameter
+>(anon):1: ptr1: can't modify read-only parameter
+
+ () {
+   typeset val=LOCAL
+   typeset -n ptr1=ptr2
+   private -n ptr2=val	# Assignment makes this a reference to existing val
+   typeset -p ptr1 ptr2
+   () {
+     ptr1=val 2>&1		# Test dies here as ptr2 is private
+     echo NOT REACHED
+   }
+   echo NOT REACHED
+ }
+ echo NOT REACHED
+1:up-reference for private namerefs, end refers existing variable and not in scope
+F:See K01nameref.ztst up-reference part 5
+F:Here ptr1 finds private ptr2 by scope mismatch
+>typeset -n ptr1=ptr2
+>typeset -hn ptr2=val
+>(anon):1: ptr1: can't modify read-only parameter
+
+ () {
+   typeset val=LOCAL
+   typeset -n ptr1=ptr2
+   private -n ptr2=foo	# Assignment makes this a reference to not-yet-defined foo
+   typeset -p ptr1 ptr2
+   () {
+     ptr1=val 2>&1		# Test dies here as ptr2 is private
+     echo NOT REACHED
+   }
+   echo NOT REACHED
+ }
+ echo NOT REACHED
+1:up-reference for private namerefs, end refers not-yet-defined variable and not in scope
+F:See K01nameref.ztst up-reference part 5
+F:Here ptr1 finds private ptr2 by scope mismatch
+>typeset -n ptr1=ptr2
+>typeset -hn ptr2=foo
+>(anon):1: ptr1: can't modify read-only parameter
 
  typeset ptr2
  () {
@@ -401,7 +442,7 @@ F:Here ptr1 finds private ptr2 by scope mismatch
    () {
      ptr1=val
      typeset -n
-     printf "%s=%s\n" ptr1 "$ptr1" ptr2 "$ptr2"
+     printf "print:%s=%s\n" ptr1 "$ptr1" ptr2 "$ptr2"
    }
    typeset -p ptr1 ptr2
  }
@@ -413,24 +454,38 @@ F:Here ptr1 points to global ptr2 so assignment succeeds
 >typeset -hn ptr2
 >ptr1=ptr2
 >ptr2=val
->ptr1=val
->ptr2=val
+>print:ptr1=val
+>print:ptr2=val
 >typeset -n ptr1=ptr2
 >typeset -hn ptr2
 >typeset ptr2=val
 
  () {
    setopt localoptions errreturn
-   private -n ptr2
-   typeset -n ptr1=ptr2
-   echo NOT REACHED
+   private -n ptr2=val
+   typeset -n ptr1=ptr2 2>&1
+   ptr1=foo
+   typeset -p ptr1 ptr2 val
  }
- typeset -p ptr1 ptr2
-1:up-reference for private namerefs, end is in scope but private
-F:Should we allow "public" namerefs to private parameters?
-*?*ptr2: invalid reference
-*?*no such variable: ptr1
-*?*no such variable: ptr2
+ unset val
+0:up-reference for private namerefs, end is set and in scope but private
+>typeset -n ptr1=ptr2
+>typeset -hn ptr2=val
+>typeset -g val=foo
+
+ () {
+   setopt localoptions errreturn
+   private -n ptr2
+   typeset -n ptr1=ptr2 2>&1
+   ptr1=val
+   ptr1=foo
+   typeset -p ptr1 ptr2 val
+ }
+ unset val
+0:up-reference for private namerefs, end is unset and in scope but private
+>typeset -n ptr1=ptr2
+>typeset -hn ptr2=val
+>typeset -g val=foo
 
  () {
    typeset ptr2=foo
@@ -438,13 +493,13 @@ F:Should we allow "public" namerefs to private parameters?
    () {
      setopt localoptions errreturn
      private -n ptr2
-     typeset -n ptr1=ptr2
-     echo NOT REACHED
+     typeset -n ptr1=ptr2 2>&1
+     typeset -p ptr1 ptr2
    }
  }
-1:regression test for invalid reference detection
-F:Should we allow "public" namerefs to private parameters?
-*?*ptr2: invalid reference
+0:regression test for invalid reference detection
+>typeset -n ptr1=ptr2
+>typeset -hn ptr2
 
  () {
    private x=1

@@ -1240,6 +1240,97 @@ F:This is a bug, the non -h variable should not hide the autoload variable
 >z=
 >v=
 
+ zmodload -u zsh/random
+ () { { typeset -g -i SRANDOM 2>&1 } always { TRY_BLOCK_ERROR=0 } }
+ () { { typeset -g -a SRANDOM 2>&1 } always { TRY_BLOCK_ERROR=0 } }
+ () { { typeset -g -n SRANDOM 2>&1 } always { TRY_BLOCK_ERROR=0 } }
+ echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
+0:Global parameter can't change type of autoloaded parameter
+>(anon):typeset: SRANDOM: can't change type of autoloaded parameter
+>(anon):typeset: SRANDOM: can't change type of autoloaded parameter
+>(anon):typeset: SRANDOM: can't change type of autoloaded parameter
+>z=SRANDOM (zsh/random)
+
+ zmodload -u zsh/random
+ () { { typeset    SRANDOM 2>&1 } always { TRY_BLOCK_ERROR=0 } }
+ () { { typeset -i SRANDOM 2>&1 } always { TRY_BLOCK_ERROR=0 } }
+ () { { typeset -a SRANDOM 2>&1 } always { TRY_BLOCK_ERROR=0 } }
+ () { { typeset -n SRANDOM 2>&1 } always { TRY_BLOCK_ERROR=0 } }
+ echo z=${(M)${(f)${ zmodload -ap}}:#*SRANDOM*}
+0:Local non -h parameter can hide autoloaded parameter
+>z=SRANDOM (zsh/random)
+
+ () { { typeset -g +i EUID 2>&1 } always { TRY_BLOCK_ERROR=0 } }
+ () { { typeset -g -i HOME 2>&1 } always { TRY_BLOCK_ERROR=0 } }
+ () { { typeset -g -a HOME 2>&1 } always { TRY_BLOCK_ERROR=0 } }
+ ( () { { typeset -g -n HOME 2>&1 } always { TRY_BLOCK_ERROR=0 } } )
+ typeset -p EUID HOME
+0q:Global parameter can't change type of special parameter
+>(anon):typeset: EUID: can't change type of a special parameter
+>(anon):typeset: HOME: can't change type of a special parameter
+>(anon):typeset: HOME: can't change type of a special parameter
+>(anon):typeset: HOME: can't change type of a special parameter
+>typeset -g -i10 EUID=$EUID
+>export HOME=$HOME
+
+ () { { typeset +i EUID 2>&1 } always { TRY_BLOCK_ERROR=0 } }
+ () { { typeset -i HOME 2>&1 } always { TRY_BLOCK_ERROR=0 } }
+ () { { typeset -a HOME 2>&1 } always { TRY_BLOCK_ERROR=0 } }
+ () { { typeset -n HOME 2>&1 } always { TRY_BLOCK_ERROR=0 } }
+ typeset -p EUID HOME
+0q:Local non -h parameter can't hide special parameter
+>(anon):typeset: EUID: can't change type of a special parameter
+>(anon):typeset: HOME: can't change type of a special parameter
+>(anon):typeset: HOME: can't change type of a special parameter
+>(anon):typeset: HOME: can't change type of a special parameter
+>typeset -g -i10 EUID=$EUID
+>export HOME=$HOME
+
+ () { typeset -h +i EUID 2>&1; typeset -p EUID }
+ () { typeset -h -i HOME 2>&1; typeset -p HOME }
+ () { typeset -h -a HOME 2>&1; typeset -p HOME }
+ () { typeset -h -n HOME 2>&1; typeset -p HOME }
+ typeset -p EUID HOME
+0q:Local -h parameter can hide special parameter
+>typeset -h EUID=''
+>typeset -ih HOME=0
+>typeset -ah HOME=(  )
+>typeset -hn HOME=''
+>typeset -g -i10 EUID=$EUID
+>export HOME=$HOME
+
+ check() {
+   echo "Testing \"local $1 $2=${3}<N>\""
+   { local $1 -r $2=${3}1 2>&1 && typeset -p $2 } always { TRY_BLOCK_ERROR=0 }
+   { local    -r $2=${3}2 2>&1 && typeset -p $2 } always { TRY_BLOCK_ERROR=0 }
+   { local $1    $2=${3}3 2>&1 && typeset -p $2 } always { TRY_BLOCK_ERROR=0 }
+   { local $1 -r $2=${3}4 2>&1 && typeset -p $2 } always { TRY_BLOCK_ERROR=0 }
+   { local $1 +r $2=${3}5 2>&1 && typeset -p $2 } always { TRY_BLOCK_ERROR=0 }
+ }
+ check "" str s
+ check -i int 1
+ check -n ref v
+0:Non +r parameter definition can't change/replace readonly parameter
+>Testing "local  str=s<N>"
+>typeset -r str=s1
+>check:3: read-only variable: str
+>check:4: read-only variable: str
+>check:5: read-only variable: str
+>typeset str=s5
+>Testing "local -i int=1<N>"
+>typeset -ir int=11
+>check:3: read-only variable: int
+>check:4: read-only variable: int
+>check:5: read-only variable: int
+>typeset -i int=15
+>Testing "local -n ref=v<N>"
+>typeset -rn ref=v1
+>typeset -rn ref=v1
+F:"typeset -r ref=v2" succeeds because it dereferences "ref" and assigns "v1" with "v2"
+>check:local:4: ref: read-only reference
+>check:local:5: ref: read-only reference
+>typeset -n ref=v5
+
  () {
    typeset -F f1=nan f2=inf f3=-inf
    typeset -p f1 f2 f3

@@ -1107,32 +1107,30 @@ F:Checking for a bug in zmodload that affects later tests
  unset -n ref
  typeset -rn ref=RO
  typeset -p ref
- (typeset -n ref=RW)
+ (typeset -n ref=RW 2>&1 && typeset -p ref)
  print status: $? expected: 1
  typeset +r -n ref
  typeset -p ref
  typeset -r +n ref
  typeset -p ref
- (typeset -rn ref)
- print status: $? expected: 1
- typeset +r -n ref=RW	# Assignment occurs after type change,
- typeset -p ref RO	# so RO=RW here.  Potentially confusing.
- typeset -r -n ref=RX	# No type change, so referent changes ...
- typeset -p ref RO	# ... and previous refererent does not.
- typeset +rn ref=RW	# Here ref=RW, again type changed first.
+ (typeset -rn ref 2>&1 && typeset -p ref)
+ print status: $? expected: 0
+ typeset +r -n ref=RW
+ typeset -p ref
+ typeset -r -n ref=RX
+ typeset -p ref
+ typeset +rn ref=RW
  typeset -p ref
 0:add and remove readonly attribute with references
 >typeset -rn ref=RO
-*?*: ref: read-only reference
+>(eval):typeset:4: ref: read-only reference
 >status: 1 expected: 1
 >typeset -n ref=RO
 >typeset -r ref=RO
-*?*: ref: read-only variable
->status: 1 expected: 1
->typeset -n ref=RO
->typeset -g RO=RW
+>typeset -rn ref=RO
+>status: 0 expected: 0
+>typeset -n ref=RW
 >typeset -rn ref=RX
->typeset -g RO=RW
 >typeset ref=RW
 
  () {
@@ -2362,13 +2360,13 @@ F:converting from association/array to string should work here too
  show '${refX}'       ${(q!)refU}       ${(q!)refN}       ${(q!)refS}
  show '${var}'        ${var}
  echo
- typeset -n refU refN="" refS=var
+ unset -n refU; typeset -n refU refN="" refS=var
  show '${refX:-ccc}'  ${(q!)refU:-ccc}  ${(q!)refN:-ccc}  ${(q!)refS:-ccc}
  show '${refX:=ccc}'  ${(q!)refU:=ccc}  ${(q!)refN:=ccc}  ${(q!)refS:=ccc}
  show '${refX}'       ${(q!)refU}       ${(q!)refN}       ${(q!)refS}
  show '${var}'        ${var}
  echo
- typeset -n refU refN="" refS=var
+ unset -n refU; typeset -n refU refN="" refS=var
  show '${refX::=ddd}' ${(q!)refU::=ddd} ${(q!)refN::=ddd} ${(q!)refS::=ddd}
  show '${refX}'       ${(q!)refU}       ${(q!)refN}       ${(q!)refS}
  show '${var}'        ${var}

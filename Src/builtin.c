@@ -2105,22 +2105,22 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	}
 	tc = 1;
 	if (OPT_MINUS(ops,'p'))
-	    usepm = (on & pm->node.flags);
+	    usepm = !!(on & pm->node.flags);
 	else if (OPT_PLUS(ops,'p'))
-	    usepm = (off & pm->node.flags);
+	    usepm = !!(off & pm->node.flags);
 	else
 	    usepm = 0;
     }
     else if (usepm || newspecial != NS_NONE) {
 	int chflags = ((off & pm->node.flags) | (on & ~pm->node.flags)) &
 	    (PM_INTEGER|PM_EFLOAT|PM_FFLOAT|PM_HASHED|
-	     PM_ARRAY|PM_TIED|PM_AUTOLOAD);
+	     PM_ARRAY|PM_NAMEREF|PM_TIED|PM_AUTOLOAD);
 	/* keep the parameter if just switching between floating types */
 	if ((tc = chflags && chflags != (PM_EFLOAT|PM_FFLOAT))) {
 	    if (OPT_MINUS(ops,'p'))
-		usepm = (on & pm->node.flags);
+		usepm = !!(on & pm->node.flags);
 	    else if (OPT_PLUS(ops,'p'))
-		usepm = (off & pm->node.flags);
+		usepm = !!(off & pm->node.flags);
 	    else
 		usepm = 0;
 	}
@@ -2232,6 +2232,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
      *   ii. we are creating a new local parameter
      */
     if (usepm) {
+	int flags = (on & PM_NAMEREF) ? ASSPM_NONAMEREF : 0;
 	if (OPT_MINUS(ops,'p') && on &&
 	    !((on & pm->node.flags) || ((on & PM_LOCAL) && pm->level)))
 	    return NULL;
@@ -2326,10 +2327,10 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 		    DPUTS(!tdp, "BUG: no join character to update");
 	    }
 	    if (asg->value.scalar &&
-		!(pm = assignsparam(pname, ztrdup(asg->value.scalar), 0)))
+		!(pm = assignsparam(pname, ztrdup(asg->value.scalar), flags)))
 		return NULL;
 	} else if (asg->flags & ASG_ARRAY) {
-	    int flags = (asg->flags & ASG_KEY_VALUE) ? ASSPM_KEY_VALUE : 0;
+	    flags |= (asg->flags & ASG_KEY_VALUE) ? ASSPM_KEY_VALUE : 0;
 	    if (!(pm = assignaparam(pname, asg->value.array ?
 				 zlinklist2array(asg->value.array, 1) :
 				 mkarray(NULL), flags)))
@@ -2360,6 +2361,9 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	on |= ~off & (PM_READONLY|PM_EXPORTED) & pm->node.flags;
 	/* ...but turn off existing readonly so we can delete it */
 	pm->node.flags &= ~PM_READONLY;
+	/* Hack to force getsparam below to use the reference's own value */
+	if (off & PM_NAMEREF)
+	    pm->node.flags &= ~PM_NAMEREF;
 	/*
 	 * If we're just changing the type, we should keep the
 	 * variable at the current level of localness.
@@ -2373,6 +2377,12 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	 * implications.)
 	 */
 	if (!ASG_VALUEP(asg) && !((pm->node.flags|on) & (PM_ARRAY|PM_HASHED))) {
+	    /*
+	     * Relying on pname is fundamentally wrong. If the original pm was
+	     * a reference, the resolved pname may refer to a hidden parameter.
+	     * In that case, getsparam wrongly returns the value of the hiding
+	     * parameter.
+	     */
 	    asg->value.scalar = dupstring(getsparam(pname));
 	    asg->flags = 0;
 	}
@@ -3115,42 +3125,6 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 		returnval = 1;
 	    }
 	    continue;
-	}
-
-	if (on & PM_NAMEREF) {
-	    if (asg->value.scalar &&
-		((pm = (Param)paramtab->getnode(paramtab, asg->value.scalar)) &&
-		 (pm->node.flags & PM_NAMEREF))) {
-		if (pm->node.flags & PM_SPECIAL) {
-		    zwarnnam(name, "%s: invalid reference", pm->node.nam);
-		    returnval = 1;
-		    continue;
-		}
-	    }
-	    if (hn) {
-		/* namerefs always start over fresh */
-		if (((Param)hn)->level >= locallevel ||
-		    (!(on & PM_LOCAL) && ((Param)hn)->level < locallevel)) {
-		    Param oldpm = (Param)hn;
-		    if (!asg->value.scalar &&
-			PM_TYPE(oldpm->node.flags) == PM_SCALAR &&
-			oldpm->u.str)
-			asg->value.scalar = dupstring(oldpm->u.str);
-		    /* Defer read-only error to typeset_single() */
-		    if (!(hn->flags & PM_READONLY)) {
-			unsetparam_pm(oldpm, 0, 1);
-			hn = NULL;
-		    }
-		}
-		/* Passing a NULL pm to typeset_single() makes the
-		 * nameref read-only before assignment, which breaks
-		 *   typeset -rn ref=var
-		 * so this is special-cased to permit that action
-		 * like assign-at-create for other parameter types.
-		 */
-		if (hn && !(hn->flags & PM_READONLY))
-		    hn = NULL;
-	    }
 	}
 
 	if (!typeset_single(name, asg->name, (Param)hn,
