@@ -22,10 +22,10 @@ place of any other parameter having the same name that was assigned or
 declared in an earlier function scope.
 (See sectref(Local Parameters)(zshparam).)
 
-A named parameter declared with the `tt(-n)' option to any of the
-`tt(typeset)' acts as a reference to another parameter, which may
-be at a different call level than the declaring function.  When the
-`tt(-u)' option is also given, the referenced parameter is always
+A named reference declared with the `tt(-n)' option to any of the
+`tt(typeset)' commands acts as a reference to another parameter, which
+may be at a different call level than the declaring function.  When
+the `tt(-u)' option is also given, the referenced parameter is always
 found at a call level above the function where the reference is
 declared, otherwise the reference scope is dynamic.  For this reason,
 it is good practice to declare a named reference as soon as the

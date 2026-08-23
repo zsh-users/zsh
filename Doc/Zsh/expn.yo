@@ -976,8 +976,7 @@ following flags are supported:
 startitem()
 item(tt(!))(
 When the parameter being expanded is a named reference, the reference
-itself is examined and thus is em(not) resolved to its referent.  In
-ksh emulation, the parens around this flag are optional.
+itself is examined and thus is em(not) resolved to its referent.
 )
 item(tt(#))(
 Evaluate the resulting words as numeric expressions and interpret
@@ -1615,26 +1614,15 @@ Note, however, that named references to em(special) parameters acquire
 the behavior of the special parameter, regardless of the scope where
 the reference is declared.
 
-In the event that the local var(pname) goes out of scope (its declaring
-function returns) before the reference var(rname) goes out of scope,
+In the event that the local var(rname) goes out of scope (its declaring
+function returns) before the reference var(pname) goes out of scope,
 the reference may change to another parameter having the same name as
-var(pname), or assignments may fail as described above.  Keep the
-declaration of var(rname) as close as possible to its initialization
-to var(pname) to avoid confusion.
+var(rname), or assignments may fail as described above.  Keep the
+initialization of var(pname) as close as possible to the declaration of
+var(rname) to avoid confusion.
 
-When var(rname) includes an array subscript, the subscript expression
-is interpreted at the time tt(${)var(pname)tt(}) is expanded.  Any
-form of subscript is allowed, including those that select individual
-elements, substrings of scalar strings, or multiple elements as with
-array slices or the `tt((i))', `tt((I))', `tt((r))', `tt((R))' and
-`tt((w))' subscript flags.  However, the subscript is evaluated with
-the tt(NO_EXEC) option in effect, so command substitution and other
-similar constructs produce no output, although are not syntactically
-excluded.
-
-When var(rname) is an array (but not an array element or slice), the
-named reference may also be used in substitutions requiring an
-var(arrayname), so these are equivalent:
+When var(rname) is an array, the named reference may also be used in
+substitutions requiring an var(arrayname), so these are equivalent:
 ifzman()
 example(tt(${)var(name)tt(:|)var(rname)tt(})
 tt(${)var(name)tt(:|)var(pname)tt(}))

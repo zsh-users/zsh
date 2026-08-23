@@ -2037,14 +2037,13 @@ cindex(named reference)
 cindex(reference, named)
 The flag tt(-n) creates a em(named reference) to another parameter.
 The second parameter need not exist at the time the reference is
-created.  Only the tt(-H), tt(-g), and tt(-r) flags may be used in
-conjunction with tt(-n), having their usual meanings.  The tt(-u)
+created.  Only the tt(-H), tt(-g), tt(-h), and tt(-r) flags may be used
+in conjunction with tt(-n), having their usual meanings.  The tt(-u)
 flag is special and may be applied to alter the scope of the reference.
 The var(name) so created may not be an array element nor use
 a subscript, but the var(value) assigned may be any valid parameter
-name syntax, even a subscripted array element (including an associative
-array element) or an array slice, which is evaluated when the named
-reference is expanded.  It is an error for a named reference to refer
+name, but not a subscripted array (or associative array) element nor
+an array slice.  It is an error for a named reference to refer
 to itself, even indirectly through a chain of references.  When tt(-u)
 is applied to a named reference, the parameter identified by var(value)
 is always found in the calling function scope rather than the current
