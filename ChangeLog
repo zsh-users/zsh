@@ -1,3 +1,10 @@
+2026-08-23  Bart Schaefer  <schaefer@zsh.org>
+
+	* 55109: Philippe: Src/builtin.c, Test/B02typeset.ztst,
+	Test/K01nameref.ztst, Test/V10private.ztst: remove obsolete
+	nameref-specific code from typeset_single and improve test
+	coverage
+
 2026-08-22  Bart Schaefer  <schaefer@zsh.org>
 
 	* 55069: Philippe: Doc/Zsh/builtins.yo, Doc/Zsh/expn.yo,
