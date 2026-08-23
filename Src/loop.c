@@ -30,18 +30,23 @@
 #include "zsh.mdh"
 #include "loop.pro"
 
-/* # of nested loops we are in */
- 
+/* # of nested loops we are in started in ancestor subshells */
+
+/**/
+int ancestor_loops;
+
+/* # of nested loops we are in started in the current subshell */
+
 /**/
 int loops;
- 
-/* # of continue levels */
- 
+
+/* whether to continue instead of break on the last break level */
+
 /**/
 mod_export int contflag;
- 
+
 /* # of break levels */
- 
+
 /**/
 mod_export volatile int breaks;
 

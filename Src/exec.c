@@ -1260,6 +1260,8 @@ entersubsh(int flags, struct entersubsh_ret *retp)
 	clearjobtab(monitor);
     get_usage();
     forklevel = locallevel;
+    ancestor_loops += loops;
+    loops = 0;
 }
 
 /* execute a string */

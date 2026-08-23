@@ -1325,7 +1325,7 @@ setupvals(char *cmd, char *runscript, char *zsh_name)
     }
 #endif
 
-    breaks = loops = 0;
+    breaks = contflag = loops = ancestor_loops = 0;
     lastmailcheck = zmonotime(NULL);
     locallevel = sourcelevel = 0;
     sfcontext = SFC_NONE;

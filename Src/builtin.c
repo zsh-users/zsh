@@ -5816,24 +5816,22 @@ bin_break(char *name, char **argv, UNUSED(Options ops), int func)
 	nump = 1;
     }
 
-    if (nump > 0 && (func == BIN_CONTINUE || func == BIN_BREAK) && num <= 0) {
-	zerrnam(name, "argument is not positive: %d", num);
-	return 1;
-    }
-
     switch (func) {
     case BIN_CONTINUE:
-	if (!loops) {   /* continue is only permitted in loops */
-	    zerrnam(name, "not in for, while, until, select, or repeat loop");
-	    return 1;
-	}
-	contflag = 1; /* FALLTHROUGH */
     case BIN_BREAK:
-	if (!loops) {   /* break is only permitted in loops */
-	    zerrnam(name, "not in for, while, until, select, or repeat loop");
+	num = nump ? num : 1;
+	if (num <= 0) {
+	    zerrnam(name, "argument is not positive: %d", num);
 	    return 1;
 	}
-	breaks = nump ? minimum(num,loops) : 1;
+	if (!loops) {   /* break/continue only permitted in loops */
+	    zerrnam(name, ancestor_loops
+		    ? "not in same subshell as first enclosing loop"
+		    : "not in for, while, until, select, or repeat loop");
+	    return 1;
+	}
+	contflag = func == BIN_CONTINUE;
+	breaks = minimum(num, loops);
 	break;
     case BIN_RETURN:
 	if ((isset(INTERACTIVE) && isset(SHINSTDIN))
