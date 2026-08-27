@@ -1,3 +1,8 @@
+2026-09-01  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 55128: Doc/Zsh/mod_socket.yo, Src/Modules/socket.c: socket:
+	unmetafy the socket name
+
 2026-08-23  Bart Schaefer  <schaefer@zsh.org>
 
 	* 55109: Philippe: Src/builtin.c, Test/B02typeset.ztst,

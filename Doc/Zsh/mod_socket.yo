@@ -10,6 +10,12 @@ cindex(sockets, Unix domain)
 item(tt(zsocket) [ tt(-alstv) ] [ tt(-d) var(fd) ] [ var(args) ])(
 tt(zsocket) is implemented as a builtin to allow full use of shell
 command line editing, file I/O, and job control mechanisms.
+
+In the invocations below, var(filename) may start with a NUL byte to use
+the abstract socket namespace where no actual socket file is used. It
+can also be passed as an empty string to ask the kernel to autoassign a
+name, in which case that name will be returned in tt(reply) and printed
+when using the tt(-v) option. This feature may be limited to Linux.
 )
 enditem()
 
@@ -34,7 +40,7 @@ needed, for example:
 
 example(exec {REPLY}>&-)
 
-The tt(zsocket -s var(fd)) command may also be used to shut down a
+The tt(zsocket -s) var(fd) command may also be used to shut down a
 socket fd before closing it. This will send an EOF to the other side,
 while this side can still read their subsequent response before closing
 the connection fully, for example.
@@ -49,13 +55,19 @@ item(tt(zsocket) tt(-l) [ tt(-v) ] [ tt(-d) var(fd) ] var(filename))(
 tt(zsocket -l) will open a socket listening on var(filename).
 The shell parameter tt(REPLY) will be set to the file descriptor
 associated with that listener.  The file descriptor remains open in subshells
-and forked external executables.
+and forked external executables. The parameter tt(reply) will return both
+that file descriptor and the socket name used, which will be different
+from var(filename) when autobind sockets are used (eg, when
+var(filename) was empty). Note also that the name returned will start
+with a NUL byte in that case.
 
 If tt(-d) is specified, its argument
 will be taken as the target file descriptor for
 the connection.
 
-In order to elicit more verbose output, use tt(-v).
+In order to elicit more verbose output, use tt(-v). (Abstract sockets
+will be printed with an tt(abstract:) prefix instead of the literal NUL
+byte, but this format is not accepted as var(filename) input.)
 )
 item(tt(zsocket) tt(-a) [ tt(-tv) ] [ tt(-d) var(targetfd) ] var(listenfd))(
 tt(zsocket -a) will accept an incoming connection

@@ -82,16 +82,19 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
     }
 
     if (OPT_ISSET(ops,'l')) {
-	char *localfn;
+	char *sockname, **reply_arr, buf[DIGBUFSIZE];
+	ZSOCKLEN_T addrlen;
+	int socknamelen, abstract;
 
 	if (!args[0]) {
 	    zwarnnam(nam, "-l requires an argument");
 	    return 1;
 	}
 
-	localfn = args[0];
-	if (strlen(localfn) >= sizeof(soun.sun_path)) {
-	    zwarnnam(nam, "socket path too long: %d > %d", strlen(localfn), sizeof(soun.sun_path) -1 );
+	sockname = unmetafy(args[0], &socknamelen);
+	abstract = (sockname[0] == '\0');
+	if (socknamelen > sizeof(soun.sun_path) - !abstract) {
+	    zwarnnam(nam, "socket path too long: %d > %d", socknamelen, sizeof(soun.sun_path) - !abstract);
 	    return 1;
 	}
 
@@ -103,11 +106,12 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	}
 
 	soun.sun_family = AF_UNIX;
-	strncpy(soun.sun_path, localfn, sizeof(soun.sun_path)-1);
+	memcpy(soun.sun_path, sockname, socknamelen);
+	addrlen = offsetof(struct sockaddr_un, sun_path) + socknamelen;
 
-	if (bind(sfd, (struct sockaddr *)&soun, sizeof(struct sockaddr_un)))
+	if (bind(sfd, (struct sockaddr *)&soun, addrlen))
 	{
-	    zwarnnam(nam, "could not bind to %s: %e", soun.sun_path, errno);
+	    zwarnnam(nam, "could not bind to %s: %e", metafy(sockname, socknamelen, META_STATIC), errno);
 	    close(sfd);
 	    return 1;
 	}
@@ -137,10 +141,37 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	/* allow to be closed explicitly */
 	fdtable[sfd] = FDT_EXTERNAL;
 
-	setiparam_no_convert("REPLY", (zlong)sfd);
+	if (socknamelen == 0) {
+	    addrlen = sizeof(soun);
+	    if (getsockname(sfd, (struct sockaddr *)&soun, &addrlen) == -1) {
+		zwarnnam(nam, "could not retrieve autobind socket name: %e", errno);
+		return 1;
+	    }
+	    socknamelen = addrlen - offsetof(struct sockaddr_un, sun_path);
+	    if (socknamelen > sizeof(soun.sun_path)) {
+		/* this should not be possible */
+		zwarnnam(nam, "socket name buffer too small, needed %d", socknamelen);
+		return 1;
+	    }
+	}
 
-	if (verbose)
-	    printf("%s listener is on fd %d\n", soun.sun_path, sfd);
+	reply_arr = (char **) zalloc(3 * sizeof(char *));
+	convbase(buf, sfd, 10);
+	setsparam("REPLY", ztrdup(buf));
+	reply_arr[0] = ztrdup(buf);
+	reply_arr[1] = metafy(soun.sun_path, socknamelen, META_DUP);
+	reply_arr[2] = NULL;
+	setaparam("reply", reply_arr);
+
+	if (verbose) {
+	    if (abstract) {
+		/* this seems nicer than just printing ^@ */
+		fputs("abstract:", stdout);
+	    }
+	    sockname = metafy(soun.sun_path + abstract, socknamelen - abstract, META_STATIC);
+	    nicezputs(sockname, stdout);
+	    printf(" listener is on fd %d\n", sfd);
+	}
 
 	return 0;
 
@@ -242,13 +273,19 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
     }
     else
     {
+	char *sockname;
+	ZSOCKLEN_T addrlen;
+	int socknamelen, abstract;
+
 	if (!args[0]) {
 	    zwarnnam(nam, "zsocket requires an argument");
 	    return 1;
 	}
 
-	if (strlen(args[0]) >= sizeof(soun.sun_path)) {
-	    zwarnnam(nam, "socket path too long: %d > %d", strlen(args[0]), sizeof(soun.sun_path) -1 );
+	sockname = unmetafy(args[0], &socknamelen);
+	abstract = (sockname[0] == '\0');
+	if (socknamelen > sizeof(soun.sun_path) - !abstract) {
+	    zwarnnam(nam, "socket path too long: %d > %d", socknamelen, sizeof(soun.sun_path) - !abstract);
 	    return 1;
 	}
 
@@ -260,9 +297,10 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	}
 
 	soun.sun_family = AF_UNIX;
-	strncpy(soun.sun_path, args[0], sizeof(soun.sun_path)-1);
+	memcpy(soun.sun_path, sockname, socknamelen);
+	addrlen = offsetof(struct sockaddr_un, sun_path) + socknamelen;
 	
-	if (connect(sfd, (struct sockaddr *)&soun, sizeof(struct sockaddr_un))) {
+	if (connect(sfd, (struct sockaddr *)&soun, addrlen)) {
 	    zwarnnam(nam, "connection failed: %e", errno);
 	    close(sfd);
 	    return 1;
