@@ -371,7 +371,7 @@ Define a function which is referenced by any one of var(word).
 Normally, only one var(word) is provided; multiple var(word)s
 are usually only useful for setting traps.
 The body of the function is the var(list) between
-the tt({) and tt(}).  See sectref(Functions)(blow).
+the tt({) and tt(}).  See sectref(Functions)(below).
 
 The options of tt(function) have the following meanings:
 

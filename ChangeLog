@@ -1,5 +1,8 @@
 2026-09-01  Mikael Magnusson  <mikachu@gmail.com>
 
+	* Jun-ichi Takimoto: 55119: Doc/Zsh/grammar.yo: fix typo from
+	53821
+
 	* 55128: Doc/Zsh/mod_socket.yo, Src/Modules/socket.c: socket:
 	unmetafy the socket name
 
