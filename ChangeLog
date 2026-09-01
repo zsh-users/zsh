@@ -1,3 +1,8 @@
+2026-09-01  Jun-ichi Takimoto  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 55120: Test/Y07call_program.ztst: only check values of LC_ALL
+	etc. while testing option -l
+
 2026-09-01  Mikael Magnusson  <mikachu@gmail.com>
 
 	* Jun-ichi Takimoto: 55119: Doc/Zsh/grammar.yo: fix typo from

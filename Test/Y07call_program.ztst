@@ -71,20 +71,23 @@
   if [[ -z ${lc::=${ ZTST_find_UTF8 }} ]]; then
     ZTST_skip='no utf8 locale'
   else
-    comptesteval "old_LC_ALL=\$LC_ALL; LC_ALL=${(q+)lc}"
-    for 1 in '' -l; do
-      tst_call_program $1 tag '
-        local -a arr=( z e é )
-        print -r - ${(o)arr}
-      '
-    done
+    comptesteval "old_LC_ALL=\$LC_ALL; lc=$lc; LC_ALL=$lc"
+    # without -l: _comp_locale sets LC_CTYPE=$lc, LC_ALL=, LANG=C
+    tst_call_program tag '
+      [[ $LC_CTYPE != $lc ]] && echo "bad LC_CTYPE (without -l)"
+      print -r - LANG=$LANG LC_ALL=$LC_ALL
+    '
+    # with -l: locale doesn't change: LC_ALL=$lc
+    tst_call_program -l tag '
+      [[ $LC_ALL != $lc ]] && echo "LC_ALL changed (with -l)"
+    '
     comptesteval 'LC_ALL=$old_LC_ALL'
   fi
 0:-l
 >line: {tst }{}
->MESSAGE:{e z é}
+>MESSAGE:{LANG=C LC_ALL=}
 >line: {tst }{}
->MESSAGE:{e é z}
+>MESSAGE:{}
 
   tst_call_program    tag print a b c
   tst_call_program -p tag print a b c
