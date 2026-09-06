@@ -7010,7 +7010,7 @@ _git_diff_filters() {
   exclude=( ${(s..)PREFIX:u} ${(s..)SUFFIX:u} ${(s..)PREFIX:l} ${(s..)SUFFIX:l} )
   compset -P \*
   compset -S \*
-  filters=( A added C copied D deleted M modified R renamed T changed  b "pairing broken" )
+  filters=( A added C copied D deleted M modified R renamed T changed U unmerged X unknown B "pairing broken" )
   if zstyle -T ":completion:${curcontext}:" verbose; then
     zstyle -s ":completion:${curcontext}:" list-separator sep || sep=--
     print -v dispinc -f "%s $sep %s" ${(kv)filters}
