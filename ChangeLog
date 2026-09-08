@@ -1,3 +1,10 @@
+2026-11-10  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 55157 + 55197: Config/defs.mk.in, Doc/Makefile.in,
+	Src/Makefile.in, Src/Makemod.in.in, Src/Modules/curses.mdd,
+	Src/Modules/newuser.mdd, Src/Modules/terminfo.mdd,
+	Src/mkmakemod.sh, Src/zsh.mdd: allow parallel make
+
 2026-11-01  Oliver Kiddle  <opk@zsh.org>
 
 	* Daniel Colascione: 55080: Src/init.c, Test/X06termquery.ztst,

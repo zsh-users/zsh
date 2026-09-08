@@ -64,13 +64,16 @@ OBJ=.o
 	$(DLCOMPILE) -o $@ $<
 
 .c.syms:
-	$(AWK) -f $(sdir_src)/makepro.awk $< $(subdir) > $@
+	$(AWK) -f $(sdir_src)/makepro.awk $< $(subdir) > $@.$$$$.tmp; \
+	mv $@.$$$$.tmp $@
 
 .syms.epro:
 	(echo '/* Generated automatically */'; sed -n '/^E/{s/^E//;p;}' < $<) \
-		> $@
+		> $@.$$$$.tmp; \
 	(echo '/* Generated automatically */'; sed -n '/^L/{s/^L//;p;}' < $<) \
-		> `echo $@ | sed 's/\.epro$$/.pro/'`
+		> `echo $@ | sed 's/\.epro$$/.pro.'$$$$.tmp/`; \
+	mv $@.$$$$.tmp $@; \
+	mv `echo $@ | sed 's/\.epro$$/.pro.'$$$$.tmp/` `echo $@ | sed 's/\.epro$$/.pro'/`
 
 PROTODEPS = $(sdir_src)/makepro.awk
 

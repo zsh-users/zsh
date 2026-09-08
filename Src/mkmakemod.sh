@@ -190,6 +190,7 @@ if $first_stage; then
 	unset objects proto headers hdrdeps otherincs libs
 	. $top_srcdir/$the_subdir/${mddname}.mdd
 	q_name=`echo $name | sed 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`
+	q_mddname=`echo $the_subdir/$mddname | sed 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`
 	test -n "${moddeps+set}" || moddeps=
 	test -n "$nozshdep" || moddeps="$moddeps zsh/main"
 	test -n "${proto+set}" ||
@@ -304,10 +305,11 @@ if $first_stage; then
 	echo "\$(SYMS_${mddname}): \$(PROTODEPS)"
 	echo
 	echo "${mddname}.export: \$(SYMS_${mddname})"
-	echo "	@( echo '#!'; cat \$(SYMS_${mddname}) | sed -n '/^X/{s/^X//;p;}' | sort -u ) > \$@"
+	echo "	@( echo '#!'; cat \$(SYMS_${mddname}) | sed -n '/^X/{s/^X//;p;}' | sort -u ) > \$@.tmp.\$\$\$\$; \\"
+	echo "	mv -f \$@.tmp.\$\$\$\$ \$@"
 	echo
 	echo "modobjs.${mddname}: \$(MODOBJS_${mddname})"
-	echo "	@echo '' \$(MODOBJS_${mddname}) $modobjs_sed>> \$(dir_src)/stamp-modobjs.tmp"
+	echo "	@echo '' \$(MODOBJS_${mddname}) $modobjs_sed> \$(dir_src)/stamp-modobjs.tmp-${q_mddname}"
 	echo
 	if test -z "$alwayslink"; then
 	    case " $all_modules" in *" ${mddname}."*)
@@ -332,22 +334,22 @@ if $first_stage; then
 	echo "	@test -f \$@ || echo 'do not delete this file' > \$@"
 	echo
 	echo "${mddname}.mdhs: ${mddname}.mdd"
-	echo "	@\$(MAKE) -f \$(makefile) \$(MAKEDEFS) ${mddname}.mdh.tmp"
-	echo "	@if cmp -s ${mddname}.mdh ${mddname}.mdh.tmp; then \\"
-	echo "	    rm -f ${mddname}.mdh.tmp; \\"
+	echo "	@\$(MAKE) -f \$(makefile) \$(MAKEDEFS) MDHPID=\$\$\$\$ ${mddname}.mdh.tmp.\$\$\$\$; \\"
+	echo "	if cmp -s ${mddname}.mdh ${mddname}.mdh.tmp.\$\$\$\$; then \\"
+	echo "	    rm -f ${mddname}.mdh.tmp.\$\$\$\$; \\"
 	echo "	    echo \"\\\`${mddname}.mdh' is up to date.\"; \\"
 	echo "	else \\"
-	echo "	    mv -f ${mddname}.mdh.tmp ${mddname}.mdh; \\"
+	echo "	    mv -f ${mddname}.mdh.tmp.\$\$\$\$ ${mddname}.mdh; \\"
 	echo "	    echo \"Updated \\\`${mddname}.mdh'.\"; \\"
 	echo "	fi"
 	echo "	echo 'timestamp for ${mddname}.mdh against ${mddname}.mdd' > \$@"
 	echo
 	echo "${mddname}.mdh: ${modhdeps} ${headers} ${hdrdeps} ${mddname}.mdhi"
-	echo "	@\$(MAKE) -f \$(makefile) \$(MAKEDEFS) ${mddname}.mdh.tmp"
-	echo "	@mv -f ${mddname}.mdh.tmp ${mddname}.mdh"
+	echo "	@\$(MAKE) -f \$(makefile) \$(MAKEDEFS) MDHPID=\$\$\$\$ ${mddname}.mdh.tmp.\$\$\$\$; \\"
+	echo "	mv -f ${mddname}.mdh.tmp.\$\$\$\$ ${mddname}.mdh"
 	echo "	@echo \"Updated \\\`${mddname}.mdh'.\""
 	echo
-	echo "${mddname}.mdh.tmp:"
+	echo "${mddname}.mdh.tmp.\$(MDHPID):"
 	echo "	@( \\"
 	echo "	    echo '#ifndef have_${q_name}_module'; \\"
 	echo "	    echo '#define have_${q_name}_module'; \\"
@@ -425,31 +427,31 @@ if $first_stage; then
 	    echo "	@cd @%@ && \$(MAKE) \$(MAKEDEFS) @%@$mdh"
 	    echo
 	done | sed 's,^\(.*\)@%@\(.*\)@%@\(.*\)/\([^/]*\)$,\1\3\2\4,'
-	if test -n "$other_mdhs"; then
-	    echo "${other_mdhs}:" | sed 's,^ ,,'
-	    echo "	false # should only happen with make -n"
+	for mdh in $other_mdhs; do
+	    echo "$mdh: FORCE"
+	    echo "	@cd @%@ && \$(MAKE) \$(MAKEDEFS) @%@$mdh"
 	    echo
-	fi
+	done | sed 's,^\(.*\)@%@\(.*\)@%@\(.*\)/\([^/]*\)$,\1\3\2\4,'
 	for export in $remote_exports; do
 	    echo "$export: FORCE"
 	    echo "	@cd @%@ && \$(MAKE) \$(MAKEDEFS) @%@$export"
 	    echo
 	done | sed 's,^\(.*\)@%@\(.*\)@%@\(.*\)/\([^/]*\)$,\1\3\2\4,'
-	if test -n "$other_exports"; then
-	    echo "${other_exports}:" | sed 's,^ ,,'
-	    echo "	false # should only happen with make -n"
+	for export in $other_exports; do
+	    echo "$export: FORCE"
+	    echo "	@cd @%@ && \$(MAKE) \$(MAKEDEFS) @%@$export"
 	    echo
-	fi
+	done | sed 's,^\(.*\)@%@\(.*\)@%@\(.*\)/\([^/]*\)$,\1\3\2\4,'
 	for mdll in $remote_modules; do
 	    echo "$mdll: FORCE"
 	    echo "	@cd @%@ && \$(MAKE) \$(MAKEDEFS) @%@$mdll"
 	    echo
 	done | sed 's,^\(.*\)@%@\(.*\)@%@\(.*\)/\([^/]*\)$,\1\3\2\4,'
-	if test -n "$other_modules"; then
-	    echo "${other_modules}:" | sed 's,^ ,,'
-	    echo "	false # should only happen with make -n"
+	for mdll in $other_modules; do
+	    echo "$mdll: FORCE"
+	    echo "	@cd @%@ && \$(MAKE) \$(MAKEDEFS) @%@$mdll"
 	    echo
-	fi
+	done | sed 's,^\(.*\)@%@\(.*\)@%@\(.*\)/\([^/]*\)$,\1\3\2\4,'
     fi
 
     echo "##### End of ${the_makefile}.in"

@@ -54,63 +54,66 @@ patchlevel.h: FORCE
 	@if [ -f $(sdir)/$@.release ]; then \
 	  cp -f $(sdir)/$@.release $@; \
 	else \
-	  echo '#define ZSH_PATCHLEVEL "'`cd $(sdir) && git describe --tags --long --abbrev=7`'"' > $@.tmp; \
-	  cmp $@ $@.tmp >/dev/null 2>&1 && rm -f $@.tmp || mv -f $@.tmp $@; \
+	  echo '#define ZSH_PATCHLEVEL "'`cd $(sdir) && git describe --tags --long --abbrev=7`'"' > $@.tmp.$$$$; \
+	  cmp $@ $@.tmp.$$$$ >/dev/null 2>&1 && rm -f $@.tmp.$$$$ || mv -f $@.tmp.$$$$ $@; \
 	fi
 FORCE:
 
 zshcurses.h: ../config.h
 	@if test x$(ZSH_CURSES_H) != x; then \
-	  echo "#include <$(ZSH_CURSES_H)>" >zshcurses.h; \
+	  echo "#include <$(ZSH_CURSES_H)>" >zshcurses.h.tmp.$$$$; \
+	  mv zshcurses.h.tmp.$$$$ zshcurses.h; \
 	else \
 	  echo >zshcurses.h; \
 	fi
 
 zshterm.h: ../config.h
 	@if test x$(ZSH_TERM_H) != x; then \
-	  echo "#include <$(ZSH_TERM_H)>" >zshterm.h; \
+	  echo "#include <$(ZSH_TERM_H)>" >zshterm.h.tmp.$$$$; \
+	  mv zshterm.h.tmp.$$$$ zshterm.h; \
 	else \
 	  echo >zshterm.h; \
 	fi
 
 zshpaths.h: Makemod $(CONFIG_INCS)
-	@echo '#define MODULE_DIR "'$(MODDIR)'"' > zshpaths.h.tmp
-	@if test x$(sitescriptdir) != xno; then \
-	  echo '#define SITESCRIPT_DIR "'$(sitescriptdir)'"' >> zshpaths.h.tmp; \
-	fi
-	@if test x$(scriptdir) != xno; then \
-	  echo '#define SCRIPT_DIR "'$(scriptdir)'"' >> zshpaths.h.tmp; \
-	fi
-	@if test x$(sitefndir) != xno; then \
-	  echo '#define SITEFPATH_DIR "'$(sitefndir)'"' >> zshpaths.h.tmp; \
-	fi
-	@if test x$(fixed_sitefndir) != x; then \
-	  echo '#define FIXED_FPATH_DIR "'$(fixed_sitefndir)'"' >> zshpaths.h.tmp; \
-        fi
-	@if test x$(fndir) != xno; then \
-	  echo '#define FPATH_DIR "'$(fndir)'"' >> zshpaths.h.tmp; \
-	  if test x$(FUNCTIONS_SUBDIRS) != x && \
-	     test x$(FUNCTIONS_SUBDIRS) != xno; then \
-	    fpath_tmp="`grep ' functions=.' \
-	    $(dir_top)/config.modules | sed -e '/^#/d' -e '/ link=no/d' \
-	    -e 's/^.* functions=//'`"; \
-	    fpath_tmp=`for f in $$fpath_tmp; do \
-	      echo $$f | sed -e 's%^Functions/%%' -e 's%/[^/]*$$%%' -e 's%/\*%%'; \
-	    done | grep -v Scripts | sort | uniq`; \
-	    fpath_tmp=`echo $$fpath_tmp | sed 's/ /\", \"/g'`; \
-	    echo "#define FPATH_SUBDIRS { \"$$fpath_tmp\" }" \
-	    >>zshpaths.h.tmp; \
+	@{ \
+	  echo '#define MODULE_DIR "'$(MODDIR)'"'; \
+	  if test x$(sitescriptdir) != xno; then \
+	    echo '#define SITESCRIPT_DIR "'$(sitescriptdir)'"'; \
 	  fi; \
-	fi
-	@if test x$(additionalfpath) != x; then \
-	  fpath_tmp="`echo $(additionalfpath) | sed -e 's:,:\", \":g'`"; \
-	  echo "#define ADDITIONAL_FPATH { \"$$fpath_tmp\" }" >> zshpaths.h.tmp; \
-	fi
-	@if cmp -s zshpaths.h zshpaths.h.tmp; then \
-	    rm -f zshpaths.h.tmp; \
+	  if test x$(scriptdir) != xno; then \
+	    echo '#define SCRIPT_DIR "'$(scriptdir)'"'; \
+	  fi; \
+	  if test x$(sitefndir) != xno; then \
+	    echo '#define SITEFPATH_DIR "'$(sitefndir)'"'; \
+	  fi; \
+	  if test x$(fixed_sitefndir) != x; then \
+	    echo '#define FIXED_FPATH_DIR "'$(fixed_sitefndir)'"'; \
+	  fi; \
+	  if test x$(fndir) != xno; then \
+	    echo '#define FPATH_DIR "'$(fndir)'"'; \
+	    if test x$(FUNCTIONS_SUBDIRS) != x && \
+	       test x$(FUNCTIONS_SUBDIRS) != xno; then \
+	      fpath_tmp="`grep ' functions=.' \
+	      $(dir_top)/config.modules | sed -e '/^#/d' -e '/ link=no/d' \
+	      -e 's/^.* functions=//'`"; \
+	      fpath_tmp=`for f in $$fpath_tmp; do \
+	        echo $$f | sed -e 's%^Functions/%%' -e 's%/[^/]*$$%%' -e 's%/\*%%'; \
+	      done | grep -v Scripts | sort | uniq`; \
+	      fpath_tmp=`echo $$fpath_tmp | sed 's/ /\", \"/g'`; \
+	      echo "#define FPATH_SUBDIRS { \"$$fpath_tmp\" }"; \
+	    fi; \
+	  fi; \
+	  if test x$(additionalfpath) != x; then \
+	    fpath_tmp="`echo $(additionalfpath) | sed -e 's:,:\", \":g'`"; \
+	    echo "#define ADDITIONAL_FPATH { \"$$fpath_tmp\" }"; \
+	  fi; \
+	} > zshpaths.h.tmp.$$$$; \
+	if cmp -s zshpaths.h zshpaths.h.tmp.$$$$; then \
+	    rm -f zshpaths.h.tmp.$$$$; \
 	    echo "\`zshpaths.h' is up to date." ; \
 	else \
-	    mv -f zshpaths.h.tmp zshpaths.h; \
+	    mv -f zshpaths.h.tmp.$$$$ zshpaths.h; \
 	    echo "Updated \`zshpaths.h'." ; \
 	fi
 

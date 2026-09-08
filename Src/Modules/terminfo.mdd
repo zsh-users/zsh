@@ -15,3 +15,15 @@ load=yes
 autofeatures="b:echoti p:terminfo"
 
 objects="terminfo.o"
+
+:<<\Make
+terminfo.o terminfo..o: ../zshcurses.h ../zshterm.h
+
+../zshcurses.h ../zshterm.h: TERMCAP_HEADER_RULE
+
+TERMCAP_HEADER_RULE: FORCE
+	@cd .. && $(MAKE) $(MAKEDEFS) -f Makemod zshcurses.h zshterm.h
+
+.PHONY: TERMCAP_HEADER_RULE
+
+Make

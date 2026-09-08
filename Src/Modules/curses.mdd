@@ -7,10 +7,17 @@ autofeatures="b:zcurses"
 objects="curses.o"
 
 :<<\Make
-curses.o curses..o: curses_keys.h
+curses.o curses..o: curses_keys.h ../zshcurses.h
 
 curses_keys.h: curses_keys.awk @CURSES_KEYS_H@
 	$(AWK) -f $(sdir)/curses_keys.awk @CURSES_KEYS_H@ /dev/null >curses_keys.h
+
+../zshcurses.h: CURSES_HEADER_RULE
+
+CURSES_HEADER_RULE: FORCE
+	@cd .. && $(MAKE) $(MAKEDEFS) -f Makemod zshcurses.h
+
+.PHONY: CURSES_HEADER_RULE
 
 clean-here: clean.curses
 clean.curses:

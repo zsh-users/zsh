@@ -8,6 +8,9 @@ functions='Scripts/newuser Functions/Newuser/*'
 objects="newuser.o"
 
 :<<\Make
-newuser.o:  ../zshpaths.h
+newuser.o newuser..o:  ../zshpaths.h
+
+../zshpaths.h: FORCE
+	@cd .. && $(MAKE) $(MAKEDEFS) -f Makemod zshpaths.h
 
 Make

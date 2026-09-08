@@ -39,9 +39,9 @@ LN_S            = @LN_S@
 @DEFS_MK@
 
 MAKEINFO = makeinfo
-TEXI2DVI = @TEXI2DVI@
+TEXI2DVI = @TEXI2DVI@ --tidy
 DVIPS = dvips
-TEXI2PDF  = @TEXI2PDF@
+TEXI2PDF  = @TEXI2PDF@ --tidy
 TEXI2HTML = @TEXI2HTML@
 SET_TEXI2ANY_VAR = @SET_TEXI2ANY_VAR@
 PAPERSIZE = @PAPERSIZE@
@@ -416,6 +416,7 @@ clean-here:
 	rm -f *.html *.info* *.dvi *.ps *.pdf
 	rm -f *.aux *.cp *.cps *.fn *.fns *.ky *.kys *.log *.idx
 	rm -f *.pg *.pgs *.toc *.tp *.tps *.vr *.vrs
+	rm -rf *.t2d
 	rm -rf infodir
 	rm -f texi2html.conf
 .PHONY: clean-here

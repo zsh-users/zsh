@@ -92,6 +92,9 @@ zsh.res.o: $(sdir)/zsh.rc $(sdir)/zsh.ico
 	windres -O coff --include-dir $(sdir) -i $(sdir)/zsh.rc -o zsh.res.o
 
 stamp-modobjs: modobjs
+	@cat stamp-modobjs.tmp-* > stamp-modobjs.tmp.$$$$; \
+	rm -f stamp-modobjs.tmp-*; \
+	mv -f stamp-modobjs.tmp.$$$$ stamp-modobjs.tmp
 	@if cmp -s stamp-modobjs.tmp stamp-modobjs; then \
 	    rm -f stamp-modobjs.tmp; \
 	else \
@@ -103,7 +106,7 @@ modobjs: headers rm-modobjs-tmp
 .PHONY: modobjs
 
 rm-modobjs-tmp:
-	rm -f stamp-modobjs.tmp
+	rm -f stamp-modobjs.tmp stamp-modobjs.tmp-*
 .PHONY: rm-modobjs-tmp
 
 @CONFIG_MK@
@@ -130,7 +133,7 @@ FORCE:
 mymods.conf:
 	@echo Linking with the standard modules.
 
-modules: $(@E@NTRYOBJ)
+modules: $(@E@NTRYOBJ) $(@L@IBZSH)
 
 $(ENTRYOBJ): FORCE
 	@$(MAKE) -f Makemod $(MAKEDEFS) $@
@@ -185,8 +188,8 @@ uninstall.cygwin-lib:
 # forces module stuff to get cleaned before Makemod itself gets
 # deleted.
 
-mostlyclean-here:
-	rm -f stamp-modobjs stamp-modobjs.tmp
+mostlyclean-here: rm-modobjs-tmp
+	rm -f stamp-modobjs
 .PHONY: mostlyclean-here
 
 clean-here:
@@ -218,6 +221,8 @@ mostlyclean-modules clean-modules distclean-modules realclean-modules:
 
 # ========== RECURSIVE MAKES ==========
 
+install.modules uninstall.modules \
+modobjs modules proto $(MAIN_OBJS) zsh.export: headers
 install.modules uninstall.modules \
 modobjs modules headers proto $(MAIN_OBJS) zsh.export: Makemod
 	@$(MAKE) -f Makemod $(MAKEDEFS) $@
