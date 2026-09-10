@@ -1,5 +1,8 @@
 2026-10-09  Oliver Kiddle  <opk@zsh.org>
 
+	* Eisuke Kawashima: github #180: Completion/Linux/Command/_btrfs:
+	update btrfs completion
+
 	* tiandic: 55199: Completion/Linux/Command/_iptables:
 	fix ipv6header module missing a ':'
 
