@@ -14,7 +14,7 @@ cmds_4=( start cancel resume status help )
 cmds_5=( start pause cancel resume status )
 cmds_6=( dump-{super,tree} {inode,logical,subvolid}-resolve map-swapfile min-dev-size rootid tree-stats help )
 cmds_7=( get set list )
-cmds_8=( enable disable rescan help )
+cmds_8=( disable enable rescan status help )
 cmds_9=( assign remove create clear-stale destroy show limit help )
 cmds_10=( start status cancel help )
 cmds_11=( chunk-recover clear-uuid-tree fix-device-size super-recover zero-log create-control-device )
@@ -123,29 +123,29 @@ while (( $#state )); do
         subvolume:find-new) args+=( '1:subvol:_files -/' '2:lastgen: _message "last gen"' );;
         (device|filesystem|qgroup|subvolume):(df|du|show|usage)|scrub:status)
           args+=(
-            '--iec[use 1024 as a base]'
-            '--si[use 1000 as a base]'
+            '(--si --raw --human-readable)--iec[use 1024 as a base]'
+            '(--iec --raw --human-readable)--si[use 1000 as a base]'
           )
         ;|
         (device|filesystem):(df|usage)|subvolume:show)
           args+=(
-            '(-b --raw)'{-b,--raw}'[output raw numbers in bytes]'
-            '(-h --human-readable -H)'{-h,--human-readable}'[output human friendly numbers, base 1024]'
-            '(-h --human-readable -H)-H[output human friendly numbers, base 1000]'
-            '(-k --kbytes)'{-k,--kbytes}'[show sizes in KiB, or kB with --si]'
-            '(-m --mbytes)'{-m,--mbytes}'[show sizes in MiB, or MB with --si]'
-            '(-g --gbytes)'{-g,--gbytes}'[show sizes in GiB, or GB with --si]'
-            '(-t --tbytes)'{-t,--tbytes}'[show sizes in TiB, or TB with --si]'
+            '(-b --raw -h --human-readable -H --iec --si -k -g -m -t --kbytes --mbytes --gbytes --tbytes)'{-b,--raw}'[output raw numbers in bytes]'
+            '(-b --raw -h --human-readable -H --iec --si)'{-h,--human-readable}'[output human friendly numbers, base 1024]'
+            '(-b --raw -h --human-readable -H --iec --si)-H[output human friendly numbers, base 1000]'
+            '(--raw -k -g -m -t --kbytes --mbytes --gbytes --tbytes)'{-k,--kbytes}'[show sizes in KiB, or kB with --si]'
+            '(--raw -k -g -m -t --kbytes --mbytes --gbytes --tbytes)'{-m,--mbytes}'[show sizes in MiB, or MB with --si]'
+            '(--raw -k -g -m -t --kbytes --mbytes --gbytes --tbytes)'{-g,--gbytes}'[show sizes in GiB, or GB with --si]'
+            '(--raw -k -g -m -t --kbytes --mbytes --gbytes --tbytes)'{-t,--tbytes}'[show sizes in TiB, or TB with --si]'
           )
         ;|
         (filesystem|qgroup|scrub):(du|show|status))
           args+=(
-            '--raw[output raw numbers in bytes]'
-            '--human-readable[output human friendly numbers, base 1024]'
-            '--kbytes[show sizes in KiB, or kB with --si]'
-            '--mbytes[show sizes in MiB, or MB with --si]'
-            '--gbytes[show sizes in GiB, or GB with --si]'
-            '--tbytes[show sizes in TiB, or TB with --si]'
+            '(--iec --si --human-readable --kbytes --mbytes --gbytes --tbytes)--raw[output raw numbers in bytes]'
+            '(--iec --si --raw)--human-readable[output human friendly numbers, base 1024]'
+            '(--raw --kbytes --mbytes --gbytes --tbytes)--kbytes[show sizes in KiB, or kB with --si]'
+            '(--raw --kbytes --mbytes --gbytes --tbytes)--mbytes[show sizes in MiB, or MB with --si]'
+            '(--raw --kbytes --mbytes --gbytes --tbytes)--gbytes[show sizes in GiB, or GB with --si]'
+            '(--raw --kbytes --mbytes --gbytes --tbytes)--tbytes[show sizes in TiB, or TB with --si]'
           )
         ;|
         filesystem:resize) args+=( '1: :_numbers -u bytes -N size K M G T P E' '2:path:->mounts' );;
@@ -250,12 +250,24 @@ while (( $#state )); do
             '1: : _guard "^-*" object'
           )
         ;;
-        quota:(enable|disable)) args+=( '1:path:_files -/' );;
+        quota:disable) args+=( '1:path:_files -/' );;
+        quota:enable)
+          args+=(
+            '(-s --simple)'{-s,--simple}'[use simple quotas (squotas) instead of full qgroup accounting]'
+            '1:path:_files -/'
+          )
+        ;;
         quota:rescan)
           args+=(
             '(-s --status)'{-s,--status}'[show status of currently running rescan]'
             '(-w --wait -W --wait-norescan)'{-w,--wait}'[wait for rescan to finish]'
-            '(-w --wait -W --wait-norescan)'{-w,--wait-norescan}'[wait for rescan to finish without starting it]'
+            '(-w --wait -W --wait-norescan)'{-W,--wait-norescan}'[wait for rescan to finish without starting it]'
+            '1:path:_files -/'
+          )
+        ;;
+        quota:status)
+          args+=(
+            --is-enabled'[only check if quotas are enabled, not not print anything]'
             '1:path:_files -/'
           )
         ;;
