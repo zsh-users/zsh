@@ -1,5 +1,8 @@
 2026-10-09  Oliver Kiddle  <opk@zsh.org>
 
+	* Philippe Altherr: 55176: Src/Modules/system.c: Avoid warning
+	about imprecise int to float conversion
+
 	* Shohei YOSHIDA: 55063: Completion/Unix/Command/_nano:
 	add --newbuffer option
 
