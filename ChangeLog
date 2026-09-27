@@ -1,5 +1,8 @@
 2026-10-09  Oliver Kiddle  <opk@zsh.org>
 
+	* Christopher Bock: 55180: Completion/Unix/Command/_libvirt:
+	extend with additional only running state commands
+
 	* Philippe Altherr: 55176: Src/Modules/system.c: Avoid warning
 	about imprecise int to float conversion
 

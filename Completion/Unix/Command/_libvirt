@@ -19,7 +19,21 @@ interact_cmds=(cd echo exit quit connect)
 typeset -A dom_opts
 dom_opts=(
   console --state-running
+  cpu-stats --state-running
   destroy " "
+  domblkstat --state-running
+  domfsfreeze --state-running
+  domfsthaw --state-running
+  domfstrim --state-running
+  domifaddr --state-running
+  domifstat --state-running
+  domlaunchsecinfo --state-running
+  dommemstat --state-running
+  dompmsuspend --state-running
+  dompmwakeup --state-running
+  get-user-sshkeys --state-running
+  guestinfo --state-running
+  guestvcpus --state-running
   managedsave " "
   reboot " "
   reset " "
@@ -27,6 +41,7 @@ dom_opts=(
   save " "
   screenshot " "
   send-key " "
+  set-user-sshkeys --state-running
   shutdown --state-running
   start --inactive
   suspend --state-running
