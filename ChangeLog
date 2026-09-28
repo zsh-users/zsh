@@ -1,3 +1,8 @@
+2026-09-28  tiandic  <2323748675@qq.com>
+
+	* github #181: Completion/Unix/Command/_python_module-venv:
+	completion: fix _python_module-venv missing backslash
+
 2026-09-18  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 55140: Src/Zle/compmatch.c: fix pointer math in join_sub
