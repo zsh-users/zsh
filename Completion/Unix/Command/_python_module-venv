@@ -10,5 +10,5 @@ _arguments -S \
   '--without-pip[skip installing or upgrading pip]' \
   '--prompt[provides an alternative prompt prefix for the environment]' \
   '--upgrade-deps[upgrade core dependencies to the latest version]' \
-  '--without-scm-ignore-files[skip adding SCM ignore files to the environment directory]'
+  '--without-scm-ignore-files[skip adding SCM ignore files to the environment directory]' \
   '*::virtual environment:_directories'
