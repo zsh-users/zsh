@@ -212,7 +212,6 @@ _ssh () {
     cmn=( -a -b -P -N -C -l -m -O -v -w -Z ) # options common to many basic commands (except -f which is common to most)
     cms=( -E -q -t -g -M -I -h -n -V -u -U ) # options specific to one basic command
     tsizes=(
-      dsa 1024
       ecdsa '256 384 521' # values appear in key names as listed with ssh -Q key - 521 really is correct
       rsa '1024 2048 4096'
     )
@@ -252,7 +251,7 @@ _ssh () {
       "$p1($cmn)$algopt" \
       - create \
       '(-P -l)-q[silence ssh-keygen]' \
-      "(-P -l)-t+[specify the type of the key to create]:key type:(rsa dsa ecdsa ed25519 ecdsa-sk ed25519-sk)" \
+      "(-P -l)-t+[specify the type of the key to create]:key type:(rsa ecdsa ecdsa-sk ed25519 ed25519-sk mldsa44-ed25519)" \
       - dns \
       "($cmn)-r[print DNS resource record]:hostname:_hosts" \
       "$p1($cmn)-g[use generic DNS format]" \
@@ -291,7 +290,8 @@ _ssh () {
       "-q[don't print server host name and banners in comments]" \
       '-T+[specify timeout]: :_numbers -u seconds -d 5 timeout \:s\:seconds m\:minutes h\:hours d\:days w\:weeks' \
       '-t+[specify key types to fetch from scanned hosts]:key type:_sequence compadd - rsa dsa ecdsa ed25519' \
-      '-v[verbose mode]'
+      '-v[verbose mode]' \
+      '1:host'
     return
   ;;
   sftp)
