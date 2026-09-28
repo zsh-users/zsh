@@ -1,5 +1,8 @@
 2026-11-19  Oliver Kiddle  <opk@zsh.org>
 
+	* Eisuke Kawashima: github #183: Completion/Unix/Command/_ssh:
+	remove obsolescent DSA
+
 	* unposted: Src/Zle/compctl.c, Src/Zle/zle_refresh.c,
 	Src/builtin.c: silence compiler warnings
 
