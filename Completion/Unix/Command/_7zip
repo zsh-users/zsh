@@ -69,7 +69,7 @@ args=(
   '-so[write data to stdout]'
   '-spd[disable wildcard matching for file names]'
   '-spe[eliminate duplication of root folder]'
-  '-spf-[use fully qualified (absolute) file paths (or specify)]::absolute-file-path behaviour::((
+  '-spf-[use fully qualified (absolute) file paths (or specify)]::absolute-file-path behaviour:((
     2\:"use full path without leading slash or drive letter"
   ))'
   '-ssc-[enable case-sensitive mode (or specify)]::case-sensitive mode:((
