@@ -1,5 +1,8 @@
 2026-10-09  Oliver Kiddle  <opk@zsh.org>
 
+	* tiandic: github #182: Completion/Unix/Command/_7zip:
+	fix excess colon
+
 	* Eisuke Kawashima: github #180: Completion/Linux/Command/_btrfs:
 	update btrfs completion
 
