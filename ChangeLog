@@ -1,5 +1,8 @@
 2026-10-25  Oliver Kiddle  <opk@zsh.org>
 
+	* tiandic: github #184: Completion/Unix/Command/_adb: avoid
+	hard-coded adb command and fix -nosystem description
+
 	* unposted: Src/Zle/termquery.c: fix offset in prompt marker
 	to allow for mouse (cl=m) tag that was added later
 
