@@ -4,6 +4,11 @@ _adb() {
   # rely on localoptions
   setopt nonomatch
 
+  local adb_command=${~words[1]}
+
+  # Record the previous adb program to avoid the error of not including adb when using 'export ANDROID_SERIAL=<Tab>'
+  (( ${+_adb_command_prev} )) || typeset -g _adb_command_prev
+
   local -a ADB_DEVICE_SPECIFICATION
   local LOG_REDIRECT
 
@@ -14,6 +19,8 @@ _adb() {
   fi
 
   if [[ $service = -value-* ]]; then
+    adb_command=${_adb_command_prev:-adb}
+
     #_message compstate=$compstate[parameter]
     case $compstate[parameter] in
       (ADB_TRACE)
@@ -31,6 +38,8 @@ _adb() {
     esac
     # We do not handle values anywhere else.
     return
+  else
+    _adb_command_prev="$adb_command"
   fi
 
   local -a ALL_ADB_COMMANDS
@@ -79,7 +88,7 @@ _adb() {
 
   (( $+functions[_adb_device_specification] )) && _adb_device_specification
 
-  if ! adb ${ADB_DEVICE_SPECIFICATION} shell exit 2>/dev/null; then
+  if ! "$adb_command" ${ADB_DEVICE_SPECIFICATION} shell exit 2>/dev/null; then
       # early bail-out until a single valid device/emulator is specified and up-and-running
       [[ $words[CURRENT-1] = -s ]] || _message -r "No (started) device specified, completions do not yet work"
       #TODO handle -t transport-id
@@ -330,7 +339,7 @@ _adb_package_manager_handler () {
 (( $+functions[_adb_cmd_handler] )) ||
 _adb_cmd_handler () {
   local -a cmds
-  cmds=(${${${(f)"$(adb ${ADB_DEVICE_SPECIFICATION} exec-out cmd -l)"}[2,-1]}##[[:space:]]##})
+  cmds=(${${${(f)"$("$adb_command" ${ADB_DEVICE_SPECIFICATION} exec-out cmd -l)"}[2,-1]}##[[:space:]]##})
   _wanted dumpsys expl 'cmd command' compadd ${cmds%$'\r'}
 }
 
@@ -338,7 +347,7 @@ _adb_cmd_handler () {
 _adb_dumpsys_handler () {
   if [[ $CURRENT -eq 3 ]]; then
     local -a services
-    services=(${${${(f)"$(adb ${ADB_DEVICE_SPECIFICATION} exec-out dumpsys -l)"}[2,-1]}##[[:space:]]##})
+    services=(${${${(f)"$("$adb_command" ${ADB_DEVICE_SPECIFICATION} exec-out dumpsys -l)"}[2,-1]}##[[:space:]]##})
     _wanted dumpsys expl 'dumpsys service' compadd - ${services%$'\r'}
   elif [[ $CURRENT -ge 4 && $words[3] == SurfaceFlinger ]]; then
     (( CURRENT -= 2 ))
@@ -367,7 +376,7 @@ _adb_dumpsys_handler () {
       case $state in
         layer)
           typeset -a layers
-          layers=(${${(f)"$(adb ${ADB_DEVICE_SPECIFICATION} exec-out dumpsys SurfaceFlinger --list)"}[2,-1]})
+          layers=(${${(f)"$("$adb_command" ${ADB_DEVICE_SPECIFICATION} exec-out dumpsys SurfaceFlinger --list)"}[2,-1]})
           _wanted dumpsys expl 'layers' compadd - ${layers%$'\r'}
           ;;
         planner)
@@ -393,7 +402,7 @@ _adb_dumpsys_handler () {
 _adb_startstop () {
   local -a services
   local -A service_status
-  services=(${(f)"$(adb ${ADB_DEVICE_SPECIFICATION} exec-out getprop)"})
+  services=(${(f)"$("$adb_command" ${ADB_DEVICE_SPECIFICATION} exec-out getprop)"})
   service_status=( ${(s,: ,)${(j,: ,)${(M)services:#\[init.svc.*}}} )
   local -A map=(start stopped stop running)
   services=( ${(k)service_status[(R)*$map[$1]*]} )
@@ -467,7 +476,7 @@ _adb_dispatch_connection_handling () {
 
 (( $+functions[_adb_check_log_redirect] )) ||
 _adb_check_log_redirect () {
-  LOG_REDIRECT=${$(adb ${ADB_DEVICE_SPECIFICATION} shell getprop log.redirect-stdio 2>/dev/null)//
+  LOG_REDIRECT=${$("$adb_command" ${ADB_DEVICE_SPECIFICATION} shell getprop log.redirect-stdio 2>/dev/null)//
 /}
   [[ ${LOG_REDIRECT[1,4]} == "true" ]] &&  _message -r "Notice: stdio log redirection enabled on the device, so some completions will not work"
 }
@@ -493,7 +502,7 @@ _adb_device_serial() {
   local expl
   local -a devices device_desc
   local device
-  devices=( $(adb devices -l | sed -n -e 's/:/\\:/' -e 's/^\([^[:space:]]*\)[[:space:]]*.*product:\([^[:space:]]*\).*$/\1:\2/p') )
+  devices=( $("$adb_command" devices -l | sed -n -e 's/:/\\:/' -e 's/^\([^[:space:]]*\)[[:space:]]*.*product:\([^[:space:]]*\).*$/\1:\2/p') )
   zstyle -a :completion:${curcontext} device-names device_desc
   for device in $device_desc; do
     if [[ -n $devices[(r)${device%:*}:*] ]]; then
@@ -509,11 +518,11 @@ _adb_device_serial() {
 _adb_logcat_filter_specification() {
   zstyle ":completion:${curcontext}:" cache-policy _adb_cache_policy_single_command
 
-  local cacheid=logcat_filter_cache_${$(adb ${ADB_DEVICE_SPECIFICATION} get-serialno)}
+  local cacheid=logcat_filter_cache_${$("$adb_command" ${ADB_DEVICE_SPECIFICATION} get-serialno)}
   typeset -a logcat_filter_tags
   if _cache_invalid "$cacheid" || ! _retrieve_cache "$cacheid"
   then
-    logcat_filter_tags=( $(command adb ${ADB_DEVICE_SPECIFICATION} logcat -d -v brief | sed -n 's#^[VDIWEF]/\([^[:space:](]*\).*#\1#p' |sort | uniq) )
+    logcat_filter_tags=( $(command "$adb_command" ${ADB_DEVICE_SPECIFICATION} logcat -d -v brief | sed -n 's#^[VDIWEF]/\([^[:space:](]*\).*#\1#p' |sort | uniq) )
     _store_cache "$cacheid" logcat_filter_tags
   fi
   local expl
@@ -554,7 +563,7 @@ _adb_shell_commands_handler() {
 
 (( $+functions[_adb_device_available] )) ||
 _adb_device_available() {
-  [[ $(adb ${ADB_DEVICE_SPECIFICATION} get-state 2>&1) == "device" ]] && return 0
+  [[ $("$adb_command" ${ADB_DEVICE_SPECIFICATION} get-state 2>&1) == "device" ]] && return 0
   return 1
 }
 
@@ -568,7 +577,7 @@ _adb_remote_folder () {
     pref=${pref%/*}/
   fi
   # yes, this ls is sickening to look at, but android doesn't have printf or find
-  files=(${${(f)"$(adb ${ADB_DEVICE_SPECIFICATION} shell 'ls -1d 2> /dev/null '$pref'*/ '$pref'*')"}%$'\r'})
+  files=(${${(f)"$("$adb_command" ${ADB_DEVICE_SPECIFICATION} shell 'ls -1d 2> /dev/null '$pref'*/ '$pref'*')"}%$'\r'})
   dirs=(${${(M)files:#*/}%/})
   files=(${${files:|dirs}:#*\*(/|)})
   _adb_device_available && \
@@ -583,11 +592,11 @@ _adb_installed_packages() {
     zstyle ":completion:${curcontext}:" cache-policy _adb_cache_policy_single_command
   fi
 
-  local cacheid=package_cache_${$(adb ${ADB_DEVICE_SPECIFICATION} get-serialno)}
+  local cacheid=package_cache_${$("$adb_command" ${ADB_DEVICE_SPECIFICATION} get-serialno)}
   typeset -a installed_packages
   if _cache_invalid "$cacheid" || ! _retrieve_cache "$cacheid"
   then
-    installed_packages=(${$( adb ${ADB_DEVICE_SPECIFICATION} shell pm list packages )//#package:/})
+    installed_packages=(${$("$adb_command" ${ADB_DEVICE_SPECIFICATION} shell pm list packages )//#package:/})
     _store_cache "$cacheid" installed_packages
   fi
  
@@ -597,7 +606,7 @@ _adb_installed_packages() {
 (( $+functions[_adb_users] )) ||
 _adb_users() {
   local -a users
-  users=( ${${${(M)${(f)"$(adb shell pm list users)"}:#*UserInfo*}#*UserInfo\{}%:*} )
+  users=( ${${${(M)${(f)"$("$adb_command" shell pm list users)"}:#*UserInfo*}#*UserInfo\{}%:*} )
   _describe -t users 'user' users
 }
 
