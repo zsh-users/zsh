@@ -93,15 +93,15 @@ _adb() {
       [[ $words[CURRENT-1] = -s ]] || _message -r "No (started) device specified, completions do not yet work"
       #TODO handle -t transport-id
       _arguments \
-	'-s[serial]: :_adb_device_serial' \
-	'(   -e)-d[device]' \
-	'(-d   )-e[emulator]' \
-	'1:option:_adb_options_handler' \
-	'*: : _default'
-      
+        '-s[serial]: :_adb_device_serial' \
+        '(   -e)-d[device]' \
+        '(-d   )-e[emulator]' \
+        '1:option:_adb_options_handler' \
+        '*: : _default'
+
       return
   fi
-  
+
   (( $+functions[_adb_check_log_redirect] )) && _adb_check_log_redirect
 
   (( $+functions[_adb_dispatch_command] )) && _adb_dispatch_command
@@ -149,10 +149,10 @@ _adb_dispatch_command () {
       ;;
     (*)
       _arguments \
-	'(-d -e)-s[serial]: :_adb_device_serial' \
-	'(-s -e)-d[device]' \
-	'(-d -s)-e[emulator]' \
-	'*:option:_adb_options_handler'
+        '(-d -e)-s[serial]: :_adb_device_serial' \
+        '(-s -e)-d[device]' \
+        '(-d -s)-e[emulator]' \
+        '*:option:_adb_options_handler'
       ;;
   esac
 }
@@ -189,7 +189,7 @@ _adb_dispatch_shell () {
     (( $+functions[_adb_shell_commands_handler] )) && _adb_shell_commands_handler
     return
   fi
-  
+
   case ${words[2]} in
     (am)
       (( $+functions[_adb_activity_manager_handler] )) && _adb_activity_manager_handler
@@ -229,21 +229,21 @@ _adb_pm_list () {
   case ${words[4]} in
     (packages)
       _arguments -s '-f[see their associated file]' \
-      			':'
+                    ':'
       ;;
     (permissions)
       _arguments -s '-g[organize by group]' \
-      		    '-f[print all information]' \
-		    '-d[only list dangerous permissions]' \
-      		    '-u[only list user visible permissions]' \
-      		    '-s[short summary]' \
-      		    ':'
+                    '-f[print all information]' \
+                    '-d[only list dangerous permissions]' \
+                    '-u[only list user visible permissions]' \
+                    '-s[short summary]' \
+                    ':'
       ;;
     (permission-groups)
       ;;
     (instrumentation)
       _arguments -s '-f[see their associated file]' \
-      			':'
+                    ':'
       ;;
     (features)
       ;;
@@ -288,8 +288,8 @@ _adb_activity_manager_handler () {
   case ${words[3]} in
     (start)
       _arguments -s '-D[enable debugging]' \
-      		    '-W[wait for launch to complete]' \
-      		    '*:intent:_adb_intent_handler'
+                    '-W[wait for launch to complete]' \
+                    '*:intent:_adb_intent_handler'
       ;;
     (startservice)
       _arguments -s '*:intent:_adb_intent_handler'
@@ -299,10 +299,10 @@ _adb_activity_manager_handler () {
       ;;
     (instrument)
       _arguments -s '-r[print raw results]' \
-      		    '-e[set argument NAME to VALUE]:<NAME> <VALUE>:' \
-      		    '-p[write profiling data to FILE]:<FILE>:' \
-		    '-w[wait for instrumentation to finish]' \
-      		    ':'
+                    '-e[set argument NAME to VALUE]:<NAME> <VALUE>:' \
+                    '-p[write profiling data to FILE]:<FILE>:' \
+                    '-w[wait for instrumentation to finish]' \
+                    ':'
       ;;
     (profile)
       _message -r "<PROCESS> start/stop <FILE>"
@@ -412,8 +412,8 @@ _adb_startstop () {
 (( $+functions[_adb_dispatch_uninstall] )) ||
 _adb_dispatch_uninstall () {
   _arguments \
-	'-k[keep data and cache]' \
-  '--user[uninstall for user id]:user id:_adb_users' \
+        '-k[keep data and cache]' \
+        '--user[uninstall for user id]:user id:_adb_users' \
         '1:installed package:_adb_installed_packages'
 }
 
@@ -427,10 +427,10 @@ _adb_dispatch_install () {
   fi
 
   _arguments \
-	'-l[forward lock]' \
-	'-r[reinstall]' \
-	'-s[install on sd]' \
-	'*:apk file:_path_files -g "*(/)|*.apk"'
+        '-l[forward lock]' \
+        '-r[reinstall]' \
+        '-s[install on sd]' \
+        '*:apk file:_path_files -g "*(/)|*.apk"'
 }
 
 (( $+functions[_adb_dispatch_push] )) ||
@@ -484,17 +484,17 @@ _adb_check_log_redirect () {
 (( $+functions[_adb_trace_opts] )) ||
 _adb_trace_opts() {
   _values -s , 'adb trace option' \
-	'(1 adb sockets packets rwx usb sync sysdeps transport jdwp)all' \
-	'(all adb sockets packets rwx usb sync sysdeps transport jdwp)1' \
-	'adb' \
-	'sockets' \
-	'packets' \
-	'rwx' \
-	'usb' \
-	'sync' \
-	'sysdeps' \
-	'transport' \
-	'jdwp'
+        '(1 adb sockets packets rwx usb sync sysdeps transport jdwp)all' \
+        '(all adb sockets packets rwx usb sync sysdeps transport jdwp)1' \
+        'adb' \
+        'sockets' \
+        'packets' \
+        'rwx' \
+        'usb' \
+        'sync' \
+        'sysdeps' \
+        'transport' \
+        'jdwp'
 }
 
 (( $+functions[_adb_device_serial] )) ||
@@ -599,7 +599,7 @@ _adb_installed_packages() {
     installed_packages=(${$("$adb_command" ${ADB_DEVICE_SPECIFICATION} shell pm list packages )//#package:/})
     _store_cache "$cacheid" installed_packages
   fi
- 
+
   _wanted adb_installed_packages expl 'packages that are installed' compadd ${installed_packages}
 }
 
