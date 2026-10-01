@@ -211,7 +211,7 @@ _adb_dispatch_backup() {
     '-obb[backup .obb files]' '!(-obb)-noobb' \
     '-shared[backup shared storage]' '!(-shared)-noshared' \
     '-all[backup all installed apps]' \
-    '-nosystem[include system apps when backing up all apps]' '!(-nosystem)-system' \
+    '-nosystem[exclude system apps when backing up all apps]' '!(-nosystem)-system' \
     '*:package name:_adb_installed_packages'
 }
 
