@@ -446,7 +446,7 @@ _ffmpeg_sample_fmts() {
   local -a sample_fmts
 
   sample_fmts=( ${(f)"$( _call_program $tag $words[1] -sample_fmts )"} )
-  sample_fmts=( ${sample_fmts:#*(:|name[[:space:]]##desc)*} )
+  sample_fmts=( ${sample_fmts:#*(:|name[[:space:]]##depth)*} )
   sample_fmts=( ${sample_fmts##[[:space:]]##} )
   sample_fmts=( ${sample_fmts%%[[:space:]]*} )
 
