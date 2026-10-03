@@ -149,7 +149,7 @@ _ffmpeg_metadata_specs() {
 # complete preset name
 (( $+functions[_ffmpeg_presets] )) ||
 _ffmpeg_presets() {
-  local -a presets=(
+  local -a expl presets=(
     ~/.ffmpeg
     $FFMPEG_DATADIR
     ${${${${(Q)words[1]}:c}%/bin/*}:-/usr}/share/ffmpeg
