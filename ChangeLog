@@ -1,3 +1,8 @@
+2026-11-01  Oliver Kiddle  <opk@zsh.org>
+
+	* tiandic: github #185: Completion/Unix/Command/_ffmpeg:
+	fix ffmpeg completion
+
 2026-10-25  Oliver Kiddle  <opk@zsh.org>
 
 	* Keith Plant: github #187: Completion/Unix/Command/_user_admin:
