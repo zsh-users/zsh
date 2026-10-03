@@ -851,7 +851,7 @@ ss_opts=(
   force_key_frames fps_mode fpsmax frames guess_layout_max hwaccel
   hwaccel_device hwaccel_output_format inter_matrix intra_matrix
   itsscale max_muxing_queue_size muxing_queue_data_threshold pass
-  passlogfile pix_fmt pre q qscale r rc_override reinit_filter s
+  passlogfile pix_fmt pre profile q qscale r rc_override reinit_filter s
   sample_fmt stats_enc_post stats_enc_post_fmt stats_enc_pre
   stats_enc_pre_fmt stats_mux_pre stats_mux_pre_fmt tag threads
   time_base top
