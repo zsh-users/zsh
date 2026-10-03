@@ -769,7 +769,7 @@ _ffmpeg_loglevels() {
 (( $+functions[_ffmpeg_dates] )) ||
 _ffmpeg_dates() {
   _message -e dates \
-    'date ([(YYYY-MM-DD|YYYYMMDD)[T|t| ]]((HH:MM:SS[.m]]])|(HHMMSS[.m]]]))[Z]) (or now)'
+    'date ([(YYYY-MM-DD|YYYYMMDD)[T|t| ]]((HH:MM:SS[.m])|(HHMMSS[.m]))[Z]) (or now)'
 }
 
 # complete duration spec
