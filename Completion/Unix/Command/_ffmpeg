@@ -1074,7 +1074,7 @@ expert_opts+=(
   '*-timestamp[specify recording timestamp]: :_ffmpeg_dates'
   '*-program[add program with specified streams]: :_ffmpeg_program_specs'
   '*-stream_group[add stream group with specified streams]: :_ffmpeg_stream_group_specs'
-  '*-dframes[specify max data frames to output (-like -frames\:d)]: :\
+  '*-dframes[specify max data frames to output (like -frames\:d)]: :\
     _ffmpeg_numbers "max data frames"
   '
   '*-target[specify target file type]:file type:(
