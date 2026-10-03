@@ -1195,7 +1195,7 @@ expert_opts+=(
   '*-display_hflip[flip video horizontally]'
   '*-display_vflip[flip video vertically]'
   '*-rc_override[specify rate-control override]:rate control (beg,end,quant):'
-  '*-timecode[specify timecode]:timecode (hh\:mm\:ss[\:;.]ff)'
+  '*-timecode[specify timecode]:timecode (hh\:mm\:ss[\:;.]ff):'
   '*-pass[specify pass number for two-pass video encoding]:pass:(1 2)'
   '*-passlogfile[specify two-pass log-file prefix]:log-file prefix [ffmpeg2pass]:'
   '*-intra_matrix[specify intra quantisation matrix]:intra quantisation matrix:'
