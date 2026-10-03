@@ -1308,10 +1308,6 @@ gen_avo_opts+=(
     very strict normal unofficial experimental
   )'
   '!*-b_qoffset[]:float:'
-  '!*-err_detect[]: :_ffmpeg_flags - \
-    crccheck bitstream buffer explode ignore_err careful compliant
-    aggressive
-  '
   '!*-maxrate[]:int64:'
   '!*-minrate[]:int64:'
   '!*-bufsize[]:int:'
