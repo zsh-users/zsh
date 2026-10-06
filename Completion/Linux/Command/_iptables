@@ -197,7 +197,7 @@ while
         --hashlimit-htable-max:entries
         --hashlimit-htable-{expire,gcinterval}:msec
         --hashlimit-rate-match
-        --hashlimit-rate-intervale:sec
+        --hashlimit-rate-interval:sec
       )
     ;;
     hbh) args+=( --hbh-len:length --hbh-opts:type ) ;;
@@ -317,7 +317,7 @@ while
         '--algo:strategy:(bm kmp)'
         --{from,to}:offset
         --{,hex}string:pattern
-        -icase
+        --icase
       )
     ;;
     tcp)

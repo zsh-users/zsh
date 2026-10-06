@@ -1,5 +1,8 @@
 2026-10-09  Oliver Kiddle  <opk@zsh.org>
 
+	* tiandic: 55198: Completion/Linux/Command/_iptables:
+	fix typos in iptables completion options
+
 	* Evan Granito: 55196: Completion/Unix/Command/_django:
 	drop stale pre-1.9 command list
 
