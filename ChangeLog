@@ -1,6 +1,9 @@
 2026-10-09  Oliver Kiddle  <opk@zsh.org>
 
 	* Evan Granito: 55196: Completion/Unix/Command/_django:
+	drop stale pre-1.9 command list
+
+	* Evan Granito: 55196: Completion/Unix/Command/_django:
 	skip [section] headers in manage.py --help output
 
 	* Christopher Bock: 55180: Completion/Unix/Command/_libvirt:
