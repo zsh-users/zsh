@@ -209,7 +209,7 @@ while
     ipv6header)
       args+=(
         --soft
-        '--header:header(hop dst route frag auth esp none prot)'
+        '--header:header:(hop dst route frag auth esp none prot)'
       )
     ;;
     ipvs)
