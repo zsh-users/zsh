@@ -283,9 +283,8 @@ static struct builtin commandbn =
 
 /* parse string into a list */
 
-/**/
-mod_export Eprog
-parse_string(char *s, int reset_lineno)
+static Eprog
+parse_string_internal(char *s, int reset_lineno, int heap)
 {
     Eprog p;
     zlong oldlineno;
@@ -296,7 +295,7 @@ parse_string(char *s, int reset_lineno)
     oldlineno = lineno;
     if (reset_lineno)
 	lineno = 1;
-    p = parse_list();
+    p = parse_list(heap);
     lineno = oldlineno;
     if (tok == LEXERR && !lastval)
 	lastval = 1;
@@ -304,6 +303,20 @@ parse_string(char *s, int reset_lineno)
     inpop();
     zcontext_restore();
     return p;
+}
+
+/**/
+mod_export Eprog
+parse_ztring(char *s, int reset_lineno)
+{
+    return parse_string_internal(s, reset_lineno, 0);
+}
+
+/**/
+mod_export Eprog
+parse_string(char *s, int reset_lineno)
+{
+    return parse_string_internal(s, reset_lineno, 1);
 }
 
 /**/

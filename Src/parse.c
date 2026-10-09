@@ -694,7 +694,7 @@ par_event(int endtok)
 
 /**/
 mod_export Eprog
-parse_list(void)
+parse_list(int heap)
 {
     int c = 0;
 
@@ -708,7 +708,7 @@ parse_list(void)
 	yyerror(0);
 	return NULL;
     }
-    return bld_eprog(1);
+    return bld_eprog(heap);
 }
 
 /*

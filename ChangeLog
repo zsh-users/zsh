@@ -1,5 +1,8 @@
 2026-11-10  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 55203: Src/exec.c, Src/glob.c, Src/parse.c: Avoid accumulating
+	eprog on heap for every file in qualsheval
+
 	* 55209: Src/Zle/computil.c: Fix crash in ca_parse_line
 
 	* 55157 + 55197: Config/defs.mk.in, Doc/Makefile.in,
