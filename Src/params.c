@@ -505,7 +505,7 @@ static initparam argvparam_pm = VAR_ARRPM("", &pparams, 0);
 			(PM)->gsu.s->getfn(PM) : (PM)->u.str)
 #define SETREFNAME(PM,S) (((PM)->node.flags & PM_SPECIAL) ?		\
 			  (PM)->gsu.s->setfn(PM,(S)) :			\
-			  (zsfree((PM)->u.str), (PM)->u.str = (S)))
+			  (void) (zsfree((PM)->u.str), (PM)->u.str = (S)))
 
 static Param argvparam;
 static Param *argnparams;
