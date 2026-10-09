@@ -3411,7 +3411,7 @@ assignaparam(char *s, char **val, int flags)
 	    /*
 	     * This is an ordinary array with key / value pairs.
 	     */
-	    int maxlen, origlen, nextind;
+	    size_t maxlen, origlen, nextind;
 	    char **fullval, **origptr;
 	    zlong *subscripts = (zlong *)zhalloc(arrlen(val) * sizeof(zlong));
 	    zlong *iptr = subscripts;
