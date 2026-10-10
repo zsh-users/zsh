@@ -1,5 +1,8 @@
 2026-10-25  Oliver Kiddle  <opk@zsh.org>
 
+	* Keith Plant: github #187: Completion/Unix/Command/_user_admin:
+	escape nested square brackets for useradd and fix typo
+
 	* tiandic: github #184: Completion/Unix/Command/_adb: avoid
 	hard-coded adb command and fix -nosystem description
 

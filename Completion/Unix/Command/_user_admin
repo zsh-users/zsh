@@ -42,7 +42,7 @@ case ${service%???}:${(M)service%???}:$OSTYPE in
     )
     args+=(
       '--btrfs-subvolume-home[use BTRFS subvolume for home directory]'
-      '(-F --add-subids-for-system)'{-F,--add-subids-for-system}'[add entries to sub[ud]id even when adding a system user]'
+      '(-F --add-subids-for-system)'{-F,--add-subids-for-system}'[add entries to sub\[ug\]id even when adding a system user]'
       '(-l --no-log-init)'{-l,--no-log-init}"[don't add user to lastlog and faillog databases]"
       '(-m --create-home -M --no-create-home)'{-M,--no-create-home}"[don't create user's home directory, regardless of /etc/login.defs]"
       '(-N --no-user-group -U --user-group)'{-N,--no-user-group}"[don't create a group with the same name as the user]"
