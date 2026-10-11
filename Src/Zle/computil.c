@@ -2367,6 +2367,8 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
 	}
 	/* Do the end-pattern test if needed. */
 
+    cont:
+
 	if (state.def && state.curopt &&
 	    (state.def->type == CAA_RREST || state.def->type == CAA_RARGS)) {
 	    if (state.def->end)
@@ -2388,8 +2390,6 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
 	    endpat = patcompile(state.def->end, 0, NULL);
 
 	/* Copy the state into the global one. */
-
-    cont:
 
 	if (cur + 1 == compcurrent) {
 	    memcpy(&ca_laststate, &state, sizeof(state));
