@@ -1,5 +1,7 @@
 2026-10-22  Oliver Kiddle  <opk@zsh.org>
 
+	* tiandic: 55212: Completion/Unix/Command/_gdb: fix shift error
+
 	* 55223: Completion/Linux/Command/_networkmanager:
 	fix for broken completion after nmcli connection modify
 

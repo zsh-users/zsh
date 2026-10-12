@@ -43,7 +43,7 @@ else
   w=( "${(@)words[2,CURRENT-1]}" )
   while [[ "$w[1]" = -* ]]; do
     [[ "$w[1]" = -(cd|se|tty|[decsxb]) ]] && shift 1 w
-    shift 1 w
+    (( $#w )) && shift 1 w
   done
 
   if [[ $#w -gt 1 ]]; then
