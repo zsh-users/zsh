@@ -1,5 +1,8 @@
 2026-10-22  Oliver Kiddle  <opk@zsh.org>
 
+	* tiandic: 55214: Completion/Unix/Command/_pip: fix curcontext
+	assignment error
+
 	* tiandic: 55222: Completion/Unix/Command/_gdb: fix for some
 	options not being skipped
 

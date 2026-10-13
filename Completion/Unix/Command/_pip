@@ -57,7 +57,7 @@ case $state in
   ;;
 
   options)
-    curcontext="${curcontext%:*}-$words[2]:"
+    curcontext="${curcontext%:*}-$words[1]:"
 
     case $words[1] in
       download|install|list|wheel)
