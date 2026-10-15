@@ -1,5 +1,8 @@
 2026-10-22  Oliver Kiddle  <opk@zsh.org>
 
+	* tiandic: 55218: Completion/Unix/Command/_gdb: fix gdb
+	completion of core file and pid after the program
+
 	* tiandic: 55212: Completion/Unix/Command/_gdb: fix shift error
 
 	* 55223: Completion/Linux/Command/_networkmanager:

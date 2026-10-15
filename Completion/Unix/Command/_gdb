@@ -46,10 +46,10 @@ else
     (( $#w )) && shift 1 w
   done
 
-  if [[ $#w -gt 1 ]]; then
-    _alternative "files:: _files -g '*core*(-.)'" "processes:: _pids -m ${w[1]:t}"
-  else
+  if [[ $#w -eq 0 ]]; then
     _description files expl executable
     _files "$expl[@]" -g '*(-*)'
+  elif [[ $#w -eq 1 ]]; then
+    _alternative "files:: _files -g '*core*(-.)'" "processes:: _pids -m ${w[1]:t}"
   fi
 fi
