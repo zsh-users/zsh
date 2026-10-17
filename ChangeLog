@@ -1,5 +1,8 @@
 2026-10-22  Oliver Kiddle  <opk@zsh.org>
 
+	* Ryan Rotter: 55219: Completion/Unix/Command/_git: add new
+	git history subcommands (drop, fixup)
+
 	* tiandic: 55214: Completion/Unix/Command/_pip: fix curcontext
 	assignment error
 

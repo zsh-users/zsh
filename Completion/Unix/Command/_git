@@ -1238,6 +1238,8 @@ _git-history() {
       declare -a commands
 
       commands=(
+        'drop:remove specified commit from the history'
+        'fixup:apply currently staged changes to specified commit'
         'reword:rewrite commit message of specified commit'
         'split:interactively split up commit'
       )
@@ -1247,12 +1249,21 @@ _git-history() {
     (option-or-argument)
       curcontext=${curcontext%:*}-$line[1]:
       common=(
-        "--dry-run[don't update any references]"
-        '--update-refs=[control which references will be updates]:references [branches]:(branches head)'
+        '(-n --dry-run)'{-n,--dry-run}"[don't update any references]"
+        '--update-refs=[control which references will be updated]:references [branches]:(branches head)'
         ':commit:__git_commits'
       )
 
       case $line[1] in
+        drop)
+          _arguments -S -s $endopt $common \
+            '--empty=[how to handle descendants that become empty]:action:(drop keep abort)' && ret=0
+        ;;
+        fixup)
+          _arguments -S -s $endopt $common \
+            '--empty=[how to handle commits that become empty]:action:(drop keep abort)' \
+            '--reedit-message[open editor to modify commit message]' && ret=0
+        ;;
         reword) _arguments -S -s $endopt $common && ret=0 ;;
         split)
           _arguments -S -s $endopt $common \
