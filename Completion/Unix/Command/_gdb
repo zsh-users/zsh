@@ -42,7 +42,7 @@ else
 
   w=( "${(@)words[2,CURRENT-1]}" )
   while [[ "$w[1]" = -* ]]; do
-    [[ "$w[1]" = -(cd|se|tty|[decsxb]) ]] && shift 1 w
+    [[ "$w[1]" = -([bcdeilpsxD]|cd|ex|ix|se|ui|eix|iex|pid|tty|baud|core|eiex|exec|command|symbols|annotate|directory|tclcommand|interpreter|eval-command|init-command|data-directory|editor-command|init-eval-command|early-init-command|early-init-eval-command) ]] && shift 1 w
     (( $#w )) && shift 1 w
   done
 

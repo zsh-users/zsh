@@ -1,5 +1,8 @@
 2026-10-22  Oliver Kiddle  <opk@zsh.org>
 
+	* tiandic: 55222: Completion/Unix/Command/_gdb: fix for some
+	options not being skipped
+
 	* tiandic: 55218: Completion/Unix/Command/_gdb: fix gdb
 	completion of core file and pid after the program
 
