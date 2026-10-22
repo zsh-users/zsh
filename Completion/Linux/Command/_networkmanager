@@ -152,11 +152,12 @@ _nm_connection_modify() {
   _arguments -A "-*" \
     "--temporary" \
     "1:connection:_nm_connection_specs" \
-    '2::remove:(remove):*:setting:->properties' \
-    '3:option:->properties' && ret=0
+    '2::remove:(remove)' \
+    '*::option:->properties' && ret=0
 
   if [[ -n "$state" ]]; then
-    properties=( ${${(f)"$(_call_program properties $nmcli -t connection show $words[CURRENT-1])"}%%:*} )
+    compset -P '[-+]'
+    properties=( ${${(f)"$(_call_program properties $nmcli -t connection show $words[1])"}%%:*} )
     _description properties expl property
     _multi_parts "$expl[@]" . properties && ret=0
   fi
@@ -421,13 +422,13 @@ _nm_device_wifi_show-password() {
 
 _nm_device_wifi_bssids() {
   local -a bssids
-  bssids=(${(f)"$(_call_program nmcli nmcli -t -f bssid device wifi list)"})
+  bssids=(${(f)"$(_call_program nmcli $nmcli -t -f bssid device wifi list)"})
   _describe 'network' bssids
 }
 
 _nm_device_wifi_ssids() {
   local -a ssids
-  ssids=(${(f)"$(_call_program nmcli nmcli -t -f ssid device wifi list)"})
+  ssids=(${(f)"$(_call_program nmcli $nmcli -t -f ssid device wifi list)"})
   _describe 'network' ssids
 }
 
@@ -447,7 +448,7 @@ _nm_device_checkpoint() {
 
 _nm_device_ifnames() {
   local -a ifnames
-  ifnames=(${(f)"$(_call_program nmcli nmcli -t -f device device)"})
+  ifnames=(${(f)"$(_call_program nmcli $nmcli -t -f device device)"})
   _describe 'device' ifnames
 }
 

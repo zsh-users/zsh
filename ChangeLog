@@ -1,3 +1,8 @@
+2026-10-22  Oliver Kiddle  <opk@zsh.org>
+
+	* 55223: Completion/Linux/Command/_networkmanager:
+	fix for broken completion after nmcli connection modify
+
 2026-10-09  Oliver Kiddle  <opk@zsh.org>
 
 	* tiandic: github #182: Completion/Unix/Command/_7zip:
