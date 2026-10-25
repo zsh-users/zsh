@@ -768,7 +768,7 @@ prompt_markers(void)
 	if (!aid) aid = 1; /* unlikely but just to be safe */
 	/* base64 not required but it is safe, convenient and compact */
 	h = base64_encode((const char *)&aid, sizeof(aid));
-	memcpy(pre + 13, h, 6);
+	memcpy(pre + 18, h, 6);
     }
 
     return markers;
