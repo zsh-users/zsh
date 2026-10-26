@@ -713,14 +713,15 @@ _perforce_charsets() {
 
 (( $+functions[_perforce_clients] )) ||
 _perforce_clients() {
-  local -a slash cl
+  local -a slash cl xargs
+  zstyle -a ":completion:${curcontext}:clients" clients xargs
 
   # Are we completing after an @, or a client view in a filespec?
   if ! compset -P '*@'; then
     compset -P '//' && slash=(-S/ -q)
   fi
 
-  cl=(${${${${(f)"$(_perforce_call_p4 clients clients)"}##Client\ }//:/\\:}/\ /:})
+  cl=(${${${${(f)"$(_perforce_call_p4 clients clients $xargs)"}##Client\ }//:/\\:}/\ /:})
   [[ $#cl -eq 1 && $cl[1] = '' ]] && cl=()
   _describe -t clients 'Perforce client' cl $slash
 }
@@ -1525,7 +1526,8 @@ _perforce_jobviews() {
 (( $+functions[_perforce_labels] )) ||
 _perforce_labels() {
     local lline file
-    local -a ll match mbegin mend
+    local -a ll match mbegin mend xargs
+    zstyle -a ":completion:${curcontext}:labels" labels xargs
 
     if [[ $argv[-1] = -tf ]]; then
       argv=($argv[1,-2])
@@ -1534,7 +1536,7 @@ _perforce_labels() {
       compset -P '*@(|\\\<|\\\>)(|=)'
     fi
 
-    ll=(${${(f)"$(_perforce_call_p4 labels labels ${file:+\$file})"}//(#b)Label\ ([^[:blank:]]##)\ (*)/$match[1]:$match[2]})
+    ll=(${${(f)"$(_perforce_call_p4 labels labels $xargs ${file:+\$file})"}//(#b)Label\ ([^[:blank:]]##)\ (*)/$match[1]:$match[2]})
     _describe -t labels 'Perforce label' ll
 }
 
