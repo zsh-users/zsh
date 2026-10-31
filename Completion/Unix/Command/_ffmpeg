@@ -149,7 +149,7 @@ _ffmpeg_metadata_specs() {
 # complete preset name
 (( $+functions[_ffmpeg_presets] )) ||
 _ffmpeg_presets() {
-  local -a presets=(
+  local -a expl presets=(
     ~/.ffmpeg
     $FFMPEG_DATADIR
     ${${${${(Q)words[1]}:c}%/bin/*}:-/usr}/share/ffmpeg
@@ -446,7 +446,7 @@ _ffmpeg_sample_fmts() {
   local -a sample_fmts
 
   sample_fmts=( ${(f)"$( _call_program $tag $words[1] -sample_fmts )"} )
-  sample_fmts=( ${sample_fmts:#*(:|name[[:space:]]##desc)*} )
+  sample_fmts=( ${sample_fmts:#*(:|name[[:space:]]##depth)*} )
   sample_fmts=( ${sample_fmts##[[:space:]]##} )
   sample_fmts=( ${sample_fmts%%[[:space:]]*} )
 
@@ -769,7 +769,7 @@ _ffmpeg_loglevels() {
 (( $+functions[_ffmpeg_dates] )) ||
 _ffmpeg_dates() {
   _message -e dates \
-    'date ([(YYYY-MM-DD|YYYYMMDD)[T|t| ]]((HH:MM:SS[.m]]])|(HHMMSS[.m]]]))[Z]) (or now)'
+    'date ([(YYYY-MM-DD|YYYYMMDD)[T|t| ]]((HH:MM:SS[.m])|(HHMMSS[.m]))[Z]) (or now)'
 }
 
 # complete duration spec
@@ -851,7 +851,7 @@ ss_opts=(
   force_key_frames fps_mode fpsmax frames guess_layout_max hwaccel
   hwaccel_device hwaccel_output_format inter_matrix intra_matrix
   itsscale max_muxing_queue_size muxing_queue_data_threshold pass
-  passlogfile pix_fmt pre q qscale r rc_override reinit_filter s
+  passlogfile pix_fmt pre profile q qscale r rc_override reinit_filter s
   sample_fmt stats_enc_post stats_enc_post_fmt stats_enc_pre
   stats_enc_pre_fmt stats_mux_pre stats_mux_pre_fmt tag threads
   time_base top
@@ -1074,7 +1074,7 @@ expert_opts+=(
   '*-timestamp[specify recording timestamp]: :_ffmpeg_dates'
   '*-program[add program with specified streams]: :_ffmpeg_program_specs'
   '*-stream_group[add stream group with specified streams]: :_ffmpeg_stream_group_specs'
-  '*-dframes[specify max data frames to output (-like -frames\:d)]: :\
+  '*-dframes[specify max data frames to output (like -frames\:d)]: :\
     _ffmpeg_numbers "max data frames"
   '
   '*-target[specify target file type]:file type:(
@@ -1195,7 +1195,7 @@ expert_opts+=(
   '*-display_hflip[flip video horizontally]'
   '*-display_vflip[flip video vertically]'
   '*-rc_override[specify rate-control override]:rate control (beg,end,quant):'
-  '*-timecode[specify timecode]:timecode (hh\:mm\:ss[\:;.]ff)'
+  '*-timecode[specify timecode]:timecode (hh\:mm\:ss[\:;.]ff):'
   '*-pass[specify pass number for two-pass video encoding]:pass:(1 2)'
   '*-passlogfile[specify two-pass log-file prefix]:log-file prefix [ffmpeg2pass]:'
   '*-intra_matrix[specify intra quantisation matrix]:intra quantisation matrix:'
@@ -1308,10 +1308,6 @@ gen_avo_opts+=(
     very strict normal unofficial experimental
   )'
   '!*-b_qoffset[]:float:'
-  '!*-err_detect[]: :_ffmpeg_flags - \
-    crccheck bitstream buffer explode ignore_err careful compliant
-    aggressive
-  '
   '!*-maxrate[]:int64:'
   '!*-minrate[]:int64:'
   '!*-bufsize[]:int:'
