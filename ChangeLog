@@ -1,5 +1,8 @@
 2026-11-01  Oliver Kiddle  <opk@zsh.org>
 
+	* Sylvain Chevillard: c.f. 55133: Completion/Unix/Command/_rubber:
+	remove function included by upstream project
+
 	* 52302: Completion/Unix/Command/_tmux: complete for
 	tmux server-access
 
