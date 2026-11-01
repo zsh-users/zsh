@@ -48,6 +48,8 @@ static const struct gsu_scalar buffer_gsu =
 { get_buffer, set_buffer, zleunsetfn };
 static const struct gsu_scalar context_gsu =
 { get_context, nullstrsetfn, zleunsetfn };
+static const struct gsu_scalar cursorform_gsu =
+{ strvargetfn, set_cursorform, zleunsetfn };
 static const struct gsu_scalar cutbuffer_gsu =
 { get_cutbuffer, set_cutbuffer, unset_cutbuffer };
 static const struct gsu_scalar keymap_gsu =
@@ -146,6 +148,7 @@ static struct zleparam {
 	NULL },
     { "CURSOR",  PM_INTEGER, GSU(cursor_gsu),
 	NULL },
+    { "CURSOR_FORM", PM_SCALAR, GSU(cursorform_gsu), (void *) &custom_cursor_form },
     { "CUTBUFFER", PM_SCALAR, GSU(cutbuffer_gsu), NULL },
     { "HISTNO", PM_INTEGER, GSU(histno_gsu), NULL },
     { "KEYMAP", PM_SCALAR | PM_READONLY, GSU(keymap_gsu), NULL },
@@ -198,7 +201,7 @@ makezleparams(int ro)
 
     for(zp = zleparams; zp->name; zp++) {
 	Param pm = createparam(zp->name, (zp->type |PM_SPECIAL|PM_REMOVABLE|
-					  PM_LOCAL|(ro ? PM_READONLY : 0)));
+		PM_LOCAL|((ro && zp->data != &custom_cursor_form) ? PM_READONLY : 0)));
 	if (!pm)
 	    pm = (Param) realparamtab->getnode2(realparamtab, zp->name);
 	DPUTS1(!pm, "param %s not set in makezleparams", zp->name);
@@ -615,6 +618,15 @@ static zlong
 get_suffixactive(UNUSED(Param pm))
 {
     return suffixlen;
+}
+
+/**/
+static void
+set_cursorform(UNUSED(Param pm), char *x)
+{
+    strvarsetfn(pm, x);
+    zle_set_cursorform();
+    cursor_form();
 }
 
 /**/

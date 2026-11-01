@@ -2077,6 +2077,7 @@ trashzle(void)
 	int sl = showinglist;
 	showinglist = 0;
 	trashedzle = 1;
+	custom_cursor_form = ztrdup("");
 	zrefresh();
 	showinglist = sl;
 	treplaceattrs(prompt_attr);
@@ -2266,6 +2267,7 @@ setup_(UNUSED(Module m))
     kungetbuf = (char *) zalloc(kungetsz = 32);
     comprecursive = 0;
     rdstrs = NULL;
+    custom_cursor_form = ztrdup("");
 
     /* detect terminal color and features */
     if (shout)
@@ -2342,6 +2344,7 @@ finish_(UNUSED(Module m))
     cleanup_keymaps();
     deletehashtable(thingytab);
 
+    zsfree(custom_cursor_form);
     zfree(lastvichg.buf, lastvichg.bufsz);
     zfree(kungetbuf, kungetsz);
     free_isrch_spots();

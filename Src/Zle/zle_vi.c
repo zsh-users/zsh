@@ -130,6 +130,11 @@ vigetkey(void)
     Keymap mn = openkeymap("main");
     char m[3], *str;
     Thingy cmd;
+    int nochg = vichgflag;
+
+    vichgflag = 2;
+    cursor_form();
+    vichgflag = nochg;
 
     if (getbyte(0L, NULL, 1) == EOF)
 	return ZLEEOF;

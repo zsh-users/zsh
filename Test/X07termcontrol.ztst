@@ -1,0 +1,289 @@
+# Tests for terminal control sequences emitted by zsh
+%prep
+  if ( zmodload zsh/zpty 2>/dev/null ); then
+    . $ZTST_srcdir/comptest
+    comptestinit -v -z $ZTST_testdir/../Src/zsh &&
+    {
+      # Not testing termcap based sequences here so the zle transformation
+      # elides those while zle is active. Except for vi/ve which it transforms
+      # to a canonical form for predictable test results.
+      # The unsetopt minimises extra cruft which is not required but does make it
+      # easier when debugging. Similarly for the use of TERM=xterm for which
+      # many sequences are shorter while vt100 sequences include time
+      # delays/NUL padding to accomodate requirements of hardware terminals.
+      comptesteval \
+        'unsetopt promptsp promptcr' \
+        'TERM=xterm' \
+        "tcfunc() {
+          case \$1 in
+            vi) REPLY=$'\e[?25l' ;;
+            ve) REPLY=$'\e[?25h' ;;
+            *) REPLY='';;
+          esac
+        }" \
+        'reset-cursor() {
+          local -a zle_cursorform=( all:hidden,blink,bar,color=\#ffffff )
+          local CURSOR_FORM=all
+          zle_cursorform=( base:none reset:none )
+          CURSOR_FORM=reset
+        }' \
+        'zle -N reset-cursor' \
+        'bindkey "^R" reset-cursor' \
+        'zle -T tc tcfunc' \
+        'POSTEDIT="<END>"'
+    }
+  else
+    ZTST_unimplemented="the zsh/zpty module is not available"
+  fi
+
+%test
+# Note that this uses a single ZLE instance so leftover state from one test
+# affects the next. The reset-cursor widget reverts the cursor where needed.
+
+# In some cases, vi command mode seems to be skipped because the escape and
+# following command come faster than KEYTIMEOUT. Intervening h or l commands
+# are used where this is unwanted
+
+# Cursor shape and colour
+
+  zpty_run '.term.extensions=( -bracketed-paste -integration )'
+  esctest
+0:Default vi-mode cursor and reset
+>CSI 6 q
+>---
+>CSI 0 q
+>CSI ?12l
+
+  zpty_run 'zle_cursorform=( base:blink )'
+  esctest 'text'
+0:With base set to blink, use blink for insert and reset
+>CSI 5 q
+>---
+>CSI 0 q
+>CSI ?12h
+
+  zpty_run 'zle_cursorform=( base:none )'
+  esctest
+0:With base set to none, trust 0q sequence to reset flashing to default
+# Still uses steady sequence when selecting a bar shape
+>CSI 6 q
+>---
+>CSI 0 q
+
+  zpty_run 'zle_cursorform=( none )'
+  esctest $'word\ebce'
+0:With none, make no cursor changes
+>---
+
+  zpty_run 'zle_cursorform=( insert:blink )'
+  esctest
+0:Set flashing cursor with default shape, revert to steady default
+>CSI ?12h
+>---
+>CSI ?12l
+
+  zpty_run 'zle_cursorform=( insert:blink base:none )'
+  esctest
+0:Set flashing cursor with default shape, no default to revert to
+>CSI ?12h
+>---
+# a final CSI 0 q would be reasonable too
+
+  zpty_run 'zle_cursorform=( insert:underline command:blink )'
+  esctest $'\el'
+0:Switch from defined shape to flashing cursor with default shape
+>CSI 4 q
+>CSI 0 q
+>CSI ?12h
+>---
+>CSI ?12l
+
+  zpty_run 'zle_cursorform=( insert:underline command:none base:block )'
+  esctest $'\el'
+0:Switch to default shape
+>CSI 4 q
+>CSI 2 q
+>---
+
+  zpty_run 'zle_cursorform=( overwrite:underline )'
+  esctest $'\elR'
+0:Switch to overwrite mode via command mode
+>CSI 6 q
+>CSI 0 q
+>CSI ?12l
+>CSI 4 q
+>---
+>CSI 0 q
+>CSI ?12l
+
+  zpty_run 'zle_cursorform=( insert:blink overwrite:hidden base:steady )'
+  esctest $'\eR'
+0:Reset blink when new form doesn't affect use of it
+>CSI ?12h
+>CSI ?25l
+>CSI ?12l
+>---
+>CSI ?25h
+>CSI ?12l
+
+  zpty_run 'zle_cursorform=( insert:none )'
+  esctest
+0:Nothing changed, no reset
+>---
+
+  zpty_run 'zle_cursorform=( insert:color=#000055 base:steady,color=#803030 )'
+  esctest
+0:Colour reset when changed
+>OSC 12;rgb:0000/0000/5500 ST
+>---
+>OSC 12;rgb:8000/3000/3000 ST
+
+  zpty_run 'unset zle_cursorform'
+  esctest $'word\eFw'
+0:Use pending context for vi-find- widget
+>CSI 6 q
+>CSI 4 q
+>CSI 0 q
+>CSI ?12l
+>---
+
+  zpty_run 'zle_cursorform=( insert:color=#000055 overwrite:underline )'
+  esctest $'\eR'
+0:Colour should be reset when new form doesn't affect colour
+>OSC 12;rgb:0000/0000/5500 ST
+>CSI 4 q
+>OSC 112; ST
+>---
+>CSI 0 q
+>CSI ?12l
+
+  zpty_run 'zle_cursorform=( insert:color=#000055 overwrite:color=#000055,underline )'
+  esctest $'\eR'
+0:Change of context with unchanged colour
+>OSC 12;rgb:0000/0000/5500 ST
+>CSI 4 q
+>---
+>CSI 0 q
+>CSI ?12l
+>OSC 112; ST
+
+  zpty_run 'zle_cursorform=( command:block base:color=#803030 )'
+  esctest $'\el'
+0:Don't use base color when it started at the reset state
+>CSI 6 q
+>CSI 2 q
+>---
+>CSI 0 q
+
+  zpty_run 'zle_cursorform=( insert:none base:block )'
+  esctest $'\el'
+0:Don't use base shape when it started at the reset state
+>---
+
+  zpty_run 'zle_cursorform=( insert:bar,color=#332211 base:color=#112233 )'
+  esctest
+0:Use base color instead of doing a reset
+>CSI 6 q
+>OSC 12;rgb:3300/2200/1100 ST
+>---
+>CSI 0 q
+>OSC 12;rgb:1100/2200/3300 ST
+
+  zpty_run 'zle_cursorform=( insert:color=#000055 overwrite:underline base:color=#803030 )'
+  esctest $'\eR'
+0:Use base color for other forms
+>OSC 12;rgb:0000/0000/5500 ST
+>CSI 4 q
+>OSC 12;rgb:8000/3000/3000 ST
+>---
+>CSI 0 q
+
+  zpty_run 'zle_cursorform=( insert:hidden,underline )'
+  esctest
+0:Combining shape and hidden still selects the shape
+# May seem pointless because if hidden you won't see the shape but do as the
+# user says. Could be a fallback if their terminal doesn't support hidden.
+>CSI ?25l
+>CSI 4 q
+>---
+>CSI ?25h
+>CSI 0 q
+>CSI ?12l
+
+  zpty_run 'zle_cursorform=( insert:hidden,blink command:blink )'
+  esctest $'\el'
+0:Compensate for disabling hidden also turning off blink in many terminals
+# Note that $termcap[vs] often contains \e[?12l\e[?25h
+>CSI ?25l
+>CSI ?12h
+>CSI ?25h
+>CSI ?12h
+>---
+>CSI ?12l
+
+  zpty_run 'zle_cursorform=( base:none )'
+  esctest $'_\ehcltest\eFt'
+0:Pending context used for change and next-character movements
+>CSI 6 q
+>CSI 0 q
+>CSI 4 q
+>CSI 6 q
+>CSI 4 q
+>CSI 0 q
+>---
+
+  zpty_run 'custom() { () { local CURSOR_FORM=custom } }; zle -N custom'
+  zpty_run 'bindkey -a gc custom'
+  zpty_run 'zle_cursorform=( custom:underline command:block )'
+  esctest $'\ehgc'
+0:Setting custom cursor context
+>CSI 6 q
+>CSI 2 q
+>CSI 4 q
+>CSI 2 q
+>---
+>CSI 0 q
+>CSI ?12l
+
+  zpty_run 'zle_cursorform=( custom:none command:underline )'
+  esctest $'\egc'
+0:Setting custom cursor context to none uses default
+>CSI 6 q
+>CSI 0 q
+>CSI ?12l
+>CSI 4 q
+>---
+>CSI 0 q
+>CSI ?12l
+
+  zpty_run 'zle_cursorform=( command:underline )'
+  esctest $'\ehgca'
+0:Apply custom cursor context for which no form is defined
+>CSI 6 q
+>CSI 4 q
+>CSI 6 q
+>---
+>CSI 0 q
+>CSI ?12l
+
+  zpty_run $'\C-R.term.extensions=( -bracketed-paste -integration -cursor-shape )'
+  zpty_run 'zle_cursorform=( insert:hidden,underline,blink,color=#803030 )'
+  esctest
+0:Setting cursor shape disabled
+>CSI ?25l
+>OSC 12;rgb:8000/3000/3000 ST
+>---
+>CSI ?25h
+>CSI ?12l
+>OSC 112; ST
+
+  zpty_run '.term.extensions=( -bracketed-paste -integration -cursor-color )'
+  zpty_run 'zle_cursorform=( insert:hidden,underline,blink,color=#803030 )'
+  esctest
+0:Setting cursor color disabled
+>CSI ?25l
+>CSI 3 q
+>---
+>CSI ?25h
+>CSI 0 q
+>CSI ?12l

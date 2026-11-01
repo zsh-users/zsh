@@ -1,5 +1,11 @@
 2026-11-01  Oliver Kiddle  <opk@zsh.org>
 
+	* 55227: Completion/Base/Core/_main_complete, Doc/Zsh/zle.yo,
+	README, Src/Zle/termquery.c, Src/Zle/zle.h, Src/Zle/zle_main.c,
+	Src/Zle/zle_params.c, Src/Zle/zle_refresh.c, Src/Zle/zle_vi.c,
+	Test/X07termcontrol.ztst, Test/comptest: allow baseline and
+	custom cursor forms to be set
+
 	* Sylvain Chevillard: c.f. 55133: Completion/Unix/Command/_rubber:
 	remove function included by upstream project
 

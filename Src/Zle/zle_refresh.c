@@ -2345,7 +2345,7 @@ tc_downcurs(int ct)
  */
 
 /**/
-static void
+void
 tcout_via_func(int cap, int arg, int (*outc)(int))
 {
     Shfunc tcout_func;

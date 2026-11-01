@@ -482,22 +482,23 @@ enum cursorcontext {
     CURC_REGION_START,
     CURC_REGION_END,
     CURC_VISUAL,
-    CURC_DEFAULT
+    CURC_DEFAULT,
+    CURC_CUSTOM
 };
 
-#define CURF_DEFAULT 0
 #define CURF_UNDERLINE 1
 #define CURF_BAR 2
 #define CURF_BLOCK 3
 #define CURF_SHAPE_MASK 3
 #define CURF_BLINK (1 << 2)
 #define CURF_STEADY (1 << 3)
-#define CURF_HIDDEN (1 << 4)
+#define CURF_HIDDEN (1 << 4) /* no flag for visible: assuming it's default */
 #define CURF_COLOR (1 << 5)
 #define CURF_COLOR_MASK ((0xffffffu << 8) | CURF_COLOR)
 #define CURF_RED_SHIFT   24
 #define CURF_GREEN_SHIFT 16
 #define CURF_BLUE_SHIFT  8
+#define CURF_INVALID (3 << 6)
 
 #ifdef MULTIBYTE_SUPPORT
 /*

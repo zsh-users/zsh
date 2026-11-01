@@ -54,6 +54,7 @@ local -ar builtin_precommands=(- builtin eval exec nocorrect noglob time)
 typeset -U _lastdescr _comp_ignore _comp_colors
 
 {
+CURSOR_FORM=completion
 
 [[ -z "$curcontext" ]] && curcontext=:::
 
@@ -382,6 +383,8 @@ fi
     compstate[list]="${compstate[list]//messages} force"
 
 } always {
+  CURSOR_FORM=
+
   # Stuff we always do to clean up.
   if [[ "$compstate[old_list]" = keep ]]; then
     if [[ $_saved_colors_set = 1 ]]; then

@@ -822,6 +822,13 @@ The offset of the cursor, within the edit buffer.  This is in the range
 Attempts to move the cursor outside the buffer will result in the
 cursor being moved to the appropriate end of the buffer.
 )
+vindex(CURSOR_FORM)
+item(tt(CURSOR_FORM) (scalar))(
+The name of a custom context to allow the shape and color of the cursor to be
+changed. The context is looked up in tt(zle_cursorform) and applies for as long
+as the line editor is active or until the variable is changed or unset from a ZLE
+Widget.
+)
 vindex(CUTBUFFER)
 item(tt(CUTBUFFER) (scalar))(
 The last item cut using one of the `tt(kill-)' commands; the string
@@ -2987,14 +2994,16 @@ vindex(zle_cursorform, setting)
 Some terminals support the ability to change the shape and color of the cursor.
 On such terminals, the line editor will use cursor styles appropriate to
 different contexts. This is controlled via the array parameter
-tt(zle_cursorform). To disable all cursor changes, see the tt(.term.extensions)
-parameter.
+tt(zle_cursorform).
 
 Each element of the array should consist of a word indicating a context
 followed by a colon, then a comma-separated list of properties describing the
-shape and color to apply to the cursor.
+shape and color to apply to the cursor. All cursor changes may be disabled
+with the following setting:
 
-The available contexts follow with the default value shown in
+example(zle_cursorform=(none))
+
+The available predefined contexts follow with the default value shown in
 parentheses. Where no default is given, the terminal's default is applied:
 
 startitem()
@@ -3033,7 +3042,22 @@ item(tt(visual))(
 Used when vi visual mode is active. The visual selection always includes the
 cursor position so the same advice as for tt(regionstart) applies.
 )
+item(tt(base) (tt(steady)))(
+Used as a baseline for all other contexts and when resetting the cursor after
+the line editor ceases to be active. Only those cursor attributes that have
+been otherwise altered will be set according to a value given for this context.
+
+This exists because many terminals don't provide a way to reset the cursor to
+its default state nor to set the shape independently of the blinking status. It
+may be useful if your cursor is not correctly restored when the line editor
+becomes inactive. It is best that the value reflects the default state of the
+terminal's cursor but can be set to tt(none) where the terminal does support
+resetting the cursor.
+)
 enditem()
+
+User-defined ZLE widgets can implement additional custom contexts by setting
+the tt(CURSOR_FORM) parameter.
 
 The available cursor shapes are tt(none), tt(bar), tt(block), tt(underline) and
 tt(hidden). Additionally, you can specify either tt(blink) or tt(steady) to

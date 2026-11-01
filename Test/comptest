@@ -87,15 +87,23 @@ zle-finish () {
   (( $+mark )) && print -lr "MARK: $mark"
   zle accept-line
 }
+esc-finish () {
+  print "<FINISH>"
+  BUFFER=""
+  zle accept-line
+}
 zle -N complete-word-with-report
 zle -N list-choices-with-report
 zle -N comp-finish
 zle -N zle-finish
+zle -N esc-finish
 bindkey "^I" complete-word-with-report
 bindkey "^D" list-choices-with-report
 bindkey "^Z" comp-finish
 bindkey "^X" zle-finish
 bindkey -a "^X" zle-finish
+bindkey "^Y" esc-finish
+bindkey -a "^Y" esc-finish
 '
 }
 
@@ -217,4 +225,24 @@ zletest () {
   }
   # zpty_flush After zletest
   print -lr "${(@)${(@ps:\r\n:)log##*<WIDGET><finish>}[2,-2]}"
+}
+
+csi=$'\x1b\\[[0-9:;<=>?]#[ "#$%&\')(*+,./!-]#[@A-Z[\\\]_a-z{|}\`~^]'
+dcs=$'\x1bP[0-9;]#[+,./-]#[@A-Z[\\\]_a-z{|}\`~^]\x1b\\'
+osc=$'\x1b\\][ -~]#\x1b\\'
+
+esctest() {
+  local log
+  local -a out
+  zpty -n -w zsh "$*"$'\C-Y'
+  zpty_read log "*<FINISH>*<PROMPT>*" || {
+    print "failed to invoke finish widget."
+    return 1
+  }
+  log=${log%<END>*}
+  while [[ -n $log ]]; do
+    out+=( ${${${${${${(M)log##(<FINISH>|$~csi|$~osc|$~_dcs)}/<FINISH>/---}/$'\x1b\['/CSI }/$'\x1b\]'/OSC }/$'\x1bP'/DCS }/$'\x1b\\'/ ST} )
+    log=${log##(<FINISH>|$~csi|$~osc|$~dcs|?)}
+  done
+  print -rl - "$out[@]"
 }

@@ -455,7 +455,8 @@ handle_color(int bg, int red, int green, int blue)
 		    "dark" : "light"), 0);
 	    break;
         case 2:  /* cursor color */
-	    memo_cursor = (red << 24) | (green << 16) | (blue << 8);
+	    memo_cursor = (red << CURF_RED_SHIFT) | (green << CURF_GREEN_SHIFT) |
+		    (blue << CURF_BLUE_SHIFT) | CURF_COLOR;
 	    break;
 	default: /* invalid color */
 	    return;
@@ -811,6 +812,9 @@ notify_pwd(void)
     write_loop(SHTTY, "\033\\", 2);
 }
 
+/**/
+char *custom_cursor_form;
+
 static unsigned int *cursor_forms;
 static unsigned int cursor_enabled_mask;
 
@@ -886,21 +890,36 @@ zle_set_cursorform(void)
 	"pending:",
 	"regionstart:",
 	"regionend:",
-        "visual:"
+	"visual:",
+	"base:"
     };
 
     if (!cursor_forms)
-	cursor_forms = zalloc(CURC_DEFAULT * sizeof(*cursor_forms));
-    memset(cursor_forms, 0, CURC_DEFAULT * sizeof(*cursor_forms));
+	cursor_forms = zalloc((CURC_DEFAULT + 2) * sizeof(*cursor_forms));
+    memset(cursor_forms, 0, (CURC_DEFAULT + 2) * sizeof(*cursor_forms));
     cursor_forms[CURC_INSERT] = CURF_BAR;
     cursor_forms[CURC_PENDING] = CURF_UNDERLINE;
+    cursor_forms[CURC_DEFAULT] = CURF_STEADY;
+    cursor_forms[CURC_CUSTOM] = CURF_INVALID;
 
     for (; atrs && *atrs; atrs++) {
+	if (!strcmp(*atrs, "none")) {
+	    memset(cursor_forms, 0, (CURC_DEFAULT + 2) * sizeof(*cursor_forms));
+	    continue;
+	}
 	if (strpfx("region:", *atrs)) {
 	    match_cursorform(*atrs + 7, &cursor_forms[CURC_REGION_END]);
 	    cursor_forms[CURC_REGION_START] = cursor_forms[CURC_REGION_END];
 	    continue;
 	}
+	if (*custom_cursor_form && strpfx(custom_cursor_form, *atrs)) {
+	    int len = strlen(custom_cursor_form);
+	    if ((*atrs)[len] == ':') {
+		match_cursorform(*atrs + len + 1, &cursor_forms[CURC_CUSTOM]);
+		continue;
+	    }
+	}
+
 	for (i = 0; i < sizeof(contexts) / sizeof(*contexts); i++) {
 	    if (strpfx(contexts[i], *atrs)) {
 		match_cursorform(*atrs + strlen(contexts[i]), &cursor_forms[i]);
@@ -912,7 +931,7 @@ zle_set_cursorform(void)
     if (trashedzle)
 	setup = 0;
     else if (!setup) {
-	cursor_enabled_mask = 0;
+	cursor_enabled_mask = CURF_HIDDEN;
 	setup = 1;
 	if (extension_enabled("cursor", "shape", 6, 1))
 	    cursor_enabled_mask |= CURF_SHAPE_MASK | CURF_BLINK | CURF_STEADY;
@@ -926,65 +945,140 @@ void
 free_cursor_forms(void)
 {
     if (cursor_forms)
-	zfree(cursor_forms, CURC_DEFAULT * sizeof(*cursor_forms));
+	zfree(cursor_forms, (CURC_DEFAULT + 1) * sizeof(*cursor_forms));
     cursor_forms = 0;
+}
+
+/* Need to write TCCURINV/TCCURVIS termcap sequencies to SHTTY */
+static int
+putshtty(int c)
+{
+    const char x = c;
+    write_loop(SHTTY, &x,1);
+    return 0;
 }
 
 /**/
 void
 cursor_form(void)
 {
-    char seq[32];
+    /* representation of maximum length sequence to size array */
+    char seq[sizeof("E[0 qE[?12xE]12;rgb:xx00/xx00/xx00STE]112;ST")];
     char *s = seq;
-    unsigned int want, changed;
-    static unsigned int state = CURF_DEFAULT;
     enum cursorcontext context = CURC_DEFAULT;
+    unsigned int
+	reset = CURF_INVALID, /* bits being reset to the defaults */
+	want = 0, /* the desired new cursor form */
+	changed; /* bit mask for changes */
+    int resetcolor = 0; /* really reset, not just applying base:color */
+    static unsigned int
+	altered = 0, /* bits that have changed from the defaults */
+	state = 0; /* current cursor form */
+    unsigned int exclusive[] = {
+	CURF_HIDDEN,
+	CURF_SHAPE_MASK,
+	CURF_BLINK | CURF_STEADY,
+	CURF_COLOR_MASK
+    };
+    int ex;
 
     if (!cursor_forms)
 	return;
 
     if (trashedzle) {
 	;
+    } else if (cursor_forms[CURC_CUSTOM] != CURF_INVALID) {
+	context = CURC_CUSTOM;
     } else if (!insmode) {
 	context = CURC_OVERWRITE;
     } else if (vichgflag == 2) {
 	context = CURC_PENDING;
     } else if (region_active) {
-        if (invicmdmode()) {
+	if (invicmdmode()) {
 	    context = CURC_VISUAL;
 	} else {
 	    context = mark > zlecs ? CURC_REGION_START : CURC_REGION_END;
 	}
     } else
-	context = invicmdmode() ? CURC_COMMAND : (vichgflag ? CURC_INSERT : CURC_EDIT);
-    want = (context == CURC_DEFAULT) ? CURF_DEFAULT : cursor_forms[context];
-    if (!(changed = (want ^ state) & cursor_enabled_mask))
+	context = invicmdmode() ? CURC_COMMAND :
+		(vichgflag ? CURC_INSERT : CURC_EDIT);
+
+    if (context != CURC_DEFAULT)
+	want = cursor_forms[context];
+    for (ex = 0; ex < sizeof(exclusive) / sizeof(*exclusive); ex++) {
+	if (!(want & exclusive[ex])) {
+	    want |= cursor_forms[CURC_DEFAULT] & exclusive[ex];
+	    reset |= exclusive[ex];
+	}
+    }
+    if (!(want & CURF_COLOR) && (reset & CURF_COLOR)) {
+	want |= memo_cursor;
+	resetcolor = 1;
+    }
+
+    /* get which bits have changed minus disabled changes and
+     * no need to reset bits that are unaltered from initial defaults */
+    if (!(changed = (want ^ state) & cursor_enabled_mask & ~(reset & ~altered)))
 	return;
 
-    if (changed & CURF_HIDDEN)
-	 tcout(want & CURF_HIDDEN ? TCCURINV : TCCURVIS);
+    /* setting shape or visible also affects flashing status */
+    if ((changed & ((state & CURF_HIDDEN) | CURF_SHAPE_MASK))) {
+	changed |= CURF_BLINK | CURF_STEADY;
+	if (!(want & (CURF_BLINK | CURF_STEADY))) {
+	    want |= cursor_forms[CURC_DEFAULT] & (CURF_BLINK | CURF_STEADY);
+	    reset |= CURF_BLINK | CURF_STEADY;
+	}
+    }
+
+    if (changed & CURF_HIDDEN) {
+	/* A terminal might not support hidden so it is intentional
+	 * that we still set shape/color when hiding the cursor
+	 * even though that change may be invisible. */
+	int cap = want & CURF_HIDDEN ? TCCURINV : TCCURVIS;
+	if (tcout_func_name) {
+	    tcout_via_func(cap, -1, putshtty);
+	} else {
+	    tputs(tcstr[cap], 1, putshtty);
+	}
+	state &= ~CURF_HIDDEN;
+	state |= want & CURF_HIDDEN;
+    }
     if (changed & CURF_SHAPE_MASK) {
 	char c = '0';
 	switch (want & CURF_SHAPE_MASK) {
-	    case CURF_BAR: c += 2;
-	    case CURF_UNDERLINE: c += 2;
+	    case CURF_BAR: c += 2; /* fall-through */
+	    case CURF_UNDERLINE: c += 2; /* fall-through */
 	    case CURF_BLOCK:
 		c += 2 - !!(want & CURF_BLINK);
-		changed &= ~(CURF_BLINK | CURF_STEADY);
+		changed &= ~(CURF_BLINK | CURF_STEADY); /* mark flash as done */
+		break;
 	}
 	s += sprintf(s, "\033[%c q", c);
+	state &= ~(CURF_SHAPE_MASK | CURF_BLINK | CURF_STEADY);
+	state |= want & (CURF_SHAPE_MASK | CURF_BLINK | CURF_STEADY);
     }
-    if (changed & (CURF_BLINK | CURF_STEADY)) {
+    if (changed & want & (CURF_BLINK | CURF_STEADY)) {
 	s += sprintf(s, "\033[?12%c", (want & CURF_BLINK) ? 'h' : 'l');
+	state &= ~(CURF_BLINK | CURF_STEADY);
+	state |= want & (CURF_BLINK | CURF_STEADY);
     }
     if (changed & CURF_COLOR_MASK) {
-	if (!(want & CURF_COLOR_MASK))
-	    want = memo_cursor | (want & 0xff);
-	s += sprintf(s, "\033]12;rgb:%02x00/%02x00/%02x00\033\\",
-		want >> CURF_RED_SHIFT, (want >> CURF_GREEN_SHIFT) & 0xff,
-		(want >> CURF_BLUE_SHIFT) & 0xff);
+	if (want & CURF_COLOR)
+	    s += sprintf(s, "\033]12;rgb:%02x00/%02x00/%02x00\033\\",
+		    want >> CURF_RED_SHIFT, (want >> CURF_GREEN_SHIFT) & 0xff,
+		    (want >> CURF_BLUE_SHIFT) & 0xff);
+
+	state &= ~CURF_COLOR_MASK;
+	/* Semi-colon included in this sequence because urxvt fails to consume
+	 * the final backslash without it. Otherwise it should be harmless. */
+	if (resetcolor)
+	    s += sprintf(s, "\033]112;\033\\");
+	else
+	    state |= want & CURF_COLOR_MASK;
     }
     if (s - seq)
 	write_loop(SHTTY, seq, s - seq);
-    state = want;
+
+    /* for the next call reset gives us the unaltered bits */
+    altered = ~reset;
 }
