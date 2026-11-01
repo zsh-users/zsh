@@ -76,7 +76,7 @@ else
     ;|
     openbsd*|netbsd*) args+=( '-a[gradually skew]' )
     ;|
-    darwin*|freebsd<14->.*|openbsd*)
+    darwin*|freebsd<14->.*|(net|open)bsd*)
       args+=( '-z+[specify timezone for output]:time zone:_time_zone')
     ;|
     freebsd*)
@@ -85,7 +85,7 @@ else
       )
     ;|
     netbsd*)
-      args+=( '-d[output date specified by string]:time string:' )
+      args+=( '-d[output date specified by string]:time string' '!(-u -z)-U' )
     ;;
   esac
 fi

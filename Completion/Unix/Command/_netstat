@@ -114,7 +114,6 @@ case $OSTYPE in
     sel_pcb=( '-P+[display contents of the protocol control block]:pcb' )
     routing+=( $verbose '(-L)-s[show routing statistics]' )
     groups+=( $families
-      '(-s)-l[display wider fields for the IPv6 multicast routing table]'
       '(-l)-s[show multicast routing statistics]'
     )
     interfaces+=(
@@ -271,18 +270,18 @@ case $OSTYPE in
     sel_wireless=( '-W+[display per-interface IEEE 802.11 wireless statistics]:interface' )
     flist+=( local mpls )
     tblopt='-T+[select an alternate routing table to query]:routing table:_routing_tables'
-    sockets+=( -l$lopt $tblopt '-B[show buffer sizes for TCP sockets]' )
-    routing+=( $Mopts $tblopt
+    sockets+=( -l$lopt $tblopt $verbose '-B[show buffer sizes for TCP sockets]' )
+    routing+=( $Mopts $tblopt $verbose
       '-A[show the internal addresses of the routing table]'
       '-F[only show routes with gateway in the same address family as the destination]'
     )
-    interfaces+=(
+    interfaces+=( $verbose
       '-c+[show specified number of updates, then exit]:count'
       '-e[show only the number of errors on the interface]'
       '-q[only show interfaces that have seen packets]'
     )
     statistics+=( $popt '-r[display routing statistics]' )
-    groups+=( -n$nopt )
+    groups+=( -n$nopt $verbose $sel_interfaces )
     pcb+=( $Mopts $verbose )
   ;;
   netbsd*)
@@ -291,6 +290,9 @@ case $OSTYPE in
     flist+=( arp ns atalk mpls local )
     sets+=( queues '-[^-]#q*' )
     sel_queues=( '-q[display software interrupt queue details for all protocols]' )
+    groups+=(
+      '(-s)-l[display wider fields for the IPv6 multicast routing table]'
+    )
     routing+=( $Xopt
       "(-s)-L[don't show link-level routes]"
       '-T[show MPLS tags for the routing tables]'

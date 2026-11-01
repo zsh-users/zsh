@@ -96,8 +96,8 @@ case $OSTYPE in
     pkopts=fGgIlnoPqsTtUuvx
     ;;
   netbsd*)
-    pgopts=dfGgilnPqstUuvx
-    pkopts=fGgilnPstUuvx
+    pgopts=dfFGgilLnPqstUuvx
+    pkopts=fFGgilLnPstUuvx
     ;;
   darwin*)
     pgopts=adFfGgiLlnoPqtUuvx

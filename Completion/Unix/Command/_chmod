@@ -65,6 +65,11 @@ case "$variant" in
       "(1)-I[remove all inherited entries from specified files' ACLs]"
     )
     ;;
+  netbsd*)
+    args+=(
+      "-d[don't attempt changes if desired values already apply]"
+    )
+  ;;
 esac
 
 _arguments -C -s -S -0 $aopts "$args[@]" && ret=0

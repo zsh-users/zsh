@@ -13,7 +13,7 @@ case $OSTYPE in
     disks=( ${${(s.,.)"$(sysctl -n hw.disknames)"}%\:*} )
   ;;
   netbsd*)
-    disks=( $(sysctl -n hw.disknames) )
+    disks=( $(/sbin/sysctl -n hw.disknames) )
   ;;
 esac
 

@@ -87,7 +87,9 @@ elif [[ "$OSTYPE" == (darwin|dragonfly|freebsd|netbsd*|openbsd)* ]]; then
       args+=(
         '(-P -G -N)-f[display only the available free]'
         '(-G -i -P)-G[display all fields in statvfs]'
+        '-M[warn for arguments that are not a mount point]'
         '(-G -P)-N[suppress the header line normally output]'
+        '-q[suppress all warning output]'
         '-W[print wedge name instead of the device]'
       )
       ;;

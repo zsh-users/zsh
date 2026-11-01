@@ -1,5 +1,13 @@
 2026-11-01  Oliver Kiddle  <opk@zsh.org>
 
+	* 55232: Completion/BSD/Type/_bsd_disks,
+	Completion/Unix/Command/_chmod, Completion/Unix/Command/_chown,
+	Completion/Unix/Command/_date, Completion/Unix/Command/_df,
+	Completion/Unix/Command/_install, Completion/Unix/Command/_iostat,
+	Completion/Unix/Command/_netstat, Completion/Unix/Command/_pgrep,
+	Completion/Unix/Command/_ssh, Completion/Unix/Command/_touch:
+	completion updates for NetBSD 11 and OpenBSD 8
+
 	* 55229: Src/Modules/zutil.c, Src/Zle/compctl.c:
 	silence compiler unused variable warnings
 

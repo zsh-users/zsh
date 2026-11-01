@@ -9,12 +9,16 @@ args=(
   '(-r -d --date --reference 1)-t+[use specified time]:time ([[CC]YY]MMDDhhmm[.SS])'
 )
 case $variant in
+  gnu|netbsd*)
+    args+=(
+      '(-t -d --date -r --reference 1)'{-r+,--reference=}'[use corresponding times from specified reference file]:reference file:_files'
+      '(-t -d --date -r --reference 1)'{-d+,--date=}'[use specified date/time]:date/time'
+    )
+  ;|
   gnu)
     args+=(
       '(-c --no-create)'{-c,--no-create}"[don't create file if it doesn't exist]"
       '(-h --no-dereference)'{-h,--no-dereference}'[act on symbolic links themselves]'
-      '(-t -d --date -r --reference)'{-r+,--reference=}'[use corresponding times from specified reference file]:file:_files'
-      '(-t -d --date -r --reference)'{-d+,--date=}'[use specified date/time]:date/time'
       '*--time=[change specified time]:time:(atime access use mtime modify)'
       '(-)--help[display help information]'
       '(-)--version[display version information]'
@@ -29,15 +33,21 @@ case $variant in
     args+=( '-h[act on symbolic links themselves]' )
   ;|
   darwin*|dragonfly*|freebsd*|openbsd*|solaris*)
-    args+=( '(-r -t 1)-d+[use specified date/time]:date/time' )
+    args+=( '(-r -t 1)-d+[use specified ISO 8601 format date/time]:date/time (ccyy-mm-ddTHH:MM:SS[.frac][Z])' )
   ;|
   darwin*|dragonfly*|freebsd*|netbsd*|solaris*)
     args+=( '1:: :_guard "[0-9]#" "timespec (MMDDhhmm[YY])"' )
   ;|
+  netbsd*)
+    args+=(
+      "-D[don't attempt changes if desired values already apply]"
+      '!(-t -d --date -r --reference 1)-R+:reference file:_files'
+    )
+  ;|
   *) # not GNU
     args=( -A "-*" $args
       "(-A)-c[don't create file if it doesn't exist]"
-      '(-t -d 1)-r+[use corresponding times from specified reference file]:file:_files'
+      '(-t -d -R --reference --date 1)-r+[use corresponding times from specified reference file]:reference file:_files'
     )
   ;;
 esac

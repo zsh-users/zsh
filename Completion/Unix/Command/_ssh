@@ -43,9 +43,9 @@ _ssh () {
       '-D+[specify a dynamic port forwarding]:dynamic port forwarding:->dynforward' \
       '-e+[set escape character]:escape character:_phony none' \
       '-E+[append log output to file instead of stderr]:log file:_files' \
-      '(-n)-f[go to background]' \
+      '(-n -Z)-f[go to background]' \
       '-g[allow remote hosts to connect to local forwarded ports]' \
-      '-G[output configuration and exit]' \
+      '(-V -Z)-G[output configuration and exit]' \
       '-I+[specify smartcard device]:device:_files' \
       '-J+[connect via a jump host]: :->userhost' \
       '-K[enable GSSAPI-based authentication and forwarding]' \
@@ -66,7 +66,7 @@ _ssh () {
       '-s[invoke subsystem]' \
       '(-t)-T[disable pseudo-tty allocation]' \
       "(-T)*-t[force pseudo-tty allocation${tdesc}]" \
-      '-V[show version number]' \
+      '(- *)-V[show version number]' \
       '(-q)*-v[verbose mode (multiple increase verbosity, up to 3)]' \
       '-W+[forward standard input and output to host]:stdinout forward:->hostport' \
       '-w+[request tunnel device forwarding]:local_tun[\:remote_tun] (integer or "any"):' \
@@ -74,6 +74,7 @@ _ssh () {
       '(-X -Y)-x[disable X11 forwarding]' \
       '(-x -X)-Y[enable trusted X11 forwarding]' \
       '-y[send log info via syslog instead of stderr]' \
+      '(-f -G -V *)-Z[list keys that would be attempted in order and exit]' \
       ':remote host name:->userhost' \
       '*::args:->command' "$common[@]" && ret=0
     ;;
@@ -115,6 +116,7 @@ _ssh () {
       '-l[list all identities]' \
       '-m+[specify minimum remaining signatures before maximum is changed]:number' \
       '-M+[specify maximum number of signatures]:number' \
+      '-P[skip PIN entry for FIDO and PKCS#11 tokens]' \
       '-S+[use specified library when adding FIDO authenticator-hosted keys]:library:_files' \
       '-s+[add keys provided by the PKCS#11 shared library]:library:_files -g "*.(so|dylib)(|.<->)(-.)"' \
       '-t+[set maximum lifetime for identity]: :_numbers -u seconds "maximum lifetime" \:s\:seconds m\:minutes h\:hours d\:days w\:weeks' \
@@ -127,7 +129,8 @@ _ssh () {
     ;;
   ssh-agent)
     _arguments -s \
-      '(-k)-a+[specify UNIX-domain socket to bind agent to]:UNIX-domain socket:_files' \
+      '(-k -a)-A+[specify directory of socket to bind agent to]:path:{ if compset -P 1 "*\:"; then _directories -W / -P /; else compadd -S"\:" user shared; fi }' \
+      '(-k -A)-a+[specify UNIX-domain socket to bind agent to]:UNIX-domain socket:_files' \
       '(-k -s)-c[force csh-style shell]' \
       '(-k)-d[debug mode]' \
       '(-k)-D[foreground mode]' \
@@ -214,11 +217,11 @@ _ssh () {
     tsizes=(
       dsa 1024
       ecdsa '256 384 521' # values appear in key names as listed with ssh -Q key - 521 really is correct
-      rsa '1024 2048 4096'
+      rsa '1024 2048 3072 4096'
     )
     _arguments -s $args \
-      "${p1}(${${(@)cmds:#-[pcKAO]}} ${${(@)cms:#-[t]}} -O)-a+[specify number of rounds]:rounds [16]" \
-      "(${${(@)cmds:#-M}} -P ${${(@)cms:#-[MS]}})-b+[specify number of bits in key]:bits in key [2048]:"'compadd ${expl\:/-X/-x} ${_comp_mesg\:=-} ${=tsizes[${opt_args[create--t]\:-rsa}]}' \
+      "${p1}(${${(@)cmds:#-[pcKAO]}} ${${(@)cms:#-[t]}} -O)-a+[specify number of rounds]:rounds [32]" \
+      "(${${(@)cmds:#-M}} -P ${${(@)cms:#-[MS]}})-b+[specify number of bits in key]:bits in key [3072]:"'compadd ${expl\:/-X/-x} ${_comp_mesg\:=-} ${=tsizes[${opt_args[create--t]\:-rsa}]}' \
       "$p1(${${(@)cmds:#-[pc]}} -b $cms)-P+[provide old passphrase]:old passphrase" \
       "(${${(@)cmds:#-p}} -v ${${(@)cms:#-[qt]}})-N+[provide new passphrase]:new passphrase" \
       "(${${(@)cmds:#-c}} -v $cms)-C+[provide new comment]:new comment" \
@@ -252,7 +255,7 @@ _ssh () {
       "$p1($cmn)$algopt" \
       - create \
       '(-P -l)-q[silence ssh-keygen]' \
-      "(-P -l)-t+[specify the type of the key to create]:key type:(rsa dsa ecdsa ed25519 ecdsa-sk ed25519-sk)" \
+      "(-P -l)-t+[specify the type of the key to create]:key type [ed25519]:(rsa dsa ecdsa ed25519 ecdsa-sk ed25519-sk mldsa44-ed25519)" \
       - dns \
       "($cmn)-r[print DNS resource record]:hostname:_hosts" \
       "$p1($cmn)-g[use generic DNS format]" \
@@ -265,6 +268,7 @@ _ssh () {
       "$p1($cmn -f -k -u)-n+[specify user/host principal names to include in certificate]:principals" \
       "$p1($cmn -f -u)-V+[specify certificate validity interval]:interval:_phony -S\: always" \
       "($cmn -I -h -n -D -O -U -V)-k[generate a KRL file]" \
+      "-t+[specify signature type]:signature type [rsa-sha2-512]:(ssh-rsa rsa-sha2-256 rsa-sha2-512)" \
       "$p1($cmn -I -h -n -D -O -U -V)-u[update a KRL]" \
       - signature \
       "(${${(@)cmn:#-O}})-Y+[signature action]:action:((
@@ -343,7 +347,7 @@ _ssh () {
           ;;
         esac
         case "${IPREFIX#-o}" in
-        (#i)(batchmode|canonicalizefallbacklocal|checkhostip|clearallforwardings|compression|enableescapecommandline|enablesshkeysign|exitonforwardfailure|fallbacktorsh|forkafterauthentication|forward(agent|x11)|forwardx11trusted|gatewayports|gssapiauthentication|gssapidelegatecredentials|gssapikeyexchange|gssapirenewalforcesrekey|gssapitrustdns|hashknownhosts|hostbasedauthentication|identitiesonly|kbdinteractiveauthentication|tcpkeepalive|nohostauthenticationforlocalhost|passwordauthentication|permitlocalcommand|permitremoteopen|proxyusefdpass|stdinnull|streamlocalbindunlink|visualhostkey)=*)
+        (#i)(batchmode|canonicalizefallbacklocal|checkhostip|clearallforwardings|compression|enableescapecommandline|enablesshkeysign|exitonforwardfailure|fallbacktorsh|forkafterauthentication|forward(agent|x11)|forwardx11trusted|gatewayports|gssapiauthentication|gssapidelegatecredentials|gssapikeyexchange|gssapirenewalforcesrekey|gssapitrustdns|hashknownhosts|hostbasedauthentication|identitiesonly|kbdinteractiveauthentication|nohostauthenticationforlocalhost|passwordauthentication|permitlocalcommand|permitremoteopen|proxyusefdpass|stdinnull|streamlocalbindunlink|visualhostkey)=*)
           _wanted values expl 'truth value' compadd yes no && ret=0
           ;;
         (#i)addkeystoagent=*)
@@ -373,8 +377,8 @@ _ssh () {
           _message -e 'CNAME rule list (source_domain_list:target_domain_list, each pattern list comma separated)' && ret=0
           ;;
         (#i)channeltimeout=*)
-          _values 'channel type' \
-            {agent-connection,direct-tcpip,forwarded-tcpip,session,tun-connection,x11-connection}:interval:'_numbers -u seconds timeout :s:seconds m:minutes h:hours d:days w:weeks' && ret=0
+          _values -s " " 'channel type' \
+            {global,agent-connection,direct-tcpip,forwarded-tcpip,session,tun-connection,x11-connection}:interval:'_numbers -f -u seconds timeout :s:seconds m:minutes h:hours d:days w:weeks' && ret=0
           ;;
         (#i)ciphers=*)
           state=ciphers
@@ -437,9 +441,9 @@ _ssh () {
           if compset -P '* '; then
             descr='QoS for non-interactive sessions'
           else
-            descr='QoS [for interactive sessions if second value given, separated by white space]'
+            descr='QoS (separated by white space)'
           fi
-          _values $descr 'af11' 'af12' 'af13' 'af14' 'af22' \
+          _values -s " " $descr 'af11' 'af12' 'af13' 'af14' 'af22' \
               'af23' 'af31' 'af32' 'af33' 'af41' 'af42' 'af43' \
               'cs0' 'cs1' 'cs2' 'cs3' 'cs4' 'cs5' 'cs6' 'cs7' 'ef' \
               'lowdelay' 'throughput' 'reliability' && ret=0
@@ -553,6 +557,9 @@ _ssh () {
           ;;
         (#i)syslogfacility=*)
           _wanted facilities expl 'facility' compadd -M 'm:{a-z}={A-Z}' DAEMON USER AUTH LOCAL{0,1,2,3,4,5,6,7} && ret=0
+          ;;
+        (#i)(tcpkeepalive=*))
+          _wanted values expl 'truthish value [yes]' compadd yes no transport all && ret=0
           ;;
         (#i)(verifyhostkeydns|updatehostkeys)=*)
           _wanted values expl 'truthish value' compadd yes no ask && ret=0

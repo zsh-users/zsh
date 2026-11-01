@@ -67,6 +67,11 @@ case "$variant" in
       '-n[interpret user and group as numeric, avoiding name lookups]'
     )
     ;;
+  netbsd*)
+    args+=(
+      "-d[don't attempt changes if desired values already apply]"
+    )
+  ;;
 esac
 
 (( $+words[(r)--reference*] )) || args+=( '(--reference)1: :->owner' )
