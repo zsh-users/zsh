@@ -287,3 +287,78 @@
 >CSI ?25h
 >CSI 0 q
 >CSI ?12l
+
+  zpty_run '.term.extensions=( modkeys-xterm -cursor )'
+  zpty_run 'zle_cursorform=()'
+  esctest $'\C-M'
+0:Bracketed paste and prompt integration, no command
+*>CSI ?2004h
+*>OSC 133;B ST
+*>CSI >4;1m
+*>CSI >4m
+*>CSI ?2004l
+*>OSC 133;A;cl=m;aid=z[A-Za-z0-9/+](#c6) ST
+*>CSI *
+*>OSC 133;P;k=i ST
+*>CSI ?2004h
+*>OSC 133;B ST
+*>CSI >4;1m
+*>---
+*>CSI >4m
+*>CSI ?2004l
+
+  zpty_run '.term.extensions=( -bracketed-paste -cursor )'
+  esctest $'echo "\\e[fake"\C-M'
+0:Command output with prompt integration
+*>OSC 133;B ST
+*>OSC 133;C ST
+*>CSI f
+*>OSC 133;D ST
+*>OSC 133;A;cl=m;aid=z[A-Za-z0-9/+](#c6) ST
+*>CSI *
+*>OSC 133;P;k=i ST
+*>OSC 133;B ST
+*>---
+
+  zpty_run 'RPROMPT=r'
+  esctest $':|\C-M:\C-m'
+0:Prompt integration with right and secondary prompt
+*>OSC 133;P;k=r ST
+*>OSC 133;B ST
+*>OSC 133;A;cl=m;aid=z[A-Za-z0-9/+](#c6) ST
+*>CSI *
+*>OSC 133;P;k=s ST
+*>OSC 133;B ST
+*>OSC 133;C ST
+*>OSC 133;D ST
+*>OSC 133;A;cl=m;aid=z[A-Za-z0-9/+](#c6) ST
+*>CSI *
+*>OSC 133;P;k=i ST
+*>OSC 133;P;k=r ST
+*>OSC 133;B ST
+*>---
+
+  zpty_run 'unset RPROMPT'
+  esctest $'cd /\C-m'
+0:Current directory integration
+*>OSC 133;B ST
+*>OSC 133;C ST
+*>OSC 7;file://[^/]*/ ST
+*>OSC 133;D ST
+*>OSC 133;A;cl=m;aid=z[A-Za-z0-9/+](#c6) ST
+*>CSI *
+*>OSC 133;P;k=i ST
+*>OSC 133;B ST
+>---
+
+  zpty_run '.term.extensions=( -cursor -bracketed-paste -integration )'
+  esctest $'123 hello\e"*ybh"+y0'
+0:Copy to clipboard
+>OSC 52;p;aGVsbA== ST
+>OSC 52;c;MTIz ST
+>---
+
+  esctest $'\e"*p'
+0:Paste from clipboard
+>OSC 52;p;? ST
+>---
