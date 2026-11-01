@@ -1194,7 +1194,6 @@ typedef struct {
 } RParseResult;
 
 static char **rparseargs;
-static LinkList rparsestates;
 
 static int rparsealt(RParseResult *result, jmp_buf *perr);
 
@@ -1583,7 +1582,6 @@ bin_zregexparse(char *nam, char **args, Options ops, UNUSED(int func))
     rparseargs = args + 3;
 
     pushheap();
-    rparsestates = newlinklist();
     if (setjmp(rparseerr) || rparsealt(&result, &rparseerr) || *rparseargs) {
 	if (*rparseargs)
 	    zwarnnam(nam, "invalid regex : %s", *rparseargs);

@@ -1,5 +1,8 @@
 2026-11-01  Oliver Kiddle  <opk@zsh.org>
 
+	* 55229: Src/Modules/zutil.c, Src/Zle/compctl.c:
+	silence compiler unused variable warnings
+
 	* 55228: Test/X07termcontrol.ztst: add tests for prompt
 	integration features
 

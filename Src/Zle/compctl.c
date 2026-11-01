@@ -1727,18 +1727,17 @@ static Patprog patcomp, filecomp;
  * lppre/lpsuf -- the path prefix/suffix, unexpanded                       *
  * fpre/fsuf   -- prefix/suffix of the pathname component the cursor is in *
  * prpre       -- ppre in expanded form usable for opendir                 *
- * qipre, qisuf-- ignored quoted string                                   *
+ * qipre, qisuf-- ignored quoted string                                    *
  *                                                                         *
  * The integer variables hold the lengths of lpre, lsuf, rpre, rsuf,       *
- * fpre, fsuf, lppre, and lpsuf.  noreal is non-zero if we have rpre/rsuf. */
+ * fpre, fsuf, lppre, and lpsuf.                                           */
 
 static char *lpre, *lsuf;
 static char *rpre, *rsuf;
 static char *ppre, *psuf, *lppre, *lpsuf, *prpre;
 static char *fpre, *fsuf;
 static char *qfpre, *qfsuf, *qrpre, *qrsuf, *qlpre, *qlsuf;
-static int lpl, lsl, rpl, rsl, fpl, fsl, lppl, lpsl;
-static int noreal;
+static int lpl, lsl, rpl, rsl, fpl, fsl;
 
 /* This is either zero or equal to the special character the word we are *
  * trying to complete starts with (e.g. Tilde or Equals).                */
@@ -3224,16 +3223,15 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
     }
     /* Compute real prefix/suffix. */
 
-    noreal = !delit;
     for (p = lpre; *p && *p != String && *p != Tick; p++);
     tt = ic && !ispar ? lpre + 1 : lpre;
     rpre = (*p || *lpre == Tilde || *lpre == Equals) ?
-	(noreal = 0, getreal(tt)) :
+	getreal(tt) :
 	dupstring(tt);
     qrpre = quotename(rpre);
 
     for (p = lsuf; *p && *p != String && *p != Tick; p++);
-    rsuf = *p ? (noreal = 0, getreal(lsuf)) : dupstring(lsuf);
+    rsuf = *p ? getreal(lsuf) : dupstring(lsuf);
     qrsuf = quotename(rsuf);
 
     /* Check if word is a pattern. */
@@ -3333,17 +3331,13 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    }
 	    if ((p = strrchr(lppre, '/'))) {
 		p[1] = '\0';
-		lppl = strlen(lppre);
 	    } else if (!sf1) {
 		lppre = NULL;
-		lppl = 0;
 	    } else {
 		lppre = ppre;
-		lppl = strlen(lppre);
 	    }
 	} else {
 	    lppre = NULL;
-	    lppl = 0;
 	}
 	if (zlemetacs != we) {
 	    int end = we;
@@ -3368,10 +3362,8 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    }
 	    if (!(lpsuf = strchr(lpsuf, '/')) && sf2)
 		lpsuf = psuf;
-	    lpsl = (lpsuf ? strlen(lpsuf) : 0);
 	} else {
 	    lpsuf = NULL;
-	    lpsl = 0;
 	}
 
 	/* And get the file prefix. */
@@ -3643,7 +3635,6 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    }
 	}
 	lppre = lpsuf = NULL;
-	lppl = lpsl = 0;
     }
     if (ic) {
 	/* Now change the `~' and `=' tokens to the real characters so *
