@@ -1,5 +1,8 @@
 2026-11-10  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 55247: Src/params.c: check we didn't advance past the end of
+	string in getarg's search loops
+
 	* 55203: Src/exec.c, Src/glob.c, Src/parse.c: Avoid accumulating
 	eprog on heap for every file in qualsheval
 
