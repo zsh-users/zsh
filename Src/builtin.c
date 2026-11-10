@@ -6090,6 +6090,16 @@ bin_dot(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		    break;
 		}
 	    }
+	    if (ret == SOURCE_NOT_FOUND) {
+		/* we have to use enam before popheap() */
+		if (isset(POSIXBUILTINS)) {
+		    /* hard error in POSIX (we'll exit later) */
+		    zerrnam(name, "%e: %s", errno, enam);
+		} else {
+		    zwarnnam(name, "%e: %s", errno, enam);
+		}
+		enam = NULL;
+	    }
 	    popheap();
 	}
     }
@@ -6098,7 +6108,7 @@ bin_dot(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	freearray(pparams);
 	pparams = old;
     }
-    if (ret == SOURCE_NOT_FOUND) {
+    if (ret == SOURCE_NOT_FOUND && enam) {
 	if (isset(POSIXBUILTINS)) {
 	    /* hard error in POSIX (we'll exit later) */
 	    zerrnam(name, "%e: %s", errno, enam);

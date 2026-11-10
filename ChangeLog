@@ -1,5 +1,8 @@
 2026-11-10  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 55250: Src/builtin.c: avoid using enam after popheap()
+	in bin_dot
+
 	* 55247: Src/params.c: check we didn't advance past the end of
 	string in getarg's search loops
 
