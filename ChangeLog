@@ -1,5 +1,7 @@
 2026-11-10  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 55251: Src/hist.c: fix a use after free in readhistfile
+
 	* 55250: Src/builtin.c: avoid using enam after popheap()
 	in bin_dot
 

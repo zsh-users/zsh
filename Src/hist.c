@@ -2683,7 +2683,7 @@ readhistfile(char *fn, int err, int readflags)
     short *words;
     struct stat sb;
     int nwordpos, nwords, bufsiz;
-    int searching, newflags, l, ret, uselex, readbytes;
+    int searching, newflags, l, ret, uselex = 0, remeta = 0, readbytes;
 
     if (!fn && !(fn = getsparam("HISTFILE")))
 	return;
@@ -2735,13 +2735,20 @@ readhistfile(char *fn, int err, int readflags)
 	    newflags |= HIST_MAKEUNIQUE;
 	while (fpos += readbytes, readbytes = 0, (l = readhistline(0, &buf, &bufsiz, in, &readbytes))) {
 	    char *pt;
-	    int remeta = 0;
 
 	    if (l < 0) {
 		zerr("corrupt history file %s", fn);
 		break;
 	    }
 
+	    /*
+	     * Do this after deciding that we aren't breaking out of the loop
+	     * since after the loop, we use start (== pt) one last time before
+	     * the popheap() call, so we better not have freeheap()d the pointer.
+	     */
+	    if (uselex || remeta)
+		freeheap();
+	    remeta = 0;
 	    /*
 	     * Handle the special case that we're reading from an
 	     * old shell with fewer meta characters, so we need to
@@ -2762,8 +2769,9 @@ readhistfile(char *fn, int err, int readflags)
 		}
 	    }
 	    if (remeta) {
-		unmetafy(buf, &remeta);
-		pt = metafy(buf, remeta, META_USEHEAP);
+		int len;
+		unmetafy(buf, &len);
+		pt = metafy(buf, len, META_USEHEAP);
 	    } else {
 		pt = buf;
 	    }
@@ -2839,12 +2847,6 @@ readhistfile(char *fn, int err, int readflags)
 		freehistnode(&he->node);
 		curhist--;
 	    }
-	    /*
-	     * Do this last out of paranoia in case use of
-	     * heap is disguised...
-	     */
-	    if (uselex || remeta)
-		freeheap();
 	    if (errflag & ERRFLAG_INT)
 		break;
 	}
