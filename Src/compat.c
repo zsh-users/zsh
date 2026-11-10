@@ -759,10 +759,16 @@ strtoul(nptr, endptr, base)
 int
 u9_wcwidth(wchar_t ucs)
 {
-  int w = wcwidth9(ucs);
-  if (w < -1)
-    return 1;
-  return w;
+    int w = wcwidth9(ucs);
+
+    /* Medial and final Hangul jamo add no columns to a syllable.
+     * Preserve negative widths for unassigned code points. */
+    if (w > 0 && ((ucs >= 0x1160 && ucs <= 0x11ff) ||
+		  (ucs >= 0xd7b0 && ucs <= 0xd7ff)))
+	return 0;
+    if (w < -1)
+	return 1;
+    return w;
 }
 
 /**/
