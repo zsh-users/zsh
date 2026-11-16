@@ -349,6 +349,62 @@
 0:Multibyte characters in printf widths
 > főo
 
+  [[ $(<$ZTST_testdir/../config.h) == *'#define ENABLE_UNICODE9 1'* ]] ||
+    ZTST_skip='requires --enable-unicode9'
+  () {
+    local hangul padded
+    for hangul in $'\ub300\ubcf8' $'\u1103\u1162\u1107\u1169\u11ab'; do
+      padded=${(ml:8::.:)hangul}
+      print ${#${padded%%$hangul}}
+      padded=${(mr:8::.:)hangul}
+      print ${#${padded#$hangul}}
+    done
+  }
+0:NFC and decomposed Hangul have equal widths with --enable-unicode9
+>4
+>4
+>4
+>4
+
+  [[ $(<$ZTST_testdir/../config.h) == *'#define ENABLE_UNICODE9 1'* ]] ||
+    ZTST_skip='requires --enable-unicode9'
+  () {
+    local jamo padded
+    for jamo in $'\u1100' $'\u115f' $'\u1160' $'\u1161' \
+                $'\u11a8' $'\u11ff' $'\ud7b0' $'\ud7c6' \
+                $'\ud7cb' $'\ud7fb' $'\u3131' $'\uffa1'; do
+      padded=${(ml:4::.:)jamo}
+      print $(( 4 - ${#${padded%%$jamo}} ))
+    done
+  }
+0:Only medial and final Hangul jamo have zero display width
+>2
+>2
+>0
+>0
+>0
+>0
+>0
+>0
+>0
+>0
+>2
+>1
+
+  [[ $(<$ZTST_testdir/../config.h) == *'#define ENABLE_UNICODE9 1'* ]] ||
+    ZTST_skip='requires --enable-unicode9'
+  () {
+    local unassigned
+    for unassigned in $'\ud7c7' $'\ud7ca' $'\ud7fc' $'\ud7ff'; do
+      print -r -- ${(q+)unassigned}
+    done
+  }
+0:Unassigned Hangul Jamo Extended-B code points remain non-printable
+>$'\ud7c7'
+>$'\ud7ca'
+>$'\ud7fc'
+>$'\ud7ff'
+
 # TODO?: POSIX requires that printf should always compute width and
 # precision of '%s' conversion in bytes, while zsh computes them in
 # characters if multi-byte locale is in use.
