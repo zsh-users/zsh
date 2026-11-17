@@ -1847,6 +1847,7 @@ if test x$zsh_cv_rlim_t_is_longer = xyes; then
 #include <sys/time.h>
 #endif
 #include <stdio.h>
+#include <string.h>
 #include <sys/resource.h>
 int main() {
   struct rlimit r;

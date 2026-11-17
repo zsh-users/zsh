@@ -1,5 +1,8 @@
 2026-11-25  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 55274: configure.ac: include <string.h> in
+	zsh_cv_rlim_t_is_quad_t test
+
 	* 55261: Doc/Zsh/mod_tcp.yo, Src/Modules/tcp.c, Src/Modules/tcp.h:
 	add some more ztcp options
 
