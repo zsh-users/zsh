@@ -672,7 +672,6 @@ static REFRESH_STRING
 static int more_start,		/* more text before start of screen?	    */
     more_end,			/* more stuff after end of screen?	    */
     olnct,			/* previous number of lines		    */
-    ovln,			/* previous video cursor position line	    */
     lpromptw, rpromptw,		/* prompt widths on screen                  */
     lpromptwof,			/* left prompt width with real end position */
     lprompth,			/* lines taken up by the prompt		    */
@@ -1745,7 +1744,6 @@ individually */
     bufswap();
 
 /* store current values so we can use them next time */
-    ovln = rpms.nvln;
     olnct = nlnct;
     onumscrolls = numscrolls;
     if (nlnct > vmaxln)

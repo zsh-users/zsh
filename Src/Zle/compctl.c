@@ -1778,9 +1778,8 @@ ccmakehookfn(UNUSED(Hookdef dummy), struct ccmakedat *dat)
 
     if ((m = cmatcher)) {
 	Cmlist mm, *mp = &mm;
-	int n;
 
-	for (n = 0; m; m = m->next, n++) {
+	for (; m; m = m->next) {
 	    *mp = (Cmlist) zhalloc(sizeof(struct cmlist));
 	    (*mp)->matcher = m->matcher;
 	    (*mp)->next = NULL;

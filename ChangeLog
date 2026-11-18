@@ -1,5 +1,8 @@
 2026-11-19  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Src/Zle/compctl.c, Src/Zle/zle_refresh.c,
+	Src/builtin.c: silence compiler warnings
+
 	* 55259: Src/exec.c: validate STTY= value
 
 2026-11-10  Mikael Magnusson  <mikachu@gmail.com>

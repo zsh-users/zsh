@@ -4827,14 +4827,13 @@ bin_print(char *name, char **args, Options ops, int func)
 	int *widths;
 
 	if (isset(MULTIBYTE)) {
-	    int *wptr;
 
 	    /*
 	     * We need the character widths to align output in
 	     * columns.
 	     */
-	    wptr = widths = (int *) zhalloc(argc * sizeof(int));
-	    for (i = 0; i < argc && args[i]; i++, wptr++) {
+	    widths = (int *) zhalloc(argc * sizeof(int));
+	    for (i = 0; i < argc && args[i]; i++) {
 		int l = len[i], width = 0;
 		char *aptr = args[i];
 		mbstate_t mbs;
