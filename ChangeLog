@@ -1,3 +1,7 @@
+2026-11-19  Oliver Kiddle  <opk@zsh.org>
+
+	* 55259: Src/exec.c: validate STTY= value
+
 2026-11-10  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 55251: Src/hist.c: fix a use after free in readhistfile

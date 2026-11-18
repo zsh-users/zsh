@@ -756,13 +756,55 @@ execute(LinkList args, int flags, int defpath)
      * parameter as it arguments. If the parameter is empty, we   *
      * do nothing, but this causes the terminal settings to be    *
      * restored later which can be useful.                        */
-    if ((s = STTYval) && *s && isatty(0) && (GETPGRP() == getpid())) {
-	char *t = tricat("stty", " ", s);
+    if ((s = STTYval) && *s && ttystrname) {
+	Eprog prog;
+	char *t, *sttycmd[] = {
+	    "command stty",
+	    s,
+	    isatty(0) ? NULL : "<",
+	    ttystrname,
+	    NULL
+        };
 
+	pushheap();
+	t = zjoin(sttycmd, ' ', 1);
 	STTYval = 0;	/* this prevents infinite recursion */
 	zsfree(s);
-	execstring(t, 1, 0, "stty");
-	zsfree(t);
+	if ((prog = parse_string(t, 0))) {
+	    /* Check the parsed code, allowing quoted strings and
+	     * the redirected $TTY but nothing else. */
+	    Wordcode end, p = prog->prog;
+	    if (!prog->npats &&
+		*p++ == wc_bld(WC_LIST, Z_END | Z_SYNC) &&
+		wc_code(*p) == WC_SUBLIST &&
+		WC_SUBLIST_FLAGS(*p++) == WC_SUBLIST_END &&
+		wc_code(*p) == WC_PIPE &&
+		WC_PIPE_TYPE(*p++) == WC_PIPE_END &&
+		(*p != wc_bld(WC_REDIR, REDIR_READ) || (
+		    !*++p && /* file descriptor 0 */
+		    !strcmp(ttystrname, ecrawstr(prog, ++p, 0)) &&
+		    p++ /* always true but need the increment */ )) &&
+		wc_code(*p) == WC_SIMPLE &&
+		(end = p + WC_SIMPLE_ARGC(*p) + 1, wc_code(*end) == WC_END))
+	    {
+		while (p < end) {
+		    for (t = ecrawstr(prog, p++, 0); *t; t++) {
+			if ((*t >= Hat && *t <= Comma) ||
+			    (*t == String && *++t != Snull))
+			    goto end;
+		    }
+		}
+
+		if (isset(VERBOSE)) {
+		    zputs(t, stderr);
+		    fputc('\n', stderr);
+		    fflush(stderr);
+		}
+		execode(prog, 1, 0, "stty");
+	    }
+	}
+    end:
+	popheap();
     } else if (s) {
 	STTYval = 0;
 	zsfree(s);
