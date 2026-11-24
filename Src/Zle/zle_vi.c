@@ -155,7 +155,11 @@ vigetkey(void)
 	ZLE_CHAR_T sav = zleline[zlecs];
 
 	zleline[zlecs] = '^';
+	cursor_special = 1;
+	vichgflag = 2;
 	zrefresh();
+	vichgflag = nochg;
+	cursor_special = 0;
 	getfullchar(0);
 	zleline[zlecs] = sav;
 	if(LASTFULLCHAR == ZLEEOF)
@@ -1108,13 +1112,19 @@ vipoundinsert(UNUSED(char **args))
 int
 viquotedinsert(char **args)
 {
+    int nochg = vichgflag;
 #ifndef HAS_TIO
     struct sgttyb sob;
 #endif
 
     spaceinline(1);
     zleline[zlecs] = '^';
+
+    vichgflag = 2;
+    cursor_special = 1;
     zrefresh();
+    vichgflag = nochg;
+    cursor_special = 0;
 #ifndef HAS_TIO
     sob = shttyinfo.sgttyb;
     sob.sg_flags = (sob.sg_flags | RAW) & ~ECHO;

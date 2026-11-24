@@ -1345,6 +1345,7 @@ zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
     initmodifier(&zmod);
     prefixflag = 0;
     region_active = 0;
+    cursor_special = 0;
 
     /* semantic prompt marker printed before first prompt */
     if (*markers)

@@ -1,3 +1,8 @@
+2026-11-25  Oliver Kiddle  <opk@zsh.org>
+
+	* 55290: Src/Zle/zle_main.c, Src/Zle/zle_refresh.c,
+	Src/Zle/zle_vi.c: highlighting and cursor for vi-quoted-insert
+
 2026-11-19  Oliver Kiddle  <opk@zsh.org>
 
 	* Eisuke Kawashima: github #183: Completion/Unix/Command/_ssh:

@@ -233,6 +233,13 @@ struct region_highlight *region_highlights;
 /**/
 int n_region_highlights;
 
+
+/*
+ * Use special highlighting for the cursor position
+ */
+/**/
+int cursor_special;
+
 /*
  * Flag that highlighting of the region is active.
  */
@@ -1320,6 +1327,8 @@ zrefresh(void)
 		} else {
 		    /* Single wide character */
 		    rpms.s->chr = *t;
+		    if (cursor_special && t == scs)
+			rpms.s->atr = all_attr;
 		}
 		rpms.s++;
 		while (--width > 0) {
