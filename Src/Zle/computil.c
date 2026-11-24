@@ -1511,7 +1511,7 @@ parse_cadef(char *nam, char **args)
 			atype = CAA_OPT;
 			p++;
 		    } else if (*p == '*') {
-			if (*++p != ':') {
+			if (*++p && *p != ':') {
 			    char sav;
 
 			    for (end = p++; *p && *p != ':'; p++)

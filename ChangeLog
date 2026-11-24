@@ -1,5 +1,8 @@
 2026-11-25  Oliver Kiddle  <opk@zsh.org>
 
+	* 55293, reported by Todd Bruss: Src/Zle/computil.c, Src/prompt.c:
+	fix OOB read in prompt expansion for unterminated sequences
+
 	* 55290: Src/Zle/zle_main.c, Src/Zle/zle_refresh.c,
 	Src/Zle/zle_vi.c: highlighting and cursor for vi-quoted-insert
 

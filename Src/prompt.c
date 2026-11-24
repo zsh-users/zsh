@@ -520,18 +520,18 @@ putpromptchar(int doprint, int endchar)
 	    if (!doprint)
 		switch(*bv->fm) {
 		  case '[':
-		    while(idigit(*++bv->fm));
-		    while(*++bv->fm != ']');
+		    while (idigit(*++bv->fm));
+		    while (*++bv->fm && *bv->fm != ']');
 		    continue;
 		  case '<':
-		    while(*++bv->fm != '<');
+		    while (*++bv->fm && *bv->fm != '<');
 		    continue;
 		  case '>':
-		    while(*++bv->fm != '>');
+		    while (*++bv->fm && *bv->fm != '>');
 		    continue;
 		  case 'D':
-		    if(bv->fm[1]=='{')
-			while(*++bv->fm != '}');
+		    if (bv->fm[1] == '{')
+			while (*++bv->fm && *bv->fm != '}');
 		    continue;
 		  default:
 		    continue;
