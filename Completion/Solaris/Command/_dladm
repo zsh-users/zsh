@@ -638,7 +638,7 @@ _dladm() {
       '(-t --trill)'{-t,--trill}'[display TRILL nickname entries]' \
       '(-o --output)'{-o,--output}'[properties to display]:property:_values -s , "property" $bridge_trill_properties' \
       ':bridge name:_dladm_bridges'
-    ;
+  ;;
 
 
   (create-iptun)
