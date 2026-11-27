@@ -168,6 +168,7 @@ _rpm () {
         '--reinstall[reinstall mode]:*:install:->install'
         '!--set'{perms,ugids,caps}':*:package:->setattrs'
         '--restore[restore owner, group, permissions and capabilities of files in the given package]:*:package:->setattrs'
+        '(-h --hash)'{-h,--hash}'[print hash marks as package installs]'
       )
     ;;
     rpmbuild)
